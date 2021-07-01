@@ -556,7 +556,10 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: "ruby-3.0"
-    mongodb-version: ['3.6', '4.0', '4.2', '4.4', '5.0']
+    # 3.6 should be brought back when the following issue is fixed:
+    # https://jira.mongodb.org/browse/MONGOID-5113
+    #mongodb-version: ['3.6', '4.0', '4.2', '4.4', '5.0']
+    mongodb-version: ['4.0', '4.2', '4.4', '5.0']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -567,7 +570,10 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: "ruby-2.7"
-    mongodb-version: ['3.6', '4.0', '4.2', '4.4', '5.0']
+    # 3.6 should be brought back when the following issue is fixed:
+    # https://jira.mongodb.org/browse/MONGOID-5113
+    #mongodb-version: ['3.6', '4.0', '4.2', '4.4', '5.0']
+    mongodb-version: ['4.0', '4.2', '4.4', '5.0']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:

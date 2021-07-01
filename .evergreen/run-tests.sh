@@ -34,6 +34,13 @@ launch_server "$dbdir"
 
 uri_options="$URI_OPTIONS"
 
+# This is needed because of ruby 3.0.0.
+# We should remove this when moving to 3.0.1
+# See https://jira.mongodb.org/browse/MONGOID-5115
+if test "$RVM_RUBY" = "ruby-3.0"; then
+  gem update --system
+fi
+
 which bundle
 bundle --version
 
@@ -91,8 +98,6 @@ if test -n "$TEST_CMD"; then
 elif test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
 elif test -n "$APP_TESTS"; then
-  touch $HOME/.gemrc
-  echo "gem: --no-document" >> $HOME/.gemrc
   # Need recent node for rails
   export N_PREFIX=$HOME/.n
   curl -o $HOME/n --retry 3 https://raw.githubusercontent.com/tj/n/master/bin/n

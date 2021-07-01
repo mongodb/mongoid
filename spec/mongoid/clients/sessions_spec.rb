@@ -40,14 +40,6 @@ describe Mongoid::Clients::Sessions do
 
     context 'when sessions are supported' do
       min_server_version '3.6'
-      if ClusterConfig.instance.short_server_version == '3.6'
-        # Sharded cluster in 3.6 has a problem with not advertising
-        # logicalSessionTimeoutMinutes parameter in hello response.
-        # Therefore, driver assumes that sessions are not supported for the cluster.
-        #
-        # https://jira.mongodb.org/browse/SERVER-37631?focusedCommentId=2142962&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-2142962
-        require_topology :single, :replica_set
-      end
 
       around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
@@ -206,14 +198,6 @@ describe Mongoid::Clients::Sessions do
 
     context 'when sessions are supported' do
       min_server_version '3.6'
-      if ClusterConfig.instance.short_server_version == '3.6'
-        # Sharded cluster in 3.6 has a problem with not advertising
-        # logicalSessionTimeoutMinutes parameter in hello response.
-        # Therefore, driver assumes that sessions are not supported for the cluster.
-        #
-        # https://jira.mongodb.org/browse/SERVER-37631?focusedCommentId=2142962&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-2142962
-        require_topology :single, :replica_set
-      end
 
       around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
