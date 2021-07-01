@@ -45,7 +45,7 @@ describe Mongoid::Document do
 
     let(:person) { Person.where(username: 'Dev').without(:title).first }
 
-    it 'allows access to attributes of embedded documents' do
+      it 'allows access to attribute of embedded document' do
       expect(person.pet.name).to eq 'Duck'
     end
 
@@ -53,7 +53,7 @@ describe Mongoid::Document do
 
       let(:person) { Person.where(username: 'Dev').without(:pet_).first }
 
-      it 'allows access to attributes of embedded documents' do
+      it 'allows access to attribute of embedded document' do
         expect(person.pet.name).to eq 'Duck'
       end
     end
@@ -62,8 +62,28 @@ describe Mongoid::Document do
 
       let(:person) { Person.where(username: 'Dev').without(:pe).first }
 
-      it 'allows access to attributes of embedded documents' do
+      it 'allows access to attribute of embedded document' do
         expect(person.pet.name).to eq 'Duck'
+      end
+    end
+
+    context 'when another attribute of the association is excluded' do
+
+      let(:person) { Person.where(username: 'Dev').without('pet.weight').first }
+
+      it 'allows access to non-excluded attribute of embedded document' do
+        expect(person.pet.name).to eq 'Duck'
+      end
+    end
+
+    context 'when the excluded attribute of the association is retrieved' do
+
+      let(:person) { Person.where(username: 'Dev').without('pet.name').first }
+
+      it 'prohibits the retrieval' do
+        lambda do
+          person.pet.name
+        end.should raise_error(ActiveModel::MissingAttributeError)
       end
     end
   end
