@@ -36,4 +36,17 @@ describe Mongoid::Document do
       expect(_person.age).to be 42
     end
   end
+
+  context 'when projecting with #without' do
+    before do
+      duck = Pet.new(name: 'Duck')
+      Person.create!(username: 'Dev', title: 'CEO', pet: duck)
+    end
+
+    let(:person) { Person.where(username: 'Dev').without(:title).first }
+
+    it 'allows access to embed fields' do
+      expect(person.pet.name).to eq 'Duck'
+    end
+  end
 end

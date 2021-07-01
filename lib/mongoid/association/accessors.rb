@@ -132,6 +132,12 @@ module Mongoid
       def _mongoid_filter_selected_fields(assoc_key)
         return nil unless __selected_fields
 
+        # If the list of fields was specified using #without instead of #only
+        # and the provided list does not include the association, any of its
+        # fields should be allowed.
+        return nil if __selected_fields.values.all?(0) &&
+          __selected_fields.keys.none? { |k| k.start_with?(assoc_key) }
+
         projecting_assoc = false
 
         filtered = {}
