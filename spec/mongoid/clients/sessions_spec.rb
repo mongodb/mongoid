@@ -46,7 +46,7 @@ describe Mongoid::Clients::Sessions do
         # Therefore, driver assumes that sessions are not supported for the cluster.
         #
         # https://jira.mongodb.org/browse/SERVER-37631?focusedCommentId=2142962&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-2142962
-        require_topology [:single, :replica_set]
+        require_topology :single, :replica_set
       end
 
       around do |example|
