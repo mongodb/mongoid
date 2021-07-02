@@ -1,9 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'actionpack', '~> 5.2.0'
-gem 'activemodel', '~> 5.2.0'
-
-gem 'i18n', '~> 1.0'
+gem 'actionpack', '~> 5.2'
+gem 'activemodel', '~> 5.2'
 
 gemspec path: '..'
 
