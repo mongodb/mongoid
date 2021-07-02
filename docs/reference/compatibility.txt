@@ -98,7 +98,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.1
-     -
+     - |checkmark| [#mongoid-7.1-ruby-3.0]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -130,6 +130,8 @@ is deprecated.
 .. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.1 or higher is required.
 
 .. [#mongoid-7.2-ruby-3.0] Mongoid version 7.2.4 or higher is required.
+
+.. [#mongoid-7.1-ruby-3.0] Mongoid version 7.1.9 or higher is required.
 
 .. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
 
