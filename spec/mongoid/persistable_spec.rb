@@ -178,8 +178,8 @@ describe Mongoid::Persistable do
 
         before do
           class Band
-            def my_updates(*args)
-              atomically(*args) do |d|
+            def my_updates(**args)
+              atomically(**args) do |d|
                 d.set(name: "Placebo")
                 d.unset(:origin)
               end

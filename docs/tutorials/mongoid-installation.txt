@@ -98,6 +98,7 @@ is deprecated.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Ruby 3.0
      - Ruby 2.7
      - Ruby 2.6
      - Ruby 2.5
@@ -107,6 +108,7 @@ is deprecated.
      - JRuby 9.2
 
    * - 7.2
+     - |checkmark| [#mongoid-7.2-ruby-3.0]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -116,6 +118,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.1
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -125,6 +128,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.0
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -135,12 +139,15 @@ is deprecated.
 
    * - 6.4
      -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
      - |checkmark|
+
+.. [#mongoid-7.2-ruby-3.0] Mongoid version 7.2.4 or higher is required.
 
 .. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
 
@@ -238,8 +245,8 @@ are supported by Mongoid.
    * - 7.2
      - |checkmark| [#rails-6.1]_
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
      -
      -
 
@@ -287,10 +294,12 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
      -
 
    * - 6.0
+     -
      -
      -
      -
@@ -302,6 +311,7 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
 
    * - 5.2
@@ -309,7 +319,10 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
+
+.. [#rails-5-ruby-3.0] Using Rails 5.x with Ruby 3 is not supported.
 
 .. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
 
