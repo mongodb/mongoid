@@ -731,6 +731,18 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
+- matrix_name: "rails-5.1"
+  matrix_spec:
+    driver: "current"
+    ruby: ["ruby-2.6", "ruby-2.7"]
+    mongodb-version: "4.4"
+    topology: "standalone"
+    rails: '5.1'
+  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  run_on:
+    - rhel70-small
+  tasks:
+     - name: "test"
 - matrix_name: "rails-5.2"
   matrix_spec:
     driver: "current"
@@ -751,18 +763,6 @@ buildvariants:
     topology: "standalone"
     rails: '6.0'
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}, ${rails}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
-- matrix_name: "rails-6.1"
-  matrix_spec:
-    driver: "current"
-    ruby: ["ruby-2.6", "ruby-2.7", "ruby-3.0"]
-    mongodb-version: "4.4"
-    topology: "standalone"
-    rails: '6.1'
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
   tasks:
@@ -821,7 +821,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     # Not currently testing rails master
-    rails: ['5.2', '6.0', '6.1']
+    rails: ['5.1', '5.2', '6.0', '6.1']
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   run_on:
     - ubuntu1804-small
