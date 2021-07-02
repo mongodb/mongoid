@@ -78,7 +78,7 @@ is deprecated.
      - JRuby 9.2
 
    * - 7.3
-     -
+     - |checkmark| [#mongoid-7.3-ruby-3.0]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -88,7 +88,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.2
-     -
+     - |checkmark| [#mongoid-7.2-ruby-3.0]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -126,6 +126,10 @@ is deprecated.
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
      - |checkmark|
+
+.. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.1 or higher is required.
+
+.. [#mongoid-7.2-ruby-3.0] Mongoid version 7.2.4 or higher is required.
 
 .. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
 
@@ -234,16 +238,16 @@ are supported by Mongoid.
    * - 7.3
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
      -
      -
 
    * - 7.2
      - |checkmark| [#rails-6.1]_
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
      -
      -
 
@@ -318,6 +322,8 @@ are supported by Mongoid.
      -
      -
      - |checkmark|
+
+.. [#rails-5-ruby-3.0] Using Rails 5.x with Ruby 3 is not supported.
 
 .. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
 
