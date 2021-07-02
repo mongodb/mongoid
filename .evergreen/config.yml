@@ -365,15 +365,15 @@ axes:
       - id: "standalone"
         display_name: Standalone
         variables:
-           TOPOLOGY: "server"
+           TOPOLOGY: "standalone"
       - id: "replica-set"
         display_name: Replica Set
         variables:
-           TOPOLOGY: "replica_set"
+           TOPOLOGY: "replica-set"
       - id: "sharded-cluster"
         display_name: Sharded Cluster
         variables:
-           TOPOLOGY: "sharded_cluster"
+           TOPOLOGY: "sharded-cluster"
            SINGLE_MONGOS: true
   - id: "auth"
     display_name: Authentication
@@ -420,6 +420,10 @@ axes:
         display_name: ruby-2.7
         variables:
            RVM_RUBY: "ruby-2.7"
+      - id: "ruby-3.0"
+        display_name: ruby-3.0
+        variables:
+          RVM_RUBY: "ruby-3.0"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -437,6 +441,12 @@ axes:
       - id: ubuntu-14.04
         display_name: "Ubuntu 14.04"
         run_on: ubuntu1404-small
+      - id: ubuntu-16.04
+        display_name: "Ubuntu 16.04"
+        run_on: ubuntu1604-small
+      - id: ubuntu-18.04
+        display_name: "Ubuntu 18.04"
+        run_on: ubuntu1804-small
 
       - id: rhel70
         display_name: "RHEL 7.0"
@@ -528,7 +538,18 @@ axes:
           APP_TESTS: yes
 
 buildvariants:
-- matrix_name: "drivers"
+- matrix_name: "drivers-ruby-3.0"
+  matrix_spec:
+    driver: [current, master, stable]
+    ruby: "ruby-3.0"
+    mongodb-version: "4.4"
+    topology: '*'
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - rhel70-small
+  tasks:
+    - name: "test"
+- matrix_name: "drivers-ruby-2.7"
   matrix_spec:
     driver: [current, master, stable]
     ruby: "ruby-2.7"
@@ -539,15 +560,32 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "topologies"
+- matrix_name: "topologies-ruby-3.0"
   matrix_spec:
     driver: current
-    ruby: "ruby-2.6"
-    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
+    ruby: "ruby-3.0"
+    # 3.6 should be brought back when the following issue is fixed:
+    # https://jira.mongodb.org/browse/MONGOID-5113
+    #mongodb-version: ['3.6', '4.0', '4.2', '4.4']
+    mongodb-version: ['4.0', '4.2', '4.4']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-small
+    - ubuntu1804-small
+  tasks:
+    - name: "test"
+- matrix_name: "topologies-ruby-2.7"
+  matrix_spec:
+    driver: current
+    ruby: "ruby-2.7"
+    # 3.6 should be brought back when the following issue is fixed:
+    # https://jira.mongodb.org/browse/MONGOID-5113
+    #mongodb-version: ['3.6', '4.0', '4.2', '4.4']
+    mongodb-version: ['4.0', '4.2', '4.4']
+    topology: ["replica-set", "sharded-cluster"]
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1804-small
   tasks:
      - name: "test"
 - matrix_name: "topologies-old"
@@ -559,18 +597,6 @@ buildvariants:
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1404-small
-  tasks:
-     - name: "test"
-- matrix_name: "rubies"
-  matrix_spec:
-    driver: "current"
-    # ruby-head temporarily omitted: https://jira.mongodb.org/browse/MONGOID-4833
-    ruby: [ruby-2.3]
-    mongodb-version: "4.2"
-    topology: "replica-set"
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1604-small
   tasks:
      - name: "test"
 - matrix_name: "mongodb"
@@ -664,7 +690,7 @@ buildvariants:
 - matrix_name: "driver-stable-old"
   matrix_spec:
     driver: "stable"
-    ruby: "ruby-2.3"
+    ruby: ["ruby-2.3","ruby-2.4", "ruby-2.5"]
     mongodb-version: "2.6"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -675,7 +701,7 @@ buildvariants:
 - matrix_name: "driver-oldstable"
   matrix_spec:
     driver: "oldstable"
-    ruby: "ruby-2.5"
+    ruby: ["ruby-2.3","ruby-2.4", "ruby-2.5"]
     mongodb-version: "4.0"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -697,7 +723,7 @@ buildvariants:
 - matrix_name: "driver-min"
   matrix_spec:
     driver: "min"
-    ruby: "ruby-2.3"
+    ruby: ["ruby-2.3","ruby-2.4", "ruby-2.5"]
     mongodb-version: "3.6"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -708,8 +734,8 @@ buildvariants:
 - matrix_name: "rails-5.1"
   matrix_spec:
     driver: "current"
-    ruby: "ruby-2.4"
-    mongodb-version: "4.2"
+    ruby: ["ruby-2.6", "ruby-2.7"]
+    mongodb-version: "4.4"
     topology: "standalone"
     rails: '5.1'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
@@ -720,11 +746,11 @@ buildvariants:
 - matrix_name: "rails-5.2"
   matrix_spec:
     driver: "current"
-    ruby: "ruby-2.6"
+    ruby: ["ruby-2.6", "ruby-2.7"]
     mongodb-version: "4.2"
     topology: "standalone"
     rails: '5.2'
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}, ${rails}"
   run_on:
     - rhel70-small
   tasks:
@@ -732,11 +758,11 @@ buildvariants:
 - matrix_name: "rails-6.0"
   matrix_spec:
     driver: "current"
-    ruby: "ruby-2.7"
+    ruby: ["ruby-2.6", "ruby-2.7", "ruby-3.0"]
     mongodb-version: "4.4"
     topology: "standalone"
     rails: '6.0'
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}, ${rails}"
   run_on:
     - rhel70-small
   tasks:
@@ -773,7 +799,21 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: app-tests
+- matrix_name: app-tests-ruby-3.0
+  matrix_spec:
+    driver: current
+    ruby: ruby-3.0
+    mongodb-version: '4.4'
+    topology: standalone
+    app-tests: yes
+    # Not currently testing rails master
+    rails: ['6.0', '6.1']
+  display_name: "app tests ${driver}, ${ruby}, ${rails}"
+  run_on:
+    - ubuntu1804-small
+  tasks:
+    - name: "test"
+- matrix_name: app-tests-ruby-2.7
   matrix_spec:
     driver: current
     ruby: ruby-2.7

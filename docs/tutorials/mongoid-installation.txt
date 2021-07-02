@@ -105,6 +105,7 @@ supported by Mongoid.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Ruby 3.0
      - Ruby 2.7
      - Ruby 2.6
      - Ruby 2.5
@@ -114,6 +115,7 @@ supported by Mongoid.
      - JRuby 9.2
 
    * - 7.1
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -123,6 +125,7 @@ supported by Mongoid.
      - |checkmark|
 
    * - 7.0
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -132,6 +135,7 @@ supported by Mongoid.
      - |checkmark|
 
    * - 6.4
+     -
      -
      - |checkmark|
      - |checkmark|
@@ -263,10 +267,12 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
      -
 
    * - 6.0
+     -
      -
      -
      -
@@ -278,6 +284,7 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
 
    * - 5.2
@@ -285,7 +292,10 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
+
+.. [#rails-5-ruby-3.0] Using Rails 5.x with Ruby 3 is not supported.
 
 .. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
 
