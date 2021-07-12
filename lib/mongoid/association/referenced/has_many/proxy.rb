@@ -202,8 +202,8 @@ module Mongoid
           # @return [ Document, Criteria ] The matching document(s).
           #
           # @since 2.0.0.beta.1
-          def find(*args)
-            matching = criteria.find(*args)
+          def find(*args, &block)
+            matching = criteria.find(*args, &block)
             Array(matching).each { |doc| _target.push(doc) }
             matching
           end
