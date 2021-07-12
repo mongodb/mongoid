@@ -235,12 +235,14 @@ supported by Mongoid.
      -
      - |checkmark|
      -
+     -
 
    * - 6.0
      -
      -
      -
      - |checkmark|
+     -
      -
 
    * - 5.4
@@ -249,6 +251,7 @@ supported by Mongoid.
      -
      -
      - |checkmark|
+     -
 
    * - 5.2
      -
@@ -256,6 +259,7 @@ supported by Mongoid.
      -
      -
      - |checkmark|
+     -
 
 .. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
 
