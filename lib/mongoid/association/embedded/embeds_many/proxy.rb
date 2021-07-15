@@ -219,8 +219,8 @@ module Mongoid
           # @param [ Array<Object> ] args Various arguments.
           #
           # @return [ Array<Document>, Document ] A single or multiple documents.
-          def find(*args)
-            criteria.find(*args)
+          def find(*args, &block)
+            criteria.find(*args, &block)
           end
 
           # Instantiate a new embeds_many association.
