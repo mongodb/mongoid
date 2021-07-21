@@ -136,6 +136,10 @@ class Person
   scope :without_ssn, ->{ without(:ssn) }
   scope :search, ->(query){ any_of({ title: query }) }
 
+  def self.older_than(age:)
+    where(:age.gt => age)
+  end
+
   def score_with_rescoring=(score)
     @rescored = score.to_i + 20
     self.score_without_rescoring = score
@@ -204,6 +208,11 @@ class Person
 
   def set_on_map_with_default=(value)
     self.map_with_default["key"] = value
+  end
+
+  def set_personal_data(ssn:, age:)
+    self.ssn = ssn
+    self.age = age
   end
 
   reset_callbacks(:validate)
