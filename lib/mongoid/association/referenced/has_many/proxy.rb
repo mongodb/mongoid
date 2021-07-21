@@ -443,7 +443,7 @@ module Mongoid
           # @return [ Criteria, Object ] A Criteria or return value from the target.
           #
           # @since 2.0.0.beta.1
-          def method_missing(name, *args, &block)
+          ruby2_keywords def method_missing(name, *args, &block)
             if _target.respond_to?(name)
               _target.send(name, *args, &block)
             else

@@ -533,7 +533,7 @@ module Mongoid
               end
             end
 
-            def method_missing(name, *args, &block)
+            ruby2_keywords def method_missing(name, *args, &block)
               entries.send(name, *args, &block)
             end
 

@@ -2449,13 +2449,26 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
 
     context "when providing a criteria class method" do
+      context "without keyword arguments" do
 
-      let(:addresses) do
-        person.addresses.california
+        let(:addresses) do
+          person.addresses.california
+        end
+
+        it "applies the criteria to the documents" do
+          expect(addresses).to eq([ address_one ])
+        end
       end
 
-      it "applies the criteria to the documents" do
-        expect(addresses).to eq([ address_one ])
+      context "with keyword arguments" do
+
+        let(:addresses) do
+          person.addresses.city_and_state(city: "Sacramento", state: "CA")
+        end
+
+        it "applies the criteria to the documents" do
+          expect(addresses).to eq([])
+        end
       end
     end
 

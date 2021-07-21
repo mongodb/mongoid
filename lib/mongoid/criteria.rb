@@ -568,7 +568,7 @@ module Mongoid
     # @return [ Object ] The result of the method call.
     #
     # @since 1.0.0
-    def method_missing(name, *args, &block)
+    ruby2_keywords def method_missing(name, *args, &block)
       if klass.respond_to?(name)
         klass.send(:with_scope, self) do
           klass.send(name, *args, &block)

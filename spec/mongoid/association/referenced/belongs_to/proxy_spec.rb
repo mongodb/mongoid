@@ -1332,4 +1332,21 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
       end
     end
   end
+
+  describe "#method_missing" do
+      let!(:person) do
+        Person.create
+      end
+
+      let!(:game) do
+        Game.create(person: person)
+      end
+
+    it 'handles keyword args' do
+      expect do
+        game.person.set_personal_data(ssn: '123', age: 25)
+      end.not_to raise_error
+    end
+
+  end
 end

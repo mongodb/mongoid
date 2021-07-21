@@ -3769,10 +3769,14 @@ describe Mongoid::Criteria do
 
       before do
         expect(Person).to receive(:minor).and_call_original
+        expect(Person).to receive(:older_than).and_call_original
       end
 
       it "calls the method on the class" do
         expect(criteria.minor).to be_empty
+        expect do
+          criteria.older_than(age: 25)
+        end.not_to raise_error
       end
     end
 
