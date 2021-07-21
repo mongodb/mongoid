@@ -78,5 +78,9 @@ class Address
     def streets
       all.map(&:street)
     end
+
+    def city_and_state(city:, state:)
+      where(city: city, state: state)
+    end
   end
 end

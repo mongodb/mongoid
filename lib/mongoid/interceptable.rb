@@ -125,7 +125,7 @@ module Mongoid
     # @return [ Document ] The document
     #
     # @since 2.3.0
-    def run_callbacks(kind, *args, &block)
+    ruby2_keywords def run_callbacks(kind, *args, &block)
       cascadable_children(kind).each do |child|
         if child.run_callbacks(child_callback_type(kind, child), *args) == false
           return false
