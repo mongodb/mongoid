@@ -46,6 +46,22 @@ module Mongoid
         end
       end
 
+      # Projects an output field containing the distance from each document
+      # to the point in the command.
+      #
+      # @example Specify the distance field.
+      #   geo_near.distance_field("dist")
+      #
+      # @param [ String ] value The distance field.
+      #
+      # @return [ GeoNear ] The GeoNear wrapper.
+      #
+      # @since 2.4.0
+      def distance_field(value)
+        command[:distanceField] = value
+        self
+      end
+
       # Provide a distance multiplier to be used for each returned distance.
       #
       # @example Provide the distance multiplier.

@@ -158,6 +158,27 @@ describe Mongoid::Contextual::GeoNear do
       end
     end
 
+    context "when providing a distance field" do
+
+      let(:criteria) do
+        Bar.all
+      end
+
+      let(:geo_near) do
+        described_class.new(collection, criteria, [ 52, 13 ])
+      end
+
+      let(:results) do
+        geo_near.distance_field("distance").entries
+      end
+
+      it "returns calculated distances" do
+        expect(results.first.distance.calculated).to eq(0.390512483795333)
+        expect(results.last.distance.calculated).to eq(0.460977222864644)
+      end
+
+    end
+
     context "when providing a distance multiplier" do
 
       let(:criteria) do
