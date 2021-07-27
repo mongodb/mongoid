@@ -68,7 +68,7 @@ module Mongoid
       # @since 2.4.10
       def add_error(document, attribute, value)
         document.errors.add(
-          attribute, :taken, options.except(:case_sensitive, :scope).merge(value: value)
+          attribute, :taken, **options.except(:case_sensitive, :scope).merge(value: value)
         )
       end
 

@@ -121,6 +121,9 @@ module Mongoid
       # (embedded) association with the given key, or nil if no projection
       # is to be performed.
       #
+      # Also returns nil if exclusionary projection was requested but it does
+      # not exclude the field of the association.
+      #
       # For example, if __selected_fields is {'a' => 1, 'b.c' => 2, 'b.c.f' => 3},
       # and assoc_key is 'b', return value would be {'c' => 2, 'c.f' => 3}.
       #
@@ -131,6 +134,15 @@ module Mongoid
       # @api private
       def _mongoid_filter_selected_fields(assoc_key)
         return nil unless __selected_fields
+
+        # If the list of fields was specified using #without instead of #only
+        # and the provided list does not include the association, any of its
+        # fields should be allowed.
+        if __selected_fields.values.all? { |v| v == 0 } &&
+          __selected_fields.keys.none? { |k| k.split('.', 2).first == assoc_key }
+        then
+          return nil
+        end
 
         projecting_assoc = false
 
