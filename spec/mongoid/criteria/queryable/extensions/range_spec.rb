@@ -300,6 +300,16 @@ describe Range do
           )
         end
       end
+
+      context "when range is times" do
+
+        it "returns utc time range" do
+          obj = described_class.evolve(Time.at(0).in_time_zone..Time.at(1).in_time_zone)
+          expect(obj).to eq({"$gte" => Time.at(0), "$lte" => Time.at(1)})
+          expect(obj["$gte"].utc?).to be(true)
+          expect(obj["$lte"].utc?).to be(true)
+        end
+      end
     end
 
     context "when provided a string" do

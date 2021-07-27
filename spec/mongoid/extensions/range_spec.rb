@@ -100,6 +100,13 @@ describe Mongoid::Extensions::Range do
       it "returns the object hash when passed a letter range" do
         expect(Range.mongoize("a".."z")).to eq({ "min" => "a", "max" => "z" })
       end
+
+      it "return the object hash when passed a ActiveSupport::TimeWithZone range" do
+        obj = Range.mongoize(Time.at(0).in_time_zone..Time.at(1).in_time_zone)
+        expect(obj).to eq({"min" => Time.at(0), "max" => Time.at(1)})
+        expect(obj["min"].utc?).to be(true)
+        expect(obj["max"].utc?).to be(true)
+      end
     end
 
     context "when the value is not nil with exclude end" do
