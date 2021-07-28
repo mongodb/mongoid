@@ -141,6 +141,8 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           it 'does not disconnect the original cluster' do
+            skip 'https://jira.mongodb.org/browse/MONGOID-5130'
+
             expect(connections_after).to eq(connections_before)
             expect(cluster_before).to be(cluster_after)
           end
