@@ -1434,9 +1434,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.any? {|a| a.street == "Bond" }).to be false
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.any?(person.addresses.first)).to be true
-        expect(person.addresses.any?(1)).to be false
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.any?(person.addresses.first)).to be true
+          expect(person.addresses.any?(1)).to be false
+        end
       end
     end
 
@@ -1454,9 +1458,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.any? {|a| a.street == "Bond" }).to be true
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.any?(person.addresses.first)).to be true
-        expect(person.addresses.any?(1)).to be false
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.any?(person.addresses.first)).to be true
+          expect(person.addresses.any?(1)).to be false
+        end
       end
     end
 
@@ -1469,8 +1477,12 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.any?(&:a)).to be false
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.any?(1)).to be false
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.any?(1)).to be false
+        end
       end
     end
   end
@@ -1495,9 +1507,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.all? {|a| a.street == "Bond" }).to be false
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.all?(person.addresses.first)).to be true
-        expect(person.addresses.all?(1)).to be false
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.all?(person.addresses.first)).to be true
+          expect(person.addresses.all?(1)).to be false
+        end
       end
     end
 
@@ -1515,9 +1531,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.all? {|a| a.street == "Bond" }).to be true
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.all?(person.addresses.first)).to be true
-        expect(person.addresses.all?(1)).to be false
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.all?(person.addresses.first)).to be true
+          expect(person.addresses.all?(1)).to be false
+        end
       end
     end
 
@@ -1530,9 +1550,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.all?(&:foo)).to be true
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.all?(nil)).to be true
-        expect(person.addresses.all?(1)).to be true
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.all?(nil)).to be true
+          expect(person.addresses.all?(1)).to be true
+        end
       end
     end
   end
@@ -1557,9 +1581,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.none? {|a| a.street == "Bond" }).to be true
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.none?(person.addresses.first)).to be false
-        expect(person.addresses.none?(1)).to be true
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.none?(person.addresses.first)).to be false
+          expect(person.addresses.none?(1)).to be true
+        end
       end
     end
 
@@ -1577,9 +1605,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.none? {|a| a.street == "Bond" }).to be false
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.none?(person.addresses.first)).to be false
-        expect(person.addresses.none?(1)).to be true
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.none?(person.addresses.first)).to be false
+          expect(person.addresses.none?(1)).to be true
+        end
       end
     end
 
@@ -1592,9 +1624,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.none?(&:a)).to be true
       end
 
-      it "argument form is supported" do
-        expect(person.addresses.none?(nil)).to be true
-        expect(person.addresses.none?(1)).to be true
+      context 'ruby version >= 2.5' do
+        ruby_version_gte '2.5'
+
+        it "argument form is supported" do
+          expect(person.addresses.none?(nil)).to be true
+          expect(person.addresses.none?(1)).to be true
+        end
       end
     end
   end
