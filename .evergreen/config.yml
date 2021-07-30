@@ -438,6 +438,9 @@ axes:
   - id: "os"
     display_name: OS
     values:
+      - id: ubuntu-14.04
+        display_name: "Ubuntu 14.04"
+        run_on: ubuntu1404-small
       - id: ubuntu-16.04
         display_name: "Ubuntu 16.04"
         run_on: ubuntu1604-small
@@ -593,7 +596,7 @@ buildvariants:
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "mongodb"
@@ -615,7 +618,7 @@ buildvariants:
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "jruby-new"
@@ -670,7 +673,7 @@ buildvariants:
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "driver-stable-new"
@@ -692,7 +695,7 @@ buildvariants:
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "driver-oldstable"
