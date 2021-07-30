@@ -832,15 +832,16 @@ buildvariants:
     - ubuntu1804-small
   tasks:
      - name: "test"
-- matrix_name: app-tests-jruby
-  matrix_spec:
-    driver: current
-    jruby: jruby-9.2
-    mongodb-version: '4.2'
-    topology: standalone
-    app-tests: yes
-  display_name: "app tests ${driver}, ${jruby}"
-  run_on:
-    - ubuntu1804-small
-  tasks:
-     - name: "test"
+# https://jira.mongodb.org/browse/MONGOID-5134
+# - matrix_name: app-tests-jruby
+#   matrix_spec:
+#     driver: current
+#     jruby: jruby-9.2
+#     mongodb-version: '4.2'
+#     topology: standalone
+#     app-tests: yes
+#   display_name: "app tests ${driver}, ${jruby}"
+#   run_on:
+#     - ubuntu1804-small
+#   tasks:
+#      - name: "test"
