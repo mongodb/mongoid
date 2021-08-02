@@ -185,7 +185,7 @@ module Mongoid
             criteria.exists?
           end
 
-          # Find the matchind document on the association, either based on id or
+          # Find the matching document on the association, either based on id or
           # conditions.
           #
           # @example Find by an id.
@@ -198,6 +198,7 @@ module Mongoid
           #   later.
           #
           # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] args The ids.
+          # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Document, Criteria ] The matching document(s).
           #

@@ -217,6 +217,7 @@ module Mongoid
           #   person.addresses.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
           #
           # @param [ Array<Object> ] args Various arguments.
+          # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Array<Document>, Document ] A single or multiple documents.
           def find(*args, &block)

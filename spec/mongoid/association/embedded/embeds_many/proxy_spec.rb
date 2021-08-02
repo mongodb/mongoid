@@ -1417,12 +1417,12 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(person.addresses.any?).to be true
       end
     end
-    
+
     context "when documents are not persisted" do
       before do
         person.addresses.build(street: "Bond")
       end
-      
+
       it "returns true" do
         expect(person.addresses.any?).to be true
       end
@@ -2146,6 +2146,44 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
             expect(addresses).to be_empty
           end
         end
+      end
+    end
+
+    context "with block" do
+      let!(:author) do
+        Person.create!(title: 'Person')
+      end
+
+      let!(:video_one) do
+        author.videos.create!(title: 'video one')
+      end
+
+      let!(:video_two) do
+        author.videos.create!(title: 'video two')
+      end
+
+      it "finds one" do
+        expect(
+          author.videos.find do |video|
+            video.title == 'video one'
+          end
+        ).to eq(video_one)
+      end
+
+      it "finds multiple" do
+        expect(
+          author.videos.find do |video|
+            ['video one', 'video two'].include?(video.title)
+          end
+        ).to eq(video_one)
+      end
+
+      it "returns nil when not found" do
+        expect(
+          author.videos.find do |video|
+            video.title == 'non exiting one'
+          end
+        ).to be_nil
       end
     end
   end
