@@ -297,6 +297,9 @@ describe 'Mongoid application tests' do
   end
 
   def remove_bundler_req
+    return unless File.file?('Gemfile.lock')
+    # TODO: Remove this method completely when we get rid of .lock files in
+    # mongoid-demo apps.
     lock_lines = IO.readlines('Gemfile.lock')
     # Get rid of the bundled with line so that whatever bundler is installed
     # on the system is usable with the application.
