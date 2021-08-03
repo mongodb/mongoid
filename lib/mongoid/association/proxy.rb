@@ -133,12 +133,12 @@ module Mongoid
       # @param [ String, Symbol ] name The name of the method.
       # @param [ Array ] args The arguments passed to the method.
       #
-      def method_missing(name, *args, &block)
+      ruby2_keywords def method_missing(name, *args, &block)
         _target.send(name, *args, &block)
       end
 
       # @api private
-      def respond_to_missing?(name, *args)
+      ruby2_keywords def respond_to_missing?(name, *args)
         _target.respond_to?(name, *args)
       end
 
