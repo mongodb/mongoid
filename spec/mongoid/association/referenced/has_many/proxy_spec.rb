@@ -2728,10 +2728,10 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           author.posts.find do |post|
             post.title == 'post one'
           end
-        ).to eq(post_one)
+        ).to be_a(Post)
       end
 
-      it "finds multiple" do
+      it "returns first match of multiple" do
         expect(
           author.posts.find do |post|
             ['post one', 'post two'].include?(post.title)

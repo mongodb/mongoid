@@ -188,11 +188,22 @@ module Mongoid
           # Find the matching document on the association, either based on id or
           # conditions.
           #
+          # This method delegates to +Mongoid::Criteria#find+. If this method is
+          # not given a block, it returns one or many documents for the provided
+          # _id values.
+          #
+          # If this method is given a block, it returns the first document
+          # of those found by the current Criteria object for which the block
+          # returns a truthy value.
+          #
           # @example Find by an id.
           #   person.posts.find(BSON::ObjectId.new)
           #
           # @example Find by multiple ids.
           #   person.posts.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
+          #
+          # @example Finds the first matching document using a block.
+          #   person.addresses.find { |addr| addr.state == 'CA' }
           #
           # @note This will keep matching documents in memory for iteration
           #   later.
@@ -200,7 +211,7 @@ module Mongoid
           # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] args The ids.
           # @param [ Proc ] block Optional block to pass.
           #
-          # @return [ Document, Criteria ] The matching document(s).
+          # @return [ Document | Array<Document> | nil ] A document or matching documents.
           #
           # @since 2.0.0.beta.1
           def find(*args, &block)

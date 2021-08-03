@@ -2170,12 +2170,12 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         ).to eq(video_one)
       end
 
-      it "finds multiple" do
+      it "returns first match of multiple" do
         expect(
           author.videos.find do |video|
             ['video one', 'video two'].include?(video.title)
           end
-        ).to eq(video_one)
+        ).to be_a(Video)
       end
 
       it "returns nil when not found" do
