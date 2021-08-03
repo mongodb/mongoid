@@ -107,8 +107,9 @@ module Mongoid
           #
           # Use #size if you want the total number of documents.
           #
-          # If args or block are present, #count will delegate to the target and
-          # will include both persisted and non-persisted documents.
+          # If args or block are present, #count will delegate to the
+          # #count method on +target+ and will include both persisted
+          # and non-persisted documents.
           #
           # @example Get the count of persisted documents.
           #   person.addresses.count
