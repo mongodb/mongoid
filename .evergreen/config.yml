@@ -37,7 +37,7 @@ functions:
         working_dir: "src"
         script: |
           set -ex
-          
+
           git submodule update --init --recursive
 
   "fetch egos":
@@ -46,10 +46,10 @@ functions:
         working_dir: "src"
         script: |
           set -ex
-          
+
           curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
           chmod +x ./egos
-  
+
   "create expansions":
     # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
@@ -89,7 +89,7 @@ functions:
               export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
               export PATH="$MONGODB_BINARIES:$PATH"
               export PROJECT="${project}"
-              
+
               export MONGODB_VERSION=${VERSION}
               export TOPOLOGY=${TOPOLOGY}
               export SINGLE_MONGOS=${SINGLE_MONGOS}
@@ -565,9 +565,7 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: "ruby-3.0"
-    # 3.6 should be brought back when the following issue is fixed:
-    # https://jira.mongodb.org/browse/MONGOID-5113
-    #mongodb-version: ['3.6', '4.0', '4.2', '4.4']
+    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
     mongodb-version: ['4.0', '4.2', '4.4']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -579,10 +577,7 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: "ruby-2.7"
-    # 3.6 should be brought back when the following issue is fixed:
-    # https://jira.mongodb.org/browse/MONGOID-5113
-    #mongodb-version: ['3.6', '4.0', '4.2', '4.4']
-    mongodb-version: ['4.0', '4.2', '4.4']
+    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
