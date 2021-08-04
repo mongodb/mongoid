@@ -327,6 +327,10 @@ axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
+      - id: "5.0"
+        display_name: "MongoDB 5.0"
+        variables:
+           VERSION: "5.0"
       - id: "4.4"
         display_name: "MongoDB 4.4"
         variables:
@@ -438,10 +442,6 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      # https://jira.mongodb.org/browse/MONGOID-5133
-      # - id: ubuntu-14.04
-      #   display_name: "Ubuntu 14.04"
-      #   run_on: ubuntu1404-small
       - id: ubuntu-16.04
         display_name: "Ubuntu 16.04"
         run_on: ubuntu1604-small
@@ -539,246 +539,157 @@ axes:
           APP_TESTS: yes
 
 buildvariants:
-- matrix_name: "drivers-ruby-3.0"
+- matrix_name: "ruby-3.0"
   matrix_spec:
-    driver: [current, master, stable]
-    ruby: "ruby-3.0"
-    mongodb-version: "4.4"
+    ruby: ["ruby-3.0"]
+    driver: ["current"]
     topology: '*'
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+    mongodb-version: ['5.0']
+  display_name: "${ruby}, ${driver}, ${rails}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1804-small
   tasks:
     - name: "test"
-- matrix_name: "drivers-ruby-2.7"
+
+- matrix_name: "jruby"
   matrix_spec:
-    driver: [current, master, stable]
-    ruby: "ruby-2.7"
-    mongodb-version: "4.4"
-    topology: '*'
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+    jruby: "jruby-9.2"
+    driver: ["current"]
+    topology: ['replica-set', 'sharded-cluster']
+    mongodb-version: '5.0'
+  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1804-small
   tasks:
-     - name: "test"
-- matrix_name: "topologies-ruby-3.0"
+    - name: "test"
+
+- matrix_name: "ruby-2.7"
   matrix_spec:
-    driver: current
-    ruby: "ruby-3.0"
-    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
-    mongodb-version: ['4.0', '4.2', '4.4']
-    topology: ["replica-set", "sharded-cluster"]
+    ruby: ["ruby-2.7"]
+    driver: ["current"]
+    topology: '*'
+    mongodb-version: ['4.4']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1804-small
   tasks:
     - name: "test"
-- matrix_name: "topologies-ruby-2.7"
+
+- matrix_name: "ruby-2.6"
   matrix_spec:
-    driver: current
-    ruby: "ruby-2.7"
-    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
-    topology: ["replica-set", "sharded-cluster"]
+    ruby: ["ruby-2.6"]
+    driver: ["current"]
+    topology: '*'
+    mongodb-version: ['4.0']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1804-small
   tasks:
-     - name: "test"
-# https://jira.mongodb.org/browse/MONGOID-5133
-# - matrix_name: "topologies-old"
-#   matrix_spec:
-#     driver: current
-#     ruby: "ruby-2.6"
-#     mongodb-version: ['2.6', '3.0', '3.2', '3.4']
-#     topology: ["replica-set", "sharded-cluster"]
-#   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-#   run_on:
-#     - ubuntu1404-small
-#   tasks:
-#      - name: "test"
-- matrix_name: "mongodb"
+    - name: "test"
+
+- matrix_name: "ruby-2.5"
   matrix_spec:
-    driver: "current"
-    ruby: "ruby-2.6"
-    mongodb-version: ["4.0", "3.6", "3.4", "3.2"]
-    topology: "standalone"
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
-# https://jira.mongodb.org/browse/MONGOID-5133
-# - matrix_name: "mongodb-old"
-#   matrix_spec:
-#     driver: "current"
-#     ruby: "ruby-2.5"
-#     mongodb-version: ["3.0", "2.6"]
-#     topology: "standalone"
-#   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-#   run_on:
-#     - ubuntu1404-small
-#   tasks:
-#      - name: "test"
-- matrix_name: "jruby-new"
-  matrix_spec:
-    driver: "current"
-    jruby: "jruby-9.2"
-    mongodb-version: "4.2"
+    ruby: ["ruby-2.5"]
+    driver: ["current"]
     topology: '*'
-  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
+    mongodb-version: ['3.6']
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1604-small
   tasks:
-     - name: "test"
-- matrix_name: "jruby-driver-stable"
+    - name: "test"
+
+- matrix_name: "ruby-2.4"
   matrix_spec:
-    driver: "stable-jruby"
-    jruby: "jruby-9.2"
-    mongodb-version: "4.0"
-    topology: "standalone"
-  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
+    ruby: ["ruby-2.4"]
+    driver: ["current"]
+    topology: ['replica-set', 'sharded-cluster']
+    mongodb-version: ['3.2', '3.4']
+  display_name: "${ruby}, ${driver}, ${rails}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1604-small
   tasks:
-     - name: "test"
-- matrix_name: "jruby-driver-master"
+    - name: "test"
+
+- matrix_name: "ruby-2.3"
   matrix_spec:
-    driver: "master-jruby"
-    jruby: "jruby-9.2"
-    mongodb-version: "4.2"
-    topology: "standalone"
-  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
+    ruby: ["ruby-2.3"]
+    driver: ["current"]
+    topology: ['replica-set', 'sharded-cluster']
+    mongodb-version: ['2.6', '3.0']
+  display_name: "${ruby}, ${driver}, ${rails}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1604-small
   tasks:
-     - name: "test"
-- matrix_name: "driver-master-new"
+    - name: "test"
+
+- matrix_name: "driver-upcoming"
   matrix_spec:
-    driver: "master"
-    ruby: "ruby-2.6"
-    mongodb-version: "4.2"
-    topology: "standalone"
+    driver: [master, stable]
+    ruby: ["ruby-3.0"]
+    mongodb-version: "5.0"
+    topology: ['replica-set', 'sharded-cluster']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-# https://jira.mongodb.org/browse/MONGOID-5133
-# - matrix_name: "driver-master-old"
-#   matrix_spec:
-#     driver: "master"
-#     ruby: "ruby-2.5"
-#     mongodb-version: "2.6"
-#     topology: "standalone"
-#   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-#   run_on:
-#     - ubuntu1404-small
-#   tasks:
-#      - name: "test"
-- matrix_name: "driver-stable-new"
-  matrix_spec:
-    driver: "stable"
-    ruby: "ruby-2.6"
-    mongodb-version: "4.0"
-    topology: "standalone"
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
-# https://jira.mongodb.org/browse/MONGOID-5133
-# - matrix_name: "driver-stable-old"
-#   matrix_spec:
-#     driver: "stable"
-#     ruby: ["ruby-2.3","ruby-2.4", "ruby-2.5"]
-#     mongodb-version: "2.6"
-#     topology: "standalone"
-#   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-#   run_on:
-#     - ubuntu1404-small
-#   tasks:
-#      - name: "test"
+
 - matrix_name: "driver-oldstable"
   matrix_spec:
-    driver: "oldstable"
-    ruby: ["ruby-2.3","ruby-2.4", "ruby-2.5"]
+    driver: [oldstable, min]
+    ruby: ["ruby-2.5"]
     mongodb-version: "4.0"
-    topology: "standalone"
+    topology: ['replica-set', 'sharded-cluster']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "driver-oldstable-jruby"
-  matrix_spec:
-    driver: "oldstable-jruby"
-    jruby: "jruby-9.2"
-    mongodb-version: "4.0"
-    topology: "standalone"
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
+
 - matrix_name: "driver-min"
   matrix_spec:
-    driver: "min"
-    ruby: ["ruby-2.3","ruby-2.4", "ruby-2.5"]
+    driver: [min]
+    ruby: ["ruby-2.5"]
     mongodb-version: "3.6"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1604-small
   tasks:
      - name: "test"
-- matrix_name: "rails-5.1"
+
+- matrix_name: "rails-6"
   matrix_spec:
-    driver: "current"
-    ruby: ["ruby-2.6", "ruby-2.7"]
-    mongodb-version: "4.4"
+    ruby: ["ruby-3.0"]
+    driver: ["current"]
+    mongodb-version: "5.0"
     topology: "standalone"
-    rails: '5.1'
+    rails: ['6.0', '6.1']
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-5.2"
+
+- matrix_name: "rails-5"
   matrix_spec:
-    driver: "current"
-    ruby: ["ruby-2.6", "ruby-2.7"]
-    mongodb-version: "4.2"
+    ruby: ["ruby-2.7"]
+    driver: ["current"]
+    mongodb-version: "4.0"
     topology: "standalone"
-    rails: '5.2'
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}, ${rails}"
+    rails: ['5.1', '5.2']
+  display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-6.0"
-  matrix_spec:
-    driver: "current"
-    ruby: ["ruby-2.6", "ruby-2.7", "ruby-3.0"]
-    mongodb-version: "4.4"
-    topology: "standalone"
-    rails: '6.0'
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}, ${rails}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
-#- matrix_name: "rails-master"
-#  matrix_spec: { driver: "current", ruby: "ruby-2.6", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
-#  display_name: "${rails}, ${driver}, ${mongodb-version}"
-#  run_on:
-#    - rhel70-small
-#  tasks:
-#     - name: "test"
+
 - matrix_name: "i18n-1.0"
   matrix_spec:
-    driver: "current"
     ruby: "ruby-2.5"
-    mongodb-version: "4.2"
+    driver: ["current"]
+    mongodb-version: "4.4"
     topology: "standalone"
     i18n: '1.0'
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
@@ -786,10 +697,11 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
+
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
-    driver: "current"
     ruby: "ruby-2.6"
+    driver: ["current"]
     mongodb-version: "4.2"
     topology: "standalone"
     i18n: '*'
@@ -799,44 +711,45 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
+
 - matrix_name: app-tests-ruby-3.0
   matrix_spec:
-    driver: current
     ruby: ruby-3.0
-    mongodb-version: '4.4'
+    driver: ["current"]
+    mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
-    # Not currently testing rails master
-    rails: ['6.0', '6.1']
+    rails: ['6.1']
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   run_on:
     - ubuntu1804-small
   tasks:
     - name: "test"
+
 - matrix_name: app-tests-ruby-2.7
   matrix_spec:
-    driver: current
     ruby: ruby-2.7
-    mongodb-version: '4.4'
+    driver: ["current"]
+    mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
-    # Not currently testing rails master
-    rails: ['5.1', '5.2', '6.0', '6.1']
+    rails: ['5.2']
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   run_on:
     - ubuntu1804-small
   tasks:
      - name: "test"
-# https://jira.mongodb.org/browse/MONGOID-5134
-# - matrix_name: app-tests-jruby
-#   matrix_spec:
-#     driver: current
-#     jruby: jruby-9.2
-#     mongodb-version: '4.2'
-#     topology: standalone
-#     app-tests: yes
-#   display_name: "app tests ${driver}, ${jruby}"
-#   run_on:
-#     - ubuntu1804-small
-#   tasks:
-#      - name: "test"
+
+- matrix_name: app-tests-jruby
+  matrix_spec:
+    jruby: jruby-9.2
+    driver: ["current"]
+    mongodb-version: '5.0'
+    topology: standalone
+    app-tests: yes
+    rails: ['6.0']
+  display_name: "app tests ${driver}, ${jruby}"
+  run_on:
+    - ubuntu1804-small
+  tasks:
+     - name: "test"
