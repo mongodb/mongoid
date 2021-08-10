@@ -21,33 +21,60 @@ module Mongoid
             to_a
           end
 
-          # Convert the range to a min/max mongo friendly query for dates.
+          # Convert the range to a $gte/$lte mongo friendly query for dates.
           #
           # @example Evolve the range.
           #   (11231312..213123131).__evolve_date__
           #
-          # @return [ Hash ] The min/max range query with times at midnight.
+          # @return [ Hash ] The $gte/$lte range query with times at UTC midnight.
           #
           # @since 1.0.0
           def __evolve_date__
-            { "$gte" => min.__evolve_date__, "$lte" => max.__evolve_date__ }
+            __evolve_range_naive__.transform_values! {|v| v&.__evolve_date__ }
           end
 
-          # Convert the range to a min/max mongo friendly query for times.
+          # Convert the range to a $gte/$lte mongo friendly query for times.
           #
           # @example Evolve the range.
           #   (11231312..213123131).__evolve_date__
           #
-          # @return [ Hash ] The min/max range query with times.
+          # @return [ Hash ] The $gte/$lte range query with times in UTC.
           #
           # @since 1.0.0
           def __evolve_time__
-            { "$gte" => min.__evolve_time__, "$lte" => max.__evolve_time__ }
+            __evolve_range_naive__.transform_values! {|v| v&.__evolve_time__ }
+          end
+
+          # Convert the range to a $gte/$lte mongo friendly query.
+          #
+          # @example Evolve the range.
+          #   (11231312..213123131).__evolve_range__
+          #
+          # @return [ Hash ] The $gte/$lte range query.
+          def __evolve_range__
+            __evolve_range_naive__.transform_values! do |value|
+              case value
+              when Time then value.__evolve_time__
+              when Date then value.__evolve_date__
+              else value
+              end
+            end
+          end
+
+          private
+
+          def __evolve_range_naive__
+            hash = {}
+            hash['$gte'] = self.begin if self.begin
+            hash[exclude_end? ? "$lt" : "$lte"] = self.end if self.end
+            hash
           end
 
           module ClassMethods
 
             # Evolve the range. This will transform it into a $gte/$lte selection.
+            # Endless and beginning-less ranges will use only $gte or $lte respectively.
+            # End-excluded ranges (...) will use $lt selector instead of $lte.
             #
             # @example Evolve the range.
             #   Range.evolve(1..3)
@@ -59,7 +86,7 @@ module Mongoid
             # @since 1.0.0
             def evolve(object)
               return object unless object.is_a?(::Range)
-              { "$gte" => object.min, "$lte" => object.max }
+              object.__evolve_range__
             end
           end
         end

@@ -1,0 +1,96 @@
+# frozen_string_literal: true
+# encoding: utf-8
+
+require 'spec_helper'
+
+describe 'Queries with Range criteria' do
+  let(:now_utc) { Time.utc(2020, 1, 1, 16, 0, 0, 0) }
+  let(:now_in_zone) { now_utc.in_time_zone('Asia/Tokyo') }
+  let(:today) { Date.new(2020, 1, 1) }
+
+  let!(:band1) { Band.create!(likes: 0, rating: 0.9, founded: today, updated_at: now_utc) }
+  let!(:band2) { Band.create!(likes: 1, rating: 1.0, founded: today + 1.day, updated_at: now_utc + 1.days) }
+  let!(:band3) { Band.create!(likes: 2, rating: 2.9, founded: today + 2.days, updated_at: now_utc + 2.days) }
+  let!(:band4) { Band.create!(likes: 3, rating: 3.0, founded: today + 3.days, updated_at: now_utc + 3.days) }
+  let!(:band5) { Band.create!(likes: 4, rating: 3.1, founded: today + 4.days, updated_at: now_utc + 4.days) }
+
+  it 'Range<Integer> criteria vs Integer field' do
+    expect(Band.where(likes: 1..3).to_a).to eq [band2, band3, band4]
+    expect(Band.where(likes: 1...3).to_a).to eq [band2, band3]
+    expect(Band.where(likes: ..3).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(likes: ...3).to_a).to eq [band1, band2, band3]
+    expect(Band.where(likes: 1..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<Integer> criteria vs Float field' do
+    expect(Band.where(rating: 1..3).to_a).to eq [band2, band3, band4]
+    expect(Band.where(rating: 1...3).to_a).to eq [band2, band3]
+    expect(Band.where(rating: ..3).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(rating: ...3).to_a).to eq [band1, band2, band3]
+    expect(Band.where(rating: 1..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<Float> criteria vs Integer field' do
+    expect(Band.where(likes: 0.95..3.05).to_a).to eq [band2, band3, band4]
+    expect(Band.where(likes: 0.95...3.0).to_a).to eq [band2, band3]
+    expect(Band.where(likes: ..3.05).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(likes: ...3.0).to_a).to eq [band1, band2, band3]
+    expect(Band.where(likes: 0.95..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<Float> criteria vs Float field' do
+    expect(Band.where(rating: 0.95..3.05).to_a).to eq [band2, band3, band4]
+    expect(Band.where(rating: 0.95...3.0).to_a).to eq [band2, band3]
+    expect(Band.where(rating: ..3.05).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(rating: ...3.0).to_a).to eq [band1, band2, band3]
+    expect(Band.where(rating: 0.95..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<Time> criteria vs Time field' do
+    expect(Band.where(updated_at: (now_utc + 1.day)..(now_utc + 3.days)).to_a).to eq [band2, band3, band4]
+    expect(Band.where(updated_at: (now_utc + 1.day)...(now_utc + 3.days)).to_a).to eq [band2, band3]
+    expect(Band.where(updated_at: ..(now_utc + 3.days)).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(updated_at: ...(now_utc + 3.days)).to_a).to eq [band1, band2, band3]
+    expect(Band.where(updated_at: (now_utc + 1.day)..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<Time> criteria vs Date field' do
+    expect(Band.where(founded: (now_utc + 1.day)..(now_utc + 3.days)).to_a).to eq [band2, band3, band4]
+    expect(Band.where(founded: (now_utc + 1.day)...(now_utc + 3.days)).to_a).to eq [band2, band3]
+    expect(Band.where(founded: ..(now_utc + 3.days)).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(founded: ...(now_utc + 3.days)).to_a).to eq [band1, band2, band3]
+    expect(Band.where(founded: (now_utc + 1.day)..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<ActiveSupport::TimeWithZone> criteria vs Time field' do
+    expect(Band.where(updated_at: (now_in_zone + 1.day)..(now_in_zone + 3.days)).to_a).to eq [band2, band3, band4]
+    expect(Band.where(updated_at: (now_in_zone + 1.day)...(now_in_zone + 3.days)).to_a).to eq [band2, band3]
+    expect(Band.where(updated_at: ..(now_in_zone + 3.days)).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(updated_at: ...(now_in_zone + 3.days)).to_a).to eq [band1, band2, band3]
+    expect(Band.where(updated_at: (now_in_zone + 1.day)..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<ActiveSupport::TimeWithZone> criteria vs Date field' do
+    expect(Band.where(founded: (now_in_zone + 1.day)..(now_in_zone + 3.days)).to_a).to eq [band3, band4, band5]
+    expect(Band.where(founded: (now_in_zone + 1.day)...(now_in_zone + 3.days)).to_a).to eq [band3, band4]
+    expect(Band.where(founded: ..(now_in_zone + 3.days)).to_a).to eq [band1, band2, band3, band4, band5]
+    expect(Band.where(founded: ...(now_in_zone + 3.days)).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(founded: (now_in_zone + 1.day)..).to_a).to eq [band3, band4, band5]
+  end
+
+  it 'Range<Date> criteria vs Date field' do
+    expect(Band.where(founded: (today + 1.day)..(today + 3.days)).to_a).to eq [band2, band3, band4]
+    expect(Band.where(founded: (today + 1.day)...(today + 3.days)).to_a).to eq [band2, band3]
+    expect(Band.where(founded: ..(today + 3.days)).to_a).to eq [band1, band2, band3, band4]
+    expect(Band.where(founded: ...(today + 3.days)).to_a).to eq [band1, band2, band3]
+    expect(Band.where(founded: (today + 1.day)..).to_a).to eq [band2, band3, band4, band5]
+  end
+
+  it 'Range<Date> criteria vs Time field' do
+    expect(Band.where(updated_at: (today + 1.day)..(today + 3.days)).to_a).to eq [band2, band3]
+    expect(Band.where(updated_at: (today + 1.day)...(today + 3.days)).to_a).to eq [band2, band3]
+    expect(Band.where(updated_at: ..(today + 3.days)).to_a).to eq [band1, band2, band3]
+    expect(Band.where(updated_at: ...(today + 3.days)).to_a).to eq [band1, band2, band3]
+    expect(Band.where(updated_at: (today + 1.day)..).to_a).to eq [band2, band3, band4, band5]
+  end
+end
