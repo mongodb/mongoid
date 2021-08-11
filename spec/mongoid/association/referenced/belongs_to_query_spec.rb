@@ -7,15 +7,28 @@ require_relative './has_many_models'
 describe Mongoid::Association::Referenced::BelongsTo do
   context 'when projecting with #only' do
     before do
+      academy1 = HmmAcademy.create!(name: 'Test Academy 1')
+      academy2 = HmmAcademy.create!(name: 'Test Academy 2')
+
       school = HmmSchool.create!(district: 'foo', team: 'Bulldogs')
-      HmmStudent.create!(school: school, name: 'Dave', grade: 10)
+
+      HmmStudent.create!(
+        school: school,
+        name: 'Dave',
+        grade: 10,
+        current_academy: academy1,
+        previous_academy: academy2)
     end
 
     let(:student) do
-      HmmStudent.where(name: 'Dave').only(:school_id, 'school._id', 'school.district').first
+      HmmStudent
+        .where(name: 'Dave')
+        .only(:school_id, :previous_academy_id, 'previous_academy.name', 'school._id', 'school.district')
+        .first
     end
 
     let(:school) { student.school }
+    let(:previous_academy) { student.previous_academy }
 
     it 'populates specified fields only' do
       pending 'https://jira.mongodb.org/browse/MONGOID-4704'
@@ -33,6 +46,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
     it 'fetches all fields' do
       expect(school.district).to eq('foo')
       expect(school.team).to eq('Bulldogs')
+      expect(previous_academy.name).to eq('Test Academy 2')
     end
   end
 end

@@ -24,6 +24,14 @@ class HmmAddress
   belongs_to :company, class_name: 'HmmCompany'
 end
 
+class HmmAcademy
+  include Mongoid::Document
+
+  has_many :students, class_name: 'HmmStudent', inverse_of: :current_academy
+
+  field :name, type: String
+end
+
 class HmmSchool
   include Mongoid::Document
 
@@ -35,6 +43,9 @@ end
 
 class HmmStudent
   include Mongoid::Document
+
+  belongs_to :current_academy, class_name: 'HmmAcademy', inverse_of: :students, optional: true
+  belongs_to :previous_academy, class_name: 'HmmAcademy', inverse_of: nil, optional: true
 
   belongs_to :school, class_name: 'HmmSchool'
 
