@@ -24,10 +24,19 @@ class HmmAddress
   belongs_to :company, class_name: 'HmmCompany'
 end
 
-class HmmAcademy
+class HmmOwner
   include Mongoid::Document
 
-  has_many :students, class_name: 'HmmStudent', inverse_of: :current_academy
+  has_many :pets, class_name: 'HmmPet', inverse_of: :current_owner
+
+  field :name, type: String
+end
+
+class HmmPet
+  include Mongoid::Document
+
+  belongs_to :current_owner, class_name: 'HmmOwner', inverse_of: :pets, optional: true
+  belongs_to :previous_owner, class_name: 'HmmOwner', inverse_of: nil, optional: true
 
   field :name, type: String
 end
@@ -43,9 +52,6 @@ end
 
 class HmmStudent
   include Mongoid::Document
-
-  belongs_to :current_academy, class_name: 'HmmAcademy', inverse_of: :students, optional: true
-  belongs_to :previous_academy, class_name: 'HmmAcademy', inverse_of: nil, optional: true
 
   belongs_to :school, class_name: 'HmmSchool'
 

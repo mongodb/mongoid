@@ -7,28 +7,15 @@ require_relative './has_many_models'
 describe Mongoid::Association::Referenced::BelongsTo do
   context 'when projecting with #only' do
     before do
-      academy1 = HmmAcademy.create!(name: 'Test Academy 1')
-      academy2 = HmmAcademy.create!(name: 'Test Academy 2')
-
       school = HmmSchool.create!(district: 'foo', team: 'Bulldogs')
-
-      HmmStudent.create!(
-        school: school,
-        name: 'Dave',
-        grade: 10,
-        current_academy: academy1,
-        previous_academy: academy2)
+      HmmStudent.create!(school: school, name: 'Dave', grade: 10)
     end
 
     let(:student) do
-      HmmStudent
-        .where(name: 'Dave')
-        .only(:school_id, :previous_academy_id, 'previous_academy.name', 'school._id', 'school.district')
-        .first
+      HmmStudent.where(name: 'Dave').only(:school_id, 'school._id', 'school.district').first
     end
 
     let(:school) { student.school }
-    let(:previous_academy) { student.previous_academy }
 
     it 'populates specified fields only' do
       pending 'https://jira.mongodb.org/browse/MONGOID-4704'
@@ -46,7 +33,26 @@ describe Mongoid::Association::Referenced::BelongsTo do
     it 'fetches all fields' do
       expect(school.district).to eq('foo')
       expect(school.team).to eq('Bulldogs')
-      expect(previous_academy.name).to eq('Test Academy 2')
+    end
+  end
+
+  context 'when projecting with #only while having similar inverse_of candidates' do
+    before do
+      alice = HmmOwner.create!(name: 'Alice')
+      bob = HmmOwner.create!(name: 'Bob')
+
+      HmmPet.create!(name: 'Rex', current_owner: bob, previous_owner: alice)
+    end
+
+    let(:pet) { HmmPet.where(name: 'Rex').only(:name, :previous_owner_id, 'previous_owner.name').first }
+
+    it 'populates specified fields' do
+      expect(pet.name).to eq('Rex')
+      expect(pet.previous_owner.name).to eq('Alice')
+    end
+
+    it 'does not try to load the inverse for an association that explicitly prevents it' do
+      expect { pet.previous_owner.name }.not_to raise_error
     end
   end
 end
