@@ -75,3 +75,21 @@ class HmmBusSeat
 
   # No belongs_to :bus
 end
+
+class HmmTrainer
+  include Mongoid::Document
+
+  field :name, type: String
+
+  has_many :animals, class_name: 'HmmAnimal', scope: :reptile
+end
+
+class HmmAnimal
+  include Mongoid::Document
+
+  field :taxonomy, type: String
+
+  scope :reptile, -> { where(taxonomy: 'reptile') }
+
+  belongs_to :trainer, class_name: 'HmmTrainer', scope: -> { where(name: 'Dave') }
+end

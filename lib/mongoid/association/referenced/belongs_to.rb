@@ -29,7 +29,8 @@ module Mongoid
             :primary_key,
             :touch,
             :optional,
-            :required
+            :required,
+            :scope
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -128,6 +129,15 @@ module Mongoid
         # @return [ Root ] The root atomic path calculator.
         def path(document)
           Mongoid::Atomic::Paths::Root.new(document)
+        end
+
+        # Get the scope to be applied when querying the association.
+        #
+        # @return [ Proc, Symbol ] The association scope.
+        #
+        # @since 7.4
+        def scope
+          @options[:scope]
         end
 
         private

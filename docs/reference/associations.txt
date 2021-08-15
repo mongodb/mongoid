@@ -969,6 +969,44 @@ the model. However, since Mongoid doesn't know what type of data should be
 allowed in the field, the field is created with a type of Object. It is a
 good idea to explicitly define the field with the appropriate type.
 
+Custom Scopes
+-------------
+
+You may set a specific scope on an association using the ``:scope`` parameter.
+The scope may be either:
+- a ``Proc`` with arity zero
+- a ``Symbol`` which references a :ref:`named scope <named-scopes>` on the associated model
+
+.. code-block:: ruby
+  class Trainer
+    has_many :pets, scope: -> { where(species: 'dog' }
+    has_many :toys, scope: :rubber
+  end
+
+  class Pet
+    belongs_to :trainer
+  end
+
+  class Toy
+    scope :rubber, where(material: 'rubber')
+    belongs_to :trainer
+  end
+
+A scoped association will return only documents which satisfy the scope condition.
+
+As a caveat, it is still possible to make associations between documents which violate
+the scope condition. In this case, such documents will appear associated in-memory,
+but will not be present when the association is re-queried. Refer to the following example:
+
+.. code-block:: ruby
+  trainer = Trainer.create!
+  dog = Pet.create!(trainer: trainer, species: 'dog')
+  cat = Pet.create!(trainer: trainer, species: 'cat')
+
+  trainer.pets #=> [dog, cat]
+
+  trainer.reload.pets #=> [dog]
+
 Validations
 -----------
 

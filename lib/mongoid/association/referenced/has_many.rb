@@ -29,7 +29,8 @@ module Mongoid
             :dependent,
             :foreign_key,
             :order,
-            :primary_key
+            :primary_key,
+            :scope
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -176,6 +177,15 @@ module Mongoid
           Mongoid::Atomic::Paths::Root.new(document)
         end
 
+        # Get the scope to be applied when querying the association.
+        #
+        # @return [ Proc, Symbol ] The association scope.
+        #
+        # @since 7.4
+        def scope
+          @options[:scope]
+        end
+
         private
 
         def default_foreign_key_field
@@ -204,7 +214,9 @@ module Mongoid
         end
 
         def query_criteria(object, base)
-          crit = klass.where(foreign_key => object)
+          crit = klass.criteria
+          crit = crit.apply_scope(scope)
+          crit = crit.where(foreign_key => object)
           crit = with_polymorphic_criterion(crit, base)
           crit.association = self
           crit.parent_document = base

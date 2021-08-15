@@ -118,6 +118,133 @@ describe Mongoid::Criteria::Scopable do
     end
   end
 
+  describe "#apply_scope" do
+
+    let(:criteria) do
+      Band.skip(20).where(name: 'Black Sabbath').includes(:same_name)
+    end
+
+    let(:result) do
+      criteria.apply_scope(scope)
+    end
+
+    context "when the scope is a Criteria" do
+
+      context 'when standard scope' do
+        let(:scope) do
+          Band.gt(member_count: 3).limit(3).includes(:drugs)
+        end
+
+        it 'merges the criteria' do
+          expect(result.selector).to eq("name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.options).to eq(skip: 20, limit: 3)
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+        end
+      end
+
+      context 'when unscoped' do
+        let(:scope) do
+          Band.unscoped.gt(member_count: 3).limit(3).includes(:drugs)
+        end
+
+        it 'unscoped has no effect' do
+          expect(result.selector).to eq("name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.options).to eq(skip: 20, limit: 3)
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+        end
+      end
+    end
+
+    context "when the scope is a Proc" do
+
+      context 'when standard scope' do
+        let(:scope) do
+          -> { gt(member_count: 3).limit(3).includes(:drugs) }
+        end
+
+        it 'adds the scope' do
+          expect(result.selector).to eq("name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.options).to eq(skip: 20, limit: 3)
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+        end
+      end
+
+      context 'when unscoped' do
+        let(:scope) do
+          -> { unscoped.gt(member_count: 3).limit(3).includes(:drugs) }
+        end
+
+        it 'removes existing scopes then adds the new scope' do
+          expect(result.selector).to eq("member_count"=>{"$gt"=>3})
+          expect(result.options).to eq(limit: 3)
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+        end
+      end
+    end
+
+    context "when the scope is a Symbol" do
+
+      context 'when standard scope' do
+        let(:scope) do
+          :highly_rated
+        end
+
+        it 'adds the scope' do
+          expect(result.selector).to eq("name"=>"Black Sabbath", "rating"=>{"$gt"=>7})
+          expect(result.options).to eq(skip: 20)
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name])
+        end
+      end
+
+      context 'when unscoped' do
+        let(:scope) do
+          :unscoped
+        end
+
+        it 'removes existing scopes then adds the new scope' do
+          expect(result.selector).to eq({})
+          expect(result.options).to eq({})
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name])
+        end
+      end
+    end
+
+    context 'when model has default_scope' do
+
+      before do
+        Band.default_scope ->{ Band.where(active: true).includes(:records) }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      context 'when standard scope' do
+        let(:scope) do
+          -> { gt(member_count: 3).limit(3).includes(:drugs) }
+        end
+
+        it 'merges the scope' do
+          expect(result.selector).to eq("active" => true, "name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.options).to eq(skip: 20, limit: 3)
+          expect(result.inclusions.map(&:name)).to eq(%i[records same_name drugs])
+        end
+      end
+
+      context 'when unscoped' do
+        let(:scope) do
+          -> { unscoped.gt(member_count: 3).limit(3).includes(:drugs) }
+        end
+
+        it 'removes existing scopes then adds the new scope' do
+          expect(result.selector).to eq("member_count"=>{"$gt"=>3})
+          expect(result.options).to eq(limit: 3)
+          expect(result.inclusions.map(&:name)).to eq(%i[records same_name drugs])
+        end
+      end
+    end
+  end
+
   describe "#remove_scoping" do
 
     context "when the other has selection" do
