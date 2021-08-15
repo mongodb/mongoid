@@ -54,7 +54,7 @@ module Mongoid
           def __evolve_range__
             __evolve_range_naive__.transform_values! do |value|
               case value
-              when Time then value.__evolve_time__
+              when Time, DateTime then value.__evolve_time__
               when Date then value.__evolve_date__
               else value
               end
