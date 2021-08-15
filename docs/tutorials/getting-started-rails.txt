@@ -65,7 +65,7 @@ Use the ``rails`` command to create the application skeleton, as follows:
     in a moment.
 
 We pass ``--skip-active-record`` to request that ActiveRecord is not added
-as a dependency, because we will be using Mongoid instead. Additionaly
+as a dependency, because we will be using Mongoid instead. Additionally
 we pass ``--skip-bundle`` because we'll be modifying the ``Gemfile`` to
 add the ``mongoid`` dependency.
 
@@ -479,7 +479,7 @@ include ``Mongoid::Document``, and usually define the fields explicitly
 (but :ref:`dynamic fields <dynamic-fields>` may also be used instead of
 explicit field definitions).
 
-For example, a barebones Post model may look like this in ActiveRecord:
+For example, a bare-bones Post model may look like this in ActiveRecord:
 
 .. code-block:: ruby
   :name: app/models/post.rb

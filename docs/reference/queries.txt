@@ -527,8 +527,8 @@ Mongoid provides three merge strategies:
   same field, the values of the existing condition are intersected with the
   values of the new condition and the result is stored as the operator value.
 - **Union**: if there already is a condition using the same operator on the
-  same field, the values of the new condition are aded to the values of the
-  exsting condition and the result is stored as the operator value.
+  same field, the values of the new condition are added to the values of the
+  existing condition and the result is stored as the operator value.
 
 The following snippet demonstrates all of the strategies, using ``in`` as the
 example operator:
@@ -1231,7 +1231,7 @@ Mongoid also has some helpful methods on criteria.
    * - ``Criteria#estimated_count``
 
        *Get an approximate number of documents in the collection using the
-       collection metadta. The* ``estimated_count`` *method does not accept
+       collection metadata. The* ``estimated_count`` *method does not accept
        query conditions; if any are given, it will raise*
        ``Mongoid::Errors::InvalidEstimatedCountCriteria``.
        *If a model defines a default scope,* ``estimated_count`` *must be
