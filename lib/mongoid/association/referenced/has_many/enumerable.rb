@@ -242,11 +242,7 @@ module Mongoid
           def any?(*args)
             return super if args.any? || block_given?
 
-            if _loaded?
-              in_memory.length > 0
-            else
-              _added.length > 0 || _unloaded.exists?
-            end
+            !empty?
           end
 
           # Get the first document in the enumerable. Will check the persisted
