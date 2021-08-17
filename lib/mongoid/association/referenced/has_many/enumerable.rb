@@ -209,9 +209,9 @@ module Mongoid
           # @since 2.1.0
           def empty?
             if _loaded?
-              in_memory.count == 0
+              in_memory.length == 0
             else
-              _unloaded.count + _added.count == 0
+              _added.length == 0 && !_unloaded.exists?
             end
           end
 
@@ -245,7 +245,7 @@ module Mongoid
             if _loaded?
               in_memory.length > 0
             else
-              _unloaded.exists? || _added.length > 0
+              _added.length > 0 || _unloaded.exists?
             end
           end
 
