@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'mongoid/association/nested/nested_buildable'
 require 'mongoid/association/nested/many'
