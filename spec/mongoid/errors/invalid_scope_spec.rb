@@ -25,7 +25,7 @@ describe Mongoid::Errors::InvalidScope do
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "Change the scope to be a proc wrapped critera."
+        "Change the scope to be a proc wrapped criteria."
       )
     end
   end

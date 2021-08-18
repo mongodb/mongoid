@@ -19,13 +19,13 @@ describe Mongoid::Errors::UnknownAttribute do
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Without including Mongoid::Attributes::Dynamic in your model"
+        "Person#gender= was called but there is no 'gender'"
       )
     end
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "You can include Mongoid::Attributes::Dynamic"
+        "Define the field 'gender' in Person, or include"
       )
     end
   end
