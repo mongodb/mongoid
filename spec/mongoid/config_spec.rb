@@ -219,7 +219,7 @@ describe Mongoid::Config do
         expect(Mongoid::Config.discriminator_key).to be("test")
       end
 
-      it 'is set globally' do 
+      it 'is set globally' do
         expect(Mongoid.discriminator_key).to be("test")
       end
     end
@@ -598,12 +598,22 @@ describe Mongoid::Config do
       "test_override_#{Time.now.to_i}"
     end
 
+    after do
+      # Ensure the database override is cleared.
+      Mongoid.override_database(nil)
+    end
+
     it 'overrides document querying and persistence' do
       House.create!(name: '1', model: 'Big')
       expect(House.count).to eq(1)
+
       Mongoid.override_database(database)
       expect(House.count).to eq(0)
+
+      expect(Band.count).to eq(0)
       Band.create!(name: 'Wolf Alice')
+      expect(Band.count).to eq(1)
+
       Mongoid.override_database(nil)
       expect(House.count).to eq(1)
       expect(Band.count).to eq(0)
