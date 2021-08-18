@@ -546,34 +546,97 @@ describe Mongoid::Config do
     end
   end
 
-  context "with an overridden database" do
+  describe "#purge!" do
+
+    it 'deletes models' do
+      House.create!(name: '1', model: 'Big')
+      expect(House.count).to eq(1)
+      Mongoid.purge!
+      expect(House.count).to eq(0)
+    end
+
+    it 'drops collections' do
+      House.create!(name: '1', model: 'Big')
+      Band.create!(name: 'Fleet Foxes')
+
+      client = Mongoid.default_client
+      expect(client.collections.map(&:name).sort).to eq %w[bands houses]
+      Mongoid.purge!
+      expect(client.collections.map(&:name)).to eq []
+    end
+  end
+
+  describe "#truncate!" do
+
+    it 'deletes models' do
+      House.create!(name: '1', model: 'Big')
+      expect(House.count).to eq(1)
+      Mongoid.truncate!
+      expect(House.count).to eq(0)
+    end
+
+    it 'does not drop collections' do
+      House.create!(name: '1', model: 'Big')
+      Band.create!(name: 'Fleet Foxes')
+
+      client = Mongoid.default_client
+      expect(client.collections.map(&:name).sort).to eq %w[bands houses]
+      Mongoid.truncate!
+      expect(client.collections.map(&:name).sort).to eq %w[bands houses]
+    end
+
+    it 'does not drop indexes' do
+      User.create_indexes
+      expect(User.collection.indexes.map {|i| i['name'] }).to eq %w[_id_ name_1]
+      Mongoid.truncate!
+      expect(User.collection.indexes.map {|i| i['name'] }).to eq %w[_id_ name_1]
+    end
+  end
+
+  describe "#override_database" do
     let(:database) do
-      "test_purge_#{Time.now.to_i}"
+      "test_override_#{Time.now.to_i}"
     end
 
-    before do
+    it 'overrides document querying and persistence' do
+      House.create!(name: '1', model: 'Big')
+      expect(House.count).to eq(1)
       Mongoid.override_database(database)
-    end
-
-    after do
+      expect(House.count).to eq(0)
+      Band.create!(name: 'Wolf Alice')
       Mongoid.override_database(nil)
+      expect(House.count).to eq(1)
+      expect(Band.count).to eq(0)
     end
 
-    describe "#purge!" do
-      it 'respects persistence context overrides' do
+    context '#truncate and #purge' do
+      before do
         House.create!(name: '1', model: 'Big')
         expect(House.count).to eq(1)
-        Mongoid.purge!
-        expect(House.count).to eq(0)
+        Mongoid.override_database(database)
       end
-    end
 
-    describe "#truncate!" do
-      it 'respects persistence context overrides' do
-        House.create!(name: '1', model: 'Big')
+      after do
+        Mongoid.override_database(nil)
         expect(House.count).to eq(1)
-        Mongoid.truncate!
-        expect(House.count).to eq(0)
+      end
+
+      context '#purge' do
+        it 'respects persistence context overrides' do
+          House.create!(name: '2', model: 'Tiny')
+          expect(House.count).to eq(1)
+          Mongoid.purge!
+          expect(House.count).to eq(0)
+        end
+      end
+
+      context '#truncate' do
+        it '#truncate! respects persistence context overrides' do
+          House.create!(name: '2', model: 'Tiny')
+          expect(House.count).to eq(1)
+          Mongoid.truncate!
+          expect(House.count).to eq(0)
+        end
       end
     end
   end
