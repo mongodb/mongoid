@@ -15,8 +15,6 @@ module Mongoid
       #
       # @param [ Class ] klass The class of the document.
       # @param [ Symbol ] method The name of the method.
-      #
-      # @since 2.2.0
       def initialize(klass, method)
         super(
           compose_message("callbacks", { klass: klass, method: method })

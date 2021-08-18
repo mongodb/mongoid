@@ -23,8 +23,6 @@ module Mongoid
         # @param [ Document ] parent The parent document.
         #
         # @return [ Document ] The built document.
-        #
-        # @since 2.0.0
         def build(parent)
           return if reject?(parent, attributes)
           @existing = parent.send(association.name)
@@ -47,8 +45,6 @@ module Mongoid
         # @param [ Association ] association The association metadata.
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
-        #
-        # @since 2.0.0
         def initialize(association, attributes, options)
           @attributes = attributes.with_indifferent_access
           @association = association
@@ -68,8 +64,6 @@ module Mongoid
         #   one.acceptable_id?
         #
         # @return [ true, false ] If the id part of the logic will allow an update.
-        #
-        # @since 2.0.0
         def acceptable_id?
           id = association.klass.extract_id_field(attributes)
           id = convert_id(existing.class, id)
@@ -82,8 +76,6 @@ module Mongoid
         #   one.delete?
         #
         # @return [ true, false ] If the association should be deleted.
-        #
-        # @since 2.0.0
         def delete?
           id = association.klass.extract_id_field(attributes)
           destroyable? && !id.nil?
@@ -96,8 +88,6 @@ module Mongoid
         #
         # @return [ true, false ] If the association can potentially be
         #   destroyed.
-        #
-        # @since 2.0.0
         def destroyable?
           Nested::DESTROY_FLAGS.include?(destroy) && allow_destroy?
         end
@@ -108,8 +98,6 @@ module Mongoid
         #   one.replace?
         #
         # @return [ true, false ] If the document should be replaced.
-        #
-        # @since 2.0.0
         def replace?
           !existing && !destroyable? && !attributes.blank?
         end
@@ -120,8 +108,6 @@ module Mongoid
         #   one.update?
         #
         # @return [ true, false ] If the object should have its attributes updated.
-        #
-        # @since 2.0.0
         def update?
           existing && !destroyable? && acceptable_id?
         end

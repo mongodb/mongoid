@@ -5,8 +5,6 @@ module Mongoid
 
   # This module contains all the behavior for Ruby implementations of MongoDB
   # selectors.
-  #
-  # @since 4.0.0
   module Matchable
     extend ActiveSupport::Concern
 
@@ -19,8 +17,6 @@ module Mongoid
     # @param [ Hash ] selector The MongoDB selector.
     #
     # @return [ true, false ] True if matches, false if not.
-    #
-    # @since 1.0.0
     def _matches?(selector)
       Matcher::Expression.matches?(self, selector)
     end

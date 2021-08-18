@@ -16,8 +16,6 @@ module Mongoid
       #   context.blank?
       #
       # @return [ true, false ] If the context is empty.
-      #
-      # @since 3.0.0
       def blank?
         !exists?
       end

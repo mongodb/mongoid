@@ -5,8 +5,6 @@ module Mongoid
   module Persistable
 
     # Defines behavior for $push and $addToSet operations.
-    #
-    # @since 4.0.0
     module Pushable
       extend ActiveSupport::Concern
 
@@ -19,8 +17,6 @@ module Mongoid
       # @param [ Hash ] adds The field/value pairs to add.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def add_to_set(adds)
         prepare_atomic_operation do |ops|
           process_atomic_operations(adds) do |field, value|
@@ -52,8 +48,6 @@ module Mongoid
       # @param [ Hash ] pushes The $push operations.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def push(pushes)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pushes) do |field, value|

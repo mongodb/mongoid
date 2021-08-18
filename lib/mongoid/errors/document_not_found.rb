@@ -52,8 +52,6 @@ module Mongoid
       # @param [ Object, Array ] unmatched The ids that did not match.
       #
       # @return [ String ] The missing string.
-      #
-      # @since 3.0.0
       def missing(unmatched)
         if unmatched.is_a?(::Array)
           unmatched.join(", ")
@@ -70,8 +68,6 @@ module Mongoid
       # @param [ Object, Array ] params The ids that were searched for.
       #
       # @return [ String ] The searched string.
-      #
-      # @since 3.0.0
       def searched(params)
         if params.is_a?(::Array)
           params.take(3).join(", ") + " ..."
@@ -88,8 +84,6 @@ module Mongoid
       # @param [ Object, Array ] params What was searched for.
       #
       # @return [ Integer ] The total number.
-      #
-      # @since 3.0.0
       def total(params)
         params.is_a?(::Array) ? params.count : 1
       end
@@ -100,8 +94,6 @@ module Mongoid
       #   error.problem
       #
       # @return [ String ] The problem.
-      #
-      # @since 3.0.0
       def message_key(params)
         case params
           when Hash then "document_with_attributes_not_found"

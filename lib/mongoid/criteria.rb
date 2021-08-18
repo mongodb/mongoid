@@ -42,8 +42,6 @@ module Mongoid
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
-    #
-    # @since 4.0.0
     CHECK = []
 
     attr_accessor :embedded, :klass, :parent_document, :association
@@ -56,8 +54,6 @@ module Mongoid
     # @param [ Object ] other The other +Enumerable+ or +Criteria+ to compare to.
     #
     # @return [ true, false ] If the objects are equal.
-    #
-    # @since 1.0.0
     def ==(other)
       return super if other.respond_to?(:selector)
       entries == other
@@ -148,8 +144,6 @@ module Mongoid
     #   criteria.documents
     #
     # @return [ Array<Document> ] The documents.
-    #
-    # @since 3.0.0
     def documents
       @documents ||= []
     end
@@ -161,8 +155,6 @@ module Mongoid
     # @param [ Array<Document> ] docs The embedded documents.
     #
     # @return [ Array<Document> ] The embedded documents.
-    #
-    # @since 3.0.0
     def documents=(docs)
       @documents = docs
     end
@@ -173,8 +165,6 @@ module Mongoid
     #   criteria.embedded?
     #
     # @return [ true, false ] If the criteria is embedded.
-    #
-    # @since 3.0.0
     def embedded?
       !!@embedded
     end
@@ -186,8 +176,6 @@ module Mongoid
     #   criteria.extract_id
     #
     # @return [ Object ] The id.
-    #
-    # @since 2.3.0
     def extract_id
       selector.extract_id
     end
@@ -201,8 +189,6 @@ module Mongoid
     # @param [ Hash ] extras The extra driver options.
     #
     # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 2.0.0
     def extras(extras)
       crit = clone
       crit.options.merge!(extras)
@@ -215,8 +201,6 @@ module Mongoid
     #   criteria.field_list
     #
     # @return [ Array<String> ] The fields.
-    #
-    # @since 2.0.0
     def field_list
       if options[:fields]
         options[:fields].keys.reject{ |key| key == klass.discriminator_key }
@@ -233,8 +217,6 @@ module Mongoid
     #   criteria.freeze
     #
     # @return [ Criteria ] The frozen criteria.
-    #
-    # @since 2.0.0
     def freeze
       context and inclusions and super
     end
@@ -245,8 +227,6 @@ module Mongoid
     #   Criteria.new(Band)
     #
     # @param [ Class ] klass The model class.
-    #
-    # @since 1.0.0
     def initialize(klass)
       @klass = klass
       @embedded = nil
@@ -288,8 +268,6 @@ module Mongoid
     # @param [ Criteria ] other The criteria to merge in.
     #
     # @return [ Criteria ] The merged criteria.
-    #
-    # @since 3.0.0
     def merge!(other)
       criteria = other.to_criteria
       selector.merge!(criteria.selector)
@@ -307,8 +285,6 @@ module Mongoid
     #   criteria.none
     #
     # @return [ Criteria ] The none criteria.
-    #
-    # @since 4.0.0
     def none
       @none = true and self
     end
@@ -319,8 +295,6 @@ module Mongoid
     #   criteria.empty_and_chainable?
     #
     # @return [ true, false ] If the criteria is a none.
-    #
-    # @since 4.0.0
     def empty_and_chainable?
       !!@none
     end
@@ -333,8 +307,6 @@ module Mongoid
     # @param [ Array<Symbol> ] args The names of the fields.
     #
     # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 1.0.0
     def only(*args)
       args = args.flatten
       return clone if args.empty?
@@ -355,8 +327,6 @@ module Mongoid
     # @param [ Hash ] value The mode preference.
     #
     # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 5.0.0
     def read(value = nil)
       clone.tap do |criteria|
         criteria.options.merge!(read: value)
@@ -371,8 +341,6 @@ module Mongoid
     # @param [ Array<Symbol> ] args The names of the fields.
     #
     # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 4.0.3
     def without(*args)
       args -= id_fields
       super(*args)
@@ -399,8 +367,6 @@ module Mongoid
     #   criteria.to_criteria
     #
     # @return [ Criteria ] self.
-    #
-    # @since 3.0.0
     def to_criteria
       self
     end
@@ -411,8 +377,6 @@ module Mongoid
     #   criteria.to_proc
     #
     # @return [ Proc ] The wrapped criteria.
-    #
-    # @since 3.0.0
     def to_proc
       ->{ self }
     end
@@ -447,8 +411,6 @@ module Mongoid
     #   is embedded.
     #
     # @return [ Criteria ] The cloned selectable.
-    #
-    # @since 1.0.0
     def where(*args)
       # Historically this method required exactly one argument.
       # As of https://jira.mongodb.org/browse/MONGOID-4804 it also accepts
@@ -476,8 +438,6 @@ module Mongoid
     #   criteria.without_options
     #
     # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 3.0.4
     def without_options
       crit = clone
       crit.options.clear
@@ -496,8 +456,6 @@ module Mongoid
     # @param [ Hash ] scope The scope for the code.
     #
     # @return [ Criteria ] The criteria.
-    #
-    # @since 3.1.0
     def for_js(javascript, scope = {})
       code = if scope.empty?
         # CodeWithScope is not supported for $where as of MongoDB 4.4
@@ -523,8 +481,6 @@ module Mongoid
     #
     # @raise [ Errors::DocumentNotFound ] If none are found and raising an
     #   error.
-    #
-    # @since 3.0.0
     def check_for_missing_documents!(result, ids)
       if (result.size < ids.size) && Mongoid.raise_not_found_error
         raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
@@ -545,8 +501,6 @@ module Mongoid
     # @param [ Criteria ] other The criteria getting cloned.
     #
     # @return [ nil ] nil.
-    #
-    # @since 1.0.0
     def initialize_copy(other)
       @inclusions = other.inclusions.dup
       @scoping_options = other.scoping_options
@@ -565,8 +519,6 @@ module Mongoid
     # @param [ Array ] args The arguments.
     #
     # @return [ Object ] The result of the method call.
-    #
-    # @since 1.0.0
     ruby2_keywords def method_missing(name, *args, &block)
       if klass.respond_to?(name)
         klass.send(:with_scope, self) do
@@ -586,8 +538,6 @@ module Mongoid
     #   criteria.merge_type_selection
     #
     # @return [ true, false ] If type selection was added.
-    #
-    # @since 3.0.3
     def merge_type_selection
       selector.merge!(type_selection) if type_selectable?
     end
@@ -600,8 +550,6 @@ module Mongoid
     #   criteria.type_selectable?
     #
     # @return [ true, false ] If type selection should be added.
-    #
-    # @since 3.0.3
     def type_selectable?
       klass.hereditary? &&
         !selector.keys.include?(self.discriminator_key) &&
@@ -616,8 +564,6 @@ module Mongoid
     #   criteria.type_selection
     #
     # @return [ Hash ] The type selection.
-    #
-    # @since 3.0.3
     def type_selection
       klasses = klass._types
       if klasses.size > 1
@@ -635,8 +581,6 @@ module Mongoid
     #   criteria.selector_with_type_selection
     #
     # @return [ Hash ] The selector.
-    #
-    # @since 3.0.3
     def selector_with_type_selection
       type_selectable? ? selector.merge(type_selection) : selector
     end

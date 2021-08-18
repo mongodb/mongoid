@@ -26,8 +26,6 @@ module Mongoid
     #
     # @example Begin validation.
     #   document.begin_validate
-    #
-    # @since 2.1.9
     def begin_validate
       Threaded.begin_validate(self)
     end
@@ -36,8 +34,6 @@ module Mongoid
     #
     # @example Exit validation.
     #   document.exit_validate
-    #
-    # @since 2.1.9
     def exit_validate
       Threaded.exit_validate(self)
     end
@@ -50,8 +46,6 @@ module Mongoid
     # @param [ Hash ] options The options to check.
     #
     # @return [ true, false ] If we are validating.
-    #
-    # @since 4.0.0
     def performing_validations?(options = {})
       options[:validate].nil? ? true : options[:validate]
     end
@@ -66,8 +60,6 @@ module Mongoid
     # @param [ Symbol ] attr The name of the field or association.
     #
     # @return [ Object ] The value of the field or the association.
-    #
-    # @since 2.0.0.rc.1
     def read_attribute_for_validation(attr)
       attribute = database_field_name(attr)
       if relations.key?(attribute)
@@ -93,8 +85,6 @@ module Mongoid
     # @param [ Symbol ] context The optional validation context.
     #
     # @return [ true, false ] True if valid, false if not.
-    #
-    # @since 2.0.0.rc.6
     def valid?(context = nil)
       super context ? context : (new_record? ? :create : :update)
     end
@@ -105,8 +95,6 @@ module Mongoid
     #   document.validated?
     #
     # @return [ true, false ] Has the document already been validated?
-    #
-    # @since 2.0.0.rc.2
     def validated?
       Threaded.validated?(self)
     end
@@ -117,8 +105,6 @@ module Mongoid
     #   document.validating_with_query?
     #
     # @return [ true, false ] If we are validating with a query.
-    #
-    # @since 3.0.2
     def validating_with_query?
       self.class.validating_with_query?
     end
@@ -132,8 +118,6 @@ module Mongoid
       #   Person.validates_relation(association)
       #
       # @param [ Association ] association The association metadata.
-      #
-      # @since 2.0.0.rc.1
       def validates_relation(association)
         if association.validate?
           validates_associated(association.name)
@@ -151,8 +135,6 @@ module Mongoid
       # @note See ActiveModel::Validations::With for full options. This is
       #   overridden to add autosave functionality when presence validation is
       #   added.
-      #
-      # @since 3.0.0
       def validates_with(*args, &block)
         if args.first == PresenceValidator
           args.last[:attributes].each do |name|
@@ -171,8 +153,6 @@ module Mongoid
       #   Model.validating_with_query?
       #
       # @return [ true, false ] If we are validating with a query.
-      #
-      # @since 3.0.2
       def validating_with_query?
         Threaded.executing?("#{name}-validate-with-query")
       end

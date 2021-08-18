@@ -7,8 +7,6 @@ module Mongoid
       class HasAndBelongsToMany
 
         # The Builder behavior for has_and_belongs_to_many associations.
-        #
-        # @since 7.0
         module Buildable
 
           # This builder either takes a hash and queries for the

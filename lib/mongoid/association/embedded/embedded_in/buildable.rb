@@ -7,8 +7,6 @@ module Mongoid
       class EmbeddedIn
 
         # The Builder behavior for embedded_in associations.
-        #
-        # @since 7.0
         module Buildable
           include Threaded::Lifecycle
 

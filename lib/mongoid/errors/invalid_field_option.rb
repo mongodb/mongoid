@@ -17,8 +17,6 @@ module Mongoid
       # @param [ Symbol ] name The method name.
       # @param [ Symbol ] option The option name.
       # @param [ Array<Symbol> ] valid All the valid options.
-      #
-      # @since 3.0.0
       def initialize(klass, name, option, valid)
         super(
           compose_message(

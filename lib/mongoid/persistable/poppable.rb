@@ -5,8 +5,6 @@ module Mongoid
   module Persistable
 
     # Defines behavior for $pop operations.
-    #
-    # @since 4.0.0
     module Poppable
       extend ActiveSupport::Concern
 
@@ -24,8 +22,6 @@ module Mongoid
       # @param [ Hash ] pops The field/value pop operations.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def pop(pops)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pops) do |field, value|

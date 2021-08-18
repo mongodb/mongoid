@@ -11,8 +11,6 @@ module Mongoid
       #   Marshal.dump(criteria)
       #
       # @return [ Array<Object> ] The dumped data.
-      #
-      # @since 3.0.15
       def marshal_dump
         data = [ klass, driver, inclusions, documents, strategy, negating ]
         data.push(scoping_options).push(dump_hash(:selector)).push(dump_hash(:options))
@@ -24,8 +22,6 @@ module Mongoid
       #   Marshal.load(criteria)
       #
       # @param [ Array ] data The raw data.
-      #
-      # @since 3.0.15
       def marshal_load(data)
         @scoping_options, raw_selector, raw_options = data.pop(3)
         @klass, @driver, @inclusions, @documents, @strategy, @negating = data

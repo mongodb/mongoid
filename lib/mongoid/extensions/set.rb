@@ -12,8 +12,6 @@ module Mongoid
       #   set.mongoize
       #
       # @return [ Array ] The object mongoized.
-      #
-      # @since 3.0.0
       def mongoize
         ::Set.mongoize(self)
       end
@@ -28,8 +26,6 @@ module Mongoid
         # @param [ Array ] object The object to demongoize.
         #
         # @return [ Set ] The set.
-        #
-        # @since 3.0.0
         def demongoize(object)
           ::Set.new(object)
         end
@@ -43,8 +39,6 @@ module Mongoid
         # @param [ Set ] object The object to mongoize.
         #
         # @return [ Array ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           object.to_a
         end

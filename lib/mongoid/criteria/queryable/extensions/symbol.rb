@@ -18,8 +18,6 @@ module Mongoid
           # @param [ true, false ] negating If the selection should be negated.
           #
           # @return [ Hash ] The selection.
-          #
-          # @since 1.0.0
           def __expr_part__(value, negating = false)
             ::String.__expr_part__(self, value, negating)
           end
@@ -30,8 +28,6 @@ module Mongoid
           #   "1".to_direction
           #
           # @return [ Integer ] The direction.
-          #
-          # @since 1.0.0
           def to_direction
             to_s.to_direction
           end
@@ -47,8 +43,6 @@ module Mongoid
             # @param [ Symbol ] strategy The name of the merge strategy.
             # @param [ String ] operator The MongoDB operator.
             # @param [ String ] additional The additional MongoDB operator.
-            #
-            # @since 1.0.0
             def add_key(name, strategy, operator, additional = nil, &block)
               define_method(name) do
                 method = "__#{strategy}__".to_sym
@@ -65,8 +59,6 @@ module Mongoid
             # @param [ Object ] object The object to convert.
             #
             # @return [ Symbol ] The value as a symbol.
-            #
-            # @since 1.0.0
             def evolve(object)
               __evolve__(object) { |obj| obj.to_sym }
             end

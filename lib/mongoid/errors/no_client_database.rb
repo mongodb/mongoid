@@ -14,8 +14,6 @@ module Mongoid
       #
       # @param [ Symbol, String ] name The db config key.
       # @param [ Hash ] config The hash configuration options.
-      #
-      # @since 3.0.0
       def initialize(name, config)
         super(
           compose_message(

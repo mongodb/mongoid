@@ -17,8 +17,6 @@ module Mongoid
       # @param [ Proc ] block The method body.
       #
       # @return [ Method ] The new method.
-      #
-      # @since 3.0.0
       def re_define_method(name, &block)
         undef_method(name) if method_defined?(name)
         define_method(name, &block)

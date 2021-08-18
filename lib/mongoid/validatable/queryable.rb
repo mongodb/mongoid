@@ -16,8 +16,6 @@ module Mongoid
       # @param [ Document ] document The document being validated.
       #
       # @return [ Object ] The result of the yield.
-      #
-      # @since 3.0.2
       def with_query(document)
         klass = document.class
         begin

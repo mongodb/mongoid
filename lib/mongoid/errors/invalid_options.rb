@@ -15,8 +15,6 @@ module Mongoid
       # @param [ Symbol ] name The name of the association.
       # @param [ Symbol ] invalid The invalid option.
       # @param [ Array<Symbol> ] valid The allowed options.
-      #
-      # @since 2.1.0
       def initialize(name, invalid, valid)
         super(
           compose_message(

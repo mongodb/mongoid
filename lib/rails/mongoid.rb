@@ -45,8 +45,6 @@ module Rails
     #   Mongoid.load_model("/mongoid/behavior")
     #
     # @param [ String ] file The base filename.
-    #
-    # @since 2.0.0.rc.3
     def load_model(file)
       begin
         require_dependency(file)

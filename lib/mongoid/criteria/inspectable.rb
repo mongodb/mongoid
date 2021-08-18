@@ -12,8 +12,6 @@ module Mongoid
       #   criteria.inspect
       #
       # @return [ String ] The inspection string.
-      #
-      # @since 1.0.0
       def inspect
 %Q{#<Mongoid::Criteria
   selector: #{selector.inspect}

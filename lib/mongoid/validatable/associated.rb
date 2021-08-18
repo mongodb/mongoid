@@ -28,8 +28,6 @@ module Mongoid
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The association to validate.
       # @param [ Object ] value The value of the association.
-      #
-      # @since 2.0.0
       def validate_each(document, attribute, value)
         begin
           document.begin_validate

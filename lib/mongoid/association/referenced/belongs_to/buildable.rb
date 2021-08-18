@@ -7,8 +7,6 @@ module Mongoid
       class BelongsTo
 
         # The Builder behavior for belongs_to associations.
-        #
-        # @since 7.0
         module Buildable
 
           # This method either takes an _id or an object and queries for the

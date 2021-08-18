@@ -15,8 +15,6 @@ module Mongoid
       #   document.clear_timeless_option
       #
       # @return [ true ] True.
-      #
-      # @since 3.1.4
       def clear_timeless_option
         if self.persisted?
           self.class.clear_timeless_option_on_update
@@ -32,8 +30,6 @@ module Mongoid
       #   person.timeless.save
       #
       # @return [ Document ] The document this was called on.
-      #
-      # @since 2.3.0
       def timeless
         self.class.timeless
         self
@@ -63,8 +59,6 @@ module Mongoid
         #   Person.timeless.create(:title => "Sir")
         #
         # @return [ Class ] The class this was called on.
-        #
-        # @since 2.3.0
         def timeless
           counter = 0
           counter += 1 if self < Mongoid::Timestamps::Created

@@ -13,8 +13,6 @@ module Mongoid
       #    InvalidStorageParent.new(Person)
       #
       # @param [ Class ] klass The model class.
-      #
-      # @since 4.0.0
       def initialize(klass)
         super(
           compose_message(

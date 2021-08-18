@@ -6,8 +6,6 @@ module Mongoid
 
     # This error is raised when trying to create an association that conflicts with
     # an already defined method.
-    #
-    # @since 6.0.0
     class InvalidRelation < MongoidError
 
       # Create the new error.
@@ -42,8 +40,6 @@ module Mongoid
       # @param [ Symbol ] name The method name.
       #
       # @return [ Class, Module ] The originating class or module.
-      #
-      # @since 6.0.0
       def origin(klass, name)
         klass.instance_method(name).owner
       end
@@ -57,8 +53,6 @@ module Mongoid
       # @param [ Symbol ] name The method name.
       #
       # @return [ Array<String, Integer> ] The location of the method.
-      #
-      # @since 6.0.0
       def location(klass, name)
         @location ||=
             (klass.instance_method(name).source_location || [ "Unknown", 0 ])

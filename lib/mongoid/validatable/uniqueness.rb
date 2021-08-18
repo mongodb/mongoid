@@ -38,8 +38,6 @@ module Mongoid
       # @param [ Object ] value The value of the field.
       #
       # @return [ Errors ] The errors.
-      #
-      # @since 1.0.0
       def validate_each(document, attribute, value)
         with_query(document) do
           attrib, val = to_validate(document, attribute, value)
@@ -64,8 +62,6 @@ module Mongoid
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The name of the attribute.
       # @param [ Object ] value The value of the object.
-      #
-      # @since 2.4.10
       def add_error(document, attribute, value)
         document.errors.add(
           attribute, :taken, **options.except(:case_sensitive, :scope).merge(value: value)
@@ -80,8 +76,6 @@ module Mongoid
       #   validator.case_sensitive?
       #
       # @return [ true, false ] If the validation is case sensitive.
-      #
-      # @since 2.3.0
       def case_sensitive?
         !(options[:case_sensitive] == false)
       end
@@ -99,8 +93,6 @@ module Mongoid
       # @param [ Object ] value The value of the object.
       #
       # @return [ Criteria ] The criteria.
-      #
-      # @since 2.4.10
       def create_criteria(base, document, attribute, value)
         criteria = scope(base.unscoped, document, attribute)
         criteria.selector.update(criterion(document, attribute, value.mongoize))
@@ -119,8 +111,6 @@ module Mongoid
       # @param [ Object ] value The value of the object.
       #
       # @return [ Criteria ] The uniqueness criteria.
-      #
-      # @since 2.3.0
       def criterion(document, attribute, value)
         field = document.database_field_name(attribute)
 
@@ -147,8 +137,6 @@ module Mongoid
       # @param [ Object ] value The value to filter.
       #
       # @return [ Object, Regexp ] The value, filtered or not.
-      #
-      # @since 2.3.0
       def filter(value)
         !case_sensitive? && value ? /\A#{Regexp.escape(value.to_s)}\z/i : value
       end
@@ -164,8 +152,6 @@ module Mongoid
       # @param [ Document ] document The document being validated.
       #
       # @return [ Criteria ] The scoped criteria.
-      #
-      # @since 2.3.0
       def scope(criteria, document, _attribute)
         Array.wrap(options[:scope]).each do |item|
           name = document.database_field_name(item)
@@ -184,8 +170,6 @@ module Mongoid
       # @param [ Document ] document The embedded document.
       #
       # @return [ true, false ] If the validation should be skipped.
-      #
-      # @since 2.3.0
       def skip_validation?(document)
         !document._parent || document.embedded_one?
       end
@@ -200,8 +184,6 @@ module Mongoid
       # @param [ Document ] document The embedded document.
       #
       # @return [ true, false ] If the scope reference has changed.
-      #
-      # @since
       def scope_value_changed?(document)
         Array.wrap(options[:scope]).any? do |item|
           document.send("attribute_changed?", item.to_s)
@@ -223,8 +205,6 @@ module Mongoid
       # @param [ Object ] value The value of the attribute.
       #
       # @return [ Array<Object, Object> ] The field and value.
-      #
-      # @since 2.4.4
       def to_validate(document, attribute, value)
         association = document.relations[attribute.to_s]
         if association && association.stores_foreign_key?
@@ -244,8 +224,6 @@ module Mongoid
       # @param [ Document ] document The document.
       # @param [ Symbol ] attribute The attribute name.
       # @param [ Object ] value The value.
-      #
-      # @since 2.4.10
       def validate_embedded(document, attribute, value)
         return if skip_validation?(document)
         relation = document._parent.send(document.association_name)
@@ -264,8 +242,6 @@ module Mongoid
       # @param [ Document ] document The document.
       # @param [ Symbol ] attribute The attribute name.
       # @param [ Object ] value The value.
-      #
-      # @since 2.4.10
       def validate_root(document, attribute, value)
         klass = document.class
 
@@ -289,8 +265,6 @@ module Mongoid
       # @param [ Symbol ] attribute The attribute to validate.
       #
       # @return [ true, false ] If we need to validate.
-      #
-      # @since 2.4.4
       def validation_required?(document, attribute)
         document.new_record? ||
           document.send("attribute_changed?", attribute.to_s) ||
@@ -308,8 +282,6 @@ module Mongoid
       # @param [ Symbol ] attribute The attribute to validate.
       #
       # @return [ true, false ] If the attribute is localized.
-      #
-      # @since 4.0.0
       def localized?(document, attribute)
         document.fields[document.database_field_name(attribute)].try(:localized?)
       end

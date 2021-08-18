@@ -5,8 +5,6 @@ module Mongoid
   module Attributes
 
     # Defines behavior around that lovel Rails feature nested attributes.
-    #
-    # @since 1.0.0
     module Nested
       extend ActiveSupport::Concern
 
@@ -80,8 +78,6 @@ module Mongoid
         #   Person.autosave_nested_attributes(metadata)
         #
         # @param [ Association ] association The existing association metadata.
-        #
-        # @since 3.1.4
         def autosave_nested_attributes(association)
           # In order for the autosave functionality to work properly, the association needs to be
           # marked as autosave despite the fact that the option isn't present. Because the method

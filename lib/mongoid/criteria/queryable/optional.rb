@@ -21,8 +21,6 @@ module Mongoid
         # @param [ Array<Symbol> ] fields The fields to sort.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def ascending(*fields)
           sort_with_list(*fields, 1)
         end
@@ -39,8 +37,6 @@ module Mongoid
         # @param [ Integer ] value The batch size.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def batch_size(value = nil)
           option(value) { |options| options.store(:batch_size, value) }
         end
@@ -53,8 +49,6 @@ module Mongoid
         # @param [ Array<Symbol> ] fields The fields to sort.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def descending(*fields)
           sort_with_list(*fields, -1)
         end
@@ -70,8 +64,6 @@ module Mongoid
         # @param [ Hash ] value The index hint.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def hint(value = nil)
           option(value) { |options| options.store(:hint, value) }
         end
@@ -84,8 +76,6 @@ module Mongoid
         # @param [ Integer ] value The number of documents to return.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def limit(value = nil)
           option(value) do |options, query|
             val = value.to_i
@@ -103,8 +93,6 @@ module Mongoid
         # @param [ Integer ] value The max number of documents to scan.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def max_scan(value = nil)
           option(value) { |options| options.store(:max_scan, value) }
         end
@@ -117,8 +105,6 @@ module Mongoid
         # @param [ Integer ] value The max time in milliseconds for processing operations on a cursor.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 6.0.0
         def max_time_ms(value = nil)
           option(value) { |options| options.store(:max_time_ms, value) }
         end
@@ -129,8 +115,6 @@ module Mongoid
         #   optional.no_timeout
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def no_timeout
           clone.tap { |query| query.options.store(:timeout, false) }
         end
@@ -143,8 +127,6 @@ module Mongoid
         # @param [ Array<Symbol> ] args The fields to return.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def only(*args)
           args = args.flatten
           option(*args) do |options|
@@ -185,8 +167,6 @@ module Mongoid
         # @param [ Array, Hash, String ] spec The sorting specification.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def order_by(*spec)
           option(spec) do |options, query|
             spec.compact.each do |criterion|
@@ -208,8 +188,6 @@ module Mongoid
         # @param [ Array, Hash, String ] spec The sorting specification.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 2.1.0
         def reorder(*spec)
           clone.tap do |query|
             query.options.delete(:sort)
@@ -224,8 +202,6 @@ module Mongoid
         # @param [ Integer ] value The number to skip.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def skip(value = nil)
           option(value) do |options, query|
             val = value.to_i
@@ -243,8 +219,6 @@ module Mongoid
         # @param [ Hash ] criterion The slice options.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def slice(criterion = nil)
           option(criterion) do |options|
             options.__union__(
@@ -261,8 +235,6 @@ module Mongoid
         #   optional.snapshot
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def snapshot
           clone.tap do |query|
             query.options.store(:snapshot, true)
@@ -277,8 +249,6 @@ module Mongoid
         # @param [ Array<Symbol> ] args The fields to ignore.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def without(*args)
           args = args.flatten
           option(*args) do |options|
@@ -301,8 +271,6 @@ module Mongoid
         # @param [ String ] comment The comment to be associated with the query.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 2.2.0
         def comment(comment = nil)
           clone.tap do |query|
             query.options.store(:comment, comment)
@@ -320,8 +288,6 @@ module Mongoid
         # @param [ Symbol ] type The type of cursor to create.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 2.2.0
         def cursor_type(type)
           clone.tap { |query| query.options.store(:cursor_type, type) }
         end
@@ -334,8 +300,6 @@ module Mongoid
         # @param [ Hash ] collation_doc The document describing the collation to use.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 6.1.0
         def collation(collation_doc)
           clone.tap { |query| query.options.store(:collation, collation_doc) }
         end
@@ -354,8 +318,6 @@ module Mongoid
         # @param [ Integer ] direction The sort direction.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def add_sort_option(options, field, direction)
           if driver == :mongo1x
             sorting = (options[:sort] || []).dup
@@ -379,8 +341,6 @@ module Mongoid
         # @param [ Array ] args The options.
         #
         # @return [ Queryable ] The cloned queryable.
-        #
-        # @since 1.0.0
         def option(*args)
           clone.tap do |query|
             unless args.compact.empty?
@@ -400,8 +360,6 @@ module Mongoid
         # @param [ Integer ] direction The sort direction.
         #
         # @return [ Optional ] The cloned optional.
-        #
-        # @since 1.0.0
         def sort_with_list(*fields, direction)
           option(fields) do |options, query|
             fields.flatten.compact.each do |field|
@@ -419,8 +377,6 @@ module Mongoid
           #   Optional.forwardables
           #
           # @return [ Array<Symbol> ] The names of the forwardable methods.
-          #
-          # @since 1.0.0
           def forwardables
             public_instance_methods(false) - [ :options, :options= ]
           end

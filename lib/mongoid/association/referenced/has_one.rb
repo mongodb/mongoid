@@ -11,8 +11,6 @@ module Mongoid
     module Referenced
 
       # The has_one association.
-      #
-      # @since 7.0
       class HasOne
         include Relatable
         include Buildable
@@ -21,8 +19,6 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        #
-        # @since 7.0
         ASSOCIATION_OPTIONS = [
             :as,
             :autobuild,
@@ -36,22 +32,16 @@ module Mongoid
         # the shared ones.
         #
         # @return [ Array<Symbol> ] The valid options.
-        #
-        # @since 7.0
         VALID_OPTIONS = (ASSOCIATION_OPTIONS + SHARED_OPTIONS).freeze
 
         # The default foreign key suffix.
         #
         # @return [ String ] '_id'
-        #
-        # @since 7.0
         FOREIGN_KEY_SUFFIX = '_id'.freeze
 
         # The list of association complements.
         #
         # @return [ Array<Association> ] The association complements.
-        #
-        # @since 7.0
         def relation_complements
           @relation_complements ||= [ Referenced::BelongsTo ].freeze
         end
@@ -59,8 +49,6 @@ module Mongoid
         # Setup the instance methods, fields, etc. on the association owning class.
         #
         # @return [ self ]
-        #
-        # @since 7.0
         def setup!
           setup_instance_methods!
           self
@@ -70,8 +58,6 @@ module Mongoid
         #
         # @return [ String ] The foreign key field for saving the
         #   association reference.
-        #
-        # @since 7.0
         def foreign_key
           @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
                              default_foreign_key_field
@@ -80,22 +66,16 @@ module Mongoid
         # Is this association type embedded?
         #
         # @return [ false ] Always false.
-        #
-        # @since 7.0
         def embedded?; false; end
 
         # The default for validation the association object.
         #
         # @return [ true ] Always true.
-        #
-        # @since 7.0
         def validation_default; true; end
 
         # Get the association proxy class for this association type.
         #
         # @return [ Association::HasOne::Proxy ] The proxy class.
-        #
-        # @since 7.0
         def relation
           Proxy
         end
@@ -106,8 +86,6 @@ module Mongoid
         # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::Many ] The Nested Builder object.
-        #
-        # @since 7.0
         def nested_builder(attributes, options)
           Nested::One.new(self, attributes, options)
         end
@@ -115,8 +93,6 @@ module Mongoid
         # Is this association polymorphic?
         #
         # @return [ true, false ] Whether this association is polymorphic.
-        #
-        # @since 7.0
         def polymorphic?
           @polymorphic ||= !!as
         end
@@ -126,8 +102,6 @@ module Mongoid
         # @note Only relevant for polymorphic associations.
         #
         # @return [ String, nil ] The type field.
-        #
-        # @since 7.0
         def type
           @type ||= "#{as}_type" if polymorphic?
         end
@@ -152,8 +126,6 @@ module Mongoid
         # @param [ Document ] document The document to calculate on.
         #
         # @return [ Root ] The root atomic path calculator.
-        #
-        # @since 2.1.0
         def path(document)
           Mongoid::Atomic::Paths::Root.new(document)
         end
@@ -163,8 +135,6 @@ module Mongoid
         # Setup the instance methods on the class having this association type.
         #
         # @return [ self ]
-        #
-        # @since 7.0
         def setup_instance_methods!
           define_getter!
           define_setter!

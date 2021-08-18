@@ -16,8 +16,6 @@ module Mongoid
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #
       # @return [ Document, Array<Document> ] The document(s).
-      #
-      # @since 2.0.0
       def execute_or_raise(ids, multi)
         result = multiple_from_db(ids)
         check_for_missing_documents!(result, ids)
@@ -35,8 +33,6 @@ module Mongoid
       # @param [ Array<BSON::ObjectId> ] args The ids to search for.
       #
       # @return [ Array<Document>, Document ] The matching document(s).
-      #
-      # @since 1.0.0
       def find(*args)
         ids = args.__find_args__
         raise_invalid if ids.any?(&:nil?)
@@ -88,8 +84,6 @@ module Mongoid
       #   criteria.id_finder
       #
       # @return [ Symbol ] The name of the finder method.
-      #
-      # @since 3.1.0
       def id_finder
         @id_finder ||= extract_id ? :all_of : :where
       end
@@ -104,8 +98,6 @@ module Mongoid
       # @param [ Array<Object> ] ids The ids to fetch with.
       #
       # @return [ Array<Document> ] The matching documents.
-      #
-      # @since 3.0.0
       def from_database(ids)
         from_database_selector(ids).entries
       end
@@ -128,8 +120,6 @@ module Mongoid
       # @param [ Array<Object> ] ids The ids to convert.
       #
       # @return [ Array<Object> ] The converted ids.
-      #
-      # @since 3.0.0
       def mongoize_ids(ids)
         ids.map do |id|
           id = id[:_id] if id.respond_to?(:keys) && id[:_id]
@@ -143,8 +133,6 @@ module Mongoid
       #   criteria.raise_invalid
       #
       # @raise [ Errors::InvalidOptions ] The error.
-      #
-      # @since 2.0.0
       def raise_invalid
         raise Errors::InvalidFind.new
       end

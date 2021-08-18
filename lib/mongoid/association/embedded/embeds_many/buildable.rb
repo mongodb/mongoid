@@ -7,8 +7,6 @@ module Mongoid
       class EmbedsMany
 
         # Builder class for embeds_many associations.
-        #
-        # @since 7.0
         module Buildable
           include Threaded::Lifecycle
 

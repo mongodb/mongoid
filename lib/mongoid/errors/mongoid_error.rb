@@ -19,8 +19,6 @@ module Mongoid
       #   error.compose_message
       #
       # @return [ String ] The composed message.
-      #
-      # @since 3.0.0
       def compose_message(key, attributes = {})
         @problem = translate_problem(key, attributes)
         @summary = translate_summary(key, attributes)
@@ -60,8 +58,6 @@ module Mongoid
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The problem.
-      #
-      # @since 3.0.0
       def translate_problem(key, attributes)
         translate("#{key}.message", attributes)
       end
@@ -75,8 +71,6 @@ module Mongoid
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The summary.
-      #
-      # @since 3.0.0
       def translate_summary(key, attributes)
         translate("#{key}.summary", attributes)
       end
@@ -90,8 +84,6 @@ module Mongoid
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The resolution.
-      #
-      # @since 3.0.0
       def translate_resolution(key, attributes)
         translate("#{key}.resolution", attributes)
       end

@@ -5,8 +5,6 @@ module Mongoid
   module Persistable
 
     # Defines behavior for persistence operations that delete documents.
-    #
-    # @since 4.0.0
     module Deletable
       extend ActiveSupport::Concern
 
@@ -18,8 +16,6 @@ module Mongoid
       # @param [ Hash ] options Options to pass to remove.
       #
       # @return [ TrueClass ] True.
-      #
-      # @since 1.0.0
       def delete(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_delete do
@@ -44,8 +40,6 @@ module Mongoid
       #   document.atomic_deletes
       #
       # @return [ Hash ] The atomic deletes.
-      #
-      # @since 4.0.0
       def atomic_deletes
         { atomic_delete_modifier => { atomic_path => _index ? { "_id" => _id } : true }}
       end
@@ -60,8 +54,6 @@ module Mongoid
       # @param [ Hash ] options The deletion options.
       #
       # @return [ true ] If the operation succeeded.
-      #
-      # @since 4.0.0
       def delete_as_embedded(options = {})
         _parent.remove_child(self) if notifying_parent?(options)
         if _parent.persisted?
@@ -81,8 +73,6 @@ module Mongoid
       #   document.delete_as_root
       #
       # @return [ true ] If the document was removed.
-      #
-      # @since 4.0.0
       def delete_as_root
         collection.find(atomic_selector).delete_one(session: _session)
         true
@@ -98,8 +88,6 @@ module Mongoid
       # @param [ Hash ] options The delete options.
       #
       # @return [ true, false ] If the parent should be notified.
-      #
-      # @since 4.0.0
       def notifying_parent?(options = {})
         !options.delete(:suppress)
       end
@@ -114,8 +102,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The result of the block.
-      #
-      # @since 4.0.0
       def prepare_delete
         yield(self)
         freeze
@@ -137,8 +123,6 @@ module Mongoid
         # @param [ Hash ] conditions Optional conditions to delete by.
         #
         # @return [ Integer ] The number of documents deleted.
-        #
-        # @since 1.0.0
         def delete_all(conditions = {})
           selector = hereditary? ? conditions.merge(discriminator_key.to_sym => discriminator_value) : conditions
           where(selector).delete

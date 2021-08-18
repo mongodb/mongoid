@@ -15,8 +15,6 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the client config.
       # @param [ Hash ] config The configuration options.
-      #
-      # @since 3.0.0
       def initialize(name, config)
         super(
           compose_message(

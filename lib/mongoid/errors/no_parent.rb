@@ -14,8 +14,6 @@ module Mongoid
       #   NoParent.new(klass)
       #
       # @param [ Class ] klass The class of the embedded document.
-      #
-      # @since 3.0.0
       def initialize(klass)
         super(
           compose_message("no_parent", { klass: klass })

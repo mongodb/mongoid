@@ -14,8 +14,6 @@ module Mongoid
       #   InvalidTime.new("this is not a time")
       #
       # @param [ Object ] value The value that was attempted.
-      #
-      # @since 2.3.1
       def initialize(value)
         super(compose_message("invalid_time", { value: value }))
       end

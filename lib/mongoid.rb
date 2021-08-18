@@ -42,8 +42,6 @@ module Mongoid
   extend self
 
   # A string added to the platform details of Ruby driver client handshake documents.
-  #
-  # @since 6.1.0
   PLATFORM_DETAILS = "mongoid-#{VERSION}".freeze
 
   # The minimum MongoDB version supported.
@@ -62,8 +60,6 @@ module Mongoid
   #   end
   #
   # @return [ Config ] The configuration object.
-  #
-  # @since 1.0.0
   def configure
     block_given? ? yield(Config) : Config
   end
@@ -74,8 +70,6 @@ module Mongoid
   #   Mongoid.default_client
   #
   # @return [ Mongo::Client ] The default client.
-  #
-  # @since 5.0.0
   def default_client
     Clients.default
   end
@@ -86,8 +80,6 @@ module Mongoid
   #   Mongoid.disconnect_clients
   #
   # @return [ true ] True.
-  #
-  # @since 5.0.0
   def disconnect_clients
     Clients.disconnect
   end
@@ -98,8 +90,6 @@ module Mongoid
   #   Mongoid.client(:default)
   #
   # @return [ Mongo::Client ] The named client.
-  #
-  # @since 5.0.0
   def client(name)
     Clients.with_name(name)
   end
@@ -109,8 +99,6 @@ module Mongoid
   #
   # @example Delegate the configuration methods.
   #   Mongoid.database = Mongo::Connection.new.db("test")
-  #
-  # @since 1.0.0
   def_delegators Config, *(Config.public_instance_methods(false) - [ :logger=, :logger ])
 
 

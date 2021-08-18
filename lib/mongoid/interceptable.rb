@@ -4,8 +4,6 @@
 module Mongoid
 
   # This module contains all the callback hooks for Mongoid.
-  #
-  # @since 4.0.0
   module Interceptable
     extend ActiveSupport::Concern
 
@@ -51,8 +49,6 @@ module Mongoid
     # @param [ Symbol ] kind The type of callback.
     #
     # @return [ true, false ] If the callback can be executed.
-    #
-    # @since 3.0.6
     def callback_executable?(kind)
       respond_to?("_#{kind}_callbacks")
     end
@@ -66,8 +62,6 @@ module Mongoid
     # @param [ Symbol ] kind The callback kind.
     #
     # @return [ true, false ] If the document is in a callback state.
-    #
-    # @since 3.1.0
     def in_callback_state?(kind)
       [ :create, :destroy ].include?(kind) || new_record? || flagged_for_destroy? || changed?
     end
@@ -83,8 +77,6 @@ module Mongoid
     # @param [ Array<Symbol> ] kinds The events that are occurring.
     #
     # @return [ Object ] The result of the chain executing.
-    #
-    # @since 3.0.0
     def run_after_callbacks(*kinds)
       kinds.each do |kind|
         run_targeted_callbacks(:after, kind)
@@ -102,8 +94,6 @@ module Mongoid
     # @param [ Array<Symbol> ] kinds The events that are occurring.
     #
     # @return [ Object ] The result of the chain executing.
-    #
-    # @since 3.0.0
     def run_before_callbacks(*kinds)
       kinds.each do |kind|
         run_targeted_callbacks(:before, kind)
@@ -123,8 +113,6 @@ module Mongoid
     # @param [ Array ] args Any options.
     #
     # @return [ Document ] The document
-    #
-    # @since 2.3.0
     ruby2_keywords def run_callbacks(kind, *args, &block)
       cascadable_children(kind).each do |child|
         if child.run_callbacks(child_callback_type(kind, child), *args) == false
@@ -149,8 +137,6 @@ module Mongoid
     #   document.before_callback_halted?
     #
     # @return [ true, false ] If a before callback was halted.
-    #
-    # @since 3.0.3
     def before_callback_halted?
       !!@before_callback_halted
     end
@@ -163,8 +149,6 @@ module Mongoid
     # @param [ Symbol ] kind The type of callback.
     #
     # @return [ Array<Document> ] The children.
-    #
-    # @since 2.3.0
     def cascadable_children(kind, children = Set.new)
       embedded_relations.each_pair do |name, association|
         next unless association.cascading_callbacks?
@@ -193,8 +177,6 @@ module Mongoid
     # @param [ Document ] child The child document.
     #
     # @return [ true, false ] If the child should fire the callback.
-    #
-    # @since 2.3.0
     def cascadable_child?(kind, child, association)
       return false if kind == :initialize || kind == :find || kind == :touch
       return false if kind == :validate && association.validate?
@@ -213,8 +195,6 @@ module Mongoid
     # @param [ Document ] child The child document
     #
     # @return [ Symbol ] The name of the callback.
-    #
-    # @since 2.3.0
     def child_callback_type(kind, child)
       if kind == :update
         return :create if child.new_record?
@@ -236,8 +216,6 @@ module Mongoid
     # @param [ Symbol ] filter The callback that halted.
     # @param [ Symbol ] name The name of the callback that was halted
     #   (requires Rails 6.1+)
-    #
-    # @since 3.0.3
     def halted_callback_hook(filter, name = nil)
       @before_callback_halted = true
     end
@@ -252,8 +230,6 @@ module Mongoid
     # @param [ Symbol ] kind The type of callback, :save, :create, :update.
     #
     # @return [ Object ] The result of the chain execution.
-    #
-    # @since 3.0.0
     def run_targeted_callbacks(place, kind)
       name = "_run__#{place}__#{kind}__callbacks"
       unless respond_to?(name)

@@ -13,8 +13,6 @@ module Mongoid
       #   InvalidPath.new(Address)
       #
       # @param [ Class ] klass The document class.
-      #
-      # @since 3.0.14
       def initialize(klass)
         super(compose_message("invalid_path", { klass: klass }))
       end

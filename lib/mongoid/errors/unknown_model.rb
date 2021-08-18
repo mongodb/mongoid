@@ -15,8 +15,6 @@ module Mongoid
       #
       # @param [ String ] klass The model class.
       # @param [ String ] value The value used to determine the (invalid) class.
-      #
-      # @since 7.0.0
       def initialize(klass, value)
         super(
             compose_message("unknown_model", { klass: klass, value: value })

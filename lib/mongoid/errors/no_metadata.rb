@@ -13,8 +13,6 @@ module Mongoid
       #   NoMetadata.new(Address)
       #
       # @param [ Class ] klass The document class.
-      #
-      # @since 3.0.0
       def initialize(klass)
         super(compose_message("no_metadata", { klass: klass }))
       end

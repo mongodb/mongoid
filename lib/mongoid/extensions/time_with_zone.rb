@@ -11,8 +11,6 @@ module Mongoid
       # (which are themselves).
       #
       # @return [ ActiveSupport::TimeWithZone ] self.
-      #
-      # @since 3.0.0
       def __mongoize_time__
         self
       end
@@ -24,8 +22,6 @@ module Mongoid
       #   date_time.mongoize
       #
       # @return [ Time ] The object mongoized.
-      #
-      # @since 3.0.0
       def mongoize
         ::ActiveSupport::TimeWithZone.mongoize(self)
       end
@@ -40,8 +36,6 @@ module Mongoid
         # @param [ Time ] object The time from Mongo.
         #
         # @return [ TimeWithZone ] The object as a date.
-        #
-        # @since 3.0.0
         def demongoize(object)
           return nil if object.blank?
           ::Time.demongoize(object).in_time_zone
@@ -56,8 +50,6 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ Time ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           ::Time.mongoize(object)
         end

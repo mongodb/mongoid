@@ -5,8 +5,6 @@ module Mongoid
 
   # This module contains behavior for all Mongoid scoping - named scopes,
   # default scopes, and criteria accessors via scoped and unscoped.
-  #
-  # @since 4.0.0
   module Scopable
     extend ActiveSupport::Concern
 
@@ -27,8 +25,6 @@ module Mongoid
     #   document.apply_default_scoping
     #
     # @return [ true, false ] If default scoping was applied.
-    #
-    # @since 4.0.0
     def apply_default_scoping
       if default_scoping
         default_scoping.call.selector.each do |field, value|
@@ -52,8 +48,6 @@ module Mongoid
       #   Band.scopes
       #
       # @return [ Hash ] The scopes defined for this class
-      #
-      # @since 3.1.4
       def scopes
         defined_scopes = {}
         ancestors.reverse.each do |klass|
@@ -86,8 +80,6 @@ module Mongoid
       # @raise [ Errors::InvalidScope ] If the scope is not a proc or criteria.
       #
       # @return [ Proc ] The default scope.
-      #
-      # @since 1.0.0
       def default_scope(value = nil)
         value = Proc.new { yield } if block_given?
         check_scope_validity(value)
@@ -100,8 +92,6 @@ module Mongoid
       #   Band.default_scopable?
       #
       # @return [ true, false ] If the default scope can be applied.
-      #
-      # @since 3.0.0
       def default_scopable?
         default_scoping? && !Threaded.without_default_scope?(self)
       end
@@ -114,8 +104,6 @@ module Mongoid
       #   Model.queryable
       #
       # @return [ Criteria ] The queryable.
-      #
-      # @since 3.0.0
       def queryable
         crit = Threaded.current_scope(self) || Criteria.new(self)
         crit.embedded = true if (crit.klass.embedded? && !crit.klass.cyclic?)
@@ -141,8 +129,6 @@ module Mongoid
       #
       # @raise [ Errors::InvalidScope ] If the scope is not a proc.
       # @raise [ Errors::ScopeOverwrite ] If the scope name already exists.
-      #
-      # @since 1.0.0
       def scope(name, value, &block)
         normalized = name.to_sym
         check_scope_validity(value)
@@ -169,8 +155,6 @@ module Mongoid
       # @option options [ Array ] :sort Optional sorting options.
       #
       # @return [ Criteria ] A scoped criteria.
-      #
-      # @since 3.0.0
       def scoped(options = nil)
         queryable.scoped(options)
       end
@@ -189,8 +173,6 @@ module Mongoid
       #
       # @return [ Criteria, Object ] The unscoped criteria or result of the
       #   block.
-      #
-      # @since 3.0.0
       def unscoped
         if block_given?
           without_default_scope do
@@ -207,8 +189,6 @@ module Mongoid
       #   Model.with_default_scope
       #
       # @return [ Criteria ] The criteria.
-      #
-      # @since 3.0.0
       def with_default_scope
         queryable.with_default_scope
       end
@@ -223,8 +203,6 @@ module Mongoid
       # @param [ Criteria ] criteria The criteria to apply.
       #
       # @return [ Criteria ] The yielded criteria.
-      #
-      # @since 1.0.0
       def with_scope(criteria)
         Threaded.set_current_scope(criteria, self)
         begin
@@ -242,8 +220,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The result of the block.
-      #
-      # @since 3.0.0
       def without_default_scope
         Threaded.begin_without_default_scope(self)
         yield
@@ -264,8 +240,6 @@ module Mongoid
       #
       # @raise [ Errors::ScopeOverwrite ] If the name exists and configured to
       #   raise the error.
-      #
-      # @since 2.1.0
       def check_scope_name(name)
         if _declared_scopes[name] || respond_to?(name, true)
           if Mongoid.scope_overwrite_exception
@@ -292,8 +266,6 @@ module Mongoid
       # @param [ Object ] value The intended scope.
       #
       # @raise [ Errors::InvalidScope ] If the scope is not a valid object.
-      #
-      # @since 3.0.0
       def check_scope_validity(value)
         unless value.respond_to?(:call)
           raise Errors::InvalidScope.new(self, value)
@@ -311,8 +283,6 @@ module Mongoid
       # @param [ Symbol ] name The method/scope name.
       #
       # @return [ Method ] The defined method.
-      #
-      # @since 3.0.0
       def define_scope_method(name)
         singleton_class.class_eval do
           define_method(name) do |*args|
@@ -336,8 +306,6 @@ module Mongoid
       #   Model.process_default_scope(value)
       #
       # @param [ Criteria, Proc ] value The default scope value.
-      #
-      # @since 3.0.5
       def process_default_scope(value)
         if existing = default_scoping
           ->{ existing.call.merge(value.to_proc.call) }

@@ -5,8 +5,6 @@ module Mongoid
   module Persistable
 
     # Defines behavior for $set operations.
-    #
-    # @since 4.0.0
     module Settable
       extend ActiveSupport::Concern
 
@@ -47,8 +45,6 @@ module Mongoid
       # @param [ Hash ] setters The field/value pairs to set.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def set(setters)
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|

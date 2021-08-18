@@ -20,8 +20,6 @@ module Mongoid
       # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
       #   configured default time zone corresponding to local midnight of
       #   this date.
-      #
-      # @since 3.0.0
       def __mongoize_time__
         ::Time.configured.local(year, month, day)
       end
@@ -33,8 +31,6 @@ module Mongoid
       #   date.mongoize
       #
       # @return [ Time ] The object mongoized.
-      #
-      # @since 3.0.0
       def mongoize
         ::Date.mongoize(self)
       end
@@ -49,8 +45,6 @@ module Mongoid
         # @param [ Time ] object The time from Mongo.
         #
         # @return [ Date ] The object as a date.
-        #
-        # @since 3.0.0
         def demongoize(object)
           ::Date.new(object.year, object.month, object.day) if object
         end
@@ -64,8 +58,6 @@ module Mongoid
         # @param [ Object ] object The object to mongoize.
         #
         # @return [ Time ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           unless object.blank?
             begin

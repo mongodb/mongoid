@@ -18,8 +18,6 @@ module Mongoid
         # @param [ Symbol ] strategy The merge strategy.
         # @param [ String ] operator The MongoDB operator.
         # @param [ String ] additional The additional MongoDB operator.
-        #
-        # @since 1.0.0
         def key(name, strategy, operator, additional = nil, &block)
           ::Symbol.add_key(name, strategy, operator, additional, &block)
         end

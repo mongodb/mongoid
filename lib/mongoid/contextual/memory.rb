@@ -27,8 +27,6 @@ module Mongoid
       # @param [ Array ] other The other array.
       #
       # @return [ true, false ] If the objects are equal.
-      #
-      # @since 3.0.0
       def ==(other)
         return false unless other.respond_to?(:entries)
         entries == other.entries
@@ -40,8 +38,6 @@ module Mongoid
       #   context.delete
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def delete
         deleted = count
         removed = map do |doc|
@@ -64,8 +60,6 @@ module Mongoid
       #   context.destroy
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def destroy
         deleted = count
         each do |doc|
@@ -84,8 +78,6 @@ module Mongoid
       # @param [ String, Symbol ] field The name of the field.
       #
       # @return [ Array<Object> ] The distinct values for the field.
-      #
-      # @since 3.0.0
       def distinct(field)
         documents.map{ |doc| doc.send(field) }.uniq
       end
@@ -99,8 +91,6 @@ module Mongoid
       #   end
       #
       # @return [ Enumerator ] The enumerator.
-      #
-      # @since 3.0.0
       def each
         if block_given?
           documents_for_iteration.each do |doc|
@@ -118,8 +108,6 @@ module Mongoid
       #   context.exists?
       #
       # @return [ true, false ] If the count is more than zero.
-      #
-      # @since 3.0.0
       def exists?
         count > 0
       end
@@ -130,8 +118,6 @@ module Mongoid
       #   context.first
       #
       # @return [ Document ] The first document.
-      #
-      # @since 3.0.0
       def first(*args)
         eager_load([documents.first]).first
       end
@@ -144,8 +130,6 @@ module Mongoid
       #   Memory.new(criteria)
       #
       # @param [ Criteria ] criteria The criteria.
-      #
-      # @since 3.0.0
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
         @documents = criteria.documents.select do |doc|
@@ -165,8 +149,6 @@ module Mongoid
       # @param [ Hash ] incs The operations.
       #
       # @return [ Enumerator ] The enumerator.
-      #
-      # @since 7.0.0
       def inc(incs)
         each do |document|
           document.inc(incs)
@@ -179,8 +161,6 @@ module Mongoid
       #   context.last
       #
       # @return [ Document ] The last document.
-      #
-      # @since 3.0.0
       def last
         eager_load([documents.last]).first
       end
@@ -191,8 +171,6 @@ module Mongoid
       #   context.length
       #
       # @return [ Integer ] The matching length.
-      #
-      # @since 3.0.0
       def length
         documents.length
       end
@@ -206,8 +184,6 @@ module Mongoid
       # @param [ Integer ] value The number of documents to return.
       #
       # @return [ Mongo ] The context.
-      #
-      # @since 3.0.0
       def limit(value)
         self.limiting = value
         self
@@ -232,8 +208,6 @@ module Mongoid
       # @param [ Integer ] value The number of documents to skip.
       #
       # @return [ Mongo ] The context.
-      #
-      # @since 3.0.0
       def skip(value)
         self.skipping = value
         self
@@ -248,8 +222,6 @@ module Mongoid
       #   pairs.
       #
       # @return [ Mongo ] The context.
-      #
-      # @since 3.0.0
       def sort(values)
         in_place_sort(values) and self
       end
@@ -262,8 +234,6 @@ module Mongoid
       # @param [ Hash ] attributes The new attributes for the document.
       #
       # @return [ nil, false ] False if no attributes were provided.
-      #
-      # @since 3.0.0
       def update(attributes = nil)
         update_documents(attributes, [ first ])
       end
@@ -276,8 +246,6 @@ module Mongoid
       # @param [ Hash ] attributes The new attributes for each document.
       #
       # @return [ nil, false ] False if no attributes were provided.
-      #
-      # @since 3.0.0
       def update_all(attributes = nil)
         update_documents(attributes, entries)
       end
@@ -292,8 +260,6 @@ module Mongoid
       #   context.documents_for_iteration
       #
       # @return [ Array<Document> ] The docs to iterate.
-      #
-      # @since 3.1.0
       def documents_for_iteration
         docs = documents[skipping || 0, limiting || documents.length] || []
         if eager_loadable?
@@ -311,8 +277,6 @@ module Mongoid
       #
       # @param [ Hash ] attributes The attributes.
       # @param [ Array<Document> ] docs The docs to update.
-      #
-      # @since 3.0.4
       def update_documents(attributes, docs)
         return false if !attributes || docs.empty?
         updates = { "$set" => {}}
@@ -332,8 +296,6 @@ module Mongoid
       # @example Get the limiting value.
       #
       # @return [ Integer ] The limit.
-      #
-      # @since 3.0.0
       def limiting
         defined?(@limiting) ? @limiting : nil
       end
@@ -347,8 +309,6 @@ module Mongoid
       # @param [ Integer ] value The limit.
       #
       # @return [ Integer ] The limit.
-      #
-      # @since 3.0.0
       def limiting=(value)
         @limiting = value
       end
@@ -360,8 +320,6 @@ module Mongoid
       # @example Get the skiping value.
       #
       # @return [ Integer ] The skip.
-      #
-      # @since 3.0.0
       def skipping
         defined?(@skipping) ? @skipping : nil
       end
@@ -375,8 +333,6 @@ module Mongoid
       # @param [ Integer ] value The skip.
       #
       # @return [ Integer ] The skip.
-      #
-      # @since 3.0.0
       def skipping=(value)
         @skipping = value
       end
@@ -389,8 +345,6 @@ module Mongoid
       #   context.apply_options
       #
       # @return [ Memory ] self.
-      #
-      # @since 3.0.0
       def apply_options
         raise Errors::InMemoryCollationNotSupported.new if criteria.options[:collation]
         skip(criteria.options[:skip]).limit(criteria.options[:limit])
@@ -400,8 +354,6 @@ module Mongoid
       #
       # @example Apply the sorting params.
       #   context.apply_sorting
-      #
-      # @since 3.0.0
       def apply_sorting
         if spec = criteria.options[:sort]
           in_place_sort(spec)
@@ -419,8 +371,6 @@ module Mongoid
       # @param [ Object ] b The first object.
       #
       # @return [ Integer ] The comparison value.
-      #
-      # @since 3.0.0
       def compare(a, b)
         case
         when a.nil? then b.nil? ? 0 : 1
@@ -435,8 +385,6 @@ module Mongoid
       #   context.in_place_sort(name: 1)
       #
       # @param [ Hash ] values The field/direction sorting pairs.
-      #
-      # @since 3.0.0
       def in_place_sort(values)
         documents.sort! do |a, b|
           values.map do |field, direction|
@@ -454,8 +402,6 @@ module Mongoid
       #   context.prepare_remove(doc)
       #
       # @param [ Document ] doc The document.
-      #
-      # @since 3.0.0
       def prepare_remove(doc)
         @selector ||= root.atomic_selector
         @path ||= doc.atomic_path

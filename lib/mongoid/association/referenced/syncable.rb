@@ -18,8 +18,6 @@ module Mongoid
         # @param [ Association ] association The association metadata.
         #
         # @return [ true, false ] If we can sync.
-        #
-        # @since 2.1.0
         def _syncable?(association)
           !_synced?(association.foreign_key) && send(association.foreign_key_check)
         end
@@ -30,8 +28,6 @@ module Mongoid
         #   document._synced
         #
         # @return [ Hash ] The synced foreign keys.
-        #
-        # @since 2.1.0
         def _synced
           @_synced ||= {}
         end
@@ -44,8 +40,6 @@ module Mongoid
         # @param [ String ] foreign_key The foreign key.
         #
         # @return [ true, false ] If we can sync.
-        #
-        # @since 2.1.0
         def _synced?(foreign_key)
           !!_synced[foreign_key]
         end
@@ -58,8 +52,6 @@ module Mongoid
         # @param [ Association ] association The association.
         #
         # @return [ Object ] The updated values.
-        #
-        # @since 2.2.1
         def remove_inverse_keys(association)
           foreign_keys = send(association.foreign_key)
           unless foreign_keys.nil? || foreign_keys.empty?
@@ -75,8 +67,6 @@ module Mongoid
         # @param [ Association ] association The document association.
         #
         # @return [ Object ] The updated values.
-        #
-        # @since 2.1.0
         def update_inverse_keys(association)
           if changes.has_key?(association.foreign_key)
             old, new = changes[association.foreign_key]
@@ -110,8 +100,6 @@ module Mongoid
           #   Person._synced(association)
           #
           # @param [ Association ] association The association metadata.
-          #
-          # @since 2.1.0
           def _synced(association)
             unless association.forced_nil_inverse?
               synced_save(association)
@@ -133,8 +121,6 @@ module Mongoid
           # @param [ Association ] association The association metadata.
           #
           # @return [ Class ] The class getting set up.
-          #
-          # @since 2.1.0
           def synced_save(association)
             set_callback(
                 :save,
@@ -154,8 +140,6 @@ module Mongoid
           # @param [ Association ] association The association metadata.
           #
           # @return [ Class ] The class getting set up.
-          #
-          # @since 2.2.1
           def synced_destroy(association)
             set_callback(
                 :destroy,

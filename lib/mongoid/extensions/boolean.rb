@@ -13,8 +13,6 @@ module Mongoid
       #   Boolean.mongoize("123.11")
       #
       # @return [ String ] The object mongoized.
-      #
-      # @since 3.0.0
       def mongoize(object)
         evolve(object)
       end

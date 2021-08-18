@@ -12,8 +12,6 @@ module Mongoid
     #   document.__evolve_object_id__
     #
     # @return [ Object ] The document's id.
-    #
-    # @since 3.0.0
     def __evolve_object_id__
       _id
     end

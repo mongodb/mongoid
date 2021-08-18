@@ -14,8 +14,6 @@ module Mongoid
         #   builder.allow_destroy?
         #
         # @return [ true, false ] True if the allow destroy option was set.
-        #
-        # @since 2.0.0.rc.1
         def allow_destroy?
           options[:allow_destroy] || false
         end
@@ -29,8 +27,6 @@ module Mongoid
         # @param [ Hash ] attrs The attributes to check for rejection.
         #
         # @return [ true, false ] True and call proc or method if rejectable, false if not.
-        #
-        # @since 2.0.0.rc.1
         def reject?(document, attrs)
           case callback = options[:reject_if]
             when Symbol
@@ -49,8 +45,6 @@ module Mongoid
         #   builder.update_only?
         #
         # @return [ true, false ] True if the update_only option was set.
-        #
-        # @since 2.0.0.rc.1
         def update_only?
           options[:update_only] || false
         end
@@ -64,8 +58,6 @@ module Mongoid
         # @param [ String ] id The id, usually coming from the form.
         #
         # @return [ BSON::ObjectId, String, Object ] The converted id.
-        #
-        # @since 2.0.0.rc.6
         def convert_id(klass, id)
           klass.using_object_ids? ? BSON::ObjectId.mongoize(id) : id
         end
