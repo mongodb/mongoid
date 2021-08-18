@@ -86,4 +86,71 @@ describe Mongoid::Config::Environment do
       end
     end
   end
+
+  describe "#load_yaml" do
+    let(:path) { 'mongoid.yml' }
+    let(:environment) {}
+    before { allow(Rails).to receive('env').and_return('test') }
+
+    subject { described_class.load_yaml(path, environment) }
+
+    context 'when file not found' do
+      let(:path) { 'not/a/valid/path'}
+
+      it { expect { subject }.to raise_error(Errno::ENOENT) }
+    end
+
+    context 'when file found' do
+      before do
+        allow(File).to receive(:new).with('mongoid.yml').and_return(StringIO.new(file_contents))
+      end
+
+      let(:file_contents) do
+        <<~FILE
+          test:
+            clients: ['test']
+          development:
+            clients: ['dev']
+        FILE
+      end
+
+      context 'when file cannot be parsed as YAML' do
+        let(:file_contents) { "*\nbad:%123abc" }
+
+        it { expect { subject }.to raise_error(Psych::SyntaxError) }
+      end
+
+      context 'when file contains ERB errors' do
+        let(:file_contents) { '<%= foo %>' }
+
+        it { expect { subject }.to raise_error(NameError) }
+      end
+
+      context 'when file does not contain a YAML Hash object' do
+        let(:file_contents) { '["this", "is", "an", "array"]' }
+
+        it { expect { subject }.to raise_error(Mongoid::Errors::InvalidConfigFile) }
+      end
+
+      context 'when environment not specified' do
+        it 'uses the rails environment' do
+          is_expected.to eq("clients"=>["test"])
+        end
+      end
+
+      context 'when environment is specified' do
+        let(:environment) { 'development' }
+
+        it 'uses the specified environment' do
+          is_expected.to eq("clients"=>["dev"])
+        end
+      end
+
+      context 'when environment is missing' do
+        let(:environment) { 'staging' }
+
+        it { is_expected.to be_nil }
+      end
+    end
+  end
 end
