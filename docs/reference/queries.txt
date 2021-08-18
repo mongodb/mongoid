@@ -1014,7 +1014,7 @@ Mongoid provides the pagination operators: ``limit``, ``skip``, and ``batch_size
 ``skip``
 --------
 
-``skip`` (alias: ``offset``) sets the number query results to skip
+``skip`` (alias: ``offset``) sets the number of query results to skip
 before returning documents. The ``limit`` value, if specified, will be applied
 after documents are skipped. When performing pagination, ``skip`` is recommended
 to be combined with :ref:`ordering <ordering>` to ensure consistent results.
@@ -1614,7 +1614,7 @@ Mongoid supports persistence operations off of criteria
 in a light capacity for when you want to expressively perform multi
 document inserts, updates, and deletion.
 
-..warning ::
+.. warning::
 
   Criteria ordering and pagination conditions, including ``order``, ``limit``,
   ``offset``, and ``batch_size``, will be ignored on the following operations.
