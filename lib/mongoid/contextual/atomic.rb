@@ -173,13 +173,16 @@ module Mongoid
       # @example Unset the field on the matches.
       #   context.unset(:name)
       #
-      # @param [ String, Symbol, Array ] args The name of the fields.
+      # @param [ String, Symbol, Array, Hash ] args The name(s) of the field(s) to unset.
+      #   If a Hash is specified, its keys will be used irrespective of its values.
       #
       # @return [ nil ] Nil.
       #
       # @since 3.0.0
       def unset(*args)
-        fields = args.__find_args__.collect { |f| [database_field_name(f), true] }
+        fields = args.collect { |a| a.is_a?(Hash) ? a.keys : a }
+                     .__find_args__
+                     .collect { |f| [database_field_name(f), true] }
         view.update_many("$unset" => Hash[fields])
       end
 
