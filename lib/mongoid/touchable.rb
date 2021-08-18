@@ -41,6 +41,16 @@ module Mongoid
           # _association.inverse_association.options but inverse_association
           # seems to not always/ever be set here. See MONGOID-5014.
           _parent.touch
+
+          if field
+            # If we are told to also touch a field, perform a separate write
+            # for that field. See MONGOID-5136.
+            # In theory we should combine the writes, which would require
+            # passing the fields to be updated to the parents - MONGOID-5142.
+            sets = set_field_atomic_updates(field)
+            selector = atomic_selector
+            _root.collection.find(selector).update_one(positionally(selector, sets), session: _session)
+          end
         else
           # If the current document is not embedded, it is composition root
           # and we need to persist the write here.
