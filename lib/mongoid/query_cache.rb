@@ -4,13 +4,14 @@ module Mongoid
 
   # A cache of database queries on a per-request basis.
   module QueryCache
-    class << self
-      LEGACY_WARNING = <<~DOC
-        You are using the legacy Mongoid::QueryCache which has known issues.
-        Please upgrade the `mongo` gem to at least 2.14.0 to use the improved QueryCache feature.
-        Refer to: https://docs.mongodb.com/mongoid/current/tutorials/mongoid-queries/#query-cache
-      DOC
+    # @api private
+    LEGACY_WARNING = <<~DOC
+      You are using the legacy Mongoid query cache which has known issues.
+      Please upgrade the `mongo' gem to at least 2.14.0 to use the improved driver query cache.
+      Refer to: https://docs.mongodb.com/mongoid/current/tutorials/mongoid-queries/#the-improved-driver-query-cache
+    DOC
 
+    class << self
       # Get the cached queries.
       #
       # @example Get the cached queries from the current thread.

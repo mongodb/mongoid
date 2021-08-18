@@ -185,6 +185,8 @@ describe Mongoid::QueryCache do
       max_driver_version '2.13'
 
       it 'logs a deprecation warning' do
+        Mongoid::QueryCache.remove_instance_variable('@legacy_query_cache_warned')
+
         expect_any_instance_of(Logger).to receive(:warn).with(described_class::LEGACY_WARNING)
         described_class.cache { }
       end
