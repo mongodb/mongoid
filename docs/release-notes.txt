@@ -9,6 +9,7 @@ Release Notes
 .. toctree::
   :titlesonly:
 
+  release-notes/mongoid-7.4
   release-notes/mongoid-7.3
   release-notes/mongoid-7.2
   release-notes/mongoid-7.1
