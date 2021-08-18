@@ -166,7 +166,7 @@ documents and does not query the database:
   band.members.any?
 
 Note that simply calling ``any?`` would *not* load the association
-(since ``any?`` only retrtieves the _id field of the first matching document).
+(since ``any?`` only retrieves the _id field of the first matching document).
 
 ``exists?``
 ~~~~~~~~~~~
@@ -180,7 +180,7 @@ any *persisted* documents in the association. Unlike the ``any?`` method:
 - ``exists?`` does not allow filtering in the application like ``any?`` does,
   and does not take any arguments.
 
-The following examle illustrates the difference between ``exists?`` and
+The following example illustrates the difference between ``exists?`` and
 ``any?``:
 
 .. code-block:: ruby
@@ -919,7 +919,7 @@ is defined:
 - ``:foreign_key`` is the field on the local model which stores the
   ``:primary_key`` values.
 - ``:inverse_primary_key`` is the field on the local model that the remote
-  model uses to look up the local model docuemnts.
+  model uses to look up the local model documents.
 - ``:inverse_foreign_key`` is the field on the remote model storing the
   values in ``:inverse_primary_key``.
 
@@ -1531,7 +1531,7 @@ are supported:
 - `$project <https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_
 - `$unwind <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_
 
-To construct a pipeline, call the corresponding aggregation pipeine methods
+To construct a pipeline, call the corresponding aggregation pipeline methods
 on a ``Criteria`` instance. Aggregation pipeline operations are added to the
 ``pipeline`` attribute of the ``Criteria`` instance. To execute the pipeline,
 pass the ``pipeline`` attribute value to ``Collection#aggragegate`` method.
@@ -1592,7 +1592,7 @@ Alternatively, standard MongoDB aggregation pipeline syntax may be used:
 
 .. code-block:: ruby
 
-    criteria = Tour.all.group(_id: 'states', states: {'$addtoSet' => '$states'})
+    criteria = Tour.all.group(_id: 'states', states: {'$addToSet' => '$states'})
 
 project
 ```````
@@ -1616,7 +1616,7 @@ unwind
 The ``unwind`` method adds an `$unwind aggregation pipeline stage
 <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_.
 
-The argument can be a field name, specifyable as a symbol or a string, or
+The argument can be a field name, specifiable as a symbol or a string, or
 a Hash or a ``BSON::Document`` instance:
 
 .. code-block:: ruby
