@@ -501,7 +501,7 @@ describe Mongoid::Document do
       end
     end
 
-    context ':compact option' do
+    context 'deprecated :compact option' do
       # Since rails 6 differs in how it treats id fields,
       # run this test on one version of rails. Currently rails 6 is in beta,
       # when it is released this version should be changed to 6.
@@ -511,6 +511,22 @@ describe Mongoid::Document do
         # These tests require a specific set of defined attributes
         # on the model
         expect(church.as_json.keys.sort).to eq(%w(_id location name))
+      end
+
+      context 'deprecation' do
+        let(:church) do
+          Church.create!(name: 'St. Basil')
+        end
+
+        it 'logs a deprecation warning when :compact is given' do
+          expect_any_instance_of(Logger).to receive(:warn).with('#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.')
+          church.as_json(compact: true)
+        end
+
+        it 'does not log a deprecation warning when :compact is not given' do
+          expect_any_instance_of(Logger).to_not receive(:warn)
+          church.as_json
+        end
       end
 
       context 'there is a nil valued attribute' do
@@ -541,7 +557,7 @@ describe Mongoid::Document do
         end
 
         it 'returns all fields and _id' do
-          actual = church.as_json(compact: true)
+          actual = church.as_json(compact: true).compact
           expect(actual).to eq('_id' => church.id, 'name' => 'St. Basil',
             'location' => {})
         end
