@@ -27,6 +27,11 @@ describe Mongoid::QueryCache do
     context 'with driver query cache' do
       min_driver_version '2.14'
 
+      it 'does not log a deprecation warning' do
+        expect_any_instance_of(Logger).to_not receive(:warn)
+        described_class.cache { }
+      end
+
       context 'when query cache is not enabled' do
         before do
           Mongoid::QueryCache.enabled = false
@@ -178,6 +183,11 @@ describe Mongoid::QueryCache do
 
     context 'with mongoid query cache' do
       max_driver_version '2.13'
+
+      it 'logs a deprecation warning' do
+        expect_any_instance_of(Logger).to receive(:warn).with(described_class::LEGACY_WARNING)
+        described_class.cache { }
+      end
 
       context 'when query cache is not enabled' do
         before do
