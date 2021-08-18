@@ -22,12 +22,12 @@ the complete list of issues fixed in each release, including bug fixes.
 ---------------------------------------
 
 **Breaking change:** In Mongoid 7.4, the ``===`` operator works the same way
-as it does in Ruby, and is equivalent to calling ``is_a?`` on the left hand
-side with the right hand side as the argument:
+as it does in Ruby, and is equivalent to calling ``is_a?`` on the right hand
+side with the left hand side as the argument:
 
 .. code-block:: ruby
 
-  instance === ModelClass
+  ModelClass === instance
   
   # equivalent to:
   instance.is_a?(ModelClass)
