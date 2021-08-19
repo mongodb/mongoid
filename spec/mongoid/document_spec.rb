@@ -557,7 +557,7 @@ describe Mongoid::Document do
         end
 
         it 'returns all fields and _id' do
-          actual = church.as_json(compact: true).compact
+          actual = church.as_json(compact: true)
           expect(actual).to eq('_id' => church.id, 'name' => 'St. Basil',
             'location' => {})
         end
