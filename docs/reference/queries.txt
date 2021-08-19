@@ -1029,7 +1029,7 @@ to be combined with :ref:`ordering <ordering>` to ensure consistent results.
   #   class:    Band
   #   embedded: false>
 
-.. _batch_size:
+.. _batch-size:
 
 ``batch_size``
 --------
