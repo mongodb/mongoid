@@ -990,7 +990,7 @@ the default scope being evaluated first:
 Pagination
 ==========
 
-Mongoid provides the pagination operators: ``limit``, ``skip``, and ``batch_size``.
+Mongoid provides the pagination operators ``limit``, ``skip``, and ``batch_size`` on ``Criteria``.
 
 .. _limit:
 
