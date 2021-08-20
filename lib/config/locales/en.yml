@@ -99,8 +99,8 @@ en:
           summary: "Your mongoid.yml configuration file does not contain the
             correct file structure."
           resolution: "Ensure your configuration file contains correct contents.
-            Please consult the following page with respect to Mongoid's configuration:\n\n
-            \_\_http://mongoid.org/en/mongoid/docs/installation.html"
+            Please consult the following page with respect to Mongoid's configuration:
+            https://docs.mongodb.com/mongoid/current/reference/configuration/"
         invalid_config_option:
           message: "Invalid configuration option: %{name}."
           summary: "A invalid configuration option was provided in your
