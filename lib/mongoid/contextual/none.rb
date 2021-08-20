@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require "mongoid/contextual/aggregable/none"
+
 module Mongoid
   module Contextual
     class None
       include Enumerable
+      include Aggregable::None
       include Queryable
 
       attr_reader :criteria, :klass
@@ -20,22 +23,22 @@ module Mongoid
         other.is_a?(None)
       end
 
-      # Allow distinct for null context.
+      # Get the distinct field values in null context.
       #
-      # @example Get the distinct values.
+      # @example Get the distinct values in null context.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] field the name of the field.
+      # @param [ String, Symbol ] _field The name of the field.
       #
-      # @return [ Array ] Empty Array
-      def distinct(field)
+      # @return [ Array ] An empty Array.
+      def distinct(_field)
         []
       end
 
       # Iterate over the null context. There are no documents to iterate over
       # in this case.
       #
-      # @example Iterate over the context.
+      # @example Iterate over the null context.
       #   context.each do |doc|
       #     puts doc.name
       #   end
@@ -52,21 +55,20 @@ module Mongoid
 
       # Do any documents exist for the context.
       #
-      # @example Do any documents exist for the context.
+      # @example Do any documents exist in the null context.
       #   context.exists?
       #
-      # @return [ true, false ] If the count is more than zero.
+      # @return [ false ] Always false.
       def exists?; false; end
 
-
-      # Allow pluck for null context.
+      # Pluck the field values in null context.
       #
-      # @example Allow pluck for null context.
+      # @example Get the values for null context.
       #   context.pluck(:name)
       #
       # @param [ String, Symbol, Array ] args Field or fields to pluck.
       #
-      # @return [ Array ] Emtpy Array
+      # @return [ Array ] An empty Array.
       def pluck(*args)
         []
       end
@@ -83,7 +85,7 @@ module Mongoid
 
       # Always returns nil.
       #
-      # @example Get the last document.
+      # @example Get the last document in null context.
       #   context.last
       #
       # @return [ nil ] Always nil.
@@ -91,12 +93,12 @@ module Mongoid
 
       # Always returns zero.
       #
-      # @example Get the length of matching documents.
+      # @example Get the length of null context.
       #   context.length
       #
       # @return [ Integer ] Always zero.
       def length
-        entries.length
+        0
       end
       alias :size :length
 
