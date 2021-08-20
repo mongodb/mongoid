@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-# encoding: utf-8
+
+require "mongoid/contextual/aggregable/none"
 
 module Mongoid
   module Contextual
@@ -21,15 +22,15 @@ module Mongoid
         #
         # @param [ String, Symbol ] field The field name.
         #
-        # @return [ Hash ] count is a number of documents with the provided
-        #   field. If there're none, then count is 0 and max, min, sum, avg
-        #   are nil.
+        # @return [ Hash ] A Hash containing the aggregate values.
+        #   If no documents are found, then returned Hash will have
+        #   count, sum of 0 and max, min, avg of nil.
         #
         # @since 3.0.0
         def aggregates(field)
           result = collection.find.aggregate(pipeline(field), session: _session).to_a
           if result.empty?
-            { "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil }
+            Mongoid::Contextual::Aggregable::None::AGGREGATES.dup
           else
             result.first
           end

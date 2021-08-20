@@ -5,6 +5,46 @@ require "spec_helper"
 
 describe Mongoid::Contextual::Aggregable::Memory do
 
+  describe "#aggregates" do
+    let(:context) do
+      Mongoid::Contextual::Memory.new(criteria)
+    end
+
+    subject { context.aggregates(:likes) }
+
+    context 'when no documents found' do
+      let(:criteria) do
+        Band.all.tap do |crit|
+          crit.documents = []
+        end
+      end
+
+      it do
+        is_expected.to eq("count" => 0, "avg" => nil, "max" => nil, "min" => nil, "sum" => 0)
+      end
+    end
+
+    context 'when documents found' do
+      let(:criteria) do
+        Band.all.tap do |crit|
+          crit.documents = [ depeche, tool ]
+        end
+      end
+
+      let!(:depeche) do
+        Band.create(name: "Depeche Mode", likes: 1000)
+      end
+
+      let!(:tool) do
+        Band.create(name: "Tool", likes: 500)
+      end
+
+      it do
+        is_expected.to eq("count" => 0, "avg" => 750.0, "max" => 1000, "min" => 500, "sum" => 1500)
+      end
+    end
+  end
+
   describe "#avg" do
 
     context "when provided a single field" do
