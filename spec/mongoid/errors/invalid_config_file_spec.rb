@@ -25,7 +25,7 @@ describe Mongoid::Errors::InvalidConfigFile do
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "Ensure your configuration file contains correct contents."
+        "Ensure your configuration file contains the correct contents."
       )
     end
   end
