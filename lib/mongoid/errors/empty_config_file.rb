@@ -11,6 +11,8 @@ module Mongoid
       # Create the new error.
       #
       # @param [ String ] path The path of the config file used.
+      #
+      # @api private
       def initialize(path)
         super(
           compose_message(
