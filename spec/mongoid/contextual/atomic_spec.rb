@@ -830,7 +830,8 @@ describe Mongoid::Contextual::Atomic do
     context "when unsetting multiple fields" do
 
       let!(:new_order) do
-        Band.create(name: "New Order", genres: %w[electro dub], years: 10, likes: 200, rating: 4.3)
+        Band.create(name: "New Order", genres: %w[electro dub], years: 10,
+          likes: 200, rating: 4.3, origin: 'Space')
       end
 
       let(:criteria) do
@@ -876,7 +877,7 @@ describe Mongoid::Contextual::Atomic do
       context "when using Hash arguments" do
 
         before do
-          context.unset({ years: true, likes: "" }, { rating: false })
+          context.unset({ years: true, likes: "" }, { rating: false, origin: nil })
         end
 
         it "unsets the specified fields" do
@@ -886,6 +887,7 @@ describe Mongoid::Contextual::Atomic do
           expect(new_order.years).to be_nil
           expect(new_order.likes).to be_nil
           expect(new_order.rating).to be_nil
+          expect(new_order.origin).to be_nil
         end
       end
 
