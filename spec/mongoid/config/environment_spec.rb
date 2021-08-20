@@ -5,9 +5,19 @@ require "spec_helper"
 
 describe Mongoid::Config::Environment do
 
-  after(:all) do
-    Rails = RailsTemp
-    Object.send(:remove_const, :RailsTemp)
+  around do |example|
+    if defined?(Rails)
+      SavedRails = Rails
+      example.run
+      Object.send(:remove_const, :Rails) if defined?(Rails)
+      Rails = SavedRails
+      Object.send(:remove_const, :SavedRails)
+    else
+      example.run
+      if defined?(Rails)
+        Object.send(:remove_const, :Rails)
+      end
+    end
   end
 
   describe "#env_name" do
@@ -22,11 +32,6 @@ describe Mongoid::Config::Environment do
               def env; "production"; end
             end
           end
-        end
-
-        after do
-          RailsTemp = Rails
-          Object.send(:remove_const, :Rails)
         end
 
         it "returns the rails environment" do
