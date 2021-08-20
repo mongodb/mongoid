@@ -182,9 +182,9 @@ module Mongoid
       #
       # @since 3.0.0
       def unset(*args)
-        fields = args.collect { |a| a.is_a?(Hash) ? a.keys : a }
+        fields = args.map { |a| a.is_a?(Hash) ? a.keys : a }
                      .__find_args__
-                     .collect { |f| [database_field_name(f), true] }
+                     .map { |f| [database_field_name(f), true] }
         view.update_many("$unset" => Hash[fields])
       end
 
