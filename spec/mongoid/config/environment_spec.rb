@@ -131,6 +131,12 @@ describe Mongoid::Config::Environment do
         it { expect { subject }.to raise_error(NameError) }
       end
 
+      context 'when file is empty' do
+        let(:file_contents) { '' }
+
+        it { expect { subject }.to raise_error(Mongoid::Errors::EmptyConfigFile) }
+      end
+
       context 'when file does not contain a YAML Hash object' do
         let(:file_contents) { '["this", "is", "an", "array"]' }
 
