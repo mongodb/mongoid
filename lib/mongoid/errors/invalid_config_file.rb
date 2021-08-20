@@ -10,10 +10,7 @@ module Mongoid
 
       # Create the new error.
       #
-      # @example Create the new error.
-      #   InvalidConfigFile.new(:name, [ :option ])
-      #
-      # @param [ String ] path The file path of the config.
+      # @param [ String ] path The path of the config file used.
       def initialize(path)
         super(
           compose_message(
