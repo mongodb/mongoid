@@ -527,8 +527,8 @@ Mongoid provides three merge strategies:
   same field, the values of the existing condition are intersected with the
   values of the new condition and the result is stored as the operator value.
 - **Union**: if there already is a condition using the same operator on the
-  same field, the values of the new condition are aded to the values of the
-  exsting condition and the result is stored as the operator value.
+  same field, the values of the new condition are added to the values of the
+  existing condition and the result is stored as the operator value.
 
 The following snippet demonstrates all of the strategies, using ``in`` as the
 example operator:
@@ -796,7 +796,7 @@ should therefore be avoided.
 
     band = Band.only(:tours, 'tours.year').last
 
-  The most recent projection specification overrided the earlier one.
+  The most recent projection specification overrides the earlier one.
   For example, the above query was equivalent to:
 
   .. code-block:: ruby
@@ -1027,8 +1027,8 @@ The Improved Driver Query Cache
 -------------------------------
 
 The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
-Ruby Driver. The driver query cache is more correct and more effective, and it
-is recmomended that you upgrade to version 2.14.0 of the Ruby driver or newer.
+Ruby Driver. The driver query cache is more correct and more effective, and we
+recommended that you upgrade to version 2.14.0 of the Ruby driver or newer.
 
 For the purposes of this tutorial, the Mongoid query cache will be called "the
 legacy query cache", and the driver query cache will be referred to as "the
@@ -1231,7 +1231,7 @@ Mongoid also has some helpful methods on criteria.
    * - ``Criteria#estimated_count``
 
        *Get an approximate number of documents in the collection using the
-       collection metadta. The* ``estimated_count`` *method does not accept
+       collection metadata. The* ``estimated_count`` *method does not accept
        query conditions; if any are given, it will raise*
        ``Mongoid::Errors::InvalidEstimatedCountCriteria``.
        *If a model defines a default scope,* ``estimated_count`` *must be

@@ -287,7 +287,7 @@ or globally. To set the discriminator key on the parent class:
    class Rectangle < Shape
    end
 
-To set the discrminator key globally:
+To set the discriminator key globally:
 
 .. code-block:: ruby
 
