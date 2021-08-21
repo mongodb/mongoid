@@ -201,6 +201,122 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
     end
   end
 
+  describe "#empty?" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:post_one) do
+      Post.create(person_id: person.id)
+    end
+
+    let!(:post_two) do
+      Post.create(person_id: person.id)
+    end
+
+    context "when only a criteria target exists" do
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:empty) do
+        enumerable.empty?
+      end
+
+      it "returns false" do
+        expect(empty).to be false
+      end
+
+      it "retains the correct length" do
+        expect(enumerable.length).to eq(2)
+      end
+
+      it "retains the correct length when calling to_a" do
+        expect(enumerable.to_a.length).to eq(2)
+      end
+
+      context "when iterating over the relation a second time" do
+
+        before do
+          enumerable.each { |post| post }
+        end
+
+        it "retains the correct length" do
+          expect(enumerable.length).to eq(2)
+        end
+
+        it "retains the correct length when calling to_a" do
+          expect(enumerable.to_a.length).to eq(2)
+        end
+      end
+    end
+
+    context "when the documents have been loaded" do
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      before do
+        enumerable.load_all!
+      end
+
+      it "is _loaded" do
+        expect(enumerable._loaded?).to be true
+      end
+
+      it "it does not call #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to_not receive(:exists?)
+        expect(enumerable.empty?).to be false
+      end
+    end
+
+    context "when the documents are not loaded" do
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      it "is not _loaded" do
+        expect(enumerable._loaded?).to be false
+      end
+
+      it "it calls #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to receive(:exists?)
+        expect(enumerable.empty?).to be true
+      end
+
+      context "when documents are added" do
+
+        before do
+          enumerable << post_one
+        end
+
+        it "is not _loaded" do
+          expect(enumerable._loaded?).to be false
+        end
+
+        it "it does not call #exists? on the unloaded scope" do
+          expect(enumerable._unloaded).to_not receive(:exists?)
+          expect(enumerable.empty?).to be false
+        end
+      end
+    end
+  end
+
   describe "#any?" do
 
     let(:person) do
