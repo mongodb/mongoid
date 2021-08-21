@@ -11,10 +11,18 @@ module Mongoid
         # Provided for interface consistency with Aggregable::Mongo.
         #
         # @param [ String, Symbol ] _field The field name.
+        # @param [ Array<String|Symbol> ] operators The aggregable operations to perform.
+        #   If a single operator is specified, the aggregate value for the given
+        #   operator only will be returned.
         #
         # @return [ Hash ] A Hash with count, sum of 0 and max, min, avg of nil.
-        def aggregates(_field)
-          AGGREGATES.dup
+        #   If a single operator is specified, the aggregate value for the given
+        #   operator only will be returned.
+        def aggregates(_field, *operators)
+          operators = operators.map(&:to_s)
+          result = AGGREGATES.dup
+          result.slice!(*operators) if (operators & result.keys).present?
+          result.size == 1 ? result.values.first : result
         end
 
         # Always returns zero.

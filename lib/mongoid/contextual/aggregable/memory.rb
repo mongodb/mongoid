@@ -11,13 +11,19 @@ module Mongoid
         # Provided for interface consistency with Aggregable::Mongo.
         #
         # @param [ String, Symbol ] field The field name.
+        # @param [ Array<String|Symbol> ] operators The aggregable operations to perform.
         #
-        # @return [ Hash ] A Hash containing the aggregate values.
-        #   If no documents are present, then returned Hash will have
-        #   count, sum of 0 and max, min, avg of nil.
-        def aggregates(field)
-          %w(count sum avg min max).each_with_object({}) do |method, hash|
-            hash[method] = send(method, field)
+        # @return [ Integer | Float | Hash ] A Hash containing the aggregate values.
+        #   If a single operator is specified, the aggregate value for the given
+        #   operator only will be returned.
+        def aggregates(field, *operators)
+          operators = operators.map(&:to_s)
+          keys = %w(count sum avg min max)
+          keys.slice!(*operators) if (operators & keys).present?
+          if keys.size == 1
+            send(method, field)
+          else
+            keys.each_with_object({}) { |method, hash| hash[method] = send(method, field) }
           end
         end
 

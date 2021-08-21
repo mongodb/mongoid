@@ -21,19 +21,17 @@ module Mongoid
         #   # }
         #
         # @param [ String, Symbol ] field The field name.
+        # @param [ Array<String|Symbol> ] operators The aggregable operations to perform.
         #
-        # @return [ Hash ] A Hash containing the aggregate values.
-        #   If no documents are found, then returned Hash will have
-        #   count, sum of 0 and max, min, avg of nil.
+        # @return [ Integer | Float | Hash ] A Hash containing the aggregate values.
+        #   If a single operator is specified, the aggregate value for the given
+        #   operator only will be returned.
         #
         # @since 3.0.0
-        def aggregates(field)
-          result = collection.find.aggregate(pipeline(field), session: _session).to_a
-          if result.empty?
-            Mongoid::Contextual::Aggregable::None::AGGREGATES.dup
-          else
-            result.first
-          end
+        def aggregates(field, *operators)
+          result = collection.find.aggregate(pipeline(field, *operators), session: _session).to_a.first
+          result ||= Mongoid::Contextual::Aggregable::None::AGGREGATES.dup
+          result.size == 1 ? result.values.first : result
         end
 
         # Get the average value of the provided field.
@@ -47,7 +45,7 @@ module Mongoid
         #
         # @since 3.0.0
         def avg(field)
-          aggregates(field)["avg"]
+          aggregates(field, 'avg')
         end
 
         # Get the max value of the provided field. If provided a block, will
@@ -69,7 +67,7 @@ module Mongoid
         #
         # @since 3.0.0
         def max(field = nil)
-          block_given? ? super() : aggregates(field)["max"]
+          block_given? ? super() : aggregates(field, 'max')
         end
 
         # Get the min value of the provided field. If provided a block, will
@@ -91,7 +89,7 @@ module Mongoid
         #
         # @since 3.0.0
         def min(field = nil)
-          block_given? ? super() : aggregates(field)["min"]
+          block_given? ? super() : aggregates(field, 'min')
         end
 
         # Get the sum value of the provided field. If provided a block, will
@@ -109,7 +107,7 @@ module Mongoid
         #
         # @since 3.0.0
         def sum(field = nil)
-          block_given? ? super() : aggregates(field)["sum"] || 0
+          block_given? ? super() : aggregates(field, 'sum') || 0
         end
 
         private
@@ -122,27 +120,28 @@ module Mongoid
         #   aggregable.pipeline(:likes)
         #
         # @param [ String, Symbol ] field The name of the field.
+        # @param [ Array<String|Symbol> ] operators The aggregable operations to perform.
         #
         # @return [ Array ] The array of pipeline operators.
         #
         # @since 3.1.0
-        def pipeline(field)
+        def pipeline(field, *operators)
+          operators = operators.map(&:to_s)
           db_field = "$#{database_field_name(field)}"
           pipeline = []
           pipeline << { "$match" =>  criteria.exists(field => true).selector }
           pipeline << { "$sort" => criteria.options[:sort] } if criteria.options[:sort]
           pipeline << { "$skip" => criteria.options[:skip] } if criteria.options[:skip]
           pipeline << { "$limit" => criteria.options[:limit] } if criteria.options[:limit]
-          pipeline << {
-            "$group"  => {
-              "_id"   => field.to_s,
-              "count" => { "$sum" => 1 },
-              "max"   => { "$max" => db_field },
-              "min"   => { "$min" => db_field },
-              "sum"   => { "$sum" => db_field },
-              "avg"   => { "$avg" => db_field }
-            }
+          group = {
+            "count" => { "$sum" => 1 },
+            "max"   => { "$max" => db_field },
+            "min"   => { "$min" => db_field },
+            "sum"   => { "$sum" => db_field },
+            "avg"   => { "$avg" => db_field }
           }
+          group.slice!(*operators) if (operators & group.keys).present?
+          pipeline << { "$group" => { "_id" => field.to_s }.merge!(group) }
         end
       end
     end
