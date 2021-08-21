@@ -13,6 +13,8 @@ Field Definition
    :class: singlecol
 
 
+.. _field-types:
+
 Field Types
 ===========
 
@@ -1177,7 +1179,7 @@ This section outlines the behavior of Mongoid and the Mongo Ruby Driver
 when working with fields whose names are prefixed with ``$`` or contain ``.``
 ("specially-named fields"):
 
-* Mongoid's ``field`` macro does not support defining specially-named fields.
+* Mongoid's :ref:`field <field-types>` macro does not support defining specially-named fields.
 * Mongoid does not support getting or setting the values of specially-named fields.
 * Mongoid does not support queries or operations which reference specially-named fields.
 * If a document existing in the database contains specially-named fields,
