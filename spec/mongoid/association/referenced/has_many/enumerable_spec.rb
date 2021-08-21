@@ -390,6 +390,11 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         expect(enumerable._loaded?).to be true
       end
 
+      it "it does not call #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to_not receive(:exists?)
+        expect(enumerable.any?).to be true
+      end
+
       context "when a block is given" do
         it "returns true when the predicate is true" do
           expect(
@@ -439,6 +444,27 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
 
       it "is not _loaded" do
         expect(enumerable._loaded?).to be false
+      end
+
+      it "it calls #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to receive(:exists?)
+        expect(enumerable.any?).to be false
+      end
+
+      context "when documents are added" do
+
+        before do
+          enumerable << post_one
+        end
+
+        it "is not _loaded" do
+          expect(enumerable._loaded?).to be false
+        end
+
+        it "it does not call #exists? on the unloaded scope" do
+          expect(enumerable._unloaded).to_not receive(:exists?)
+          expect(enumerable.any?).to be true
+        end
       end
 
       context "when a block is given" do
