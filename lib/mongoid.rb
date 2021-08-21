@@ -19,10 +19,10 @@ require "mongo"
 require 'mongo/active_support'
 
 require "mongoid/version"
+require "mongoid/deprecable"
 require "mongoid/config"
 require "mongoid/persistence_context"
 require "mongoid/loggable"
-require "mongoid/deprecatable"
 require "mongoid/clients"
 require "mongoid/document"
 require "mongoid/tasks/database"
@@ -40,7 +40,7 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 module Mongoid
   extend Forwardable
   extend Loggable
-  extend Deprecatable
+  extend Deprecable
   extend self
 
   # A string added to the platform details of Ruby driver client handshake documents.

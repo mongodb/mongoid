@@ -4,9 +4,8 @@ require "mongoid/deprecation"
 
 module Mongoid
 
-  # Mixin which overrides ActiveSupport's default deprecation
-  # behavior added to Module class.
-  module Deprecatable
+  # Adds ability to declare Mongoid-specific deprecations
+  module Deprecable
 
     # Declares method(s) as deprecated.
     #
@@ -22,11 +21,14 @@ module Mongoid
     #   Mongoid.deprecate(Cat, meow: 'eat :catnip instead'); Cat.new.meow
     #   #=> Mongoid.logger.warn("meow is deprecated and will be removed from Mongoid 8.0 (eat :catnip instead)")
     #
-    # @param [ Module ] klass The parent which contains the method.
+    # @param [ Module ] target_module The parent which contains the method.
     # @param [ Symbol | Hash<Symbol, [Symbol|String]> ] method_descriptors
     #   The methods to deprecate, with optional replacement instructions.
-    def deprecate(klass, *method_descriptors)
-      Mongoid::Deprecation.deprecate_methods(klass, *method_descriptors)
+    def deprecate(target_module, *method_descriptors)
+      Mongoid::Deprecation.deprecate_methods(target_module, *method_descriptors)
     end
   end
 end
+
+# Ensure Mongoid.deprecate can be used during initialization
+Mongoid.extend(Mongoid::Deprecable)
