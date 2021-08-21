@@ -18,15 +18,15 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
-BSON::ObjectID ``#as_json`` returns String
+BSON::ObjectId ``#as_json`` returns String
 ------------------------------------------
 
-**Breaking change:** BSON::ObjectID ``#as_json`` used for JSON serialization
+**Breaking change:** BSON::ObjectId ``#as_json`` used for JSON serialization
 now returns a String value. Note this will also affect the behavior of the ``#to_json`` method.
 
 .. code-block:: ruby
 
-  id = BSON::ObjectID("03d623ca58edf9046e207565")
+  id = BSON::ObjectId("03d623ca58edf9046e207565")
 
   id.as_json  #=> "03d623ca58edf9046e207565"
 
