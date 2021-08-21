@@ -94,8 +94,8 @@ class GithubConfig < YamlConfig
 end
 
 class Transmogrifier
-  SPLATTABLE_FIELDS  = %i[mongodb ruby rails topology driver i18n]
-  COMPACTABLE_FIELDS = %i[mongodb ruby topology gemfile]
+  SPLATTABLE_FIELDS  = %i[mongodb topology ruby rails driver i18n]
+  COMPACTABLE_FIELDS = %i[mongodb topology ruby gemfile]
 
   attr_reader :eg_config,
               :gh_config
