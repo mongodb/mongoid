@@ -18,6 +18,8 @@ module Mongoid
       include Association::EagerLoadable
       include Queryable
 
+      Mongoid.deprecate(self, :geo_near)
+
       # Options constant.
       #
       # @since 5.0.0

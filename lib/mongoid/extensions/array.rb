@@ -195,3 +195,4 @@ end
 
 ::Array.__send__(:include, Mongoid::Extensions::Array)
 ::Array.extend(Mongoid::Extensions::Array::ClassMethods)
+::Mongoid.deprecate(Array, :blank_criteria)

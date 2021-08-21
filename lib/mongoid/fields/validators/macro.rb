@@ -9,11 +9,6 @@ module Mongoid
       module Macro
         extend self
 
-        # The warning message to give when a field is of type Symbol.
-        #
-        # @since 7.0.0
-        FIELD_TYPE_IS_SYMBOL = 'The BSON symbol type is deprecated; use String instead'.freeze
-
         OPTIONS = [
           :as,
           :default,
@@ -127,8 +122,9 @@ module Mongoid
 
             if option == :type && options[option] == Symbol
               @field_type_is_symbol_warned ||= begin
-                Mongoid.logger.warn(FIELD_TYPE_IS_SYMBOL)
-                true
+                Mongoid::Deprecation.warn(<<~MSG.squish.freeze) && true
+                  The BSON Symbol type is deprecated (use String instead)
+                MSG
               end
             end
           end
