@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+# TODO: Support topology=sharded-cluster (requires better MongoDB Github Action)
 # TODO: Support i18n-fallbacks test
 # TODO: Support app-tests tests
 
