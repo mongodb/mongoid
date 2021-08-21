@@ -29,7 +29,7 @@ class EvergreenConfig < YamlConfig
   end
 
   def variants
-    data[:buildvariants].each_with_object([]) do |var, nodes|
+    @variants ||= data[:buildvariants].each_with_object([]) do |var, nodes|
       name = var[:matrix_name]
 
       spec = var[:matrix_spec]
@@ -53,7 +53,11 @@ class EvergreenConfig < YamlConfig
 
       missing = node.map {|k, v| k if v.blank? }.compact
       missing -= %i[driver rails i18n]
-      raise("Invalid Evergreen buildvariant '#{name}'. Keys missing: #{missing}") if missing.present?
+
+      if missing.present?
+        puts "Skipping invalid Evergreen buildvariant '#{name}'. Keys missing: #{missing}"
+        next
+      end
 
       nodes << node
     end
@@ -90,7 +94,8 @@ class GithubConfig < YamlConfig
 end
 
 class Transmogrifier
-  SPLATTABLE_FIELDS = %i[mongodb ruby rails driver topology i18n]
+  SPLATTABLE_FIELDS  = %i[mongodb ruby rails topology driver i18n]
+  COMPACTABLE_FIELDS = %i[mongodb ruby topology gemfile]
 
   attr_reader :eg_config,
               :gh_config
@@ -132,12 +137,22 @@ class Transmogrifier
   end
 
   def print_stats
-    puts "#{inclusions_node.size} matrix builds written"
+    puts "#{inclusions_node.size} unique matrix builds written"
   end
 
   def inclusions_node
-    @inclusions_node ||= splat(variants).each {|node| transform_node!(node) }
-                                        .reject {|node| unsupported?(node) }
+    @inclusions_node ||= begin
+      inclusions = splat(variants).each {|node| transform_node!(node) }.reject {|node| unsupported?(node) }
+      puts "#{inclusions.size} candidate matrix builds identified"
+      compact_nodes(inclusions)
+    end
+  end
+
+  def compact_nodes(nodes)
+    nodes.each_with_object({}) do |node, uniq_nodes|
+      key = COMPACTABLE_FIELDS.map {|k| "#{k}:#{node[k]}" }.join('|')
+      uniq_nodes[key] ||= node
+    end.values
   end
 
   def splat(array)
