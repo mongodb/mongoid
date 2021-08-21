@@ -39,6 +39,7 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 module Mongoid
   extend Forwardable
   extend Loggable
+  extend Deprecatable
   extend self
 
   # A string added to the platform details of Ruby driver client handshake documents.
