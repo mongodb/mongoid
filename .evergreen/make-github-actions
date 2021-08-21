@@ -96,7 +96,6 @@ class Transmogrifier
               :gh_config
 
   def initialize
-    @name =
     @eg_config = EvergreenConfig.new
     @gh_config = GithubConfig.new
   end
