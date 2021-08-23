@@ -80,6 +80,12 @@ en:
             different collections so a simple id lookup is not sufficient enough."
           resolution: "Don't attempt to perform this action and have patience,
             maybe this will be supported in the future."
+        empty_config_file:
+          message: "Empty configuration file: %{path}."
+          summary: "Your mongoid.yml configuration file appears to be empty."
+          resolution: "Ensure your configuration file contains the correct contents.
+            Please consult the following page with respect to Mongoid's configuration:
+            https://docs.mongodb.com/mongoid/current/reference/configuration/"
         invalid_collection:
           message: "Access to the collection for %{klass} is not allowed."
           summary: "%{klass}.collection was called, and %{klass} is an embedded
@@ -94,6 +100,13 @@ en:
             A collation option is only supported if the query is executed on a MongoDB server
             with version >= 3.4."
           resolution: "Remove the collation option from the query."
+        invalid_config_file:
+          message: "Invalid configuration file: %{path}."
+          summary: "Your mongoid.yml configuration file does not contain the
+            correct file structure."
+          resolution: "Ensure your configuration file contains the correct contents.
+            Please consult the following page with respect to Mongoid's configuration:
+            https://docs.mongodb.com/mongoid/current/reference/configuration/"
         invalid_config_option:
           message: "Invalid configuration option: %{name}."
           summary: "A invalid configuration option was provided in your

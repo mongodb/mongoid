@@ -52,7 +52,15 @@ module Mongoid
       # @api private
       def load_yaml(path, environment = nil)
         env = environment ? environment.to_s : env_name
-        YAML.load(ERB.new(File.new(path).read).result)[env]
+        contents = File.new(path).read
+        if contents.empty?
+          raise Mongoid::Errors::EmptyConfigFile.new(path)
+        end
+        data = YAML.load(ERB.new(contents).result)
+        unless data.is_a?(Hash)
+          raise Mongoid::Errors::InvalidConfigFile.new(path)
+        end
+        data[env]
       end
     end
   end
