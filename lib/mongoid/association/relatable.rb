@@ -122,6 +122,8 @@ module Mongoid
       # @since 7.0
       def inverses(other = nil)
         return [ inverse_of ] if inverse_of
+        return [] if @options.key?(:inverse_of) && !inverse_of
+
         if polymorphic?
           polymorphic_inverses(other)
         else
