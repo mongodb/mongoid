@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -12,8 +11,6 @@ module Mongoid
       #
       # @example Create the error.
       #   NoClientsConfig.new
-      #
-      # @since 3.0.0
       def initialize
         super(compose_message("no_clients_config", {}))
       end

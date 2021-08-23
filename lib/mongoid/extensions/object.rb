@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Extensions
@@ -11,8 +10,6 @@ module Mongoid
       #   object.__evolve_object_id__
       #
       # @return [ Object ] self.
-      #
-      # @since 3.0.0
       def __evolve_object_id__
         self
       end
@@ -24,8 +21,6 @@ module Mongoid
       #   object.__find_args__
       #
       # @return [ Object ] self.
-      #
-      # @since 3.0.0
       def __find_args__
         self
       end
@@ -41,8 +36,6 @@ module Mongoid
       #   object.__mongoize_time__
       #
       # @return [ Object ] self.
-      #
-      # @since 3.0.0
       # @deprecated
       def __mongoize_time__
         self
@@ -54,8 +47,6 @@ module Mongoid
       #   object.__setter__
       #
       # @return [ String ] The object as a string plus =.
-      #
-      # @since 3.1.0
       def __setter__
         "#{self}="
       end
@@ -66,8 +57,6 @@ module Mongoid
       #   object.__sortable__
       #
       # @return [ Object ] self.
-      #
-      # @since 3.0.0
       def __sortable__
         self
       end
@@ -78,8 +67,6 @@ module Mongoid
       #   1.__to_inc__
       #
       # @return [ Object ] The object.
-      #
-      # @since 3.0.3
       def __to_inc__
         self
       end
@@ -93,8 +80,6 @@ module Mongoid
       # for backwards compatibility only. It always returns false.
       #
       # @return [ false ] Always false.
-      #
-      # @since 3.1.0
       # @deprecated
       def blank_criteria?
         false
@@ -110,8 +95,6 @@ module Mongoid
       #
       # @return [ Object, nil ] The result of the method call or nil if the
       #   method does not exist.
-      #
-      # @since 2.0.0.rc.1
       def do_or_do_not(name, *args)
         send(name, *args) if name && respond_to?(name)
       end
@@ -124,8 +107,6 @@ module Mongoid
       # @param [ String ] name The name of the variable.
       #
       # @return [ Object, false ] The value or false.
-      #
-      # @since 2.0.0.rc.1
       def ivar(name)
         var_name = "@_#{name}"
         if instance_variable_defined?(var_name)
@@ -142,8 +123,6 @@ module Mongoid
       #   object.mongoize
       #
       # @return [ Object ] The object.
-      #
-      # @since 3.0.0
       def mongoize
         self
       end
@@ -154,8 +133,6 @@ module Mongoid
       #   object.multi_arged?
       #
       # @return [ false ] false.
-      #
-      # @since 3.0.0
       def multi_arged?
         false
       end
@@ -166,8 +143,6 @@ module Mongoid
       #   object.numeric?
       #
       # @return [ false ] Always false.
-      #
-      # @since 3.0.0
       def numeric?
         false
       end
@@ -180,8 +155,6 @@ module Mongoid
       # @param [ String ] name The name of the variable.
       #
       # @return [ true, false ] If the variable was defined.
-      #
-      # @since 2.1.0
       def remove_ivar(name)
         if instance_variable_defined?("@_#{name}")
           return remove_instance_variable("@_#{name}")
@@ -197,8 +170,6 @@ module Mongoid
       #   object.resizable?
       #
       # @return [ false ] false.
-      #
-      # @since 3.0.0
       def resizable?
         false
       end
@@ -209,8 +180,6 @@ module Mongoid
       #   object.substitutable
       #
       # @return [ Object ] self.
-      #
-      # @since 2.0.0
       def substitutable
         self
       end
@@ -225,8 +194,6 @@ module Mongoid
       #
       # @return [ Object, nil ] The result of the method call or nil if the
       #   method does not exist. Nil if the object is frozen.
-      #
-      # @since 2.2.1
       def you_must(name, *args)
         frozen? ? nil : do_or_do_not(name, *args)
       end
@@ -243,8 +210,6 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ Object ] The converted object.
-        #
-        # @since 3.0.0
         def __mongoize_fk__(association, object)
           return nil if !object || object == ""
           association.convert_to_foreign_key(object)
@@ -258,8 +223,6 @@ module Mongoid
         # @param [ Object ] object The object to demongoize.
         #
         # @return [ Object ] The object.
-        #
-        # @since 3.0.0
         def demongoize(object)
           object
         end
@@ -273,8 +236,6 @@ module Mongoid
         # @param [ Object ] object The object to mongoize.
         #
         # @return [ Object ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           object.mongoize
         end

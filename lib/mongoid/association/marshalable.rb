@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -11,8 +10,6 @@ module Mongoid
       #   Marshal.dump(proxy)
       #
       # @return [ Array<Object> ] The dumped data.
-      #
-      # @since 3.0.15
       def marshal_dump
         [ _base, _target, _association ]
       end
@@ -25,8 +22,6 @@ module Mongoid
       # @param [ Array<Object> ] data The data to set on the proxy.
       #
       # @return [ Array<Object> ] The loaded data.
-      #
-      # @since 3.0.15
       def marshal_load(data)
         @_base, @_target, @_association = data
         extend_proxy(_association.extension) if _association.extension

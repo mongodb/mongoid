@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Attributes
@@ -16,8 +15,6 @@ module Mongoid
       #   person.process_attributes(:title => "sir", :age => 40)
       #
       # @param [ Hash ] attrs The attributes to set.
-      #
-      # @since 2.0.0.rc.7
       def process_attributes(attrs = nil)
         attrs ||= {}
         if !attrs.empty?
@@ -44,8 +41,6 @@ module Mongoid
       # @param [ Object ] value The value of the attribute.
       #
       # @return [ true, false ] True if pending, false if not.
-      #
-      # @since 2.0.0.rc.7
       def pending_attribute?(key, value)
         name = key.to_s
         if relations.has_key?(name)
@@ -65,8 +60,6 @@ module Mongoid
       #   document.pending_relations
       #
       # @return [ Hash ] The pending associations in key/value pairs.
-      #
-      # @since 2.0.0.rc.7
       def pending_relations
         @pending_relations ||= {}
       end
@@ -77,8 +70,6 @@ module Mongoid
       #   document.pending_nested
       #
       # @return [ Hash ] The pending nested attributes in key/value pairs.
-      #
-      # @since 2.0.0.rc.7
       def pending_nested
         @pending_nested ||= {}
       end
@@ -91,8 +82,6 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Object ] value The value of the field.
-      #
-      # @since 2.0.0.rc.7
       def process_attribute(name, value)
         if !respond_to?("#{name}=", true) && store_as = aliased_fields.invert[name.to_s]
           name = store_as
@@ -107,8 +96,6 @@ module Mongoid
       #
       # @example Process the nested attributes.
       #   document.process_nested
-      #
-      # @since 2.0.0.rc.7
       def process_nested
         pending_nested.each_pair do |name, value|
           send("#{name}=", value)
@@ -119,8 +106,6 @@ module Mongoid
       #
       # @example Process the pending items.
       #   document.process_pending
-      #
-      # @since 2.0.0.rc.7
       def process_pending
         process_nested and process_relations
         pending_nested.clear and pending_relations.clear
@@ -131,8 +116,6 @@ module Mongoid
       #
       # @example Process the associations.
       #   document.process_relations
-      #
-      # @since 2.0.0.rc.7
       def process_relations
         pending_relations.each_pair do |name, value|
           association = relations[name]

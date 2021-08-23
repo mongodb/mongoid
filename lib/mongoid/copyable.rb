@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
@@ -50,8 +49,6 @@ module Mongoid
     #
     # @example clone document
     #   model.clone_document
-    #
-    # @since 3.0.22
     def clone_document
       attrs = as_attributes.__deep_copy__
       process_localized_attributes(self, attrs)
@@ -67,8 +64,6 @@ module Mongoid
     #   model.process_localized_attributes(attributes)
     #
     # @param [ Hash ] attrs The attributes.
-    #
-    # @since 3.0.20
     def process_localized_attributes(klass, attrs)
       klass.localized_fields.keys.each do |name|
         if value = attrs.delete(name)

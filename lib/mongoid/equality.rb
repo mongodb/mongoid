@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
@@ -14,8 +13,6 @@ module Mongoid
     # @param [ Document ] other The document to compare with.
     #
     # @return [ Integer ] -1, 0, 1.
-    #
-    # @since 1.0.0
     def <=>(other)
       attributes["_id"].to_s <=> other.attributes["_id"].to_s
     end
@@ -29,8 +26,6 @@ module Mongoid
     # @param [ Document, Object ] other The other object to compare with.
     #
     # @return [ true, false ] True if the ids are equal, false if not.
-    #
-    # @since 1.0.0
     def ==(other)
       self.class == other.class &&
           attributes["_id"] == other.attributes["_id"]
@@ -44,8 +39,6 @@ module Mongoid
     # @param [ Document, Object ] other The other object to compare with.
     #
     # @return [ true, false ] True if the classes are equal, false if not.
-    #
-    # @since 1.0.0
     def ===(other)
       other.class == Class ? self.class === other : self == other
     end
@@ -58,8 +51,6 @@ module Mongoid
     # @param [ Document, Object ] other The object to check against.
     #
     # @return [ true, false ] True if equal, false if not.
-    #
-    # @since 1.0.0
     def eql?(other)
       self == (other)
     end

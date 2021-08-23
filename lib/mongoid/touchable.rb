@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Touchable
@@ -21,8 +20,6 @@ module Mongoid
       # @param [ Symbol ] field The name of an additional field to update.
       #
       # @return [ true/false ] false if record is new_record otherwise true.
-      #
-      # @since 3.0.0
       def touch(field = nil)
         return false if _root.new_record?
         current = Time.now
@@ -70,8 +67,6 @@ module Mongoid
     # @param [ Association ] association The association metadata.
     #
     # @return [ Class ] The model class.
-    #
-    # @since 3.0.0
     def define_touchable!(association)
       name = association.name
       method_name = define_relation_touch_method(name, association)
@@ -95,8 +90,6 @@ module Mongoid
     #
     # @param [ Symbol ] name The name of the association.
     # @param [ Association ] association The association metadata.
-    #
-    # @since 3.1.0
     #
     # @return [ Symbol ] The method name.
     def define_relation_touch_method(name, association)

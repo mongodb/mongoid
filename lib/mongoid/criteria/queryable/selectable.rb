@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -14,18 +13,12 @@ module Mongoid
         Mongoid.deprecate(self, :geo_spacial)
 
         # Constant for a LineString $geometry.
-        #
-        # @since 2.0.0
         LINE_STRING = "LineString"
 
         # Constant for a Point $geometry.
-        #
-        # @since 2.0.0
         POINT = "Point"
 
         # Constant for a Polygon $geometry.
-        #
-        # @since 2.0.0
         POLYGON = "Polygon"
 
         # @attribute [rw] negating If the next expression is negated.
@@ -43,8 +36,6 @@ module Mongoid
         # @param [ Hash ] criterion The key value pairs for $all matching.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def all(*criteria)
           if criteria.empty?
             return clone.tap do |query|
@@ -84,8 +75,6 @@ module Mongoid
         #   matches or Criteria objects that all must match to return results.
         #
         # @return [ Selectable ] The new selectable.
-        #
-        # @since 1.0.0
         def and(*criteria)
           _mongoid_flatten_arrays(criteria).inject(self.clone) do |c, new_s|
             if new_s.is_a?(Selectable)
@@ -132,8 +121,6 @@ module Mongoid
         # @param [ Hash ] criterion Multiple key/range pairs.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def between(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :between
@@ -164,8 +151,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/match pairs.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def elem_match(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :elem_match
@@ -189,8 +174,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/boolean existence checks.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def exists(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :exists
@@ -284,8 +267,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/value pairs to check.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def gt(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :gt
@@ -306,8 +287,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/value pairs to check.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def gte(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :gte
@@ -331,8 +310,6 @@ module Mongoid
         # @param [ Hash ] condition The field/value criterion pairs.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def in(condition)
           if condition.nil?
             raise Errors::CriteriaArgumentRequired, :in
@@ -366,8 +343,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/value pairs to check.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def lt(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :lt
@@ -388,8 +363,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/value pairs to check.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def lte(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :lte
@@ -407,8 +380,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/distance pairs.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def max_distance(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :max_distance
@@ -429,8 +400,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/mod selections.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def mod(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :mod
@@ -451,8 +420,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/ne selections.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def ne(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :ne
@@ -474,8 +441,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/location pair.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def near(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :near
@@ -496,8 +461,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/location pair.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def near_sphere(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :near_sphere
@@ -521,8 +484,6 @@ module Mongoid
         # @param [ Hash ] condition The field/value criterion pairs.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def nin(condition)
           if condition.nil?
             raise Errors::CriteriaArgumentRequired, :nin
@@ -554,8 +515,6 @@ module Mongoid
         #   matches or Criteria objects.
         #
         # @return [ Selectable ] The new selectable.
-        #
-        # @since 1.0.0
         def nor(*criteria)
           _mongoid_add_top_level_operation('$nor', criteria)
         end
@@ -566,8 +525,6 @@ module Mongoid
         #   selectable.negating?
         #
         # @return [ true, false ] If the selectable is negating.
-        #
-        # @since 1.0.0
         def negating?
           !!negating
         end
@@ -587,8 +544,6 @@ module Mongoid
         #   matches or Criteria objects to negate.
         #
         # @return [ Selectable ] The new selectable.
-        #
-        # @since 1.0.0
         def not(*criteria)
           if criteria.empty?
             dup.tap { |query| query.negating = true }
@@ -650,8 +605,6 @@ module Mongoid
         #   thereof. Passing arrays is deprecated.
         #
         # @return [ Selectable ] The new selectable.
-        #
-        # @since 1.0.0
         def or(*criteria)
           _mongoid_add_top_level_operation('$or', criteria)
         end
@@ -682,8 +635,6 @@ module Mongoid
         #   thereof. Passing arrays is deprecated.
         #
         # @return [ Selectable ] The new selectable.
-        #
-        # @since 1.0.0
         def any_of(*criteria)
           criteria = _mongoid_flatten_arrays(criteria)
           case criteria.length
@@ -737,8 +688,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/size pairs criterion.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def with_size(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :with_size
@@ -765,8 +714,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/type pairs.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def with_type(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :with_type
@@ -799,8 +746,6 @@ module Mongoid
         #   for options.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 2.2.0
         def text_search(terms, opts = nil)
           if terms.nil?
             raise Errors::CriteriaArgumentRequired, :terms
@@ -836,8 +781,6 @@ module Mongoid
         # @param [ String, Hash ] criterion The javascript or standard selection.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         def where(*criteria)
           criteria.inject(clone) do |query, criterion|
             if criterion.nil?
@@ -877,8 +820,6 @@ module Mongoid
         # @param [ Hash ] criterion The field/value pairs.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         # @api private
         def expr_query(criterion)
           if criterion.nil?
@@ -913,8 +854,6 @@ module Mongoid
         #   end
         #
         # @param [ Hash ] criterion The criterion.
-        #
-        # @since 1.0.0
         def typed_override(criterion, operator)
           if criterion
             criterion.update_values do |value|
@@ -934,8 +873,6 @@ module Mongoid
         # @param [ String ] criterion The javascript as a string.
         #
         # @return [ Selectable ] The cloned selectable
-        #
-        # @since 1.0.0
         def js_query(criterion)
           clone.tap do |query|
             if negating?
@@ -957,8 +894,6 @@ module Mongoid
         # @param [ Hash ] criterion The selection to store.
         #
         # @return [ Selectable ] The cloned selectable.
-        #
-        # @since 1.0.0
         # @api private
         def selection(criterion = nil)
           clone.tap do |query|
@@ -979,8 +914,6 @@ module Mongoid
           #   Selectable.forwardables
           #
           # @return [ Array<Symbol> ] The names of the forwardable methods.
-          #
-          # @since 1.0.0
           def forwardables
             public_instance_methods(false) -
               [ :negating, :negating=, :negating?, :selector, :selector= ]

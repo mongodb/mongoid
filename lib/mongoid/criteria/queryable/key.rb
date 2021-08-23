@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -84,8 +83,6 @@ module Mongoid
         # @param [ Object ] other The object to compare to.
         #
         # @return [ true, false ] If the objects are equal.
-        #
-        # @since 1.0.0
         def ==(other)
           return false unless other.is_a?(Key)
           name == other.name && operator == other.operator && expanded == other.expanded
@@ -95,8 +92,6 @@ module Mongoid
         # Calculate the hash code for a key.
         #
         # @return [ Fixnum ] The hash code for the key.
-        #
-        # @since 1.1.0
         def hash
           [name, operator, expanded].hash
         end
@@ -114,8 +109,6 @@ module Mongoid
         # @param [ String | Integer ] operator The MongoDB operator,
         #   or sort direction (1 or -1).
         # @param [ String ] expanded The Mongo expanded operator.
-        #
-        # @since 1.0.0
         def initialize(name, strategy, operator, expanded = nil, &block)
           unless operator.is_a?(String) || operator.is_a?(Integer)
             raise ArgumentError, "Operator must be a string or an integer: #{operator.inspect}"
@@ -134,8 +127,6 @@ module Mongoid
         # @param [ true, false ] negating If the selection should be negated.
         #
         # @return [ Hash ] The raw MongoDB selector.
-        #
-        # @since 1.0.0
         def __expr_part__(object, negating = false)
           { name.to_s => transform_value(object, negating) }
         end
@@ -166,8 +157,6 @@ module Mongoid
         #   key.__sort_option__
         #
         # @return [ Hash ] The field/direction pair.
-        #
-        # @since 1.0.0
         def __sort_option__
           { name => operator }
         end
@@ -179,8 +168,6 @@ module Mongoid
         #   key.to_s
         #
         # @return [ String ] The key as a string.
-        #
-        # @since 1.1.0
         def to_s
           @name.to_s
         end

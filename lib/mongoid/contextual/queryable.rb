@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Contextual
@@ -16,8 +15,6 @@ module Mongoid
       #   context.blank?
       #
       # @return [ true, false ] If the context is empty.
-      #
-      # @since 3.0.0
       def blank?
         !exists?
       end

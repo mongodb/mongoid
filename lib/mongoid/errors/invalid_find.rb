@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -11,8 +10,6 @@ module Mongoid
       #
       # @example Create the error.
       #   InvalidFind.new
-      #
-      # @since 2.2.0
       def initialize
         super(compose_message("calling_document_find_with_nil_is_invalid", {}))
       end

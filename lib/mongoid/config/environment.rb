@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Config
@@ -23,8 +22,6 @@ module Mongoid
       #   determined because none of the sources was set.
       #
       # @return [ String ] The name of the current environment.
-      #
-      # @since 2.3.0
       # @api public
       def env_name
         if defined?(::Rails)
@@ -47,12 +44,18 @@ module Mongoid
       #   override the current Mongoid environment.
       #
       # @return [ Hash ] The settings.
-      #
-      # @since 2.3.0
       # @api private
       def load_yaml(path, environment = nil)
         env = environment ? environment.to_s : env_name
-        YAML.load(ERB.new(File.new(path).read).result)[env]
+        contents = File.new(path).read
+        if contents.empty?
+          raise Mongoid::Errors::EmptyConfigFile.new(path)
+        end
+        data = YAML.load(ERB.new(contents).result)
+        unless data.is_a?(Hash)
+          raise Mongoid::Errors::InvalidConfigFile.new(path)
+        end
+        data[env]
       end
     end
   end

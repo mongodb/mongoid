@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Fields
@@ -31,8 +30,6 @@ module Mongoid
         # @param [ Class ] klass The model class.
         # @param [ Symbol ] name The field name.
         # @param [ Hash ] options The provided options.
-        #
-        # @since 3.0.0
         def validate(klass, name, options)
           validate_field_name(klass, name)
           validate_name_uniqueness(klass, name, options)
@@ -47,8 +44,6 @@ module Mongoid
         # @param [ Class ] klass The model class.
         # @param [ Symbol ] name The field name.
         # @param [ Hash ] options The provided options.
-        #
-        # @since 6.0.0
         def validate_relation(klass, name, options = {})
           [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
             if Mongoid.destructive_fields.include?(n)
@@ -112,8 +107,6 @@ module Mongoid
         # @param [ Hash ] options The provided options.
         #
         # @raise [ Errors::InvalidFieldOption ] If an option is invalid.
-        #
-        # @since 3.0.0
         def validate_options(klass, name, options)
           options.keys.each do |option|
             if !OPTIONS.include?(option) && !Fields.options.include?(option)

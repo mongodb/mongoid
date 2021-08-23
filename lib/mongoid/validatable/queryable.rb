@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Validatable
@@ -16,8 +15,6 @@ module Mongoid
       # @param [ Document ] document The document being validated.
       #
       # @return [ Object ] The result of the yield.
-      #
-      # @since 3.0.2
       def with_query(document)
         klass = document.class
         begin

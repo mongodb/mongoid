@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/atomic/modifiers"
 require "mongoid/atomic/paths"
@@ -34,8 +33,6 @@ module Mongoid
     #   person.add_atomic_pull(address)
     #
     # @param [ Document ] document The embedded document to pull.
-    #
-    # @since 2.2.0
     def add_atomic_pull(document)
       document.flagged_for_destroy = true
       key = document.association_name.to_s
@@ -51,8 +48,6 @@ module Mongoid
     # @param [ Document ] document The child document.
     #
     # @return [ Array<Document> ] The children.
-    #
-    # @since 3.0.0
     def add_atomic_unset(document)
       document.flagged_for_destroy = true
       key = document.association_name.to_s
@@ -66,8 +61,6 @@ module Mongoid
     #   address.atomic_attribute_name(:city)
     #
     # @return [ String ] The path to the document attribute in the database
-    #
-    # @since 3.0.0
     def atomic_attribute_name(name)
       embedded? ? "#{atomic_position}.#{name}" : name
     end
@@ -78,8 +71,6 @@ module Mongoid
     #   person.atomic_array_pushes
     #
     # @return [ Hash ] The array pushes.
-    #
-    # @since 2.4.0
     def atomic_array_pushes
       @atomic_array_pushes ||= {}
     end
@@ -90,8 +81,6 @@ module Mongoid
     #   person.atomic_array_pulls
     #
     # @return [ Hash ] The array pulls.
-    #
-    # @since 2.4.0
     def atomic_array_pulls
       @atomic_array_pulls ||= {}
     end
@@ -102,8 +91,6 @@ module Mongoid
     #   person.atomic_array_add_to_sets
     #
     # @return [ Hash ] The array add_to_sets.
-    #
-    # @since 2.4.0
     def atomic_array_add_to_sets
       @atomic_array_add_to_sets ||= {}
     end
@@ -129,8 +116,6 @@ module Mongoid
     #   person.atomic_updates(children)
     #
     # @return [ Hash ] The updates and their modifiers.
-    #
-    # @since 2.1.0
     def atomic_updates(_use_indexes = false)
       process_flagged_destroys
       mods = Modifiers.new
@@ -192,8 +177,6 @@ module Mongoid
     #   document.atomic_paths
     #
     # @return [ Object ] The associated path.
-    #
-    # @since 2.1.0
     def atomic_paths
       @atomic_paths ||= begin
         if _association
@@ -210,8 +193,6 @@ module Mongoid
     #   person.atomic_pulls
     #
     # @return [ Array<Hash> ] The $pullAll operations.
-    #
-    # @since 2.2.0
     def atomic_pulls
       pulls = {}
       delayed_atomic_pulls.each_pair do |_, docs|
@@ -231,8 +212,6 @@ module Mongoid
     #   person.atomic_pushes
     #
     # @return [ Hash ] The $push and $each operations.
-    #
-    # @since 2.1.0
     def atomic_pushes
       pushable? ? { atomic_position => as_attributes } : {}
     end
@@ -243,8 +222,6 @@ module Mongoid
     #   person.atomic_sets
     #
     # @return [ Hash ] The $set operations.
-    #
-    # @since 2.1.0
     def atomic_sets
       updateable? ? setters : settable? ? { atomic_path => as_attributes } : {}
     end
@@ -255,8 +232,6 @@ module Mongoid
     #   person.atomic_unsets
     #
     # @return [ Array<Hash> ] The $unset operations.
-    #
-    # @since 2.2.0
     def atomic_unsets
       unsets = []
       delayed_atomic_unsets.each_pair do |name, docs|
@@ -275,8 +250,6 @@ module Mongoid
     #   person.delayed_atomic_sets
     #
     # @return [ Hash ] The delayed $sets.
-    #
-    # @since 2.3.0
     def delayed_atomic_sets
       @delayed_atomic_sets ||= {}
     end
@@ -287,8 +260,6 @@ module Mongoid
     #   document.delayed_atomic_pulls
     #
     # @return [ Hash ] name/document pairs.
-    #
-    # @since 2.3.2
     def delayed_atomic_pulls
       @delayed_atomic_pulls ||= {}
     end
@@ -299,8 +270,6 @@ module Mongoid
     #   document.delayed_atomic_unsets
     #
     # @return [ Hash ] The atomic unsets
-    #
-    # @since 3.0.0
     def delayed_atomic_unsets
       @delayed_atomic_unsets ||= {}
     end
@@ -311,8 +280,6 @@ module Mongoid
     #   document.flag_as_destroyed
     #
     # @return [ String ] The atomic path.
-    #
-    # @since 3.0.0
     def flag_as_destroyed
       self.destroyed = true
       self.flagged_for_destroy = false
@@ -325,8 +292,6 @@ module Mongoid
     #   document.flagged_destroys
     #
     # @return [ Array<Proc> ] The flagged destroys.
-    #
-    # @since 3.0.10
     def flagged_destroys
       @flagged_destroys ||= []
     end
@@ -337,8 +302,6 @@ module Mongoid
     #   document.process_flagged_destroys
     #
     # @return [ Array ] The cleared array.
-    #
-    # @since 3.0.10
     def process_flagged_destroys
       _assigning do
         flagged_destroys.each(&:call)
@@ -355,8 +318,6 @@ module Mongoid
     #
     # @param [ Modifiers ] mods The atomic modifications.
     # @param [ Document ] doc The document to update for.
-    #
-    # @since 2.2.0
     def generate_atomic_updates(mods, doc)
       mods.unset(doc.atomic_unsets)
       mods.pull(doc.atomic_pulls)
@@ -379,8 +340,6 @@ module Mongoid
     # @param [ Symbol ] field The optional field.
     #
     # @return [ Hash ] The atomic updates.
-    #
-    # @since 3.0.6
     def touch_atomic_updates(field = nil)
       updates = atomic_updates
       return {} unless atomic_updates.key?("$set")

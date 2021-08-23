@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Constraints
   RAILS_VERSION = ActiveSupport.version.to_s.split('.')[0..1].join('.').freeze

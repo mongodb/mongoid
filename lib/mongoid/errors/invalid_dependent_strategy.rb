@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -16,8 +15,6 @@ module Mongoid
       #   dependency is defined.
       # @param [ Symbol, String ] invalid_strategy The attempted invalid strategy.
       # @param [ Array<Symbol> ] valid_strategies The valid strategies.
-      #
-      # @since 7.0.0
       def initialize(association, invalid_strategy, valid_strategies)
         super(
             compose_message(

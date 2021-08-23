@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -7,8 +6,6 @@ module Mongoid
       class HasOne
 
         # Binding class for has_one associations.
-        #
-        # @since 7.0
         class Binding
           include Bindable
 
@@ -21,8 +18,6 @@ module Mongoid
           # @example Bind the document.
           #   person.game.bind(:continue => true)
           #   person.game = Game.new
-          #
-          # @since 2.0.0.rc.1
           def bind_one
             binding do
               bind_from_relational_parent(_target)
@@ -35,8 +30,6 @@ module Mongoid
           # @example Unbind the document.
           #   person.game.unbind(:continue => true)
           #   person.game = nil
-          #
-          # @since 2.0.0.rc.1
           def unbind_one
             binding do
               unbind_from_relational_parent(_target)

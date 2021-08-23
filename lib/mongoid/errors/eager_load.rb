@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -18,8 +17,6 @@ module Mongoid
       #   EagerLoad.new(:preferences)
       #
       # @param [ Symbol ] name The name of the association.
-      #
-      # @since 2.2.0
       def initialize(name)
         super(compose_message("eager_load", { name: name }))
       end

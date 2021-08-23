@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Clients
@@ -7,8 +6,6 @@ module Mongoid
     # Encapsulates behavior for getting a session from the client of a model class or instance,
     # setting the session on the current thread, and yielding to a block.
     # The session will be closed after the block completes or raises an error.
-    #
-    # @since 6.4.0
     module Sessions
 
       # Execute a block within the context of a session.
@@ -38,8 +35,6 @@ module Mongoid
       # @return [ Object ] The result of calling the block.
       #
       # @yieldparam [ Mongo::Session ] The session being used for the block.
-      #
-      # @since 6.4.0
       def with_session(options = {})
         if Threaded.get_session
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
@@ -97,8 +92,6 @@ module Mongoid
         # @return [ Object ] The result of calling the block.
         #
         # @yieldparam [ Mongo::Session ] The session being used for the block.
-        #
-        # @since 6.4.0
         def with_session(options = {})
           if Threaded.get_session
             raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
