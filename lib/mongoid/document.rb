@@ -303,7 +303,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.4
       def ===(other)
-        other.class == Class ? self <= other : other.is_a?(self)
+        other.is_a?(self)
       end
 
       # Instantiate a new object, only when loaded from the database or when
