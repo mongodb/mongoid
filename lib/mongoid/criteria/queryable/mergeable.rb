@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -17,8 +16,6 @@ module Mongoid
         #   mergeable.intersect.in(field: [ 1, 2, 3 ])
         #
         # @return [ Mergeable ] The intersect flagged mergeable.
-        #
-        # @since 1.0.0
         def intersect
           use(:__intersect__)
         end
@@ -29,8 +26,6 @@ module Mongoid
         #   mergeable.override.in(field: [ 1, 2, 3 ])
         #
         # @return [ Mergeable ] The override flagged mergeable.
-        #
-        # @since 1.0.0
         def override
           use(:__override__)
         end
@@ -41,8 +36,6 @@ module Mongoid
         #   mergeable.union.in(field: [ 1, 2, 3 ])
         #
         # @return [ Mergeable ] The union flagged mergeable.
-        #
-        # @since 1.0.0
         def union
           use(:__union__)
         end
@@ -53,8 +46,6 @@ module Mongoid
         #   mergeable.reset_strategies!
         #
         # @return [ Criteria ] self.
-        #
-        # @since 1.0.0
         def reset_strategies!
           self.strategy = nil
           self.negating = nil
@@ -74,8 +65,6 @@ module Mongoid
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
-        #
-        # @since 1.0.0
         def __add__(criterion, operator)
           with_strategy(:__add__, criterion, operator)
         end
@@ -92,8 +81,6 @@ module Mongoid
         # @param [ String ] inner The inner MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
-        #
-        # @since 1.0.0
         def __expanded__(criterion, outer, inner)
           selection(criterion) do |selector, field, value|
             selector.store(field, { outer => { inner => value }})
@@ -111,8 +98,6 @@ module Mongoid
         # @param [ Hash ] criterion The criteria.
         #
         # @return [ Mergeable ] The cloned object.
-        #
-        # @since 2.0.0
         def __merge__(criterion)
           selection(criterion) do |selector, field, value|
             selector.merge!(field.__expr_part__(value))
@@ -130,8 +115,6 @@ module Mongoid
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
-        #
-        # @since 1.0.0
         def __intersect__(criterion, operator)
           with_strategy(:__intersect__, criterion, operator)
         end
@@ -152,8 +135,6 @@ module Mongoid
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
-        #
-        # @since 1.0.0
         def __multi__(criteria, operator)
           clone.tap do |query|
             sel = query.selector
@@ -337,8 +318,6 @@ module Mongoid
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
-        #
-        # @since 1.0.0
         def __override__(criterion, operator)
           if criterion.is_a?(Selectable)
             criterion = criterion.selector
@@ -365,8 +344,6 @@ module Mongoid
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
-        #
-        # @since 1.0.0
         def __union__(criterion, operator)
           with_strategy(:__union__, criterion, operator)
         end
@@ -381,8 +358,6 @@ module Mongoid
         # @param [ Symbol ] strategy The strategy to use.
         #
         # @return [ Mergeable ] The existing mergeable.
-        #
-        # @since 1.0.0
         def use(strategy)
           tap do |mergeable|
             mergeable.strategy = strategy
@@ -401,8 +376,6 @@ module Mongoid
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The cloned query.
-        #
-        # @since 1.0.0
         def with_strategy(strategy, criterion, operator)
           selection(criterion) do |selector, field, value|
             selector.store(
@@ -423,8 +396,6 @@ module Mongoid
         # @param [ Object ] value The value.
         #
         # @return [ Object ] The serialized value.
-        #
-        # @since 1.0.0
         def prepare(field, operator, value)
           unless operator =~ /exists|type|size/
             value = value.__expand_complex__

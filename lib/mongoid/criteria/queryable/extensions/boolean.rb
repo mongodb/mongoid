@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -19,8 +18,6 @@ module Mongoid
             # @param [ Object ] object The object to evolve.
             #
             # @return [ true, false ] The boolean value.
-            #
-            # @since 1.0.0
             def evolve(object)
               __evolve__(object) do |obj|
                 obj.to_s =~ (/\A(true|t|yes|y|on|1|1.0)\z/i) ? true : false

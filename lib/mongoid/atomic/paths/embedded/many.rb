@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Atomic
@@ -17,8 +16,6 @@ module Mongoid
           #   Many.new(document)
           #
           # @param [ Document ] document The document to generate the paths for.
-          #
-          # @since 2.1.0
           def initialize(document)
             @document, @parent = document, document._parent
             @insert_modifier, @delete_modifier ="$push", "$pull"
@@ -32,8 +29,6 @@ module Mongoid
           #   many.position
           #
           # @return [ String ] The position of the document.
-          #
-          # @since 2.1.0
           def position
             pos = parent.atomic_position
             locator = document.new_record? ? "" : ".#{document._index}"

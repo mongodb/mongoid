@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -66,9 +65,15 @@ describe Mongoid::Clients::Factory do
             expect(client).to be_a(Mongo::Client)
           end
 
-          it 'does not produce driver warnings' do
-            Mongo::Logger.logger.should_not receive(:warn)
-            client
+          context 'not JRuby' do
+            # Run this test on JRuby when driver 2.16.0 is released -
+            # see RUBY-2771.
+            fails_on_jruby
+
+            it 'does not produce driver warnings' do
+              Mongo::Logger.logger.should_not receive(:warn)
+              client
+            end
           end
 
           let(:cluster_addresses) do

@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
     module Queryable
 
       # Represents an aggregation pipeline.
-      #
-      # @since 2.0.0
       class Pipeline < Array
 
         # @attribute [r] aliases The field aliases.
@@ -20,8 +17,6 @@ module Mongoid
         #   pipeline.__deep_copy__
         #
         # @return [ Pipeline ] The cloned pipeline.
-        #
-        # @since 2.0.0
         def __deep_copy__
           self.class.new(aliases) do |copy|
             each do |entry|
@@ -38,8 +33,6 @@ module Mongoid
         # @param [ Hash ] entry The group entry.
         #
         # @return [ Pipeline ] The pipeline.
-        #
-        # @since 2.0.0
         def group(entry)
           push("$group" => evolve(entry.__expand_complex__))
         end
@@ -51,8 +44,6 @@ module Mongoid
         #
         # @param [ Hash ] aliases A hash of mappings from aliases to the actual
         #   field names in the database.
-        #
-        # @since 2.0.0
         def initialize(aliases = {})
           @aliases = aliases
           yield(self) if block_given?
@@ -80,8 +71,6 @@ module Mongoid
         #   document.
         #
         # @return [ Pipeline ] The pipeline.
-        #
-        # @since 2.0.0
         def unwind(field_or_doc)
           unless field_or_doc.respond_to? :keys
             normalized = field_or_doc.to_s
@@ -104,8 +93,6 @@ module Mongoid
         # @param [ Hash ] entry The entry to evolve.
         #
         # @return [ Hash ] The evolved entry.
-        #
-        # @since 2.0.0
         def evolve(entry)
           aggregate = Selector.new(aliases)
           entry.each_pair do |field, value|

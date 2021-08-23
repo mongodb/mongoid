@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Clients
@@ -19,8 +18,6 @@ module Mongoid
       # @option options [ String | Symbol ] :collection The collection name.
       # @option options [ String | Symbol ] :database The database name.
       # @option options [ String | Symbol ] :client The client name.
-      #
-      # @since 6.0.0
       def with(options_or_context, &block)
         original_context = PersistenceContext.get(self)
         original_cluster = persistence_context.cluster
@@ -92,8 +89,6 @@ module Mongoid
         # @option options [ String | Symbol ] :collection The collection name.
         # @option options [ String | Symbol ] :database The database name.
         # @option options [ String | Symbol ] :client The client name.
-        #
-        # @since 6.0.0
         def with(options, &block)
           original_context = PersistenceContext.get(self)
           original_cluster = persistence_context.cluster

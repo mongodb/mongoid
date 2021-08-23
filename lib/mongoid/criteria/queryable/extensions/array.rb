@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -17,8 +16,6 @@ module Mongoid
           # @param [ Object ] object The object to add.
           #
           # @return [ Object ] The result of the add.
-          #
-          # @since 1.0.0
           def __add__(object)
             object.__add_from_array__(self)
           end
@@ -29,8 +26,6 @@ module Mongoid
           #   [ 1, 2 ].__array__
           #
           # @return [ Array ] self
-          #
-          # @since 1.0.0
           def __array__; self; end
 
           # Makes a deep copy of the array, deep copying every element inside the
@@ -40,8 +35,6 @@ module Mongoid
           #   [ 1, 2, 3 ].__deep_copy__
           #
           # @return [ Array ] The deep copy of the array.
-          #
-          # @since 1.0.0
           def __deep_copy__
             map { |value| value.__deep_copy__ }
           end
@@ -53,8 +46,6 @@ module Mongoid
           #   [ Date.new(2010, 1, 1) ].__evolve_date__
           #
           # @return [ Array<Time> ] The array as times at midnight UTC.
-          #
-          # @since 1.0.0
           def __evolve_date__
             map { |value| value.__evolve_date__ }
           end
@@ -65,8 +56,6 @@ module Mongoid
           #   obj.__expand_complex__
           #
           # @return [ Array ] The expanded array.
-          #
-          # @since 1.1.0
           def __expand_complex__
             map do |value|
               value.__expand_complex__
@@ -79,8 +68,6 @@ module Mongoid
           #   [ 1231231231 ].__evolve_time__
           #
           # @return [ Array<Time> ] The array as times.
-          #
-          # @since 1.0.0
           def __evolve_time__
             map { |value| value.__evolve_time__ }
           end
@@ -93,8 +80,6 @@ module Mongoid
           # @param [ Object ] object The object to intersect with.
           #
           # @return [ Object ] The result of the intersection.
-          #
-          # @since 1.0.0
           def __intersect__(object)
             object.__intersect_from_array__(self)
           end
@@ -106,8 +91,6 @@ module Mongoid
           #   [ :field, 1 ].__sort_option__
           #
           # @return [ Hash ] The array as sort criterion.
-          #
-          # @since 1.0.0
           def __sort_option__
             multi.inject({}) do |options, criteria|
               options.merge!(criteria.__sort_pair__)
@@ -121,8 +104,6 @@ module Mongoid
           #   [ field, 1 ].__sort_pair__
           #
           # @return [ Hash ] The field/direction pair.
-          #
-          # @since 1.0.0
           def __sort_pair__
             { first => last.to_direction }
           end
@@ -135,8 +116,6 @@ module Mongoid
           # @param [ Proc ] block The block to execute on each value.
           #
           # @return [ Array ] the array.
-          #
-          # @since 1.0.0
           def update_values(&block)
             replace(map(&block))
           end
@@ -151,8 +130,6 @@ module Mongoid
           #   [ 1, 2, 3 ].multi
           #
           # @return [ Array ] The multi-dimensional array.
-          #
-          # @since 1.0.0
           def multi
             first.is_a?(::Symbol) || first.is_a?(::String) ? [ self ] : self
           end
@@ -167,8 +144,6 @@ module Mongoid
             # @param [ Object ] object The object to evolve.
             #
             # @return [ Object ] The evolved object.
-            #
-            # @since 1.0.0
             def evolve(object)
               if object.is_a?(::Array)
                 object.map { |obj| obj.class.evolve(obj) }

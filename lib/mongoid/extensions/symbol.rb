@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Extensions
@@ -11,8 +10,6 @@ module Mongoid
       #   :_id.mongoid_id?
       #
       # @return [ true, false ] If the symbol is :id or :_id.
-      #
-      # @since 2.3.1
       def mongoid_id?
         to_s.mongoid_id?
       end
@@ -27,8 +24,6 @@ module Mongoid
         # @param [ Object ] object The object to demongoize.
         #
         # @return [ Symbol ] The object.
-        #
-        # @since 3.0.0
         def demongoize(object)
           object.try(:to_sym)
         end
@@ -42,8 +37,6 @@ module Mongoid
         # @param [ Object ] object The object to mongoize.
         #
         # @return [ Symbol ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           demongoize(object)
         end

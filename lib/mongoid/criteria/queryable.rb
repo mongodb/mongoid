@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/criteria/queryable/expandable"
 require "mongoid/criteria/queryable/extensions"
@@ -47,8 +46,6 @@ module Mongoid
       # @param [ Object ] other The object to compare against.
       #
       # @return [ true, false ] If the objects are equal.
-      #
-      # @since 1.0.0
       def ==(other)
         return false unless other.is_a?(Queryable)
         selector == other.selector && options == other.options
@@ -63,8 +60,6 @@ module Mongoid
       # @param [ Hash ] aliases The optional field aliases.
       # @param [ Hash ] serializers The optional field serializers.
       # @param [ Symbol ] driver The driver being used.
-      #
-      # @since 1.0.0
       def initialize(aliases = {}, serializers = {}, driver = :mongo)
         @aliases, @driver, @serializers = aliases, driver.to_sym, serializers
         @options = Options.new(aliases, serializers)
@@ -80,8 +75,6 @@ module Mongoid
       #   queryable.initialize_copy(criteria)
       #
       # @param [ Queryable ] other The original copy.
-      #
-      # @since 1.0.0
       def initialize_copy(other)
         @options = other.options.__deep_copy__
         @selector = other.selector.__deep_copy__

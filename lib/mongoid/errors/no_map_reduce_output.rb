@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -14,8 +13,6 @@ module Mongoid
       #   NoMapReduceOutput.new({ map: "" })
       #
       # @param [ Hash ] command The map/reduce command.
-      #
-      # @since 3.0.0
       def initialize(command)
         super(
           compose_message("no_map_reduce_output", { command: command })
