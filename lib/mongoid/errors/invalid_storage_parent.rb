@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -13,8 +12,6 @@ module Mongoid
       #    InvalidStorageParent.new(Person)
       #
       # @param [ Class ] klass The model class.
-      #
-      # @since 4.0.0
       def initialize(klass)
         super(
           compose_message(

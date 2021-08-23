@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Attributes
 
     # This module contains the behavior for dynamic attributes.
-    #
-    # @since 4.0.0
     module Dynamic
       extend ActiveSupport::Concern
 
@@ -19,8 +16,6 @@ module Mongoid
       # @param [ true, false ] include_private
       #
       # @return [ true, false ] True if it does, false if not.
-      #
-      # @since 4.0.0
       def respond_to?(name, include_private = false)
         super || (
           attributes &&
@@ -36,8 +31,6 @@ module Mongoid
       #   model.define_dynamic_reader(:field)
       #
       # @param [ String ] name The name of the field.
-      #
-      # @since 4.0.0
       def define_dynamic_reader(name)
         return unless name.valid_method_name?
 
@@ -57,8 +50,6 @@ module Mongoid
       #   model.define_dynamic_before_type_cast_reader(:field)
       #
       # @param [ String ] name The name of the field.
-      #
-      # @since 4.0.0
       def define_dynamic_before_type_cast_reader(name)
         class_eval do
           define_method("#{name}_before_type_cast") do
@@ -76,8 +67,6 @@ module Mongoid
       #   model.define_dynamic_writer(:field)
       #
       # @param [ String ] name The name of the field.
-      #
-      # @since 4.0.0
       def define_dynamic_writer(name)
         return unless name.valid_method_name?
 
@@ -96,8 +85,6 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Object ] value The value of the field.
-      #
-      # @since 4.0.0
       def process_attribute(name, value)
         responds = respond_to?("#{name}=")
         if !responds
@@ -113,8 +100,6 @@ module Mongoid
       #   document.inspect_dynamic_fields
       #
       # @return [ String ] An array of pretty printed dynamic field values.
-      #
-      # @since 4.0.0
       def inspect_dynamic_fields
         keys = attributes.keys - fields.keys - relations.keys - ["_id", self.class.discriminator_key]
         return keys.map do |name|
@@ -133,8 +118,6 @@ module Mongoid
       # @param [ Array ] args The arguments to the method.
       #
       # @return [ Object ] The result of the method call.
-      #
-      # @since 4.0.0
       def method_missing(name, *args)
         attr = name.to_s
         return super unless attributes.has_key?(attr.reader)

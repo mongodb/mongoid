@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
@@ -19,8 +18,6 @@ module Mongoid
       include Queryable
 
       # Options constant.
-      #
-      # @since 5.0.0
       OPTIONS = [ :hint,
                   :limit,
                   :skip,
@@ -44,8 +41,6 @@ module Mongoid
       #   context.cached?
       #
       # @return [ true, false ] If the context is cached.
-      #
-      # @since 3.0.0
       def cached?
         !!@cache
       end
@@ -67,8 +62,6 @@ module Mongoid
       #   into the count.
       #
       # @return [ Integer ] The number of matches.
-      #
-      # @since 3.0.0
       def count(options = {}, &block)
         return super(&block) if block_given?
         try_cache(:count) { view.count_documents(options) }
@@ -99,8 +92,6 @@ module Mongoid
       #   context.delete
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def delete
         view.delete_many.deleted_count
       end
@@ -112,8 +103,6 @@ module Mongoid
       #   context.destroy
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def destroy
         each.inject(0) do |count, doc|
           doc.destroy
@@ -131,8 +120,6 @@ module Mongoid
       # @param [ String, Symbol ] field The name of the field.
       #
       # @return [ Array<Object> ] The distinct values for the field.
-      #
-      # @since 3.0.0
       def distinct(field)
         view.distinct(klass.database_field_name(field)).map do |value|
           value.class.demongoize(value)
@@ -148,8 +135,6 @@ module Mongoid
       #   end
       #
       # @return [ Enumerator ] The enumerator.
-      #
-      # @since 3.0.0
       def each(&block)
         if block_given?
           documents_for_iteration.each do |doc|
@@ -172,8 +157,6 @@ module Mongoid
       #   used to determine the value.
       #
       # @return [ true, false ] If the count is more than zero.
-      #
-      # @since 3.0.0
       def exists?
         return !documents.empty? if cached? && cache_loaded?
         return @count > 0 if instance_variable_defined?(:@count)
@@ -189,8 +172,6 @@ module Mongoid
       #   Band.where(name: "Depeche Mode").explain
       #
       # @return [ Hash ] The explain result.
-      #
-      # @since 3.0.0
       def explain
         view.explain
       end
@@ -209,8 +190,6 @@ module Mongoid
       # @option options [ true, false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
-      #
-      # @since 5.0.0
       def find_one_and_update(update, options = {})
         if doc = view.find_one_and_update(update, options)
           Factory.from_db(klass, doc)
@@ -231,8 +210,6 @@ module Mongoid
       # @option options [ true, false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
-      #
-      # @since 5.0.0
       def find_one_and_replace(replacement, options = {})
         if doc = view.find_one_and_replace(replacement, options)
           Factory.from_db(klass, doc)
@@ -246,8 +223,6 @@ module Mongoid
       #   context.find_one_and_delete
       #
       # @return [ Document ] The result of the command.
-      #
-      # @since 5.0.0
       def find_one_and_delete
         if doc = view.find_one_and_delete
           Factory.from_db(klass, doc)
@@ -271,8 +246,6 @@ module Mongoid
       #   is defined on the criteria.
       #
       # @return [ Document ] The first document.
-      #
-      # @since 3.0.0
       def first(opts = {})
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
@@ -294,8 +267,6 @@ module Mongoid
       # Return the first result without applying sort
       #
       # @api private
-      #
-      # @since 4.0.2
       def find_first
         return documents.first if cached? && cache_loaded?
         if raw_doc = view.first
@@ -323,8 +294,6 @@ module Mongoid
       # @return [ GeoNear ] The GeoNear command.
       #
       # @deprecated
-      #
-      # @since 3.1.0
       def geo_near(coordinates)
         GeoNear.new(collection, criteria, coordinates)
       end
@@ -359,8 +328,6 @@ module Mongoid
       #   Mongo.new(criteria)
       #
       # @param [ Criteria ] criteria The criteria.
-      #
-      # @since 3.0.0
       def initialize(criteria)
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         @collection = @klass.collection
@@ -386,8 +353,6 @@ module Mongoid
       #
       # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
       #   is defined on the criteria.
-      #
-      # @since 3.0.0
       def last(opts = {})
         try_cache(:last) do
           with_inverse_sorting(opts) do
@@ -405,8 +370,6 @@ module Mongoid
       #   context.length
       #
       # @return [ Integer ] The number of documents.
-      #
-      # @since 3.0.0
       def length
         @length ||= self.count
       end
@@ -420,8 +383,6 @@ module Mongoid
       # @param [ Integer ] value The number of documents to return.
       #
       # @return [ Mongo ] The context.
-      #
-      # @since 3.0.0
       def limit(value)
         @view = view.limit(value) and self
       end
@@ -435,8 +396,6 @@ module Mongoid
       # @param [ String ] reduce The reduce js function.
       #
       # @return [ MapReduce ] The map/reduce lazy wrapper.
-      #
-      # @since 3.0.0
       def map_reduce(map, reduce)
         MapReduce.new(collection, criteria, map, reduce)
       end
@@ -453,8 +412,6 @@ module Mongoid
       # @param [ String, Symbol, Array ] fields Fields to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
-      #
-      # @since 3.1.0
       def pluck(*fields)
         normalized_select = fields.inject({}) do |hash, f|
           hash[klass.database_field_name(f)] = 1
@@ -477,8 +434,6 @@ module Mongoid
       # @param [ Integer ] value The number of documents to skip.
       #
       # @return [ Mongo ] The context.
-      #
-      # @since 3.0.0
       def skip(value)
         @view = view.skip(value) and self
       end
@@ -492,8 +447,6 @@ module Mongoid
       #   pairs.
       #
       # @return [ Mongo ] The context.
-      #
-      # @since 3.0.0
       def sort(values = nil, &block)
         if block_given?
           super(&block)
@@ -517,8 +470,6 @@ module Mongoid
       #   an update should apply.
       #
       # @return [ nil, false ] False if no attributes were provided.
-      #
-      # @since 3.0.0
       def update(attributes = nil, opts = {})
         update_documents(attributes, :update_one, opts)
       end
@@ -535,8 +486,6 @@ module Mongoid
       #   an update should apply.
       #
       # @return [ nil, false ] False if no attributes were provided.
-      #
-      # @since 3.0.0
       def update_all(attributes = nil, opts = {})
         update_documents(attributes, :update_many, opts)
       end
@@ -548,8 +497,6 @@ module Mongoid
       # @param [ String, Symbol ] key The instance variable name
       #
       # @return the result of the block
-      #
-      # @since 3.1.4
       def try_cache(key, &block)
         unless cached?
           yield
@@ -572,8 +519,6 @@ module Mongoid
       # @param [ Symbol ] method The method to use.
       #
       # @return [ true, false ] If the update succeeded.
-      #
-      # @since 3.0.4
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
@@ -586,8 +531,6 @@ module Mongoid
       #
       # @example Apply the field limitations.
       #   context.apply_fields
-      #
-      # @since 3.0.0
       def apply_fields
         if spec = criteria.options[:fields]
           @view = view.projection(spec)
@@ -600,8 +543,6 @@ module Mongoid
       #
       # @example Apply all options.
       #   context.apply_options
-      #
-      # @since 3.1.0
       def apply_options
         apply_fields
         OPTIONS.each do |name|
@@ -618,8 +559,6 @@ module Mongoid
       #
       # @example Apply the skip option.
       #   context.apply_option(:skip)
-      #
-      # @since 3.1.0
       def apply_option(name)
         if spec = criteria.options[name]
           @view = view.send(name, spec)
@@ -632,8 +571,6 @@ module Mongoid
       #
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
-      #
-      # @since 3.0.0
       def with_inverse_sorting(opts = {})
         begin
           if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
@@ -653,8 +590,6 @@ module Mongoid
       #   context.cacheable?
       #
       # @return [ true, false ] If caching, and the cache isn't loaded.
-      #
-      # @since 3.0.0
       def cacheable?
         cached? && !cache_loaded?
       end
@@ -668,8 +603,6 @@ module Mongoid
       #   context.cache_loaded?
       #
       # @return [ true, false ] If the cache is loaded.
-      #
-      # @since 3.0.0
       def cache_loaded?
         !!@cache_loaded
       end
@@ -682,8 +615,6 @@ module Mongoid
       #   context.documents
       #
       # @return [ Array<Document> ] The documents.
-      #
-      # @since 3.0.0
       def documents
         @documents ||= []
       end
@@ -702,8 +633,6 @@ module Mongoid
       #   context.documents_for_iteration
       #
       # @return [ Array<Document>, Mongo::Collection::View ] The docs to iterate.
-      #
-      # @since 3.0.0
       def documents_for_iteration
         return documents if cached? && !documents.empty?
         return view unless eager_loadable?
@@ -721,8 +650,6 @@ module Mongoid
       #   end
       #
       # @param [ Document ] document The document to yield to.
-      #
-      # @since 3.0.0
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)

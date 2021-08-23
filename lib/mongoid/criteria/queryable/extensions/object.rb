@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -17,8 +16,6 @@ module Mongoid
           # @param [ Object ] object The object to add.
           #
           # @return [ Object ] The result of the add.
-          #
-          # @since 1.0.0
           def __add__(object)
             (object == self) ? self : [ self, object ].flatten.uniq
           end
@@ -31,8 +28,6 @@ module Mongoid
           # @param [ Array ] array The array to add to.
           #
           # @return [ Array ] The merged object.
-          #
-          # @since 1.0.0
           def __add_from_array__(array)
             array.concat(Array(self)).uniq
           end
@@ -45,8 +40,6 @@ module Mongoid
           # @param [ Object ] object The object to intersect.
           #
           # @return [ Array ] The result of the intersect.
-          #
-          # @since 1.0.0
           def __intersect__(object)
             object.__intersect_from_object__(self)
           end
@@ -59,8 +52,6 @@ module Mongoid
           # @param [ Array ] array The array to intersect to.
           #
           # @return [ Array ] The merged object.
-          #
-          # @since 1.0.0
           def __intersect_from_array__(array)
             array & Array(self)
           end
@@ -73,8 +64,6 @@ module Mongoid
           # @param [ Object ] object The value to intersect to.
           #
           # @return [ Array ] The merged object.
-          #
-          # @since 1.0.0
           def __intersect_from_object__(object)
             Array(object) & Array(self)
           end
@@ -87,8 +76,6 @@ module Mongoid
           # @param [ Object ] object The object to union.
           #
           # @return [ Array ] The result of the union.
-          #
-          # @since 1.0.0
           def __union__(object)
             object.__union_from_object__(self)
           end
@@ -101,8 +88,6 @@ module Mongoid
           # @param [ Object ] object The value to union to.
           #
           # @return [ Array ] The merged object.
-          #
-          # @since 1.0.0
           def __union_from_object__(object)
             (Array(object) + Array(self)).uniq
           end
@@ -114,8 +99,6 @@ module Mongoid
           #   1.__deep_copy__
           #
           # @return [ Object ] self.
-          #
-          # @since 1.0.0
           def __deep_copy__; self; end
 
           # Get the object as an array.
@@ -124,8 +107,6 @@ module Mongoid
           #   4.__array__
           #
           # @return [ Array ] The wrapped object.
-          #
-          # @since 1.0.0
           def __array__
             [ self ]
           end
@@ -136,8 +117,6 @@ module Mongoid
           #   obj.__expand_complex__
           #
           # @return [ Object ] self.
-          #
-          # @since 1.0.5
           def __expand_complex__
             self
           end
@@ -148,8 +127,6 @@ module Mongoid
           #   obj.regexp?
           #
           # @return [ false ] Always false.
-          #
-          # @since 1.0.4
           def regexp?
             false
           end
@@ -164,8 +141,6 @@ module Mongoid
             #   Object.evolve("test")
             #
             # @return [ Object ] The provided object.
-            #
-            # @since 1.0.0
             def evolve(object)
               object
             end
@@ -184,8 +159,6 @@ module Mongoid
             #   end
             #
             # @return [ Object ] The evolved object.
-            #
-            # @since 1.0.0
             def __evolve__(object)
               return nil if object.nil?
               case object

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -15,8 +14,6 @@ module Mongoid
       #
       # @param [ Class ] klass The model class.
       # @param [ String, Symbol ] name The name of the attribute.
-      #
-      # @since 3.0.0
       def initialize(klass, name)
         super(
           compose_message("unknown_attribute", { klass: klass.name, name: name })

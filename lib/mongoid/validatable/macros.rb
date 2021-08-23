@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Validatable
@@ -54,8 +53,6 @@ module Mongoid
       #   end
       #
       # @param [ Array ] args The names of the fields to validate.
-      #
-      # @since 2.4.0
       def validates_format_of(*args)
         validates_with(FormatValidator, _merge_attributes(args))
       end
@@ -71,8 +68,6 @@ module Mongoid
       #   end
       #
       # @param [ Array ] args The names of the fields to validate.
-      #
-      # @since 2.4.0
       def validates_length_of(*args)
         validates_with(LengthValidator, _merge_attributes(args))
       end
@@ -88,8 +83,6 @@ module Mongoid
       #   end
       #
       # @param [ Array ] args The names of the fields to validate.
-      #
-      # @since 2.4.0
       def validates_presence_of(*args)
         validates_with(PresenceValidator, _merge_attributes(args))
       end

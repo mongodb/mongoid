@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -14,8 +13,6 @@ module Mongoid
       #   InvalidTime.new("this is not a time")
       #
       # @param [ Object ] value The value that was attempted.
-      #
-      # @since 2.3.1
       def initialize(value)
         super(compose_message("invalid_time", { value: value }))
       end

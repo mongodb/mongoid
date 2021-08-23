@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -124,6 +123,8 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           it 'disconnects the new cluster when the block exits' do
+            skip 'https://jira.mongodb.org/browse/MONGOID-5130'
+
             expect(connections_before).to eq(connections_after)
           end
         end

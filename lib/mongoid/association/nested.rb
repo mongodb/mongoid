@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'mongoid/association/nested/nested_buildable'
 require 'mongoid/association/nested/many'
@@ -10,8 +9,6 @@ module Mongoid
     module Nested
 
       # The flags indicating that an association can be destroyed.
-      #
-      # @since 7.0
       DESTROY_FLAGS = [1, "1", true, "true"].freeze
     end
   end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -17,8 +16,6 @@ module Mongoid
           #   person.preferences.bind_one(preference)
           #
           # @param [ Document ] doc The single document to bind.
-          #
-          # @since 2.0.0.rc.1
           def bind_one(doc)
             binding do
               inverse_keys = doc.you_must(_association.inverse_foreign_key)
@@ -38,8 +35,6 @@ module Mongoid
           #
           # @example Unbind the document.
           #   person.preferences.unbind_one(document)
-          #
-          # @since 2.0.0.rc.1
           def unbind_one(doc)
             binding do
               _base.send(_association.foreign_key).delete_one(record_id(doc))

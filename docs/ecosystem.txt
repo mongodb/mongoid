@@ -35,7 +35,7 @@ Extension Libraries
 
 - `Mongoid Collection Snapshot <https://github.com/mongoid/mongoid-collection-snapshot>`_
 
-  Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM.
+  Easy maintenance of collections of processed data in MongoDB with the Mongoid ODM.
 
 - `Mongoid Locker <https://github.com/mongoid/mongoid-locker>`_
 

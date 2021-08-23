@@ -1,0 +1,90 @@
+***********
+Mongoid 7.4
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 7.4.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+``===`` Operator Matches Ruby Semantics
+---------------------------------------
+
+**Breaking change:** In Mongoid 7.4, the ``===`` operator works the same way
+as it does in Ruby, and is equivalent to calling ``is_a?`` on the right hand
+side with the left hand side as the argument:
+
+.. code-block:: ruby
+
+  ModelClass === instance
+  
+  # equivalent to:
+  instance.is_a?(ModelClass)
+
+Previously, ``===`` returned ``true`` for some cases when the equivalent Ruby
+``===`` implementation returned false.
+
+Mongoid 7.4 behavior:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+  end
+  
+  class CoverBand < Band
+  end
+  
+  band = Band.new
+  cover_band = CoverBand.new
+  
+  band === Band
+  # => false
+  
+  cover_band === Band
+  # => false
+  
+  Band === Band
+  # => false
+  
+  CoverBand === Band
+  # => false
+  
+Mongoid 7.3 behavior:
+
+.. code-block:: ruby
+
+  band === Band
+  # => true
+
+  cover_band === Band
+  # => true
+  
+  Band === Band
+  # => true
+  
+  CoverBand === Band
+  # => true
+
+The standard invocation of ``===``, that is having the class on the left and
+the instance on the right, works the same in Mongoid 7.4 as it did previously
+and matches the core Ruby behavior:
+
+.. code-block:: ruby
+
+  Band === band
+  # => true
+  
+  Band === cover_band
+  # => true

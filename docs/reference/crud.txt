@@ -707,7 +707,7 @@ Hash Access
 -----------
 
 Mongoid model instances define the ``[]`` and ``[]=`` methods to provide
-``Hash`` style acccess to the attributes. ``[]`` is an alias for
+``Hash`` style access to the attributes. ``[]`` is an alias for
 ``read_attribute`` and ``[]=`` is an alias for ``write_attribute``; see
 the section on :ref:`read_attribute and write_attribute <read-write-attribute>`
 for the detailed description of their behavior.

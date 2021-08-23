@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'lite_spec_helper'
 
@@ -155,31 +154,21 @@ RSpec.configure do |config|
 end
 
 # A subscriber to be used with the Ruby driver for testing.
-#
-# @since 6.4.0
 class EventSubscriber
 
   # The started events.
-  #
-  # @since 6.4.0
   attr_reader :started_events
 
   # The succeeded events.
-  #
-  # @since 6.4.0
   attr_reader :succeeded_events
 
   # The failed events.
-  #
-  # @since 6.4.0
   attr_reader :failed_events
 
   # Create the test event subscriber.
   #
   # @example Create the subscriber
   #   EventSubscriber.new
-  #
-  # @since 6.4.0
   def initialize
     @started_events = []
     @succeeded_events = []
@@ -189,8 +178,6 @@ class EventSubscriber
   # Cache the succeeded event.
   #
   # @param [ Event ] event The event.
-  #
-  # @since 6.4.0
   def succeeded(event)
     @succeeded_events.push(event)
   end
@@ -198,8 +185,6 @@ class EventSubscriber
   # Cache the started event.
   #
   # @param [ Event ] event The event.
-  #
-  # @since 6.4.0
   def started(event)
     @started_events.push(event)
   end
@@ -207,15 +192,11 @@ class EventSubscriber
   # Cache the failed event.
   #
   # @param [ Event ] event The event.
-  #
-  # @since 6.4.0
   def failed(event)
     @failed_events.push(event)
   end
 
   # Clear all cached events.
-  #
-  # @since 6.4.0
   def clear_events!
     @started_events = []
     @succeeded_events = []

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Extensions
@@ -11,8 +10,6 @@ module Mongoid
       #   range.__find_args__
       #
       # @return [ Array ] The range as an array.
-      #
-      # @since 3.0.0
       def __find_args__
         to_a
       end
@@ -24,8 +21,6 @@ module Mongoid
       #   range.mongoize
       #
       # @return [ Hash ] The object mongoized.
-      #
-      # @since 3.0.0
       def mongoize
         ::Range.mongoize(self)
       end
@@ -36,8 +31,6 @@ module Mongoid
       #   range.resizable?
       #
       # @return [ true ] True.
-      #
-      # @since 3.0.0
       def resizable?
         true
       end
@@ -52,8 +45,6 @@ module Mongoid
         # @param [ Hash ] object The object to demongoize.
         #
         # @return [ Range, Hash ] The range, or database hash object if cannot be represented as range.
-        #
-        # @since 3.0.0
         def demongoize(object)
           object.nil? ? nil : ::Range.new(object["min"], object["max"], object["exclude_end"])
         rescue ArgumentError # can be removed when Ruby version >= 2.7
@@ -69,8 +60,6 @@ module Mongoid
         # @param [ Range ] object The object to mongoize.
         #
         # @return [ Hash ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           case object
           when NilClass then nil

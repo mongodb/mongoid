@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -14,8 +13,6 @@ module Mongoid
       #   destroyed.
       # @param [ Symbol ] association_name The name of the dependent
       #   association that prevents the document from being deleted.
-      #
-      # @since 3.0.0
       def initialize(document, association_name)
         super(
           compose_message(

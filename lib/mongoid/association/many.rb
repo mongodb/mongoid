@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -19,8 +18,6 @@ module Mongoid
       #   person.addresses.blank?
       #
       # @return [ true, false ] If the association is empty or not.
-      #
-      # @since 2.1.0
       def blank?
         !any?
       end
@@ -36,8 +33,6 @@ module Mongoid
       # @param [ Class ] type The optional type of document to create.
       #
       # @return [ Document ] The newly created document.
-      #
-      # @since 2.0.0.beta.1
       def create(attributes = nil, type = nil, &block)
         if attributes.is_a?(::Array)
           attributes.map { |attrs| create(attrs, type, &block) }
@@ -61,8 +56,6 @@ module Mongoid
       # @raise [ Errors::Validations ] If validation failed.
       #
       # @return [ Document ] The newly created document.
-      #
-      # @since 2.0.0.beta.1
       def create!(attributes = nil, type = nil, &block)
         if attributes.is_a?(::Array)
           attributes.map { |attrs| create!(attrs, type, &block) }
@@ -123,8 +116,6 @@ module Mongoid
       #   relation.nil?
       #
       # @return [ false ] Always false.
-      #
-      # @since 2.0.0
       def nil?
         false
       end
@@ -138,8 +129,6 @@ module Mongoid
       # @param [ true, false ] include_private Whether to include private methods.
       #
       # @return [ true, false ] If the proxy responds to the method.
-      #
-      # @since 2.0.0
       def respond_to?(name, include_private = false)
         [].respond_to?(name, include_private) ||
           klass.respond_to?(name, include_private) || super
@@ -151,8 +140,6 @@ module Mongoid
       #   relation.scoped
       #
       # @return [ Criteria ] The scoped criteria.
-      #
-      # @since 2.1.0
       def scoped
         criteria
       end
@@ -171,8 +158,6 @@ module Mongoid
       # @option options [ Symbol ] :except Dont include these fields.
       #
       # @return [ Hash ] The documents, ready to be serialized.
-      #
-      # @since 2.0.0.rc.6
       def serializable_hash(options = {})
         _target.map { |document| document.serializable_hash(options) }
       end
@@ -184,8 +169,6 @@ module Mongoid
       #   person.addresses.unscoped
       #
       # @return [ Criteria ] The unscoped criteria.
-      #
-      # @since 2.4.0
       def unscoped
         criteria.unscoped
       end
