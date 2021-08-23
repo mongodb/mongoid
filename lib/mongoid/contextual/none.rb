@@ -112,6 +112,9 @@ module Mongoid
         entries.length
       end
       alias :size :length
+
+      alias :find_first :first
+      alias :one :first
     end
   end
 end
