@@ -518,13 +518,17 @@ describe Mongoid::Document do
           Church.create!(name: 'St. Basil')
         end
 
+        let(:message) do
+          '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
+        end
+
         it 'logs a deprecation warning when :compact is given' do
-          expect_any_instance_of(Logger).to receive(:warn).with('#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.')
+          expect_any_instance_of(Logger).to receive(:warn).with(message)
           church.as_json(compact: true)
         end
 
         it 'does not log a deprecation warning when :compact is not given' do
-          expect_any_instance_of(Logger).to_not receive(:warn)
+          expect_any_instance_of(Logger).to_not receive(:warn).with(message)
           church.as_json
         end
       end
