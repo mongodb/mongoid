@@ -18,8 +18,6 @@ module Mongoid
       #   geo_near.average_distance
       #
       # @return [ Float, nil ] The average distance.
-      #
-      # @since 3.1.0
       def average_distance
         average = stats["avgDistance"]
         (average.nil? || average.nan?) ? nil : average
@@ -34,8 +32,6 @@ module Mongoid
       #   end
       #
       # @return [ Enumerator ] The enumerator.
-      #
-      # @since 3.1.0
       def each
         if block_given?
           documents.each do |doc|
@@ -54,8 +50,6 @@ module Mongoid
       # @param [ Integer, Float ] value The distance multiplier.
       #
       # @return [ GeoNear ] The GeoNear wrapper.
-      #
-      # @since 3.1.0
       def distance_multiplier(value)
         command[:distanceMultiplier] = value
         self
@@ -70,8 +64,6 @@ module Mongoid
       #   operation on.
       # @param [ Criteria ] criteria The Mongoid criteria.
       # @param [ String ] near
-      #
-      # @since 3.0.0
       def initialize(collection, criteria, near)
         @collection, @criteria = collection, criteria
         command[:geoNear] = collection.name.to_s
@@ -85,8 +77,6 @@ module Mongoid
       #   geo_near.inspect
       #
       # @return [ String ] The inspection string.
-      #
-      # @since 3.1.0
       def inspect
 %Q{#<Mongoid::Contextual::GeoNear
   selector:   #{criteria.selector.inspect}
@@ -112,8 +102,6 @@ module Mongoid
       # @param [ Integer, Float ] value The maximum distance.
       #
       # @return [ GeoNear, Float ] The GeoNear command or the value.
-      #
-      # @since 3.1.0
       def max_distance(value = nil)
         if value
           command[:maxDistance] = value
@@ -131,8 +119,6 @@ module Mongoid
       # @param [ Integer, Float ] value The minimum distance.
       #
       # @return [ GeoNear ] The GeoNear command.
-      #
-      # @since 3.1.0
       def min_distance(value)
         command[:minDistance] = value
         self
@@ -144,8 +130,6 @@ module Mongoid
       #   geo_near.spherical
       #
       # @return [ GeoNear ] The command.
-      #
-      # @since 3.1.0
       def spherical
         command[:spherical] = true
         self
@@ -159,8 +143,6 @@ module Mongoid
       # @param [ true, false ] value Whether to return unique documents.
       #
       # @return [ GeoNear ] The command.
-      #
-      # @since 3.1.0
       def unique(value = true)
         command[:unique] = value
         self
@@ -172,8 +154,6 @@ module Mongoid
       #   geo_near.execute
       #
       # @return [ Hash ] The raw output
-      #
-      # @since 3.1.0
       def execute
         results
       end
@@ -184,8 +164,6 @@ module Mongoid
       #   geo_near.stats
       #
       # @return [ Hash ] The stats from the command run.
-      #
-      # @since 3.1.0
       def stats
         results["stats"]
       end
@@ -196,8 +174,6 @@ module Mongoid
       #   geo_near.time
       #
       # @return [ Float ] The execution time.
-      #
-      # @since 3.1.0
       def time
         stats["time"]
       end
@@ -208,8 +184,6 @@ module Mongoid
       #   geo_near.empty_and_chainable?
       #
       # @return [ true ] Always true.
-      #
-      # @since 5.1.0
       def empty_and_chainable?
         true
       end
@@ -224,8 +198,6 @@ module Mongoid
       #   geo_near.apply_criteria_options
       #
       # @return [ nil ] Nothing.
-      #
-      # @since 3.0.0
       def apply_criteria_options
         command[:query] = criteria.selector
         if limit = criteria.options[:limit]
@@ -241,8 +213,6 @@ module Mongoid
       #   geo_near.documents
       #
       # @return [ Array, Cursor ] The documents.
-      #
-      # @since 3.0.0
       def documents
         results["results"].map do |attributes|
           doc = Factory.from_db(criteria.klass, attributes["obj"], criteria)
@@ -259,8 +229,6 @@ module Mongoid
       #   geo_near.results
       #
       # @return [ Hash ] The results of the command.
-      #
-      # @since 3.0.0
       def results
         @results ||= client.command(command).first
       end

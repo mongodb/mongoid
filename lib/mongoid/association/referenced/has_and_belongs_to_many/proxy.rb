@@ -25,8 +25,6 @@ module Mongoid
           # @param [ Document, Array<Document> ] args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
-          #
-          # @since 2.0.0.beta.1
           def <<(*args)
             docs = args.flatten
             return concat(docs) if docs.size > 1
@@ -51,8 +49,6 @@ module Mongoid
           # @param [ Array<Document> ] documents The docs to add.
           #
           # @return [ Array<Document> ] The documents.
-          #
-          # @since 2.4.0
           def concat(documents)
             ids, docs, inserts = {}, [], []
             documents.each do |doc|
@@ -85,8 +81,6 @@ module Mongoid
           # @param [ Class ] type The optional subclass to build.
           #
           # @return [ Document ] The new document.
-          #
-          # @since 2.0.0.beta.1
           def build(attributes = {}, type = nil)
             doc = Factory.build(type || klass, attributes)
             _base.send(foreign_key).push(doc._id)
@@ -109,8 +103,6 @@ module Mongoid
           # @param [ Document ] document The document to remove.
           #
           # @return [ Document ] The matching document.
-          #
-          # @since 2.1.0
           def delete(document)
             doc = super
             if doc && persistable?
@@ -129,8 +121,6 @@ module Mongoid
           #   person.preferences.nullify
           #
           # @param [ Array<Document> ] replacement The replacement documents.
-          #
-          # @since 2.0.0.rc.1
           def nullify(replacement = [])
             _target.each do |doc|
               execute_callback :before_remove, doc
@@ -183,8 +173,6 @@ module Mongoid
           # @param [ Array<Document> ] replacement The replacement target.
           #
           # @return [ Many ] The association.
-          #
-          # @since 2.0.0.rc.1
           def substitute(replacement)
             purge(replacement)
             unless replacement.blank?
@@ -202,8 +190,6 @@ module Mongoid
           #   person.preferences.unscoped
           #
           # @return [ Criteria ] The unscoped criteria.
-          #
-          # @since 2.4.0
           def unscoped
             klass.unscoped.any_in(_id: _base.send(foreign_key))
           end
@@ -217,8 +203,6 @@ module Mongoid
           #   relation.append(document)
           #
           # @param [ Document ] document The document to append to the target.
-          #
-          # @since 2.0.0.rc.1
           def append(document)
             execute_callback :before_add, document
             _target.push(document)
@@ -233,8 +217,6 @@ module Mongoid
           #   relation.binding([ address ])
           #
           # @return [ Binding ] The binding.
-          #
-          # @since 2.0.0.rc.1
           def binding
             HasAndBelongsToMany::Binding.new(_base, _target, _association)
           end
@@ -249,8 +231,6 @@ module Mongoid
           # @param [ Document ] doc The document.
           #
           # @return [ true, false ] If the document can be persisted.
-          #
-          # @since 3.0.20
           def child_persistable?(doc)
             (persistable? || _creating?) &&
                 !(doc.persisted? && _association.forced_nil_inverse?)
@@ -278,8 +258,6 @@ module Mongoid
           # @param [ Symbol ] key The key to flag on the document.
           #
           # @return [ true ] true.
-          #
-          # @since 3.0.0
           def unsynced(doc, key)
             doc._synced[key] = false
             true
@@ -293,8 +271,6 @@ module Mongoid
             #
             # @param [ Association ] association The association object.
             # @param [ Array<Document> ] docs The array of documents.
-            #
-            # @since 7.0
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end
@@ -306,8 +282,6 @@ module Mongoid
             #   Referenced::ManyToMany.embedded?
             #
             # @return [ false ] Always false.
-            #
-            # @since 2.0.0.rc.1
             def embedded?
               false
             end

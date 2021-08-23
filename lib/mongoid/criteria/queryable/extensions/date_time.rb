@@ -15,8 +15,6 @@ module Mongoid
           #   date_time.__evolve_time__
           #
           # @return [ Time ] The converted time in UTC.
-          #
-          # @since 1.0.0
           def __evolve_time__
             usec = strftime("%6N").to_f
             u = utc
@@ -36,8 +34,6 @@ module Mongoid
             # @param [ Object ] object The object to evolve.
             #
             # @return [ Time ] The evolved date time.
-            #
-            # @since 1.0.0
             def evolve(object)
               object.__evolve_time__
             end

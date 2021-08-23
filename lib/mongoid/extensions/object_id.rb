@@ -11,8 +11,6 @@ module Mongoid
       #   object_id.__evolve_object_id__
       #
       # @return [ BSON::ObjectId ] self.
-      #
-      # @since 3.0.0
       def __evolve_object_id__
         self
       end
@@ -28,8 +26,6 @@ module Mongoid
         # @param [ Object ] object The object to evolve.
         #
         # @return [ BSON::ObjectId ] The object id.
-        #
-        # @since 3.0.0
         def evolve(object)
           object.__evolve_object_id__
         end
@@ -42,8 +38,6 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ BSON::ObjectId ] The object id.
-        #
-        # @since 3.0.0
         def mongoize(object)
           object.__mongoize_object_id__
         end

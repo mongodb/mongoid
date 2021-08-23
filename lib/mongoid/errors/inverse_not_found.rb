@@ -16,8 +16,6 @@ module Mongoid
       # @param [ Symbol ] name The name of the association.
       # @param [ Class ] klass The child class.
       # @param [ Symbol ] inverse The attempted inverse key.
-      #
-      # @since 3.0.0
       def initialize(base, name, klass, inverse)
         super(
           compose_message(

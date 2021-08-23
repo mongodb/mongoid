@@ -14,8 +14,6 @@ module Mongoid
       #   InvalidConfigOption.new(:name, [ :option ])
       #
       # @param [ Symbol, String ] name The attempted config option name.
-      #
-      # @since 3.0.0
       def initialize(name)
         super(
           compose_message(

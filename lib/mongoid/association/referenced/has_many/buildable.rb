@@ -7,8 +7,6 @@ module Mongoid
       class HasMany
 
         # The Builder behavior for has_many associations.
-        #
-        # @since 7.0
         module Buildable
 
           # This method either takes an _id or an object and queries for the

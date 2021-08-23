@@ -15,8 +15,6 @@ module Mongoid
         #   options.fields
         #
         # @return [ Hash ] The fields options.
-        #
-        # @since 1.0.0
         def fields
           self[:fields]
         end
@@ -27,8 +25,6 @@ module Mongoid
         #   options.limit
         #
         # @return [ Integer ] The limit option.
-        #
-        # @since 1.0.0
         def limit
           self[:limit]
         end
@@ -39,8 +35,6 @@ module Mongoid
         #   options.skip
         #
         # @return [ Integer ] The skip option.
-        #
-        # @since 1.0.0
         def skip
           self[:skip]
         end
@@ -51,8 +45,6 @@ module Mongoid
         #   options.sort
         #
         # @return [ Hash ] The sort options.
-        #
-        # @since 1.0.0
         def sort
           self[:sort]
         end
@@ -67,8 +59,6 @@ module Mongoid
         # @param [ Object ] value The value to add.
         #
         # @return [ Object ] The stored object.
-        #
-        # @since 1.0.0
         def store(key, value, localize = true)
           super(key, evolve(value, localize))
         end
@@ -80,8 +70,6 @@ module Mongoid
         #   options.to_pipeline
         #
         # @return [ Array<Hash> ] The options in pipeline form.
-        #
-        # @since 2.0.0
         def to_pipeline
           pipeline = []
           pipeline.push({ "$skip" => skip }) if skip
@@ -96,8 +84,6 @@ module Mongoid
         #   options.__deep_copy__
         #
         # @return [ Options ] The copied options.
-        #
-        # @since 6.1.1
         def __deep_copy__
           self.class.new(aliases, serializers) do |copy|
             each_pair do |key, value|
@@ -118,8 +104,6 @@ module Mongoid
         # @param [ Object ] value The value to serialize.
         #
         # @return [ Object ] The serialized object.
-        #
-        # @since 1.0.0
         def evolve(value, localize = true)
           case value
           when Hash
@@ -139,8 +123,6 @@ module Mongoid
         # @param [ Hash ] value The hash to serialize.
         #
         # @return [ Object ] The serialized hash.
-        #
-        # @since 1.0.0
         def evolve_hash(value, localize = true)
           value.inject({}) do |hash, (field, _value)|
             name, serializer = storage_pair(field)

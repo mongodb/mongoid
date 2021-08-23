@@ -22,8 +22,6 @@ module Mongoid
       #   Mongoid::Clients.clear
       #
       # @return [ Array ] The empty clients.
-      #
-      # @since 3.0.0
       def clear
         clients.clear
       end
@@ -34,8 +32,6 @@ module Mongoid
       #   Mongoid::Clients.default
       #
       # @return [ Mongo::Client ] The default client.
-      #
-      # @since 3.0.0
       def default
         with_name(:default)
       end
@@ -46,8 +42,6 @@ module Mongoid
       #   Mongoid::Clients.disconnect
       #
       # @return [ true ] True.
-      #
-      # @since 3.1.0
       def disconnect
         clients.values.each do |client|
           client.close
@@ -62,8 +56,6 @@ module Mongoid
       # @param [ String | Symbol ] name The name of the client.
       #
       # @return [ Mongo::Client ] The named client.
-      #
-      # @since 3.0.0
       def with_name(name)
         name_as_symbol = name.to_sym
         return clients[name_as_symbol] if clients[name_as_symbol]

@@ -10,8 +10,6 @@ module Mongoid
     module Embedded
 
       # The EmbedsOne type association.
-      #
-      # @since 7.0
       class EmbedsOne
         include Relatable
         include Buildable
@@ -20,8 +18,6 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        #
-        # @since 7.0
         ASSOCIATION_OPTIONS = [
             :autobuild,
             :as,
@@ -34,15 +30,11 @@ module Mongoid
         # the shared ones.
         #
         # @return [ Array<Symbol> ] The valid options.
-        #
-        # @since 7.0
         VALID_OPTIONS = (ASSOCIATION_OPTIONS + SHARED_OPTIONS).freeze
 
         # Setup the instance methods, fields, etc. on the association owning class.
         #
         # @return [ self ]
-        #
-        # @since 7.0
         def setup!
           setup_instance_methods!
           @owner_class.embedded_relations = @owner_class.embedded_relations.merge(name => self)
@@ -53,8 +45,6 @@ module Mongoid
         # The field key used to store the association object.
         #
         # @return [ String ] The field name.
-        #
-        # @since 7.0
         def store_as
           @store_as ||= (@options[:store_as].try(:to_s) || name.to_s)
         end
@@ -62,8 +52,6 @@ module Mongoid
         # The key that is used to get the attributes for the associated object.
         #
         # @return [ String ] The name of the field used to store the association.
-        #
-        # @since 7.0
         def key
           store_as.to_s
         end
@@ -71,8 +59,6 @@ module Mongoid
         # Is this association type embedded?
         #
         # @return [ true ] Always true.
-        #
-        # @since 7.0
         def embedded?; true; end
 
         # Get the default validation setting for the association. Determines if
@@ -82,15 +68,11 @@ module Mongoid
         #   Proxy.validation_default
         #
         # @return [ true, false ] The validation default.
-        #
-        # @since 2.1.9
         def validation_default; true; end
 
         # Does this association type store the foreign key?
         #
         # @return [ false ] Always false.
-        #
-        # @since 7.0
         def stores_foreign_key?; false; end
 
         # The primary key
@@ -101,8 +83,6 @@ module Mongoid
         # Get the association proxy class for this association type.
         #
         # @return [ Association::Embedded::EmbedsMany::Proxy ] The proxy class.
-        #
-        # @since 7.0
         def relation
           Proxy
         end
@@ -110,8 +90,6 @@ module Mongoid
         # Is this association polymorphic?
         #
         # @return [ true, false ] Whether this association is polymorphic.
-        #
-        # @since 7.0
         def polymorphic?
           @polymorphic ||= !!@options[:as]
         end
@@ -121,8 +99,6 @@ module Mongoid
         # @note Only relevant if the association is polymorphic.
         #
         # @return [ String, nil ] The field for storing the associated object's type.
-        #
-        # @since 7.0
         def type
           @type ||= "#{as}_type" if polymorphic?
         end
@@ -133,8 +109,6 @@ module Mongoid
         # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::One ] The Nested Builder object.
-        #
-        # @since 7.0
         def nested_builder(attributes, options)
           Nested::One.new(self, attributes, options)
         end

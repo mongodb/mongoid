@@ -23,8 +23,6 @@ module Mongoid
       # @param [ Hash ] mods The current modifications.
       # @param [ Array ] new The new elements to add.
       # @param [ Array ] old The old elements getting removed.
-      #
-      # @since 2.4.0
       def add_atomic_changes(document, name, key, mods, new, old)
         mods[key] = new
       end
@@ -38,8 +36,6 @@ module Mongoid
       # @param [ Document ] doc The document the field belongs to.
       #
       # @return [ Object ] The serialized default value.
-      #
-      # @since 2.1.8
       def eval_default(doc)
         if fields = doc.__selected_fields
           evaluated_default(doc) if included?(fields)
@@ -54,8 +50,6 @@ module Mongoid
       #   field.foreign_key?
       #
       # @return [ true, false ] If the field is a foreign key.
-      #
-      # @since 2.4.0
       def foreign_key?
         false
       end
@@ -70,8 +64,6 @@ module Mongoid
       # @option options [ Class ] :type The class of the field.
       # @option options [ Object ] :default The default value for the field.
       # @option options [ String ] :label The field's label.
-      #
-      # @since 3.0.0
       def initialize(name, options = {})
         @name = name
         @options = options
@@ -92,8 +84,6 @@ module Mongoid
       #   field.lazy?
       #
       # @return [ true, false ] If the field is lazy.
-      #
-      # @since 3.1.0
       def lazy?
         false
       end
@@ -104,8 +94,6 @@ module Mongoid
       #   field.localized?
       #
       # @return [ true, false ] If the field is localized.
-      #
-      # @since 2.3.0
       def localized?
         false
       end
@@ -116,8 +104,6 @@ module Mongoid
       #   field.metadata
       #
       # @return [ Metadata ] The association metadata.
-      #
-      # @since 2.2.0
       def association
         @association ||= options[:association]
       end
@@ -128,8 +114,6 @@ module Mongoid
       #   field.object_id_field?
       #
       # @return [ true, false ] If the field is a BSON::ObjectId.
-      #
-      # @since 2.2.0
       def object_id_field?
         @object_id_field ||= (type == BSON::ObjectId)
       end
@@ -140,8 +124,6 @@ module Mongoid
       #   field.pre_processed?
       #
       # @return [ true, false ] If the field's default is pre-processed.
-      #
-      # @since 3.0.0
       def pre_processed?
         @pre_processed ||=
           (options[:pre_processed] || (default_val && !default_val.is_a?(::Proc)))
@@ -153,8 +135,6 @@ module Mongoid
       #   field.type
       #
       # @return [ Class ] The name of the class.
-      #
-      # @since 2.1.0
       def type
         @type ||= options[:type] || Object
       end
@@ -169,8 +149,6 @@ module Mongoid
       #   field.default_name
       #
       # @return [ String ] The method name.
-      #
-      # @since 3.0.0
       def default_name
         @default_name ||= "__#{name}_default__"
       end
@@ -186,8 +164,6 @@ module Mongoid
       #
       # @param [ Class, Module ] object The class or module the field is
       #   defined on.
-      #
-      # @since 3.0.0
       def define_default_method(object)
         object.__send__(:define_method, default_name, default_val)
       end
@@ -203,8 +179,6 @@ module Mongoid
       # @param [ Hash ] fields The field limitations.
       #
       # @return [ true, false ] If the field was included.
-      #
-      # @since 2.4.4
       def included?(fields)
         (fields.values.first == 1 && fields[name.to_s] == 1) ||
           (fields.values.first == 0 && !fields.has_key?(name.to_s))
@@ -218,8 +192,6 @@ module Mongoid
       # @param [ Document ] doc The doc being applied to.
       #
       # @return [ Object ] The default value.
-      #
-      # @since 2.4.4
       def evaluated_default(doc)
         if default_val.respond_to?(:call)
           evaluate_default_proc(doc)
@@ -237,8 +209,6 @@ module Mongoid
       # @param [ Document ] doc The document.
       #
       # @return [ Object ] The called proc.
-      #
-      # @since 3.0.0
       def evaluate_default_proc(doc)
         serialize_default(doc.__send__(default_name))
       end
@@ -254,8 +224,6 @@ module Mongoid
       # @param [ Object ] object The default.
       #
       # @return [ Object ] The serialized default.
-      #
-      # @since 3.0.0
       def serialize_default(object)
         mongoize(object)
       end

@@ -26,8 +26,6 @@ module Mongoid
       #   load.
       #
       # @return [ Criteria ] The cloned criteria.
-      #
-      # @since 2.2.0
       def includes(*relations)
         extract_includes_list(klass, relations)
         clone
@@ -39,8 +37,6 @@ module Mongoid
       #   Person.includes(:game).inclusions
       #
       # @return [ Array<Association> ] The inclusions.
-      #
-      # @since 2.2.0
       def inclusions
         @inclusions ||= []
       end
@@ -53,8 +49,6 @@ module Mongoid
       # @param [ Array<Association> ] value The inclusions.
       #
       # @return [ Array<Association> ] The new inclusions.
-      #
-      # @since 3.0.0
       def inclusions=(value)
         @inclusions = value
       end
@@ -70,8 +64,6 @@ module Mongoid
       # @param [ Symbol ] association The association.
       #
       # @raise [ Errors::InvalidIncludes ] If no association is found.
-      #
-      # @since 5.1.0
       def add_inclusion(_klass, association)
         inclusions.push(association) unless inclusions.include?(association)
       end

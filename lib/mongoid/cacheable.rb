@@ -4,8 +4,6 @@
 module Mongoid
 
   # Encapsulates behavior around caching.
-  #
-  # @since 6.0.0
   module Cacheable
     extend ActiveSupport::Concern
 
@@ -27,8 +25,6 @@ module Mongoid
     #   document.cache_key
     #
     # @return [ String ] the string with or without updated_at
-    #
-    # @since 2.4.0
     def cache_key
       return "#{model_key}/new" if new_record?
       return "#{model_key}/#{_id}-#{updated_at.utc.to_s(cache_timestamp_format)}" if do_or_do_not(:updated_at)

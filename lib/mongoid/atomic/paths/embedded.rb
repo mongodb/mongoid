@@ -19,8 +19,6 @@ module Mongoid
         #   many.path
         #
         # @return [ String ] The path to the document.
-        #
-        # @since 2.1.0
         def path
           @path ||= position.sub(/\.\d+\z/, "")
         end

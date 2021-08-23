@@ -11,8 +11,6 @@ module Mongoid
       #   decimal128.__evolve_decimal128__
       #
       # @return [ BSON::Decimal128 ] self.
-      #
-      # @since 6.1.0
       def __evolve_decimal128__
         self
       end
@@ -27,8 +25,6 @@ module Mongoid
         # @param [ Object ] object The object to evolve.
         #
         # @return [ BSON::Decimal128 ] The decimal128.
-        #
-        # @since 6.1.0
         def evolve(object)
           object.__evolve_decimal128__
         end

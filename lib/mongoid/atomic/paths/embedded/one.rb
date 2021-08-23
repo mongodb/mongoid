@@ -17,8 +17,6 @@ module Mongoid
           #   One.new(document)
           #
           # @param [ Document ] document The document to generate the paths for.
-          #
-          # @since 2.1.0
           def initialize(document)
             @document, @parent = document, document._parent
             @insert_modifier, @delete_modifier ="$set", "$unset"
@@ -32,8 +30,6 @@ module Mongoid
           #   one.position
           #
           # @return [ String ] The position of the document.
-          #
-          # @since 2.1.0
           def position
             pos = parent.atomic_position
             "#{pos}#{"." unless pos.blank?}#{document._association.store_as}"

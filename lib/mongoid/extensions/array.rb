@@ -11,8 +11,6 @@ module Mongoid
       #   [ id ].__evolve_object_id__
       #
       # @return [ Array<BSON::ObjectId> ] The converted array.
-      #
-      # @since 3.0.0
       def __evolve_object_id__
         map!(&:__evolve_object_id__)
         self
@@ -24,8 +22,6 @@ module Mongoid
       #   [ 1, 2, 3 ].__find_args__
       #
       # @return [ Array ] The array of args.
-      #
-      # @since 3.0.0
       def __find_args__
         flat_map{ |a| a.__find_args__ }.uniq{ |a| a.to_s }
       end
@@ -36,8 +32,6 @@ module Mongoid
       #   [ id ].__mongoize_object_id__
       #
       # @return [ Array<BSON::ObjectId> ] The converted array.
-      #
-      # @since 3.0.0
       def __mongoize_object_id__
         map!(&:__mongoize_object_id__).compact!
         self
@@ -54,8 +48,6 @@ module Mongoid
       # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
       #   configured default time zone corresponding to date/time components
       #   in this array.
-      #
-      # @since 3.0.0
       def __mongoize_time__
         ::Time.configured.local(*self)
       end
@@ -75,8 +67,6 @@ module Mongoid
       # for backwards compatibility only. It always returns false.
       #
       # @return [ false ] Always false.
-      #
-      # @since 3.1.0
       # @deprecated
       def blank_criteria?
         false
@@ -88,8 +78,6 @@ module Mongoid
       #   [ 1, 2, 3 ].multi_arged?
       #
       # @return [ true, false ] If the array is multi args.
-      #
-      # @since 3.0.0
       def multi_arged?
         !first.is_a?(Hash) && first.resizable? || size > 1
       end
@@ -101,8 +89,6 @@ module Mongoid
       #   object.mongoize
       #
       # @return [ Array ] The object.
-      #
-      # @since 3.0.0
       def mongoize
         ::Array.mongoize(self)
       end
@@ -118,8 +104,6 @@ module Mongoid
       # @param [ Object ] object The object to delete.
       #
       # @return [ Object ] The deleted object.
-      #
-      # @since 2.1.0
       def delete_one(object)
         position = index(object)
         position ? delete_at(position) : nil
@@ -131,8 +115,6 @@ module Mongoid
       #   object.resizable?
       #
       # @return [ true ] true.
-      #
-      # @since 3.0.0
       def resizable?
         true
       end
@@ -148,8 +130,6 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ Array ] The array of ids.
-        #
-        # @since 3.0.0
         def __mongoize_fk__(association, object)
           if object.resizable?
             object.blank? ? object : association.convert_to_foreign_key(object)
@@ -167,8 +147,6 @@ module Mongoid
         # @param [ Object ] object The object to mongoize.
         #
         # @return [ Array ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           if object.is_a?(::Array)
             evolve(object).collect{ |obj| obj.class.mongoize(obj) }
@@ -183,8 +161,6 @@ module Mongoid
         #   Array.resizable?
         #
         # @return [ true ] true.
-        #
-        # @since 3.0.0
         def resizable?
           true
         end

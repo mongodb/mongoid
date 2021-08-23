@@ -39,8 +39,6 @@ module Mongoid
     #   document.flagged_for_destroy?
     #
     # @return [ true, false ] If the document is flagged.
-    #
-    # @since 2.3.2
     def flagged_for_destroy?
       @flagged_for_destroy ||= false
     end
@@ -78,8 +76,6 @@ module Mongoid
     #   document.readonly?
     #
     # @return [ true, false ] If the document is readonly.
-    #
-    # @since 4.0.0
     def readonly?
       __selected_fields != nil
     end
@@ -90,8 +86,6 @@ module Mongoid
     #   person.settable?
     #
     # @return [ true, false ] Is this document a new embeds one?
-    #
-    # @since 2.1.0
     def settable?
       new_record? && embedded_one? && _parent.persisted?
     end
@@ -102,8 +96,6 @@ module Mongoid
     #   person.updateable?
     #
     # @return [ true, false ] If the document is changed and persisted.
-    #
-    # @since 2.1.0
     def updateable?
       persisted? && changed?
     end

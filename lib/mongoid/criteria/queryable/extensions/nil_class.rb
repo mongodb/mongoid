@@ -17,8 +17,6 @@ module Mongoid
           # @param [ Object ] object The object to add.
           #
           # @return [ Object ] The provided object.
-          #
-          # @since 1.0.0
           def __add__(object); object; end
 
           # Add this object to nil.
@@ -29,8 +27,6 @@ module Mongoid
           # @param [ Object ] object The object to expanded.
           #
           # @return [ Object ] The provided object.
-          #
-          # @since 1.0.0
           def __expanded__(object); object; end
 
           # Evolve the nil into a date or time.
@@ -39,8 +35,6 @@ module Mongoid
           #   nil.__evolve_time__
           #
           # @return [ nil ] nil.
-          #
-          # @since 1.0.0
           def __evolve_time__; self; end
           alias :__evolve_date__ :__evolve_time__
 
@@ -52,8 +46,6 @@ module Mongoid
           # @param [ Object ] object The object to intersect.
           #
           # @return [ Object ] The provided object.
-          #
-          # @since 1.0.0
           def __intersect__(object); object; end
 
           # Add this object to nil.
@@ -64,8 +56,6 @@ module Mongoid
           # @param [ Object ] object The object to override.
           #
           # @return [ Object ] The provided object.
-          #
-          # @since 1.0.0
           def __override__(object); object; end
 
           # Add this object to nil.
@@ -76,8 +66,6 @@ module Mongoid
           # @param [ Object ] object The object to union.
           #
           # @return [ Object ] The provided object.
-          #
-          # @since 1.0.0
           def __union__(object); object; end
         end
       end

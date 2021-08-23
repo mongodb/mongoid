@@ -17,8 +17,6 @@ module Mongoid
       # @param [ Array ] other The other array.
       #
       # @return [ true, false ] If the objects are equal.
-      #
-      # @since 4.0.0
       def ==(other)
         other.is_a?(None)
       end
@@ -44,8 +42,6 @@ module Mongoid
       #   end
       #
       # @return [ Enumerator ] The enumerator.
-      #
-      # @since 4.0.0
       def each
         if block_given?
           [].each { |doc| yield(doc) }
@@ -61,8 +57,6 @@ module Mongoid
       #   context.exists?
       #
       # @return [ true, false ] If the count is more than zero.
-      #
-      # @since 4.0.0
       def exists?; false; end
 
 
@@ -84,8 +78,6 @@ module Mongoid
       #   Null.new(criteria)
       #
       # @param [ Criteria ] criteria The criteria.
-      #
-      # @since 4.0.0
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
       end
@@ -96,8 +88,6 @@ module Mongoid
       #   context.last
       #
       # @return [ nil ] Always nil.
-      #
-      # @since 4.0.0
       def last; nil; end
 
       # Always returns zero.
@@ -106,8 +96,6 @@ module Mongoid
       #   context.length
       #
       # @return [ Integer ] Always zero.
-      #
-      # @since 4.0.0
       def length
         entries.length
       end

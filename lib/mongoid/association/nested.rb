@@ -10,8 +10,6 @@ module Mongoid
     module Nested
 
       # The flags indicating that an association can be destroyed.
-      #
-      # @since 7.0
       DESTROY_FLAGS = [1, "1", true, "true"].freeze
     end
   end

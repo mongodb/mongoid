@@ -5,8 +5,6 @@ module Mongoid
   module Persistable
 
     # Defines behavior for $pull and $pullAll operations.
-    #
-    # @since 4.0.0
     module Pullable
       extend ActiveSupport::Concern
 
@@ -20,8 +18,6 @@ module Mongoid
       # @param [ Hash ] pulls The field/value pull pairs.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def pull(pulls)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pulls) do |field, value|
@@ -40,8 +36,6 @@ module Mongoid
       # @param [ Hash ] pulls The pull all operations.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def pull_all(pulls)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pulls) do |field, value|

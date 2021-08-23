@@ -15,8 +15,6 @@ module Mongoid
           #
           # @example Bind one document.
           #   person.posts.bind_one(post)
-          #
-          # @since 2.0.0.rc.1
           def bind_one(doc)
             binding do
               bind_from_relational_parent(doc)
@@ -27,8 +25,6 @@ module Mongoid
           #
           # @example Unbind the document.
           #   person.posts.unbind_one(document)
-          #
-          # @since 2.0.0.rc.1
           def unbind_one(doc)
             binding do
               unbind_from_relational_parent(doc)

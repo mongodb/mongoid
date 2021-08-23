@@ -5,14 +5,10 @@ module Mongoid
   module Indexable
 
     # Encapsulates behavior around an index specification.
-    #
-    # @since 4.0.0
     class Specification
 
       # The mappings of nice Ruby-style names to the corresponding driver
       # option name.
-      #
-      # @since 4.0.0
       MAPPINGS = {
         expire_after_seconds: :expire_after
       }
@@ -33,8 +29,6 @@ module Mongoid
       # @param [ Specification ] other The spec to compare against.
       #
       # @return [ true, false ] If the specs are equal.
-      #
-      # @since 4.0.0
       def ==(other)
         fields == other.fields && key == other.key
       end
@@ -47,8 +41,6 @@ module Mongoid
       # @param [ Class ] klass The class the index is defined on.
       # @param [ Hash ] key The hash of name/direction pairs.
       # @param [ Hash ] opts the index options.
-      #
-      # @since 4.0.0
       def initialize(klass, key, opts = nil)
         options = opts || {}
         Validators::Options.validate(klass, key, options)
@@ -64,8 +56,6 @@ module Mongoid
       #   specification.name
       #
       # @return [ String ] name The index name.
-      #
-      # @since 5.0.2
       def name
         @name ||= key.reduce([]) do |n, (k,v)|
           n << "#{k}_#{v}"
@@ -84,8 +74,6 @@ module Mongoid
       # @param [ Hash ] key The index key(s).
       #
       # @return [ Hash ] The normalized specification.
-      #
-      # @since 4.0.0
       def normalize_key(key)
         normalized = {}
         key.each_pair do |name, direction|
@@ -104,8 +92,6 @@ module Mongoid
       # @param [ Hash ] opts The index options.
       #
       # @return [ Hash ] The normalized options.
-      #
-      # @since 4.0.0
       def normalize_options(opts)
         options = {}
         opts.each_pair do |option, value|

@@ -12,18 +12,12 @@ module Mongoid
     DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
 
     # Constant for the key to store clients.
-    #
-    # @since 5.0.0
     CLIENTS_KEY = "[mongoid]:clients"
 
     # The key to override the client.
-    #
-    # @since 5.0.0
     CLIENT_OVERRIDE_KEY = "[mongoid]:client-override"
 
     # The key for the current thread's scope stack.
-    #
-    # @since 2.0.0
     CURRENT_SCOPE_KEY = "[mongoid]:current-scope"
 
     AUTOSAVES_KEY = "[mongoid]:autosaves"
@@ -43,8 +37,6 @@ module Mongoid
     # @param [ String ] name The name of the stack
     #
     # @return [ true ] True.
-    #
-    # @since 2.4.0
     def begin_execution(name)
       stack(name).push(true)
     end
@@ -55,8 +47,6 @@ module Mongoid
     #   Threaded.database_override
     #
     # @return [ String, Symbol ] The override.
-    #
-    # @since 3.0.0
     def database_override
       Thread.current[DATABASE_OVERRIDE_KEY]
     end
@@ -69,8 +59,6 @@ module Mongoid
     # @param [ String, Symbol ] name The global override name.
     #
     # @return [ String, Symbol ] The override.
-    #
-    # @since 3.0.0
     def database_override=(name)
       Thread.current[DATABASE_OVERRIDE_KEY] = name
     end
@@ -83,8 +71,6 @@ module Mongoid
     # @param [ Symbol ] name The name of the stack
     #
     # @return [ true ] If the stack is being executed.
-    #
-    # @since 2.4.0
     def executing?(name)
       !stack(name).empty?
     end
@@ -97,8 +83,6 @@ module Mongoid
     # @param [ Symbol ] name The name of the stack
     #
     # @return [ true ] True.
-    #
-    # @since 2.4.0
     def exit_execution(name)
       stack(name).pop
     end
@@ -111,8 +95,6 @@ module Mongoid
     # @param [ Symbol ] name The name of the stack
     #
     # @return [ Array ] The stack.
-    #
-    # @since 2.4.0
     def stack(name)
       Thread.current[STACK_KEYS[name]] ||= []
     end
@@ -123,8 +105,6 @@ module Mongoid
     #   Threaded.begin_autosave(doc)
     #
     # @param [ Document ] document The document to autosave.
-    #
-    # @since 3.0.0
     def begin_autosave(document)
       autosaves_for(document.class).push(document._id)
     end
@@ -135,8 +115,6 @@ module Mongoid
     #   Threaded.begin_validate(doc)
     #
     # @param [ Document ] document The document to validate.
-    #
-    # @since 2.1.9
     def begin_validate(document)
       validations_for(document.class).push(document._id)
     end
@@ -147,8 +125,6 @@ module Mongoid
     #   Threaded.exit_autosave(doc)
     #
     # @param [ Document ] document The document to autosave.
-    #
-    # @since 3.0.0
     def exit_autosave(document)
       autosaves_for(document.class).delete_one(document._id)
     end
@@ -159,8 +135,6 @@ module Mongoid
     #   Threaded.exit_validate(doc)
     #
     # @param [ Document ] document The document to validate.
-    #
-    # @since 2.1.9
     def exit_validate(document)
       validations_for(document.class).delete_one(document._id)
     end
@@ -195,8 +169,6 @@ module Mongoid
     #   Threaded.client_override
     #
     # @return [ String, Symbol ] The override.
-    #
-    # @since 5.0.0
     def client_override
       Thread.current[CLIENT_OVERRIDE_KEY]
     end
@@ -209,8 +181,6 @@ module Mongoid
     # @param [ String, Symbol ] name The global override name.
     #
     # @return [ String, Symbol ] The override.
-    #
-    # @since 3.0.0
     def client_override=(name)
       Thread.current[CLIENT_OVERRIDE_KEY] = name
     end
@@ -224,8 +194,6 @@ module Mongoid
     # @param [ Klass ] klass The class type of the scope.
     #
     # @return [ Criteria ] The scope.
-    #
-    # @since 5.0.0
     def current_scope(klass = nil)
       if klass && Thread.current[CURRENT_SCOPE_KEY].respond_to?(:keys)
         Thread.current[CURRENT_SCOPE_KEY][
@@ -244,8 +212,6 @@ module Mongoid
     # @param [ Criteria ] scope The current scope.
     #
     # @return [ Criteria ] The scope.
-    #
-    # @since 5.0.0
     def current_scope=(scope)
       Thread.current[CURRENT_SCOPE_KEY] = scope
     end
@@ -259,8 +225,6 @@ module Mongoid
     # @param [ Class ] klass The current model class.
     #
     # @return [ Criteria ] The scope.
-    #
-    # @since 5.0.1
     def set_current_scope(scope, klass)
       if scope.nil?
         if Thread.current[CURRENT_SCOPE_KEY]
@@ -293,8 +257,6 @@ module Mongoid
     # @param [ Document ] document The document to check.
     #
     # @return [ true, false ] If the document is autosaved.
-    #
-    # @since 2.1.9
     def autosaved?(document)
       autosaves_for(document.class).include?(document._id)
     end
@@ -307,8 +269,6 @@ module Mongoid
     # @param [ Document ] document The document to check.
     #
     # @return [ true, false ] If the document is validated.
-    #
-    # @since 2.1.9
     def validated?(document)
       validations_for(document.class).include?(document._id)
     end
@@ -319,8 +279,6 @@ module Mongoid
     #   Threaded.autosaves
     #
     # @return [ Hash ] The current autosaves.
-    #
-    # @since 3.0.0
     def autosaves
       Thread.current[AUTOSAVES_KEY] ||= {}
     end
@@ -331,8 +289,6 @@ module Mongoid
     #   Threaded.validations
     #
     # @return [ Hash ] The current validations.
-    #
-    # @since 2.1.9
     def validations
       Thread.current[VALIDATIONS_KEY] ||= {}
     end
@@ -345,8 +301,6 @@ module Mongoid
     # @param [ Class ] klass The class to check.
     #
     # @return [ Array ] The current autosaves.
-    #
-    # @since 3.0.0
     def autosaves_for(klass)
       autosaves[klass] ||= []
     end
@@ -358,8 +312,6 @@ module Mongoid
     # @param [ Class ] klass The class to check.
     #
     # @return [ Array ] The current validations.
-    #
-    # @since 2.1.9
     def validations_for(klass)
       validations[klass] ||= []
     end
@@ -370,8 +322,6 @@ module Mongoid
     #   Threaded.set_session(session)
     #
     # @param [ Mongo::Session ] session The session to save.
-    #
-    # @since 6.4.0
     def set_session(session)
       Thread.current[:session] = session
     end
@@ -382,8 +332,6 @@ module Mongoid
     #   Threaded.get_session
     #
     # @return [ Mongo::Session, nil ] The session cached on this thread or nil.
-    #
-    # @since 6.4.0
     def get_session
       Thread.current[:session]
     end
@@ -394,8 +342,6 @@ module Mongoid
     #   Threaded.clear_session
     #
     # @return [ nil ]
-    #
-    # @since 6.4.0
     def clear_session
       session = get_session
       session.end_session if session

@@ -11,8 +11,6 @@ module Mongoid
       #   bd.__to_inc__
       #
       # @return [ Float ] The big decimal as a float.
-      #
-      # @since 3.0.3
       def __to_inc__
         to_f
       end
@@ -24,8 +22,6 @@ module Mongoid
       #   object.mongoize
       #
       # @return [ Object ] The object.
-      #
-      # @since 3.0.0
       def mongoize
         to_s
       end
@@ -36,8 +32,6 @@ module Mongoid
       #   object.numeric?
       #
       # @return [ true ] Always true.
-      #
-      # @since 6.0.0
       def numeric?
         true
       end
@@ -52,8 +46,6 @@ module Mongoid
         # @param [ Object ] object The object to demongoize.
         #
         # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
-        #
-        # @since 3.0.0
         def demongoize(object)
           object && object.numeric? ? BigDecimal(object.to_s) : nil
         end
@@ -66,8 +58,6 @@ module Mongoid
         # @param [ Object ] object The object to Mongoize
         #
         # @return [ String, nil ] A String representing the object or nil.
-        #
-        # @since 3.0.7
         def mongoize(object)
           object && object.numeric? ? object.to_s : nil
         end

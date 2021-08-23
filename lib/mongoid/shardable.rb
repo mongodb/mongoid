@@ -4,8 +4,6 @@
 module Mongoid
 
   # This module contains behavior for adding shard key fields to updates.
-  #
-  # @since 4.0.0
   module Shardable
     extend ActiveSupport::Concern
 
@@ -46,8 +44,6 @@ module Mongoid
     #   model.shard_key_fields
     #
     # @return [ Array<String> ] The shard key field names.
-    #
-    # @since 1.0.0
     def shard_key_fields
       self.class.shard_key_fields
     end
@@ -97,8 +93,6 @@ module Mongoid
       #
       #     shard_key first_name: 1, last_name: 1
       #   end
-      #
-      # @since 2.0.0
       def shard_key(*args)
         unless args.first.is_a?(Hash)
           # Shorthand syntax

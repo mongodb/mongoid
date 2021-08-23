@@ -14,8 +14,6 @@ module Mongoid
         #   document.autosaved?
         #
         # @return [ true, false ] Has the document already been autosaved?
-        #
-        # @since 3.0.0
         def autosaved?
           Threaded.autosaved?(self)
         end
@@ -24,8 +22,6 @@ module Mongoid
         #
         # @example Begin autosave.
         #   document.__autosaving__
-        #
-        # @since 3.1.3
         def __autosaving__
           Threaded.begin_autosave(self)
           yield
@@ -38,8 +34,6 @@ module Mongoid
         # @example Return true if there is changes on self or in
         #           autosaved associations.
         #   document.changed_for_autosave?
-        #
-        # @since 3.1.3
         def changed_for_autosave?(doc)
           doc.new_record? || doc.changed? || doc.marked_for_destruction?
         end
@@ -53,8 +47,6 @@ module Mongoid
         # @param [ Association ] association The association for which autosaving is enabled.
         #
         # @return [ Class ] The association's owner class.
-        #
-        # @since 7.0
         def self.define_autosave!(association)
           association.inverse_class.tap do |klass|
             save_method = :"autosave_documents_for_#{association.name}"

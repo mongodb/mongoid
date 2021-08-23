@@ -36,8 +36,6 @@ module Mongoid
           #
           # This provides the default nomenclature for accessing a parent document
           # or its children.
-          #
-          # @since 2.0.0.rc.1
           def recursively_embeds_many(options = {})
             embeds_many(
                 cyclic_child_name,
@@ -66,8 +64,6 @@ module Mongoid
           #
           # This provides the default nomenclature for accessing a parent document
           # or its children.
-          #
-          # @since 2.0.0.rc.1
           def recursively_embeds_one(options = {})
             embeds_one(
                 cyclic_child_name(false),
@@ -84,8 +80,6 @@ module Mongoid
           #   Role.cyclic_parent_name
           #
           # @return [ String ] "parent_" plus the class name underscored.
-          #
-          # @since 2.0.0.rc.1
           def cyclic_parent_name
             ("parent_#{self.name.demodulize.underscore.singularize}").to_sym
           end
@@ -99,8 +93,6 @@ module Mongoid
           #
           # @return [ String ] "child_" plus the class name underscored in
           #   singular or plural form.
-          #
-          # @since 2.0.0.rc.1
           def cyclic_child_name(many = true)
             ("child_#{self.name.demodulize.underscore.send(many ? :pluralize : :singularize)}").to_sym
           end

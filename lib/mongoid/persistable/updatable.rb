@@ -6,8 +6,6 @@ module Mongoid
 
     # Defines behavior for persistence operations that update existing
     # documents.
-    #
-    # @since 4.0.0
     module Updatable
 
       # Update a single attribute and persist the entire document.
@@ -23,8 +21,6 @@ module Mongoid
       #   to being flagged as reaodnly.
       #
       # @return [ true, false ] True if save was successfull, false if not.
-      #
-      # @since 2.0.0
       def update_attribute(name, value)
         as_writable_attribute!(name, value) do |access|
           normalized = name.to_s
@@ -41,8 +37,6 @@ module Mongoid
       # @param [ Hash ] attributes The attributes to update.
       #
       # @return [ true, false ] True if validation passed, false if not.
-      #
-      # @since 1.0.0
       def update(attributes = {})
         assign_attributes(attributes)
         save
@@ -61,8 +55,6 @@ module Mongoid
       # @raise [ Errors::Callbacks ] If a callback returns false.
       #
       # @return [ true, false ] True if validation passed.
-      #
-      # @since 1.0.0
       def update!(attributes = {})
         result = update_attributes(attributes)
         unless result
@@ -83,8 +75,6 @@ module Mongoid
       #   document.init_atomic_updates
       #
       # @return [ Array<Hash> ] The updates and conflicts.
-      #
-      # @since 4.0.0
       def init_atomic_updates
         updates = atomic_updates
         conflicts = updates.delete(:conflicts) || {}
@@ -103,8 +93,6 @@ module Mongoid
       # @param [ Hash ] options The options.
       #
       # @return [ true, false ] The result of the update.
-      #
-      # @since 4.0.0
       def prepare_update(options = {})
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
@@ -128,8 +116,6 @@ module Mongoid
       # @option options [ true, false ] :validate Whether or not to validate.
       #
       # @return [ true, false ] True if succeeded, false if not.
-      #
-      # @since 1.0.0
       def update_document(options = {})
         prepare_update(options) do
           updates, conflicts = init_atomic_updates

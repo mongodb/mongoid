@@ -13,8 +13,6 @@ module Mongoid
       # @param [ Hash ] adds The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def add_to_set(adds)
         view.update_many("$addToSet" => collect_operations(adds))
       end
@@ -27,8 +25,6 @@ module Mongoid
       # @param [ Hash ] adds The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 7.0.0
       def add_each_to_set(adds)
         view.update_many("$addToSet" => collect_each_operations(adds))
       end
@@ -41,8 +37,6 @@ module Mongoid
       # @param [ Hash ] bits The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def bit(bits)
         view.update_many("$bit" => collect_operations(bits))
       end
@@ -55,8 +49,6 @@ module Mongoid
       # @param [ Hash ] incs The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def inc(incs)
         view.update_many("$inc" => collect_operations(incs))
       end
@@ -72,8 +64,6 @@ module Mongoid
       # @param [ Hash ] pops The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def pop(pops)
         view.update_many("$pop" => collect_operations(pops))
       end
@@ -88,8 +78,6 @@ module Mongoid
       # @param [ Hash ] pulls The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def pull(pulls)
         view.update_many("$pull" => collect_operations(pulls))
       end
@@ -102,8 +90,6 @@ module Mongoid
       # @param [ Hash ] pulls The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def pull_all(pulls)
         view.update_many("$pullAll" => collect_operations(pulls))
       end
@@ -116,8 +102,6 @@ module Mongoid
       # @param [ Hash ] pushes The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def push(pushes)
         view.update_many("$push" => collect_operations(pushes))
       end
@@ -130,8 +114,6 @@ module Mongoid
       # @param [ Hash ] pushes The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def push_all(pushes)
         view.update_many("$push" => collect_each_operations(pushes))
       end
@@ -144,8 +126,6 @@ module Mongoid
       # @param [ Hash ] renames The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def rename(renames)
         operations = renames.inject({}) do |ops, (old_name, new_name)|
           ops[old_name] = new_name.to_s
@@ -162,8 +142,6 @@ module Mongoid
       # @param [ Hash ] sets The operations.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def set(sets)
         view.update_many("$set" => collect_operations(sets))
       end
@@ -179,8 +157,6 @@ module Mongoid
       #   each key's value is, even if the value is nil or false.
       #
       # @return [ nil ] Nil.
-      #
-      # @since 3.0.0
       def unset(*args)
         fields = args.map { |a| a.is_a?(Hash) ? a.keys : a }
                      .__find_args__

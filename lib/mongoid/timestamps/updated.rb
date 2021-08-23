@@ -37,8 +37,6 @@ module Mongoid
       #   document.able_to_set_updated_at?
       #
       # @return [ true, false ] If the timestamp can be set.
-      #
-      # @since 2.4.0
       def able_to_set_updated_at?
         !frozen? && !timeless? && (new_record? || changed?)
       end

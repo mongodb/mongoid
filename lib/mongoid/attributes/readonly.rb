@@ -22,8 +22,6 @@ module Mongoid
       #
       # @return [ true, false ] If the document is new, or if the field is not
       #   readonly.
-      #
-      # @since 3.0.0
       def attribute_writable?(name)
         new_record? || (!readonly_attributes.include?(name) && _loaded?(name))
       end
@@ -65,8 +63,6 @@ module Mongoid
         #   end
         #
         # @param [ Array<Symbol> ] names The names of the fields.
-        #
-        # @since 3.0.0
         def attr_readonly(*names)
           names.each do |name|
             readonly_attributes << database_field_name(name)

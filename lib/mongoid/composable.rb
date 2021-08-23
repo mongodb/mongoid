@@ -22,8 +22,6 @@ require "mongoid/validatable"
 module Mongoid
 
   # This module provides inclusions of all behavior in a Mongoid document.
-  #
-  # @since 4.0.0
   module Composable
     extend ActiveSupport::Concern
 
@@ -99,8 +97,6 @@ module Mongoid
     # separately.
     #
     # @return [ Array<Symbol> ] A list of reserved method names.
-    #
-    # @since 6.0.0
     RESERVED_METHOD_NAMES = [ :fields,
                               :aliased_fields,
                               :localized_fields,
@@ -123,8 +119,6 @@ module Mongoid
       #   Mongoid::Components.prohibited_methods
       #
       # @return [ Array<Symbol> ]
-      #
-      # @since 2.1.8
       def prohibited_methods
         @prohibited_methods ||= MODULES.flat_map do |mod|
           mod.instance_methods.map(&:to_sym)

@@ -5,8 +5,6 @@ module Mongoid
 
   # This module provides the extra behavior for including associations in JSON
   # and XML serialization.
-  #
-  # @since 4.0.0
   module Serializable
     extend ActiveSupport::Concern
 
@@ -42,8 +40,6 @@ module Mongoid
     # @option options [ Symbol ] :methods What methods to include.
     #
     # @return [ Hash ] The document, ready to be serialized.
-    #
-    # @since 2.0.0.rc.6
     def serializable_hash(options = nil)
       options ||= {}
       attrs = {}
@@ -73,8 +69,6 @@ module Mongoid
     #   document.send(:field_names)
     #
     # @return [ Array<String> ] The names of the fields.
-    #
-    # @since 3.0.0
     def field_names(options)
       names = (as_attributes.keys + attribute_names).uniq.sort
 
@@ -104,8 +98,6 @@ module Mongoid
     # @param [ Hash ] options The options.
     #
     # @return [ Object ] The attribute.
-    #
-    # @since 3.0.0
     def serialize_attribute(attrs, name, names, options)
       if relations.key?(name)
         value = send(name)
@@ -129,8 +121,6 @@ module Mongoid
     # @option options [ Symbol ] :include What associations to include
     # @option options [ Symbol ] :only Limit the fields to only these.
     # @option options [ Symbol ] :except Dont include these fields.
-    #
-    # @since 2.0.0.rc.6
     def serialize_relations(attributes = {}, options = {})
       inclusions = options[:include]
       relation_names(inclusions).each do |name|
@@ -151,8 +141,6 @@ module Mongoid
     # @param [ Hash, Symbol, Array<Symbol> ] inclusions The inclusions.
     #
     # @return [ Array<Symbol> ] The names of the included associations.
-    #
-    # @since 2.0.0.rc.6
     def relation_names(inclusions)
       inclusions.is_a?(Hash) ? inclusions.keys : Array.wrap(inclusions)
     end
@@ -168,8 +156,6 @@ module Mongoid
     # @param [ Symbol ] name The name of the association.
     #
     # @return [ Hash ] The options for the association.
-    #
-    # @since 2.0.0.rc.6
     def relation_options(inclusions, options, name)
       if inclusions.is_a?(Hash)
         inclusions[name]

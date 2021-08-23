@@ -14,8 +14,6 @@ module Mongoid
       #
       # @param [ Class ] klass The model class.
       # @param [ Hash, String, Symbol ] options The provided options.
-      #
-      # @since 3.0.0
       def initialize(klass, options)
         super(
           compose_message(

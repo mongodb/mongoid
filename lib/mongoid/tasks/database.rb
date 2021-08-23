@@ -13,8 +13,6 @@ module Mongoid
       #   Mongoid::Tasks::Database.create_indexes
       #
       # @return [ Array<Class> ] The indexed models.
-      #
-      # @since 2.1.0
       def create_indexes(models = ::Mongoid.models)
         models.each do |model|
           next if model.index_specifications.empty?
@@ -72,8 +70,6 @@ module Mongoid
       #   Mongoid::Tasks::Database.remove_undefined_indexes
       #
       # @return [ Hash{Class => Array(Hash)}] The list of indexes that were removed by model.
-      #
-      # @since 4.0.0
       def remove_undefined_indexes(models = ::Mongoid.models)
         undefined_indexes(models).each do |model, indexes|
           indexes.each do |index|

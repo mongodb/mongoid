@@ -18,8 +18,6 @@ module Mongoid
       # @param [ Object ] object The object to convert.
       #
       # @return [ Object ] The object cast to the correct type.
-      #
-      # @since 2.0.0.rc.7
       def convert_to_foreign_key(object)
         return convert_polymorphic(object) if polymorphic?
         field = relation_class.fields["_id"]

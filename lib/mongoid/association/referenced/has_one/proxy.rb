@@ -34,8 +34,6 @@ module Mongoid
           #
           # @example Nullify the association.
           #   person.game.nullify
-          #
-          # @since 2.0.0.rc.1
           def nullify
             unbind_one
             _target.save
@@ -51,8 +49,6 @@ module Mongoid
           # @param [ Array<Document> ] replacement The replacement target.
           #
           # @return [ One ] The association.
-          #
-          # @since 2.0.0.rc.1
           def substitute(replacement)
             # If the same object currently associated is being assigned,
             # rebind the association and save the target but do not destroy
@@ -88,8 +84,6 @@ module Mongoid
           #   relation.persistable?
           #
           # @return [ true, false ] If the association is persistable.
-          #
-          # @since 2.1.0
           def persistable?
             _base.persisted? && !_binding? && !_building?
           end
@@ -107,8 +101,6 @@ module Mongoid
             #   Referenced::One.embedded?
             #
             # @return [ false ] Always false.
-            #
-            # @since 2.0.0.rc.1
             def embedded?
               false
             end

@@ -5,8 +5,6 @@ module Mongoid
   module Persistable
 
     # Defines behavior for persistence operations that upsert documents.
-    #
-    # @since 4.0.0
     module Upsertable
 
       # Perform an upsert of the document. If the document does not exist in the
@@ -19,8 +17,6 @@ module Mongoid
       # @param [ Hash ] options The validation options.
       #
       # @return [ true ] True.
-      #
-      # @since 3.0.0
       def upsert(options = {})
         prepare_upsert(options) do
           collection.find(atomic_selector).update_one(
@@ -42,8 +38,6 @@ module Mongoid
       # @param [ Hash ] options The options hash.
       #
       # @return [ true, false ] If the operation succeeded.
-      #
-      # @since 4.0.0
       def prepare_upsert(options = {})
         return false if performing_validations?(options) && invalid?(:upsert)
         result = run_callbacks(:upsert) do

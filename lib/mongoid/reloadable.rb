@@ -4,8 +4,6 @@
 module Mongoid
 
   # This module handles reloading behavior of documents.
-  #
-  # @since 4.0.0
   module Reloadable
 
     # Reloads the +Document+ attributes from the database. If the document has
@@ -18,8 +16,6 @@ module Mongoid
     # @raise [ Errors::DocumentNotFound ] If the document was deleted.
     #
     # @return [ Document ] The document, reloaded.
-    #
-    # @since 1.0.0
     def reload
       if @atomic_selector
         # Clear atomic_selector cache for sharded clusters. MONGOID-5076
@@ -50,8 +46,6 @@ module Mongoid
     #   document._reload
     #
     # @return [ Hash ] The reloaded attributes.
-    #
-    # @since 2.3.2
     def _reload
       embedded? ? reload_embedded_document : reload_root_document
     end
@@ -62,8 +56,6 @@ module Mongoid
     #   document.reload_root_document
     #
     # @return [ Hash ] The reloaded attributes.
-    #
-    # @since 2.3.2
     def reload_root_document
       {}.merge(collection.find(atomic_selector, session: _session).read(mode: :primary).first || {})
     end
@@ -74,8 +66,6 @@ module Mongoid
     #   document.reload_embedded_document
     #
     # @return [ Hash ] The reloaded attributes.
-    #
-    # @since 2.3.2
     def reload_embedded_document
       extract_embedded_attributes({}.merge(
         collection(_root).find(_root.atomic_selector).read(mode: :primary).first
@@ -90,8 +80,6 @@ module Mongoid
     # @param [ Hash ] attributes The document in the db.
     #
     # @return [ Hash ] The document's extracted attributes.
-    #
-    # @since 2.3.2
     def extract_embedded_attributes(attributes)
       atomic_position.split(".").inject(attributes) do |attrs, part|
         attrs = attrs[part =~ /\d/ ? part.to_i : part]

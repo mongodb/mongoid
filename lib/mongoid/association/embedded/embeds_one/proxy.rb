@@ -11,8 +11,6 @@ module Mongoid
           # The valid options when defining this association.
           #
           # @return [ Array<Symbol> ] The allowed options when defining this association.
-          #
-          # @since 7.0
           VALID_OPTIONS = [
               :autobuild,
               :as,
@@ -48,8 +46,6 @@ module Mongoid
           # @param [ Document ] replacement A document to replace the target.
           #
           # @return [ Document, nil ] The association or nil.
-          #
-          # @since 2.0.0.rc.1
           def substitute(replacement)
             if replacement != self
               if _assigning?
@@ -78,8 +74,6 @@ module Mongoid
           #   relation.binding([ address ])
           #
           # @return [ Binding ] The association's binding.
-          #
-          # @since 2.0.0.rc.1
           def binding
             Binding.new(_base, _target, _association)
           end
@@ -90,8 +84,6 @@ module Mongoid
           #   relation.persistable?
           #
           # @return [ true, false ] If the association is persistable.
-          #
-          # @since 2.1.0
           def persistable?
             _base.persisted? && !_binding? && !_building? && !_assigning?
           end
@@ -105,8 +97,6 @@ module Mongoid
             #   Association::Embedded::EmbedsOne.embedded?
             #
             # @return [ true ] true.
-            #
-            # @since 2.0.0.rc.1
             def embedded?
               true
             end
@@ -120,8 +110,6 @@ module Mongoid
             #
             # @return [ Mongoid::Atomic::Paths::Embedded::One ]
             #   The embedded one atomic path calculator.
-            #
-            # @since 2.1.0
             def path(document)
               Mongoid::Atomic::Paths::Embedded::One.new(document)
             end

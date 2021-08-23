@@ -23,8 +23,6 @@ module Mongoid
       #   determined because none of the sources was set.
       #
       # @return [ String ] The name of the current environment.
-      #
-      # @since 2.3.0
       # @api public
       def env_name
         if defined?(::Rails)
@@ -47,8 +45,6 @@ module Mongoid
       #   override the current Mongoid environment.
       #
       # @return [ Hash ] The settings.
-      #
-      # @since 2.3.0
       # @api private
       def load_yaml(path, environment = nil)
         env = environment ? environment.to_s : env_name

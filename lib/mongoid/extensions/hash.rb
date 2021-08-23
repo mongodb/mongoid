@@ -11,8 +11,6 @@ module Mongoid
       #   { field: id }.__evolve_object_id__
       #
       # @return [ Hash ] The converted hash.
-      #
-      # @since 3.0.0
       def __evolve_object_id__
         update_values(&:__evolve_object_id__)
       end
@@ -23,8 +21,6 @@ module Mongoid
       #   { field: id }.__mongoize_object_id__
       #
       # @return [ Hash ] The converted hash.
-      #
-      # @since 3.0.0
       def __mongoize_object_id__
         if id = self['$oid']
           BSON::ObjectId.from_string(id)
@@ -39,8 +35,6 @@ module Mongoid
       #   { name: "Placebo" }.__consolidate__
       #
       # @return [ Hash ] A new consolidated hash.
-      #
-      # @since 3.0.0
       def __consolidate__(klass)
         consolidated = {}
         each_pair do |key, value|
@@ -103,8 +97,6 @@ module Mongoid
       #
       # @return [ true | false ] Whether hash contains known unsatisfiable
       #   conditions.
-      #
-      # @since 3.1.0
       # @deprecated
       alias :blank_criteria? :_mongoid_unsatisfiable_criteria?
 
@@ -114,8 +106,6 @@ module Mongoid
       #   {}.delete_id
       #
       # @return [ Object ] The deleted value, or nil.
-      #
-      # @since 3.0.2
       def delete_id
         delete("_id") || delete(:_id) || delete("id") || delete(:id)
       end
@@ -127,8 +117,6 @@ module Mongoid
       #   { :_id => 1 }.extract_id
       #
       # @return [ Object ] The value of the id.
-      #
-      # @since 2.3.2
       def extract_id
         self["_id"] || self[:_id] || self["id"] || self[:id]
       end
@@ -141,8 +129,6 @@ module Mongoid
       # @param [ String ] string the dot syntax string.
       #
       # @return [ Object ] The matching value.
-      #
-      # @since 3.0.15
       def __nested__(string)
         keys = string.split(".")
         value = self
@@ -164,8 +150,6 @@ module Mongoid
       #   object.mongoize
       #
       # @return [ Hash ] The object.
-      #
-      # @since 3.0.0
       def mongoize
         ::Hash.mongoize(self)
       end
@@ -176,8 +160,6 @@ module Mongoid
       #   {}.resizable?
       #
       # @return [ true ] true.
-      #
-      # @since 3.0.0
       def resizable?
         true
       end
@@ -190,8 +172,6 @@ module Mongoid
       #   { klass: Band, where: { name: "Depeche Mode" }.to_criteria
       #
       # @return [ Criteria ] The criteria.
-      #
-      # @since 3.0.7
       def to_criteria
         criteria = Criteria.new(delete(:klass) || delete("klass"))
         each_pair do |method, args|
@@ -215,8 +195,6 @@ module Mongoid
       # @param [ Object ] value The value to mongoize.
       #
       # @return [ Object ] The mongoized value.
-      #
-      # @since 3.1.0
       def mongoize_for(operator, klass, key, value)
         field = klass.fields[key.to_s]
         if field
@@ -241,8 +219,6 @@ module Mongoid
         # @param [ Object ] object The object to mongoize.
         #
         # @return [ Hash ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           return if object.nil?
           evolve(object.dup).update_values { |value| value.mongoize }
@@ -254,8 +230,6 @@ module Mongoid
         #   {}.resizable?
         #
         # @return [ true ] true.
-        #
-        # @since 3.0.0
         def resizable?
           true
         end

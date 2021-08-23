@@ -15,8 +15,6 @@ module Mongoid
       #
       # @param [ Class ] klass The model class.
       # @param [ Array<Object> ] args The arguments passed to the includes.
-      #
-      # @since 3.0.2
       def initialize(klass, args)
         super(
           compose_message(

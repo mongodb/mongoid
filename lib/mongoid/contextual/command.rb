@@ -15,8 +15,6 @@ module Mongoid
       #   command.command
       #
       # @return [ Hash ] The db command.
-      #
-      # @since 3.0.0
       def command
         @command ||= {}
       end
@@ -27,8 +25,6 @@ module Mongoid
       #   command.client
       #
       # @return [ Mongo::Client ] The Mongo client.
-      #
-      # @since 3.0.0
       def client
         collection.database.client
       end

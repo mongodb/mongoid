@@ -18,8 +18,6 @@ module Mongoid
       # @param [ Hash ] mods The current modifications.
       # @param [ Array ] new_elements The new elements to add.
       # @param [ Array ] old_elements The old elements getting removed.
-      #
-      # @since 2.4.0
       def add_atomic_changes(document, name, key, mods, new_elements, old_elements)
         old = (old_elements || [])
         new = (new_elements || [])
@@ -47,8 +45,6 @@ module Mongoid
       #   field.foreign_key?
       #
       # @return [ true, false ] If the field is a foreign key.
-      #
-      # @since 2.4.0
       def foreign_key?
         true
       end
@@ -61,8 +57,6 @@ module Mongoid
       # @param [ Object ] object The object to evolve.
       #
       # @return [ Object ] The evolved object.
-      #
-      # @since 3.0.0
       def evolve(object)
         if object_id_field? || object.is_a?(Document)
           if association.polymorphic?
@@ -81,8 +75,6 @@ module Mongoid
       #   field.lazy?
       #
       # @return [ true, false ] If the field is lazy.
-      #
-      # @since 3.1.0
       def lazy?
         type.resizable?
       end
@@ -95,8 +87,6 @@ module Mongoid
       # @param [ Object ] object The object to Mongoize.
       #
       # @return [ Object ] The mongoized object.
-      #
-      # @since 3.0.0
       def mongoize(object)
         if type.resizable? || object_id_field?
           type.__mongoize_fk__(association, object)
@@ -111,8 +101,6 @@ module Mongoid
       #   field.object_id_field?
       #
       # @return [ true, false ] If the field is a BSON::ObjectId.
-      #
-      # @since 2.2.0
       def object_id_field?
         @object_id_field ||=
             association.polymorphic? ? true : association.klass.using_object_ids?
@@ -124,8 +112,6 @@ module Mongoid
       #   field.resizable?
       #
       # @return [ true, false ] If the field is resizable.
-      #
-      # @since 3.0.2
       def resizable?
         type.resizable?
       end
@@ -141,8 +127,6 @@ module Mongoid
       # @param [ Document ] doc The document.
       #
       # @return [ Object ] The called proc.
-      #
-      # @since 3.0.0
       def evaluate_default_proc(doc)
         serialize_default(default_val[])
       end
@@ -155,8 +139,6 @@ module Mongoid
       #   field.related_id_field
       #
       # @return [ Fields::Standard ] The field.
-      #
-      # @since 3.0.0
       def related_id_field
         @related_id_field ||= association.klass.fields["_id"]
       end
@@ -172,8 +154,6 @@ module Mongoid
       # @param [ Object ] object The default.
       #
       # @return [ Object ] The serialized default.
-      #
-      # @since 3.0.0
       def serialize_default(object); object; end
     end
   end

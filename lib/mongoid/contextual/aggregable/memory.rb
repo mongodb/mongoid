@@ -15,8 +15,6 @@ module Mongoid
         # @param [ Symbol ] field The field to average.
         #
         # @return [ Float ] The average.
-        #
-        # @since 3.0.0
         def avg(field)
           count > 0 ? sum(field).to_f / count.to_f : nil
         end
@@ -37,8 +35,6 @@ module Mongoid
         #
         # @return [ Float, Document ] The max value or document with the max
         #   value.
-        #
-        # @since 3.0.0
         def max(field = nil)
           block_given? ? super() : aggregate_by(field, :max_by)
         end
@@ -59,8 +55,6 @@ module Mongoid
         #
         # @return [ Float, Document ] The min value or document with the min
         #   value.
-        #
-        # @since 3.0.0
         def min(field = nil)
           block_given? ? super() : aggregate_by(field, :min_by)
         end
@@ -77,8 +71,6 @@ module Mongoid
         # @param [ Symbol ] field The field to sum.
         #
         # @return [ Float ] The sum value.
-        #
-        # @since 3.0.0
         def sum(field = nil)
           if block_given?
             super()
@@ -100,8 +92,6 @@ module Mongoid
         # @param [ Symbol ] method The method (min_by or max_by).
         #
         # @return [ Integer ] The aggregate.
-        #
-        # @since 3.0.0
         def aggregate_by(field, method)
           count > 0 ? send(method) { |doc| doc.public_send(field) }.public_send(field) : nil
         end

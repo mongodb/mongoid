@@ -13,8 +13,6 @@ module Mongoid
       #   options.defaults
       #
       # @return [ Hash ] The default options.
-      #
-      # @since 2.3.0
       def defaults
         @defaults ||= {}
       end
@@ -28,8 +26,6 @@ module Mongoid
       # @param [ Hash ] options Extras for the option.
       #
       # @option options [ Object ] :default The default value.
-      #
-      # @since 2.0.0.rc.1
       def option(name, options = {})
         defaults[name] = settings[name] = options[:default]
 
@@ -57,8 +53,6 @@ module Mongoid
       #   config.reset
       #
       # @return [ Hash ] The defaults.
-      #
-      # @since 2.3.0
       def reset
         settings.replace(defaults)
       end
@@ -69,8 +63,6 @@ module Mongoid
       #   options.settings
       #
       # @return [ Hash ] The setting options.
-      #
-      # @since 2.3.0
       def settings
         @settings ||= {}
       end
@@ -81,8 +73,6 @@ module Mongoid
       #   config.log_level
       #
       # @return [ Integer ] The log level.
-      #
-      # @since 5.1.0
       def log_level
         if level = settings[:log_level]
           unless level.is_a?(Integer)

@@ -8,8 +8,6 @@ require "ostruct"
 module Mongoid
 
   # Encapsulates behavior around defining indexes.
-  #
-  # @since 4.0.0
   module Indexable
     extend ActiveSupport::Concern
 
@@ -26,8 +24,6 @@ module Mongoid
       #   Person.create_indexes
       #
       # @return [ true ] If the operation succeeded.
-      #
-      # @since 1.0.0
       def create_indexes
         return unless index_specifications
 
@@ -52,8 +48,6 @@ module Mongoid
       #   Person.remove_indexes
       #
       # @return [ true ] If the operation succeeded.
-      #
-      # @since 3.0.0
       def remove_indexes
         indexed_database_names.each do |database|
           with(database: database) do |klass|
@@ -79,8 +73,6 @@ module Mongoid
       #   Person.add_indexes
       #
       # @return [ true ] If the operation succeeded.
-      #
-      # @since 1.0.0
       def add_indexes
         if hereditary? && !index_keys.include?(self.discriminator_key.to_sym => 1)
           index({ self.discriminator_key.to_sym => 1 }, unique: false, background: true)
@@ -101,8 +93,6 @@ module Mongoid
       # @param [ Hash ] options The index options.
       #
       # @return [ Hash ] The index options.
-      #
-      # @since 1.0.0
       def index(spec, options = nil)
         specification = Specification.new(self, spec, options)
         if !index_specifications.include?(specification)
@@ -119,8 +109,6 @@ module Mongoid
       # @param [ String ] index_name The index name.
       #
       # @return [ Specification ] The found specification.
-      #
-      # @since 4.0.0
       def index_specification(index_hash, index_name = nil)
         index = OpenStruct.new(fields: index_hash.keys, key: index_hash)
         index_specifications.detect do |spec|
@@ -139,8 +127,6 @@ module Mongoid
       #   Model.indexed_database_names
       #
       # @return [ Array<String> ] The names.
-      #
-      # @since 3.1.0
       def indexed_database_names
         index_specifications.map do |spec|
           spec.options[:database] || database_name
@@ -155,8 +141,6 @@ module Mongoid
       #   Model.index_keys
       #
       # @return [ Array<Hash> ] The specification keys.
-      #
-      # @since 4.0.0
       def index_keys
         index_specifications.map(&:key)
       end

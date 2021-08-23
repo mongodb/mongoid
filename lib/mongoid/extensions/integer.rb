@@ -11,8 +11,6 @@ module Mongoid
       #   1335532685.__mongoize_time__
       #
       # @return [ Time | ActiveSupport::TimeWithZone ] The time.
-      #
-      # @since 3.0.0
       def __mongoize_time__
         ::Time.configured.at(self)
       end
@@ -23,8 +21,6 @@ module Mongoid
       #   object.numeric?
       #
       # @return [ true ] Always true.
-      #
-      # @since 3.0.0
       def numeric?
         true
       end
@@ -35,8 +31,6 @@ module Mongoid
       #   object.unconvertable_to_bson?
       #
       # @return [ true ] If the object is unconvertable.
-      #
-      # @since 2.2.1
       def unconvertable_to_bson?
         true
       end
@@ -50,8 +44,6 @@ module Mongoid
         #   BigDecimal.mongoize("123.11")
         #
         # @return [ String ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           unless object.blank?
             __numeric__(object).to_i rescue 0

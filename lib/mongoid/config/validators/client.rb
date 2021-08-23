@@ -10,8 +10,6 @@ module Mongoid
         extend self
 
         # Standard configuration options.
-        #
-        # @since 3.0.0
         STANDARD = [ :database, :hosts, :username, :password ].freeze
 
         # Validate the client configuration.
@@ -20,8 +18,6 @@ module Mongoid
         #   Client.validate({ default: { hosts: [ "localhost:27017" ] }})
         #
         # @param [ Hash ] clients The clients config.
-        #
-        # @since 3.0.0
         def validate(clients)
           unless clients.has_key?(:default)
             raise Errors::NoDefaultClient.new(clients.keys)
@@ -44,8 +40,6 @@ module Mongoid
         #
         # @param [ String, Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
-        #
-        # @since 3.0.0
         def validate_client_database(name, config)
           if no_database_or_uri?(config)
             raise Errors::NoClientDatabase.new(name, config)
@@ -61,8 +55,6 @@ module Mongoid
         #
         # @param [ String, Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
-        #
-        # @since 3.0.0
         def validate_client_hosts(name, config)
           if no_hosts_or_uri?(config)
             raise Errors::NoClientHosts.new(name, config)
@@ -79,8 +71,6 @@ module Mongoid
         #
         # @param [ String, Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
-        #
-        # @since 3.0.0
         def validate_client_uri(name, config)
           if both_uri_and_standard?(config)
             raise Errors::MixedClientConfiguration.new(name, config)
@@ -98,8 +88,6 @@ module Mongoid
         # @param [ Hash ] config The configuration options.
         #
         # @return [ true, false ] If no database or uri is defined.
-        #
-        # @since 3.0.0
         def no_database_or_uri?(config)
           !config.has_key?(:database) && !config.has_key?(:uri)
         end
@@ -115,8 +103,6 @@ module Mongoid
         # @param [ Hash ] config The configuration options.
         #
         # @return [ true, false ] If no hosts or uri is defined.
-        #
-        # @since 3.0.0
         def no_hosts_or_uri?(config)
           !config.has_key?(:hosts) && !config.has_key?(:uri)
         end
@@ -132,8 +118,6 @@ module Mongoid
         # @param [ Hash ] config The configuration options.
         #
         # @return [ true, false ] If both standard and uri are defined.
-        #
-        # @since 3.0.0
         def both_uri_and_standard?(config)
           config.has_key?(:uri) && config.keys.any? do |key|
             STANDARD.include?(key.to_sym)

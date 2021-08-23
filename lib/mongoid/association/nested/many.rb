@@ -96,8 +96,6 @@ module Mongoid
         #
         # @param [ Document ] parent The parent document.
         # @param [ Hash ] attrs The single document attributes to process.
-        #
-        # @since 2.0.0
         def process_attributes(parent, attrs)
           return if reject?(parent, attrs)
           if id = attrs.extract_id
@@ -118,8 +116,6 @@ module Mongoid
         # @param [ Document ] parent The parent document.
         # @param [ Proxy ] relation The association proxy.
         # @param [ Document ] doc The doc to destroy.
-        #
-        # @since 3.0.10
         def destroy(parent, relation, doc)
           doc.flagged_for_destroy = true
           if !doc.embedded? || parent.new_record?
@@ -138,8 +134,6 @@ module Mongoid
         #
         # @param [ Proxy ] relation The association proxy.
         # @param [ Document ] doc The document to delete.
-        #
-        # @since 3.0.10
         def destroy_document(relation, doc)
           relation.delete(doc)
           doc.destroy unless doc.embedded? || doc.destroyed?
@@ -154,8 +148,6 @@ module Mongoid
         #
         # @param [ Document ] doc The document to update.
         # @param [ Hash ] attrs The attributes.
-        #
-        # @since 3.0.10
         def update_document(doc, attrs)
           attrs.delete_id
           if association.embedded?
@@ -175,8 +167,6 @@ module Mongoid
         # @param [ Document ] parent The parent document.
         # @param [ String, BSON::ObjectId ] id of the related document.
         # @param [ Hash ] attrs The single document attributes to process.
-        #
-        # @since 6.0.0
         def update_nested_relation(parent, id, attrs)
           first = existing.first
           converted = first ? convert_id(first.class, id) : id

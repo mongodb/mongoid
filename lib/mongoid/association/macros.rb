@@ -24,8 +24,6 @@ module Mongoid
       #   person.associations
       #
       # @return [ Hash ] The associations.
-      #
-      # @since 2.3.1
       def associations
         self.relations
       end
@@ -164,8 +162,6 @@ module Mongoid
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
-        #
-        # @since 2.0.0.rc.1
         def has_and_belongs_to_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
