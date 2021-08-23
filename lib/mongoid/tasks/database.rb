@@ -123,7 +123,7 @@ module Mongoid
           next if model.shard_config.nil?
 
           if model.embedded? && !model.cyclic?
-            logger.warn("MONGOID: #{model} has shard config but is emdedded")
+            logger.warn("MONGOID: #{model} has shard config but is embedded")
             next
           end
 

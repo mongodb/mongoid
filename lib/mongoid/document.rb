@@ -194,8 +194,8 @@ module Mongoid
     #
     # @param [ Hash ] options The options.
     #
-    # @option options [ true, false ] :compact Whether to include fields with
-    #   nil values in the json document.
+    # @option options [ true, false ] :compact (Deprecated) Whether to include fields
+    #   with nil values in the json document.
     #
     # @return [ Hash ] The document as json.
     #
@@ -203,6 +203,7 @@ module Mongoid
     def as_json(options = nil)
       rv = super
       if options && options[:compact]
+        Mongoid.logger.warn('#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.')
         rv = rv.compact
       end
       rv
