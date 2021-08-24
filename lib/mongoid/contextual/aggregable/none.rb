@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
+require "mongoid/contextual/aggregable"
+
 module Mongoid
   module Contextual
     module Aggregable
       # Contains behavior for aggregating values in null context.
       module None
-        AGGREGATES = { "count" => 0, "sum" => 0, "avg" => nil, "min" => nil, "max" => nil }.freeze
 
         # Get all the aggregate values for the provided field in null context.
         # Provided for interface consistency with Aggregable::Mongo.
@@ -14,7 +15,7 @@ module Mongoid
         #
         # @return [ Hash ] A Hash with count, sum of 0 and max, min, avg of nil.
         def aggregates(_field)
-          AGGREGATES.dup
+          Aggregable::EMPTY_RESULT.dup
         end
 
         # Always returns zero.

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "mongoid/contextual/aggregable/none"
+require "mongoid/contextual/aggregable"
 
 module Mongoid
   module Contextual
@@ -28,7 +28,7 @@ module Mongoid
         def aggregates(field)
           result = collection.find.aggregate(pipeline(field), session: _session).to_a
           if result.empty?
-            Mongoid::Contextual::Aggregable::None::AGGREGATES.dup
+            Aggregable::EMPTY_RESULT.dup
           else
             result.first
           end
