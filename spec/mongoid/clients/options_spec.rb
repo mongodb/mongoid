@@ -123,9 +123,7 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           it 'disconnects the new cluster when the block exits' do
-            skip 'https://jira.mongodb.org/browse/MONGOID-5130'
-
-            expect(connections_before).to eq(connections_after)
+            expect(cluster_after).not_to be(cluster_during)
           end
         end
 
@@ -142,9 +140,6 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           it 'does not disconnect the original cluster' do
-            skip 'https://jira.mongodb.org/browse/MONGOID-5130'
-
-            expect(connections_after).to eq(connections_before)
             expect(cluster_before).to be(cluster_after)
           end
         end
