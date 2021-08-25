@@ -21,7 +21,7 @@ module Mongoid
       #
       #   Foo.where(:price.gt => 1)
       #
-      # ... causes a Key instance to be created thusly:
+      # ... causes a Key instance to be created as follows:
       #
       #   Key.new(:price, :__override__, '$gt')
       #

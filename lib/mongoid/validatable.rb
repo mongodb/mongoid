@@ -123,7 +123,7 @@ module Mongoid
         end
       end
 
-      # Add validation with the supplied validators forthe provided fields
+      # Add validation with the supplied validators for the provided fields
       # with options.
       #
       # @example Validate with a specific validator.

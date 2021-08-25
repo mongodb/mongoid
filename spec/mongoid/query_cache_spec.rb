@@ -767,7 +767,7 @@ describe Mongoid::QueryCache do
       end
     end
 
-   context 'when querying colleciton larger than the batch size' do
+   context 'when querying collection larger than the batch size' do
      before do
        Band.destroy_all
        101.times { |i| Band.create!(_id: i) }

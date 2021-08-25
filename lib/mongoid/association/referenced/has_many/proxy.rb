@@ -124,12 +124,12 @@ module Mongoid
           # @example Destroy all documents in the association.
           #   person.posts.destroy_all
           #
-          # @example Conditonally destroy all documents in the association.
+          # @example Conditionally destroy all documents in the association.
           #   person.posts.destroy_all({ :title => "Testing" })
           #
           # @param [ Hash ] conditions Optional conditions to destroy with.
           #
-          # @return [ Integer ] The number of documents destroyd.
+          # @return [ Integer ] The number of documents destroydd.
           def destroy_all(conditions = nil)
             remove_all(conditions, :destroy_all)
           end

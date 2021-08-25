@@ -12,7 +12,7 @@ module Mongoid
       # @example Clear the relation.
       #   relation.clear
       #
-      # @return [ true, false ] If the delete suceeded.
+      # @return [ true, false ] If the delete succeeded.
       def clear
         _target.delete
       end

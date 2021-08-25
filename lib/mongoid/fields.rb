@@ -158,7 +158,7 @@ module Mongoid
     # method to automatically wrap params in JSON requests.
     #
     # @example Get the field names
-    #   docment.attribute_names
+    #   document.attribute_names
     #
     # @return [ Array<String> ] The field names
     def attribute_names

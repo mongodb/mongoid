@@ -2,7 +2,7 @@
 
 module Mongoid
 
-  # Contains the bahvior around inspecting documents via inspect.
+  # Contains the behavior around inspecting documents via inspect.
   module Inspectable
 
     # Returns the class name plus its attributes. If using dynamic fields will
