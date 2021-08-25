@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Persistable
 
     # Defines behavior for persistence operations that destroy documents.
-    #
-    # @since 4.0.0
     module Destroyable
       extend ActiveSupport::Concern
 
@@ -18,8 +15,6 @@ module Mongoid
       # @param [ Hash ] options Options to pass to destroy.
       #
       # @return [ true, false ] True if successful, false if not.
-      #
-      # @since 1.0.0
       def destroy(options = nil)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         self.flagged_for_destroy = true
@@ -53,8 +48,6 @@ module Mongoid
         # @param [ Hash ] conditions Optional conditions to destroy by.
         #
         # @return [ Integer ] The number of documents destroyed.
-        #
-        # @since 1.0.0
         def destroy_all(conditions = nil)
           where(conditions || {}).destroy
         end

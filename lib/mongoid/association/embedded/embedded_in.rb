@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'mongoid/association/embedded/embedded_in/binding'
 require 'mongoid/association/embedded/embedded_in/buildable'
@@ -10,8 +9,6 @@ module Mongoid
     module Embedded
 
       # The EmbeddedIn type association.
-      #
-      # @since 7.0
       class EmbeddedIn
         include Relatable
         include Buildable
@@ -20,8 +17,6 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        #
-        # @since 7.0
         ASSOCIATION_OPTIONS = [
             :autobuild,
             :cyclic,
@@ -33,15 +28,11 @@ module Mongoid
         # the shared ones.
         #
         # @return [ Array<Symbol> ] The valid options.
-        #
-        # @since 7.0
         VALID_OPTIONS = (ASSOCIATION_OPTIONS + SHARED_OPTIONS).freeze
 
         # Setup the instance methods, fields, etc. on the association owning class.
         #
         # @return [ self ]
-        #
-        # @since 7.0
         def setup!
           setup_instance_methods!
           @owner_class.embedded = true
@@ -51,8 +42,6 @@ module Mongoid
         # Is this association type embedded?
         #
         # @return [ true ] Always true.
-        #
-        # @since 7.0
         def embedded?; true; end
 
         # The primary key
@@ -63,22 +52,16 @@ module Mongoid
         # Does this association type store the foreign key?
         #
         # @return [ false ] Always false.
-        #
-        # @since 7.0
         def stores_foreign_key?; false; end
 
         # The default for validating the association object.
         #
         # @return [ false ] Always false.
-        #
-        # @since 7.0
         def validation_default; false; end
 
         # The key that is used to get the attributes for the associated object.
         #
         # @return [ String ] The name of the association.
-        #
-        # @since 7.0
         def key
           @key ||= name.to_s
         end
@@ -86,8 +69,6 @@ module Mongoid
         # Get the association proxy class for this association type.
         #
         # @return [ Association::Embedded::EmbeddedIn::Proxy ] The proxy class.
-        #
-        # @since 7.0
         def relation
           Proxy
         end
@@ -95,8 +76,6 @@ module Mongoid
         # Is this association polymorphic?
         #
         # @return [ true, false ] Whether this association is polymorphic.
-        #
-        # @since 7.0
         def polymorphic?
           !!@options[:polymorphic]
         end
@@ -107,8 +86,6 @@ module Mongoid
         # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::One ] The Nested Builder object.
-        #
-        # @since 7.0
         def nested_builder(attributes, options)
           Nested::One.new(self, attributes, options)
         end

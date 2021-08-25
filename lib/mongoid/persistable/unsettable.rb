@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Persistable
 
     # Defines behavior for $unset operations.
-    #
-    # @since 4.0.0
     module Unsettable
       extend ActiveSupport::Concern
 
@@ -20,8 +17,6 @@ module Mongoid
       #   unset.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def unset(*fields)
         prepare_atomic_operation do |ops|
           fields.flatten.each do |field|

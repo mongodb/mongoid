@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/association/marshalable"
 
@@ -51,8 +50,6 @@ module Mongoid
       # @param [ Document ] base The base document on the proxy.
       # @param [ Document, Array<Document> ] target The target of the proxy.
       # @param [ Association ] association The association metadata.
-      #
-      # @since 2.0.0.rc.1
       def init(base, target, association)
         @_base, @_target, @_association = base, target, association
         yield(self) if block_given?
@@ -70,8 +67,6 @@ module Mongoid
       #   proxy.klass
       #
       # @return [ Class ] The association class.
-      #
-      # @since 3.0.15
       def klass
         _association ? _association.klass : nil
       end
@@ -81,8 +76,6 @@ module Mongoid
       #
       # @example Reset the association criteria.
       #   person.preferences.reset_relation_criteria
-      #
-      # @since 3.0.14
       def reset_unloaded
         _target.reset_unloaded(criteria)
       end
@@ -94,8 +87,6 @@ module Mongoid
       #   proxy.substitutable
       #
       # @return [ Object ] A clone of the target.
-      #
-      # @since 2.1.6
       def substitutable
         _target
       end
@@ -108,8 +99,6 @@ module Mongoid
       #   relation.collection
       #
       # @return [ Collection ] The root's collection.
-      #
-      # @since 2.0.0
       def collection
         root = _base._root
         root.collection unless root.embedded?
@@ -121,8 +110,6 @@ module Mongoid
       #   proxt.characterize_one(name)
       #
       # @param [ Document ] document The document to set on.
-      #
-      # @since 2.0.0.rc.4
       def characterize_one(document)
         document._association = _association unless document._association
       end
@@ -149,8 +136,6 @@ module Mongoid
       #   relation.raise_mixed
       #
       # @raise [ Errors::MixedRelations ] The error.
-      #
-      # @since 2.0.0
       def raise_mixed
         raise Errors::MixedRelations.new(_base.class, _association.klass)
       end
@@ -164,8 +149,6 @@ module Mongoid
       # @param [ Document ] doc The child document getting created.
       #
       # @raise [ Errors::UnsavedDocument ] The error.
-      #
-      # @since 2.0.0.rc.6
       def raise_unsaved(doc)
         raise Errors::UnsavedDocument.new(_base, doc)
       end
@@ -176,8 +159,6 @@ module Mongoid
       #   execute_callback(:before_add)
       #
       # @param [ Symbol ] callback to be executed
-      #
-      # @since 3.1.0
       def execute_callback(callback, doc)
         _association.get_callbacks(callback).each do |c|
           if c.is_a? Proc
@@ -199,8 +180,6 @@ module Mongoid
         # @param [ Association ] association The association metadata.
         #
         # @return [ Criteria ] The ordered criteria.
-        #
-        # @since 3.0.6
         def apply_ordering(criteria, association)
           association.order ? criteria.order_by(association.order) : criteria
         end

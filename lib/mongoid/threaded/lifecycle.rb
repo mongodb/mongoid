@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Threaded
@@ -26,8 +25,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The yielded value.
-      #
-      # @since 2.2.0
       def _assigning
         Threaded.begin_execution(ASSIGN)
         yield
@@ -41,8 +38,6 @@ module Mongoid
       #   proxy._assigning?
       #
       # @return [ true, false ] If the thread is assigning.
-      #
-      # @since 2.1.0
       def _assigning?
         Threaded.executing?(ASSIGN)
       end
@@ -55,8 +50,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The return value of the block.
-      #
-      # @since 2.1.0
       def _binding
         Threaded.begin_execution(BIND)
         yield
@@ -70,8 +63,6 @@ module Mongoid
       #   proxy.binding?
       #
       # @return [ true, false ] If the thread is binding.
-      #
-      # @since 2.1.0
       def _binding?
         Threaded.executing?(BIND)
       end
@@ -84,8 +75,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The return value of the block.
-      #
-      # @since 2.1.0
       def _building
         Threaded.begin_execution(BUILD)
         yield
@@ -99,8 +88,6 @@ module Mongoid
       #   proxy._building?
       #
       # @return [ true, false ] If the thread is building.
-      #
-      # @since 2.1.0
       def _building?
         Threaded.executing?(BUILD)
       end
@@ -111,8 +98,6 @@ module Mongoid
       #   proxy.creating?
       #
       # @return [ true, false ] If the thread is creating.
-      #
-      # @since 2.1.0
       def _creating?
         Threaded.executing?(CREATE)
       end
@@ -125,8 +110,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The return value of the block.
-      #
-      # @since 2.3.2
       def _loading
         Threaded.begin_execution(LOAD)
         yield
@@ -140,8 +123,6 @@ module Mongoid
       #   proxy._loading?
       #
       # @return [ true, false ] If the thread is loading.
-      #
-      # @since 2.3.2
       def _loading?
         Threaded.executing?(LOAD)
       end
@@ -156,8 +137,6 @@ module Mongoid
         #   end
         #
         # @return [ Object ] The return value of the block.
-        #
-        # @since 2.1.0
         def _creating
           Threaded.begin_execution(CREATE)
           yield

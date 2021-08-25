@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -15,8 +14,6 @@ module Mongoid
           #   time.__evolve_date__
           #
           # @return [ Time ] The date at midnight UTC.
-          #
-          # @since 1.0.0
           def __evolve_date__
             ::Time.utc(year, month, day, 0, 0, 0, 0)
           end
@@ -27,8 +24,6 @@ module Mongoid
           #   time.__evolve_time__
           #
           # @return [ Time ] The time in UTC.
-          #
-          # @since 1.0.0
           def __evolve_time__
             utc
           end
@@ -46,8 +41,6 @@ module Mongoid
             # @param [ Object ] object The object to evolve.
             #
             # @return [ Time ] The evolved date time.
-            #
-            # @since 1.0.0
             def evolve(object)
               object.__evolve_time__
             end

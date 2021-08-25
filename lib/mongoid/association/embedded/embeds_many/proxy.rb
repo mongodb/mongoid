@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'mongoid/association/embedded/batchable'
 
@@ -39,8 +38,6 @@ module Mongoid
           #   person.addresses.as_document
           #
           # @return [ Array<Hash> ] The association as stored in the db.
-          #
-          # @since 2.0.0.rc.1
           def as_document
             as_attributes.collect { |attrs| BSON::Document.new(attrs) }
           end
@@ -54,8 +51,6 @@ module Mongoid
           # @param [ Array<Document> ] docs The docs to add.
           #
           # @return [ Array<Document> ] The documents.
-          #
-          # @since 2.4.0
           def concat(docs)
             batch_insert(docs) unless docs.empty?
             self
@@ -125,8 +120,6 @@ module Mongoid
           # @param [ Document ] document The document to be deleted.
           #
           # @return [ Document, nil ] The deleted document or nil if nothing deleted.
-          #
-          # @since 2.0.0.rc.1
           def delete(document)
             execute_callback :before_remove, document
             doc = _target.delete_one(document)
@@ -168,8 +161,6 @@ module Mongoid
           #
           # @return [ Many, Enumerator ] The association or an enumerator if no
           #   block was provided.
-          #
-          # @since 3.1.0
           def delete_if
             if block_given?
               dup_target = _target.dup
@@ -210,17 +201,29 @@ module Mongoid
           # Finds a document in this association through several different
           # methods.
           #
+          # This method delegates to +Mongoid::Criteria#find+. If this method is
+          # not given a block, it returns one or many documents for the provided
+          # _id values.
+          #
+          # If this method is given a block, it returns the first document
+          # of those found by the current Criteria object for which the block
+          # returns a truthy value.
+          #
           # @example Find a document by its id.
           #   person.addresses.find(BSON::ObjectId.new)
           #
           # @example Find documents for multiple ids.
           #   person.addresses.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
           #
-          # @param [ Array<Object> ] args Various arguments.
+          # @example Finds the first matching document using a block.
+          #   person.addresses.find { |addr| addr.state == 'CA' }
           #
-          # @return [ Array<Document>, Document ] A single or multiple documents.
-          def find(*args)
-            criteria.find(*args)
+          # @param [ Array<Object> ] args Various arguments.
+          # @param [ Proc ] block Optional block to pass.
+          #
+          # @return [ Document | Array<Document> | nil ] A document or matching documents.
+          def find(*args, &block)
+            criteria.find(*args, &block)
           end
 
           # Instantiate a new embeds_many association.
@@ -250,8 +253,6 @@ module Mongoid
           #   relation.in_memory
           #
           # @return [ Array<Document> ] The documents in memory.
-          #
-          # @since 2.1.0
           def in_memory
             _target
           end
@@ -269,8 +270,6 @@ module Mongoid
           #   provided.
           #
           # @return [ Document, Array<Document> ] The popped document(s).
-          #
-          # @since 3.0.0
           def pop(count = nil)
             if count
               if docs = _target[_target.size - count, _target.size]
@@ -313,8 +312,6 @@ module Mongoid
           # @param [ Array<Document> ] docs The replacement docs.
           #
           # @return [ Many ] The proxied association.
-          #
-          # @since 2.0.0.rc.1
           def substitute(docs)
             batch_replace(docs)
             self
@@ -327,8 +324,6 @@ module Mongoid
           #   person.addresses.unscoped
           #
           # @return [ Criteria ] The unscoped association.
-          #
-          # @since 2.4.0
           def unscoped
             criterion = klass.unscoped
             criterion.embedded = true
@@ -349,8 +344,6 @@ module Mongoid
           #   relation.append(document)
           #
           # @param [ Document ] document The document to append to the target.
-          #
-          # @since 2.0.0.rc.1
           def append(document)
             execute_callback :before_add, document
             unless object_already_related?(document)
@@ -368,8 +361,6 @@ module Mongoid
           #   relation.binding([ address ])
           #
           # @return [ Binding ] The many binding.
-          #
-          # @since 2.0.0.rc.1
           def binding
             Binding.new(_base, _target, _association)
           end
@@ -390,8 +381,6 @@ module Mongoid
           #   relation.delete_one(doc)
           #
           # @param [ Document ] document The document to delete.
-          #
-          # @since 2.4.7
           def delete_one(document)
             _target.delete_one(document)
             _unscoped.delete_one(document)
@@ -405,8 +394,6 @@ module Mongoid
           #   relation.integrate(document)
           #
           # @param [ Document ] document The document to integrate.
-          #
-          # @since 2.1.0
           def integrate(document)
             characterize_one(document)
             bind_one(document)
@@ -435,8 +422,6 @@ module Mongoid
           #   relation.persistable?
           #
           # @return [ true, false ] If the association is persistable.
-          #
-          # @since 2.1.0
           def persistable?
             _base.persisted? && !_binding?
           end
@@ -447,8 +432,6 @@ module Mongoid
           #
           # @example Reindex the association.
           #   person.addresses.reindex
-          #
-          # @since 2.0.0.rc.1
           def reindex
             _unscoped.each_with_index do |doc, index|
               doc._index = index
@@ -464,8 +447,6 @@ module Mongoid
           # @param [ Array<Document> ] docs The documents to scope.
           #
           # @return [ Array<Document> ] The scoped docs.
-          #
-          # @since 2.4.0
           def scope(docs)
             unless _association.order || _association.klass.default_scoping?
               return docs
@@ -500,8 +481,6 @@ module Mongoid
           #   relation._unscoped
           #
           # @return [ Array<Document> ] The unscoped documents.
-          #
-          # @since 2.4.0
           def _unscoped
             @_unscoped ||= []
           end
@@ -514,8 +493,6 @@ module Mongoid
           # @param [ Array<Document> ] docs The documents.
           #
           # @return [ Array<Document ] The unscoped docs.
-          #
-          # @since 2.4.0
           def _unscoped=(docs)
             @_unscoped = docs
           end
@@ -537,8 +514,6 @@ module Mongoid
             #   Association::Embedded::EmbedsMany.embedded?
             #
             # @return [ true ] true.
-            #
-            # @since 2.0.0.rc.1
             def embedded?
               true
             end
@@ -549,8 +524,6 @@ module Mongoid
             #   Association::Embedded::EmbedsMany.foreign_key_suffix
             #
             # @return [ nil ] nil.
-            #
-            # @since 3.0.0
             def foreign_key_suffix
               nil
             end

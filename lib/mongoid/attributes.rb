@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "active_model/attribute_methods"
 require "mongoid/attributes/dynamic"
@@ -29,8 +28,6 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the attribute.
     #
     # @return [ true, false ] True if present, false if not.
-    #
-    # @since 1.0.0
     def attribute_present?(name)
       attribute = read_raw_attribute(name)
       !attribute.blank? || attribute == false
@@ -44,8 +41,6 @@ module Mongoid
     #   document.attributes_before_type_cast
     #
     # @return [ Hash ] The uncast attributes.
-    #
-    # @since 3.1.0
     def attributes_before_type_cast
       @attributes_before_type_cast ||= {}
     end
@@ -58,8 +53,6 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the attribute.
     #
     # @return [ true, false ] If the key is present in the attributes.
-    #
-    # @since 3.0.0
     def has_attribute?(name)
       attributes.key?(name.to_s)
     end
@@ -74,8 +67,6 @@ module Mongoid
     #
     # @return [ true, false ] If the key is present in the
     #   attributes_before_type_cast.
-    #
-    # @since 3.1.0
     def has_attribute_before_type_cast?(name)
       attributes_before_type_cast.key?(name.to_s)
     end
@@ -92,8 +83,6 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute.
-    #
-    # @since 1.0.0
     def read_attribute(name)
       field = fields[name.to_s]
       raw = read_raw_attribute(name)
@@ -112,8 +101,6 @@ module Mongoid
     #
     # @return [ Object ] The value of the attribute before type cast, if
     #   available. Otherwise, the value of the attribute.
-    #
-    # @since 3.1.0
     def read_attribute_before_type_cast(name)
       attr = name.to_s
       if attributes_before_type_cast.key?(attr)
@@ -133,8 +120,6 @@ module Mongoid
     #
     # @raise [ Errors::ReadonlyAttribute ] If the field cannot be removed due
     #   to being flagged as reaodnly.
-    #
-    # @since 1.0.0
     def remove_attribute(name)
       as_writable_attribute!(name) do |access|
         _assigning do
@@ -157,8 +142,6 @@ module Mongoid
     #
     # @param [ String, Symbol ] name The name of the attribute to update.
     # @param [ Object ] value The value to set for the attribute.
-    #
-    # @since 1.0.0
     def write_attribute(name, value)
       field_name = database_field_name(name)
 
@@ -201,8 +184,6 @@ module Mongoid
     #   person.assign_attributes({ :title => "Mr." }, :as => :admin)
     #
     # @param [ Hash ] attrs The new attributes to set.
-    #
-    # @since 2.2.1
     def assign_attributes(attrs = nil)
       _assigning do
         process_attributes(attrs)
@@ -220,8 +201,6 @@ module Mongoid
     #   person.attributes = { :title => "Mr." }
     #
     # @param [ Hash ] attrs The new attributes to set.
-    #
-    # @since 1.0.0
     def write_attributes(attrs = nil)
       assign_attributes(attrs)
     end
@@ -236,8 +215,6 @@ module Mongoid
     # @param [ String ] name The name of the attribute.
     #
     # @return [ true, false ] If the attribute is missing.
-    #
-    # @since 4.0.0
     def attribute_missing?(name)
       !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
     end
@@ -248,8 +225,6 @@ module Mongoid
     #   document.typed_attributes
     #
     # @return [ Object ] The hash with keys and values of the type-casted attributes.
-    #
-    # @since 6.1.0
     def typed_attributes
       attribute_names.map { |name| [name, send(name)] }.to_h
     end
@@ -264,8 +239,6 @@ module Mongoid
     #   model.hash_dot_syntax?
     #
     # @return [ true, false ] If the string contains a "."
-    #
-    # @since 3.0.15
     def hash_dot_syntax?(string)
       string.include?(".")
     end
@@ -279,8 +252,6 @@ module Mongoid
     # @param [ Object ] value The uncast value.
     #
     # @return [ Object ] The cast value.
-    #
-    # @since 1.0.0
     def typed_value_for(key, value)
       fields.key?(key) ? fields[key].mongoize(value) : value.mongoize
     end
@@ -316,8 +287,6 @@ module Mongoid
       #
       # @param [ Symbol ] name The new name.
       # @param [ Symbol ] original The original name.
-      #
-      # @since 2.3.0
       def alias_attribute(name, original)
         aliased_fields[name.to_s] = original.to_s
 
@@ -368,8 +337,6 @@ module Mongoid
     #
     # @param [ String, Symbol ] field_name The name of the field.
     # @param [ Object ] value The value to be validated.
-    #
-    # @since 3.0.10
     def validate_attribute_value(field_name, value)
       return if value.nil?
       field = fields[field_name]

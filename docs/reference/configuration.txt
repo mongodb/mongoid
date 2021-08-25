@@ -605,7 +605,7 @@ When using Mongoid with a forking web server such as Puma, Unicorn or
 Passenger, it is recommended to not perform any operations on Mongoid models
 in the parent process prior to the fork.
 
-When a process forks, Ruby threads are not transfered to the child processes
+When a process forks, Ruby threads are not transferred to the child processes
 and the Ruby driver Client objects lose their background monitoring. The
 application will typically seem to work just fine until the deployment
 state changes (for example due to network errors, a maintenance event) at

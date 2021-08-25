@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Fields
@@ -14,8 +13,6 @@ module Mongoid
       # @param [ Hash ] object The hash of translations.
       #
       # @return [ Object ] The value for the current locale.
-      #
-      # @since 2.3.0
       def demongoize(object)
         if object
           type.demongoize(lookup(object))
@@ -28,8 +25,6 @@ module Mongoid
       #   field.localized?
       #
       # @return [ true, false ] If the field is localized.
-      #
-      # @since 2.3.0
       def localized?
         true
       end
@@ -42,8 +37,6 @@ module Mongoid
       # @param [ String ] object The string to convert.
       #
       # @return [ Hash ] The locale with string translation.
-      #
-      # @since 2.3.0
       def mongoize(object)
         { ::I18n.locale.to_s => type.mongoize(object) }
       end
@@ -58,8 +51,6 @@ module Mongoid
       #   field.fallbacks?
       #
       # @return [ true, false ] If fallbacks should be used.
-      #
-      # @since 5.1.0
       def fallbacks?
         return true if options[:fallbacks].nil?
         !!options[:fallbacks]
@@ -75,8 +66,6 @@ module Mongoid
       # @param [ Hash ] object The localized object.
       #
       # @return [ Object ] The object for the locale.
-      #
-      # @since 3.0.0
       def lookup(object)
         locale = ::I18n.locale
 

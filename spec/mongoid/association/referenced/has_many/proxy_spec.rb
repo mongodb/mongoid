@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -2707,6 +2706,44 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             end
           end
         end
+      end
+    end
+
+    context "with block" do
+      let!(:author) do
+        Person.create!(title: 'Person')
+      end
+
+      let!(:post_one) do
+        author.posts.create!(title: 'post one')
+      end
+
+      let!(:post_two) do
+        author.posts.create!(title: 'post two')
+      end
+
+      it "finds one" do
+        expect(
+          author.posts.find do |post|
+            post.title == 'post one'
+          end
+        ).to be_a(Post)
+      end
+
+      it "returns first match of multiple" do
+        expect(
+          author.posts.find do |post|
+            ['post one', 'post two'].include?(post.title)
+          end
+        ).to eq(post_one)
+      end
+
+      it "returns nil when not found" do
+        expect(
+          author.posts.find do |post|
+            post.title == 'non exiting one'
+          end
+        ).to be_nil
       end
     end
   end

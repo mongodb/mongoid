@@ -127,11 +127,11 @@ is deprecated.
      - |checkmark| [#ruby-2.2]_
      - |checkmark|
 
-.. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.1 or higher is required.
+.. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.2 or higher is required.
 
-.. [#mongoid-7.2-ruby-3.0] Mongoid version 7.2.4 or higher is required.
+.. [#mongoid-7.2-ruby-3.0] Mongoid version 7.2.5 or higher is required.
 
-.. [#mongoid-7.1-ruby-3.0] Mongoid version 7.1.9 or higher is required.
+.. [#mongoid-7.1-ruby-3.0] Mongoid version 7.1.10 or higher is required.
 
 .. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
 

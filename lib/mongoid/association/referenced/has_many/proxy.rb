@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -29,8 +28,6 @@ module Mongoid
           # @param [ Document, Array<Document> ] args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
-          #
-          # @since 2.0.0.beta.1
           def <<(*args)
             docs = args.flatten
             return concat(docs) if docs.size > 1
@@ -52,8 +49,6 @@ module Mongoid
           # @param [ Array<Document> ] documents The docs to add.
           #
           # @return [ Array<Document> ] The documents.
-          #
-          # @since 2.4.0
           def concat(documents)
             docs, inserts = [], []
             documents.each do |doc|
@@ -75,8 +70,6 @@ module Mongoid
           # @param [ Class ] type The optional subclass to build.
           #
           # @return [ Document ] The new document.
-          #
-          # @since 2.0.0.beta.1
           def build(attributes = {}, type = nil)
             doc = Factory.build(type || klass, attributes)
             append(doc)
@@ -98,8 +91,6 @@ module Mongoid
           # @param [ Document ] document The document to remove.
           #
           # @return [ Document ] The matching document.
-          #
-          # @since 2.1.0
           def delete(document)
             execute_callback :before_remove, document
             _target.delete(document) do |doc|
@@ -123,8 +114,6 @@ module Mongoid
           # @param [ Hash ] conditions Optional conditions to delete with.
           #
           # @return [ Integer ] The number of documents deleted.
-          #
-          # @since 2.0.0.beta.1
           def delete_all(conditions = nil)
             remove_all(conditions, :delete_all)
           end
@@ -141,8 +130,6 @@ module Mongoid
           # @param [ Hash ] conditions Optional conditions to destroy with.
           #
           # @return [ Integer ] The number of documents destroyd.
-          #
-          # @since 2.0.0.beta.1
           def destroy_all(conditions = nil)
             remove_all(conditions, :destroy_all)
           end
@@ -158,8 +145,6 @@ module Mongoid
           #   end
           #
           # @return [ Array<Document> ] The loaded docs.
-          #
-          # @since 2.1.0
           def each
             if block_given?
               _target.each { |doc| yield(doc) }
@@ -185,8 +170,16 @@ module Mongoid
             criteria.exists?
           end
 
-          # Find the matchind document on the association, either based on id or
+          # Find the matching document on the association, either based on id or
           # conditions.
+          #
+          # This method delegates to +Mongoid::Criteria#find+. If this method is
+          # not given a block, it returns one or many documents for the provided
+          # _id values.
+          #
+          # If this method is given a block, it returns the first document
+          # of those found by the current Criteria object for which the block
+          # returns a truthy value.
           #
           # @example Find by an id.
           #   person.posts.find(BSON::ObjectId.new)
@@ -194,16 +187,18 @@ module Mongoid
           # @example Find by multiple ids.
           #   person.posts.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
           #
+          # @example Finds the first matching document using a block.
+          #   person.addresses.find { |addr| addr.state == 'CA' }
+          #
           # @note This will keep matching documents in memory for iteration
           #   later.
           #
           # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] args The ids.
+          # @param [ Proc ] block Optional block to pass.
           #
-          # @return [ Document, Criteria ] The matching document(s).
-          #
-          # @since 2.0.0.beta.1
-          def find(*args)
-            matching = criteria.find(*args)
+          # @return [ Document | Array<Document> | nil ] A document or matching documents.
+          def find(*args, &block)
+            matching = criteria.find(*args, &block)
             Array(matching).each { |doc| _target.push(doc) }
             matching
           end
@@ -217,8 +212,6 @@ module Mongoid
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Array<Document> ] target The target of the association.
           # @param [ Association ] association The association metadata.
-          #
-          # @since 2.0.0.beta.1
           def initialize(base, target, association)
             enum = HasMany::Enumerable.new(target, base, association)
             init(base, enum, association) do
@@ -232,8 +225,6 @@ module Mongoid
           #
           # @example Nullify the association.
           #   person.posts.nullify
-          #
-          # @since 2.0.0.rc.1
           def nullify
             criteria.update_all(foreign_key => nil)
             _target.clear do |doc|
@@ -251,8 +242,6 @@ module Mongoid
           #   person.posts.clear
           #
           # @return [ Many ] The association emptied.
-          #
-          # @since 2.0.0.beta.1
           def purge
             unless _association.destructive?
               nullify
@@ -286,8 +275,6 @@ module Mongoid
           # @param [ Array<Document> ] replacement The replacement target.
           #
           # @return [ Many ] The association.
-          #
-          # @since 2.0.0.rc.1
           def substitute(replacement)
             if replacement
               new_docs, docs = replacement.compact, []
@@ -310,8 +297,6 @@ module Mongoid
           #   person.posts.unscoped
           #
           # @return [ Criteria ] The unscoped criteria.
-          #
-          # @since 2.4.0
           def unscoped
             klass.unscoped.where(foreign_key => _base.send(_association.primary_key))
           end
@@ -325,8 +310,6 @@ module Mongoid
           #   relation.append(document)
           #
           # @param [ Document ] document The document to append to the target.
-          #
-          # @since 2.0.0.rc.1
           def append(document)
             with_add_callbacks(document, already_related?(document)) do
               _target.push(document)
@@ -344,8 +327,6 @@ module Mongoid
           # @param [ Document ] document The document to append to the target.
           # @param [ true, false ] already_related Whether the document is already related
           #   to the target.
-          #
-          # @since 5.1.0
           def with_add_callbacks(document, already_related)
             execute_callback :before_add, document unless already_related
             yield
@@ -361,8 +342,6 @@ module Mongoid
           #
           # @return [ true, false ] Whether the document is already related to the base and the
           #   association is persisted.
-          #
-          # @since 5.1.0
           def already_related?(document)
             document.persisted? &&
                 document._association &&
@@ -376,8 +355,6 @@ module Mongoid
           #   relation.binding([ address ])
           #
           # @return [ Binding ] The binding.
-          #
-          # @since 2.0.0.rc.1
           def binding
             HasMany::Binding.new(_base, _target, _association)
           end
@@ -388,8 +365,6 @@ module Mongoid
           #   relation.collection
           #
           # @return [ Collection ] The collection of the association.
-          #
-          # @since 2.0.2
           def collection
             klass.collection
           end
@@ -401,8 +376,6 @@ module Mongoid
           #   relation.criteria
           #
           # @return [ Criteria ] A new criteria.
-          #
-          # @since 2.0.0.beta.1
           def criteria
             @criteria ||= _association.criteria(_base)
           end
@@ -416,8 +389,6 @@ module Mongoid
           # @param [ Document ] document The document to cascade on.
           #
           # @return [ true, false ] If the association is destructive.
-          #
-          # @since 2.1.0
           def cascade!(document)
             if persistable?
               case _association.dependent
@@ -441,8 +412,6 @@ module Mongoid
           # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Criteria, Object ] A Criteria or return value from the target.
-          #
-          # @since 2.0.0.beta.1
           ruby2_keywords def method_missing(name, *args, &block)
             if _target.respond_to?(name)
               _target.send(name, *args, &block)
@@ -462,8 +431,6 @@ module Mongoid
           #
           # @param [ Array<Document> ] docs The delayed inserts.
           # @param [ Array<Hash> ] inserts The raw insert document.
-          #
-          # @since 3.0.0
           def persist_delayed(docs, inserts)
             unless docs.empty?
               collection.insert_many(inserts, session: _session)
@@ -481,8 +448,6 @@ module Mongoid
           #   relation.persistable?
           #
           # @return [ true, false ] If the association is persistable.
-          #
-          # @since 2.1.0
           def persistable?
             !_binding? && (_creating? || _base.persisted? && !_building?)
           end
@@ -500,8 +465,6 @@ module Mongoid
           # @param [ Symbol ] method The deletion method to call.
           #
           # @return [ Integer ] The number of documents deleted.
-          #
-          # @since 2.1.0
           def remove_all(conditions = nil, method = :delete_all)
             selector = conditions || {}
             removed = klass.send(method, selector.merge!(criteria.selector))
@@ -520,8 +483,6 @@ module Mongoid
           #   proxy.remove_not_in([ id ])
           #
           # @param [ Array<Object> ] ids The ids.
-          #
-          # @since 2.4.0
           def remove_not_in(ids)
             removed = criteria.not_in(_id: ids)
             if _association.destructive?
@@ -550,8 +511,6 @@ module Mongoid
           #
           # @param [ Document ] doc The document.
           # @param [ Array<Document> ] inserts The inserts.
-          #
-          # @since 3.0.0
           def save_or_delay(doc, docs, inserts)
             if doc.new_record? && doc.valid?(:create)
               doc.run_before_callbacks(:save, :create)
@@ -575,8 +534,6 @@ module Mongoid
             #   Referenced::Many.embedded?
             #
             # @return [ false ] Always false.
-            #
-            # @since 2.0.0.rc.1
             def embedded?
               false
             end

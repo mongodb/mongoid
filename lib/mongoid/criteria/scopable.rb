@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -11,8 +10,6 @@ module Mongoid
       #   criteria.apply_default_scope
       #
       # @return [ Criteria ] The criteria.
-      #
-      # @since 3.0.0
       def apply_default_scope
         klass.without_default_scope do
           merge!(klass.default_scoping.call)
@@ -29,8 +26,6 @@ module Mongoid
       # @param [ Criteria ] other The other criteria.
       #
       # @return [ Criteria ] The criteria with scoping removed.
-      #
-      # @since 3.0.0
       def remove_scoping(other)
         if other
           reject_matching(other, :selector, :options)
@@ -49,8 +44,6 @@ module Mongoid
       # @param [ Hash ] options Additional query options.
       #
       # @return [ Criteria ] The scoped criteria.
-      #
-      # @since 3.0.0
       def scoped(options = nil)
         crit = clone
         crit.options.merge!(options || {})
@@ -66,8 +59,6 @@ module Mongoid
       #   criteria.scoped?
       #
       # @return [ true, false ] If the default scope is applied.
-      #
-      # @since 3.0.0
       def scoped?
         !!(defined?(@scoped) ? @scoped : nil)
       end
@@ -78,8 +69,6 @@ module Mongoid
       #   criteria.unscoped
       #
       # @return [ Criteria ] The unscoped criteria.
-      #
-      # @since 3.0.0
       def unscoped
         crit = clone
         unless unscoped?
@@ -95,8 +84,6 @@ module Mongoid
       #   criteria.unscoped?
       #
       # @return [ true, false ] If the criteria is force unscoped.
-      #
-      # @since 3.0.0
       def unscoped?
         !!(defined?(@unscoped) ? @unscoped : nil)
       end
@@ -107,8 +94,6 @@ module Mongoid
       #   criteria.scoping_options
       #
       # @return [ Array ] Scoped, unscoped.
-      #
-      # @since 3.0.0
       def scoping_options
         [ (defined?(@scoped) ? @scoped : nil), (defined?(@unscoped) ? @unscoped : nil) ]
       end
@@ -121,8 +106,6 @@ module Mongoid
       # @param [ Array ] options Scoped, unscoped.
       #
       # @return [ Array ] The new scoping options.
-      #
-      # @since 3.0.0
       def scoping_options=(options)
         @scoped, @unscoped = options
       end
@@ -136,8 +119,6 @@ module Mongoid
       #   criteria.with_default_scope
       #
       # @return [ Criteria ] The criteria.
-      #
-      # @since 3.0.0
       def with_default_scope
         crit = clone
         if klass.default_scopable? && !unscoped? && !scoped?

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -15,8 +14,6 @@ module Mongoid
           #   1...3.__array__
           #
           # @return [ Array ] The range as an array.
-          #
-          # @since 1.0.0
           def __array__
             to_a
           end
@@ -27,8 +24,6 @@ module Mongoid
           #   (11231312..213123131).__evolve_date__
           #
           # @return [ Hash ] The $gte/$lte range query with times at UTC midnight.
-          #
-          # @since 1.0.0
           def __evolve_date__
             __evolve_range_naive__.transform_values! {|v| v&.__evolve_date__ }
           end
@@ -39,8 +34,6 @@ module Mongoid
           #   (11231312..213123131).__evolve_date__
           #
           # @return [ Hash ] The $gte/$lte range query with times in UTC.
-          #
-          # @since 1.0.0
           def __evolve_time__
             __evolve_range_naive__.transform_values! {|v| v&.__evolve_time__ }
           end
@@ -82,8 +75,6 @@ module Mongoid
             # @param [ Range ] object The range to evolve.
             #
             # @return [ Hash ] The range as a gte/lte criteria.
-            #
-            # @since 1.0.0
             def evolve(object)
               return object unless object.is_a?(::Range)
               object.__evolve_range__
