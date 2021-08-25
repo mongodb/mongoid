@@ -30,7 +30,7 @@ module Mongoid
             :foreign_key,
             :order,
             :primary_key,
-            :scope
+            :scope,
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -179,9 +179,7 @@ module Mongoid
 
         # Get the scope to be applied when querying the association.
         #
-        # @return [ Proc, Symbol ] The association scope.
-        #
-        # @since 7.4
+        # @return [ Proc | Symbol | nil ] The association scope, if any.
         def scope
           @options[:scope]
         end

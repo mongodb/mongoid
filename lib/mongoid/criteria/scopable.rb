@@ -17,19 +17,28 @@ module Mongoid
         self.scoping_options = true, false
       end
 
-      # Applies a scope to the criteria
+      # Applies a scope to the current criteria.
       #
-      # @param [ Proc, Symbol ] scope The scope to apply.
+      # This method does not modify the receiver but it may return a new
+      # object or the receiver depending on the argument: if the +scope+
+      # argument is nil, the receiver is returned without modification,
+      # otherwise a new criteria object is returned.
       #
-      # @return [ Criteria ] The criteria with scoping removed.
+      # @param [ Proc | Symbol | Criteria | nil ] scope The scope to apply.
       #
-      # @since 7.4.0
+      # @return [ Criteria ] The criteria with the scope applied.
+      #
+      # @api private
       def apply_scope(scope)
         case scope
-        when Proc then instance_exec(&scope)
-        when Symbol then send(scope)
-        when Criteria then merge(scope)
-        else self
+        when Proc
+          instance_exec(&scope)
+        when Symbol
+          send(scope)
+        when Criteria
+          merge(scope)
+        else
+          self
         end
       end
 
