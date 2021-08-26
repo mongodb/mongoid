@@ -38,7 +38,9 @@ describe Mongoid::QueryCache do
       it 'does not log a deprecation warning' do
         reset_legacy_qc_warning
 
-        expect_any_instance_of(Logger).to_not receive(:warn)
+        expect_any_instance_of(Logger).to_not receive(:warn).with(
+          described_class::LEGACY_WARNING
+        )
         described_class.cache { }
       end
 
