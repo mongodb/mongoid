@@ -24,9 +24,26 @@ describe Mongoid::QueryCache do
     SessionRegistry.instance.verify_sessions_ended!
   end
 
+  let(:reset_legacy_qc_warning) do
+    begin
+      Mongoid::QueryCache.remove_instance_variable('@legacy_query_cache_warned')
+    rescue NameError
+      # raised if the instance variable wasn't set
+    end
+  end
+
   describe '#cache' do
     context 'with driver query cache' do
       min_driver_version '2.14'
+
+      it 'does not log a deprecation warning' do
+        reset_legacy_qc_warning
+
+        expect_any_instance_of(Logger).to_not receive(:warn).with(
+          described_class::LEGACY_WARNING
+        )
+        described_class.cache { }
+      end
 
       context 'when query cache is not enabled' do
         before do
@@ -179,6 +196,13 @@ describe Mongoid::QueryCache do
 
     context 'with mongoid query cache' do
       max_driver_version '2.13'
+
+      it 'logs a deprecation warning' do
+        reset_legacy_qc_warning
+
+        expect_any_instance_of(Logger).to receive(:warn).with(described_class::LEGACY_WARNING)
+        described_class.cache { }
+      end
 
       context 'when query cache is not enabled' do
         before do
