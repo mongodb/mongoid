@@ -38,7 +38,7 @@ module Mongoid
             raise ArgumentError, "Field must be a string: #{field}"
           end
 
-          if field[0] == ?$
+          if field.start_with?('$')
             raise ArgumentError, "Field cannot be an operator (i.e. begin with $): #{field}"
           end
 
@@ -48,7 +48,7 @@ module Mongoid
             if value.is_a?(Hash) && selector[field].is_a?(Hash) &&
               value.keys.all? { |key|
                 key_s = key.to_s
-                key_s[0] == ?$ && !selector[field].key?(key_s)
+                key_s.start_with?('$') && !selector[field].key?(key_s)
               }
             then
               # Multiple operators can be combined on the same field by
@@ -185,7 +185,7 @@ module Mongoid
             raise ArgumentError, "Operator must be a string: #{operator}"
           end
 
-          unless operator[0] == ?$
+          unless operator.start_with?('$')
             raise ArgumentError, "Operator must begin with $: #{operator}"
           end
 
@@ -220,7 +220,7 @@ module Mongoid
             raise ArgumentError, "Field must be a string: #{field}"
           end
 
-          if field[0] == ?$
+          if field.start_with?('$')
             add_operator_expression(field, value)
           else
             add_field_expression(field, value)
