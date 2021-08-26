@@ -597,7 +597,7 @@ module Mongoid
               end
               _mongoid_expand_keys(new_s).each do |k, v|
                 k = k.to_s
-                if c.selector[k] || k[0] == ?$
+                if c.selector[k] || k.start_with?('$')
                   c = c.send(:__multi__, [{'$nor' => [{k => v}]}], '$and')
                 else
                   if v.is_a?(Hash)
@@ -889,7 +889,7 @@ module Mongoid
             end
             criterion.each do |field, value|
               field_s = field.to_s
-              if field_s[0] == ?$
+              if field_s.start_with?('$')
                 # Query expression-level operator, like $and or $where
                 query.add_operator_expression(field_s, value)
               else
