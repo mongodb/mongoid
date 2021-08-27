@@ -210,7 +210,9 @@ module Mongoid
       #   context that was set before this context was used.
       def clear(object, cluster = nil, original_context = nil)
         if context = get(object)
-          context.client.close unless (context.cluster.equal?(cluster) || cluster.nil?)
+          unless cluster.nil? || context.cluster.equal?(cluster)
+            context.client.close
+          end
         end
       ensure
         Thread.current["[mongoid][#{object.object_id}]:context"] = original_context

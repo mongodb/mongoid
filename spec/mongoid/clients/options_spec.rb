@@ -82,9 +82,11 @@ describe Mongoid::Clients::Options, retry: 3 do
 
         let!(:connections_and_cluster_during) do
           connections = nil
-          cluster = Minim.with(options) do |klass|
+          cluster = nil
+          Minim.with(options) do |klass|
             klass.where(name: 'emily').to_a
             connections = Minim.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+            cluster = Minim.collection.cluster
           end
           [ connections, cluster ]
         end
@@ -123,9 +125,10 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           it 'disconnects the new cluster when the block exits' do
-            skip 'https://jira.mongodb.org/browse/MONGOID-5130'
+            expect(cluster_after).not_to be(cluster_during)
 
-            expect(connections_before).to eq(connections_after)
+            cluster_during.connected?.should be false
+            cluster_before.connected?.should be true
           end
         end
 
@@ -139,13 +142,14 @@ describe Mongoid::Clients::Options, retry: 3 do
 
           it 'does not create a new cluster' do
             expect(connections_during).to eq(connections_before)
+
+            cluster_during.should be cluster_before
           end
 
           it 'does not disconnect the original cluster' do
-            skip 'https://jira.mongodb.org/browse/MONGOID-5130'
-
-            expect(connections_after).to eq(connections_before)
             expect(cluster_before).to be(cluster_after)
+
+            cluster_before.connected?.should be true
           end
         end
 
