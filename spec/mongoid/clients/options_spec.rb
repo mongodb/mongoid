@@ -82,9 +82,11 @@ describe Mongoid::Clients::Options, retry: 3 do
 
         let!(:connections_and_cluster_during) do
           connections = nil
-          cluster = Minim.with(options) do |klass|
+          cluster = nil
+          Minim.with(options) do |klass|
             klass.where(name: 'emily').to_a
             connections = Minim.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+            cluster = Minim.collection.cluster
           end
           [ connections, cluster ]
         end
@@ -124,6 +126,8 @@ describe Mongoid::Clients::Options, retry: 3 do
 
           it 'disconnects the new cluster when the block exits' do
             expect(cluster_after).not_to be(cluster_during)
+
+            cluster_during.connected?.should be false
           end
         end
 
