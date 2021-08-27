@@ -385,11 +385,35 @@ module Mongoid
       updates = atomic_updates
       return {} unless atomic_updates.key?("$set")
       touches = {}
+      wanted_keys = %w(updated_at u_at)
+      # TODO this permits field to be passed as an empty string in which case
+      # it is ignored, get rid of this behavior.
+      if field.present?
+        wanted_keys << field.to_s
+      end
       updates["$set"].each_pair do |key, value|
-        key_regex = /updated_at|u_at#{"|" + field if field.present?}/
-        touches.merge!({ key => value }) if key =~ key_regex
+        if wanted_keys.include?(key.split('.').last)
+          touches.update(key => value)
+        end
       end
       { "$set" => touches }
+    end
+
+    # Returns the $set atomic updates affecting the specified field.
+    #
+    # @param [ String ] field The field name.
+    #
+    # @api private
+    def set_field_atomic_updates(field)
+      updates = atomic_updates
+      return {} unless atomic_updates.key?("$set")
+      sets = {}
+      updates["$set"].each_pair do |key, value|
+        if key.split('.').last == field
+          sets.update(key => value)
+        end
+      end
+      { "$set" => sets }
     end
   end
 end
