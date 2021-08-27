@@ -102,5 +102,5 @@ behaves the same in Mongoid 7.4 as it did in Mongoid 7.3. However, if
 this implementation is changed in a future version of ``bson-ruby``
 which is `under consideration <https://jira.mongodb.org/browse/MONGOID-5158>`_,
 Mongoid 7.4 and later will inherit the new implementation provided by
-``bson-ruby`` while Mongoid 7.4 and earlier will continue with the
+``bson-ruby`` while Mongoid 7.3 and earlier will continue with the
 implementation returning a hash of ``{"$oid" => "..."}``.
