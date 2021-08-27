@@ -31,7 +31,7 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.14-2.10
+     - Driver 2.15-2.10
      - Driver 2.9-2.7
 
    * - 7.3
