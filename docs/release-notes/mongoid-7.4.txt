@@ -95,3 +95,19 @@ and matches the core Ruby behavior:
   
   Band === cover_band
   # => true
+
+
+``BSON::ObjectId#as_json`` Implementation Removed
+-------------------------------------------------
+
+Mongoid in versions up to 7.3 used to provide a ``BSON::ObjectId#as_json``
+implementation that was identical to the one provided by ``bson-ruby``.
+Mongoid 7.4 removes its copy of this implementation.
+
+This change has no immediate impact on applications - ``BSON::ObjectId#as_json``
+behaves the same in Mongoid 7.4 as it did in Mongoid 7.3. However, if
+this implementation is changed in a future version of ``bson-ruby``
+which is `under consideration <https://jira.mongodb.org/browse/MONGOID-5158>`_,
+Mongoid 7.4 and later will inherit the new implementation provided by
+``bson-ruby`` while Mongoid 7.3 and earlier will continue with the
+implementation returning a hash of ``{"$oid" => "..."}``.
