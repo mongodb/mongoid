@@ -131,6 +131,24 @@ describe Mongoid::Touchable do
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
         include_examples 'updates the parent when :touch is not set'
+
+        context 'when also updating an additional field' do
+          it 'persists the update to the additional field' do
+            entrance
+            update_time
+            entrance.touch(:last_used_at)
+
+            entrance.reload
+            building.reload
+
+            # This is the assertion we want.
+            entrance.last_used_at.should == update_time
+
+            # Check other timestamps for good measure.
+            entrance.updated_at.should == update_time
+            building.updated_at.should == update_time
+          end
+        end
       end
 
       context "when the document is referenced" do

@@ -15,6 +15,8 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       embedded_in :building
+
+      field :last_used_at, type: Time
     end
 
     class Floor
