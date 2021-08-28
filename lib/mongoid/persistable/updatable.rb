@@ -17,7 +17,7 @@ module Mongoid
       # @param [ Object ] value The new value of the attribute.a
       #
       # @raise [ Errors::ReadonlyAttribute ] If the field cannot be changed due
-      #   to being flagged as readonly.
+      #   to being flagged as read-only.
       #
       # @return [ true, false ] True if save was successful, false if not.
       def update_attribute(name, value)

@@ -129,7 +129,7 @@ module Mongoid
           #
           # @param [ Hash ] conditions Optional conditions to destroy with.
           #
-          # @return [ Integer ] The number of documents destroydd.
+          # @return [ Integer ] The number of documents destroyed.
           def destroy_all(conditions = nil)
             remove_all(conditions, :destroy_all)
           end
