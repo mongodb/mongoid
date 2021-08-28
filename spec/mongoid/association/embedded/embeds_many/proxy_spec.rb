@@ -1404,7 +1404,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     it "block form iterates across all documents" do
       expect(person.addresses.count {|a| a.persisted? }).to eq(1)
       expect(person.addresses.count {|a| !a.persisted? }).to eq(2)
-      expect(person.addresses.count {|a| a.street.include?('o') }).to eq(2)
+      expect(person.addresses.count {|a| a.street.include?('on') }).to eq(1)
       expect(person.addresses.count {|a| a.street.ends_with?('er') }).to eq(2)
     end
 
