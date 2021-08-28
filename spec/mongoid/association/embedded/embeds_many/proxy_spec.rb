@@ -1401,16 +1401,23 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       expect(person.addresses.count).to eq(1)
     end
 
-    it "block form iterates across all documents" do
-      expect(person.addresses.count {|a| a.persisted? }).to eq(1)
-      expect(person.addresses.count {|a| !a.persisted? }).to eq(2)
-      expect(person.addresses.count {|a| a.street.include?('on') }).to eq(1)
-      expect(person.addresses.count {|a| a.street.ends_with?('er') }).to eq(2)
+    context 'block form' do
+      it "iterates across all documents" do
+        expect(person.addresses.count {|a| a.persisted? }).to eq(1)
+        expect(person.addresses.count {|a| !a.persisted? }).to eq(2)
+        expect(person.addresses.count {|a| a.street.include?('on') }).to eq(1)
+        expect(person.addresses.count {|a| a.street.ends_with?('er') }).to eq(2)
+      end
     end
 
-    it "argument form is supported" do
-      expect(person.addresses.count(person.addresses.first)).to eq(1)
-      expect(person.addresses.count(1)).to eq(0)
+    context 'argument form' do
+      it "behaves correctly when given a model instance" do
+        expect(person.addresses.count(person.addresses.first)).to eq(1)
+      end
+
+      it "behaves correctly when given a non-model instance" do
+        expect(person.addresses.count(1)).to eq(0)
+      end
     end
   end
 
@@ -1437,9 +1444,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.any?(person.addresses.first)).to be true
-          expect(person.addresses.any?(1)).to be false
+        context 'argument form' do
+          it "behaves correctly when given a model instance" do
+            expect(person.addresses.any?(person.addresses.first)).to be true
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.any?(1)).to be false
+          end
         end
       end
     end
@@ -1461,9 +1473,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.any?(person.addresses.first)).to be true
-          expect(person.addresses.any?(1)).to be false
+        context 'argument form' do
+          it "behaves correctly when given a model instance" do
+            expect(person.addresses.any?(person.addresses.first)).to be true
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.any?(1)).to be false
+          end
         end
       end
     end
@@ -1510,9 +1527,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.all?(person.addresses.first)).to be true
-          expect(person.addresses.all?(1)).to be false
+        context 'argument form' do
+          it "behaves correctly when given a model instance" do
+            expect(person.addresses.all?(person.addresses.first)).to be true
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.all?(1)).to be false
+          end
         end
       end
     end
@@ -1534,9 +1556,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.all?(person.addresses.first)).to be true
-          expect(person.addresses.all?(1)).to be false
+        context 'argument form' do
+          it "behaves correctly when given a model instance" do
+            expect(person.addresses.all?(person.addresses.first)).to be true
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.all?(1)).to be false
+          end
         end
       end
     end
@@ -1553,9 +1580,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.all?(nil)).to be true
-          expect(person.addresses.all?(1)).to be true
+        context 'argument form' do
+          it "behaves correctly when given nil" do
+            expect(person.addresses.all?(nil)).to be true
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.all?(1)).to be true
+          end
         end
       end
     end
@@ -1584,9 +1616,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.none?(person.addresses.first)).to be false
-          expect(person.addresses.none?(1)).to be true
+        context 'argument form' do
+          it "behaves correctly when given a model instance" do
+            expect(person.addresses.none?(person.addresses.first)).to be false
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.none?(1)).to be true
+          end
         end
       end
     end
@@ -1608,9 +1645,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.none?(person.addresses.first)).to be false
-          expect(person.addresses.none?(1)).to be true
+        context 'argument form' do
+          it "behaves correctly when given a model instance" do
+            expect(person.addresses.none?(person.addresses.first)).to be false
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.none?(1)).to be true
+          end
         end
       end
     end
@@ -1627,9 +1669,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context 'ruby version >= 2.5' do
         ruby_version_gte '2.5'
 
-        it "argument form is supported" do
-          expect(person.addresses.none?(nil)).to be true
-          expect(person.addresses.none?(1)).to be true
+        context 'argument form' do
+          it "behaves correctly when given nil" do
+            expect(person.addresses.none?(nil)).to be true
+          end
+
+          it "behaves correctly when given a non-model instance" do
+            expect(person.addresses.none?(1)).to be true
+          end
         end
       end
     end
