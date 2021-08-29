@@ -1215,7 +1215,7 @@ an empty result:
 
   Person.where('www.mongodb.com' => 'favorite_website').to_a
   #=> []
-  # queries for `www: { mongodb: { com: 'favorite_website' } }`
+  # queries for a nested document such as `www: { mongodb: { com: 'favorite_website' } }`
 
 Lastly, please note that method names containing ``$`` or ``.``
 are `not permitted in Ruby language
