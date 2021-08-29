@@ -1218,5 +1218,5 @@ an empty result:
   # queries for a nested document such as `www: { mongodb: { com: 'favorite_website' } }`
 
 Lastly, please note that method names containing ``$`` or ``.``
-are `not permitted in Ruby language
+`are not standard syntax in Ruby language
 <https://docs.ruby-lang.org/en/3.0.0/doc/syntax/methods_rdoc.html>`_.
