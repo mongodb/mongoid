@@ -340,7 +340,7 @@ describe Mongoid::Serializable do
 
       context "when only two attributes are loaded" do
         before do
-          person.save
+          person.save!
         end
 
         let(:from_db) do
@@ -407,7 +407,7 @@ describe Mongoid::Serializable do
       context "when the model is saved before the relation is added" do
 
         before do
-          person.save
+          person.save!
         end
 
         context "when a model has an embeds many" do
@@ -417,7 +417,7 @@ describe Mongoid::Serializable do
           end
 
           before do
-            person.save
+            person.save!
           end
 
           it "includes the relation" do
@@ -431,7 +431,7 @@ describe Mongoid::Serializable do
           end
 
           before do
-            person.save
+            person.save!
           end
 
           it "includes the relation" do
@@ -449,7 +449,7 @@ describe Mongoid::Serializable do
           end
 
           before do
-            person.save
+            person.save!
           end
 
           it "includes the relation" do
@@ -463,7 +463,7 @@ describe Mongoid::Serializable do
           end
 
           before do
-            person.save
+            person.save!
           end
 
           it "includes the relation" do
@@ -503,7 +503,7 @@ describe Mongoid::Serializable do
           context "when the ids were not loaded" do
 
             before do
-              person.save
+              person.save!
             end
 
             let(:from_db) do
@@ -611,7 +611,7 @@ describe Mongoid::Serializable do
                 end
 
                 before do
-                  person.save
+                  person.save!
                 end
 
                 it "includes the specific ralations" do

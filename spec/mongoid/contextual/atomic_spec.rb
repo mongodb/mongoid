@@ -7,15 +7,15 @@ describe Mongoid::Contextual::Atomic do
   describe "#add_to_set" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave" ])
+      Band.create!(members: [ "Dave" ])
     end
 
     let!(:new_order) do
-      Band.create(members: [ "Peter" ])
+      Band.create!(members: [ "Peter" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     context "when the criteria has no sorting" do
@@ -104,15 +104,15 @@ describe Mongoid::Contextual::Atomic do
   describe "#add_each_to_set" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave" ])
+      Band.create!(members: [ "Dave" ])
     end
 
     let!(:new_order) do
-      Band.create(members: [ "Peter" ])
+      Band.create!(members: [ "Peter" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     context "when the criteria has no sorting" do
@@ -201,7 +201,7 @@ describe Mongoid::Contextual::Atomic do
   describe "#bit" do
 
     let!(:depeche_mode) do
-      Band.create(likes: 60)
+      Band.create!(likes: 60)
     end
 
     let(:criteria) do
@@ -249,7 +249,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ], likes: 60)
+        Band.create!(members: [ "Dave" ], likes: 60)
       end
 
       let(:criteria) do
@@ -273,15 +273,15 @@ describe Mongoid::Contextual::Atomic do
   describe "#inc" do
 
     let!(:depeche_mode) do
-      Band.create(likes: 60)
+      Band.create!(likes: 60)
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let!(:beatles) do
-      Band.create(years: 2)
+      Band.create!(years: 2)
     end
 
     let(:criteria) do
@@ -329,7 +329,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let(:criteria) do
@@ -353,11 +353,11 @@ describe Mongoid::Contextual::Atomic do
   describe "#pop" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave", "Martin" ])
+      Band.create!(members: [ "Dave", "Martin" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let(:criteria) do
@@ -402,7 +402,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let(:criteria) do
@@ -426,11 +426,11 @@ describe Mongoid::Contextual::Atomic do
   describe "#pull" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave", "Alan" ])
+      Band.create!(members: [ "Dave", "Alan" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let(:criteria) do
@@ -457,7 +457,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let(:criteria) do
@@ -483,11 +483,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave", "Alan", "Fletch" ])
+        Band.create!(members: [ "Dave", "Alan", "Fletch" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -515,7 +515,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave", "Alan", "Fletch" ])
+        Band.create!(members: [ "Dave", "Alan", "Fletch" ])
       end
 
       let(:criteria) do
@@ -541,11 +541,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -573,11 +573,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -607,11 +607,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -639,11 +639,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -669,11 +669,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -701,11 +701,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -733,11 +733,11 @@ describe Mongoid::Contextual::Atomic do
   describe "#set" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let(:criteria) do
@@ -779,11 +779,11 @@ describe Mongoid::Contextual::Atomic do
     context "when unsetting a single field" do
 
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode", years: 10)
+        Band.create!(name: "Depeche Mode", years: 10)
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order", years: 10)
+        Band.create!(name: "New Order", years: 10)
       end
 
       let(:criteria) do
@@ -829,7 +829,7 @@ describe Mongoid::Contextual::Atomic do
     context "when unsetting multiple fields" do
 
       let!(:new_order) do
-        Band.create(name: "New Order", genres: %w[electro dub], years: 10,
+        Band.create!(name: "New Order", genres: %w[electro dub], years: 10,
           likes: 200, rating: 4.3, origin: 'Space')
       end
 
@@ -911,11 +911,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode", years: 10)
+        Band.create!(name: "Depeche Mode", years: 10)
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order", years: 10)
+        Band.create!(name: "New Order", years: 10)
       end
 
       let(:criteria) do

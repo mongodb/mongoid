@@ -22,7 +22,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
           before do
             Dictionary.with(collection: "dicts") do |klass|
-              klass.create(name: "websters")
+              klass.create!(name: "websters")
             end
           end
 
@@ -80,7 +80,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute id is unique" do
 
             let(:dictionary) do
-              Dictionary.create
+              Dictionary.create!
             end
 
             let(:word) do
@@ -172,7 +172,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                 context "when a document with no value exists in the database" do
 
                   before do
-                    Dictionary.create
+                    Dictionary.create!
                   end
 
                   let(:dictionary) do
@@ -190,7 +190,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                 context "when single localization" do
 
                   before do
-                    Dictionary.create(description: "english")
+                    Dictionary.create!(description: "english")
                   end
 
                   let(:dictionary) do
@@ -226,7 +226,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                   context "when single localization" do
 
                     before do
-                      Dictionary.create(description: "english")
+                      Dictionary.create!(description: "english")
                     end
 
                     let(:dictionary) do
@@ -282,7 +282,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                 context "when there are no special characters" do
 
                   before do
-                    Dictionary.create(description: "english")
+                    Dictionary.create!(description: "english")
                   end
 
                   let(:dictionary) do
@@ -297,7 +297,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                 context "when special characters exist" do
 
                   before do
-                    Dictionary.create(description: "english")
+                    Dictionary.create!(description: "english")
                   end
 
                   let(:dictionary) do
@@ -317,7 +317,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                   context "when signle localization" do
 
                     before do
-                      Dictionary.create(description: "english")
+                      Dictionary.create!(description: "english")
                     end
 
                     let(:dictionary) do
@@ -359,7 +359,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                 context "when the document is the match in the database" do
 
                   let!(:dictionary) do
-                    Dictionary.create(description: "english")
+                    Dictionary.create!(description: "english")
                   end
 
                   it "returns true" do
@@ -419,7 +419,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             let!(:oxford) do
-              Dictionary.create(name: "Oxford")
+              Dictionary.create!(name: "Oxford")
             end
 
             let(:dictionary) do
@@ -447,7 +447,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               let!(:dictionary) do
@@ -469,7 +469,7 @@ describe Mongoid::Validatable::UniquenessValidator do
               context "when the field has changed" do
 
                 let!(:dictionary) do
-                  Dictionary.create(name: "Oxford")
+                  Dictionary.create!(name: "Oxford")
                 end
 
                 it "returns true" do
@@ -521,7 +521,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the attribute is not unique" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               let(:dictionary) do
@@ -548,7 +548,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             before do
-              Dictionary.create(name: "Oxford", language: "English")
+              Dictionary.create!(name: "Oxford", language: "English")
             end
 
             let(:dictionary) do
@@ -563,7 +563,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique in the scope" do
 
             before do
-              Dictionary.create(name: "Oxford", language: "English")
+              Dictionary.create!(name: "Oxford", language: "English")
             end
 
             let(:dictionary) do
@@ -578,7 +578,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique with no scope" do
 
             before do
-              Dictionary.create(name: "Oxford", language: "English")
+              Dictionary.create!(name: "Oxford", language: "English")
             end
 
             let(:dictionary) do
@@ -593,7 +593,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique in another scope" do
 
             before do
-              Dictionary.create(name: "Oxford", language: "English")
+              Dictionary.create!(name: "Oxford", language: "English")
             end
 
             let(:dictionary) do
@@ -610,7 +610,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Dictionary.create(name: "Oxford", language: "English")
+                Dictionary.create!(name: "Oxford", language: "English")
               end
 
               let(:dictionary) do
@@ -630,7 +630,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:dictionary) do
-                Dictionary.create(name: "Oxford", language: "English")
+                Dictionary.create!(name: "Oxford", language: "English")
               end
 
               it "returns true" do
@@ -653,7 +653,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             before do
-              Dictionary.create(name: "Oxford", publisher: "Amazon")
+              Dictionary.create!(name: "Oxford", publisher: "Amazon")
             end
 
             let(:dictionary) do
@@ -668,7 +668,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique in the scope" do
 
             before do
-              Dictionary.create(name: "Oxford", publisher: "Amazon")
+              Dictionary.create!(name: "Oxford", publisher: "Amazon")
             end
 
             let(:dictionary) do
@@ -708,7 +708,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique with no scope" do
 
             before do
-              Dictionary.create(name: "Oxford", publisher: "Amazon")
+              Dictionary.create!(name: "Oxford", publisher: "Amazon")
             end
 
             let(:dictionary) do
@@ -723,7 +723,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique in another scope" do
 
             before do
-              Dictionary.create(name: "Oxford", publisher: "Amazon")
+              Dictionary.create!(name: "Oxford", publisher: "Amazon")
             end
 
             let(:dictionary) do
@@ -740,7 +740,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Dictionary.create(name: "Oxford", publisher: "Amazon")
+                Dictionary.create!(name: "Oxford", publisher: "Amazon")
               end
 
               let(:dictionary) do
@@ -760,7 +760,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:dictionary) do
-                Dictionary.create(name: "Oxford", publisher: "Amazon")
+                Dictionary.create!(name: "Oxford", publisher: "Amazon")
               end
 
               it "returns true" do
@@ -771,7 +771,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when one of the scopes is a time" do
 
               before do
-                Dictionary.create(
+                Dictionary.create!(
                   name: "Oxford",
                   publisher: "Amazon",
                   published: 10.days.ago.to_time
@@ -855,7 +855,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             before do
-              Dictionary.create(name: "Oxford", publisher: "Amazon")
+              Dictionary.create!(name: "Oxford", publisher: "Amazon")
             end
 
             let(:dictionary) do
@@ -870,7 +870,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique in the scope" do
 
             before do
-              Dictionary.create(
+              Dictionary.create!(
                 name: "Oxford",
                 publisher: "Amazon",
                 year: 2011
@@ -893,7 +893,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique with no scope" do
 
             before do
-              Dictionary.create(name: "Oxford", publisher: "Amazon")
+              Dictionary.create!(name: "Oxford", publisher: "Amazon")
             end
 
             let(:dictionary) do
@@ -908,7 +908,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique in another scope" do
 
             before do
-              Dictionary.create(
+              Dictionary.create!(
                 name: "Oxford",
                 publisher: "Amazon",
                 year: 1995
@@ -933,7 +933,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Dictionary.create(
+                Dictionary.create!(
                   name: "Oxford",
                   publisher: "Amazon",
                   year: 1960
@@ -961,7 +961,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:dictionary) do
-                Dictionary.create(
+                Dictionary.create!(
                   name: "Oxford",
                   publisher: "Amazon",
                   year: 1960
@@ -988,7 +988,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             before do
-              Dictionary.create(name: "Oxford")
+              Dictionary.create!(name: "Oxford")
             end
 
             let(:dictionary) do
@@ -1005,7 +1005,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               let(:dictionary) do
@@ -1025,7 +1025,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:dictionary) do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               it "returns true" do
@@ -1050,7 +1050,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when there are no special characters" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               let(:dictionary) do
@@ -1065,7 +1065,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when special characters exist" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               let(:dictionary) do
@@ -1083,7 +1083,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               let(:dictionary) do
@@ -1103,7 +1103,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:dictionary) do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create!(name: "Oxford")
               end
 
               it "returns true" do
@@ -1133,7 +1133,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is nil" do
 
             before do
-              Dictionary.create
+              Dictionary.create!
             end
 
             let(:dictionary) do
@@ -1159,7 +1159,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is blank" do
 
             before do
-              Dictionary.create(name: "")
+              Dictionary.create!(name: "")
             end
 
             let(:dictionary) do
@@ -1188,7 +1188,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             before do
-              Login.create(username: "Oxford")
+              Login.create!(username: "Oxford")
             end
 
             let(:login) do
@@ -1205,7 +1205,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               let(:login) do
@@ -1225,7 +1225,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:login) do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               it "returns true" do
@@ -1248,7 +1248,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             before do
-              Login.create(username: "Oxford", application_id: 1)
+              Login.create!(username: "Oxford", application_id: 1)
             end
 
             let(:login) do
@@ -1263,7 +1263,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique in the scope" do
 
             before do
-              Login.create(username: "Oxford", application_id: 1)
+              Login.create!(username: "Oxford", application_id: 1)
             end
 
             let(:login) do
@@ -1278,7 +1278,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique with no scope" do
 
             before do
-              Login.create(username: "Oxford", application_id: 1)
+              Login.create!(username: "Oxford", application_id: 1)
             end
 
             let(:login) do
@@ -1293,7 +1293,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is not unique in another scope" do
 
             before do
-              Login.create(username: "Oxford", application_id: 1)
+              Login.create!(username: "Oxford", application_id: 1)
             end
 
             let(:login) do
@@ -1310,7 +1310,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Login.create(username: "Oxford", application_id: 1)
+                Login.create!(username: "Oxford", application_id: 1)
               end
 
               let(:login) do
@@ -1330,7 +1330,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:login) do
-                Login.create(username: "Oxford", application_id: 1)
+                Login.create!(username: "Oxford", application_id: 1)
               end
 
               it "returns true" do
@@ -1353,7 +1353,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is unique" do
 
             before do
-              Login.create(username: "Oxford")
+              Login.create!(username: "Oxford")
             end
 
             let(:login) do
@@ -1370,7 +1370,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               let(:login) do
@@ -1390,7 +1390,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:login) do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               it "returns true" do
@@ -1415,7 +1415,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when there are no special characters" do
 
               before do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               let(:login) do
@@ -1430,7 +1430,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when special characters exist" do
 
               before do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               let(:login) do
@@ -1448,7 +1448,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               let(:login) do
@@ -1468,7 +1468,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             context "when the document is the match in the database" do
 
               let!(:login) do
-                Login.create(username: "Oxford")
+                Login.create!(username: "Oxford")
               end
 
               it "returns true" do
@@ -1491,7 +1491,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is nil" do
 
             before do
-              Login.create
+              Login.create!
             end
 
             let(:login) do
@@ -1517,7 +1517,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the attribute is blank" do
 
             before do
-              Login.create(username: "")
+              Login.create!(username: "")
             end
 
             let(:login) do
@@ -1544,7 +1544,7 @@ describe Mongoid::Validatable::UniquenessValidator do
         context "when the attribute is unique" do
 
           before do
-            Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+            Bar.create!(lat_lng: LatLng.new(52.30, 13.25))
           end
 
           let(:unique_bar) do
@@ -1560,7 +1560,7 @@ describe Mongoid::Validatable::UniquenessValidator do
         context "when the attribute is not unique" do
 
           before do
-            Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+            Bar.create!(lat_lng: LatLng.new(52.30, 13.25))
           end
 
           let(:non_unique_bar) do
@@ -1587,7 +1587,7 @@ describe Mongoid::Validatable::UniquenessValidator do
         context "when the attribute is unique" do
 
           before do
-            Band.create(name: 'Foo', active: false)
+            Band.create!(name: 'Foo', active: false)
           end
 
           let(:unique_band) do
@@ -1603,7 +1603,7 @@ describe Mongoid::Validatable::UniquenessValidator do
         context "when the attribute is not unique" do
 
           before do
-            Band.create(name: 'Foo')
+            Band.create!(name: 'Foo')
           end
 
           let(:non_unique_band) do
@@ -1621,17 +1621,17 @@ describe Mongoid::Validatable::UniquenessValidator do
   context "when the document is embedded" do
 
     let(:word) do
-      Word.create(name: "Schadenfreude")
+      Word.create!(name: "Schadenfreude")
     end
 
     context "when in an embeds_many" do
 
       let!(:def_one) do
-        word.definitions.create(description: "1")
+        word.definitions.create!(description: "1")
       end
 
       let!(:def_two) do
-        word.definitions.create(description: "2")
+        word.definitions.create!(description: "2")
       end
 
       context "when a document is being destroyed" do
@@ -2458,7 +2458,7 @@ describe Mongoid::Validatable::UniquenessValidator do
     end
 
     let!(:person) do
-      Person.create(ssn: "132-11-1111", username: "aaasdaffff")
+      Person.create!(ssn: "132-11-1111", username: "aaasdaffff")
     end
 
     after do

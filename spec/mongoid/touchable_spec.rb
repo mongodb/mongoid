@@ -170,7 +170,7 @@ describe Mongoid::Touchable do
       context "when no updated at is defined" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when no attribute is provided" do
@@ -230,7 +230,7 @@ describe Mongoid::Touchable do
       context "when an updated at is defined" do
 
         let!(:agent) do
-          Agent.create(updated_at: 2.days.ago)
+          Agent.create!(updated_at: 2.days.ago)
         end
 
         context "when no attribute is provided" do
@@ -396,11 +396,11 @@ describe Mongoid::Touchable do
         end
 
         let(:page) do
-          WikiPage.create(title: "test")
+          WikiPage.create!(title: "test")
         end
 
         let!(:edit) do
-          page.edits.create
+          page.edits.create!
         end
 
         before do
@@ -425,7 +425,7 @@ describe Mongoid::Touchable do
 
         before do
           book.pages.new
-          book.save
+          book.save!
           book.unset(:updated_at)
           book.pages.first.touch
         end
@@ -443,7 +443,7 @@ describe Mongoid::Touchable do
 
         before do
           2.times { book.pages.new }
-          book.save
+          book.save!
           book.unset(:updated_at)
           book.pages.first.content  = "foo"
           book.pages.second.content = "bar"
@@ -458,7 +458,7 @@ describe Mongoid::Touchable do
       context "when the relation is nil" do
 
         let!(:agent) do
-          Agent.create
+          Agent.create!
         end
 
         context "when the relation autobuilds" do
@@ -476,7 +476,7 @@ describe Mongoid::Touchable do
       context "when the relation is not nil" do
 
         let!(:agent) do
-          Agent.create
+          Agent.create!
         end
 
         let!(:agency) do
@@ -501,7 +501,7 @@ describe Mongoid::Touchable do
       context "when creating the child" do
 
         let!(:agency) do
-          Agency.create
+          Agency.create!
         end
 
         let!(:updated) do
@@ -509,7 +509,7 @@ describe Mongoid::Touchable do
         end
 
         let!(:agent) do
-          agency.agents.create
+          agency.agents.create!
         end
 
         it "updates the parent's updated at" do
@@ -529,7 +529,7 @@ describe Mongoid::Touchable do
 
         it "updates the parent's updated at" do
           expect {
-            agent.update_attributes(number: '2')
+            agent.update_attributes!(number: '2')
           }.to change { agency.updated_at }
         end
       end
@@ -537,11 +537,11 @@ describe Mongoid::Touchable do
       context "when destroying the child" do
 
         let!(:agency) do
-          Agency.create
+          Agency.create!
         end
 
         let!(:agent) do
-          agency.agents.create
+          agency.agents.create!
         end
 
         let!(:updated) do
@@ -561,7 +561,7 @@ describe Mongoid::Touchable do
     context "when other document attributes have been changed" do
 
       let(:band) do
-        Band.create(name: "Placebo")
+        Band.create!(name: "Placebo")
       end
 
       context "when an attribute is provided" do

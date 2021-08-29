@@ -52,7 +52,7 @@ describe Mongoid::Timestamps do
 
     it "does not run the update callbacks" do
       expect(document).to receive(:updated_at=).never
-      document.save
+      document.save!
     end
   end
 
@@ -69,14 +69,14 @@ describe Mongoid::Timestamps do
 
     it "does not set updated at" do
       expect(document).to receive(:updated_at=).never
-      document.save
+      document.save!
     end
   end
 
   context "when the document is created" do
 
     let!(:document) do
-      Dokument.create
+      Dokument.create!
     end
 
     it "runs the update callbacks" do
@@ -87,11 +87,11 @@ describe Mongoid::Timestamps do
   context "when only embedded documents have changed" do
 
     let!(:document) do
-      Dokument.create(updated_at: 2.days.ago)
+      Dokument.create!(updated_at: 2.days.ago)
     end
 
     let!(:address) do
-      document.addresses.create(street: "Karl Marx Strasse")
+      document.addresses.create!(street: "Karl Marx Strasse")
     end
 
     let!(:updated_at) do
@@ -100,7 +100,7 @@ describe Mongoid::Timestamps do
 
     before do
       address.number = 1
-      document.save
+      document.save!
     end
 
     it "updates the root document updated at" do

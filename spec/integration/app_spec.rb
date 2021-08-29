@@ -162,7 +162,7 @@ describe 'Mongoid application tests' do
                 end
 
                 client['posts'].drop
-                client['posts'].create
+                client['posts'].create!
               end
 
               it 'creates an index' do

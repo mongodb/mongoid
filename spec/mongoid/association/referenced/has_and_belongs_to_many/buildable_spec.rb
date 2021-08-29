@@ -107,7 +107,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
       context "when the ids are incorrect" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         before do

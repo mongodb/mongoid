@@ -49,7 +49,7 @@ describe Mongoid::Timestamps::Updated::Short do
       end
 
       let(:doc) do
-        ShortAgent.create(updated_at: time)
+        ShortAgent.create!(updated_at: time)
       end
 
       it "does not override it with the default" do
@@ -74,14 +74,14 @@ describe Mongoid::Timestamps::Updated::Short do
 
     it "does not run the update callbacks" do
       expect(agent).to receive(:updated_at=).never
-      agent.save
+      agent.save!
     end
   end
 
   context "when the document is created" do
 
     let(:agent) do
-      ShortAgent.create
+      ShortAgent.create!
     end
 
     it "runs the update callbacks" do

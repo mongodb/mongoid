@@ -87,7 +87,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:name) do
@@ -173,7 +173,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
           context "when replacing an existing document" do
 
             let(:pet_owner) do
-              PetOwner.create
+              PetOwner.create!
             end
 
             let(:pet_one) do
@@ -206,7 +206,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
         context 'when the original document does not need to be unset because it will be replaced by the $set' do
 
           let!(:pet_owner) do
-            PetOwner.create(pet: pet_one)
+            PetOwner.create!(pet: pet_one)
           end
 
           let(:pet_one) do
@@ -279,7 +279,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:parent_shelf) do
-          Shelf.create
+          Shelf.create!
         end
 
         let(:child_shelf) do
@@ -311,7 +311,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
     context "when setting a new document multiple times in a row" do
 
       let(:parent) do
-        Parent.create
+        Parent.create!
       end
 
       before do
@@ -372,7 +372,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the parent is persisted" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:name) do
@@ -461,7 +461,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the documents are not new records" do
 
         let(:parent_shelf) do
-          Shelf.create
+          Shelf.create!
         end
 
         let(:child_shelf) do
@@ -610,7 +610,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:name) do
@@ -655,7 +655,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:parent_shelf) do
-          Shelf.create
+          Shelf.create!
         end
 
         let!(:child_shelf) do
@@ -757,7 +757,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:name) do
@@ -778,7 +778,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
       context "when the embedded document inherits its relationship" do
 
         let(:courier_job) do
-          CourierJob.create
+          CourierJob.create!
         end
 
         let(:old_child) do
@@ -847,7 +847,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
   context "when the embedded document has an array field" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:name) do
@@ -866,7 +866,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
 
       before do
         from_db.aliases = [ "Syd", "Sydney" ]
-        from_db.save
+        from_db.save!
       end
 
       it "sets the values of the array" do
@@ -882,7 +882,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
   context "when embedding a many under a one" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     before do
@@ -908,7 +908,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
         context "when saving the root" do
 
           before do
-            from_db.save
+            from_db.save!
           end
 
           it "persists the new document on the first save" do
@@ -922,15 +922,15 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
   context "when embedding a one under a many" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:address_one) do
-      person.addresses.create(street: "hobrecht")
+      person.addresses.create!(street: "hobrecht")
     end
 
     let!(:address_two) do
-      person.addresses.create(street: "kreuzberg")
+      person.addresses.create!(street: "kreuzberg")
     end
 
     context "when a parent was removed outside of mongoid" do
@@ -965,7 +965,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
   context "when embedded documents are stored without ids" do
 
     let!(:band) do
-      Band.create(name: "Moderat")
+      Band.create!(name: "Moderat")
     end
 
     before do
@@ -1012,9 +1012,9 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
   context "when parent validation of child is set to false" do
 
     let(:building) do
-      building = Building.create
+      building = Building.create!
       building.building_address = BuildingAddress.new
-      building.save
+      building.save!
       building.reload
     end
 

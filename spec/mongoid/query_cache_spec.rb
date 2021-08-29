@@ -258,11 +258,11 @@ describe Mongoid::QueryCache do
     end
 
     before do
-      person = Person.create
+      person = Person.create!
       3.times do
-        person.send(relation).create
+        person.send(relation).create!
       end
-      person.save
+      person.save!
     end
 
     let!(:relations) do
@@ -475,7 +475,7 @@ describe Mongoid::QueryCache do
   context 'querying all documents after a single document' do
     before do
       3.times do
-        Person.create
+        Person.create!
       end
     end
 
@@ -531,7 +531,7 @@ describe Mongoid::QueryCache do
   context 'when using a block API' do
     before do
       Band.destroy_all
-      5.times { Band.create }
+      5.times { Band.create! }
     end
 
     context '#any? with no block' do
@@ -890,7 +890,7 @@ describe Mongoid::QueryCache do
   context "when reloading a document" do
 
     let!(:band_id) do
-      Band.create.id
+      Band.create!.id
     end
 
     context 'when query cache is disabled' do

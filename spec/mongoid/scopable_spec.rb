@@ -177,7 +177,7 @@ describe Mongoid::Scopable do
         context "when scopes are chained" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           it "constructs a criteria for an embedded relation" do
@@ -234,7 +234,7 @@ describe Mongoid::Scopable do
 
         before do
           Band.scope(:tests, ->{ Band.where(name: 'TESTING').collation(locale: 'en_US', strength: 2) })
-          Band.create(name: 'testing')
+          Band.create!(name: 'testing')
         end
 
         it 'applies the collation' do
@@ -659,12 +659,12 @@ describe Mongoid::Scopable do
                 where(:author_id.in => author_ids)
               })
 
-              Author.create(author: true, id: 1)
-              Author.create(author: true, id: 2)
-              Author.create(author: true, id: 3)
-              Article.create(author_id: 1, public: true)
-              Article.create(author_id: 2, public: true)
-              Article.create(author_id: 3, public: false)
+              Author.create!(author: true, id: 1)
+              Author.create!(author: true, id: 2)
+              Author.create!(author: true, id: 3)
+              Article.create!(author_id: 1, public: true)
+              Article.create!(author_id: 2, public: true)
+              Article.create!(author_id: 3, public: false)
             end
 
             after do

@@ -32,7 +32,7 @@ describe Mongoid::Association::Referenced::AutoSave do
       context "when saving the parent document" do
 
         before do
-          person.save
+          person.save!
         end
 
         it "does not save the relation" do
@@ -56,7 +56,7 @@ describe Mongoid::Association::Referenced::AutoSave do
         it "does not add the autosave callback twice" do
           expect(drug).to receive(:save).once
           person.drugs.push(drug)
-          person.save
+          person.save!
         end
       end
 
@@ -76,7 +76,7 @@ describe Mongoid::Association::Referenced::AutoSave do
 
             before do
               person.drugs << drug
-              person.save
+              person.save!
             end
 
             it "saves the relation" do
@@ -102,7 +102,7 @@ describe Mongoid::Association::Referenced::AutoSave do
             before do
               person.with(database: other_database) do |per|
                 per.drugs << drug
-                per.save
+                per.save!
               end
             end
 
@@ -117,9 +117,9 @@ describe Mongoid::Association::Referenced::AutoSave do
         context "when saving an existing parent document" do
 
           before do
-            person.save
+            person.save!
             person.drugs << drug
-            person.save
+            person.save!
           end
 
           it "saves the relation" do
@@ -135,11 +135,11 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           before do
             person.drugs << drug
-            person.save
+            person.save!
           end
 
           it 'does not load the association' do
-            from_db.save
+            from_db.save!
             expect(from_db.ivar(:drugs)).to be false
           end
         end
@@ -155,7 +155,7 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           before do
             person.account = account
-            person.save
+            person.save!
           end
 
           it "saves the relation" do
@@ -170,9 +170,9 @@ describe Mongoid::Association::Referenced::AutoSave do
         context "when saving an existing parent document" do
 
           before do
-            person.save
+            person.save!
             person.account = account
-            person.save
+            person.save!
           end
 
           it "saves the relation" do
@@ -188,14 +188,14 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           before do
             person.account = account
-            person.save
+            person.save!
           end
 
           it "sends one insert" do
             account.name = "account"
             expect_query(1) do
               person.with(write: {w:0}) do |_person|
-                _person.save
+                _person.save!
               end
             end
           end
@@ -209,11 +209,11 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           before do
             person.account = account
-            person.save
+            person.save!
           end
 
           it 'does not load the association' do
-            from_db.save
+            from_db.save!
             expect(from_db.ivar(:account)).to be false
           end
         end
@@ -233,7 +233,7 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           before do
             ghost.movie = movie
-            ghost.save
+            ghost.save!
           end
 
           it "saves the relation" do
@@ -244,9 +244,9 @@ describe Mongoid::Association::Referenced::AutoSave do
         context "when saving an existing parent document" do
 
           before do
-            ghost.save
+            ghost.save!
             ghost.movie = movie
-            ghost.save
+            ghost.save!
           end
 
           it "saves the relation" do
@@ -258,7 +258,7 @@ describe Mongoid::Association::Referenced::AutoSave do
       context "when it has two relations with autosaves" do
 
         let!(:person) do
-          Person.create(drugs: [percocet], account: account)
+          Person.create!(drugs: [percocet], account: account)
         end
 
         let(:from_db) do
@@ -281,7 +281,7 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           before do
             from_db.drugs = [placebo]
-            from_db.save
+            from_db.save!
           end
 
           it 'loads the updated association' do
@@ -296,7 +296,7 @@ describe Mongoid::Association::Referenced::AutoSave do
         context "when updating none document" do
 
           before do
-            from_db.save
+            from_db.save!
           end
 
           it 'doest not load drugs association' do
@@ -337,22 +337,22 @@ describe Mongoid::Association::Referenced::AutoSave do
         end
 
         let(:king) do
-          King.create
+          King.create!
         end
 
         let(:peasant) do
-          Peasant.create
+          Peasant.create!
         end
 
         let(:harvest) do
-          Harvest.create(season: 'Summer')
+          Harvest.create!(season: 'Summer')
         end
 
         before do
           peasant.harvest = harvest
           king.peasant = peasant
           harvest.season = 'Fall'
-          king.save
+          king.save!
         end
 
         it 'cascades the save' do

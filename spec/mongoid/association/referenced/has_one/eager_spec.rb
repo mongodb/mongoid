@@ -152,7 +152,7 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
     context "when the relation is polymorphic" do
 
       let!(:book) do
-        Book.create(name: "Game of Thrones")
+        Book.create!(name: "Game of Thrones")
       end
 
       let!(:rating) do

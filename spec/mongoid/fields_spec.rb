@@ -109,7 +109,7 @@ describe Mongoid::Fields do
         context "when saving the new translations" do
 
           before do
-            product.save
+            product.save!
           end
 
           it "persists the changes" do
@@ -120,7 +120,7 @@ describe Mongoid::Fields do
 
             before do
               product.description_translations = { "en" => "overwritten" }
-              product.save
+              product.save!
             end
 
             it "persists the changes" do
@@ -151,7 +151,7 @@ describe Mongoid::Fields do
         context "when saving the new translations" do
 
           before do
-            dictionary.save
+            dictionary.save!
           end
 
           it "persists the changes" do
@@ -164,7 +164,7 @@ describe Mongoid::Fields do
 
             before do
               dictionary.description_translations = { "en" => "overwritten" }
-              dictionary.save
+              dictionary.save!
             end
 
             it "persists the changes" do
@@ -620,14 +620,14 @@ describe Mongoid::Fields do
 
       before do
         product.stores = [ "kadewe", "karstadt" ]
-        product.save
+        product.save!
       end
 
       context "when setting the value to nil" do
 
         before do
           product.stores = nil
-          product.save
+          product.save!
         end
 
         it "allows the set" do
@@ -639,7 +639,7 @@ describe Mongoid::Fields do
 
         before do
           product.stores = [ "kadewe", nil ]
-          product.save
+          product.save!
         end
 
         it "allows the set of nil values" do
@@ -655,7 +655,7 @@ describe Mongoid::Fields do
 
         before do
           product.stores = [ "karstadt", "kadewe" ]
-          product.save
+          product.save!
         end
 
         it "reverses the values" do
@@ -1306,7 +1306,7 @@ describe Mongoid::Fields do
   context "when the field is a hash of arrays" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:map) do
@@ -1320,7 +1320,7 @@ describe Mongoid::Fields do
     before do
       person.map = map
       person.map["stack1"].reverse!
-      person.save
+      person.save!
     end
 
     it "properly updates the hash" do

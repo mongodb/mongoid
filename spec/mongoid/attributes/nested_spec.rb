@@ -191,7 +191,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       context "when adding existing document to a relation" do
-        let(:preference) { Preference.create(name: 'sample preference') }
+        let(:preference) { Preference.create!(name: 'sample preference') }
         let(:person) do
           Person.new(
             preferences_attributes: { 0 => { id: preference.id, name: preference.name } }
@@ -242,7 +242,7 @@ describe Mongoid::Attributes::Nested do
         context "when the parent document is persisted" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           before do
@@ -272,7 +272,7 @@ describe Mongoid::Attributes::Nested do
             context "when saving the parent" do
 
               before do
-                person.save
+                person.save!
                 person.reload
               end
 
@@ -374,7 +374,7 @@ describe Mongoid::Attributes::Nested do
             context "when all attributes are empty" do
 
               let(:product) do
-                Product.create(name: "testing")
+                Product.create!(name: "testing")
               end
 
               it "does not add the document" do
@@ -607,7 +607,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       let(:owner) do
-                        PetOwner.create
+                        PetOwner.create!
                       end
 
                       let!(:pet) do
@@ -616,7 +616,7 @@ describe Mongoid::Attributes::Nested do
 
                       before do
                         owner.pet_attributes = { id: pet.id, _destroy: truth }
-                        owner.save
+                        owner.save!
                       end
 
                       it "destroys the existing document" do
@@ -1034,7 +1034,7 @@ describe Mongoid::Attributes::Nested do
         context "when the parent document is persisted" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           before do
@@ -1068,7 +1068,7 @@ describe Mongoid::Attributes::Nested do
             context "when saving the parent" do
 
               before do
-                person.save
+                person.save!
                 person.reload
               end
 
@@ -1184,7 +1184,7 @@ describe Mongoid::Attributes::Nested do
             context "when the parent is saved" do
 
               before do
-                band.save
+                band.save!
               end
 
               it "runs the first child create callbacks" do
@@ -1376,7 +1376,7 @@ describe Mongoid::Attributes::Nested do
                   end
 
                   let!(:record) do
-                    band.records.create
+                    band.records.create!
                   end
 
                   let(:attributes) do
@@ -1414,17 +1414,17 @@ describe Mongoid::Attributes::Nested do
                   end
 
                   let!(:band) do
-                    Band.create
+                    Band.create!
                   end
 
                   let!(:record) do
-                    band.records.create
+                    band.records.create!
                   end
 
                   before do
                     band.records_attributes =
                       { "foo" => { "id" => record.id, "_destroy" => true }}
-                    band.save
+                    band.save!
                   end
 
                   it "deletes the child document" do
@@ -1449,7 +1449,7 @@ describe Mongoid::Attributes::Nested do
                   context "when the parent is persisted" do
 
                     let!(:persisted) do
-                      Person.create(age: 42)
+                      Person.create!(age: 42)
                     end
 
                     context "when the child halts the callback chain in a before callback" do
@@ -1457,11 +1457,11 @@ describe Mongoid::Attributes::Nested do
                       context "when the child is not paranoid" do
 
                         let(:actor) do
-                          Actor.create
+                          Actor.create!
                         end
 
                         let!(:thing) do
-                          actor.things.create
+                          actor.things.create!
                         end
 
                         before do
@@ -1479,11 +1479,11 @@ describe Mongoid::Attributes::Nested do
                     context "when only 1 child has the default persisted" do
 
                       let!(:app_one) do
-                        persisted.appointments.create
+                        persisted.appointments.create!
                       end
 
                       let!(:app_two) do
-                        persisted.appointments.create.tap do |app|
+                        persisted.appointments.create!.tap do |app|
                           app.unset(:timed)
                         end
                       end
@@ -1500,7 +1500,7 @@ describe Mongoid::Attributes::Nested do
                               "bar" => { "id" => app_one.id, "_destroy" => true },
                               "foo" => { "id" => app_two.id, "_destroy" => true }
                             }
-                          from_db.save
+                          from_db.save!
                         end
 
                         it "destroys both children" do
@@ -1575,7 +1575,7 @@ describe Mongoid::Attributes::Nested do
                       context "when the parent is persisted" do
 
                         let!(:persisted) do
-                          Person.create do |p|
+                          Person.create! do |p|
                             p.addresses << [ address_one, address_two ]
                           end
                         end
@@ -1622,7 +1622,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.save
+                              persisted.save!
                             end
 
                             it "deletes the marked document from the relation" do
@@ -1678,7 +1678,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.save
+                              persisted.save!
                             end
 
                             it "deletes the marked document from the relation" do
@@ -2390,8 +2390,8 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                pizza.topping = Topping.create(name: "cheese")
-                pizza.update_attributes(topping_attributes: { name: "onions" })
+                pizza.topping = Topping.create!(name: "cheese")
+                pizza.update_attributes!(topping_attributes: { name: "onions" })
               end
 
               it "persists the attribute changes" do
@@ -2966,7 +2966,7 @@ describe Mongoid::Attributes::Nested do
         context "when ids are passed" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           before do
@@ -3031,7 +3031,7 @@ describe Mongoid::Attributes::Nested do
                       "0" => { "id" => post_one.id, "title" => "testing again" },
                       "1" => { "id" => post_two.id, "title" => "$$$" }
                     }
-                  person.save
+                  person.save!
                 end
 
                 it "does not perist the invalid value" do
@@ -3307,7 +3307,7 @@ describe Mongoid::Attributes::Nested do
               context "when the parent is saved" do
 
                 before do
-                  person.save
+                  person.save!
                   person.posts_attributes =
                     [
                       { "title" => "Third" },
@@ -3722,7 +3722,7 @@ describe Mongoid::Attributes::Nested do
         context "when ids are passed" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           before do
@@ -4304,7 +4304,7 @@ describe Mongoid::Attributes::Nested do
     end
   end
 
-  describe "#update_attributes" do
+  describe "#update_attributes!" do
 
     before do
       Person.send(:undef_method, :addresses_attributes=)
@@ -4314,11 +4314,11 @@ describe Mongoid::Attributes::Nested do
     context "when embedding one level behind a has many" do
 
       let(:node) do
-        Node.create
+        Node.create!
       end
 
       let!(:server) do
-        node.servers.create(name: "prod")
+        node.servers.create!(name: "prod")
       end
 
       context "when adding a new embedded document" do
@@ -4337,7 +4337,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          node.update_attributes(attributes)
+          node.update_attributes!(attributes)
         end
 
         it "adds the new embedded document" do
@@ -4353,11 +4353,11 @@ describe Mongoid::Attributes::Nested do
     context "when deleting the child document" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:service) do
-        person.services.create(sid: "123")
+        person.services.create!(sid: "123")
       end
 
       let(:attributes) do
@@ -4369,7 +4369,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        person.update_attributes(attributes)
+        person.update_attributes!(attributes)
       end
 
       it "removes the document from the parent" do
@@ -4407,15 +4407,15 @@ describe Mongoid::Attributes::Nested do
       end
 
       let(:dokument) do
-        Dokument.create
+        Dokument.create!
       end
 
       let!(:address) do
-        dokument.addresses.create(street: "hobrecht")
+        dokument.addresses.create!(street: "hobrecht")
       end
 
       let!(:location) do
-        address.locations.create(name: "work")
+        address.locations.create!(name: "work")
       end
 
       let(:attributes) do
@@ -4427,7 +4427,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        address.update_attributes(attributes)
+        address.update_attributes!(attributes)
         address.reload
       end
 
@@ -4439,21 +4439,21 @@ describe Mongoid::Attributes::Nested do
     context "when nesting multiple levels" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when second level is a one to many" do
 
         let(:person_one) do
-          Person.create
+          Person.create!
         end
 
         let!(:address_one) do
-          person_one.addresses.create(street: "hobrecht")
+          person_one.addresses.create!(street: "hobrecht")
         end
 
         let!(:location_one) do
-          address_one.locations.create(name: "home")
+          address_one.locations.create!(name: "home")
         end
 
         context "when destroying a second level document" do
@@ -4470,7 +4470,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person_one.update_attributes(attributes)
+            person_one.update_attributes!(attributes)
           end
 
           it "deletes the document from the relation" do
@@ -4485,15 +4485,15 @@ describe Mongoid::Attributes::Nested do
         context "when destroying a second level document with callbacks" do
 
           let(:band) do
-            Band.create(name: "Tool")
+            Band.create!(name: "Tool")
           end
 
           let(:record) do
-            band.records.create(name: "Undertow")
+            band.records.create!(name: "Undertow")
           end
 
           let!(:track) do
-            record.tracks.create(name: "Sober")
+            record.tracks.create!(name: "Sober")
           end
 
           context "when cascading callbacks" do
@@ -4520,7 +4520,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              band.update_attributes(attributes)
+              band.update_attributes!(attributes)
             end
 
             it "removes the child from the relation" do
@@ -4553,7 +4553,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
             end
 
             let(:address) do
@@ -4576,11 +4576,11 @@ describe Mongoid::Attributes::Nested do
           context "when adding to an existing document in the first level" do
 
             let!(:address) do
-              person.addresses.create(street: "hobrecht")
+              person.addresses.create!(street: "hobrecht")
             end
 
             let!(:location) do
-              address.locations.create(name: "work")
+              address.locations.create!(name: "work")
             end
 
             let(:attributes) do
@@ -4593,7 +4593,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
               person.reload
             end
 
@@ -4624,7 +4624,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.update_attributes(attributes)
+            person.update_attributes!(attributes)
           end
 
           let(:address) do
@@ -4650,7 +4650,7 @@ describe Mongoid::Attributes::Nested do
         context "when the nested document is not polymorphic" do
 
           let!(:address) do
-            person.addresses.create(street: "Alexanderstr", number: 1)
+            person.addresses.create!(street: "Alexanderstr", number: 1)
           end
 
           let!(:code) do
@@ -4673,7 +4673,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.update_attributes(attributes)
+            person.update_attributes!(attributes)
           end
 
           it "updates the first level embedded document" do
@@ -4690,7 +4690,7 @@ describe Mongoid::Attributes::Nested do
           context "when the first level is an embeds many" do
 
             let!(:address) do
-              person.addresses.create(street: "Alexanderstr", number: 1)
+              person.addresses.create!(street: "Alexanderstr", number: 1)
             end
 
             let!(:target) do
@@ -4713,7 +4713,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
             end
 
             it "updates the first level embedded document" do
@@ -4749,7 +4749,7 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                person.update_attributes(attributes)
+                person.update_attributes!(attributes)
               end
 
               it "updates the nested embedded document" do
@@ -4766,7 +4766,7 @@ describe Mongoid::Attributes::Nested do
       context "when updating with valid attributes" do
 
         let(:user) do
-          User.create
+          User.create!
         end
 
         let(:params) do
@@ -4776,7 +4776,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          user.update_attributes(params)
+          user.update_attributes!(params)
         end
 
         around do |example|
@@ -4802,11 +4802,11 @@ describe Mongoid::Attributes::Nested do
       context "when the document is freshly loaded from the db" do
 
         let!(:node) do
-          Node.create
+          Node.create!
         end
 
         let!(:server) do
-          node.servers.create(name: "test")
+          node.servers.create!(name: "test")
         end
 
         before do
@@ -4839,11 +4839,11 @@ describe Mongoid::Attributes::Nested do
     context "when the relation is an embeds many" do
 
       let(:league) do
-        League.create
+        League.create!
       end
 
       let!(:division) do
-        league.divisions.create(name: "Old Name")
+        league.divisions.create!(name: "Old Name")
       end
 
       context "when additional validation is set" do
@@ -4898,7 +4898,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          league.update_attributes(params)
+          league.update_attributes!(params)
         end
 
         it "sets the nested attributes" do
@@ -4918,7 +4918,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            league.update_attributes(new_params)
+            league.update_attributes!(new_params)
           end
 
           it "sets the nested attributes" do

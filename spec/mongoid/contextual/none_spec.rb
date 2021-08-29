@@ -7,7 +7,7 @@ describe Mongoid::Contextual::None do
   describe "#==" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -40,7 +40,7 @@ describe Mongoid::Contextual::None do
   describe "#each" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -55,7 +55,7 @@ describe Mongoid::Contextual::None do
   describe "#exists?" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -70,7 +70,7 @@ describe Mongoid::Contextual::None do
   describe "#distinct" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -85,7 +85,7 @@ describe Mongoid::Contextual::None do
   describe "#pluck" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -100,7 +100,7 @@ describe Mongoid::Contextual::None do
   describe "#first" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -115,7 +115,7 @@ describe Mongoid::Contextual::None do
   describe "#last" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -130,7 +130,7 @@ describe Mongoid::Contextual::None do
   describe "#length" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do
@@ -145,7 +145,7 @@ describe Mongoid::Contextual::None do
   describe "#size" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:context) do

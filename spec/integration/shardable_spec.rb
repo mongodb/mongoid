@@ -60,7 +60,7 @@ describe 'Sharding helpers' do
 
       before do
         SmMovie.collection.database.drop
-        SmMovie.collection.create
+        SmMovie.collection.create!
         SmMovie.collection.drop
       end
 

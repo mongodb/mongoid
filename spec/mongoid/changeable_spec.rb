@@ -697,7 +697,7 @@ describe Mongoid::Changeable do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:name) do
@@ -739,7 +739,7 @@ describe Mongoid::Changeable do
       context "when the field has not changed" do
 
         let(:person) do
-          Person.create(map: { name: "value" })
+          Person.create!(map: { name: "value" })
         end
 
         before do
@@ -754,7 +754,7 @@ describe Mongoid::Changeable do
       context "when the field is changed" do
 
         let(:person) do
-          Person.create(map: { name: "value" })
+          Person.create!(map: { name: "value" })
         end
 
         before do
@@ -769,7 +769,7 @@ describe Mongoid::Changeable do
       context "when a dynamic field is changed in place" do
 
         let(:person) do
-          Person.create(other_name: { full: {first: 'first', last: 'last'} })
+          Person.create!(other_name: { full: {first: 'first', last: 'last'} })
         end
 
         before do
@@ -797,11 +797,11 @@ describe Mongoid::Changeable do
     context "when a child has changed" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:address) do
-        person.addresses.create(street: "hobrecht")
+        person.addresses.create!(street: "hobrecht")
       end
 
       before do
@@ -816,15 +816,15 @@ describe Mongoid::Changeable do
     context "when changed? has been called before child elements size change" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "hobrecht")
+        person.addresses.create!(street: "hobrecht")
       end
 
       let!(:location) do
-        address.locations.create(name: "home")
+        address.locations.create!(name: "home")
       end
 
       before do
@@ -856,7 +856,7 @@ describe Mongoid::Changeable do
       context "when adding via create" do
 
         before do
-          address.locations.create
+          address.locations.create!
         end
 
         it "returns false" do
@@ -868,15 +868,15 @@ describe Mongoid::Changeable do
     context "when a deeply embedded child has changed" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "hobrecht")
+        person.addresses.create!(street: "hobrecht")
       end
 
       let!(:location) do
-        address.locations.create(name: "home")
+        address.locations.create!(name: "home")
       end
 
       before do
@@ -891,7 +891,7 @@ describe Mongoid::Changeable do
     context "when a child is new" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:address) do
@@ -906,11 +906,11 @@ describe Mongoid::Changeable do
     context "when a deeply embedded child is new" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "hobrecht")
+        person.addresses.create!(street: "hobrecht")
       end
 
       let!(:location) do
@@ -1259,7 +1259,7 @@ describe Mongoid::Changeable do
       context "when the document is persisted" do
 
         let(:person) do
-          Person.create(pets: true)
+          Person.create!(pets: true)
         end
 
         before do
@@ -1296,7 +1296,7 @@ describe Mongoid::Changeable do
       context "when the document is persisted" do
 
         let(:person) do
-          Person.create(title: "test")
+          Person.create!(title: "test")
         end
 
         before do
@@ -1394,7 +1394,7 @@ describe Mongoid::Changeable do
   context "when only embedded documents change" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when the child is an embeds one" do
@@ -1453,7 +1453,7 @@ describe Mongoid::Changeable do
       context "when a child is modified" do
 
         let!(:address) do
-          person.addresses.create(street: "jakobstr.")
+          person.addresses.create!(street: "jakobstr.")
         end
 
         before do
@@ -1468,7 +1468,7 @@ describe Mongoid::Changeable do
       context "when no child is modified" do
 
         let!(:address) do
-          person.addresses.create(street: "skalitzerstr.")
+          person.addresses.create!(street: "skalitzerstr.")
         end
 
         it "does not flag the parent as changed" do
@@ -1481,7 +1481,7 @@ describe Mongoid::Changeable do
   context "when changing a hash of hashes" do
 
     let!(:person) do
-      Person.create(map: { "test" => {}})
+      Person.create!(map: { "test" => {}})
     end
 
     before do
@@ -1498,15 +1498,15 @@ describe Mongoid::Changeable do
   context "when modifying a many to many key" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:preference) do
-      Preference.create(name: "dirty")
+      Preference.create!(name: "dirty")
     end
 
     before do
-      person.update_attributes(preference_ids: [ preference.id ])
+      person.update_attributes!(preference_ids: [ preference.id ])
     end
 
     it "records the foreign key dirty changes" do
@@ -1519,7 +1519,7 @@ describe Mongoid::Changeable do
   context "when accessing an array field" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:from_db) do
@@ -1545,7 +1545,7 @@ describe Mongoid::Changeable do
   context "when reloading an unchanged document" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:from_db) do
@@ -1564,7 +1564,7 @@ describe Mongoid::Changeable do
   context "when fields are getting changed" do
 
     let(:person) do
-      Person.create(
+      Person.create!(
         title: "MC",
         some_dynamic_field: 'blah'
       )
@@ -1644,7 +1644,7 @@ describe Mongoid::Changeable do
     context "when the document is persisted" do
 
       let!(:acolyte) do
-        Acolyte.create(name: "callback-test")
+        Acolyte.create!(name: "callback-test")
       end
 
       before do
@@ -1688,7 +1688,7 @@ describe Mongoid::Changeable do
       end
 
       it "retains the changes until after all callbacks" do
-        acolyte.save
+        acolyte.save!
         expect(acolyte.changed_in_callback["name"]).to eq([ nil, "callback-test" ])
       end
     end
@@ -1697,7 +1697,7 @@ describe Mongoid::Changeable do
   context "when associations are getting changed" do
 
     let(:person) do
-      Person.create(addresses: [ Address.new ])
+      Person.create!(addresses: [ Address.new ])
     end
 
     before do
@@ -1714,7 +1714,7 @@ describe Mongoid::Changeable do
     context 'when persisting the root document' do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       it 'is not marked as changed' do
@@ -1738,7 +1738,7 @@ describe Mongoid::Changeable do
         context 'when building the lowest level document' do
 
           before do
-            person.save
+            person.save!
           end
 
           let!(:code) do
@@ -1760,7 +1760,7 @@ describe Mongoid::Changeable do
           context 'when saving the hierarchy' do
 
             before do
-              person.save
+              person.save!
             end
 
             let(:reloaded) do
@@ -1782,7 +1782,7 @@ describe Mongoid::Changeable do
               end
 
               before do
-                reloaded.save
+                reloaded.save!
               end
 
               it 'saves the deepest embedded document' do

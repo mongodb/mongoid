@@ -7,7 +7,7 @@ describe Mongoid::Persistable::Savable do
   describe "#save" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:contextable_item) do
@@ -15,7 +15,7 @@ describe Mongoid::Persistable::Savable do
     end
 
     let(:persisted_contextable_item) do
-      ContextableItem.create(title: 'sir')
+      ContextableItem.create!(title: 'sir')
     end
 
     context "when skipping validation" do
@@ -46,7 +46,7 @@ describe Mongoid::Persistable::Savable do
       context "when saving document that is a belongs to child" do
 
         let(:account) do
-          Account.create
+          Account.create!(name: 'Foobar')
         end
 
         let(:alert) do
@@ -148,7 +148,7 @@ describe Mongoid::Persistable::Savable do
     context "when validation fails" do
 
       let(:address) do
-        person.addresses.create(city: "London")
+        person.addresses.create!(city: "London")
       end
 
       before do
@@ -165,7 +165,7 @@ describe Mongoid::Persistable::Savable do
       context "when performing modification and insert ops" do
 
         let(:owner) do
-          Owner.create(name: "Blah")
+          Owner.create!(name: "Blah")
         end
 
         let!(:birthday) do
@@ -228,7 +228,7 @@ describe Mongoid::Persistable::Savable do
         end
 
         let!(:person) do
-          Person.create(
+          Person.create!(
             title: "Blah",
             addresses: [ address ]
           )
@@ -296,7 +296,7 @@ describe Mongoid::Persistable::Savable do
           # no conflicts.
           #expect(truck.atomic_updates[:conflicts]).to eq nil
 
-          expect { truck.save! }.not_to raise_error
+          expect(truck.save).to eq true
 
           _truck = Truck.find(truck.id)
           expect(_truck.crates.size).to eq 2
@@ -316,7 +316,7 @@ describe Mongoid::Persistable::Savable do
           truck.crates.build(volume: 1)
           truck.crates.first.volume = 2
 
-          truck.save!
+          expect(truck.save).to eq true
 
           _truck = Truck.find(truck.id)
           _truck.crates.length.should == 2
@@ -333,7 +333,7 @@ describe Mongoid::Persistable::Savable do
           truck.seats.first.armrests.build(side: 'left')
           truck.seats.first.rating = 2
 
-          truck.save!
+          expect(truck.save).to eq true
 
           _truck = Truck.find(truck.id)
           _truck.seats.length.should == 1
@@ -350,7 +350,7 @@ describe Mongoid::Persistable::Savable do
           truck.crates.first.toys.build(name: 'Bear')
           truck.crates.build
 
-          truck.save!
+          expect(truck.save).to eq true
 
           _truck = Truck.find(truck.id)
           _truck.crates.length.should == 2
@@ -365,7 +365,7 @@ describe Mongoid::Persistable::Savable do
             truck.crates.first.toys.build(name: 'Bear')
             truck.crates.build
 
-            truck.save!
+            expect(truck.save).to eq true
 
             _truck = Truck.find(truck.id)
             _truck.crates.length.should == 2
@@ -386,7 +386,7 @@ describe Mongoid::Persistable::Savable do
 
           truck.seats.build
 
-          expect { truck.save! }.not_to raise_error
+          expect(truck.save).to eq true
 
           _truck = Truck.find(truck.id)
           expect(_truck.seats.size).to eq 2
@@ -402,7 +402,7 @@ describe Mongoid::Persistable::Savable do
             truck.seats.first.armrests.build
             truck.seats.build
 
-            expect { truck.save! }.not_to raise_error
+            expect(truck.save).to eq true
 
             _truck = Truck.find(truck.id)
             expect(_truck.seats.size).to eq 2
@@ -456,7 +456,7 @@ describe Mongoid::Persistable::Savable do
     context "when the changed attribute is not writable" do
 
       before do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       let(:person) do
@@ -473,7 +473,7 @@ describe Mongoid::Persistable::Savable do
       context 'when the changed attribute is aliased' do
 
         before do
-          Person.create(at: Time.now)
+          Person.create!(at: Time.now)
         end
 
         let(:person) do
@@ -482,7 +482,7 @@ describe Mongoid::Persistable::Savable do
 
         it "saves the document" do
           person.aliased_timestamp = Time.now
-          expect(person.save(validate: false)).to be true
+          expect(person.save!(validate: false)).to be true
         end
       end
     end
@@ -494,21 +494,26 @@ describe Mongoid::Persistable::Savable do
     end
 
     context "when validation context exists" do
+
       context "on new document" do
+
         it "returns true" do
           contextable_item.title = "sir"
           expect(contextable_item.save(context: :in_context)).to be true
         end
+
         it "returns false" do
           expect(contextable_item.save(context: :in_context)).to be false
         end
       end
 
       context "on persisted document" do
+
         it "returns true" do
           persisted_contextable_item.title = "lady"
           expect(persisted_contextable_item.save(context: :in_context)).to be true
         end
+
         it "returns false" do
           persisted_contextable_item.title = nil
           expect(persisted_contextable_item.save(context: :in_context)).to be false
@@ -626,7 +631,7 @@ describe Mongoid::Persistable::Savable do
     context "when the document has associations" do
 
       let!(:firefox) do
-        Firefox.create(name: "firefox")
+        Firefox.create!(name: "firefox")
       end
 
       let!(:writer) do

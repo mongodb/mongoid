@@ -7,7 +7,7 @@ describe Mongoid::Criteria do
   describe "#only" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode", likes: 3, views: 10)
+      Band.create!(name: "Depeche Mode", likes: 3, views: 10)
     end
 
     context "when not using inheritance" do
@@ -157,10 +157,10 @@ describe Mongoid::Criteria do
 
       before do
         I18n.locale = :en
-        d = Dictionary.create(description: 'english-text')
+        d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
-        d.save
+        d.save!
       end
 
       after do

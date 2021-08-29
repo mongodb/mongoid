@@ -7,7 +7,7 @@ describe Mongoid::Association::Accessors do
   describe "\#{getter}?" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when the association is a has one" do
@@ -88,7 +88,7 @@ describe Mongoid::Association::Accessors do
       context "when the association is named next" do
 
         let(:user) do
-          User.create
+          User.create!
         end
 
         it "allows the existence check" do
@@ -354,13 +354,13 @@ describe Mongoid::Association::Accessors do
     context "when the association is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the association is a many to many" do
 
         let!(:preference) do
-          Preference.create(name: "Setting")
+          Preference.create!(name: "Setting")
         end
 
         before do
@@ -412,7 +412,7 @@ describe Mongoid::Association::Accessors do
       context "when the association is a many to one" do
 
         let!(:post) do
-          Post.create(title: "First!")
+          Post.create!(title: "First!")
         end
 
         before do
@@ -464,7 +464,7 @@ describe Mongoid::Association::Accessors do
       context "when the association is a references one" do
 
         let!(:game) do
-          Game.create(name: "Centipeded")
+          Game.create!(name: "Centipeded")
         end
 
         before do
@@ -519,15 +519,15 @@ describe Mongoid::Association::Accessors do
       context "when there's a single references many/one" do
 
         let!(:movie) do
-          Movie.create(title: "Inception")
+          Movie.create!(title: "Inception")
         end
 
         let!(:book) do
-          Book.create(title: "Jurassic Park")
+          Book.create!(title: "Jurassic Park")
         end
 
         let!(:movie_rating) do
-          movie.ratings.create(value: 10)
+          movie.ratings.create!(value: 10)
         end
 
         let!(:book_rating) do
@@ -832,7 +832,7 @@ describe Mongoid::Association::Accessors do
       context "when setting the _ids accessor" do
 
         let(:post) do
-          Post.create
+          Post.create!
         end
 
         before do
@@ -910,7 +910,7 @@ describe Mongoid::Association::Accessors do
     end
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when value is an empty string" do
@@ -969,13 +969,13 @@ describe Mongoid::Association::Accessors do
   context 'when setting the association more than once' do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     context 'when the association is a references one' do
 
       let(:game) do
-        Game.create
+        Game.create!
       end
 
       before do
@@ -991,7 +991,7 @@ describe Mongoid::Association::Accessors do
     context 'when the association is a references many' do
 
       let!(:preference) do
-        Preference.create(name: "Setting")
+        Preference.create!(name: "Setting")
       end
 
       before do

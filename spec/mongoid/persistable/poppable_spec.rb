@@ -36,7 +36,7 @@ describe Mongoid::Persistable::Poppable do
       end
 
       let(:person) do
-        Person.create(array: [ 1, 2, 3, 4 ], aliases: [ "a", "b" ])
+        Person.create!(array: [ 1, 2, 3, 4 ], aliases: [ "a", "b" ])
       end
 
       context "when provided string fields" do
@@ -88,11 +88,11 @@ describe Mongoid::Persistable::Poppable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "test", services: [ 1, 2, 3, 4 ], aliases: [ "a", "b" ])
+        person.addresses.create!(street: "test", services: [ 1, 2, 3, 4 ], aliases: [ "a", "b" ])
       end
 
       context "when provided string fields" do
@@ -117,7 +117,7 @@ describe Mongoid::Persistable::Poppable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(test_array: [1, 2, 3])
+        Person.create!(test_array: [1, 2, 3])
       end
 
       it "marks a dirty change for the popped fields" do
