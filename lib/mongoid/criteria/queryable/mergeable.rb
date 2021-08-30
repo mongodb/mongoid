@@ -152,7 +152,7 @@ module Mongoid
 
         # Combines criteria into a MongoDB selector.
         #
-        # Criteria is an array of criterions which will be flattened.
+        # Criteria is an array of criterion objects which will be flattened.
         #
         # Each criterion can be:
         # - A hash

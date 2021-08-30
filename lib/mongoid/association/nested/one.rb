@@ -54,7 +54,7 @@ module Mongoid
 
         private
 
-        # Is the id in the attribtues acceptable for allowing an update to
+        # Is the id in the attributes acceptable for allowing an update to
         # the existing association?
         #
         # @api private

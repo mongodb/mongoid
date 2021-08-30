@@ -20,7 +20,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     describe "##{method}" do
 
-      context "when providing the base class in child contructor" do
+      context "when providing the base class in child constructor" do
 
         let(:person) do
           Person.create
@@ -1869,7 +1869,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when using a diferent primary_key" do
+    context "when using a different primary_key" do
 
       let(:person) do
         Person.create!(username: 'arthurnn')
@@ -3643,7 +3643,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
                                             )
     end
 
-    it "chaining order criterias" do
+    it "chaining order criteria" do
       expect(person.ordered_posts.order_by(:title.desc).to_a).to eq(
                                                                      [post_three, post_two, post_one]
                                                                  )

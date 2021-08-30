@@ -312,22 +312,22 @@ module Mongoid
         @limiting = value
       end
 
-      # Get the skiping value.
+      # Get the skipping value.
       #
       # @api private
       #
-      # @example Get the skiping value.
+      # @example Get the skipping value.
       #
       # @return [ Integer ] The skip.
       def skipping
         defined?(@skipping) ? @skipping : nil
       end
 
-      # Set the skiping value.
+      # Set the skipping value.
       #
       # @api private
       #
-      # @example Set the skiping value.
+      # @example Set the skipping value.
       #
       # @param [ Integer ] value The skip.
       #

@@ -3,11 +3,11 @@
 module Mongoid
   module Errors
 
-    # Raised when attempting to destroy a document that had destory callbacks
+    # Raised when attempting to destroy a document that had destroy callbacks
     # return false.
     class DocumentNotDestroyed < MongoidError
 
-      # Instnatiate the exception.
+      # Instantiate the exception.
       #
       # @example Create the error.
       #   DocumentNotDestroyed.new(Band)
