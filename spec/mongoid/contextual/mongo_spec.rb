@@ -640,8 +640,25 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "does not load all documents" do
-            expect(Mongo::Logger.logger).to receive(:debug?).exactly(2).times.and_call_original
+            subscriber = Class.new do
+              attr_reader :events
+              def initialize; @events = []; end
+              def started(event); @events << event; end
+              def succeeded(event); @events << event; end
+              def failed(event); @events << event; end
+            end.new
+            context.view.client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+
             enum.next
+
+            find_events = subscriber.events.select do |evt|
+              evt.command_name == 'find'
+            end
+            expect(find_events.length).to be(2)
+            get_more_events = subscriber.events.select do |evt|
+              evt.command_name == 'getMore'
+            end
+            expect(get_more_events.length).to be(0)
           end
         end
       end
