@@ -653,6 +653,8 @@ describe Mongoid::Contextual::Mongo do
               evt.command_name == 'getMore'
             end
             expect(get_more_events.length).to be(0)
+          ensure
+            context.view.client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
           end
         end
       end
