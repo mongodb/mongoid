@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -21,7 +20,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     describe "##{method}" do
 
-      context "when providing the base class in child contructor" do
+      context "when providing the base class in child constructor" do
 
         let(:person) do
           Person.create
@@ -1419,6 +1418,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       it "returns the number of persisted documents" do
         expect(movie.ratings.count).to eq(1)
       end
+
+      it "block form includes persisted results" do
+        expect(movie.ratings.count {|r| r.value >= 1 }).to eq(1)
+        expect(movie.ratings.count {|r| r.value >= 2 }).to eq(0)
+      end
     end
 
     context "when documents have not been persisted" do
@@ -1429,6 +1433,27 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       it "returns 0" do
         expect(movie.ratings.count).to eq(0)
+      end
+
+      it "block form does not include unpersisted results" do
+        expect(movie.ratings.count {|r| r.value == 1 }).to eq(0)
+      end
+    end
+
+    context "when mixed persisted and unpersisted documents" do
+
+      before do
+        movie.ratings.create(value: 1)
+        movie.ratings.build(value: 2)
+      end
+
+      it "returns 1" do
+        expect(movie.ratings.count).to eq(1)
+      end
+
+      it "block form includes only persisted results" do
+        expect(movie.ratings.count {|r| r.value >= 1 }).to eq(1)
+        expect(movie.ratings.count {|r| r.value == 2 }).to eq(0)
       end
     end
 
@@ -1844,7 +1869,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when using a diferent primary_key" do
+    context "when using a different primary_key" do
 
       let(:person) do
         Person.create!(username: 'arthurnn')
@@ -3618,7 +3643,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
                                             )
     end
 
-    it "chaining order criterias" do
+    it "chaining order criteria" do
       expect(person.ordered_posts.order_by(:title.desc).to_a).to eq(
                                                                      [post_three, post_two, post_one]
                                                                  )

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -17,8 +16,6 @@ module Mongoid
           # @param [ Hash ] object The other hash to add.
           #
           # @return [ Hash ] The hash with object added.
-          #
-          # @since 1.0.0
           def __add__(object)
             apply_strategy(:__add__, object)
           end
@@ -31,8 +28,6 @@ module Mongoid
           # @param [ Array ] array The array to add to.
           #
           # @return [ Hash ] The merged hash.
-          #
-          # @since 1.0.0
           def __add_from_array__(array)
             { keys.first => array.__add__(values.first) }
           end
@@ -45,8 +40,6 @@ module Mongoid
           # @param [ Hash ] object The other hash to intersect.
           #
           # @return [ Hash ] The hash with object intersected.
-          #
-          # @since 1.0.0
           def __intersect__(object)
             apply_strategy(:__intersect__, object)
           end
@@ -59,8 +52,6 @@ module Mongoid
           # @param [ Array ] array The array to intersect to.
           #
           # @return [ Hash ] The merged hash.
-          #
-          # @since 1.0.0
           def __intersect_from_array__(array)
             { keys.first => array.__intersect__(values.first) }
           end
@@ -73,8 +64,6 @@ module Mongoid
           # @param [ Object ] object The object to intersect to.
           #
           # @return [ Hash ] The merged hash.
-          #
-          # @since 1.0.0
           def __intersect_from_object__(object)
             { keys.first => object.__intersect__(values.first) }
           end
@@ -87,8 +76,6 @@ module Mongoid
           # @param [ Hash ] object The other hash to union.
           #
           # @return [ Hash ] The hash with object unioned.
-          #
-          # @since 1.0.0
           def __union__(object)
             apply_strategy(:__union__, object)
           end
@@ -101,8 +88,6 @@ module Mongoid
           # @param [ Object ] object The object to union to.
           #
           # @return [ Hash ] The merged hash.
-          #
-          # @since 1.0.0
           def __union_from_object__(object)
             { keys.first => object.__union__(values.first) }
           end
@@ -113,8 +98,6 @@ module Mongoid
           #   { field: value }.__deep_copy__
           #
           # @return [ Hash ] The copied hash.
-          #
-          # @since 1.0.0
           def __deep_copy__
             {}.tap do |copy|
               each_pair do |key, value|
@@ -129,8 +112,6 @@ module Mongoid
           #   { field: 1 }.__sort_option__
           #
           # @return [ Hash ] The hash as sort option.
-          #
-          # @since 1.0.0
           def __sort_option__
             tap do |hash|
               hash.each_pair do |key, value|
@@ -145,8 +126,6 @@ module Mongoid
           #   obj.__expand_complex__
           #
           # @return [ Hash ] The expanded hash.
-          #
-          # @since 1.0.5
           def __expand_complex__
             replacement = {}
             each_pair do |key, value|
@@ -163,8 +142,6 @@ module Mongoid
           # @param [ Proc ] block The block to execute on each value.
           #
           # @return [ Hash ] the hash.
-          #
-          # @since 1.0.0
           def update_values(&block)
             each_pair do |key, value|
               store(key, block[value])
@@ -184,8 +161,6 @@ module Mongoid
           # @param [ Object ] object The object to merge.
           #
           # @return [ Hash ] The merged hash.
-          #
-          # @since 1.0.0
           def apply_strategy(strategy, object)
             tap do |hash|
               object.each_pair do |key, value|

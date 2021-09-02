@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/config/environment"
 require "mongoid/config/options"
@@ -82,8 +81,6 @@ module Mongoid
     #   config.configured?
     #
     # @return [ true, false ] If Mongoid is configured.
-    #
-    # @since 3.0.9
     def configured?
       clients.key?(:default)
     end
@@ -96,8 +93,6 @@ module Mongoid
     #   config.connect_to("mongoid_test")
     #
     # @param [ String ] name The database name.
-    #
-    # @since 3.0.0
     def connect_to(name, options = { read: { mode: :primary }})
       self.clients = {
         default: {
@@ -127,8 +122,6 @@ module Mongoid
     #
     # @param [ String ] path The path to the file.
     # @param [ String, Symbol ] environment The environment to load.
-    #
-    # @since 2.0.1
     def load!(path, environment = nil)
       settings = Environment.load_yaml(path, environment)
       if settings.present?
@@ -146,8 +139,6 @@ module Mongoid
     #   config.models
     #
     # @return [ Array<Class> ] All the models in the application.
-    #
-    # @since 3.1.0
     def models
       @models ||= []
     end
@@ -158,8 +149,6 @@ module Mongoid
     #   config.register_model(Band)
     #
     # @param [ Class ] klass The model to register.
-    #
-    # @since 3.1.0
     def register_model(klass)
       LOCK.synchronize do
         models.push(klass) unless models.include?(klass)
@@ -172,8 +161,6 @@ module Mongoid
     #   config.load_configuration(settings)
     #
     # @param [ Hash ] settings The configuration settings.
-    #
-    # @since 3.1.0
     def load_configuration(settings)
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
@@ -189,8 +176,6 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the database.
     #
     # @return [ String, Symbol ] The global override.
-    #
-    # @since 3.0.0
     def override_database(name)
       Threaded.database_override = name
     end
@@ -203,8 +188,6 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the client.
     #
     # @return [ String, Symbol ] The global override.
-    #
-    # @since 3.0.0
     def override_client(name)
       Threaded.client_override = name ? name.to_s : nil
     end
@@ -217,8 +200,6 @@ module Mongoid
     # @note This is the fastest way to drop all data.
     #
     # @return [ true ] true.
-    #
-    # @since 2.0.2
     def purge!
       global_client.database.collections.each(&:drop) and true
     end
@@ -231,8 +212,6 @@ module Mongoid
     # @note This will be slower than purge!
     #
     # @return [ true ] true.
-    #
-    # @since 2.0.2
     def truncate!
       global_client.database.collections.each do |collection|
         collection.find.delete_many
@@ -245,8 +224,6 @@ module Mongoid
     #   config.options = { raise_not_found_error: true }
     #
     # @param [ Hash ] options The configuration options.
-    #
-    # @since 3.0.0
     def options=(options)
       if options
         options.each_pair do |option, value|
@@ -262,8 +239,6 @@ module Mongoid
     #   config.clients
     #
     # @return [ Hash ] The clients configuration.
-    #
-    # @since 3.0.0
     def clients
       @clients ||= {}
     end
@@ -274,8 +249,6 @@ module Mongoid
     #   Config.time_zone
     #
     # @return [ String ] The time zone.
-    #
-    # @since 3.0.0
     def time_zone
       use_utc? ? "UTC" : ::Time.zone
     end
@@ -286,8 +259,6 @@ module Mongoid
     #   config.running_with_passenger?
     #
     # @return [ true, false ] If the app is deployed on Passenger.
-    #
-    # @since 3.0.11
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end

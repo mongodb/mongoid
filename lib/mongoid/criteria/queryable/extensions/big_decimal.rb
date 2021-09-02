@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "bigdecimal"
 
@@ -22,8 +21,6 @@ module Mongoid
             # @param [ BigDecimal ] object The object to convert.
             #
             # @return [ String ] The big decimal as a string.
-            #
-            # @since 1.0.0
             def evolve(object)
               __evolve__(object) do |obj|
                 obj ? obj.to_s : obj

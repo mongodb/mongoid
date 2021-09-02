@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Persistable
 
     # Defines behavior for logical bitwise operations.
-    #
-    # @since 4.0.0
     module Logical
       extend ActiveSupport::Concern
 
@@ -19,8 +16,6 @@ module Mongoid
       # @param [ Hash ] operations The bitwise operations.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def bit(operations)
         prepare_atomic_operation do |ops|
           process_atomic_operations(operations) do |field, values|

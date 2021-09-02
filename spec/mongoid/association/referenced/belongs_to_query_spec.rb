@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 require_relative './has_many_models'
@@ -33,6 +32,26 @@ describe Mongoid::Association::Referenced::BelongsTo do
     it 'fetches all fields' do
       expect(school.district).to eq('foo')
       expect(school.team).to eq('Bulldogs')
+    end
+  end
+
+  context 'when projecting with #only while having similar inverse_of candidates' do
+    before do
+      alice = HmmOwner.create!(name: 'Alice')
+      bob = HmmOwner.create!(name: 'Bob')
+
+      HmmPet.create!(name: 'Rex', current_owner: bob, previous_owner: alice)
+    end
+
+    let(:pet) { HmmPet.where(name: 'Rex').only(:name, :previous_owner_id, 'previous_owner.name').first }
+
+    it 'populates specified fields' do
+      expect(pet.name).to eq('Rex')
+      expect(pet.previous_owner.name).to eq('Alice')
+    end
+
+    it 'does not try to load the inverse for an association that explicitly prevents it' do
+      expect { pet.previous_owner.name }.not_to raise_error
     end
   end
 end

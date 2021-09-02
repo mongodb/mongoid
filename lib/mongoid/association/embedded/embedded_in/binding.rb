@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -7,8 +6,6 @@ module Mongoid
       class EmbeddedIn
 
         # The Binding object for embedded_in associations.
-        #
-        # @since 7.0
         class Binding
           include Bindable
 
@@ -21,8 +18,6 @@ module Mongoid
           # @example Bind the documents.
           #   name.person.bind(:continue => true)
           #   name.person = Person.new
-          #
-          # @since 2.0.0.rc.1
           def bind_one
             _base._association = _association.inverse_association(_target) unless _base._association
             _base.parentize(_target)
@@ -41,8 +36,6 @@ module Mongoid
           # @example Unbind the document.
           #   name.person.unbind(:continue => true)
           #   name.person = nil
-          #
-          # @since 2.0.0.rc.1
           def unbind_one
             binding do
               if _base.embedded_many?

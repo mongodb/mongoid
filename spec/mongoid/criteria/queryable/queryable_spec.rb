@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -69,7 +68,7 @@ describe Mongoid::Query do
         described_class.new
       end
 
-      it "intializes the selector" do
+      it "initializes the selector" do
         expect(query.selector).to eq({})
       end
 

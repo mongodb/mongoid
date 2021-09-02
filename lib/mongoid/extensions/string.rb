@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Extensions
@@ -14,8 +13,6 @@ module Mongoid
       #   "test".__evolve_object_id__
       #
       # @return [ String, BSON::ObjectId ] The evolved string.
-      #
-      # @since 3.0.0
       def __evolve_object_id__
         convert_to_object_id
       end
@@ -26,8 +23,6 @@ module Mongoid
       #   "test".__mongoize_object_id__
       #
       # @return [ String, BSON::ObjectId, nil ] The mongoized string.
-      #
-      # @since 3.0.0
       def __mongoize_object_id__
         convert_to_object_id unless blank?
       end
@@ -42,8 +37,6 @@ module Mongoid
       #
       # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
       #   configured default time zone corresponding to this string.
-      #
-      # @since 3.0.0
       def __mongoize_time__
         # This extra parse from Time is because ActiveSupport::TimeZone
         # either returns nil or Time.now if the string is empty or invalid,
@@ -63,8 +56,6 @@ module Mongoid
       #   "namespace/model".collectionize
       #
       # @return [ String ] The string in collection friendly form.
-      #
-      # @since 1.0.0
       def collectionize
         tableize.gsub("/", "_")
       end
@@ -75,8 +66,6 @@ module Mongoid
       #   "_id".mongoid_id?
       #
       # @return [ true, false ] If the string is id or _id.
-      #
-      # @since 2.3.1
       def mongoid_id?
         self =~ /\A(|_)id\z/
       end
@@ -88,8 +77,6 @@ module Mongoid
       #   "1234.23".numeric?
       #
       # @return [ true, false ] If the string is a number.
-      #
-      # @since 3.0.0
       def numeric?
         !!Float(self)
       rescue ArgumentError
@@ -102,8 +89,6 @@ module Mongoid
       #   "model=".reader
       #
       # @return [ String ] The string stripped of "=".
-      #
-      # @since 1.0.0
       def reader
         delete("=").sub(/\_before\_type\_cast\z/, '')
       end
@@ -114,20 +99,16 @@ module Mongoid
       #   "model=".writer?
       #
       # @return [ true, false ] If the string contains "=".
-      #
-      # @since 1.0.0
       def writer?
         include?("=")
       end
 
       # Is this string a valid_method_name?
       #
-      # @example Is the string a valid Ruby idenfier for use as a method name
+      # @example Is the string a valid Ruby identifier for use as a method name
       #   "model=".valid_method_name?
       #
       # @return [ true, false ] If the string contains a valid Ruby identifier.
-      #
-      # @since 3.0.15
       def valid_method_name?
         /[@$"-]/ !~ self
       end
@@ -138,8 +119,6 @@ module Mongoid
       #   "price_before_type_cast".before_type_cast?
       #
       # @return [ true, false ] If the string ends with "_before_type_cast"
-      #
-      # @since 3.1.0
       def before_type_cast?
         ends_with?("_before_type_cast")
       end
@@ -150,8 +129,6 @@ module Mongoid
       #   object.unconvertable_to_bson?
       #
       # @return [ true, false ] If the object is unconvertable.
-      #
-      # @since 2.2.1
       def unconvertable_to_bson?
         @unconvertable_to_bson ||= false
       end
@@ -166,8 +143,6 @@ module Mongoid
       #   string.convert_to_object_id
       #
       # @return [ String, BSON::ObjectId ] The string or the id.
-      #
-      # @since 3.0.0
       def convert_to_object_id
         BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
       end
@@ -182,8 +157,6 @@ module Mongoid
         # @param [ Object ] object The object to demongoize.
         #
         # @return [ String ] The object.
-        #
-        # @since 3.0.0
         def demongoize(object)
           object.try(:to_s)
         end
@@ -197,8 +170,6 @@ module Mongoid
         # @param [ Object ] object The object to mongoize.
         #
         # @return [ String ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           demongoize(object)
         end

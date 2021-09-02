@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -641,8 +640,21 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "does not load all documents" do
-            expect(Mongo::Logger.logger).to receive(:debug?).exactly(2).times.and_call_original
+            subscriber = Mrss::EventSubscriber.new
+            context.view.client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+
             enum.next
+
+            find_events = subscriber.all_events.select do |evt|
+              evt.command_name == 'find'
+            end
+            expect(find_events.length).to be(2)
+            get_more_events = subscriber.all_events.select do |evt|
+              evt.command_name == 'getMore'
+            end
+            expect(get_more_events.length).to be(0)
+          ensure
+            context.view.client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
           end
         end
       end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Touchable
@@ -21,8 +20,6 @@ module Mongoid
       # @param [ Symbol ] field The name of an additional field to update.
       #
       # @return [ true/false ] false if record is new_record otherwise true.
-      #
-      # @since 3.0.0
       def touch(field = nil)
         return false if _root.new_record?
         current = Time.now
@@ -41,6 +38,16 @@ module Mongoid
           # _association.inverse_association.options but inverse_association
           # seems to not always/ever be set here. See MONGOID-5014.
           _parent.touch
+
+          if field
+            # If we are told to also touch a field, perform a separate write
+            # for that field. See MONGOID-5136.
+            # In theory we should combine the writes, which would require
+            # passing the fields to be updated to the parents - MONGOID-5142.
+            sets = set_field_atomic_updates(field)
+            selector = atomic_selector
+            _root.collection.find(selector).update_one(positionally(selector, sets), session: _session)
+          end
         else
           # If the current document is not embedded, it is composition root
           # and we need to persist the write here.
@@ -70,8 +77,6 @@ module Mongoid
     # @param [ Association ] association The association metadata.
     #
     # @return [ Class ] The model class.
-    #
-    # @since 3.0.0
     def define_touchable!(association)
       name = association.name
       method_name = define_relation_touch_method(name, association)
@@ -95,8 +100,6 @@ module Mongoid
     #
     # @param [ Symbol ] name The name of the association.
     # @param [ Association ] association The association metadata.
-    #
-    # @since 3.1.0
     #
     # @return [ Symbol ] The method name.
     def define_relation_touch_method(name, association)

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'mongoid/association/referenced/belongs_to/binding'
 require 'mongoid/association/referenced/belongs_to/buildable'
@@ -11,8 +10,6 @@ module Mongoid
     module Referenced
 
       # The BelongsTo type association.
-      #
-      # @since 7.0
       class BelongsTo
         include Relatable
         include Buildable
@@ -21,8 +18,6 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        #
-        # @since 7.0
         ASSOCIATION_OPTIONS = [
             :autobuild,
             :autosave,
@@ -41,29 +36,21 @@ module Mongoid
         # the shared ones.
         #
         # @return [ Array<Symbol> ] The valid options.
-        #
-        # @since 7.0
         VALID_OPTIONS = (ASSOCIATION_OPTIONS + SHARED_OPTIONS).freeze
 
         # The type of the field holding the foreign key.
         #
         # @return [ Object ]
-        #
-        # @since 7.0
         FOREIGN_KEY_FIELD_TYPE = Object
 
         # The default foreign key suffix.
         #
         # @return [ String ] '_id'
-        #
-        # @since 7.0
         FOREIGN_KEY_SUFFIX = '_id'.freeze
 
         # The list of association complements.
         #
         # @return [ Array<Association> ] The association complements.
-        #
-        # @since 7.0
         def relation_complements
           @relation_complements ||= [ HasMany, HasOne ].freeze
         end
@@ -71,8 +58,6 @@ module Mongoid
         # Setup the instance methods, fields, etc. on the association owning class.
         #
         # @return [ self ]
-        #
-        # @since 7.0
         def setup!
           setup_instance_methods!
           @owner_class.aliased_fields[name.to_s] = foreign_key
@@ -82,29 +67,21 @@ module Mongoid
         # Does this association type store the foreign key?
         #
         # @return [ true ] Always true.
-        #
-        # @since 7.0
         def stores_foreign_key?; true; end
 
         # Is this association type embedded?
         #
         # @return [ false ] Always false.
-        #
-        # @since 7.0
         def embedded?; false; end
 
         # The default for validation the association object.
         #
         # @return [ false ] Always false.
-        #
-        # @since 7.0
         def validation_default; false; end
 
         # Get the foreign key field for saving the association reference.
         #
         # @return [ String ] The foreign key field for saving the association reference.
-        #
-        # @since 7.0
         def foreign_key
           @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
                              default_foreign_key_field
@@ -113,8 +90,6 @@ module Mongoid
         # Get the association proxy class for this association type.
         #
         # @return [ Association::BelongsTo::Proxy ] The proxy class.
-        #
-        # @since 7.0
         def relation
           Proxy
         end
@@ -122,8 +97,6 @@ module Mongoid
         # Is this association polymorphic?
         #
         # @return [ true, false ] Whether this association is polymorphic.
-        #
-        # @since 7.0
         def polymorphic?
           @polymorphic ||= !!@options[:polymorphic]
         end
@@ -131,8 +104,6 @@ module Mongoid
         # The name of the field used to store the type of polymorphic association.
         #
         # @return [ String ] The field used to store the type of polymorphic association.
-        #
-        # @since 7.0
         def inverse_type
           (@inverse_type ||= "#{name}_type") if polymorphic?
         end
@@ -143,8 +114,6 @@ module Mongoid
         # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::One ] The Nested Builder object.
-        #
-        # @since 7.0
         def nested_builder(attributes, options)
           Nested::One.new(self, attributes, options)
         end
@@ -157,8 +126,6 @@ module Mongoid
         # @param [ Document ] document The document to calculate on.
         #
         # @return [ Root ] The root atomic path calculator.
-        #
-        # @since 2.1.0
         def path(document)
           Mongoid::Atomic::Paths::Root.new(document)
         end

@@ -89,7 +89,7 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* \#4091 Use sublcass context when calling a scope defined in a superclass. (Edgars Beigarts)
+* \#4091 Use subclass context when calling a scope defined in a superclass. (Edgars Beigarts)
 
 * \#4075 Made remove index logging specific to each index that was actually getting removed.
 
@@ -107,7 +107,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
 
-* \#3991 Fixed emebdded documents not flagging as changed after calling #changed? and modifying the
+* \#3991 Fixed embedded documents not flagging as changed after calling #changed? and modifying the
 child elements.
 
 * \#3874 Adding snapshot option to context.
@@ -568,7 +568,7 @@ child elements.
 * \#3197 Improvements in the calls to `aggregates` on root and embedded
   collections. (Wojciech Piekutowski)
 
-* \#3144/\#3219 Fixing name colission on @_children ivar. (Arthur Neves)
+* \#3144/\#3219 Fixing name collision on @_children ivar. (Arthur Neves)
 
 * \#3088 Range field can accept a hash, which could be the attribute from the db.
   (Daniel Libanori)
@@ -589,9 +589,9 @@ child elements.
 
 ### Resolved Issues
 
-* \#3465 Fixed ambigous relation errors where inverse_of is set to nil.
+* \#3465 Fixed ambiguous relation errors where inverse_of is set to nil.
 
-* \#3414 Backkport skip and limit options on aggregation. (Wojciech Piekutowski)
+* \#3414 Backport skip and limit options on aggregation. (Wojciech Piekutowski)
 
 * \#3469 Fix RegexpError: failed to allocate memory: /\./ on .hash_dot_syntax?  (Dmitry Krasnoukhov)
 
@@ -628,7 +628,7 @@ child elements.
 
 * \#3137 Allow multiple `belongs_to` sets in a row with ids.
 
-* \#3079 Embbed docs with paranoia parents, were losing the _id when
+* \#3079 Embedded docs with paranoia parents were losing the _id when
   reloading from db, as they didnt have the right persisted? value. (Arthur Neves)
 
 * \#3081 Criteria's `method_missing` now checks if an array responds to the provided
@@ -1342,7 +1342,7 @@ child elements.
 * \#2411 BigDecimal fields are properly stored as strings when mongoizing
   integers and floats.
 
-* \#2409 Don't warn about missing mongoid.yml if configured programatically.
+* \#2409 Don't warn about missing mongoid.yml if configured programmatically.
 
 * \#2403 Return false on `update_all` of an embeds many with no documents.
 
@@ -1390,7 +1390,7 @@ child elements.
 
 * \#2353 Allow `update_attribute` to properly handle aliased fields.
 
-* \#2348 Conversion of strings to times should raise an arugment error if the
+* \#2348 Conversion of strings to times should raise an argument error if the
   string is invalid. (Campbell Allen)
 
 * \#2346 Ensure `belongs_to` relations are evolvable when passed the proxy and
@@ -1912,7 +1912,7 @@ child elements.
         criteria.merge(filter)
 
 * \#1635 All exceptions now provide more comprehensive errors, including
-  the problem that occured, a detail summary of why it happened, and
+  the problem that occurred, a detail summary of why it happened, and
   potential resolutions. Example:
 
         (Mongoid::Errors::DocumentNotFound)
@@ -1929,7 +1929,7 @@ child elements.
           false, which will cause a nil to be returned instead
           of raising this error.
 
-* \#1616 `Model.find_by` added which takes a hash of arugments to search
+* \#1616 `Model.find_by` added which takes a hash of arguments to search
   for in the database. If no single document is returned a DocumentNotFound
   error is raised. (Piotr Jakubowski)
 
@@ -1990,7 +1990,7 @@ child elements.
 
 * \#1291 Mongoid now supports any number of database connections as defined in
   the mongoid.yml. For example you could have a local single server db, a
-  multi availablity zone replica set, and a shard cluster all in the same
+  multi availability zone replica set, and a shard cluster all in the same
   application environment. Mongoid can connect to any session at any point in
   time.
 
@@ -2941,7 +2941,7 @@ child elements.
 * \#1463 Batch insert consumers are now scoped to collection to avoid persistence
   of documents to other collections in callbacks going to the wrong place.
 
-* \#1462 Assigning has many relations via nested attribtues `*_attributes=` does
+* \#1462 Assigning has many relations via nested attributes `*_attributes=` does
   not autosave the relation.
 
 * \#1461 Fixed serialization of foreign key fields in complex criteria not to
@@ -3040,7 +3040,7 @@ child elements.
 
 * \#1386 Lowered mongo/bson dependency to 1.3
 
-* \#1377 Fix aggregation functions to properly handle nil or indefined values.
+* \#1377 Fix aggregation functions to properly handle nil or undefined values.
   (Maxime Garcia)
 
 * \#1373 Warn if a scope overrides another scope.
@@ -3121,7 +3121,7 @@ child elements.
 
 * \#1287 Fixed max versions limitation with versioning.
 
-* \#1277 attribute_will_change! properly flags the attribute even if no change occured.
+* \#1277 attribute_will_change! properly flags the attribute even if no change occurred.
 
 * \#1063 Paranoid documents properly run destroy callbacks on soft destroy.
 
@@ -3156,7 +3156,7 @@ child elements.
 
 * \#1256 Mongoid now can create indexes for models in Rails engines. (Caio Filipini)
 
-* \#1228 Allow pre formatting of compsoite keys by passing a block to #key.
+* \#1228 Allow pre formatting of composite keys by passing a block to #key.
   (Ben Hundley)
 
 * \#1222 Scoped mass assignment is now supported. (Andrew Shaydurov)
@@ -3236,7 +3236,7 @@ child elements.
 
 ## 2.2.4
 
-* \#1377 Fix aggregation functions to properly handle nil or indefined values.
+* \#1377 Fix aggregation functions to properly handle nil or undefined values.
   (Maxime Garcia)
 
 * \#1373 Warn if a scope overrides another scope.
@@ -3250,7 +3250,7 @@ child elements.
   key without error.
 
 * \#1350, \#1351 Fixed errors in the string conversions of double quotes and
-  tilde when paramterizing keys.
+  tilde when parameterizing keys.
 
 * \#1349 Mongoid documents should not blow up when including Enumerable.
   (Jonas Nicklas)

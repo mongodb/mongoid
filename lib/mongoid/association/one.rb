@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -13,9 +12,7 @@ module Mongoid
       # @example Clear the relation.
       #   relation.clear
       #
-      # @return [ true, false ] If the delete suceeded.
-      #
-      # @since 3.0.0
+      # @return [ true, false ] If the delete succeeded.
       def clear
         _target.delete
       end
@@ -26,8 +23,6 @@ module Mongoid
       #   relation.in_memory
       #
       # @return [ Array<Document> ] The documents in memory.
-      #
-      # @since 2.1.0
       def in_memory
         [ _target ]
       end
@@ -40,8 +35,6 @@ module Mongoid
       # @param [ Symbol ] name The method name.
       #
       # @return [ true, false ] If the proxy responds to the method.
-      #
-      # @since 2.1.8
       def respond_to?(name, include_private = false)
         _target.respond_to?(name, include_private) || super
       end
@@ -52,8 +45,6 @@ module Mongoid
       #   proxy.__evolve_object_id__
       #
       # @return [ Object ] The proxy document's id.
-      #
-      # @since 4.0.0
       def __evolve_object_id__
         _target._id
       end

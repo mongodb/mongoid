@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 require_relative './has_one_models'
@@ -1900,7 +1899,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
   describe '#foreign_key_setter' do
 
-    it 'returns the foriegn key field followed by "="' do
+    it 'returns the foreign key field followed by "="' do
       expect(association.foreign_key_setter).to eq("owner_object_id=")
     end
   end

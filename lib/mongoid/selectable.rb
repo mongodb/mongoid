@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
   # Provides behavior for generating the selector for a specific document.
-  #
-  # @since 4.0.0
   module Selectable
     extend ActiveSupport::Concern
 
@@ -17,8 +14,6 @@ module Mongoid
     #   document.atomic_selector
     #
     # @return [ Hash ] The document's selector.
-    #
-    # @since 1.0.0
     def atomic_selector
       @atomic_selector ||=
         (embedded? ? embedded_atomic_selector : root_atomic_selector_in_db)
@@ -34,8 +29,6 @@ module Mongoid
     #   document.embedded_atomic_selector
     #
     # @return [ Hash ] The embedded document selector.
-    #
-    # @since 4.0.0
     def embedded_atomic_selector
       if persisted? && _id_changed?
         _parent.atomic_selector
@@ -50,8 +43,6 @@ module Mongoid
     # @api private
     #
     # @return [ Hash ] The root document selector.
-    #
-    # @since 4.0.0
     def root_atomic_selector_in_db
       { "_id" => _id }.merge!(shard_key_selector_in_db)
     end

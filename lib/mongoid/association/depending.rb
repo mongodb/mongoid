@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -31,8 +30,6 @@ module Mongoid
       end
 
       # The valid dependent strategies.
-      #
-      # @since 7.0
       STRATEGIES = [
           :delete_all,
           :destroy,
@@ -50,8 +47,6 @@ module Mongoid
       # @param [ Association ] association The association metadata.
       #
       # @return [ Class ] The class of the document.
-      #
-      # @since 2.0.0.rc.1
       def self.define_dependency!(association)
         validate!(association)
         association.inverse_class.tap do |klass|
@@ -79,8 +74,6 @@ module Mongoid
       #
       # @example Execute cascades.
       #   document.apply_destroy_dependencies!
-      #
-      # @since 2.0.0.rc.1
       def apply_destroy_dependencies!
         self.class._all_dependents.each do |association|
           if dependent = association.try(:dependent)

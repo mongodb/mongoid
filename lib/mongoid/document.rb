@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/positional"
 require "mongoid/evolvable"
@@ -40,8 +39,6 @@ module Mongoid
     # that should be used instead.
     # When ruby driver 2.3.0 is released and Mongoid can be updated
     # to require >= 2.3.0, the BSON constant can be used.
-    #
-    # @since 6.0.0
     ILLEGAL_KEY = /(\A[$])|(\.)/.freeze
 
     # Freezes the internal attributes of the document.
@@ -50,8 +47,6 @@ module Mongoid
     #   document.freeze
     #
     # @return [ Document ] The document.
-    #
-    # @since 2.0.0
     def freeze
       as_attributes.freeze and self
     end
@@ -62,8 +57,6 @@ module Mongoid
     #   document.frozen?
     #
     # @return [ true, false ] True if frozen, else false.
-    #
-    # @since 2.0.0
     def frozen?
       attributes.frozen?
     end
@@ -78,8 +71,6 @@ module Mongoid
     #   document.hash
     #
     # @return [ Integer ] The hash of the document's identity.
-    #
-    # @since 1.0.0
     def hash
       identity.hash
     end
@@ -92,8 +83,6 @@ module Mongoid
     #   document.identity
     #
     # @return [ Array ] An array containing [document.class, document._id]
-    #
-    # @since 3.0.0
     def identity
       [ self.class, self._id ]
     end
@@ -111,8 +100,6 @@ module Mongoid
     # @param [ Hash ] attrs The attributes to set up the document with.
     #
     # @return [ Document ] A new document.
-    #
-    # @since 1.0.0
     def initialize(attrs = nil)
       @__parent = nil
       _building do
@@ -136,8 +123,6 @@ module Mongoid
     #   document.model_name
     #
     # @return [ String ] The model name.
-    #
-    # @since 3.0.16
     def model_name
       self.class.model_name
     end
@@ -148,8 +133,6 @@ module Mongoid
     #   document.to_key
     #
     # @return [ String ] The id of the document or nil if new.
-    #
-    # @since 2.4.0
     def to_key
       (persisted? || destroyed?) ? [ _id.to_s ] : nil
     end
@@ -160,8 +143,6 @@ module Mongoid
     #   document.to_a
     #
     # @return [ Array<Document> ] An array with the document as its only item.
-    #
-    # @since 1.0.0
     def to_a
       [ self ]
     end
@@ -174,8 +155,6 @@ module Mongoid
     #   person.as_document
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
-    #
-    # @since 1.0.0
     def as_document
       BSON::Document.new(as_attributes)
     end
@@ -194,15 +173,14 @@ module Mongoid
     #
     # @param [ Hash ] options The options.
     #
-    # @option options [ true, false ] :compact Whether to include fields with
-    #   nil values in the json document.
+    # @option options [ true, false ] :compact (Deprecated) Whether to include fields
+    #   with nil values in the json document.
     #
     # @return [ Hash ] The document as json.
-    #
-    # @since 5.1.0
     def as_json(options = nil)
       rv = super
       if options && options[:compact]
+        Mongoid.logger.warn('#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.')
         rv = rv.compact
       end
       rv
@@ -219,8 +197,6 @@ module Mongoid
     # @param [ Class ] klass The class to become.
     #
     # @return [ Document ] An instance of the specified class.
-    #
-    # @since 2.0.0
     def becomes(klass)
       unless klass.include?(Mongoid::Document)
         raise ArgumentError, "A class which includes Mongoid::Document is expected"
@@ -255,8 +231,6 @@ module Mongoid
     # Returns the logger
     #
     # @return [ Logger ] The configured logger or a default Logger instance.
-    #
-    # @since 2.2.0
     def logger
       Mongoid.logger
     end
@@ -267,8 +241,6 @@ module Mongoid
     #   model.model_key
     #
     # @return [ String ] The model key.
-    #
-    # @since 2.4.0
     def model_key
       @model_cache_key ||= self.class.model_name.cache_key
     end
@@ -300,10 +272,8 @@ module Mongoid
       # @param [ Document, Object ] other The other object to compare with.
       #
       # @return [ true, false ] True if the classes are equal, false if not.
-      #
-      # @since 2.0.0.rc.4
       def ===(other)
-        other.class == Class ? self <= other : other.is_a?(self)
+        other.is_a?(self)
       end
 
       # Instantiate a new object, only when loaded from the database or when
@@ -317,8 +287,6 @@ module Mongoid
       #   criteria.
       #
       # @return [ Document ] A new document.
-      #
-      # @since 1.0.0
       def instantiate(attrs = nil, selected_fields = nil)
         attributes = attrs || {}
         doc = allocate
@@ -337,8 +305,6 @@ module Mongoid
       #   document._types
       #
       # @return [ Array<Class> ] All subclasses of the current document.
-      #
-      # @since 1.0.0
       def _types
         @_type ||= (descendants + [ self ]).uniq.map(&:discriminator_value)
       end
@@ -358,8 +324,6 @@ module Mongoid
       # Set the i18n scope to overwrite ActiveModel.
       #
       # @return [ Symbol ] :mongoid
-      #
-      # @since 2.0.0
       def i18n_scope
         :mongoid
       end
@@ -370,8 +334,6 @@ module Mongoid
       #   Person.logger
       #
       # @return [ Logger ] The configured logger or a default Logger instance.
-      #
-      # @since 2.2.0
       def logger
         Mongoid.logger
       end

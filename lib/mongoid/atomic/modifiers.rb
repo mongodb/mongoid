@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Atomic
@@ -14,8 +13,6 @@ module Mongoid
       #   modifiers.add_to_set({ "preference_ids" => [ "one" ] })
       #
       # @param [ Hash ] modifications The add to set modifiers.
-      #
-      # @since 2.4.0
       def add_to_set(modifications)
         modifications.each_pair do |field, value|
           if add_to_sets.has_key?(field)
@@ -34,8 +31,6 @@ module Mongoid
       #   modifiers.pull_all({ "addresses" => { "street" => "Bond" }})
       #
       # @param [ Hash ] modifications The pull all modifiers.
-      #
-      # @since 3.0.0
       def pull_all(modifications)
         modifications.each_pair do |field, value|
           add_operation(pull_alls, field, value)
@@ -49,8 +44,6 @@ module Mongoid
       #   modifiers.pull({ "addresses" => { "_id" => { "$in" => [ 1, 2, 3 ]}}})
       #
       # @param [ Hash ] modifications The pull all modifiers.
-      #
-      # @since 3.0.0
       def pull(modifications)
         modifications.each_pair do |field, value|
           pulls[field] = value
@@ -64,8 +57,6 @@ module Mongoid
       #   modifiers.push({ "addresses" => { "street" => "Bond" }})
       #
       # @param [ Hash ] modifications The push modifiers.
-      #
-      # @since 2.1.0
       def push(modifications)
         modifications.each_pair do |field, value|
           push_fields[field] = field
@@ -80,8 +71,6 @@ module Mongoid
       #   modifiers.set({ "title" => "sir" })
       #
       # @param [ Hash ] modifications The set modifiers.
-      #
-      # @since 2.1.0
       def set(modifications)
         modifications.each_pair do |field, value|
           next if field == "_id"
@@ -97,8 +86,6 @@ module Mongoid
       #   modifiers.unset([ "addresses" ])
       #
       # @param [ Array<String> ] modifications The unset association names.
-      #
-      # @since 2.2.0
       def unset(modifications)
         modifications.each do |field|
           unsets.update(field => true)
@@ -116,8 +103,6 @@ module Mongoid
       # @param [ Hash ] mods The modifications.
       # @param [ String ] field The field.
       # @param [ Hash ] value The atomic op.
-      #
-      # @since 2.2.0
       def add_operation(mods, field, value)
         if mods.has_key?(field)
           if mods[field].is_a?(Array)
@@ -141,8 +126,6 @@ module Mongoid
       # @param [ Hash ] mods The modifications.
       # @param [ String ] field The field.
       # @param [ Hash ] value The atomic op.
-      #
-      # @since 7.0.0
       def add_each_operation(mods, field, value)
         if mods.has_key?(field)
           value.each do |val|
@@ -153,14 +136,12 @@ module Mongoid
         end
       end
 
-      # Get the $addToSet operations or intialize a new one.
+      # Get the $addToSet operations or initialize a new one.
       #
       # @example Get the $addToSet operations.
       #   modifiers.add_to_sets
       #
       # @return [ Hash ] The $addToSet operations.
-      #
-      # @since 2.4.0
       def add_to_sets
         self["$addToSet"] ||= {}
       end
@@ -173,8 +154,6 @@ module Mongoid
       # @param [ String ] field The field.
       #
       # @return [ true, false ] If this field is a conflict.
-      #
-      # @since 2.2.0
       def set_conflict?(field)
         name = field.split(".", 2)[0]
         pull_fields.has_key?(name) || push_fields.has_key?(name)
@@ -188,8 +167,6 @@ module Mongoid
       # @param [ String ] field The field.
       #
       # @return [ true, false ] If this field is a conflict.
-      #
-      # @since 2.2.0
       def push_conflict?(field)
         name = field.split(".", 2)[0]
         set_fields.has_key?(name) || pull_fields.has_key?(name) ||
@@ -202,8 +179,6 @@ module Mongoid
       #   modifiers.conflicting_pulls
       #
       # @return [ Hash ] The conflicting pull operations.
-      #
-      # @since 2.2.0
       def conflicting_pulls
         conflicts["$pullAll"] ||= {}
       end
@@ -214,8 +189,6 @@ module Mongoid
       #   modifiers.conflicting_pushs
       #
       # @return [ Hash ] The conflicting push operations.
-      #
-      # @since 2.2.0
       def conflicting_pushes
         conflicts["$push"] ||= {}
       end
@@ -226,8 +199,6 @@ module Mongoid
       #   modifiers.conflicting_sets
       #
       # @return [ Hash ] The conflicting set operations.
-      #
-      # @since 2.2.0
       def conflicting_sets
         conflicts["$set"] ||= {}
       end
@@ -238,8 +209,6 @@ module Mongoid
       #   modifiers.conflicts
       #
       # @return [ Hash ] The conflicting modifications.
-      #
-      # @since 2.1.0
       def conflicts
         self[:conflicts] ||= {}
       end
@@ -250,8 +219,6 @@ module Mongoid
       #   modifiers.pull_fields
       #
       # @return [ Array<String> ] The pull fields.
-      #
-      # @since 2.2.0
       def pull_fields
         @pull_fields ||= {}
       end
@@ -262,8 +229,6 @@ module Mongoid
       #   modifiers.push_fields
       #
       # @return [ Array<String> ] The push fields.
-      #
-      # @since 2.2.0
       def push_fields
         @push_fields ||= {}
       end
@@ -274,32 +239,26 @@ module Mongoid
       #   modifiers.set_fields
       #
       # @return [ Array<String> ] The set fields.
-      #
-      # @since 2.2.0
       def set_fields
         @set_fields ||= {}
       end
 
-      # Get the $pullAll operations or intialize a new one.
+      # Get the $pullAll operations or initialize a new one.
       #
       # @example Get the $pullAll operations.
       #   modifiers.pull_alls
       #
       # @return [ Hash ] The $pullAll operations.
-      #
-      # @since 3.0.0
       def pull_alls
         self["$pullAll"] ||= {}
       end
 
-      # Get the $pull operations or intialize a new one.
+      # Get the $pull operations or initialize a new one.
       #
       # @example Get the $pull operations.
       #   modifiers.pulls
       #
       # @return [ Hash ] The $pull operations.
-      #
-      # @since 3.0.0
       def pulls
         self["$pull"] ||= {}
       end
@@ -310,20 +269,16 @@ module Mongoid
       #   modifiers.pushes
       #
       # @return [ Hash ] The $push/$each operations.
-      #
-      # @since 2.1.0
       def pushes
         self["$push"] ||= {}
       end
 
-      # Get the $set operations or intialize a new one.
+      # Get the $set operations or initialize a new one.
       #
       # @example Get the $set operations.
       #   modifiers.sets
       #
       # @return [ Hash ] The $set operations.
-      #
-      # @since 2.1.0
       def sets
         self["$set"] ||= {}
       end
@@ -334,8 +289,6 @@ module Mongoid
       #   modifiers.unsets
       #
       # @return [ Hash ] The $unset operations.
-      #
-      # @since 2.2.0
       def unsets
         self["$unset"] ||= {}
       end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -15,7 +14,7 @@ describe Mongoid::Criteria::Queryable::Aggregable do
       expect(aggregation).to_not equal(query)
     end
 
-    it "sets the aggrating flag" do
+    it "sets the aggregating flag" do
       expect(aggregation).to be_aggregating
     end
   end

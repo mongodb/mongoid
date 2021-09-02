@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -1756,7 +1755,7 @@ describe Mongoid::Criteria::Queryable::Optional do
 
     context "when provided fields" do
 
-      context "as sevaral arguments" do
+      context "as several arguments" do
 
         let(:selection) do
           query.without(:first, :second)

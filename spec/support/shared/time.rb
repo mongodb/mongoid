@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 shared_context 'using AS time zone' do
   before do
