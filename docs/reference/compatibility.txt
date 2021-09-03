@@ -34,6 +34,10 @@ specified Mongoid versions.
      - Driver 2.15-2.10
      - Driver 2.9-2.7
 
+   * - 7.4
+     - |checkmark|
+     -
+
    * - 7.3
      - |checkmark|
      -
@@ -76,6 +80,16 @@ is deprecated.
      - Ruby 2.3
      - Ruby 2.2
      - JRuby 9.2
+
+   * - 7.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+     -
+     - |checkmark|
 
    * - 7.3
      - |checkmark| [#mongoid-7.3-ruby-3.0]_
@@ -165,6 +179,16 @@ for driver compatibility matrices.
      - MongoDB 3.0
      - MongoDB 2.6
 
+   * - 7.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
    * - 7.3
      - |checkmark|
      - |checkmark|
@@ -236,6 +260,14 @@ are supported by Mongoid.
      - Rails 5.1
      - Rails 5.0
      - Rails 4.2
+
+   * - 7.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
+     -
+     -
 
    * - 7.3
      - |checkmark|

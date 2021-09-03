@@ -50,7 +50,7 @@ module Mongoid
       # @api private
       #
       # @example Check is the association or fk is blank.
-      #   validator.relation_or_fk_mising(doc, :name, "")
+      #   validator.relation_or_fk_missing(doc, :name, "")
       #
       # @param [ Document ] doc The document.
       # @param [ Symbol ] attr The attribute.

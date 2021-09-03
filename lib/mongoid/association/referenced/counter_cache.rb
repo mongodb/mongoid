@@ -7,7 +7,7 @@ module Mongoid
         extend ActiveSupport::Concern
 
         # Reset the given counter using the .count() query from the
-        # db. This method is usuful in case that a counter got
+        # db. This method is useful in case that a counter got
         # corrupted, or a new counter was added to the collection.
         #
         # @example Reset the given counter cache
@@ -23,7 +23,7 @@ module Mongoid
         module ClassMethods
 
           # Reset the given counter using the .count() query from the
-          # db. This method is usuful in case that a counter got
+          # db. This method is useful in case that a counter got
           # corrupted, or a new counter was added to the collection.
           #
           # @example Reset the given counter cache

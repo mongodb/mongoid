@@ -786,7 +786,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
               expect(person.preferences).to eq([ another_preference ])
             end
 
-            it "persists the relation between another_prefrence and person" do
+            it "persists the relation between another_preference and person" do
               expect(another_preference.people).to eq([ person ])
             end
 
@@ -807,7 +807,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
               expect(person.preferences).to eq([ another_preference ])
             end
 
-            it "persists the relation between another_prefrence and person" do
+            it "persists the relation between another_preference and person" do
               expect(another_preference.people).to eq([ person ])
             end
 
@@ -2560,7 +2560,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           end
         end
 
-        context "when the ids matche unreferenced documents" do
+        context "when the ids match unreferenced documents" do
 
           let(:preferences) do
             person.preferences.find(

@@ -74,7 +74,7 @@ module Mongoid
 
           # Combine the two objects using an intersection strategy.
           #
-          # @example Interset with the object.
+          # @example Intersect with the object.
           #   [ 1, 2 ].__intersect__(3)
           #
           # @param [ Object ] object The object to intersect with.

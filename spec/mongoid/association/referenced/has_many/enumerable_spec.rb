@@ -288,7 +288,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when an argument is given" do
-        ruby_version_gte '2.5'
 
         it "returns true when the argument is true" do
           expect(enumerable.any?(Post)).to be true
@@ -300,7 +299,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when both an argument and a block are given" do
-        ruby_version_gte '2.5'
 
         it "gives precedence to the pattern" do
           expect(
@@ -339,7 +337,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when an argument is given" do
-        ruby_version_gte '2.5'
 
         it "returns true when the argument is true" do
           expect(enumerable.any?(Post)).to be true
@@ -351,7 +348,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when both an argument and a block are given" do
-        ruby_version_gte '2.5'
 
         it "gives precedence to the pattern" do
           expect(

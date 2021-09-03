@@ -66,7 +66,7 @@ module Mongoid
       #
       # @param [ String, Symbol, Array ] args Field or fields to pluck.
       #
-      # @return [ Array ] Emtpy Array
+      # @return [ Array ] Empty Array
       def pluck(*args)
         []
       end

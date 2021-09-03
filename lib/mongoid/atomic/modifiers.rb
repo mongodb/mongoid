@@ -136,7 +136,7 @@ module Mongoid
         end
       end
 
-      # Get the $addToSet operations or intialize a new one.
+      # Get the $addToSet operations or initialize a new one.
       #
       # @example Get the $addToSet operations.
       #   modifiers.add_to_sets
@@ -243,7 +243,7 @@ module Mongoid
         @set_fields ||= {}
       end
 
-      # Get the $pullAll operations or intialize a new one.
+      # Get the $pullAll operations or initialize a new one.
       #
       # @example Get the $pullAll operations.
       #   modifiers.pull_alls
@@ -253,7 +253,7 @@ module Mongoid
         self["$pullAll"] ||= {}
       end
 
-      # Get the $pull operations or intialize a new one.
+      # Get the $pull operations or initialize a new one.
       #
       # @example Get the $pull operations.
       #   modifiers.pulls
@@ -273,7 +273,7 @@ module Mongoid
         self["$push"] ||= {}
       end
 
-      # Get the $set operations or intialize a new one.
+      # Get the $set operations or initialize a new one.
       #
       # @example Get the $set operations.
       #   modifiers.sets

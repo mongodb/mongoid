@@ -32,6 +32,7 @@ begin
   require 'mrss/cluster_config'
   require 'support/client_registry'
   require 'mrss/constraints'
+  require 'mrss/event_subscriber'
 rescue LoadError
   raise LoadError.new <<~MSG.strip
     The test suite requires shared tooling to be installed.

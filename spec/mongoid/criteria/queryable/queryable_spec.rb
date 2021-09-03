@@ -68,7 +68,7 @@ describe Mongoid::Query do
         described_class.new
       end
 
-      it "intializes the selector" do
+      it "initializes the selector" do
         expect(query.selector).to eq({})
       end
 
