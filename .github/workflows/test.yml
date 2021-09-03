@@ -427,10 +427,11 @@ jobs:
     - name: repo checkout
       uses: actions/checkout@v2
     - name: start mongodb
-      uses: supercharge/mongodb-github-action@1.6.0
+      id: "setup-mongodb"
+      uses: mongodb-labs/drivers-evergreen-tools@master
       with:
-        mongodb-version: "${{matrix.mongodb}}"
-        mongodb-replica-set: rs0
+        version: "${{matrix.mongodb}}"
+        topology: "${{matrix.topology}}"
     - name: load ruby
       uses: ruby/setup-ruby@v1
       env:
