@@ -452,3 +452,4 @@ jobs:
       run: bundle exec rake spec
       env:
         BUNDLE_GEMFILE: "${{matrix.gemfile}}"
+        MONGODB_URI: ${{ steps.setup-mongodb.outputs.cluster-uri }}
