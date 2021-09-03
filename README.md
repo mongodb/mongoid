@@ -9,7 +9,7 @@ Documentation
 -------------
 
 Mongoid has [extensive user documentation](https://docs.mongodb.com/mongoid/current/).
-[API documentation](http://api.mongodb.com/mongoid/current/) is also available.
+[API documentation](https://docs.mongodb.com/mongoid/current/api/) is also available.
 
 Mongoid is built on top of the MongoDB Ruby driver which has
 [its own user documentation](https://docs.mongodb.com/ruby-driver/current/).
