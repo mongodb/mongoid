@@ -169,7 +169,7 @@ can be configured.
           auth_mech: :scram
 
           # The database or source to authenticate the user against.
-          # If no auth source is specified, then a default will be set by the client
+          # If no auth source is specified, then a default will be set by the driver
           # depending on the auth mechanism that is being used to connect. Refer to:
           # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
           auth_source: admin
