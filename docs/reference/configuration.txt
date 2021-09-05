@@ -168,9 +168,11 @@ can be configured.
           # on 2.4 and 2.6 is :plain)
           auth_mech: :scram
 
-          # When authenticating, look up the user in this database.
-          # This parameter is also called the authentication database or the
-          # auth source.
+          # Specify the auth source, i.e. the database or other source
+          # which contains the user's login credentials.
+          # Please review the server documentation for the authentication
+          # mechanism you are using for more information on auth source(s)
+          # that can be used with that authentication mechanism.
           # If no auth source is specified, the default auth source as
           # determined by the driver will be used. Please refer to:
           # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
