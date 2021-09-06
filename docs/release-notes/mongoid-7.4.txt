@@ -111,3 +111,43 @@ which is `under consideration <https://jira.mongodb.org/browse/MONGOID-5158>`_,
 Mongoid 7.4 and later will inherit the new implementation provided by
 ``bson-ruby`` while Mongoid 7.3 and earlier will continue with the
 implementation returning a hash of ``{"$oid" => "..."}``.
+
+
+``distinct`` and ``pluck`` Respect Field Aliases In Embedded Documents
+----------------------------------------------------------------------
+
+When ``distinct`` and ``pluck`` are used with aliased fields in embedded
+documents, the aliases are now expanded. Given the following definitions:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :managers
+  end
+  
+  class Manager
+    include Mongoid::Document
+    embedded_in :band
+    
+    field :name, as: :n
+  end
+
+Mongoid 7.4 behavior:
+
+.. code-block:: ruby
+
+  # Expands out to "managers.name" in the query:
+  Band.distinct('managers.n')
+  Band.pluck('managers.n')
+
+Mongoid 7.3 behavior:
+
+.. code-block:: ruby
+
+  # Sends "managers.n" without expanding the alias:
+  Band.distinct('managers.n')
+  Band.pluck('managers.n')
+
+Note that the alias expansion for top-level fields has already been
+done by Mongoid 7.3.
