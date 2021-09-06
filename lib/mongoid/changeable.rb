@@ -96,7 +96,7 @@ module Mongoid
     end
 
     # Remove a change from the dirty attributes hash. Used by the single field
-    # atomic updators.
+    # atomic updaters.
     #
     # @example Remove a flagged change.
     #   model.remove_change(:field)

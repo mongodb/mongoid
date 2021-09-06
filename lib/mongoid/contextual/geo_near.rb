@@ -134,7 +134,7 @@ module Mongoid
         self
       end
 
-      # Tell the command whether or not the retured results should be unique.
+      # Tell the command whether or not the returned results should be unique.
       #
       # @example Set the unique flag.
       #   geo_near.unique(false)

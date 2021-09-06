@@ -196,14 +196,14 @@ describe Mongoid::Extensions::String do
         end
       end
 
-      it "returns an underscored tableized name" do
+      it "returns an underscored table-ized name" do
         expect(Medical::Patient.name.collectionize).to eq("medical_patients")
       end
     end
 
     context "when class is not namespaced" do
 
-      it "returns an underscored tableized name" do
+      it "returns an underscored table-ized name" do
         expect(MixedDrink.name.collectionize).to eq("mixed_drinks")
       end
     end

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "support/ruby_version"
-
 require "forwardable"
 require "time"
 require "set"
