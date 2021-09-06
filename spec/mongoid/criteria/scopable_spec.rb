@@ -132,25 +132,25 @@ describe Mongoid::Criteria::Scopable do
 
       context 'when standard scope' do
         let(:scope) do
-          Band.gt(member_count: 3).limit(3).includes(:drugs)
+          Band.gt(member_count: 3).limit(3).includes(:artists)
         end
 
         it 'merges the criteria' do
-          expect(result.selector).to eq("name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.selector).to eq("name" => "Black Sabbath", "member_count" => { "$gt"=>3 })
           expect(result.options).to eq(skip: 20, limit: 3)
-          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name artists])
         end
       end
 
       context 'when unscoped' do
         let(:scope) do
-          Band.unscoped.gt(member_count: 3).limit(3).includes(:drugs)
+          Band.unscoped.gt(member_count: 3).limit(3).includes(:artists)
         end
 
         it 'unscoped has no effect' do
-          expect(result.selector).to eq("name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.selector).to eq("name" => "Black Sabbath", "member_count" => { "$gt"=>3 })
           expect(result.options).to eq(skip: 20, limit: 3)
-          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name artists])
         end
       end
     end
@@ -159,25 +159,25 @@ describe Mongoid::Criteria::Scopable do
 
       context 'when standard scope' do
         let(:scope) do
-          -> { gt(member_count: 3).limit(3).includes(:drugs) }
+          -> { gt(member_count: 3).limit(3).includes(:artists) }
         end
 
         it 'adds the scope' do
-          expect(result.selector).to eq("name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.selector).to eq("name" => "Black Sabbath", "member_count" => { "$gt"=>3 })
           expect(result.options).to eq(skip: 20, limit: 3)
-          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name artists])
         end
       end
 
       context 'when unscoped' do
         let(:scope) do
-          -> { unscoped.gt(member_count: 3).limit(3).includes(:drugs) }
+          -> { unscoped.gt(member_count: 3).limit(3).includes(:artists) }
         end
 
         it 'removes existing scopes then adds the new scope' do
-          expect(result.selector).to eq("member_count"=>{"$gt"=>3})
+          expect(result.selector).to eq("member_count" => { "$gt"=>3 })
           expect(result.options).to eq(limit: 3)
-          expect(result.inclusions.map(&:name)).to eq(%i[same_name drugs])
+          expect(result.inclusions.map(&:name)).to eq(%i[same_name artists])
         end
       end
     end
@@ -190,7 +190,7 @@ describe Mongoid::Criteria::Scopable do
         end
 
         it 'adds the scope' do
-          expect(result.selector).to eq("name"=>"Black Sabbath", "rating"=>{"$gt"=>7})
+          expect(result.selector).to eq("name" => "Black Sabbath", "rating" => { "$gte" => 7 })
           expect(result.options).to eq(skip: 20)
           expect(result.inclusions.map(&:name)).to eq(%i[same_name])
         end
@@ -221,25 +221,25 @@ describe Mongoid::Criteria::Scopable do
 
       context 'when standard scope' do
         let(:scope) do
-          -> { gt(member_count: 3).limit(3).includes(:drugs) }
+          -> { gt(member_count: 3).limit(3).includes(:artists) }
         end
 
         it 'merges the scope' do
-          expect(result.selector).to eq("active" => true, "name"=>"Black Sabbath", "member_count"=>{"$gt"=>3})
+          expect(result.selector).to eq("active" => true, "name" => "Black Sabbath", "member_count" => { "$gt" => 3 })
           expect(result.options).to eq(skip: 20, limit: 3)
-          expect(result.inclusions.map(&:name)).to eq(%i[records same_name drugs])
+          expect(result.inclusions.map(&:name)).to eq(%i[records same_name artists])
         end
       end
 
       context 'when unscoped' do
         let(:scope) do
-          -> { unscoped.gt(member_count: 3).limit(3).includes(:drugs) }
+          -> { unscoped.gt(member_count: 3).limit(3).includes(:artists) }
         end
 
         it 'removes existing scopes then adds the new scope' do
-          expect(result.selector).to eq("member_count"=>{"$gt"=>3})
+          expect(result.selector).to eq("member_count" => { "$gt" => 3 })
           expect(result.options).to eq(limit: 3)
-          expect(result.inclusions.map(&:name)).to eq(%i[records same_name drugs])
+          expect(result.inclusions.map(&:name)).to eq(%i[records same_name artists])
         end
       end
     end
