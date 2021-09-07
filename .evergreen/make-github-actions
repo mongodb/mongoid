@@ -178,11 +178,18 @@ class Transmogrifier
   end
 
   def unsupported?(node)
-    node[:topology] == 'sharded-cluster'
+    node[:topology] == 'sharded_cluster'
   end
 
   def transform_node!(node)
-    node[:topology] = nil if node[:topology] == 'standalone'
+    node[:topology] = case node[:topology]
+                        when 'replica-set'
+                          'replica_set'
+                        when 'sharded-cluster'
+                          'sharded_cluster'
+                        else
+                          'server'
+                      end
     extract_gemfile!(node)
     set_experimental!(node)
   end
@@ -222,18 +229,22 @@ class Transmogrifier
   end
 
   def step_checkout
-    { name: "repo checkout",
-      uses: "actions/checkout@v2"}
+    {
+      name: "repo checkout",
+      uses: "actions/checkout@v2",
+      with: {
+        submodules: "recursive"
+      }
+    }
   end
 
   def step_mongodb
     {
       name: "start mongodb",
-      uses: "supercharge/mongodb-github-action@1.6.0",
+      uses: "mongodb-labs/drivers-evergreen-tools@master",
       with: {
-        'mongodb-version': '${{matrix.mongodb}}',
-        'mongodb-replica-set': 'rs0'
-        # 'mongodb-replica-set': '${{matrix.topology}}'
+        'version': '${{matrix.mongodb}}',
+        'topology': '${{matrix.topology}}'
       }
     }
   end
@@ -251,13 +262,11 @@ class Transmogrifier
   end
 
   def step_bundle
-    { name: 'bundle',
-      run: [
-        'bundle install --jobs 4 --retry 3',
-        'git submodule init',
-        'git submodule update'
-      ].join("\n"),
-      env: step_ruby_env }
+    {
+      name: 'bundle',
+      run: 'bundle install --jobs 4 --retry 3',
+      env: step_ruby_env
+    }
   end
 
   def step_test
