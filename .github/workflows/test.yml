@@ -426,6 +426,8 @@ jobs:
     steps:
     - name: repo checkout
       uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: start mongodb
       id: "setup-mongodb"
       uses: mongodb-labs/drivers-evergreen-tools@master
@@ -442,8 +444,6 @@ jobs:
     - name: bundle
       run: |-
         bundle install --jobs 4 --retry 3
-        git submodule init
-        git submodule update
       env:
         BUNDLE_GEMFILE: "${{matrix.gemfile}}"
     - name: test
