@@ -240,6 +240,7 @@ class Transmogrifier
 
   def step_mongodb
     {
+      id: "start-mongodb"
       name: "start mongodb",
       uses: "mongodb-labs/drivers-evergreen-tools@master",
       with: {
@@ -270,11 +271,13 @@ class Transmogrifier
   end
 
   def step_test
-    { name: 'test',
+    {
+      name: 'test',
       "timeout-minutes": 60,
       "continue-on-error": '${{matrix.experimental}}',
       run: 'bundle exec rake spec',
-      env: step_ruby_env }
+      env: step_ruby_env.merge({'MONGODB_URI': "${{ steps.start-mongodb.outputs.cluster-uri }}"})
+    }
   end
 
   def step_ruby_env
