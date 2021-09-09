@@ -19,7 +19,7 @@ describe Mongoid::QueryCache::Middleware do
       expect(code).to eq(200)
     end
 
-    it "enableds the query cache" do
+    it "enables the query cache" do
       middleware.call({})
       expect(@enabled).to be true
     end

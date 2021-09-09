@@ -51,7 +51,7 @@ module Mongoid
         "#{self}="
       end
 
-      # Get the value of the object as a mongo friendy sort value.
+      # Get the value of the object as a mongo friendly sort value.
       #
       # @example Get the object as sort criteria.
       #   object.__sortable__

@@ -267,14 +267,14 @@ describe Range do
           1..3
         end
 
-        it "returns the inclusize range criterion" do
+        it "returns the inclusive range criterion" do
           expect(described_class.evolve(range)).to eq(
             { "$gte" => 1, "$lte" => 3 }
           )
         end
       end
 
-      context "when the range is not inclusve" do
+      context "when the range is not inclusive" do
 
         let(:range) do
           1...3

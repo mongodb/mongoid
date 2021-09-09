@@ -94,8 +94,7 @@ module Mongoid
 
       # Delete the first object in the array that is equal to the supplied
       # object and return it. This is much faster than performing a standard
-      # delete for large arrays ince it attempt to delete multiple in the
-      # other.
+      # delete for large arrays since it does not perform multiple deletes.
       #
       # @example Delete the first object.
       #   [ "1", "2", "1" ].delete_one("1")
@@ -108,7 +107,7 @@ module Mongoid
         position ? delete_at(position) : nil
       end
 
-      # Is the object's size changable?
+      # Returns whether the object's size can be changed.
       #
       # @example Is the object resizable?
       #   object.resizable?
@@ -154,7 +153,7 @@ module Mongoid
           end
         end
 
-        # Is the object's size changable?
+        # Returns whether the object's size can be changed.
         #
         # @example Is the object resizable?
         #   Array.resizable?

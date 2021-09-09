@@ -25,7 +25,7 @@ module Mongoid
           #     recursively_embeds_many
           #   end
           #
-          # @example The previous example is a shorcut for this.
+          # @example The previous example is a shortcut for this.
           #
           #   class Role
           #     include Mongoid::Document
@@ -53,7 +53,7 @@ module Mongoid
           #     recursively_embeds_one
           #   end
           #
-          # @example The previous example is a shorcut for this.
+          # @example The previous example is a shortcut for this.
           #
           #   class Role
           #     include Mongoid::Document
