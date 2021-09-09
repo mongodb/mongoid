@@ -19,6 +19,9 @@ class SpecConfig
     if @uri
       @uri.servers
     else
+      STDERR.puts "Environment variable 'MONGODB_URI' is not set, so the default url will be used."
+      STDERR.puts "This may lead to unexpected test failures because service discovery will raise unexpected warnings."
+      STDERR.puts "Please consider providing the correct uri via MONGODB_URI environment variable."
       ['127.0.0.1:27017']
     end
   end

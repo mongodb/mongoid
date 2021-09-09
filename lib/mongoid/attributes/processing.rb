@@ -8,7 +8,7 @@ module Mongoid
 
       # Process the provided attributes casting them to their proper values if a
       # field exists for them on the document. This will be limited to only the
-      # attributes provided in the suppied +Hash+ so that no extra nil values get
+      # attributes provided in the supplied +Hash+ so that no extra nil values get
       # put into the document's attributes.
       #
       # @example Process the attributes.

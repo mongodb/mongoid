@@ -31,6 +31,7 @@ end
 require 'mrss/cluster_config'
 require 'support/client_registry'
 require 'mrss/constraints'
+require 'mrss/event_subscriber'
 
 ClusterConfig = Mrss::ClusterConfig
 
