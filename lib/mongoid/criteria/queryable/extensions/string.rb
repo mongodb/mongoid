@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -15,8 +14,6 @@ module Mongoid
           #   "2012-1-1".__evolve_date__
           #
           # @return [ Time ] The time at UTC midnight.
-          #
-          # @since 1.0.0
           def __evolve_date__
             time = ::Time.parse(self)
             ::Time.utc(time.year, time.month, time.day, 0, 0, 0, 0)
@@ -28,8 +25,6 @@ module Mongoid
           #   "2012-1-1".__evolve_time__
           #
           # @return [ Time ] The string as a time.
-          #
-          # @since 1.0.0
           def __evolve_time__
             __mongoize_time__.utc
           end
@@ -40,8 +35,6 @@ module Mongoid
           #   "test".__mongo_expression__
           #
           # @return [ String ] The string with $ at the front.
-          #
-          # @since 2.0.0
           def __mongo_expression__
             start_with?("$") ? self : "$#{self}"
           end
@@ -52,8 +45,6 @@ module Mongoid
           #   "field ASC".__sort_option__
           #
           # @return [ Hash ] The string as a sort option hash.
-          #
-          # @since 1.0.0
           def __sort_option__
             split(/,/).inject({}) do |hash, spec|
               hash.tap do |_hash|
@@ -72,8 +63,6 @@ module Mongoid
           # @param [ true, false ] negating If the selection should be negated.
           #
           # @return [ Hash ] The selection.
-          #
-          # @since 1.0.0
           def __expr_part__(value, negating = false)
             ::String.__expr_part__(self, value, negating)
           end
@@ -84,8 +73,6 @@ module Mongoid
           #   "1".to_direction
           #
           # @return [ Integer ] The direction.
-          #
-          # @since 1.0.0
           def to_direction
             self =~ /desc/i ? -1 : 1
           end
@@ -102,8 +89,6 @@ module Mongoid
             # @param [ true, false ] negating If the selection should be negated.
             #
             # @return [ Hash ] The selection.
-            #
-            # @since 2.0.0
             def __expr_part__(key, value, negating = false)
               if negating
                 { key => { "$#{value.regexp? ? "not" : "ne"}" => value }}
@@ -121,8 +106,6 @@ module Mongoid
             # @param [ Object ] object The object to convert.
             #
             # @return [ String ] The value as a string.
-            #
-            # @since 1.0.0
             def evolve(object)
               __evolve__(object) do |obj|
                 obj.regexp? ? obj : obj.to_s

@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
     module Queryable
 
       # Provides a DSL around crafting aggregation framework commands.
-      #
-      # @since 2.0.0
       module Aggregable
         extend Macroable
 
@@ -24,8 +21,6 @@ module Mongoid
         #   aggregable.aggregating?
         #
         # @return [ true, false ] If the aggregable is aggregating.
-        #
-        # @since 2.0.0
         def aggregating?
           !!@aggregating
         end
@@ -41,8 +36,6 @@ module Mongoid
         # @param [ Hash ] operation The group operation.
         #
         # @return [ Aggregable ] The aggregable.
-        #
-        # @since 2.0.0
         def group(operation)
           aggregation(operation) do |pipeline|
             pipeline.group(operation)
@@ -65,8 +58,6 @@ module Mongoid
         # @param [ Hash ] operation The projection to make.
         #
         # @return [ Aggregable ] The aggregable.
-        #
-        # @since 2.0.0
         def project(operation = nil)
           aggregation(operation) do |pipeline|
             pipeline.project(operation)
@@ -81,8 +72,6 @@ module Mongoid
         # @param [ String, Symbol ] field The name of the field to unwind.
         #
         # @return [ Aggregable ] The aggregable.
-        #
-        # @since 2.0.0
         def unwind(field)
           aggregation(field) do |pipeline|
             pipeline.unwind(field)
@@ -103,8 +92,6 @@ module Mongoid
         # @param [ Hash ] operation The operation for the pipeline.
         #
         # @return [ Aggregable ] The cloned aggregable.
-        #
-        # @since 2.0.0
         def aggregation(operation)
           return self unless operation
           clone.tap do |query|

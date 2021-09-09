@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
   # Defines behavior for dirty tracking.
-  #
-  # @since 4.0.0
   module Changeable
     extend ActiveSupport::Concern
 
@@ -15,8 +12,6 @@ module Mongoid
     #   model.changed
     #
     # @return [ Array<String> ] The changed attributes.
-    #
-    # @since 2.4.0
     def changed
       changed_attributes.keys.select { |attr| attribute_change(attr) }
     end
@@ -27,8 +22,6 @@ module Mongoid
     #   model.changed?
     #
     # @return [ true, false ] If the document is changed.
-    #
-    # @since 2.4.0
     def changed?
       changes.values.any? { |val| val } || children_changed?
     end
@@ -39,8 +32,6 @@ module Mongoid
     #   model.children_changed?
     #
     # @return [ true, false ] If any children have changed.
-    #
-    # @since 2.4.1
     def children_changed?
       _children.any?(&:changed?)
     end
@@ -51,8 +42,6 @@ module Mongoid
     #   model.changed_attributes
     #
     # @return [ Hash<String, Object> ] The attribute changes.
-    #
-    # @since 2.4.0
     def changed_attributes
       @changed_attributes ||= {}
     end
@@ -63,8 +52,6 @@ module Mongoid
     #   model.changes
     #
     # @return [ Hash<String, Array<Object, Object> ] The changes.
-    #
-    # @since 2.4.0
     def changes
       _changes = {}
       changed.each do |attr|
@@ -81,8 +68,6 @@ module Mongoid
     #
     # @example Move the changes to previous.
     #   person.move_changes
-    #
-    # @since 2.1.0
     def move_changes
       @previous_changes = changes
       Atomic::UPDATES.each do |update|
@@ -95,8 +80,6 @@ module Mongoid
     #
     # @example Handle post persistence.
     #   document.post_persist
-    #
-    # @since 3.0.0
     def post_persist
       reset_persisted_children
       move_changes
@@ -108,21 +91,17 @@ module Mongoid
     #   model.previous_changes
     #
     # @return [ Hash<String, Array<Object, Object> ] The previous changes.
-    #
-    # @since 2.4.0
     def previous_changes
       @previous_changes ||= {}
     end
 
     # Remove a change from the dirty attributes hash. Used by the single field
-    # atomic updators.
+    # atomic updaters.
     #
     # @example Remove a flagged change.
     #   model.remove_change(:field)
     #
     # @param [ Symbol, String ] name The name of the field.
-    #
-    # @since 2.1.0
     def remove_change(name)
       changed_attributes.delete(name.to_s)
     end
@@ -136,8 +115,6 @@ module Mongoid
     #   person.setters # returns { "title" => "Madam" }
     #
     # @return [ Hash ] A +Hash+ of atomic setters.
-    #
-    # @since 2.0.0
     def setters
       mods = {}
       changes.each_pair do |name, changes|
@@ -165,8 +142,6 @@ module Mongoid
     # @param [ String ] attr The name of the attribute.
     #
     # @return [ Array<Object> ] The old and new values.
-    #
-    # @since 2.1.0
     def attribute_change(attr)
       attr = database_field_name(attr)
       [changed_attributes[attr], attributes[attr]] if attribute_changed?(attr)
@@ -180,8 +155,6 @@ module Mongoid
     # @param [ String ] attr The name of the attribute.
     #
     # @return [ true, false ] Whether the attribute has changed.
-    #
-    # @since 2.1.6
     def attribute_changed?(attr)
       attr = database_field_name(attr)
       return false unless changed_attributes.key?(attr)
@@ -196,8 +169,6 @@ module Mongoid
     # @param [ String ] attr The name of the attribute.
     #
     # @return [ true, false ] If the attribute differs.
-    #
-    # @since 3.0.0
     def attribute_changed_from_default?(attr)
       field = fields[attr]
       return false unless field
@@ -210,8 +181,6 @@ module Mongoid
     #   model.attribute_was("name")
     #
     # @param [ String ] attr The attribute name.
-    #
-    # @since 2.4.0
     def attribute_was(attr)
       attr = database_field_name(attr)
       attribute_changed?(attr) ? changed_attributes[attr] : attributes[attr]
@@ -225,8 +194,6 @@ module Mongoid
     # @param [ String ] attr The name of the attribute.
     #
     # @return [ Object ] The old value.
-    #
-    # @since 2.3.0
     def attribute_will_change!(attr)
       unless changed_attributes.key?(attr)
         changed_attributes[attr] = read_raw_attribute(attr).__deep_copy__
@@ -241,8 +208,6 @@ module Mongoid
     # @param [ String ] attr The name of the attribute.
     #
     # @return [ Object ] The old value.
-    #
-    # @since 2.4.0
     def reset_attribute!(attr)
       attr = database_field_name(attr)
       attributes[attr] = changed_attributes.delete(attr) if attribute_changed?(attr)
@@ -270,8 +235,6 @@ module Mongoid
       # @param [ String ] meth The name of the accessor.
       #
       # @return [ Module ] The fields module.
-      #
-      # @since 2.4.0
       def create_dirty_methods(name, meth)
         create_dirty_change_accessor(name, meth)
         create_dirty_change_check(name, meth)
@@ -291,8 +254,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 3.0.0
       def create_dirty_change_accessor(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_change") do
@@ -308,8 +269,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 3.0.0
       def create_dirty_change_check(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_changed?") do
@@ -325,8 +284,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 3.0.0
       def create_dirty_default_change_check(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_changed_from_default?") do
@@ -342,8 +299,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 3.0.0
       def create_dirty_previous_value_accessor(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_was") do
@@ -359,8 +314,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 3.0.0
       def create_dirty_change_flag(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_will_change!") do
@@ -376,8 +329,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 3.0.0
       def create_dirty_reset(name, meth)
         generated_methods.module_eval do
           re_define_method("reset_#{meth}!") do
@@ -393,8 +344,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 3.0.0
       def create_dirty_reset_to_default(name, meth)
         generated_methods.module_eval do
           re_define_method("reset_#{meth}_to_default!") do
@@ -410,8 +359,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 6.0.0
       def create_dirty_previously_changed?(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_previously_changed?") do
@@ -427,8 +374,6 @@ module Mongoid
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      #
-      # @since 6.0.0
       def create_dirty_previous_change(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_previous_change") do

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 if defined?(ActiveSupport)
   unless defined?(ActiveSupport::TimeWithZone)

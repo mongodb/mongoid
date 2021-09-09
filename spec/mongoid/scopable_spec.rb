@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -858,7 +857,7 @@ describe Mongoid::Scopable do
         Circle._declared_scopes.clear
       end
 
-      it "uses sublcass context for all the other used scopes" do
+      it "uses subclass context for all the other used scopes" do
         expect(Circle.visible.selector).to eq("radius" => 5)
       end
     end

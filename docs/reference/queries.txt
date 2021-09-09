@@ -987,6 +987,69 @@ the default scope being evaluated first:
     embedded: false>
 
 
+Pagination
+==========
+
+Mongoid provides the pagination operators ``limit``, ``skip``, and ``batch_size`` on ``Criteria``.
+
+.. _limit:
+
+``limit``
+---------
+
+``limit`` sets the total number of documents to be returned by a query:
+
+.. code-block:: ruby
+
+  Band.limit(5)
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:limit=>5}
+  #   class:    Band
+  #   embedded: false>
+
+.. _skip:
+
+``skip``
+--------
+
+``skip`` (alias: ``offset``) sets the number of query results to skip
+before returning documents. The ``limit`` value, if specified, will be applied
+after documents are skipped. When performing pagination, ``skip`` is recommended
+to be combined with :ref:`ordering <ordering>` to ensure consistent results.
+
+.. code-block:: ruby
+
+  Band.skip(10)
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:skip=>10}
+  #   class:    Band
+  #   embedded: false>
+
+.. _batch-size:
+
+``batch_size``
+--------
+
+When executing large queries, or when iterating over query results with an enumerator method such as
+``Criteria#each``, Mongoid automatically uses the `MongoDB getMore command
+<https://docs.mongodb.com/manual/reference/command/getMore/>`_ to load results in batches.
+The default ``batch_size`` is 1000, however you may set it explicitly:
+
+.. code-block:: ruby
+
+  Band.batch_size(500)
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:batch_size=>500}
+  #   class:    Band
+  #   embedded: false>
+
+
 .. _query-cache:
 
 Query Cache
@@ -1550,6 +1613,11 @@ Queries + Persistence
 Mongoid supports persistence operations off of criteria
 in a light capacity for when you want to expressively perform multi
 document inserts, updates, and deletion.
+
+.. warning::
+
+  Criteria ordering and pagination conditions, including ``order``, ``limit``,
+  ``offset``, and ``batch_size``, will be ignored on the following operations.
 
 .. list-table::
    :header-rows: 1

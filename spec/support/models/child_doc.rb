@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 class ChildDoc
   include Mongoid::Document
@@ -11,8 +10,8 @@ class ChildDoc
   after_save :update_position
 
   def position
-    exsited_position = parent_doc.children_order.index(id)
-    exsited_position ? exsited_position + 1 : parent_doc.aspects.size
+    existing_position = parent_doc.children_order.index(id)
+    existing_position ? existing_position + 1 : parent_doc.aspects.size
   end
 
   def update_position

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/errors/mongoid_error"
 require "mongoid/errors/ambiguous_relationship"
@@ -8,8 +7,10 @@ require "mongoid/errors/criteria_argument_required"
 require "mongoid/errors/document_not_destroyed"
 require "mongoid/errors/document_not_found"
 require "mongoid/errors/eager_load"
+require "mongoid/errors/empty_config_file"
 require "mongoid/errors/in_memory_collation_not_supported"
 require "mongoid/errors/invalid_collection"
+require "mongoid/errors/invalid_config_file"
 require "mongoid/errors/invalid_config_option"
 require "mongoid/errors/invalid_dependent_strategy"
 require "mongoid/errors/invalid_field"

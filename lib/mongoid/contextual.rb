@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/contextual/queryable"
 require "mongoid/contextual/mongo"
@@ -32,8 +31,6 @@ module Mongoid
     #   criteria.context
     #
     # @return [ Memory, Mongo ] The context.
-    #
-    # @since 3.0.0
     def context
       @context ||= create_context
     end
@@ -49,8 +46,6 @@ module Mongoid
     #   contextual.create_context
     #
     # @return [ Mongo, Memory ] The context.
-    #
-    # @since 3.0.0
     def create_context
       return None.new(self) if empty_and_chainable?
       embedded ? Memory.new(self) : Mongo.new(self)

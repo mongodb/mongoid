@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -59,7 +58,7 @@ describe Mongoid::Contextual::GeoNear do
       end
 
       it "is nil except for 4.0 sharded when it is 0" do
-        expect(geo_near.average_distance).to be expected_value
+        expect(geo_near.average_distance).to eq expected_value
       end
     end
   end
@@ -139,7 +138,7 @@ describe Mongoid::Contextual::GeoNear do
       end
     end
 
-    context "when spcifying spherical" do
+    context "when specifying spherical" do
 
       let(:criteria) do
         Bar.all

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -20,8 +19,6 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to add.
         #
         # @return [ Array<Hash> ] The inserts.
-        #
-        # @since 3.0.0
         def batch_insert(docs)
           execute_batch_push(docs)
         end
@@ -34,8 +31,6 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to clear.
         #
         # @return [ Array ] The empty array.
-        #
-        # @since 3.0.0
         def batch_clear(docs)
           pre_process_batch_remove(docs, :delete)
           unless docs.empty?
@@ -55,8 +50,6 @@ module Mongoid
         #
         # @param [ Array<Document> ] docs The docs to remove.
         # @param [ Symbol ] method Delete or destroy.
-        #
-        # @since 3.0.0
         def batch_remove(docs, method = :delete)
           removals = pre_process_batch_remove(docs, method)
           if !docs.empty?
@@ -77,8 +70,6 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to replace with.
         #
         # @return [ Array<Hash> ] The inserts.
-        #
-        # @since 3.0.0
         def batch_replace(docs)
           if docs.blank?
             if _assigning? && !empty?
@@ -108,8 +99,6 @@ module Mongoid
         #   batchable.add_atomic_sets([{ field: value }])
         #
         # @param [ Array<Hash> ] sets The atomic sets.
-        #
-        # @since 3.0.0
         def add_atomic_sets(sets)
           if _assigning?
             _base.delayed_atomic_sets[path].try(:clear)
@@ -130,8 +119,6 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to persist.
         #
         # @return [ Array<Hash> ] The inserts.
-        #
-        # @since 7.0.0
         def execute_batch_set(docs)
           self.inserts_valid = true
           inserts = pre_process_batch_insert(docs)
@@ -155,8 +142,6 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to persist.
         #
         # @return [ Array<Hash> ] The inserts.
-        #
-        # @since 7.0.0
         def execute_batch_push(docs)
           self.inserts_valid = true
           pushes = pre_process_batch_insert(docs)
@@ -178,8 +163,6 @@ module Mongoid
         #   batchable.insertable?
         #
         # @return [ true, false ] If inserts can be performed.
-        #
-        # @since 3.0.0
         def insertable?
           persistable? && !_assigning? && inserts_valid
         end
@@ -192,8 +175,6 @@ module Mongoid
         #   batchable.inserts_valid
         #
         # @return [ true, false ] If inserts are currently valid.
-        #
-        # @since 3.0.0
         def inserts_valid
           @inserts_valid
         end
@@ -208,8 +189,6 @@ module Mongoid
         # @param [ true, false ] value The flag.
         #
         # @return [ true, false ] The flag.
-        #
-        # @since 3.0.0
         def inserts_valid=(value)
           @inserts_valid = value
         end
@@ -225,8 +204,6 @@ module Mongoid
         # @param [ Array<Hash, Document> ] docs The docs to normalize.
         #
         # @return [ Array<Document> ] The docs.
-        #
-        # @since 3.0.0
         def normalize_docs(docs)
           if docs.first.is_a?(::Hash)
             docs.map do |doc|
@@ -247,8 +224,6 @@ module Mongoid
         #   batchable.path
         #
         # @return [ String ] The atomic path.
-        #
-        # @since 3.0.0
         def path
           @path ||= _unscoped.first.atomic_path
         end
@@ -263,8 +238,6 @@ module Mongoid
         # @param [ String ] value The path.
         #
         # @return [ String ] The path.
-        #
-        # @since 3.0.0
         def path=(value)
           @path = value
         end
@@ -277,8 +250,6 @@ module Mongoid
         #   batchable.selector
         #
         # @return [ Hash ] The atomic selector.
-        #
-        # @since 3.0.0
         def selector
           @selector ||= _base.atomic_selector
         end
@@ -293,8 +264,6 @@ module Mongoid
         # @param [ Array<Document> ] docs The documents.
         #
         # @return [ Array<Hash> ] The documents as an array of hashes.
-        #
-        # @since 3.0.0
         def pre_process_batch_insert(docs)
           docs.map do |doc|
             next unless doc
@@ -322,8 +291,6 @@ module Mongoid
         # @param [ Symbol ] method Delete or destroy.
         #
         # @return [ Array<Hash> ] The documents as hashes.
-        #
-        # @since 3.0.0
         def pre_process_batch_remove(docs, method)
           docs.map do |doc|
             self.path = doc.atomic_path unless path
@@ -350,8 +317,6 @@ module Mongoid
         # @param [ Array<Documents> ] docs The inserted docs.
         #
         # @return [ Enumerable ] The document enum.
-        #
-        # @since 3.0.0
         def post_process_batch_insert(docs)
           docs.each do |doc|
             doc.new_record = false
@@ -371,8 +336,6 @@ module Mongoid
         # @param [ Symbol ] method Delete or destroy.
         #
         # @return [ Array<Document> ] The documents.
-        #
-        # @since 3.0.0
         def post_process_batch_remove(docs, method)
           docs.each do |doc|
             doc.run_after_callbacks(:destroy) if method == :destroy

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -221,6 +220,7 @@ describe Mongoid::Factory do
         end
 
         it "sets the attributes to _type only" do
+          skip 'https://jira.mongodb.org/browse/MONGOID-5179'
           # Note that Address provides the _id override.
           document.attributes.should == {'_type' => 'Address'}
         end

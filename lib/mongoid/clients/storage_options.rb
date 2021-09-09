@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Clients
@@ -48,8 +47,6 @@ module Mongoid
         # @option options [ String | Symbol ] :client The client name.
         #
         # @return [ Class ] The model class.
-        #
-        # @since 3.0.0
         def store_in(options)
           Validators::Storage.validate(self, options)
           storage_options.merge!(options)
@@ -59,8 +56,6 @@ module Mongoid
         #
         # @example Reset the store_in options
         #   Model.reset_storage_options!
-        #
-        # @since 4.0.0
         def reset_storage_options!
           self.storage_options = storage_options_defaults.dup
           PersistenceContext.clear(self)
@@ -72,8 +67,6 @@ module Mongoid
         #   Model.storage_options_defaults
         #
         # @return [ Hash ] Default storage options.
-        #
-        # @since 4.0.0
         def storage_options_defaults
           {
             collection: name.collectionize.to_sym,

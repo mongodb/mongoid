@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Extensions
@@ -11,8 +10,6 @@ module Mongoid
       #   date_time.__mongoize_time__
       #
       # @return [ Time | ActiveSupport::TimeWithZone ] The mongoized time.
-      #
-      # @since 3.0.0
       def __mongoize_time__
         if Mongoid.use_activesupport_time_zone?
           in_time_zone(::Time.zone)
@@ -29,8 +26,6 @@ module Mongoid
       #   date_time.mongoize
       #
       # @return [ Time ] The object mongoized.
-      #
-      # @since 3.0.0
       def mongoize
         ::DateTime.mongoize(self)
       end
@@ -45,8 +40,6 @@ module Mongoid
         # @param [ Time ] object The time from Mongo.
         #
         # @return [ DateTime ] The object as a date.
-        #
-        # @since 3.0.0
         def demongoize(object)
           ::Time.demongoize(object).try(:to_datetime)
         end
@@ -60,8 +53,6 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ Time ] The object mongoized.
-        #
-        # @since 3.0.0
         def mongoize(object)
           ::Time.mongoize(object)
         end

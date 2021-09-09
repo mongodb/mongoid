@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
   # This module is responsible for taking update selectors and switching out
   # the indexes for the $ positional operator where appropriate.
-  #
-  # @since 4.0.0
   module Positional
 
     # Takes the provided selector and atomic operations and replaces the
@@ -33,8 +30,6 @@ module Mongoid
     # @param [ Hash ] processed The processed update operations.
     #
     # @return [ Hash ] The new operations.
-    #
-    # @since 3.1.0
     def positionally(selector, operations, processed = {})
       if selector.size == 1 || selector.values.any? { |val| val.nil? }
         return operations
