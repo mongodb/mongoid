@@ -330,11 +330,7 @@ describe Mongoid::Touchable do
         end
 
         let(:frozen_error_cls) do
-          if RUBY_VERSION >= '2.5'
-            FrozenError
-          else
-            RuntimeError
-          end
+          FrozenError
         end
 
         context "when no attribute is provided" do

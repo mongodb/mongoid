@@ -1573,7 +1573,7 @@ describe Mongoid::Attributes do
         person.write_attribute(:test, "aliased field to test")
       end
 
-      it "allows the field name to be udpated" do
+      it "allows the field name to be updated" do
         expect(person.t).to eq("aliased field to test")
       end
     end

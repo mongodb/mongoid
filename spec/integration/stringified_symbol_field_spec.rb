@@ -31,8 +31,8 @@ describe "StringifiedSymbol fields" do
     end
   end
 
-# Using command monitoring to test that StringifiedSymbol sends a string and returns a symbol
-let(:client) { Order.collection.client }
+  # Using command monitoring to test that StringifiedSymbol sends a string and returns a symbol
+  let(:client) { Order.collection.client }
 
   before do
     client.subscribe(Mongo::Monitoring::COMMAND, subscriber)

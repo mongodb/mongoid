@@ -105,7 +105,7 @@ module Mongoid
 
       # Is this string a valid_method_name?
       #
-      # @example Is the string a valid Ruby idenfier for use as a method name
+      # @example Is the string a valid Ruby identifier for use as a method name
       #   "model=".valid_method_name?
       #
       # @return [ true, false ] If the string contains a valid Ruby identifier.

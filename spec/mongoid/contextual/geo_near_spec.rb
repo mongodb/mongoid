@@ -138,7 +138,7 @@ describe Mongoid::Contextual::GeoNear do
       end
     end
 
-    context "when spcifying spherical" do
+    context "when specifying spherical" do
 
       let(:criteria) do
         Bar.all

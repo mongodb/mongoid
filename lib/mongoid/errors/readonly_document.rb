@@ -7,7 +7,7 @@ module Mongoid
     # database with partial fields.
     class ReadonlyDocument < MongoidError
 
-      # Instnatiate the exception.
+      # Instantiate the exception.
       #
       # @example Create the error.
       #   ReadonlyDocument.new(Band)

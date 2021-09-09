@@ -178,7 +178,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       described_class.new([])
     end
 
-    context "when the relation is empty" do
+    context "when the association is empty" do
 
       let!(:added) do
         enumerable << post
@@ -195,6 +195,127 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       it "sets the base on the new document" do
         expect_query(0) do
           added.collect(&:person)
+        end
+      end
+    end
+  end
+
+  describe "#empty?" do
+
+    let(:person) do
+      Person.create!
+    end
+
+    let!(:post_one) do
+      Post.create!(person_id: person.id)
+    end
+
+    let!(:post_two) do
+      Post.create!(person_id: person.id)
+    end
+
+    context "when only a criteria target exists" do
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let(:empty) do
+        enumerable.empty?
+      end
+
+      it "returns false" do
+        expect(empty).to be false
+      end
+
+      context 'when #empty? is called' do
+
+        before { empty }
+
+        it "retains the correct length" do
+          expect(enumerable.length).to eq(2)
+        end
+
+        it "retains the correct length when calling to_a" do
+          expect(enumerable.to_a.length).to eq(2)
+        end
+
+        context "when iterating over the association a second time" do
+
+          before do
+            enumerable.each { |post| post }
+          end
+
+          it "retains the correct length" do
+            expect(enumerable.length).to eq(2)
+          end
+
+          it "retains the correct length when calling to_a" do
+            expect(enumerable.to_a.length).to eq(2)
+          end
+        end
+      end
+    end
+
+    context "when the documents have been loaded" do
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      before do
+        enumerable.load_all!
+      end
+
+      it "is _loaded" do
+        expect(enumerable._loaded?).to be true
+      end
+
+      it "it does not call #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to_not receive(:exists?)
+        expect(enumerable.empty?).to be false
+      end
+    end
+
+    context "when the documents are not loaded" do
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      it "is not _loaded" do
+        expect(enumerable._loaded?).to be false
+      end
+
+      it "it calls #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to receive(:exists?)
+        expect(enumerable.empty?).to be true
+      end
+
+      context "when documents are added" do
+
+        before do
+          enumerable << post_one
+        end
+
+        it "is not _loaded" do
+          expect(enumerable._loaded?).to be false
+        end
+
+        it "it does not call #exists? on the unloaded scope" do
+          expect(enumerable._unloaded).to_not receive(:exists?)
+          expect(enumerable.empty?).to be false
         end
       end
     end
@@ -224,7 +345,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         described_class.new(criteria)
       end
 
-      let!(:any) do
+      let(:any) do
         enumerable.any?
       end
 
@@ -232,19 +353,9 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         expect(any).to be true
       end
 
-      it "retains the correct length" do
-        expect(enumerable.length).to eq(2)
-      end
+      context 'when #any? is called' do
 
-      it "retains the correct length when calling to_a" do
-        expect(enumerable.to_a.length).to eq(2)
-      end
-
-      context "when iterating over the relation a second time" do
-
-        before do
-          enumerable.each { |post| post }
-        end
+        before { any }
 
         it "retains the correct length" do
           expect(enumerable.length).to eq(2)
@@ -252,6 +363,21 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
 
         it "retains the correct length when calling to_a" do
           expect(enumerable.to_a.length).to eq(2)
+        end
+
+        context "when iterating over the association a second time" do
+
+          before do
+            enumerable.each { |post| post }
+          end
+
+          it "retains the correct length" do
+            expect(enumerable.length).to eq(2)
+          end
+
+          it "retains the correct length when calling to_a" do
+            expect(enumerable.to_a.length).to eq(2)
+          end
         end
       end
     end
@@ -273,6 +399,11 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         expect(enumerable._loaded?).to be true
       end
 
+      it "it does not call #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to_not receive(:exists?)
+        expect(enumerable.any?).to be true
+      end
+
       context "when a block is given" do
         it "returns true when the predicate is true" do
           expect(
@@ -288,7 +419,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when an argument is given" do
-        ruby_version_gte '2.5'
 
         it "returns true when the argument is true" do
           expect(enumerable.any?(Post)).to be true
@@ -300,7 +430,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when both an argument and a block are given" do
-        ruby_version_gte '2.5'
 
         it "gives precedence to the pattern" do
           expect(
@@ -324,6 +453,27 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         expect(enumerable._loaded?).to be false
       end
 
+      it "it calls #exists? on the unloaded scope" do
+        expect(enumerable._unloaded).to receive(:exists?)
+        expect(enumerable.any?).to be false
+      end
+
+      context "when documents are added" do
+
+        before do
+          enumerable << post_one
+        end
+
+        it "is not _loaded" do
+          expect(enumerable._loaded?).to be false
+        end
+
+        it "it does not call #exists? on the unloaded scope" do
+          expect(enumerable._unloaded).to_not receive(:exists?)
+          expect(enumerable.any?).to be true
+        end
+      end
+
       context "when a block is given" do
         it "returns true when the predicate is true" do
           expect(
@@ -339,7 +489,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when an argument is given" do
-        ruby_version_gte '2.5'
 
         it "returns true when the argument is true" do
           expect(enumerable.any?(Post)).to be true
@@ -351,7 +500,6 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       context "when both an argument and a block are given" do
-        ruby_version_gte '2.5'
 
         it "gives precedence to the pattern" do
           expect(
@@ -736,7 +884,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         expect(enumerable).to be__loaded
       end
 
-      context 'when the base relation is accessed from each document' do
+      context 'when the base association is accessed from each document' do
 
         let(:persons) do
           described_class.new(criteria).collect(&:person)
@@ -747,7 +895,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
           Post.create!(person_id: person.id)
         end
 
-        it 'sets the base relation from the criteria' do
+        it 'sets the base association from the criteria' do
           expect(persons.uniq.size).to eq(1)
         end
       end
@@ -1186,7 +1334,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         described_class.new(criteria)
       end
 
-      let!(:included) do
+      let(:included) do
         enumerable.include?(post_two)
       end
 
@@ -1202,7 +1350,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         expect(enumerable.to_a.length).to eq(2)
       end
 
-      context "when iterating over the relation a second time" do
+      context "when iterating over the association a second time" do
 
         before do
           enumerable.each { |post| post }
