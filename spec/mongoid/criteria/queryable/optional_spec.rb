@@ -1755,7 +1755,7 @@ describe Mongoid::Criteria::Queryable::Optional do
 
     context "when provided fields" do
 
-      context "as sevaral arguments" do
+      context "as several arguments" do
 
         let(:selection) do
           query.without(:first, :second)
