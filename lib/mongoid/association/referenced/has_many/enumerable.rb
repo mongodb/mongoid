@@ -190,9 +190,9 @@ module Mongoid
           # @return [ true, false ] If the enumerable is empty.
           def empty?
             if _loaded?
-              in_memory.count == 0
+              in_memory.empty?
             else
-              _unloaded.count + _added.count == 0
+              _added.empty? && !_unloaded.exists?
             end
           end
 
@@ -223,11 +223,7 @@ module Mongoid
           def any?(*args)
             return super if args.any? || block_given?
 
-            if _loaded?
-              in_memory.length > 0
-            else
-              _unloaded.exists? || _added.length > 0
-            end
+            !empty?
           end
 
           # Get the first document in the enumerable. Will check the persisted

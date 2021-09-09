@@ -63,7 +63,7 @@ module Mongoid
     # A separate module was needed because the subclasses of this class
     # need to be manually prepended with the discriminator_value and can't
     # rely on being a class_attribute because the .discriminator_value
-    # method is overriden by every subclass in the inherited method.
+    # method is overridden by every subclass in the inherited method.
     #
     # @api private
     module DiscriminatorRetrieval
@@ -288,7 +288,7 @@ module Mongoid
         subclass.discriminator_value = subclass.name
 
         # We need to do this here because the discriminator_value method is
-        # overriden in the subclass above.
+        # overridden in the subclass above.
         class << subclass
           include DiscriminatorRetrieval
         end

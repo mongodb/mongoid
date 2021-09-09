@@ -404,14 +404,6 @@ axes:
   - id: "ruby"
     display_name: Ruby Version
     values:
-      - id: "ruby-2.3"
-        display_name: ruby-2.3
-        variables:
-           RVM_RUBY: "ruby-2.3"
-      - id: "ruby-2.4"
-        display_name: ruby-2.4
-        variables:
-           RVM_RUBY: "ruby-2.4"
       - id: "ruby-2.5"
         display_name: ruby-2.5
         variables:
@@ -594,30 +586,6 @@ buildvariants:
     topology: '*'
     mongodb-version: ['3.6']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1604-small
-  tasks:
-    - name: "test"
-
-- matrix_name: "ruby-2.4"
-  matrix_spec:
-    ruby: ["ruby-2.4"]
-    driver: ["current"]
-    topology: ['replica-set', 'sharded-cluster']
-    mongodb-version: ['3.2', '3.4']
-  display_name: "${ruby}, ${driver}, ${rails}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1604-small
-  tasks:
-    - name: "test"
-
-- matrix_name: "ruby-2.3"
-  matrix_spec:
-    ruby: ["ruby-2.3"]
-    driver: ["current"]
-    topology: ['replica-set', 'sharded-cluster']
-    mongodb-version: ['2.6', '3.0']
-  display_name: "${ruby}, ${driver}, ${rails}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1604-small
   tasks:
