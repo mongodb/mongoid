@@ -12,6 +12,7 @@ module Mongoid
         class_attribute :embedded, instance_reader: false
         class_attribute :embedded_relations
         class_attribute :relations
+        # @api private
         class_attribute :aliased_associations
         self.embedded = false
         self.embedded_relations = BSON::Document.new
