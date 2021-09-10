@@ -272,7 +272,7 @@ module Mongoid
         segment = aliased_fields[segment]&.dup || segment
         return segment unless remaining
 
-        relation = relations[aliased_relations[segment] || segment]
+        relation = relations[aliased_associations[segment] || segment]
         if relation
           "#{segment}.#{relation.klass.database_field_name(remaining)}"
         else
