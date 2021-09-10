@@ -369,7 +369,7 @@ axes:
       - id: "replica-set"
         display_name: Replica Set
         variables:
-           TOPOLOGY: "replica_set"
+           TOPOLOGY: "replica-set"
       - id: "sharded-cluster"
         display_name: Sharded Cluster
         variables:
