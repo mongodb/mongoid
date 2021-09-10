@@ -402,7 +402,7 @@ Mongoid query cache. If you plan to use the query cache, it is recommended
 that you upgrade to driver version 2.14.
 
 To read more about the query cache improvements made in the driver, see
-`the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
+`the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_.
 
 To read more about using the query cache with Mongoid and the limitations
 of the legacy query cache, see :ref:`the query cache documentation <query-cache>`.
