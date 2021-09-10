@@ -373,7 +373,7 @@ axes:
       - id: "sharded-cluster"
         display_name: Sharded Cluster
         variables:
-           TOPOLOGY: "sharded_cluster"
+           TOPOLOGY: "sharded-cluster"
            SINGLE_MONGOS: true
   - id: "auth"
     display_name: Authentication
