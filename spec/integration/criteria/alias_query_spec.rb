@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 
+=begin Not yet implemented, see https://github.com/mongodb/mongoid/pull/5047.
 describe 'Conditions on aliased fields' do
   let(:selector) { query.selector }
 
@@ -25,6 +26,7 @@ describe 'Conditions on aliased fields' do
     end
   end
 end
+=end
 
 describe 'distinct on aliased fields' do
 
