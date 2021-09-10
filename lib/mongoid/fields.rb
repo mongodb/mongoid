@@ -269,15 +269,15 @@ module Mongoid
         return nil unless name.present?
         key = name.to_s
         segment, remaining = key.split('.', 2)
-        segment = aliased_fields[segment] || segment
-        return segment.freeze unless remaining
+        segment = aliased_fields[segment]&.dup || segment
+        return segment unless remaining
 
         relation = relations[aliased_relations[segment] || segment]
         if relation
           "#{segment}.#{relation.klass.database_field_name(remaining)}"
         else
           "#{segment}.#{remaining}"
-        end.freeze
+        end
       end
 
       # Defines all the fields that are accessible on the Document
