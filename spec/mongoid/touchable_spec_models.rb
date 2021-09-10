@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module TouchableSpec
   module Embedded
@@ -16,6 +15,8 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       embedded_in :building
+
+      field :last_used_at, type: Time
     end
 
     class Floor

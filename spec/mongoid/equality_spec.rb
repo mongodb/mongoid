@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -106,8 +105,8 @@ describe Mongoid::Equality do
 
     context "when comparable is the same class" do
 
-      it "returns true" do
-        expect(klass === Person).to be true
+      it "returns false" do
+        expect(klass === Person).to be false
       end
     end
 
@@ -156,8 +155,8 @@ describe Mongoid::Equality do
 
       context "when the class is the same" do
 
-        it "returns true" do
-          expect(person === Person).to be true
+        it "returns false" do
+          expect(person === Person).to be false
         end
       end
 
@@ -170,8 +169,8 @@ describe Mongoid::Equality do
 
       context "when the class is a superclass" do
 
-        it "returns true" do
-          expect(Doctor.new === Person).to be true
+        it "returns false" do
+          expect(Doctor.new === Person).to be false
         end
       end
     end

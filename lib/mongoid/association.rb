@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'mongoid/association/accessors'
 require 'mongoid/association/builders'
@@ -34,8 +33,6 @@ module Mongoid
     # Map the macros to their corresponding Association classes.
     #
     # @return [ Hash ] The mapping from macros to their Association class.
-    #
-    # @since 7.0
     MACRO_MAPPING = {
         embeds_one: Association::Embedded::EmbedsOne,
         embeds_many: Association::Embedded::EmbedsMany,
@@ -60,8 +57,6 @@ module Mongoid
     #   address.embedded?
     #
     # @return [ true, false ] True if the document has a parent document.
-    #
-    # @since 2.0.0.rc.1
     def embedded?
       @embedded ||= (cyclic ? _parent.present? : self.class.embedded?)
     end
@@ -72,8 +67,6 @@ module Mongoid
     #   address.embedded_many?
     #
     # @return [ true, false ] True if in an embeds many.
-    #
-    # @since 2.0.0.rc.1
     def embedded_many?
       _association && _association.is_a?(Association::Embedded::EmbedsMany)
     end
@@ -84,8 +77,6 @@ module Mongoid
     #   address.embedded_one?
     #
     # @return [ true, false ] True if in an embeds one.
-    #
-    # @since 2.0.0.rc.1
     def embedded_one?
       _association && _association.is_a?(Association::Embedded::EmbedsOne)
     end
@@ -99,8 +90,6 @@ module Mongoid
     # @raise [ Errors::NoMetadata ] If no association metadata is present.
     #
     # @return [ Symbol ] The association name.
-    #
-    # @since 3.0.0
     def association_name
       raise Errors::NoMetadata.new(self.class.name) unless _association
       _association.name
@@ -112,8 +101,6 @@ module Mongoid
     #   post.referenced_many?
     #
     # @return [ true, false ] True if in a references many.
-    #
-    # @since 2.0.0.rc.1
     def referenced_many?
       _association && _association.is_a?(Association::Referenced::HasMany)
     end
@@ -124,8 +111,6 @@ module Mongoid
     #   address.referenced_one?
     #
     # @return [ true, false ] True if in a references one.
-    #
-    # @since 2.0.0.rc.1
     def referenced_one?
       _association && _association.is_a?(Association::Referenced::HasOne)
     end
@@ -137,8 +122,6 @@ module Mongoid
     #   document.reload_relations
     #
     # @return [ Hash ] The association metadata.
-    #
-    # @since 2.1.6
     def reload_relations
       relations.each_pair do |name, meta|
         if instance_variable_defined?("@_#{name}")

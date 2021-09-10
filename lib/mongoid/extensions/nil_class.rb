@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Extensions
@@ -11,8 +10,6 @@ module Mongoid
       #   object.__setter__
       #
       # @return [ nil ] Always nil.
-      #
-      # @since 3.1.0
       def __setter__
         self
       end
@@ -23,8 +20,6 @@ module Mongoid
       #   nil.collectionize
       #
       # @return [ String ] A blank string.
-      #
-      # @since 1.0.0
       def collectionize
         to_s.collectionize
       end

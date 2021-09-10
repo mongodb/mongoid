@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Contextual
@@ -17,8 +16,6 @@ module Mongoid
       #   map_reduce.counts
       #
       # @return [ Hash ] The counts.
-      #
-      # @since 3.0.0
       def counts
         results["counts"]
       end
@@ -32,8 +29,6 @@ module Mongoid
       #   end
       #
       # @return [ Enumerator ] The enumerator.
-      #
-      # @since 3.0.0
       def each
         validate_out!
         if block_given?
@@ -51,8 +46,6 @@ module Mongoid
       #   map_reduce.emitted
       #
       # @return [ Integer ] The number of emitted documents.
-      #
-      # @since 3.0.0
       def emitted
         counts["emit"]
       end
@@ -65,8 +58,6 @@ module Mongoid
       # @param [ String ] function The finalize function.
       #
       # @return [ MapReduce ] The map reduce.
-      #
-      # @since 3.0.0
       def finalize(function)
         @map_reduce = @map_reduce.finalize(function)
         self
@@ -80,8 +71,6 @@ module Mongoid
       # @param [ Criteria ] criteria The Mongoid criteria.
       # @param [ String ] map The map js function.
       # @param [ String ] reduce The reduce js function.
-      #
-      # @since 3.0.0
       def initialize(collection, criteria, map, reduce)
         @collection = collection
         @criteria = criteria
@@ -94,8 +83,6 @@ module Mongoid
       #   map_reduce.input
       #
       # @return [ Integer ] The number of input documents.
-      #
-      # @since 3.0.0
       def input
         counts["input"]
       end
@@ -106,8 +93,6 @@ module Mongoid
       #   map_reduce.js_mode
       #
       # @return [ MapReduce ] The map/reduce.
-      #
-      # @since 3.0.0
       def js_mode
         @map_reduce = @map_reduce.js_mode(true)
         self
@@ -134,8 +119,6 @@ module Mongoid
       # @param [ Hash ] location The place to store the results.
       #
       # @return [ MapReduce ] The map/reduce object.
-      #
-      # @since 3.0.0
       def out(location)
         normalized = location.dup
         normalized.update_values do |value|
@@ -151,8 +134,6 @@ module Mongoid
       #   map_reduce.output
       #
       # @return [ Integer ] The number of output documents.
-      #
-      # @since 3.0.0
       def output
         counts["output"]
       end
@@ -163,8 +144,6 @@ module Mongoid
       #   map_reduce.raw
       #
       # @return [ Hash ] The raw output.
-      #
-      # @since 3.0.0
       def raw
         validate_out!
         cmd = command
@@ -180,8 +159,6 @@ module Mongoid
       #   map_reduce.execute
       #
       # @return [ Hash ] The raw output
-      #
-      # @since 3.1.0
       alias :execute :raw
 
       # Get the number of documents reduced by the map/reduce.
@@ -190,8 +167,6 @@ module Mongoid
       #   map_reduce.reduced
       #
       # @return [ Integer ] The number of reduced documents.
-      #
-      # @since 3.0.0
       def reduced
         counts["reduce"]
       end
@@ -204,8 +179,6 @@ module Mongoid
       # @param [ Hash ] object A hash of key/values for the global scope.
       #
       # @return [ MapReduce ]
-      #
-      # @since 3.0.0
       def scope(object)
         @map_reduce = @map_reduce.scope(object)
         self
@@ -217,8 +190,6 @@ module Mongoid
       #   map_reduce.time
       #
       # @return [ Float ] The time in milliseconds.
-      #
-      # @since 3.0.0
       def time
         results["timeMillis"]
       end
@@ -230,8 +201,6 @@ module Mongoid
       #   map_reduce.inspect
       #
       # @return [ String ] The inspection string.
-      #
-      # @since 3.1.0
       def inspect
 %Q{#<Mongoid::Contextual::MapReduce
   selector: #{criteria.selector.inspect}

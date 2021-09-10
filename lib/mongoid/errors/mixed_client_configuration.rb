@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -15,8 +14,6 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the client config.
       # @param [ Hash ] config The configuration options.
-      #
-      # @since 3.0.0
       def initialize(name, config)
         super(
           compose_message(

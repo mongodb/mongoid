@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Indexable
@@ -53,8 +52,6 @@ module Mongoid
         # @param [ Hash ] options The index options.
         #
         # @raise [ Errors::InvalidIndex ] If validation failed.
-        #
-        # @since 3.0.0
         def validate(klass, spec, options)
           validate_spec(klass, spec, options)
           validate_options(klass, spec, options)
@@ -74,8 +71,6 @@ module Mongoid
         # @param [ Hash ] options The index options.
         #
         # @raise [ Errors::InvalidIndex ] If validation failed.
-        #
-        # @since 3.0.0
         def validate_options(klass, spec, options)
           options.each_pair do |name, value|
             unless VALID_OPTIONS.include?(name)
@@ -96,8 +91,6 @@ module Mongoid
         # @param [ Hash ] options The index options.
         #
         # @raise [ Errors::InvalidIndex ] If validation failed.
-        #
-        # @since 3.0.0
         def validate_spec(klass, spec, options)
           raise Errors::InvalidIndex.new(klass, spec, options) if !spec.is_a?(::Hash)
           spec.each_pair do |name, value|

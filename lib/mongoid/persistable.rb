@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/persistable/creatable"
 require "mongoid/persistable/deletable"
@@ -19,8 +18,6 @@ require "mongoid/persistable/unsettable"
 module Mongoid
 
   # Contains general behavior for persistence operations.
-  #
-  # @since 2.0.0
   module Persistable
     extend ActiveSupport::Concern
     include Creatable
@@ -40,8 +37,6 @@ module Mongoid
     include Unsettable
 
     # The atomic operations that deal with arrays or sets in the db.
-    #
-    # @since 4.0.0
     LIST_OPERATIONS = [ "$addToSet", "$push", "$pull", "$pullAll" ].freeze
 
     # Execute operations atomically (in a single database call) for everything
@@ -89,8 +84,6 @@ module Mongoid
     #   for the same document, if one exists.
     #
     # @return [ true, false ] If the operation succeeded.
-    #
-    # @since 4.0.0
     def atomically(join_context: nil)
       join_context = Mongoid.join_contexts if join_context.nil?
       call_depth = @atomic_depth ||= 0
@@ -128,8 +121,6 @@ module Mongoid
     #   Person.fail_due_to_validation!(person)
     #
     # @raise [ Errors::Validations ] The validation error.
-    #
-    # @since 4.0.0
     def fail_due_to_validation!
       raise Errors::Validations.new(self)
     end
@@ -142,8 +133,6 @@ module Mongoid
     # @param [ Symbol ] method The method being called.
     #
     # @raise [ Errors::Callback ] The callback error.
-    #
-    # @since 4.0.0
     def fail_due_to_callback!(method)
       raise Errors::Callback.new(self.class, method)
     end
@@ -158,8 +147,6 @@ module Mongoid
     #   document.executing_atomically?
     #
     # @return [ true, false ] If we are current executing atomically.
-    #
-    # @since 4.0.0
     def executing_atomically?
       !@atomic_updates_to_execute_stack.nil?
     end
@@ -175,8 +162,6 @@ module Mongoid
     # @param [ Hash ] options The options.
     #
     # @return [ true ] true.
-    #
-    # @since 4.0.0
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
@@ -194,8 +179,6 @@ module Mongoid
     #   end
     #
     # @return [ Object ] The result of the operation.
-    #
-    # @since 4.0.0
     def prepare_atomic_operation
       operations = yield({})
       persist_or_delay_atomic_operation(operations)
@@ -216,8 +199,6 @@ module Mongoid
     # @param [ Hash ] operations The atomic operations.
     #
     # @return [ Hash ] The operations.
-    #
-    # @since 4.0.0
     def process_atomic_operations(operations)
       operations.each do |field, value|
         access = database_field_name(field)
@@ -295,8 +276,6 @@ module Mongoid
     #   document.persist_or_delay_atomic_operation(ops)
     #
     # @param [ Hash ] operation The operation.
-    #
-    # @since 4.0.0
     def persist_or_delay_atomic_operation(operation)
       if executing_atomically?
         operation.each do |(name, hash)|
@@ -316,8 +295,6 @@ module Mongoid
     #   persist_atomic_operations(ops)
     #
     # @param [ Hash ] operations The atomic operations.
-    #
-    # @since 4.0.0
     def persist_atomic_operations(operations)
       if persisted? && operations && !operations.empty?
         selector = atomic_selector

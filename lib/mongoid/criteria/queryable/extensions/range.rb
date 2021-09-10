@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -15,8 +14,6 @@ module Mongoid
           #   1...3.__array__
           #
           # @return [ Array ] The range as an array.
-          #
-          # @since 1.0.0
           def __array__
             to_a
           end
@@ -27,8 +24,6 @@ module Mongoid
           #   (11231312..213123131).__evolve_date__
           #
           # @return [ Hash ] The min/max range query with times at midnight.
-          #
-          # @since 1.0.0
           def __evolve_date__
             { "$gte" => min.__evolve_date__, "$lte" => max.__evolve_date__ }
           end
@@ -39,8 +34,6 @@ module Mongoid
           #   (11231312..213123131).__evolve_date__
           #
           # @return [ Hash ] The min/max range query with times.
-          #
-          # @since 1.0.0
           def __evolve_time__
             { "$gte" => min.__evolve_time__, "$lte" => max.__evolve_time__ }
           end
@@ -55,8 +48,6 @@ module Mongoid
             # @param [ Range ] object The range to evolve.
             #
             # @return [ Hash ] The range as a gte/lte criteria.
-            #
-            # @since 1.0.0
             def evolve(object)
               return object unless object.is_a?(::Range)
               { "$gte" => object.min, "$lte" => object.max }

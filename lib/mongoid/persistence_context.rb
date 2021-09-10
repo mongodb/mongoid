@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
   # Object encapsulating logic for setting/getting a collection and database name
   # and a client with particular options to use when persisting models.
-  #
-  # @since 6.0.0
   class PersistenceContext
     extend Forwardable
 
@@ -19,8 +16,6 @@ module Mongoid
     # The options defining this persistence context.
     #
     # @return [ Hash ] The persistence context options.
-    #
-    # @since 6.0.0
     attr_reader :options
 
     # Extra options in addition to driver client options that determine the
@@ -28,8 +23,6 @@ module Mongoid
     #
     # @return [ Array<Symbol> ] The list of extra options besides client options
     #   that determine the persistence context.
-    #
-    # @since 6.0.0
     EXTRA_OPTIONS = [ :client,
                       :collection
                     ].freeze
@@ -38,8 +31,6 @@ module Mongoid
     #
     # @return [ Array<Symbol> ] The full list of options defining the persistence
     #   context.
-    #
-    # @since 6.0.0
     VALID_OPTIONS = ( Mongo::Client::VALID_OPTIONS + EXTRA_OPTIONS ).freeze
 
     # Initialize the persistence context object.
@@ -50,8 +41,6 @@ module Mongoid
     # @param [ Object ] object The class or model instance for which a persistence context
     #   should be created.
     # @param [ Hash ] opts The persistence context options.
-    #
-    # @since 6.0.0
     def initialize(object, opts = {})
       @object = object
       set_options!(opts)
@@ -67,8 +56,6 @@ module Mongoid
     #
     # @return [ Mongo::Collection ] The collection for this persistence
     #   context.
-    #
-    # @since 6.0.0
     def collection(parent = nil)
       parent ? parent.collection.with(client_options) : client[collection_name.to_sym]
     end
@@ -80,8 +67,6 @@ module Mongoid
     #
     # @return [ String ] The collection name for this persistence
     #  context.
-    #
-    # @since 6.0.0
     def collection_name
       @collection_name ||= (__evaluate__(options[:collection] ||
                              storage_options[:collection]))
@@ -94,8 +79,6 @@ module Mongoid
     #
     # @return [ String ] The database name for this persistence
     #  context.
-    #
-    # @since 6.0.0
     def database_name
       __evaluate__(database_name_option) || client.database.name
     end
@@ -107,8 +90,6 @@ module Mongoid
     #
     # @return [ Mongo::Client ] The client for this persistence
     #  context.
-    #
-    # @since 6.0.0
     def client
       @client ||= begin
         client = Clients.with_name(client_name)
@@ -136,8 +117,6 @@ module Mongoid
     # @param [ Object ] other The object to be compared with this one.
     #
     # @return [ true, false ] Whether the two persistence contexts are equal.
-    #
-    # @since 6.0.0
     def ==(other)
       return false unless other.is_a?(PersistenceContext)
       options == other.options
@@ -192,8 +171,6 @@ module Mongoid
       #   options or a persistence context object.
       #
       # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
-      #
-      # @since 6.0.0
       def set(object, options_or_context)
         key = "[mongoid][#{object.object_id}]:context"
         existing_context = Thread.current[key]
@@ -218,8 +195,6 @@ module Mongoid
       # @param [ Object ] object The class or model instance.
       #
       # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
-      #
-      # @since 6.0.0
       def get(object)
         Thread.current["[mongoid][#{object.object_id}]:context"]
       end
@@ -233,11 +208,11 @@ module Mongoid
       # @param [ Mongo::Cluster ] cluster The original cluster before this context was used.
       # @param [ Mongoid::PersistenceContext ] original_context The original persistence
       #   context that was set before this context was used.
-      #
-      # @since 6.0.0
       def clear(object, cluster = nil, original_context = nil)
         if context = get(object)
-          context.client.close unless (context.cluster.equal?(cluster) || cluster.nil?)
+          unless cluster.nil? || context.cluster.equal?(cluster)
+            context.client.close
+          end
         end
       ensure
         Thread.current["[mongoid][#{object.object_id}]:context"] = original_context

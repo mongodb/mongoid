@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -14,8 +13,6 @@ module Mongoid
       #
       # @param [ Class ] klass The model class.
       # @param [ Object ] value The attempted scope value.
-      #
-      # @since 3.0.0
       def initialize(klass, value)
         super(
           compose_message("invalid_scope", { klass: klass, value: value })

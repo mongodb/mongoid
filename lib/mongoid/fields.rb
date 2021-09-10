@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/fields/standard"
 require "mongoid/fields/foreign_key"
@@ -16,8 +15,6 @@ module Mongoid
     Boolean = Mongoid::Boolean
 
     # For fields defined with symbols use the correct class.
-    #
-    # @since 4.0.0
     TYPE_MAPPINGS = {
       array: Array,
       big_decimal: BigDecimal,
@@ -110,8 +107,6 @@ module Mongoid
     #   model.apply_pre_processed_defaults
     #
     # @return [ Array<String ] The names of the non-proc defaults.
-    #
-    # @since 2.4.0
     def apply_pre_processed_defaults
       pre_processed_defaults.each do |name|
         apply_default(name)
@@ -124,8 +119,6 @@ module Mongoid
     #   model.apply_post_processed_defaults
     #
     # @return [ Array<String ] The names of the proc defaults.
-    #
-    # @since 2.4.0
     def apply_post_processed_defaults
       post_processed_defaults.each do |name|
         apply_default(name)
@@ -138,8 +131,6 @@ module Mongoid
     #   model.apply_default("name")
     #
     # @param [ String ] name The name of the field.
-    #
-    # @since 2.4.0
     def apply_default(name)
       unless attributes.key?(name)
         if field = fields[name]
@@ -156,8 +147,6 @@ module Mongoid
     #
     # @example Apply all the defaults.
     #   model.apply_defaults
-    #
-    # @since 2.4.0
     def apply_defaults
       apply_pre_processed_defaults
       apply_post_processed_defaults
@@ -169,11 +158,9 @@ module Mongoid
     # method to automatically wrap params in JSON requests.
     #
     # @example Get the field names
-    #   docment.attribute_names
+    #   document.attribute_names
     #
     # @return [ Array<String> ] The field names
-    #
-    # @since 3.0.0
     def attribute_names
       self.class.attribute_names
     end
@@ -187,8 +174,6 @@ module Mongoid
     # @param [ String, Symbol ] name The name to get.
     #
     # @return [ String ] The name of the field as it's stored in the db.
-    #
-    # @since 3.0.7
     def database_field_name(name)
       self.class.database_field_name(name)
     end
@@ -202,8 +187,6 @@ module Mongoid
     # @param [ Object ] value The current value.
     #
     # @return [ true, false ] If we set the field lazily.
-    #
-    # @since 3.1.0
     def lazy_settable?(field, value)
       !frozen? && value.nil? && field.lazy?
     end
@@ -237,8 +220,6 @@ module Mongoid
       # @param [ Symbol ] option_name the option name to match against
       # @param [ Proc ] block the handler to execute when the option is
       #   provided.
-      #
-      # @since 2.1.0
       def option(option_name, &block)
         options[option_name] = block
       end
@@ -250,8 +231,6 @@ module Mongoid
       #   # => { :required => #<Proc:0x00000100976b38> }
       #
       # @return [ Hash ] the option map
-      #
-      # @since 2.1.0
       def options
         @options ||= {}
       end
@@ -268,8 +247,6 @@ module Mongoid
       #   Model.attribute_names
       #
       # @return [ Array<String> ] The field names
-      #
-      # @since 3.0.0
       def attribute_names
         fields.keys
       end
@@ -283,8 +260,6 @@ module Mongoid
       # @param [ String, Symbol ] name The name to get.
       #
       # @return [ String ] The name of the field as it's stored in the db.
-      #
-      # @since 3.0.7
       def database_field_name(name)
         return nil unless name
         normalized = name.to_s
@@ -325,8 +300,6 @@ module Mongoid
       # @param [ Class ] type The new type of field.
       #
       # @return [ Serializable ] The new field.
-      #
-      # @since 2.1.0
       def replace_field(name, type)
         remove_defaults(name)
         add_field(name, fields[name].options.merge(type: type))
@@ -339,8 +312,6 @@ module Mongoid
       #   person.using_object_ids?
       #
       # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
-      #
-      # @since 1.0.0
       def using_object_ids?
         fields["_id"].object_id_field?
       end
@@ -354,8 +325,6 @@ module Mongoid
       #   Model.add_defaults(field)
       #
       # @param [ Field ] field The field to add for.
-      #
-      # @since 2.4.0
       def add_defaults(field)
         default, name = field.default_val, field.name.to_s
         remove_defaults(name)
@@ -424,8 +393,6 @@ module Mongoid
       # @param [ Symbol ] name The name of the field.
       # @param [ Symbol ] meth The name of the accessor.
       # @param [ Hash ] options The options.
-      #
-      # @since 2.0.0
       def create_accessors(name, meth, options = {})
         field = fields[name]
 
@@ -449,8 +416,6 @@ module Mongoid
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
       # @param [ Field ] field The field.
-      #
-      # @since 2.4.0
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
@@ -475,8 +440,6 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
-      #
-      # @since 3.1.0
       def create_field_getter_before_type_cast(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_before_type_cast") do
@@ -497,8 +460,6 @@ module Mongoid
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
       # @param [ Field ] field The field.
-      #
-      # @since 2.4.0
       def create_field_setter(name, meth, field)
         generated_methods.module_eval do
           re_define_method("#{meth}=") do |value|
@@ -518,8 +479,6 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
-      #
-      # @since 2.4.0
       def create_field_check(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}?") do
@@ -536,8 +495,6 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
-      #
-      # @since 2.4.0
       def create_translations_getter(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_translations") do
@@ -556,8 +513,6 @@ module Mongoid
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
       # @param [ Field ] field The field.
-      #
-      # @since 2.4.0
       def create_translations_setter(name, meth, field)
         generated_methods.module_eval do
           re_define_method("#{meth}_translations=") do |value|
@@ -579,8 +534,6 @@ module Mongoid
       #   Person.generated_methods
       #
       # @return [ Module ] The module of generated methods.
-      #
-      # @since 2.0.0
       def generated_methods
         @generated_methods ||= begin
           mod = Module.new
@@ -595,8 +548,6 @@ module Mongoid
       #   Model.remove_defaults(name)
       #
       # @param [ String ] name The field name.
-      #
-      # @since 2.4.0
       def remove_defaults(name)
         pre_processed_defaults.delete_one(name)
         post_processed_defaults.delete_one(name)

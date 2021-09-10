@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -18,8 +17,6 @@ module Mongoid
     #     embedded_in :person
     #     referenced_in :post
     #   end
-    #
-    # @since 2.0.0
     class MixedRelations < MongoidError
       def initialize(root_klass, embedded_klass)
         super(

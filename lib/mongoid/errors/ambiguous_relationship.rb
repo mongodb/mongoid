@@ -1,12 +1,11 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
 
-    # This error is raised in case of an ambigous association.
+    # This error is raised in case of an ambiguous association.
     #
-    # @example An ambigous association.
+    # @example An ambiguous association.
     #   class Person
     #     include Mongoid::Document
     #
@@ -33,8 +32,6 @@ module Mongoid
       # @param [ Class ] inverse The inverse class.
       # @param [ Symbol ] name The relation name.
       # @param [ Array<Symbol> ] candidates The potential inverses.
-      #
-      # @since 3.0.0
       def initialize(klass, inverse, name, candidates)
         super(
           compose_message(

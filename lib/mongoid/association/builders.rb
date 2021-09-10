@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -17,8 +16,6 @@ module Mongoid
     #   # The following methods get created:
     #   person.build_name({ :first_name => "Durran" })
     #   person.create_name({ :first_name => "Durran" })
-    #
-    # @since 2.0.0.rc.1
     module Builders
       extend ActiveSupport::Concern
 
@@ -33,8 +30,6 @@ module Mongoid
       # @param [ Array ] args The arguments.
       #
       # @return [ Array<Hash> ] The attributes and options.
-      #
-      # @since 2.3.4
       def parse_args(*args)
         [ args.first || {}, args.size > 1 ? args[1] : {} ]
       end
@@ -47,8 +42,6 @@ module Mongoid
       # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
       def self.define_builder!(association)
         association.inverse_class.tap do |klass|
           klass.re_define_method("build_#{association.name}") do |*args|
@@ -72,8 +65,6 @@ module Mongoid
       # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
       def self.define_creator!(association)
         association.inverse_class.tap do |klass|
           klass.re_define_method("create_#{association.name}") do |*args|

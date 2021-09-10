@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -8,15 +7,13 @@ module Mongoid
         extend ActiveSupport::Concern
 
         # Reset the given counter using the .count() query from the
-        # db. This method is usuful in case that a counter got
+        # db. This method is useful in case that a counter got
         # corrupted, or a new counter was added to the collection.
         #
         # @example Reset the given counter cache
         #   post.reset_counters(:comments)
         #
         # @param [ Symbol, Array ] counters One or more counter caches to reset
-        #
-        # @since 4.0.0
         def reset_counters(*counters)
           self.class.with(persistence_context) do |_class|
             _class.reset_counters(self, *counters)
@@ -26,7 +23,7 @@ module Mongoid
         module ClassMethods
 
           # Reset the given counter using the .count() query from the
-          # db. This method is usuful in case that a counter got
+          # db. This method is useful in case that a counter got
           # corrupted, or a new counter was added to the collection.
           #
           # @example Reset the given counter cache
@@ -34,8 +31,6 @@ module Mongoid
           #
           # @param [ String ] id The id of the object that will be reset.
           # @param [ Symbol, Array ] counters One or more counter caches to reset
-          #
-          # @since 3.1.0
           def reset_counters(id, *counters)
             document = id.is_a?(Document) ? id : find(id)
             counters.each do |name|
@@ -55,8 +50,6 @@ module Mongoid
           #
           # @param [ String ] id The id of the object to update.
           # @param [ Hash ] counters
-          #
-          # @since 3.1.0
           def update_counters(id, counters)
             where(:_id => id).inc(counters)
           end
@@ -70,8 +63,6 @@ module Mongoid
           #
           # @param [ Symbol ] counter_name Counter cache name
           # @param [ String ] id The id of the object that will have its counter incremented.
-          #
-          # @since 3.1.0
           def increment_counter(counter_name, id)
             update_counters(id, counter_name.to_sym => 1)
           end
@@ -85,8 +76,6 @@ module Mongoid
           #
           # @param [ Symbol ] counter_name Counter cache name
           # @param [ String ] id The id of the object that will have its counter decremented.
-          #
-          # @since 3.1.0
           def decrement_counter(counter_name, id)
             update_counters(id, counter_name.to_sym => -1)
           end
@@ -102,8 +91,6 @@ module Mongoid
         # @param [ Association ] association The association.
         #
         # @return [ Class ] The association's owning class.
-        #
-        # @since 7.0
         def self.define_callbacks!(association)
           name = association.name
           cache_column = association.counter_cache_column_name.to_sym

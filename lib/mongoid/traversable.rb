@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "mongoid/fields/validators/macro"
 
 module Mongoid
 
   # Provides behavior around traversing the document graph.
-  #
-  # @since 4.0.0
   module Traversable
     extend ActiveSupport::Concern
 
@@ -66,7 +63,7 @@ module Mongoid
     # A separate module was needed because the subclasses of this class
     # need to be manually prepended with the discriminator_value and can't
     # rely on being a class_attribute because the .discriminator_value
-    # method is overriden by every subclass in the inherited method.
+    # method is overridden by every subclass in the inherited method.
     #
     # @api private
     module DiscriminatorRetrieval
@@ -139,8 +136,6 @@ module Mongoid
     #   document.collect_children
     #
     # @return [ Array<Document> ] The children.
-    #
-    # @since 2.4.0
     def collect_children
       children = []
       embedded_relations.each_pair do |name, association|
@@ -161,8 +156,6 @@ module Mongoid
     #   document.flag_children_persisted
     #
     # @return [ Array<Document> ] The flagged children.
-    #
-    # @since 3.0.7
     def flag_children_persisted
       _children.each do |child|
         child.new_record = false
@@ -201,8 +194,6 @@ module Mongoid
     #   document.remove_child(child)
     #
     # @param [ Document ] child The child (embedded) document to remove.
-    #
-    # @since 2.0.0.beta.1
     def remove_child(child)
       name = child.association_name
       if child.embedded_one?
@@ -220,8 +211,6 @@ module Mongoid
     #   document.reset_persisted_children
     #
     # @return [ Array<Document> ] The children.
-    #
-    # @since 2.1.0
     def reset_persisted_children
       _children.each do |child|
         child.move_changes
@@ -239,8 +228,6 @@ module Mongoid
     #   document._reset_memoized_children!
     #
     # @return [ nil ] nil.
-    #
-    # @since 5.0.0
     def _reset_memoized_children!
       _parent._reset_memoized_children! if _parent
       @__children = nil
@@ -265,8 +252,6 @@ module Mongoid
     #   document._root?
     #
     # @return [ true, false ] If the document is the root.
-    #
-    # @since 3.1.0
     def _root?
       _parent ? false : true
     end
@@ -291,8 +276,6 @@ module Mongoid
       #   Person.inherited(Doctor)
       #
       # @param [ Class ] subclass The inheriting class.
-      #
-      # @since 2.0.0.rc.6
       def inherited(subclass)
         super
         @_type = nil
@@ -305,7 +288,7 @@ module Mongoid
         subclass.discriminator_value = subclass.name
 
         # We need to do this here because the discriminator_value method is
-        # overriden in the subclass above.
+        # overridden in the subclass above.
         class << subclass
           include DiscriminatorRetrieval
         end

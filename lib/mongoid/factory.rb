@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
@@ -12,7 +11,7 @@ module Mongoid
 
     # Builds a new +Document+ from the supplied attributes.
     #
-    # This method either instantiats klass or a descendant of klass if the attributes include
+    # This method either instantiates klass or a descendant of klass if the attributes include
     # klass' discriminator key.
     #
     # If the attributes contain the discriminator key (which is _type by default) and the

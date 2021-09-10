@@ -1,11 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
-
-class BSON::ObjectId
-  def as_json(options = nil)
-    { "$oid" => to_s }
-  end
-end
 
 class BSON::Document
   # We need to override this as ActiveSupport creates a new Object, instead of a new Hash

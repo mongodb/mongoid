@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -18,8 +17,6 @@ module Mongoid
         #   smash.__deep_copy__
         #
         # @return [ Smash ] The copied hash.
-        #
-        # @since 1.0.0
         def __deep_copy__
           self.class.new(aliases, serializers) do |copy|
             each_pair do |key, value|
@@ -39,8 +36,6 @@ module Mongoid
         #   responsible for serializing values. The keys of the hash must be
         #   strings that match the field name, and the values must respond to
         #   #localized? and #evolve(object).
-        #
-        # @since 1.0.0
         def initialize(aliases = {}, serializers = {})
           @aliases, @serializers = aliases, serializers
           yield(self) if block_given?
@@ -54,8 +49,6 @@ module Mongoid
         # @param [ String ] key The key.
         #
         # @return [ Object ] The found object.
-        #
-        # @since 2.0.0
         def [](key)
           fetch(aliases[key]) { super }
         end
@@ -75,8 +68,6 @@ module Mongoid
         # @param [ Object ] serializer The optional field serializer.
         #
         # @return [ String ] The normalized key.
-        #
-        # @since 1.0.0
         def localized_key(name, serializer)
           serializer && serializer.localized? ? "#{name}.#{::I18n.locale}" : name
         end
@@ -93,8 +84,6 @@ module Mongoid
         #
         # @return [ Array<String, Object> ] The name of the db field and
         #   serializer.
-        #
-        # @since 1.0.0
         def storage_pair(key)
           field = key.to_s
           name = aliases[field] || field

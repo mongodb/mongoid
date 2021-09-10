@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 require_relative './selectable_shared_examples'
@@ -1950,7 +1949,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.all
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -1969,7 +1968,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.elem_match
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -1988,7 +1987,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.exists
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2007,7 +2006,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.gt
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2026,7 +2025,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.gte
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2045,7 +2044,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.in
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2064,7 +2063,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.lt
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2083,7 +2082,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.lte
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2102,7 +2101,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.mod
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2121,7 +2120,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.ne
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2140,7 +2139,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.near
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2159,7 +2158,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.near_sphere
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2178,7 +2177,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.nin
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2217,7 +2216,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.with_size
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
@@ -2236,7 +2235,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         :field.with_type
       end
 
-      it "returns a selecton key" do
+      it "returns a selection key" do
         expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
