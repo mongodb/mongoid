@@ -115,9 +115,10 @@ module Mongoid
 
             if option == :type && options[option] == Symbol
               @field_type_is_symbol_warned ||= begin
-                Mongoid::Deprecation.warn(<<~MSG.squish.freeze) && true
-                  The BSON Symbol type is deprecated (use String instead)
+                Mongoid::Deprecation.warn(<<~MSG.squish.freeze)
+                  The BSON Symbol type is deprecated. Please use String or StringifiedSymbol instead
                 MSG
+                true
               end
             end
           end
