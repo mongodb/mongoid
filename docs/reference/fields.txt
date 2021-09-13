@@ -643,6 +643,70 @@ with systems that use the ``id`` field to store value different from ``_id``.
 Customizing Field Behavior
 ==========================
 
+Mongoid offers several options for customizing the behavior of fields.
+
+
+Custom Getters And Setters
+--------------------------
+
+You can define custom getters and setters for fields to modify the values
+when they are being accessed or written. The getters and setters use the
+same name as the field. Use ``read_attribute`` and ``write_attribute``
+methods inside the getters and setters to operate on the raw attribute
+values.
+
+For example, Mongoid provides the ``:default`` field option to write a
+default value into the field. If you wish to have a field default value
+in your application but do not wish to persist it, you can override the
+getter as follows:
+
+.. code-block:: ruby
+
+  class DistanceMeasurement
+    include Mongoid::Document
+    
+    field :value, type: Float
+    field :unit, type: String
+    
+    def unit
+      read_attribute(:unit) || "m"
+    end
+    
+    def to_s
+      "#{value} #{unit}"
+    end
+  end
+  
+  measurement = DistanceMeasurement.new(value: 2)
+  measurement.to_s
+  # => "2.0 m"
+  measurement.attributes
+  # => {"_id"=>BSON::ObjectId('613fa0b0a15d5d61502f3447'), "value"=>2.0}
+
+To give another example, a field which converts empty strings to nil values
+may be implemented as follows:
+
+.. code-block:: ruby
+
+  class DistanceMeasurement
+    include Mongoid::Document
+    
+    field :value, type: Float
+    field :unit, type: String
+    
+    def unit=(value)
+      if value.blank?
+        value = nil
+      end
+      write_attribute(:unit, value)
+    end
+  end
+  
+  measurement = DistanceMeasurement.new(value: 2, unit: "")
+  measurement.attributes
+  # => {"_id"=>BSON::ObjectId('613fa15aa15d5d617216104c'), "value"=>2.0, "unit"=>nil}
+
+
 Custom Field Types
 ------------------
 
