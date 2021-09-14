@@ -2,32 +2,6 @@
 
 require 'spec_helper'
 
-=begin Not yet implemented, see https://github.com/mongodb/mongoid/pull/5047.
-describe 'Conditions on aliased fields' do
-  let(:selector) { query.selector }
-
-  context 'top level field' do
-    let(:query) do
-      Person.where(test: 1)
-    end
-
-    it 'expands the alias' do
-      selector.should == {'t' => '1'}
-    end
-  end
-
-  context 'embedded document field' do
-    let(:query) do
-      Person.where('phone_numbers.extension' => 1)
-    end
-
-    it 'expands the alias' do
-      selector.should == {'phone_numbers.ext' => 1}
-    end
-  end
-end
-=end
-
 describe 'distinct on aliased fields' do
 
   let(:client) { Person.collection.client }
