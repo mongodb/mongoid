@@ -12,9 +12,12 @@ module Mongoid
         class_attribute :embedded, instance_reader: false
         class_attribute :embedded_relations
         class_attribute :relations
+        # @api private
+        class_attribute :aliased_associations
         self.embedded = false
         self.embedded_relations = BSON::Document.new
         self.relations = BSON::Document.new
+        self.aliased_associations = {}
       end
 
       # This is convenience for libraries still on the old API.
@@ -193,6 +196,9 @@ module Mongoid
           Association::MACRO_MAPPING[macro_name].new(self, name, options, &block).tap do |assoc|
             assoc.setup!
             self.relations = self.relations.merge(name => assoc)
+            if assoc.respond_to?(:store_as) && assoc.store_as != name
+              self.aliased_associations[assoc.store_as] = name
+            end
           end
         end
       end

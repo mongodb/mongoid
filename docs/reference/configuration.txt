@@ -139,7 +139,7 @@ can be configured.
           - myhost3.mydomain.com:27017
         options:
           # These options are Ruby driver options, documented in
-          # https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/
+          # https://docs.mongodb.com/ruby-driver/current/reference/create-client/
 
           # Change the default write concern. (default = { w: 1 })
           write:
@@ -168,7 +168,13 @@ can be configured.
           # on 2.4 and 2.6 is :plain)
           auth_mech: :scram
 
-          # The database or source to authenticate the user against. (default: admin)
+          # Specify the auth source, i.e. the database or other source which
+          # contains the user's login credentials. Allowed values for auth source
+          # depend on the authentication mechanism, as explained in the server documentation:
+          # https://docs.mongodb.com/manual/reference/connection-string/#mongodb-urioption-urioption.authSource
+          # If no auth source is specified, the default auth source as
+          # determined by the driver will be used. Please refer to:
+          # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
           auth_source: admin
 
           # Force the driver to connect in a specific way instead of auto-
@@ -291,7 +297,7 @@ can be configured.
       use_utc: false
 
 The Ruby driver options may be found in
-`the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
+`the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/>`_.
 
 ERb Preprocessing
 =================
@@ -596,7 +602,7 @@ be executed sequentially during socket creation.
   in an application.
 
 For more information about TLS context hooks, including best practices for
-assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/#modifying-sslcontext>`_.
+assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/#modifying-sslcontext>`_.
 
 Usage with Forking Servers
 ==========================
