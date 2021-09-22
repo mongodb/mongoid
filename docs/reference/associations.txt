@@ -970,6 +970,8 @@ allowed in the field, the field is created with a type of Object. It is a
 good idea to explicitly define the field with the appropriate type.
 
 
+.. _association-scope:
+
 Custom Scopes
 -------------
 
