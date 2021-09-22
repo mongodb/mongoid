@@ -252,18 +252,32 @@ module Mongoid
       end
 
       # Get the name of the provided field as it is stored in the database.
-      # Used in determining if the field is aliased or not.
+      # Used in determining if the field is aliased or not. Recursively
+      # finds aliases for embedded documents and fields, delimited with
+      # period "." character.
       #
-      # @example Get the database field name.
+      # @example Get the database field name of a field.
       #   Model.database_field_name(:authorization)
+      #
+      # @example Get the database field name of an embedded field.
+      #   Model.database_field_name('customers.addresses.city')
       #
       # @param [ String, Symbol ] name The name to get.
       #
-      # @return [ String ] The name of the field as it's stored in the db.
+      # @return [ String ] The name of the field as stored in the database.
       def database_field_name(name)
-        return nil unless name
-        normalized = name.to_s
-        aliased_fields[normalized] || normalized
+        return nil unless name.present?
+        key = name.to_s
+        segment, remaining = key.split('.', 2)
+        segment = aliased_fields[segment]&.dup || segment
+        return segment unless remaining
+
+        relation = relations[aliased_associations[segment] || segment]
+        if relation
+          "#{segment}.#{relation.klass.database_field_name(remaining)}"
+        else
+          "#{segment}.#{remaining}"
+        end
       end
 
       # Defines all the fields that are accessible on the Document

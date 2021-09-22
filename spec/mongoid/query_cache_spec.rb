@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require 'mongoid/association/referenced/has_many_models'
 
 describe Mongoid::QueryCache do
 
@@ -996,6 +997,28 @@ describe Mongoid::QueryCache do
         SystemRole.all.to_a
         SystemRole.all.to_a
       end
+    end
+  end
+
+  context 'after calling none? on an association' do
+    let!(:host) do
+      HmmSchool.delete_all
+      school = HmmSchool.create!
+      5.times do
+        HmmStudent.create!(school: school)
+      end
+    end
+
+    let(:school) { HmmSchool.first }
+
+    before do
+      Mongoid::QueryCache.clear_cache
+
+      school.students.none?
+    end
+
+    it 'returns all children for the association' do
+      school.students.to_a.length.should == 5
     end
   end
 end
