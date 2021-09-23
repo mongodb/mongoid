@@ -25,7 +25,7 @@ module Mongoid
           #
           # @return [ Hash ] The $gte/$lte range query with times at UTC midnight.
           def __evolve_date__
-            __evolve_range_naive__.transform_values! {|v| v&.__evolve_date__ }
+            __evolve_range_naive__.transform_values {|v| v&.__evolve_date__ }
           end
 
           # Convert the range to a $gte/$lte mongo friendly query for times.
@@ -35,7 +35,7 @@ module Mongoid
           #
           # @return [ Hash ] The $gte/$lte range query with times in UTC.
           def __evolve_time__
-            __evolve_range_naive__.transform_values! {|v| v&.__evolve_time__ }
+            __evolve_range_naive__.transform_values {|v| v&.__evolve_time__ }
           end
 
           # Convert the range to a $gte/$lte mongo friendly query.
@@ -45,7 +45,7 @@ module Mongoid
           #
           # @return [ Hash ] The $gte/$lte range query.
           def __evolve_range__
-            __evolve_range_naive__.transform_values! do |value|
+            __evolve_range_naive__.transform_values do |value|
               case value
               when Time, DateTime then value.__evolve_time__
               when Date then value.__evolve_date__
