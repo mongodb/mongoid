@@ -3,9 +3,9 @@
 module Mongoid
   module Errors
 
-    # This error is raised in case of an ambigous association.
+    # This error is raised in case of an ambiguous association.
     #
-    # @example An ambigous association.
+    # @example An ambiguous association.
     #   class Person
     #     include Mongoid::Document
     #

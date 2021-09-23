@@ -18,7 +18,7 @@ module Mongoid
     # If not             - will append /id-updated_at.to_s(cache_timestamp_format)
     # Without updated_at - will append /id
     #
-    # This is usually called insode a cache() block
+    # This is usually called inside a cache() block
     #
     # @example Returns the cache key
     #   document.cache_key

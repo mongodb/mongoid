@@ -1573,7 +1573,7 @@ describe Mongoid::Attributes do
         person.write_attribute(:test, "aliased field to test")
       end
 
-      it "allows the field name to be udpated" do
+      it "allows the field name to be updated" do
         expect(person.t).to eq("aliased field to test")
       end
     end
@@ -2142,7 +2142,7 @@ describe Mongoid::Attributes do
       context "when the default is a proc" do
 
         let!(:account) do
-          Account.create(name: "savings", balance: "100")
+          Account.create(name: "savings", balance: 100)
         end
 
         let(:from_db) do

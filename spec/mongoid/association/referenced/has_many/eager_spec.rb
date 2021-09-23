@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../has_many_models'
 
 describe Mongoid::Association::Referenced::HasMany::Eager do
 
@@ -267,6 +268,22 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
         expect_query(0) do
           expect(eager.ratings).to eq([rating])
         end
+      end
+    end
+
+    context "when the association has scope" do
+      let!(:trainer1) { HmmTrainer.create!(name: 'Dave') }
+      let!(:trainer2) { HmmTrainer.create!(name: 'Ash') }
+      let!(:animal1) { HmmAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }
+      let!(:animal2) { HmmAnimal.create!(taxonomy: 'bird', trainer: trainer1) }
+
+      let(:eager) do
+        HmmTrainer.includes(:animals).where(_id: trainer1._id).to_a.first
+      end
+
+      it 'eager loads the included docs' do
+        expect(eager.animals._loaded).to eq(animal1._id => animal1)
+        expect(eager.animals).to eq [animal1]
       end
     end
   end
