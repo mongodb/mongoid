@@ -32,6 +32,7 @@ module Mongoid
             :primary_key,
             :inverse_primary_key,
             :inverse_foreign_key,
+            :scope,
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -163,6 +164,13 @@ module Mongoid
           Mongoid::Atomic::Paths::Root.new(document)
         end
 
+        # Get the scope to be applied when querying the association.
+        #
+        # @return [ Proc | Symbol | nil ] The association scope, if any.
+        def scope
+          @options[:scope]
+        end
+
         private
 
         def setup_instance_methods!
@@ -251,7 +259,9 @@ module Mongoid
         end
 
         def query_criteria(id_list)
-          crit = relation_class.all_of(primary_key => {"$in" => id_list || []})
+          crit = relation_class.criteria
+          crit = crit.apply_scope(scope)
+          crit = crit.all_of(primary_key => {"$in" => id_list || []})
           with_ordering(crit)
         end
       end

@@ -113,6 +113,13 @@ Mongoid 7.4 and later will inherit the new implementation provided by
 implementation returning a hash of ``{"$oid" => "..."}``.
 
 
+Scoped Associations
+-------------------
+
+Associations now support the ``:scope`` argument, yielding
+:ref:`scoped associations <association-scope>`.
+
+
 ``distinct`` and ``pluck`` Respect Field Aliases In Embedded Documents
 ----------------------------------------------------------------------
 

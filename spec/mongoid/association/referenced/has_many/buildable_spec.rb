@@ -58,6 +58,27 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
       end
     end
 
+    context "when scope is specified" do
+
+      let(:options) do
+        {
+          scope: -> { where(rating: 3) },
+        }
+      end
+
+      let(:object) do
+        BSON::ObjectId.new
+      end
+
+      let(:criteria) do
+        Post.where(association.foreign_key => object, rating: 3)
+      end
+
+      it "adds the ordering to the criteria" do
+        expect(documents).to eq(criteria)
+      end
+    end
+
     context "when the relation is polymorphic" do
 
       let(:options) do

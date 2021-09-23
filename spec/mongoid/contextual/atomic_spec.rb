@@ -685,15 +685,15 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.rename(members: :artists)
+        context.rename(members: :musicians)
       end
 
       it "renames existing fields" do
-        expect(depeche_mode.reload.artists).to eq([ "Dave" ])
+        expect(depeche_mode.reload.musicians).to eq([ "Dave" ])
       end
 
       it "does not rename non existent fields" do
-        expect(smiths.reload).to_not respond_to(:artists)
+        expect(smiths.reload).to_not respond_to(:musicians)
       end
     end
 
@@ -717,15 +717,15 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.rename(members: :artists)
+        context.rename(members: :musicians)
       end
 
       it "renames existing fields" do
-        expect(depeche_mode.reload.artists).to eq([ "Dave" ])
+        expect(depeche_mode.reload.musicians).to eq([ "Dave" ])
       end
 
       it "does not rename non existent fields" do
-        expect(smiths.reload).to_not respond_to(:artists)
+        expect(smiths.reload).to_not respond_to(:musicians)
       end
     end
   end
