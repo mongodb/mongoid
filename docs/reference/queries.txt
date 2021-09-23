@@ -880,6 +880,8 @@ as its ``id`` alias) cannot be omitted via ``without``:
   #   embedded: false>
 
 
+.. _ordering:
+
 Ordering
 ========
 
@@ -1032,7 +1034,7 @@ to be combined with :ref:`ordering <ordering>` to ensure consistent results.
 .. _batch-size:
 
 ``batch_size``
---------
+--------------
 
 When executing large queries, or when iterating over query results with an enumerator method such as
 ``Criteria#each``, Mongoid automatically uses the `MongoDB getMore command
@@ -1828,6 +1830,9 @@ Scoping
 
 Scopes provide a convenient way to reuse common criteria with more
 business domain style syntax.
+
+
+.. _named-scopes:
 
 Named Scopes
 ------------
