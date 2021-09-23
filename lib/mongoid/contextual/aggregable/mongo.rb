@@ -116,11 +116,13 @@ module Mongoid
         # @return [ Array ] The array of pipeline operators.
         def pipeline(field)
           db_field = "$#{database_field_name(field)}"
+          sort, skip, limit = criteria.options.values_at(:sort, :skip, :limit)
+
           pipeline = []
           pipeline << { "$match" =>  criteria.exists(field => true).selector }
-          pipeline << { "$sort" => criteria.options[:sort] } if criteria.options[:sort]
-          pipeline << { "$skip" => criteria.options[:skip] } if criteria.options[:skip]
-          pipeline << { "$limit" => criteria.options[:limit] } if criteria.options[:limit]
+          pipeline << { "$sort" => sort } if sort && (skip || limit)
+          pipeline << { "$skip" => skip } if skip
+          pipeline << { "$limit" => limit } if limit
           pipeline << {
             "$group"  => {
               "_id"   => field.to_s,

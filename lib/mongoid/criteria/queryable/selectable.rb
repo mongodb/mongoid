@@ -254,6 +254,26 @@ module Mongoid
         end
         key :within_box, :override, "$geoWithin", "$box"
 
+        # Add the $eq criterion to the selector.
+        #
+        # @example Add the $eq criterion.
+        #   selectable.eq(age: 60)
+        #
+        # @example Execute an $eq in a where query.
+        #   selectable.where(:field.eq => 10)
+        #
+        # @param [ Hash ] criterion The field/value pairs to check.
+        #
+        # @return [ Selectable ] The cloned selectable.
+        def eq(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :eq
+          end
+
+          __override__(criterion, "$eq")
+        end
+        key :eq, :override, "$eq"
+
         # Add the $gt criterion to the selector.
         #
         # @example Add the $gt criterion.

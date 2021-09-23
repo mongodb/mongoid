@@ -1071,6 +1071,25 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#eq" do
+
+    let!(:match) do
+      Band.create(member_count: 5)
+    end
+
+    let!(:non_match) do
+      Band.create(member_count: 1)
+    end
+
+    let(:criteria) do
+      Band.eq(member_count: 5)
+    end
+
+    it "returns the matching documents" do
+      expect(criteria).to eq([ match ])
+    end
+  end
+
   describe "#gt" do
 
     let!(:match) do

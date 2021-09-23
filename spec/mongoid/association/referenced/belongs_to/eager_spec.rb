@@ -2,6 +2,7 @@
 
 require "spec_helper"
 require_relative '../has_many_models'
+require_relative '../has_one_models'
 
 describe Mongoid::Association::Referenced::BelongsTo::Eager do
 
@@ -339,6 +340,41 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
 
         it 'does not error' do
           eager.map(&:reviewer).should == [nil]
+        end
+      end
+    end
+
+    context "when the association has scope" do
+
+      context 'when inverse of has_many' do
+        let!(:trainer1) { HmmTrainer.create!(name: 'Dave') }
+        let!(:trainer2) { HmmTrainer.create!(name: 'Ash') }
+        let!(:animal1) { HmmAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }
+        let!(:animal2) { HmmAnimal.create!(taxonomy: 'bird', trainer: trainer2) }
+
+        let(:eager) do
+          HmmAnimal.includes(:trainer).to_a
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager[0].trainer).to eq trainer1
+          expect(eager[1].trainer).to be_nil
+        end
+      end
+
+      context 'when inverse of has_one' do
+        let!(:trainer1) { HomTrainer.create!(name: 'Dave') }
+        let!(:trainer2) { HomTrainer.create!(name: 'Ash') }
+        let!(:animal1) { HomAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }
+        let!(:animal2) { HomAnimal.create!(taxonomy: 'bird', trainer: trainer2) }
+
+        let(:eager) do
+          HomAnimal.includes(:trainer).to_a
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager[0].trainer).to eq trainer1
+          expect(eager[1].trainer).to be_nil
         end
       end
     end
