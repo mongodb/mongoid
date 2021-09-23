@@ -1912,46 +1912,68 @@ document inserts, updates, and deletion.
 
           Band.where(label: "Mute").destroy
 
+
 .. _query-cache:
 
 Query Cache
 ===========
 
-Mongoid provides a Query Cache module which, when enabled, will cache the
-results of all MongoDB read queries. The Query Cache is useful to avoid executing
-duplicate queries and reduce database load.
+Mongoid and the underlying Ruby MongoDB driver provide query caching
+functionality. When enabled, the query cache saves the results of
+previously executed find and aggregation queries and reuses them in
+the future instead of performing the queries again, thus increasing
+application performance and reducing database load.
+
+The query cache has historically been provided by Mongoid but as of driver
+version 2.14.0, the query cache implementation has been moved into the driver.
+When Mongoid is used with driver version 2.14.0 or later, Mongoid delegates
+all work to the driver's query cache implementation. When Mongoid is used
+with driver versions 2.13.x and earlier, Mongoid utilizes its own, legacy,
+query cache implementation.
+
+Please review the `driver query cache documentation
+<https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_
+for details about the driver's query cache behavior.
 
 .. warning::
-  If you wish to use the Query Cache, please upgrade to Ruby driver version 2.14.0 or later.
-  If it is not possible to upgrade, please read the
-  :ref:`Legacy Query Cache Limitations <legacy-query-cache-limitations>` section carefully.
 
-Each thread has its own query cache store. Cached query results are not shared across
-threads.
+  The legacy query cache implementation that Mongoid uses when it detects
+  driver version 2.13.x and earlier has a number of limitations and
+  known issues, some of which are severe. If you wish to use the query cache,
+  it is strongly recommended to use driver 2.14.0 or later. The limitations
+  of the legacy Mongoid query cache are :ref:`described below
+  <legacy-query-cache-limitations>`.
 
-Write operations will clear the query cache on the thread that issued the write.
-Most write operations (insert, update, replace, delete) will clear results specifically for
-collection that is being written to. Certain other operations will clear the entire
-query cache. Note that writes will not clear the Query Cache if performed
-while it is disabled.
+The rest of this section assumes that driver 2.14.0 or later is being used and
+Mongoid delegates to the driver's query cache.
 
-.. _enabling-the-query-cache-middleware:
 
-Enabling the Query Cache via Middleware
----------------------------------------
+Enabling Query Cache
+--------------------
 
-We recommend Rack-based web framework (Rails, etc.) users to install
-the :ref:`Query Cache Rack Middleware <query-cache-middleware>`. This
-enables the query cache automatically on each web request, and clears
-the cache after the request completes.
+The query cache may be enabled by using the driver's namespace or Mongoid's
+namespace.
+
+
+.. _enabling-query-cache-via-middleware:
+
+Enabling Query Cache Via Middleware
+-----------------------------------
+
+Applications that utilize a Rack-based web framework (Rails, etc.) can
+take advantage of the Rack middleware provided by Mongoid to automatically
+enable the query cache for each web request, and clear the query cache after
+each request completes. Please see the :ref:`Query Cache Rack Middleware
+<query-cache-middleware>` section on the configuration page for instructions.
 
 Note that the Query Cache Middleware does not apply to code executed
 outside web requests.
 
-.. _enabling-the-query-cache-manually:
 
-Enabling the Query Cache Manually
----------------------------------
+.. _enabling-query-cache-manually:
+
+Enabling Query Cache Manually
+-----------------------------
 
 To enable the Query Cache manually for a code segment, use:
 
@@ -1971,6 +1993,47 @@ recommend to use the block form described above:
   # ...
 
   Mongoid::QueryCache.enabled = false
+
+Alternatively, you can reference the driver's query cache module directly:
+
+.. code-block:: ruby
+
+  Mongo::QueryCache.cache do
+    # ...
+  end
+
+  Mongo::QueryCache.enabled = true
+
+  Mongo::QueryCache.enabled = true
+
+
+Query Cache Shared With Driver
+------------------------------
+
+When Mongoid delegates to the driver's query cache, the same cache is used
+by both Mongoid and the driver. For example, the following two queries
+are implemented via the same server query and only the first of them
+would be sent to the server:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.cache do
+    Band.first
+    Band.collection.find.sort(_id: 1).first
+  end
+
+Similarly, write operations that clear the cache would do so when the read
+is performed by the driver and write by Mongoid, or vice versa:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.cache do
+    Band.first
+    Band.collection.insert_one({})
+    # Queries again
+    Band.first
+  end
+
 
 .. _query-cache-first-method:
 
@@ -1996,47 +2059,19 @@ will query the database and separately cache their results.
 
 To use the cached results, call ``all.to_a.first`` on the model class.
 
-.. _query-cache-system-collections:
-
-System Collections and the Query Cache
---------------------------------------
-
-MongoDB stores system information in collections that use the ``database.system.*``
-namespace pattern. These are called system collections.
-
-Data in system collections can change due to activity not triggered by the
-application (such as internal server processes) and as a result of a variety of
-database commands issued by the application. Because of the difficulty of
-determining when the cached results for system collections should be expired,
-queries on system collections bypass the query cache.
-
-.. code-block:: ruby
-
-  Band.all.to_a
-  #=> Queries the database and caches the results
-
-  Band.all.to_a.first
-  #=> Returns the first cached result
 
 .. _legacy-query-cache-limitations:
 
 Legacy Query Cache Limitations
 ------------------------------
 
-MongoDB Ruby Driver version 2.14.0 introduced a new and improved implementation
-of the Query Cache. When driver version 2.14.0 or greater is installed,
-Mongoid will automatically delegate all Query Cache methods to the driver.
-Note the the method interface of the `Mongoid::QueryCache` module remains consistent
-after upgrading. You may read more about the Ruby driver query cache
-`in the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_.
+When Mongoid uses its legacy query cache due to driver version being older
+than 2.14.0, the following limitations apply:
 
-On older driver versions, Mongoid will use its Legacy Query Cache functionality,
-and the following limitations apply:
-
-* The Legacy Query Cache does not cache query results that exceed the batch size.
+* The query cache does not cache query results that exceed the batch size.
   The default batch size is 1000 documents (refer to :ref:`batch_size <batch-size>`.)
 
-* The Legacy Query Cache does not take into account read preference or read concern
+* The query cache does not take into account read preference or read concern
   when deciding whether to return cached results. When performing the same
   query with a different read preference or read concern with the query cache
   enabled, incorrect results may be returned.
