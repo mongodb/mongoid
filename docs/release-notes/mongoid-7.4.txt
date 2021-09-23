@@ -151,3 +151,17 @@ Mongoid 7.3 behavior:
 
 Note that the alias expansion for top-level fields has already been
 done by Mongoid 7.3.
+
+
+``count``, ``sum``, ``avg``, ``min``, ``max`` Ignore Sort If Not Limiting/Skipping
+----------------------------------------------------------------------------------
+
+The ``count``, ``sum``, ``avg``, ``min`` and ``max`` methods now omit the
+sort stage from the generated aggregation pipeline if no skip or limit
+is specified, because the results aren't affected by the sort order.
+Example call that will now omit the sort stage and would potentially use
+an index where it wouldn't before:
+
+.. code-block:: ruby
+
+  Band.desc(:name).count
