@@ -1052,141 +1052,6 @@ The default ``batch_size`` is 1000, however you may set it explicitly:
   #   embedded: false>
 
 
-.. _query-cache:
-
-Query Cache
-===========
-
-When the query cache is enabled, Mongoid will cache results for MongoDB queries
-when the entire result set is returned in a single batch (1000 documents by
-default).
-
-Each thread has its own query cache.
-
-When the query cache is enabled, performing most write operations (insert,
-update, replace or delete) clears the cache of the thread issuing the write.
-
-To enable the query cache manually for a code segment, use:
-
-.. code-block:: ruby
-
-  Mongoid::QueryCache.cache do
-    # ...
-  end
-
-The query cache can also be explicitly enabled and disabled, although it is
-recommended to use the block form described above:
-
-.. code-block:: ruby
-
-  Mongoid::QueryCache.enabled = true
-
-  # ...
-
-  Mongoid::QueryCache.enabled = false
-
-Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
-to enable the query cache automatically for each web request.
-
-The Improved Driver Query Cache
--------------------------------
-
-The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
-Ruby Driver. The driver query cache is more correct and more effective, and we
-recommended that you upgrade to version 2.14.0 of the Ruby driver or newer.
-
-For the purposes of this tutorial, the Mongoid query cache will be called "the
-legacy query cache", and the driver query cache will be referred to as "the
-driver query cache."
-
-With driver versions 2.14.0 or newer, Mongoid will use the driver query cache
-instead of the legacy query cache. When used with older versions of the driver
-(that do not implement the query cache) Mongoid will fall back on the legacy
-query cache.
-
-Mongoid will retain the interface (described above) for enabling and disabling
-the query cache. When using driver versions 2.14.0 or newer, this interface
-will affect the driver query cache.
-
-Read more about the Ruby driver query cache
-`in the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_.
-
-.. warning::
-
-  The legacy Mongoid query cache has been deprecated in favor of the query cache
-  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
-  query cache will continue to function, the driver query cache is
-  more correct and more effective. If you plan on using the query cache, it is
-  recommended that you upgrade to Ruby driver version 2.14.0 or newer.
-
-  Read more about the Ruby driver query cache
-  `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_.
-
-Legacy Query Cache Limitations
-------------------------------
-
-The following is a list of limitations of the legacy query cache:
-
-* The legacy query cache does not cache query results that exceed the batch size.
-  The default batch size is 1000 documents.
-
-* The legacy query cache does not take into account read preference or read concern
-  when deciding whether to return cached results. When performing the same
-  query with a different read preference or read concern with the query cache
-  enabled, incorrect results may be returned.
-
-* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
-  do not invalidate the query cache. Cached results may be stale after performing
-  any of these operations.
-
-* Aggregation results are not cached.
-
-A Note on using ``#first``
---------------------------
-
-Calling the ``first`` method on a model class imposes an ascending sort by
-the ``_id`` field on the underlying query. This may produce unexpected behavior
-with query caching.
-
-For example, when calling ``all`` on a model class and then ``first``,
-one would expect the second query to use the cached results from the first.
-However, because of the sort imposed on the second query, both methods
-will query the database and separately cache their results.
-
-.. code-block:: ruby
-
-  Band.all.to_a
-  #=> Queries the database and caches the results
-
-  Band.first
-  #=> Queries the database again because of the sort
-
-To use the cached results, call ``all.to_a.first`` on the model class.
-
-System Collections and the Query Cache
---------------------------------------
-
-MongoDB stores system information in collections that use the ``database.system.*``
-namespace pattern. These are called system collections.
-
-Data in system collections can change due to activity not triggered by the
-application (such as internal server processes) and as a result of a variety of
-database commands issued by the application. Because of the difficulty of
-determining when the cached results for system collections should be expired,
-queries on system collections bypass the query cache.
-
-Neither the legacy query cache nor the driver query cache will cache query
-results from system collections.
-
-.. code-block:: ruby
-
-  Band.all.to_a
-  #=> Queries the database and caches the results
-
-  Band.all.to_a.first
-  #=> Returns the first cached result
-
-
 Finding By ``_id``
 ==================
 
@@ -1639,192 +1504,6 @@ nonexistent field ``deregistered_at`` the date was interpreted to be in UTC
 and converted to a time, matching the behavior of querying a ``Date`` field.
 
 
-Queries + Persistence
-=====================
-
-Mongoid supports persistence operations off of criteria
-in a light capacity for when you want to expressively perform multi
-document inserts, updates, and deletion.
-
-.. warning::
-
-  Criteria ordering and pagination conditions, including ``order``, ``limit``,
-  ``offset``, and ``batch_size``, will be ignored on the following operations.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 60
-
-   * - Operation
-     - Example
-
-   * - ``Criteria#create``
-
-       *Create a newly persisted document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").create
-
-   * - ``Criteria#create!``
-
-       *Create a newly persisted document and raise an exception on validation failure.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").create!
-
-   * - ``Criteria#build|new``
-
-       *Create a new (unsaved) document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").build
-          Band.where(name: "Photek").new
-
-   * - ``Criteria#update``
-
-       *Update attributes of the first matching document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").update(label: "Mute")
-
-   * - ``Criteria#update_all``
-
-       *Update attributes of all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(members: 2).update_all(label: "Mute")
-
-   * - ``Criteria#add_to_set``
-
-       *Perform an $addToSet on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").add_to_set(label: "Mute")
-
-   * - ``Criteria#bit``
-
-       *Perform a $bit on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
-
-   * - ``Criteria#inc``
-
-       *Perform an $inc on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").inc(likes: 123)
-
-   * - ``Criteria#pop``
-
-       *Perform a $pop on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").pop(members: -1)
-          Band.where(name: "Photek").pop(members: 1)
-
-   * - ``Criteria#pull``
-
-       *Perform a $pull on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").pull(members: "Maynard")
-
-   * - ``Criteria#pull_all``
-
-       *Perform a $pullAll on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").
-            pull_all(:members, [ "Maynard", "Danny" ])
-
-   * - ``Criteria#push``
-
-       *Perform a $push on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").push(members: "Maynard")
-
-   * - ``Criteria#push_all``
-
-       *Perform a $push with $each on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").
-            push_all(members: [ "Maynard", "Danny" ])
-
-   * - ``Criteria#rename``
-
-       *Perform a $rename on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").rename(name: :title)
-
-   * - ``Criteria#set``
-
-       *Perform a $set on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").set(likes: 10000)
-
-   * - ``Criteria#unset``
-
-       *Perform a $unset on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").unset(:likes)
-
-   * - ``Criteria#delete``
-
-       *Deletes all matching documents in the database.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(label: "Mute").delete
-
-   * - ``Criteria#destroy``
-
-       *Deletes all matching documents in the database while running callbacks for all.
-       This loads all documents into memory and can be an expensive operation.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(label: "Mute").destroy
-
 Scoping
 =======
 
@@ -2045,3 +1724,325 @@ treated like scopes, and can be chained as well.
   end
 
   Band.active
+
+
+Queries + Persistence
+=====================
+
+Mongoid supports persistence operations off of criteria
+in a light capacity for when you want to expressively perform multi
+document inserts, updates, and deletion.
+
+.. warning::
+
+  Criteria ordering and pagination conditions, including ``order``, ``limit``,
+  ``offset``, and ``batch_size``, will be ignored on the following operations.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Operation
+     - Example
+
+   * - ``Criteria#create``
+
+       *Create a newly persisted document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").create
+
+   * - ``Criteria#create!``
+
+       *Create a newly persisted document and raise an exception on validation failure.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").create!
+
+   * - ``Criteria#build|new``
+
+       *Create a new (unsaved) document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").build
+          Band.where(name: "Photek").new
+
+   * - ``Criteria#update``
+
+       *Update attributes of the first matching document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").update(label: "Mute")
+
+   * - ``Criteria#update_all``
+
+       *Update attributes of all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(members: 2).update_all(label: "Mute")
+
+   * - ``Criteria#add_to_set``
+
+       *Perform an $addToSet on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").add_to_set(label: "Mute")
+
+   * - ``Criteria#bit``
+
+       *Perform a $bit on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
+
+   * - ``Criteria#inc``
+
+       *Perform an $inc on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").inc(likes: 123)
+
+   * - ``Criteria#pop``
+
+       *Perform a $pop on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").pop(members: -1)
+          Band.where(name: "Photek").pop(members: 1)
+
+   * - ``Criteria#pull``
+
+       *Perform a $pull on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").pull(members: "Maynard")
+
+   * - ``Criteria#pull_all``
+
+       *Perform a $pullAll on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            pull_all(:members, [ "Maynard", "Danny" ])
+
+   * - ``Criteria#push``
+
+       *Perform a $push on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").push(members: "Maynard")
+
+   * - ``Criteria#push_all``
+
+       *Perform a $push with $each on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            push_all(members: [ "Maynard", "Danny" ])
+
+   * - ``Criteria#rename``
+
+       *Perform a $rename on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").rename(name: :title)
+
+   * - ``Criteria#set``
+
+       *Perform a $set on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").set(likes: 10000)
+
+   * - ``Criteria#unset``
+
+       *Perform a $unset on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").unset(:likes)
+
+   * - ``Criteria#delete``
+
+       *Deletes all matching documents in the database.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").delete
+
+   * - ``Criteria#destroy``
+
+       *Deletes all matching documents in the database while running callbacks for all.
+       This loads all documents into memory and can be an expensive operation.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").destroy
+
+.. _query-cache:
+
+Query Cache
+===========
+
+Mongoid provides a Query Cache module which, when enabled, will cache the
+results of all MongoDB read queries. The Query Cache is useful to avoid executing
+duplicate queries and reduce database load.
+
+.. warning::
+  If you wish to use the Query Cache, please upgrade to Ruby driver version 2.14.0 or later.
+  If it is not possible to upgrade, please read the
+  :ref:`Legacy Query Cache Limitations <legacy-query-cache-limitations>` section carefully.
+
+Each thread has its own query cache store. Cached query results are not shared across
+threads.
+
+Write operations will clear the query cache on the thread that issued the write.
+Most write operations (insert, update, replace, delete) will clear results specifically for
+collection that is being written to. Certain other operations will clear the entire
+query cache. Note that writes will not clear the Query Cache if performed
+while it is disabled.
+
+.. _enabling-the-query-cache-middleware:
+
+Enabling the Query Cache via Middleware
+---------------------------------------
+
+We recommend Rack-based web framework (Rails, etc.) users to install
+the :ref:`Query Cache Rack Middleware <query-cache-middleware>`. This
+enables the query cache automatically on each web request, and clears
+the cache after the request completes.
+
+Note that the Query Cache Middleware does not apply to code executed
+outside web requests.
+
+.. _enabling-the-query-cache-manually:
+
+Enabling the Query Cache Manually
+---------------------------------
+
+To enable the Query Cache manually for a code segment, use:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.cache do
+    # ...
+  end
+
+The Query Cache can also be explicitly enabled and disabled, although we
+recommend to use the block form described above:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.enabled = true
+
+  # ...
+
+  Mongoid::QueryCache.enabled = false
+
+.. _query-cache-first-method:
+
+Caching the Result of ``#first``
+--------------------------------
+
+Calling the ``first`` method on a model class imposes an ascending sort by
+the ``_id`` field on the underlying query. This may produce unexpected behavior
+with query caching.
+
+For example, when calling ``all`` on a model class and then ``first``,
+one would expect the second query to use the cached results from the first.
+However, because of the sort imposed on the second query, both methods
+will query the database and separately cache their results.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.first
+  #=> Queries the database again because of the sort
+
+To use the cached results, call ``all.to_a.first`` on the model class.
+
+.. _query-cache-system-collections:
+
+System Collections and the Query Cache
+--------------------------------------
+
+MongoDB stores system information in collections that use the ``database.system.*``
+namespace pattern. These are called system collections.
+
+Data in system collections can change due to activity not triggered by the
+application (such as internal server processes) and as a result of a variety of
+database commands issued by the application. Because of the difficulty of
+determining when the cached results for system collections should be expired,
+queries on system collections bypass the query cache.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.all.to_a.first
+  #=> Returns the first cached result
+
+.. _legacy-query-cache-limitations:
+
+Legacy Query Cache Limitations
+------------------------------
+
+MongoDB Ruby Driver version 2.14.0 introduced a new and improved implementation
+of the Query Cache. When driver version 2.14.0 or greater is installed,
+Mongoid will automatically delegate all Query Cache methods to the driver.
+Note the the method interface of the `Mongoid::QueryCache` module remains consistent
+after upgrading. You may read more about the Ruby driver query cache
+`in the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_.
+
+On older driver versions, Mongoid will use its Legacy Query Cache functionality,
+and the following limitations apply:
+
+* The Legacy Query Cache does not cache query results that exceed the batch size.
+  The default batch size is 1000 documents (refer to :ref:`batch_size <batch-size>`.)
+
+* The Legacy Query Cache does not take into account read preference or read concern
+  when deciding whether to return cached results. When performing the same
+  query with a different read preference or read concern with the query cache
+  enabled, incorrect results may be returned.
+
+* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
+  do not invalidate the query cache. Cached results may be stale after performing
+  any of these operations.
+
+* Aggregation results are not cached.
