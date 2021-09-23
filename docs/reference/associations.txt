@@ -981,7 +981,8 @@ to be a part of the association - a scoped association will return only
 documents which satisfy the scope condition.. The scope may be either:
 
 - a ``Proc`` with arity zero, or
-- a ``Symbol`` which references a named scope on the associated model.
+- a ``Symbol`` which references a :ref:`named scope <named-scopes>` on the
+  associated model.
 
 .. code-block:: ruby
   class Trainer
