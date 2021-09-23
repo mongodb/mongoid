@@ -56,6 +56,10 @@ module Mongoid
 
           private
 
+          # @note This method's return value will be mutated by the __evolve_*__
+          #   methods, therefore it must always return new objects.
+          #
+          # @api private
           def __evolve_range_naive__
             hash = {}
             hash['$gte'] = self.begin if self.begin
