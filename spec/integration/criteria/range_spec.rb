@@ -20,7 +20,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<Integer> criteria vs Integer field' do
       expect(Band.where(likes: eval('..3')).to_a).to eq [band1, band2, band3, band4]
@@ -35,7 +35,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<Integer> criteria vs Float field' do
       expect(Band.where(rating: eval('..3')).to_a).to eq [band1, band2, band3, band4]
@@ -50,7 +50,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<Float> criteria vs Integer field' do
       expect(Band.where(likes: eval('..3.05')).to_a).to eq [band1, band2, band3, band4]
@@ -65,7 +65,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<Float> criteria vs Float field' do
       expect(Band.where(rating: eval('..3.05')).to_a).to eq [band1, band2, band3, band4]
@@ -80,7 +80,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<Time> criteria vs Time field' do
       expect(Band.where(updated_at: eval('..(now_utc + 3.days)')).to_a).to eq [band1, band2, band3, band4]
@@ -95,7 +95,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<Time> criteria vs Date field' do
       expect(Band.where(founded: eval('..(now_utc + 3.days)')).to_a).to eq [band1, band2, band3, band4]
@@ -110,7 +110,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<ActiveSupport::TimeWithZone> criteria vs Time field' do
       expect(Band.where(updated_at: eval('..(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4]
@@ -125,7 +125,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<ActiveSupport::TimeWithZone> criteria vs Date field' do
       expect(Band.where(founded: eval('..(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4, band5]
@@ -140,7 +140,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
   it 'Range<Date> criteria vs Date field' do
       expect(Band.where(founded: eval('..(today + 3.days)')).to_a).to eq [band1, band2, band3, band4]
@@ -155,7 +155,7 @@ describe 'Queries with Range criteria' do
   end
 
   context 'endless range' do
-    ruby_version_gte '2.6'
+    ruby_version_gte '2.7'
 
     it 'Range<Date> criteria vs Time field' do
       expect(Band.where(updated_at: eval('..(today + 3.days)')).to_a).to eq [band1, band2, band3]
