@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'spec_helper'
 
@@ -14,153 +13,253 @@ describe 'Queries with Range criteria' do
   let!(:band4) { Band.create!(likes: 3, rating: 3.0, founded: today + 3.days, updated_at: now_utc + 3.days) }
   let!(:band5) { Band.create!(likes: 4, rating: 3.1, founded: today + 4.days, updated_at: now_utc + 4.days) }
 
-  it 'Range<Integer> criteria vs Integer field' do
-    expect(Band.where(likes: 1..3).to_a).to eq [band2, band3, band4]
-    expect(Band.where(likes: 1...3).to_a).to eq [band2, band3]
-  end
+  context 'Range<Integer> criteria vs Integer field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(likes: 1..3).to_a).to eq [band2, band3, band4]
+      expect(Band.where(likes: 1...3).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<Integer> criteria vs Integer field' do
-      expect(Band.where(likes: eval('..3')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(likes: eval('...3')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(likes: eval('1..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(likes: eval('1..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(likes: eval('..3')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(likes: eval('...3')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<Integer> criteria vs Float field' do
-    expect(Band.where(rating: 1..3).to_a).to eq [band2, band3, band4]
-    expect(Band.where(rating: 1...3).to_a).to eq [band2, band3]
-  end
+  context 'Range<Integer> criteria vs Float field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(rating: 1..3).to_a).to eq [band2, band3, band4]
+      expect(Band.where(rating: 1...3).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<Integer> criteria vs Float field' do
-      expect(Band.where(rating: eval('..3')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(rating: eval('...3')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(rating: eval('1..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(rating: eval('1..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(rating: eval('..3')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(rating: eval('...3')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<Float> criteria vs Integer field' do
-    expect(Band.where(likes: 0.95..3.05).to_a).to eq [band2, band3, band4]
-    expect(Band.where(likes: 0.95...3.0).to_a).to eq [band2, band3]
-  end
+  context 'Range<Float> criteria vs Integer field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(likes: 0.95..3.05).to_a).to eq [band2, band3, band4]
+      expect(Band.where(likes: 0.95...3.0).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<Float> criteria vs Integer field' do
-      expect(Band.where(likes: eval('..3.05')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(likes: eval('...3.0')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(likes: eval('0.95..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(likes: eval('0.95..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(likes: eval('..3.05')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(likes: eval('...3.0')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<Float> criteria vs Float field' do
-    expect(Band.where(rating: 0.95..3.05).to_a).to eq [band2, band3, band4]
-    expect(Band.where(rating: 0.95...3.0).to_a).to eq [band2, band3]
-  end
+  context 'Range<Float> criteria vs Float field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(rating: 0.95..3.05).to_a).to eq [band2, band3, band4]
+      expect(Band.where(rating: 0.95...3.0).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<Float> criteria vs Float field' do
-      expect(Band.where(rating: eval('..3.05')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(rating: eval('...3.0')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(rating: eval('0.95..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(rating: eval('0.95..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(rating: eval('..3.05')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(rating: eval('...3.0')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<Time> criteria vs Time field' do
-    expect(Band.where(updated_at: (now_utc + 1.day)..(now_utc + 3.days)).to_a).to eq [band2, band3, band4]
-    expect(Band.where(updated_at: (now_utc + 1.day)...(now_utc + 3.days)).to_a).to eq [band2, band3]
-  end
+  context 'Range<Time> criteria vs Time field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(updated_at: (now_utc + 1.day)..(now_utc + 3.days)).to_a).to eq [band2, band3, band4]
+      expect(Band.where(updated_at: (now_utc + 1.day)...(now_utc + 3.days)).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<Time> criteria vs Time field' do
-      expect(Band.where(updated_at: eval('..(now_utc + 3.days)')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(updated_at: eval('...(now_utc + 3.days)')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(updated_at: eval('(now_utc + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(updated_at: eval('(now_utc + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(updated_at: eval('..(now_utc + 3.days)')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(updated_at: eval('...(now_utc + 3.days)')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<Time> criteria vs Date field' do
-    expect(Band.where(founded: (now_utc + 1.day)..(now_utc + 3.days)).to_a).to eq [band2, band3, band4]
-    expect(Band.where(founded: (now_utc + 1.day)...(now_utc + 3.days)).to_a).to eq [band2, band3]
-  end
+  context 'Range<Time> criteria vs Date field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(founded: (now_utc + 1.day)..(now_utc + 3.days)).to_a).to eq [band2, band3, band4]
+      expect(Band.where(founded: (now_utc + 1.day)...(now_utc + 3.days)).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<Time> criteria vs Date field' do
-      expect(Band.where(founded: eval('..(now_utc + 3.days)')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(founded: eval('...(now_utc + 3.days)')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(founded: eval('(now_utc + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(founded: eval('(now_utc + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(founded: eval('..(now_utc + 3.days)')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(founded: eval('...(now_utc + 3.days)')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<ActiveSupport::TimeWithZone> criteria vs Time field' do
-    expect(Band.where(updated_at: (now_in_zone + 1.day)..(now_in_zone + 3.days)).to_a).to eq [band2, band3, band4]
-    expect(Band.where(updated_at: (now_in_zone + 1.day)...(now_in_zone + 3.days)).to_a).to eq [band2, band3]
-  end
+  context 'Range<ActiveSupport::TimeWithZone> criteria vs Time field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(updated_at: (now_in_zone + 1.day)..(now_in_zone + 3.days)).to_a).to eq [band2, band3, band4]
+      expect(Band.where(updated_at: (now_in_zone + 1.day)...(now_in_zone + 3.days)).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<ActiveSupport::TimeWithZone> criteria vs Time field' do
-      expect(Band.where(updated_at: eval('..(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(updated_at: eval('...(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(updated_at: eval('(now_in_zone + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(updated_at: eval('(now_in_zone + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(updated_at: eval('..(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(updated_at: eval('...(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<ActiveSupport::TimeWithZone> criteria vs Date field' do
-    expect(Band.where(founded: (now_in_zone + 1.day)..(now_in_zone + 3.days)).to_a).to eq [band3, band4, band5]
-    expect(Band.where(founded: (now_in_zone + 1.day)...(now_in_zone + 3.days)).to_a).to eq [band3, band4]
-  end
+  context 'Range<ActiveSupport::TimeWithZone> criteria vs Date field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(founded: (now_in_zone + 1.day)..(now_in_zone + 3.days)).to_a).to eq [band3, band4, band5]
+      expect(Band.where(founded: (now_in_zone + 1.day)...(now_in_zone + 3.days)).to_a).to eq [band3, band4]
+    end
 
-    it 'Range<ActiveSupport::TimeWithZone> criteria vs Date field' do
-      expect(Band.where(founded: eval('..(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4, band5]
-      expect(Band.where(founded: eval('...(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(founded: eval('(now_in_zone + 1.day)..')).to_a).to eq [band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(founded: eval('(now_in_zone + 1.day)..')).to_a).to eq [band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(founded: eval('..(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4, band5]
+        expect(Band.where(founded: eval('...(now_in_zone + 3.days)')).to_a).to eq [band1, band2, band3, band4]
+      end
     end
   end
 
-  it 'Range<Date> criteria vs Date field' do
-    expect(Band.where(founded: (today + 1.day)..(today + 3.days)).to_a).to eq [band2, band3, band4]
-    expect(Band.where(founded: (today + 1.day)...(today + 3.days)).to_a).to eq [band2, band3]
-  end
+  context 'Range<Date> criteria vs Date field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(founded: (today + 1.day)..(today + 3.days)).to_a).to eq [band2, band3, band4]
+      expect(Band.where(founded: (today + 1.day)...(today + 3.days)).to_a).to eq [band2, band3]
+    end
 
-  it 'Range<Date> criteria vs Date field' do
-      expect(Band.where(founded: eval('..(today + 3.days)')).to_a).to eq [band1, band2, band3, band4]
-      expect(Band.where(founded: eval('...(today + 3.days)')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(founded: eval('(today + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(founded: eval('(today + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(founded: eval('..(today + 3.days)')).to_a).to eq [band1, band2, band3, band4]
+        expect(Band.where(founded: eval('...(today + 3.days)')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 
-  it 'Range<Date> criteria vs Time field' do
-    expect(Band.where(updated_at: (today + 1.day)..(today + 3.days)).to_a).to eq [band2, band3]
-    expect(Band.where(updated_at: (today + 1.day)...(today + 3.days)).to_a).to eq [band2, band3]
-  end
+  context 'Range<Date> criteria vs Time field' do
 
-  context 'endless range' do
-    ruby_version_gte '2.7'
+    it 'returns objects within the range' do
+      expect(Band.where(updated_at: (today + 1.day)..(today + 3.days)).to_a).to eq [band2, band3]
+      expect(Band.where(updated_at: (today + 1.day)...(today + 3.days)).to_a).to eq [band2, band3]
+    end
 
-    it 'Range<Date> criteria vs Time field' do
-      expect(Band.where(updated_at: eval('..(today + 3.days)')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(updated_at: eval('...(today + 3.days)')).to_a).to eq [band1, band2, band3]
-      expect(Band.where(updated_at: eval('(today + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where(updated_at: eval('(today + 1.day)..')).to_a).to eq [band2, band3, band4, band5]
+      end
+    end
+
+    context 'beginless range' do
+      ruby_version_gte '2.7'
+
+      it 'returns all objects under the value' do
+        expect(Band.where(updated_at: eval('..(today + 3.days)')).to_a).to eq [band1, band2, band3]
+        expect(Band.where(updated_at: eval('...(today + 3.days)')).to_a).to eq [band1, band2, band3]
+      end
     end
   end
 end
