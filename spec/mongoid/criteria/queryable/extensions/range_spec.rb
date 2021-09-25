@@ -326,6 +326,7 @@ describe Range do
         expect(subject["$lte"].utc?).to be(true)
       end
     end
+
     context "when provided Date objects" do
       let(:range) { Date.new(2010, 1, 1)..Date.new(2010, 1, 3) }
 
