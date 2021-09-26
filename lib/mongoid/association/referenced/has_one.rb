@@ -24,7 +24,8 @@ module Mongoid
             :autosave,
             :dependent,
             :foreign_key,
-            :primary_key
+            :primary_key,
+            :scope,
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -127,6 +128,13 @@ module Mongoid
         # @return [ Root ] The root atomic path calculator.
         def path(document)
           Mongoid::Atomic::Paths::Root.new(document)
+        end
+
+        # Get the scope to be applied when querying the association.
+        #
+        # @return [ Proc | Symbol | nil ] The association scope, if any.
+        def scope
+          @options[:scope]
         end
 
         private

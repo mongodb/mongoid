@@ -77,3 +77,21 @@ class HomBusDriver
 
   # No belongs_to :bus
 end
+
+class HomTrainer
+  include Mongoid::Document
+
+  field :name, type: String
+
+  has_one :animal, class_name: 'HomAnimal', scope: :reptile
+end
+
+class HomAnimal
+  include Mongoid::Document
+
+  field :taxonomy, type: String
+
+  scope :reptile, -> { where(taxonomy: 'reptile') }
+
+  belongs_to :trainer, class_name: 'HomTrainer', scope: -> { where(name: 'Dave') }
+end

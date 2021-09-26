@@ -14,14 +14,18 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
       association.build(base, object)
     end
 
+    let(:options) do
+      {}
+    end
+
     let(:association) do
-      Mongoid::Association::Referenced::HasOne.new(Person, :account)
+      Mongoid::Association::Referenced::HasOne.new(Person, :account, options)
     end
 
     context "when provided an id" do
 
       let!(:account) do
-        Account.create!(person_id: object, name: 'banking')
+        Account.create!(person_id: object, name: 'banking', balance: 200)
       end
 
       let(:object) do
@@ -29,11 +33,51 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
       end
 
       before do
-        expect(Account).to receive(:where).with(association.foreign_key => object).and_call_original
+        expect_any_instance_of(Mongoid::Criteria).to receive(:where).with(association.foreign_key => object).and_call_original
       end
 
       it "sets the document" do
         expect(document).to eq(account)
+      end
+    end
+
+    context "when scope is specified" do
+
+      let!(:account) do
+        Account.create!(person_id: object, name: 'banking', balance: 200)
+      end
+
+      let(:object) do
+        BSON::ObjectId.new
+      end
+
+      let(:options) do
+        {
+            scope: -> { gt(balance: 100) }
+        }
+      end
+
+      before do
+        expect_any_instance_of(Mongoid::Criteria).to receive(:where).with(association.foreign_key => object).and_call_original
+        expect_any_instance_of(Mongoid::Criteria).to receive(:gt).with(balance: 100).and_call_original
+      end
+
+      context "when document satisfies scope" do
+
+        it "sets the document" do
+          expect(document).to eq(account)
+        end
+      end
+
+      context "when document does not satisfy scope" do
+
+        let!(:account) do
+          Account.create!(person_id: object, name: 'banking', balance: 50)
+        end
+
+        it "returns nil" do
+          expect(document).to eq(nil)
+        end
       end
     end
 

@@ -14,8 +14,12 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       association.build(base, object)
     end
 
+    let(:options) do
+      {}
+    end
+
     let(:association) do
-      Post.relations['person']
+      Mongoid::Association::Referenced::BelongsTo.new(Post, :person, options)
     end
 
     context "when provided an id" do
@@ -23,7 +27,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       context "when the object is an object id" do
 
         let!(:person) do
-          Person.create!(_id: object)
+          Person.create!(_id: object, username: 'Bob')
         end
 
         let(:object) do
@@ -31,11 +35,46 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
         end
 
         before do
-          expect(Person).to receive(:where).with(association.primary_key => object).and_call_original
+          expect_any_instance_of(Mongoid::Criteria).to receive(:where).with(association.primary_key => object).and_call_original
         end
 
         it "sets the document" do
           expect(document).to eq(person)
+        end
+      end
+
+      context "when scope is specified" do
+
+        let!(:person) do
+          Person.create(_id: object, username: 'Bob')
+        end
+
+        let(:object) do
+          BSON::ObjectId.new
+        end
+
+        let(:options) do
+          {
+            scope: -> { where(username: 'Bob') }
+          }
+        end
+
+        context "when document satisfies scope" do
+
+          it "sets the document" do
+            expect(document).to eq(person)
+          end
+        end
+
+        context "when document does not satisfy scope" do
+
+          let!(:person) do
+            Person.create(_id: object, username: 'Bruce')
+          end
+
+          it "returns nil" do
+            expect(document).to eq(nil)
+          end
         end
       end
 
@@ -65,7 +104,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
         end
 
         before do
-          expect(Person).to receive(:where).with(association.primary_key => object).and_call_original
+          expect_any_instance_of(Mongoid::Criteria).to receive(:where).with(association.primary_key => object).and_call_original
         end
 
         it 'returns nil' do
@@ -84,7 +123,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
         end
 
         before do
-          expect(Person).to receive(:where).with(association.primary_key => object).and_call_original
+          expect_any_instance_of(Mongoid::Criteria).to receive(:where).with(association.primary_key => object).and_call_original
         end
 
         it "sets the document" do
@@ -104,7 +143,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       end
 
       before do
-        expect(Person).not_to receive(:where)
+        expect_any_instance_of(Mongoid::Criteria).not_to receive(:where)
       end
 
       it "returns the object" do

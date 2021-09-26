@@ -123,6 +123,35 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       end
     end
 
+    context "when the association has scope" do
+      let!(:trainer1) { HabtmmTrainer.create!(name: 'Dave') }
+      let!(:trainer2) { HabtmmTrainer.create!(name: 'Ash') }
+      let!(:animal1) { HabtmmAnimal.create!(taxonomy: 'reptile', trainers: [trainer1, trainer2]) }
+      let!(:animal2) { HabtmmAnimal.create!(taxonomy: 'bird', trainers: [trainer1, trainer2]) }
+
+      context 'when scope set by Symbol' do
+        let(:eager) do
+          HabtmmAnimal.includes(:trainers).where(_id: animal1._id).first
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager.trainers._loaded).to eq(trainer1._id => trainer1)
+          expect(eager.trainers).to eq [trainer1]
+        end
+      end
+
+      context 'when scope set by Proc' do
+        let(:eager) do
+          HabtmmTrainer.includes(:animals).where(_id: trainer1._id).to_a.first
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager.animals._loaded).to eq(animal1._id => animal1)
+          expect(eager.animals).to eq [animal1]
+        end
+      end
+    end
+
     context "when some related documents no longer exist" do
       # Query count assertions require that all queries are sent using the
       # same connection object.
