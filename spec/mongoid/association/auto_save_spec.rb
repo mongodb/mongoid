@@ -12,7 +12,7 @@ describe Mongoid::Association::Referenced::AutoSave do
     end
 
     after(:all) do
-      Person.reset_callbacks(:save)
+      Person.reset_callbacks(:internal_save)
     end
 
     let(:person) do
@@ -21,22 +21,47 @@ describe Mongoid::Association::Referenced::AutoSave do
 
     context "when the option is not provided" do
 
-      let(:game) do
-        Game.new(name: "Tekken")
-      end
+      context "with accept_nested_attributes" do
 
-      before do
-        person.game = game
-      end
-
-      context "when saving the parent document" do
-
-        before do
-          person.save
+        let(:game) do
+          Game.new(name: "Tekken")
         end
 
-        it "does not save the relation" do
-          expect(game).to_not be_persisted
+        before do
+          person.game = game
+        end
+
+        context "when saving the parent document" do
+
+          before do
+            person.save
+          end
+
+          it "saves the relation" do
+            expect(game).to be_persisted
+          end
+        end
+      end
+
+      context "without accept_nested_attributes" do
+
+        let(:cat) do
+          Cat.new(name: "123")
+        end
+
+        before do
+          person.cat = cat
+        end
+
+        context "when saving the parent document" do
+
+          before do
+            person.save
+          end
+
+          it "does not save the relation" do
+            expect(cat).to_not be_persisted
+          end
         end
       end
     end
