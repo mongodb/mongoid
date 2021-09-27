@@ -24,8 +24,46 @@ module InterceptableSpec
             callback_registry.record_call(self.class, "#{whn}_#{what}".to_sym)
           end
         end
+        unless what == :validation
+          send("around_#{what}", "around_#{what}_stub".to_sym)
+          define_method("around_#{what}_stub") do |&block|
+            callback_registry.record_call(self.class, "around_#{what}_open".to_sym)
+            block.call
+            callback_registry.record_call(self.class, "around_#{what}_close".to_sym)
+          end
+        end
       end
     end
+  end
+
+  class CbHasOneParent
+    include Mongoid::Document
+
+    has_one :cb_has_one_child, autosave: true, class_name: "CbHasOneChild", inverse_of: :cb_has_one_parent
+
+    def initialize(callback_registry)
+      @callback_registry = callback_registry
+      super()
+    end
+
+    attr_reader :callback_registry
+
+    include CallbackTracking
+  end
+
+  class CbHasOneChild
+    include Mongoid::Document
+
+    belongs_to :cb_has_one_parent, class_name: "CbHasOneParent", inverse_of: :cb_has_one_child
+
+    def initialize(callback_registry)
+      @callback_registry = callback_registry
+      super()
+    end
+
+    attr_reader :callback_registry
+
+    include CallbackTracking
   end
 
   class CbParent

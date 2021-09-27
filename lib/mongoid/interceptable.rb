@@ -27,7 +27,7 @@ module Mongoid
       :before_save,
       :before_update,
       :before_upsert,
-      :before_validation
+      :before_validation,
     ].freeze
 
     included do
@@ -36,6 +36,9 @@ module Mongoid
 
       define_model_callbacks :build, :find, :initialize, :touch, only: :after
       define_model_callbacks :create, :destroy, :save, :update, :upsert
+
+      # @api private
+      define_model_callbacks :internal_save
 
       attr_accessor :before_callback_halted
     end

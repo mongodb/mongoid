@@ -97,9 +97,11 @@ module Mongoid
           invalid?(options[:context] || :update)
         process_flagged_destroys
         result = run_callbacks(:save) do
-          run_callbacks(:update) do
-            yield(self)
-            true
+          run_callbacks(:internal_save) do
+            run_callbacks(:update) do
+              yield(self)
+              true
+            end
           end
         end
         post_process_persist(result, options) and result
