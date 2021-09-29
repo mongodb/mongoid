@@ -321,6 +321,8 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it 'applies the persistence options when saving the child' do
+            skip 'https://jira.mongodb.org/browse/MONGOID-5190'
+
             expect(other_people_count).to eq(1)
             expect(other_posts_count).to eq(1)
           end
