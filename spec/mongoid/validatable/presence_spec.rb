@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../association/referenced/has_one_models'
 
 describe Mongoid::Validatable::PresenceValidator do
 
@@ -249,41 +250,44 @@ describe Mongoid::Validatable::PresenceValidator do
       end
     end
 
-    context "when the relation is a has one and autosave is false" do
+    context "when the association is a has one and autosave is false" do
 
       before do
-        Person.relations["game"].options[:autosave] = false
-        Person.validates :game, presence: true
+        HomCollege.validates :accreditation, presence: true
       end
 
       after do
-        Person.reset_callbacks(:validate)
+        HomCollege.reset_callbacks(:validate)
       end
 
-      it "does not change autosave on the relation" do
-        expect(Person.relations["game"].autosave?).to be false
+      it "does not change autosave on the association" do
+        expect(HomCollege.relations["accreditation"].autosave?).to be false
       end
 
-      context "when the relation is new" do
+      context "when the association target is new" do
 
-        let(:person) do
-          Person.new
+        let(:parent) do
+          HomCollege.new
         end
 
-        context "when the base is valid" do
+        context "when the parent is valid" do
 
-          let!(:game) do
-            person.build_game
+          let!(:child) do
+            parent.build_accreditation
           end
 
-          context "when saving the base" do
+          context "when saving the parent" do
 
             before do
-              person.save!
+              parent.associations[:accreditation].options[:autosave].should be_falsy
+
+              parent.save!
             end
 
-            it "does not save the relation" do
-              expect { game.reload }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            it "does not save the association target" do
+              child.persisted?.should be false
+
+              expect { child.reload }.to raise_error(Mongoid::Errors::DocumentNotFound)
             end
           end
         end
