@@ -1180,8 +1180,10 @@ when working with fields whose names are prefixed with ``$`` or contain ``.``
 ("specially-named fields"):
 
 * Mongoid's :ref:`field <field-types>` macro does not support defining specially-named fields.
-* Mongoid does not support getting or setting the values of specially-named fields.
-* Mongoid does not support queries or operations which reference specially-named fields.
+* Mongoid does not provide helper functions or idiomatic support for getting/setting
+  the values of specially-named fields.
+* Mongoid does not provide helper functions or idiomatic support for queries/operations
+  which reference specially-named fields.
 * If a document existing in the database contains specially-named fields,
   Mongoid will load the document normally **except** for its specially-named fields,
   which will not be retrieved.
