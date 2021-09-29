@@ -38,7 +38,7 @@ module Mongoid
       define_model_callbacks :create, :destroy, :save, :update, :upsert
 
       # @api private
-      define_model_callbacks :internal_save
+      define_model_callbacks :save_relations
 
       attr_accessor :before_callback_halted
     end

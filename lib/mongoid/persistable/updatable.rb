@@ -97,7 +97,7 @@ module Mongoid
           invalid?(options[:context] || :update)
         process_flagged_destroys
         result = run_callbacks(:save) do
-          run_callbacks(:internal_save) do
+          run_callbacks(:save_relations) do
             run_callbacks(:update) do
               yield(self)
               true

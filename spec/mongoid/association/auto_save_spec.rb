@@ -14,7 +14,7 @@ describe Mongoid::Association::Referenced::AutoSave do
     end
 
     after(:all) do
-      Person.reset_callbacks(:internal_save)
+      Person.reset_callbacks(:save_relations)
     end
 
     let(:person) do
