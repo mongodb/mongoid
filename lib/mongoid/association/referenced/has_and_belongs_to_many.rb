@@ -219,7 +219,7 @@ module Mongoid
         def synced_save
           assoc = self
           inverse_class.set_callback(
-              :save_relations,
+              :persist_parent,
               :after,
               if: ->(doc){ doc._syncable?(assoc) }
           ) do |doc|

@@ -64,7 +64,7 @@ module Mongoid
                 end
               end
             end
-            klass.after_save_relations save_method, unless: :autosaved?
+            klass.after_persist_parent save_method, unless: :autosaved?
           end
         end
       end
