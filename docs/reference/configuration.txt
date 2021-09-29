@@ -703,13 +703,13 @@ Query Cache Middleware
 
 .. note::
 
-  When used with Ruby driver version 2.15 or newer, Mongoid's query cache
-  middleware delegates to :ref:`the driver's query cache middleware
+  When used with Ruby driver version 2.15 or newer, Mongoid's Query Cache
+  Middleware delegates to :ref:`the driver's Query Cache Middleware
   <driver:query-cache-middleware>`.
 
-Mongoid provides a Rack middleware which enables the :ref:`query cache
+Mongoid provides a Rack middleware which enables the :ref:`Query Cache
 <query-cache>` for the duration of each web request. Below is an example of
-how to enable the query cache middleware in a Ruby on Rails application:
+how to enable the Query Cache Middleware in a Ruby on Rails application:
 
 .. code-block:: ruby
 

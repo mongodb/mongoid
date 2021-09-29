@@ -2142,7 +2142,7 @@ describe Mongoid::Attributes do
       context "when the default is a proc" do
 
         let!(:account) do
-          Account.create(name: "savings", balance: "100")
+          Account.create(name: "savings", balance: 100)
         end
 
         let(:from_db) do

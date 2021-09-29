@@ -285,6 +285,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
         context 'when the child has persistence options set' do
 
+          before do
+            Person.collection.client['other-posts'].delete_many
+            Person.collection.client['other-people'].delete_many
+          end
+
           let(:person) do
             Person.new
           end
@@ -294,11 +299,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           before do
-            post.with(collection: 'other-posts') do |p|
-              person.with(collection: 'other-people') do |per|
-                p.person = person
-                per.save
-                p.save
+            post.with(collection: 'other-posts') do |post|
+              person.with(collection: 'other-people') do |person|
+                post.person = person
+                person.save!
+                post.save!
               end
             end
           end
