@@ -28,7 +28,7 @@ module Mongoid
     include Mongoid::Touchable::InstanceMethods
 
     attr_accessor :__selected_fields
-    attr_reader :new_record
+    attr_reader :new_record, :during_post_persist_callbacks
 
     included do
       Mongoid.register_model(self)
@@ -103,6 +103,7 @@ module Mongoid
     def initialize(attrs = nil)
       @__parent = nil
       _building do
+        @during_post_persist_callbacks = false
         @new_record = true
         @attributes ||= {}
         apply_pre_processed_defaults
@@ -224,6 +225,14 @@ module Mongoid
       end
 
       became
+    end
+
+    def begin_post_persist_callbacks
+      @during_post_persist_callbacks = true
+    end
+
+    def end_post_persist_callbacks
+      @during_post_persist_callbacks = false
     end
 
     private

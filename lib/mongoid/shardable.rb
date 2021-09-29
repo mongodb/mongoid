@@ -74,7 +74,7 @@ module Mongoid
     def shard_key_selector_in_db
       selector = {}
       shard_key_fields.each do |field|
-        selector[field.to_s] = new_record? ? send(field) : attribute_was(field)
+        selector[field.to_s] = new_record? || during_post_persist_callbacks ? send(field) : attribute_was(field)
       end
       selector
     end
