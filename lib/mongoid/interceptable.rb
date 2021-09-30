@@ -27,7 +27,7 @@ module Mongoid
       :before_save,
       :before_update,
       :before_upsert,
-      :before_validation
+      :before_validation,
     ].freeze
 
     included do
@@ -36,6 +36,12 @@ module Mongoid
 
       define_model_callbacks :build, :find, :initialize, :touch, only: :after
       define_model_callbacks :create, :destroy, :save, :update, :upsert
+
+      # This callback is used internally by Mongoid to save association
+      # targets for referenced associations after the parent model is persisted.
+      #
+      # @api private
+      define_model_callbacks :persist_parent
 
       attr_accessor :before_callback_halted
     end
