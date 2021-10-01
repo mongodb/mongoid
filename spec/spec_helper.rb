@@ -28,10 +28,18 @@ def database_id_alt
   "mongoid_test_alt"
 end
 
-require 'mrss/cluster_config'
-require 'support/client_registry'
-require 'mrss/constraints'
-require 'mrss/event_subscriber'
+begin
+  require 'mrss/cluster_config'
+  require 'support/client_registry'
+  require 'mrss/constraints'
+  require 'mrss/event_subscriber'
+rescue LoadError => exc
+  raise LoadError.new <<~MSG.strip
+    The test suite requires shared tooling to be installed.
+    Please refer to spec/README.md for instructions.
+    #{exc.class}: #{exc}
+  MSG
+end
 
 ClusterConfig = Mrss::ClusterConfig
 
