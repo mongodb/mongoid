@@ -33,10 +33,11 @@ begin
   require 'support/client_registry'
   require 'mrss/constraints'
   require 'mrss/event_subscriber'
-rescue LoadError
+rescue LoadError => exc
   raise LoadError.new <<~MSG.strip
     The test suite requires shared tooling to be installed.
     Please refer to spec/README.md for instructions.
+    #{exc.class}: #{exc}
   MSG
 end
 
