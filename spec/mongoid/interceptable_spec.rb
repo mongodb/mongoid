@@ -1798,7 +1798,7 @@ describe Mongoid::Interceptable do
 
       let(:parent) do
         InterceptableSpec::CbHasOneParent.new(registry).tap do |p|
-          p.cb_has_one_child = InterceptableSpec::CbHasOneChild.new(registry)
+          p.child = InterceptableSpec::CbHasOneChild.new(registry)
         end
       end
 
@@ -1812,8 +1812,6 @@ describe Mongoid::Interceptable do
           [InterceptableSpec::CbHasOneParent, :around_save_open],
           [InterceptableSpec::CbHasOneParent, :before_create],
           [InterceptableSpec::CbHasOneParent, :around_create_open],
-          [InterceptableSpec::CbHasOneParent, :around_create_close],
-          [InterceptableSpec::CbHasOneParent, :after_create],
           [InterceptableSpec::CbHasOneChild, :before_validation],
           [InterceptableSpec::CbHasOneChild, :after_validation],
           [InterceptableSpec::CbHasOneChild, :before_save],
@@ -1824,8 +1822,52 @@ describe Mongoid::Interceptable do
           [InterceptableSpec::CbHasOneChild, :after_create],
           [InterceptableSpec::CbHasOneChild, :around_save_close],
           [InterceptableSpec::CbHasOneChild, :after_save],
+          [InterceptableSpec::CbHasOneParent, :around_create_close],
+          [InterceptableSpec::CbHasOneParent, :after_create],
           [InterceptableSpec::CbHasOneParent, :around_save_close],
           [InterceptableSpec::CbHasOneParent, :after_save],
+        ]
+      end
+
+      it 'calls callbacks in the right order' do
+        parent.save!
+        expect(registry.calls).to eq expected
+      end
+    end
+
+    context "has_many" do
+      let(:registry) { InterceptableSpec::CallbackRegistry.new }
+
+      let(:parent) do
+        InterceptableSpec::CbHasManyParent.new(registry).tap do |p|
+          p.children = [InterceptableSpec::CbHasManyChild.new(registry)]
+        end
+      end
+
+      let(:expected) do
+        [
+          [InterceptableSpec::CbHasManyParent, :before_validation],
+          [InterceptableSpec::CbHasManyChild, :before_validation],
+          [InterceptableSpec::CbHasManyChild, :after_validation],
+          [InterceptableSpec::CbHasManyParent, :after_validation],
+          [InterceptableSpec::CbHasManyParent, :before_save],
+          [InterceptableSpec::CbHasManyParent, :around_save_open],
+          [InterceptableSpec::CbHasManyParent, :before_create],
+          [InterceptableSpec::CbHasManyParent, :around_create_open],
+          [InterceptableSpec::CbHasManyChild, :before_validation],
+          [InterceptableSpec::CbHasManyChild, :after_validation],
+          [InterceptableSpec::CbHasManyChild, :before_save],
+          [InterceptableSpec::CbHasManyChild, :around_save_open],
+          [InterceptableSpec::CbHasManyChild, :before_create],
+          [InterceptableSpec::CbHasManyChild, :around_create_open],
+          [InterceptableSpec::CbHasManyChild, :around_create_close],
+          [InterceptableSpec::CbHasManyChild, :after_create],
+          [InterceptableSpec::CbHasManyChild, :around_save_close],
+          [InterceptableSpec::CbHasManyChild, :after_save],
+          [InterceptableSpec::CbHasManyParent, :around_create_close],
+          [InterceptableSpec::CbHasManyParent, :after_create],
+          [InterceptableSpec::CbHasManyParent, :around_save_close],
+          [InterceptableSpec::CbHasManyParent, :after_save],
         ]
       end
 
