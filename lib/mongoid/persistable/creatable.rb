@@ -103,8 +103,8 @@ module Mongoid
         return self if performing_validations?(options) &&
           invalid?(options[:context] || :create)
         result = run_callbacks(:save) do
-          run_callbacks(:persist_parent) do
-            run_callbacks(:create) do
+          run_callbacks(:create) do
+            run_callbacks(:persist_parent) do
               yield(self)
               post_process_insert
             end

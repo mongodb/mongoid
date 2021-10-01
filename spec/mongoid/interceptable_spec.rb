@@ -1812,8 +1812,6 @@ describe Mongoid::Interceptable do
           [InterceptableSpec::CbHasOneParent, :around_save_open],
           [InterceptableSpec::CbHasOneParent, :before_create],
           [InterceptableSpec::CbHasOneParent, :around_create_open],
-          [InterceptableSpec::CbHasOneParent, :around_create_close],
-          [InterceptableSpec::CbHasOneParent, :after_create],
           [InterceptableSpec::CbHasOneChild, :before_validation],
           [InterceptableSpec::CbHasOneChild, :after_validation],
           [InterceptableSpec::CbHasOneChild, :before_save],
@@ -1824,6 +1822,8 @@ describe Mongoid::Interceptable do
           [InterceptableSpec::CbHasOneChild, :after_create],
           [InterceptableSpec::CbHasOneChild, :around_save_close],
           [InterceptableSpec::CbHasOneChild, :after_save],
+          [InterceptableSpec::CbHasOneParent, :around_create_close],
+          [InterceptableSpec::CbHasOneParent, :after_create],
           [InterceptableSpec::CbHasOneParent, :around_save_close],
           [InterceptableSpec::CbHasOneParent, :after_save],
         ]
