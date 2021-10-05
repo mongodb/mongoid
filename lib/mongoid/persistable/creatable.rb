@@ -104,8 +104,10 @@ module Mongoid
           invalid?(options[:context] || :create)
         result = run_callbacks(:save) do
           run_callbacks(:create) do
-            yield(self)
-            post_process_insert
+            run_callbacks(:persist_parent) do
+              yield(self)
+              post_process_insert
+            end
           end
         end
         post_process_persist(result, options) and self

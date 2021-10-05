@@ -98,8 +98,10 @@ module Mongoid
         process_flagged_destroys
         result = run_callbacks(:save) do
           run_callbacks(:update) do
-            yield(self)
-            true
+            run_callbacks(:persist_parent) do
+              yield(self)
+              true
+            end
           end
         end
         post_process_persist(result, options) and result

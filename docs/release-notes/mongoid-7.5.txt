@@ -1,0 +1,71 @@
+***********
+Mongoid 7.5
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 7.5.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Order of Callbacks Invocation
+-----------------------------
+
+**Breaking change:** Mongoid 7.5 changes order of _create and _save callbacks
+invocation for documents with associations.
+
+Referenced associations (``has_one`` and ``has_many``):
+
++---------------------------------------+---------------------------------------+
+| Mongoid 7.5                           | Mongoid 7.4                           |
++=======================================+=======================================+
+| Parent :before_save                   | Parent :before_save                   |
++---------------------------------------+---------------------------------------+
+| Parent :around_save_open              | Parent :around_save_open              |
++---------------------------------------+---------------------------------------+
+| Parent :before_create                 | Parent :before_create                 |
++---------------------------------------+---------------------------------------+
+| Parent :around_create_open            | Parent :around_create_open            |
++---------------------------------------+---------------------------------------+
+| **Parent persisted in MongoDB**       | **Parent persisted in MongoDB**       |
++---------------------------------------+---------------------------------------+
+| Child :before_save                    | Parent :around_create_close           |
++---------------------------------------+---------------------------------------+
+| Child :around_save_open               | Parent :after_create                  |
++---------------------------------------+---------------------------------------+
+| Child :before_create                  | Child :before_save                    |
++---------------------------------------+---------------------------------------+
+| Child :around_create_open             | Child :around_save_open               |
++---------------------------------------+---------------------------------------+
+|                                       | Child :before_create                  |
++---------------------------------------+---------------------------------------+
+|                                       | Child :around_create_open             |
++---------------------------------------+---------------------------------------+
+| **Child persisted in MongoDB**        | **Child persisted in MongoDB**        |
++---------------------------------------+---------------------------------------+
+| Child :around_create_close            | Child :around_create_close            |
++---------------------------------------+---------------------------------------+
+| Child :after_create                   | Child :after_create                   |
++---------------------------------------+---------------------------------------+
+| Child :around_save_close              | Child :around_save_close              |
++---------------------------------------+---------------------------------------+
+| Child :after_save                     | Child :after_save                     |
++---------------------------------------+---------------------------------------+
+| Parent :around_create_close           | Parent :around_save_close             |
++---------------------------------------+---------------------------------------+
+| Parent :after_create                  | Parent :after_save                    |
++---------------------------------------+---------------------------------------+
+| Parent :around_save_close             |                                       |
++---------------------------------------+---------------------------------------+
+| Parent :after_save                    |                                       |
++---------------------------------------+---------------------------------------+
