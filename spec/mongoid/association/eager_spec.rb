@@ -209,10 +209,10 @@ describe Mongoid::Association::EagerLoadable do
         end
 
         it 'successfully loads all relations' do
-          user = User.create
-          unit = Unit.create
-          booking = Booking.create(unit: unit)
-          Voucher.create(booking: booking, created_by: user)
+          user = User.create!
+          unit = Unit.create!
+          booking = Booking.create!(unit: unit)
+          Voucher.create!(booking: booking, created_by: user)
 
           vouchers = Voucher.includes(:created_by, booking: [:unit])
 

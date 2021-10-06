@@ -122,7 +122,7 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
       context "when the eager load has returned documents" do
 
         let!(:post) do
-          person.posts.create(title: "testing")
+          person.posts.create!(title: "testing")
         end
 
         let!(:eager) do
@@ -176,7 +176,7 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
 
         it "returns the proxy" do
           expect do
-            eager.posts.create(title: "testing")
+            eager.posts.create!(title: "testing")
           end.to_not raise_error
         end
       end
@@ -188,11 +188,11 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
         end
 
         let!(:person_two) do
-          Person.create(username: "durran")
+          Person.create!(username: "durran")
         end
 
         let!(:post) do
-          person_one.posts.create(title: "testing")
+          person_one.posts.create!(title: "testing")
         end
 
         let!(:eager) do
@@ -249,11 +249,11 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
     context "when the relation is polymorphic" do
 
       let!(:movie) do
-        Movie.create(name: "Bladerunner")
+        Movie.create!(name: "Bladerunner")
       end
 
       let!(:rating) do
-        movie.ratings.create(value: 10)
+        movie.ratings.create!(value: 10)
       end
 
       let!(:eager) do

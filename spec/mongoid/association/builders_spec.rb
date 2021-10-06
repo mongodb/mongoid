@@ -176,7 +176,7 @@ describe Mongoid::Association::Builders do
     context "when the parent is persisted" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the relation is a has one" do

@@ -78,7 +78,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       context "when the eager load has returned documents" do
 
         let!(:preference) do
-          person.preferences.create(name: "testing")
+          person.preferences.create!(name: "testing")
         end
 
         before { eager }
@@ -117,7 +117,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
 
         it "returns the proxy" do
           expect do
-            eager.preferences.create(name: "testing")
+            eager.preferences.create!(name: "testing")
           end.to_not raise_error
         end
       end

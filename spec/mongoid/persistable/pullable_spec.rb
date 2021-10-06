@@ -36,7 +36,7 @@ describe Mongoid::Persistable::Pullable do
       end
 
       let(:person) do
-        Person.create(aliases: [ 1, 1, 2, 3 ], array: [ 4, 5, 6 ])
+        Person.create!(aliases: [ 1, 1, 2, 3 ], array: [ 4, 5, 6 ])
       end
 
       context "when providing string keys" do
@@ -88,11 +88,11 @@ describe Mongoid::Persistable::Pullable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "t", services: [ 1, 2, 3 ], a: [ 4, 5, 6 ])
+        person.addresses.create!(street: "t", services: [ 1, 2, 3 ], a: [ 4, 5, 6 ])
       end
 
       context "when providing string keys" do
@@ -117,7 +117,7 @@ describe Mongoid::Persistable::Pullable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(test_array: [ 1, 1, 2, 3 ])
+        Person.create!(test_array: [ 1, 1, 2, 3 ])
       end
 
       it "marks a dirty change for the pulled fields" do
@@ -161,7 +161,7 @@ describe Mongoid::Persistable::Pullable do
       end
 
       let(:person) do
-        Person.create(aliases: [ 1, 1, 2, 3 ], array: [ 4, 5, 6 ])
+        Person.create!(aliases: [ 1, 1, 2, 3 ], array: [ 4, 5, 6 ])
       end
 
       context "when providing string keys" do
@@ -215,11 +215,11 @@ describe Mongoid::Persistable::Pullable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "t", services: [ 1, 2, 3 ], a: [ 4, 5, 6 ])
+        person.addresses.create!(street: "t", services: [ 1, 2, 3 ], a: [ 4, 5, 6 ])
       end
 
       context "when providing string keys" do
@@ -244,7 +244,7 @@ describe Mongoid::Persistable::Pullable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(test_array: [ 1, 1, 2, 3, 4 ])
+        Person.create!(test_array: [ 1, 1, 2, 3, 4 ])
       end
 
       it "marks a dirty change for the pulled fields" do

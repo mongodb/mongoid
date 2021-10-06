@@ -57,7 +57,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       let(:person) do
-        Person.create(title: "sir", terms: true, aliased_timestamp: Time.at(42))
+        Person.create!(title: "sir", terms: true, aliased_timestamp: Time.at(42))
       end
 
       it "sets the first readonly value" do
@@ -242,11 +242,11 @@ describe Mongoid::Attributes::Readonly do
       context 'when the relation exists' do
 
         let(:mother) do
-          Person.create
+          Person.create!
         end
 
         let(:child) do
-          Person.create(mother: mother)
+          Person.create!(mother: mother)
           Person.find_by(mother: mother)
         end
 
@@ -258,7 +258,7 @@ describe Mongoid::Attributes::Readonly do
       context 'when the relation does not exist' do
 
         let(:child) do
-          Person.create
+          Person.create!
         end
 
         it 'the relation is nil' do
