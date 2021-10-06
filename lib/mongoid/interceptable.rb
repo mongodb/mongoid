@@ -115,20 +115,36 @@ module Mongoid
     #   end
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array ] args Any options.
-    #
-    # @return [ Document ] The document
-    ruby2_keywords def run_callbacks(kind, *args, &block)
-      cascadable_children(kind).each do |child|
-        if child.run_callbacks(child_callback_type(kind, child), *args) == false
-          return false
+    # @param [ true | false ] with_children Flag specifies whether callbacks of embedded document should be run.
+    def run_callbacks(kind, with_children: true, &block)
+      if with_children
+        cascadable_children(kind).each do |child|
+          if child.run_callbacks(child_callback_type(kind, child), with_children: with_children) == false
+            return false
+          end
         end
       end
       if callback_executable?(kind)
-        super(kind, *args, &block)
+        super(kind, &block)
       else
         true
       end
+    end
+
+    # Run the callbacks for embedded documents.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    def run_children_callbacks(kind, &block)
+      children = cascadable_children(kind)
+      if children.empty?
+        return block&.call
+      end
+      children.each do |child|
+        if child.run_callbacks(child_callback_type(kind, child), &block) == false
+          return false
+        end
+      end
+      true
     end
 
     private

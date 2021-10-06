@@ -48,6 +48,11 @@ module InterceptableSpec
 
     attr_reader :callback_registry
 
+    def insert_as_root
+      @callback_registry.record_call(self.class, :insert_into_database)
+      super
+    end
+
     include CallbackTracking
   end
 
@@ -78,6 +83,11 @@ module InterceptableSpec
 
     attr_reader :callback_registry
 
+    def insert_as_root
+      @callback_registry.record_call(self.class, :insert_into_database)
+      super
+    end
+
     include CallbackTracking
   end
 
@@ -85,6 +95,76 @@ module InterceptableSpec
     include Mongoid::Document
 
     belongs_to :parent, class_name: "CbHasManyParent", inverse_of: :children
+
+    def initialize(callback_registry)
+      @callback_registry = callback_registry
+      super()
+    end
+
+    attr_reader :callback_registry
+
+    include CallbackTracking
+  end
+
+  class CbEmbedsOneParent
+    include Mongoid::Document
+
+    embeds_one :child, cascade_callbacks: true, class_name: "CbEmbedsOneChild", inverse_of: :parent
+
+    def initialize(callback_registry)
+      @callback_registry = callback_registry
+      super()
+    end
+
+    attr_reader :callback_registry
+
+    def insert_as_root
+      @callback_registry.record_call(self.class, :insert_into_database)
+      super
+    end
+
+    include CallbackTracking
+  end
+
+  class CbEmbedsOneChild
+    include Mongoid::Document
+
+    embedded_in :parent, class_name: "CbEmbedsOneParent", inverse_of: :child
+
+    def initialize(callback_registry)
+      @callback_registry = callback_registry
+      super()
+    end
+
+    attr_reader :callback_registry
+
+    include CallbackTracking
+  end
+
+  class CbEmbedsManyParent
+    include Mongoid::Document
+
+    embeds_many :children, cascade_callbacks: true, class_name: "CbEmbedsManyChild", inverse_of: :parent
+
+    def initialize(callback_registry)
+      @callback_registry = callback_registry
+      super()
+    end
+
+    attr_reader :callback_registry
+
+    def insert_as_root
+      @callback_registry.record_call(self.class, :insert_into_database)
+      super
+    end
+
+    include CallbackTracking
+  end
+
+  class CbEmbedsManyChild
+    include Mongoid::Document
+
+    embedded_in :parent, class_name: "CbEmbedsManyParent", inverse_of: :children
 
     def initialize(callback_registry)
       @callback_registry = callback_registry
