@@ -1814,14 +1814,14 @@ describe Mongoid::Interceptable do
           [InterceptableSpec::CbHasOneParent, :before_create],
           [InterceptableSpec::CbHasOneParent, :around_create_open],
 
+          [InterceptableSpec::CbHasOneParent, :insert_into_database],
+
           [InterceptableSpec::CbHasOneChild, :before_validation],
           [InterceptableSpec::CbHasOneChild, :after_validation],
           [InterceptableSpec::CbHasOneChild, :before_save],
           [InterceptableSpec::CbHasOneChild, :around_save_open],
           [InterceptableSpec::CbHasOneChild, :before_create],
           [InterceptableSpec::CbHasOneChild, :around_create_open],
-
-          [InterceptableSpec::CbHasOneParent, :insert_into_database],
 
           [InterceptableSpec::CbHasOneChild, :around_create_close],
           [InterceptableSpec::CbHasOneChild, :after_create],
