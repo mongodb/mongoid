@@ -1797,8 +1797,8 @@ describe Mongoid::Interceptable do
       let(:registry) { InterceptableSpec::CallbackRegistry.new }
 
       let(:parent) do
-        InterceptableSpec::CbHasOneParent.new(registry).tap do |p|
-          p.child = InterceptableSpec::CbHasOneChild.new(registry)
+        InterceptableSpec::CbHasOneParent.new(registry).tap do |parent|
+          parent.child = InterceptableSpec::CbHasOneChild.new(registry)
         end
       end
 
@@ -1845,8 +1845,8 @@ describe Mongoid::Interceptable do
       let(:registry) { InterceptableSpec::CallbackRegistry.new }
 
       let(:parent) do
-        InterceptableSpec::CbEmbedsOneParent.new(registry).tap do |p|
-          p.child = InterceptableSpec::CbEmbedsOneChild.new(registry)
+        InterceptableSpec::CbEmbedsOneParent.new(registry).tap do |parent|
+          parent.child = InterceptableSpec::CbEmbedsOneChild.new(registry)
         end
       end
 
@@ -1893,8 +1893,8 @@ describe Mongoid::Interceptable do
       let(:registry) { InterceptableSpec::CallbackRegistry.new }
 
       let(:parent) do
-        InterceptableSpec::CbHasManyParent.new(registry).tap do |p|
-          p.children = [
+        InterceptableSpec::CbHasManyParent.new(registry).tap do |parent|
+          parent.children = [
             InterceptableSpec::CbHasManyChild.new(registry),
             InterceptableSpec::CbHasManyChild.new(registry)
           ]
@@ -1956,8 +1956,8 @@ describe Mongoid::Interceptable do
       let(:registry) { InterceptableSpec::CallbackRegistry.new }
 
       let(:parent) do
-        InterceptableSpec::CbEmbedsManyParent.new(registry).tap do |p|
-          p.children = [
+        InterceptableSpec::CbEmbedsManyParent.new(registry).tap do |parent|
+          parent.children = [
             InterceptableSpec::CbEmbedsManyChild.new(registry),
             InterceptableSpec::CbEmbedsManyChild.new(registry),
           ]
@@ -1984,6 +1984,12 @@ describe Mongoid::Interceptable do
 
           [InterceptableSpec::CbEmbedsManyChild, :before_save],
           [InterceptableSpec::CbEmbedsManyChild, :around_save_open],
+          [InterceptableSpec::CbEmbedsManyChild, :before_save],
+
+          [InterceptableSpec::CbEmbedsManyChild, :around_save_open],
+          [InterceptableSpec::CbEmbedsManyChild, :before_create],
+          [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
+
           [InterceptableSpec::CbEmbedsManyChild, :before_create],
           [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
 
@@ -1991,23 +1997,13 @@ describe Mongoid::Interceptable do
 
           [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
           [InterceptableSpec::CbEmbedsManyChild, :after_create],
-          [InterceptableSpec::CbEmbedsManyChild, :before_create],
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
+
           [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
           [InterceptableSpec::CbEmbedsManyChild, :after_create],
+
           [InterceptableSpec::CbEmbedsManyChild, :around_save_close],
           [InterceptableSpec::CbEmbedsManyChild, :after_save],
 
-          [InterceptableSpec::CbEmbedsManyChild, :before_save],
-          [InterceptableSpec::CbEmbedsManyChild, :around_save_open],
-          [InterceptableSpec::CbEmbedsManyChild, :before_create],
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
-          [InterceptableSpec::CbEmbedsManyChild, :after_create],
-          [InterceptableSpec::CbEmbedsManyChild, :before_create],
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
-          [InterceptableSpec::CbEmbedsManyChild, :after_create],
           [InterceptableSpec::CbEmbedsManyChild, :around_save_close],
           [InterceptableSpec::CbEmbedsManyChild, :after_save],
 

@@ -99,8 +99,8 @@ module Mongoid
         result = run_callbacks(:save, with_children: false) do
           run_callbacks(:update, with_children: false) do
             run_callbacks(:persist_parent, with_children: false) do
-              run_children_callbacks(:save) do
-                run_children_callbacks(:update) do
+              _mongoid_run_child_callbacks(:save) do
+                _mongoid_run_child_callbacks(:update) do
                   yield(self)
                   true
                 end

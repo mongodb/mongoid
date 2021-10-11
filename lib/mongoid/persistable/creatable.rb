@@ -105,12 +105,10 @@ module Mongoid
         result = run_callbacks(:save, with_children: false) do
           run_callbacks(:create, with_children: false) do
             run_callbacks(:persist_parent, with_children: false) do
-              run_children_callbacks(:save) do
-                run_children_callbacks(:create) do
-                  if new_record?
-                    yield(self)
-                    post_process_insert
-                  end
+              _mongoid_run_child_callbacks(:save) do
+                _mongoid_run_child_callbacks(:create) do
+                  yield(self)
+                  post_process_insert
                 end
               end
             end

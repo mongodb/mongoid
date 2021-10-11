@@ -134,17 +134,22 @@ module Mongoid
     # Run the callbacks for embedded documents.
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    def run_children_callbacks(kind, &block)
-      children = cascadable_children(kind)
-      if children.empty?
+    # @param [ Array<Document> ] children Children to exeute callbacks on. If
+    #   nil, callbacks will be executed on all cascadable children of
+    #   the document.
+    #
+    # @api private
+    def _mongoid_run_child_callbacks(kind, children: nil, &block)
+      child, *tail = (children || cascadable_children(kind))
+      if child.nil?
         return block&.call
-      end
-      children.each do |child|
-        if child.run_callbacks(child_callback_type(kind, child), &block) == false
-          return false
+      elsif tail.empty?
+        return child.run_callbacks(child_callback_type(kind, child), &block)
+      else
+        return child.run_callbacks(child_callback_type(kind, child)) do
+          _mongoid_run_child_callbacks(kind, children: tail, &block)
         end
       end
-      true
     end
 
     private
