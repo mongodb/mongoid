@@ -96,11 +96,15 @@ module Mongoid
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys
-        result = run_callbacks(:save) do
-          run_callbacks(:update) do
-            run_callbacks(:persist_parent) do
-              yield(self)
-              true
+        result = run_callbacks(:save, with_children: false) do
+          run_callbacks(:update, with_children: false) do
+            run_callbacks(:persist_parent, with_children: false) do
+              run_children_callbacks(:save) do
+                run_children_callbacks(:update) do
+                  yield(self)
+                  true
+                end
+              end
             end
           end
         end
