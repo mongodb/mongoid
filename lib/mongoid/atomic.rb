@@ -120,7 +120,8 @@ module Mongoid
       process_flagged_destroys
       mods = Modifiers.new
       generate_atomic_updates(mods, self)
-      _children.each do |child|
+      # TODO: (DR) Find out why calling _children stopped working
+      collect_children.each do |child|
         child.process_flagged_destroys
         generate_atomic_updates(mods, child)
       end
