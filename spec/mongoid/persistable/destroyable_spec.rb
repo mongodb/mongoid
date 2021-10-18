@@ -134,11 +134,11 @@ describe Mongoid::Persistable::Destroyable do
       context "when the document has been saved" do
 
         let(:address) do
-          person.addresses.create(street: "Bond Street")
+          person.addresses.create!(street: "Bond Street")
         end
 
         let(:location) do
-          address.locations.create(name: "Home")
+          address.locations.create!(name: "Home")
         end
 
         let(:from_db) do
@@ -249,7 +249,7 @@ describe Mongoid::Persistable::Destroyable do
     context "when no validation callback returns false" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       it "returns true" do
@@ -260,7 +260,7 @@ describe Mongoid::Persistable::Destroyable do
     context "when a validation callback returns false" do
 
       let(:album) do
-        Album.create
+        Album.create!
       end
 
       before do
@@ -282,7 +282,7 @@ describe Mongoid::Persistable::Destroyable do
   describe "#destroy_all" do
 
     let!(:person) do
-      Person.create(title: "sir")
+      Person.create!(title: "sir")
     end
 
     context "when no conditions are provided" do
@@ -303,7 +303,7 @@ describe Mongoid::Persistable::Destroyable do
     context "when conditions are provided" do
 
       let!(:person_two) do
-        Person.create
+        Person.create!
       end
 
       context "when no conditions attribute provided" do
@@ -325,7 +325,7 @@ describe Mongoid::Persistable::Destroyable do
     context 'when the write concern is unacknowledged' do
 
       before do
-        Person.create(title: 'miss')
+        Person.create!(title: 'miss')
       end
 
       let!(:removed) do

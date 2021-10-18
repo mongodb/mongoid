@@ -16,11 +16,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Bar.create(location: [ 52.30, 13.35 ])
+      Bar.create!(location: [ 52.30, 13.35 ])
     end
 
     context "when results are returned" do
@@ -74,11 +74,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Bar.create(location: [ 52.30, 13.35 ])
+      Bar.create!(location: [ 52.30, 13.35 ])
     end
 
     context "when no options are provided" do
@@ -211,11 +211,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Bar.create(location: [ 52.30, 13.35 ])
+      Bar.create!(location: [ 52.30, 13.35 ])
     end
 
     let(:geo_near) do
@@ -256,11 +256,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Bar.create(location: [ 52.30, 13.35 ])
+      Bar.create!(location: [ 52.30, 13.35 ])
     end
 
     let(:criteria) do
@@ -291,11 +291,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Bar.create(location: [ 52.30, 13.35 ])
+      Bar.create!(location: [ 52.30, 13.35 ])
     end
 
     context "when results are returned" do
@@ -340,11 +340,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Pub.create(location: [ 52.30, 13.25 ])
+      Pub.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Pub.create(location: [ 52.30, 13.35 ])
+      Pub.create!(location: [ 52.30, 13.35 ])
     end
 
     context "when results are returned" do
@@ -375,11 +375,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Bar.create(location: [ 52.30, 13.35 ])
+      Bar.create!(location: [ 52.30, 13.35 ])
     end
 
     let(:criteria) do
@@ -430,11 +430,11 @@ describe Mongoid::Contextual::GeoNear do
     end
 
     let!(:bar_one) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:bar_two) do
-      Bar.create(location: [ 52.30, 13.35 ])
+      Bar.create!(location: [ 52.30, 13.35 ])
     end
 
     let(:criteria) do

@@ -23,11 +23,11 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   let!(:depeche_mode) do
-    Band.create(name: "Depeche Mode", likes: 200)
+    Band.create!(name: "Depeche Mode", likes: 200)
   end
 
   let!(:tool) do
-    Band.create(name: "Tool", likes: 100)
+    Band.create!(name: "Tool", likes: 100)
   end
 
   let!(:collection) do

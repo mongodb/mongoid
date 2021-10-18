@@ -9,11 +9,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000, years: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000, years: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500, years: 800)
+        Band.create!(name: "Tool", likes: 500, years: 800)
       end
 
       let(:criteria) do
@@ -185,11 +185,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
       context "when the field sometimes exists" do
         let!(:oasis) do
-          Band.create(name: "Oasis", likes: 50)
+          Band.create!(name: "Oasis", likes: 50)
         end
 
         let!(:radiohead) do
-          Band.create(name: "Radiohead")
+          Band.create!(name: "Radiohead")
         end
 
         context "and the field doesn't exist on the last document" do
@@ -216,7 +216,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
         context "and the field doesn't exist on the before-last document" do
           let!(:u2) do
-            Band.create(name: "U2", likes: 100)
+            Band.create!(name: "U2", likes: 100)
           end
 
           let(:criteria) do
@@ -277,11 +277,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
       context "when there are matching documents" do
 
         let!(:depeche) do
-          Band.create(name: "Depeche Mode", likes: 1000)
+          Band.create!(name: "Depeche Mode", likes: 1000)
         end
 
         let!(:tool) do
-          Band.create(name: "Tool", likes: 500)
+          Band.create!(name: "Tool", likes: 500)
         end
 
         let(:criteria) do
@@ -304,7 +304,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
       context "when no documents match" do
 
         let!(:depeche) do
-          Band.create(name: "Depeche Mode", likes: 1000)
+          Band.create!(name: "Depeche Mode", likes: 1000)
         end
 
         let(:criteria) do
@@ -331,7 +331,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context 'when the field does not exist in any document' do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let(:criteria) do
@@ -354,11 +354,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -419,11 +419,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -484,11 +484,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do

@@ -1022,11 +1022,11 @@ describe Mongoid::Document do
           context "when embedded doc is persisted" do
 
             let(:manager) do
-              Manager.create(title: "Sir")
+              Manager.create!(title: "Sir")
             end
 
             let!(:address) do
-              manager.addresses.create(street: "hobrecht")
+              manager.addresses.create!(street: "hobrecht")
             end
 
             let(:person) do

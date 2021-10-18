@@ -44,7 +44,7 @@ describe Mongoid::Persistable::Pushable do
       end
 
       let(:person) do
-        Person.create(aliases: [ 1, 2 ], array: [ 4, 5 ])
+        Person.create!(aliases: [ 1, 2 ], array: [ 4, 5 ])
       end
 
       context "when provided string fields" do
@@ -154,11 +154,11 @@ describe Mongoid::Persistable::Pushable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "t", services: [ 1 ], a: [ 4, 5 ])
+        person.addresses.create!(street: "t", services: [ 1 ], a: [ 4, 5 ])
       end
 
       context "when provided string fields" do
@@ -194,7 +194,7 @@ describe Mongoid::Persistable::Pushable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(test_array: [ 1, 2, 3 ])
+        Person.create!(test_array: [ 1, 2, 3 ])
       end
 
       it "marks a dirty change for the modified fields" do
@@ -250,7 +250,7 @@ describe Mongoid::Persistable::Pushable do
       end
 
       let(:person) do
-        Person.create(aliases: [ 1, 2, 3 ], array: [ 4, 5, 6 ])
+        Person.create!(aliases: [ 1, 2, 3 ], array: [ 4, 5, 6 ])
       end
 
       context "when provided string fields" do
@@ -310,11 +310,11 @@ describe Mongoid::Persistable::Pushable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "t", services: [ 1 ], a: [ 4, 5 ])
+        person.addresses.create!(street: "t", services: [ 1 ], a: [ 4, 5 ])
       end
 
       context "when provided string fields" do
@@ -339,7 +339,7 @@ describe Mongoid::Persistable::Pushable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(test_array: [ 1, 2, 3 ])
+        Person.create!(test_array: [ 1, 2, 3 ])
       end
 
       it "marks a dirty change for the pushed fields" do

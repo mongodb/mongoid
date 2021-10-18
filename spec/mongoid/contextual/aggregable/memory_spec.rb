@@ -53,11 +53,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
         context "when the types are integers" do
 
           let!(:depeche) do
-            Band.create(name: "Depeche Mode", likes: 1000)
+            Band.create!(name: "Depeche Mode", likes: 1000)
           end
 
           let!(:tool) do
-            Band.create(name: "Tool", likes: 500)
+            Band.create!(name: "Tool", likes: 500)
           end
 
           let(:criteria) do
@@ -82,11 +82,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
         context "when the types are floats" do
 
           let!(:depeche) do
-            Band.create(name: "Depeche Mode", rating: 10)
+            Band.create!(name: "Depeche Mode", rating: 10)
           end
 
           let!(:tool) do
-            Band.create(name: "Tool", rating: 5)
+            Band.create!(name: "Tool", rating: 5)
           end
 
           let(:criteria) do
@@ -112,7 +112,7 @@ describe Mongoid::Contextual::Aggregable::Memory do
       context "when no documents match" do
 
         let!(:depeche) do
-          Band.create(name: "Depeche Mode", likes: 1000)
+          Band.create!(name: "Depeche Mode", likes: 1000)
         end
 
         let(:criteria) do
@@ -139,11 +139,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -206,11 +206,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -273,11 +273,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do

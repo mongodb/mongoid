@@ -10,7 +10,7 @@ describe Mongoid::Reloadable do
 
       let(:person) do
         Person.with(collection: 'other') do |person_class|
-          person_class.create
+          person_class.create!
         end
       end
 

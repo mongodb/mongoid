@@ -77,7 +77,7 @@ describe Mongoid::Interceptable do
   describe ".after_find" do
 
     let!(:player) do
-      Player.create
+      Player.create!
     end
 
     context "when the callback is on a root document" do
@@ -130,7 +130,7 @@ describe Mongoid::Interceptable do
     context "when the callback is on an embedded document" do
 
       let!(:implant) do
-        player.implants.create
+        player.implants.create!
       end
 
       context "when when the document is instantiated" do
@@ -344,7 +344,7 @@ describe Mongoid::Interceptable do
     context "when updating" do
 
       let(:artist) do
-        Artist.create(name: "Depeche Mode").tap do |artist|
+        Artist.create!(name: "Depeche Mode").tap do |artist|
           artist.name = "The Mountain Goats"
         end
       end
@@ -385,7 +385,7 @@ describe Mongoid::Interceptable do
   describe ".before_destroy" do
 
     let(:artist) do
-      Artist.create(name: "Depeche Mode")
+      Artist.create!(name: "Depeche Mode")
     end
 
     before do
@@ -584,7 +584,7 @@ describe Mongoid::Interceptable do
     context "when cascading after initialize" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       before do

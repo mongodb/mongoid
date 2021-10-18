@@ -9,7 +9,7 @@ describe Mongoid::Persistable::Updatable do
     context "when the field is aliased" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the setter is overridden" do
@@ -69,7 +69,7 @@ describe Mongoid::Persistable::Updatable do
     context "when setting an array field" do
 
       let(:person) do
-        Person.create(aliases: [])
+        Person.create!(aliases: [])
       end
 
       before do
@@ -125,7 +125,7 @@ describe Mongoid::Persistable::Updatable do
       end
 
       it "will update value of aliased field" do
-        person = Person.create
+        person = Person.create!
         person.update_attribute(:t, "test_value")
         expect(person.reload.t).to eq "test_value"
         expect(person.test).to eq "test_value"
@@ -233,7 +233,7 @@ describe Mongoid::Persistable::Updatable do
     context "when persisting a localized field" do
 
       let!(:product) do
-        Product.create(description: "The bomb")
+        Product.create!(description: "The bomb")
       end
 
       before do
@@ -262,15 +262,15 @@ describe Mongoid::Persistable::Updatable do
     context "when updating a deeply embedded document" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:address) do
-        person.addresses.create(street: "Winterfeldtstr")
+        person.addresses.create!(street: "Winterfeldtstr")
       end
 
       let!(:location) do
-        address.locations.create(name: "work")
+        address.locations.create!(name: "work")
       end
 
       let(:from_db) do
@@ -301,7 +301,7 @@ describe Mongoid::Persistable::Updatable do
       end
 
       let(:person) do
-        Person.create(species: :human)
+        Person.create!(species: :human)
       end
 
       it 'raises an error when trying to set the attribute' do
@@ -346,7 +346,7 @@ describe Mongoid::Persistable::Updatable do
     context 'when the field is loaded explicitly' do
 
       before do
-        Person.create(title: 'Captain')
+        Person.create!(title: 'Captain')
       end
 
       context 'when the loaded attribute is updated' do
@@ -400,7 +400,7 @@ describe Mongoid::Persistable::Updatable do
     context 'when fields are explicitly not loaded' do
 
       before do
-        Person.create(title: 'Captain')
+        Person.create!(title: 'Captain')
       end
 
       context 'when the loaded attribute is updated' do
@@ -460,7 +460,7 @@ describe Mongoid::Persistable::Updatable do
         max_server_version '4.9'
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         it "raises an error" do
@@ -473,7 +473,7 @@ describe Mongoid::Persistable::Updatable do
       context "when validation passes" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:saved) do
@@ -497,7 +497,7 @@ describe Mongoid::Persistable::Updatable do
         max_server_version '4.9'
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         it "raises an error" do
@@ -510,7 +510,7 @@ describe Mongoid::Persistable::Updatable do
       context "when validation passes" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:saved) do
@@ -533,7 +533,7 @@ describe Mongoid::Persistable::Updatable do
       context "when the document has been destroyed" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         before do
@@ -554,7 +554,7 @@ describe Mongoid::Persistable::Updatable do
         end
 
         let(:game) do
-          Game.create(person: person)
+          Game.create!(person: person)
         end
 
         before do
@@ -591,7 +591,7 @@ describe Mongoid::Persistable::Updatable do
         context "when providing an embedded child" do
 
           let!(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:name) do
@@ -618,11 +618,11 @@ describe Mongoid::Persistable::Updatable do
         context "when providing a parent to a referenced in" do
 
           let!(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:post) do
-            Post.create(title: "Testing")
+            Post.create!(title: "Testing")
           end
 
           context "when the relation has not yet been touched" do

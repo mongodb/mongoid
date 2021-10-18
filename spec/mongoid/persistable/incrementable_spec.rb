@@ -44,7 +44,7 @@ describe Mongoid::Persistable::Incrementable do
       end
 
       let(:person) do
-        Person.create(age: 10, score: 100)
+        Person.create!(age: 10, score: 100)
       end
 
       context "when providing string fields" do
@@ -125,11 +125,11 @@ describe Mongoid::Persistable::Incrementable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "test", number: 10, no: 100)
+        person.addresses.create!(street: "test", number: 10, no: 100)
       end
 
       context "when providing string fields" do
@@ -189,19 +189,19 @@ describe Mongoid::Persistable::Incrementable do
       end
 
       let(:survey) do
-        Survey.create
+        Survey.create!
       end
 
       let(:question) do
-        survey.questions.create(content: 'foo')
+        survey.questions.create!(content: 'foo')
       end
 
       let!(:first_answer) do
-        question.answers.create(position: 99)
+        question.answers.create!(position: 99)
       end
 
       let!(:second_answer) do
-        question.answers.create(position: 1)
+        question.answers.create!(position: 1)
       end
 
       context "when providing string fields" do
@@ -227,7 +227,7 @@ describe Mongoid::Persistable::Incrementable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(age: 10, score: 100)
+        Person.create!(age: 10, score: 100)
       end
 
       it "marks a dirty change for the incremented fields" do

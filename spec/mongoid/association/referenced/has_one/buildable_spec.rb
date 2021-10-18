@@ -129,11 +129,11 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
     context "when the document is persisted" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:game) do
-        Game.create(person: person)
+        Game.create!(person: person)
       end
 
       it "returns the document" do
@@ -144,11 +144,11 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
     context "when the document have a non standard pk" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:cat) do
-        Cat.create(person: person)
+        Cat.create!(person: person)
       end
 
       it "returns the document" do

@@ -91,7 +91,7 @@ describe "StringifiedSymbol fields" do
     end
 
     it "sends the value as a string" do
-      Order.create(saved_status: [0, 1, 2])
+      Order.create!(saved_status: [0, 1, 2])
       event = insert_events.second
       doc = event.command["documents"].first
       expect(doc["saved_status"]).to eq("[0, 1, 2]")
