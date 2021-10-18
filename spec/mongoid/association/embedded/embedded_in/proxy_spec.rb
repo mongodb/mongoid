@@ -78,7 +78,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:name) do
@@ -223,7 +223,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
       context "when the documents are not new records" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:name) do
@@ -293,7 +293,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
       context "when the documents are not new records" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:address) do
@@ -321,7 +321,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
       context "when a child already exists on the parent" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:address_one) do
@@ -391,19 +391,19 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
   context "when creating the tree through initialization" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:address) do
-      Address.create(addressable: person)
+      Address.create!(addressable: person)
     end
 
     let!(:first_location) do
-      Location.create(address: address)
+      Location.create!(address: address)
     end
 
     let!(:second_location) do
-      Location.create(address: address)
+      Location.create!(address: address)
     end
 
     it "saves the child" do
@@ -432,7 +432,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
   context "when instantiating a new child with a persisted parent" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:address) do
@@ -455,15 +455,15 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
   context "when replacing the relation with another" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:person_two) do
-      Person.create
+      Person.create!
     end
 
     let!(:address) do
-      person.addresses.create(street: "Kotbusser Damm")
+      person.addresses.create!(street: "Kotbusser Damm")
     end
 
     let!(:name) do
@@ -472,7 +472,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
     before do
       name.namable = address.addressable
-      name.namable.save
+      name.namable.save!
     end
 
     it "sets the new parent" do

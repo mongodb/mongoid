@@ -20,7 +20,7 @@ end
 describe "when creating a model with an embedded model" do
 
   let(:person) do
-    Person.create(pet: Pet.new)
+    Person.create!(pet: Pet.new)
   end
 
   it "does not have changes in the embedded model" do
@@ -35,7 +35,7 @@ end
 describe "when embedding a model on an already saved model" do
 
   let(:person) do
-    Person.create
+    Person.create!
   end
 
   before do

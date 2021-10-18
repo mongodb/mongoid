@@ -27,7 +27,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       context "when the object is an object id" do
 
         let!(:person) do
-          Person.create(_id: object, username: 'Bob')
+          Person.create!(_id: object, username: 'Bob')
         end
 
         let(:object) do
@@ -96,7 +96,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       context "when the id does not correspond to a document in the database" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:object) do
@@ -115,7 +115,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       context "when the object is an integer" do
 
         let!(:person) do
-          Person.create(_id: object)
+          Person.create!(_id: object)
         end
 
         let(:object) do
@@ -135,7 +135,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     context "when provided a object" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:object) do
@@ -154,7 +154,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     context "when the document is persisted" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:game) do
@@ -169,16 +169,16 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     context 'setting an associated document to nil' do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:game) do
-        Game.create(person: person)
+        Game.create!(person: person)
       end
 
       before do
         game.person = nil
-        game.save
+        game.save!
       end
 
       it 'sets the person_id to nil' do
@@ -194,11 +194,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
   describe '#substitute' do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:game) do
-      Game.create(person: person)
+      Game.create!(person: person)
     end
 
     context 'setting an associated document to nil' do
@@ -219,7 +219,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     context 'setting an associated document to other doc' do
 
       let(:other_person) do
-        Person.create
+        Person.create!
       end
 
       before do

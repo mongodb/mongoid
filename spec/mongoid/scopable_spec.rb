@@ -177,7 +177,7 @@ describe Mongoid::Scopable do
         context "when scopes are chained" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           it "constructs a criteria for an embedded relation" do
@@ -234,7 +234,7 @@ describe Mongoid::Scopable do
 
         before do
           Band.scope(:tests, ->{ Band.where(name: 'TESTING').collation(locale: 'en_US', strength: 2) })
-          Band.create(name: 'testing')
+          Band.create!(name: 'testing')
         end
 
         it 'applies the collation' do
