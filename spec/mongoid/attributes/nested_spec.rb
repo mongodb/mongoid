@@ -4395,13 +4395,6 @@ describe Mongoid::Attributes::Nested do
 
     context "when nesting multiple levels and parent is timestamped" do
 
-      around do |example|
-        original_relations = Location.relations
-        Location.embedded_in :address, touch: true
-        example.run
-        Location.relations = original_relations
-      end
-
       after do
         Address.reset_callbacks(:save)
       end

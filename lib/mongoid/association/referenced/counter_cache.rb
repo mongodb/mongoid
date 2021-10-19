@@ -100,8 +100,8 @@ module Mongoid
               if record = __send__(name)
                 foreign_key = association.foreign_key
 
-                if attribute_changed?(foreign_key)
-                  original, current = attribute_change(foreign_key)
+                if send("#{foreign_key}_previously_changed?")
+                  original, current = send("#{foreign_key}_previous_change")
 
                   unless original.nil?
                     record.class.with(persistence_context) do |_class|
