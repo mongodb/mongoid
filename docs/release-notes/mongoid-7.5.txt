@@ -117,3 +117,46 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
 +---------------------------------------+---------------------------------------+
 | Parent :after_save                    | Parent :after_save                    |
 +---------------------------------------+---------------------------------------+
+
+
+``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Ditry``
+--------------------------------------------------------------------------
+
+When updating documents, it is now possible to get updated attribute values
+in ``after_*`` callbacks. This is following with ActiveRecord/ActiveModel
+behavior.
+
+.. code-block:: ruby
+
+  class Cat
+    include Mongoid::Document
+
+    field :age, type: Integer
+
+    after_save do
+        p self
+        p attribute_was(:age)
+    end
+  end
+
+  a = Cat.create!
+  a.age = 2
+  a.save!
+
+Mongoid 7.5 output:
+
+.. code-block:: ruby
+
+  #<Cat _id: 60aef1652c97a617438dc9bb, age: 2>
+  2
+
+
+Mongoid 7.4 output:
+
+.. code-block:: ruby
+
+  #<Cat _id: 60aef1652c97a617438dc9bb, age: 2>
+  nil
+
+Notice that in 7.4 ``attribute_was(:age)`` returns an old attribute value,
+while in 7.5 ``attribute_was(:age)`` returns the new values,
