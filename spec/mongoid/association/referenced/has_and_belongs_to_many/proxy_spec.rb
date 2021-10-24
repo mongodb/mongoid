@@ -3660,6 +3660,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       Cat.create(name: 'Kitty')
     end
 
+    let(:another_cat) do
+      Cat.create(name: 'Kitten')
+    end
+
     let(:fire_hydrant) do
       FireHydrant.create(location: '221B Baker Street')
     end
@@ -3672,6 +3676,28 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
       it "adds the pk value to the fk set" do
         expect(fire_hydrant.cat_ids).to eq([cat.name])
+      end
+    end
+
+    context "when adding multiple documents to a one-way many to many" do
+
+      before do
+        fire_hydrant.cats.push([cat, another_cat])
+      end
+
+      it "adds the pk values to the fk set" do
+        expect(fire_hydrant.cat_ids).to eq([cat.name, another_cat.name])
+      end
+    end
+
+    context "when adding a new document to a one-way many to many" do
+
+      before do
+        fire_hydrant.cats.build name: 'Kitten'
+      end
+
+      it "adds the pk values to the fk set" do
+        expect(fire_hydrant.cat_ids).to eq(['Kitten'])
       end
     end
 

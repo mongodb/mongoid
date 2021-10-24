@@ -54,12 +54,12 @@ module Mongoid
               next unless doc
               append(doc)
               if persistable? || _creating?
-                ids[doc._id] = true
+                ids[doc.send(_association.primary_key)] = true
                 save_or_delay(doc, docs, inserts)
               else
                 existing = _base.send(foreign_key)
-                unless existing.include?(doc._id)
-                  existing.push(doc._id) and unsynced(_base, foreign_key)
+                unless existing.include?(doc.send(_association.primary_key))
+                  existing.push(doc.send(_association.primary_key)) and unsynced(_base, foreign_key)
                 end
               end
             end
@@ -82,7 +82,7 @@ module Mongoid
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
             doc = Factory.build(type || klass, attributes)
-            _base.send(foreign_key).push(doc._id)
+            _base.send(foreign_key).push(doc.send(_association.primary_key))
             append(doc)
             doc.apply_post_processed_defaults
             unsynced(doc, inverse_foreign_key)
