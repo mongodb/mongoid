@@ -20,6 +20,33 @@ describe 'Matcher operators' do
     end
   end
 
+  context 'when comparing Time objects' do
+    let(:time) {Time.utc(2021, 10, 25, 10, 30, 30, 581345)}
+    let(:document) do
+      ConsumptionPeriod.new(:started_at => time)
+    end
+
+    context 'comparing millisecond precision' do
+      let(:time_millis) {Time.utc(2021, 10, 25, 10, 30, 30, 581774)}
+
+      context 'with exact match' do
+        let(:query) do
+          {'started_at' => time_millis}
+        end
+
+        it_behaves_like 'is true'
+      end
+
+      context 'with $in' do
+        let(:query) do
+          {'started_at' => {:$in => [time_millis]}}
+        end
+
+        it_behaves_like 'is true'
+      end
+    end
+  end
+
   context 'when querying nested document' do
     context 'embeds_one' do
       let(:document) do
