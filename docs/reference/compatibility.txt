@@ -31,8 +31,12 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.15-2.10
+     - Driver 2.16-2.10
      - Driver 2.9-2.7
+
+   * - 7.5
+     - |checkmark|
+     -
 
    * - 7.4
      - |checkmark|
@@ -170,6 +174,7 @@ for driver compatibility matrices.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - MongoDB 5.0
      - MongoDB 4.4
      - MongoDB 4.2
      - MongoDB 4.0
@@ -188,8 +193,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
 
    * - 7.3
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -208,8 +215,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
 
    * - 7.1
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -228,8 +237,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
 
    * - 6.4
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
