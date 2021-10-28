@@ -23,11 +23,22 @@ module Mongoid
           end
 =end
         else
+          # When doing a comparison with Time objects, compare using millisecond precision
           if value.kind_of?(Time) && condition.kind_of?(Time)
             time_eq?(value, condition)
           else
-            value == condition ||
-            value.is_a?(Array) && value.include?(condition)
+            if value.is_a?(Array) && condition.kind_of?(Time)
+              value.map do |v|
+                if v.kind_of?(Time)
+                  time_rounded_to_millis(v)
+                else
+                  v
+                end
+              end.include?(time_rounded_to_millis(condition))
+            else
+              value == condition ||
+              value.is_a?(Array) && value.include?(condition)
+            end
           end
         end
       end
@@ -42,9 +53,11 @@ module Mongoid
       #
       # As such, perform a similar operation to what the bson-ruby gem does
       module_function def time_eq?(time_a, time_b)
-        time_a_millis = time_a._bson_to_i * 1000 + time_a.usec.divmod(1000).first
-        time_b_millis = time_b._bson_to_i * 1000 + time_b.usec.divmod(1000).first
-        time_a_millis == time_b_millis
+        time_rounded_to_millis(time_a) == time_rounded_to_millis(time_b)
+      end
+
+      module_function def time_rounded_to_millis(time)
+        return time._bson_to_i * 1000 + time.usec.divmod(1000).first
       end
     end
   end

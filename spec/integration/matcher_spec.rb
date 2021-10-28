@@ -44,6 +44,20 @@ describe 'Matcher operators' do
 
         it_behaves_like 'is true'
       end
+
+      context 'when matching an element in an array' do
+        let(:document) do
+          Mop.new(:array_field => [time])
+        end
+
+        context 'with equals match' do
+          let(:query) do
+            {'array_field' => time_millis}
+          end
+
+          it_behaves_like 'is true'
+        end
+      end
     end
   end
 
