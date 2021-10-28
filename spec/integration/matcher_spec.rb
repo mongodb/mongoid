@@ -35,6 +35,14 @@ describe 'Matcher operators' do
         end
 
         it_behaves_like 'is true'
+
+        context 'and query has different timezone' do
+          let(:time_millis) do
+            Time.utc(2021, 10, 25, 10, 30, 30, 581345).in_time_zone("Stockholm")
+          end
+
+          it_behaves_like 'is true'
+        end
       end
 
       context 'with $in' do

@@ -55,7 +55,7 @@ module Mongoid
       end
 
       module_function def time_rounded_to_millis(time)
-        return time._bson_to_i * 1000 + time.usec.divmod(1000).first
+        return time.utc._bson_to_i * 1000 + time.usec.divmod(1000).first
       end
     end
   end
