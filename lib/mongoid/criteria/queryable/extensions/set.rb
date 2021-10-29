@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "set"
 
@@ -20,8 +19,6 @@ module Mongoid
             # @param [ Set, Object ] object The object to evolve.
             #
             # @return [ Array ] The evolved set.
-            #
-            # @since 1.0.0
             def evolve(object)
               return object if !object || !object.respond_to?(:map)
               object.map{ |obj| obj.class.evolve(obj) }

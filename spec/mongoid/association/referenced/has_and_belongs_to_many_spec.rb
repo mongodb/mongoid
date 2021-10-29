@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -490,6 +489,27 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
       it 'returns nil' do
         expect(association.order).to be_nil
+      end
+    end
+  end
+
+  describe '#scope' do
+
+    context 'when scope is specified in the options' do
+
+      let(:options) do
+        { scope: -> { unscoped.where(foo: :bar) } }
+      end
+
+      it 'returns a Criteria Queryable Key' do
+        expect(association.scope).to be_a(Proc)
+      end
+    end
+
+    context 'when scope is not specified in the options' do
+
+      it 'returns nil' do
+        expect(association.scope).to be_nil
       end
     end
   end
@@ -988,8 +1008,8 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
   describe '#foreign_key_check' do
 
-    it 'returns the foreign_key followed by "_changed?"' do
-      expect(association.foreign_key_check).to eq('has_many_right_object_ids_changed?')
+    it 'returns the foreign_key followed by "_previously_changed?"' do
+      expect(association.foreign_key_check).to eq('has_many_right_object_ids_previously_changed?')
     end
   end
 

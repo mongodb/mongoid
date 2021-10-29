@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -8,7 +7,7 @@ describe Mongoid::Criteria do
   describe "#only" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode", likes: 3, views: 10)
+      Band.create!(name: "Depeche Mode", likes: 3, views: 10)
     end
 
     context "when not using inheritance" do

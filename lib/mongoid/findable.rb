@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
   # This module defines the finder methods that hang off the document at the
   # class level.
-  #
-  # @since 4.0.0
   module Findable
     extend Forwardable
 
@@ -149,8 +146,6 @@ module Mongoid
     # and Mongoid.raise_not_found_error is true.
     #
     # @return [ Document, nil ] A matching document.
-    #
-    # @since 3.0.0
     def find_by(attrs = {})
       result = where(attrs).find_first
       if result.nil? && Mongoid.raise_not_found_error

@@ -1,0 +1,47 @@
+*********
+Mongoid 5
+*********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 5 releases.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Upgrading to Mongoid 5
+======================
+
+The underlying driver has changed from Moped to the official MongoDB Ruby driver.
+For all users dropping down to the driver level for operations, please see the driver
+documentation for help with that API.
+
+All Mongoid configuration options have changed, as the underlying driver has changed
+from Moped to the official MongoDB Ruby driver. Please see the
+:ref:`configuration section <configuration>` for a detailed description
+of all the new options.
+
+All references to session are now replaced with client. This includes the ``mongoid.yml``
+configuration, ``store_in`` options, and all exceptions and modules with Session in the name.
+
+``find_and_modify`` has been removed and replaced with 3 options: ``find_one_and_update``,
+``find_one_and_delete`` and ``find_one_and_replace``.
+
+``text_search`` has been removed as it is now a $text option in a query from
+MongoDB 2.6 onward.
+
+``first`` and ``last`` no longer add an ``_id`` sort when no sorting options have been
+provided. In order to guarantee that a document is the first or last, it needs to now
+contain an explicit sort.
+
+Mongoid 5 supports MongoDB 2.4 and higher only - MongoDB 2.2 is no longer
+supported.

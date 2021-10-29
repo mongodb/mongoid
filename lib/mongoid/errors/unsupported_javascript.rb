@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -14,8 +13,6 @@ module Mongoid
       #
       # @param [ Class ] klass The embedded document class.
       # @param [ String ] javascript The javascript expression.
-      #
-      # @since 3.0.0
       def initialize(klass, javascript)
         super(
           compose_message(

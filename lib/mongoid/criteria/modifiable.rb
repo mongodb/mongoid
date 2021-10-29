@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -19,8 +18,6 @@ module Mongoid
       #   Person.where(:age.gt => 5).build
       #
       # @return [ Document ] A non-persisted document.
-      #
-      # @since 2.0.0
       def build(attrs = {}, &block)
         create_document(:new, attrs, &block)
       end
@@ -36,8 +33,6 @@ module Mongoid
       #   Person.where(:age.gt => 5).create
       #
       # @return [ Document ] A newly created document.
-      #
-      # @since 2.0.0.rc.1
       def create(attrs = {}, &block)
         create_document(:create, attrs, &block)
       end
@@ -55,8 +50,6 @@ module Mongoid
       # @raise [ Errors::Validations ] on a validation error.
       #
       # @return [ Document ] A newly created document.
-      #
-      # @since 3.0.0
       def create!(attrs = {}, &block)
         create_document(:create!, attrs, &block)
       end
@@ -70,8 +63,6 @@ module Mongoid
       #   Person.create_with(job: 'Engineer').find_or_create_by(employer: 'MongoDB')
       #
       # @return [ Mongoid::Criteria ] A criteria.
-      #
-      # @since 5.1.0
       def create_with(attrs = {})
         tap do
           @create_attrs ||= {}
@@ -130,8 +121,6 @@ module Mongoid
       # @param [ Hash ] attrs The additional attributes to add.
       #
       # @return [ Document ] A matching or newly created document.
-      #
-      # @since 3.1.0
       def first_or_create(attrs = nil, &block)
         first_or(:create, attrs, &block)
       end
@@ -146,8 +135,6 @@ module Mongoid
       # @param [ Hash ] attrs The additional attributes to add.
       #
       # @return [ Document ] A matching or newly created document.
-      #
-      # @since 3.1.0
       def first_or_create!(attrs = nil, &block)
         first_or(:create!, attrs, &block)
       end
@@ -161,8 +148,6 @@ module Mongoid
       # @param [ Hash ] attrs The additional attributes to add.
       #
       # @return [ Document ] A matching or newly initialized document.
-      #
-      # @since 3.1.0
       def first_or_initialize(attrs = nil, &block)
         first_or(:new, attrs, &block)
       end
@@ -181,8 +166,6 @@ module Mongoid
       # @param [ Hash ] attrs Additional attributes to use.
       #
       # @return [ Document ] The new or saved document.
-      #
-      # @since 3.0.0
       def create_document(method, attrs = nil, &block)
         attrs = (create_attrs || {}).merge(attrs || {})
         attributes = selector.reduce(attrs) do |hash, (key, value)|
@@ -228,8 +211,6 @@ module Mongoid
       # @param [ Hash ] attrs The attributes to query or set.
       #
       # @return [ Document ] The first or new document.
-      #
-      # @since 3.1.0
       def first_or(method, attrs = {}, &block)
         first || create_document(method, attrs, &block)
       end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -68,14 +67,44 @@ describe Mongoid::Criteria::Queryable::Mergeable do
         'age' => {'$gt' => 42, '$lt' => 50}}
     end
 
-    it 'expands simple and Key instances on the same field' do
-      query.send(:_mongoid_expand_keys, {'age' => 42, lt => 50}).should == {
-        'age' => {'$eq' => 42, '$lt' => 50}}
+    context 'given implicit equality and Key instance on the same field' do
+      [42, 'infinite', [nil]].each do |value|
+        context "for non-regular expression value #{value}" do
+          context 'implicit equality then Key instance' do
+            it 'expands implicit equality with $eq and combines with Key operator' do
+              query.send(:_mongoid_expand_keys, {'age' => value, lt => 50}).should == {
+                'age' => {'$eq' => value, '$lt' => 50}}
+            end
+          end
+
+          context 'symbol operator then implicit equality' do
+            it 'expands implicit equality with $eq and combines with Key operator' do
+              query.send(:_mongoid_expand_keys, {gt => 42, 'age' => value}).should == {
+                'age' => {'$gt' => 42, '$eq' => value}}
+            end
+          end
+        end
+      end
     end
 
-    it 'expands Key and simple instances on the same field' do
-      query.send(:_mongoid_expand_keys, {gt => 42, 'age' => 50}).should == {
-        'age' => {'$gt' => 42, '$eq' => 50}}
+    context 'given implicit equality with Regexp argument and Key instance on the same field' do
+      [/42/, BSON::Regexp::Raw.new('42')].each do |value|
+        context "for regular expression value #{value}" do
+          context 'implicit equality then Key instance' do
+            it 'expands implicit equality with $eq and combines with Key operator' do
+              query.send(:_mongoid_expand_keys, {'age' => value, lt => 50}).should == {
+                'age' => {'$regex' => value, '$lt' => 50}}
+            end
+          end
+
+          context 'Key instance then implicit equality' do
+            it 'expands implicit equality with $eq and combines with Key operator' do
+              query.send(:_mongoid_expand_keys, {gt => 50, 'age' => value}).should == {
+                'age' => {'$gt' => 50, '$regex' => value}}
+            end
+          end
+        end
+      end
     end
 
     it 'Ruby does not allow same symbol operator with different values' do

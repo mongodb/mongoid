@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -8,7 +7,7 @@ describe Mongoid::Persistable::Deletable do
   describe "#delete" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when deleting a readonly document" do
@@ -21,6 +20,20 @@ describe Mongoid::Persistable::Deletable do
         expect {
           from_db.delete
         }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+      end
+    end
+
+    context 'when deleting a document that was not saved' do
+      let(:unsaved_person) { Person.new(id: person.id) }
+
+      before do
+        unsaved_person.delete
+      end
+
+      it 'deletes the matching document from the database' do
+        lambda do
+          person.reload
+        end.should raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
 
@@ -120,19 +133,19 @@ describe Mongoid::Persistable::Deletable do
     context "when deleting subclasses" do
 
       let!(:firefox) do
-        Firefox.create(name: "firefox")
+        Firefox.create!(name: "firefox")
       end
 
       let!(:firefox2) do
-        Firefox.create(name: "firefox 2")
+        Firefox.create!(name: "firefox 2")
       end
 
       let!(:browser) do
-        Browser.create(name: "browser")
+        Browser.create!(name: "browser")
       end
 
       let!(:canvas) do
-        Canvas.create(name: "canvas")
+        Canvas.create!(name: "canvas")
       end
 
       context "when deleting a single document" do
@@ -184,19 +197,19 @@ describe Mongoid::Persistable::Deletable do
       end
 
       let!(:firefox) do
-        Firefox.create(name: "firefox")
+        Firefox.create!(name: "firefox")
       end
 
       let!(:firefox2) do
-        Firefox.create(name: "firefox 2")
+        Firefox.create!(name: "firefox 2")
       end
 
       let!(:browser) do
-        Browser.create(name: "browser")
+        Browser.create!(name: "browser")
       end
 
       let!(:canvas) do
-        Canvas.create(name: "canvas")
+        Canvas.create!(name: "canvas")
       end
 
       before do
@@ -228,19 +241,19 @@ describe Mongoid::Persistable::Deletable do
       end
 
       let!(:firefox) do
-        Firefox.create(name: "firefox")
+        Firefox.create!(name: "firefox")
       end
 
       let!(:firefox2) do
-        Firefox.create(name: "firefox 2")
+        Firefox.create!(name: "firefox 2")
       end
 
       let!(:browser) do
-        Browser.create(name: "browser")
+        Browser.create!(name: "browser")
       end
 
       let!(:canvas) do
-        Canvas.create(name: "canvas")
+        Canvas.create!(name: "canvas")
       end
 
       before do
@@ -259,12 +272,92 @@ describe Mongoid::Persistable::Deletable do
         expect(Browser.count).to eq(1)
       end
     end
+
+    context 'when there are dependent documents' do
+      context 'has_one' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!(bolt: Bolt.create!)
+          end
+
+          it 'does not destroy dependent documents' do
+            Bolt.count.should == 1
+            parent.delete
+            Bolt.count.should == 1
+          end
+        end
+
+        context 'dependent: :delete_all' do
+          let!(:parent) do
+            Hole.create!(threadlocker: Threadlocker.create!)
+          end
+
+          it 'does not destroy dependent documents' do
+            Threadlocker.count.should == 1
+            parent.delete
+            Threadlocker.count.should == 1
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!(sealer: Sealer.create!)
+          end
+
+          it 'does not destroy dependent documents' do
+            Sealer.count.should == 1
+            parent.delete
+            Sealer.count.should == 1
+          end
+        end
+      end
+
+      context 'has_many' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!(nuts: [Nut.create!])
+          end
+
+          it 'does not destroy dependent documents' do
+            Nut.count.should == 1
+            parent.delete
+            Nut.count.should == 1
+          end
+        end
+
+        context 'dependent: :delete_all' do
+          let!(:parent) do
+            Hole.create!(washers: [Washer.create!])
+          end
+
+          it 'does not destroy dependent documents' do
+            Washer.count.should == 1
+            parent.delete
+            Washer.count.should == 1
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!(spacers: [Spacer.create!])
+          end
+
+          it 'does not destroy dependent documents' do
+            Spacer.count.should == 1
+            parent.delete
+            Spacer.count.should == 1
+          end
+        end
+      end
+    end
   end
 
   describe "#delete_all" do
 
     let!(:person) do
-      Person.create(title: "sir")
+      Person.create!(title: "sir")
     end
 
     context "when no conditions are provided" do
@@ -285,7 +378,7 @@ describe Mongoid::Persistable::Deletable do
     context "when conditions are provided" do
 
       let!(:person_two) do
-        Person.create
+        Person.create!
       end
 
       context "when no conditions attribute provided" do
@@ -321,7 +414,7 @@ describe Mongoid::Persistable::Deletable do
       context 'when the write concern is unacknowledged' do
 
         before do
-          Person.create(title: 'miss')
+          Person.create!(title: 'miss')
         end
 
         let!(:deleted) do
@@ -334,6 +427,86 @@ describe Mongoid::Persistable::Deletable do
 
         it "returns 0" do
           expect(deleted).to eq(0)
+        end
+      end
+    end
+
+    context 'when there are dependent documents' do
+      context 'has_one' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!(bolt: Bolt.create!)
+          end
+
+          it 'does not destroy dependent documents' do
+            Bolt.count.should == 1
+            Hole.delete_all
+            Bolt.count.should == 1
+          end
+        end
+
+        context 'dependent: :delete_all' do
+          let!(:parent) do
+            Hole.create!(threadlocker: Threadlocker.create!)
+          end
+
+          it 'does not destroy dependent documents' do
+            Threadlocker.count.should == 1
+            Hole.delete_all
+            Threadlocker.count.should == 1
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!(sealer: Sealer.create!)
+          end
+
+          it 'does not destroy dependent documents' do
+            Sealer.count.should == 1
+            Hole.delete_all
+            Sealer.count.should == 1
+          end
+        end
+      end
+
+      context 'has_many' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!(nuts: [Nut.create!])
+          end
+
+          it 'does not destroy dependent documents' do
+            Nut.count.should == 1
+            Hole.delete_all
+            Nut.count.should == 1
+          end
+        end
+
+        context 'dependent: :delete_all' do
+          let!(:parent) do
+            Hole.create!(washers: [Washer.create!])
+          end
+
+          it 'does not destroy dependent documents' do
+            Washer.count.should == 1
+            Hole.delete_all
+            Washer.count.should == 1
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!(spacers: [Spacer.create!])
+          end
+
+          it 'does not destroy dependent documents' do
+            Spacer.count.should == 1
+            Hole.delete_all
+            Spacer.count.should == 1
+          end
         end
       end
     end

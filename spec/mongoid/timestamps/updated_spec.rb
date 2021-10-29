@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -42,7 +41,7 @@ describe Mongoid::Timestamps::Updated do
       end
 
       let(:doc) do
-        Dokument.create(updated_at: time)
+        Dokument.create!(updated_at: time)
       end
 
       it "does not override it with the default" do
@@ -67,14 +66,14 @@ describe Mongoid::Timestamps::Updated do
 
     it "does not run the update callbacks" do
       expect(agent).to receive(:updated_at=).never
-      agent.save
+      agent.save!
     end
   end
 
   context "when the document is created" do
 
     let(:agent) do
-      Agent.create
+      Agent.create!
     end
 
     it "runs the update callbacks" do

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -13,9 +12,12 @@ module Mongoid
         class_attribute :embedded, instance_reader: false
         class_attribute :embedded_relations
         class_attribute :relations
+        # @api private
+        class_attribute :aliased_associations
         self.embedded = false
         self.embedded_relations = BSON::Document.new
         self.relations = BSON::Document.new
+        self.aliased_associations = {}
       end
 
       # This is convenience for libraries still on the old API.
@@ -24,8 +26,6 @@ module Mongoid
       #   person.associations
       #
       # @return [ Hash ] The associations.
-      #
-      # @since 2.3.1
       def associations
         self.relations
       end
@@ -164,8 +164,6 @@ module Mongoid
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
-        #
-        # @since 2.0.0.rc.1
         def has_and_belongs_to_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -198,6 +196,9 @@ module Mongoid
           Association::MACRO_MAPPING[macro_name].new(self, name, options, &block).tap do |assoc|
             assoc.setup!
             self.relations = self.relations.merge(name => assoc)
+            if assoc.respond_to?(:store_as) && assoc.store_as != name
+              self.aliased_associations[assoc.store_as] = name
+            end
           end
         end
       end

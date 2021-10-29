@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'spec_helper'
 require_relative './callbacks_models'
@@ -211,6 +210,17 @@ describe 'callbacks integration tests' do
           include_examples 'persists the attribute value'
         end
       end
+    end
+  end
+
+  context 'attribute_was value in after_save callback' do
+    let!(:obj) { Emission.create!(frequency: 1) }
+
+    it 'is set to the new value' do
+      obj.frequency = 2
+      obj.save!
+
+      obj.previous.should == 2
     end
   end
 end

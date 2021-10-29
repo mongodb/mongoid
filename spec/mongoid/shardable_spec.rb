@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 require_relative './shardable_models'
@@ -129,7 +128,51 @@ describe Mongoid::Shardable do
     end
 
     context 'when record is persisted' do
-      let(:instance) { klass.create(name: value) }
+      let(:instance) { klass.create!(name: value) }
+
+      it { is_expected.to eq({ 'name' => value }) }
+
+      context 'changing shard key value' do
+        let(:new_value) { 'a-new-value' }
+
+        before do
+          instance.name = new_value
+        end
+
+        it 'uses the newly set shard key value' do
+          subject.should == { 'name' => new_value }
+        end
+      end
+    end
+  end
+
+  describe '#shard_key_selector_in_db' do
+    subject { instance.shard_key_selector_in_db }
+    let(:klass) { Band }
+    let(:value) { 'a-brand-name' }
+
+    before { klass.shard_key(:name) }
+
+    context 'when record is new' do
+      let(:instance) { klass.new(name: value) }
+
+      it { is_expected.to eq({ 'name' => value }) }
+
+      context 'changing shard key value' do
+        let(:new_value) { 'a-new-value' }
+
+        before do
+          instance.name = new_value
+        end
+
+        it 'uses the existing shard key value' do
+          subject.should == { 'name' => new_value }
+        end
+      end
+    end
+
+    context 'when record is persisted' do
+      let(:instance) { klass.create!(name: value) }
 
       it { is_expected.to eq({ 'name' => value }) }
 

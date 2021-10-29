@@ -1,0 +1,18 @@
+.. _schema-configuration:
+
+********************
+Schema Configuration
+********************
+
+.. default-domain:: mongodb
+
+.. toctree::
+  :titlesonly:
+
+  reference/fields
+  reference/inheritance
+  reference/associations
+  reference/validation
+  reference/collection-configuration
+  reference/indexes
+  reference/sharding

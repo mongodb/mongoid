@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -8,8 +7,8 @@ describe Mongoid::Findable do
   describe ".distinct" do
 
     before do
-      Band.create(name: "Tool")
-      Band.create(name: "Photek")
+      Band.create!(name: "Tool")
+      Band.create!(name: "Photek")
     end
 
     it "returns the distinct values for the field" do
@@ -20,7 +19,7 @@ describe Mongoid::Findable do
   describe ".each" do
 
     let!(:band) do
-      Band.create
+      Band.create!
     end
 
     it "iterates through all documents" do
@@ -33,7 +32,7 @@ describe Mongoid::Findable do
   describe ".each_with_index" do
 
     let!(:band) do
-      Band.create
+      Band.create!
     end
 
     it "iterates through all documents" do
@@ -46,7 +45,7 @@ describe Mongoid::Findable do
   describe ".find_one_and_update" do
 
     let!(:person) do
-      Person.create(title: "Senior")
+      Person.create!(title: "Senior")
     end
 
     it "returns the document" do
@@ -59,7 +58,7 @@ describe Mongoid::Findable do
     context "when collection is a embeds_many" do
 
       let(:person) do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       let!(:message) do
@@ -108,7 +107,7 @@ describe Mongoid::Findable do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       context "when no block is provided" do
@@ -185,7 +184,7 @@ describe Mongoid::Findable do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       context "when no block is provided" do
@@ -224,7 +223,7 @@ describe Mongoid::Findable do
     describe "##{method}" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       it "returns the first matching document" do
@@ -238,7 +237,7 @@ describe Mongoid::Findable do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       it "returns the document" do
@@ -251,7 +250,7 @@ describe Mongoid::Findable do
       context "when providing a document" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:from_db) do
@@ -306,7 +305,7 @@ describe Mongoid::Findable do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       it "returns the document" do
@@ -319,7 +318,7 @@ describe Mongoid::Findable do
       context "when providing a document" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:found) do
@@ -380,7 +379,7 @@ describe Mongoid::Findable do
   describe ".none" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode", likes: 3)
+      Band.create!(name: "Depeche Mode", likes: 3)
     end
 
     context "when not chaining any criteria" do
@@ -445,15 +444,15 @@ describe Mongoid::Findable do
   describe ".pluck" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode", likes: 3)
+      Band.create!(name: "Depeche Mode", likes: 3)
     end
 
     let!(:tool) do
-      Band.create(name: "Tool", likes: 3)
+      Band.create!(name: "Tool", likes: 3)
     end
 
     let!(:photek) do
-      Band.create(name: "Photek", likes: 1)
+      Band.create!(name: "Photek", likes: 1)
     end
 
     context "when field values exist" do
@@ -495,8 +494,8 @@ describe Mongoid::Findable do
   describe '.estimated_count' do
     context 'when the collection is not empty' do
       before do
-        Band.create(name: "Tool")
-        Band.create(name: "Photek")
+        Band.create!(name: "Tool")
+        Band.create!(name: "Photek")
       end
 
       it 'returns the correct count' do
@@ -531,7 +530,7 @@ describe Mongoid::Findable do
 
     let!(:time) do
       Time.zone.now.tap do |t|
-        User.create(last_login: t, name: 'Tom')
+        User.create!(last_login: t, name: 'Tom')
       end
     end
 
@@ -553,7 +552,7 @@ describe Mongoid::Findable do
 
     let!(:time) do
       Time.now.tap do |t|
-        User.create(last_login: t, name: 'Tom')
+        User.create!(last_login: t, name: 'Tom')
       end
     end
 

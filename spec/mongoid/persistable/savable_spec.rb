@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -8,7 +7,7 @@ describe Mongoid::Persistable::Savable do
   describe "#save" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:contextable_item) do
@@ -16,7 +15,7 @@ describe Mongoid::Persistable::Savable do
     end
 
     let(:persisted_contextable_item) do
-      ContextableItem.create(title: 'sir')
+      ContextableItem.create!(title: 'sir')
     end
 
     context "when skipping validation" do
@@ -149,7 +148,7 @@ describe Mongoid::Persistable::Savable do
     context "when validation fails" do
 
       let(:address) do
-        person.addresses.create(city: "London")
+        person.addresses.create!(city: "London")
       end
 
       before do
@@ -166,7 +165,7 @@ describe Mongoid::Persistable::Savable do
       context "when performing modification and insert ops" do
 
         let(:owner) do
-          Owner.create(name: "Blah")
+          Owner.create!(name: "Blah")
         end
 
         let!(:birthday) do
@@ -229,7 +228,7 @@ describe Mongoid::Persistable::Savable do
         end
 
         let!(:person) do
-          Person.create(
+          Person.create!(
             title: "Blah",
             addresses: [ address ]
           )
@@ -457,7 +456,7 @@ describe Mongoid::Persistable::Savable do
     context "when the changed attribute is not writable" do
 
       before do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       let(:person) do
@@ -474,7 +473,7 @@ describe Mongoid::Persistable::Savable do
       context 'when the changed attribute is aliased' do
 
         before do
-          Person.create(at: Time.now)
+          Person.create!(at: Time.now)
         end
 
         let(:person) do

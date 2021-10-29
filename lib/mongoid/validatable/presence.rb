@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Validatable
@@ -25,8 +24,6 @@ module Mongoid
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The attribute name.
       # @param [ Object ] value The current value of the field.
-      #
-      # @since 2.4.0
       def validate_each(document, attribute, value)
         field = document.fields[document.database_field_name(attribute)]
         if field.try(:localized?) && !value.blank?
@@ -34,15 +31,15 @@ module Mongoid
             document.errors.add(
               attribute,
               :blank_in_locale,
-              options.merge(location: _locale)
+              **options.merge(location: _locale)
             ) if not_present?(_value)
           end
         elsif document.relations.has_key?(attribute.to_s)
           if relation_or_fk_missing?(document, attribute, value)
-            document.errors.add(attribute, :blank, options)
+            document.errors.add(attribute, :blank, **options)
           end
         else
-          document.errors.add(attribute, :blank, options) if not_present?(value)
+          document.errors.add(attribute, :blank, **options) if not_present?(value)
         end
       end
 
@@ -53,15 +50,13 @@ module Mongoid
       # @api private
       #
       # @example Check is the association or fk is blank.
-      #   validator.relation_or_fk_mising(doc, :name, "")
+      #   validator.relation_or_fk_missing(doc, :name, "")
       #
       # @param [ Document ] doc The document.
       # @param [ Symbol ] attr The attribute.
       # @param [ Object ] value The value.
       #
       # @return [ true, false ] If the doc is missing.
-      #
-      # @since 3.0.0
       def relation_or_fk_missing?(doc, attr, value)
         return true if value.blank? && doc.send(attr).blank?
         association = doc.relations[attr.to_s]
@@ -78,8 +73,6 @@ module Mongoid
       # @param [ Object ] value The value.
       #
       # @return [ true, false ] If the value is not present.
-      #
-      # @since 3.0.5
       def not_present?(value)
         value.blank? && value != false
       end

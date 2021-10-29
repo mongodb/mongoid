@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -7,8 +6,6 @@ module Mongoid
       class BelongsTo
 
         # The Builder behavior for belongs_to associations.
-        #
-        # @since 7.0
         module Buildable
 
           # This method either takes an _id or an object and queries for the
@@ -35,8 +32,10 @@ module Mongoid
           end
 
           def query_criteria(object, type)
-            model = type ? type.constantize : relation_class
-            model.where(primary_key => object)
+            cls = type ? type.constantize : relation_class
+            crit = cls.criteria
+            crit = crit.apply_scope(scope)
+            crit.where(primary_key => object)
           end
 
           def query?(object)

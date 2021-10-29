@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-# encoding: utf-8
+
+require "mongoid/contextual/aggregable"
 
 module Mongoid
   module Contextual
@@ -21,15 +22,13 @@ module Mongoid
         #
         # @param [ String, Symbol ] field The field name.
         #
-        # @return [ Hash ] count is a number of documents with the provided
-        #   field. If there're none, then count is 0 and max, min, sum, avg
-        #   are nil.
-        #
-        # @since 3.0.0
+        # @return [ Hash ] A Hash containing the aggregate values.
+        #   If no documents are found, then returned Hash will have
+        #   count, sum of 0 and max, min, avg of nil.
         def aggregates(field)
           result = collection.find.aggregate(pipeline(field), session: _session).to_a
           if result.empty?
-            { "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil }
+            Aggregable::EMPTY_RESULT.dup
           else
             result.first
           end
@@ -43,8 +42,6 @@ module Mongoid
         # @param [ Symbol ] field The field to average.
         #
         # @return [ Float ] The average.
-        #
-        # @since 3.0.0
         def avg(field)
           aggregates(field)["avg"]
         end
@@ -65,8 +62,6 @@ module Mongoid
         #
         # @return [ Float, Document ] The max value or document with the max
         #   value.
-        #
-        # @since 3.0.0
         def max(field = nil)
           block_given? ? super() : aggregates(field)["max"]
         end
@@ -87,8 +82,6 @@ module Mongoid
         #
         # @return [ Float, Document ] The min value or document with the min
         #   value.
-        #
-        # @since 3.0.0
         def min(field = nil)
           block_given? ? super() : aggregates(field)["min"]
         end
@@ -105,8 +98,6 @@ module Mongoid
         # @param [ Symbol ] field The field to sum.
         #
         # @return [ Float ] The sum value.
-        #
-        # @since 3.0.0
         def sum(field = nil)
           block_given? ? super() : aggregates(field)["sum"] || 0
         end
@@ -123,15 +114,15 @@ module Mongoid
         # @param [ String, Symbol ] field The name of the field.
         #
         # @return [ Array ] The array of pipeline operators.
-        #
-        # @since 3.1.0
         def pipeline(field)
           db_field = "$#{database_field_name(field)}"
+          sort, skip, limit = criteria.options.values_at(:sort, :skip, :limit)
+
           pipeline = []
           pipeline << { "$match" =>  criteria.exists(field => true).selector }
-          pipeline << { "$sort" => criteria.options[:sort] } if criteria.options[:sort]
-          pipeline << { "$skip" => criteria.options[:skip] } if criteria.options[:skip]
-          pipeline << { "$limit" => criteria.options[:limit] } if criteria.options[:limit]
+          pipeline << { "$sort" => sort } if sort && (skip || limit)
+          pipeline << { "$skip" => skip } if skip
+          pipeline << { "$limit" => limit } if limit
           pipeline << {
             "$group"  => {
               "_id"   => field.to_s,

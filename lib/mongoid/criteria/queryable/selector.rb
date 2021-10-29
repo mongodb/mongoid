@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -17,8 +16,6 @@ module Mongoid
         # @param [ Hash, Selector ] other The object to merge in.
         #
         # @return [ Selector ] The selector.
-        #
-        # @since 1.0.0
         def merge!(other)
           other.each_pair do |key, value|
             if value.is_a?(Hash) && self[key.to_s].is_a?(Hash)
@@ -50,8 +47,6 @@ module Mongoid
         # @param [ Object ] value The value to add.
         #
         # @return [ Object ] The stored object.
-        #
-        # @since 1.0.0
         def store(key, value)
           name, serializer = storage_pair(key)
           if multi_selection?(name)
@@ -71,8 +66,6 @@ module Mongoid
         #   selector.to_pipeline
         #
         # @return [ Array<Hash> ] The pipeline entry for the selector.
-        #
-        # @since 2.0.0
         def to_pipeline
           pipeline = []
           pipeline.push({ "$match" => self }) unless empty?
@@ -90,8 +83,6 @@ module Mongoid
         # @param [ Array<Hash> ] specs The multi-selection.
         #
         # @return [ Array<Hash> ] The serialized values.
-        #
-        # @since 1.0.0
         #
         # @api private
         def evolve_multi(specs)
@@ -142,8 +133,6 @@ module Mongoid
         # @param [ Object ] value The value to serialize.
         #
         # @return [ Object ] The serialized object.
-        #
-        # @since 1.0.0
         def evolve(serializer, value)
           case value
           when Hash
@@ -166,8 +155,6 @@ module Mongoid
         # @param [ Array<Object> ] value The array to serialize.
         #
         # @return [ Object ] The serialized array.
-        #
-        # @since 1.0.0
         def evolve_array(serializer, value)
           value.map do |_value|
             evolve(serializer, _value)
@@ -185,8 +172,6 @@ module Mongoid
         # @param [ Hash ] value The hash to serialize.
         #
         # @return [ Object ] The serialized hash.
-        #
-        # @since 1.0.0
         def evolve_hash(serializer, value)
           value.each_pair do |operator, _value|
             if operator =~ /exists|type|size/
@@ -208,8 +193,6 @@ module Mongoid
         # @param [ String ] key The key to check.
         #
         # @return [ true, false ] If the key is for a multi-select.
-        #
-        # @since 1.0.0
         def multi_selection?(key)
           %w($and $or $nor).include?(key)
         end

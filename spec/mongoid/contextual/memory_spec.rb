@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -168,19 +167,19 @@ describe Mongoid::Contextual::Memory do
   [ :delete, :delete_all ].each do |method|
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:hobrecht) do
-      person.addresses.create(street: "hobrecht")
+      person.addresses.create!(street: "hobrecht")
     end
 
     let(:friedel) do
-      person.addresses.create(street: "friedel")
+      person.addresses.create!(street: "friedel")
     end
 
     let(:pfluger) do
-      person.addresses.create(street: "pfluger")
+      person.addresses.create!(street: "pfluger")
     end
 
     describe "##{method}" do
@@ -233,11 +232,11 @@ describe Mongoid::Contextual::Memory do
       context "when embedded multiple levels" do
 
         let!(:home) do
-          hobrecht.locations.create(name: "home")
+          hobrecht.locations.create!(name: "home")
         end
 
         let!(:work) do
-          hobrecht.locations.create(name: "work")
+          hobrecht.locations.create!(name: "work")
         end
 
         let(:criteria) do
@@ -299,19 +298,19 @@ describe Mongoid::Contextual::Memory do
   [ :destroy, :destroy_all ].each do |method|
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:hobrecht) do
-      person.addresses.create(street: "hobrecht")
+      person.addresses.create!(street: "hobrecht")
     end
 
     let(:friedel) do
-      person.addresses.create(street: "friedel")
+      person.addresses.create!(street: "friedel")
     end
 
     let(:pfluger) do
-      person.addresses.create(street: "pfluger")
+      person.addresses.create!(street: "pfluger")
     end
 
     let(:criteria) do
@@ -1252,19 +1251,19 @@ describe Mongoid::Contextual::Memory do
   describe "#update" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:hobrecht) do
-      person.addresses.create(street: "hobrecht")
+      person.addresses.create!(street: "hobrecht")
     end
 
     let(:friedel) do
-      person.addresses.create(street: "friedel")
+      person.addresses.create!(street: "friedel")
     end
 
     let(:pfluger) do
-      person.addresses.create(street: "pfluger")
+      person.addresses.create!(street: "pfluger")
     end
 
     context "when the documents are embedded one level" do
@@ -1324,11 +1323,11 @@ describe Mongoid::Contextual::Memory do
     context "when the documents are embedded multiple levels" do
 
       let!(:home) do
-        hobrecht.locations.create(name: "home")
+        hobrecht.locations.create!(name: "home")
       end
 
       let!(:work) do
-        hobrecht.locations.create(name: "work")
+        hobrecht.locations.create!(name: "work")
       end
 
       let(:criteria) do
@@ -1392,19 +1391,19 @@ describe Mongoid::Contextual::Memory do
   describe "#update_all" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:hobrecht) do
-      person.addresses.create(street: "hobrecht")
+      person.addresses.create!(street: "hobrecht")
     end
 
     let(:friedel) do
-      person.addresses.create(street: "friedel")
+      person.addresses.create!(street: "friedel")
     end
 
     let(:pfluger) do
-      person.addresses.create(street: "pfluger")
+      person.addresses.create!(street: "pfluger")
     end
 
     context 'when there is a collation on the criteria' do
@@ -1423,7 +1422,7 @@ describe Mongoid::Contextual::Memory do
     context "when the documents are empty" do
 
       let(:person_two) do
-        Person.create
+        Person.create!
       end
 
       let(:criteria) do
@@ -1526,11 +1525,11 @@ describe Mongoid::Contextual::Memory do
     context "when the documents are embedded multiple levels" do
 
       let!(:home) do
-        hobrecht.locations.create(name: "home")
+        hobrecht.locations.create!(name: "home")
       end
 
       let!(:work) do
-        hobrecht.locations.create(name: "work")
+        hobrecht.locations.create!(name: "work")
       end
 
       let(:criteria) do

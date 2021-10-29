@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -615,7 +614,7 @@ describe Mongoid::Serializable do
                   person.save
                 end
 
-                it "includes the specific ralations" do
+                it "includes the specific relations" do
                   expect(relation_hash[0]["locations"].map do |location|
                     location["name"]
                   end).to include "Home"

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -8,15 +7,15 @@ describe Mongoid::Contextual::Atomic do
   describe "#add_to_set" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave" ])
+      Band.create!(members: [ "Dave" ])
     end
 
     let!(:new_order) do
-      Band.create(members: [ "Peter" ])
+      Band.create!(members: [ "Peter" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     context "when the criteria has no sorting" do
@@ -105,15 +104,15 @@ describe Mongoid::Contextual::Atomic do
   describe "#add_each_to_set" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave" ])
+      Band.create!(members: [ "Dave" ])
     end
 
     let!(:new_order) do
-      Band.create(members: [ "Peter" ])
+      Band.create!(members: [ "Peter" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     context "when the criteria has no sorting" do
@@ -202,7 +201,7 @@ describe Mongoid::Contextual::Atomic do
   describe "#bit" do
 
     let!(:depeche_mode) do
-      Band.create(likes: 60)
+      Band.create!(likes: 60)
     end
 
     let(:criteria) do
@@ -250,7 +249,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ], likes: 60)
+        Band.create!(members: [ "Dave" ], likes: 60)
       end
 
       let(:criteria) do
@@ -274,15 +273,15 @@ describe Mongoid::Contextual::Atomic do
   describe "#inc" do
 
     let!(:depeche_mode) do
-      Band.create(likes: 60)
+      Band.create!(likes: 60)
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let!(:beatles) do
-      Band.create(years: 2)
+      Band.create!(years: 2)
     end
 
     let(:criteria) do
@@ -330,7 +329,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let(:criteria) do
@@ -354,11 +353,11 @@ describe Mongoid::Contextual::Atomic do
   describe "#pop" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave", "Martin" ])
+      Band.create!(members: [ "Dave", "Martin" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let(:criteria) do
@@ -403,7 +402,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let(:criteria) do
@@ -427,11 +426,11 @@ describe Mongoid::Contextual::Atomic do
   describe "#pull" do
 
     let!(:depeche_mode) do
-      Band.create(members: [ "Dave", "Alan" ])
+      Band.create!(members: [ "Dave", "Alan" ])
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let(:criteria) do
@@ -458,7 +457,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let(:criteria) do
@@ -484,11 +483,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave", "Alan", "Fletch" ])
+        Band.create!(members: [ "Dave", "Alan", "Fletch" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -516,7 +515,7 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave", "Alan", "Fletch" ])
+        Band.create!(members: [ "Dave", "Alan", "Fletch" ])
       end
 
       let(:criteria) do
@@ -542,11 +541,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -574,11 +573,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -608,11 +607,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -640,11 +639,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -670,11 +669,11 @@ describe Mongoid::Contextual::Atomic do
     context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -686,15 +685,15 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.rename(members: :artists)
+        context.rename(members: :musicians)
       end
 
       it "renames existing fields" do
-        expect(depeche_mode.reload.artists).to eq([ "Dave" ])
+        expect(depeche_mode.reload.musicians).to eq([ "Dave" ])
       end
 
       it "does not rename non existent fields" do
-        expect(smiths.reload).to_not respond_to(:artists)
+        expect(smiths.reload).to_not respond_to(:musicians)
       end
     end
 
@@ -702,11 +701,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(members: [ "Dave" ])
+        Band.create!(members: [ "Dave" ])
       end
 
       let!(:smiths) do
-        Band.create
+        Band.create!
       end
 
       let(:criteria) do
@@ -718,15 +717,15 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.rename(members: :artists)
+        context.rename(members: :musicians)
       end
 
       it "renames existing fields" do
-        expect(depeche_mode.reload.artists).to eq([ "Dave" ])
+        expect(depeche_mode.reload.musicians).to eq([ "Dave" ])
       end
 
       it "does not rename non existent fields" do
-        expect(smiths.reload).to_not respond_to(:artists)
+        expect(smiths.reload).to_not respond_to(:musicians)
       end
     end
   end
@@ -734,11 +733,11 @@ describe Mongoid::Contextual::Atomic do
   describe "#set" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:smiths) do
-      Band.create
+      Band.create!
     end
 
     let(:criteria) do
@@ -753,12 +752,25 @@ describe Mongoid::Contextual::Atomic do
       context.set(name: "Recoil")
     end
 
-    it "sets existing fields" do
-      expect(depeche_mode.reload.name).to eq("Recoil")
+    shared_examples 'writes as expected' do
+      it "sets existing fields" do
+        expect(depeche_mode.reload.name).to eq("Recoil")
+      end
+
+      it "sets non existent fields" do
+        expect(smiths.reload.name).to eq("Recoil")
+      end
     end
 
-    it "sets non existent fields" do
-      expect(smiths.reload.name).to eq("Recoil")
+    include_examples 'writes as expected'
+
+    context 'when fields being set have been projected out' do
+
+      let(:criteria) do
+        Band.only(:genres)
+      end
+
+      include_examples 'writes as expected'
     end
   end
 
@@ -767,11 +779,11 @@ describe Mongoid::Contextual::Atomic do
     context "when unsetting a single field" do
 
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode", years: 10)
+        Band.create!(name: "Depeche Mode", years: 10)
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order", years: 10)
+        Band.create!(name: "New Order", years: 10)
       end
 
       let(:criteria) do
@@ -788,27 +800,28 @@ describe Mongoid::Contextual::Atomic do
           context.unset(:name)
         end
 
-        it "unsets the first existing field" do
-          expect(depeche_mode.reload.name).to be_nil
-        end
-
-        it "unsets the last existing field" do
-          expect(new_order.reload.name).to be_nil
+        it "unsets the fields from all documents" do
+          depeche_mode.reload
+          new_order.reload
+          expect(depeche_mode.name).to be_nil
+          expect(depeche_mode.years).to_not be_nil
+          expect(new_order.name).to be_nil
+          expect(new_order.years).to_not be_nil
         end
       end
 
       context "when the field is aliased" do
-
         before do
           context.unset(:years)
         end
 
-        it "unsets the first existing field" do
-          expect(depeche_mode.reload.years).to be_nil
-        end
-
-        it "unsets the last existing field" do
-          expect(new_order.reload.years).to be_nil
+        it "unsets the fields from all documents" do
+          depeche_mode.reload
+          new_order.reload
+          expect(depeche_mode.name).to_not be_nil
+          expect(depeche_mode.years).to be_nil
+          expect(new_order.name).to_not be_nil
+          expect(new_order.years).to be_nil
         end
       end
     end
@@ -816,7 +829,8 @@ describe Mongoid::Contextual::Atomic do
     context "when unsetting multiple fields" do
 
       let!(:new_order) do
-        Band.create(name: "New Order", genres: [ "electro", "dub" ], years: 10)
+        Band.create!(name: "New Order", genres: %w[electro dub], years: 10,
+          likes: 200, rating: 4.3, origin: 'Space')
       end
 
       let(:criteria) do
@@ -833,12 +847,13 @@ describe Mongoid::Contextual::Atomic do
           context.unset(:name, :genres)
         end
 
-        it "unsets name field" do
-          expect(new_order.reload.name).to be_nil
-        end
-
-        it "unsets genres field" do
-          expect(new_order.reload.genres).to be_nil
+        it "unsets the specified fields" do
+          new_order.reload
+          expect(new_order.name).to be_nil
+          expect(new_order.genres).to be_nil
+          expect(new_order.years).to_not be_nil
+          expect(new_order.likes).to_not be_nil
+          expect(new_order.rating).to_not be_nil
         end
       end
 
@@ -848,12 +863,46 @@ describe Mongoid::Contextual::Atomic do
           context.unset(:name, :years)
         end
 
-        it "unsets the unaliased field" do
-          expect(new_order.reload.name).to be_nil
+        it "unsets the specified fields" do
+          new_order.reload
+          expect(new_order.name).to be_nil
+          expect(new_order.genres).to_not be_nil
+          expect(new_order.years).to be_nil
+          expect(new_order.likes).to_not be_nil
+          expect(new_order.rating).to_not be_nil
+        end
+      end
+
+      context "when using Hash arguments" do
+
+        before do
+          context.unset({ years: true, likes: "" }, { rating: false, origin: nil })
         end
 
-        it "unsets the aliased field" do
-          expect(new_order.reload.years).to be_nil
+        it "unsets the specified fields" do
+          new_order.reload
+          expect(new_order.name).to_not be_nil
+          expect(new_order.genres).to_not be_nil
+          expect(new_order.years).to be_nil
+          expect(new_order.likes).to be_nil
+          expect(new_order.rating).to be_nil
+          expect(new_order.origin).to be_nil
+        end
+      end
+
+      context "when mixing argument types" do
+
+        before do
+          context.unset(:name, [:years], { likes: "" }, { rating: false })
+        end
+
+        it "unsets the specified fields" do
+          new_order.reload
+          expect(new_order.name).to be_nil
+          expect(new_order.genres).to_not be_nil
+          expect(new_order.years).to be_nil
+          expect(new_order.likes).to be_nil
+          expect(new_order.rating).to be_nil
         end
       end
     end
@@ -862,11 +911,11 @@ describe Mongoid::Contextual::Atomic do
       min_server_version '3.4'
 
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode", years: 10)
+        Band.create!(name: "Depeche Mode", years: 10)
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order", years: 10)
+        Band.create!(name: "New Order", years: 10)
       end
 
       let(:criteria) do
@@ -882,7 +931,9 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "unsets the unaliased field" do
-        expect(depeche_mode.reload.name).to be_nil
+        depeche_mode.reload
+        expect(depeche_mode.name).to be_nil
+        expect(depeche_mode.years).to_not be_nil
       end
     end
   end

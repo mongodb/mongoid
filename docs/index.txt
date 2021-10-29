@@ -1,4 +1,4 @@
-.. _ruby-mongoid-tutorial:
+.. _mongoid:
 
 *******
 Mongoid
@@ -10,28 +10,16 @@ Mongoid is the officially supported object-document mapper (ODM)
 for MongoDB in Ruby.
 
 .. toctree::
-   :titlesonly:
+  :titlesonly:
 
-   /tutorials/getting-started-sinatra
-   /tutorials/getting-started-rails
-   /tutorials/mongoid-installation
-   /tutorials/mongoid-configuration
-   /tutorials/mongoid-documents
-   /tutorials/mongoid-persistence
-   /tutorials/mongoid-queries
-   /tutorials/mongoid-relations
-   /tutorials/mongoid-nested-attributes
-   /tutorials/mongoid-callbacks
-   /tutorials/mongoid-validation
-   /tutorials/mongoid-indexes
-   /tutorials/sharding
-   /tutorials/mongoid-sessions
-   /tutorials/mongoid-transactions
-   /tutorials/mongoid-rails
-   /tutorials/mongoid-upgrade
-   API <https://docs.mongodb.com/mongoid/master/api/>
-   /additional-resources
-   /ecosystem
+  installation-configuration
+  tutorials
+  schema-configuration
+  working-with-data
+  API <https://docs.mongodb.com/mongoid/master/api/>
+  release-notes
+  additional-resources
+  ecosystem
 
 
 For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.

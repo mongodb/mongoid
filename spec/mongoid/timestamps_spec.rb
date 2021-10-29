@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -70,14 +69,14 @@ describe Mongoid::Timestamps do
 
     it "does not set updated at" do
       expect(document).to receive(:updated_at=).never
-      document.save
+      document.save!
     end
   end
 
   context "when the document is created" do
 
     let!(:document) do
-      Dokument.create
+      Dokument.create!
     end
 
     it "runs the update callbacks" do

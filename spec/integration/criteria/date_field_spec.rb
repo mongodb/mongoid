@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'spec_helper'
 
@@ -12,7 +11,7 @@ describe 'Queries on Date fields' do
 
   shared_examples 'converts to beginning of day in UTC' do
     it 'converts to beginning of day in UTC' do
-      selector['founded'].should == arg.dup.beginning_of_day.utc.beginning_of_day
+      selector['founded'].should == Time.utc(arg.year, arg.month, arg.day)
     end
   end
 

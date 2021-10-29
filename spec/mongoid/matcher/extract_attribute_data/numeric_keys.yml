@@ -1,0 +1,104 @@
+- name: string key - matches
+  document:
+    # Document field names in MongoDB are always strings.
+    '42': foo
+  # The paths are also always strings.
+  key: '42'
+  
+  result:
+    - foo
+
+- name: string key - does not match
+  document:
+    # Document field names in MongoDB are always strings.
+    '42': foo
+  # The paths are also always strings.
+  key: '4'
+  
+  result: []
+
+- name: array value - matches
+  document:
+    '42':
+      - foo
+  key: '42'
+  
+  result:
+    - ['foo']
+
+- name: subfield of numeric key - matches
+  document:
+    '42':
+      foo: bar
+  key: 42.foo
+  
+  result: 
+    - bar
+
+- name: numeric key under array
+  document:
+    a:
+      -
+        '42': bar
+
+  key: a.42
+
+  result: 
+    - bar
+
+- name: multiple values under numeric key under array
+  document: &numeric-key-under-array
+    a:
+      -
+        '42': bar
+      -
+        '42': foo
+
+  key: a.42
+
+  result: 
+    - bar
+    - foo
+
+- name: array indexing with values under numeric key under array
+  document: *numeric-key-under-array
+
+  key: a.1
+
+  result: 
+    - 
+      '42': foo
+
+- name: multiple values under array under numeric key
+  document:
+    a:
+      '42':
+        -
+          foo: bar
+        -       
+          foo: baq
+
+  key: a.42.foo
+
+  result: 
+    - bar
+    - baq
+
+- name: path component interpretable as both array index and hash key
+  document: 
+    a:
+      -
+        '1': bar
+      -
+        '1': foo
+
+  key: a.1
+
+  result: 
+    # The order of these results isn't guaranteed:
+    # 1 interpreted as the array index:
+    -
+      '1': foo
+    # 1 interpreted as hash key:
+    - bar
+    - foo

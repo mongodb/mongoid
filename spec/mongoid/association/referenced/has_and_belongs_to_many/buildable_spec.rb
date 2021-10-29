@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -67,6 +66,31 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
       end
     end
 
+    context "when scope is specified" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:options) do
+        {
+          scope: -> { where(rating: 3) }
+        }
+      end
+
+      let(:object) do
+        [ object_id ]
+      end
+
+      let(:criteria) do
+        Preference.all_of("_id" => { "$in" => object }).where(rating: 3)
+      end
+
+      it "returns the criteria" do
+        expect(documents).to eq(criteria)
+      end
+    end
+
     context "when provided a object" do
 
       context "when the object is not nil" do
@@ -108,7 +132,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
       context "when the ids are incorrect" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         before do

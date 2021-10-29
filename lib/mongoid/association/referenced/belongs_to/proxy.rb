@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -50,8 +49,6 @@ module Mongoid
           # @param [ Document, Array<Document> ] replacement The replacement.
           #
           # @return [ self, nil ] The association or nil.
-          #
-          # @since 2.0.0.rc.1
           def substitute(replacement)
             unbind_one
             if replacement
@@ -69,8 +66,6 @@ module Mongoid
           #   binding([ address ])
           #
           # @return [ Binding ] The binding object.
-          #
-          # @since 2.0.0.rc.1
           def binding
             BelongsTo::Binding.new(_base, _target, _association)
           end
@@ -85,8 +80,6 @@ module Mongoid
           # @param [ Document, Object ] replacement The replacement object.
           #
           # @return [ Document ] The document.
-          #
-          # @since 3.1.5
           def normalize(replacement)
             return replacement if replacement.is_a?(Document)
             _association.build(klass, replacement)
@@ -98,8 +91,6 @@ module Mongoid
           #   relation.persistable?
           #
           # @return [ true, false ] If the association is persistable.
-          #
-          # @since 2.1.0
           def persistable?
             _target.persisted? && !_binding? && !_building?
           end
@@ -112,8 +103,6 @@ module Mongoid
             #
             # @param [ Association ] association The association object.
             # @param [ Array<Document> ] docs The array of documents.
-            #
-            # @since 7.0
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end
@@ -125,8 +114,6 @@ module Mongoid
             #   Association::BelongsTo::Proxy.embedded?
             #
             # @return [ false ] Always false.
-            #
-            # @since 2.0.0.rc.1
             def embedded?
               false
             end

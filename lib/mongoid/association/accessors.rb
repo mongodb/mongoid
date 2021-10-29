@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -24,8 +23,6 @@ module Mongoid
       #   accessible in the built document.
       #
       # @return [ Proxy ] The association.
-      #
-      # @since 2.0.0.rc.1
       def __build__(name, object, association, selected_fields = nil)
         relation = create_relation(object, association, selected_fields)
         set_relation(name, relation)
@@ -43,8 +40,6 @@ module Mongoid
       #   accessible in the created association document.
       #
       # @return [ Proxy ] The association.
-      #
-      # @since 2.0.0.rc.1
       def create_relation(object, association, selected_fields = nil)
         type = @attributes[association.inverse_type]
         target = association.build(self, object, type, selected_fields)
@@ -58,8 +53,6 @@ module Mongoid
       #   person.reset_relation_criteria(:preferences)
       #
       # @param [ Symbol ] name The name of the association.
-      #
-      # @since 3.0.14
       def reset_relation_criteria(name)
         if instance_variable_defined?("@_#{name}")
           send(name).reset_unloaded
@@ -76,8 +69,6 @@ module Mongoid
       # @param [ Proxy ] relation The association to set.
       #
       # @return [ Proxy ] The association.
-      #
-      # @since 2.0.0.rc.1
       def set_relation(name, relation)
         instance_variable_set("@_#{name}", relation)
       end
@@ -98,8 +89,6 @@ module Mongoid
       # @param [ true, false ] reload If the association is to be reloaded.
       #
       # @return [ Proxy ] The association.
-      #
-      # @since 3.0.16
       def get_relation(name, association, object, reload = false)
         if !reload && (value = ivar(name)) != false
           value
@@ -121,6 +110,9 @@ module Mongoid
       # (embedded) association with the given key, or nil if no projection
       # is to be performed.
       #
+      # Also returns nil if exclusionary projection was requested but it does
+      # not exclude the field of the association.
+      #
       # For example, if __selected_fields is {'a' => 1, 'b.c' => 2, 'b.c.f' => 3},
       # and assoc_key is 'b', return value would be {'c' => 2, 'c.f' => 3}.
       #
@@ -131,6 +123,15 @@ module Mongoid
       # @api private
       def _mongoid_filter_selected_fields(assoc_key)
         return nil unless __selected_fields
+
+        # If the list of fields was specified using #without instead of #only
+        # and the provided list does not include the association, any of its
+        # fields should be allowed.
+        if __selected_fields.values.all? { |v| v == 0 } &&
+          __selected_fields.keys.none? { |k| k.split('.', 2).first == assoc_key }
+        then
+          return nil
+        end
 
         projecting_assoc = false
 
@@ -197,8 +198,6 @@ module Mongoid
       #   document.without_autobuild?
       #
       # @return [ true, false ] If autobuild is disabled.
-      #
-      # @since 3.0.0
       def without_autobuild?
         Threaded.executing?(:without_autobuild)
       end
@@ -211,8 +210,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The result of the yield.
-      #
-      # @since 3.0.0
       def without_autobuild
         Threaded.begin_execution("without_autobuild")
         yield
@@ -229,8 +226,6 @@ module Mongoid
       # @param [ Array ] args The arguments.
       #
       # @return [ Array<Hash> ] The attributes and options.
-      #
-      # @since 2.3.4
       def parse_args(*args)
         [args.first || {}, args.size > 1 ? args[1] : {}]
       end
@@ -248,8 +243,6 @@ module Mongoid
       # @param [ Association ] association The association.
       #
       # @return [ Class ] The model being set up.
-      #
-      # @since 3.0.0
       def self.define_existence_check!(association)
         name = association.name
         association.inverse_class.tap do |klass|
@@ -272,8 +265,6 @@ module Mongoid
       # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
       def self.define_getter!(association)
         name = association.name
         association.inverse_class.tap do |klass|
@@ -316,8 +307,6 @@ module Mongoid
       # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
       def self.define_setter!(association)
         name = association.name
         association.inverse_class.tap do |klass|
@@ -368,8 +357,6 @@ module Mongoid
       # @param [ Association ] association The association for the association.
       #
       # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
       def self.define_builder!(association)
         name = association.name
         association.inverse_class.tap do |klass|
@@ -395,8 +382,6 @@ module Mongoid
       # @param [ Association ] association The association for the association.
       #
       # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
       def self.define_creator!(association)
         name = association.name
         association.inverse_class.tap do |klass|

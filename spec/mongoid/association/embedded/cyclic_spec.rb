@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -28,7 +27,7 @@ describe Mongoid::Association::Embedded::Cyclic do
       context "when a query is executed" do
 
         before do
-          document.save
+          document.save!
         end
 
         it "queries the database, not memory" do
@@ -151,7 +150,7 @@ describe Mongoid::Association::Embedded::Cyclic do
     context "when a query is executed" do
 
       before do
-        document.save
+        document.save!
       end
 
       it "queries the database, not memory" do

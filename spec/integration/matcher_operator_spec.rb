@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'spec_helper'
 
@@ -52,7 +51,7 @@ describe 'Matcher operators' do
           end
 
           context 'server query' do
-            let!(:document) { Mop.create(spec.fetch('document')) }
+            let!(:document) { Mop.create!(spec.fetch('document')) }
 
             context 'via driver' do
               if mop_error?(spec, 'driver')

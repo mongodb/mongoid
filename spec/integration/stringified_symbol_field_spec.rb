@@ -31,8 +31,8 @@ describe "StringifiedSymbol fields" do
     end
   end
 
-# Using command monitoring to test that StringifiedSymbol sends a string and returns a symbol
-let(:client) { Order.collection.client }
+  # Using command monitoring to test that StringifiedSymbol sends a string and returns a symbol
+  let(:client) { Order.collection.client }
 
   before do
     client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
@@ -91,7 +91,7 @@ let(:client) { Order.collection.client }
     end
 
     it "sends the value as a string" do
-      Order.create(saved_status: [0, 1, 2])
+      Order.create!(saved_status: [0, 1, 2])
       event = insert_events.second
       doc = event.command["documents"].first
       expect(doc["saved_status"]).to eq("[0, 1, 2]")

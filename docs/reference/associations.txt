@@ -166,7 +166,7 @@ documents and does not query the database:
   band.members.any?
 
 Note that simply calling ``any?`` would *not* load the association
-(since ``any?`` only retrtieves the _id field of the first matching document).
+(since ``any?`` only retrieves the _id field of the first matching document).
 
 ``exists?``
 ~~~~~~~~~~~
@@ -180,7 +180,7 @@ any *persisted* documents in the association. Unlike the ``any?`` method:
 - ``exists?`` does not allow filtering in the application like ``any?`` does,
   and does not take any arguments.
 
-The following examle illustrates the difference between ``exists?`` and
+The following example illustrates the difference between ``exists?`` and
 ``any?``:
 
 .. code-block:: ruby
@@ -747,6 +747,76 @@ A future version of Mongoid may allow removing previously defined fields.
   by their content attribute values during queries, updates and deletes.
 
 
+Deleting
+--------
+
+Mongoid provides three methods for deleting children from ``embeds_many``
+associations: ``clear``, ``destroy_all`` and ``delete_all``.
+
+``clear``
+`````````
+
+The ``clear`` method uses the :manual:`$unset operator
+</reference/operator/update/unset>` to remove the entire association from the
+host document. It does not run destroy callbacks on the documents being removed,
+acting like ``delete_all`` in this regard:
+
+.. code-block:: ruby
+
+  band = Band.find(...)
+  band.tours.clear
+
+If ``clear`` is called on an association in an unsaved host document, it will
+still try to remove the association from the database based on the host
+document's ``_id``:
+
+.. code-block:: ruby
+
+  band = Band.find(...)
+  band.tours << Tour.new(...)
+  
+  unsaved_band = Band.new(id: band.id, tours: [Tour.new])
+  # Removes all tours from the persisted band due to _id match.
+  unsaved_band.tours.clear
+  
+  band.tours
+  # => []
+
+``delete_all``
+``````````````
+
+The ``delete_all`` method removes the documents that are in the association
+using the :manual:`$pullAll operator </reference/operator/update/pullAll>`.
+Unlike ``clear``, ``delete_all``:
+
+- Loads the association, if it wasn't yet loaded;
+- Only removes the documents that exist in the application.
+
+``delete_all`` does not run destroy callbacks on the documents being removed.
+
+Example:
+
+.. code-block:: ruby
+
+  band = Band.find(...)
+  band.tours.delete_all
+
+
+``destroy_all``
+```````````````
+
+The ``delete_all`` method removes the documents that are in the association
+using the :manual:`$pullAll operator </reference/operator/update/pullAll>`
+while running the destroy callbacks. Like ``delete_all``, ``destroy_all``
+loads the entire association if it wasn't yet loaded and it only removes
+documents that exist in the application:
+
+.. code-block:: ruby
+
+  band = Band.find(...)
+  band.tours.destroy_all
+
+
 Common Behavior
 ===============
 
@@ -849,7 +919,7 @@ is defined:
 - ``:foreign_key`` is the field on the local model which stores the
   ``:primary_key`` values.
 - ``:inverse_primary_key`` is the field on the local model that the remote
-  model uses to look up the local model docuemnts.
+  model uses to look up the local model documents.
 - ``:inverse_foreign_key`` is the field on the remote model storing the
   values in ``:inverse_primary_key``.
 
@@ -898,6 +968,61 @@ Mongoid automatically adds a field for the custom foreign key ``c_ref`` to
 the model. However, since Mongoid doesn't know what type of data should be
 allowed in the field, the field is created with a type of Object. It is a
 good idea to explicitly define the field with the appropriate type.
+
+
+.. _association-scope:
+
+Custom Scopes
+-------------
+
+You may set a specific scope on an association using the ``:scope`` parameter.
+The scope is an additional filter that restricts which objects are considered
+to be a part of the association - a scoped association will return only
+documents which satisfy the scope condition.. The scope may be either:
+
+- a ``Proc`` with arity zero, or
+- a ``Symbol`` which references a :ref:`named scope <named-scopes>` on the
+  associated model.
+
+.. code-block:: ruby
+  class Trainer
+    has_many :pets, scope: -> { where(species: 'dog') }
+    has_many :toys, scope: :rubber
+  end
+
+  class Pet
+    belongs_to :trainer
+  end
+
+  class Toy
+    scope :rubber, where(material: 'rubber')
+    belongs_to :trainer
+  end
+
+.. note::
+
+  It is possible to add documents that do not satisfy an association's scope
+  to that association. In this case, such documents will appear associated
+  in memory, and will be saved to the database, but will not be present when
+  the association is queried in the future. For example:
+
+  .. code-block:: ruby
+
+    trainer = Trainer.create!
+    dog = Pet.create!(trainer: trainer, species: 'dog')
+    cat = Pet.create!(trainer: trainer, species: 'cat')
+
+    trainer.pets #=> [dog, cat]
+
+    trainer.reload.pets #=> [dog]
+
+.. note::
+
+  Mongoid's syntax for scoped association differs from that of Active Record.
+  Mongoid uses the ``:scope`` keyword argument for consistency with other
+  association options, whereas in Active Record the scope is a positional
+  argument.
+
 
 Validations
 -----------
@@ -1032,6 +1157,7 @@ to the association.
    end
 
   band.save # Fires all save callbacks on the band, albums, and label.
+
 
 .. _dependent-behavior:
 
@@ -1460,7 +1586,7 @@ are supported:
 - `$project <https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_
 - `$unwind <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_
 
-To construct a pipeline, call the corresponding aggregation pipeine methods
+To construct a pipeline, call the corresponding aggregation pipeline methods
 on a ``Criteria`` instance. Aggregation pipeline operations are added to the
 ``pipeline`` attribute of the ``Criteria`` instance. To execute the pipeline,
 pass the ``pipeline`` attribute value to ``Collection#aggragegate`` method.
@@ -1521,7 +1647,7 @@ Alternatively, standard MongoDB aggregation pipeline syntax may be used:
 
 .. code-block:: ruby
 
-    criteria = Tour.all.group(_id: 'states', states: {'$addtoSet' => '$states'})
+    criteria = Tour.all.group(_id: 'states', states: {'$addToSet' => '$states'})
 
 project
 ```````
@@ -1545,7 +1671,7 @@ unwind
 The ``unwind`` method adds an `$unwind aggregation pipeline stage
 <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_.
 
-The argument can be a field name, specifyable as a symbol or a string, or
+The argument can be a field name, specifiable as a symbol or a string, or
 a Hash or a ``BSON::Document`` instance:
 
 .. code-block:: ruby

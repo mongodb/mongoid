@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -27,7 +26,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the inverse_of is nil" do
 
         let!(:article) do
-          Article.create
+          Article.create!
         end
 
         context "when the child document is new" do
@@ -48,7 +47,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the child document is not new" do
 
           let(:preference) do
-            Preference.create
+            Preference.create!
           end
 
           it "does not persist the child document" do
@@ -80,7 +79,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:preference) do
@@ -124,11 +123,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when appending in a parent create block" do
 
           let!(:preference) do
-            Preference.create(name: "testing")
+            Preference.create!(name: "testing")
           end
 
           let!(:person) do
-            Person.create do |doc|
+            Person.create! do |doc|
               doc.preferences << preference
             end
           end
@@ -213,7 +212,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           context "when the child is already persisted" do
 
             let!(:persisted) do
-              Preference.create(name: "testy")
+              Preference.create!(name: "testy")
             end
 
             let(:preference) do
@@ -253,7 +252,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           context "when setting via the associated ids" do
 
             let!(:persisted) do
-              Preference.create(name: "testy")
+              Preference.create!(name: "testy")
             end
 
             let(:preference) do
@@ -293,7 +292,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let(:preference) do
@@ -375,11 +374,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when both sides have been persisted" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let(:event) do
-            Event.create
+            Event.create!
           end
 
           before do
@@ -428,15 +427,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the relation also includes a has_many relation" do
 
           let(:artwork) do
-            Artwork.create
+            Artwork.create!
           end
 
           let(:exhibition) do
-            Exhibition.create
+            Exhibition.create!
           end
 
           let(:exhibitor) do
-            Exhibitor.create(exhibition: exhibition)
+            Exhibitor.create!(exhibition: exhibition)
           end
 
           before do
@@ -787,7 +786,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
               expect(person.preferences).to eq([ another_preference ])
             end
 
-            it "persists the relation between another_prefrence and person" do
+            it "persists the relation between another_preference and person" do
               expect(another_preference.people).to eq([ person ])
             end
 
@@ -808,7 +807,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
               expect(person.preferences).to eq([ another_preference ])
             end
 
-            it "persists the relation between another_prefrence and person" do
+            it "persists the relation between another_preference and person" do
               expect(another_preference.people).to eq([ person ])
             end
 
@@ -2561,7 +2560,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           end
         end
 
-        context "when the ids matche unreferenced documents" do
+        context "when the ids match unreferenced documents" do
 
           let(:preferences) do
             person.preferences.find(

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -21,10 +20,10 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     describe "##{method}" do
 
-      context "when providing the base class in child contructor" do
+      context "when providing the base class in child constructor" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:post) do
@@ -86,7 +85,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           context "when the child is persisted" do
 
             let(:post) do
-              Post.create
+              Post.create!
             end
 
             before do
@@ -130,11 +129,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when appending in a parent create block" do
 
           let!(:post) do
-            Post.create(title: "testing")
+            Post.create!(title: "testing")
           end
 
           let!(:person) do
-            Person.create do |doc|
+            Person.create! do |doc|
               doc.posts << post
             end
           end
@@ -163,7 +162,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let(:post) do
@@ -206,13 +205,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           context "when the related item has embedded associations" do
 
             let!(:user) do
-              User.create
+              User.create!
             end
 
             before do
-              p = Post.create(roles: [ Role.create ])
+              p = Post.create!(roles: [ Role.create! ])
               user.posts = [ p ]
-              user.save
+              user.save!
             end
 
             it "add the document to the target" do
@@ -280,7 +279,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when.adding to the association" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when the operation succeeds" do
@@ -301,7 +300,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the operation fails" do
 
           let!(:existing) do
-            Post.create
+            Post.create!
           end
 
           let(:post) do
@@ -354,7 +353,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the parent is not a new record" do
 
           let(:movie) do
-            Movie.create
+            Movie.create!
           end
 
           let(:rating) do
@@ -423,7 +422,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:post) do
@@ -490,7 +489,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when replacing the with a combination of old and new docs" do
 
           let(:new_post) do
-            Post.create(title: "new post")
+            Post.create!(title: "new post")
           end
 
           context "when using the same in memory instance" do
@@ -539,7 +538,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when replacing the with a combination of only new docs" do
 
           let(:new_post) do
-            Post.create(title: "new post")
+            Post.create!(title: "new post")
           end
 
           context "when using the same in memory instance" do
@@ -615,7 +614,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:movie) do
-          Movie.create
+          Movie.create!
         end
 
         let(:rating) do
@@ -650,11 +649,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the parent is persisted" do
 
       let(:posts) do
-        [ Post.create(title: "1"), Post.create(title: "2") ]
+        [ Post.create!(title: "1"), Post.create!(title: "2") ]
       end
 
       let(:person) do
-        Person.create(posts: posts)
+        Person.create!(posts: posts)
       end
 
       context "when the parent has multiple children" do
@@ -709,7 +708,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when dependent is destructive" do
@@ -803,7 +802,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:movie) do
-          Movie.create
+          Movie.create!
         end
 
         let(:rating) do
@@ -844,11 +843,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
 
     let(:post_one) do
-      Post.create
+      Post.create!
     end
 
     let(:post_two) do
-      Post.create
+      Post.create!
     end
 
     before do
@@ -863,11 +862,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#\{name}_ids" do
 
     let(:posts) do
-      [ Post.create, Post.create ]
+      [ Post.create!, Post.create! ]
     end
 
     let(:person) do
-      Person.create(posts: posts)
+      Person.create!(posts: posts)
     end
 
     it "returns ids of documents that are in the association" do
@@ -923,7 +922,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:post) do
@@ -957,7 +956,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the parent is a subclass" do
 
           let(:video_game) do
-            VideoGame.create
+            VideoGame.create!
           end
 
           let(:rating) do
@@ -1011,7 +1010,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the parent is not a new record" do
 
           let(:movie) do
-            Movie.create
+            Movie.create!
           end
 
           let!(:rating) do
@@ -1049,13 +1048,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent has been persisted" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when the children are persisted" do
 
           let!(:post) do
-            person.posts.create(title: "Testing")
+            person.posts.create!(title: "Testing")
           end
 
           let!(:association) do
@@ -1120,13 +1119,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent has been persisted" do
 
         let!(:movie) do
-          Movie.create
+          Movie.create!
         end
 
         context "when the children are persisted" do
 
           let!(:rating) do
-            movie.ratings.create(value: 1)
+            movie.ratings.create!(value: 1)
           end
 
           let!(:association) do
@@ -1229,11 +1228,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when appending in a parent create block" do
 
         let!(:post) do
-          Post.create(title: "testing")
+          Post.create!(title: "testing")
         end
 
         let!(:person) do
-          Person.create do |doc|
+          Person.create! do |doc|
             doc.posts.concat([ post ])
           end
         end
@@ -1262,7 +1261,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:post) do
@@ -1375,7 +1374,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the parent is not a new record" do
 
       let(:movie) do
-        Movie.create
+        Movie.create!
       end
 
       let(:rating) do
@@ -1407,17 +1406,22 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#count" do
 
     let(:movie) do
-      Movie.create
+      Movie.create!
     end
 
     context "when documents have been persisted" do
 
       let!(:rating) do
-        movie.ratings.create(value: 1)
+        movie.ratings.create!(value: 1)
       end
 
       it "returns the number of persisted documents" do
         expect(movie.ratings.count).to eq(1)
+      end
+
+      it "block form includes persisted results" do
+        expect(movie.ratings.count {|r| r.value >= 1 }).to eq(1)
+        expect(movie.ratings.count {|r| r.value >= 2 }).to eq(0)
       end
     end
 
@@ -1429,6 +1433,27 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       it "returns 0" do
         expect(movie.ratings.count).to eq(0)
+      end
+
+      it "block form does not include unpersisted results" do
+        expect(movie.ratings.count {|r| r.value == 1 }).to eq(0)
+      end
+    end
+
+    context "when mixed persisted and unpersisted documents" do
+
+      before do
+        movie.ratings.create(value: 1)
+        movie.ratings.build(value: 2)
+      end
+
+      it "returns 1" do
+        expect(movie.ratings.count).to eq(1)
+      end
+
+      it "block form includes only persisted results" do
+        expect(movie.ratings.count {|r| r.value >= 1 }).to eq(1)
+        expect(movie.ratings.count {|r| r.value == 2 }).to eq(0)
       end
     end
 
@@ -1444,7 +1469,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the documents are part of the association" do
 
         before do
-          Rating.create(ratable: movie)
+          Rating.create!(ratable: movie)
         end
 
         it "returns the count from the db" do
@@ -1455,7 +1480,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the documents are not part of the association" do
 
         before do
-          Rating.create
+          Rating.create!
         end
 
         it "returns the count from the db" do
@@ -1517,7 +1542,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
 
     let(:movie) do
-      Movie.create
+      Movie.create!
     end
 
     context "when nothing exists on the association" do
@@ -1568,12 +1593,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       context 'when association is not loaded' do
-        it 'queries database on each call' do
-          expect_query(1) do
-            movie.ratings.any?.should be true
-          end
+        before do
+          movie.ratings._loaded?.should be false
+        end
 
-          expect_query(1) do
+        it 'does not query the database because it knows about the added models' do
+          expect_no_queries do
             movie.ratings.any?.should be true
           end
         end
@@ -1581,7 +1606,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       context 'when association is loaded' do
         it 'does not query database' do
-          expect_query(1) do
+          expect_no_queries do
             movie.ratings.any?.should be true
           end
 
@@ -1614,7 +1639,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when documents have been persisted" do
 
       let!(:rating) do
-        movie.ratings.create(value: 1)
+        movie.ratings.create!(value: 1)
       end
 
       it "returns true" do
@@ -1638,7 +1663,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     context "when new documents exist in the database" do
       before do
-        Rating.create(ratable: movie)
+        Rating.create!(ratable: movie)
       end
 
       it "returns true" do
@@ -1652,7 +1677,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when providing multiple attributes" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:posts) do
@@ -1698,11 +1723,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the operation is successful" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:post) do
-            person.posts.create(text: "Testing")
+            person.posts.create!(text: "Testing")
           end
 
           it "creates the document" do
@@ -1713,11 +1738,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the operation fails" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:existing) do
-            Post.create
+            Post.create!
           end
 
           it "raises an error" do
@@ -1733,11 +1758,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:post) do
-          person.posts.create(text: "Testing") do |post|
+          person.posts.create!(text: "Testing") do |post|
             post.content = "The Content"
           end
         end
@@ -1770,11 +1795,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when passing a new object" do
 
         let!(:odd) do
-          Odd.create(name: 'one')
+          Odd.create!(name: 'one')
         end
 
         let!(:even) do
-          odd.evens.create(name: 'two', odds: [Odd.new(name: 'three')])
+          odd.evens.create!(name: 'two', odds: [Odd.new(name: 'three')])
         end
 
         it "only push one even to the list" do
@@ -1804,7 +1829,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
 
         let(:rating) do
-          movie.ratings.create(value: 1)
+          movie.ratings.create!(value: 1)
         end
 
         it "raises an unsaved document error" do
@@ -1815,11 +1840,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:movie) do
-          Movie.create
+          Movie.create!
         end
 
         let!(:rating) do
-          movie.ratings.create(value: 3)
+          movie.ratings.create!(value: 3)
         end
 
         it "sets the foreign key on the association" do
@@ -1844,7 +1869,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when using a diferent primary_key" do
+    context "when using a different primary_key" do
 
       let(:person) do
         Person.create!(username: 'arthurnn')
@@ -1865,7 +1890,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when providing multiple attributes" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:posts) do
@@ -1909,7 +1934,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:post) do
@@ -1967,7 +1992,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:movie) do
-          Movie.create
+          Movie.create!
         end
 
         let!(:rating) do
@@ -2055,7 +2080,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#delete" do
 
     let!(:person) do
-      Person.create(username: 'arthurnn')
+      Person.create!(username: 'arthurnn')
     end
 
     context "when the document is found" do
@@ -2065,7 +2090,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when we are assigning attributes" do
 
           let!(:drug) do
-            person.drugs.create
+            person.drugs.create!
           end
 
           before do
@@ -2088,7 +2113,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the document is loaded" do
 
           let!(:drug) do
-            person.drugs.create
+            person.drugs.create!
           end
 
           let!(:deleted) do
@@ -2111,7 +2136,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the document is not loaded" do
 
           let!(:drug) do
-            Drug.create(person_id: person.username)
+            Drug.create!(person_id: person.username)
           end
 
           let!(:deleted) do
@@ -2137,7 +2162,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the document is loaded" do
 
           let!(:post) do
-            person.posts.create(title: "test")
+            person.posts.create!(title: "test")
           end
 
           let!(:deleted) do
@@ -2160,7 +2185,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the document is not loaded" do
 
           let!(:post) do
-            Post.create(title: "foo", person_id: person.id)
+            Post.create!(title: "foo", person_id: person.id)
           end
 
           let!(:deleted) do
@@ -2185,7 +2210,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the document is not found" do
 
       let!(:post) do
-        Post.create(title: "foo")
+        Post.create!(title: "foo")
       end
 
       let!(:deleted) do
@@ -2211,12 +2236,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when conditions are provided" do
 
           let(:person) do
-            Person.create(username: 'durran')
+            Person.create!(username: 'durran')
           end
 
           before do
-            person.posts.create(title: "Testing")
-            person.posts.create(title: "Test")
+            person.posts.create!(title: "Testing")
+            person.posts.create!(title: "Test")
           end
 
           it "removes the correct posts" do
@@ -2238,12 +2263,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when conditions are not provided" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           before do
-            person.posts.create(title: "Testing")
-            person.posts.create(title: "Test")
+            person.posts.create!(title: "Testing")
+            person.posts.create!(title: "Test")
           end
 
           it "removes the correct posts" do
@@ -2267,12 +2292,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when conditions are provided" do
 
           let(:movie) do
-            Movie.create(title: "Bladerunner")
+            Movie.create!(title: "Bladerunner")
           end
 
           before do
-            movie.ratings.create(value: 1)
-            movie.ratings.create(value: 2)
+            movie.ratings.create!(value: 1)
+            movie.ratings.create!(value: 2)
           end
 
           it "removes the correct ratings" do
@@ -2293,12 +2318,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when conditions are not provided" do
 
           let(:movie) do
-            Movie.create(title: "Bladerunner")
+            Movie.create!(title: "Bladerunner")
           end
 
           before do
-            movie.ratings.create(value: 1)
-            movie.ratings.create(value: 2)
+            movie.ratings.create!(value: 1)
+            movie.ratings.create!(value: 2)
           end
 
           it "removes the correct ratings" do
@@ -2329,13 +2354,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#exists?" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when documents exist in the database" do
 
       before do
-        person.posts.create
+        person.posts.create!
       end
 
       it "returns true" do
@@ -2466,15 +2491,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post_one) do
-        person.posts.create(title: "Test")
+        person.posts.create!(title: "Test")
       end
 
       let!(:post_two) do
-        person.posts.create(title: "OMG I has associations")
+        person.posts.create!(title: "OMG I has associations")
       end
 
       context "when providing an id" do
@@ -2493,7 +2518,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         context "when the id matches but is not scoped to the association" do
 
           let(:post) do
-            Post.create(title: "Unscoped")
+            Post.create!(title: "Unscoped")
           end
 
           it "raises an error" do
@@ -2592,15 +2617,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is polymorphic" do
 
       let(:movie) do
-        Movie.create
+        Movie.create!
       end
 
       let!(:rating_one) do
-        movie.ratings.create(value: 1)
+        movie.ratings.create!(value: 1)
       end
 
       let!(:rating_two) do
-        movie.ratings.create(value: 5)
+        movie.ratings.create!(value: 5)
       end
 
       context "when providing an id" do
@@ -2709,6 +2734,44 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
       end
     end
+
+    context "with block" do
+      let!(:author) do
+        Person.create!(title: 'Person')
+      end
+
+      let!(:post_one) do
+        author.posts.create!(title: 'post one')
+      end
+
+      let!(:post_two) do
+        author.posts.create!(title: 'post two')
+      end
+
+      it "finds one" do
+        expect(
+          author.posts.find do |post|
+            post.title == 'post one'
+          end
+        ).to be_a(Post)
+      end
+
+      it "returns first match of multiple" do
+        expect(
+          author.posts.find do |post|
+            ['post one', 'post two'].include?(post.title)
+          end
+        ).to eq(post_one)
+      end
+
+      it "returns nil when not found" do
+        expect(
+          author.posts.find do |post|
+            post.title == 'non exiting one'
+          end
+        ).to be_nil
+      end
+    end
   end
 
   describe "#find_or_create_by" do
@@ -2716,11 +2779,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post) do
-        person.posts.create(title: "Testing")
+        person.posts.create!(title: "Testing")
       end
 
       context "when the document exists" do
@@ -2789,11 +2852,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is polymorphic" do
 
       let(:movie) do
-        Movie.create
+        Movie.create!
       end
 
       let!(:rating) do
-        movie.ratings.create(value: 1)
+        movie.ratings.create!(value: 1)
       end
 
       context "when the document exists" do
@@ -2837,11 +2900,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post) do
-        person.posts.create(title: "Testing")
+        person.posts.create!(title: "Testing")
       end
 
       context "when the document exists" do
@@ -2910,11 +2973,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is polymorphic" do
 
       let(:movie) do
-        Movie.create
+        Movie.create!
       end
 
       let!(:rating) do
-        movie.ratings.create(value: 1)
+        movie.ratings.create!(value: 1)
       end
 
       context "when the document exists" do
@@ -2967,11 +3030,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post) do
-        person.posts.create(title: "Testing")
+        person.posts.create!(title: "Testing")
       end
 
       context "when the document exists" do
@@ -3010,11 +3073,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is polymorphic" do
 
       let(:movie) do
-        Movie.create
+        Movie.create!
       end
 
       let!(:rating) do
-        movie.ratings.create(value: 1)
+        movie.ratings.create!(value: 1)
       end
 
       context "when the document exists" do
@@ -3104,15 +3167,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#max" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:post_one) do
-      Post.create(rating: 5)
+      Post.create!(rating: 5)
     end
 
     let(:post_two) do
-      Post.create(rating: 10)
+      Post.create!(rating: 10)
     end
 
     before do
@@ -3133,15 +3196,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#max_by" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:post_one) do
-      Post.create(rating: 5)
+      Post.create!(rating: 5)
     end
 
     let(:post_two) do
-      Post.create(rating: 10)
+      Post.create!(rating: 10)
     end
 
     before do
@@ -3160,15 +3223,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#method_missing" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:post_one) do
-      person.posts.create(title: "First", content: "Posting")
+      person.posts.create!(title: "First", content: "Posting")
     end
 
     let!(:post_two) do
-      person.posts.create(title: "Second", content: "Testing")
+      person.posts.create!(title: "Second", content: "Testing")
     end
 
     context "when providing a single criteria" do
@@ -3235,15 +3298,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#min" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:post_one) do
-      Post.create(rating: 5)
+      Post.create!(rating: 5)
     end
 
     let(:post_two) do
-      Post.create(rating: 10)
+      Post.create!(rating: 10)
     end
 
     before do
@@ -3264,15 +3327,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   describe "#min_by" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:post_one) do
-      Post.create(rating: 5)
+      Post.create!(rating: 5)
     end
 
     let(:post_two) do
-      Post.create(rating: 10)
+      Post.create!(rating: 10)
     end
 
     before do
@@ -3293,15 +3356,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the inverse has not been loaded" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post_one) do
-        person.posts.create(title: "One")
+        person.posts.create!(title: "One")
       end
 
       let!(:post_two) do
-        person.posts.create(title: "Two")
+        person.posts.create!(title: "Two")
       end
 
       let(:from_db) do
@@ -3330,15 +3393,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post_one) do
-        person.posts.create(title: "One")
+        person.posts.create!(title: "One")
       end
 
       let!(:post_two) do
-        person.posts.create(title: "Two")
+        person.posts.create!(title: "Two")
       end
 
       before do
@@ -3376,15 +3439,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association is polymorphic" do
 
       let(:movie) do
-        Movie.create(title: "Oldboy")
+        Movie.create!(title: "Oldboy")
       end
 
       let!(:rating_one) do
-        movie.ratings.create(value: 10)
+        movie.ratings.create!(value: 10)
       end
 
       let!(:rating_two) do
-        movie.ratings.create(value: 9)
+        movie.ratings.create!(value: 9)
       end
 
       before do
@@ -3470,13 +3533,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     describe "##{method}" do
 
       let(:movie) do
-        Movie.create
+        Movie.create!
       end
 
       context "when documents have been persisted" do
 
         let!(:rating) do
-          movie.ratings.create(value: 1)
+          movie.ratings.create!(value: 1)
         end
 
         it "returns 1" do
@@ -3488,7 +3551,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
         before do
           movie.ratings.build(value: 1)
-          movie.ratings.create(value: 2)
+          movie.ratings.create!(value: 2)
         end
 
         it "returns the total number of documents" do
@@ -3503,15 +3566,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association has no default scope" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post_one) do
-        person.posts.create(title: "first")
+        person.posts.create!(title: "first")
       end
 
       let!(:post_two) do
-        Post.create(title: "second")
+        Post.create!(title: "second")
       end
 
       let(:unscoped) do
@@ -3526,15 +3589,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when the association has a default scope" do
 
       let!(:church) do
-        Church.create
+        Church.create!
       end
 
       let!(:acolyte_one) do
-        church.acolytes.create(name: "first")
+        church.acolytes.create!(name: "first")
       end
 
       let!(:acolyte_two) do
-        Acolyte.create(name: "second")
+        Acolyte.create!(name: "second")
       end
 
       let(:unscoped) do
@@ -3554,19 +3617,19 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   context "when the association has an order defined" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:post_one) do
-      OrderedPost.create(rating: 10, title: '1')
+      OrderedPost.create!(rating: 10, title: '1')
     end
 
     let(:post_two) do
-      OrderedPost.create(rating: 20, title: '2')
+      OrderedPost.create!(rating: 20, title: '2')
     end
 
     let(:post_three) do
-      OrderedPost.create(rating: 20, title: '3')
+      OrderedPost.create!(rating: 20, title: '3')
     end
 
     before do
@@ -3580,7 +3643,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
                                             )
     end
 
-    it "chaining order criterias" do
+    it "chaining order criteria" do
       expect(person.ordered_posts.order_by(:title.desc).to_a).to eq(
                                                                      [post_three, post_two, post_one]
                                                                  )
@@ -3590,15 +3653,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   context "when reloading the association" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:post_one) do
-      Post.create(title: "one")
+      Post.create!(title: "one")
     end
 
     let!(:post_two) do
-      Post.create(title: "two")
+      Post.create!(title: "two")
     end
 
     before do
@@ -3644,7 +3707,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   context "when the parent is using integer ids" do
 
     let(:jar) do
-      Jar.create do |doc|
+      Jar.create! do |doc|
         doc._id = 1
       end
     end
@@ -3922,15 +3985,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   context "when executing a criteria call on an ordered association" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:post_one) do
-      person.ordered_posts.create(rating: 1)
+      person.ordered_posts.create!(rating: 1)
     end
 
     let!(:post_two) do
-      person.ordered_posts.create(rating: 5)
+      person.ordered_posts.create!(rating: 5)
     end
 
     let(:criteria) do
@@ -3945,11 +4008,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   context "when accessing a scope named open" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:post) do
-      person.posts.create(title: "open")
+      person.posts.create!(title: "open")
     end
 
     it "returns the appropriate documents" do
@@ -3960,11 +4023,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   context "when accessing a association named parent" do
 
     let!(:parent) do
-      Odd.create(name: "odd parent")
+      Odd.create!(name: "odd parent")
     end
 
     let(:child) do
-      Even.create(parent_id: parent.id, name: "original even child")
+      Even.create!(parent_id: parent.id, name: "original even child")
     end
 
     it "updates the child after accessing the parent" do
@@ -4017,8 +4080,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     before do
       agent.same_name = band
-      agent.save
-      band.save
+      agent.save!
+      band.save!
       band.reload
     end
 

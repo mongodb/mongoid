@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -124,13 +123,13 @@ describe Mongoid::Document do
   describe "._mongoid_clear_types" do
 
     context "when changing the discriminator_value" do
-      
-      before do 
+
+      before do
         Kangaroo._types
         Kangaroo.discriminator_value = "dvalue"
       end
 
-      after do 
+      after do
         Kangaroo.discriminator_value = nil
       end
 
@@ -140,13 +139,13 @@ describe Mongoid::Document do
     end
 
     context "when changing the discriminator_value in child" do
-      
-      before do 
+
+      before do
         Shape._types
         Circle.discriminator_value = "dvalue"
       end
 
-      after do 
+      after do
         Circle.discriminator_value = nil
       end
 
@@ -431,27 +430,6 @@ describe Mongoid::Document do
       Person.new(title: "Sir")
     end
 
-    describe 'id' do
-      context 'rails < 6' do
-        max_rails_version '5.2'
-
-        it 'is a BSON::ObjectId' do
-          id = person.as_json['_id']
-          expect(id).to be_a(BSON::ObjectId)
-        end
-      end
-
-      context 'rails >= 6' do
-        min_rails_version '6.0'
-
-        it 'is a hash with $oid' do
-          id = person.as_json['_id']
-          expect(id).to be_a(Hash)
-          expect(id['$oid']).to be_a(String)
-        end
-      end
-    end
-
     context "when no options are provided" do
 
       it "does not apply any options" do
@@ -501,7 +479,7 @@ describe Mongoid::Document do
       end
     end
 
-    context ':compact option' do
+    context 'deprecated :compact option' do
       # Since rails 6 differs in how it treats id fields,
       # run this test on one version of rails. Currently rails 6 is in beta,
       # when it is released this version should be changed to 6.
@@ -511,6 +489,26 @@ describe Mongoid::Document do
         # These tests require a specific set of defined attributes
         # on the model
         expect(church.as_json.keys.sort).to eq(%w(_id location name))
+      end
+
+      context 'deprecation' do
+        let(:church) do
+          Church.create!(name: 'St. Basil')
+        end
+
+        let(:message) do
+          '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
+        end
+
+        it 'logs a deprecation warning when :compact is given' do
+          expect_any_instance_of(Logger).to receive(:warn).with(message)
+          church.as_json(compact: true)
+        end
+
+        it 'does not log a deprecation warning when :compact is not given' do
+          expect_any_instance_of(Logger).to_not receive(:warn).with(message)
+          church.as_json
+        end
       end
 
       context 'there is a nil valued attribute' do
@@ -924,7 +922,7 @@ describe Mongoid::Document do
       end
 
       context "when no embedded documents are present" do
-        context "when using the default discriminator key" do 
+        context "when using the default discriminator key" do
           let(:person) do
             manager.becomes(Person)
           end
@@ -948,12 +946,12 @@ describe Mongoid::Document do
           end
         end
 
-        context "when using a custom discriminator key" do 
-          before do 
+        context "when using a custom discriminator key" do
+          before do
             Person.discriminator_key = "dkey"
           end
 
-          after do 
+          after do
             Person.discriminator_key = nil
           end
 
@@ -962,13 +960,13 @@ describe Mongoid::Document do
           end
         end
 
-        context "when using a custom discriminator key and discriminator value" do 
-          before do 
+        context "when using a custom discriminator key and discriminator value" do
+          before do
             Person.discriminator_key = "dkey"
             Person.discriminator_value = "dvalue"
           end
 
-          after do 
+          after do
             Person.discriminator_key = nil
             Person.discriminator_value = nil
           end
@@ -1024,11 +1022,11 @@ describe Mongoid::Document do
           context "when embedded doc is persisted" do
 
             let(:manager) do
-              Manager.create(title: "Sir")
+              Manager.create!(title: "Sir")
             end
 
             let!(:address) do
-              manager.addresses.create(street: "hobrecht")
+              manager.addresses.create!(street: "hobrecht")
             end
 
             let(:person) do
@@ -1320,17 +1318,6 @@ describe Mongoid::Document do
           expect(manager.level).to eq(1)
         end
       end
-    end
-  end
-
-  describe "#to_ary" do
-
-    it "does not publicly respond to #to_ary" do
-      expect(Person.new.respond_to?(:to_ary)).to eq false
-    end
-
-    it "does private respond to #to_ary" do
-      expect(Person.new.send(:to_ary)).to eq nil
     end
   end
 

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
@@ -15,8 +14,6 @@ module Mongoid
     #   Loggable.logger
     #
     # @return [ Logger ] The logger.
-    #
-    # @since 3.0.0
     def logger
       return @logger if defined?(@logger)
       @logger = rails_logger || default_logger
@@ -30,8 +27,6 @@ module Mongoid
     # @param [ Logger ] logger The logger to set.
     #
     # @return [ Logger ] The new logger.
-    #
-    # @since 3.0.0
     def logger=(logger)
       @logger = logger
     end
@@ -46,8 +41,6 @@ module Mongoid
     #   Loggable.default_logger
     #
     # @return [ Logger ] The default logger.
-    #
-    # @since 3.0.0
     def default_logger
       logger = Logger.new(STDERR)
       logger.level = Mongoid::Config.log_level
@@ -62,8 +55,6 @@ module Mongoid
     #   Loggable.rails_logger
     #
     # @return [ Logger ] The Rails logger.
-    #
-    # @since 3.0.0
     def rails_logger
       if defined?(::Rails)
         ::Rails.logger

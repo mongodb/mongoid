@@ -80,6 +80,12 @@ en:
             different collections so a simple id lookup is not sufficient enough."
           resolution: "Don't attempt to perform this action and have patience,
             maybe this will be supported in the future."
+        empty_config_file:
+          message: "Empty configuration file: %{path}."
+          summary: "Your mongoid.yml configuration file appears to be empty."
+          resolution: "Ensure your configuration file contains the correct contents.
+            Please consult the following page with respect to Mongoid's configuration:
+            https://docs.mongodb.com/mongoid/current/reference/configuration/"
         invalid_collection:
           message: "Access to the collection for %{klass} is not allowed."
           summary: "%{klass}.collection was called, and %{klass} is an embedded
@@ -94,6 +100,13 @@ en:
             A collation option is only supported if the query is executed on a MongoDB server
             with version >= 3.4."
           resolution: "Remove the collation option from the query."
+        invalid_config_file:
+          message: "Invalid configuration file: %{path}."
+          summary: "Your mongoid.yml configuration file does not contain the
+            correct file structure."
+          resolution: "Ensure your configuration file contains the correct contents.
+            Please consult the following page with respect to Mongoid's configuration:
+            https://docs.mongodb.com/mongoid/current/reference/configuration/"
         invalid_config_option:
           message: "Invalid configuration option: %{name}."
           summary: "A invalid configuration option was provided in your
@@ -101,7 +114,7 @@ en:
             options are: %{options}."
           resolution: "Remove the invalid option or fix the typo. If you were
             expecting the option to be there, please consult the following page
-            with repect to Mongoid's configuration:\n\n
+            with respect to Mongoid's configuration:\n\n
             \_\_http://mongoid.org/en/mongoid/docs/installation.html"
         invalid_dependent_strategy:
           message: "Invalid dependent strategy: %{invalid_strategy}."
@@ -124,7 +137,7 @@ en:
         invalid_estimated_count_criteria:
           message: "Invalid criteria for estimated_count."
           summary: "Estimated count is strictly a collection-level operation and cannot be called
-            on a filtered critera."
+            on a filtered criteria."
           resolution: "Try calling estimated_count directly on the class: %{class_name}.estimated_count.\n\n
             \_If the class defines a default scope, use unscoped: %{class_name}.unscoped.estimated_count."
         invalid_expression_operator:
@@ -255,7 +268,7 @@ en:
           message: "Defining a scope of value %{value} on %{klass} is not
             allowed."
           summary: "Scopes in Mongoid must be procs that wrap criteria objects."
-          resolution: "Change the scope to be a proc wrapped critera.\n\n
+          resolution: "Change the scope to be a proc wrapped criteria.\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
@@ -400,7 +413,7 @@ en:
           resolution: "Make sure some environment is set from the mentioned
             options. Mongoid cannot load configuration from the yaml without
             knowing which environment it is in, and we have considered
-            defaulting to development an undesireable side effect of this not
+            defaulting to development an undesirable side effect of this not
             being defined."
         no_map_reduce_output:
           message: "No output location was specified for the map/reduce
@@ -450,7 +463,7 @@ en:
             to connect."
           resolution: "Double check your mongoid.yml to make sure under the
             clients key that a configuration exists for '%{name}'. If you
-            have set the configuration programatically, ensure that '%{name}'
+            have set the configuration programmatically, ensure that '%{name}'
             exists in the configuration hash."
         no_clients_config:
           message: "No clients configuration provided."
@@ -542,13 +555,14 @@ en:
         unknown_attribute:
           message: "Attempted to set a value for '%{name}' which is not
             allowed on the model %{klass}."
-          summary: "Without including Mongoid::Attributes::Dynamic in your model
-            and the attribute does not already exist in the attributes hash,
-            attempting to call %{klass}#%{name}= for it is not allowed. This is
-            also triggered by passing the attribute to any method that accepts an
-            attributes hash, and is raised instead of getting a NoMethodError."
-          resolution: "You can include Mongoid::Attributes::Dynamic if you
-            expect to be writing values for undefined fields often."
+          summary: "%{klass}#%{name}= was called but there is no '%{name}'
+            field defined in the model, and Mongoid::Attributes::Dynamic is
+            not included. This error is also raised instead of NoMethodError
+            if the unknown attribute is passed to any method that accepts an
+            attributes hash, such as #attributes=."
+          resolution: "Define the field '%{name}' in %{klass}, or include
+            Mongoid::Attributes::Dynamic in %{klass} if you intend to
+            store values in fields that are not explicitly defined."
         unknown_model:
           message: "Attempted to instantiate an object of the unknown Model '%{klass}'."
           summary: "A document with the value '%{value}' at the key '_type' was used to
@@ -578,9 +592,9 @@ en:
           resolution: "Try persisting the document with valid data or remove
             the validations."
         delete_restriction:
-          message: "Cannot delete %{document} because of dependent '%{relation}'."
+          message: "Cannot destroy %{document} because of dependent '%{relation}'."
           summary: "When defining '%{relation}' with a :dependent => :restrict_with_error,
-            Mongoid will raise an error when attempting to delete the
+            Mongoid will raise an error when attempting to destroy the
             %{document} when the child '%{relation}' still has documents in it."
           resolution: "Don't attempt to delete the parent %{document} when
             it has children, or change the dependent option on the association."

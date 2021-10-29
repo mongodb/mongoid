@@ -10,8 +10,6 @@ Queries
    :depth: 2
    :class: singlecol
 
-Queries
-=======
 
 Mongoid provides a rich query DSL inspired by ActiveRecord. A trivial query
 looks as follows:
@@ -84,7 +82,7 @@ Criteria instance with the new conditions added to the existing conditions:
 
 
 Condition Syntax
-----------------
+================
 
 Mongoid supports three ways of specifying individual conditions:
 
@@ -119,7 +117,7 @@ The examples in this section use the following model definition:
   end
 
 Field Syntax
-````````````
+------------
 
 The simplest querying syntax utilizes the basic Ruby hashes. Keys can be
 symbols or strings, and correspond to field names in MongoDB documents:
@@ -138,7 +136,7 @@ symbols or strings, and correspond to field names in MongoDB documents:
   Band.where("name" => "Depeche Mode")
 
 MQL Syntax
-``````````
+----------
 
 An MQL operator may be specified on any field using the hash syntax:
 
@@ -156,7 +154,7 @@ An MQL operator may be specified on any field using the hash syntax:
   Band.where('founded' => {'$gt' => 1980})
 
 Symbol Operator Syntax
-``````````````````````
+----------------------
 
 MQL operators may be specified as methods on symbols for the respective field
 name, as follows:
@@ -171,7 +169,7 @@ name, as follows:
   #   embedded: false>
 
 Embedded Documents
-``````````````````
+==================
 
 To match values of fields of embedded documents, use the dot notation:
 
@@ -197,7 +195,7 @@ To match values of fields of embedded documents, use the dot notation:
   conditions are referencing embedded documents.
 
 Field Types
-```````````
+===========
 
 In order to query on a field, it is not necessary to add the field to
 :ref:`the model class definition <fields>`. However, if a field is defined in
@@ -221,7 +219,7 @@ the query:
   #   embedded: false>
 
 Aliases
-```````
+=======
 
 Queries take into account :ref:`storage field names <storage-field-names>`
 and :ref:`field aliases <field-aliases>`:
@@ -250,7 +248,7 @@ Since `id` and `_id` fields are aliases, either one can be used for queries:
 .. _logical-operations:
 
 Logical Operations
-------------------
+==================
 
 Mongoid supports ``and``, ``or``, ``nor`` and ``not`` logical operations on
 ``Criteria`` objects. These methods take one or more hash of conditions
@@ -307,7 +305,7 @@ The following calls all produce the same query conditions:
 
 
 Operator Combinations
-`````````````````````
+---------------------
 
 As of Mongoid 7.1, logical operators (``and``, ``or``, ``nor`` and ``not``)
 have been changed to have the the same semantics as `those of ActiveRecord
@@ -358,7 +356,7 @@ operate on the criteria built up to that point and its argument.
 
 
 ``and`` Behavior
-````````````````
+----------------
 
 The ``and`` method will add new simple conditions to the top level of the
 criteria, unless the receiving criteria already has a condition on the
@@ -379,7 +377,7 @@ the same field, depending on which form of ``and`` was used.
 
 
 ``or``/``nor`` Behavior
-```````````````````````
+_----------------------
 
 ``or`` and ``nor`` produce ``$or`` and ``$nor`` MongoDB operators, respectively,
 using the receiver and all of the arguments as operands. For example:
@@ -409,7 +407,7 @@ all of the conditions built up so far as they are.
 .. _any-of:
 
 ``any_of`` Behavior
-```````````````````
+-------------------
 
 ``any_of`` adds a disjunction built from its arguments to the existing
 conditions in the criteria. For example:
@@ -428,7 +426,7 @@ The conditions are hoisted to the top level if possible:
 
 
 ``not`` Behavior
-````````````````
+----------------
 
 ``not`` method can be called without arguments, in which case it will negate
 the next condition that is specified. ``not`` can also be called with one
@@ -494,7 +492,7 @@ caveats/limitations of ``$not`` `stated in the MongoDB server documentation
 
 
 Incremental Query Construction
-------------------------------
+==============================
 
 By default, when conditions are added to a query, Mongoid considers each
 condition complete and independent from any other conditions potentially
@@ -519,7 +517,7 @@ specified *merge strategy*.
 .. _merge-strategies:
 
 Merge Strategies
-````````````````
+----------------
 
 Mongoid provides three merge strategies:
 
@@ -529,8 +527,8 @@ Mongoid provides three merge strategies:
   same field, the values of the existing condition are intersected with the
   values of the new condition and the result is stored as the operator value.
 - **Union**: if there already is a condition using the same operator on the
-  same field, the values of the new condition are aded to the values of the
-  exsting condition and the result is stored as the operator value.
+  same field, the values of the new condition are added to the values of the
+  existing condition and the result is stored as the operator value.
 
 The following snippet demonstrates all of the strategies, using ``in`` as the
 example operator:
@@ -578,7 +576,7 @@ ignored and reset and when ``in`` was invoked the second time there was no
 strategy active.
 
 Supported Operator Methods
-``````````````````````````
+--------------------------
 
 The following operator methods support merge strategies:
 
@@ -622,7 +620,7 @@ mechanism still applies:
     embedded: false>
 
 Operator Value Expansion
-````````````````````````
+------------------------
 
 Operator methods that support merge strategies all take ``Array`` as their value
 type. Mongoid expands ``Array``-compatible types, such as a ``Range``,
@@ -654,10 +652,10 @@ removed in a future release of Mongoid.
 
 
 Query Methods
--------------
+=============
 
 elem_match
-``````````
+----------
 
 This matcher finds documents with array fields where one of the array values
 matches all of the conditions. For example:
@@ -728,11 +726,18 @@ as the following example shows:
   root.child_tags.elem_match(child_tags: {name: 'subsub1'}).to_a # => [sub1]
 
 
+.. _projection:
+
 Projection
-----------
+==========
+
+Mongoid provides two projection operators: ``only`` and ``without``.
+
+
+.. _only:
 
 ``only``
-````````
+--------
 
 The ``only`` method retrieves only the specified fields from the database. This
 operation is sometimes called "projection".
@@ -791,7 +796,7 @@ should therefore be avoided.
 
     band = Band.only(:tours, 'tours.year').last
 
-  The most recent projection specification overrided the earlier one.
+  The most recent projection specification overrides the earlier one.
   For example, the above query was equivalent to:
 
   .. code-block:: ruby
@@ -835,8 +840,11 @@ loaded with ``only`` for those associations to be loaded. For example:
   Band.where(name: 'Astral Projection').only(:name, :manager_ids).first.managers
   # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
 
+
+.. _without:
+
 ``without``
-```````````
+-----------
 
 The opposite of ``only``, ``without`` causes the specified fields to be omitted:
 
@@ -872,8 +880,10 @@ as its ``id`` alias) cannot be omitted via ``without``:
   #   embedded: false>
 
 
+.. _ordering:
+
 Ordering
---------
+========
 
 Mongoid provides the ``order`` method on ``Criteria`` objects and its alias,
 ``order_by``, to specify the ordering of documents. These methods take a
@@ -979,144 +989,71 @@ the default scope being evaluated first:
     embedded: false>
 
 
-.. _query-cache:
+Pagination
+==========
 
-Query Cache
------------
+Mongoid provides the pagination operators ``limit``, ``skip``, and ``batch_size`` on ``Criteria``.
 
-When the query cache is enabled, Mongoid will cache results for MongoDB queries
-when the entire result set is returned in a single batch (1000 documents by
-default).
+.. _limit:
 
-Each thread has its own query cache.
+``limit``
+---------
 
-When the query cache is enabled, performing most write operations (insert,
-update, replace or delete) clears the cache of the thread issuing the write.
-
-To enable the query cache manually for a code segment, use:
+``limit`` sets the total number of documents to be returned by a query:
 
 .. code-block:: ruby
 
-  Mongoid::QueryCache.cache do
-    # ...
-  end
+  Band.limit(5)
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:limit=>5}
+  #   class:    Band
+  #   embedded: false>
 
-The query cache can also be explicitly enabled and disabled, although it is
-recommended to use the block form described above:
+.. _skip:
 
-.. code-block:: ruby
+``skip``
+--------
 
-  Mongoid::QueryCache.enabled = true
-
-  # ...
-
-  Mongoid::QueryCache.enabled = false
-
-Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
-to enable the query cache automatically for each web request.
-
-The Improved Driver Query Cache
-```````````````````````````````
-
-The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
-Ruby Driver. The driver query cache is more correct and more effective, and it
-is recmomended that you upgrade to version 2.14.0 of the Ruby driver or newer.
-
-For the purposes of this tutorial, the Mongoid query cache will be called "the
-legacy query cache", and the driver query cache will be referred to as "the
-driver query cache."
-
-With driver versions 2.14.0 or newer, Mongoid will use the driver query cache
-instead of the legacy query cache. When used with older versions of the driver
-(that do not implement the query cache) Mongoid will fall back on the legacy
-query cache.
-
-Mongoid will retain the interface (described above) for enabling and disabling
-the query cache. When using driver versions 2.14.0 or newer, this interface
-will affect the driver query cache.
-
-Read more about the Ruby driver query cache
-`in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
-
-.. warning::
-
-  The legacy Mongoid query cache has been deprecated in favor of the query cache
-  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
-  query cache will continue to function, the driver query cache is
-  more correct and more effective. If you plan on using the query cache, it is
-  recommended that you upgrade to Ruby driver version 2.14.0 or newer.
-
-  Read more about the Ruby driver query cache
-  `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
-
-Legacy Query Cache Limitations
-``````````````````````````````
-
-The following is a list of limitations of the legacy query cache:
-
-* The legacy query cache does not cache query results that exceed the batch size.
-  The default batch size is 1000 documents.
-
-* The legacy query cache does not take into account read preference or read concern
-  when deciding whether to return cached results. When performing the same
-  query with a different read preference or read concern with the query cache
-  enabled, incorrect results may be returned.
-
-* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
-  do not invalidate the query cache. Cached results may be stale after performing
-  any of these operations.
-
-* Aggregation results are not cached.
-
-A Note on using ``#first``
-``````````````````````````
-
-Calling the ``first`` method on a model class imposes an ascending sort by
-the ``_id`` field on the underlying query. This may produce unexpected behavior
-with query caching.
-
-For example, when calling ``all`` on a model class and then ``first``,
-one would expect the second query to use the cached results from the first.
-However, because of the sort imposed on the second query, both methods
-will query the database and separately cache their results.
+``skip`` (alias: ``offset``) sets the number of query results to skip
+before returning documents. The ``limit`` value, if specified, will be applied
+after documents are skipped. When performing pagination, ``skip`` is recommended
+to be combined with :ref:`ordering <ordering>` to ensure consistent results.
 
 .. code-block:: ruby
 
-  Band.all.to_a
-  #=> Queries the database and caches the results
+  Band.skip(10)
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:skip=>10}
+  #   class:    Band
+  #   embedded: false>
 
-  Band.first
-  #=> Queries the database again because of the sort
+.. _batch-size:
 
-To use the cached results, call ``all.to_a.first`` on the model class.
+``batch_size``
+--------------
 
-System Collections and the Query Cache
-``````````````````````````````````````
-
-MongoDB stores system information in collections that use the ``database.system.*``
-namespace pattern. These are called system collections.
-
-Data in system collections can change due to activity not triggered by the
-application (such as internal server processes) and as a result of a variety of
-database commands issued by the application. Because of the difficulty of
-determining when the cached results for system collections should be expired,
-queries on system collections bypass the query cache.
-
-Neither the legacy query cache nor the driver query cache will cache query
-results from system collections.
+When executing large queries, or when iterating over query results with an enumerator method such as
+``Criteria#each``, Mongoid automatically uses the `MongoDB getMore command
+<https://docs.mongodb.com/manual/reference/command/getMore/>`_ to load results in batches.
+The default ``batch_size`` is 1000, however you may set it explicitly:
 
 .. code-block:: ruby
 
-  Band.all.to_a
-  #=> Queries the database and caches the results
+  Band.batch_size(500)
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:batch_size=>500}
+  #   class:    Band
+  #   embedded: false>
 
-  Band.all.to_a.first
-  #=> Returns the first cached result
-
-.. _additional-query-methods:
 
 Finding By ``_id``
-------------------
+==================
 
 Mongoid provides the ``find`` method on ``Criteria`` objects to find documents
 by their ``_id`` values:
@@ -1182,13 +1119,15 @@ option. If the option is set to ``true``, ``find`` raises
 ``Mongoid::Errors::DocumentNotFound`` if any of the ``_id``s are not found.
 If the option is set to ``false`` and ``find`` is given a single ``_id`` to
 find and there is no matching document, ``find`` returns ``nil``. If the
-option is set to ``false`` and ``find`` is given an array of ``_id``s to find
+option is set to ``false`` and ``find`` is given an array of ids to find
 and some are not found, the return value is an array of documents that were
 found (which could be empty if no documents were found at all).
 
 
+.. _additional-query-methods:
+
 Additional Query Methods
-------------------------
+========================
 
 Mongoid also has some helpful methods on criteria.
 
@@ -1222,7 +1161,7 @@ Mongoid also has some helpful methods on criteria.
    * - ``Criteria#estimated_count``
 
        *Get an approximate number of documents in the collection using the
-       collection metadta. The* ``estimated_count`` *method does not accept
+       collection metadata. The* ``estimated_count`` *method does not accept
        query conditions; if any are given, it will raise*
        ``Mongoid::Errors::InvalidEstimatedCountCriteria``.
        *If a model defines a default scope,* ``estimated_count`` *must be
@@ -1252,6 +1191,12 @@ Mongoid also has some helpful methods on criteria.
 
        *Get a list of distinct values for a single field. Note this will always hit
        the database for the distinct values.*
+       
+       *This method accepts the dot notation, thus permitting referencing
+       fields in embedded associations.*
+       
+       *This method respects :ref:`field aliases <field-aliases>`,
+       including those defined in embedded documents.*
 
      -
         .. code-block:: ruby
@@ -1259,6 +1204,18 @@ Mongoid also has some helpful methods on criteria.
           Band.distinct(:name)
           Band.where(:fans.gt => 100000).
             distinct(:name)
+
+          Band.distinct('cities.name')
+          
+          # Assuming an aliased field:
+          class Manager
+            include Mongoid::Document
+            embedded_in :band
+            field :name, as: :n
+          end
+          
+          # Expands out to "managers.name" in the query:
+          Band.distinct('managers.n')
 
    * - ``Criteria#each``
 
@@ -1405,15 +1362,27 @@ Mongoid also has some helpful methods on criteria.
 
        *Get all the values for the provided field.
        Returns nil for unset fields and for non-existent fields.*
+       
+       *This method accepts the dot notation, thus permitting referencing
+       fields in embedded associations.*
+       
+       *This method respects :ref:`field aliases <field-aliases>`,
+       including those defined in embedded documents.*
 
      -
         .. code-block:: ruby
 
           Band.all.pluck(:name)
 
+          Band.all.pluck('cities.name')
+
+          # Using the earlier definition of Manager,
+          # expands out to "managers.name" in the query:
+          Band.all.pluck('managers.n')
+
 
 Eager Loading
--------------
+=============
 
 Mongoid provides a facility to eager load documents
 from associations to prevent the n+1 issue when
@@ -1439,7 +1408,7 @@ associations.
 
 
 Regular Expressions
--------------------
+===================
 
 MongoDB, and Mongoid, allow querying documents by regular expressions.
 
@@ -1535,192 +1504,14 @@ nonexistent field ``deregistered_at`` the date was interpreted to be in UTC
 and converted to a time, matching the behavior of querying a ``Date`` field.
 
 
-Queries + Persistence
-=====================
-
-Mongoid supports persistence operations off of criteria
-in a light capacity for when you want to expressively perform multi
-document inserts, updates, and deletion.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 60
-
-   * - Operation
-     - Example
-
-   * - ``Criteria#create``
-
-       *Create a newly persisted document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").create
-
-   * - ``Criteria#create!``
-
-       *Create a newly persisted document and raise an exception on validation failure.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").create!
-
-   * - ``Criteria#build|new``
-
-       *Create a new (unsaved) document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").build
-          Band.where(name: "Photek").new
-
-   * - ``Criteria#update``
-
-       *Update attributes of the first matching document.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").update(label: "Mute")
-
-   * - ``Criteria#update_all``
-
-       *Update attributes of all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(members: 2).update_all(label: "Mute")
-
-   * - ``Criteria#add_to_set``
-
-       *Perform an $addToSet on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").add_to_set(label: "Mute")
-
-   * - ``Criteria#bit``
-
-       *Perform a $bit on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
-
-   * - ``Criteria#inc``
-
-       *Perform an $inc on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").inc(likes: 123)
-
-   * - ``Criteria#pop``
-
-       *Perform a $pop on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Photek").pop(members: -1)
-          Band.where(name: "Photek").pop(members: 1)
-
-   * - ``Criteria#pull``
-
-       *Perform a $pull on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").pull(members: "Maynard")
-
-   * - ``Criteria#pull_all``
-
-       *Perform a $pullAll on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").
-            pull_all(:members, [ "Maynard", "Danny" ])
-
-   * - ``Criteria#push``
-
-       *Perform a $push on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").push(members: "Maynard")
-
-   * - ``Criteria#push_all``
-
-       *Perform a $push with $each on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").
-            push_all(members: [ "Maynard", "Danny" ])
-
-   * - ``Criteria#rename``
-
-       *Perform a $rename on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").rename(name: :title)
-
-   * - ``Criteria#set``
-
-       *Perform a $set on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").set(likes: 10000)
-
-   * - ``Criteria#unset``
-
-       *Perform a $unset on all matching documents.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(name: "Tool").unset(:likes)
-
-   * - ``Criteria#delete``
-
-       *Deletes all matching documents in the database.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(label: "Mute").delete
-
-   * - ``Criteria#destroy``
-
-       *Deletes all matching documents in the database while running callbacks for all.
-       This loads all documents into memory and can be an expensive operation.*
-
-     -
-        .. code-block:: ruby
-
-          Band.where(label: "Mute").destroy
-
 Scoping
 =======
 
 Scopes provide a convenient way to reuse common criteria with more
 business domain style syntax.
+
+
+.. _named-scopes:
 
 Named Scopes
 ------------
@@ -1934,199 +1725,359 @@ treated like scopes, and can be chained as well.
 
   Band.active
 
-Map/Reduce
-==========
 
-Mongoid provides a DSL around MongoDB's map/reduce framework, for performing
-custom map/reduce jobs or simple aggregations.
+Queries + Persistence
+=====================
 
-Execution
----------
+Mongoid supports persistence operations off of criteria
+in a light capacity for when you want to expressively perform multi
+document inserts, updates, and deletion.
 
-You can tell Mongoid off the class or a criteria to perform a map/reduce
-by calling ``map_reduce`` and providing map and reduce javascript
-functions.
+.. warning::
 
-.. code-block:: ruby
+  Criteria ordering and pagination conditions, including ``order``, ``limit``,
+  ``offset``, and ``batch_size``, will be ignored on the following operations.
 
-  map = %Q{
-    function() {
-      emit(this.name, { likes: this.likes });
-    }
-  }
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
 
-  reduce = %Q{
-    function(key, values) {
-      var result = { likes: 0 };
-      values.forEach(function(value) {
-        result.likes += value.likes;
-      });
-      return result;
-    }
-  }
+   * - Operation
+     - Example
 
-  Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
+   * - ``Criteria#create``
 
-Just like criteria, map/reduce calls are lazily evaluated. So nothing will
-hit the database until you iterate over the results, or make a call on the
-wrapper that would need to force a database hit.
+       *Create a newly persisted document.*
 
-.. code-block:: ruby
+     -
+        .. code-block:: ruby
 
-  Band.map_reduce(map, reduce).out(replace: "mr-results").each do |document|
-    p document # { "_id" => "Tool", "value" => { "likes" => 200 }}
-  end
+          Band.where(name: "Photek").create
 
-The only required thing you provide along with a map/reduce is where to
-output the results. If you do not provide this an error will be raised.
-Valid options to ``#out`` are:
+   * - ``Criteria#create!``
 
-- ``inline: 1``: Don't store the output in a collection.
-- ``replace: "name"``: Store in a collection with the
-  provided name, and overwrite any documents that exist in it.
-- ``merge: "name"``: Store in a collection with the
-  provided name, and merge the results with the existing documents.
-- ``reduce: "name"``: Store in a collection with the
-  provided name, and reduce all existing results in that collection.
+       *Create a newly persisted document and raise an exception on validation failure.*
 
-Raw Results
------------
+     -
+        .. code-block:: ruby
 
-Results of Map/Reduce execution can be retrieved via the ``execute`` method
-or its aliases ``raw`` and ``results``:
+          Band.where(name: "Photek").create!
 
-.. code-block:: ruby
+   * - ``Criteria#build|new``
 
-  mr = Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
+       *Create a new (unsaved) document.*
 
-  mr.execute
-  # => {"results"=>[{"_id"=>"Tool", "value"=>{"likes"=>200.0}}],
-        "timeMillis"=>14,
-        "counts"=>{"input"=>4, "emit"=>4, "reduce"=>1, "output"=>1},
-        "ok"=>1.0,
-        "$clusterTime"=>{"clusterTime"=>#<BSON::Timestamp:0x00005633c2c2ad20 @seconds=1590105400, @increment=1>, "signature"=>{"hash"=><BSON::Binary:0x12240 type=generic data=0x0000000000000000...>, "keyId"=>0}},
-        "operationTime"=>#<BSON::Timestamp:0x00005633c2c2aaf0 @seconds=1590105400, @increment=1>}
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").build
+          Band.where(name: "Photek").new
+
+   * - ``Criteria#update``
+
+       *Update attributes of the first matching document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").update(label: "Mute")
+
+   * - ``Criteria#update_all``
+
+       *Update attributes of all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(members: 2).update_all(label: "Mute")
+
+   * - ``Criteria#add_to_set``
+
+       *Perform an $addToSet on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").add_to_set(label: "Mute")
+
+   * - ``Criteria#bit``
+
+       *Perform a $bit on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
+
+   * - ``Criteria#inc``
+
+       *Perform an $inc on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").inc(likes: 123)
+
+   * - ``Criteria#pop``
+
+       *Perform a $pop on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").pop(members: -1)
+          Band.where(name: "Photek").pop(members: 1)
+
+   * - ``Criteria#pull``
+
+       *Perform a $pull on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").pull(members: "Maynard")
+
+   * - ``Criteria#pull_all``
+
+       *Perform a $pullAll on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            pull_all(:members, [ "Maynard", "Danny" ])
+
+   * - ``Criteria#push``
+
+       *Perform a $push on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").push(members: "Maynard")
+
+   * - ``Criteria#push_all``
+
+       *Perform a $push with $each on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            push_all(members: [ "Maynard", "Danny" ])
+
+   * - ``Criteria#rename``
+
+       *Perform a $rename on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").rename(name: :title)
+
+   * - ``Criteria#set``
+
+       *Perform a $set on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").set(likes: 10000)
+
+   * - ``Criteria#unset``
+
+       *Perform a $unset on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").unset(:likes)
+
+   * - ``Criteria#delete``
+
+       *Deletes all matching documents in the database.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").delete
+
+   * - ``Criteria#destroy``
+
+       *Deletes all matching documents in the database while running callbacks for all.
+       This loads all documents into memory and can be an expensive operation.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").destroy
 
 
-Statistics
-----------
+.. _query-cache:
 
-MongoDB servers 4.2 and lower provide Map/Reduce execution statistics. As of
-MongoDB 4.4, Map/Reduce is implemented via the aggregation pipeline and
-statistics described in this section are not available.
-
-The following methods are provided on the ``MapReduce`` object:
-
-- ``counts``: Number of documents read, emitted, reduced and output through
-  the pipeline.
-- ``input``, ``emitted``, ``reduced``, ``output``: individual count methods.
-  Note that ``emitted`` and ``reduced`` methods are named differently from
-  hash keys in ``counts``.
-- ``time``: The time, in milliseconds, that Map/Reduce pipeline took to execute.
-
-The following code illustrates retrieving the statistics:
-
-.. code-block:: ruby
-
-  mr = Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
-
-  mr.counts
-  # => {"input"=>4, "emit"=>4, "reduce"=>1, "output"=>1}
-
-  mr.input
-  # => 4
-
-  mr.emitted
-  # => 4
-
-  mr.reduced
-  # => 1
-
-  mr.output
-  # => 1
-
-  mr.time
-  # => 14
-
-.. note::
-
-  Each statistics method invocation re-executes the Map/Reduce pipeline.
-  The results of execution are not stored by Mongoid. Consider using the
-  ``execute`` method to retrieve the raw results and obtaining the statistics
-  from the raw results if multiple statistics are desired.
-
-
-.. _text-search:
-
-Text Search
+Query Cache
 ===========
 
-MongoDB provides :manual:`text indexes </core/index-text/>`
-to support text search queries on string content. Text indexes
-can include any field whose value is a string or an array of
-string elements.
+Mongoid and the underlying Ruby MongoDB driver provide query caching
+functionality. When enabled, the query cache saves the results of
+previously executed find and aggregation queries and reuses them in
+the future instead of performing the queries again, thus increasing
+application performance and reducing database load.
 
-.. note::
+The query cache has historically been provided by Mongoid but as of driver
+version 2.14.0, the query cache implementation has been moved into the driver.
+When Mongoid is used with driver version 2.14.0 or later, Mongoid delegates
+all work to the driver's query cache implementation. When Mongoid is used
+with driver versions 2.13.x and earlier, Mongoid utilizes its own, legacy,
+query cache implementation.
 
-  MongoDB Atlas also provides
-  `Atlas Search <https://docs.atlas.mongodb.com/atlas-search/>`_
-  which is a more powerful and flexible text search solution.
-  The rest of this section discusses text indexes and not Atlas Search.
+Please review the `driver query cache documentation
+<https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_
+for details about the driver's query cache behavior.
 
-To perform text search with Mongoid, follow these steps:
+.. warning::
 
-1. Define a text index on a model.
-2. Create the text index on the server.
-3. Build a text search query.
+  The legacy query cache implementation that Mongoid uses when it detects
+  driver version 2.13.x and earlier has a number of limitations and
+  known issues, some of which are severe. If you wish to use the query cache,
+  it is strongly recommended to use driver 2.14.0 or later. The limitations
+  of the legacy Mongoid query cache are :ref:`described below
+  <legacy-query-cache-limitations>`.
+
+The rest of this section assumes that driver 2.14.0 or later is being used and
+Mongoid delegates to the driver's query cache.
 
 
-Defining Text Search Index
---------------------------
+Enabling Query Cache
+--------------------
 
-Index definition through Mongoid is described in detail on the `indexes
-<mongoid-indexes>`_ page. Text search indexes are described in detail
-under `text indexes <https://docs.mongodb.com/manual/core/index-text/>`_
-in the MongoDB manual. Below is an example definition of a Band model with
-a text index utilizing the description field:
+The query cache may be enabled by using the driver's namespace or Mongoid's
+namespace.
+
+
+.. _enabling-query-cache-via-middleware:
+
+Enabling Query Cache Via Middleware
+-----------------------------------
+
+Applications that utilize a Rack-based web framework (Rails, etc.) can
+take advantage of the Rack middleware provided by Mongoid to automatically
+enable the query cache for each web request, and clear the query cache after
+each request completes. Please see the :ref:`Query Cache Rack Middleware
+<query-cache-middleware>` section on the configuration page for instructions.
+
+Note that the Query Cache Middleware does not apply to code executed
+outside web requests.
+
+
+.. _enabling-query-cache-manually:
+
+Enabling Query Cache Manually
+-----------------------------
+
+To enable the Query Cache manually for a code segment, use:
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-
-    field :name, type: String
-    field :description, type: String
-
-    index description: 'text'
+  Mongoid::QueryCache.cache do
+    # ...
   end
 
-Note that the index type (``text``) must be given as a string, not as a symbol.
-
-
-Creating Text Index
--------------------
-
-To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
+The Query Cache can also be explicitly enabled and disabled, although we
+recommend to use the block form described above:
 
 .. code-block:: ruby
 
-  bundle exec rake db:mongoid:create_indexes
+  Mongoid::QueryCache.enabled = true
 
+  # ...
 
-Querying Using Text Index
--------------------------
+  Mongoid::QueryCache.enabled = false
 
-To find bands whose description contains "ounces" or its variations, use the
-`$text operator <https://docs.mongodb.com/manual/reference/operator/query/text/#op._S_text>`_:
+Alternatively, you can reference the driver's query cache module directly:
 
 .. code-block:: ruby
 
-  Band.where('$text' => {'$search' => 'ounces'}).to_a
-  # => [#<Band _id: 5d5341b3ce4ef35d5016746d, name: "foo", description: "ounce">]
+  Mongo::QueryCache.cache do
+    # ...
+  end
 
-Note that the description contains the word "ounce" even though the search
-query was "ounces".
+  Mongo::QueryCache.enabled = true
 
-Note also that when performing text search, the name of the field is not
-explicitly specified - ``$text`` operator searches all fields indexed with
-the text index.
+  Mongo::QueryCache.enabled = true
+
+
+Query Cache Shared With Driver
+------------------------------
+
+When Mongoid delegates to the driver's query cache, the same cache is used
+by both Mongoid and the driver. For example, the following two queries
+are implemented via the same server query and only the first of them
+would be sent to the server:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.cache do
+    Band.first
+    Band.collection.find.sort(_id: 1).first
+  end
+
+Similarly, write operations that clear the cache would do so when the read
+is performed by the driver and write by Mongoid, or vice versa:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.cache do
+    Band.first
+    Band.collection.insert_one({})
+    # Queries again
+    Band.first
+  end
+
+
+.. _query-cache-first-method:
+
+Caching the Result of ``#first``
+--------------------------------
+
+Calling the ``first`` method on a model class imposes an ascending sort by
+the ``_id`` field on the underlying query. This may produce unexpected behavior
+with query caching.
+
+For example, when calling ``all`` on a model class and then ``first``,
+one would expect the second query to use the cached results from the first.
+However, because of the sort imposed on the second query, both methods
+will query the database and separately cache their results.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.first
+  #=> Queries the database again because of the sort
+
+To use the cached results, call ``all.to_a.first`` on the model class.
+
+
+.. _legacy-query-cache-limitations:
+
+Legacy Query Cache Limitations
+------------------------------
+
+When Mongoid uses its legacy query cache due to driver version being older
+than 2.14.0, the following limitations apply:
+
+* The query cache does not cache query results that exceed the batch size.
+  The default batch size is 1000 documents (refer to :ref:`batch_size <batch-size>`.)
+
+* The query cache does not take into account read preference or read concern
+  when deciding whether to return cached results. When performing the same
+  query with a different read preference or read concern with the query cache
+  enabled, incorrect results may be returned.
+
+* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
+  do not invalidate the query cache. Cached results may be stale after performing
+  any of these operations.
+
+* Aggregation results are not cached.

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -45,7 +44,7 @@ describe Mongoid::Persistable::Logical do
       end
 
       let(:person) do
-        Person.create(age: 60, score: 60, inte: 60)
+        Person.create!(age: 60, score: 60, inte: 60)
       end
 
       context "when provided string fields" do
@@ -111,11 +110,11 @@ describe Mongoid::Persistable::Logical do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "t", number: 60, no: 60, house: 60)
+        person.addresses.create!(street: "t", number: 60, no: 60, house: 60)
       end
 
       context "when provided string fields" do
@@ -146,7 +145,7 @@ describe Mongoid::Persistable::Logical do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(age: 10, score: 100)
+        Person.create!(age: 10, score: 100)
       end
 
       it "marks a dirty change for the modified fields" do

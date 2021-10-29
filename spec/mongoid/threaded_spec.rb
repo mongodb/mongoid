@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -19,7 +18,7 @@ describe Mongoid::Threaded do
       described_class.stack("load").clear
     end
 
-    it "adds a boolen to the load stack" do
+    it "adds a boolean to the load stack" do
       expect(described_class.stack("load")).to eq([ true ])
     end
   end
@@ -104,7 +103,7 @@ describe Mongoid::Threaded do
       described_class.stack("load").clear
     end
 
-    it "removes a boolen from the stack" do
+    it "removes a boolean from the stack" do
       expect(described_class.stack("load")).to be_empty
     end
   end

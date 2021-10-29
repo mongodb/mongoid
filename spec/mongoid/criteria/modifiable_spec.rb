@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -133,9 +132,9 @@ describe Mongoid::Criteria::Modifiable do
       end
 
       before do
-        Person.create(title: "Madam")
+        Person.create!(title: "Madam")
         2.times do |n|
-          Person.create(
+          Person.create!(
             title: "Sir",
             name: name,
             addresses: [ address_one, address_two ]
@@ -220,7 +219,7 @@ describe Mongoid::Criteria::Modifiable do
       context "when providing an attribute" do
 
         let!(:person) do
-          Person.create(title: "Senior")
+          Person.create!(title: "Senior")
         end
 
         it "returns the document" do
@@ -233,11 +232,11 @@ describe Mongoid::Criteria::Modifiable do
         context "with an owner with a BSON identity type" do
 
           let!(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:game) do
-            Game.create(person: person)
+            Game.create!(person: person)
           end
 
           context "when providing the object directly" do
@@ -266,11 +265,11 @@ describe Mongoid::Criteria::Modifiable do
         context "with an owner with an Integer identity type" do
 
           let!(:jar) do
-            Jar.create
+            Jar.create!
           end
 
           let!(:cookie) do
-            Cookie.create(jar: jar)
+            Cookie.create!(jar: jar)
           end
 
           let(:from_db) do
@@ -289,11 +288,11 @@ describe Mongoid::Criteria::Modifiable do
       context "when providing a document" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:game) do
-          Game.create
+          Game.create!
         end
 
         let(:from_db) do
@@ -373,7 +372,7 @@ describe Mongoid::Criteria::Modifiable do
       context "when providing an attribute" do
 
         let!(:person) do
-          Person.create(title: "Senior")
+          Person.create!(title: "Senior")
         end
 
         it "returns the document" do
@@ -386,11 +385,11 @@ describe Mongoid::Criteria::Modifiable do
         context "with an owner with a BSON identity type" do
 
           let!(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:game) do
-            Game.create(person: person)
+            Game.create!(person: person)
           end
 
           context "when providing the object directly" do
@@ -419,11 +418,11 @@ describe Mongoid::Criteria::Modifiable do
         context "with an owner with an Integer identity type" do
 
           let!(:jar) do
-            Jar.create
+            Jar.create!
           end
 
           let!(:cookie) do
-            Cookie.create(jar: jar)
+            Cookie.create!(jar: jar)
           end
 
           let(:from_db) do
@@ -442,11 +441,11 @@ describe Mongoid::Criteria::Modifiable do
       context "when providing a document" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:game) do
-          Game.create
+          Game.create!
         end
 
         let(:from_db) do
@@ -541,7 +540,7 @@ describe Mongoid::Criteria::Modifiable do
     context "when the document is found" do
 
       let!(:person) do
-        Person.create(title: "Senior")
+        Person.create!(title: "Senior")
       end
 
       it "returns the document" do
@@ -611,7 +610,7 @@ describe Mongoid::Criteria::Modifiable do
   describe "first_or_create" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     context "when the document is found" do
@@ -724,7 +723,7 @@ describe Mongoid::Criteria::Modifiable do
 
           let(:band) do
             record = Record.new(producers: ['testing'])
-            band = Band.create(records: [record])
+            band = Band.create!(records: [record])
           end
 
           let(:document) do
@@ -752,7 +751,7 @@ describe Mongoid::Criteria::Modifiable do
         context 'when the criteria has a deeply-nested selector with query operators' do
 
           let(:criteria) do
-            band = Band.create
+            band = Band.create!
             Mongoid::Criteria.new(Record) do |criteria|
               criteria.embedded = true
               criteria.association = Band.reflect_on_association(:records)
@@ -793,7 +792,7 @@ describe Mongoid::Criteria::Modifiable do
       context "when the criteria is on an embedded relation" do
 
         let!(:band) do
-          Band.create(name: "Placebo")
+          Band.create!(name: "Placebo")
         end
 
         let(:document) do
@@ -1076,7 +1075,7 @@ describe Mongoid::Criteria::Modifiable do
   describe "first_or_initialize" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     context "when the document is found" do
@@ -1250,11 +1249,11 @@ describe Mongoid::Criteria::Modifiable do
     end
 
     let!(:address_one) do
-      person.addresses.create(street: "Oranienstr")
+      person.addresses.create!(street: "Oranienstr")
     end
 
     let!(:address_two) do
-      person.addresses.create(street: "Wienerstr")
+      person.addresses.create!(street: "Wienerstr")
     end
 
     context "when updating the root document" do
@@ -1395,11 +1394,11 @@ describe Mongoid::Criteria::Modifiable do
         end
 
         let!(:preference_one) do
-          person.preferences.create(name: "First")
+          person.preferences.create!(name: "First")
         end
 
         let!(:preference_two) do
-          person.preferences.create(name: "Second")
+          person.preferences.create!(name: "Second")
         end
 
         context "when updating the relation directly" do
@@ -1438,15 +1437,15 @@ describe Mongoid::Criteria::Modifiable do
   describe "#update_all" do
 
     let!(:person) do
-      Person.create(title: "Sir")
+      Person.create!(title: "Sir")
     end
 
     let!(:address_one) do
-      person.addresses.create(street: "Oranienstr")
+      person.addresses.create!(street: "Oranienstr")
     end
 
     let!(:address_two) do
-      person.addresses.create(street: "Wienerstr")
+      person.addresses.create!(street: "Wienerstr")
     end
 
     context "when updating the root document" do
@@ -1545,11 +1544,11 @@ describe Mongoid::Criteria::Modifiable do
       context "when the relation is a references many" do
 
         let!(:post_one) do
-          person.posts.create(title: "First")
+          person.posts.create!(title: "First")
         end
 
         let!(:post_two) do
-          person.posts.create(title: "Second")
+          person.posts.create!(title: "Second")
         end
 
         context "when updating the relation directly" do
@@ -1598,11 +1597,11 @@ describe Mongoid::Criteria::Modifiable do
         end
 
         let!(:preference_one) do
-          person.preferences.create(name: "First")
+          person.preferences.create!(name: "First")
         end
 
         let!(:preference_two) do
-          person.preferences.create(name: "Second")
+          person.preferences.create!(name: "Second")
         end
 
         context "when updating the relation directly" do

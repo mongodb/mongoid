@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Errors
@@ -19,8 +18,6 @@ module Mongoid
       #   error.compose_message
       #
       # @return [ String ] The composed message.
-      #
-      # @since 3.0.0
       def compose_message(key, attributes = {})
         @problem = translate_problem(key, attributes)
         @summary = translate_summary(key, attributes)
@@ -48,7 +45,7 @@ module Mongoid
       #
       # @return [ String ] A localized error message string.
       def translate(key, options)
-        ::I18n.translate("#{BASE_KEY}.#{key}", options)
+        ::I18n.translate("#{BASE_KEY}.#{key}", **options)
       end
 
       # Create the problem.
@@ -60,8 +57,6 @@ module Mongoid
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The problem.
-      #
-      # @since 3.0.0
       def translate_problem(key, attributes)
         translate("#{key}.message", attributes)
       end
@@ -75,8 +70,6 @@ module Mongoid
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The summary.
-      #
-      # @since 3.0.0
       def translate_summary(key, attributes)
         translate("#{key}.summary", attributes)
       end
@@ -90,8 +83,6 @@ module Mongoid
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The resolution.
-      #
-      # @since 3.0.0
       def translate_resolution(key, attributes)
         translate("#{key}.resolution", attributes)
       end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -36,7 +35,7 @@ describe Mongoid::Timestamps::Created do
   context "when the document is created" do
 
     let(:quiz) do
-      Quiz.create
+      Quiz.create!
     end
 
     it "runs the created callbacks" do

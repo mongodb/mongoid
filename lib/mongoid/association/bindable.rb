@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -18,8 +17,6 @@ module Mongoid
       # @param [ Document ] base The base of the binding.
       # @param [ Document, Array<Document> ] target The target of the binding.
       # @param [ Association ] association The association metadata.
-      #
-      # @since 2.0.0.rc.1
       def initialize(base, target, association)
         @_base, @_target, @_association = base, target, association
       end
@@ -32,8 +29,6 @@ module Mongoid
       #   end
       #
       # @return [ Object ] The result of the yield.
-      #
-      # @since 3.0.0
       def binding
         unless _binding?
           _binding do
@@ -54,8 +49,6 @@ module Mongoid
       # @param [ Document ] doc The document getting bound.
       #
       # @raise [ Errors::InverseNotFound ] If no inverse found.
-      #
-      # @since 3.0.0
       def check_inverse!(doc)
         unless _association.bindable?(doc)
           raise Errors::InverseNotFound.new(
@@ -77,8 +70,6 @@ module Mongoid
       #
       # @param [ Document ] keyed The document that stores the foreign key.
       # @param [ Object ] id The id of the bound document.
-      #
-      # @since 3.0.0
       def bind_foreign_key(keyed, id)
         unless keyed.frozen?
           keyed.you_must(_association.foreign_key_setter, id)
@@ -95,8 +86,6 @@ module Mongoid
       #
       # @param [ Document ] typed The document that stores the type field.
       # @param [ String ] name The name of the model.
-      #
-      # @since 3.0.0
       def bind_polymorphic_type(typed, name)
         if _association.type
           typed.you_must(_association.type_setter, name)
@@ -113,8 +102,6 @@ module Mongoid
       #
       # @param [ Document ] typed The document that stores the type field.
       # @param [ String ] name The name of the model.
-      #
-      # @since 3.0.0
       def bind_polymorphic_inverse_type(typed, name)
         if _association.inverse_type
           typed.you_must(_association.inverse_type_setter, name)
@@ -131,8 +118,6 @@ module Mongoid
       #
       # @param [ Document ] doc The base document.
       # @param [ Document ] inverse The inverse document.
-      #
-      # @since 3.0.0
       def bind_inverse(doc, inverse)
         if doc.respond_to?(_association.inverse_setter)
           doc.you_must(_association.inverse_setter, inverse)
@@ -147,8 +132,6 @@ module Mongoid
       #   binding.bind_from_relational_parent(doc)
       #
       # @param [ Document ] doc The document to bind.
-      #
-      # @since 3.0.0
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
         bind_foreign_key(doc, record_id(_base))
@@ -170,8 +153,6 @@ module Mongoid
       #   binding.set_base_association
       #
       # @return [ true, false ] If the association changed.
-      #
-      # @since 2.4.4
       def set_base_association
         inverse_association = _association.inverse_association(_target)
         if inverse_association != _association && !inverse_association.nil?
@@ -187,8 +168,6 @@ module Mongoid
       #   unbinding.unbind_from_relational_parent(doc)
       #
       # @param [ Document ] doc The document to unbind.
-      #
-      # @since 3.0.0
       def unbind_from_relational_parent(doc)
         check_inverse!(doc)
         bind_foreign_key(doc, nil)

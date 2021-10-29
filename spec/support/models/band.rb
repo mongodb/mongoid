@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 class Band
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
+
   field :name, type: String
   field :active, type: Mongoid::Boolean, default: true
   field :origin, type: String
@@ -26,6 +26,9 @@ class Band
   embeds_many :labels
   embeds_one :label, cascade_callbacks: true
 
+  scope :highly_rated, -> { gte(rating: 7) }
+
+  has_many :artists
   has_many :same_name, class_name: 'Agent', inverse_of: :same_name
 
   after_upsert do |doc|

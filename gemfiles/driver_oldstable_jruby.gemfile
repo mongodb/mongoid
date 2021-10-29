@@ -3,11 +3,9 @@ source "https://rubygems.org"
 # Due to https://github.com/jruby/jruby/issues/5292 /
 # https://github.com/bundler/bundler/issues/6678 we cannot test unreleased
 # bson with JRuby, just test the driver then
-gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.12-stable'
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.14-stable'
 
-gem 'actionpack', '~> 5.1'
-gem 'activemodel', '~> 5.1'
-
+gem 'actionpack'
 # https://github.com/jruby/jruby/issues/6573
 gem 'i18n', '~> 1.0', '< 1.8.8'
 

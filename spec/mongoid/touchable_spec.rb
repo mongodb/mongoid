@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 require_relative './touchable_spec_models'
@@ -132,6 +131,24 @@ describe Mongoid::Touchable do
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
         include_examples 'updates the parent when :touch is not set'
+
+        context 'when also updating an additional field' do
+          it 'persists the update to the additional field' do
+            entrance
+            update_time
+            entrance.touch(:last_used_at)
+
+            entrance.reload
+            building.reload
+
+            # This is the assertion we want.
+            entrance.last_used_at.should == update_time
+
+            # Check other timestamps for good measure.
+            entrance.updated_at.should == update_time
+            building.updated_at.should == update_time
+          end
+        end
       end
 
       context "when the document is referenced" do
@@ -153,7 +170,7 @@ describe Mongoid::Touchable do
       context "when no updated at is defined" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when no attribute is provided" do
@@ -213,7 +230,7 @@ describe Mongoid::Touchable do
       context "when an updated at is defined" do
 
         let!(:agent) do
-          Agent.create(updated_at: 2.days.ago)
+          Agent.create!(updated_at: 2.days.ago)
         end
 
         context "when no attribute is provided" do
@@ -313,11 +330,7 @@ describe Mongoid::Touchable do
         end
 
         let(:frozen_error_cls) do
-          if RUBY_VERSION >= '2.5'
-            FrozenError
-          else
-            RuntimeError
-          end
+          FrozenError
         end
 
         context "when no attribute is provided" do

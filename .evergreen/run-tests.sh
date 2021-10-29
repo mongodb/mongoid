@@ -6,12 +6,11 @@ set -o errexit  # Exit the script with error if any of the commands fail
 # Supported/used environment variables:
 #       MONGODB_URI             Set the suggested connection MONGODB_URI (including credentials and topology info)
 #       RVM_RUBY                Define the Ruby version to test with, using its RVM identifier.
-#                               For example: "ruby-2.7" or "jruby-9.2"
+#                               For example: "ruby-3.0" or "jruby-9.2"
 
 . `dirname "$0"`/../spec/shared/shlib/distro.sh
 . `dirname "$0"`/../spec/shared/shlib/set_env.sh
 . `dirname "$0"`/../spec/shared/shlib/server.sh
-. `dirname "$0"`/functions.sh
 . `dirname "$0"`/functions.sh
 
 arch=`host_distro`
@@ -34,6 +33,13 @@ calculate_server_args
 launch_server "$dbdir"
 
 uri_options="$URI_OPTIONS"
+
+# This is needed because of ruby 3.0.0.
+# We should remove this when moving to 3.0.1
+# See https://jira.mongodb.org/browse/MONGOID-5115
+if test "$RVM_RUBY" = "ruby-3.0"; then
+  gem update --system
+fi
 
 which bundle
 bundle --version
@@ -86,6 +92,7 @@ export BUNDLE_GEMFILE
 
 export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite&$uri_options"
 
+set +e
 if test -n "$TEST_CMD"; then
   eval $TEST_CMD
 elif test -n "$TEST_I18N_FALLBACKS"; then
@@ -103,4 +110,14 @@ else
   bundle exec rake ci
 fi
 
+test_status=$?
+echo "TEST STATUS: ${test_status}"
+set -e
+
+if test -f tmp/rspec-all.json; then
+  mv tmp/rspec-all.json tmp/rspec.json
+fi
+
 python -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
+
+exit ${test_status}

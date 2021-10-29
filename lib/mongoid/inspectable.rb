@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
-  # Contains the bahvior around inspecting documents via inspect.
-  #
-  # @since 4.0.0
+  # Contains the behavior around inspecting documents via inspect.
   module Inspectable
 
     # Returns the class name plus its attributes. If using dynamic fields will
@@ -15,8 +12,6 @@ module Mongoid
     #   person.inspect
     #
     # @return [ String ] A nice pretty string to look at.
-    #
-    # @since 1.0.0
     def inspect
       inspection = []
       inspection.concat(inspect_fields).concat(inspect_dynamic_fields)
@@ -33,8 +28,6 @@ module Mongoid
     #   document.inspect_fields
     #
     # @return [ String ] An array of pretty printed field values.
-    #
-    # @since 1.0.0
     def inspect_fields
       fields.map do |name, field|
         unless name == "_id"
@@ -52,8 +45,6 @@ module Mongoid
     #   document.inspect_dynamic_fields
     #
     # @return [ String ] An array of pretty printed dynamic field values.
-    #
-    # @since 1.0.0
     def inspect_dynamic_fields
       []
     end

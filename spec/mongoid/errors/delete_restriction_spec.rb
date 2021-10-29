@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -13,7 +12,7 @@ describe Mongoid::Errors::DeleteRestriction do
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "Cannot delete Person because of dependent 'drugs'."
+        "Cannot destroy Person because of dependent 'drugs'."
       )
     end
 

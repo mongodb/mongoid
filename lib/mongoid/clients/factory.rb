@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Clients
     module Factory
       extend self
+      extend Loggable
 
       # Create a new client given the named configuration. If no name is
       # provided, return a new client with the default configuration. If a
@@ -19,8 +19,6 @@ module Mongoid
       # @raise [ Errors::NoClientConfig ] If no config could be found.
       #
       # @return [ Mongo::Client ] The new client.
-      #
-      # @since 3.0.0
       def create(name = nil)
         return default unless name
         config = Mongoid.clients[name]
@@ -37,8 +35,6 @@ module Mongoid
       #   found.
       #
       # @return [ Mongo::Client ] The default client.
-      #
-      # @since 3.0.0
       def default
         create_client(Mongoid.clients[:default])
       end
@@ -55,16 +51,22 @@ module Mongoid
       # @param [ Hash ] configuration The client config.
       #
       # @return [ Mongo::Client ] The client.
-      #
-      # @since 3.0.0
       def create_client(configuration)
         raise Errors::NoClientsConfig.new unless configuration
-        if configuration[:uri]
-          Mongo::Client.new(configuration[:uri], options(configuration))
+        config = configuration.dup
+        uri = config.delete(:uri)
+        database = config.delete(:database)
+        hosts = config.delete(:hosts)
+        opts = config.delete(:options) || {}
+        unless config.empty?
+          default_logger.warn("Unknown config options detected: #{config}.")
+        end
+        if uri
+          Mongo::Client.new(uri, options(opts))
         else
           Mongo::Client.new(
-            configuration[:hosts],
-            options(configuration).merge(database: configuration[:database])
+            hosts,
+            options(opts).merge(database: database)
           )
         end
       end
@@ -78,9 +80,14 @@ module Mongoid
         Mongo::VERSION.split('.')[0...2].map(&:to_i)
       end
 
-      def options(configuration)
-        config = configuration.dup
-        options = config.delete(:options) || {}
+      # Prepare options for Mongo::Client based on Mongoid client configuration.
+      #
+      # @param [ Hash ] opts Parameters from options section of Mongoid client configuration.
+      # @return [ Hash ] Options that should be passed to Mongo::Client constructor.
+      #
+      # @api private
+      def options(opts)
+        options = opts.dup
         options[:platform] = PLATFORM_DETAILS
         options[:app_name] = Mongoid::Config.app_name if Mongoid::Config.app_name
         if (driver_version <=> [2, 13]) >= 0
@@ -91,7 +98,7 @@ module Mongoid
           end
           options[:wrapping_libraries] = wrap_lib
         end
-        options.reject{ |k, v| k == :hosts }.to_hash.symbolize_keys!
+        options.reject{ |k, _v| k == :hosts }.to_hash.symbolize_keys!
       end
     end
   end

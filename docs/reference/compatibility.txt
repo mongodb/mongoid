@@ -1,6 +1,6 @@
-************
-Installation
-************
+*************
+Compatibility
+*************
 
 .. default-domain:: mongodb
 
@@ -10,41 +10,6 @@ Installation
    :depth: 2
    :class: singlecol
 
-Install the Gem
-===============
-
-Mongoid is bundled as a gem, and is `hosted on Rubygems
-<https://rubygems.org/gems/mongoid>`_.
-It can be installed manually or with bundler.
-
-To install the gem manually:
-
-.. code-block:: sh
-
-    gem install mongoid
-
-To install the gem with bundler, include the following in your ``Gemfile``:
-
-.. code-block:: ruby
-
-   gem 'mongoid', '~> 7.3.0'
-
-Using Mongoid with a New Rails Application
-==========================================
-
-When creating a new Rails application and wish to use Mongoid for
-data access, give the ``--skip-active-record`` flag to the ``rails new``
-command to avoid depending on and configuring ActiveRecord..
-
-Using Mongoid with an Existing Rails Application
-================================================
-
-When converting an existing Rails application to use Mongoid for data access,
-the ``config/application.rb`` file needs to be updated to remove the
-``require 'rails/all'`` line and explicitly include the required frameworks
-(which could be all of the frameworks provided by Rails with the exception of
-ActiveRecord). Any references to ActiveRecord in files in the ``config``
-directory and in the models also need to be removed.
 
 Ruby MongoDB Driver Compatibility
 =================================
@@ -66,8 +31,16 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.14-2.10
+     - Driver 2.16-2.10
      - Driver 2.9-2.7
+
+   * - 7.5
+     - |checkmark|
+     -
+
+   * - 7.4
+     - |checkmark|
+     -
 
    * - 7.3
      - |checkmark|
@@ -88,6 +61,7 @@ specified Mongoid versions.
    * - 6.4
      - |checkmark|
      - |checkmark|
+
 
 Ruby Compatibility
 ==================
@@ -111,8 +85,18 @@ is deprecated.
      - Ruby 2.2
      - JRuby 9.2
 
-   * - 7.3
+   * - 7.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
      -
+     -
+     -
+     - |checkmark|
+
+   * - 7.3
+     - |checkmark| [#mongoid-7.3-ruby-3.0]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -122,7 +106,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.2
-     -
+     - |checkmark| [#mongoid-7.2-ruby-3.0]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -132,7 +116,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.1
-     -
+     - |checkmark| [#mongoid-7.1-ruby-3.0]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -161,9 +145,16 @@ is deprecated.
      - |checkmark| [#ruby-2.2]_
      - |checkmark|
 
+.. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.2 or higher is required.
+
+.. [#mongoid-7.2-ruby-3.0] Mongoid version 7.2.5 or higher is required.
+
+.. [#mongoid-7.1-ruby-3.0] Mongoid version 7.1.10 or higher is required.
+
 .. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
 
 .. [#ruby-2.2] Ruby version 2.2.2 or higher is required.
+
 
 MongoDB Server Compatibility
 ============================
@@ -183,6 +174,7 @@ for driver compatibility matrices.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - MongoDB 5.0
      - MongoDB 4.4
      - MongoDB 4.2
      - MongoDB 4.0
@@ -192,7 +184,19 @@ for driver compatibility matrices.
      - MongoDB 3.0
      - MongoDB 2.6
 
+   * - 7.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
    * - 7.3
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -211,8 +215,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
 
    * - 7.1
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -231,8 +237,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
 
    * - 6.4
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -264,19 +272,27 @@ are supported by Mongoid.
      - Rails 5.0
      - Rails 4.2
 
+   * - 7.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
+     -
+     -
+
    * - 7.3
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
      -
      -
 
    * - 7.2
      - |checkmark| [#rails-6.1]_
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
      -
      -
 
@@ -351,6 +367,8 @@ are supported by Mongoid.
      -
      -
      - |checkmark|
+
+.. [#rails-5-ruby-3.0] Using Rails 5.x with Ruby 3 is not supported.
 
 .. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
 

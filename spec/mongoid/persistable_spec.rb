@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -10,7 +9,7 @@ describe Mongoid::Persistable do
   describe "#atomically" do
 
     let(:document) do
-      Band.create(member_count: 0, likes: 60, origin: "London")
+      Band.create!(member_count: 0, likes: 60, origin: "London")
     end
 
     context "when providing a block" do
@@ -178,8 +177,8 @@ describe Mongoid::Persistable do
 
         before do
           class Band
-            def my_updates(*args)
-              atomically(*args) do |d|
+            def my_updates(**args)
+              atomically(**args) do |d|
                 d.set(name: "Placebo")
                 d.unset(:origin)
               end

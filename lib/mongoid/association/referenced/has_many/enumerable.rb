@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -30,8 +29,6 @@ module Mongoid
           # @param [ Enumerable ] other The other enumerable.
           #
           # @return [ true, false ] If the objects are equal.
-          #
-          # @since 2.1.0
           def ==(other)
             return false unless other.respond_to?(:entries)
             entries == other.entries
@@ -46,8 +43,6 @@ module Mongoid
           # @param [ Object ] other The object to check.
           #
           # @return [ true, false ] If the objects are equal in a case.
-          #
-          # @since 3.1.4
           def ===(other)
             other.class == Class ? (Array == other || Enumerable == other) : self == other
           end
@@ -60,8 +55,6 @@ module Mongoid
           # @param [ Document ] document The document to append.
           #
           # @return [ Document ] The document.
-          #
-          # @since 2.1.0
           def <<(document)
             _added[document._id] = document
             self
@@ -81,8 +74,6 @@ module Mongoid
           #   end
           #
           # @return [ Array<Document> ] The cleared out _added docs.
-          #
-          # @since 2.1.0
           def clear
             if block_given?
               in_memory { |doc| yield(doc) }
@@ -98,8 +89,6 @@ module Mongoid
           #   enumerable.clone
           #
           # @return [ Array<Document> ] An array clone of the enumerable.
-          #
-          # @since 2.1.6
           def clone
             collect { |doc| doc.clone }
           end
@@ -112,8 +101,6 @@ module Mongoid
           # @param [ Document ] document The document to delete.
           #
           # @return [ Document ] The deleted document.
-          #
-          # @since 2.1.0
           def delete(document)
             doc = (_loaded.delete(document._id) || _added.delete(document._id))
             unless doc
@@ -137,8 +124,6 @@ module Mongoid
           #   end
           #
           # @return [ Array<Document> ] The remaining docs.
-          #
-          # @since 2.1.0
           def delete_if(&block)
             load_all!
             deleted = in_memory.select(&block)
@@ -172,8 +157,6 @@ module Mongoid
           #   a = enumerable.each
           #
           # @return [ true ] That the enumerable is now _loaded.
-          #
-          # @since 2.1.0
           def each
             unless block_given?
               return to_enum
@@ -205,13 +188,11 @@ module Mongoid
           #   enumerable.empty?
           #
           # @return [ true, false ] If the enumerable is empty.
-          #
-          # @since 2.1.0
           def empty?
             if _loaded?
-              in_memory.count == 0
+              in_memory.empty?
             else
-              _unloaded.count + _added.count == 0
+              _added.empty? && !_unloaded.exists?
             end
           end
 
@@ -242,11 +223,7 @@ module Mongoid
           def any?(*args)
             return super if args.any? || block_given?
 
-            if _loaded?
-              in_memory.length > 0
-            else
-              _unloaded.exists? || _added.length > 0
-            end
+            !empty?
           end
 
           # Get the first document in the enumerable. Will check the persisted
@@ -266,8 +243,6 @@ module Mongoid
           # @option opts [ :none ] :id_sort Don't apply a sort on _id.
           #
           # @return [ Document ] The first document found.
-          #
-          # @since 2.1.0
           def first(opts = {})
             _loaded.try(:values).try(:first) ||
                 _added[(ul = _unloaded.try(:first, opts)).try(:_id)] ||
@@ -284,8 +259,6 @@ module Mongoid
           #   Enumerable.new([ post ])
           #
           # @param [ Criteria, Array<Document> ] target The wrapped object.
-          #
-          # @since 2.1.0
           def initialize(target, base = nil, association = nil)
             @_base = base
             @_association = association
@@ -308,8 +281,6 @@ module Mongoid
           # @param [ Document ] doc The document to check.
           #
           # @return [ true, false ] If the document is in the target.
-          #
-          # @since 3.0.0
           def include?(doc)
             return super unless _unloaded
             _unloaded.where(_id: doc._id).exists? || _added.has_key?(doc._id)
@@ -322,8 +293,6 @@ module Mongoid
           #   enumerable.inspect
           #
           # @return [ String ] The inspected enum.
-          #
-          # @since 2.1.0
           def inspect
             entries.inspect
           end
@@ -337,8 +306,6 @@ module Mongoid
           #   enumerable.in_memory
           #
           # @return [ Array<Document> ] The in memory docs.
-          #
-          # @since 2.1.0
           def in_memory
             docs = (_loaded.values + _added.values)
             docs.each do |doc|
@@ -363,8 +330,6 @@ module Mongoid
           # @option opts [ :none ] :id_sort Don't apply a sort on _id.
           #
           # @return [ Document ] The last document found.
-          #
-          # @since 2.1.0
           def last(opts = {})
             _added.values.try(:last) ||
                 _loaded.try(:values).try(:last) ||
@@ -378,8 +343,6 @@ module Mongoid
           #   enumerable.load_all!
           #
           # @return [ true ] That the enumerable is _loaded.
-          #
-          # @since 2.1.0
           alias :load_all! :entries
 
           # Has the enumerable been _loaded? This will be true if the criteria has
@@ -389,8 +352,6 @@ module Mongoid
           #   enumerable._loaded?
           #
           # @return [ true, false ] If the enumerable has been _loaded.
-          #
-          # @since 2.1.0
           def _loaded?
             !!@executed
           end
@@ -401,8 +362,6 @@ module Mongoid
           #   Marshal.dump(proxy)
           #
           # @return [ Array<Object> ] The dumped data.
-          #
-          # @since 3.0.15
           def marshal_dump
             [_added, _loaded, _unloaded, @executed]
           end
@@ -413,8 +372,6 @@ module Mongoid
           #   Marshal.load(proxy)
           #
           # @return [ Array<Object> ] The dumped data.
-          #
-          # @since 3.0.15
           def marshal_load(data)
             @_added, @_loaded, @_unloaded, @executed = data
           end
@@ -425,8 +382,6 @@ module Mongoid
           #   enumerable.reset
           #
           # @return [ false ] Always false.
-          #
-          # @since 2.1.0
           def reset
             _loaded.clear
             _added.clear
@@ -440,8 +395,6 @@ module Mongoid
           #   enumerable.reset_unloaded(criteria)
           #
           # @param [ Criteria ] criteria The criteria to replace with.
-          #
-          # @since 3.0.14
           def reset_unloaded(criteria)
             @_unloaded = criteria if _unloaded.is_a?(Criteria)
           end
@@ -456,8 +409,6 @@ module Mongoid
           #   methods.
           #
           # @return [ true, false ] Whether the enumerable responds.
-          #
-          # @since 2.1.0
           def respond_to?(name, include_private = false)
             [].respond_to?(name, include_private) || super
           end
@@ -469,8 +420,6 @@ module Mongoid
           #   enumerable.size
           #
           # @return [ Integer ] The size of the enumerable.
-          #
-          # @since 2.1.0
           def size
             count = (_unloaded ? _unloaded.count : _loaded.count)
             if count.zero?
@@ -490,8 +439,6 @@ module Mongoid
           # @param [ Hash ] options Optional parameters.
           #
           # @return [ String ] The entries all _loaded as a string.
-          #
-          # @since 2.2.0
           def to_json(options = {})
             entries.to_json(options)
           end
@@ -504,8 +451,6 @@ module Mongoid
           # @param [ Hash ] options Optional parameters.
           #
           # @return [ Hash ] The entries all _loaded as a hash.
-          #
-          # @since 2.2.0
           def as_json(options = {})
             entries.as_json(options)
           end
@@ -518,8 +463,6 @@ module Mongoid
           #   enumerable.uniq
           #
           # @return [ Array<Document> ] The unique documents.
-          #
-          # @since 2.1.0
           def uniq
             entries.uniq
           end
@@ -532,7 +475,7 @@ module Mongoid
             end
           end
 
-          def method_missing(name, *args, &block)
+          ruby2_keywords def method_missing(name, *args, &block)
             entries.send(name, *args, &block)
           end
 

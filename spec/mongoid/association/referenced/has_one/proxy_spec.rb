@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -88,7 +87,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:game) do
@@ -143,7 +142,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when relation have a different primary_key" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:cat) do
@@ -216,7 +215,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:bar) do
-          Bar.create
+          Bar.create!
         end
 
         let(:rating) do
@@ -251,7 +250,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when replacing an existing persisted (dependent: :destroy) relation" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:game) do
@@ -324,7 +323,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when replacing an existing unpersisted (dependent: :destroy) relation" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:game) do
@@ -397,7 +396,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when replacing an existing persisted (dependent: :nullify) relation" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:cat) do
@@ -470,7 +469,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when replacing an existing unpersisted (dependent: :nullify) relation" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:cat) do
@@ -543,7 +542,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when replacing an existing relation with a new one" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when dependent is destroy" do
@@ -553,7 +552,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           end
 
           let!(:new_game) do
-            Game.create(name: "Starcraft 2")
+            Game.create!(name: "Starcraft 2")
           end
 
           before do
@@ -584,7 +583,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           end
 
           let!(:new_account) do
-            Account.create(name: "checking")
+            Account.create!(name: "checking")
           end
 
           before do
@@ -646,7 +645,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:game) do
@@ -709,7 +708,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when the parent is not a new record" do
 
         let(:bar) do
-          Bar.create
+          Bar.create!
         end
 
         let(:rating) do
@@ -760,7 +759,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when using object ids" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:game) do
@@ -787,7 +786,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when providing no attributes" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:game) do
@@ -810,7 +809,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when providing nil attributes" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:game) do
@@ -836,7 +835,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       context "when using object ids" do
 
         let(:bar) do
-          Bar.create
+          Bar.create!
         end
 
         let(:rating) do
@@ -880,7 +879,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     context "when the relation is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:game) do
@@ -907,7 +906,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     context "when providing no attributes" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:game) do
@@ -930,7 +929,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     context "when providing nil attributes" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:game) do
@@ -953,7 +952,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     context "when the relation is polymorphic" do
 
       let(:bar) do
-        Bar.create
+        Bar.create!
       end
 
       let(:rating) do
@@ -988,7 +987,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
   describe "#nullify" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:game) do
@@ -1062,15 +1061,15 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
   context "when reloading the relation" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:game_one) do
-      Game.create(name: "Warcraft 3")
+      Game.create!(name: "Warcraft 3")
     end
 
     let!(:game_two) do
-      Game.create(name: "Starcraft 2")
+      Game.create!(name: "Starcraft 2")
     end
 
     before do
@@ -1122,11 +1121,11 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     context "when autobuild is true for child" do
 
       let(:explosion) do
-        Explosion.create
+        Explosion.create!
       end
 
       let(:bomb) do
-        bomb = Bomb.create
+        bomb = Bomb.create!
         bomb.explosion = explosion
         bomb
       end

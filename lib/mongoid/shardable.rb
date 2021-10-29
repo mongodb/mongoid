@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
   # This module contains behavior for adding shard key fields to updates.
-  #
-  # @since 4.0.0
   module Shardable
     extend ActiveSupport::Concern
 
@@ -46,21 +43,35 @@ module Mongoid
     #   model.shard_key_fields
     #
     # @return [ Array<String> ] The shard key field names.
-    #
-    # @since 1.0.0
     def shard_key_fields
       self.class.shard_key_fields
     end
 
-    # Get the document selector with the defined shard keys.
-    #
-    # @example Get the selector for the shard keys.
-    #   person.shard_key_selector
+    # Returns the selector that would match the current version of this
+    # document.
     #
     # @return [ Hash ] The shard key selector.
     #
-    # @since 2.0.0
+    # @api private
     def shard_key_selector
+      selector = {}
+      shard_key_fields.each do |field|
+        selector[field.to_s] = send(field)
+      end
+      selector
+    end
+
+    # Returns the selector that would match the existing version of this
+    # document in the database.
+    #
+    # If the document is not persisted, this method uses the current values
+    # of the shard key fields. If the document is persisted, this method
+    # uses the values retrieved from the database.
+    #
+    # @return [ Hash ] The shard key selector.
+    #
+    # @api private
+    def shard_key_selector_in_db
       selector = {}
       shard_key_fields.each do |field|
         selector[field.to_s] = new_record? ? send(field) : attribute_was(field)
@@ -81,8 +92,6 @@ module Mongoid
       #
       #     shard_key first_name: 1, last_name: 1
       #   end
-      #
-      # @since 2.0.0
       def shard_key(*args)
         unless args.first.is_a?(Hash)
           # Shorthand syntax

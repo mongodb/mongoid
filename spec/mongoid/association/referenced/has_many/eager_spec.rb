@@ -1,7 +1,7 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
+require_relative '../has_many_models'
 
 describe Mongoid::Association::Referenced::HasMany::Eager do
 
@@ -122,7 +122,7 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
       context "when the eager load has returned documents" do
 
         let!(:post) do
-          person.posts.create(title: "testing")
+          person.posts.create!(title: "testing")
         end
 
         let!(:eager) do
@@ -176,7 +176,7 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
 
         it "returns the proxy" do
           expect do
-            eager.posts.create(title: "testing")
+            eager.posts.create!(title: "testing")
           end.to_not raise_error
         end
       end
@@ -188,11 +188,11 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
         end
 
         let!(:person_two) do
-          Person.create(username: "durran")
+          Person.create!(username: "durran")
         end
 
         let!(:post) do
-          person_one.posts.create(title: "testing")
+          person_one.posts.create!(title: "testing")
         end
 
         let!(:eager) do
@@ -249,11 +249,11 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
     context "when the relation is polymorphic" do
 
       let!(:movie) do
-        Movie.create(name: "Bladerunner")
+        Movie.create!(name: "Bladerunner")
       end
 
       let!(:rating) do
-        movie.ratings.create(value: 10)
+        movie.ratings.create!(value: 10)
       end
 
       let!(:eager) do
@@ -268,6 +268,22 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
         expect_query(0) do
           expect(eager.ratings).to eq([rating])
         end
+      end
+    end
+
+    context "when the association has scope" do
+      let!(:trainer1) { HmmTrainer.create!(name: 'Dave') }
+      let!(:trainer2) { HmmTrainer.create!(name: 'Ash') }
+      let!(:animal1) { HmmAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }
+      let!(:animal2) { HmmAnimal.create!(taxonomy: 'bird', trainer: trainer1) }
+
+      let(:eager) do
+        HmmTrainer.includes(:animals).where(_id: trainer1._id).to_a.first
+      end
+
+      it 'eager loads the included docs' do
+        expect(eager.animals._loaded).to eq(animal1._id => animal1)
+        expect(eager.animals).to eq [animal1]
       end
     end
   end

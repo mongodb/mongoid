@@ -1,4 +1,4 @@
-.. _mongoid-configuration:
+.. _configuration:
 
 *************
 Configuration
@@ -139,7 +139,7 @@ can be configured.
           - myhost3.mydomain.com:27017
         options:
           # These options are Ruby driver options, documented in
-          # https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/
+          # https://docs.mongodb.com/ruby-driver/current/reference/create-client/
 
           # Change the default write concern. (default = { w: 1 })
           write:
@@ -168,7 +168,13 @@ can be configured.
           # on 2.4 and 2.6 is :plain)
           auth_mech: :scram
 
-          # The database or source to authenticate the user against. (default: admin)
+          # Specify the auth source, i.e. the database or other source which
+          # contains the user's login credentials. Allowed values for auth source
+          # depend on the authentication mechanism, as explained in the server documentation:
+          # https://docs.mongodb.com/manual/reference/connection-string/#mongodb-urioption-urioption.authSource
+          # If no auth source is specified, the default auth source as
+          # determined by the driver will be used. Please refer to:
+          # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
           auth_source: admin
 
           # Force the driver to connect in a specific way instead of auto-
@@ -177,7 +183,7 @@ can be configured.
           connect: :direct
 
           # Change the default time in seconds the server monitors refresh their status
-          # via ismaster commands. (default: 10)
+          # via hello commands. (default: 10)
           heartbeat_frequency: 10
 
           # The time in seconds for selecting servers for a near read preference. (default: 0.015)
@@ -291,7 +297,7 @@ can be configured.
       use_utc: false
 
 The Ruby driver options may be found in
-`the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
+`the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/>`_.
 
 ERb Preprocessing
 =================
@@ -587,7 +593,7 @@ that only enables the "AES256-SHA" cipher.
   # Only the AES256-SHA cipher will be enabled from this point forward
 
 Every ``Proc`` in ``Mongo.tls_context_hooks`` will be passed an
-``OpenSSL::SSL::SSLContext`` object as its sole argument. These ``Proc``s will
+``OpenSSL::SSL::SSLContext`` object as its sole argument. These procs will
 be executed sequentially during socket creation.
 
 ..warning ::
@@ -596,7 +602,7 @@ be executed sequentially during socket creation.
   in an application.
 
 For more information about TLS context hooks, including best practices for
-assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/#modifying-sslcontext>`_.
+assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/#modifying-sslcontext>`_.
 
 Usage with Forking Servers
 ==========================
@@ -605,7 +611,7 @@ When using Mongoid with a forking web server such as Puma, Unicorn or
 Passenger, it is recommended to not perform any operations on Mongoid models
 in the parent process prior to the fork.
 
-When a process forks, Ruby threads are not transfered to the child processes
+When a process forks, Ruby threads are not transferred to the child processes
 and the Ruby driver Client objects lose their background monitoring. The
 application will typically seem to work just fine until the deployment
 state changes (for example due to network errors, a maintenance event) at
@@ -697,13 +703,13 @@ Query Cache Middleware
 
 .. note::
 
-  When used with Ruby driver version 2.15 or newer, Mongoid's query cache
-  middleware delegates to :ref:`the driver's query cache middleware
+  When used with Ruby driver version 2.15 or newer, Mongoid's Query Cache
+  Middleware delegates to :ref:`the driver's Query Cache Middleware
   <driver:query-cache-middleware>`.
 
-Mongoid provides a Rack middleware which enables the :ref:`query cache
+Mongoid provides a Rack middleware which enables the :ref:`Query Cache
 <query-cache>` for the duration of each web request. Below is an example of
-how to enable the query cache middleware in a Ruby on Rails application:
+how to enable the Query Cache Middleware in a Ruby on Rails application:
 
 .. code-block:: ruby
 

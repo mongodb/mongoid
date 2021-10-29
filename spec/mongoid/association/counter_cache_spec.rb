@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -10,7 +9,7 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when counter is reset" do
 
       let(:person) do
-        Person.create do |person|
+        Person.create! do |person|
           person[:drugs_count] = 3
         end
       end
@@ -31,7 +30,7 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when reset with invalid name" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       it "expect to raise an error" do
@@ -44,11 +43,11 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when counter gets messy" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post) do
-        person.posts.create(title: "my first post")
+        person.posts.create!(title: "my first post")
       end
 
       before do
@@ -69,11 +68,11 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when the counter is on a subclass" do
 
       let(:subscription) do
-        Subscription.create
+        Subscription.create!
       end
 
       let!(:pack) do
-        subscription.packs.create
+        subscription.packs.create!
       end
 
       before do
@@ -97,8 +96,8 @@ describe Mongoid::Association::Referenced::CounterCache do
 
       before do
         subscription.with(collection: 'other') do |sub|
-          sub.save
-          sub.packs.create
+          sub.save!
+          sub.packs.create!
         end
       end
 
@@ -115,7 +114,7 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when counter is reset" do
 
       let(:person) do
-        Person.create do |person|
+        Person.create! do |person|
           person[:drugs_count] = 3
         end
       end
@@ -141,7 +140,7 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when reset with invalid name" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       it "expect to raise an error" do
@@ -154,11 +153,11 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when counter gets messy" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:post) do
-        person.posts.create(title: "my first post")
+        person.posts.create!(title: "my first post")
       end
 
       before do
@@ -174,11 +173,11 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when the counter is on a subclass" do
 
       let(:subscription) do
-        Subscription.create
+        Subscription.create!
       end
 
       let!(:pack) do
-        subscription.packs.create
+        subscription.packs.create!
       end
 
       before do
@@ -196,7 +195,7 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when was 3 " do
 
       let(:person) do
-        Person.create do |person|
+        Person.create! do |person|
           person[:drugs_count] = 3
         end
       end
@@ -225,7 +224,7 @@ describe Mongoid::Association::Referenced::CounterCache do
     end
     context "when update with 2 and use a string argument" do
 
-      let(:person) { Person.create }
+      let(:person) { Person.create! }
 
       before do
         Person.update_counters person.id, "drugs_count" => 2
@@ -238,7 +237,7 @@ describe Mongoid::Association::Referenced::CounterCache do
 
     context "when update more multiple counters" do
 
-      let(:person) { Person.create }
+      let(:person) { Person.create! }
 
       before do
         Person.update_counters(person.id, :drugs_count => 2, :second_counter => 5)
@@ -256,7 +255,7 @@ describe Mongoid::Association::Referenced::CounterCache do
 
   describe "#increment_counter" do
 
-    let(:person) { Person.create }
+    let(:person) { Person.create! }
 
     context "when increment 3 times" do
 
@@ -288,8 +287,8 @@ describe Mongoid::Association::Referenced::CounterCache do
 
       before do
         person.with(collection: 'other') do |per|
-          per.save
-          per.drugs.create
+          per.save!
+          per.drugs.create!
         end
       end
 
@@ -304,7 +303,7 @@ describe Mongoid::Association::Referenced::CounterCache do
   describe "#decrement_counter" do
 
     let(:person) do
-      Person.create do |p|
+      Person.create! do |p|
         p[:drugs_count] = 3
       end
     end
@@ -338,8 +337,8 @@ describe Mongoid::Association::Referenced::CounterCache do
 
       before do
         person.with(collection: 'other') do |per|
-          per.save
-          drug = per.drugs.create
+          per.save!
+          drug = per.drugs.create!
           drug.destroy
         end
       end
@@ -359,11 +358,11 @@ describe Mongoid::Association::Referenced::CounterCache do
       context 'when #destroy is called on the object' do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let!(:drug) do
-          person.drugs.create
+          person.drugs.create!
         end
 
         before do
@@ -378,7 +377,7 @@ describe Mongoid::Association::Referenced::CounterCache do
       context 'when #create is called on the object' do
 
         let(:person) do
-          Person.create { |p| p.drugs += [Drug.create, Drug.create] }
+          Person.create! { |p| p.drugs += [Drug.create!, Drug.create!] }
         end
 
         it "updates the counter cache" do
@@ -389,7 +388,7 @@ describe Mongoid::Association::Referenced::CounterCache do
       context 'when #update is called on the object' do
 
         let(:person1) do
-          Person.create { |p| p.drugs += [Drug.create, Drug.create] }
+          Person.create! { |p| p.drugs += [Drug.create!, Drug.create!] }
         end
 
         let(:drug) do
@@ -397,7 +396,7 @@ describe Mongoid::Association::Referenced::CounterCache do
         end
 
         let(:person2) do
-          Person.create
+          Person.create!
         end
 
         before do
@@ -418,9 +417,9 @@ describe Mongoid::Association::Referenced::CounterCache do
 
         context 'when foreign_key differs from model name' do
 
-          let(:genre) { PostGenre.create }
+          let(:genre) { PostGenre.create! }
 
-          let(:post) { Post.create }
+          let(:post) { Post.create! }
 
           it 'updates correct counter cache' do
             post.update post_genre: genre
@@ -433,11 +432,11 @@ describe Mongoid::Association::Referenced::CounterCache do
     context "when parent is frozen" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:drug) do
-        person.drugs.create
+        person.drugs.create!
       end
 
       before do

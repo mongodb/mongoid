@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -45,7 +44,7 @@ describe Mongoid::Persistable::Settable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:date) do
@@ -109,11 +108,11 @@ describe Mongoid::Persistable::Settable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "t")
+        person.addresses.create!(street: "t")
       end
 
       let(:date) do
@@ -141,7 +140,7 @@ describe Mongoid::Persistable::Settable do
       context 'when the field is a relation' do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:pet) do
@@ -171,7 +170,7 @@ describe Mongoid::Persistable::Settable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(title: "sir", age: 30)
+        Person.create!(title: "sir", age: 30)
       end
 
       it "marks a dirty change for the set fields" do
@@ -197,7 +196,7 @@ describe Mongoid::Persistable::Settable do
 
   context "when dynamic attributes enabled" do
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     it "updates non existing attribute" do
@@ -208,7 +207,7 @@ describe Mongoid::Persistable::Settable do
 
   context "with an attribute with private setter" do
     let(:agent) do
-      Agent.create
+      Agent.create!
     end
 
     let(:title) do
@@ -462,7 +461,7 @@ describe Mongoid::Persistable::Settable do
   context 'when the field is not already set locally' do
 
     let(:church) do
-      Church.create
+      Church.create!
     end
 
     context 'when the field is a Hash type' do
@@ -509,6 +508,36 @@ describe Mongoid::Persistable::Settable do
       it 'sets the fields in the database' do
         expect(church.reload.name).to eq('Church2')
         expect(church.reload.location).to eq({ 'street' => 'Yorckstr.'})
+      end
+    end
+  end
+
+  context "when the field being set was projected out" do
+    let(:full_agent) do
+      Agent.create!(title: "Double-Oh Eight")
+    end
+
+    let(:agent) do
+      Agent.where(_id: full_agent.id).only(:dob).first
+    end
+
+    context 'field exists in database' do
+      it "raises MissingAttributeError" do
+        lambda do
+          agent.set(title: '008')
+        end.should raise_error(ActiveModel::MissingAttributeError)
+
+        expect(agent.reload.title).to eq 'Double-Oh Eight'
+      end
+    end
+
+    context 'field does not exist in database' do
+      it "raises MissingAttributeError" do
+        lambda do
+          agent.set(number: '008')
+        end.should raise_error(ActiveModel::MissingAttributeError)
+
+        expect(agent.reload.read_attribute(:number)).to be nil
       end
     end
   end

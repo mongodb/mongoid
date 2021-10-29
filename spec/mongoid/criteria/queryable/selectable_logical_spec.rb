@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -512,12 +511,33 @@ describe Mongoid::Criteria::Queryable::Selectable do
             it_behaves_like 'returns a cloned query'
           end
 
-          context 'criteria are provided in the same hash' do
-            let(:selection) do
-              query.send(tested_method, :field => 3, :field.lt => 5)
+          shared_examples_for 'combines conditions with $regex' do
+
+            it "combines conditions with $regex" do
+              expect(selection.selector).to eq({
+                "field" => {'$regex' => /t/, '$lt' => 5},
+              })
             end
 
-            it_behaves_like 'combines conditions with $eq'
+            it_behaves_like 'returns a cloned query'
+          end
+
+          context 'criteria are provided in the same hash' do
+            context 'non-regexp argument' do
+              let(:selection) do
+                query.send(tested_method, :field => 3, :field.lt => 5)
+              end
+
+              it_behaves_like 'combines conditions with $eq'
+            end
+
+            context 'regexp argument' do
+              let(:selection) do
+                query.send(tested_method, :field => /t/, :field.lt => 5)
+              end
+
+              it_behaves_like 'combines conditions with $regex'
+            end
           end
 
           context 'criteria are provided in separate hashes' do
@@ -561,12 +581,33 @@ describe Mongoid::Criteria::Queryable::Selectable do
             it_behaves_like 'returns a cloned query'
           end
 
-          context 'criteria are provided in the same hash' do
-            let(:selection) do
-              query.send(tested_method, :field.gt => 3, :field => 5)
+          shared_examples_for 'combines conditions with $regex' do
+
+            it "combines conditions with $regex" do
+              expect(selection.selector).to eq({
+                "field" => {'$gt' => 3, '$regex' => /t/},
+              })
             end
 
-            it_behaves_like 'combines conditions with $eq'
+            it_behaves_like 'returns a cloned query'
+          end
+
+          context 'criteria are provided in the same hash' do
+            context 'non-regexp argument' do
+              let(:selection) do
+                query.send(tested_method, :field.gt => 3, :field => 5)
+              end
+
+              it_behaves_like 'combines conditions with $eq'
+            end
+
+            context 'regexp argument' do
+              let(:selection) do
+                query.send(tested_method, :field.gt => 3, :field => /t/)
+              end
+
+              it_behaves_like 'combines conditions with $regex'
+            end
           end
 
           context 'criteria are provided in separate hashes' do
@@ -1090,17 +1131,34 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
     context 'when giving multiple conditions in one call on the same key with symbol operator' do
 
-      let(:selection) do
-        query.send(tested_method, field: 1, :field.gt => 0)
+      context 'non-regexp argument' do
+        let(:selection) do
+          query.send(tested_method, field: 1, :field.gt => 0)
+        end
+
+        it 'combines conditions with $eq' do
+          selection.selector.should == {
+            expected_operator => [
+              'field' => {'$eq' => 1, '$gt' => 0},
+            ]
+          }
+        end
       end
 
-      it 'combines conditions with $eq' do
-        selection.selector.should == {
-          expected_operator => [
-            'field' => {'$eq' => 1, '$gt' => 0},
-          ]
-        }
+      context 'regexp argument' do
+        let(:selection) do
+          query.send(tested_method, field: /t/, :field.gt => 0)
+        end
+
+        it 'combines conditions with $regex' do
+          selection.selector.should == {
+            expected_operator => [
+              'field' => {'$regex' => /t/, '$gt' => 0},
+            ]
+          }
+        end
       end
+
     end
   end
 
@@ -1355,12 +1413,36 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it_behaves_like 'returns a cloned query'
         end
 
-        context 'criteria are provided in the same hash' do
-          let(:selection) do
-            query.send(tested_method, :field => 3, :field.lt => 5)
+        shared_examples_for 'combines conditions with $regex' do
+
+          it "combines conditions with $regex" do
+            expect(selection.selector).to eq({
+              'field' => {
+                '$regex' => /t/,
+                '$lt' => 5,
+              },
+            })
           end
 
-          it_behaves_like 'combines conditions with $eq'
+          it_behaves_like 'returns a cloned query'
+        end
+
+        context 'criteria are provided in the same hash' do
+          context 'non-regexp argument' do
+            let(:selection) do
+              query.send(tested_method, :field => 3, :field.lt => 5)
+            end
+
+            it_behaves_like 'combines conditions with $eq'
+          end
+
+          context 'regexp argument' do
+            let(:selection) do
+              query.send(tested_method, :field => /t/, :field.lt => 5)
+            end
+
+            it_behaves_like 'combines conditions with $regex'
+          end
         end
 
         context 'criteria are provided in separate hashes' do
@@ -1406,12 +1488,33 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it_behaves_like 'returns a cloned query'
         end
 
-        context 'criteria are provided in the same hash' do
-          let(:selection) do
-            query.send(tested_method, :field.gt => 3, :field => 5)
+        shared_examples_for 'combines conditions with $regex' do
+
+          it "combines conditions with $regex" do
+            expect(selection.selector).to eq(
+              'field' => {'$gt' => 3, '$regex' => /t/},
+            )
           end
 
-          it_behaves_like 'combines conditions with $eq'
+          it_behaves_like 'returns a cloned query'
+        end
+
+        context 'criteria are provided in the same hash' do
+          context 'non-regexp argument' do
+            let(:selection) do
+              query.send(tested_method, :field.gt => 3, :field => 5)
+            end
+
+            it_behaves_like 'combines conditions with $eq'
+          end
+
+          context 'regexp argument' do
+            let(:selection) do
+              query.send(tested_method, :field.gt => 3, :field => /t/)
+            end
+
+            it_behaves_like 'combines conditions with $regex'
+          end
         end
 
         context 'criteria are provided in separate hashes' do
@@ -1934,16 +2037,32 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
     context 'when giving multiple conditions in one call on the same key with symbol operator' do
 
-      let(:selection) do
-        query.not(field: 1, :field.gt => 0)
+      context 'non-regexp argument' do
+        let(:selection) do
+          query.not(field: 1, :field.gt => 0)
+        end
+
+        it 'combines conditions with $eq' do
+          selection.selector.should == {
+            '$and' => ['$nor' => [
+              'field' => {'$eq' => 1, '$gt' => 0},
+            ]]
+          }
+        end
       end
 
-      it 'combines conditions with $eq' do
-        selection.selector.should == {
-          '$and' => ['$nor' => [
-            'field' => {'$eq' => 1, '$gt' => 0},
-          ]]
-        }
+      context 'regexp argument' do
+        let(:selection) do
+          query.not(field: /t/, :field.gt => 0)
+        end
+
+        it 'combines conditions with $regex' do
+          selection.selector.should == {
+            '$and' => ['$nor' => [
+              'field' => {'$regex' => /t/, '$gt' => 0},
+            ]]
+          }
+        end
       end
     end
   end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -25,7 +24,7 @@ describe Mongoid::Errors::InvalidScope do
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "Change the scope to be a proc wrapped critera."
+        "Change the scope to be a proc wrapped criteria."
       )
     end
   end

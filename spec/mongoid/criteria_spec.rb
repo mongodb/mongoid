@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -41,7 +40,7 @@ describe Mongoid::Criteria do
       context "when the entries are the same" do
 
         let!(:band) do
-          Band.create(name: "Depeche Mode")
+          Band.create!(name: "Depeche Mode")
         end
 
         let(:other) do
@@ -56,11 +55,11 @@ describe Mongoid::Criteria do
       context "when the entries are not the same" do
 
         let!(:band) do
-          Band.create(name: "Depeche Mode")
+          Band.create!(name: "Depeche Mode")
         end
 
         let!(:other_band) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         let(:other) do
@@ -105,21 +104,21 @@ describe Mongoid::Criteria do
   describe "#asc" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when the documents are embedded" do
 
       let!(:hobrecht) do
-        person.addresses.create(street: "hobrecht", name: "hobrecht")
+        person.addresses.create!(street: "hobrecht", name: "hobrecht")
       end
 
       let!(:friedel) do
-        person.addresses.create(street: "friedel", name: "friedel")
+        person.addresses.create!(street: "friedel", name: "friedel")
       end
 
       let!(:pfluger) do
-        person.addresses.create(street: "pfluger", name: "pfluger")
+        person.addresses.create!(street: "pfluger", name: "pfluger")
       end
 
       let(:criteria) do
@@ -135,7 +134,7 @@ describe Mongoid::Criteria do
   describe "#batch_size" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:criteria) do
@@ -154,7 +153,7 @@ describe Mongoid::Criteria do
   describe "#read" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:criteria) do
@@ -171,11 +170,11 @@ describe Mongoid::Criteria do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -213,11 +212,11 @@ describe Mongoid::Criteria do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -239,11 +238,11 @@ describe Mongoid::Criteria do
     describe "\##{method}" do
 
       let!(:match) do
-        Band.create(genres: [ "electro", "dub" ])
+        Band.create!(genres: [ "electro", "dub" ])
       end
 
       let!(:non_match) do
-        Band.create(genres: [ "house" ])
+        Band.create!(genres: [ "house" ])
       end
 
       let(:criteria) do
@@ -261,11 +260,11 @@ describe Mongoid::Criteria do
     describe "\##{method}" do
 
       let!(:match) do
-        Band.create(name: "Depeche Mode", genres: [ "electro" ])
+        Band.create!(name: "Depeche Mode", genres: [ "electro" ])
       end
 
       let!(:non_match) do
-        Band.create(genres: [ "house" ])
+        Band.create!(genres: [ "house" ])
       end
 
       let(:criteria) do
@@ -281,7 +280,7 @@ describe Mongoid::Criteria do
   describe "#as_json" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:criteria) do
@@ -311,11 +310,11 @@ describe Mongoid::Criteria do
   describe "#between" do
 
     let!(:match) do
-      Band.create(member_count: 3)
+      Band.create!(member_count: 3)
     end
 
     let!(:non_match) do
-      Band.create(member_count: 10)
+      Band.create!(member_count: 10)
     end
 
     let(:criteria) do
@@ -381,7 +380,7 @@ describe Mongoid::Criteria do
   describe "#cache" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when no eager loading is involved" do
@@ -533,11 +532,11 @@ describe Mongoid::Criteria do
   describe "#delete" do
 
     let(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:tool) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     context "when no selector is provided" do
@@ -591,7 +590,7 @@ describe Mongoid::Criteria do
   describe "#each" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     context "when provided a block" do
@@ -611,14 +610,14 @@ describe Mongoid::Criteria do
   describe "#elem_match" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode").tap do |band|
+      Band.create!(name: "Depeche Mode").tap do |band|
         r = band.records
-        r.create(name: "101")
+        r.create!(name: "101")
       end
     end
 
     let!(:non_match) do
-      Band.create(genres: [ "house" ])
+      Band.create!(genres: [ "house" ])
     end
 
     let(:criteria) do
@@ -664,7 +663,7 @@ describe Mongoid::Criteria do
     context "when matching documents exist" do
 
       let!(:match) do
-        Band.create(name: "Depeche Mode")
+        Band.create!(name: "Depeche Mode")
       end
 
       let(:criteria) do
@@ -679,7 +678,7 @@ describe Mongoid::Criteria do
     context "when no matching documents exist" do
 
       let!(:nonmatch) do
-        Band.create(name: "New Order")
+        Band.create!(name: "New Order")
       end
 
       let(:criteria) do
@@ -695,11 +694,11 @@ describe Mongoid::Criteria do
   describe "#exists" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:non_match) do
-      Band.create
+      Band.create!
     end
 
     let(:criteria) do
@@ -716,7 +715,7 @@ describe Mongoid::Criteria do
     context "when matching documents exist" do
 
       let!(:match) do
-        Band.create(name: "Depeche Mode")
+        Band.create!(name: "Depeche Mode")
       end
 
       let(:criteria) do
@@ -858,11 +857,11 @@ describe Mongoid::Criteria do
   describe "#find_one_and_update" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:tool) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     context "when the selector matches" do
@@ -1060,7 +1059,7 @@ describe Mongoid::Criteria do
     end
 
     let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let(:criteria) do
@@ -1072,7 +1071,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#gt" do
+  describe "#eq" do
 
     let!(:match) do
       Band.create(member_count: 5)
@@ -1080,6 +1079,25 @@ describe Mongoid::Criteria do
 
     let!(:non_match) do
       Band.create(member_count: 1)
+    end
+
+    let(:criteria) do
+      Band.eq(member_count: 5)
+    end
+
+    it "returns the matching documents" do
+      expect(criteria).to eq([ match ])
+    end
+  end
+
+  describe "#gt" do
+
+    let!(:match) do
+      Band.create!(member_count: 5)
+    end
+
+    let!(:non_match) do
+      Band.create!(member_count: 1)
     end
 
     let(:criteria) do
@@ -1094,11 +1112,11 @@ describe Mongoid::Criteria do
   describe "#gte" do
 
     let!(:match) do
-      Band.create(member_count: 5)
+      Band.create!(member_count: 5)
     end
 
     let!(:non_match) do
-      Band.create(member_count: 1)
+      Band.create!(member_count: 1)
     end
 
     let(:criteria) do
@@ -1117,11 +1135,11 @@ describe Mongoid::Criteria do
       context "when querying on a normal field" do
 
         let!(:match) do
-          Band.create(genres: [ "electro", "dub" ])
+          Band.create!(genres: [ "electro", "dub" ])
         end
 
         let!(:non_match) do
-          Band.create(genres: [ "house" ])
+          Band.create!(genres: [ "house" ])
         end
 
         let(:criteria) do
@@ -1140,7 +1158,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:match_one) do
-          Person.create(preference_ids: [ id ])
+          Person.create!(preference_ids: [ id ])
         end
 
         context "when providing valid ids" do
@@ -1181,7 +1199,7 @@ describe Mongoid::Criteria do
           context "when the relation is a one to one" do
 
             let!(:game) do
-              Game.create
+              Game.create!
             end
 
             let(:criteria) do
@@ -1219,7 +1237,7 @@ describe Mongoid::Criteria do
   describe "#includes" do
 
     let!(:person) do
-      Person.create(age: 1)
+      Person.create!(age: 1)
     end
 
     context "when providing a name that is not a relation" do
@@ -1234,11 +1252,11 @@ describe Mongoid::Criteria do
     context "when providing one association" do
 
       let!(:user) do
-        User.create(posts: [ post1 ])
+        User.create!(posts: [ post1 ])
       end
 
       let!(:post1) do
-        Post.create
+        Post.create!
       end
 
       let(:result) do
@@ -1257,15 +1275,15 @@ describe Mongoid::Criteria do
     context "when providing a list of associations" do
 
       let!(:user) do
-        User.create(posts: [ post1 ], descriptions: [ description1 ])
+        User.create!(posts: [ post1 ], descriptions: [ description1 ])
       end
 
       let!(:post1) do
-        Post.create
+        Post.create!
       end
 
       let!(:description1) do
-        Description.create(details: 1)
+        Description.create!(details: 1)
       end
 
       let(:result) do
@@ -1285,7 +1303,7 @@ describe Mongoid::Criteria do
     context "when providing a nested association" do
 
       let!(:user) do
-        User.create
+        User.create!
       end
 
       before do
@@ -1311,7 +1329,7 @@ describe Mongoid::Criteria do
     context "when providing a deeply nested association" do
 
       let!(:user) do
-        User.create
+        User.create!
       end
 
       let(:results) do
@@ -1349,15 +1367,15 @@ describe Mongoid::Criteria do
       context "when the includes is on the subclass" do
 
         let!(:c_one) do
-          C.create
+          C.create!
         end
 
         let!(:c_two) do
-          C.create
+          C.create!
         end
 
         let!(:b) do
-          B.create(c: c_two)
+          B.create!(c: c_two)
         end
 
         let!(:results) do
@@ -1412,19 +1430,19 @@ describe Mongoid::Criteria do
         context "when the includes is on the several relations" do
 
           let!(:d_one) do
-            D.create
+            D.create!
           end
 
           let!(:d_two) do
-            D.create
+            D.create!
           end
 
           let!(:b) do
-            B.create(d: d_two)
+            B.create!(d: d_two)
           end
 
           let!(:c) do
-            C.create(d: d_two)
+            C.create!(d: d_two)
           end
 
           let!(:results) do
@@ -1483,19 +1501,19 @@ describe Mongoid::Criteria do
         context "when the includes is on the several relations" do
 
           let!(:d_one) do
-            D.create
+            D.create!
           end
 
           let!(:d_two) do
-            D.create
+            D.create!
           end
 
           let!(:bs) do
-            2.times.map { B.create(d: d_two) }
+            2.times.map { B.create!(d: d_two) }
           end
 
           let!(:cs) do
-            2.times.map { C.create(d: d_two) }
+            2.times.map { C.create!(d: d_two) }
           end
 
           let!(:results) do
@@ -1541,7 +1559,7 @@ describe Mongoid::Criteria do
     context "when mapping the results more than once" do
 
       let!(:post) do
-        person.posts.create(title: "one")
+        person.posts.create!(title: "one")
       end
 
       let(:criteria) do
@@ -1563,15 +1581,15 @@ describe Mongoid::Criteria do
       context "when the criteria is from the root" do
 
         let!(:person_two) do
-          Person.create(age: 2)
+          Person.create!(age: 2)
         end
 
         let!(:post_one) do
-          person.posts.create(title: "one")
+          person.posts.create!(title: "one")
         end
 
         let!(:post_two) do
-          person_two.posts.create(title: "two")
+          person_two.posts.create!(title: "two")
         end
 
         context "when calling first" do
@@ -1620,15 +1638,15 @@ describe Mongoid::Criteria do
       context "when the criteria is from an embedded relation" do
 
         let(:peep) do
-          Person.create
+          Person.create!
         end
 
         let!(:address_one) do
-          peep.addresses.create(street: "rosenthaler")
+          peep.addresses.create!(street: "rosenthaler")
         end
 
         let!(:address_two) do
-          peep.addresses.create(street: "weinmeister")
+          peep.addresses.create!(street: "weinmeister")
         end
 
         let!(:depeche) do
@@ -1740,11 +1758,11 @@ describe Mongoid::Criteria do
       end
 
       let!(:post_one) do
-        person.posts.create(title: "one")
+        person.posts.create!(title: "one")
       end
 
       let!(:post_two) do
-        person.posts.create(title: "two")
+        person.posts.create!(title: "two")
       end
 
       context "when the criteria has no options" do
@@ -1862,11 +1880,11 @@ describe Mongoid::Criteria do
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
-          Person.create
+          Person.create!
         end
 
         let!(:post_three) do
-          person_two.posts.create(title: "three")
+          person_two.posts.create!(title: "three")
         end
 
         let!(:criteria) do
@@ -1898,11 +1916,11 @@ describe Mongoid::Criteria do
     context "when including a has and belongs to many" do
 
       let!(:preference_one) do
-        person.preferences.create(name: "one")
+        person.preferences.create!(name: "one")
       end
 
       let!(:preference_two) do
-        person.preferences.create(name: "two")
+        person.preferences.create!(name: "two")
       end
 
       context "when one of the related items is deleted" do
@@ -2006,11 +2024,11 @@ describe Mongoid::Criteria do
     context "when including a has many" do
 
       let!(:post_one) do
-        person.posts.create(title: "one")
+        person.posts.create!(title: "one")
       end
 
       let!(:post_two) do
-        person.posts.create(title: "two")
+        person.posts.create!(title: "two")
       end
 
       context "when the criteria has no options" do
@@ -2095,11 +2113,11 @@ describe Mongoid::Criteria do
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
-          Person.create
+          Person.create!
         end
 
         let!(:post_three) do
-          person_two.posts.create(title: "three")
+          person_two.posts.create!(title: "three")
         end
 
         let!(:criteria) do
@@ -2160,7 +2178,7 @@ describe Mongoid::Criteria do
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
-          Person.create(age: 2)
+          Person.create!(age: 2)
         end
 
         let!(:game_three) do
@@ -2192,7 +2210,7 @@ describe Mongoid::Criteria do
     context "when including a belongs to" do
 
       let(:person_two) do
-        Person.create(age: 2)
+        Person.create!(age: 2)
       end
 
       let!(:game_one) do
@@ -2253,11 +2271,11 @@ describe Mongoid::Criteria do
     context "when including multiples in the same criteria" do
 
       let!(:post_one) do
-        person.posts.create(title: "one")
+        person.posts.create!(title: "one")
       end
 
       let!(:post_two) do
-        person.posts.create(title: "two")
+        person.posts.create!(title: "two")
       end
 
       let!(:game_one) do
@@ -2327,11 +2345,11 @@ describe Mongoid::Criteria do
   describe "#lt" do
 
     let!(:match) do
-      Band.create(member_count: 1)
+      Band.create!(member_count: 1)
     end
 
     let!(:non_match) do
-      Band.create(member_count: 5)
+      Band.create!(member_count: 5)
     end
 
     let(:criteria) do
@@ -2346,11 +2364,11 @@ describe Mongoid::Criteria do
   describe "#lte" do
 
     let!(:match) do
-      Band.create(member_count: 4)
+      Band.create!(member_count: 4)
     end
 
     let!(:non_match) do
-      Band.create(member_count: 5)
+      Band.create!(member_count: 5)
     end
 
     let(:criteria) do
@@ -2383,11 +2401,11 @@ describe Mongoid::Criteria do
     end
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode", likes: 200)
+      Band.create!(name: "Depeche Mode", likes: 200)
     end
 
     let!(:tool) do
-      Band.create(name: "Tool", likes: 100)
+      Band.create!(name: "Tool", likes: 100)
     end
 
     context "when no timeout options are provided" do
@@ -2410,11 +2428,11 @@ describe Mongoid::Criteria do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -2454,11 +2472,11 @@ describe Mongoid::Criteria do
     end
 
     let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let!(:non_match) do
-      Bar.create(location: [ 19.26, 99.70 ])
+      Bar.create!(location: [ 19.26, 99.70 ])
     end
 
     let(:criteria) do
@@ -2611,11 +2629,11 @@ describe Mongoid::Criteria do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -2651,11 +2669,11 @@ describe Mongoid::Criteria do
   describe "#mod" do
 
     let!(:match) do
-      Band.create(member_count: 5)
+      Band.create!(member_count: 5)
     end
 
     let!(:non_match) do
-      Band.create(member_count: 2)
+      Band.create!(member_count: 2)
     end
 
     let(:criteria) do
@@ -2670,11 +2688,11 @@ describe Mongoid::Criteria do
   describe "#ne" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:non_match) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     let(:criteria) do
@@ -2693,7 +2711,7 @@ describe Mongoid::Criteria do
     end
 
     let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let(:criteria) do
@@ -2712,7 +2730,7 @@ describe Mongoid::Criteria do
     end
 
     let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
+      Bar.create!(location: [ 52.30, 13.25 ])
     end
 
     let(:criteria) do
@@ -2727,11 +2745,11 @@ describe Mongoid::Criteria do
   describe "#nin" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:non_match) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     let(:criteria) do
@@ -2746,11 +2764,11 @@ describe Mongoid::Criteria do
   describe "#nor" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:non_match) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     let(:criteria) do
@@ -2767,11 +2785,11 @@ describe Mongoid::Criteria do
     describe "\##{method}" do
 
       let!(:match) do
-        Band.create(name: "Depeche Mode")
+        Band.create!(name: "Depeche Mode")
       end
 
       let!(:non_match) do
-        Band.create(name: "Tool")
+        Band.create!(name: "Tool")
       end
 
       context "when sending a normal $or criterion" do
@@ -2801,25 +2819,25 @@ describe Mongoid::Criteria do
   describe "#pluck" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode", likes: 3)
+      Band.create!(name: "Depeche Mode", likes: 3)
     end
 
     let!(:tool) do
-      Band.create(name: "Tool", likes: 3)
+      Band.create!(name: "Tool", likes: 3)
     end
 
     let!(:photek) do
-      Band.create(name: "Photek", likes: 1)
+      Band.create!(name: "Photek", likes: 1)
     end
 
     context "when the field is aliased" do
 
       let!(:expensive) do
-        Product.create(price: 100000)
+        Product.create!(price: 100000)
       end
 
       let!(:cheap) do
-        Product.create(price: 1)
+        Product.create!(price: 1)
       end
 
       context "when using alias_attribute" do
@@ -2866,8 +2884,8 @@ describe Mongoid::Criteria do
           context 'when a top-level field and a subdocument field are plucked' do
 
             before do
-              Band.create(name: 'FKA Twigs')
-              Band.create(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+              Band.create!(name: 'FKA Twigs')
+              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
             end
 
             let(:embedded_pluck) do
@@ -2889,8 +2907,8 @@ describe Mongoid::Criteria do
           context 'when only a subdocument field is plucked' do
 
             before do
-              Band.create(name: 'FKA Twigs')
-              Band.create(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+              Band.create!(name: 'FKA Twigs')
+              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
             end
 
             let(:embedded_pluck) do
@@ -3112,11 +3130,11 @@ describe Mongoid::Criteria do
   describe "#sort" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode", likes: 1000)
+      Band.create!(name: "Depeche Mode", likes: 1000)
     end
 
     let!(:tool) do
-      Band.create(name: "Tool", likes: 500)
+      Band.create!(name: "Tool", likes: 500)
     end
 
     let(:sorted) do
@@ -3135,11 +3153,11 @@ describe Mongoid::Criteria do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -3173,7 +3191,7 @@ describe Mongoid::Criteria do
   describe "#to_ary" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:criteria) do
@@ -3189,11 +3207,11 @@ describe Mongoid::Criteria do
     max_server_version '4.0'
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:band2) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     let(:criteria) do
@@ -3236,7 +3254,7 @@ describe Mongoid::Criteria do
       context "when the type is a string" do
 
         let!(:browser) do
-          Browser.create
+          Browser.create!
         end
 
         let(:criteria) do
@@ -3251,7 +3269,7 @@ describe Mongoid::Criteria do
       context "when the type is an Array of type" do
 
         let!(:browser) do
-          Firefox.create
+          Firefox.create!
         end
 
         let(:criteria) do
@@ -3276,7 +3294,7 @@ describe Mongoid::Criteria do
       context "when the type is a string" do
 
         let!(:browser) do
-          Browser.create
+          Browser.create!
         end
 
         let(:criteria) do
@@ -3291,7 +3309,7 @@ describe Mongoid::Criteria do
       context "when the type is an Array of type" do
 
         let!(:browser) do
-          Firefox.create
+          Firefox.create!
         end
 
         let(:criteria) do
@@ -3308,11 +3326,11 @@ describe Mongoid::Criteria do
   describe "#where" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:non_match) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     context 'when provided no arguments' do
@@ -3409,7 +3427,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:band) do
-          Band.create(name: "Boards of Canada", sales: sales)
+          Band.create!(name: "Boards of Canada", sales: sales)
         end
 
         let(:from_db) do
@@ -3429,7 +3447,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:band) do
-          Band.create(name: "Boards of Canada", decimal: decimal)
+          Band.create!(name: "Boards of Canada", decimal: decimal)
         end
 
         let(:from_db) do
@@ -3444,7 +3462,7 @@ describe Mongoid::Criteria do
       context 'when querying on a polymorphic relation' do
 
         let(:movie) do
-          Movie.create
+          Movie.create!
         end
 
         let(:selector) do
@@ -3495,7 +3513,7 @@ describe Mongoid::Criteria do
   describe "#for_js" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     context "when the code has no scope" do
@@ -3532,10 +3550,14 @@ describe Mongoid::Criteria do
 
       before do
         expect(Person).to receive(:minor).and_call_original
+        expect(Person).to receive(:older_than).and_call_original
       end
 
       it "calls the method on the class" do
         expect(criteria.minor).to be_empty
+        expect do
+          criteria.older_than(age: 25)
+        end.not_to raise_error
       end
     end
 
@@ -3578,11 +3600,11 @@ describe Mongoid::Criteria do
   describe "#uniq" do
 
     let!(:band_one) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let!(:band_two) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -3631,7 +3653,7 @@ describe Mongoid::Criteria do
       end
 
       let!(:match) do
-        Bar.create(location: [ 52.30, 13.25 ])
+        Bar.create!(location: [ 52.30, 13.25 ])
       end
 
       let(:criteria) do
@@ -3649,11 +3671,11 @@ describe Mongoid::Criteria do
   describe "#with_size" do
 
     let!(:match) do
-      Band.create(genres: [ "electro", "dub" ])
+      Band.create!(genres: [ "electro", "dub" ])
     end
 
     let!(:non_match) do
-      Band.create(genres: [ "house" ])
+      Band.create!(genres: [ "house" ])
     end
 
     let(:criteria) do
@@ -3668,7 +3690,7 @@ describe Mongoid::Criteria do
   describe "#with_type" do
 
     let!(:match) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:criteria) do

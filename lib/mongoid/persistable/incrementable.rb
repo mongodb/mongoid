@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Persistable
 
     # Defines behavior for $inc operations.
-    #
-    # @since 4.0.0
     module Incrementable
       extend ActiveSupport::Concern
 
@@ -20,8 +17,6 @@ module Mongoid
       # @param [ Hash ] increments The field/inc increment pairs.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def inc(increments)
         prepare_atomic_operation do |ops|
           process_atomic_operations(increments) do |field, value|

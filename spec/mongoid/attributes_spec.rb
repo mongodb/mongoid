@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -21,7 +20,7 @@ describe Mongoid::Attributes do
     context "when the attribute was excluded in a criteria" do
 
       let!(:person) do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       context "when the attribute is localized" do
@@ -199,7 +198,7 @@ describe Mongoid::Attributes do
     context 'when the document has a custom attribute type' do
 
       let(:bar) do
-        Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+        Bar.create!(lat_lng: LatLng.new(52.30, 13.25))
       end
 
       it 'returns the demongoized version of the attribute' do
@@ -256,7 +255,7 @@ describe Mongoid::Attributes do
     context "when the document is an existing record" do
 
       let!(:person) do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       context "when the attribute was excluded in a criteria" do
@@ -284,6 +283,91 @@ describe Mongoid::Attributes do
             expect {
               from_db[:title]
             }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+      end
+
+      context "when the field was not explicitly defined" do
+
+        context "when excluding with only and the field was not excluded" do
+
+          let(:from_db) do
+            Person.only(:_id).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:undefined_field]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context "when excluding with without and the field was excluded" do
+
+          let(:from_db) do
+            Person.without(:title).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:title]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context "when excluding with without and the field was not excluded" do
+
+          let(:from_db) do
+            Person.without(:title).first
+          end
+
+          it "returns nil" do
+            from_db[:undefined_field].should be nil
+          end
+        end
+      end
+
+      context 'when projecting with #only' do
+        let!(:person) do
+          Person.create!(title: 'sir', name: { first_name: 'Jose', language: { name: 'es' } })
+        end
+
+        context 'when projecting an embedded association' do
+          let(:from_db) do
+            Person.only(:name).first
+          end
+
+          context 'when retrieving a field of the association using the dot notation' do
+
+            it 'retrieves the field' do
+              expect(from_db['name.first_name']).to eq 'Jose'
+            end
+          end
+
+          context 'when retrieving a field of a nested association using the dot notation' do
+            it 'retrieves the field' do
+              expect(from_db['name.language.name']).to eq 'es'
+            end
+          end
+        end
+
+        context 'when projecting a sub-association of an embedded association' do
+          let(:from_db) do
+            Person.only('name.language').first
+          end
+
+          context 'when retrieving a field under the projected sub-association' do
+            it 'retrieves the field' do
+              expect(from_db['name.language.name']).to eq 'es'
+            end
+          end
+
+          context 'when retrieving a non-projected field' do
+            it 'raises MissingAttributeError' do
+              expect do
+                from_db['name.first_name']
+              end.to raise_error(ActiveModel::MissingAttributeError)
+            end
           end
         end
       end
@@ -370,6 +454,67 @@ describe Mongoid::Attributes do
 
       it "returns the set value" do
         expect(terms).to eq(true)
+      end
+    end
+
+    context 'when the field is not explicitly defined' do
+      let(:bar) { Bar.new }
+
+      before do
+        bar['missing_field'] = 42
+      end
+
+      it 'writes the value into attributes' do
+        bar.attributes.should == {'_id' => bar.id, 'missing_field' => 42}
+      end
+
+      it 'makes the attribute accessible via []' do
+        bar['missing_field'].should == 42
+      end
+
+      context 'when writing fields on a document with projection' do
+
+        let!(:person) do
+          Person.create!(title: "sir")
+        end
+
+        context "when excluding with only and the field was not excluded" do
+
+          let(:from_db) do
+            Person.only(:_id).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:undefined_field] = 'x'
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context "when excluding with without and the field was excluded" do
+
+          let(:from_db) do
+            Person.without(:title).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:title] = 'x'
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context "when excluding with without and the field was not excluded" do
+
+          let(:from_db) do
+            Person.without(:title).first
+          end
+
+          it "writes the value" do
+            from_db[:undefined_field] = 'x'
+            from_db[:undefined_field].should == 'x'
+          end
+        end
       end
     end
   end
@@ -842,7 +987,7 @@ describe Mongoid::Attributes do
     context 'when the document has a custom attribute type' do
 
       let(:bar) do
-        Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+        Bar.create!(lat_lng: LatLng.new(52.30, 13.25))
       end
 
       it 'returns the demongoized version of the attribute' do
@@ -880,7 +1025,7 @@ describe Mongoid::Attributes do
     context "when the document is an existing record" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the attribute does not exist" do
@@ -919,7 +1064,7 @@ describe Mongoid::Attributes do
   describe "#read_attribute_before_type_cast" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when the attribute has not yet been assigned" do
@@ -934,6 +1079,50 @@ describe Mongoid::Attributes do
       it "returns the default value" do
         person.age = "old"
         expect(person.age_before_type_cast).to eq("old")
+      end
+    end
+
+    context 'when reading fields on a document with projection' do
+
+      let!(:person) do
+        Person.create!(title: "sir")
+      end
+
+      context "when excluding with only and the field was not excluded" do
+
+        let(:from_db) do
+          Person.only(:_id).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.read_attribute(:undefined_field)
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+
+      context "when excluding with without and the field was excluded" do
+
+        let(:from_db) do
+          Person.without(:title).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.read_attribute(:title)
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+
+      context "when excluding with without and the field was not excluded" do
+
+        let(:from_db) do
+          Person.without(:title).first
+        end
+
+        it "returns nil" do
+          from_db.read_attribute(:undefined_field).should be nil
+        end
       end
     end
   end
@@ -967,7 +1156,7 @@ describe Mongoid::Attributes do
     context "when the document is an existing record" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the attribute does not exist" do
@@ -1026,7 +1215,7 @@ describe Mongoid::Attributes do
 
     context "when the attribute is not on only list" do
 
-      before { Person.create }
+      before { Person.create! }
       let(:person) do
         Person.only(:id).first
       end
@@ -1095,7 +1284,7 @@ describe Mongoid::Attributes do
     context "when the attribute exists" do
 
       let(:person) do
-        Person.create(title: "Sir")
+        Person.create!(title: "Sir")
       end
 
       before do
@@ -1193,7 +1382,7 @@ describe Mongoid::Attributes do
       context 'when the database name is used' do
 
         let(:person) do
-          Person.create(at: Time.now)
+          Person.create!(at: Time.now)
         end
 
         before do
@@ -1223,7 +1412,7 @@ describe Mongoid::Attributes do
       context 'when the alias is used' do
 
         let(:person) do
-          Person.create(aliased_timestamp: Time.now)
+          Person.create!(aliased_timestamp: Time.now)
         end
 
         before do
@@ -1384,7 +1573,7 @@ describe Mongoid::Attributes do
         person.write_attribute(:test, "aliased field to test")
       end
 
-      it "allows the field name to be udpated" do
+      it "allows the field name to be updated" do
         expect(person.t).to eq("aliased field to test")
       end
     end
@@ -1439,6 +1628,51 @@ describe Mongoid::Attributes do
       it "sets the value for the current locale" do
         dictionary.write_attribute(:description, 'foo')
         expect(dictionary.description).to eq('foo')
+      end
+    end
+
+    context 'when writing fields on a document with projection' do
+
+      let!(:person) do
+        Person.create!(title: "sir")
+      end
+
+      context "when excluding with only and the field was not excluded" do
+
+        let(:from_db) do
+          Person.only(:_id).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.write_attribute(:undefined_field, 'x')
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+
+      context "when excluding with without and the field was excluded" do
+
+        let(:from_db) do
+          Person.without(:title).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.write_attribute(:title, 'x')
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+
+      context "when excluding with without and the field was not excluded" do
+
+        let(:from_db) do
+          Person.without(:title).first
+        end
+
+        it "writes the value" do
+          from_db.write_attribute(:undefined_field, 'x')
+          from_db.read_attribute(:undefined_field).should == 'x'
+        end
       end
     end
   end
@@ -1840,7 +2074,7 @@ describe Mongoid::Attributes do
   context "when persisting nil attributes" do
 
     let!(:person) do
-      Person.create(score: nil)
+      Person.create!(score: nil)
     end
 
     it "has an entry in the attributes" do
@@ -1865,7 +2099,7 @@ describe Mongoid::Attributes do
     context "when no value exists in the database" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       it "applies the default value" do
@@ -1878,7 +2112,7 @@ describe Mongoid::Attributes do
       context "when the value is not nil" do
 
         let!(:person) do
-          Person.create(age: 50)
+          Person.create!(age: 50)
         end
 
         let(:from_db) do
@@ -1893,7 +2127,7 @@ describe Mongoid::Attributes do
       context "when the value is explicitly nil" do
 
         let!(:person) do
-          Person.create(age: nil)
+          Person.create!(age: nil)
         end
 
         let(:from_db) do
@@ -1908,7 +2142,7 @@ describe Mongoid::Attributes do
       context "when the default is a proc" do
 
         let!(:account) do
-          Account.create(name: "savings", balance: "100")
+          Account.create!(name: "savings", balance: 100)
         end
 
         let(:from_db) do
@@ -1926,7 +2160,7 @@ describe Mongoid::Attributes do
 
     context 'when the attribute is blank' do
       let(:person) do
-        Person.create(title: '')
+        Person.create!(title: '')
       end
 
       it 'returns false' do
@@ -1936,7 +2170,7 @@ describe Mongoid::Attributes do
 
     context 'when the attribute is localized' do
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context 'after initialization when the field is nil' do
@@ -1968,7 +2202,7 @@ describe Mongoid::Attributes do
 
     context 'when the attribute is not localized' do
       let(:person) do
-        Person.create(username: 'localized')
+        Person.create!(username: 'localized')
       end
 
       before do

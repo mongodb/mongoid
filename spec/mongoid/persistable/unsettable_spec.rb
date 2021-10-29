@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -41,7 +40,7 @@ describe Mongoid::Persistable::Unsettable do
       end
 
       let(:person) do
-        Person.create(title: "test", age: 30, dob: date)
+        Person.create!(title: "test", age: 30, dob: date)
       end
 
       context "when provided a splat of symbols" do
@@ -111,11 +110,11 @@ describe Mongoid::Persistable::Unsettable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "kreuzberg", number: 40, city: "Berlin")
+        person.addresses.create!(street: "kreuzberg", number: 40, city: "Berlin")
       end
 
       context "when provided a splat of symbols" do
@@ -158,7 +157,7 @@ describe Mongoid::Persistable::Unsettable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(title: "sir", age: 30)
+        Person.create!(title: "sir", age: 30)
       end
 
       it "marks a dirty change for the unset fields" do

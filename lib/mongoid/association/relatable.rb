@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'mongoid/association/constrainable'
 require 'mongoid/association/options'
@@ -8,8 +7,6 @@ module Mongoid
   module Association
 
     # This module provides behaviors shared between Association types.
-    #
-    # @since 7.0
     module Relatable
       include Constrainable
       include Options
@@ -17,8 +14,6 @@ module Mongoid
       # The options shared between all association types.
       #
       # @return [ Array<Symbol> ] The shared options.
-      #
-      # @since 7.0
       SHARED_OPTIONS = [
                          :class_name,
                          :inverse_of,
@@ -29,22 +24,16 @@ module Mongoid
       # The primary key default.
       #
       # @return [ String ] The primary key field default.
-      #
-      # @since 7.0
       PRIMARY_KEY_DEFAULT = '_id'.freeze
 
       # The name of the association.
       #
       # @return [ Symbol ] The name of the association.
-      #
-      # @since 7.0
       attr_reader :name
 
       # The options on this association.
       #
       # @return [ Hash ] The options.
-      #
-      # @since 7.0
       attr_reader :options
 
       # Initialize the Association.
@@ -53,8 +42,6 @@ module Mongoid
       # @param [ Symbol ] name The name of the association.
       # @param [ Hash ] opts The association options.
       # @param [ Block ] block The optional block.
-      #
-      # @since 7.0
       def initialize(_class, name, opts = {}, &block)
         @owner_class = _class
         @name = name
@@ -71,8 +58,6 @@ module Mongoid
       # Compare this association to another.
       #
       # @return [ Object ] The object to compare to this association.
-      #
-      # @since 7.0
       def ==(other)
         relation_class_name == other.relation_class_name &&
           inverse_class_name == other.inverse_class_name &&
@@ -86,8 +71,6 @@ module Mongoid
       #
       # @return [ Array<Proc, Symbol> ] A list of the callbacks, either method
       #   names or Procs.
-      #
-      # @since 7.0
       def get_callbacks(callback_type)
         Array(options[callback_type])
       end
@@ -96,8 +79,6 @@ module Mongoid
       # @note Only relevant for polymorphic associations that take the :as option.
       #
       # @return [ String ] The type setter method.
-      #
-      # @since 7.0
       def type_setter
         @type_setter ||= type.__setter__
       end
@@ -108,8 +89,6 @@ module Mongoid
       # @param [ Document ] doc The document to be bound.
       #
       # @return [ true, false ] Whether the document can be bound.
-      #
-      # @since 7.0
       def bindable?(doc); false; end
 
       # Get the inverse names.
@@ -118,10 +97,10 @@ module Mongoid
       #   determining inverses.
       #
       # @return [ Array<Symbol> ] The list of inverse names.
-      #
-      # @since 7.0
       def inverses(other = nil)
         return [ inverse_of ] if inverse_of
+        return [] if @options.key?(:inverse_of) && !inverse_of
+
         if polymorphic?
           polymorphic_inverses(other)
         else
@@ -135,8 +114,6 @@ module Mongoid
       #   determining inverses.
       #
       # @return [ Association ] The inverse's association metadata.
-      #
-      # @since 7.0
       def inverse_association(other = nil)
         (other || relation_class).relations[inverse(other)]
       end
@@ -144,8 +121,6 @@ module Mongoid
       # Get the inverse type.
       #
       # @return [ nil ] Default is nil for an association.
-      #
-      # @since 7.0
       def inverse_type; end
 
       # The class name, possibly unqualified or :: prefixed, of the association
@@ -169,8 +144,6 @@ module Mongoid
       #   the +relation_class+ method.
       #
       # @return [ String ] The association objects' class name.
-      #
-      # @since 7.0
       def relation_class_name
         @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name)
       end
@@ -190,8 +163,6 @@ module Mongoid
       # happen to be defined with the same name as the association name).
       #
       # @return [ String ] The association objects' class.
-      #
-      # @since 7.0
       def relation_class
         @klass ||= begin
           cls_name = @options[:class_name] || ActiveSupport::Inflector.classify(name)
@@ -203,8 +174,6 @@ module Mongoid
       # The class name of the object owning this association.
       #
       # @return [ String ] The owning objects' class name.
-      #
-      # @since 7.0
       def inverse_class_name
         @inverse_class_name ||= @owner_class.name
       end
@@ -212,8 +181,6 @@ module Mongoid
       # The class of the object owning this association.
       #
       # @return [ String ] The owning objects' class.
-      #
-      # @since 7.0
       def inverse_class
         @owner_class
       end
@@ -223,8 +190,6 @@ module Mongoid
       # Otherwise, the primary key.
       #
       # @return [ Symbol, String ] The primary key.
-      #
-      # @since 7.0
       def key
         stores_foreign_key? ? foreign_key : primary_key
       end
@@ -232,8 +197,6 @@ module Mongoid
       # The name of the setter on this object for assigning an associated object.
       #
       # @return [ String ] The setter name.
-      #
-      # @since 7.0
       def setter
         @setter ||= "#{name}="
       end
@@ -241,8 +204,6 @@ module Mongoid
       # The name of the inverse setter method.
       #
       # @return [ String ] The name of the inverse setter.
-      #
-      # @since 7.0
       def inverse_setter(other = nil)
         @inverse_setter ||= "#{inverses(other).first}=" unless inverses(other).blank?
       end
@@ -250,8 +211,6 @@ module Mongoid
       # The name of the foreign key setter method.
       #
       # @return [ String ] The name of the foreign key setter.
-      #
-      # @since 7.0
       def foreign_key_setter
         # note: You can't check if this association stores foreign key
         # See HasOne and HasMany binding, they referenced foreign_key_setter
@@ -261,8 +220,6 @@ module Mongoid
       # The atomic path for this association.
       #
       # @return [  Mongoid::Atomic::Paths::Root ] The atomic path object.
-      #
-      # @since 7.0
       def path(document)
         relation.path(document)
       end
@@ -274,8 +231,6 @@ module Mongoid
       #   association.inverse_type_setter
       #
       # @return [ String ] The name of the setter.
-      #
-      # @since 7.0
       def inverse_type_setter
         @inverse_type_setter ||= inverse_type.__setter__
       end
@@ -286,10 +241,8 @@ module Mongoid
       #   association.foreign_key_check
       #
       # @return [ String ] The foreign key check.
-      #
-      # @since 7.0
       def foreign_key_check
-        @foreign_key_check ||= "#{foreign_key}_changed?" if (stores_foreign_key? && foreign_key)
+        @foreign_key_check ||= "#{foreign_key}_previously_changed?" if (stores_foreign_key? && foreign_key)
       end
 
       # Create an association proxy object using the owner and target.
@@ -299,8 +252,6 @@ module Mongoid
       #   association.
       #
       # @return [ Proxy ]
-      #
-      # @since 7.0
       def create_relation(owner, target)
         relation.new(owner, target, self)
       end
@@ -308,8 +259,6 @@ module Mongoid
       # Whether the dependent method is destructive.
       #
       # @return [ true, false ] If the dependent method is destructive.
-      #
-      # @since 7.0
       def destructive?
         @destructive ||= !!(dependent && (dependent == :delete_all || dependent == :destroy))
       end
@@ -317,8 +266,6 @@ module Mongoid
       # Get the counter cache column name.
       #
       # @return [ String ] The counter cache column name.
-      #
-      # @since 7.0
       def counter_cache_column_name
         @counter_cache_column_name ||= (@options[:counter_cache].is_a?(String) ||
             @options[:counter_cache].is_a?(Symbol)) ?
@@ -328,8 +275,6 @@ module Mongoid
       # Get the extension.
       #
       # @return [ Module ] The extension module, if one has been defined.
-      #
-      # @since 7.0
       def extension
         @extension ||= @options[:extend]
       end
@@ -337,8 +282,6 @@ module Mongoid
       # Get the inverse name.
       #
       # @return [ Symbol ] The inverse name.
-      #
-      # @since 7.0
       def inverse(other = nil)
         candidates = inverses(other)
         candidates.detect { |c| c } if candidates
@@ -348,8 +291,6 @@ module Mongoid
       #
       # @return [ true, false ] If the associated object(s)
       #   should be validated.
-      #
-      # @since 7.0
       def validate?
         @validate ||= if @options[:validate].nil?
                         validation_default

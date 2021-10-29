@@ -1,22 +1,23 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
 
   # A cache of database queries on a per-request basis.
-  #
-  # @since 4.0.0
   module QueryCache
-    class << self
+    # @api private
+    LEGACY_WARNING = <<~DOC
+      You are using the legacy Mongoid query cache which has known issues.
+      Please upgrade the `mongo' gem to at least 2.14.0 to use the improved driver query cache.
+      Refer to: https://docs.mongodb.com/mongoid/current/tutorials/mongoid-queries/#the-improved-driver-query-cache
+    DOC
 
+    class << self
       # Get the cached queries.
       #
       # @example Get the cached queries from the current thread.
       #   QueryCache.cache_table
       #
       # @return [ Hash ] The hash of cached queries.
-      #
-      # @since 4.0.0
       # @api private
       def cache_table
         if defined?(Mongo::QueryCache)
@@ -32,8 +33,6 @@ module Mongoid
       #   QueryCache.clear_cache
       #
       # @return [ nil ] Always nil.
-      #
-      # @since 4.0.0
       def clear_cache
         if defined?(Mongo::QueryCache)
           Mongo::QueryCache.clear
@@ -48,8 +47,6 @@ module Mongoid
       #   QueryCache.enabled = true
       #
       # @param [ true, false ] value The enabled value.
-      #
-      # @since 4.0.0
       def enabled=(value)
         if defined?(Mongo::QueryCache)
           Mongo::QueryCache.enabled = value
@@ -64,8 +61,6 @@ module Mongoid
       #   QueryCache.enabled?
       #
       # @return [ true, false ] If the cache is enabled.
-      #
-      # @since 4.0.0
       def enabled?
         if defined?(Mongo::QueryCache)
           Mongo::QueryCache.enabled?
@@ -80,12 +75,14 @@ module Mongoid
       #   QueryCache.cache { collection.find }
       #
       # @return [ Object ] The result of the block.
-      #
-      # @since 4.0.0
       def cache(&block)
         if defined?(Mongo::QueryCache)
           Mongo::QueryCache.cache(&block)
         else
+          @legacy_query_cache_warned ||= begin
+            Mongoid.logger.warn(LEGACY_WARNING)
+            true
+          end
           enabled = QueryCache.enabled?
           QueryCache.enabled = true
           begin
@@ -122,8 +119,6 @@ module Mongoid
     else
       # The middleware to be added to a rack application in order to activate the
       # query cache.
-      #
-      # @since 4.0.0
       class Middleware
 
         # Instantiate the middleware.
@@ -132,8 +127,6 @@ module Mongoid
         #   Middleware.new(app)
         #
         # @param [ Object ] app The rack application stack.
-        #
-        # @since 4.0.0
         def initialize(app)
           @app = app
         end
@@ -146,8 +139,6 @@ module Mongoid
         # @param [ Object ] env The environment.
         #
         # @return [ Object ] The result of the call.
-        #
-        # @since 4.0.0
         def call(env)
           QueryCache.cache do
             @app.call(env)
@@ -160,8 +151,6 @@ module Mongoid
 
     # A Cursor that attempts to load documents from memory first before hitting
     # the database if the same query has already been executed.
-    #
-    # @since 5.0.0
     # @deprecated This class is only used with driver versions 2.13 and lower.
     class CachedCursor < Mongo::Cursor
 
@@ -172,8 +161,6 @@ module Mongoid
       #   cursor.each do |doc|
       #     # ...
       #   end
-      #
-      # @since 5.0.0
       def each
         if @cached_documents
           @cached_documents.each do |doc|
@@ -190,8 +177,6 @@ module Mongoid
       #   cursor.inspect
       #
       # @return [ String ] A string representation of a +Cursor+ instance.
-      #
-      # @since 2.0.0
       def inspect
         "#<Mongoid::QueryCache::CachedCursor:0x#{object_id} @view=#{@view.inspect}>"
       end
@@ -211,8 +196,6 @@ module Mongoid
 
     # Included to add behavior for clearing out the query cache on certain
     # operations.
-    #
-    # @since 4.0.0
     # @deprecated This module is only used with driver versions 2.13 and lower.
     module Base
 
@@ -231,8 +214,6 @@ module Mongoid
 
     # Contains enhancements to the Mongo::Collection::View in order to get a
     # cached cursor or a regular cursor on iteration.
-    #
-    # @since 5.0.0
     # @deprecated This module is only used with driver versions 2.13 and lower.
     module View
       extend ActiveSupport::Concern
@@ -256,8 +237,6 @@ module Mongoid
       #   view.each do |doc|
       #     # ...
       #   end
-      #
-      # @since 5.0.0
       def each
         if system_collection? || !QueryCache.enabled? || (respond_to?(:write?, true) && write?)
           super
@@ -311,8 +290,6 @@ module Mongoid
     end
 
     # Adds behavior to the query cache for collections.
-    #
-    # @since 5.0.0
     # @deprecated This module is only used with driver versions 2.13 and lower.
     module Collection
       extend ActiveSupport::Concern

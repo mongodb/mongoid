@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   class Criteria
@@ -15,8 +14,6 @@ module Mongoid
           #   /\A[123]/.regexp?
           #
           # @return [ true ] Always true.
-          #
-          # @since 1.0.0
           def regexp?; true; end
 
           module ClassMethods
@@ -29,8 +26,6 @@ module Mongoid
             # @param [ Regexp, String ] object The object to evolve.
             #
             # @return [ Regexp ] The evolved regex.
-            #
-            # @since 1.0.0
             def evolve(object)
               __evolve__(object) do |obj|
                 ::Regexp.new(obj)
@@ -46,8 +41,6 @@ module Mongoid
             #   bson_raw_regexp.regexp?
             #
             # @return [ true ] Always true.
-            #
-            # @since 5.2.1
             def regexp?; true; end
 
             module ClassMethods
@@ -60,8 +53,6 @@ module Mongoid
               # @param [ BSON::Regexp::Raw, String ] object The object to evolve.
               #
               # @return [ BSON::Regexp::Raw ] The evolved raw regex.
-              #
-              # @since 5.2.1
               def evolve(object)
                 __evolve__(object) do |obj|
                   obj.is_a?(String) ? BSON::Regexp::Raw.new(obj) : obj

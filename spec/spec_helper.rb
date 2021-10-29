@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require 'lite_spec_helper'
 
@@ -29,9 +28,18 @@ def database_id_alt
   "mongoid_test_alt"
 end
 
-require 'mrss/cluster_config'
-require 'support/client_registry'
-require 'mrss/constraints'
+begin
+  require 'mrss/cluster_config'
+  require 'support/client_registry'
+  require 'mrss/constraints'
+  require 'mrss/event_subscriber'
+rescue LoadError => exc
+  raise LoadError.new <<~MSG.strip
+    The test suite requires shared tooling to be installed.
+    Please refer to spec/README.md for instructions.
+    #{exc.class}: #{exc}
+  MSG
+end
 
 ClusterConfig = Mrss::ClusterConfig
 
@@ -47,7 +55,7 @@ if SpecConfig.instance.ci?
   client = Mongo::Client.new(SpecConfig.instance.addresses)
   while starting
     begin
-      client.command(Mongo::Server::Monitor::Connection::ISMASTER)
+      client.command(ping: 1)
       break
     rescue Mongo::Error::OperationFailure => e
       sleep(2)
@@ -155,31 +163,21 @@ RSpec.configure do |config|
 end
 
 # A subscriber to be used with the Ruby driver for testing.
-#
-# @since 6.4.0
 class EventSubscriber
 
   # The started events.
-  #
-  # @since 6.4.0
   attr_reader :started_events
 
   # The succeeded events.
-  #
-  # @since 6.4.0
   attr_reader :succeeded_events
 
   # The failed events.
-  #
-  # @since 6.4.0
   attr_reader :failed_events
 
   # Create the test event subscriber.
   #
   # @example Create the subscriber
   #   EventSubscriber.new
-  #
-  # @since 6.4.0
   def initialize
     @started_events = []
     @succeeded_events = []
@@ -189,8 +187,6 @@ class EventSubscriber
   # Cache the succeeded event.
   #
   # @param [ Event ] event The event.
-  #
-  # @since 6.4.0
   def succeeded(event)
     @succeeded_events.push(event)
   end
@@ -198,8 +194,6 @@ class EventSubscriber
   # Cache the started event.
   #
   # @param [ Event ] event The event.
-  #
-  # @since 6.4.0
   def started(event)
     @started_events.push(event)
   end
@@ -207,15 +201,11 @@ class EventSubscriber
   # Cache the failed event.
   #
   # @param [ Event ] event The event.
-  #
-  # @since 6.4.0
   def failed(event)
     @failed_events.push(event)
   end
 
   # Clear all cached events.
-  #
-  # @since 6.4.0
   def clear_events!
     @started_events = []
     @succeeded_events = []

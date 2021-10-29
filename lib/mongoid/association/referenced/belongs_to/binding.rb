@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -19,8 +18,6 @@ module Mongoid
           # @example Bind the documents.
           #   game.person.bind(:continue => true)
           #   game.person = Person.new
-          #
-          # @since 2.0.0.rc.1
           def bind_one
             binding do
               check_polymorphic_inverses!(_target)
@@ -44,8 +41,6 @@ module Mongoid
           # @example Unbind the document.
           #   game.person.unbind(:continue => true)
           #   game.person = nil
-          #
-          # @since 2.0.0.rc.1
           def unbind_one
             binding do
               inverse = _association.inverse(_target)
@@ -72,8 +67,6 @@ module Mongoid
           #   binding.check_inverses!(doc)
           #
           # @param [ Document ] doc The document to check.
-          #
-          # @since 3.0.0
           def check_polymorphic_inverses!(doc)
             inverses = _association.inverses(doc)
             if inverses.length > 1 && _base.send(_association.foreign_key).nil?

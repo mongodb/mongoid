@@ -1,0 +1,105 @@
+- name: embedded field - inclusion
+  projection:
+    foo.bar: 1
+  
+  queries: &embedded-field-inclusion-expectations
+    # Top-level field is allowed as a container
+    - query: foo
+      allowed: true
+      
+    # Unmentioned field is not allowed
+    - query: bar
+      allowed: false
+      
+    # A peer to the field isn't allowed
+    - query: foo.buck
+      allowed: false
+      
+    # A more nested field is allowed
+    - query: foo.bar.baz
+      allowed: true
+
+- name: embedded field - exclusion
+  projection:
+    foo.bar: 0
+  
+  queries: &embedded-field-exclusion-expectations
+    # Top-level field is allowed
+    - query: foo
+      allowed: true
+    
+    # Unmentioned field is allowed
+    - query: bar
+      allowed: true
+      
+    # A peer to the excluded field is allowed
+    - query: foo.buck
+      allowed: true
+      
+    # A more nested field is not allowed
+    - query: foo.bar.baz
+      allowed: false
+
+- name: parent and child fields - inclusion
+  projection:
+    foo.bar: 1
+    foo.bar.baz: 1
+  
+  queries:
+    # Top-level field is allowed
+    - query: foo
+      allowed: true
+      
+    # Second-level field is allowed
+    - query: foo.bar
+      allowed: true
+    
+    # Third-level field is also allowed
+    - query: foo.bar.baz
+      allowed: true
+    
+    # Fourth-level field is still allowed
+    - query: foo.bar.baz.zzz
+      allowed: true
+    
+    # Unmentioned siblings are not allowed
+    - query: buck
+      allowed: false
+    - query: foo.buck
+      allowed: false
+    
+    # This sibling is under the second-level include and is allowed
+    - query: foo.bar.buck
+      allowed: true
+
+- name: parent and child fields - exclusion
+  projection:
+    foo.bar: 0
+    foo.bar.baz: 0
+  
+  queries:
+    # Top-level field is allowed
+    - query: foo
+      allowed: true
+      
+    # Second-level field is not allowed
+    - query: foo.bar
+      allowed: false
+    
+    # Third-level field is also not allowed
+    - query: foo.bar.baz
+      allowed: false
+    
+    # Fourth-level field is still not allowed
+    - query: foo.bar.baz.zzz
+      allowed: false
+    
+    # Unmentioned siblings are allowed
+    - query: buck
+      allowed: true
+    - query: foo.buck
+      allowed: true
+      
+    # This sibling is under the second-level exclude and is disallowed
+    - query: foo.bar.buck
+      allowed: false

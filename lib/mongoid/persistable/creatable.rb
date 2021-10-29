@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Persistable
 
     # Defines behavior for persistence operations that create new documents.
-    #
-    # @since 4.0.0
     module Creatable
       extend ActiveSupport::Concern
 
@@ -19,8 +16,6 @@ module Mongoid
       # @param [ Hash ] options Options to pass to insert.
       #
       # @return [ Document ] The persisted document.
-      #
-      # @since 1.0.0
       def insert(options = {})
         prepare_insert(options) do
           if embedded?
@@ -41,8 +36,6 @@ module Mongoid
       #   document.inserts
       #
       # @return [ Hash ] The insert ops.
-      #
-      # @since 2.1.0
       def atomic_inserts
         { atomic_insert_modifier => { atomic_position => as_attributes }}
       end
@@ -55,8 +48,6 @@ module Mongoid
       #   document.insert_as_embedded
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def insert_as_embedded
         raise Errors::NoParent.new(self.class.name) unless _parent
         if _parent.new_record?
@@ -77,8 +68,6 @@ module Mongoid
       #   document.insert_as_root
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def insert_as_root
         collection.insert_one(as_attributes, session: _session)
       end
@@ -92,8 +81,6 @@ module Mongoid
       #   document.post_process_insert
       #
       # @return [ true ] true.
-      #
-      # @since 4.0.0
       def post_process_insert
         self.new_record = false
         flag_children_persisted
@@ -112,18 +99,23 @@ module Mongoid
       # @param [ Hash ] options The options.
       #
       # @return [ Document ] The document.
-      #
-      # @since 4.0.0
       def prepare_insert(options = {})
         return self if performing_validations?(options) &&
           invalid?(options[:context] || :create)
-        result = run_callbacks(:save) do
-          run_callbacks(:create) do
-            yield(self)
-            post_process_insert
+        run_callbacks(:save, with_children: false) do
+          run_callbacks(:create, with_children: false) do
+            run_callbacks(:persist_parent, with_children: false) do
+              _mongoid_run_child_callbacks(:save) do
+                _mongoid_run_child_callbacks(:create) do
+                  result = yield(self)
+                  post_process_insert
+                  post_process_persist(result, options)
+                end
+              end
+            end
           end
         end
-        post_process_persist(result, options) and self
+        self
       end
 
       module ClassMethods
@@ -142,8 +134,6 @@ module Mongoid
         #   Array of multiple attributes for multiple documents.
         #
         # @return [ Document, Array<Document> ] The newly created document(s).
-        #
-        # @since 1.0.0
         def create(attributes = nil, &block)
           _creating do
             if attributes.is_a?(::Array)
@@ -171,8 +161,6 @@ module Mongoid
         #   Array of multiple attributes for multiple documents.
         #
         # @return [ Document, Array<Document> ] The newly created document(s).
-        #
-        # @since 1.0.0
         def create!(attributes = nil, &block)
           _creating do
             if attributes.is_a?(::Array)

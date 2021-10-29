@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 module Mongoid
   module Association
@@ -7,8 +6,6 @@ module Mongoid
       module Eager
 
         # Base class for eager load preload functions.
-        #
-        # @since 4.0.0
         class Base
 
           # Instantiate the eager load class.
@@ -20,8 +17,6 @@ module Mongoid
           # @param [ Array<Document> ] docs Documents to preload the associations
           #
           # @return [ Base ] The eager load preloader
-          #
-          # @since 4.0.0
           def initialize(associations, docs)
             @associations = associations
             @docs = docs
@@ -34,8 +29,6 @@ module Mongoid
           #   loader.run
           #
           # @return [ Array ] The list of documents given.
-          #
-          # @since 4.0.0
           def run
             @loaded = []
             while shift_association
@@ -53,8 +46,6 @@ module Mongoid
           #
           # @example Preload the current association into the documents.
           #   loader.preload
-          #
-          # @since 4.0.0
           def preload
             raise NotImplementedError
           end
@@ -64,8 +55,6 @@ module Mongoid
           # association is not polymorphic, all documents are retrieved in
           # a single query. If the association is polymorphic, one query is
           # issued per association target class.
-          #
-          # @since 4.0.0
           def each_loaded_document(&block)
             each_loaded_document_of_class(@association.klass, keys_from_docs, &block)
           end
@@ -81,7 +70,9 @@ module Mongoid
             # Upstream code is responsible for eliminating nils from keys.
             return cls.none if keys.empty?
 
-            criteria = cls.any_in(key => keys)
+            criteria = cls.criteria
+            criteria = criteria.apply_scope(@association.scope)
+            criteria = criteria.any_in(key => keys)
             criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc
@@ -95,8 +86,6 @@ module Mongoid
           #
           # @param [ ObjectId ] id parent`s id
           # @param [ Document, Array ] element to push into the parent
-          #
-          # @since 4.0.0
           def set_on_parent(id, element)
             grouped_docs[id].each do |d|
               set_relation(d, element)
@@ -112,8 +101,6 @@ module Mongoid
           #   loader.grouped_docs
           #
           # @return [ Hash ] hash with grouped documents.
-          #
-          # @since 4.0.0
           def grouped_docs
             @grouped_docs[@association.name] ||= @docs.group_by do |doc|
               doc.send(group_by_key) if doc.respond_to?(group_by_key)
@@ -131,8 +118,6 @@ module Mongoid
           #   loader.keys_from_docs
           #
           # @return [ Array ] keys, ids
-          #
-          # @since 4.0.0
           def keys_from_docs
             grouped_docs.keys
           end
@@ -145,8 +130,6 @@ module Mongoid
           #   loader.group_by_key
           #
           # @return [ Symbol ] Key to group by the current documents.
-          #
-          # @since 4.0.0
           def group_by_key
             raise NotImplementedError
           end
@@ -158,8 +141,6 @@ module Mongoid
           #
           # @param [ Document ] doc The object to set the association on
           # @param [ Document, Array ] element to set into the parent
-          #
-          # @since 4.0.0
           def set_relation(doc, element)
             doc.set_relation(@association.name, element) unless doc.blank?
           end
@@ -172,8 +153,6 @@ module Mongoid
           #   loader.shift_association
           #
           # @return [ Association ] The association object.
-          #
-          # @since 4.0.0
           def shift_association
             @association = @associations.shift
           end

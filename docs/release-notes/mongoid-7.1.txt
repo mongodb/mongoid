@@ -1,0 +1,308 @@
+***********
+Mongoid 7.1
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 7.1.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Condition Combination
+---------------------
+
+**Breaking change:** In Mongoid 7.1, when condition methods are invoked on a
+Criteria object, they always add new conditions to the existing conditions in
+the Criteria object. Previously new conditions could have replaced existing
+conditions in some circumstances.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.where(id: 1).where(id: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"_id"=>1, "$and"=>[{"_id"=>2}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Corresponding Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.where(id: 1).where(id: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"_id"=>2}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+**Known issue:** When using Ruby 2.6 and lower, when adding multiple conditions
+on the same field using the same operator, the operator must be given as a
+string, not as a symbol. The following invocations fail:
+
+.. code-block:: ruby
+
+  Band.and({year: {'$in': [2020]}}, {year: {'$in': [2020]}})
+  # Traceback (most recent call last):
+  #         2: from (irb):10
+  #         1: from (irb):10:in `rescue in irb_binding'
+  # NoMethodError (undefined method `start_with?' for :$in:Symbol)
+
+  Band.and(year: {'$in': [2020]}).and(year: {'$in': [2020]})
+  # Traceback (most recent call last):
+  #         2: from (irb):11
+  #         1: from (irb):11:in `rescue in irb_binding'
+  # NoMethodError (undefined method `start_with?' for :$in:Symbol)
+
+Use string keys instead:
+
+.. code-block:: ruby
+
+  # Band.and({year: {'$in' => [2020]}}, {year: {'$in' => [2020]}})
+  # => #<Mongoid::Criteria
+  #   selector: {"year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2020]}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.and(year: {'$in' => [2020]}).and(year: {'$in' => [2020]})
+  # => #<Mongoid::Criteria
+  #   selector: {"year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2020]}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+This issue is rectified in Mongoid 7.3.
+
+
+Logical Operations
+------------------
+
+**Breaking change:** In Mongoid 7.1 logical operator methods ``or`` and
+``nor`` treat the receiver as one of the operands. This behavior matches that
+of ActiveRecord. Previously, ``or`` and ``nor`` added their parameters as
+additional conditions to the receiver.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').or(name: 'Two')
+    # => #<Mongoid::Criteria
+    #   selector: {"$or"=>[{"name"=>"One"}, {"name"=>"Two"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Corresponding Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').or(name: 'Two')
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>"One", "$or"=>[{"name"=>"Two"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+To add ``or`` or ``nor`` parameters to the existing query without disjuncting
+the existing query, create a separate scope:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').and(Band.or({name: 'Two'}, {name: 'Three'}))
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>"One", "$and"=>[{"$or"=>[{"name"=>"Two"}, {"name"=>"Three"}]}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Alternatively, use ``any_of`` which behaves as ``or`` did in Mongoid 7.0:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').any_of({name: 'Two'}, {name: 'Three'})
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>"One", "$or"=>[{"name"=>"Two"}, {"name"=>"Three"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+For more information, please review the :ref:`logical operations
+<logical-operations>` section of the documentation.
+
+
+Merge Strategies
+----------------
+
+**Breaking change:** In Mongoid 7.1, :ref:`Merge strategies <merge-strategies>`
+must be explicitly requested. Previously, ``all`` defaulted to the
+union strategy and ``in`` and ``nin`` defaulted to the intersect strategy.
+In Mongoid 7.1, there is no merge strategy applied by default.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.all(a: 1).all(a: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"a"=>{"$all"=>[1]}, "$and"=>[{"a"=>{"$all"=>[2]}}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Default Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.all(a: 1).all(a: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"a"=>{"$all"=>[1, 2]}}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+To achieve the same behavior in Mongoid 7.1, the desired merge strategy must be
+explicitly requested:
+
+.. code-block:: ruby
+
+    Band.all(a: 1).union.all(a: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"a"=>{"$all"=>[1, 2]}}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+
+Required Condition Arguments
+----------------------------
+
+**Breaking change:** ``nil`` arguments to Criteria methods are no longer
+accepted. For example, the following invocation is now an error:
+
+.. code-block:: ruby
+
+  Band.where(nil)
+
+**Breaking change:** Most Criteria methods (other than logical operations)
+can no longer be called without arguments. For example, the following
+invocation is now an error:
+
+.. code-block:: ruby
+
+  Band.in
+
+``and``, ``or``, ``nor``, ``not``, ``any_of`` and ``where`` can be called
+without arguments.
+
+
+Generated Queries
+-----------------
+
+Minor change: Mongoid 7.1 will simplify the Criteria selectors where possible
+by eliding unnecessary logical operators, typically ``$and``.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.where(year: 2000).and(name: 'One')
+    # => #<Mongoid::Criteria
+    #   selector: {"year"=>2000, "name"=>"One"}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Corresponding Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.where(year: 2000).and(name: 'One')
+    # => #<Mongoid::Criteria
+    #   selector: {"year"=>2000, "$and"=>[{"name"=>"One"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Mongoid 7.1 also takes steps to produce the same selector shapes when
+semantically the same query is constructed using different code paths. For
+example, the following two approaches result in the same generated selector:
+
+.. code-block:: ruby
+
+    Band.where(name: /ne/).and(name: 'One')
+
+    Band.and({name: /ne/}, {name: 'One'})
+
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>/ne/, "$and"=>[{"name"=>"One"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+
+Ruby Version Support
+--------------------
+
+As of version 7.1, Mongoid supports Ruby 2.3+ and JRuby 9.2.
+Support for Ruby 2.2 and JRuby 9.1 has been dropped.
+
+
+Changes in Mongoid 7.1.0
+------------------------
+
+Improvement: :ref:`Multiple atomic operations can now be grouped
+<atomic-operation-grouping>` to be executed as a single atomic operation.
+
+Improvement: :ref:`Shard key declarations <shard-keys>` now support hashed
+shard keys, and a Rake task to shard collection has been added to the
+:ref:`sharding management Rake tasks <sharding-management>`.
+
+
+Changes in Mongoid 7.1.1
+------------------------
+
+**Breaking change:** The behavior of :ref:`any_of <any-of>` was reverted to
+its Mongoid 7.0 behavior. As was the case in Mongoid 7.0, ``any_of`` now
+does not treat the receiver as one of its operands:
+
+.. code-block:: ruby
+
+  Band.where(year: 1990).any_of({name: 'One'}, {name: 'Two'})
+  # => #<Mongoid::Criteria
+  #   selector: {"year"=>1990, "$or"=>[{"name"=>"One"}, {"name"=>"Two"}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+``or`` behaves the same way in Mongoid 7.1.1 and 7.1.0:
+
+.. code-block:: ruby
+
+  Band.where(year: 1990).or({name: 'One'}, {name: 'Two'})
+  # => #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"year"=>1990}, {"name"=>"One"}, {"name"=>"Two"}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Minor change: The value of ``include_root_in_json`` is now properly respected
+throughout the model hierarchy. Previously the values set on model classes
+were ignored.
+
+Improvement: ``Model.where`` can now be called with no arguments.
+
+Improvement: Polymorphic ``belongs_to`` associations can now be eagerly loaded.

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 require "spec_helper"
 
@@ -11,7 +10,7 @@ describe Mongoid::Reloadable do
 
       let(:person) do
         Person.with(collection: 'other') do |person_class|
-          person_class.create
+          person_class.create!
         end
       end
 
@@ -110,12 +109,29 @@ describe Mongoid::Reloadable do
 
     context "when document not saved" do
 
-      context "when raising not found error" do
+      context "when there is no document matching our id" do
 
         it "raises an error" do
           expect {
             Person.new.reload
           }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+      end
+
+      context 'when there is a document matching our id' do
+
+        let!(:previous) { Agent.create!(title: '007') }
+
+        let(:agent) { Agent.new(id: previous.id) }
+
+        it 'loads the existing document' do
+          agent.title.should be nil
+
+          lambda do
+            agent.reload
+          end.should_not raise_error
+
+          agent.title.should == '007'
         end
       end
     end

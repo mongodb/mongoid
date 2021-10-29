@@ -1,6 +1,6 @@
-********
-Sharding
-********
+**********************
+Sharding Configuration
+**********************
 
 .. default-domain:: mongodb
 
@@ -36,7 +36,7 @@ Shard keys can be declared on models using the ``shard_key`` macro:
 
 Note that in order to shard a collection, the collection must have an index
 that starts with the shard key. Mongoid provides `index management
-<mongoid-indexes>`_ functionality, which the examples here take
+<indexes>`_ functionality, which the examples here take
 advantage of.
 
 Mongoid supports two syntaxes for declaring shard keys. The standard syntax

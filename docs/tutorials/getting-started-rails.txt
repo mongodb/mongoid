@@ -65,7 +65,7 @@ Use the ``rails`` command to create the application skeleton, as follows:
     in a moment.
 
 We pass ``--skip-active-record`` to request that ActiveRecord is not added
-as a dependency, because we will be using Mongoid instead. Additionaly
+as a dependency, because we will be using Mongoid instead. Additionally
 we pass ``--skip-bundle`` because we'll be modifying the ``Gemfile`` to
 add the ``mongoid`` dependency.
 
@@ -222,7 +222,7 @@ creating blog posts:
 Navigate to `localhost:3000/posts <http://localhost:3000/posts>`_
 to create posts and see the posts that have already been created.
 
-.. image:: rails-new-blog.png
+.. image:: ../img/rails-new-blog.png
   :alt: Screenshot of the new blog
 
 
@@ -351,7 +351,7 @@ with the following contents:
 
 You should now be able to leave comments for the posts:
 
-.. image:: rails-blog-new-comment.png
+.. image:: ../img/rails-blog-new-comment.png
   :alt: Screenshot of the blog with a new comment being added
 
 
@@ -479,7 +479,7 @@ include ``Mongoid::Document``, and usually define the fields explicitly
 (but :ref:`dynamic fields <dynamic-fields>` may also be used instead of
 explicit field definitions).
 
-For example, a barebones Post model may look like this in ActiveRecord:
+For example, a bare-bones Post model may look like this in ActiveRecord:
 
 .. code-block:: ruby
   :name: app/models/post.rb

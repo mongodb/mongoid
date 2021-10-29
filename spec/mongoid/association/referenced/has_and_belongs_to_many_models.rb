@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# encoding: utf-8
 
 class HabtmmCompany
   include Mongoid::Document
@@ -47,4 +46,22 @@ class HabtmmPerson
   include Mongoid::Document
 
   has_and_belongs_to_many :tickets, class_name: 'HabtmmTicket'
+end
+
+class HabtmmTrainer
+  include Mongoid::Document
+
+  field :name, type: String
+
+  has_and_belongs_to_many :animals, inverse_of: :trainers, class_name: 'HabtmmAnimal', scope: :reptile
+end
+
+class HabtmmAnimal
+  include Mongoid::Document
+
+  field :taxonomy, type: String
+
+  scope :reptile, -> { where(taxonomy: 'reptile') }
+
+  has_and_belongs_to_many :trainers, inverse_of: :animals, class_name: 'HabtmmTrainer', scope: -> { where(name: 'Dave') }
 end
