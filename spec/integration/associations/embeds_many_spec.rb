@@ -65,4 +65,143 @@ describe 'embeds_many associations' do
       include_examples 'does not delete the target from the database'
     end
   end
+
+  context 'assigning attributes to the same association' do
+    context 'setting then clearing' do
+      let(:canvas) do
+        Canvas.create!(shapes: [Shape.new])
+      end
+
+      shared_examples 'persists correctly' do
+        it 'persists correctly' do
+          canvas.shapes.should be_empty
+          _canvas = Canvas.find(canvas.id)
+          _canvas.shapes.should be_empty
+        end
+      end
+
+      context 'via assignment operator' do
+        before do
+          canvas.shapes = [Shape.new, Shape.new]
+          canvas.shapes = []
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via attributes=' do
+        before do
+          canvas.attributes = {shapes: [Shape.new, Shape.new]}
+          canvas.attributes = {shapes: []}
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via assign_attributes' do
+        before do
+          canvas.assign_attributes(shapes: [Shape.new, Shape.new])
+          canvas.assign_attributes(shapes: [])
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+    end
+
+    context 'clearing then setting' do
+      let(:canvas) do
+        Canvas.create!(shapes: [Shape.new])
+      end
+
+      shared_examples 'persists correctly' do
+        it 'persists correctly' do
+          canvas.shapes.length.should eq 2
+          _canvas = Canvas.find(canvas.id)
+          _canvas.shapes.length.should eq 2
+        end
+      end
+
+      context 'via assignment operator' do
+        before do
+          canvas.shapes = []
+          canvas.shapes = [Shape.new, Shape.new]
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via attributes=' do
+        before do
+          canvas.attributes = {shapes: []}
+          canvas.attributes = {shapes: [Shape.new, Shape.new]}
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via assign_attributes' do
+        before do
+          canvas.assign_attributes(shapes: [])
+          canvas.assign_attributes(shapes: [Shape.new, Shape.new])
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+    end
+
+    context 'updating a child then clearing' do
+      let(:canvas) do
+        Canvas.create!(shapes: [Shape.new])
+      end
+
+      shared_examples 'persists correctly' do
+        it 'persists correctly' do
+          canvas.shapes.should be_empty
+          _canvas = Canvas.find(canvas.id)
+          _canvas.shapes.should be_empty
+        end
+      end
+
+      context 'via assignment operator' do
+        before do
+          # Mongoid uses the new value of `x` in the $pullAll query,
+          # which doesn't match the document that is in the database,
+          # resulting in the empty array assignment not taking effect.
+          pending 'MONGOID-5037'
+
+          canvas.shapes.first.x = 1
+          canvas.shapes = []
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via attributes=' do
+        before do
+          canvas.shapes.first.x = 1
+          canvas.attributes = {shapes: []}
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via assign_attributes' do
+        before do
+          canvas.shapes.first.x = 1
+          canvas.assign_attributes(shapes: [])
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+    end
+  end
 end
