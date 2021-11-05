@@ -29,7 +29,7 @@ module Mongoid
             return concat(docs) if docs.size > 1
             if doc = docs.first
               append(doc)
-              _base.add_to_set(foreign_key => doc.send(_association.primary_key))
+              _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
               if child_persistable?(doc)
                 doc.save
               end
@@ -54,12 +54,12 @@ module Mongoid
               next unless doc
               append(doc)
               if persistable? || _creating?
-                ids[doc.send(_association.primary_key)] = true
+                ids[doc.public_send(_association.primary_key)] = true
                 save_or_delay(doc, docs, inserts)
               else
-                existing = _base.send(foreign_key)
-                unless existing.include?(doc.send(_association.primary_key))
-                  existing.push(doc.send(_association.primary_key)) and unsynced(_base, foreign_key)
+                existing = _base.public_send(foreign_key)
+                unless existing.include?(doc.public_send(_association.primary_key))
+                  existing.push(doc.public_send(_association.primary_key)) and unsynced(_base, foreign_key)
                 end
               end
             end
@@ -82,7 +82,7 @@ module Mongoid
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
             doc = Factory.build(type || klass, attributes)
-            _base.send(foreign_key).push(doc.send(_association.primary_key))
+            _base.public_send(foreign_key).push(doc.public_send(_association.primary_key))
             append(doc)
             doc.apply_post_processed_defaults
             unsynced(doc, inverse_foreign_key)
@@ -105,7 +105,7 @@ module Mongoid
           def delete(document)
             doc = super
             if doc && persistable?
-              _base.pull(foreign_key => doc.send(_association.primary_key))
+              _base.pull(foreign_key => doc.public_send(_association.primary_key))
               _target._unloaded = criteria
               unsynced(_base, foreign_key)
             end
@@ -126,13 +126,13 @@ module Mongoid
             end
             unless _association.forced_nil_inverse?
               if field = _association.options[:inverse_primary_key]
-                ipk = _base.send(field)
+                ipk = _base.public_send(field)
               else
                 ipk = _base._id
               end
               if replacement
-                objects_to_clear = _base.send(foreign_key) - replacement.collect do |object|
-                  object.send(_association.primary_key)
+                objects_to_clear = _base.public_send(foreign_key) - replacement.collect do |object|
+                  object.public_send(_association.primary_key)
                 end
                 criteria(objects_to_clear).pull(inverse_foreign_key => ipk)
               else
@@ -140,7 +140,7 @@ module Mongoid
               end
             end
             if persistable?
-              _base.set(foreign_key => _base.send(foreign_key).clear)
+              _base.set(foreign_key => _base.public_send(foreign_key).clear)
             end
             after_remove_error = nil
             many_to_many = _target.clear do |doc|
@@ -190,7 +190,7 @@ module Mongoid
           #
           # @return [ Criteria ] The unscoped criteria.
           def unscoped
-            klass.unscoped.any_in(_id: _base.send(foreign_key))
+            klass.unscoped.any_in(_id: _base.public_send(foreign_key))
           end
 
           private
