@@ -3653,15 +3653,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   context "when using a different primary key" do
 
     let(:dog) do
-      Dog.create(name: 'Doggie')
+      Dog.create!(name: 'Doggie')
     end
 
     let(:cat) do
-      Cat.create(name: 'Kitty')
+      Cat.create!(name: 'Kitty')
     end
 
     let(:another_cat) do
-      Cat.create(name: 'Kitten')
+      Cat.create!(name: 'Kitten')
     end
 
     let(:fire_hydrant) do
