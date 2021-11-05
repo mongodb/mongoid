@@ -6,7 +6,7 @@ class Account
   field :_id, type: String, overwrite: true, default: ->{ name.try(:parameterize) }
 
   field :number, type: String
-  field :balance, type: String
+  field :balance, type: Integer
   field :nickname, type: String
   field :name, type: String
   field :balanced, type: Mongoid::Boolean, default: ->{ balance? ? true : false }

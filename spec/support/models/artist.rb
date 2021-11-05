@@ -10,6 +10,7 @@ class Artist
   embeds_many :songs, before_add: [ :before_add_song, Proc.new { |artist, song| song.before_add_called = true } ], before_remove: :before_remove_song
   embeds_many :labels, after_add: :after_add_label, after_remove: :after_remove_label
   has_many :albums, dependent: :destroy, before_add: [:before_add_album, Proc.new { |artist, album| album.before_add_called = true} ], after_add: :after_add_album, before_remove: :before_remove_album, after_remove: :after_remove_album
+  belongs_to :band
 
   before_create :before_create_stub
   after_create :create_songs
@@ -18,6 +19,7 @@ class Artist
   before_update :before_update_stub
 
   protected
+
   def before_create_stub
     true
   end

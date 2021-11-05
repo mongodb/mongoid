@@ -9,7 +9,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
   end
 
   let(:person) do
-    Person.create
+    Person.create!
   end
 
   describe "#=" do
@@ -61,15 +61,15 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
     context "when referencing a document from an embedded document" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "Wienerstr")
+        person.addresses.create!(street: "Wienerstr")
       end
 
       let(:account) do
-        Account.create(name: "1", number: 1000000)
+        Account.create!(name: "1", number: 1000000)
       end
 
       before do
@@ -152,7 +152,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           let(:game) do
-            Game.create
+            Game.create!
           end
 
           before do
@@ -186,16 +186,16 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         context "when the parent is a subclass" do
 
           let(:canvas) do
-            Canvas::Test.create
+            Canvas::Test.create!
           end
 
           let(:comment) do
-            Comment.create(title: "test")
+            Comment.create!(title: "test")
           end
 
           before do
             comment.commentable = canvas
-            comment.save
+            comment.save!
           end
 
           it "sets the correct value in the type field" do
@@ -249,7 +249,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           let(:rating) do
-            Rating.create
+            Rating.create!
           end
 
           before do
@@ -285,6 +285,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
         context 'when the child has persistence options set' do
 
+          before do
+            Person.collection.client['other-posts'].delete_many
+            Person.collection.client['other-people'].delete_many
+          end
+
           let(:person) do
             Person.new
           end
@@ -294,11 +299,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           before do
-            post.with(collection: 'other-posts') do |p|
-              person.with(collection: 'other-people') do |per|
-                p.person = person
-                per.save
-                p.save
+            post.with(collection: 'other-posts') do |post|
+              person.with(collection: 'other-people') do |person|
+                post.person = person
+                person.save!
+                post.save!
               end
             end
           end
@@ -316,6 +321,8 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it 'applies the persistence options when saving the child' do
+            pending 'https://jira.mongodb.org/browse/MONGOID-5190'
+
             expect(other_people_count).to eq(1)
             expect(other_posts_count).to eq(1)
           end
@@ -355,7 +362,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           let(:post) do
-            Post.create
+            Post.create!
           end
 
           before do
@@ -447,7 +454,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
             end
 
             let(:rating) do
-              Rating.create
+              Rating.create!
             end
 
             before do
@@ -582,15 +589,15 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
     context "when dependent is delete" do
 
       let(:account) do
-        Account.create
+        Account.create!(name: 'Foobar')
       end
 
       let(:drug) do
-        Drug.create
+        Drug.create!
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when relation is has_one" do
@@ -677,15 +684,15 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
     context "when dependent is nullify" do
 
       let(:account) do
-        Account.create
+        Account.create!(name: 'Foobar')
       end
 
       let(:drug) do
-        Drug.create
+        Drug.create!
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when relation is has_one" do
@@ -826,11 +833,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let(:game) do
-            Game.create
+            Game.create!
           end
 
           before do
@@ -895,7 +902,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
             end
 
             let(:rating) do
-              Rating.create
+              Rating.create!
             end
 
             before do
@@ -958,7 +965,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           let(:post) do
-            Post.create
+            Post.create!
           end
 
           before do
@@ -1017,7 +1024,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           let(:rating) do
-            Rating.create
+            Rating.create!
           end
 
           before do
@@ -1159,11 +1166,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
   context "when replacing the relation with another" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:post) do
-      Post.create(title: "test")
+      Post.create!(title: "test")
     end
 
     let!(:game) do
@@ -1172,7 +1179,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
     before do
       post.person = game.person
-      post.save
+      post.save!
     end
 
     it "clones the relation" do
@@ -1219,17 +1226,17 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
   context "when the document belongs to a has one and has many" do
 
     let(:movie) do
-      Movie.create(name: "Infernal Affairs")
+      Movie.create!(name: "Infernal Affairs")
     end
 
     let(:account) do
-      Account.create(name: "Leung")
+      Account.create!(name: "Leung")
     end
 
     context "when creating the document" do
 
       let(:comment) do
-        Comment.create(movie: movie, account: account)
+        Comment.create!(title: 'My Title', movie: movie, account: account)
       end
 
       it "sets the correct has one" do
@@ -1245,20 +1252,20 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
   context "when reloading the relation" do
 
     let!(:person_one) do
-      Person.create
+      Person.create!
     end
 
     let!(:person_two) do
-      Person.create(title: "Sir")
+      Person.create!(title: "Sir")
     end
 
     let!(:game) do
-      Game.create(name: "Starcraft 2")
+      Game.create!(name: "Starcraft 2")
     end
 
     before do
       game.person = person_one
-      game.save
+      game.save!
     end
 
     context "when the relation references the same document" do
@@ -1285,7 +1292,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
       before do
         game.person_id = person_two.id
-        game.save
+        game.save!
       end
 
       let(:reloaded) do
@@ -1305,13 +1312,13 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
   context "when creating with a reference to an integer id parent" do
 
     let!(:jar) do
-      Jar.create do |doc|
+      Jar.create! do |doc|
         doc._id = 1
       end
     end
 
     let(:cookie) do
-      Cookie.create(jar_id: "1")
+      Cookie.create!(jar_id: "1")
     end
 
     it "allows strings to be passed as the id" do
@@ -1328,15 +1335,15 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
     context "when the relation exists" do
 
       let!(:person_one) do
-        Person.create
+        Person.create!
       end
 
       let!(:person_two) do
-        Person.create
+        Person.create!
       end
 
       let!(:game) do
-        Game.create(person: person_one)
+        Game.create!(person: person_one)
       end
 
       before do
@@ -1351,11 +1358,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
   describe "#method_missing" do
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:game) do
-        Game.create(person: person)
+        Game.create!(person: person)
       end
 
     it 'handles keyword args' do

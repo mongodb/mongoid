@@ -380,11 +380,11 @@ describe Mongoid::Association::Depending do
       context "when strategy is delete" do
 
         let(:parent) do
-          Person.create
+          Person.create!
         end
 
         let!(:child) do
-          parent.posts.create(title: "Testing")
+          parent.posts.create!(title: "Testing")
         end
 
         include_examples 'destroys dependents if parent is destroyed but does not if parent is deleted'
@@ -393,7 +393,7 @@ describe Mongoid::Association::Depending do
       context "when strategy is destroy" do
 
         let(:parent) do
-          Person.create
+          Person.create!
         end
 
         let!(:child) do
@@ -430,11 +430,11 @@ describe Mongoid::Association::Depending do
         context "when nullifying a references many" do
 
           let(:parent) do
-            Movie.create(title: "Bladerunner")
+            Movie.create!(title: "Bladerunner")
           end
 
           let!(:rating) do
-            parent.ratings.create(value: 10)
+            parent.ratings.create!(value: 10)
           end
 
           let(:from_db) do
@@ -449,7 +449,7 @@ describe Mongoid::Association::Depending do
           context "when the relation exists" do
 
             let(:parent) do
-              Book.create(title: "Neuromancer")
+              Book.create!(title: "Neuromancer")
             end
 
             let!(:rating) do
@@ -466,7 +466,7 @@ describe Mongoid::Association::Depending do
           context "when no association target exists" do
 
             let(:parent) do
-              Book.create(title: "Neuromancer")
+              Book.create!(title: "Neuromancer")
             end
 
             [:delete, :destroy].each do |method|
@@ -483,11 +483,11 @@ describe Mongoid::Association::Depending do
         context "when nullifying a many to many" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:preference) do
-            person.preferences.create(name: "Setting")
+            person.preferences.create!(name: "Setting")
           end
 
           let(:from_db) do
@@ -652,7 +652,7 @@ describe Mongoid::Association::Depending do
     context 'when the strategy is :delete_all' do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when cascading a has one" do
@@ -695,11 +695,11 @@ describe Mongoid::Association::Depending do
         context "when the relation has documents" do
 
           let!(:post_one) do
-            person.posts.create(title: "one")
+            person.posts.create!(title: "one")
           end
 
           let!(:post_two) do
-            person.posts.create(title: "two")
+            person.posts.create!(title: "two")
           end
 
           context "when the documents are in memory" do

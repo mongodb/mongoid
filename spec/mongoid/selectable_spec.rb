@@ -11,7 +11,7 @@ describe Mongoid::Selectable do
       context "when the document has a shard key" do
 
         let(:profile) do
-          Profile.create(name: "google")
+          Profile.create!(name: "google")
         end
 
         let!(:selector) do
@@ -28,7 +28,7 @@ describe Mongoid::Selectable do
         context "when using object ids" do
 
           let(:band) do
-            Band.create
+            Band.create!
           end
 
           let(:selector) do
@@ -43,7 +43,7 @@ describe Mongoid::Selectable do
         context "when using a custom id" do
 
           let(:account) do
-            Account.create(name: "savings")
+            Account.create!(name: "savings")
           end
 
           let(:selector) do
@@ -75,7 +75,7 @@ describe Mongoid::Selectable do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the document is an embeds one" do
@@ -94,7 +94,7 @@ describe Mongoid::Selectable do
       context "when the document is an embeds many" do
 
         let(:address) do
-          person.addresses.create(street: "kreuzbergstr")
+          person.addresses.create!(street: "kreuzbergstr")
         end
 
         it "returns the hash with the selector" do
@@ -117,7 +117,7 @@ describe Mongoid::Selectable do
         context "when the document is embedded multiple levels" do
 
           let(:location) do
-            address.locations.create
+            address.locations.create!
           end
 
           it "returns a hash with the selector" do

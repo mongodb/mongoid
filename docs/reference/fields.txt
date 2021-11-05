@@ -545,102 +545,13 @@ This is useful for storing different values in ``id`` and ``_id`` fields:
   # => #<Band _id: 5fc1c3f42c97a6590684046c, id: "42">
 
 
-Custom Fields
--------------
-
-You can define custom types in Mongoid and determine how they are serialized and deserialized.
-You simply need to provide three methods on it for Mongoid to call to convert your object to
-and from MongoDB friendly values.
-
-.. code-block:: ruby
-
-   class Profile
-     include Mongoid::Document
-     field :location, type: Point
-   end
-
-   class Point
-
-     attr_reader :x, :y
-
-     def initialize(x, y)
-       @x, @y = x, y
-     end
-
-     # Converts an object of this instance into a database friendly value.
-     def mongoize
-       [ x, y ]
-     end
-
-     class << self
-
-       # Get the object as it was stored in the database, and instantiate
-       # this custom class from it.
-       def demongoize(object)
-         Point.new(object[0], object[1])
-       end
-
-       # Takes any possible object and converts it to how it would be
-       # stored in the database.
-       def mongoize(object)
-         case object
-         when Point then object.mongoize
-         when Hash then Point.new(object[:x], object[:y]).mongoize
-         else object
-         end
-       end
-
-       # Converts the object that was supplied to a criteria and converts it
-       # into a database friendly form.
-       def evolve(object)
-         case object
-         when Point then object.mongoize
-         else object
-         end
-       end
-     end
-   end
-
-The instance method ``mongoize`` takes an instance of your object, and converts it
-into how it will be stored in the database. In our example above, we want to store our
-point object as an array in the form ``[ x, y ]``.
-
-The class method ``demongoize`` takes an object as how it was stored in the database,
-and is responsible for instantiating an object of your custom type. In this case, we
-take an array and instantiate a ``Point`` from it.
-
-The class method ``mongoize`` takes an object that you would use to set on your model
-from your application code, and create the object as it would be stored in the database.
-This is for cases where you are not passing your model instances of your custom type in the setter:
-
-.. code-block:: ruby
-
-   point = Point.new(12, 24)
-   venue = Venue.new(location: point) # This uses the mongoize instance method.
-   venue = Venue.new(location: [ 12, 24 ]) # This uses the mongoize class method.
-
-The class method ``evolve`` takes an object, and determines how it is to be transformed
-for use in criteria. For example we may want to write a query like so:
-
-.. code-block:: ruby
-
-   point = Point.new(12, 24)
-   Venue.where(location: point)
-
-Note that when accessing custom fields from the document, you will get a new instance
-of that object with each call to the getter. This is because Mongoid is generating a new
-object from the raw attributes on each access.
-
-We need the point object in the criteria to be transformed to a Mongo friendly value when
-it is not as well, ``evolve`` is the method that takes care of this. We check if the passed
-in object is a ``Point`` first, in case we also want to be able to pass in ordinary arrays instead.
-
 Reserved Names
 --------------
 
 Attempting to define a field on a document that conflicts with a reserved
 method name in Mongoid will raise an error. The list of reserved names can
 be obtained by invoking the ``Mongoid.destructive_fields`` method.
+
 
 Field Redefinition
 ------------------
@@ -727,6 +638,167 @@ Omitting ``_id`` fields is more common in :ref:`embedded documents <omit-id>`.
 Mongoid also defines the ``id`` field aliased to ``_id``. The ``id``
 alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
+
+
+Customizing Field Behavior
+==========================
+
+Mongoid offers several options for customizing the behavior of fields.
+
+
+Custom Getters And Setters
+--------------------------
+
+You can define custom getters and setters for fields to modify the values
+when they are being accessed or written. The getters and setters use the
+same name as the field. Use ``read_attribute`` and ``write_attribute``
+methods inside the getters and setters to operate on the raw attribute
+values.
+
+For example, Mongoid provides the ``:default`` field option to write a
+default value into the field. If you wish to have a field default value
+in your application but do not wish to persist it, you can override the
+getter as follows:
+
+.. code-block:: ruby
+
+  class DistanceMeasurement
+    include Mongoid::Document
+    
+    field :value, type: Float
+    field :unit, type: String
+    
+    def unit
+      read_attribute(:unit) || "m"
+    end
+    
+    def to_s
+      "#{value} #{unit}"
+    end
+  end
+  
+  measurement = DistanceMeasurement.new(value: 2)
+  measurement.to_s
+  # => "2.0 m"
+  measurement.attributes
+  # => {"_id"=>BSON::ObjectId('613fa0b0a15d5d61502f3447'), "value"=>2.0}
+
+To give another example, a field which converts empty strings to nil values
+may be implemented as follows:
+
+.. code-block:: ruby
+
+  class DistanceMeasurement
+    include Mongoid::Document
+    
+    field :value, type: Float
+    field :unit, type: String
+    
+    def unit=(value)
+      if value.blank?
+        value = nil
+      end
+      write_attribute(:unit, value)
+    end
+  end
+  
+  measurement = DistanceMeasurement.new(value: 2, unit: "")
+  measurement.attributes
+  # => {"_id"=>BSON::ObjectId('613fa15aa15d5d617216104c'), "value"=>2.0, "unit"=>nil}
+
+
+Custom Field Types
+------------------
+
+You can define custom types in Mongoid and determine how they are serialized
+and deserialized. You simply need to provide three methods on it for Mongoid
+to call to convert your object to and from MongoDB friendly values.
+
+.. code-block:: ruby
+
+  class Profile
+    include Mongoid::Document
+    field :location, type: Point
+  end
+
+  class Point
+
+    attr_reader :x, :y
+
+    def initialize(x, y)
+      @x, @y = x, y
+    end
+
+    # Converts an object of this instance into a database friendly value.
+    def mongoize
+      [ x, y ]
+    end
+
+    class << self
+
+      # Get the object as it was stored in the database, and instantiate
+      # this custom class from it.
+      def demongoize(object)
+        Point.new(object[0], object[1])
+      end
+
+      # Takes any possible object and converts it to how it would be
+      # stored in the database.
+      def mongoize(object)
+        case object
+        when Point then object.mongoize
+        when Hash then Point.new(object[:x], object[:y]).mongoize
+        else object
+        end
+      end
+
+      # Converts the object that was supplied to a criteria and converts it
+      # into a database friendly form.
+      def evolve(object)
+        case object
+        when Point then object.mongoize
+        else object
+        end
+      end
+    end
+  end
+
+The instance method ``mongoize`` takes an instance of your object, and
+converts it into how it will be stored in the database. In our example above,
+we want to store our point object as an array in the form ``[ x, y ]``.
+
+The class method ``demongoize`` takes an object as how it was stored in the
+database, and is responsible for instantiating an object of your custom type.
+In this case, we take an array and instantiate a ``Point`` from it.
+
+The class method ``mongoize`` takes an object that you would use to set on
+your model from your application code, and create the object as it would be
+stored in the database. This is for cases where you are not passing your
+model instances of your custom type in the setter:
+
+.. code-block:: ruby
+
+   point = Point.new(12, 24)
+   venue = Venue.new(location: point) # This uses the mongoize instance method.
+   venue = Venue.new(location: [ 12, 24 ]) # This uses the mongoize class method.
+
+The class method ``evolve`` takes an object, and determines how it is to be
+transformed for use in criteria. For example we may want to write a query
+like so:
+
+.. code-block:: ruby
+
+   point = Point.new(12, 24)
+   Venue.where(location: point)
+
+Note that when accessing custom fields from the document, you will get a
+new instance of that object with each call to the getter. This is because
+Mongoid is generating a new object from the raw attributes on each access.
+
+We need the point object in the criteria to be transformed to a
+MongoDB-friendly value when it is not as well, ``evolve`` is the method
+that takes care of this. We check if the passed in object is a ``Point``
+first, in case we also want to be able to pass in ordinary arrays instead.
 
 
 .. _dynamic-fields:

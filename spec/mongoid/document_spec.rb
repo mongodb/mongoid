@@ -430,27 +430,6 @@ describe Mongoid::Document do
       Person.new(title: "Sir")
     end
 
-    describe 'id' do
-      context 'rails < 6' do
-        max_rails_version '5.2'
-
-        it 'is a BSON::ObjectId' do
-          id = person.as_json['_id']
-          expect(id).to be_a(BSON::ObjectId)
-        end
-      end
-
-      context 'rails >= 6' do
-        min_rails_version '6.0'
-
-        it 'is a hash with $oid' do
-          id = person.as_json['_id']
-          expect(id).to be_a(Hash)
-          expect(id['$oid']).to be_a(String)
-        end
-      end
-    end
-
     context "when no options are provided" do
 
       it "does not apply any options" do
@@ -1043,11 +1022,11 @@ describe Mongoid::Document do
           context "when embedded doc is persisted" do
 
             let(:manager) do
-              Manager.create(title: "Sir")
+              Manager.create!(title: "Sir")
             end
 
             let!(:address) do
-              manager.addresses.create(street: "hobrecht")
+              manager.addresses.create!(street: "hobrecht")
             end
 
             let(:person) do

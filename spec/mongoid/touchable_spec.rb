@@ -170,7 +170,7 @@ describe Mongoid::Touchable do
       context "when no updated at is defined" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when no attribute is provided" do
@@ -230,7 +230,7 @@ describe Mongoid::Touchable do
       context "when an updated at is defined" do
 
         let!(:agent) do
-          Agent.create(updated_at: 2.days.ago)
+          Agent.create!(updated_at: 2.days.ago)
         end
 
         context "when no attribute is provided" do

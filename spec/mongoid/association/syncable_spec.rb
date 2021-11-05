@@ -153,11 +153,11 @@ describe "Syncable Association" do
   context "when first setting by the relation itself" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     before do
@@ -175,12 +175,12 @@ describe "Syncable Association" do
     context "when subsequently setting with keys" do
 
       let!(:two) do
-        Preference.create(name: "two")
+        Preference.create!(name: "two")
       end
 
       before do
         person.preference_ids << two.id
-        person.save
+        person.save!
       end
 
       it "sets the inverse foreign key" do
@@ -192,15 +192,15 @@ describe "Syncable Association" do
   context "when setting new ids" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     let!(:two) do
-      Preference.create(name: "two")
+      Preference.create!(name: "two")
     end
 
     before do
@@ -224,7 +224,7 @@ describe "Syncable Association" do
       context "when validation passes" do
 
         before do
-          person.save
+          person.save!
         end
 
         it "persists the foreign_key" do
@@ -245,19 +245,19 @@ describe "Syncable Association" do
   context "when replacing ids" do
 
     let!(:one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     let!(:two) do
-      Preference.create(name: "two")
+      Preference.create!(name: "two")
     end
 
     let!(:person) do
-      Person.create(preference_ids: [ one.id, two.id ])
+      Person.create!(preference_ids: [ one.id, two.id ])
     end
 
     let!(:three) do
-      Preference.create(name: "three")
+      Preference.create!(name: "three")
     end
 
     before do
@@ -285,7 +285,7 @@ describe "Syncable Association" do
       context "when validation passes" do
 
         before do
-          person.save
+          person.save!
         end
 
         it "persists the foreign_key" do
@@ -310,15 +310,15 @@ describe "Syncable Association" do
   context "when setting ids to empty" do
 
     let!(:one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     let!(:two) do
-      Preference.create(name: "two")
+      Preference.create!(name: "two")
     end
 
     let!(:person) do
-      Person.create(preference_ids: [ one.id, two.id ])
+      Person.create!(preference_ids: [ one.id, two.id ])
     end
 
     before do
@@ -342,7 +342,7 @@ describe "Syncable Association" do
       context "when validation passes" do
 
         before do
-          person.save
+          person.save!
         end
 
         it "persists the foreign_key" do
@@ -363,15 +363,15 @@ describe "Syncable Association" do
   context "when setting ids to nil" do
 
     let!(:one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     let!(:two) do
-      Preference.create(name: "two")
+      Preference.create!(name: "two")
     end
 
     let!(:person) do
-      Person.create(preference_ids: [ one.id, two.id ])
+      Person.create!(preference_ids: [ one.id, two.id ])
     end
 
     before do
@@ -395,7 +395,7 @@ describe "Syncable Association" do
       context "when validation passes" do
 
         before do
-          person.save
+          person.save!
         end
 
         it "persists the foreign_key" do
@@ -416,15 +416,15 @@ describe "Syncable Association" do
   context "when destroying" do
 
     let!(:one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     let!(:two) do
-      Preference.create(name: "two")
+      Preference.create!(name: "two")
     end
 
     let!(:person) do
-      Person.create(preferences: [ one, two ])
+      Person.create!(preferences: [ one, two ])
     end
 
     context "when destroying the parent" do
@@ -457,7 +457,7 @@ describe "Syncable Association" do
   context "when appending an existing document to a new one" do
 
     let!(:persisted) do
-      Tag.create
+      Tag.create!
     end
 
     let(:article) do
@@ -466,7 +466,7 @@ describe "Syncable Association" do
 
     before do
       article.tags << persisted
-      article.save
+      article.save!
     end
 
     it "persists the foreign key on the inverse" do
@@ -481,7 +481,7 @@ describe "Syncable Association" do
   context "when the document has an ordering default scope" do
 
     let!(:dog) do
-      Dog.create(name: "Fido")
+      Dog.create!(name: "Fido")
     end
 
     let!(:breed) do
@@ -489,7 +489,7 @@ describe "Syncable Association" do
     end
 
     before do
-      breed.save
+      breed.save!
     end
 
     it "adds the id to the inverse relation" do

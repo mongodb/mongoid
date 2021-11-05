@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './referenced/has_many_models'
+require_relative './referenced/has_one_models'
 
 describe Mongoid::Association::Referenced::AutoSave do
 
@@ -21,22 +23,59 @@ describe Mongoid::Association::Referenced::AutoSave do
 
     context "when the option is not provided" do
 
-      let(:game) do
-        Game.new(name: "Tekken")
-      end
+      context 'has_many' do
 
-      before do
-        person.game = game
-      end
-
-      context "when saving the parent document" do
-
-        before do
-          person.save
+        let(:parent) do
+          HmmSchool.new
         end
 
-        it "does not save the relation" do
-          expect(game).to_not be_persisted
+        let(:child) do
+          HmmStudent.new(name: "Panda")
+        end
+
+        before do
+          parent.students = [child]
+        end
+
+        context "when saving the parent document" do
+
+          before do
+            parent.associations[:students].options[:autosave].should be_falsy
+
+            parent.save!
+          end
+
+          it "does not save the child" do
+            expect(child).to_not be_persisted
+          end
+        end
+      end
+
+      context 'has_one' do
+
+        let(:parent) do
+          HomCollege.new
+        end
+
+        let(:child) do
+          HomAccreditation.new
+        end
+
+        before do
+          parent.accreditation = child
+        end
+
+        context "when saving the parent document" do
+
+          before do
+            parent.associations[:accreditation].options[:autosave].should be_falsy
+
+            parent.save!
+          end
+
+          it "does not save the child" do
+            expect(child).to_not be_persisted
+          end
         end
       end
     end

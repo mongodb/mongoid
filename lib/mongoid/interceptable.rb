@@ -27,7 +27,7 @@ module Mongoid
       :before_save,
       :before_update,
       :before_upsert,
-      :before_validation
+      :before_validation,
     ].freeze
 
     included do
@@ -36,6 +36,12 @@ module Mongoid
 
       define_model_callbacks :build, :find, :initialize, :touch, only: :after
       define_model_callbacks :create, :destroy, :save, :update, :upsert
+
+      # This callback is used internally by Mongoid to save association
+      # targets for referenced associations after the parent model is persisted.
+      #
+      # @api private
+      define_model_callbacks :persist_parent
 
       attr_accessor :before_callback_halted
     end
@@ -109,19 +115,40 @@ module Mongoid
     #   end
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array ] args Any options.
-    #
-    # @return [ Document ] The document
-    ruby2_keywords def run_callbacks(kind, *args, &block)
-      cascadable_children(kind).each do |child|
-        if child.run_callbacks(child_callback_type(kind, child), *args) == false
-          return false
+    # @param [ true | false ] with_children Flag specifies whether callbacks of embedded document should be run.
+    def run_callbacks(kind, with_children: true, &block)
+      if with_children
+        cascadable_children(kind).each do |child|
+          if child.run_callbacks(child_callback_type(kind, child), with_children: with_children) == false
+            return false
+          end
         end
       end
       if callback_executable?(kind)
-        super(kind, *args, &block)
+        super(kind, &block)
       else
         true
+      end
+    end
+
+    # Run the callbacks for embedded documents.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to exeute callbacks on. If
+    #   nil, callbacks will be executed on all cascadable children of
+    #   the document.
+    #
+    # @api private
+    def _mongoid_run_child_callbacks(kind, children: nil, &block)
+      child, *tail = (children || cascadable_children(kind))
+      if child.nil?
+        return block&.call
+      elsif tail.empty?
+        return child.run_callbacks(child_callback_type(kind, child), &block)
+      else
+        return child.run_callbacks(child_callback_type(kind, child)) do
+          _mongoid_run_child_callbacks(kind, children: tail, &block)
+        end
       end
     end
 

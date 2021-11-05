@@ -51,7 +51,7 @@ describe 'Matcher operators' do
           end
 
           context 'server query' do
-            let!(:document) { Mop.create(spec.fetch('document')) }
+            let!(:document) { Mop.create!(spec.fetch('document')) }
 
             context 'via driver' do
               if mop_error?(spec, 'driver')

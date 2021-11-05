@@ -53,10 +53,10 @@ describe Mongoid::Clients::Sessions do
 
         let!(:last_use_diff) do
           Person.with_session do |session|
-            Person.create
-            Person.create
+            Person.create!
+            Person.create!
             last_use = session.instance_variable_get(:@server_session).last_use
-            Thread.new { Person.create }.value
+            Thread.new { Person.create! }.value
             session.instance_variable_get(:@server_session).last_use - last_use
           end
         end
@@ -75,8 +75,8 @@ describe Mongoid::Clients::Sessions do
 
         before do
           Person.with_session do
-            Person.create
-            Person.create
+            Person.create!
+            Person.create!
           end
         end
 
@@ -95,9 +95,9 @@ describe Mongoid::Clients::Sessions do
           before do
             Post.with(client: :other) do
               Person.with_session do
-                Person.create
-                Person.create
-                Post.create
+                Person.create!
+                Person.create!
+                Post.create!
               end
             end
           end
@@ -116,9 +116,9 @@ describe Mongoid::Clients::Sessions do
             e = nil
             begin
               Person.with_session do
-                Person.create
-                Person.create
-                Post.create
+                Person.create!
+                Person.create!
+                Post.create!
               end
             rescue => ex
                 e = ex
@@ -145,8 +145,8 @@ describe Mongoid::Clients::Sessions do
             begin
               Person.with_session do
                 Person.with_session do
-                  Person.create
-                  Post.create
+                  Person.create!
+                  Post.create!
                 end
               end
             rescue => ex

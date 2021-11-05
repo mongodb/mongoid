@@ -70,7 +70,9 @@ module Mongoid
             # Upstream code is responsible for eliminating nils from keys.
             return cls.none if keys.empty?
 
-            criteria = cls.any_in(key => keys)
+            criteria = cls.criteria
+            criteria = criteria.apply_scope(@association.scope)
+            criteria = criteria.any_in(key => keys)
             criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc

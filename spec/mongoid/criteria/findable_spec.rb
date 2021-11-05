@@ -9,11 +9,11 @@ describe Mongoid::Criteria::Findable do
     context "when finding by a document" do
 
       let(:band) do
-        Band.create(name: "Tool")
+        Band.create!(name: "Tool")
       end
 
       let!(:record) do
-        band.records.create(name: "Undertow")
+        band.records.create!(name: "Undertow")
       end
 
       context "when the document is the root" do
@@ -40,7 +40,7 @@ describe Mongoid::Criteria::Findable do
 
       context 'when criteria has additional conditions' do
         let(:band) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         let(:found) do
@@ -56,11 +56,11 @@ describe Mongoid::Criteria::Findable do
 
       context 'when criteria has additional conditions on id' do
         let(:band) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         let(:other) do
-          Band.create(name: "Other")
+          Band.create!(name: "Other")
         end
 
         let(:found) do
@@ -78,7 +78,7 @@ describe Mongoid::Criteria::Findable do
     context "when using object ids" do
 
       let!(:band) do
-        Band.create
+        Band.create!
       end
 
       context "when providing a single id" do
@@ -148,7 +148,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing a splat of ids" do
 
         let!(:band_two) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         context "when all ids match" do
@@ -220,7 +220,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing an array of ids" do
 
         let!(:band_two) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         context "when all ids match" do
@@ -345,7 +345,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing a splat of extended json ids" do
 
         let!(:band_two) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         context "when all ids match" do
@@ -417,7 +417,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing an array of extended json ids" do
 
         let!(:band_two) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         context "when all ids match" do
@@ -498,7 +498,7 @@ describe Mongoid::Criteria::Findable do
       end
 
       let!(:band) do
-        Band.create do |band|
+        Band.create! do |band|
           band.id = "tool"
         end
       end
@@ -559,7 +559,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing a splat of ids" do
 
         let!(:band_two) do
-          Band.create do |band|
+          Band.create! do |band|
             band.id = "depeche-mode"
           end
         end
@@ -622,7 +622,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing an array of ids" do
 
         let!(:band_two) do
-          Band.create do |band|
+          Band.create! do |band|
             band.id = "depeche-mode"
           end
         end
@@ -694,7 +694,7 @@ describe Mongoid::Criteria::Findable do
       end
 
       let!(:band) do
-        Band.create do |band|
+        Band.create! do |band|
           band.id = {"new-order" => true, "Depeche Mode" => false}
         end
       end
@@ -755,7 +755,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing a splat of ids" do
 
         let!(:band_two) do
-          Band.create do |band|
+          Band.create! do |band|
             band.id = {"Radiohead" => false, "Nirvana"=> true}
           end
         end
@@ -818,7 +818,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing an array of ids" do
 
         let!(:band_two) do
-          Band.create do |band|
+          Band.create! do |band|
             band.id = {"Radiohead" => false, "Nirvana"=> true}
           end
         end
@@ -890,7 +890,7 @@ describe Mongoid::Criteria::Findable do
       end
 
       let!(:band) do
-        Band.create do |band|
+        Band.create! do |band|
           band.id = 1
         end
       end
@@ -951,7 +951,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing a splat of ids" do
 
         let!(:band_two) do
-          Band.create do |band|
+          Band.create! do |band|
             band.id = 2
           end
         end
@@ -1014,7 +1014,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing an array of ids" do
 
         let!(:band_two) do
-          Band.create do |band|
+          Band.create! do |band|
             band.id = 2
           end
         end
@@ -1077,7 +1077,7 @@ describe Mongoid::Criteria::Findable do
       context "when providing a range" do
 
         let!(:band_two) do
-          Band.create do |band|
+          Band.create! do |band|
             band.id = 2
           end
         end
@@ -1149,7 +1149,7 @@ describe Mongoid::Criteria::Findable do
     context "when using string and object ids" do
 
       let!(:band) do
-        Band.create
+        Band.create!
       end
 
       context "when providing multiple ids" do
@@ -1189,11 +1189,11 @@ describe Mongoid::Criteria::Findable do
   describe "#multiple_from__db" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:band_two) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     context "when providing a single id" do

@@ -45,7 +45,7 @@ describe Mongoid::Copyable do
       context "when the document has an id field in the database" do
 
         let!(:band) do
-          Band.create(name: "Tool")
+          Band.create!(name: "Tool")
         end
 
         before do
@@ -65,7 +65,7 @@ describe Mongoid::Copyable do
 
         shared_examples 'behaves as expected' do
           let!(:instance) do
-            cls.create(name: "test")
+            cls.create!(name: "test")
           end
 
           before do
