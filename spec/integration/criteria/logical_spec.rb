@@ -25,6 +25,17 @@ describe 'Criteria logical operations' do
       bands = Band.where(name: /Proj/).and(Band.where(name: /u/))
       expect(bands.to_a).to eq([sp])
     end
+
+    it 'combines existing `$and` clause in query and `where` condition' do
+      bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
+      expect(bands.selector).to eq(
+        {
+          "_id"=>1,
+          "year"=>{"$in"=>[2020]},
+          "$and"=>[{"year"=>{"$in"=>[2021]}}, {"_id"=>2}]
+        }
+      )
+    end
   end
 
   describe 'or' do
