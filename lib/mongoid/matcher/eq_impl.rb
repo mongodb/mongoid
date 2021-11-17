@@ -23,9 +23,39 @@ module Mongoid
           end
 =end
         else
-          value == condition ||
-          value.is_a?(Array) && value.include?(condition)
+          # When doing a comparison with Time objects, compare using millisecond precision
+          if value.kind_of?(Time) && condition.kind_of?(Time)
+            time_eq?(value, condition)
+          elsif value.is_a?(Array) && condition.kind_of?(Time)
+            value.map do |v|
+              if v.kind_of?(Time)
+                time_rounded_to_millis(v)
+              else
+                v
+              end
+            end.include?(time_rounded_to_millis(condition))
+          else
+            value == condition ||
+            value.is_a?(Array) && value.include?(condition)
+          end
         end
+      end
+
+      # Per https://docs.mongodb.com/ruby-driver/current/tutorials/bson-v4/#time-instances,
+      # > Times in BSON (and MongoDB) can only have millisecond precision. When Ruby Time instances
+      # are serialized to BSON or Extended JSON, the times are floored to the nearest millisecond.
+      #
+      # > Because of this flooring, applications are strongly recommended to perform all time
+      # calculations using integer math, as inexactness of floating point calculations may produce
+      # unexpected results.
+      #
+      # As such, perform a similar operation to what the bson-ruby gem does
+      module_function def time_eq?(time_a, time_b)
+        time_rounded_to_millis(time_a) == time_rounded_to_millis(time_b)
+      end
+
+      module_function def time_rounded_to_millis(time)
+        return time._bson_to_i * 1000 + time.usec.divmod(1000).first
       end
     end
   end

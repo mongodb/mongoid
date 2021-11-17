@@ -25,6 +25,19 @@ module Mongoid
         ::ActiveSupport::TimeWithZone.mongoize(self)
       end
 
+      # This code is copied from Time class extension in bson-ruby gem. It
+      # should be removed from here when added to bson-ruby.
+      # See https://jira.mongodb.org/browse/RUBY-2846.
+      def _bson_to_i
+        # Workaround for JRuby's #to_i rounding negative timestamps up
+        # rather than down (https://github.com/jruby/jruby/issues/6104)
+        if BSON::Environment.jruby?
+          (self - usec.to_r/1000000).to_i
+        else
+          to_i
+        end
+      end
+
       module ClassMethods
 
         # Convert the object from its mongo friendly ruby type to this type.
