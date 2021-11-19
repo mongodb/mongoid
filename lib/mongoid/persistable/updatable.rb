@@ -96,15 +96,19 @@ module Mongoid
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys
-        result = run_callbacks(:save) do
-          run_callbacks(:update) do
-            run_callbacks(:persist_parent) do
-              yield(self)
-              true
+        run_callbacks(:save, with_children: false) do
+          run_callbacks(:update, with_children: false) do
+            run_callbacks(:persist_parent, with_children: false) do
+              _mongoid_run_child_callbacks(:save) do
+                _mongoid_run_child_callbacks(:update) do
+                  result = yield(self)
+                  post_process_persist(result, options)
+                  true
+                end
+              end
             end
           end
         end
-        post_process_persist(result, options) and result
       end
 
       # Update the document in the database.

@@ -1649,21 +1649,26 @@ describe Mongoid::Changeable do
 
       before do
         Acolyte.set_callback(:save, :after, if: :callback_test?) do |doc|
-          doc[:changed_in_callback] = doc.changes.dup
+          doc[:changed_in_after_callback] = doc.changes.dup
+        end
+
+        Acolyte.set_callback(:save, :before, if: :callback_test?) do |doc|
+          doc[:changed_in_before_callback] = doc.changes.dup
         end
       end
 
       after do
         Acolyte._save_callbacks.select do |callback|
-          callback.kind == :after
+          [:before, :after].include?(callback.kind)
         end.each do |callback|
           Acolyte._save_callbacks.delete(callback)
         end
       end
 
-      it "retains the changes until after all callbacks" do
+      it "does not retain the changes until after all callbacks" do
         acolyte.update_attribute(:status, "testing")
-        expect(acolyte.changed_in_callback).to eq({ "status" => [ nil, "testing" ] })
+        expect(acolyte.changed_in_before_callback).to eq({"status"=>[nil, "testing"]})
+        expect(acolyte.changed_in_after_callback).to eq({  })
       end
     end
 
@@ -1675,21 +1680,26 @@ describe Mongoid::Changeable do
 
       before do
         Acolyte.set_callback(:save, :after, if: :callback_test?) do |doc|
-          doc[:changed_in_callback] = doc.changes.dup
+          doc[:changed_after_in_callback] = doc.changes.dup
+        end
+
+        Acolyte.set_callback(:save, :before, if: :callback_test?) do |doc|
+          doc[:changed_before_in_callback] = doc.changes.dup
         end
       end
 
       after do
         Acolyte._save_callbacks.select do |callback|
-          callback.kind == :after
+          [:before, :after].include?(callback.kind)
         end.each do |callback|
           Acolyte._save_callbacks.delete(callback)
         end
       end
 
-      it "retains the changes until after all callbacks" do
+      it "does not retain the changes until after all callbacks" do
         acolyte.save!
-        expect(acolyte.changed_in_callback["name"]).to eq([ nil, "callback-test" ])
+        expect(acolyte.changed_before_in_callback["name"]).to eq([ nil, "callback-test" ])
+        expect(acolyte.changed_after_in_callback["name"]).to be_nil
       end
     end
   end

@@ -1008,8 +1008,8 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
   describe '#foreign_key_check' do
 
-    it 'returns the foreign_key followed by "_changed?"' do
-      expect(association.foreign_key_check).to eq('has_many_right_object_ids_changed?')
+    it 'returns the foreign_key followed by "_previously_changed?"' do
+      expect(association.foreign_key_check).to eq('has_many_right_object_ids_previously_changed?')
     end
   end
 

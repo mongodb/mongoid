@@ -2019,8 +2019,8 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
   describe '#foreign_key_check' do
 
-    it 'returns the foreign_key followed by "_changed?"' do
-      expect(association.foreign_key_check).to eq('owner_object_id_changed?')
+    it 'returns the foreign_key followed by "_previously_changed?"' do
+      expect(association.foreign_key_check).to eq('owner_object_id_previously_changed?')
     end
   end
 

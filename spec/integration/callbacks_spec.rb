@@ -217,8 +217,6 @@ describe 'callbacks integration tests' do
     let!(:obj) { Emission.create!(frequency: 1) }
 
     it 'is set to the new value' do
-      pending 'MONGOID-5104'
-
       obj.frequency = 2
       obj.save!
 
