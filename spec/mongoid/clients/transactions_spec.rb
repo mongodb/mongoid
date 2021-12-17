@@ -189,6 +189,27 @@ describe Mongoid::Clients::Sessions do
           end
         end
       end
+
+      context 'When reloading an embedded document created inside a transaction' do
+        it 'does not raise an error and has the correct document' do
+          Canvas.with_session do |s|
+            s.start_transaction
+
+            p = Palette.new
+            c = Canvas.new(palette: p)
+            c.save!
+
+            expect do
+              p.reload
+            end.to_not raise_error
+
+            expect(c.palette).to eq(p)
+
+            s.commit_transaction
+          end
+
+        end
+      end
     end
 
     context 'when sessions are supported but transactions are not' do

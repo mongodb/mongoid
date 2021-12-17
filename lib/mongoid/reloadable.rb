@@ -67,7 +67,7 @@ module Mongoid
     # @return [ Hash ] The reloaded attributes.
     def reload_embedded_document
       extract_embedded_attributes({}.merge(
-        collection(_root).find(_root.atomic_selector).read(mode: :primary).first
+        collection(_root).find(_root.atomic_selector, session: _session).read(mode: :primary).first
       ))
     end
 
