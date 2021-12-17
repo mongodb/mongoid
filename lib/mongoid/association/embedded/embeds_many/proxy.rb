@@ -72,7 +72,7 @@ module Mongoid
             doc.apply_post_processed_defaults
             yield(doc) if block_given?
             doc.run_callbacks(:build) { doc }
-            _base._reset_memoized_children!
+            _base._reset_memoized_descendants!
             doc
           end
 
