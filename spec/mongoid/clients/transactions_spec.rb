@@ -62,8 +62,10 @@ describe Mongoid::Clients::Sessions do
         Mongoid::Clients.with_name(:other).command(create: :people)
         Mongoid::Clients.with_name(:other).command(create: :posts)
         subscriber.clear_events!
-        Person.with(client: :other) do
-          example.run
+        Canvas.with(client: :other) do
+          Person.with(client: :other) do
+            example.run
+          end
         end
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
       end
@@ -207,7 +209,6 @@ describe Mongoid::Clients::Sessions do
 
             s.commit_transaction
           end
-
         end
       end
     end
