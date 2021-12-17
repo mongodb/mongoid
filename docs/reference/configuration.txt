@@ -116,6 +116,10 @@ Mongoid Configuration Options
 The following annotated example ``mongoid.yml`` demonstrates how Mongoid
 can be configured.
 
+Mongoid delegates to the Ruby driver for client configuration. Please review
+`the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/>`_
+for details on driver options.
+
 .. code-block:: yaml
 
   development:
@@ -163,9 +167,11 @@ can be configured.
           roles:
             - 'dbOwner'
 
-          # Change the default authentication mechanism. Valid options are: :scram,
-          # :mongodb_cr, :mongodb_x509, and :plain. (default on 3.0 is :scram, default
-          # on 2.4 and 2.6 is :plain)
+          # Change the default authentication mechanism. Please see the
+          # driver documentation linked above for details on how to configure
+          # authentication. Valid options are :aws, :gssapi, :mongodb_cr,
+          # :mongodb_x509, :plain, :scram and :scram256 (default on 3.0
+          # and higher servers is :scram, default on 2.6 servers is :plain)
           auth_mech: :scram
 
           # Specify the auth source, i.e. the database or other source which
@@ -295,9 +301,6 @@ can be configured.
       # further information. Most applications should not use this option.
       # (default: false)
       use_utc: false
-
-The Ruby driver options may be found in
-`the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/>`_.
 
 ERb Preprocessing
 =================
