@@ -60,9 +60,9 @@ module Mongoid
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
           return nil if object.nil?
-          return object if object.is_a?(::Hash)
-          return object if object.is_a?(String)
-          hash = { "min" => object.first, "max" => object.last }
+          return object.mongoize if object.is_a?(::Hash)
+          return object.mongoize if object.is_a?(String)
+          hash = { "min" => object.first&.mongoize, "max" => object.last&.mongoize }
           if object.respond_to?(:exclude_end?) && object.exclude_end?
             hash.merge!("exclude_end" => true)
           end
