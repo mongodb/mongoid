@@ -659,12 +659,12 @@ describe Mongoid::Scopable do
                 where(:author_id.in => author_ids)
               })
 
-              Author.create(author: true, id: 1)
-              Author.create(author: true, id: 2)
-              Author.create(author: true, id: 3)
-              Article.create(author_id: 1, public: true)
-              Article.create(author_id: 2, public: true)
-              Article.create(author_id: 3, public: false)
+              Author.create!(author: true, id: 1)
+              Author.create!(author: true, id: 2)
+              Author.create!(author: true, id: 3)
+              Article.create!(author_id: 1, public: true)
+              Article.create!(author_id: 2, public: true)
+              Article.create!(author_id: 3, public: false)
             end
 
             after do

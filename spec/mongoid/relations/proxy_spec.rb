@@ -16,7 +16,7 @@
 #
 #     before do
 #       circus.animals << animal
-#       circus.save
+#       circus.save!
 #     end
 #
 #     it 'uses the new persistence options' do
@@ -30,7 +30,7 @@
 #
 #   describe "#find" do
 #     let(:person) do
-#       Person.create
+#       Person.create!
 #     end
 #
 #     let(:messages) do
@@ -38,7 +38,7 @@
 #     end
 #
 #     let(:msg1) do
-#       messages.create(body: 'msg1')
+#       messages.create!(body: 'msg1')
 #     end
 #
 #     it "returns nil with no arguments" do
@@ -69,7 +69,7 @@
 #     end
 #
 #     let(:person) do
-#       Person.create
+#       Person.create!
 #     end
 #
 #     let(:name) do
@@ -87,7 +87,7 @@
 #     context "when extending from the relation definition" do
 #
 #       let!(:address) do
-#         person.addresses.create(street: "hobrecht")
+#         person.addresses.create!(street: "hobrecht")
 #       end
 #
 #       let(:found) do
@@ -102,7 +102,7 @@
 #
 #   describe "equality" do
 #     let(:messages) do
-#       Person.create.messages
+#       Person.create!.messages
 #     end
 #
 #     it "is #equal? to itself" do

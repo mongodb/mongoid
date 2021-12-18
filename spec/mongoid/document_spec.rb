@@ -622,7 +622,7 @@ describe Mongoid::Document do
     context "when removing an embedded document" do
 
       before do
-        person.save
+        person.save!
         person.addresses.delete(address)
       end
 
@@ -635,9 +635,9 @@ describe Mongoid::Document do
 
       before do
         # Save the doc, then set an embeds_one relation to nil
-        person.save
+        person.save!
         person.name = nil
-        person.save
+        person.save!
       end
 
       it "does not include the document in the hash" do
@@ -855,7 +855,7 @@ describe Mongoid::Document do
     end
 
     before do
-      person.save
+      person.save!
     end
 
     it "persists the correct type" do
@@ -1077,7 +1077,7 @@ describe Mongoid::Document do
       context "when the document is persisted" do
 
         before do
-          manager.save
+          manager.save!
         end
 
         let(:person) do
@@ -1107,7 +1107,7 @@ describe Mongoid::Document do
       context "when the document is dirty" do
 
         before do
-          manager.save
+          manager.save!
           manager.ssn = "123-22-1234"
         end
 
@@ -1205,7 +1205,7 @@ describe Mongoid::Document do
       context "when the document is persisted" do
 
         before do
-          person.save
+          person.save!
         end
 
         let(:manager) do
@@ -1219,7 +1219,7 @@ describe Mongoid::Document do
         context "when downcasted document is saved" do
 
           before do
-            manager.save
+            manager.save!
           end
 
           it "keeps the type" do
@@ -1258,7 +1258,7 @@ describe Mongoid::Document do
       context "when the document is dirty" do
 
         before do
-          person.save
+          person.save!
           person.ssn = "123-22-1234"
         end
 

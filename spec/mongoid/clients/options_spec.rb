@@ -245,11 +245,11 @@ describe Mongoid::Clients::Options, retry: 3 do
             threads << Thread.new do
               if i % 2 == 0
                 NameOnly.with(collection: 'British') do |klass|
-                  klass.create(name: 'realised')
+                  klass.create!(name: 'realised')
                 end
               else
                 NameOnly.with(collection: 'American') do |klass|
-                  klass.create(name: 'realized')
+                  klass.create!(name: 'realized')
                 end
               end
             end

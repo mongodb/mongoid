@@ -1307,9 +1307,9 @@ describe Mongoid::Criteria do
       end
 
       before do
-        p = Post.create(alerts: [ Alert.create ])
+        p = Post.create!(alerts: [ Alert.create! ])
         user.posts = [ p ]
-        user.save
+        user.save!
       end
 
       let(:result) do
@@ -1660,8 +1660,8 @@ describe Mongoid::Criteria do
         before do
           address_one.band = depeche
           address_two.band = tool
-          address_one.save
-          address_two.save
+          address_one.save!
+          address_two.save!
         end
 
         context "when calling first" do
@@ -3015,10 +3015,10 @@ describe Mongoid::Criteria do
 
       before do
         I18n.locale = :en
-        d = Dictionary.create(description: 'english-text')
+        d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
-        d.save
+        d.save!
       end
 
       after do

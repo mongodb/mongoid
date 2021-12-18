@@ -28,13 +28,13 @@ describe Mongoid::Reloadable do
     context "when using bson ids" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:from_db) do
         Person.find(person.id).tap do |peep|
           peep.age = 35
-          peep.save
+          peep.save!
         end
       end
 
@@ -51,13 +51,13 @@ describe Mongoid::Reloadable do
     context "when using string ids" do
 
       let(:account) do
-        Account.create(name: "bank", number: "1000")
+        Account.create!(name: "bank", number: "1000")
       end
 
       let!(:from_db) do
         Account.find(account.id).tap do |acc|
           acc.number = "1001"
-          acc.save
+          acc.save!
         end
       end
 
@@ -74,7 +74,7 @@ describe Mongoid::Reloadable do
     context "when an after initialize callback is defined" do
 
       let!(:book) do
-        Book.create(title: "Snow Crash")
+        Book.create!(title: "Snow Crash")
       end
 
       before do
@@ -90,7 +90,7 @@ describe Mongoid::Reloadable do
     context "when the document was dirty" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       before do
@@ -139,7 +139,7 @@ describe Mongoid::Reloadable do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when embedded a single level" do
@@ -148,13 +148,13 @@ describe Mongoid::Reloadable do
 
           let(:person) do
             Person.with(collection: 'other') do |person_class|
-              person_class.create
+              person_class.create!
             end
           end
 
           let!(:address) do
             person.with(collection: 'other') do |person_object|
-              person_object.addresses.create(street: "Abbey Road", number: 4)
+              person_object.addresses.create!(street: "Abbey Road", number: 4)
             end
           end
 
@@ -179,7 +179,7 @@ describe Mongoid::Reloadable do
         context "when the relation is an embeds many" do
 
           let!(:address) do
-            person.addresses.create(street: "Abbey Road", number: 4)
+            person.addresses.create!(street: "Abbey Road", number: 4)
           end
 
           before do
@@ -237,11 +237,11 @@ describe Mongoid::Reloadable do
       context "when the relation is embedded multiple levels" do
 
         let!(:address) do
-          person.addresses.create(street: "Abbey Road", number: 3)
+          person.addresses.create!(street: "Abbey Road", number: 3)
         end
 
         let!(:location) do
-          address.locations.create(name: "home")
+          address.locations.create!(name: "home")
         end
 
         before do
@@ -270,11 +270,11 @@ describe Mongoid::Reloadable do
     context "when embedded documents change" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:address) do
-        person.addresses.create(number: 27, street: "Maiden Lane")
+        person.addresses.create!(number: 27, street: "Maiden Lane")
       end
 
       before do
@@ -291,7 +291,7 @@ describe Mongoid::Reloadable do
     context "with relational associations" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "for a has_one" do
@@ -335,13 +335,13 @@ describe Mongoid::Reloadable do
     context "when overriding #id alias" do
 
       let!(:object) do
-        IdKey.create(key: 'foo')
+        IdKey.create!(key: 'foo')
       end
 
       let!(:from_db) do
         IdKey.find(object._id).tap do |object|
           object.key = 'bar'
-          object.save
+          object.save!
         end
       end
 
@@ -358,7 +358,7 @@ describe Mongoid::Reloadable do
     context 'when the document is readonly' do
 
       before do
-        Person.create
+        Person.create!
       end
 
       let(:reloaded) do
@@ -400,7 +400,7 @@ describe Mongoid::Reloadable do
       context 'without embedded document' do
         let(:profile) do
           Profile.with(client: :other) do |klass|
-            klass.create
+            klass.create!
           end
         end
 
@@ -422,8 +422,8 @@ describe Mongoid::Reloadable do
       context 'with embedded document' do
         let(:profile_image) do
           Profile.with(client: :other) do |klass|
-            profile = klass.create
-            ProfileImage.create(profile: profile)
+            profile = klass.create!
+            ProfileImage.create!(profile: profile)
           end
         end
 

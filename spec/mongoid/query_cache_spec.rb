@@ -259,11 +259,11 @@ describe Mongoid::QueryCache do
     end
 
     before do
-      person = Person.create
+      person = Person.create!
       3.times do
-        person.send(relation).create
+        person.send(relation).create!
       end
-      person.save
+      person.save!
     end
 
     let!(:relations) do

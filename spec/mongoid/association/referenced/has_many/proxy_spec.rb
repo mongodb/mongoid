@@ -115,8 +115,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             context "when subsequently saving the parent" do
 
               before do
-                person.save
-                post.save
+                person.save!
+                post.save!
               end
 
               it "returns the correct count of the association" do
@@ -1681,7 +1681,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       let!(:posts) do
-        person.posts.create([{ text: "Test1" }, { text: "Test2" }])
+        person.posts.create!([{ text: "Test1" }, { text: "Test2" }])
       end
 
       it "creates multiple documents" do
@@ -1710,7 +1710,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
 
         let(:post) do
-          person.posts.create(text: "Testing")
+          person.posts.create!(text: "Testing")
         end
 
         it "raises an unsaved document error" do
@@ -1747,7 +1747,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "raises an error" do
             expect {
-              person.posts.create do |doc|
+              person.posts.create! do |doc|
                 doc._id = existing.id
               end
             }.to raise_error(Mongo::Error::OperationFailure)
@@ -3820,8 +3820,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       before do
         artist.albums << album
-        album.save
-        artist.save
+        album.save!
+        artist.save!
         expect(artist).not_to receive(:after_add_album)
       end
 
@@ -4064,7 +4064,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
 
     it 'saves the document correctly' do
-      expect(agent.save).to be(true)
+      expect(agent.save!).to be(true)
     end
   end
 

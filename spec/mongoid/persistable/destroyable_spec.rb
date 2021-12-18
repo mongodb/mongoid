@@ -86,7 +86,7 @@ describe Mongoid::Persistable::Destroyable do
       context "when the document has been saved" do
 
         before do
-          address.save
+          address.save!
           address.destroy
         end
 

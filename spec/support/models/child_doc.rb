@@ -18,7 +18,7 @@ class ChildDoc
     if @position && (@position.to_i > 0)
       parent_doc.children_order.delete(id)
       parent_doc.children_order.insert(@position.to_i - 1, id)
-      parent_doc.save
+      parent_doc.save!
     end
   end
 end

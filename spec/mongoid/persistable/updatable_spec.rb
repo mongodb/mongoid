@@ -117,7 +117,7 @@ describe Mongoid::Persistable::Updatable do
     context "when dynamic attributes are not enabled" do
 
       it "raises exception for an unknown attribute " do
-        account = Account.create
+        account = Account.create!(name: 'Foobar')
 
         expect {
           account.update_attribute(:somethingnew, "somethingnew")
@@ -465,7 +465,7 @@ describe Mongoid::Persistable::Updatable do
 
         it "raises an error" do
           expect {
-            person.update_attributes(map: { "$bad.key" => "value" })
+            person.update_attributes!(map: { "$bad.key" => "value" })
           }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
@@ -477,7 +477,7 @@ describe Mongoid::Persistable::Updatable do
         end
 
         let!(:saved) do
-          person.update_attributes(pets: false)
+          person.update_attributes!(pets: false)
         end
 
         let(:from_db) do
@@ -683,7 +683,7 @@ describe Mongoid::Persistable::Updatable do
         before do
           phone_number.country_code = country_code
           person.phone_numbers << phone_number
-          person.save
+          person.save!
         end
 
         it "sets the first level document" do
