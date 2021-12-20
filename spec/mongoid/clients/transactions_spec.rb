@@ -61,9 +61,12 @@ describe Mongoid::Clients::Sessions do
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
         Mongoid::Clients.with_name(:other).command(create: :people)
         Mongoid::Clients.with_name(:other).command(create: :posts)
+        Mongoid::Clients.with_name(:other).command(create: :canvases)
         subscriber.clear_events!
-        Person.with(client: :other) do
-          example.run
+        Canvas.with(client: :other) do
+          Person.with(client: :other) do
+            example.run
+          end
         end
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
       end
@@ -186,6 +189,26 @@ describe Mongoid::Clients::Sessions do
             expect(Person.count).to be(0)
             expect(Post.count).to be(0)
             expect(insert_events).to be_empty
+          end
+        end
+      end
+
+      context 'When reloading an embedded document created inside a transaction' do
+        it 'does not raise an error and has the correct document' do
+          Canvas.with_session do |s|
+            s.start_transaction
+
+            p = Palette.new
+            c = Canvas.new(palette: p)
+            c.save!
+
+            expect do
+              p.reload
+            end.to_not raise_error
+
+            expect(c.palette).to eq(p)
+
+            s.commit_transaction
           end
         end
       end
