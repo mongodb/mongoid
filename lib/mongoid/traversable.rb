@@ -115,49 +115,82 @@ module Mongoid
       end
     end
 
-    # Get all child +Documents+ to this +Document+, going n levels deep if
-    # necessary. This is used when calling update persistence operations from
+    # Get all child +Documents+ to this +Document+
+    #
+    # @return [ Array<Document> ] All child documents in the hierarchy.
+    #
+    # @api private
+    def _children
+      @__children ||= collect_children
+    end
+
+    # Get all descendant +Documents+ of this +Document+ recursively.
+    # This is used when calling update persistence operations from
     # the root document, where changes in the entire tree need to be
     # determined. Note that persistence from the embedded documents will
     # always be preferred, since they are optimized calls... This operation
     # can get expensive in domains with large hierarchies.
     #
-    # @example Get all the document's children.
-    #   person._children
+    # @return [ Array<Document> ] All descendant documents in the hierarchy.
     #
-    # @return [ Array<Document> ] All child documents in the hierarchy.
-    def _children
-      @__children ||= collect_children
+    # @api private
+    def _descendants
+      @__descendants ||= collect_descendants
     end
 
     # Collect all the children of this document.
     #
-    # @example Collect all the children.
-    #   document.collect_children
-    #
     # @return [ Array<Document> ] The children.
+    #
+    # @api private
     def collect_children
       children = []
       embedded_relations.each_pair do |name, association|
         without_autobuild do
           child = send(name)
-          Array.wrap(child).each do |doc|
-            children.push(doc)
-            children.concat(doc._children)
-          end if child
+          if child
+            children += Array.wrap(child)
+          end
         end
       end
       children
     end
 
-    # Marks all children as being persisted.
+    # Collect all the descendants of this document.
     #
-    # @example Flag all the children.
-    #   document.flag_children_persisted
+    # @return [ Array<Document> ] The descendants.
     #
-    # @return [ Array<Document> ] The flagged children.
-    def flag_children_persisted
-      _children.each do |child|
+    # @api private
+    def collect_descendants
+      children = []
+      to_expand = []
+      expanded = {}
+      embedded_relations.each_pair do |name, association|
+        without_autobuild do
+          child = send(name)
+          if child
+            to_expand += Array.wrap(child)
+          end
+        end
+      end
+      until to_expand.empty?
+        expanding = to_expand
+        to_expand = []
+        expanding.each do |child|
+          next if expanded[child]
+          expanded[child] = true
+          children << child
+          to_expand += child._children
+        end
+      end
+      children
+    end
+
+    # Marks all descendants as being persisted.
+    #
+    # @return [ Array<Document> ] The flagged descendants.
+    def flag_descendants_persisted
+      _descendants.each do |child|
         child.new_record = false
       end
     end
@@ -204,33 +237,28 @@ module Mongoid
       end
     end
 
-    # After children are persisted we can call this to move all their changes
-    # and flag them as persisted in one call.
+    # After descendants are persisted we can call this to move all their
+    # changes and flag them as persisted in one call.
     #
-    # @example Reset the children.
-    #   document.reset_persisted_children
-    #
-    # @return [ Array<Document> ] The children.
-    def reset_persisted_children
-      _children.each do |child|
+    # @return [ Array<Document> ] The descendants.
+    def reset_persisted_descendants
+      _descendants.each do |child|
         child.move_changes
         child.new_record = false
       end
-      _reset_memoized_children!
+      _reset_memoized_descendants!
     end
 
-    # Resets the memoized children on the object. Called internally when an
+    # Resets the memoized descendants on the object. Called internally when an
     # embedded array changes size.
     #
-    # @api semiprivate
-    #
-    # @example Reset the memoized children.
-    #   document._reset_memoized_children!
-    #
     # @return [ nil ] nil.
-    def _reset_memoized_children!
-      _parent._reset_memoized_children! if _parent
+    #
+    # @api private
+    def _reset_memoized_descendants!
+      _parent._reset_memoized_descendants! if _parent
       @__children = nil
+      @__descendants = nil
     end
 
     # Return the root document in the object graph. If the current document
