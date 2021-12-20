@@ -61,6 +61,7 @@ describe Mongoid::Clients::Sessions do
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
         Mongoid::Clients.with_name(:other).command(create: :people)
         Mongoid::Clients.with_name(:other).command(create: :posts)
+        Mongoid::Clients.with_name(:other).command(create: :canvases)
         subscriber.clear_events!
         Canvas.with(client: :other) do
           Person.with(client: :other) do
