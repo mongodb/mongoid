@@ -31,7 +31,7 @@ module Mongoid
               characterize_one(_target)
               bind_one
               characterize_one(_target)
-              _base._reset_memoized_children!
+              _base._reset_memoized_descendants!
               _target.save if persistable?
             end
           end
