@@ -8,7 +8,7 @@ Mongoid is an ODM (Object-Document Mapper) framework for MongoDB in Ruby.
 Documentation
 -------------
 
-Mongoid has [extensive user documentation](https://docs.mongodb.com/mongoid/current/).
+Mong oid has [extensive user documentation](https://docs.mongodb.com/mongoid/current/).
 [API documentation](https://docs.mongodb.com/mongoid/current/api/) is also available.
 
 Mongoid is built on top of the MongoDB Ruby driver which has
