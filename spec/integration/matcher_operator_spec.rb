@@ -14,7 +14,28 @@ end
 describe 'Matcher operators' do
   Dir[File.join(File.dirname(__FILE__), 'matcher_operator_data', '*.yml')].sort.each do |path|
     context File.basename(path) do
-      specs = YAML.load(File.read(path))
+      permitted_classes = [ BigDecimal,
+                            Date,
+                            Time,
+                            Range,
+                            Regexp,
+                            Symbol,
+                            BSON::Binary,
+                            BSON::Code,
+                            BSON::CodeWithScope,
+                            BSON::DbPointer,
+                            BSON::Decimal128,
+                            BSON::Int32,
+                            BSON::Int64,
+                            BSON::MaxKey,
+                            BSON::MinKey,
+                            BSON::ObjectId,
+                            BSON::Regexp::Raw,
+                            BSON::Symbol::Raw,
+                            BSON::Timestamp,
+                            BSON::Undefined ]
+
+      specs = YAML.safe_load(File.read(path), permitted_classes, [], true)
 
       specs.each do |spec|
         context spec['name'] do
