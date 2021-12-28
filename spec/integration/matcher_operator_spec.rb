@@ -36,11 +36,10 @@ describe 'Matcher operators' do
                             BSON::Undefined ]
 
       specs = if RUBY_VERSION.start_with?("2.5")
-        YAML.safe_load(File.read(path), permitted_classes, [], true)
-      else
-        # Here we have Ruby 2.6+ that supports the new syntax of `safe_load`.
-        YAML.safe_load(File.read(path), permitted_classes: permitted_classes, aliases: true)
-      end
+                YAML.safe_load(File.read(path), permitted_classes, [], true)
+              else
+                YAML.safe_load(File.read(path), permitted_classes: permitted_classes, aliases: true)
+              end
 
       specs.each do |spec|
         context spec['name'] do
