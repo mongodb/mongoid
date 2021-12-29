@@ -166,6 +166,19 @@ describe Mongoid::Association::Accessors do
           end
         end
       end
+
+      context "when the association is set to nil first" do
+
+        let!(:name) do
+          person.build_name
+        end
+
+        it "returns true" do
+          person.name = nil
+          person.name = name
+          expect(person).to have_name
+        end
+      end
     end
 
     context "when the association is an embeds many" do

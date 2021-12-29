@@ -53,6 +53,7 @@ module Mongoid
                 # The associated object will be replaced by the below update if non-nil, so only
                 # run the callbacks and state-changing code by passing persist: false in that case.
                 _target.destroy(persist: !replacement) if persistable?
+                _target.new_record = true
               end
               unbind_one
               return nil unless replacement

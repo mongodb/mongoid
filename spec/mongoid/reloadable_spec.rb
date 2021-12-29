@@ -288,6 +288,29 @@ describe Mongoid::Reloadable do
       end
     end
 
+    context "when embedded documents change multiple times" do
+
+      let(:palette) do
+        Palette.new
+      end
+
+      let(:canvas) do
+        Canvas.create!
+      end
+
+      before do
+        canvas.palette = palette
+        canvas.palette = nil
+        canvas.palette = palette
+        canvas.save!
+        canvas.reload
+      end
+
+      it "reloads the embedded document correctly" do
+        expect(canvas.palette).to eq(palette)
+      end
+    end
+
     context "with relational associations" do
 
       let(:person) do
