@@ -33,17 +33,15 @@ Gem::Specification.new do |s|
   s.required_ruby_version     = ">= 2.5"
   s.required_rubygems_version = ">= 1.3.6"
 
-  if RUBY_VERSION.start_with?('2.')
-    s.add_dependency("activemodel", [">=5.1", "<6.2"])
-  elsif RUBY_VERSION.start_with?('3.')
-    s.add_dependency("activemodel", [">=6.0", "<6.2"])
-  end
+  # activemodel 7.0.0 cannot be used due to Class#descendants issue (see: https://github.com/rails/rails/pull/43951)
+  s.add_dependency("activemodel", ['>=5.1', '<7.1', '!= 7.0.0'])
   s.add_dependency("mongo", ['>=2.10.5', '<3.0.0'])
-  # Using this gem is recommended for handling argument delegation issues,
+
+  # The ruby2_keywords gem is recommended for handling argument delegation issues,
   # especially if support for 2.6 or prior is required.
   # See https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/#delegation
   #
-  # We have a bunch of complex delegation logic, including various method_missngs.
+  # We have a bunch of complex delegation logic, including various method_missings.
   # If we try to fix them "right", it will add too much logic. We will have to
   # handle different Ruby versions (including minor ones, Ruby 2.6 and 2.7
   # behave differently), hash key types (strings vs symbols), ways of passing
