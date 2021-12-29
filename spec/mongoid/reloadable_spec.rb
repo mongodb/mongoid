@@ -311,6 +311,31 @@ describe Mongoid::Reloadable do
       end
     end
 
+    context "when embedded document is nil" do
+
+      let(:palette) do
+        Palette.new
+      end
+
+      let(:canvas) do
+        Canvas.create!(palette: palette)
+      end
+
+      before do
+        canvas.palette = nil
+      end
+
+      let(:reload) do
+        palette.reload
+      end
+
+      it "doesn't raise an error" do
+        expect do
+          reload
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Palette with id\(s\)/)
+      end
+    end
+
     context "with relational associations" do
 
       let(:person) do

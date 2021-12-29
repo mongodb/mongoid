@@ -22,7 +22,7 @@ module Mongoid
       end
 
       reloaded = _reload
-      if Mongoid.raise_not_found_error && reloaded.empty?
+      if Mongoid.raise_not_found_error && (!reloaded || reloaded.empty?)
         raise Errors::DocumentNotFound.new(self.class, _id, _id)
       end
       @attributes = reloaded
