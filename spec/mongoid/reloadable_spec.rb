@@ -329,7 +329,7 @@ describe Mongoid::Reloadable do
         palette.reload
       end
 
-      it "doesn't raise an error" do
+      it "raises a document not found error" do
         expect do
           reload
         end.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Palette with id\(s\)/)
