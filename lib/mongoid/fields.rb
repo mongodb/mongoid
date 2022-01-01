@@ -575,7 +575,7 @@ module Mongoid
       end
 
       def field_type_klass_for(field, type)
-        klass = FieldTypes.get(type)
+        klass = Mongoid::FieldTypes.get(type)
         return klass if klass
         raise Mongoid::Errors::InvalidFieldType.new(self.name, field, type)
       end
