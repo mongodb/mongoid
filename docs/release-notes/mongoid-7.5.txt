@@ -159,3 +159,39 @@ Mongoid 7.4 output:
 
 Notice that in 7.4 ``attribute_was(:age)`` returns the old attribute value,
 while in 7.5 ``attribute_was(:age)`` returns the new value.
+
+
+Setting Field Type as a Class is Deprecated
+-------------------------------------------
+
+Mongoid has historically supported defining the ``field :type`` option
+as either a Symbol or a Class. As of Mongoid 7.5, using a Class is deprecated
+and Symbol is preferred. Support for Class will be removed entirely in Mongoid 8.0.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    # Deprecated; will log an warning message.
+    field :first_name, type: String
+
+    # Good
+    field :last_name, type: :string
+  end
+
+
+Support for Defining Custom Field Type Values
+---------------------------------------------
+
+Mongoid 7.5 adds the ability to define custom ``field :type`` Symbol values as follows:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid_custom_fields.rb
+
+  Mongoid::Fields.configure do
+    type :point, Point
+  end
+
+Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
