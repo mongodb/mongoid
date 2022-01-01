@@ -52,7 +52,11 @@ module Mongoid
       return Object if type.nil?
 
       if type.is_a?(Module)
-        Mongoid.logger.warn(FIELD_TYPE_IS_SYMBOL)
+        symbol = type.name.demodulize.underscore
+        Mongoid.logger.warn(
+          "Using a Class (#{type}) as the field :type option is deprecated and will be removed in Mongoid 8.0. " +
+          "Please use a Symbol (:#{symbol}) instead."
+        )
         return Mongoid::Boolean if type.to_s == 'Boolean'
         type
       end

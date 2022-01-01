@@ -21,7 +21,7 @@ the complete list of issues fixed in each release, including bug fixes.
 Order of Callbacks Invocation
 -----------------------------
 
-**Breaking change:** Mongoid 7.5 changes order of _create and _save callbacks
+**Breaking change:** Mongoid 7.5 changes the order of _create and _save callback
 invocation for documents with associations.
 
 Referenced associations (``has_one`` and ``has_many``):
@@ -119,12 +119,11 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
 +---------------------------------------+---------------------------------------+
 
 
-``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Ditry``
+``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
 --------------------------------------------------------------------------
 
 When updating documents, it is now possible to get updated attribute values
-in ``after_*`` callbacks. This is following with ActiveRecord/ActiveModel
-behavior.
+in ``after_*`` callbacks. This follows ActiveRecord/ActiveModel behavior.
 
 .. code-block:: ruby
 
@@ -159,4 +158,40 @@ Mongoid 7.4 output:
   nil
 
 Notice that in 7.4 ``attribute_was(:age)`` returns an old attribute value,
-while in 7.5 ``attribute_was(:age)`` returns the new values,
+while in 7.5 ``attribute_was(:age)`` returns the new values.
+
+
+Setting Field Type as a Class is Deprecated
+-------------------------------------------
+
+Mongoid has historically supported defining the ``field :type`` option
+as either a Symbol or a Class. As of Mongoid 7.5, using a Class is deprecated
+and Symbol is preferred. Support for Class will be removed entirely in Mongoid 8.0.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    # Deprecated; will log an warning message.
+    field :first_name, type: String
+
+    # Good
+    field :last_name, type: :string
+  end
+
+
+Support for Defining Custom Field Type Values
+---------------------------------------------
+
+Mongoid 7.5 adds the ability to define custom ``field :type`` Symbol values as follows:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid_custom_fields.rb
+
+  Mongoid::Fields.configure do
+    type :point, Point
+  end
+
+Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
