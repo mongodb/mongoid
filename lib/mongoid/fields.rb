@@ -12,6 +12,10 @@ module Mongoid
   module Fields
     extend ActiveSupport::Concern
 
+    # @deprecated Remove class aliases in Mongoid 8.0.
+    StringifiedSymbol = Mongoid::StringifiedSymbol
+    Boolean = Mongoid::Boolean
+
     # Constant for all names of the _id field in a document.
     #
     # This does not include aliases of _id field.
