@@ -178,7 +178,9 @@ en:
             \_\_class %{klass}\n
             \_\_\_\_include Mongoid::Document\n
             \_\_\_\_field :%{name}, %{option}: true\n
-            \_\_end\n\n"
+            \_\_end\n\n
+            Refer to:
+            https://docs.mongodb.com/mongoid/current/reference/fields/#custom-field-options"
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
