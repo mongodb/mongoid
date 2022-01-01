@@ -4,6 +4,7 @@ require "mongoid/fields/standard"
 require "mongoid/fields/foreign_key"
 require "mongoid/fields/localized"
 require "mongoid/fields/validators"
+require "mongoid/fields/field_types"
 
 module Mongoid
 
@@ -199,7 +200,7 @@ module Mongoid
       #     type :point, Point
       #   end
       def type(symbol, klass)
-        Mongoid::FieldTypes.define(symbol, klass)
+        Fields::FieldTypes.define(symbol, klass)
       end
 
       # Stores the provided block to be run when the option name specified is
@@ -575,7 +576,7 @@ module Mongoid
       end
 
       def field_type_klass_for(field, type)
-        klass = Mongoid::FieldTypes.get(type)
+        klass = Fields::FieldTypes.get(type)
         return klass if klass
         raise Mongoid::Errors::InvalidFieldType.new(self.name, field, type)
       end

@@ -186,7 +186,7 @@ en:
         invalid_field_type:
           message: "Invalid field type :%{type} for field :%{field} on model '%{klass}'."
           summary: "Model '%{klass}' defines a field :%{field} with an unknown :type value
-            '%{type}'. This value is neither present in Mongoid's default type mapping,
+            :%{type}. This value is neither present in Mongoid's default type mapping,
             nor defined in a custom field type mapping."
           resolution: "Please provide a valid :type value for the field. If you
             meant to define a custom field type, please do so first as follows:\n\n
