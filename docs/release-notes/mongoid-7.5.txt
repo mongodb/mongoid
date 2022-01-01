@@ -157,5 +157,5 @@ Mongoid 7.4 output:
   #<Cat _id: 60aef1652c97a617438dc9bb, age: 2>
   nil
 
-Notice that in 7.4 ``attribute_was(:age)`` returns an old attribute value,
-while in 7.5 ``attribute_was(:age)`` returns the new values.
+Notice that in 7.4 ``attribute_was(:age)`` returns the old attribute value,
+while in 7.5 ``attribute_was(:age)`` returns the new value.
