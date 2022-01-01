@@ -84,8 +84,7 @@ en:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
           resolution: "Ensure your configuration file contains the correct contents.
-            Please consult the following page with respect to Mongoid's configuration:
-            https://docs.mongodb.com/mongoid/current/reference/configuration/"
+            Refer to: https://docs.mongodb.com/mongoid/current/reference/configuration/"
         invalid_collection:
           message: "Access to the collection for %{klass} is not allowed."
           summary: "%{klass}.collection was called, and %{klass} is an embedded
@@ -105,8 +104,7 @@ en:
           summary: "Your mongoid.yml configuration file does not contain the
             correct file structure."
           resolution: "Ensure your configuration file contains the correct contents.
-            Please consult the following page with respect to Mongoid's configuration:
-            https://docs.mongodb.com/mongoid/current/reference/configuration/"
+            Refer to: https://docs.mongodb.com/mongoid/current/reference/configuration/"
         invalid_config_option:
           message: "Invalid configuration option: %{name}."
           summary: "A invalid configuration option was provided in your
@@ -173,7 +171,7 @@ en:
             field definition in order to prevent unexpected behavior later on."
           resolution: "When defining the field :%{name} on '%{klass}', please provide
             valid options for the field. These are currently: %{valid}. If you
-            meant to define a custom field option, please do so first like so:\n\n
+            meant to define a custom field option, please do so first as follows:\n\n
             \_\_Mongoid::Fields.option :%{option} do |model, field, value|\n
             \_\_\_\_# Your logic here...\n
             \_\_end\n
@@ -564,12 +562,12 @@ en:
             Mongoid::Attributes::Dynamic in %{klass} if you intend to
             store values in fields that are not explicitly defined."
         unknown_model:
-          message: "Attempted to instantiate an object of the unknown Model '%{klass}'."
+          message: "Attempted to instantiate an object of the unknown model '%{klass}'."
           summary: "A document with the value '%{value}' at the key '_type' was used to
             instantiate a model object but Mongoid cannot find this Class."
           resolution: "The _type field is a reserved one used by Mongoid to determine the
             class for instantiating an object. Please don't save data in this field or ensure
-            that any values in this field correspond to valid Models."
+            that any values in this field correspond to valid models."
         unsaved_document:
           message: "Attempted to save %{document} before the parent %{base}."
           summary: "You cannot call create or create! through the
