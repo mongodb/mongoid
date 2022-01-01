@@ -134,8 +134,8 @@ Now we can define some models:
     class Post
       include Mongoid::Document
 
-      field :title, type: String
-      field :body, type: String
+      field :title, type: :string
+      field :body, type: :string
 
       has_many :comments
     end
@@ -143,8 +143,8 @@ Now we can define some models:
     class Comment
       include Mongoid::Document
 
-      field :name, type: String
-      field :message, type: String
+      field :name, type: :string
+      field :message, type: :string
 
       belongs_to :post
     end

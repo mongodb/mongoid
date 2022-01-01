@@ -32,7 +32,10 @@ module Mongoid
         stringified_symbol: Mongoid::StringifiedSymbol,
         symbol: Symbol,
         time: Time,
-        time_with_zone: ActiveSupport::TimeWithZone
+        time_with_zone: ActiveSupport::TimeWithZone,
+        bson_regexp: BSON::Regexp::Raw,
+        bson_symbol: BSON::Symbol::Raw,
+        bson_timestamp: BSON::Timestamp
       }.with_indifferent_access.freeze
 
       def get(value)

@@ -2,7 +2,7 @@
 
 class Role
   include Mongoid::Document
-  field :name, type: String
+  field :name, type: :string
   belongs_to :user
   belongs_to :post
   recursively_embeds_many

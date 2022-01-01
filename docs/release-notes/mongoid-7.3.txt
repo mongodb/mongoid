@@ -90,21 +90,11 @@ unqualified:
   
   User.field :verified, type: Boolean
 
-To fix it, use the fully-qualified ``Mongoid::Boolean`` class:
+To fix it, use ``:boolean`` as a Symbol:
 
 .. code-block:: ruby
   
-  User.field :verified, type: Mongoid::Boolean
-
-Note that ``class_eval`` is executed in the scope of the caller, not in
-the scope of the class being modified. Thus even when using ``class_eval``
-it is necessary to fully qualify ``Mongoid::Boolean``:
-
-.. code-block:: ruby
-  
-  User.class_eval do
-    field :verified, type: Mongoid::Boolean
-  end
+  User.field :verified, type: :boolean
 
 Additionally, in Mongoid 7.2 ``::Boolean`` and ``Mongoid::Boolean`` were
 different classes. In Mongoid 7.3 there is only one class which is

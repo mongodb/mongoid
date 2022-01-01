@@ -2,7 +2,7 @@
 
 class Tag
   include Mongoid::Document
-  field :text, type: String
+  field :text, type: :string
   has_and_belongs_to_many :actors
   has_and_belongs_to_many :articles
   has_and_belongs_to_many :posts

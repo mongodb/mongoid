@@ -3,7 +3,7 @@
 class Manufacturer
   include Mongoid::Document
 
-  field :products, type: Array, default: []
+  field :products, type: :array, default: []
 
   validates_presence_of :products
 end

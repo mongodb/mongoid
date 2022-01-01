@@ -546,7 +546,7 @@ describe Mongoid::Attributes do
     after(:all) do
       Person.field(
         :_id,
-        type: BSON::ObjectId,
+        type: :object_id,
         pre_processed: true,
         default: ->{ BSON::ObjectId.new },
         overwrite: true
@@ -558,7 +558,7 @@ describe Mongoid::Attributes do
       before(:all) do
         Person.field(
           :_id,
-          type: BSON::ObjectId,
+          type: :object_id,
           pre_processed: true,
           default: ->{ BSON::ObjectId.new },
           overwrite: true
@@ -625,7 +625,7 @@ describe Mongoid::Attributes do
       before(:all) do
         Person.field(
           :_id,
-          type: String,
+          type: :string,
           pre_processed: true,
           default: ->{ BSON::ObjectId.new.to_s },
           overwrite: true
@@ -677,7 +677,7 @@ describe Mongoid::Attributes do
     context "when using integer ids" do
 
       before(:all) do
-        Person.field(:_id, type: Integer, overwrite: true)
+        Person.field(:_id, type: :integer, overwrite: true)
       end
 
       let(:person) do

@@ -364,7 +364,7 @@ describe Mongoid::Association::Referenced::AutoSave do
 
           class Harvest
             include Mongoid::Document
-            field :season, type: String
+            field :season, type: :string
             belongs_to :peasant
           end
         end

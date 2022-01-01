@@ -46,7 +46,7 @@ module Mongoid
         # if it doesn't then it doesn't need a discriminator key.
         if !fields.has_key?(self.discriminator_key) && !descendants.empty?
           default_proc = lambda { self.class.discriminator_value }
-          field(self.discriminator_key, default: default_proc, type: String)
+          field(self.discriminator_key, default: default_proc, type: :string)
         end
       end
 
@@ -325,7 +325,7 @@ module Mongoid
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?(self.discriminator_key)
           default_proc = lambda { self.class.discriminator_value }
-          field(self.discriminator_key, default: default_proc, type: String)
+          field(self.discriminator_key, default: default_proc, type: :string)
         end
       end
     end

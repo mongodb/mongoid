@@ -2,6 +2,6 @@
 
 class Sound
   include Mongoid::Document
-  field :active, type: Mongoid::Boolean
+  field :active, type: :boolean
   default_scope ->{ where(active: true) }
 end

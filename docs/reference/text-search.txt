@@ -46,8 +46,8 @@ a text index utilizing the description field:
   class Band
     include Mongoid::Document
 
-    field :name, type: String
-    field :description, type: String
+    field :name, type: :string
+    field :description, type: :string
 
     index description: 'text'
   end

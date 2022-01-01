@@ -20,12 +20,12 @@ fields, associations, validations and scopes are copied to the child document.
 
    class Canvas
      include Mongoid::Document
-     field :name, type: String
+     field :name, type: :string
      embeds_many :shapes
    end
 
    class Browser < Canvas
-     field :version, type: Integer
+     field :version, type: :integer
      scope :recent, ->{ where(:version.gt => 3) }
    end
 
@@ -34,18 +34,18 @@ fields, associations, validations and scopes are copied to the child document.
 
    class Shape
      include Mongoid::Document
-     field :x, type: Integer
-     field :y, type: Integer
+     field :x, type: :integer
+     field :y, type: :integer
      embedded_in :canvas
    end
 
    class Circle < Shape
-     field :radius, type: Float
+     field :radius, type: :float
    end
 
    class Rectangle < Shape
-     field :width, type: Float
-     field :height, type: Float
+     field :width, type: :float
+     field :height, type: :float
    end
 
 In the above example, ``Canvas``, ``Browser`` and ``Firefox`` will all save in the canvases
@@ -87,20 +87,20 @@ Take the above example:
 
    class Shape
      include Mongoid::Document
-     field :x, type: Integer
-     field :y, type: Integer
+     field :x, type: :integer
+     field :y, type: :integer
      embedded_in :canvas
 
      self.discriminator_key = "shape_type"
    end
 
    class Circle < Shape
-     field :radius, type: Float
+     field :radius, type: :float
    end
 
    class Rectangle < Shape
-     field :width, type: Float
-     field :height, type: Float
+     field :width, type: :float
+     field :height, type: :float
    end
 
 Here a call to the ``discriminator_key=`` setter was added to the parent class. Now, on
@@ -117,18 +117,18 @@ For example:
 
    class Shape
      include Mongoid::Document
-     field :x, type: Integer
-     field :y, type: Integer
+     field :x, type: :integer
+     field :y, type: :integer
      embedded_in :canvas
    end
 
    class Circle < Shape
-     field :radius, type: Float
+     field :radius, type: :float
    end
 
    class Rectangle < Shape
-     field :width, type: Float
-     field :height, type: Float
+     field :width, type: :float
+     field :height, type: :float
    end
 
    Shape.discriminator_key = "shape_type"
@@ -146,18 +146,18 @@ use the globally set discriminator key instead of ``_type``. Take the above exam
 
    class Shape
      include Mongoid::Document
-     field :x, type: Integer
-     field :y, type: Integer
+     field :x, type: :integer
+     field :y, type: :integer
      embedded_in :canvas
    end
 
    class Circle < Shape
-     field :radius, type: Float
+     field :radius, type: :float
    end
 
    class Rectangle < Shape
-     field :width, type: Float
-     field :height, type: Float
+     field :width, type: :float
+     field :height, type: :float
    end
 
 After setting the global discriminator key, all classes will use ``_the_type`` as
@@ -184,20 +184,20 @@ Take the above example:
 
    class Shape
      include Mongoid::Document
-     field :x, type: Integer
-     field :y, type: Integer
+     field :x, type: :integer
+     field :y, type: :integer
      embedded_in :canvas
    end
 
    class Circle < Shape
-     field :radius, type: Float
+     field :radius, type: :float
 
      self.discriminator_value = "round thing"
    end
 
    class Rectangle < Shape
-     field :width, type: Float
-     field :height, type: Float
+     field :width, type: :float
+     field :height, type: :float
    end
 
 Here, a call to the ``discriminator_value=`` setter was added to ``Circle``.

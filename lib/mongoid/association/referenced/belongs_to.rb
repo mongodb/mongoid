@@ -176,7 +176,7 @@ module Mongoid
         def polymorph!
           if polymorphic?
             @owner_class.polymorphic = true
-            @owner_class.field(inverse_type, type: String)
+            @owner_class.field(inverse_type, type: :string)
           end
         end
 

@@ -56,8 +56,8 @@ module Mongoid
         # @example Flag fields as readonly.
         #   class Band
         #     include Mongoid::Document
-        #     field :name, type: String
-        #     field :genre, type: String
+        #     field :name, type: :string
+        #     field :genre, type: :string
         #     attr_readonly :name, :genre
         #   end
         #

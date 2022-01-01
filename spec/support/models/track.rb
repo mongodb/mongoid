@@ -2,13 +2,13 @@
 
 class Track
   include Mongoid::Document
-  field :name, type: String
+  field :name, type: :string
 
-  field :before_create_called, type: Mongoid::Boolean, default: false
-  field :before_save_called, type: Mongoid::Boolean, default: false
-  field :before_update_called, type: Mongoid::Boolean, default: false
-  field :before_validation_called, type: Mongoid::Boolean, default: false
-  field :before_destroy_called, type: Mongoid::Boolean, default: false
+  field :before_create_called, type: :boolean, default: false
+  field :before_save_called, type: :boolean, default: false
+  field :before_update_called, type: :boolean, default: false
+  field :before_validation_called, type: :boolean, default: false
+  field :before_destroy_called, type: :boolean, default: false
 
   embedded_in :record
 

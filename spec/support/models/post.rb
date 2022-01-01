@@ -4,10 +4,10 @@ class Post
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
 
-  field :title, type: String
-  field :content, type: String
-  field :rating, type: Integer
-  field :person_title, type: String, default: ->{ person.title if ivar(:person) }
+  field :title, type: :string
+  field :content, type: :string
+  field :rating, type: :integer
+  field :person_title, type: :string, default: ->{ person.title if ivar(:person) }
 
   attr_accessor :before_add_called, :after_add_called, :before_remove_called, :after_remove_called
 

@@ -4,9 +4,9 @@ class Product
   include Mongoid::Document
   field :description, localize: true
   field :name, localize: true, default: "no translation"
-  field :price, type: Integer
+  field :price, type: :integer
   field :brand_name
-  field :stores, type: Array
+  field :stores, type: :array
   field :website, localize: true
   field :sku, as: :stock_keeping_unit
   field :tl, as: :tagline, localize: true

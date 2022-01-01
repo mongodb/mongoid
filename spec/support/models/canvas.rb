@@ -7,7 +7,7 @@ class Canvas
   embeds_one :writer
   embeds_one :palette
 
-  field :foo, type: String, default: ->{ "original" }
+  field :foo, type: :string, default: ->{ "original" }
 
   has_many :comments, as: :commentable
 
@@ -20,7 +20,7 @@ class Canvas
 
   class Test < Canvas
 
-    field :foo, type: String, overwrite: true, default: ->{ "overridden" }
+    field :foo, type: :string, overwrite: true, default: ->{ "overridden" }
   end
 end
 

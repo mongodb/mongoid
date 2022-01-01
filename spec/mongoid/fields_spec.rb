@@ -321,7 +321,7 @@ describe Mongoid::Fields do
       end
 
       it "converts to Mongoid::Boolean" do
-        expect(klass.field(:test, type: Mongoid::Boolean).type).to be(Mongoid::Boolean)
+        expect(klass.field(:test, type: :boolean).type).to be(Mongoid::Boolean)
       end
     end
 
@@ -403,7 +403,7 @@ describe Mongoid::Fields do
       context "when the options are all standard" do
 
         before do
-          Band.field :acceptable, type: Mongoid::Boolean
+          Band.field :acceptable, type: :boolean
         end
 
         after do
@@ -418,7 +418,7 @@ describe Mongoid::Fields do
       context "when a custom option is provided" do
 
         before do
-          Band.field :acceptable, type: Mongoid::Boolean, custom: true
+          Band.field :acceptable, type: :boolean, custom: true
         end
 
         it "adds the field to the model" do
@@ -745,7 +745,7 @@ describe Mongoid::Fields do
       context "when provided a default array" do
 
         before do
-          Person.field(:array_testing, type: Array, default: [], overwrite: true)
+          Person.field(:array_testing, type: :array, default: [], overwrite: true)
         end
 
         after do
@@ -763,7 +763,7 @@ describe Mongoid::Fields do
       context "when provided a default hash" do
 
         before do
-          Person.field(:hash_testing, type: Hash, default: {}, overwrite: true)
+          Person.field(:hash_testing, type: :hash, default: {}, overwrite: true)
         end
 
         after do
@@ -784,7 +784,7 @@ describe Mongoid::Fields do
           before do
             Person.field(
               :generated_testing,
-              type: Float,
+              type: :float,
               default: ->{ Time.now.to_f },
               overwrite: true
             )
@@ -807,7 +807,7 @@ describe Mongoid::Fields do
           before do
             Person.field(
               :rank,
-              type: Integer,
+              type: :integer,
               default: ->{ title? ? 1 : 2 },
               overwrite: true
             )
@@ -989,7 +989,7 @@ describe Mongoid::Fields do
       end
 
       before do
-        Person.field :aliased, as: :alias, type: Mongoid::Boolean, overwrite: true
+        Person.field :aliased, as: :alias, type: :boolean, overwrite: true
       end
 
       it "uses the alias to write the attribute" do
@@ -1168,7 +1168,7 @@ describe Mongoid::Fields do
   describe ".replace_field" do
 
     let!(:original) do
-      Person.field(:id_test, type: BSON::ObjectId, label: "id")
+      Person.field(:id_test, type: :object_id, label: "id")
     end
 
     let!(:altered) do

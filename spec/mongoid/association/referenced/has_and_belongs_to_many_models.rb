@@ -3,8 +3,8 @@
 class HabtmmCompany
   include Mongoid::Document
 
-  field :c_id, type: Integer
-  field :e_ids, type: Array
+  field :c_id, type: :integer
+  field :e_ids, type: :array
   has_and_belongs_to_many :employees, class_name: 'HabtmmEmployee',
     primary_key: :e_id, foreign_key: :e_ids,
     inverse_primary_key: :c_id, inverse_foreign_key: :c_ids
@@ -13,9 +13,9 @@ end
 class HabtmmEmployee
   include Mongoid::Document
 
-  field :e_id, type: Integer
-  field :c_ids, type: Array
-  field :habtmm_company_ids, type: Array
+  field :e_id, type: :integer
+  field :c_ids, type: :array
+  field :habtmm_company_ids, type: :array
   has_and_belongs_to_many :companies, class_name: 'HabtmmCompany',
     primary_key: :c_id, foreign_key: :c_ids,
     inverse_primary_key: :e_id, inverse_foreign_key: :e_ids
@@ -26,7 +26,7 @@ class HabtmmContract
 
   has_and_belongs_to_many :signatures, class_name: 'HabtmmSignature'
 
-  field :item, type: String
+  field :item, type: :string
 end
 
 class HabtmmSignature
@@ -34,8 +34,8 @@ class HabtmmSignature
 
   has_and_belongs_to_many :contracts, class_name: 'HabtmmContract'
 
-  field :name, type: String
-  field :year, type: Integer
+  field :name, type: :string
+  field :year, type: :integer
 end
 
 class HabtmmTicket
@@ -51,7 +51,7 @@ end
 class HabtmmTrainer
   include Mongoid::Document
 
-  field :name, type: String
+  field :name, type: :string
 
   has_and_belongs_to_many :animals, inverse_of: :trainers, class_name: 'HabtmmAnimal', scope: :reptile
 end
@@ -59,7 +59,7 @@ end
 class HabtmmAnimal
   include Mongoid::Document
 
-  field :taxonomy, type: String
+  field :taxonomy, type: :string
 
   scope :reptile, -> { where(taxonomy: 'reptile') }
 

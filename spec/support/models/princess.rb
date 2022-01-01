@@ -3,7 +3,7 @@
 class Princess
   include Mongoid::Document
   field :primary_color
-  field :name, type: String
+  field :name, type: :string
   def color
     primary_color.to_s
   end

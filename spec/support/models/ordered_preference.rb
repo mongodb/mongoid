@@ -2,7 +2,7 @@
 
 class OrderedPreference
   include Mongoid::Document
-  field :name, type: String
-  field :value, type: String
+  field :name, type: :string
+  field :value, type: :string
   has_and_belongs_to_many :people, validate: false
 end

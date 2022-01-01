@@ -5,7 +5,7 @@ class Seat
 
   embedded_in :vehicle
 
-  field :rating, type: Integer
+  field :rating, type: :integer
 
   embeds_many :armrests
 

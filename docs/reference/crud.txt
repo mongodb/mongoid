@@ -425,7 +425,7 @@ are not invoked.
     	  class Post
     	    include Mongoid::Document
     	    
-    	    field :metadata, type: Hash
+    	    field :metadata, type: :hash
     	  end
     	  
           post = Post.create!
@@ -447,7 +447,7 @@ are not invoked.
 
             embedded_in :flight
 
-            field :route, type: String
+            field :route, type: :string
           end
           
           flight = Flight.create!
@@ -777,7 +777,7 @@ the database up to the time it is saved. Any persistence operation clears the ch
 
    class Person
      include Mongoid::Document
-     field :name, type: String
+     field :name, type: :string
    end
 
    person = Person.first
@@ -857,7 +857,7 @@ For example, adding to a set like this does not work:
   class Band
     include Mongoid::Document
 
-    field :tours, type: Set
+    field :tours, type: :set
   end
 
   band = Band.new
@@ -877,7 +877,7 @@ back to the model as follows:
   class Band
     include Mongoid::Document
 
-    field :tours, type: Set
+    field :tours, type: :set
   end
 
   band = Band.new

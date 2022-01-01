@@ -20,7 +20,7 @@ module Mongoid
     #   class Person
     #     include Mongoid::Document
     #     field :title
-    #     field :active, type: Boolean
+    #     field :active, type: :boolean
     #
     #     validates_uniqueness_of :title, conditions: -> {where(active: true)}
     #   end

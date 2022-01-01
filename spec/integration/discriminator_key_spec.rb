@@ -210,20 +210,20 @@ describe "#discriminator_key" do
       before do
         class Example1Shape
           include Mongoid::Document
-          field :x, type: Integer
-          field :y, type: Integer
+          field :x, type: :integer
+          field :y, type: :integer
           embedded_in :canvas
   
           self.discriminator_key = "shape_type"
         end
   
         class Example1Circle < Example1Shape
-          field :radius, type: Float
+          field :radius, type: :float
         end
   
         class Example1Rectangle < Example1Shape
-          field :width, type: Float
-          field :height, type: Float
+          field :width, type: :float
+          field :height, type: :float
         end
       end
   
@@ -256,18 +256,18 @@ describe "#discriminator_key" do
       before do
         class Example2Shape
           include Mongoid::Document
-          field :x, type: Integer
-          field :y, type: Integer
+          field :x, type: :integer
+          field :y, type: :integer
           embedded_in :canvas
         end
   
         class Example2Circle < Example2Shape
-          field :radius, type: Float
+          field :radius, type: :float
         end
   
         class Example2Rectangle < Example2Shape
-          field :width, type: Float
-          field :height, type: Float
+          field :width, type: :float
+          field :height, type: :float
         end
   
         Example2Shape.discriminator_key = "shape_type"
@@ -305,18 +305,18 @@ describe "#discriminator_key" do
         
         class Example3Shape
           include Mongoid::Document
-          field :x, type: Integer
-          field :y, type: Integer
+          field :x, type: :integer
+          field :y, type: :integer
           embedded_in :canvas
         end
   
         class Example3Circle < Example3Shape
-          field :radius, type: Float
+          field :radius, type: :float
         end
   
         class Example3Rectangle < Example3Shape
-          field :width, type: Float
-          field :height, type: Float
+          field :width, type: :float
+          field :height, type: :float
         end
   
       end

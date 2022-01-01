@@ -2,10 +2,10 @@
 
 class Video
   include Mongoid::Document
-  field :title, type: String
-  field :year, type: Integer
-  field :release_dates, type: Set
-  field :genres, type: Array
+  field :title, type: :string
+  field :year, type: :integer
+  field :release_dates, type: :set
+  field :genres, type: :array
 
   embedded_in :person
   belongs_to :post

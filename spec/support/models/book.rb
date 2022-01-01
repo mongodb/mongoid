@@ -4,8 +4,8 @@ class Book
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
   include Mongoid::Timestamps
-  field :title, type: String
-  field :chapters, type: Integer
+  field :title, type: :string
+  field :chapters, type: :integer
   belongs_to :series
   belongs_to :person, autobuild: true
   has_one :rating, as: :ratable, dependent: :nullify

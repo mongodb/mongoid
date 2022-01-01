@@ -101,9 +101,9 @@ The examples in this section use the following model definition:
   class Band
     include Mongoid::Document
 
-    field :name, type: String
-    field :founded, type: Integer
-    field :m, as: :member_count, type: Integer
+    field :name, type: :string
+    field :founded, type: :integer
+    field :m, as: :member_count, type: :integer
 
     embeds_one :manager
   end
@@ -113,7 +113,7 @@ The examples in this section use the following model definition:
 
     embedded_in :band
 
-    field :name, type: String
+    field :name, type: :string
   end
 
 Field Syntax
@@ -664,8 +664,8 @@ matches all of the conditions. For example:
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :tours, type: Array
+    field :name, type: :string
+    field :tours, type: :array
   end
 
   aerosmith = Band.create!(name: 'Aerosmith', tours: [
@@ -681,14 +681,14 @@ matches all of the conditions. For example:
 
   class Band
     include Mongoid::Document
-    field :name, type: String
+    field :name, type: :string
     embeds_many :tours
   end
 
   class Tour
     include Mongoid::Document
-    field :city, type: String
-    field :year, type: Integer
+    field :city, type: :string
+    field :year, type: :integer
     embedded_in :band
   end
 
@@ -711,7 +711,7 @@ as the following example shows:
 
   class Tag
     include Mongoid::Document
-    field :name, type: String
+    field :name, type: :string
     recursively_embeds_many
   end
 
@@ -747,8 +747,8 @@ operation is sometimes called "projection".
   class Band
     include Mongoid::Document
 
-    field :name, type: String
-    field :label, type: String
+    field :name, type: :string
+    field :label, type: :string
 
     embeds_many :tours
   end
@@ -756,8 +756,8 @@ operation is sometimes called "projection".
   class Tour
     include Mongoid::Document
 
-    field :city, type: String
-    field :year, type: Integer
+    field :city, type: :string
+    field :year, type: :integer
 
     embedded_in :band
   end
@@ -820,7 +820,7 @@ loaded with ``only`` for those associations to be loaded. For example:
   class Band
     include Mongoid::Document
 
-    field :name, type: String
+    field :name, type: :string
 
     has_and_belongs_to_many :managers
   end
@@ -975,8 +975,8 @@ the default scope being evaluated first:
   class Band
     include Mongoid::Document
 
-    field :name, type: String
-    field :year, type: Integer
+    field :name, type: :string
+    field :year, type: :integer
 
     default_scope -> { order(name: :asc) }
   end
@@ -1176,7 +1176,7 @@ Mongoid also has some helpful methods on criteria.
           class Contract
             include Mongoid::Document
 
-            field :active, type: Boolean
+            field :active, type: :boolean
 
             default_scope -> { where(active: true) }
           end
@@ -1419,8 +1419,8 @@ Given the following model definitions:
   class Band
     include Mongoid::Document
 
-    field :name, type: String
-    field :description, type: String
+    field :name, type: :string
+    field :description, type: :string
   end
 
   Band.create!(name: 'Sun Project', description: "Sun\nProject")
@@ -1461,8 +1461,8 @@ intentionally does not define a field called ``deregistered_at``:
     class Voter
       include Mongoid::Document
       
-      field :born_on, type: Date
-      field :registered_at, type: Time
+      field :born_on, type: :date
+      field :registered_at, type: :time
       field :voted_at
     end
 
@@ -1523,8 +1523,8 @@ by a provided name. Just like normal criteria, they are lazy and chainable.
 
   class Band
     include Mongoid::Document
-    field :country, type: String
-    field :genres, type: Array
+    field :country, type: :string
+    field :genres, type: :array
 
     scope :english, ->{ where(country: "England") }
     scope :rock, ->{ where(:genres.in => [ "rock" ]) }
@@ -1539,9 +1539,9 @@ extending functionality.
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :country, type: String
-    field :active, type: Boolean, default: true
+    field :name, type: :string
+    field :country, type: :string
+    field :active, type: :boolean, default: true
 
     scope :named, ->(name){ where(name: name) }
     scope :active, ->{
@@ -1588,8 +1588,8 @@ Default scopes are procs that return criteria objects.
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :active, type: Boolean
+    field :name, type: :string
+    field :active, type: :boolean
 
     default_scope ->{ where(active: true) }
   end
@@ -1605,9 +1605,9 @@ the values given in the default scope, if the values are simple literals:
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :active, type: Boolean
-    field :num_tours, type: Integer
+    field :name, type: :string
+    field :active, type: :boolean
+    field :num_tours, type: :integer
 
     default_scope ->{ where(active: true, num_tours: {'$gt' => 1}) }
   end
@@ -1622,8 +1622,8 @@ in the default scope, the value in the default scope takes precedence:
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :active, type: Boolean, default: true
+    field :name, type: :string
+    field :active, type: :boolean, default: true
 
     default_scope ->{ where(active: false) }
   end
@@ -1638,8 +1638,8 @@ not possible:
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :tags, type: Hash
+    field :name, type: :string
+    field :tags, type: :hash
 
     default_scope ->{ where('tags.foo' => 'bar') }
   end
@@ -1652,8 +1652,8 @@ A workaround is to define the default scope as a complex query:
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :tags, type: Hash
+    field :name, type: :string
+    field :tags, type: :hash
 
     default_scope ->{ where('tags.foo' => {'$eq' => 'bar'}) }
   end
@@ -1715,8 +1715,8 @@ treated like scopes, and can be chained as well.
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :active, type: Boolean, default: true
+    field :name, type: :string
+    field :active, type: :boolean, default: true
 
     def self.active
       where(active: true)

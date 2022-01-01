@@ -10,7 +10,7 @@ describe Mongoid::Fields::ForeignKey do
       described_class.new(
         :vals,
         association: Person.relations["preferences"],
-        type: Array,
+        type: :array,
         default: [],
         identity: true
       )
@@ -71,7 +71,7 @@ describe Mongoid::Fields::ForeignKey do
       described_class.new(
         :vals,
         association: Person.relations["posts"],
-        type: Array,
+        type: :array,
         default: default,
         identity: true
       )
@@ -92,7 +92,7 @@ describe Mongoid::Fields::ForeignKey do
       described_class.new(
         :vals,
         association: Person.relations["posts"],
-        type: Array,
+        type: :array,
         default: [],
         identity: true
       )
@@ -112,7 +112,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when provided a document" do
 
       let(:field) do
-        described_class.new(:person_id, type: Object, association: association)
+        described_class.new(:person_id, type: :object, association: association)
       end
 
       let(:game) do
@@ -131,7 +131,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the type is an array" do
 
       let(:field) do
-        described_class.new(:preference_ids, type: Array, default: [], association: association)
+        described_class.new(:preference_ids, type: :array, default: [], association: association)
       end
 
       context "when providing a single value" do
@@ -204,7 +204,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             let!(:field) do
-              described_class.new(:account_ids, type: Array, default: [], association: association)
+              described_class.new(:account_ids, type: :array, default: [], association: association)
             end
 
             let(:id_one) do
@@ -267,7 +267,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       let(:field) do
-        described_class.new(:person_id, type: Object, association: association)
+        described_class.new(:person_id, type: :object, association: association)
       end
 
       context "when providing a single value" do
@@ -319,7 +319,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           let(:field) do
-            described_class.new(:person_id, type: Object, association: association)
+            described_class.new(:person_id, type: :object, association: association)
           end
 
           context "when the value is an id string" do
@@ -391,7 +391,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             let(:field) do
-              described_class.new(:person_id, type: Object, association: association)
+              described_class.new(:person_id, type: :object, association: association)
             end
 
             let(:id_one) do
@@ -454,7 +454,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       let(:field) do
-        described_class.new(:nameable_id, type: Object, association: association)
+        described_class.new(:nameable_id, type: :object, association: association)
       end
 
       let(:value) do
@@ -476,7 +476,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the key is resizable" do
 
       let(:field) do
-        described_class.new(:test, type: Array, overwrite: true)
+        described_class.new(:test, type: :array, overwrite: true)
       end
 
       it "returns true" do
@@ -487,7 +487,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the key is not resizable" do
 
       let(:field) do
-        described_class.new(:test, type: BSON::ObjectId, overwrite: true)
+        described_class.new(:test, type: :object_id, overwrite: true)
       end
 
       it "returns false" do
@@ -509,7 +509,7 @@ describe Mongoid::Fields::ForeignKey do
         let(:field) do
           described_class.new(
             :vals,
-            type: Array,
+            type: :array,
             default: [],
             identity: true,
             association: association,
@@ -559,7 +559,7 @@ describe Mongoid::Fields::ForeignKey do
           before do
             Person.field(
               :_id,
-              type: String,
+              type: :string,
               pre_processed: true,
               default: ->{ BSON::ObjectId.new.to_s },
               overwrite: true
@@ -569,7 +569,7 @@ describe Mongoid::Fields::ForeignKey do
           after do
             Person.field(
               :_id,
-              type: BSON::ObjectId,
+              type: :object_id,
               pre_processed: true,
               default: ->{ BSON::ObjectId.new },
               overwrite: true
@@ -594,7 +594,7 @@ describe Mongoid::Fields::ForeignKey do
         let(:field) do
           described_class.new(
             :vals,
-            type: Object,
+            type: :object,
             default: nil,
             identity: true,
             association: association,
@@ -626,7 +626,7 @@ describe Mongoid::Fields::ForeignKey do
               before do
                 Person.field(
                   :_id,
-                  type: String,
+                  type: :string,
                   pre_processed: true,
                   default: ->{ BSON::ObjectId.new.to_s },
                   overwrite: true
@@ -636,7 +636,7 @@ describe Mongoid::Fields::ForeignKey do
               after do
                 Person.field(
                   :_id,
-                  type: BSON::ObjectId,
+                  type: :object_id,
                   pre_processed: true,
                   default: ->{ BSON::ObjectId.new },
                   overwrite: true
@@ -654,13 +654,13 @@ describe Mongoid::Fields::ForeignKey do
             context "when provided a string" do
 
               before do
-                Person.field(:_id, type: Integer, overwrite: true)
+                Person.field(:_id, type: :integer, overwrite: true)
               end
 
               after do
                 Person.field(
                   :_id,
-                  type: BSON::ObjectId,
+                  type: :object_id,
                   pre_processed: true,
                   default: ->{ BSON::ObjectId.new },
                   overwrite: true
@@ -682,7 +682,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the type is an array" do
 
       let(:field) do
-        described_class.new(:vals, type: Array, default: [])
+        described_class.new(:vals, type: :array, default: [])
       end
 
       it "returns true" do
@@ -693,7 +693,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the type is an object" do
 
       let(:field) do
-        described_class.new(:vals, type: Object, default: [])
+        described_class.new(:vals, type: :object, default: [])
       end
 
       it "returns false" do

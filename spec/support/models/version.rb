@@ -2,6 +2,6 @@
 
 class Version
   include Mongoid::Document
-  field :number, type: Integer
+  field :number, type: :integer
   embedded_in :memorable, polymorphic: true
 end

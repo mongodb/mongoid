@@ -3,7 +3,7 @@
 class Birthday
   include Mongoid::Document
   field :title
-  field :date, type: Date
+  field :date, type: :date
   embedded_in :owner, inverse_of: :birthdays
 
   def self.each_day(start_date, end_date)

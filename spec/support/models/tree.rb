@@ -4,7 +4,7 @@ class Tree
   include Mongoid::Document
 
   field :name
-  field :evergreen, type: Mongoid::Boolean
+  field :evergreen, type: :boolean
 
   scope :verdant, ->{ where(evergreen: true) }
   default_scope ->{ asc(:name) }

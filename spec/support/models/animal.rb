@@ -3,12 +3,12 @@
 class Animal
   include Mongoid::Document
 
-  field :_id, type: String, overwrite: true, default: ->{ name.try(:parameterize) }
+  field :_id, type: :string, overwrite: true, default: ->{ name.try(:parameterize) }
 
   field :name
-  field :height, type: Integer
-  field :weight, type: Integer
-  field :tags, type: Array
+  field :height, type: :integer
+  field :weight, type: :integer
+  field :tags, type: :array
 
   embedded_in :person
   embedded_in :circus, class_name: 'Circus' # class_name is necessary because ActiveRecord think the singular of Circus

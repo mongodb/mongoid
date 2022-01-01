@@ -2,7 +2,7 @@
 
 class Writer
   include Mongoid::Document
-  field :speed, type: Integer, default: 0
+  field :speed, type: :integer, default: 0
 
   embedded_in :canvas
 

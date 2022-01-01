@@ -3,7 +3,7 @@
 class Folder
   include Mongoid::Document
 
-  field :name, type: String
+  field :name, type: :string
   has_many :folder_items
 
 end

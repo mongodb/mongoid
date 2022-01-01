@@ -5,5 +5,5 @@ class ConsumptionPeriod
 
   belongs_to :account
 
-  field :started_at, type: Time
+  field :started_at, type: :time
 end

@@ -3,9 +3,9 @@
 class Shirt
   include Mongoid::Document
 
-  field :color, type: String
+  field :color, type: :string
 
   unalias_attribute :id
 
-  field :id, type: String
+  field :id, type: :string
 end

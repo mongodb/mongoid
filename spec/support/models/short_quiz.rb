@@ -3,5 +3,5 @@
 class ShortQuiz
   include Mongoid::Document
   include Mongoid::Timestamps::Created::Short
-  field :name, type: String
+  field :name, type: :string
 end

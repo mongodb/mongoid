@@ -2,6 +2,6 @@
 
 class Topping
   include Mongoid::Document
-  field :name, type: String
+  field :name, type: :string
   belongs_to :pizza
 end

@@ -3,7 +3,7 @@
 class Eye
   include Mongoid::Document
 
-  field :pupil_dilation, type: Integer
+  field :pupil_dilation, type: :integer
 
   belongs_to :eyeable, polymorphic: true
 

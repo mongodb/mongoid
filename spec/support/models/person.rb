@@ -10,35 +10,35 @@ class Person
 
   field :username, default: -> { "arthurnn#{rand(0..10)}" }
   field :title
-  field :terms, type: Mongoid::Boolean
-  field :pets, type: Mongoid::Boolean, default: false
-  field :age, type: Integer, default: "100"
-  field :dob, type: Date
+  field :terms, type: :boolean
+  field :pets, type: :boolean, default: false
+  field :age, type: :integer, default: "100"
+  field :dob, type: :date
   field :employer_id
-  field :lunch_time, type: Time
-  field :aliases, type: Array
-  field :map, type: Hash
-  field :map_with_default, type: Hash, default: {}
-  field :score, type: Integer
-  field :blood_alcohol_content, type: Float, default: ->{ 0.0 }
-  field :last_drink_taken_at, type: Date, default: ->{ 1.day.ago.in_time_zone("Alaska") }
+  field :lunch_time, type: :time
+  field :aliases, type: :array
+  field :map, type: :hash
+  field :map_with_default, type: :hash, default: {}
+  field :score, type: :integer
+  field :blood_alcohol_content, type: :float, default: ->{ 0.0 }
+  field :last_drink_taken_at, type: :date, default: ->{ 1.day.ago.in_time_zone("Alaska") }
   field :ssn
-  field :owner_id, type: Integer
+  field :owner_id, type: :integer
   field :security_code
-  field :reading, type: Object
-  field :bson_id, type: BSON::ObjectId
-  field :pattern, type: Regexp
-  field :override_me, type: Integer
-  field :at, as: :aliased_timestamp, type: Time
-  field :t, as: :test, type: String
-  field :i, as: :inte, type: Integer
-  field :a, as: :array, type: Array
+  field :reading, type: :object
+  field :bson_id, type: :object_id
+  field :pattern, type: :regexp
+  field :override_me, type: :integer
+  field :at, as: :aliased_timestamp, type: :time
+  field :t, as: :test, type: :string
+  field :i, as: :inte, type: :integer
+  field :a, as: :array, type: :array
   field :desc, localize: true
-  field :test_array, type: Array
-  field :overridden_setter, type: String
-  field :arrays, type: Array
-  field :range, type: Range
-  field :species, type: Symbol
+  field :test_array, type: :array
+  field :overridden_setter, type: :string
+  field :arrays, type: :array
+  field :range, type: :range
+  field :species, type: :symbol
 
   index age: 1
   index addresses: 1

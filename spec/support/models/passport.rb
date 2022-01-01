@@ -3,9 +3,9 @@
 class Passport
   include Mongoid::Document
 
-  field :number, type: String
-  field :country, type: String
-  field :exp, as: :expiration_date, type: Date
+  field :number, type: :string
+  field :country, type: :string
+  field :exp, as: :expiration_date, type: :date
 
   embedded_in :person, autobuild: true
 end

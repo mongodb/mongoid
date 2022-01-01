@@ -2,7 +2,7 @@
 
 class ValidationCallback
   include Mongoid::Document
-  field :history, type: Array, default: []
+  field :history, type: :array, default: []
   validate do
     self.history << :validate
   end

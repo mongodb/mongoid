@@ -3,5 +3,5 @@
 class Contractor
   include Mongoid::Document
   embedded_in :building
-  field :name, type: String
+  field :name, type: :string
 end

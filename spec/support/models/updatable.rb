@@ -3,5 +3,5 @@
 class Updatable
   include Mongoid::Document
 
-  field :updated_at, type: BSON::Timestamp
+  field :updated_at, type: :bson_timestamp
 end

@@ -2,10 +2,10 @@
 
 class Player
   include Mongoid::Document
-  field :active, type: Mongoid::Boolean
-  field :frags, type: Integer
-  field :deaths, type: Integer
-  field :impressions, type: Integer, default: 0
+  field :active, type: :boolean
+  field :frags, type: :integer
+  field :deaths, type: :integer
+  field :impressions, type: :integer, default: 0
   field :status
 
   scope :active, ->{ where(active: true) } do

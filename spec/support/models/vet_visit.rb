@@ -2,6 +2,6 @@
 
 class VetVisit
   include Mongoid::Document
-  field :date, type: Date
+  field :date, type: :date
   embedded_in :pet
 end

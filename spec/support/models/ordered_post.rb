@@ -2,8 +2,8 @@
 
 class OrderedPost
   include Mongoid::Document
-  field :title, type: String
-  field :rating, type: Integer
+  field :title, type: :string
+  field :rating, type: :integer
   belongs_to :person
 
   after_destroy do

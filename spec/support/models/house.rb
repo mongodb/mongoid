@@ -2,7 +2,7 @@
 
 class House
   include Mongoid::Document
-  field :name, type: String
-  field :model, type: String
+  field :name, type: :string
+  field :model, type: :string
   default_scope ->{ asc(:name) }
 end

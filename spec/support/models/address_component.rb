@@ -2,6 +2,6 @@
 
 class AddressComponent
   include Mongoid::Document
-  field :street, type: String
+  field :street, type: :string
   embedded_in :person
 end

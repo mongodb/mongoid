@@ -2,8 +2,8 @@
 
 class Word
   include Mongoid::Document
-  field :name, type: String
-  field :origin, type: String
+  field :name, type: :string
+  field :origin, type: :string
 
   belongs_to :dictionary
 

@@ -10,15 +10,15 @@ class Mop
 
   # We need some fields of specific types because the query conditions are
   # transformed differently based on the type of field being queried.
-  field :int_field, type: Integer
-  field :array_field, type: Array
-  field :date_field, type: Date
-  field :time_field, type: Time
-  field :datetime_field, type: DateTime
-  field :big_decimal_field, type: BigDecimal
-  field :decimal128_field, type: BSON::Decimal128
-  field :symbol_field, type: Symbol
-  field :bson_symbol_field, type: BSON::Symbol::Raw
-  field :regexp_field, type: Regexp
-  field :bson_regexp_field, type: BSON::Regexp::Raw
+  field :int_field, type: :integer
+  field :array_field, type: :array
+  field :date_field, type: :date
+  field :time_field, type: :time
+  field :datetime_field, type: :date_time
+  field :big_decimal_field, type: :big_decimal
+  field :decimal128_field, type: :decimal128
+  field :symbol_field, type: :symbol
+  field :bson_symbol_field, type: :bson_symbol
+  field :regexp_field, type: :regexp
+  field :bson_regexp_field, type: :bson_regexp
 end

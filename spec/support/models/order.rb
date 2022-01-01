@@ -2,7 +2,7 @@
 
 class Order
   include Mongoid::Document
-  field :status, type: Mongoid::StringifiedSymbol
+  field :status, type: :stringified_symbol
 
   # This is a dummy field that verifies the Mongoid::Fields::StringifiedSymbol
   # alias.

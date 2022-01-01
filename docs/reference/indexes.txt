@@ -97,7 +97,7 @@ For geospatial indexes, make sure the field being indexed is of type Array:
 
     class Person
       include Mongoid::Document
-      field :location, type: Array
+      field :location, type: :array
  
       index({ location: "2d" }, { min: -200, max: 200 })
     end

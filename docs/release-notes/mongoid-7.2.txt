@@ -345,7 +345,7 @@ Consider a class ``Band`` whose documents are sharded by the ``name`` key.
 
   class Band
     include Mongoid::Document
-    field :name, type: String
+    field :name, type: :string
 
     shard_key :name
   end
@@ -425,7 +425,7 @@ Example Mongoid 7.2 behavior:
   class Offer
     include Mongoid::Document
     
-    field :constraint, type: Regexp
+    field :constraint, type: :regexp
   end
   
   offer = Offer.create!(constraint: /foo/)

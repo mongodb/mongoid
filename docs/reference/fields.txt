@@ -84,9 +84,10 @@ Below is a list of valid types for fields.
 
 To define custom field types, refer to :ref:`Custom Field Types <custom-field-types>` below.
 
-As of Mongoid 7.5, ``field :type`` should be specified as a ``Symbol``.
-Specifying as a ``Class`` is deprecated and will be no longer supported in Mongoid 8.0.
-Unrecognized field type symbols will result in an `InvalidFieldType` error when the model class is loaded.
+As of Mongoid 7.5, the ``field :type`` option should be specified as a ``Symbol`` value
+(e.g. ``type: :float``). Specifying as a ``Class`` (e.g. ``type: Float``) is deprecated
+and will be no longer supported in Mongoid 8.0. Unrecognized field type symbols will result
+in an `InvalidFieldType` error when the model class is loaded.
 
 
 .. _omitting-field-type-definition:
@@ -141,7 +142,7 @@ An example usage is shown below:
   class Post
     include Mongoid::Document
 
-    field :status, type: StringifiedSymbol
+    field :status, type: :stringified_symbol
   end
 
   post = Post.new(status: :hello)
@@ -168,10 +169,10 @@ For example, setting an integer as ``status``:
   post.status
   # => :"42"
 
-If the ``StringifiedSymbol`` type is applied to a field that contains BSON symbols, the values
+If the ``:stringified_symbol`` type is applied to a field that contains BSON symbols, the values
 will be stored as strings instead of BSON symbols on the next save. This permits transparent lazy
 migration from fields that currently store either strings or BSON symbols in the database to the
-``StringifiedSymbol`` field type.
+``:stringified_symbol`` field type.
 
 
 .. _field-type-symbol:
@@ -186,9 +187,9 @@ and has the same behavior in all circumstances.
 
 Mongoid also provides the deprecated ``:symbol`` field type for serializing
 Ruby symbols to BSON symbols. Because the BSON specification deprecated the
-BSON symbol type, the `bson` gem will serialize Ruby symbols into BSON strings
+BSON symbol type, the ``bson`` gem will serialize Ruby symbols into BSON strings
 when used on its own. However, in order to maintain backwards compatibility
-with older datasets, the `mongo` gem overrides this behavior to serialize Ruby
+with older datasets, the ``mongo`` gem overrides this behavior to serialize Ruby
 symbols as BSON symbols. This is necessary to be able to specify queries for
 documents which contain BSON symbols as fields.
 
@@ -435,7 +436,7 @@ fixed, as in the following example:
   class Order
     include Mongoid::Document
 
-    field :state, type: String, default: 'created'
+    field :state, type: :string, default: 'created'
   end
 
 The default value can also be specified as a ``Proc``:
@@ -445,7 +446,7 @@ The default value can also be specified as a ``Proc``:
   class Order
     include Mongoid::Document
 
-    field :fulfill_by, type: Time, default: ->{ Time.now + 3.days }
+    field :fulfill_by, type: :time, default: ->{ Time.now + 3.days }
   end
 
 .. note::
@@ -455,8 +456,8 @@ The default value can also be specified as a ``Proc``:
 
   .. code-block:: ruby
 
-    field :submitted_at, type: Time, default: Time.now
-    field :submitted_at, type: Time, default: ->{ Time.now }
+    field :submitted_at, type: :time, default: Time.now
+    field :submitted_at, type: :time, default: ->{ Time.now }
 
   The second definition is most likely the desired one, which causes the
   time of submission to be set to the current time at the moment of
@@ -468,7 +469,7 @@ being operated on:
 
 .. code-block:: ruby
 
-  field :fulfill_by, type: Time, default: ->{
+  field :fulfill_by, type: :time, default: ->{
     # Order should be fulfilled in 2 business hours.
     if (7..8).include?(self.submitted_at.hour)
       self.submitted_at + 4.hours
@@ -485,7 +486,7 @@ the other attributes are set, use the ``pre_processed: true`` field option:
 
 .. code-block:: ruby
 
-  field :fulfill_by, type: Time, default: ->{ Time.now + 3.days },
+  field :fulfill_by, type: :time, default: ->{ Time.now + 3.days },
     pre_processed: true
 
 
@@ -506,7 +507,7 @@ and criteria while performing the conversion for you.
 
   class Band
     include Mongoid::Document
-    field :n, as: :name, type: String
+    field :n, as: :name, type: :string
   end
 
   band = Band.new(name: "Placebo")
@@ -530,7 +531,7 @@ from the aliased field:
   class Band
     include Mongoid::Document
     
-    field :name, type: String
+    field :name, type: :string
     alias_attribute :n, :name
   end
   
@@ -566,7 +567,7 @@ This is useful for storing different values in ``id`` and ``_id`` fields:
     include Mongoid::Document
     
     unalias_attribute :id
-    field :id, type: String
+    field :id, type: :string
   end
   
   Band.new(id: '42')
@@ -597,7 +598,7 @@ With the option set to true, the following example will raise an error:
 
     field :name
 
-    field :name, type: String
+    field :name, type: :string
   end
 
 To define the field anyway, use the ``overwrite: true`` option:
@@ -609,7 +610,7 @@ To define the field anyway, use the ``overwrite: true`` option:
 
     field :name
 
-    field :name, type: String, overwrite: true
+    field :name, type: :string, overwrite: true
   end
 
 
@@ -628,8 +629,8 @@ of the ``_id`` values or have different default values:
 
   class Band
     include Mongoid::Document
-    field :name, type: String
-    field :_id, type: String, default: ->{ name }
+    field :name, type: :string
+    field :_id, type: :string, default: ->{ name }
   end
 
 It is possible to omit the default entirely:
@@ -638,7 +639,7 @@ It is possible to omit the default entirely:
 
   class Band
     include Mongoid::Document
-    field :_id, type: String
+    field :_id, type: :string
   end
 
 If the default on ``_id`` is omitted, and no ``_id`` value is provided by
@@ -697,8 +698,8 @@ getter as follows:
   class DistanceMeasurement
     include Mongoid::Document
     
-    field :value, type: Float
-    field :unit, type: String
+    field :value, type: :float
+    field :unit, type: :string
     
     def unit
       read_attribute(:unit) || "m"
@@ -723,8 +724,8 @@ may be implemented as follows:
   class DistanceMeasurement
     include Mongoid::Document
     
-    field :value, type: Float
-    field :unit, type: String
+    field :value, type: :float
+    field :unit, type: :string
     
     def unit=(value)
       if value.blank?
@@ -745,8 +746,8 @@ Custom Field Types
 ------------------
 
 You can define custom types in Mongoid and determine how they are serialized
-and deserialized. In this example, we define a new field type ``Point``, which we
-can use in our model class as follows:
+and deserialized. In this example, we define a new field type ``:point``,
+which we can use in our model class as follows:
 
 .. code-block:: ruby
 
@@ -766,8 +767,9 @@ First, declare the new field type mapping in an initializer:
   end
 
 
-Then make a Ruby class to represent the type. This class must define methods
-used for MongoDB serialization and deserialization as follows:
+Then make a Ruby class ``Point`` to represent the type.
+This class must define methods used for MongoDB serialization
+and deserialization as follows:
 
 .. code-block:: ruby
 
@@ -874,7 +876,7 @@ Then, use it your model class:
   class Person
     include Mongoid::Document
 
-    field :name, type: String, required: true
+    field :name, type: :string, required: true
   end
 
 Note that the handler function will be invoked whenever the option is used
@@ -1127,6 +1129,7 @@ alter the criteria to match the current locale.
    Product.where(description: "Marvelous!")
    # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
 
+
 Indexing
 --------
 
@@ -1157,8 +1160,8 @@ ignored when using mass update methods such as ``update_attributes``:
 
    class Band
      include Mongoid::Document
-     field :name, type: String
-     field :origin, type: String
+     field :name, type: :string
+     field :origin, type: :string
 
      attr_readonly :name, :origin
    end

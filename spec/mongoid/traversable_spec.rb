@@ -840,7 +840,7 @@ describe Mongoid::Traversable do
 
         class DuplicateDiscriminatorKeyParent
           include Mongoid::Document
-          field :dkey, type: String
+          field :dkey, type: :string
         end
 
         class DuplicateDiscriminatorKeyChild < DuplicateDiscriminatorKeyParent

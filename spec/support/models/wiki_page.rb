@@ -4,10 +4,10 @@ class WikiPage
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  field :title, type: String
-  field :transient_property, type: String
-  field :author, type: String
-  field :description, type: String, localize: true
+  field :title, type: :string
+  field :transient_property, type: :string
+  field :author, type: :string
+  field :description, type: :string, localize: true
 
   embeds_many :edits, validate: false
   # Must have dependent: :destroy

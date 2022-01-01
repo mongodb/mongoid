@@ -4,7 +4,7 @@ class Implant
   include Mongoid::Document
 
   field :name
-  field :impressions, type: Integer, default: 0
+  field :impressions, type: :integer, default: 0
 
   embedded_in :player, inverse_of: :implants
 

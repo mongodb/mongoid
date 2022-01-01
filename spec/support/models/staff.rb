@@ -5,5 +5,5 @@ class Staff
 
   embedded_in :company
 
-  field :age, type: Integer
+  field :age, type: :integer
 end

@@ -1,7 +1,7 @@
 class Galaxy
   include Mongoid::Document
 
-  field :age, type: Integer
+  field :age, type: :integer
 
   before_validation :set_age
 
@@ -19,7 +19,7 @@ class Star
 
   embedded_in :galaxy
 
-  field :age, type: Integer
+  field :age, type: :integer
 
   before_validation :set_age
 
@@ -37,7 +37,7 @@ class Planet
 
   embedded_in :star
 
-  field :age, type: Integer
+  field :age, type: :integer
 
   before_validation :set_age
 

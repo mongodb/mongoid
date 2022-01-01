@@ -12,7 +12,7 @@ module Mongoid
       included do
         include Mongoid::Timestamps::Timeless
 
-        field :created_at, type: Time
+        field :created_at, type: :time
         set_callback :create, :before, :set_created_at
       end
 

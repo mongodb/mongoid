@@ -2,7 +2,7 @@
 
 class Patient
   include Mongoid::Document
-  field :title, type: String
+  field :title, type: :string
   store_in collection: "inpatient"
   embeds_many :addresses, as: :addressable
   embeds_one :email

@@ -750,7 +750,7 @@ child elements.
 
         class Person
           include Mongoid::Document
-          field :username, type: String
+          field :username, type: :string
           has_many :cats, primary_key: "username"
         end
 
@@ -877,7 +877,7 @@ child elements.
 
         class Event
           include Mongoid::Document
-          field :created_at, type: DateTime
+          field :created_at, type: :date_time
           index({ created_at: 1 }, { expire_after_seconds: 3600 })
         end
 
@@ -1698,7 +1698,7 @@ child elements.
 
         class Band
           include Mongoid::Document
-          field :name, type: String
+          field :name, type: :string
         end
 
         Band.attribute_names
@@ -1718,7 +1718,7 @@ child elements.
 
         class User
           include Mongoid::Document
-          field :name, type: String
+          field :name, type: :string
           embeds_many :prefs, class_name: "Preference", store_as: 'my_preferences'
         end
 
@@ -1750,7 +1750,7 @@ child elements.
 
         class Band
           include Mongoid::Document
-          field :name, type: String, default: "New"
+          field :name, type: :string, default: "New"
         end
 
         band = Band.first
@@ -1811,7 +1811,7 @@ child elements.
 
         class Rule
           include Mongoid::Document
-          field :pattern, type: Regexp, default: /[^abc]/
+          field :pattern, type: :regexp, default: /[^abc]/
         end
 
 * \#1714/\#1706 Added better logging on index creation. (Hans Hasselberg)
@@ -2069,7 +2069,7 @@ child elements.
 
         class Person
           include Mongoid::Document
-          field :title, type: String
+          field :title, type: :string
         end
 
         Person.new.age = 50 # raises the UnknownAttribute error.
@@ -2079,8 +2079,8 @@ child elements.
 
         class Band
           include Mongoid::Document
-          field :name, type: String
-          field :genre, type: String
+          field :name, type: :string
+          field :genre, type: :string
 
           attr_readonly :name, :genre
         end
@@ -2114,7 +2114,7 @@ child elements.
 
         class Band
           include Mongoid::Document
-          field :name, type: String
+          field :name, type: :string
 
           index({ name: 1 }, { unique: true, background: true })
         end
@@ -2123,7 +2123,7 @@ child elements.
 
         class Venue
           include Mongoid::Document
-          field :location, type: Array
+          field :location, type: :array
 
           index location: "2d"
         end
@@ -2202,7 +2202,7 @@ child elements.
 
         class Band
           include Mongoid::Document
-          field :_id, type: String, default: ->{ name }
+          field :_id, type: :string, default: ->{ name }
         end
 
     To have the default applied *before* other attributes, set `:pre_processed`
@@ -2211,7 +2211,7 @@ child elements.
         class Band
           include Mongoid::Document
           field :_id,
-            type: String,
+            type: :string,
             pre_processed: true,
             default: ->{ BSON::ObjectId.new.to_s }
         end

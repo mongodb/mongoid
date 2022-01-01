@@ -9,7 +9,7 @@ describe ActiveModel::Validations::NumericalityValidator do
     before(:all) do
       class TestModel
         include Mongoid::Document
-        field :amount, type: BigDecimal
+        field :amount, type: :big_decimal
         validates_numericality_of :amount, allow_blank: false
       end
     end

@@ -3,9 +3,9 @@
 class CustomerAddress
   include Mongoid::Document
 
-  field :street, type: String
-  field :city, type: String
-  field :state, type: String
+  field :street, type: :string
+  field :city, type: :string
+  field :state, type: :string
 
   embedded_in :addressable, polymorphic: true
 end

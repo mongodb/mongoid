@@ -6,7 +6,7 @@ class EmmCongress
 
   embeds_many :legislators, class_name: 'EmmLegislator'
 
-  field :name, type: String
+  field :name, type: :string
 end
 
 class EmmLegislator
@@ -14,8 +14,8 @@ class EmmLegislator
 
   embedded_in :congress, class_name: 'EmmCongress'
 
-  field :a, type: Integer, default: 0
-  field :b, type: Integer, default: 0
+  field :a, type: :integer, default: 0
+  field :b, type: :integer, default: 0
 end
 
 # Models with associations with :class_name as a :: prefixed string
@@ -25,7 +25,7 @@ class EmmCcCongress
 
   embeds_many :legislators, class_name: '::EmmCcLegislator'
 
-  field :name, type: String
+  field :name, type: :string
 end
 
 class EmmCcLegislator
@@ -33,8 +33,8 @@ class EmmCcLegislator
 
   embedded_in :congress, class_name: '::EmmCcCongress'
 
-  field :a, type: Integer, default: 0
-  field :b, type: Integer, default: 0
+  field :a, type: :integer, default: 0
+  field :b, type: :integer, default: 0
 end
 
 class EmmManufactory
@@ -49,7 +49,7 @@ class EmmProduct
 
   embedded_in :manufactory, class_name: 'EmmManufactory'
 
-  field :name, type: String
+  field :name, type: :string
 end
 
 class EmmInner

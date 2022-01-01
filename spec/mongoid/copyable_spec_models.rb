@@ -35,13 +35,13 @@ module CopyableSpec
   class Reg
     include Mongoid::Document
 
-    field :name, type: String
+    field :name, type: :string
   end
 
   class Dyn
     include Mongoid::Document
     include Mongoid::Attributes::Dynamic
 
-    field :name, type: String
+    field :name, type: :string
   end
 end

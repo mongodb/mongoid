@@ -3,15 +3,15 @@
 class Account
   include Mongoid::Document
 
-  field :_id, type: String, overwrite: true, default: ->{ name.try(:parameterize) }
+  field :_id, type: :string, overwrite: true, default: ->{ name.try(:parameterize) }
 
-  field :number, type: String
-  field :balance, type: Integer
-  field :nickname, type: String
-  field :name, type: String
-  field :balanced, type: Mongoid::Boolean, default: ->{ balance? ? true : false }
+  field :number, type: :string
+  field :balance, type: :integer
+  field :nickname, type: :string
+  field :name, type: :string
+  field :balanced, type: :boolean, default: ->{ balance? ? true : false }
 
-  field :overridden, type: String
+  field :overridden, type: :string
 
   embeds_many :memberships
   belongs_to :creator, class_name: "User", foreign_key: :creator_id
@@ -29,7 +29,7 @@ class Account
   end
 
   # MONGOID-3365
-  field :period_started_at, type: Time
+  field :period_started_at, type: :time
   has_many :consumption_periods, dependent: :destroy, validate: false
 
   def current_consumption

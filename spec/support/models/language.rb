@@ -2,6 +2,6 @@
 
 class Language
   include Mongoid::Document
-  field :name, type: String
+  field :name, type: :string
   embedded_in :translatable, polymorphic: true
 end

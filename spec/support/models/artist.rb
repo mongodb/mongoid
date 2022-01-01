@@ -5,7 +5,7 @@ class Artist
 
   attr_accessor :before_add_called, :after_add_called, :before_add_referenced_called, :after_add_referenced_called, :before_remove_embedded_called, :after_remove_embedded_called, :before_remove_referenced_called, :after_remove_referenced_called
 
-  field :name, type: String
+  field :name, type: :string
 
   embeds_many :songs, before_add: [ :before_add_song, Proc.new { |artist, song| song.before_add_called = true } ], before_remove: :before_remove_song
   embeds_many :labels, after_add: :after_add_label, after_remove: :after_remove_label

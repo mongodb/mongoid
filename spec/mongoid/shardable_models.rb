@@ -1,7 +1,7 @@
 class SmMovie
   include Mongoid::Document
 
-  field :year, type: Integer
+  field :year, type: :integer
 
   index year: 1
   shard_key :year
@@ -25,7 +25,7 @@ end
 class SmAssistant
   include Mongoid::Document
 
-  field :gender, type: String
+  field :gender, type: :string
 
   index gender: 1
   shard_key 'gender' => :hashed

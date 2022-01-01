@@ -248,8 +248,8 @@ association for the comments:
     class Post
       include Mongoid::Document
       
-      field :title, type: String
-      field :body, type: String
+      field :title, type: :string
+      field :body, type: :string
 
       has_many :comments, dependent: :destroy
     end
@@ -264,8 +264,8 @@ generated ``embedded_in`` association to ``belongs_to``:
     class Comment
       include Mongoid::Document
       
-      field :name, type: String
-      field :message, type: String
+      field :name, type: :string
+      field :message, type: :string
 
       belongs_to :post
     end
@@ -498,8 +498,8 @@ The same model may look like this in Mongoid:
   class Post
     include Mongoid::Document
     
-    field :title, type: String
-    field :body, type: String
+    field :title, type: :string
+    field :body, type: :string
 
     has_many :comments, dependent: :destroy
   end

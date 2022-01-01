@@ -62,7 +62,7 @@ describe Mongoid::Association::Embedded::Cyclic do
           include Mongoid::Document
           recursively_embeds_many
 
-          field :name, type: String
+          field :name, type: :string
 
           def is_root?
             parent_node.nil?

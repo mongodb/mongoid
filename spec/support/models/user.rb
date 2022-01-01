@@ -4,8 +4,8 @@ class User
   include Mongoid::Document
 
   field :name
-  field :last_login, type: DateTime
-  field :account_expires, type: Date
+  field :last_login, type: :date_time
+  field :account_expires, type: :date
 
   has_one :account, foreign_key: :creator_id, validate: false
   has_many :posts, foreign_key: :author_id, validate: false

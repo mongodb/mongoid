@@ -4,14 +4,14 @@ class Name
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
 
-  field :_id, type: String, overwrite: true, default: ->{
+  field :_id, type: :string, overwrite: true, default: ->{
     "#{first_name}-#{last_name}"
   }
 
-  field :first_name, type: String
-  field :last_name, type: String
-  field :parent_title, type: String
-  field :middle, type: String
+  field :first_name, type: :string
+  field :last_name, type: :string
+  field :parent_title, type: :string
+  field :middle, type: :string
 
   embeds_many :translations, validate: false
   embeds_one :language, as: :translatable, validate: false

@@ -12,7 +12,7 @@ module Mongoid
         included do
           include Created
           fields.delete("created_at")
-          field :c_at, type: Time, as: :created_at
+          field :c_at, type: :time, as: :created_at
         end
       end
     end

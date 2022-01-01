@@ -76,7 +76,7 @@ module Mongoid
         :_id,
         default: ->{ BSON::ObjectId.new },
         pre_processed: true,
-        type: BSON::ObjectId
+        type: :object_id
       )
 
       alias_attribute(:id, :_id)

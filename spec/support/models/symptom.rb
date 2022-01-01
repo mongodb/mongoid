@@ -2,7 +2,7 @@
 
 class Symptom
   include Mongoid::Document
-  field :name, type: String
+  field :name, type: :string
   embedded_in :person
   default_scope ->{ asc(:name) }
 end

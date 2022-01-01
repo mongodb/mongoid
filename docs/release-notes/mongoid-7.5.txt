@@ -130,7 +130,7 @@ in ``after_*`` callbacks. This follows ActiveRecord/ActiveModel behavior.
   class Cat
     include Mongoid::Document
 
-    field :age, type: Integer
+    field :age, type: :integer
 
     after_save do
         p self

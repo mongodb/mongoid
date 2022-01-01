@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Browser < Canvas
-  field :version, type: Integer
+  field :version, type: :integer
   def render; end
 end
 

@@ -16,7 +16,7 @@ module TouchableSpec
 
       embedded_in :building
 
-      field :last_used_at, type: Time
+      field :last_used_at, type: :time
     end
 
     class Floor

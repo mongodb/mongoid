@@ -12,7 +12,7 @@ module Mongoid
         included do
           include Updated
           fields.delete("updated_at")
-          field :u_at, type: Time, as: :updated_at
+          field :u_at, type: :time, as: :updated_at
         end
       end
     end

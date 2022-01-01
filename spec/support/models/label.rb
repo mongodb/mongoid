@@ -4,13 +4,13 @@ class Label
   include Mongoid::Document
   include Mongoid::Timestamps::Updated::Short
 
-  field :name, type: String
-  field :after_create_called, type: Mongoid::Boolean, default: false
-  field :after_save_called, type: Mongoid::Boolean, default: false
-  field :after_update_called, type: Mongoid::Boolean, default: false
-  field :after_validation_called, type: Mongoid::Boolean, default: false
+  field :name, type: :string
+  field :after_create_called, type: :boolean, default: false
+  field :after_save_called, type: :boolean, default: false
+  field :after_update_called, type: :boolean, default: false
+  field :after_validation_called, type: :boolean, default: false
 
-  field :before_save_count, type: Integer, default: 0
+  field :before_save_count, type: :integer, default: 0
 
   embedded_in :artist
   embedded_in :band

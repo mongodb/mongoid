@@ -3738,7 +3738,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       class Project
         include Mongoid::Document
 
-        field :n, type: String, as: :name
+        field :n, type: :string, as: :name
 
         has_and_belongs_to_many :distributors,
                                 foreign_key: :d_ids,
@@ -3748,7 +3748,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       class Distributor
         include Mongoid::Document
 
-        field :n, type: String, as: :name
+        field :n, type: :string, as: :name
 
         has_and_belongs_to_many :projects,
                                 foreign_key: :p_ids,

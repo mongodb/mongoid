@@ -6,7 +6,7 @@ class EomParent
 
   embeds_one :child, class_name: 'EomChild'
 
-  field :name, type: String
+  field :name, type: :string
 end
 
 class EomChild
@@ -14,8 +14,8 @@ class EomChild
 
   embedded_in :parent, class_name: 'EomParent'
 
-  field :a, type: Integer, default: 0
-  field :b, type: Integer, default: 0
+  field :a, type: :integer, default: 0
+  field :b, type: :integer, default: 0
 end
 
 # Models with associations with :class_name as a :: prefixed string

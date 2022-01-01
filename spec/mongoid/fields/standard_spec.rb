@@ -7,7 +7,7 @@ describe Mongoid::Fields::Standard do
   describe "#lazy?" do
 
     let(:field) do
-      described_class.new(:test, type: String)
+      described_class.new(:test, type: :string)
     end
 
     it "returns false" do
@@ -39,7 +39,7 @@ describe Mongoid::Fields::Standard do
               default: ->{ "testing" },
               pre_processed: true,
               klass: FieldTest,
-              type: String
+              type: :string
             )
           end
 
@@ -55,7 +55,7 @@ describe Mongoid::Fields::Standard do
               :test,
               default: ->{ "testing" },
               klass: FieldTest,
-              type: String
+              type: :string
             )
           end
 
@@ -72,7 +72,7 @@ describe Mongoid::Fields::Standard do
             :test,
             default: "testing",
             klass: FieldTest,
-            type: String
+            type: :string
           )
         end
 
@@ -87,7 +87,7 @@ describe Mongoid::Fields::Standard do
       let(:field) do
         described_class.new(
           :test,
-          type: String
+          type: :string
         )
       end
 

@@ -40,7 +40,7 @@ module Mongoid
       # @example Get the defined scopes for a class
       #   class Band
       #     include Mongoid::Document
-      #     field :active, type: Boolean
+      #     field :active, type: :boolean
       #
       #     scope :active, -> { where(active: true) }
       #   end
@@ -63,14 +63,14 @@ module Mongoid
       # @example Define a default scope with a criteria.
       #   class Band
       #     include Mongoid::Document
-      #     field :active, type: Boolean
+      #     field :active, type: :boolean
       #     default_scope where(active: true)
       #   end
       #
       # @example Define a default scope with a proc.
       #   class Band
       #     include Mongoid::Document
-      #     field :active, type: Boolean
+      #     field :active, type: :boolean
       #     default_scope ->{ where(active: true) }
       #   end
       #
@@ -116,8 +116,8 @@ module Mongoid
       #
       #   class Person
       #     include Mongoid::Document
-      #     field :active, type: Boolean
-      #     field :count, type: Integer
+      #     field :active, type: :boolean
+      #     field :count, type: :integer
       #
       #     scope :active, -> { where(active: true) }
       #     scope :at_least, ->(count){ where(:count.gt => count) }

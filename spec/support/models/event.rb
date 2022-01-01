@@ -4,7 +4,7 @@ class Event
   include Mongoid::Document
 
   field :title
-  field :date, type: Date
+  field :date, type: :date
   has_and_belongs_to_many \
     :administrators,
     class_name: 'Person',

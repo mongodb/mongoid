@@ -3,6 +3,6 @@
 class Pub
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
-  field :location, type: Array
+  field :location, type: :array
   index location: "2dsphere"
 end

@@ -4,5 +4,5 @@
 class NameOnly
   include Mongoid::Document
 
-  field :name, type: String
+  field :name, type: :string
 end

@@ -84,7 +84,7 @@ module Mongoid
       # @example Create a basic index.
       #   class Person
       #     include Mongoid::Document
-      #     field :name, type: String
+      #     field :name, type: :string
       #     index({ name: 1 }, { background: true })
       #   end
       #
