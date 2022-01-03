@@ -296,7 +296,7 @@ describe Mongoid::Persistable::Savable do
           # no conflicts.
           #expect(truck.atomic_updates[:conflicts]).to eq nil
 
-          expect(truck.save).to eq true
+          expect { truck.save! }.not_to raise_error
 
           _truck = Truck.find(truck.id)
           expect(_truck.crates.size).to eq 2
@@ -316,7 +316,7 @@ describe Mongoid::Persistable::Savable do
           truck.crates.build(volume: 1)
           truck.crates.first.volume = 2
 
-          expect(truck.save).to eq true
+          truck.save!
 
           _truck = Truck.find(truck.id)
           _truck.crates.length.should == 2
@@ -333,7 +333,7 @@ describe Mongoid::Persistable::Savable do
           truck.seats.first.armrests.build(side: 'left')
           truck.seats.first.rating = 2
 
-          expect(truck.save).to eq true
+          truck.save!
 
           _truck = Truck.find(truck.id)
           _truck.seats.length.should == 1
@@ -350,7 +350,7 @@ describe Mongoid::Persistable::Savable do
           truck.crates.first.toys.build(name: 'Bear')
           truck.crates.build
 
-          expect(truck.save).to eq true
+          truck.save!
 
           _truck = Truck.find(truck.id)
           _truck.crates.length.should == 2
@@ -365,7 +365,7 @@ describe Mongoid::Persistable::Savable do
             truck.crates.first.toys.build(name: 'Bear')
             truck.crates.build
 
-            expect(truck.save).to eq true
+            truck.save!
 
             _truck = Truck.find(truck.id)
             _truck.crates.length.should == 2
@@ -386,7 +386,7 @@ describe Mongoid::Persistable::Savable do
 
           truck.seats.build
 
-          expect(truck.save).to eq true
+          expect { truck.save! }.not_to raise_error
 
           _truck = Truck.find(truck.id)
           expect(_truck.seats.size).to eq 2
@@ -402,7 +402,7 @@ describe Mongoid::Persistable::Savable do
             truck.seats.first.armrests.build
             truck.seats.build
 
-            expect(truck.save).to eq true
+            expect { truck.save! }.not_to raise_error
 
             _truck = Truck.find(truck.id)
             expect(_truck.seats.size).to eq 2
