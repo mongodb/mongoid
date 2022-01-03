@@ -515,6 +515,10 @@ axes:
         display_name: "Rails 6.1"
         variables:
           RAILS: "6.1"
+      - id: "7.0"
+        display_name: "Rails 7.0"
+        variables:
+          RAILS: "7.0"
   - id: "i18n"
     display_name: I18n version
     values:
@@ -645,6 +649,19 @@ buildvariants:
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1604-small
+  tasks:
+     - name: "test"
+
+- matrix_name: "rails-7"
+  matrix_spec:
+    ruby: ["ruby-3.0"]
+    driver: ["current"]
+    mongodb-version: "5.0"
+    topology: "standalone"
+    rails: ['7.0']
+  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  run_on:
+    - rhel70-small
   tasks:
      - name: "test"
 

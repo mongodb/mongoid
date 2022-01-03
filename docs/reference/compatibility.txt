@@ -265,6 +265,7 @@ are supported by Mongoid.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Rails 7.0
      - Rails 6.1
      - Rails 6.0
      - Rails 5.2
@@ -275,12 +276,14 @@ are supported by Mongoid.
    * - 7.4
      - |checkmark|
      - |checkmark|
+     - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
      - |checkmark| [#rails-5-ruby-3.0]_
      -
      -
 
    * - 7.3
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
@@ -289,6 +292,7 @@ are supported by Mongoid.
      -
 
    * - 7.2
+     -
      - |checkmark| [#rails-6.1]_
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
@@ -297,6 +301,7 @@ are supported by Mongoid.
      -
 
    * - 7.1
+     -
      - |checkmark| [#rails-6.1]_
      - |checkmark|
      - |checkmark|
@@ -305,6 +310,7 @@ are supported by Mongoid.
      -
 
    * - 7.0
+     -
      - |checkmark| [#rails-6.1]_
      - |checkmark| [#rails-6]_
      - |checkmark|
@@ -315,6 +321,7 @@ are supported by Mongoid.
    * - 6.4
      -
      -
+     -
      - |checkmark|
      - |checkmark|
      -
@@ -323,12 +330,14 @@ are supported by Mongoid.
    * - 6.3
      -
      -
+     -
      - |checkmark|
      - |checkmark|
      -
      -
 
    * - 6.2
+     -
      -
      -
      - |checkmark|
@@ -341,10 +350,12 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
      -
 
    * - 6.0
+     -
      -
      -
      -
@@ -358,9 +369,11 @@ are supported by Mongoid.
      -
      -
      -
+     -
      - |checkmark|
 
    * - 5.2
+     -
      -
      -
      -
