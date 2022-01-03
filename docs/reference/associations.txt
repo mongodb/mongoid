@@ -985,6 +985,7 @@ documents which satisfy the scope condition.. The scope may be either:
   associated model.
 
 .. code-block:: ruby
+
   class Trainer
     has_many :pets, scope: -> { where(species: 'dog') }
     has_many :toys, scope: :rubber
