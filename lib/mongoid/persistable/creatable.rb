@@ -83,7 +83,7 @@ module Mongoid
       # @return [ true ] true.
       def post_process_insert
         self.new_record = false
-        flag_children_persisted
+        flag_descendants_persisted
         true
       end
 

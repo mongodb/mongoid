@@ -62,8 +62,72 @@ describe Mongoid::Traversable do
         expect(person._children).to include(address)
       end
 
+      it "does not include embedded documents multiple levels deep" do
+        expect(person._children).not_to include(location)
+      end
+    end
+  end
+
+  describe "#_descendants" do
+
+    let(:person) do
+      Person.new(title: "King")
+    end
+
+    context "with one level of embedding" do
+
+      let(:name) do
+        Name.new(first_name: "Titus")
+      end
+
+      let(:address) do
+        Address.new(street: "Queen St")
+      end
+
+      before do
+        person.name = name
+        person.addresses << address
+      end
+
+      it "includes embeds_one documents" do
+        expect(person._descendants).to include(name)
+      end
+
+      it "includes embeds_many documents" do
+        expect(person._descendants).to include(address)
+      end
+    end
+
+    context "with multiple levels of embedding" do
+
+      let(:name) do
+        Name.new(first_name: "Titus")
+      end
+
+      let(:address) do
+        Address.new(street: "Queen St")
+      end
+
+      let(:location) do
+        Location.new(name: "Work")
+      end
+
+      before do
+        person.name = name
+        address.locations << location
+        person.addresses << address
+      end
+
+      it "includes embeds_one documents" do
+        expect(person._descendants).to include(name)
+      end
+
+      it "includes embeds_many documents" do
+        expect(person._descendants).to include(address)
+      end
+
       it "includes embedded documents multiple levels deep" do
-        expect(person._children).to include(location)
+        expect(person._descendants).to include(location)
       end
     end
   end

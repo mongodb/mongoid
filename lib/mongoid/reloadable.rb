@@ -22,7 +22,7 @@ module Mongoid
       end
 
       reloaded = _reload
-      if Mongoid.raise_not_found_error && reloaded.empty?
+      if Mongoid.raise_not_found_error && (reloaded.nil? || reloaded.empty?)
         raise Errors::DocumentNotFound.new(self.class, _id, _id)
       end
       @attributes = reloaded
@@ -67,7 +67,7 @@ module Mongoid
     # @return [ Hash ] The reloaded attributes.
     def reload_embedded_document
       extract_embedded_attributes({}.merge(
-        collection(_root).find(_root.atomic_selector).read(mode: :primary).first
+        collection(_root).find(_root.atomic_selector, session: _session).read(mode: :primary).first
       ))
     end
 
@@ -78,7 +78,8 @@ module Mongoid
     #
     # @param [ Hash ] attributes The document in the db.
     #
-    # @return [ Hash ] The document's extracted attributes.
+    # @return [ Hash | nil ] The document's extracted attributes or nil if the
+    #   document doesn't exist.
     def extract_embedded_attributes(attributes)
       atomic_position.split(".").inject(attributes) do |attrs, part|
         attrs = attrs[part =~ /\d/ ? part.to_i : part]
