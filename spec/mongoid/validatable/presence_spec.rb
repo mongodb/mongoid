@@ -239,7 +239,7 @@ describe Mongoid::Validatable::PresenceValidator do
           context "when saving the base" do
 
             before do
-              person.save
+              person.save!
             end
 
             it "saves the relation" do
@@ -297,17 +297,17 @@ describe Mongoid::Validatable::PresenceValidator do
     context "when the relation is a belongs to" do
 
       let(:product) do
-        Product.create(name: "testing")
+        Product.create!(name: "testing")
       end
 
       context "when the relation is present" do
 
         let(:purchase) do
-          Purchase.create
+          Purchase.create!
         end
 
         let(:line_item) do
-          purchase.line_items.create(product: product)
+          purchase.line_items.create!(product: product)
         end
 
         context "when the foreign key is nil" do
@@ -337,11 +337,11 @@ describe Mongoid::Validatable::PresenceValidator do
       context "when the relation has documents" do
 
         let!(:house) do
-          House.create
+          House.create!
         end
 
         let!(:person) do
-          Person.create(houses: [ house ])
+          Person.create!(houses: [ house ])
         end
 
         context "when the relation is loaded from the db" do

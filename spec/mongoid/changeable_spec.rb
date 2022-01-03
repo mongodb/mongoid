@@ -856,7 +856,7 @@ describe Mongoid::Changeable do
       context "when adding via create" do
 
         before do
-          address.locations.create
+          address.locations.create!
         end
 
         it "returns false" do
@@ -1506,7 +1506,7 @@ describe Mongoid::Changeable do
     end
 
     before do
-      person.update_attributes(preference_ids: [ preference.id ])
+      person.update_attributes!(preference_ids: [ preference.id ])
     end
 
     it "records the foreign key dirty changes" do
@@ -1688,7 +1688,7 @@ describe Mongoid::Changeable do
       end
 
       it "retains the changes until after all callbacks" do
-        acolyte.save
+        acolyte.save!
         expect(acolyte.changed_in_callback["name"]).to eq([ nil, "callback-test" ])
       end
     end
@@ -1738,7 +1738,7 @@ describe Mongoid::Changeable do
         context 'when building the lowest level document' do
 
           before do
-            person.save
+            person.save!
           end
 
           let!(:code) do
@@ -1760,7 +1760,7 @@ describe Mongoid::Changeable do
           context 'when saving the hierarchy' do
 
             before do
-              person.save
+              person.save!
             end
 
             let(:reloaded) do
@@ -1782,7 +1782,7 @@ describe Mongoid::Changeable do
               end
 
               before do
-                reloaded.save
+                reloaded.save!
               end
 
               it 'saves the deepest embedded document' do

@@ -191,7 +191,7 @@ describe Mongoid::Clients::Sessions do
 
     let!(:person) do
       Person.with(client: :other) do |klass|
-        klass.create
+        klass.create!
       end
     end
 
@@ -212,9 +212,9 @@ describe Mongoid::Clients::Sessions do
         before do
           person.with_session do
             person.username = 'Emily'
-            person.save
+            person.save!
             person.age = 80
-            person.save
+            person.save!
           end
         end
 
@@ -235,8 +235,8 @@ describe Mongoid::Clients::Sessions do
             Post.with(client: :other) do
               person.with_session do
                 person.username = 'Emily'
-                person.save
-                person.posts << Post.create
+                person.save!
+                person.posts << Post.create!
               end
             end
           end
@@ -261,8 +261,8 @@ describe Mongoid::Clients::Sessions do
             begin
               person.with_session do
                 person.username = 'Emily'
-                person.save
-                person.posts << Post.create
+                person.save!
+                person.posts << Post.create!
               end
             rescue => ex
               e = ex
@@ -290,8 +290,8 @@ describe Mongoid::Clients::Sessions do
               person.with_session do
                 person.with_session do
                   person.username = 'Emily'
-                  person.save
-                  person.posts << Post.create
+                  person.save!
+                  person.posts << Post.create!
                 end
               end
             rescue => ex

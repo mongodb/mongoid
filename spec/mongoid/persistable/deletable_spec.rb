@@ -86,7 +86,7 @@ describe Mongoid::Persistable::Deletable do
       context "when the document has been saved" do
 
         before do
-          address.save
+          address.save!
           address.delete
         end
 
@@ -105,11 +105,11 @@ describe Mongoid::Persistable::Deletable do
       context "when the document has been saved" do
 
         let(:address) do
-          person.addresses.create(street: "Bond Street")
+          person.addresses.create!(street: "Bond Street")
         end
 
         let(:location) do
-          address.locations.create(name: "Home")
+          address.locations.create!(name: "Home")
         end
 
         let(:from_db) do

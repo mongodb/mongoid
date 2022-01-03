@@ -184,7 +184,7 @@ describe Mongoid::Persistable::Settable do
 
   context "when dynamic attributes are not enabled" do
     let(:account) do
-      Account.create
+      Account.create!(name: 'Foobar')
     end
 
     it "raises exception for an unknown attribute " do

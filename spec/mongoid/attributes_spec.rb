@@ -55,7 +55,7 @@ describe Mongoid::Attributes do
               let!(:agent) do
                 agent = Agent.new(:title => title)
                 agent.build_address(:city => city)
-                agent.save()
+                agent.save!()
                 agent
               end
               let(:from_db) do
@@ -414,7 +414,7 @@ describe Mongoid::Attributes do
       let(:bar) do
         Bar.new.tap do |b|
           b[:lat_lng] = LatLng.new(52.30, 13.25)
-          b.save
+          b.save!
         end
       end
 
@@ -1302,7 +1302,7 @@ describe Mongoid::Attributes do
       context "when saving after the removal" do
 
         before do
-          person.save
+          person.save!
         end
 
         it "persists the removal" do
@@ -1322,7 +1322,7 @@ describe Mongoid::Attributes do
      end
 
      before do
-       person.save
+       person.save!
        person.pet.remove_attribute(:name)
      end
 
@@ -1337,7 +1337,7 @@ describe Mongoid::Attributes do
      context "when saving after the removal" do
 
        before do
-         person.save
+         person.save!
        end
 
        it "persists the removal" do
@@ -1400,7 +1400,7 @@ describe Mongoid::Attributes do
         context "when saving after the removal" do
 
           before do
-            person.save
+            person.save!
           end
 
           it "persists the removal" do
@@ -1430,7 +1430,7 @@ describe Mongoid::Attributes do
         context "when saving after the removal" do
 
           before do
-            person.save
+            person.save!
           end
 
           it "persists the removal" do
@@ -2089,7 +2089,7 @@ describe Mongoid::Attributes do
     end
 
     it "saves the default" do
-      expect { person.save }.to_not raise_error
+      expect { person.save! }.to_not raise_error
       expect(person.last_drink_taken_at).to eq(1.day.ago.in_time_zone("Alaska").to_date)
     end
   end

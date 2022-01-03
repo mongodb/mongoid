@@ -126,7 +126,7 @@ describe Mongoid::Copyable do
             it "clones" do
               t = StoreAsDupTest1.new(:name => "hi")
               t.build_store_as_dup_test2(:name => "there")
-              t.save
+              t.save!
               copy = t.send(method)
               expect(copy.object_id).not_to eq(t.object_id)
               expect(copy.store_as_dup_test2.name).to eq(t.store_as_dup_test2.name)
@@ -139,7 +139,7 @@ describe Mongoid::Copyable do
             it "clones" do
               t = StoreAsDupTest3.new(:name => "hi")
               t.store_as_dup_test4s << StoreAsDupTest4.new
-              t.save
+              t.save!
               copy = t.send(method)
               expect(copy.object_id).not_to eq(t.object_id)
               expect(copy.store_as_dup_test4s).not_to be_empty
@@ -170,7 +170,7 @@ describe Mongoid::Copyable do
           I18n.locale = 'pt_BR'
           person.desc = "descrição"
           person.addresses.first.name = "descrição"
-          person.save
+          person.save!
         end
 
         after do
@@ -248,7 +248,7 @@ describe Mongoid::Copyable do
       context "when cloning a loaded document" do
 
         before do
-          person.save
+          person.save!
         end
 
         let!(:from_db) do
@@ -363,7 +363,7 @@ describe Mongoid::Copyable do
             end
 
             before do
-              copy.save(validate: false)
+              copy.save!(validate: false)
             end
 
             it "persists the attributes" do
@@ -440,7 +440,7 @@ describe Mongoid::Copyable do
             end
 
             before do
-              copy.save(validate: false)
+              copy.save!(validate: false)
             end
 
             it "persists the attributes" do
@@ -529,7 +529,7 @@ describe Mongoid::Copyable do
             end
 
             before do
-              copy.save(validate: false)
+              copy.save!(validate: false)
             end
 
             it "persists the attributes" do
@@ -604,7 +604,7 @@ describe Mongoid::Copyable do
           end
 
           before do
-            copy.save(validate: false)
+            copy.save!(validate: false)
           end
 
           it "persists the attributes" do
@@ -636,7 +636,7 @@ describe Mongoid::Copyable do
         end
 
         before do
-          person.save
+          person.save!
         end
 
         let!(:from_db) do

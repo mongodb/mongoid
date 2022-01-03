@@ -406,7 +406,7 @@ describe Mongoid::Association::Macros do
               let(:default_require) { true }
 
               it 'does not require the association' do
-                expect(relation.save).to be(true)
+                expect(relation.save!).to be(true)
               end
             end
 
@@ -415,7 +415,7 @@ describe Mongoid::Association::Macros do
               let(:default_require) { false }
 
               it 'does not require the association' do
-                expect(relation.save).to be(true)
+                expect(relation.save!).to be(true)
               end
             end
           end
@@ -498,7 +498,7 @@ describe Mongoid::Association::Macros do
                 let(:default_require) { true }
 
                 it 'does not require the association' do
-                  expect(relation.save).to be(true)
+                  expect(relation.save!).to be(true)
                 end
               end
 
@@ -507,7 +507,7 @@ describe Mongoid::Association::Macros do
                 let(:default_require) { true }
 
                 it 'does not require the association' do
-                  expect(relation.save).to be(true)
+                  expect(relation.save!).to be(true)
                 end
               end
             end
@@ -526,7 +526,7 @@ describe Mongoid::Association::Macros do
                 let(:default_require) { true }
 
                 it 'does not require the association' do
-                  expect(relation.save).to be(true)
+                  expect(relation.save!).to be(true)
                 end
               end
 
@@ -535,7 +535,7 @@ describe Mongoid::Association::Macros do
                 let(:default_require) { false }
 
                 it 'does not require the association' do
-                  expect(relation.save).to be(true)
+                  expect(relation.save!).to be(true)
                 end
               end
             end
@@ -558,7 +558,7 @@ describe Mongoid::Association::Macros do
               let(:default_require) { true }
 
               it 'does not require the association' do
-                expect(relation.save).to be(true)
+                expect(relation.save!).to be(true)
               end
             end
 
@@ -567,7 +567,7 @@ describe Mongoid::Association::Macros do
               let(:default_require) { false }
 
               it 'does not require the association' do
-                expect(relation.save).to be(true)
+                expect(relation.save!).to be(true)
               end
             end
           end
@@ -616,7 +616,7 @@ describe Mongoid::Association::Macros do
         let(:default_require) { false }
 
         it 'does not require the association' do
-          expect(relation.save).to be(true)
+          expect(relation.save!).to be(true)
         end
       end
     end
