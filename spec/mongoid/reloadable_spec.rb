@@ -288,6 +288,54 @@ describe Mongoid::Reloadable do
       end
     end
 
+    context "when embedded documents are unasssigned and reassigned" do
+
+      let(:palette) do
+        Palette.new
+      end
+
+      let(:canvas) do
+        Canvas.create!
+      end
+
+      before do
+        canvas.palette = palette
+        canvas.palette = nil
+        canvas.palette = palette
+        canvas.save!
+        canvas.reload
+      end
+
+      it "reloads the embedded document correctly" do
+        expect(canvas.palette).to eq(palette)
+      end
+    end
+
+    context "when embedded document is nil" do
+
+      let(:palette) do
+        Palette.new
+      end
+
+      let(:canvas) do
+        Canvas.create!(palette: palette)
+      end
+
+      before do
+        canvas.palette = nil
+      end
+
+      let(:reload) do
+        palette.reload
+      end
+
+      it "raises a document not found error" do
+        expect do
+          reload
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Palette with id\(s\)/)
+      end
+    end
+
     context "with relational associations" do
 
       let(:person) do
