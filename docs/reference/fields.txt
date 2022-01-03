@@ -1157,68 +1157,44 @@ you can include the short versions of the modules.
 
 .. _field-names-with-periods-and-dollar-signs:
 
-Field Names with Periods (``.``) and Dollar Signs (``$``)
-=========================================================
+Field Names with Dots/Periods (``.``) and Dollar Signs (``$``)
+==============================================================
 
-Mongo 5.0 `adds specialized support
+MongoDB query language (MQL) generally uses the dot/period character (``.``)
+to separate field names in a field path that traverses embedded documents, and
+the dollar character (``$``) for operators. It is possible to utilize field
+names containing the dot and dollar characters, however it is recommended to
+avoid these characters for ease of querying.
+
+MongoDB 5.0 adds `special operators
 <https://docs.mongodb.com/manual/core/dot-dollar-considerations/#std-label-crud-concepts-dot-dollar-considerations>`_
-for field names that are prefixed with a dollar sign (``$``) or
-that contain periods (``.``).
+for querying and modifying documents using field names containing dots and
+dollars. Previous MongoDB versions do not provide a mechanism for querying
+documents on fields whose names contain dots and dollars, though such documents
+can be retrieved verbatim (once they are matched using some other strategy).
 
-Fields prefixed with ``$`` or containing ``.`` are not directly accessible in standard queries.
-They may only be accessed with special database helper methods (new in MongoDB 5.0)
-including ``$getField``, ``$setField``, and ``$literal``.
-In normal usage scenarios, such fields behave as "hidden" fields on the document.
-In addition, they come with severe limitations, such as the inability
-to be indexed.
+Mongoid provides its own DSL for querying MongoDB and, unlike MongoDB 5.0,
+Mongoid does not yet provide any facilities for querying documents using
+field names containing dots and dollars. It is possible to query such documents
+using MQL, but not via most Mongoid DSL methods. Additionally, there is
+other code in Mongoid that assumes that the dot (``.``) separates path
+components which may misbehave should a document contain a field with dots
+in its name.
 
-Support in Mongoid
-------------------
+Historically, MongoDB drivers prohibited inserting documents with field names
+containing dots and dollars, since such documents couldn't be queried via
+those field names. This prohibition is now being lifted due to the new
+operators introduced with MongoDB 5.0; however, the required changes in the
+Ruby driver `have not yet been implemented
+<https://jira.mongodb.org/browse/RUBY-2528>`_. By virtue of using the Ruby
+driver to interact with the database, this prohibition on inserting documents
+with field names containing dots and dollars also applies to Mongoid.
+Thus, while both the Ruby driver and Mongoid permit querying documents that
+have been inserted using other mechanisms by field names containing dots and
+dollars, there is presently no possibility to insert such documents using
+either Ruby driver or Mongoid.
 
-This section outlines the behavior of Mongoid and the Mongo Ruby Driver
-when working with fields whose names are prefixed with ``$`` or contain ``.``
-("specially-named fields"):
-
-* Mongoid's :ref:`field <field-types>` macro does not support defining specially-named fields.
-* Mongoid does not provide helper functions or idiomatic support for getting/setting
-  the values of specially-named fields.
-* Mongoid does not provide helper functions or idiomatic support for queries/operations
-  which reference specially-named fields.
-* If a document existing in the database contains specially-named fields,
-  Mongoid will load the document normally **except** for its specially-named fields,
-  which will not be retrieved.
-* Mongoid will not change or overwrite any specially-named field's value when saving documents.
-* If support is added to Mongoid or the Mongo Ruby Driver in the future,
-  following the MongoDB behavior it will be implemented with specialized driver
-  functions specifically for accessing and writing specially-named fields.
-
-Further Background
-------------------
-
-Since its inception, MongoDB has reserved the ``$`` and ``.`` chars
-for `specific meanings in query operations <https://docs.mongodb.com/manual/crud/>`_.
-Support for ``$`` and ``.`` in field names is intended to address a use-case
-in storing data from third-party sources (i.e. not native to MongoDB.)
-Given the pre-existing query  usage of ``$`` and ``.``,
-such field names require special handling.
-
-In both MongoDB and Mongoid, ``$`` is reserved for operators and will
-return a syntax error (or will use the operator, if it exists):
-
-.. code-block:: ruby
-
-  Person.where('$my_money' => 100)
-  #=> raises Mongo::Error::OperationFailure (unknown top level operator: $my_money)
-
-In both MongoDB and Mongoid, ``.`` is reserved for embedded field references, and will return
-an empty result:
-
-.. code-block:: ruby
-
-  Person.where('www.mongodb.com' => 'favorite_website').to_a
-  #=> []
-  # queries for a nested document such as `www: { mongodb: { com: 'favorite_website' } }`
-
-Lastly, please note that method names containing ``$`` or ``.``
-`are not standard syntax in Ruby language
-<https://docs.ruby-lang.org/en/3.0.0/doc/syntax/methods_rdoc.html>`_.
+To summarize, field names containing dots and dollars have limited support in
+Mongoid, the Ruby MongoDB driver and MongoDB server. Such field names should
+only be used when interfacing with software that already uses these names,
+and should be avoided for new development.
