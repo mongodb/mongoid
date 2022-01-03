@@ -52,7 +52,7 @@ describe Mongoid::Stateful do
 
     context "when the object has been destroyed" do
       before do
-        person.save
+        person.save!
         person.destroy
       end
 

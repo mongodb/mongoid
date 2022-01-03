@@ -102,7 +102,7 @@ describe Mongoid::Validatable do
 
         before do
           account.name = "Testing"
-          account.save
+          account.save!
           account.name = "Testing a really long name."
         end
 
@@ -120,7 +120,7 @@ describe Mongoid::Validatable do
 
       before do
         pizza.build_topping(name: "cheese")
-        pizza.save
+        pizza.save!
       end
 
       let(:from_db) do

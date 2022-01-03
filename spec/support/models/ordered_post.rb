@@ -8,6 +8,6 @@ class OrderedPost
 
   after_destroy do
     person.title = 'Minus one ordered post.'
-    person.save
+    person.save!
   end
 end

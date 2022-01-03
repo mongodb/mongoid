@@ -272,7 +272,7 @@ describe Mongoid::Attributes::Nested do
             context "when saving the parent" do
 
               before do
-                person.save
+                person.save!
                 person.reload
               end
 
@@ -616,7 +616,7 @@ describe Mongoid::Attributes::Nested do
 
                       before do
                         owner.pet_attributes = { id: pet.id, _destroy: truth }
-                        owner.save
+                        owner.save!
                       end
 
                       it "destroys the existing document" do
@@ -1068,7 +1068,7 @@ describe Mongoid::Attributes::Nested do
             context "when saving the parent" do
 
               before do
-                person.save
+                person.save!
                 person.reload
               end
 
@@ -1184,7 +1184,7 @@ describe Mongoid::Attributes::Nested do
             context "when the parent is saved" do
 
               before do
-                band.save
+                band.save!
               end
 
               it "runs the first child create callbacks" do
@@ -1414,17 +1414,17 @@ describe Mongoid::Attributes::Nested do
                   end
 
                   let!(:band) do
-                    Band.create
+                    Band.create!
                   end
 
                   let!(:record) do
-                    band.records.create
+                    band.records.create!
                   end
 
                   before do
                     band.records_attributes =
                       { "foo" => { "id" => record.id, "_destroy" => true }}
-                    band.save
+                    band.save!
                   end
 
                   it "deletes the child document" do
@@ -1500,7 +1500,7 @@ describe Mongoid::Attributes::Nested do
                               "bar" => { "id" => app_one.id, "_destroy" => true },
                               "foo" => { "id" => app_two.id, "_destroy" => true }
                             }
-                          from_db.save
+                          from_db.save!
                         end
 
                         it "destroys both children" do
@@ -1622,7 +1622,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.save
+                              persisted.save!
                             end
 
                             it "deletes the marked document from the relation" do
@@ -1678,7 +1678,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.save
+                              persisted.save!
                             end
 
                             it "deletes the marked document from the relation" do
@@ -2390,8 +2390,8 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                pizza.topping = Topping.create(name: "cheese")
-                pizza.update_attributes(topping_attributes: { name: "onions" })
+                pizza.topping = Topping.create!(name: "cheese")
+                pizza.update_attributes!(topping_attributes: { name: "onions" })
               end
 
               it "persists the attribute changes" do
@@ -3031,7 +3031,7 @@ describe Mongoid::Attributes::Nested do
                       "0" => { "id" => post_one.id, "title" => "testing again" },
                       "1" => { "id" => post_two.id, "title" => "$$$" }
                     }
-                  person.save
+                  person.save!
                 end
 
                 it "does not perist the invalid value" do
@@ -3307,7 +3307,7 @@ describe Mongoid::Attributes::Nested do
               context "when the parent is saved" do
 
                 before do
-                  person.save
+                  person.save!
                   person.posts_attributes =
                     [
                       { "title" => "Third" },

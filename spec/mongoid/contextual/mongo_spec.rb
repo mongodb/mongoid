@@ -2262,12 +2262,12 @@ describe Mongoid::Contextual::Mongo do
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Sony')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
 
         b = Band.new(name: 'FKA Twigs')
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
       end
 
 
@@ -2435,12 +2435,12 @@ describe Mongoid::Contextual::Mongo do
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Sony')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
 
         b = Band.new(name: 'FKA Twigs')
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
       end
 
 

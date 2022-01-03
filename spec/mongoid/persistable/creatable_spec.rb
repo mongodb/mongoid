@@ -351,8 +351,8 @@ describe Mongoid::Persistable::Creatable do
       context "when building related documents" do
 
         before do
-          container.vehicles.build({}, Car).save
-          container.vehicles.build({}, Truck).save
+          container.vehicles.build({}, Car).save!
+          container.vehicles.build({}, Truck).save!
         end
 
         it "allows STI from the build call" do

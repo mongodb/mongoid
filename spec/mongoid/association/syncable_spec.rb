@@ -110,7 +110,7 @@ describe "Syncable Association" do
       context "and is Persisted" do
 
         it "is able to :save" do
-          expect(account.save).to be true
+          expect(account.save!).to be true
         end
       end
 
@@ -121,7 +121,7 @@ describe "Syncable Association" do
         end
 
         it "is able to :save" do
-          expect(account.save).to be true
+          expect(account.save!).to be true
         end
       end
     end
@@ -142,7 +142,7 @@ describe "Syncable Association" do
     end
 
     it "does not attempt synchronization" do
-      expect { article.save }.to_not raise_error
+      expect { article.save! }.to_not raise_error
     end
 
     it "sets the one side of the relation" do

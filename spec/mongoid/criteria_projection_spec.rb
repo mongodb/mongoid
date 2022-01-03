@@ -157,10 +157,10 @@ describe Mongoid::Criteria do
 
       before do
         I18n.locale = :en
-        d = Dictionary.create(description: 'english-text')
+        d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
-        d.save
+        d.save!
       end
 
       after do
