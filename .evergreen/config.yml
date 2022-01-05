@@ -546,7 +546,7 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['5.0']
-  display_name: "${ruby}, ${driver}, ${rails}, ${mongodb-version}, ${topology}"
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu2004-small
   tasks:
@@ -584,7 +584,7 @@ buildvariants:
     mongodb-version: ['4.0']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1804-small
+    - ubuntu1604-small
   tasks:
     - name: "test"
 
@@ -638,7 +638,7 @@ buildvariants:
 
 - matrix_name: "rails-6"
   matrix_spec:
-    ruby: ["ruby-3.1"]
+    ruby: ["ruby-3.0"]
     driver: ["current"]
     mongodb-version: "5.0"
     topology: "standalone"
