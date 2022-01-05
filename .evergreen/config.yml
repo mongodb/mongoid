@@ -420,6 +420,10 @@ axes:
         display_name: ruby-3.0
         variables:
           RVM_RUBY: "ruby-3.0"
+      - id: "ruby-3.1"
+        display_name: ruby-3.1
+        variables:
+          RVM_RUBY: "ruby-3.1"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -440,10 +444,15 @@ axes:
       - id: ubuntu-18.04
         display_name: "Ubuntu 18.04"
         run_on: ubuntu1804-small
-
+      - id: ubuntu-20.04
+        display_name: "Ubuntu 20.04"
+        run_on: ubuntu2004-small
       - id: rhel70
         display_name: "RHEL 7.0"
         run_on: rhel70-small
+      - id: rhel80
+        display_name: "RHEL 8.0"
+        run_on: rhel80-small
   - id: "driver"
     display_name: Driver Version
     values:
@@ -531,15 +540,15 @@ axes:
           APP_TESTS: yes
 
 buildvariants:
-- matrix_name: "ruby-3.0"
+- matrix_name: "ruby-3"
   matrix_spec:
-    ruby: ["ruby-3.0"]
+    ruby: ["ruby-3.0", "ruby-3.1"]
     driver: ["current"]
     topology: '*'
     mongodb-version: ['5.0']
   display_name: "${ruby}, ${driver}, ${rails}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1804-small
+    - ubuntu2004-small
   tasks:
     - name: "test"
 
@@ -594,12 +603,12 @@ buildvariants:
 - matrix_name: "driver-upcoming"
   matrix_spec:
     driver: [master, stable]
-    ruby: ["ruby-3.0"]
+    ruby: ["ruby-3.1"]
     mongodb-version: "5.0"
     topology: ['replica-set', 'sharded-cluster']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - rhel80-small
   tasks:
      - name: "test"
 
@@ -629,14 +638,14 @@ buildvariants:
 
 - matrix_name: "rails-6"
   matrix_spec:
-    ruby: ["ruby-3.0"]
+    ruby: ["ruby-3.1"]
     driver: ["current"]
     mongodb-version: "5.0"
     topology: "standalone"
     rails: ['6.0', '6.1']
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - rhel80-small
   tasks:
      - name: "test"
 
@@ -680,9 +689,9 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: app-tests-ruby-3.0
+- matrix_name: app-tests-ruby-3
   matrix_spec:
-    ruby: ruby-3.0
+    ruby: ["ruby-3.0", "ruby-3.1"]
     driver: ["current"]
     mongodb-version: '5.0'
     topology: standalone
