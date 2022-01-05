@@ -699,7 +699,7 @@ buildvariants:
     rails: ['6.0', '6.1']
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   run_on:
-    - ubuntu1804-small
+    - ubuntu2004-small
   tasks:
     - name: "test"
 
