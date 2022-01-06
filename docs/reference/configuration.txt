@@ -280,6 +280,10 @@ for details on driver options.
       # Ruby on Rails logger instance. (default: :info)
       log_level: :info
 
+      # When using the BigDecimal field type, store the value in the database
+      # as a BSON::Decimal128 instead of a string. (default: false)
+      map_big_decimal_to_decimal128: false
+
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
       preload_models: false
