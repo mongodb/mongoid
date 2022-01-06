@@ -540,11 +540,23 @@ axes:
           APP_TESTS: yes
 
 buildvariants:
-- matrix_name: "ruby-3"
+- matrix_name: "ruby-3.1"
   matrix_spec:
-    ruby: ["ruby-3.0", "ruby-3.1"]
+    ruby: ["ruby-3.1"]
     driver: ["current"]
     topology: '*'
+    mongodb-version: ['5.0']
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu2004-small
+  tasks:
+    - name: "test"
+
+- matrix_name: "ruby-3.0"
+  matrix_spec:
+    ruby: ["ruby-3.0"]
+    driver: ["current"]
+    topology: ['replica-set']
     mongodb-version: ['5.0']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -580,7 +592,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-2.6"]
     driver: ["current"]
-    topology: '*'
+    topology: ['replica-set']
     mongodb-version: ['4.0']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -592,7 +604,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-2.5"]
     driver: ["current"]
-    topology: '*'
+    topology: ['replica-set']
     mongodb-version: ['3.6']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
