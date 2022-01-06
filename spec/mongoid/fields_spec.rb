@@ -1234,71 +1234,153 @@ describe Mongoid::Fields do
 
   context "when a field is defined as a big decimal" do
 
-    let(:band) do
-      Band.new(name: "Tool")
+    context 'when Mongoid.map_big_decimal_to_decimal128 is false' do
+
+      let(:band) do
+        Band.new(name: "Tool")
+      end
+
+      let(:decimal) do
+        BigDecimal.new("1000000.00")
+      end
+
+      context "when setting to a big decimal" do
+
+        before do
+          band.sales = decimal
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a string" do
+
+        before do
+          band.sales = decimal.to_s
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to an integer" do
+
+        before do
+          band.sales = decimal.to_i
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq("1000000")
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a float" do
+
+        before do
+          band.sales = decimal.to_f
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
     end
 
-    let(:decimal) do
-      BigDecimal("1000000.00")
-    end
-
-    context "when setting to a big decimal" do
+    context 'when Mongoid.map_big_decimal_to_decimal128 is true' do
 
       before do
-        band.sales = decimal
+        Mongoid.map_big_decimal_to_decimal128 = true
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
+      after do
+        Mongoid.map_big_decimal_to_decimal128 = false
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
-
-    context "when setting to a string" do
-
-      before do
-        band.sales = decimal.to_s
+      let(:band) do
+        Band.new(name: "Tool")
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
+      let(:decimal) do
+        BigDecimal.new("1000000.00")
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
+      context "when setting to a big decimal" do
 
-    context "when setting to an integer" do
+        before do
+          band.sales = decimal
+        end
 
-      before do
-        band.sales = decimal.to_i
-      end
+        it "properly persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal))
+        end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq("1000000")
-      end
-
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
-
-    context "when setting to a float" do
-
-      before do
-        band.sales = decimal.to_f
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
+      context "when setting to a string" do
+
+        before do
+          band.sales = decimal.to_s
+        end
+
+        it "persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
+      context "when setting to an integer" do
+
+        before do
+          band.sales = decimal.to_i
+        end
+
+        it "persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_i.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a float" do
+
+        before do
+          band.sales = decimal.to_f
+        end
+
+        it "properly persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_f.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
     end
   end

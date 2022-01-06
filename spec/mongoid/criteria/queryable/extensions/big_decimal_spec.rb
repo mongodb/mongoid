@@ -6,55 +6,121 @@ describe BigDecimal do
 
   describe ".evolve" do
 
-    context "when provided a big decimal" do
+    context 'when map_big_decimal_to_decimal128 is false' do
 
-      let(:big_decimal) do
-        BigDecimal("123456.789")
+      context "when provided a big decimal" do
+
+        let(:big_decimal) do
+          BigDecimal.new("123456.789")
+        end
+
+        it "returns the decimal as a string" do
+          expect(described_class.evolve(big_decimal)).to eq(big_decimal.to_s)
+        end
       end
 
-      it "returns the decimal as a string" do
-        expect(described_class.evolve(big_decimal)).to eq(big_decimal.to_s)
+      context "when provided a non big decimal" do
+
+        it "returns the object as a string" do
+          expect(described_class.evolve("testing")).to eq("testing")
+        end
+      end
+
+      context "when provided an array of big decimals" do
+
+        let(:bd_one) do
+          BigDecimal.new("123456.789")
+        end
+
+        let(:bd_two) do
+          BigDecimal.new("123333.789")
+        end
+
+        let(:array) do
+          [ bd_one, bd_two ]
+        end
+
+        let(:evolved) do
+          described_class.evolve(array)
+        end
+
+        it "returns the array as strings" do
+          expect(evolved).to eq([ bd_one.to_s, bd_two.to_s ])
+        end
+
+        it "does not evolve in place" do
+          expect(evolved).to_not equal(array)
+        end
+      end
+
+      context "when provided nil" do
+
+        it "returns nil" do
+          expect(described_class.evolve(nil)).to be_nil
+        end
       end
     end
 
-    context "when provided a non big decimal" do
+    context 'when map_big_decimal_to_decimal128 is true' do
 
-      it "returns the object as a string" do
-        expect(described_class.evolve("testing")).to eq("testing")
-      end
-    end
-
-    context "when provided an array of big decimals" do
-
-      let(:bd_one) do
-        BigDecimal("123456.789")
+      before do
+        Mongoid.map_big_decimal_to_decimal128 = true
       end
 
-      let(:bd_two) do
-        BigDecimal("123333.789")
+      after do
+        Mongoid.map_big_decimal_to_decimal128 = false
       end
 
-      let(:array) do
-        [ bd_one, bd_two ]
+      context "when provided a big decimal" do
+
+        let(:big_decimal) do
+          BigDecimal.new("123456.789")
+        end
+
+        it "returns the decimal as a BSON::Decimal128 object" do
+          expect(described_class.evolve(big_decimal)).to eq(BSON::Decimal128.new(big_decimal))
+        end
       end
 
-      let(:evolved) do
-        described_class.evolve(array)
+      context "when provided a non big decimal" do
+
+        it "returns the object as a string" do
+          expect(described_class.evolve("testing")).to eq("testing")
+        end
       end
 
-      it "returns the array as strings" do
-        expect(evolved).to eq([ bd_one.to_s, bd_two.to_s ])
+      context "when provided an array of big decimals" do
+
+        let(:bd_one) do
+          BigDecimal.new("123456.789")
+        end
+
+        let(:bd_two) do
+          BigDecimal.new("123333.789")
+        end
+
+        let(:array) do
+          [ bd_one, bd_two ]
+        end
+
+        let(:evolved) do
+          described_class.evolve(array)
+        end
+
+        it "returns the array as BSON::Decimal128s" do
+          expect(evolved).to eq([ BSON::Decimal128.new(bd_one), BSON::Decimal128.new(bd_two) ])
+        end
+
+        it "does not evolve in place" do
+          expect(evolved).to_not equal(array)
+        end
       end
 
-      it "does not evolve in place" do
-        expect(evolved).to_not equal(array)
-      end
-    end
+      context "when provided nil" do
 
-    context "when provided nil" do
-
-      it "returns nil" do
-        expect(described_class.evolve(nil)).to be_nil
+        it "returns nil" do
+          expect(described_class.evolve(nil)).to be_nil
+        end
       end
     end
   end

@@ -22,7 +22,11 @@ module Mongoid
       #
       # @return [ Object ] The object.
       def mongoize
-        to_s
+        if Mongoid.map_big_decimal_to_decimal128
+          BSON::Decimal128.new(self)
+        else
+          to_s
+        end
       end
 
       # Is the BigDecimal a number?
@@ -46,7 +50,13 @@ module Mongoid
         #
         # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
         def demongoize(object)
-          object && object.numeric? ? BigDecimal(object.to_s) : nil
+          if object
+            if object.is_a?(BSON::Decimal128)
+              demongoize_from_decimal128(object)
+            elsif object.numeric?
+              ::BigDecimal.new(object.to_s)
+            end
+          end
         end
 
         # Mongoize an object of any type to how it's stored in the db as a String.
@@ -58,7 +68,31 @@ module Mongoid
         #
         # @return [ String, nil ] A String representing the object or nil.
         def mongoize(object)
-          object && object.numeric? ? object.to_s : nil
+          if object
+            if Mongoid.map_big_decimal_to_decimal128
+              mongoize_to_decimal128(object)
+            elsif object.numeric?
+              object.to_s
+            end
+          end
+        end
+
+        private
+
+        def demongoize_from_decimal128(object)
+          if Mongoid.map_big_decimal_to_decimal128
+            object.to_big_decimal
+          else
+            raise Mongoid::Errors::UnmappedBSONType.new(object)
+          end
+        end
+
+        def mongoize_to_decimal128(object)
+          if object.is_a?(BigDecimal)
+            BSON::Decimal128.new(object)
+          elsif object.numeric?
+            BSON::Decimal128.new(object.to_s)
+          end
         end
       end
     end
