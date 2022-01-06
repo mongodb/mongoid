@@ -30,7 +30,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a BigDecimal" do
-          expect(BigDecimal.demongoize(string)).to eq(BigDecimal.new(string))
+          expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
         end
       end
 
@@ -41,7 +41,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a BigDecimal" do
-          expect(BigDecimal.demongoize(string)).to eq(BigDecimal.new(string))
+          expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
         end
       end
 
@@ -52,7 +52,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a BigDecimal" do
-          expect(BigDecimal.demongoize(string)).to eq(BigDecimal.new(string))
+          expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
         end
       end
 
@@ -205,7 +205,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is the BigDecimal zero" do
 
         let(:big_decimal) do
-          BigDecimal.new("0.0")
+          BigDecimal("0.0")
         end
 
         it "returns a string" do
@@ -216,7 +216,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is the BigDecimal negative zero" do
 
         let(:big_decimal) do
-          BigDecimal.new("-0.0")
+          BigDecimal("-0.0")
         end
 
         it "returns a string" do
@@ -347,7 +347,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is BigDecimal NaN" do
 
         let(:nan) do
-          BigDecimal.new("NaN")
+          BigDecimal("NaN")
         end
 
         it "returns a String" do
@@ -358,7 +358,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is BigDecimal Infinity" do
 
         let(:infinity) do
-          BigDecimal.new("Infinity")
+          BigDecimal("Infinity")
         end
 
         it "returns a String" do
@@ -369,7 +369,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is BigDecimal negative Infinity" do
 
         let(:neg_infinity) do
-          BigDecimal.new("-Infinity")
+          BigDecimal("-Infinity")
         end
 
         it "returns a String" do
@@ -456,7 +456,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a BigDecimal" do
-          expect(BigDecimal.demongoize(string)).to eq(BigDecimal.new(string))
+          expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
         end
       end
 
@@ -467,7 +467,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a BigDecimal" do
-          expect(BigDecimal.demongoize(string)).to eq(BigDecimal.new(string))
+          expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
         end
       end
 
@@ -478,7 +478,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a BigDecimal" do
-          expect(BigDecimal.demongoize(string)).to eq(BigDecimal.new(string))
+          expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
         end
       end
 
@@ -625,7 +625,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is the BigDecimal zero" do
 
         let(:big_decimal) do
-          BigDecimal.new("0.0")
+          BigDecimal("0.0")
         end
 
         it "returns a BSON::Decimal128" do
@@ -636,7 +636,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is the BigDecimal negative zero" do
 
         let(:big_decimal) do
-          BigDecimal.new("-0.0")
+          BigDecimal("-0.0")
         end
 
         it "returns a BSON::Decimal128" do
@@ -775,7 +775,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is BigDecimal NaN" do
 
         let(:nan) do
-          BigDecimal.new("NaN")
+          BigDecimal("NaN")
         end
 
         it "returns a BSON::Decimal128 representation of BigDecimal NaN" do
@@ -786,7 +786,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is BigDecimal Infinity" do
 
         let(:infinity) do
-          BigDecimal.new("Infinity")
+          BigDecimal("Infinity")
         end
 
         it "returns a BSON::Decimal128 representation of BigDecimal Infinity" do
@@ -797,7 +797,7 @@ describe Mongoid::Extensions::BigDecimal do
       context "when the value is BigDecimal negative Infinity" do
 
         let(:neg_infinity) do
-          BigDecimal.new("-Infinity")
+          BigDecimal("-Infinity")
         end
 
         it "returns a BSON::Decimal128 representation of BigDecimal negative Infinity" do

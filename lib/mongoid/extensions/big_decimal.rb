@@ -54,7 +54,7 @@ module Mongoid
             if object.is_a?(BSON::Decimal128)
               demongoize_from_decimal128(object)
             elsif object.numeric?
-              ::BigDecimal.new(object.to_s)
+              BigDecimal(object.to_s) # TODO: this should be a ::BigDecimal
             end
           end
         end
