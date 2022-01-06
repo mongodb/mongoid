@@ -185,10 +185,14 @@ describe Mongoid::Extensions::BigDecimal do
           BigDecimal.demongoize(decimal128)
         end
 
-        it "raises a UnmappedBSONType" do
-          expect {
+        it "does not raise an error" do
+          expect do
             demongoized
-          }.to raise_exception(Mongoid::Errors::UnmappedBSONType)
+          end.to_not raise_error
+        end
+
+        it "returns a big decimal" do
+          expect(demongoized).to eq(decimal128.to_big_decimal)
         end
       end
     end

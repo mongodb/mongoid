@@ -265,7 +265,7 @@ describe Mongoid::Config do
       end
     end
 
-    it 'does not set the Mongoid.app_name option' do
+    it 'does not set the Mongoid.map_big_decimal_to_decimal128 option' do
       expect(Mongoid.map_big_decimal_to_decimal128).to be(false)
     end
   end
