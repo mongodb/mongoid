@@ -9,7 +9,7 @@ set_env_vars() {
   AUTH=${AUTH:-noauth}
   SSL=${SSL:-nossl}
   MONGODB_URI=${MONGODB_URI:-}
-  TOPOLOGY=${TOPOLOGY:-server}
+  TOPOLOGY=${TOPOLOGY:-standalone}
   DRIVERS_TOOLS=${DRIVERS_TOOLS:-}
 
   if [ "$AUTH" != "noauth" ]; then

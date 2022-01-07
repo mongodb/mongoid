@@ -20,7 +20,7 @@ jobs:
         include:
         - mongodb: '5.0'
           ruby: ruby-3.1
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
@@ -40,7 +40,7 @@ jobs:
           experimental: false
         - mongodb: '5.0'
           ruby: ruby-3.0
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
@@ -70,7 +70,7 @@ jobs:
           experimental: false
         - mongodb: '4.4'
           ruby: ruby-2.7
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
@@ -90,7 +90,7 @@ jobs:
           experimental: false
         - mongodb: '4.0'
           ruby: ruby-2.6
-          topology: server
+          topology: standalone
           os: ubuntu-18.04
           task: test
           driver: current
@@ -110,7 +110,7 @@ jobs:
           experimental: false
         - mongodb: '3.6'
           ruby: ruby-2.5
-          topology: server
+          topology: standalone
           os: ubuntu-18.04
           task: test
           driver: current
@@ -170,7 +170,7 @@ jobs:
           experimental: false
         - mongodb: '3.6'
           ruby: ruby-2.5
-          topology: server
+          topology: standalone
           os: ubuntu-18.04
           task: test
           driver: min
@@ -180,7 +180,7 @@ jobs:
           experimental: false
         - mongodb: '5.0'
           ruby: ruby-3.0
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
@@ -190,7 +190,7 @@ jobs:
           experimental: false
         - mongodb: '4.0'
           ruby: ruby-2.7
-          topology: server
+          topology: standalone
           os: ubuntu-18.04
           task: test
           driver: current
@@ -200,7 +200,7 @@ jobs:
           experimental: false
         - mongodb: '4.0'
           ruby: ruby-2.7
-          topology: server
+          topology: standalone
           os: ubuntu-18.04
           task: test
           driver: current
@@ -210,7 +210,7 @@ jobs:
           experimental: false
         - mongodb: '4.4'
           ruby: ruby-2.5
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
@@ -220,7 +220,7 @@ jobs:
           experimental: false
         - mongodb: '4.2'
           ruby: ruby-2.6
-          topology: server
+          topology: standalone
           os: ubuntu-18.04
           task: test
           driver: current
@@ -230,7 +230,7 @@ jobs:
           experimental: false
         - mongodb: '4.2'
           ruby: ruby-2.6
-          topology: server
+          topology: standalone
           os: ubuntu-18.04
           task: test
           driver: current
@@ -240,7 +240,7 @@ jobs:
           experimental: false
         - mongodb: '5.0'
           ruby: ruby-2.7
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
@@ -250,7 +250,7 @@ jobs:
           experimental: false
         - mongodb: '5.0'
           ruby: ruby-2.7
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
@@ -260,7 +260,7 @@ jobs:
           experimental: false
         - mongodb: '5.0'
           ruby: jruby-9.2
-          topology: server
+          topology: standalone
           os: ubuntu-20.04
           task: test
           driver: current
