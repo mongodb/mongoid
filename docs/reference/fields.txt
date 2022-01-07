@@ -430,6 +430,15 @@ a ``BSON::Decimal128``:
   retrieving ``BSON::Decimal128`` values using the ``BigDecimal`` field type
   may result in a loss of precision.
 
+There is an additional caveat when storing a ``BigDecimal`` in a field with no
+type (i.e. a dynamically typed field) and ``Mongoid.map_big_decimal_to_decimal128``
+is false. In this case, the ``BigDecimal`` is stored as a string, and since a
+dynamic field is being used, querying for that field with a ``BigDecimal`` will
+not find the string for that ``BigDecimal``, since the query is looking for a
+``BigDecimal``. In order to query for that string, the ``BigDecimal`` must
+first be converted to a string with ``to_s``. Note that this is not a problem
+when the field has type ``BigDecimal``.
+
 If you wish to avoid using ``BigDecimal`` altogether, you can set the field
 type to ``BSON::Decimal128``. This will allow you to keep track of trailing
 zeroes and signed ``NaN`` values.
