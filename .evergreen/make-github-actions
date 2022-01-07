@@ -10,6 +10,7 @@
 # topologies.
 
 require 'fileutils'
+require 'active_support'
 require 'active_support/dependencies/autoload'
 require 'active_support/core_ext'
 require 'yaml'
@@ -245,7 +246,7 @@ class Transmogrifier
 
   def step_mongodb
     {
-      id: "start-mongodb"
+      id: "start-mongodb",
       name: "start mongodb",
       uses: "mongodb-labs/drivers-evergreen-tools@master",
       with: {
