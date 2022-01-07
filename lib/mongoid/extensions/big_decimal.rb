@@ -50,10 +50,10 @@ module Mongoid
         #
         # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
         def demongoize(object)
-          if object
+          unless object.nil?
             if object.is_a?(BSON::Decimal128)
               object.to_big_decimal
-            elsif object.numeric?
+            else
               BigDecimal(object.to_s)
             end
           end
@@ -68,12 +68,16 @@ module Mongoid
         #
         # @return [ String, nil ] A String representing the object or nil.
         def mongoize(object)
-          if object
-            if Mongoid.map_big_decimal_to_decimal128
+          unless object.nil?
+            if object.is_a?(BSON::Decimal128)
+              object
+            elsif Mongoid.map_big_decimal_to_decimal128
               if object.is_a?(BigDecimal)
                 BSON::Decimal128.new(object)
               elsif object.numeric?
                 BSON::Decimal128.new(object.to_s)
+              else
+                object
               end
             elsif object.numeric?
               object.to_s

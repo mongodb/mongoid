@@ -10,6 +10,13 @@ describe Mongoid::Extensions::BigDecimal do
 
   context 'when map_big_decimal_to_decimal128 is false' do
 
+    around do |example|
+      current = Mongoid.map_big_decimal_to_decimal128
+      Mongoid.map_big_decimal_to_decimal128 = false
+      example.run
+      Mongoid.map_big_decimal_to_decimal128 = current
+    end
+
     describe ".demongoize" do
 
       let(:demongoized) do
@@ -253,7 +260,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns the String" do
-          expect(mongoized).to eq value
+          expect(mongoized).to eq(value)
         end
       end
 
@@ -264,7 +271,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns the String" do
-          expect(mongoized).to eq value
+          expect(mongoized).to eq(value)
         end
       end
 
@@ -450,12 +457,11 @@ describe Mongoid::Extensions::BigDecimal do
 
   context 'when map_big_decimal_to_decimal128 is true' do
 
-    before do
+    around do |example|
+      current = Mongoid.map_big_decimal_to_decimal128
       Mongoid.map_big_decimal_to_decimal128 = true
-    end
-
-    after do
-      Mongoid.map_big_decimal_to_decimal128 = false
+      example.run
+      Mongoid.map_big_decimal_to_decimal128 = current
     end
 
     describe ".demongoize" do
