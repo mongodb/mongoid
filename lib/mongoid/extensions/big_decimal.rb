@@ -53,7 +53,7 @@ module Mongoid
           unless object.nil?
             if object.is_a?(BSON::Decimal128)
               object.to_big_decimal
-            else
+            elsif object.numeric?
               BigDecimal(object.to_s)
             end
           end
