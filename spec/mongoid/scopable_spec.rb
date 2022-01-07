@@ -1126,6 +1126,26 @@ describe Mongoid::Scopable do
         expect(Mongoid::Threaded.current_scope(Band)).to be_nil
       end
     end
+
+    context 'when nesting with_scope calls' do
+      let(:c1) { Band.where(active: true) }
+      let(:c2) { Band.where(active: false) }
+
+      it 'restores previous scope' do
+        Band.with_scope(c1) do |crit|
+          Band.with_scope(c2) do |crit2|
+            Mongoid::Threaded.current_scope(Band).selector.should == {
+              'active' => true,
+              '$and' => ['active' => false],
+            }
+          end
+
+          Mongoid::Threaded.current_scope(Band).selector.should == {
+            'active' => true,
+          }
+        end
+      end
+    end
   end
 
   describe ".without_default_scope" do

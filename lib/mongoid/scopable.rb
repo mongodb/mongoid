@@ -203,11 +203,12 @@ module Mongoid
       #
       # @return [ Criteria ] The yielded criteria.
       def with_scope(criteria)
+        previous = Threaded.current_scope(self)
         Threaded.set_current_scope(criteria, self)
         begin
           yield criteria
         ensure
-          Threaded.set_current_scope(nil, self)
+          Threaded.set_current_scope(previous, self)
         end
       end
 
