@@ -3473,6 +3473,34 @@ describe Mongoid::Criteria do
             expect(from_db).to eq(band)
           end
         end
+
+        context 'when map_big_decimal_to_decimal128 was false and is now true' do
+
+          around do |example|
+            current = Mongoid.map_big_decimal_to_decimal128
+            Mongoid.map_big_decimal_to_decimal128 = false
+            example.run
+            Mongoid.map_big_decimal_to_decimal128 = current
+          end
+
+          let(:sales) do
+            BigDecimal('0.1')
+          end
+
+          let!(:band) do
+            Mongoid.map_big_decimal_to_decimal128 = false
+            Band.create!(name: "Boards of Canada", sales: sales)
+          end
+
+          let(:from_db) do
+            Mongoid.map_big_decimal_to_decimal128 = true
+            Band.where(sales: sales.to_s).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
+        end
       end
 
       context "when querying on a big decimal from a dynamic field" do
