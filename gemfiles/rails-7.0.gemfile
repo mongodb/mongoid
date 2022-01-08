@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gem 'actionpack', '~> 7.0'
+gem 'activemodel', '~> 7.0'
+
+gemspec path: '..'
+
+require_relative './standard'
+
+standard_dependencies
