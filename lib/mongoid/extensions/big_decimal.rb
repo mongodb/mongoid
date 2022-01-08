@@ -77,7 +77,7 @@ module Mongoid
               elsif object.numeric?
                 BSON::Decimal128.new(object.to_s)
               else
-                object
+                object.mongoize
               end
             elsif object.numeric?
               object.to_s
