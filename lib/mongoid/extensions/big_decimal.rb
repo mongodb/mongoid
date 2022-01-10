@@ -59,14 +59,15 @@ module Mongoid
           end
         end
 
-        # Mongoize an object of any type to how it's stored in the db as a String.
+        # Mongoize an object of any type to how it's stored in the db.
         #
         # @example Mongoize the object.
         #   BigDecimal.mongoize(123)
         #
         # @param [ Object ] object The object to Mongoize
         #
-        # @return [ String, nil ] A String representing the object or nil.
+        # @return [ String | BSON::Decimal128 | nil ] A String or Decimal128
+        #   representing the object or nil.
         def mongoize(object)
           unless object.nil?
             if object.is_a?(BSON::Decimal128)
