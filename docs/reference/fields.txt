@@ -401,8 +401,8 @@ BigDecimal Fields
 
 The ``BigDecimal`` field type is used to store numbers with increased precision.
 
-The ``BigDecimal`` field type stores its values in two different ways under the
-hood, depending on the value of the ``Mongoid.map_big_decimal_to_decimal128``
+The ``BigDecimal`` field type stores its values in two different ways in the
+database, depending on the value of the ``Mongoid.map_big_decimal_to_decimal128``
 global config option. If this flag is set to false (which is the default),
 the ``BigDecimal`` field will be stored as a string, otherwise it will be stored
 as a ``BSON::Decimal128``.
