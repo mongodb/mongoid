@@ -450,7 +450,7 @@ global config option will be defaulted to ``true``. When this flag is turned on,
 ``BigDecimal`` values in queries will not match to the strings that are already
 stored in the database; they will only match to ``decimal128`` values that are
 in the database. If you have a ``BigDecimal`` field that is backed by strings,
-you have two options:
+you have three options:
 
 1. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
    set to ``false``, and you can continue storing your ``BigDecimal`` values as
