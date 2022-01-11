@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version     = ">= 2.5"
   s.required_rubygems_version = ">= 1.3.6"
 
-  # ActiveModel 6.0 requires Ruby 3.0 or higher.
+  # Ruby 3.0 requires ActiveModel 6.0 or higher.
   # activemodel 7.0.0 cannot be used due to Class#descendants issue
   # See: https://github.com/rails/rails/pull/43951
   s.add_dependency("activemodel", ['>=5.1', '<7.1', '!= 7.0.0'])
