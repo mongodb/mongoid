@@ -208,7 +208,7 @@ module Mongoid
       # Stores the provided block to be run when the option name specified is
       # defined on a field.
       #
-      # No assumptions are made about what sort of work the handler might
+      # No assumptions are made about what functionality the handler might
       # perform, so it will always be called if the `option_name` key is
       # provided in the field definition -- even if it is false or nil.
       #
