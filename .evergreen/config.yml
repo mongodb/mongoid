@@ -492,6 +492,10 @@ axes:
         display_name: "Driver-min (JRuby)"
         variables:
           DRIVER: "min-jruby"
+      - id: bson-min
+        display_name: "BSON-min"
+        variables:
+          DRIVER: "bson-min"
   - id: "rails"
     display_name: Rails Version
     values:
@@ -663,7 +667,19 @@ buildvariants:
   run_on:
     - rhel70-small
   tasks:
-     - name: "test"
+    - name: "test"
+
+- matrix_name: "bson-min"
+  matrix_spec:
+    driver: [bson-min]
+    ruby: ["ruby-2.7"]
+    mongodb-version: "5.0"
+    topology: "standalone"
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1604-small
+  tasks:
+    - name: "test"
 
 - matrix_name: "rails-6"
   matrix_spec:
