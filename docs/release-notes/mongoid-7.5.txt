@@ -18,10 +18,10 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
-Order of Callbacks Invocation
------------------------------
+Order of Callback Invocation
+----------------------------
 
-**Breaking change:** Mongoid 7.5 changes order of _create and _save callbacks
+**Breaking change:** Mongoid 7.5 changes the order of _create and _save callback
 invocation for documents with associations.
 
 Referenced associations (``has_one`` and ``has_many``):
@@ -119,12 +119,11 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
 +---------------------------------------+---------------------------------------+
 
 
-``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Ditry``
+``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
 --------------------------------------------------------------------------
 
 When updating documents, it is now possible to get updated attribute values
-in ``after_*`` callbacks. This is following with ActiveRecord/ActiveModel
-behavior.
+in ``after_*`` callbacks. This follows ActiveRecord/ActiveModel behavior.
 
 .. code-block:: ruby
 
@@ -158,5 +157,5 @@ Mongoid 7.4 output:
   #<Cat _id: 60aef1652c97a617438dc9bb, age: 2>
   nil
 
-Notice that in 7.4 ``attribute_was(:age)`` returns an old attribute value,
-while in 7.5 ``attribute_was(:age)`` returns the new values,
+Notice that in 7.4 ``attribute_was(:age)`` returns the old attribute value,
+while in 7.5 ``attribute_was(:age)`` returns the new value.

@@ -18,12 +18,16 @@ Field Definition
 Field Types
 ===========
 
-Even though MongoDB is a schemaless database and allows data to be stored
-as strings, Mongoid permits the application to declare the type of data
-stored in the various fields of a document. Field type declarations affect
-the following:
+MongoDB stores underlying document data using
+`BSON types <https://docs.mongodb.com/manual/reference/bson-types/>`_, and
+Mongoid converts BSON types to Ruby types at runtime in your application.
+For example, a field defined with `type: :float` will use the Ruby ``Float``
+class in-memory and will persist in the database as the the BSON ``double`` type.
 
-1. When assigning values to fields, the values are converted to the
+Field type definitions determine how Mongoid behaves when constructing queries
+and retrieving/writing fields from/to the database. Specifically:
+
+1. When assigning values to fields at runtime, the values are converted to the
 specified type.
 
 2. When persisting data to MongoDB, the data is sent in an appropriate
@@ -36,9 +40,7 @@ type before being sent to MongoDB.
 4. When retrieving documents from the database, field values are converted
 to the specified type.
 
-Field type definitions determine how Mongoid behaves when constructing the
-queries, retrieving and writing fields from the database. Changing the field
-definitions in a model class does not alter data already stored in
+Changing the field definitions in a model class does not alter data already stored in
 MongoDB. To update type or contents of fields of existing documents,
 the field must be re-saved to the database. Note that, due to Mongoid
 tracking which attributes on a model change and only saving the changed ones,
@@ -46,16 +48,16 @@ it may be necessary to explicitly write a field value when changing the
 type of an existing field without changing the stored values.
 
 Consider a simple class for modeling a person in an application. A person may
-have a first name, last name, and middle name. We can define these attributes
+have a name, date_of_birth, and weight. We can define these attributes
 on a person by using the ``field`` macro.
 
 .. code-block:: ruby
 
    class Person
      include Mongoid::Document
-     field :first_name, type: String
-     field :middle_name, type: String
-     field :last_name, type: String
+     field :name, type: String
+     field :date_of_birth, type: Date
+     field :weight, type: Float
    end
 
 Below is a list of valid types for fields.
@@ -78,6 +80,14 @@ Below is a list of valid types for fields.
 - ``Symbol``
 - ``Time``
 - ``TimeWithZone``
+
+To define custom field types, refer to :ref:`Custom Field Types <custom-field-types>` below.
+
+
+.. _omitting-field-type-definition:
+
+Omitting Field Type Definition
+------------------------------
 
 If you decide not to specify the type of field with the definition, Mongoid will treat
 it as an object and not try to typecast it when sending the values to the database.
@@ -105,15 +115,15 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 - ``Range``
 
 
-.. _stringified-symbol:
+.. _field-type-stringified-symbol:
 
-The StringifiedSymbol Type
---------------------------
+Field Type: StringifiedSymbol
+-----------------------------
 
 The ``StringifiedSymbol`` field type is the recommended field type for storing
 values that should be exposed as symbols to Ruby applications. When using the ``Symbol`` field type,
 Mongoid defaults to storing values as BSON symbols. For more information on the
-BSON symbol type, see :ref:`here <bson-symbol>`.
+BSON symbol type, see :ref:`here <field-type-symbol>`.
 However, the BSON symbol type is deprecated and is difficult to work with in programming languages
 without native symbol types, so the ``StringifiedSymbol`` type allows the use of symbols
 while ensuring interoperability with other drivers. The ``StringifiedSymbol`` type stores all data
@@ -159,12 +169,12 @@ migration from fields that currently store either strings or BSON symbols in the
 ``StringifiedSymbol`` field type.
 
 
-.. _bson-symbol:
+.. _field-type-symbol:
 
-BSON Symbol Type
-----------------
+Field Type: Symbol
+------------------
 
-New applications should use the :ref:`StringifiedSymbol field type <stringified-symbol>`
+New applications should use the :ref:`StringifiedSymbol field type <field-type-stringified-symbol>`
 to store Ruby symbols in the database. The ``StringifiedSymbol`` field type
 provides maximum compatibility with other applications and programming languages
 and has the same behavior in all circumstances.
@@ -190,8 +200,10 @@ snippet in your project:
   end
 
 
-Hash Fields
------------
+.. _field-type-hash:
+
+Field Type: Hash
+----------------
 
 When using a field of type Hash, be wary of adhering to the
 `legal key names for mongoDB <http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>`_,
@@ -220,8 +232,10 @@ or else the values will not store properly.
    end
 
 
-Time Fields
------------
+.. _field-type-time:
+
+Field Type: Time
+----------------
 
 ``Time`` fields store values as ``Time`` instances in the :ref:`configured
 time zone <time-zones>`.
@@ -244,8 +258,10 @@ In the above example, the value was interpreted as the beginning of today in
 local time, because the application was not configured to use UTC times.
 
 
-Date Fields
------------
+.. _field-type-date:
+
+Field Type: Date
+----------------
 
 Mongoid allows assignment of values of several types to ``Date`` fields:
 
@@ -267,8 +283,11 @@ recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
 
-DateTime Fields
----------------
+
+.. _field-type-date-time:
+
+Field Type: DateTime
+---------------------
 
 MongoDB stores all times as UTC timestamps. When assigning a value to a
 ``DateTime`` field, or when querying a ``DateTime`` field, Mongoid
@@ -334,13 +353,13 @@ If a time zone is specified, it is respected:
     # => Sun, 04 Mar 2018 09:00:00 +0000
 
 
-.. _regular-expression-fields:
+.. _field-type-regexp:
 
-Regular Expression Fields
--------------------------
+Field Type: Regexp
+------------------
 
 MongoDB supports storing regular expressions in documents, and querying using
-regular expressions. Of note for Ruby applications, MongoDB uses
+regular expressions. Note that MongoDB uses
 `Perl-compatible regular expressions (PCRE) <http://pcre.org/>`_
 and Ruby uses `Onigmo <https://github.com/k-takata/Onigmo>`_, which is a
 fork of `Oniguruma regular expression engine <https://github.com/kkos/oniguruma>`_.
@@ -398,8 +417,10 @@ This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
 
 
-Defaults
---------
+.. _field-default-values:
+
+Specifying Field Default Values
+-------------------------------
 
 A field can be configured to have a default value. The default value can be
 fixed, as in the following example:
@@ -589,7 +610,7 @@ To define the field anyway, use the ``overwrite: true`` option:
 
 .. _custom-id:
 
-Custom Ids
+Custom IDs
 ----------
 
 By default, Mongoid defines the ``_id`` field on documents to contain a
@@ -642,16 +663,20 @@ alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
 
 
+.. _customizing-field-behavior:
+
 Customizing Field Behavior
 ==========================
 
-Mongoid offers several options for customizing the behavior of fields.
+Mongoid offers several ways to customize the behavior of fields.
 
+
+.. _custom-getters-and-setters:
 
 Custom Getters And Setters
 --------------------------
 
-You can define custom getters and setters for fields to modify the values
+You may override getters and setters for fields to modify the values
 when they are being accessed or written. The getters and setters use the
 same name as the field. Use ``read_attribute`` and ``write_attribute``
 methods inside the getters and setters to operate on the raw attribute
@@ -709,12 +734,14 @@ may be implemented as follows:
   # => {"_id"=>BSON::ObjectId('613fa15aa15d5d617216104c'), "value"=>2.0, "unit"=>nil}
 
 
+.. _custom-field-types:
+
 Custom Field Types
 ------------------
 
 You can define custom types in Mongoid and determine how they are serialized
-and deserialized. You simply need to provide three methods on it for Mongoid
-to call to convert your object to and from MongoDB friendly values.
+and deserialized. In this example, we define a new field type ``Point``, which we
+can use in our model class as follows:
 
 .. code-block:: ruby
 
@@ -722,6 +749,11 @@ to call to convert your object to and from MongoDB friendly values.
     include Mongoid::Document
     field :location, type: Point
   end
+
+Then make a Ruby class to represent the type. This class must define methods
+used for MongoDB serialization and deserialization as follows:
+
+.. code-block:: ruby
 
   class Point
 
@@ -732,17 +764,12 @@ to call to convert your object to and from MongoDB friendly values.
     end
 
     # Converts an object of this instance into a database friendly value.
+    # In this example, we store the values in the database as array.
     def mongoize
       [ x, y ]
     end
 
     class << self
-
-      # Get the object as it was stored in the database, and instantiate
-      # this custom class from it.
-      def demongoize(object)
-        Point.new(object[0], object[1])
-      end
 
       # Takes any possible object and converts it to how it would be
       # stored in the database.
@@ -754,8 +781,14 @@ to call to convert your object to and from MongoDB friendly values.
         end
       end
 
+      # Get the object as it was stored in the database, and instantiate
+      # this custom class from it.
+      def demongoize(object)
+        Point.new(object[0], object[1])
+      end
+
       # Converts the object that was supplied to a criteria and converts it
-      # into a database friendly form.
+      # into a query-friendly form.
       def evolve(object)
         case object
         when Point then object.mongoize
@@ -765,42 +798,69 @@ to call to convert your object to and from MongoDB friendly values.
     end
   end
 
-The instance method ``mongoize`` takes an instance of your object, and
-converts it into how it will be stored in the database. In our example above,
-we want to store our point object as an array in the form ``[ x, y ]``.
+The instance method ``mongoize`` takes an instance of your custom type object, and
+converts it into a represenation of how it will be stored in the database, i.e. to pass
+to the MongoDB Ruby driver. In our example above, we want to store our ``Point``
+object as an ``Array`` in the form ``[ x, y ]``.
 
-The class method ``demongoize`` takes an object as how it was stored in the
-database, and is responsible for instantiating an object of your custom type.
-In this case, we take an array and instantiate a ``Point`` from it.
-
-The class method ``mongoize`` takes an object that you would use to set on
-your model from your application code, and create the object as it would be
-stored in the database. This is for cases where you are not passing your
-model instances of your custom type in the setter:
+The class method ``mongoize`` is similar to the instance method, however it must handle
+objects of all possible types as inputs. The ``mongoize`` method is used when calling the
+setter methods for fields of your custom type.
 
 .. code-block:: ruby
 
    point = Point.new(12, 24)
-   venue = Venue.new(location: point) # This uses the mongoize instance method.
-   venue = Venue.new(location: [ 12, 24 ]) # This uses the mongoize class method.
+   venue = Venue.new(location: point) # This uses the Point#mongoize instance method.
+   venue = Venue.new(location: [ 12, 24 ]) # This uses the Point.mongoize class method.
 
-The class method ``evolve`` takes an object, and determines how it is to be
-transformed for use in criteria. For example we may want to write a query
-like so:
+The class method ``demongoize`` does the inverse of ``mongoize``. It takes the raw object
+from the MongoDB Ruby driver and converts it to an instance of your custom type.
+In this case, the database driver returns an ``Array`` and we instantiate a ``Point`` from it.
+The ``demongoize`` method is used when calling the getters of fields for your custom type.
+Note that in the example above, since ``demongoize`` calls ``Point.new``, a new instance of
+``Point`` will be generated on each call to the getter.
+
+Lastly, the class method ``evolve`` is similar to ``mongoize``, however it is used
+when transforming objects for use in Mongoid query criteria.
 
 .. code-block:: ruby
 
    point = Point.new(12, 24)
-   Venue.where(location: point)
+   Venue.where(location: point) # This uses Point.evolve
 
-Note that when accessing custom fields from the document, you will get a
-new instance of that object with each call to the getter. This is because
-Mongoid is generating a new object from the raw attributes on each access.
 
-We need the point object in the criteria to be transformed to a
-MongoDB-friendly value when it is not as well, ``evolve`` is the method
-that takes care of this. We check if the passed in object is a ``Point``
-first, in case we also want to be able to pass in ordinary arrays instead.
+.. _custom-field-options:
+
+Custom Field Options
+--------------------
+
+You may define custom options for the ``field`` macro function
+which extend its behavior at the your time model classes are loaded.
+
+As an example, we will define a ``:required`` option which will add a presence
+validator for the field. First, declare the new field option in an initializer,
+specifiying its handler function as a block:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid_custom_fields.rb
+
+  Mongoid::Fields.option :required do |model, field, value|
+    model.validates_presence_of field if value
+  end
+
+Then, use it your model class:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :name, type: String, required: true
+  end
+
+Note that the handler function will be invoked whenever the option is used
+in the field definition, even if the option's value is false or nil.
 
 
 .. _dynamic-fields:
