@@ -445,7 +445,7 @@ zeroes and signed ``NaN`` values.
 
 Migration to ``decimal128``-backed ``BigDecimal`` Field
 ```````````````````````````````````````````````````````
-In a future version of Mongoid, the ``Mongoid.map_big_decimal_to_decimal128``
+In a future major version of Mongoid, the ``Mongoid.map_big_decimal_to_decimal128``
 global config option will be defaulted to ``true``. When this flag is turned on,
 ``BigDecimal`` values in queries will not match to the strings that are already
 stored in the database; they will only match to ``decimal128`` values that are
