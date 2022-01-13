@@ -179,6 +179,46 @@ jobs:
           gemfile: gemfiles/driver_min.gemfile
           experimental: false
         - mongodb: '5.0'
+          ruby: ruby-3.1
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '7.0'
+          i18n:
+          gemfile: gemfiles/rails-7.0.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.1
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '6.1'
+          i18n:
+          gemfile: gemfiles/rails-6.1.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '7.0'
+          i18n:
+          gemfile: gemfiles/rails-7.0.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '6.1'
+          i18n:
+          gemfile: gemfiles/rails-6.1.gemfile
+          experimental: false
+        - mongodb: '5.0'
           ruby: ruby-3.0
           topology: server
           os: ubuntu-20.04
