@@ -109,7 +109,6 @@ You can safely omit type specifications when:
 
 Types that are not supported as dynamic attributes since they cannot be cast are:
 
-- ``BigDecimal``
 - ``Date``
 - ``DateTime``
 - ``Range``
@@ -247,10 +246,10 @@ assignment to a ``Time`` field:
 
   class Voter
     include Mongoid::Document
-    
+
     field :registered_at, type: Time
   end
-  
+
   Voter.new(registered_at: Date.today)
   # => #<Voter _id: 5fdd80392c97a618f07ba344, registered_at: 2020-12-18 05:00:00 UTC>
 
@@ -416,6 +415,107 @@ matches strings containing "hello" before a newline, besides strings ending in
 This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
 
+BigDecimal Fields
+-----------------
+
+The ``BigDecimal`` field type is used to store numbers with increased precision.
+
+The ``BigDecimal`` field type stores its values in two different ways in the
+database, depending on the value of the ``Mongoid.map_big_decimal_to_decimal128``
+global config option. If this flag is set to false (which is the default),
+the ``BigDecimal`` field will be stored as a string, otherwise it will be stored
+as a ``BSON::Decimal128``.
+
+The ``BigDecimal`` field type has some limitations when converting to and from
+a ``BSON::Decimal128``:
+
+- ``BSON::Decimal128`` has a limited range and precision, while ``BigDecimal``
+  has no restrictions in terms of range and precision. ``BSON::Decimal128`` has
+  a max value of approximately ``10^6145`` and a min value of approximately
+  ``-10^6145``, and has a maximum of 34 bits of precision. When attempting to
+  store values that don't fit into a ``BSON::Decimal128``, it is recommended to
+  have them stored as a string instead of a ``BSON::Decimal128``. You can do
+  that by setting ``Mongoid.map_big_decimal_to_decimal128`` to ``false``. If a
+  value that does not fit in a ``BSON::Decimal128`` is attempted to be stored
+  as one, an error will be raised.
+
+- ``BSON::Decimal128`` is able to accept signed ``NaN`` values, while
+  ``BigDecimal`` is not. When retrieving signed ``NaN`` values from
+  the database using the ``BigDecimal`` field type, the ``NaN`` will be
+  unsigned.
+
+- ``BSON::Decimal128`` maintains trailing zeroes when stored in the database.
+  ``BigDecimal``, however, does not maintain trailing zeroes, and therefore
+  retrieving ``BSON::Decimal128`` values using the ``BigDecimal`` field type
+  may result in a loss of precision.
+
+There is an additional caveat when storing a ``BigDecimal`` in a field with no
+type (i.e. a dynamically typed field) and ``Mongoid.map_big_decimal_to_decimal128``
+is ``false``. In this case, the ``BigDecimal`` is stored as a string, and since a
+dynamic field is being used, querying for that field with a ``BigDecimal`` will
+not find the string for that ``BigDecimal``, since the query is looking for a
+``BigDecimal``. In order to query for that string, the ``BigDecimal`` must
+first be converted to a string with ``to_s``. Note that this is not a problem
+when the field has type ``BigDecimal``.
+
+If you wish to avoid using ``BigDecimal`` altogether, you can set the field
+type to ``BSON::Decimal128``. This will allow you to keep track of trailing
+zeroes and signed ``NaN`` values.
+
+Migration to ``decimal128``-backed ``BigDecimal`` Field
+```````````````````````````````````````````````````````
+In a future major version of Mongoid, the ``Mongoid.map_big_decimal_to_decimal128``
+global config option will be defaulted to ``true``. When this flag is turned on,
+``BigDecimal`` values in queries will not match to the strings that are already
+stored in the database; they will only match to ``decimal128`` values that are
+in the database. If you have a ``BigDecimal`` field that is backed by strings,
+you have three options:
+
+1. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
+   set to ``false``, and you can continue storing your ``BigDecimal`` values as
+   strings. Note that you are surrendering the advantages of storing ``BigDecimal``
+   values as a ``decimal128``, like being able to do queries and aggregations
+   based on the numerical value of the field.
+
+2. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
+   set to ``true``, and you can convert all values for that field from strings to
+   ``decimal128`` values in the database. You should do this conversion before
+   setting the global config option to true. An example query to accomplish this
+   is as follows:
+
+   .. code-block:: javascript
+
+      db.bands.updateMany({
+        "field": { "$exists": true }
+      }, [
+        {
+          "$set": {
+            "field": { "$toDecimal": "$field" }
+          }
+        }
+      ])
+
+   This query updates all documents that have the given field, setting that
+   field to its corresponding ``decimal128`` value. Note that this query only
+   works in MongoDB 4.2+.
+
+3. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
+   set to ``true``, and you can have both strings and ``decimal128`` values for
+   that field. This way, only ``decimal128`` values will be inserted into and
+   updated to the database going forward. Note that you still don't get the
+   full advantages of using only ``decimal128`` values, but your dataset is
+   slowly migrating to all ``decimal128`` values, as old string values are
+   updated to ``decimal128`` and new ``decimal128`` values are added. With this
+   setup, you can still query for ``BigDecimal`` values as follows:
+
+   .. code-block:: ruby
+
+      Mongoid.map_big_decimal_to_decimal128 = true
+      big_decimal = BigDecimal('2E9')
+      Band.in(sales: [big_decimal, big_decimal.to_s]).to_a
+
+   This query will find all values that are either a ``decimal128`` value or
+   a string that match that value.
 
 .. _field-default-values:
 
@@ -524,17 +624,17 @@ from the aliased field:
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
     alias_attribute :n, :name
   end
-  
+
   band = Band.new(n: 'Astral Projection')
   # => #<Band _id: 5fc1c1ee2c97a64accbeb5e1, name: "Astral Projection">
-  
+
   band.attributes
   # => {"_id"=>BSON::ObjectId('5fc1c1ee2c97a64accbeb5e1'), "name"=>"Astral Projection"}
-  
+
   band.n
   # => "Astral Projection"
 
@@ -559,11 +659,11 @@ This is useful for storing different values in ``id`` and ``_id`` fields:
 
   class Band
     include Mongoid::Document
-    
+
     unalias_attribute :id
     field :id, type: String
   end
-  
+
   Band.new(id: '42')
   # => #<Band _id: 5fc1c3f42c97a6590684046c, id: "42">
 
@@ -691,19 +791,19 @@ getter as follows:
 
   class DistanceMeasurement
     include Mongoid::Document
-    
+
     field :value, type: Float
     field :unit, type: String
-    
+
     def unit
       read_attribute(:unit) || "m"
     end
-    
+
     def to_s
       "#{value} #{unit}"
     end
   end
-  
+
   measurement = DistanceMeasurement.new(value: 2)
   measurement.to_s
   # => "2.0 m"
@@ -717,10 +817,10 @@ may be implemented as follows:
 
   class DistanceMeasurement
     include Mongoid::Document
-    
+
     field :value, type: Float
     field :unit, type: String
-    
+
     def unit=(value)
       if value.blank?
         value = nil
@@ -728,7 +828,7 @@ may be implemented as follows:
       write_attribute(:unit, value)
     end
   end
-  
+
   measurement = DistanceMeasurement.new(value: 2, unit: "")
   measurement.attributes
   # => {"_id"=>BSON::ObjectId('613fa15aa15d5d617216104c'), "value"=>2.0, "unit"=>nil}
