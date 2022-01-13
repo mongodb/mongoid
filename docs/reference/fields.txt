@@ -460,7 +460,8 @@ you have three options:
 
 2. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
    set to ``true``, and you can convert all values for that field from strings to
-   ``decimal128`` values in the database. An example query to accomplish this
+   ``decimal128`` values in the database. You should do this conversion before
+   setting the global config option to true. An example query to accomplish this
    is as follows:
 
    .. code-block:: javascript
