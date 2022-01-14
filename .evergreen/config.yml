@@ -671,7 +671,7 @@ buildvariants:
 
 - matrix_name: "bson-min"
   matrix_spec:
-    driver: [bson-min]
+    driver: [min]
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
     topology: "standalone"
