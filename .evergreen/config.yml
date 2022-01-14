@@ -671,13 +671,13 @@ buildvariants:
 
 - matrix_name: "bson-min"
   matrix_spec:
-    driver: [min]
+    driver: [bson-min]
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-small
+    - ubuntu1804-small
   tasks:
     - name: "test"
 
