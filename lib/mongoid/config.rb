@@ -74,6 +74,9 @@ module Mongoid
     # Return stored times as UTC.
     option :use_utc, default: false
 
+    # Store BigDecimals as Decimal128s instead of strings in the db.
+    option :map_big_decimal_to_decimal128, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

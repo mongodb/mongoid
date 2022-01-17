@@ -66,6 +66,9 @@ elif test "$DRIVER" = "oldstable"; then
 elif test "$DRIVER" = "min"; then
   bundle install --gemfile=gemfiles/driver_min.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_min.gemfile
+elif test "$DRIVER" = "bson-min"; then
+  bundle install --gemfile=gemfiles/bson_min.gemfile
+  BUNDLE_GEMFILE=gemfiles/bson_min.gemfile
 elif test "$DRIVER" = "stable-jruby"; then
   bundle install --gemfile=gemfiles/driver_stable_jruby.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_stable_jruby.gemfile
@@ -104,7 +107,7 @@ elif test -n "$APP_TESTS"; then
   bash $HOME/n stable
   export PATH=$HOME/.n/bin:$PATH
   npm -g install yarn
-  
+
   bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake ci
