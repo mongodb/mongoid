@@ -3,6 +3,7 @@
 class Band
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
+
   field :name, type: String
   field :active, type: Mongoid::Boolean, default: true
   field :origin, type: String
@@ -19,12 +20,16 @@ class Band
   field :y, as: :years, type: Integer
   field :founded, type: Date
   field :deleted, type: Boolean
+  field :fans
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
   embeds_many :labels
   embeds_one :label, cascade_callbacks: true
 
+  scope :highly_rated, -> { gte(rating: 7) }
+
+  has_many :artists
   has_many :same_name, class_name: 'Agent', inverse_of: :same_name
 
   after_upsert do |doc|

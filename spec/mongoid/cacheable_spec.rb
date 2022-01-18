@@ -37,7 +37,7 @@ describe Mongoid::Cacheable do
     context "when persisted" do
 
       before do
-        document.save
+        document.save!
       end
 
       context "with updated_at" do

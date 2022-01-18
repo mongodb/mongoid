@@ -116,6 +116,10 @@ Mongoid Configuration Options
 The following annotated example ``mongoid.yml`` demonstrates how Mongoid
 can be configured.
 
+Mongoid delegates to the Ruby driver for client configuration. Please review
+`the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/>`_
+for details on driver options.
+
 .. code-block:: yaml
 
   development:
@@ -139,7 +143,7 @@ can be configured.
           - myhost3.mydomain.com:27017
         options:
           # These options are Ruby driver options, documented in
-          # https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/
+          # https://docs.mongodb.com/ruby-driver/current/reference/create-client/
 
           # Change the default write concern. (default = { w: 1 })
           write:
@@ -163,12 +167,20 @@ can be configured.
           roles:
             - 'dbOwner'
 
-          # Change the default authentication mechanism. Valid options are: :scram,
-          # :mongodb_cr, :mongodb_x509, and :plain. (default on 3.0 is :scram, default
-          # on 2.4 and 2.6 is :plain)
+          # Change the default authentication mechanism. Please see the
+          # driver documentation linked above for details on how to configure
+          # authentication. Valid options are :aws, :gssapi, :mongodb_cr,
+          # :mongodb_x509, :plain, :scram and :scram256 (default on 3.0
+          # and higher servers is :scram, default on 2.6 servers is :plain)
           auth_mech: :scram
 
-          # The database or source to authenticate the user against. (default: admin)
+          # Specify the auth source, i.e. the database or other source which
+          # contains the user's login credentials. Allowed values for auth source
+          # depend on the authentication mechanism, as explained in the server documentation:
+          # https://docs.mongodb.com/manual/reference/connection-string/#mongodb-urioption-urioption.authSource
+          # If no auth source is specified, the default auth source as
+          # determined by the driver will be used. Please refer to:
+          # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
           auth_source: admin
 
           # Force the driver to connect in a specific way instead of auto-
@@ -268,6 +280,10 @@ can be configured.
       # Ruby on Rails logger instance. (default: :info)
       log_level: :info
 
+      # When using the BigDecimal field type, store the value in the database
+      # as a BSON::Decimal128 instead of a string. (default: false)
+      map_big_decimal_to_decimal128: false
+
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
       preload_models: false
@@ -289,9 +305,6 @@ can be configured.
       # further information. Most applications should not use this option.
       # (default: false)
       use_utc: false
-
-The Ruby driver options may be found in
-`the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
 
 ERb Preprocessing
 =================
@@ -596,7 +609,7 @@ be executed sequentially during socket creation.
   in an application.
 
 For more information about TLS context hooks, including best practices for
-assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/#modifying-sslcontext>`_.
+assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/#modifying-sslcontext>`_.
 
 Usage with Forking Servers
 ==========================
@@ -697,13 +710,13 @@ Query Cache Middleware
 
 .. note::
 
-  When used with Ruby driver version 2.15 or newer, Mongoid's query cache
-  middleware delegates to :ref:`the driver's query cache middleware
+  When used with Ruby driver version 2.15 or newer, Mongoid's Query Cache
+  Middleware delegates to :ref:`the driver's Query Cache Middleware
   <driver:query-cache-middleware>`.
 
-Mongoid provides a Rack middleware which enables the :ref:`query cache
+Mongoid provides a Rack middleware which enables the :ref:`Query Cache
 <query-cache>` for the duration of each web request. Below is an example of
-how to enable the query cache middleware in a Ruby on Rails application:
+how to enable the Query Cache Middleware in a Ruby on Rails application:
 
 .. code-block:: ruby
 

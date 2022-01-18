@@ -44,7 +44,7 @@ describe Mongoid::Persistable::Settable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:date) do
@@ -108,11 +108,11 @@ describe Mongoid::Persistable::Settable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:address) do
-        person.addresses.create(street: "t")
+        person.addresses.create!(street: "t")
       end
 
       let(:date) do
@@ -140,7 +140,7 @@ describe Mongoid::Persistable::Settable do
       context 'when the field is a relation' do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:pet) do
@@ -170,7 +170,7 @@ describe Mongoid::Persistable::Settable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(title: "sir", age: 30)
+        Person.create!(title: "sir", age: 30)
       end
 
       it "marks a dirty change for the set fields" do
@@ -184,7 +184,7 @@ describe Mongoid::Persistable::Settable do
 
   context "when dynamic attributes are not enabled" do
     let(:account) do
-      Account.create
+      Account.create!(name: 'Foobar')
     end
 
     it "raises exception for an unknown attribute " do
@@ -196,7 +196,7 @@ describe Mongoid::Persistable::Settable do
 
   context "when dynamic attributes enabled" do
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     it "updates non existing attribute" do
@@ -207,7 +207,7 @@ describe Mongoid::Persistable::Settable do
 
   context "with an attribute with private setter" do
     let(:agent) do
-      Agent.create
+      Agent.create!
     end
 
     let(:title) do
@@ -461,7 +461,7 @@ describe Mongoid::Persistable::Settable do
   context 'when the field is not already set locally' do
 
     let(:church) do
-      Church.create
+      Church.create!
     end
 
     context 'when the field is a Hash type' do

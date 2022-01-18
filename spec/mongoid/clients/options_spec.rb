@@ -245,11 +245,11 @@ describe Mongoid::Clients::Options, retry: 3 do
             threads << Thread.new do
               if i % 2 == 0
                 NameOnly.with(collection: 'British') do |klass|
-                  klass.create(name: 'realised')
+                  klass.create!(name: 'realised')
                 end
               else
                 NameOnly.with(collection: 'American') do |klass|
-                  klass.create(name: 'realized')
+                  klass.create!(name: 'realized')
                 end
               end
             end
@@ -307,7 +307,7 @@ describe Mongoid::Clients::Options, retry: 3 do
       end
 
       let(:test_model) do
-        Minim.create
+        Minim.create!
       end
 
       let(:persistence_context) do
@@ -463,7 +463,7 @@ describe Mongoid::Clients::Options, retry: 3 do
         before do
           threads = []
           100.times do |i|
-            test_model = NameOnly.create
+            test_model = NameOnly.create!
             threads << Thread.new do
               if i % 2 == 0
                 test_model.with(collection: 'British') do |b|

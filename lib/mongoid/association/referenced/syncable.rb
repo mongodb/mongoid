@@ -67,8 +67,8 @@ module Mongoid
         #
         # @return [ Object ] The updated values.
         def update_inverse_keys(association)
-          if changes.has_key?(association.foreign_key)
-            old, new = changes[association.foreign_key]
+          if previous_changes.has_key?(association.foreign_key)
+            old, new = previous_changes[association.foreign_key]
             adds, subs = new - (old || []), (old || []) - new
 
             # If we are autosaving we don't want a duplicate to get added - the

@@ -57,7 +57,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       let(:person) do
-        Person.create(title: "sir", terms: true, aliased_timestamp: Time.at(42))
+        Person.create!(title: "sir", terms: true, aliased_timestamp: Time.at(42))
       end
 
       it "sets the first readonly value" do
@@ -92,20 +92,20 @@ describe Mongoid::Attributes::Readonly do
       end
 
       let(:person) do
-        Person.create(title: "sir", terms: true, score: 1, aliased_timestamp: Time.at(42))
+        Person.create!(title: "sir", terms: true, score: 1, aliased_timestamp: Time.at(42))
       end
 
       context "when updating via the setter" do
 
         it "does not update the first field" do
           person.title = 'mr'
-          person.save
+          person.save!
           expect(person.reload.title).to eq("sir")
         end
 
         it "does not update the second field" do
           person.aliased_timestamp = Time.at(43)
-          person.save
+          person.save!
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -116,7 +116,7 @@ describe Mongoid::Attributes::Readonly do
 
           it "updates the field" do
             person.inc(score: 1)
-            person.save
+            person.save!
             expect(person.reload.score).to eq(2)
           end
         end
@@ -125,7 +125,7 @@ describe Mongoid::Attributes::Readonly do
 
           it "updates the fields" do
             person.inc(score: 1, age: 1)
-            person.save
+            person.save!
             expect(person.reload.score).to eq(2)
             expect(person.reload.age).to eq(101)
           end
@@ -138,7 +138,7 @@ describe Mongoid::Attributes::Readonly do
 
           it "does the update" do
             person.bit(score: { or: 13 })
-            person.save
+            person.save!
             expect(person.reload.score).to eq(13)
           end
         end
@@ -147,7 +147,7 @@ describe Mongoid::Attributes::Readonly do
 
           it "updates the attribute" do
             person.bit(age: {and: 13}, score: {or: 13})
-            person.save
+            person.save!
             expect(person.reload.score).to eq(13)
             expect(person.reload.age).to eq(4)
           end
@@ -158,13 +158,13 @@ describe Mongoid::Attributes::Readonly do
 
         it "does not update the first field" do
           person[:title] = "mr"
-          person.save
+          person.save!
           expect(person.reload.title).to eq("sir")
         end
 
         it "does not update the second field" do
           person[:aliased_timestamp] = Time.at(43)
-          person.save
+          person.save!
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -173,13 +173,13 @@ describe Mongoid::Attributes::Readonly do
 
         it "does not update the first field" do
           person.write_attribute(:title, "mr")
-          person.save
+          person.save!
           expect(person.reload.title).to eq("sir")
         end
 
         it "does not update the second field" do
           person.write_attribute(:aliased_timestamp, Time.at(43))
-          person.save
+          person.save!
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -187,14 +187,14 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via update_attributes" do
 
         it "does not update the first field" do
-          person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
-          person.save
+          person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
+          person.save!
           expect(person.reload.title).to eq("sir")
         end
 
         it "does not update the second field" do
-          person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
-          person.save
+          person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
+          person.save!
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -203,13 +203,13 @@ describe Mongoid::Attributes::Readonly do
 
         it "does not update the first field" do
           person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
-          person.save
+          person.save!
           expect(person.reload.title).to eq("sir")
         end
 
         it "does not update the second field" do
           person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
-          person.save
+          person.save!
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -242,11 +242,11 @@ describe Mongoid::Attributes::Readonly do
       context 'when the relation exists' do
 
         let(:mother) do
-          Person.create
+          Person.create!
         end
 
         let(:child) do
-          Person.create(mother: mother)
+          Person.create!(mother: mother)
           Person.find_by(mother: mother)
         end
 
@@ -258,7 +258,7 @@ describe Mongoid::Attributes::Readonly do
       context 'when the relation does not exist' do
 
         let(:child) do
-          Person.create
+          Person.create!
         end
 
         it 'the relation is nil' do

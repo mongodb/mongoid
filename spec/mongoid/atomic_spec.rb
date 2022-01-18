@@ -7,15 +7,15 @@ describe Mongoid::Atomic do
   describe "#add_atomic_pull" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:address) do
-      person.addresses.create
+      person.addresses.create!
     end
 
     let(:location) do
-      address.locations.create
+      address.locations.create!
     end
 
     before do
@@ -59,7 +59,7 @@ describe Mongoid::Atomic do
     context "when the document is persisted" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the document is modified" do
@@ -111,7 +111,7 @@ describe Mongoid::Atomic do
         context "when an existing embeds many gets modified" do
 
           let!(:address) do
-            person.addresses.create(street: "Oxford St")
+            person.addresses.create!(street: "Oxford St")
           end
 
           before do
@@ -139,7 +139,7 @@ describe Mongoid::Atomic do
           context "when an existing 2nd level embedded child gets modified" do
 
             let!(:location) do
-              address.locations.create(name: "Home")
+              address.locations.create!(name: "Home")
             end
 
             before do

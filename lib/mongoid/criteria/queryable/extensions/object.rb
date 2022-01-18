@@ -165,7 +165,7 @@ module Mongoid
               when ::Array
                 object.map{ |obj| evolve(obj) }
               when ::Range
-                { "$gte" => evolve(object.min), "$lte" => evolve(object.max) }
+                object.__evolve_range__
               else
                 yield(object)
               end

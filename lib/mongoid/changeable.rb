@@ -28,8 +28,7 @@ module Mongoid
 
     # Have any children (embedded documents) of this document changed?
     #
-    # @example Have any children changed?
-    #   model.children_changed?
+    # @note This intentionally only considers children and not descendants.
     #
     # @return [ true, false ] If any children have changed.
     def children_changed?
@@ -81,7 +80,7 @@ module Mongoid
     # @example Handle post persistence.
     #   document.post_persist
     def post_persist
-      reset_persisted_children
+      reset_persisted_descendants
       move_changes
     end
 

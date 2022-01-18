@@ -2,6 +2,7 @@
 
 require "spec_helper"
 require_relative '../has_many_models'
+require_relative '../has_one_models'
 
 describe Mongoid::Association::Referenced::BelongsTo::Eager do
 
@@ -103,7 +104,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       context "when the eager load has returned documents" do
 
         let!(:post) do
-          person.posts.create(title: "testing")
+          person.posts.create!(title: "testing")
         end
 
         before { eager }
@@ -128,7 +129,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       context "when the eager load has not returned documents" do
 
         let!(:post) do
-          Post.create(title: "testing")
+          Post.create!(title: "testing")
         end
 
         before { eager }
@@ -148,11 +149,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       context "without namespaces" do
 
         let!(:stand_alone_rating) do
-          Rating.create(value: 7)
+          Rating.create!(value: 7)
         end
 
         let!(:bar) do
-          Bar.create(name: "FooBar")
+          Bar.create!(name: "FooBar")
         end
 
         let(:bar_rating) do
@@ -160,11 +161,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         let!(:movie) do
-          Movie.create(name: "Bladerunner")
+          Movie.create!(name: "Bladerunner")
         end
 
         let(:movie_rating) do
-          movie.ratings.create(value: 10)
+          movie.ratings.create!(value: 10)
         end
 
         let(:eager) do
@@ -213,23 +214,23 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       context "with namespaces" do
 
         let!(:stand_alone_review) do
-          Publication::Review.create(summary: "awful")
+          Publication::Review.create!(summary: "awful")
         end
 
         let!(:encyclopedia) do
-          Publication::Encyclopedia.create(title: "Encyclopedia Britannica")
+          Publication::Encyclopedia.create!(title: "Encyclopedia Britannica")
         end
 
         let(:encyclopedia_review) do
-          encyclopedia.reviews.create(summary: "inspiring")
+          encyclopedia.reviews.create!(summary: "inspiring")
         end
 
         let!(:pull_request) do
-          Coding::PullRequest.create(title: "Add eager loading for polymorphic belongs_to associations")
+          Coding::PullRequest.create!(title: "Add eager loading for polymorphic belongs_to associations")
         end
 
         let(:pull_request_review) do
-          pull_request.reviews.create(summary: "Looks good to me")
+          pull_request.reviews.create!(summary: "Looks good to me")
         end
 
         let(:eager) do
@@ -290,7 +291,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         let!(:reviewer_review) do
-          Publication::Review.create(summary: "okay",
+          Publication::Review.create!(summary: "okay",
             reviewer: reviewer)
         end
 
@@ -299,7 +300,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         let!(:template_review) do
-          Publication::Review.create(summary: "Looks good to me",
+          Publication::Review.create!(summary: "Looks good to me",
             template: template)
         end
 
@@ -329,7 +330,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       context 'when eager loading an association that has type but not value set' do
 
         let!(:reviewer_review) do
-          Publication::Review.create(summary: "okay",
+          Publication::Review.create!(summary: "okay",
             reviewer_type: 'Dog')
         end
 
@@ -339,6 +340,41 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
 
         it 'does not error' do
           eager.map(&:reviewer).should == [nil]
+        end
+      end
+    end
+
+    context "when the association has scope" do
+
+      context 'when inverse of has_many' do
+        let!(:trainer1) { HmmTrainer.create!(name: 'Dave') }
+        let!(:trainer2) { HmmTrainer.create!(name: 'Ash') }
+        let!(:animal1) { HmmAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }
+        let!(:animal2) { HmmAnimal.create!(taxonomy: 'bird', trainer: trainer2) }
+
+        let(:eager) do
+          HmmAnimal.includes(:trainer).to_a
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager[0].trainer).to eq trainer1
+          expect(eager[1].trainer).to be_nil
+        end
+      end
+
+      context 'when inverse of has_one' do
+        let!(:trainer1) { HomTrainer.create!(name: 'Dave') }
+        let!(:trainer2) { HomTrainer.create!(name: 'Ash') }
+        let!(:animal1) { HomAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }
+        let!(:animal2) { HomAnimal.create!(taxonomy: 'bird', trainer: trainer2) }
+
+        let(:eager) do
+          HomAnimal.includes(:trainer).to_a
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager[0].trainer).to eq trainer1
+          expect(eager[1].trainer).to be_nil
         end
       end
     end

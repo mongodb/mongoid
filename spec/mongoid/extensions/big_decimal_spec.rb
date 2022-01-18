@@ -8,401 +8,877 @@ describe Mongoid::Extensions::BigDecimal do
     BigDecimal("123456.789")
   end
 
-  describe ".demongoize" do
+  context 'when map_big_decimal_to_decimal128 is false' do
 
-    context "when the value is an empty String" do
-
-      let(:string) do
-        ""
-      end
-
-      it "returns nil" do
-        expect(BigDecimal.demongoize(string)).to be_nil
-      end
+    around do |example|
+      current = Mongoid.map_big_decimal_to_decimal128
+      Mongoid.map_big_decimal_to_decimal128 = false
+      example.run
+      Mongoid.map_big_decimal_to_decimal128 = current
     end
 
-    context "when the value is a numeric String" do
-
-      let(:string) do
-        "123456.789"
-      end
-
-      it "returns a BigDecimal" do
-        expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
-      end
-    end
-
-    context "when the value is the numeric String zero" do
-
-      let(:string) do
-        "0.0"
-      end
-
-      it "returns a BigDecimal" do
-        expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
-      end
-    end
-
-    context "when the value is the numeric String negative zero" do
-
-      let(:string) do
-        "-0.0"
-      end
-
-      it "returns a BigDecimal" do
-        expect(BigDecimal.demongoize(string)).to eq(BigDecimal(string))
-      end
-    end
-
-    context "when the value is a non-numeric String" do
-
-      let(:string) do
-        "1a2"
-      end
-
-      it "returns nil" do
-        expect(BigDecimal.demongoize(string)).to be_nil
-      end
-    end
-
-    context "when the value is nil" do
-
-      it "returns nil" do
-        expect(BigDecimal.demongoize(nil)).to be_nil
-      end
-    end
-
-    context "when the value is true" do
-
-      let(:value) do
-        true
-      end
-
-      it "returns nil" do
-        expect(BigDecimal.demongoize(value)).to be_nil
-      end
-    end
-
-    context "when the value is false" do
-
-      let(:value) do
-        false
-      end
-
-      it "returns nil" do
-        expect(BigDecimal.demongoize(value)).to be_nil
-      end
-    end
-
-    context "when the value is an Integer" do
-
-      let(:integer) do
-        123456
-      end
-
-      it "returns an integer" do
-        expect(BigDecimal.demongoize(integer)).to eq(integer)
-      end
-    end
-
-    context "when the value is a Float" do
-
-      let(:float) do
-        123456.789
-      end
-
-      it "returns a float" do
-        expect(BigDecimal.demongoize(float)).to eq(float)
-      end
-    end
-
-    context "when the value is the String 'NaN'" do
-
-      let(:nan) do
-        "NaN"
-      end
+    describe ".demongoize" do
 
       let(:demongoized) do
-        BigDecimal.demongoize(nan)
+        BigDecimal.demongoize(value)
       end
 
-      it "returns a BigDecimal" do
-        expect(demongoized).to be_a(BigDecimal)
+      context "when the value is an empty String" do
+
+        let(:value) do
+          ""
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
       end
 
-      it "is a NaN BigDecimal" do
-        expect(demongoized).to be_nan
+      context "when the value is a numeric String" do
+
+        let(:value) do
+          "123456.789"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to eq(BigDecimal(value))
+        end
+      end
+
+      context "when the value is the numeric String zero" do
+
+        let(:value) do
+          "0.0"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to eq(BigDecimal(value))
+        end
+      end
+
+      context "when the value is the numeric String negative zero" do
+
+        let(:value) do
+          "-0.0"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to eq(BigDecimal(value))
+        end
+      end
+
+      context "when the value is a non-numeric String" do
+
+        let(:value) do
+          "1a2"
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is nil" do
+
+        let(:value) do
+          nil
+        end
+
+        it "returns nil" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is true" do
+
+        let(:value) do
+          true
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is false" do
+
+        let(:value) do
+          false
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is an Integer" do
+
+        let(:value) do
+          123456
+        end
+
+        it "returns an integer" do
+          expect(demongoized).to eq(value)
+        end
+      end
+
+      context "when the value is a Float" do
+
+        let(:value) do
+          123456.789
+        end
+
+        it "returns a float" do
+          expect(demongoized).to eq(value)
+        end
+      end
+
+      context "when the value is the String 'NaN'" do
+
+        let(:value) do
+          "NaN"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to be_a(BigDecimal)
+        end
+
+        it "is a NaN BigDecimal" do
+          expect(demongoized).to be_nan
+        end
+      end
+
+      context "when the value is the String 'Infinity'" do
+
+        let(:value) do
+          "Infinity"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to be_a(BigDecimal)
+        end
+
+        it "is a infinity BigDecimal" do
+          expect(demongoized.infinite?).to eq 1
+        end
+      end
+
+      context "when the value is the String '-Infinity'" do
+
+        let(:value) do
+          "-Infinity"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to be_a(BigDecimal)
+        end
+
+        it "is a negative infinity BigDecimal" do
+          expect(demongoized.infinite?).to eq -1
+        end
+      end
+
+      context "when the value is a BSON::Decimal128" do
+
+        let(:value) do
+          BSON::Decimal128.new("1.2")
+        end
+
+        it "does not raise an error" do
+          expect do
+            demongoized
+          end.to_not raise_error
+        end
+
+        it "returns a big decimal" do
+          expect(demongoized).to eq(value.to_big_decimal)
+        end
       end
     end
 
-    context "when the value is the String 'Infinity'" do
+    describe ".mongoize" do
 
-      let(:infinity) do
-        "Infinity"
+      let(:mongoized) do
+        BigDecimal.mongoize(value)
+      end
+      context "when the value is a BigDecimal" do
+
+        let(:value) do
+          big_decimal
+        end
+
+        it "returns a string" do
+          expect(mongoized).to eq(value.to_s)
+        end
       end
 
-      let(:demongoized) do
-        BigDecimal.demongoize(infinity)
+      context "when the value is the BigDecimal zero" do
+
+        let(:value) do
+          BigDecimal("0.0")
+        end
+
+        it "returns a string" do
+          expect(mongoized).to eq(value.to_s)
+        end
       end
 
-      it "returns a BigDecimal" do
-        expect(demongoized).to be_a(BigDecimal)
+      context "when the value is the BigDecimal negative zero" do
+
+        let(:value) do
+          BigDecimal("-0.0")
+        end
+
+        it "returns a string" do
+          expect(mongoized).to eq(value.to_s)
+        end
       end
 
-      it "is a infinity BigDecimal" do
-        expect(demongoized.infinite?).to eq 1
+      context "when the value is an empty String" do
+
+        let(:value) do
+          ""
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context "when the value is an integer numeric String" do
+
+        let(:value) do
+          "123456"
+        end
+
+        it "returns the String" do
+          expect(mongoized).to eq(value)
+        end
+      end
+
+      context "when the value is a float numeric String" do
+
+        let(:value) do
+          "123456.789"
+        end
+
+        it "returns the String" do
+          expect(mongoized).to eq(value)
+        end
+      end
+
+      context "when the value is a non-numeric String" do
+
+        let(:value) do
+          "1a2"
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context "when the value is nil" do
+
+        let(:value) do
+          nil
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context "when the value is true" do
+
+        let(:value) do
+          true
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context "when the value is false" do
+
+        let(:value) do
+          false
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context "when the value is an Integer" do
+        let(:value) do
+          123456
+        end
+
+        it "returns a string" do
+          expect(mongoized).to eq(value.to_s)
+        end
+      end
+
+      context "when the value is a Float" do
+
+        let(:value) do
+          123456.789
+        end
+
+        it "returns a string" do
+          expect(mongoized).to eq(value.to_s)
+        end
+      end
+
+      context "when the value is String NaN" do
+
+        let(:value) do
+          "NaN"
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("NaN")
+        end
+      end
+
+      context "when the value is String Infinity" do
+
+        let(:value) do
+          "Infinity"
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("Infinity")
+        end
+      end
+
+      context "when the value is String negative Infinity" do
+
+        let(:value) do
+          "-Infinity"
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("-Infinity")
+        end
+      end
+
+      context "when the value is BigDecimal NaN" do
+
+        let(:value) do
+          BigDecimal("NaN")
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("NaN")
+        end
+      end
+
+      context "when the value is BigDecimal Infinity" do
+
+        let(:value) do
+          BigDecimal("Infinity")
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("Infinity")
+        end
+      end
+
+      context "when the value is BigDecimal negative Infinity" do
+
+        let(:value) do
+          BigDecimal("-Infinity")
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("-Infinity")
+        end
+      end
+
+      context "when the value is the constant Float::NAN" do
+
+        let(:value) do
+          Float::NAN
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("NaN")
+        end
+      end
+
+      context "when the value is constant Float::INFINITY" do
+
+        let(:value) do
+          Float::INFINITY
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("Infinity")
+        end
+      end
+
+      context "when the value is constant Float::INFINITY * -1" do
+
+        let(:value) do
+          Float::INFINITY * -1
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("-Infinity")
+        end
       end
     end
 
-    context "when the value is the String '-Infinity'" do
+    describe "#mongoize" do
 
-      let(:neg_infinity) do
-        "-Infinity"
+      it "returns a string" do
+        expect(big_decimal.mongoize).to eq(big_decimal.to_s)
       end
+    end
 
-      let(:demongoized) do
-        BigDecimal.demongoize(neg_infinity)
-      end
+    describe "#numeric?" do
 
-      it "returns a BigDecimal" do
-        expect(demongoized).to be_a(BigDecimal)
-      end
-
-      it "is a negative infinity BigDecimal" do
-        expect(demongoized.infinite?).to eq -1
+      it "returns true" do
+        expect(big_decimal.numeric?).to eq(true)
       end
     end
   end
 
-  describe ".mongoize" do
+  context 'when map_big_decimal_to_decimal128 is true' do
 
-    context "when the value is a BigDecimal" do
+    around do |example|
+      current = Mongoid.map_big_decimal_to_decimal128
+      Mongoid.map_big_decimal_to_decimal128 = true
+      example.run
+      Mongoid.map_big_decimal_to_decimal128 = current
+    end
 
-      it "returns a string" do
-        expect(BigDecimal.mongoize(big_decimal)).to eq(big_decimal.to_s)
+    describe ".demongoize" do
+
+      let(:demongoized) do
+        BigDecimal.demongoize(value)
+      end
+
+      context "when the value is an empty String" do
+
+        let(:value) do
+          ""
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is a numeric String" do
+
+        let(:value) do
+          "123456.789"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to eq(BigDecimal(value))
+        end
+      end
+
+      context "when the value is the numeric String zero" do
+
+        let(:value) do
+          "0.0"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to eq(BigDecimal(value))
+        end
+      end
+
+      context "when the value is the numeric String negative zero" do
+
+        let(:value) do
+          "-0.0"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to eq(BigDecimal(value))
+        end
+      end
+
+      context "when the value is a non-numeric String" do
+
+        let(:value) do
+          "1a2"
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is nil" do
+
+        let(:value) do
+          nil
+        end
+
+        it "returns nil" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is an Integer" do
+
+        let(:value) do
+          123456
+        end
+
+        it "returns an integer" do
+          expect(demongoized).to eq(value)
+        end
+      end
+
+      context "when the value is a BSON::Decimal128 object" do
+
+        let(:value) do
+          BSON::Decimal128.new("123456")
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to eq(value.to_big_decimal)
+        end
+      end
+
+      context "when the value is a Float" do
+
+        let(:value) do
+          123456.789
+        end
+
+        it "returns a float" do
+          expect(demongoized).to eq(value)
+        end
+      end
+
+      context "when the value is the String 'NaN'" do
+
+        let(:value) do
+          "NaN"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to be_a(BigDecimal)
+        end
+
+        it "is a NaN BigDecimal" do
+          expect(demongoized).to be_nan
+        end
+      end
+
+      context "when the value is the String 'Infinity'" do
+
+        let(:value) do
+          "Infinity"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to be_a(BigDecimal)
+        end
+
+        it "is a infinity BigDecimal" do
+          expect(demongoized.infinite?).to eq 1
+        end
+      end
+
+      context "when the value is the String '-Infinity'" do
+
+        let(:value) do
+          "-Infinity"
+        end
+
+        it "returns a BigDecimal" do
+          expect(demongoized).to be_a(BigDecimal)
+        end
+
+        it "is a negative infinity BigDecimal" do
+          expect(demongoized.infinite?).to eq -1
+        end
+      end
+
+      context "when the value is true" do
+
+        let(:value) do
+          true
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
+      end
+
+      context "when the value is false" do
+
+        let(:value) do
+          false
+        end
+
+        it "raises an error" do
+          expect(demongoized).to be_nil
+        end
       end
     end
 
-    context "when the value is the BigDecimal zero" do
+    describe ".mongoize" do
 
-      let(:big_decimal) do
-        BigDecimal("0.0")
+      let(:mongoized) do
+        BigDecimal.mongoize(value)
       end
 
-      it "returns a BigDecimal" do
-        expect(BigDecimal.mongoize(big_decimal)).to eq(big_decimal.to_s)
+      context "when the value is a BigDecimal" do
+
+        let(:value) do
+          big_decimal
+        end
+
+        it "returns a BSON::Decimal128" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is the BigDecimal zero" do
+
+        let(:value) do
+          BigDecimal("0.0")
+        end
+
+        it "returns a BSON::Decimal128" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is the BigDecimal negative zero" do
+
+        let(:value) do
+          BigDecimal("-0.0")
+        end
+
+        it "returns a BSON::Decimal128" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is an empty String" do
+
+        let(:value) do
+          ""
+        end
+
+        it "returns an empty String" do
+          expect(mongoized).to eq(value)
+        end
+      end
+
+      context "when the value is an integer numeric String" do
+
+        let(:value) do
+          "123456"
+        end
+
+        it "returns the BSON::Decimal128" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is a float numeric String" do
+
+        let(:value) do
+          "123456.789"
+        end
+
+        it "returns the BSON::Decimal128" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is a non-numeric String" do
+
+        let(:value) do
+          "1a2"
+        end
+
+        it "returns the non-numeric String" do
+          expect(mongoized).to eq(value)
+        end
+      end
+
+      context "when the value is nil" do
+
+        let(:value) do
+          nil
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context "when the value is true" do
+
+        let(:value) do
+          true
+        end
+
+        it "returns true" do
+          expect(mongoized).to eq(value)
+        end
+      end
+
+      context "when the value is false" do
+
+        let(:value) do
+          false
+        end
+
+        it "returns false" do
+          expect(mongoized).to eq(value)
+        end
+      end
+
+      context "when the value is an Integer" do
+
+        let(:value) do
+          123456
+        end
+
+        it "returns a BSON::Decimal128" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value.to_s))
+        end
+      end
+
+      context "when the value is a Float" do
+
+        let(:value) do
+          123456.789
+        end
+
+        it "returns a BSON::Decimal128" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value.to_s))
+        end
+      end
+
+      context "when the value is String NaN" do
+
+        let(:value) do
+          "NaN"
+        end
+
+        it "returns a BSON::Decimal128 representation of NaN" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is String Infinity" do
+
+        let(:value) do
+          "Infinity"
+        end
+
+        it "returns a BSON::Decimal128 representation of Infinity" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is String negative Infinity" do
+
+        let(:value) do
+          "-Infinity"
+        end
+
+        it "returns a BSON::Decimal128 representation of -Infinity" do
+          expect(mongoized).to eq(BSON::Decimal128.new(value))
+        end
+      end
+
+      context "when the value is BigDecimal NaN" do
+
+        let(:value) do
+          BigDecimal("NaN")
+        end
+
+        it "returns a BSON::Decimal128 representation of BigDecimal NaN" do
+          expect(mongoized).to eq(BSON::Decimal128.new("NaN"))
+        end
+      end
+
+      context "when the value is BigDecimal Infinity" do
+
+        let(:value) do
+          BigDecimal("Infinity")
+        end
+
+        it "returns a BSON::Decimal128 representation of BigDecimal Infinity" do
+          expect(mongoized).to eq(BSON::Decimal128.new("Infinity"))
+        end
+      end
+
+      context "when the value is BigDecimal negative Infinity" do
+
+        let(:value) do
+          BigDecimal("-Infinity")
+        end
+
+        it "returns a BSON::Decimal128 representation of BigDecimal negative Infinity" do
+          expect(mongoized).to eq(BSON::Decimal128.new("-Infinity"))
+        end
+      end
+
+      context "when the value is the constant Float::NAN" do
+
+        let(:value) do
+          Float::NAN
+        end
+
+        it "returns a BSON::Decimal128 representation of NaN" do
+          expect(mongoized).to eq(BSON::Decimal128.new("NaN"))
+        end
+      end
+
+      context "when the value is constant Float::INFINITY" do
+
+        let(:value) do
+          Float::INFINITY
+        end
+
+        it "returns a BSON::Decimal128 representation of Infinity" do
+          expect(mongoized).to eq(BSON::Decimal128.new("Infinity"))
+        end
+      end
+
+      context "when the value is constant Float::INFINITY * -1" do
+
+        let(:value) do
+          Float::INFINITY * -1
+        end
+
+        it "returns a BSON::Decimal128 representation of negative Infinity" do
+          expect(mongoized).to eq(BSON::Decimal128.new("-Infinity"))
+        end
       end
     end
 
-    context "when the value is the BigDecimal negative zero" do
+    describe "#mongoize" do
 
-      let(:big_decimal) do
-        BigDecimal("-0.0")
-      end
-
-      it "returns a BigDecimal" do
-        expect(BigDecimal.mongoize(big_decimal)).to eq(big_decimal.to_s)
+      it "returns a BSON::Decimal128 representation of the BigDecimal" do
+        expect(big_decimal.mongoize).to eq(BSON::Decimal128.new(big_decimal))
       end
     end
 
-    context "when the value is an empty String" do
+    describe "#numeric?" do
 
-      let(:string) do
-        ""
+      it "returns true" do
+        expect(big_decimal.numeric?).to eq(true)
       end
-
-      it "returns nil" do
-        expect(BigDecimal.mongoize(string)).to be_nil
-      end
-    end
-
-    context "when the value is an integer numeric String" do
-
-      let(:string) do
-        "123456"
-      end
-
-      it "returns the String" do
-        expect(BigDecimal.mongoize(string)).to eq string
-      end
-    end
-
-    context "when the value is a float numeric String" do
-
-      let(:string) do
-        "123456.789"
-      end
-
-      it "returns the String" do
-        expect(BigDecimal.mongoize(string)).to eq string
-      end
-    end
-
-    context "when the value is a non-numeric String" do
-
-      let(:string) do
-        "1a2"
-      end
-
-      it "returns nil" do
-        expect(BigDecimal.mongoize(string)).to be_nil
-      end
-    end
-
-    context "when the value is nil" do
-
-      it "returns nil" do
-        expect(BigDecimal.mongoize(nil)).to be_nil
-      end
-    end
-
-    context "when the value is true" do
-
-      let(:value) do
-        true
-      end
-
-      it "returns nil" do
-        expect(BigDecimal.mongoize(value)).to be_nil
-      end
-    end
-
-    context "when the value is false" do
-
-      let(:value) do
-        false
-      end
-
-      it "returns nil" do
-        expect(BigDecimal.mongoize(value)).to be_nil
-      end
-    end
-
-    context "when the value is an Integer" do
-
-      it "returns a string" do
-        expect(BigDecimal.mongoize(123456)).to eq("123456")
-      end
-    end
-
-    context "when the value is a Float" do
-
-      it "returns a string" do
-        expect(BigDecimal.mongoize(123456.789)).to eq("123456.789")
-      end
-    end
-
-    context "when the value is String NaN" do
-
-      let(:nan) do
-        "NaN"
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(nan)).to eq("NaN")
-      end
-    end
-
-    context "when the value is String Infinity" do
-
-      let(:infinity) do
-        "Infinity"
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(infinity)).to eq("Infinity")
-      end
-    end
-
-    context "when the value is String negative Infinity" do
-
-      let(:neg_infinity) do
-        "-Infinity"
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(neg_infinity)).to eq("-Infinity")
-      end
-    end
-
-    context "when the value is BigDecimal NaN" do
-
-      let(:nan) do
-        BigDecimal("NaN")
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(nan)).to eq("NaN")
-      end
-    end
-
-    context "when the value is BigDecimal Infinity" do
-
-      let(:infinity) do
-        BigDecimal("Infinity")
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(infinity)).to eq("Infinity")
-      end
-    end
-
-    context "when the value is BigDecimal negative Infinity" do
-
-      let(:neg_infinity) do
-        BigDecimal("-Infinity")
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(neg_infinity)).to eq("-Infinity")
-      end
-    end
-
-    context "when the value is the constant Float::NAN" do
-
-      let(:nan) do
-        Float::NAN
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(nan)).to eq("NaN")
-      end
-    end
-
-    context "when the value is constant Float::INFINITY" do
-
-      let(:infinity) do
-        Float::INFINITY
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(infinity)).to eq("Infinity")
-      end
-    end
-
-    context "when the value is constant Float::INFINITY * -1" do
-
-      let(:neg_infinity) do
-        Float::INFINITY * -1
-      end
-
-      it "returns a String" do
-        expect(BigDecimal.mongoize(neg_infinity)).to eq("-Infinity")
-      end
-    end
-  end
-
-  describe "#mongoize" do
-
-    it "returns a string" do
-      expect(big_decimal.mongoize).to eq(big_decimal.to_s)
-    end
-  end
-
-  describe "#numeric?" do
-
-    it "returns true" do
-      expect(big_decimal.numeric?).to eq(true)
     end
   end
 end

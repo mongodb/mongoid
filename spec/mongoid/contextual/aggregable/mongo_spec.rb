@@ -9,11 +9,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000, years: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000, years: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500, years: 800)
+        Band.create!(name: "Tool", likes: 500, years: 800)
       end
 
       let(:criteria) do
@@ -141,7 +141,6 @@ describe Mongoid::Contextual::Aggregable::Mongo do
             expect(aggregates["sum"]).to eq(1000)
           end
         end
-
       end
 
       context "when the field does not exist" do
@@ -167,17 +166,17 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         it "returns a sum" do
-          expect(aggregates["sum"]).to be_nil
+          expect(aggregates["sum"]).to eq 0
         end
       end
 
       context "when the field sometimes exists" do
         let!(:oasis) do
-          Band.create(name: "Oasis", likes: 50)
+          Band.create!(name: "Oasis", likes: 50)
         end
 
         let!(:radiohead) do
-          Band.create(name: "Radiohead")
+          Band.create!(name: "Radiohead")
         end
 
         context "and the field doesn't exist on the last document" do
@@ -204,7 +203,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
         context "and the field doesn't exist on the before-last document" do
           let!(:u2) do
-            Band.create(name: "U2", likes: 100)
+            Band.create!(name: "U2", likes: 100)
           end
 
           let(:criteria) do
@@ -240,7 +239,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         it "returns nil" do
-          expect(aggregates).to eq({ "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil })
+          expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => nil, "min" => nil, "max" => nil })
         end
       end
     end
@@ -253,11 +252,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
       context "when there are matching documents" do
 
         let!(:depeche) do
-          Band.create(name: "Depeche Mode", likes: 1000)
+          Band.create!(name: "Depeche Mode", likes: 1000)
         end
 
         let!(:tool) do
-          Band.create(name: "Tool", likes: 500)
+          Band.create!(name: "Tool", likes: 500)
         end
 
         let(:criteria) do
@@ -280,7 +279,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
       context "when no documents match" do
 
         let!(:depeche) do
-          Band.create(name: "Depeche Mode", likes: 1000)
+          Band.create!(name: "Depeche Mode", likes: 1000)
         end
 
         let(:criteria) do
@@ -307,7 +306,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context 'when the field does not exist in any document' do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let(:criteria) do
@@ -330,11 +329,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -395,11 +394,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -460,11 +459,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create!(name: "Depeche Mode", likes: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create!(name: "Tool", likes: 500)
       end
 
       let(:criteria) do
@@ -513,6 +512,82 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
         it "returns the sum for the provided block" do
           expect(sum).to eq(1500)
+        end
+      end
+    end
+  end
+
+  describe '#pipeline' do
+    let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
+    let(:pipeline) { context.send(:pipeline, :likes) }
+    subject(:stages) { pipeline.map {|s| s.keys.first } }
+
+    context "with sort" do
+
+      context "without limit or skip" do
+        let(:criteria) { Band.desc(:name) }
+
+        it 'should omit the $sort stage' do
+          expect(stages).to eq %w[$match $group]
+        end
+      end
+
+      context "with limit" do
+        let(:criteria) { Band.desc(:name).limit(1) }
+
+        it 'should include the $sort stage' do
+          expect(stages).to eq %w[$match $sort $limit $group]
+        end
+      end
+
+      context "with skip" do
+        let(:criteria) { Band.desc(:name).skip(1) }
+
+        it 'should include the $sort stage' do
+          expect(stages).to eq %w[$match $sort $skip $group]
+        end
+      end
+
+      context "with skip and skip" do
+        let(:criteria) { Band.desc(:name).limit(1).skip(1) }
+
+        it 'should include the $sort stage' do
+          expect(stages).to eq %w[$match $sort $skip $limit $group]
+        end
+      end
+    end
+
+    context "without sort" do
+
+      context "without limit or skip" do
+        let(:criteria) { Band.all }
+
+        it 'should omit the $sort stage' do
+          expect(stages).to eq %w[$match $group]
+        end
+      end
+
+      context "with limit" do
+        let(:criteria) { Band.limit(1) }
+
+        it 'should include the $sort stage' do
+          expect(stages).to eq %w[$match $limit $group]
+        end
+      end
+
+      context "with skip" do
+        let(:criteria) { Band.skip(1) }
+
+        it 'should include the $sort stage' do
+          expect(stages).to eq %w[$match $skip $group]
+        end
+      end
+
+      context "with skip and skip" do
+        let(:criteria) { Band.limit(1).skip(1) }
+
+        it 'should include the $sort stage' do
+          expect(stages).to eq %w[$match $skip $limit $group]
         end
       end
     end

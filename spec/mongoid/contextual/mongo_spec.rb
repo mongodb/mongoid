@@ -9,7 +9,7 @@ describe Mongoid::Contextual::Mongo do
     describe "##{method}" do
 
       before do
-        Band.create(name: "Depeche Mode")
+        Band.create!(name: "Depeche Mode")
       end
 
       context "when the count is zero" do
@@ -80,11 +80,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#count" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:new_order) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -133,7 +133,7 @@ describe Mongoid::Contextual::Mongo do
       context "and a limit true" do
 
         before do
-          2.times { Band.create(name: "Depeche Mode", likes: 1) }
+          2.times { Band.create!(name: "Depeche Mode", likes: 1) }
         end
 
         let(:count) do
@@ -151,7 +151,7 @@ describe Mongoid::Contextual::Mongo do
     context "when provided limit" do
 
       before do
-        2.times { Band.create(name: "Depeche Mode") }
+        2.times { Band.create!(name: "Depeche Mode") }
       end
 
       let(:context) do
@@ -194,11 +194,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#estimated_count" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:new_order) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -261,11 +261,11 @@ describe Mongoid::Contextual::Mongo do
     describe "##{method}" do
 
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
+        Band.create!(name: "Depeche Mode")
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order")
+        Band.create!(name: "New Order")
       end
 
       context "when the selector is contraining" do
@@ -366,11 +366,11 @@ describe Mongoid::Contextual::Mongo do
     describe "##{method}" do
 
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
+        Band.create!(name: "Depeche Mode")
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order")
+        Band.create!(name: "New Order")
       end
 
       context "when the selector is contraining" do
@@ -451,7 +451,7 @@ describe Mongoid::Contextual::Mongo do
     context 'when the write concern is unacknowledged' do
 
       before do
-        2.times { Band.create }
+        2.times { Band.create! }
       end
 
       let(:criteria) do
@@ -473,8 +473,8 @@ describe Mongoid::Contextual::Mongo do
   describe "#distinct" do
 
     before do
-      Band.create(name: "Depeche Mode", years: 30)
-      Band.create(name: "New Order", years: 25)
+      Band.create!(name: "Depeche Mode", years: 30)
+      Band.create!(name: "New Order", years: 25)
     end
 
     context "when limiting the result set" do
@@ -526,7 +526,7 @@ describe Mongoid::Contextual::Mongo do
       min_server_version '3.4'
 
       before do
-        Band.create(name: 'DEPECHE MODE')
+        Band.create!(name: 'DEPECHE MODE')
       end
 
       let(:context) do
@@ -550,7 +550,7 @@ describe Mongoid::Contextual::Mongo do
   describe "#each" do
 
     before do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:criteria) do
@@ -628,7 +628,7 @@ describe Mongoid::Contextual::Mongo do
         context "when iterating with next" do
 
           before do
-            10.times { |i| Band.create(name: "Test #{i}") }
+            10.times { |i| Band.create!(name: "Test #{i}") }
           end
 
           let(:criteria) do
@@ -663,9 +663,9 @@ describe Mongoid::Contextual::Mongo do
     context 'when the criteria has a parent document' do
 
       before do
-        Post.create(person: person)
-        Post.create(person: person)
-        Post.create(person: person)
+        Post.create!(person: person)
+        Post.create!(person: person)
+        Post.create!(person: person)
       end
 
       let(:person) do
@@ -712,7 +712,7 @@ describe Mongoid::Contextual::Mongo do
   describe "#exists?" do
 
     before do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     context "when the count is zero" do
@@ -825,11 +825,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#find_one_and_replace" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:tool) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     context "when the selector matches" do
@@ -981,11 +981,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#find_one_and_update" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:tool) do
-      Band.create(name: "Tool")
+      Band.create!(name: "Tool")
     end
 
     context "when the selector matches" do
@@ -1134,7 +1134,7 @@ describe Mongoid::Contextual::Mongo do
   describe "#find_one_and_delete" do
 
     let!(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:criteria) do
@@ -1213,11 +1213,11 @@ describe Mongoid::Contextual::Mongo do
     describe "##{method}" do
 
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
+        Band.create!(name: "Depeche Mode")
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order")
+        Band.create!(name: "New Order")
       end
 
       context "when the context is not cached" do
@@ -1553,11 +1553,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#limit" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:new_order) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -1576,8 +1576,8 @@ describe Mongoid::Contextual::Mongo do
   describe "#map" do
 
     before do
-      Band.create(name: "Depeche Mode")
-      Band.create(name: "New Order")
+      Band.create!(name: "Depeche Mode")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -1606,11 +1606,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#map_reduce" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode", likes: 200)
+      Band.create!(name: "Depeche Mode", likes: 200)
     end
 
     let!(:tool) do
-      Band.create(name: "Tool", likes: 100)
+      Band.create!(name: "Tool", likes: 100)
     end
 
     let(:map) do
@@ -2035,11 +2035,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#skip" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:new_order) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -2058,11 +2058,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#sort" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:new_order) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -2101,11 +2101,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#update" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let!(:new_order) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -2119,11 +2119,11 @@ describe Mongoid::Contextual::Mongo do
     context "when adding an element to a HABTM set" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:preference) do
-        Preference.create
+        Preference.create!
       end
 
       before do
@@ -2262,12 +2262,12 @@ describe Mongoid::Contextual::Mongo do
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Sony')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
 
         b = Band.new(name: 'FKA Twigs')
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
       end
 
 
@@ -2293,11 +2293,11 @@ describe Mongoid::Contextual::Mongo do
   describe "#update_all" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode", origin: "Essex")
+      Band.create!(name: "Depeche Mode", origin: "Essex")
     end
 
     let!(:new_order) do
-      Band.create(name: "New Order")
+      Band.create!(name: "New Order")
     end
 
     let(:criteria) do
@@ -2435,12 +2435,12 @@ describe Mongoid::Contextual::Mongo do
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Sony')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
 
         b = Band.new(name: 'FKA Twigs')
         b.labels << Label.new(name: 'Warner')
         b.labels << Label.new(name: 'Cbs')
-        b.save
+        b.save!
       end
 
 
