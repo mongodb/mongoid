@@ -739,4 +739,22 @@ describe Mongoid::Persistable::Updatable do
       end
     end
   end
+
+  describe "#update_attributes!" do
+
+    let(:person) do
+      Person.create!
+    end
+
+    let(:attributes) do
+      { security_code: 'secret' }
+    end
+
+    it 'calls update_attributes' do
+      person.should receive(:update_attributes).with(attributes).and_call_original
+      lambda do
+        person.update_attributes!(attributes)
+      end.should_not raise_error
+    end
+  end
 end
