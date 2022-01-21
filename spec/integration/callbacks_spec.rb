@@ -148,7 +148,7 @@ describe 'callbacks integration tests' do
       end
     end
 
-    context 'when updating top-level document via #update_attributes' do
+    context 'when updating top-level document via #update_attributes!' do
       let!(:instance) do
         Galaxy.create!
       end
@@ -166,7 +166,7 @@ describe 'callbacks integration tests' do
 
         context 'set as a document instance' do
           before do
-            instance.update_attributes(stars: [Star.new])
+            instance.update_attributes!(stars: [Star.new])
           end
 
           include_examples 'persists the attribute value'
@@ -174,7 +174,7 @@ describe 'callbacks integration tests' do
 
         context 'set as attributes on parent' do
           before do
-            instance.update_attributes(stars: [{}])
+            instance.update_attributes!(stars: [{}])
           end
 
           include_examples 'persists the attribute value'
@@ -196,7 +196,7 @@ describe 'callbacks integration tests' do
 
         context 'set as a document instance' do
           before do
-            instance.update_attributes(stars: [Star.new(planets: [Planet.new])])
+            instance.update_attributes!(stars: [Star.new(planets: [Planet.new])])
           end
 
           include_examples 'persists the attribute value'
@@ -204,7 +204,7 @@ describe 'callbacks integration tests' do
 
         context 'set as attributes on parent' do
           before do
-            instance.update_attributes(stars: [planets: [{}]])
+            instance.update_attributes!(stars: [planets: [{}]])
           end
 
           include_examples 'persists the attribute value'

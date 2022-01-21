@@ -791,11 +791,11 @@ describe Mongoid::Clients do
         end
       end
 
-      describe ".create" do
+      describe ".create!" do
 
         let!(:band) do
           Band.with(database: database_id_alt) do |klass|
-            klass.create
+            klass.create!
           end
         end
 
@@ -829,11 +829,11 @@ describe Mongoid::Clients do
 
     context "when sending operations to a different collection" do
 
-      describe ".create" do
+      describe ".create!" do
 
         let!(:band) do
           Band.with(collection: "artists") do |klass|
-            klass.create
+            klass.create!
           end
         end
 
@@ -944,7 +944,7 @@ describe Mongoid::Clients do
       describe ".save" do
 
         before do
-          Person.create(ssn: "432-97-1113")
+          Person.create!(ssn: "432-97-1113")
         end
 
         context "when a mongodb error occurs" do
@@ -1037,7 +1037,7 @@ describe Mongoid::Clients do
       end
 
       let!(:band) do
-        Band.create(name: "Tool")
+        Band.create!(name: "Tool")
       end
 
       it "persists to the overridden database" do
