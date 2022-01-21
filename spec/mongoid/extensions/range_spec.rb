@@ -80,8 +80,8 @@ describe Mongoid::Extensions::Range do
       context 'kernel cannot support endless range' do
         ruby_version_lt '2.6'
 
-        it "returns an alphabetic range" do
-          is_expected.to eq(hash)
+        it "returns nil" do
+          is_expected.to be nil
         end
       end
     end
@@ -100,8 +100,8 @@ describe Mongoid::Extensions::Range do
       context 'kernel cannot support endless range' do
         ruby_version_lt '2.6'
 
-        it "returns an alphabetic range" do
-          is_expected.to eq(hash)
+        it "returns nil" do
+          is_expected.to be nil
         end
       end
     end
@@ -120,8 +120,8 @@ describe Mongoid::Extensions::Range do
       context 'kernel cannot support beginning-less range' do
         ruby_version_lt '2.7'
 
-        it "returns an alphabetic range" do
-          is_expected.to eq(hash)
+        it "returns nil" do
+          is_expected.to be nil
         end
       end
     end
@@ -140,8 +140,8 @@ describe Mongoid::Extensions::Range do
       context 'kernel cannot support beginning-less range' do
         ruby_version_lt '2.7'
 
-        it "returns an alphabetic range" do
-          is_expected.to eq(hash)
+        it "returns nil" do
+          is_expected.to be nil
         end
       end
     end
