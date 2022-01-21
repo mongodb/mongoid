@@ -239,4 +239,5 @@ end
 
 ::Hash.__send__(:include, Mongoid::Extensions::Hash)
 ::Hash.extend(Mongoid::Extensions::Hash::ClassMethods)
+
 ::Mongoid.deprecate(Hash, :blank_criteria)
