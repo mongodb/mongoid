@@ -65,6 +65,86 @@ describe Mongoid::Extensions::Range do
         is_expected.to eq("a"..."z")
       end
     end
+
+    context "when the range is endless" do
+      let(:hash) { { "min" => 1, "max" => nil } }
+
+      context 'kernel can support endless range' do
+        ruby_version_gte '2.6'
+
+        it "returns an alphabetic range" do
+          is_expected.to eq(eval('1..'))
+        end
+      end
+
+      context 'kernel cannot support endless range' do
+        ruby_version_lt '2.6'
+
+        it "returns nil" do
+          is_expected.to be nil
+        end
+      end
+    end
+
+    context "when the range is endless with exclude end" do
+      let(:hash) { { "min" => 1, "max" => nil, "exclude_end" => true } }
+
+      context 'kernel can support endless range' do
+        ruby_version_gte '2.6'
+
+        it "returns an alphabetic range" do
+          is_expected.to eq(eval('1...'))
+        end
+      end
+
+      context 'kernel cannot support endless range' do
+        ruby_version_lt '2.6'
+
+        it "returns nil" do
+          is_expected.to be nil
+        end
+      end
+    end
+
+    context "when the range is beginning-less" do
+      let(:hash) { { "min" => nil, "max" => 3 } }
+
+      context 'kernel can support beginning-less range' do
+        ruby_version_gte '2.7'
+
+        it "returns an alphabetic range" do
+          is_expected.to eq(nil..3)
+        end
+      end
+
+      context 'kernel cannot support beginning-less range' do
+        ruby_version_lt '2.7'
+
+        it "returns nil" do
+          is_expected.to be nil
+        end
+      end
+    end
+
+    context "when the range is beginning-less with exclude end" do
+      let(:hash) { { "min" => nil, "max" => 3, "exclude_end" => true } }
+
+      context 'kernel can support endless range' do
+        ruby_version_gte '2.7'
+
+        it "returns an alphabetic beginning-less" do
+          is_expected.to eq(eval('...3'))
+        end
+      end
+
+      context 'kernel cannot support beginning-less range' do
+        ruby_version_lt '2.7'
+
+        it "returns nil" do
+          is_expected.to be nil
+        end
+      end
+    end
   end
 
   shared_examples_for 'mongoize range' do
@@ -98,6 +178,46 @@ describe Mongoid::Extensions::Range do
 
       it "returns the object hash" do
         is_expected.to eq("min" => 5, "max" => 1, "exclude_end" => true)
+      end
+    end
+
+    context 'given an endless range' do
+      ruby_version_gte '2.6'
+
+      let(:range) { eval('5..') }
+
+      it "returns the object hash" do
+        is_expected.to eq("min" => 5)
+      end
+    end
+
+    context 'given an endless range not inclusive' do
+      ruby_version_gte '2.6'
+
+      let(:range) { eval('5...') }
+
+      it "returns the object hash" do
+        is_expected.to eq("min" => 5, "exclude_end" => true)
+      end
+    end
+
+    context 'given a beginning-less range' do
+      ruby_version_gte '2.7'
+
+      let(:range) { eval('..5') }
+
+      it "returns the object hash" do
+        is_expected.to eq("max" => 5)
+      end
+    end
+
+    context 'given an endless range not inclusive' do
+      ruby_version_gte '2.7'
+
+      let(:range) { eval('...5') }
+
+      it "returns the object hash" do
+        is_expected.to eq("max" => 5, "exclude_end" => true)
       end
     end
 
@@ -138,10 +258,10 @@ describe Mongoid::Extensions::Range do
     end
 
     context 'given a Date range' do
-      let(:range) { Time.at(0).to_date..Time.at(1).to_date }
+      let(:range) { Date.new(2020, 1, 1)..Date.new(2020, 1, 2) }
 
       it "returns the object hash" do
-        is_expected.to eq("min" => Time.at(0).in_time_zone, "max" => Time.at(0).in_time_zone)
+        is_expected.to eq("min" => Time.utc(2020, 1, 1), "max" => Time.utc(2020, 1, 2))
         expect(subject["min"].utc?).to be(true)
         expect(subject["max"].utc?).to be(true)
       end

@@ -25,6 +25,30 @@ describe 'Range field persistence' do
       it { expect(subject).to eq(1...3) }
     end
 
+    context 'when endless' do
+      ruby_version_gte '2.6'
+      let(:value) { eval('3..') }
+      it { expect(subject).to eq(eval('3..')) }
+    end
+
+    context 'when endless exclude_end' do
+      ruby_version_gte '2.6'
+      let(:value) { eval('3...') }
+      it { expect(subject).to eq(eval('3...')) }
+    end
+
+    context 'when beginning-less' do
+      ruby_version_gte '2.7'
+      let(:value) { eval('..3') }
+      it { expect(subject).to eq(eval('..3')) }
+    end
+
+    context 'when beginning-less exclude_end' do
+      ruby_version_gte '2.7'
+      let(:value) { eval('...3') }
+      it { expect(subject).to eq(eval('...3')) }
+    end
+
     context 'when Hash<String, Integer>' do
       let(:value) { { 'min' => 1, 'max' => 3 } }
       it { expect(subject).to eq(1..3) }
@@ -173,6 +197,30 @@ describe 'Range field persistence' do
     context 'when descending exclude_end' do
       let(:value) { 3...1 }
       it { expect(subject).to eq('max' => 1, 'min' => 3, 'exclude_end' => true) }
+    end
+
+    context 'when endless' do
+      ruby_version_gte '2.6'
+      let(:value) { eval('3..') }
+      it { expect(subject).to eq('min' => 3) }
+    end
+
+    context 'when endless exclude_end' do
+      ruby_version_gte '2.6'
+      let(:value) { eval('3...') }
+      it { expect(subject).to eq('min' => 3, 'exclude_end' => true) }
+    end
+
+    context 'when beginning-less' do
+      ruby_version_gte '2.7'
+      let(:value) { eval('..3') }
+      it { expect(subject).to eq('max' => 3) }
+    end
+
+    context 'when beginning-less exclude_end' do
+      ruby_version_gte '2.7'
+      let(:value) { eval('...3') }
+      it { expect(subject).to eq('max' => 3, 'exclude_end' => true) }
     end
 
     context 'when Hash<String, Integer>' do
