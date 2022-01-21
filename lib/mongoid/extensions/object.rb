@@ -246,3 +246,5 @@ end
 
 ::Object.__send__(:include, Mongoid::Extensions::Object)
 ::Object.extend(Mongoid::Extensions::Object::ClassMethods)
+
+::Mongoid.deprecate(Object, :blank_criteria)

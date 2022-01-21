@@ -10,6 +10,8 @@ module Mongoid
       module Selectable
         extend Macroable
 
+        Mongoid.deprecate(self, :geo_spacial)
+
         # Constant for a LineString $geometry.
         LINE_STRING = "LineString"
 

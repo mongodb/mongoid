@@ -9,6 +9,8 @@ module Mongoid
     # @deprecated No longer used by Mongoid per MONGOID-4841.
     class EagerLoad < MongoidError
 
+      Mongoid.deprecate(self, :initialize)
+
       # Create the new eager load error.
       #
       # @example Create the new eager load error.
