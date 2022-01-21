@@ -73,7 +73,7 @@ describe Mongoid::Extensions::Range do
         ruby_version_gte '2.6'
 
         it "returns an alphabetic range" do
-          is_expected.to eq(1..)
+          is_expected.to eq(eval('1..'))
         end
       end
 
@@ -93,7 +93,7 @@ describe Mongoid::Extensions::Range do
         ruby_version_gte '2.6'
 
         it "returns an alphabetic range" do
-          is_expected.to eq(1...)
+          is_expected.to eq(eval('1...'))
         end
       end
 
@@ -133,7 +133,7 @@ describe Mongoid::Extensions::Range do
         ruby_version_gte '2.7'
 
         it "returns an alphabetic beginning-less" do
-          is_expected.to eq(...3)
+          is_expected.to eq(eval('...3'))
         end
       end
 
@@ -184,7 +184,7 @@ describe Mongoid::Extensions::Range do
     context 'given an endless range' do
       ruby_version_gte '2.6'
 
-      let(:range) { 5.. }
+      let(:range) { eval('5..') }
 
       it "returns the object hash" do
         is_expected.to eq("min" => 5)
@@ -194,7 +194,7 @@ describe Mongoid::Extensions::Range do
     context 'given an endless range not inclusive' do
       ruby_version_gte '2.6'
 
-      let(:range) { 5... }
+      let(:range) { eval('5...') }
 
       it "returns the object hash" do
         is_expected.to eq("min" => 5, "exclude_end" => true)
@@ -204,7 +204,7 @@ describe Mongoid::Extensions::Range do
     context 'given a beginning-less range' do
       ruby_version_gte '2.7'
 
-      let(:range) { ..5 }
+      let(:range) { eval('..5') }
 
       it "returns the object hash" do
         is_expected.to eq("max" => 5)
@@ -214,7 +214,7 @@ describe Mongoid::Extensions::Range do
     context 'given an endless range not inclusive' do
       ruby_version_gte '2.7'
 
-      let(:range) { ...5 }
+      let(:range) { eval('...5') }
 
       it "returns the object hash" do
         is_expected.to eq("max" => 5, "exclude_end" => true)
