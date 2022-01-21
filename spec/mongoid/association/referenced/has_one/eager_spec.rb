@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../has_one_models'
 
 describe Mongoid::Association::Referenced::HasOne::Eager do
 
@@ -152,7 +153,7 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
     context "when the relation is polymorphic" do
 
       let!(:book) do
-        Book.create(name: "Game of Thrones")
+        Book.create!(name: "Game of Thrones")
       end
 
       let!(:rating) do
@@ -171,6 +172,21 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
         expect_query(0) do
           expect(eager.rating).to eq(rating)
         end
+      end
+    end
+
+    context "when the association has scope" do
+      let!(:trainer1) { HomTrainer.create!(name: 'Dave') }
+      let!(:trainer2) { HomTrainer.create!(name: 'Ash') }
+      let!(:animal1) { HomAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }
+      let!(:animal2) { HomAnimal.create!(taxonomy: 'bird', trainer: trainer1) }
+
+      let(:eager) do
+        HomTrainer.includes(:animal).where(_id: trainer1._id).to_a.first
+      end
+
+      it 'eager loads the included docs' do
+        expect(eager.animal).to eq animal1
       end
     end
   end

@@ -56,7 +56,7 @@ describe Mongoid::Persistable::Renamable do
       end
 
       let(:person) do
-        Person.create(title: "sir", dob: date)
+        Person.create!(title: "sir", dob: date)
       end
 
       context "when provided symbol names" do
@@ -108,7 +108,7 @@ describe Mongoid::Persistable::Renamable do
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let(:name) do
@@ -137,7 +137,7 @@ describe Mongoid::Persistable::Renamable do
     context "when executing atomically" do
 
       let(:person) do
-        Person.create(title: "sir")
+        Person.create!(title: "sir")
       end
 
       it "marks a dirty change for the renamed fields" do

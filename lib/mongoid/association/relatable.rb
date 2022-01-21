@@ -242,7 +242,7 @@ module Mongoid
       #
       # @return [ String ] The foreign key check.
       def foreign_key_check
-        @foreign_key_check ||= "#{foreign_key}_changed?" if (stores_foreign_key? && foreign_key)
+        @foreign_key_check ||= "#{foreign_key}_previously_changed?" if (stores_foreign_key? && foreign_key)
       end
 
       # Create an association proxy object using the owner and target.

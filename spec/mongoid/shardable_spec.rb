@@ -128,7 +128,7 @@ describe Mongoid::Shardable do
     end
 
     context 'when record is persisted' do
-      let(:instance) { klass.create(name: value) }
+      let(:instance) { klass.create!(name: value) }
 
       it { is_expected.to eq({ 'name' => value }) }
 
@@ -172,7 +172,7 @@ describe Mongoid::Shardable do
     end
 
     context 'when record is persisted' do
-      let(:instance) { klass.create(name: value) }
+      let(:instance) { klass.create!(name: value) }
 
       it { is_expected.to eq({ 'name' => value }) }
 

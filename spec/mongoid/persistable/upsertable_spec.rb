@@ -82,7 +82,7 @@ describe Mongoid::Persistable::Upsertable do
     context "when the document is not new" do
 
       let!(:existing) do
-        Band.create(name: "Photek")
+        Band.create!(name: "Photek")
       end
 
       context "when updating fields outside of the id" do

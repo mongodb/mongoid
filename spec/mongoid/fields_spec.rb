@@ -109,7 +109,7 @@ describe Mongoid::Fields do
         context "when saving the new translations" do
 
           before do
-            product.save
+            product.save!
           end
 
           it "persists the changes" do
@@ -120,7 +120,7 @@ describe Mongoid::Fields do
 
             before do
               product.description_translations = { "en" => "overwritten" }
-              product.save
+              product.save!
             end
 
             it "persists the changes" do
@@ -151,7 +151,7 @@ describe Mongoid::Fields do
         context "when saving the new translations" do
 
           before do
-            dictionary.save
+            dictionary.save!
           end
 
           it "persists the changes" do
@@ -164,7 +164,7 @@ describe Mongoid::Fields do
 
             before do
               dictionary.description_translations = { "en" => "overwritten" }
-              dictionary.save
+              dictionary.save!
             end
 
             it "persists the changes" do
@@ -620,14 +620,14 @@ describe Mongoid::Fields do
 
       before do
         product.stores = [ "kadewe", "karstadt" ]
-        product.save
+        product.save!
       end
 
       context "when setting the value to nil" do
 
         before do
           product.stores = nil
-          product.save
+          product.save!
         end
 
         it "allows the set" do
@@ -639,7 +639,7 @@ describe Mongoid::Fields do
 
         before do
           product.stores = [ "kadewe", nil ]
-          product.save
+          product.save!
         end
 
         it "allows the set of nil values" do
@@ -655,7 +655,7 @@ describe Mongoid::Fields do
 
         before do
           product.stores = [ "karstadt", "kadewe" ]
-          product.save
+          product.save!
         end
 
         it "reverses the values" do
@@ -1234,71 +1234,153 @@ describe Mongoid::Fields do
 
   context "when a field is defined as a big decimal" do
 
-    let(:band) do
-      Band.new(name: "Tool")
+    context 'when Mongoid.map_big_decimal_to_decimal128 is false' do
+
+      let(:band) do
+        Band.new(name: "Tool")
+      end
+
+      let(:decimal) do
+        BigDecimal("1000000.00")
+      end
+
+      context "when setting to a big decimal" do
+
+        before do
+          band.sales = decimal
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a string" do
+
+        before do
+          band.sales = decimal.to_s
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to an integer" do
+
+        before do
+          band.sales = decimal.to_i
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq("1000000")
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a float" do
+
+        before do
+          band.sales = decimal.to_f
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
     end
 
-    let(:decimal) do
-      BigDecimal("1000000.00")
-    end
-
-    context "when setting to a big decimal" do
+    context 'when Mongoid.map_big_decimal_to_decimal128 is true' do
 
       before do
-        band.sales = decimal
+        Mongoid.map_big_decimal_to_decimal128 = true
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
+      after do
+        Mongoid.map_big_decimal_to_decimal128 = false
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
-
-    context "when setting to a string" do
-
-      before do
-        band.sales = decimal.to_s
+      let(:band) do
+        Band.new(name: "Tool")
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
+      let(:decimal) do
+        BigDecimal("1000000.00")
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
+      context "when setting to a big decimal" do
 
-    context "when setting to an integer" do
+        before do
+          band.sales = decimal
+        end
 
-      before do
-        band.sales = decimal.to_i
-      end
+        it "properly persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal))
+        end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq("1000000")
-      end
-
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
-
-    context "when setting to a float" do
-
-      before do
-        band.sales = decimal.to_f
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
+      context "when setting to a string" do
+
+        before do
+          band.sales = decimal.to_s
+        end
+
+        it "persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
+      context "when setting to an integer" do
+
+        before do
+          band.sales = decimal.to_i
+        end
+
+        it "persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_i.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a float" do
+
+        before do
+          band.sales = decimal.to_f
+        end
+
+        it "properly persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_f.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
     end
   end
@@ -1306,7 +1388,7 @@ describe Mongoid::Fields do
   context "when the field is a hash of arrays" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:map) do
@@ -1320,7 +1402,7 @@ describe Mongoid::Fields do
     before do
       person.map = map
       person.map["stack1"].reverse!
-      person.save
+      person.save!
     end
 
     it "properly updates the hash" do
@@ -1395,6 +1477,118 @@ describe Mongoid::Fields do
       it 'is correctly set' do
         circle.attributes['_type'].should == 'Circle'
       end
+    end
+  end
+
+  describe '.database_field_name' do
+
+    shared_examples_for 'database_field_name' do
+      subject { Person.database_field_name(key) }
+
+      context 'non-aliased field name' do
+        let(:key) { 't' }
+        it { is_expected.to eq 't' }
+      end
+
+      context 'aliased field name' do
+        let(:key) { 'test' }
+        it { is_expected.to eq 't' }
+      end
+
+      context 'non-aliased embeds one relation' do
+        let(:key) { 'pass' }
+        it { is_expected.to eq 'pass' }
+      end
+
+      context 'aliased embeds one relation' do
+        let(:key) { 'passport' }
+        it { is_expected.to eq 'pass' }
+      end
+
+      context 'non-aliased embeds many relation' do
+        let(:key) { 'mobile_phones' }
+        it { is_expected.to eq 'mobile_phones' }
+      end
+
+      context 'aliased embeds many relation' do
+        let(:key) { 'phones' }
+        it { is_expected.to eq 'mobile_phones' }
+      end
+
+      context 'non-aliased embeds one field' do
+        let(:key) { 'pass.exp' }
+        it { is_expected.to eq 'pass.exp' }
+      end
+
+      context 'aliased embeds one field' do
+        let(:key) { 'passport.expiration_date' }
+        it { is_expected.to eq 'pass.exp' }
+      end
+
+      context 'non-aliased embeds many field' do
+        let(:key) { 'mobile_phones.landline' }
+        it { is_expected.to eq 'mobile_phones.landline' }
+      end
+
+      context 'aliased embeds many field' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'mobile_phones.ext' }
+      end
+
+      context 'aliased multi-level embedded document' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'mobile_phones.ext' }
+      end
+
+      context 'non-aliased multi-level embedded document' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'mobile_phones.ext' }
+      end
+
+      context 'aliased multi-level embedded document field' do
+        let(:key) { 'mobile_phones.country_code.code' }
+        it { is_expected.to eq 'mobile_phones.country_code.code' }
+      end
+
+      context 'non-aliased multi-level embedded document field' do
+        let(:key) { 'phones.country_code.iso_alpha2_code' }
+        it { is_expected.to eq 'mobile_phones.country_code.iso' }
+      end
+
+      context 'when field is unknown' do
+        let(:key) { 'shenanigans' }
+        it { is_expected.to eq 'shenanigans' }
+      end
+
+      context 'when embedded field is unknown' do
+        let(:key) { 'phones.bamboozle' }
+        it { is_expected.to eq 'mobile_phones.bamboozle' }
+      end
+
+      context 'when multi-level embedded field is unknown' do
+        let(:key) { 'phones.bamboozle.brouhaha' }
+        it { is_expected.to eq 'mobile_phones.bamboozle.brouhaha' }
+      end
+    end
+
+    context 'given nil' do
+      subject { Person.database_field_name(nil) }
+      it { is_expected.to eq nil }
+    end
+
+    context 'given an empty String' do
+      subject { Person.database_field_name('') }
+      it { is_expected.to eq nil }
+    end
+
+    context 'given a String' do
+      subject { Person.database_field_name(key.to_s) }
+      it_behaves_like 'database_field_name'
+    end
+
+    context 'given a Symbol' do
+      subject { Person.database_field_name(key.to_sym) }
+      it_behaves_like 'database_field_name'
     end
   end
 end

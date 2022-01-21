@@ -9,7 +9,7 @@ describe Mongoid::Persistable do
   describe "#atomically" do
 
     let(:document) do
-      Band.create(member_count: 0, likes: 60, origin: "London")
+      Band.create!(member_count: 0, likes: 60, origin: "London")
     end
 
     context "when providing a block" do

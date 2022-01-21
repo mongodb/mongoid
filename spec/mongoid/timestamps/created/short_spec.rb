@@ -39,7 +39,7 @@ describe Mongoid::Timestamps::Created::Short do
   context "when the document is created" do
 
     let(:quiz) do
-      ShortQuiz.create
+      ShortQuiz.create!
     end
 
     it "runs the created callbacks" do

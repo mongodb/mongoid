@@ -88,7 +88,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         before do
-          document.timeless.save
+          document.timeless.save!
         end
 
         it "does not set the created timestamp" do
@@ -118,7 +118,7 @@ describe Mongoid::Timestamps::Timeless do
       context "when used on the class" do
 
         let!(:document) do
-          Dokument.timeless.create
+          Dokument.timeless.create!
         end
 
         it "does not set the created timestamp" do

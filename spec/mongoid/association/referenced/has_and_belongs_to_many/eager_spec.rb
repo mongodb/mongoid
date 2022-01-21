@@ -78,7 +78,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       context "when the eager load has returned documents" do
 
         let!(:preference) do
-          person.preferences.create(name: "testing")
+          person.preferences.create!(name: "testing")
         end
 
         before { eager }
@@ -117,8 +117,37 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
 
         it "returns the proxy" do
           expect do
-            eager.preferences.create(name: "testing")
+            eager.preferences.create!(name: "testing")
           end.to_not raise_error
+        end
+      end
+    end
+
+    context "when the association has scope" do
+      let!(:trainer1) { HabtmmTrainer.create!(name: 'Dave') }
+      let!(:trainer2) { HabtmmTrainer.create!(name: 'Ash') }
+      let!(:animal1) { HabtmmAnimal.create!(taxonomy: 'reptile', trainers: [trainer1, trainer2]) }
+      let!(:animal2) { HabtmmAnimal.create!(taxonomy: 'bird', trainers: [trainer1, trainer2]) }
+
+      context 'when scope set by Symbol' do
+        let(:eager) do
+          HabtmmAnimal.includes(:trainers).where(_id: animal1._id).first
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager.trainers._loaded).to eq(trainer1._id => trainer1)
+          expect(eager.trainers).to eq [trainer1]
+        end
+      end
+
+      context 'when scope set by Proc' do
+        let(:eager) do
+          HabtmmTrainer.includes(:animals).where(_id: trainer1._id).to_a.first
+        end
+
+        it 'eager loads the included docs' do
+          expect(eager.animals._loaded).to eq(animal1._id => animal1)
+          expect(eager.animals).to eq [animal1]
         end
       end
     end

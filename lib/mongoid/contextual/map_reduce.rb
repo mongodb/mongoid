@@ -147,7 +147,7 @@ module Mongoid
       def raw
         validate_out!
         cmd = command
-        opts = { read: cmd.delete(:read) } if cmd[:read]
+        opts = { read: criteria.options.fetch(:read) } if criteria.options[:read]
         @map_reduce.database.command(cmd, (opts || {}).merge(session: _session)).first
       end
       alias :results :raw

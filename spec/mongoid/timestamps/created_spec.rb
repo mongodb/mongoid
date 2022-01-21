@@ -35,7 +35,7 @@ describe Mongoid::Timestamps::Created do
   context "when the document is created" do
 
     let(:quiz) do
-      Quiz.create
+      Quiz.create!
     end
 
     it "runs the created callbacks" do

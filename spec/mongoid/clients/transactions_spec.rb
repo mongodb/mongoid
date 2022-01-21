@@ -61,9 +61,12 @@ describe Mongoid::Clients::Sessions do
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
         Mongoid::Clients.with_name(:other).command(create: :people)
         Mongoid::Clients.with_name(:other).command(create: :posts)
+        Mongoid::Clients.with_name(:other).command(create: :canvases)
         subscriber.clear_events!
-        Person.with(client: :other) do
-          example.run
+        Canvas.with(client: :other) do
+          Person.with(client: :other) do
+            example.run
+          end
         end
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
       end
@@ -73,9 +76,9 @@ describe Mongoid::Clients::Sessions do
         let!(:last_use_diff) do
           Person.with_session do |s|
             s.start_transaction
-            Person.create
-            Person.create
-            Thread.new { Person.create }.value
+            Person.create!
+            Person.create!
+            Thread.new { Person.create! }.value
             s.commit_transaction
           end
         end
@@ -93,8 +96,8 @@ describe Mongoid::Clients::Sessions do
         before do
           Person.with_session do |s|
             s.start_transaction
-            Person.create
-            Person.create
+            Person.create!
+            Person.create!
             s.commit_transaction
           end
         end
@@ -114,9 +117,9 @@ describe Mongoid::Clients::Sessions do
             Post.with(client: :other) do
               Person.with_session do |s|
                 s.start_transaction
-                Person.create
-                Person.create
-                Post.create
+                Person.create!
+                Person.create!
+                Post.create!
                 s.commit_transaction
               end
             end
@@ -136,9 +139,9 @@ describe Mongoid::Clients::Sessions do
             begin
               Person.with_session do |s|
                 s.start_transaction
-                Person.create
-                Person.create
-                Post.create
+                Person.create!
+                Person.create!
+                Post.create!
                 s.commit_transaction
               end
             rescue => ex
@@ -168,8 +171,8 @@ describe Mongoid::Clients::Sessions do
               Person.with_session do |s|
                 s.start_transaction
                 s.start_transaction
-                Person.create
-                Post.create
+                Person.create!
+                Post.create!
                 s.commit_transaction
               end
             rescue => ex
@@ -189,6 +192,26 @@ describe Mongoid::Clients::Sessions do
           end
         end
       end
+
+      context 'When reloading an embedded document created inside a transaction' do
+        it 'does not raise an error and has the correct document' do
+          Canvas.with_session do |s|
+            s.start_transaction
+
+            p = Palette.new
+            c = Canvas.new(palette: p)
+            c.save!
+
+            expect do
+              p.reload
+            end.to_not raise_error
+
+            expect(c.palette).to eq(p)
+
+            s.commit_transaction
+          end
+        end
+      end
     end
 
     context 'when sessions are supported but transactions are not' do
@@ -201,7 +224,7 @@ describe Mongoid::Clients::Sessions do
         begin
           Person.with_session do |s|
             s.start_transaction
-            Person.create
+            Person.create!
             s.commit_transaction
           end
         rescue => ex
@@ -221,7 +244,7 @@ describe Mongoid::Clients::Sessions do
 
     let!(:person) do
       Person.with(client: :other) do |klass|
-        klass.create
+        klass.create!
       end
     end
 
@@ -245,9 +268,9 @@ describe Mongoid::Clients::Sessions do
           person.with_session do |s|
             s.start_transaction
             person.username = 'Emily'
-            person.save
+            person.save!
             person.age = 80
-            person.save
+            person.save!
             s.commit_transaction
           end
         end
@@ -269,8 +292,8 @@ describe Mongoid::Clients::Sessions do
               person.with_session do |s|
                 s.start_transaction
                 person.username = 'Emily'
-                person.save
-                person.posts << Post.create
+                person.save!
+                person.posts << Post.create!
                 s.commit_transaction
               end
             end
@@ -295,8 +318,8 @@ describe Mongoid::Clients::Sessions do
               person.with_session do |s|
                 s.start_transaction
                 person.username = 'Emily'
-                person.save
-                person.posts << Post.create
+                person.save!
+                person.posts << Post.create!
                 s.commit_transaction
               end
             rescue => ex
@@ -326,8 +349,8 @@ describe Mongoid::Clients::Sessions do
                 s.start_transaction
                 s.start_transaction
                 person.username = 'Emily'
-                person.save
-                person.posts << Post.create
+                person.save!
+                person.posts << Post.create!
                 s.commit_transaction
               end
             rescue => ex
@@ -374,7 +397,7 @@ describe Mongoid::Clients::Sessions do
           person.with_session do |s|
             s.start_transaction
             person.username = 'Emily'
-            person.save
+            person.save!
             s.commit_transaction
           end
         rescue => ex
