@@ -258,10 +258,10 @@ describe Mongoid::Extensions::Range do
     end
 
     context 'given a Date range' do
-      let(:range) { Time.at(0).to_date..Time.at(1).to_date }
+      let(:range) { Date.new(2020, 1, 1)..Date.new(2020, 1, 2) }
 
       it "returns the object hash" do
-        is_expected.to eq("min" => Time.at(0).in_time_zone, "max" => Time.at(0).in_time_zone)
+        is_expected.to eq("min" => Time.utc(2020, 1, 1), "max" => Time.utc(2020, 1, 2))
         expect(subject["min"].utc?).to be(true)
         expect(subject["max"].utc?).to be(true)
       end
