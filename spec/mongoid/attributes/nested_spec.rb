@@ -4304,7 +4304,7 @@ describe Mongoid::Attributes::Nested do
     end
   end
 
-  describe "#update_attributes" do
+  describe "#update_attributes!" do
 
     before do
       Person.send(:undef_method, :addresses_attributes=)
@@ -4337,7 +4337,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          node.update_attributes(attributes)
+          node.update_attributes!(attributes)
         end
 
         it "adds the new embedded document" do
@@ -4369,7 +4369,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        person.update_attributes(attributes)
+        person.update_attributes!(attributes)
       end
 
       it "removes the document from the parent" do
@@ -4420,7 +4420,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        address.update_attributes(attributes)
+        address.update_attributes!(attributes)
         address.reload
       end
 
@@ -4463,7 +4463,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person_one.update_attributes(attributes)
+            person_one.update_attributes!(attributes)
           end
 
           it "deletes the document from the relation" do
@@ -4513,7 +4513,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              band.update_attributes(attributes)
+              band.update_attributes!(attributes)
             end
 
             it "removes the child from the relation" do
@@ -4546,7 +4546,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
             end
 
             let(:address) do
@@ -4586,7 +4586,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
               person.reload
             end
 
@@ -4617,7 +4617,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.update_attributes(attributes)
+            person.update_attributes!(attributes)
           end
 
           let(:address) do
@@ -4666,7 +4666,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.update_attributes(attributes)
+            person.update_attributes!(attributes)
           end
 
           it "updates the first level embedded document" do
@@ -4706,7 +4706,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
             end
 
             it "updates the first level embedded document" do
@@ -4742,7 +4742,7 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                person.update_attributes(attributes)
+                person.update_attributes!(attributes)
               end
 
               it "updates the nested embedded document" do
@@ -4769,7 +4769,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          user.update_attributes(params)
+          user.update_attributes!(params)
         end
 
         around do |example|
@@ -4891,7 +4891,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          league.update_attributes(params)
+          league.update_attributes!(params)
         end
 
         it "sets the nested attributes" do
@@ -4911,7 +4911,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            league.update_attributes(new_params)
+            league.update_attributes!(new_params)
           end
 
           it "sets the nested attributes" do
