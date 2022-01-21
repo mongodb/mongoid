@@ -4,7 +4,13 @@
 # TODO: Support i18n-fallbacks test
 # TODO: Support app-tests tests
 
+# Note on topology: server:
+# The GH actions use mongo-orchestration, which uses a "server" topology for
+# the standalone one. See transform_node! below for the mapping of all
+# topologies.
+
 require 'fileutils'
+require 'active_support'
 require 'active_support/dependencies/autoload'
 require 'active_support/core_ext'
 require 'yaml'
@@ -240,7 +246,7 @@ class Transmogrifier
 
   def step_mongodb
     {
-      id: "start-mongodb"
+      id: "start-mongodb",
       name: "start mongodb",
       uses: "mongodb-labs/drivers-evergreen-tools@master",
       with: {

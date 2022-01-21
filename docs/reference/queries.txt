@@ -1577,6 +1577,7 @@ To have Mongoid raise an error when a scope would overwrite an existing class
 method, set the ``scope_overwrite_exception`` :ref:`configuration option
 <configuration-options>` to ``true``.
 
+
 Default Scopes
 --------------
 
@@ -1703,6 +1704,35 @@ that would affect its visibility within the scoped association.
   band.update_attribute(:active, false)
   label.bands # [ band ] Must reload.
   label.reload.bands # []
+
+
+Runtime Default Scope Override
+------------------------------
+
+You can use the ``with_scope`` method to change the default scope in a block
+at runtime:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :country, type: String
+    field :genres, type: Array
+
+    scope :english, ->{ where(country: "England") }
+  end
+
+  criteria = Band.with_scope(Band.english) do
+    Band.all
+  end
+  
+  criteria
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"country"=>"England"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
 
 
 Class Methods

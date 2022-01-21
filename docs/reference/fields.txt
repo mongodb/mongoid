@@ -13,15 +13,21 @@ Field Definition
    :class: singlecol
 
 
+.. _field-types:
+
 Field Types
 ===========
 
-Even though MongoDB is a schemaless database and allows data to be stored
-as strings, Mongoid permits the application to declare the type of data
-stored in the various fields of a document. Field type declarations affect
-the following:
+MongoDB stores underlying document data using
+`BSON types <https://docs.mongodb.com/manual/reference/bson-types/>`_, and
+Mongoid converts BSON types to Ruby types at runtime in your application.
+For example, a field defined with `type: :float` will use the Ruby ``Float``
+class in-memory and will persist in the database as the the BSON ``double`` type.
 
-1. When assigning values to fields, the values are converted to the
+Field type definitions determine how Mongoid behaves when constructing queries
+and retrieving/writing fields from/to the database. Specifically:
+
+1. When assigning values to fields at runtime, the values are converted to the
 specified type.
 
 2. When persisting data to MongoDB, the data is sent in an appropriate
@@ -34,9 +40,7 @@ type before being sent to MongoDB.
 4. When retrieving documents from the database, field values are converted
 to the specified type.
 
-Field type definitions determine how Mongoid behaves when constructing the
-queries, retrieving and writing fields from the database. Changing the field
-definitions in a model class does not alter data already stored in
+Changing the field definitions in a model class does not alter data already stored in
 MongoDB. To update type or contents of fields of existing documents,
 the field must be re-saved to the database. Note that, due to Mongoid
 tracking which attributes on a model change and only saving the changed ones,
@@ -44,16 +48,16 @@ it may be necessary to explicitly write a field value when changing the
 type of an existing field without changing the stored values.
 
 Consider a simple class for modeling a person in an application. A person may
-have a first name, last name, and middle name. We can define these attributes
+have a name, date_of_birth, and weight. We can define these attributes
 on a person by using the ``field`` macro.
 
 .. code-block:: ruby
 
    class Person
      include Mongoid::Document
-     field :first_name, type: String
-     field :middle_name, type: String
-     field :last_name, type: String
+     field :name, type: String
+     field :date_of_birth, type: Date
+     field :weight, type: Float
    end
 
 Below is a list of valid types for fields.
@@ -77,6 +81,14 @@ Below is a list of valid types for fields.
 - ``Time``
 - ``TimeWithZone``
 
+To define custom field types, refer to :ref:`Custom Field Types <custom-field-types>` below.
+
+
+.. _omitting-field-type-definition:
+
+Omitting Field Type Definition
+------------------------------
+
 If you decide not to specify the type of field with the definition, Mongoid will treat
 it as an object and not try to typecast it when sending the values to the database.
 This can be advantageous as the lack of attempted conversion will yield a slight
@@ -97,21 +109,20 @@ You can safely omit type specifications when:
 
 Types that are not supported as dynamic attributes since they cannot be cast are:
 
-- ``BigDecimal``
 - ``Date``
 - ``DateTime``
 - ``Range``
 
 
-.. _stringified-symbol:
+.. _field-type-stringified-symbol:
 
-The StringifiedSymbol Type
---------------------------
+Field Type: StringifiedSymbol
+-----------------------------
 
 The ``StringifiedSymbol`` field type is the recommended field type for storing
 values that should be exposed as symbols to Ruby applications. When using the ``Symbol`` field type,
 Mongoid defaults to storing values as BSON symbols. For more information on the
-BSON symbol type, see :ref:`here <bson-symbol>`.
+BSON symbol type, see :ref:`here <field-type-symbol>`.
 However, the BSON symbol type is deprecated and is difficult to work with in programming languages
 without native symbol types, so the ``StringifiedSymbol`` type allows the use of symbols
 while ensuring interoperability with other drivers. The ``StringifiedSymbol`` type stores all data
@@ -157,12 +168,12 @@ migration from fields that currently store either strings or BSON symbols in the
 ``StringifiedSymbol`` field type.
 
 
-.. _bson-symbol:
+.. _field-type-symbol:
 
-BSON Symbol Type
-----------------
+Field Type: Symbol
+------------------
 
-New applications should use the :ref:`StringifiedSymbol field type <stringified-symbol>`
+New applications should use the :ref:`StringifiedSymbol field type <field-type-stringified-symbol>`
 to store Ruby symbols in the database. The ``StringifiedSymbol`` field type
 provides maximum compatibility with other applications and programming languages
 and has the same behavior in all circumstances.
@@ -188,8 +199,10 @@ snippet in your project:
   end
 
 
-Hash Fields
------------
+.. _field-type-hash:
+
+Field Type: Hash
+----------------
 
 When using a field of type Hash, be wary of adhering to the
 `legal key names for mongoDB <http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>`_,
@@ -218,8 +231,10 @@ or else the values will not store properly.
    end
 
 
-Time Fields
------------
+.. _field-type-time:
+
+Field Type: Time
+----------------
 
 ``Time`` fields store values as ``Time`` instances in the :ref:`configured
 time zone <time-zones>`.
@@ -231,10 +246,10 @@ assignment to a ``Time`` field:
 
   class Voter
     include Mongoid::Document
-    
+
     field :registered_at, type: Time
   end
-  
+
   Voter.new(registered_at: Date.today)
   # => #<Voter _id: 5fdd80392c97a618f07ba344, registered_at: 2020-12-18 05:00:00 UTC>
 
@@ -242,8 +257,10 @@ In the above example, the value was interpreted as the beginning of today in
 local time, because the application was not configured to use UTC times.
 
 
-Date Fields
------------
+.. _field-type-date:
+
+Field Type: Date
+----------------
 
 Mongoid allows assignment of values of several types to ``Date`` fields:
 
@@ -265,8 +282,11 @@ recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
 
-DateTime Fields
----------------
+
+.. _field-type-date-time:
+
+Field Type: DateTime
+---------------------
 
 MongoDB stores all times as UTC timestamps. When assigning a value to a
 ``DateTime`` field, or when querying a ``DateTime`` field, Mongoid
@@ -332,13 +352,13 @@ If a time zone is specified, it is respected:
     # => Sun, 04 Mar 2018 09:00:00 +0000
 
 
-.. _regular-expression-fields:
+.. _field-type-regexp:
 
-Regular Expression Fields
--------------------------
+Field Type: Regexp
+------------------
 
 MongoDB supports storing regular expressions in documents, and querying using
-regular expressions. Of note for Ruby applications, MongoDB uses
+regular expressions. Note that MongoDB uses
 `Perl-compatible regular expressions (PCRE) <http://pcre.org/>`_
 and Ruby uses `Onigmo <https://github.com/k-takata/Onigmo>`_, which is a
 fork of `Oniguruma regular expression engine <https://github.com/kkos/oniguruma>`_.
@@ -395,9 +415,112 @@ matches strings containing "hello" before a newline, besides strings ending in
 This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
 
+BigDecimal Fields
+-----------------
 
-Defaults
---------
+The ``BigDecimal`` field type is used to store numbers with increased precision.
+
+The ``BigDecimal`` field type stores its values in two different ways in the
+database, depending on the value of the ``Mongoid.map_big_decimal_to_decimal128``
+global config option. If this flag is set to false (which is the default),
+the ``BigDecimal`` field will be stored as a string, otherwise it will be stored
+as a ``BSON::Decimal128``.
+
+The ``BigDecimal`` field type has some limitations when converting to and from
+a ``BSON::Decimal128``:
+
+- ``BSON::Decimal128`` has a limited range and precision, while ``BigDecimal``
+  has no restrictions in terms of range and precision. ``BSON::Decimal128`` has
+  a max value of approximately ``10^6145`` and a min value of approximately
+  ``-10^6145``, and has a maximum of 34 bits of precision. When attempting to
+  store values that don't fit into a ``BSON::Decimal128``, it is recommended to
+  have them stored as a string instead of a ``BSON::Decimal128``. You can do
+  that by setting ``Mongoid.map_big_decimal_to_decimal128`` to ``false``. If a
+  value that does not fit in a ``BSON::Decimal128`` is attempted to be stored
+  as one, an error will be raised.
+
+- ``BSON::Decimal128`` is able to accept signed ``NaN`` values, while
+  ``BigDecimal`` is not. When retrieving signed ``NaN`` values from
+  the database using the ``BigDecimal`` field type, the ``NaN`` will be
+  unsigned.
+
+- ``BSON::Decimal128`` maintains trailing zeroes when stored in the database.
+  ``BigDecimal``, however, does not maintain trailing zeroes, and therefore
+  retrieving ``BSON::Decimal128`` values using the ``BigDecimal`` field type
+  may result in a loss of precision.
+
+There is an additional caveat when storing a ``BigDecimal`` in a field with no
+type (i.e. a dynamically typed field) and ``Mongoid.map_big_decimal_to_decimal128``
+is ``false``. In this case, the ``BigDecimal`` is stored as a string, and since a
+dynamic field is being used, querying for that field with a ``BigDecimal`` will
+not find the string for that ``BigDecimal``, since the query is looking for a
+``BigDecimal``. In order to query for that string, the ``BigDecimal`` must
+first be converted to a string with ``to_s``. Note that this is not a problem
+when the field has type ``BigDecimal``.
+
+If you wish to avoid using ``BigDecimal`` altogether, you can set the field
+type to ``BSON::Decimal128``. This will allow you to keep track of trailing
+zeroes and signed ``NaN`` values.
+
+Migration to ``decimal128``-backed ``BigDecimal`` Field
+```````````````````````````````````````````````````````
+In a future major version of Mongoid, the ``Mongoid.map_big_decimal_to_decimal128``
+global config option will be defaulted to ``true``. When this flag is turned on,
+``BigDecimal`` values in queries will not match to the strings that are already
+stored in the database; they will only match to ``decimal128`` values that are
+in the database. If you have a ``BigDecimal`` field that is backed by strings,
+you have three options:
+
+1. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
+   set to ``false``, and you can continue storing your ``BigDecimal`` values as
+   strings. Note that you are surrendering the advantages of storing ``BigDecimal``
+   values as a ``decimal128``, like being able to do queries and aggregations
+   based on the numerical value of the field.
+
+2. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
+   set to ``true``, and you can convert all values for that field from strings to
+   ``decimal128`` values in the database. You should do this conversion before
+   setting the global config option to true. An example query to accomplish this
+   is as follows:
+
+   .. code-block:: javascript
+
+      db.bands.updateMany({
+        "field": { "$exists": true }
+      }, [
+        {
+          "$set": {
+            "field": { "$toDecimal": "$field" }
+          }
+        }
+      ])
+
+   This query updates all documents that have the given field, setting that
+   field to its corresponding ``decimal128`` value. Note that this query only
+   works in MongoDB 4.2+.
+
+3. The ``Mongoid.map_big_decimal_to_decimal128`` global config option can be
+   set to ``true``, and you can have both strings and ``decimal128`` values for
+   that field. This way, only ``decimal128`` values will be inserted into and
+   updated to the database going forward. Note that you still don't get the
+   full advantages of using only ``decimal128`` values, but your dataset is
+   slowly migrating to all ``decimal128`` values, as old string values are
+   updated to ``decimal128`` and new ``decimal128`` values are added. With this
+   setup, you can still query for ``BigDecimal`` values as follows:
+
+   .. code-block:: ruby
+
+      Mongoid.map_big_decimal_to_decimal128 = true
+      big_decimal = BigDecimal('2E9')
+      Band.in(sales: [big_decimal, big_decimal.to_s]).to_a
+
+   This query will find all values that are either a ``decimal128`` value or
+   a string that match that value.
+
+.. _field-default-values:
+
+Specifying Field Default Values
+-------------------------------
 
 A field can be configured to have a default value. The default value can be
 fixed, as in the following example:
@@ -501,17 +624,17 @@ from the aliased field:
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
     alias_attribute :n, :name
   end
-  
+
   band = Band.new(n: 'Astral Projection')
   # => #<Band _id: 5fc1c1ee2c97a64accbeb5e1, name: "Astral Projection">
-  
+
   band.attributes
   # => {"_id"=>BSON::ObjectId('5fc1c1ee2c97a64accbeb5e1'), "name"=>"Astral Projection"}
-  
+
   band.n
   # => "Astral Projection"
 
@@ -536,11 +659,11 @@ This is useful for storing different values in ``id`` and ``_id`` fields:
 
   class Band
     include Mongoid::Document
-    
+
     unalias_attribute :id
     field :id, type: String
   end
-  
+
   Band.new(id: '42')
   # => #<Band _id: 5fc1c3f42c97a6590684046c, id: "42">
 
@@ -587,7 +710,7 @@ To define the field anyway, use the ``overwrite: true`` option:
 
 .. _custom-id:
 
-Custom Ids
+Custom IDs
 ----------
 
 By default, Mongoid defines the ``_id`` field on documents to contain a
@@ -640,16 +763,20 @@ alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
 
 
+.. _customizing-field-behavior:
+
 Customizing Field Behavior
 ==========================
 
-Mongoid offers several options for customizing the behavior of fields.
+Mongoid offers several ways to customize the behavior of fields.
 
+
+.. _custom-getters-and-setters:
 
 Custom Getters And Setters
 --------------------------
 
-You can define custom getters and setters for fields to modify the values
+You may override getters and setters for fields to modify the values
 when they are being accessed or written. The getters and setters use the
 same name as the field. Use ``read_attribute`` and ``write_attribute``
 methods inside the getters and setters to operate on the raw attribute
@@ -664,19 +791,19 @@ getter as follows:
 
   class DistanceMeasurement
     include Mongoid::Document
-    
+
     field :value, type: Float
     field :unit, type: String
-    
+
     def unit
       read_attribute(:unit) || "m"
     end
-    
+
     def to_s
       "#{value} #{unit}"
     end
   end
-  
+
   measurement = DistanceMeasurement.new(value: 2)
   measurement.to_s
   # => "2.0 m"
@@ -690,10 +817,10 @@ may be implemented as follows:
 
   class DistanceMeasurement
     include Mongoid::Document
-    
+
     field :value, type: Float
     field :unit, type: String
-    
+
     def unit=(value)
       if value.blank?
         value = nil
@@ -701,18 +828,20 @@ may be implemented as follows:
       write_attribute(:unit, value)
     end
   end
-  
+
   measurement = DistanceMeasurement.new(value: 2, unit: "")
   measurement.attributes
   # => {"_id"=>BSON::ObjectId('613fa15aa15d5d617216104c'), "value"=>2.0, "unit"=>nil}
 
 
+.. _custom-field-types:
+
 Custom Field Types
 ------------------
 
 You can define custom types in Mongoid and determine how they are serialized
-and deserialized. You simply need to provide three methods on it for Mongoid
-to call to convert your object to and from MongoDB friendly values.
+and deserialized. In this example, we define a new field type ``Point``, which we
+can use in our model class as follows:
 
 .. code-block:: ruby
 
@@ -720,6 +849,11 @@ to call to convert your object to and from MongoDB friendly values.
     include Mongoid::Document
     field :location, type: Point
   end
+
+Then make a Ruby class to represent the type. This class must define methods
+used for MongoDB serialization and deserialization as follows:
+
+.. code-block:: ruby
 
   class Point
 
@@ -730,17 +864,12 @@ to call to convert your object to and from MongoDB friendly values.
     end
 
     # Converts an object of this instance into a database friendly value.
+    # In this example, we store the values in the database as array.
     def mongoize
       [ x, y ]
     end
 
     class << self
-
-      # Get the object as it was stored in the database, and instantiate
-      # this custom class from it.
-      def demongoize(object)
-        Point.new(object[0], object[1])
-      end
 
       # Takes any possible object and converts it to how it would be
       # stored in the database.
@@ -752,8 +881,14 @@ to call to convert your object to and from MongoDB friendly values.
         end
       end
 
+      # Get the object as it was stored in the database, and instantiate
+      # this custom class from it.
+      def demongoize(object)
+        Point.new(object[0], object[1])
+      end
+
       # Converts the object that was supplied to a criteria and converts it
-      # into a database friendly form.
+      # into a query-friendly form.
       def evolve(object)
         case object
         when Point then object.mongoize
@@ -763,42 +898,69 @@ to call to convert your object to and from MongoDB friendly values.
     end
   end
 
-The instance method ``mongoize`` takes an instance of your object, and
-converts it into how it will be stored in the database. In our example above,
-we want to store our point object as an array in the form ``[ x, y ]``.
+The instance method ``mongoize`` takes an instance of your custom type object, and
+converts it into a represenation of how it will be stored in the database, i.e. to pass
+to the MongoDB Ruby driver. In our example above, we want to store our ``Point``
+object as an ``Array`` in the form ``[ x, y ]``.
 
-The class method ``demongoize`` takes an object as how it was stored in the
-database, and is responsible for instantiating an object of your custom type.
-In this case, we take an array and instantiate a ``Point`` from it.
-
-The class method ``mongoize`` takes an object that you would use to set on
-your model from your application code, and create the object as it would be
-stored in the database. This is for cases where you are not passing your
-model instances of your custom type in the setter:
+The class method ``mongoize`` is similar to the instance method, however it must handle
+objects of all possible types as inputs. The ``mongoize`` method is used when calling the
+setter methods for fields of your custom type.
 
 .. code-block:: ruby
 
    point = Point.new(12, 24)
-   venue = Venue.new(location: point) # This uses the mongoize instance method.
-   venue = Venue.new(location: [ 12, 24 ]) # This uses the mongoize class method.
+   venue = Venue.new(location: point) # This uses the Point#mongoize instance method.
+   venue = Venue.new(location: [ 12, 24 ]) # This uses the Point.mongoize class method.
 
-The class method ``evolve`` takes an object, and determines how it is to be
-transformed for use in criteria. For example we may want to write a query
-like so:
+The class method ``demongoize`` does the inverse of ``mongoize``. It takes the raw object
+from the MongoDB Ruby driver and converts it to an instance of your custom type.
+In this case, the database driver returns an ``Array`` and we instantiate a ``Point`` from it.
+The ``demongoize`` method is used when calling the getters of fields for your custom type.
+Note that in the example above, since ``demongoize`` calls ``Point.new``, a new instance of
+``Point`` will be generated on each call to the getter.
+
+Lastly, the class method ``evolve`` is similar to ``mongoize``, however it is used
+when transforming objects for use in Mongoid query criteria.
 
 .. code-block:: ruby
 
    point = Point.new(12, 24)
-   Venue.where(location: point)
+   Venue.where(location: point) # This uses Point.evolve
 
-Note that when accessing custom fields from the document, you will get a
-new instance of that object with each call to the getter. This is because
-Mongoid is generating a new object from the raw attributes on each access.
 
-We need the point object in the criteria to be transformed to a
-MongoDB-friendly value when it is not as well, ``evolve`` is the method
-that takes care of this. We check if the passed in object is a ``Point``
-first, in case we also want to be able to pass in ordinary arrays instead.
+.. _custom-field-options:
+
+Custom Field Options
+--------------------
+
+You may define custom options for the ``field`` macro function
+which extend its behavior at the your time model classes are loaded.
+
+As an example, we will define a ``:required`` option which will add a presence
+validator for the field. First, declare the new field option in an initializer,
+specifiying its handler function as a block:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid_custom_fields.rb
+
+  Mongoid::Fields.option :required do |model, field, value|
+    model.validates_presence_of field if value
+  end
+
+Then, use it your model class:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :name, type: String, required: true
+  end
+
+Note that the handler function will be invoked whenever the option is used
+in the field definition, even if the option's value is false or nil.
 
 
 .. _dynamic-fields:
@@ -1151,3 +1313,48 @@ you can include the short versions of the modules.
      include Mongoid::Document
      include Mongoid::Timestamps::Updated::Short # For u_at only.
    end
+
+
+.. _field-names-with-periods-and-dollar-signs:
+
+Field Names with Dots/Periods (``.``) and Dollar Signs (``$``)
+==============================================================
+
+MongoDB query language (MQL) generally uses the dot/period character (``.``)
+to separate field names in a field path that traverses embedded documents, and
+the dollar character (``$``) for operators. It is possible to utilize field
+names containing the dot and dollar characters, however it is recommended to
+avoid these characters for ease of querying.
+
+MongoDB 5.0 adds `special operators
+<https://docs.mongodb.com/manual/core/dot-dollar-considerations/#std-label-crud-concepts-dot-dollar-considerations>`_
+for querying and modifying documents using field names containing dots and
+dollars. Previous MongoDB versions do not provide a mechanism for querying
+documents on fields whose names contain dots and dollars, though such documents
+can be retrieved verbatim (once they are matched using some other strategy).
+
+Mongoid provides its own DSL for querying MongoDB and, unlike MongoDB 5.0,
+Mongoid does not yet provide any facilities for querying documents using
+field names containing dots and dollars. It is possible to query such documents
+using MQL, but not via most Mongoid DSL methods. Additionally, there is
+other code in Mongoid that assumes that the dot (``.``) separates path
+components which may misbehave should a document contain a field with dots
+in its name.
+
+Historically, MongoDB drivers prohibited inserting documents with field names
+containing dots and dollars, since such documents couldn't be queried via
+those field names. This prohibition is now being lifted due to the new
+operators introduced with MongoDB 5.0; however, the required changes in the
+Ruby driver `have not yet been implemented
+<https://jira.mongodb.org/browse/RUBY-2528>`_. By virtue of using the Ruby
+driver to interact with the database, this prohibition on inserting documents
+with field names containing dots and dollars also applies to Mongoid.
+Thus, while both the Ruby driver and Mongoid permit querying documents that
+have been inserted using other mechanisms by field names containing dots and
+dollars, there is presently no possibility to insert such documents using
+either Ruby driver or Mongoid.
+
+To summarize, field names containing dots and dollars have limited support in
+Mongoid, the Ruby MongoDB driver and MongoDB server. Such field names should
+only be used when interfacing with software that already uses these names,
+and should be avoided for new development.
