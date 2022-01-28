@@ -133,8 +133,8 @@ in ``after_*`` callbacks. This follows ActiveRecord/ActiveModel behavior.
     field :age, type: Integer
 
     after_save do
-        p self
-        p attribute_was(:age)
+      p self
+      p attribute_was(:age)
     end
   end
 
