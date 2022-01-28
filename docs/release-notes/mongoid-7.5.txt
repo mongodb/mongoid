@@ -119,6 +119,61 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
 +---------------------------------------+---------------------------------------+
 
 
+``any_of`` Adds Multiple Arguments As Top-Level Conditions
+----------------------------------------------------------
+
+**Breaking change:** When ``any_of`` is invoked with multiple conditions, the
+conditions are now added to the top level of the criteria, same as when
+``any_of`` is invoked with a single condition. Previously when multiple
+conditions were provided, and the criteria already had an ``$or`` operator,
+the new conditions would be added to the existing ``$or`` as an additional
+branch.
+
+Mongoid 7.5 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}],
+  #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Mongoid 7.4 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990},
+  #     {"members"=>2}, {"last_tour"=>1995}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+
 ``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
 --------------------------------------------------------------------------
 

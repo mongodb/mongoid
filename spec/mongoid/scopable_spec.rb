@@ -780,9 +780,11 @@ describe Mongoid::Scopable do
             "$or" => [
               { "ccc" => nil },
               { "ccc" => { "$gt" => 1.0 }},
+            ],
+            '$and' => ['$or' => [
               { "aaa" => { "$gt" => 0.0 }},
               { "bbb" => { "$gt" => 0.0 }}
-            ]
+            ]],
           })
         end
       end

@@ -1344,6 +1344,34 @@ describe Mongoid::Criteria::Queryable::Selectable do
           )
         end
       end
+
+      context 'when any_of has multiple arguments' do
+
+        let(:selection) do
+          query.or(field: [ 1, 2 ]).where(foo: 'bar').any_of({a: 1}, {b: 2})
+        end
+
+        it 'adds the new condition to top level' do
+          expect(selection.selector).to eq(
+            '$or' => [{'field' => [1, 2]}],
+            'foo' => 'bar',
+            '$and' => [{'$or' => [{'a' => 1}, {'b' => 2}]}],
+          )
+        end
+
+        context 'when query already has a top-level $and' do
+          let(:selection) do
+            query.or(field: [ 1, 2 ]).where('$and' => [foo: 'bar']).any_of({a: 1}, {b: 2})
+          end
+
+          it 'adds the new condition to top level $and' do
+            expect(selection.selector).to eq(
+              '$or' => [{'field' => [1, 2]}],
+              '$and' => [{'foo' => 'bar'}, {'$or' => [{'a' => 1}, {'b' => 2}]}],
+            )
+          end
+        end
+      end
     end
 
     context "when provided multiple criteria" do
