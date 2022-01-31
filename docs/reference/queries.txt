@@ -1705,6 +1705,53 @@ that would affect its visibility within the scoped association.
   label.bands # [ band ] Must reload.
   label.reload.bands # []
 
+.. note::
+
+  After the default scope is applied, it is no longer distinguished from
+  other query conditions. This can lead to surprising behavior when using
+  ``or`` and ``nor`` operators in particular:
+
+  .. code-block:: ruby
+
+    class Band
+      include Mongoid::Document
+      
+      field :name
+      field :active
+      field :touring
+      
+      default_scope ->{ where(active: true) }
+    end
+    
+    Band.where(name: 'Infected Mushroom')
+    # => 
+    # #<Mongoid::Criteria
+    #   selector: {"active"=>true, "name"=>"Infected Mushroom"}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+    
+    Band.where(name: 'Infected Mushroom').or(touring: true)
+    # => 
+    # #<Mongoid::Criteria
+    #   selector: {"$or"=>[{"active"=>true, "name"=>"Infected Mushroom"}, {"touring"=>true}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+    
+    Band.or(touring: true)
+    # => 
+    # #<Mongoid::Criteria
+    #   selector: {"$or"=>[{"active"=>true}, {"touring"=>true}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+    
+  In the last example, you might expect the two conditions
+  (``active: true`` and ``touring: true``) to be combined with an ``$and``,
+  but because the ``Band`` class already has the scope applied to it,
+  it becomes one of the disjunction branches of the ``or``.
+
 
 Runtime Default Scope Override
 ------------------------------
