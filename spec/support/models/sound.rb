@@ -5,3 +5,6 @@ class Sound
   field :active, type: Mongoid::Boolean
   default_scope ->{ where(active: true) }
 end
+
+class AudibleSound < Sound
+end

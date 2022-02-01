@@ -110,6 +110,21 @@ describe Mongoid::Scopable do
         expect(Band).to be_default_scoping
       end
     end
+    
+    context "when parent class has default scope" do 
+      
+      before do 
+        Sound.send(:include, Ownable)
+      end
+      
+      let (:selector) do 
+        AudibleSound.all.selector
+      end
+      
+      it "the subclass doesn't duplicate the default scope in the selector" do
+        expect(selector).to eq({'active' => true})
+      end
+    end
   end
 
   describe ".default_scopable?" do
