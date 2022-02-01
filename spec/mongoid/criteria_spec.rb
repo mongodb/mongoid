@@ -3627,6 +3627,23 @@ describe Mongoid::Criteria do
           'foo' => 1, '$and' => [{'foo' => 2}], 'bar' => 3)
       end
     end
+    
+    context "when duplicating where conditions" do 
+      let(:criteria) { Sound.where(active: true).where(active: true) }
+      
+      it 'does not duplicate criteria' do
+        expect(criteria.selector).to eq('active' => true)
+      end
+    end
+    
+    context "when duplicating where conditions with different values" do 
+      let(:criteria) { Sound.where(active: true).where(active: false).where(active: true).where(active: false) }
+      
+      it 'does not duplicate criteria' do
+        expect(criteria.selector).to eq(
+          'active' => true, '$and' => [{'active' => false}])
+      end
+    end
   end
 
   describe "#for_js" do
