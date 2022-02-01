@@ -681,16 +681,7 @@ module Mongoid
                 end]
               end
             end
-            # Should be able to do:
-            #where('$or' => exprs)
-            # But since that is broken do instead:
-            clone.tap do |query|
-              if query.selector['$or']
-                query.selector.store('$or', query.selector['$or'] + exprs)
-              else
-                query.selector.store('$or', exprs)
-              end
-            end
+            self.and('$or' => exprs)
           end
         end
 
