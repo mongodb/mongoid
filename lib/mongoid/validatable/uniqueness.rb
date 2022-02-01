@@ -94,8 +94,10 @@ module Mongoid
       # @return [ Criteria ] The criteria.
       def create_criteria(base, document, attribute, value)
         criteria = scope(base.unscoped, document, attribute)
-        field = document.fields[attribute.to_s]
-        criteria.selector.update(criterion(document, attribute, field.mongoize(value)))
+        field_name = document.aliased_fields[attribute.to_s] || attribute.to_s
+        field = document.fields[field_name]
+        mongoized = field&.localized? ? value.mongoize : field.mongoize(value) 
+        criteria.selector.update(criterion(document, attribute, mongoized))
         criteria
       end
 
