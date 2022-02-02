@@ -95,19 +95,18 @@ module Mongoid
       def create_criteria(base, document, attribute, value)
         criteria = scope(base.unscoped, document, attribute)
         field = document.fields[document.database_field_name(attribute)]
-        
+
         # In the past, we were calling value.mongoize in all cases, which
-        # would call Object's mongoize method. This is a problem for StringifiedSymbol, 
-        # because a symbol should mongoize to a string, but calling .mongoize on a 
-        # Symbol mongoizes it to a Symbol, when StringifiedSymbol's mongoize should 
-        # mongoize it to a string. 
+        # would call Object's mongoize method. This is a problem for StringifiedSymbol,
+        # because a Symbol should mongoize to a String, but calling .mongoize
+        # on a Symbol mongoizes it to a Symbol.
         # Therefore, we call the field's mongoize in all cases except when the field is
         # localized, because by the time we arrive at this code, the value is already
         # in the form of { lang => translation } and calling the fields mongoize will
         # nest that further into { lang => "\{ lang => translation \}"} (assuming the
-        # field type is a string). Therefore, we just call object's mongoize so it 
-        # returns the hash as it is. 
-        mongoized = field.try(:localized?) ? value.mongoize : field.mongoize(value) 
+        # field type is a string). Therefore, we just call object's mongoize so it
+        # returns the hash as it is.
+        mongoized = field.try(:localized?) ? value.mongoize : field.mongoize(value)
         criteria.selector.update(criterion(document, attribute, mongoized))
         criteria
       end
