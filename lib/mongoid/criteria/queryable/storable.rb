@@ -54,7 +54,7 @@ module Mongoid
               # adding them to the existing hash.
               new_value = selector[field].merge(value)
               selector.store(field, new_value)
-            else
+            elsif selector[field] != value
               add_operator_expression('$and', [{field => value}])
             end
           else
