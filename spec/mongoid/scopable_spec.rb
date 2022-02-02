@@ -113,10 +113,6 @@ describe Mongoid::Scopable do
     
     context "when parent class has default scope" do 
       
-      before do 
-        Sound.send(:include, Ownable)
-      end
-      
       let (:selector) do 
         AudibleSound.all.selector
       end
