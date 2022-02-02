@@ -223,4 +223,35 @@ describe 'callbacks integration tests' do
       obj.previous.should == 2
     end
   end
+
+  context 'atomic_selector in after_save callback' do
+    let(:name) do
+      'Alice'
+    end
+
+    let(:new_name) do
+      'Bob'
+    end
+
+    class CBIntSpecProfile
+      include Mongoid::Document
+      field :name, type: String
+      shard_key :name
+
+      attr_reader :atomic_selector_in_after_save
+
+      after_save do |document|
+        @atomic_selector_in_after_save = document.atomic_selector
+      end
+    end
+
+    it 'has updated attributes' do
+      profile = CBIntSpecProfile.create!(name: name)
+      profile.name = new_name
+      profile.save!
+      expect(
+        profile.atomic_selector_in_after_save['name']
+      ).to eq(new_name)
+    end
+  end
 end
