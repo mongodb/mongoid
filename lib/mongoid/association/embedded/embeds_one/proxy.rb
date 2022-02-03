@@ -75,7 +75,7 @@ module Mongoid
                 # The change I introduce here, respecifies palette as a "new
                 # record" when it gets removed from the database, so if it is
                 # reassigned, it will be reinserted into the database.
-                _target.new_record = true
+                _target.new_record = true if Mongoid.update_embedded_after_nil
               end
               unbind_one
               return nil unless replacement
