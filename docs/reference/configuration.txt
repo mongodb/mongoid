@@ -296,6 +296,23 @@ for details on driver options.
       # existing method. (default: false)
       scope_overwrite_exception: false
 
+      # In Mongoid 7.3.3 and earlier, when setting an embedded document, setting
+      # it to nil, and then setting it again to that same original value, the
+      # second update would not work and the value for the embedded document
+      # would remain nil. Take this case:
+      #
+      # canvas.palette = palette
+      # canvas.palette = nil
+      # canvas.palette = palette
+      # Where canvas embeds_one palette.
+      #
+      # In 7.3.3 and earlier, canvas.palette would be nil when we would expect
+      # it to be palette. Since fixing this would be a breaking change, we have
+      # put this fix behind this feature flag. Turning this flag on fixes this
+      # bug, and canvas.palette would contain the correct value: the assigned
+      # palette. (default: false)
+      update_embedded_after_nil: false
+
       # Use ActiveSupport's time zone in time operations instead of
       # the Ruby default time zone. See the time zone section below for
       # further information. (default: true)
