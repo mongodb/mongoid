@@ -74,6 +74,10 @@ module Mongoid
     # Return stored times as UTC.
     option :use_utc, default: false
 
+    # Update embedded documents correctly when setting it, unsetting it
+    # and resetting it. See MONGOID-5206 for more details.
+    option :update_embedded_after_nil, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
