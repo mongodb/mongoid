@@ -168,15 +168,46 @@ describe Mongoid::Association::Accessors do
       end
 
       context "when the association is set to nil first" do
+        context "when update_embedded_after_nil feature flag is set" do
+          around do |example|
+            saved_flag = Mongoid::update_embedded_after_nil
+            Mongoid::update_embedded_after_nil = true
+            begin
+              example.run
+            ensure
+              Mongoid::update_embedded_after_nil = saved_flag
+            end
+          end
+          let!(:name) do
+            person.build_name
+          end
 
-        let!(:name) do
-          person.build_name
+          it "returns true" do
+            person.name = nil
+            person.name = name
+            expect(person).to have_name
+          end
         end
 
-        it "returns true" do
-          person.name = nil
-          person.name = name
-          expect(person).to have_name
+        context "when update_embedded_after_nil feature flag is not set" do
+          around do |example|
+            saved_flag = Mongoid::update_embedded_after_nil
+            Mongoid::update_embedded_after_nil = false
+            begin
+              example.run
+            ensure
+              Mongoid::update_embedded_after_nil = saved_flag
+            end
+          end
+          let!(:name) do
+            person.build_name
+          end
+
+          it "returns true" do
+            person.name = nil
+            person.name = name
+            expect(person).to have_name
+          end
         end
       end
     end

@@ -290,24 +290,69 @@ describe Mongoid::Reloadable do
 
     context "when embedded documents are unasssigned and reassigned" do
 
-      let(:palette) do
-        Palette.new
+      context "when update_embedded_after_nil feature flag is set" do
+        around do |example|
+          saved_flag = Mongoid::update_embedded_after_nil
+          Mongoid::update_embedded_after_nil = true
+          begin
+            example.run
+          ensure
+            Mongoid::update_embedded_after_nil = saved_flag
+          end
+        end
+
+        let(:palette) do
+          Palette.new
+        end
+
+        let(:canvas) do
+          Canvas.create!
+        end
+
+        before do
+          canvas.palette = palette
+          canvas.palette = nil
+          canvas.palette = palette
+          canvas.save!
+          canvas.reload
+        end
+
+        it "reloads the embedded document correctly" do
+          expect(canvas.palette).to eq(palette)
+        end
       end
 
-      let(:canvas) do
-        Canvas.create!
-      end
+      context "when update_embedded_after_nil feature flag is not set" do
 
-      before do
-        canvas.palette = palette
-        canvas.palette = nil
-        canvas.palette = palette
-        canvas.save!
-        canvas.reload
-      end
+        around do |example|
+          saved_flag = Mongoid::update_embedded_after_nil
+          Mongoid::update_embedded_after_nil = false
+          begin
+            example.run
+          ensure
+            Mongoid::update_embedded_after_nil = saved_flag
+          end
+        end
 
-      it "reloads the embedded document correctly" do
-        expect(canvas.palette).to eq(palette)
+        let(:palette) do
+          Palette.new
+        end
+
+        let(:canvas) do
+          Canvas.create!
+        end
+
+        before do
+          canvas.palette = palette
+          canvas.palette = nil
+          canvas.palette = palette
+          canvas.save!
+          canvas.reload
+        end
+
+        it "does not reload the embedded document correctly" do
+          expect(canvas.palette).to be_nil
+        end
       end
     end
 

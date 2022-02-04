@@ -77,6 +77,10 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: false
 
+    # Update embedded documents correctly when setting it, unsetting it
+    # and resetting it. See MONGOID-5206 for more details.
+    option :update_embedded_after_nil, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
