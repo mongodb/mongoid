@@ -377,14 +377,15 @@ describe Mongoid::Reloadable do
           Building.create!
         end
 
-        before do
+        it "persists an embedded document correctly the second time" do
           building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
           building.contractors.clear
+          expect(building.contractors).to eq([])
+
           building.contractors << contractor
           building.reload
-        end
-
-        it "reloads the embedded document correctly" do
           expect(building.contractors).to eq([contractor])
         end
       end
@@ -408,14 +409,15 @@ describe Mongoid::Reloadable do
           Building.create!
         end
 
-        before do
+        it "doesn't persist the embedded document correctly the second time" do
           building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
           building.contractors.clear
+          expect(building.contractors).to eq([])
+
           building.contractors << contractor
           building.reload
-        end
-
-        it "does not reload the embedded document correctly" do
           expect(building.contractors).to eq([])
         end
       end
