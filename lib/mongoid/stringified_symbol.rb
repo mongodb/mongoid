@@ -9,7 +9,7 @@ module Mongoid
       # Convert the object from its mongo friendly ruby type to this type.
       #
       # @example Demongoize the object.
-      #   Symbol.demongoize(object)
+      #   Mongoid::StringifiedSymbol.demongoize(object)
       #
       # @param [ Object ] object The object to demongoize.
       #
@@ -28,7 +28,7 @@ module Mongoid
       # type.
       #
       # @example Mongoize the object.
-      #   Symbol.mongoize("123.11")
+      #   Mongoid::StringifiedSymbol.mongoize("123.11")
       #
       # @param [ Object ] object The object to mongoize.
       #
