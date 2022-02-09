@@ -3,6 +3,14 @@
 class BSON::ObjectId
   alias :bson_ruby_as_json :as_json
 
+  # Return a string representation of the object id for use in
+  # application-level JSON serialization. This method is intentionally
+  # different from #as_extended_json.
+  #
+  # @example Get the object id as a JSON-serializable object.
+  #   object_id.as_json
+  #
+  # @return [ String ] The object id as a string.
   def as_json(options = nil)
     if Mongoid::use_bson_ruby_as_json
       bson_ruby_as_json(options)
