@@ -208,7 +208,11 @@ module Mongoid
         begin
           yield criteria
         ensure
-          Threaded.set_current_scope(previous, self)
+          if Mongoid::restore_previous_scope
+            Threaded.set_current_scope(previous, self)
+          else
+            Threaded.set_current_scope(nil, self)
+          end
         end
       end
 

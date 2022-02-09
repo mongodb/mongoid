@@ -1144,18 +1144,55 @@ describe Mongoid::Scopable do
       let(:c1) { Band.where(active: true) }
       let(:c2) { Band.where(active: false) }
 
-      it 'restores previous scope' do
-        Band.with_scope(c1) do |crit|
-          Band.with_scope(c2) do |crit2|
+      context "when the restore_previous_scope is set" do
+        around do |example|
+          saved_flag = Mongoid::restore_previous_scope
+          Mongoid::restore_previous_scope = true
+          begin
+            example.run
+          ensure
+            Mongoid::restore_previous_scope = saved_flag
+          end
+        end
+
+        it 'restores previous scope' do
+          Band.with_scope(c1) do |crit|
+            Band.with_scope(c2) do |crit2|
+              Mongoid::Threaded.current_scope(Band).selector.should == {
+                'active' => true,
+                '$and' => ['active' => false],
+              }
+            end
+
             Mongoid::Threaded.current_scope(Band).selector.should == {
               'active' => true,
-              '$and' => ['active' => false],
             }
           end
+        end
+      end
 
-          Mongoid::Threaded.current_scope(Band).selector.should == {
-            'active' => true,
-          }
+      context "when the restore_previous_scope is not set" do
+        around do |example|
+          saved_flag = Mongoid::restore_previous_scope
+          Mongoid::restore_previous_scope = false
+          begin
+            example.run
+          ensure
+            Mongoid::restore_previous_scope = saved_flag
+          end
+        end
+
+        it 'does not restore previous scope' do
+          Band.with_scope(c1) do |crit|
+            Band.with_scope(c2) do |crit2|
+              Mongoid::Threaded.current_scope(Band).selector.should == {
+                'active' => true,
+                '$and' => ['active' => false],
+              }
+            end
+
+            Mongoid::Threaded.current_scope(Band).should be_nil
+          end
         end
       end
     end
