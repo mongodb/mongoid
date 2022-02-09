@@ -361,6 +361,52 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the restore_previous_scope option is set in the config' do
+
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { restore_previous_scope: false })
+      end
+
+      it 'sets the Mongoid.restore_previous_scope option to the provided value' do
+        expect(Mongoid.restore_previous_scope).to be(false)
+      end
+    end
+
+    context 'when the value is true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { restore_previous_scope: true })
+      end
+
+      it 'sets the Mongoid.restore_previous_scope option to the provided value' do
+        expect(Mongoid.restore_previous_scope).to be(true)
+      end
+    end
+  end
+
+  context 'when the restore_previous_scope option is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'does not set the Mongoid.restore_previous_scope option' do
+      expect(Mongoid.restore_previous_scope).to be(false)
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do
