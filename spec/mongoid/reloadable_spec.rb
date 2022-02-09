@@ -356,6 +356,73 @@ describe Mongoid::Reloadable do
       end
     end
 
+    context "when embeds_many documents are cleared and reassigned" do
+
+      context "when update_embedded_after_nil feature flag is set" do
+        around do |example|
+          saved_flag = Mongoid::update_embedded_after_nil
+          Mongoid::update_embedded_after_nil = true
+          begin
+            example.run
+          ensure
+            Mongoid::update_embedded_after_nil = saved_flag
+          end
+        end
+
+        let(:contractor) do
+          Contractor.new(name: 'contractor')
+        end
+
+        let(:building) do
+          Building.create!
+        end
+
+        it "persists an embedded document correctly the second time" do
+          building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
+          building.contractors.clear
+          expect(building.contractors).to eq([])
+
+          building.contractors << contractor
+          building.reload
+          expect(building.contractors).to eq([contractor])
+        end
+      end
+
+      context "when update_embedded_after_nil feature flag is not set" do
+        around do |example|
+          saved_flag = Mongoid::update_embedded_after_nil
+          Mongoid::update_embedded_after_nil = false
+          begin
+            example.run
+          ensure
+            Mongoid::update_embedded_after_nil = saved_flag
+          end
+        end
+
+        let(:contractor) do
+          Contractor.new(name: 'contractor')
+        end
+
+        let(:building) do
+          Building.create!
+        end
+
+        it "doesn't persist the embedded document correctly the second time" do
+          building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
+          building.contractors.clear
+          expect(building.contractors).to eq([])
+
+          building.contractors << contractor
+          building.reload
+          expect(building.contractors).to eq([])
+        end
+      end
+    end
+
     context "when embedded document is nil" do
 
       let(:palette) do
