@@ -103,6 +103,10 @@ module Mongoid
     # function.
     option :compare_time_by_ms, default: false
 
+    # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
+    # the one monkey-patched into Mongoid.
+    option :use_bson_ruby_as_json, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

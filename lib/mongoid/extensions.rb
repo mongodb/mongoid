@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
 class BSON::ObjectId
+  alias :bson_ruby_as_json :as_json
+
   def as_json(options = nil)
-    { "$oid" => to_s }
+    if Mongoid::use_bson_ruby_as_json
+      bson_ruby_as_json(options)
+    else
+      { "$oid" => to_s }
+    end
   end
 end
 
