@@ -272,7 +272,6 @@ describe Mongoid::Config do
 
   context 'when the update_embedded_after_nil option is set in the config' do
 
-
     before do
       Mongoid.configure do |config|
         config.load_configuration(conf)
