@@ -35,9 +35,14 @@ module Mongoid
           pre_process_batch_remove(docs, :delete)
           unless docs.empty?
             collection.find(selector).update_one(
-                positionally(selector, "$unset" => { path => true }),
-                session: _session
+              positionally(selector, "$unset" => { path => true }),
+              session: _session
             )
+            # This solves the case in which a user sets, clears and resets an
+            # embedded document. Previously, since the embedded document was
+            # already marked not a "new_record", it wouldn't be persisted to
+            # the second time. This change fixes that and allows it to be persisted.
+            docs.each { |doc| doc.new_record = true } if Mongoid::update_embedded_after_nil
             post_process_batch_remove(docs, :delete)
           end
           _unscoped.clear
