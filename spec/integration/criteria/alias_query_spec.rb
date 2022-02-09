@@ -24,27 +24,77 @@ describe 'distinct on aliased fields' do
 
   let(:command) { event.command }
 
-  context 'top level field' do
-    let(:query) do
-      Person.distinct(:test)
+  context 'when fix_embedded_alias_pluck_distinct is set' do
+
+    around do |example|
+      saved_flag = Mongoid::fix_embedded_alias_pluck_distinct
+      Mongoid::fix_embedded_alias_pluck_distinct = true
+      begin
+        example.run
+      ensure
+        Mongoid::fix_embedded_alias_pluck_distinct = saved_flag
+      end
     end
 
-    it 'expands the alias' do
-      query
+    context 'top level field' do
+      let(:query) do
+        Person.distinct(:test)
+      end
 
-      command['key'].should == 't'
+      it 'expands the alias' do
+        query
+
+        command['key'].should == 't'
+      end
+    end
+
+    context 'embedded document field' do
+      let(:query) do
+        Person.distinct('phone_numbers.extension')
+      end
+
+      it 'expands the alias' do
+        query
+
+        command['key'].should == 'phone_numbers.ext'
+      end
     end
   end
 
-  context 'embedded document field' do
-    let(:query) do
-      Person.distinct('phone_numbers.extension')
+  context 'when fix_embedded_alias_pluck_distinct is not set' do
+
+    around do |example|
+      saved_flag = Mongoid::fix_embedded_alias_pluck_distinct
+      Mongoid::fix_embedded_alias_pluck_distinct = false
+      begin
+        example.run
+      ensure
+        Mongoid::fix_embedded_alias_pluck_distinct = saved_flag
+      end
     end
 
-    it 'expands the alias' do
-      query
+    context 'top level field' do
+      let(:query) do
+        Person.distinct(:test)
+      end
 
-      command['key'].should == 'phone_numbers.ext'
+      it 'expands the alias' do
+        query
+
+        command['key'].should == 't'
+      end
+    end
+
+    context 'embedded document field' do
+      let(:query) do
+        Person.distinct('phone_numbers.extension')
+      end
+
+      it 'deos not expands the alias' do
+        query
+
+        command['key'].should == 'phone_numbers.extension'
+      end
     end
   end
 end
@@ -71,27 +121,77 @@ describe 'pluck on aliased fields' do
 
   let(:command) { event.command }
 
-  context 'top level field' do
-    let(:query) do
-      Person.pluck(:test)
+  context 'when fix_embedded_alias_pluck_distinct is set' do
+
+    around do |example|
+      saved_flag = Mongoid::fix_embedded_alias_pluck_distinct
+      Mongoid::fix_embedded_alias_pluck_distinct = true
+      begin
+        example.run
+      ensure
+        Mongoid::fix_embedded_alias_pluck_distinct = saved_flag
+      end
     end
 
-    it 'expands the alias' do
-      query
+    context 'top level field' do
+      let(:query) do
+        Person.pluck(:test)
+      end
 
-      command['projection'].should == {'t' => 1}
+      it 'expands the alias' do
+        query
+
+        command['projection'].should == {'t' => 1}
+      end
+    end
+
+    context 'embedded document field' do
+      let(:query) do
+        Person.pluck('phone_numbers.extension')
+      end
+
+      it 'expands the alias' do
+        query
+
+        command['projection'].should == {'phone_numbers.ext' => 1}
+      end
     end
   end
 
-  context 'embedded document field' do
-    let(:query) do
-      Person.pluck('phone_numbers.extension')
+  context 'when fix_embedded_alias_pluck_distinct is not set' do
+
+    around do |example|
+      saved_flag = Mongoid::fix_embedded_alias_pluck_distinct
+      Mongoid::fix_embedded_alias_pluck_distinct = false
+      begin
+        example.run
+      ensure
+        Mongoid::fix_embedded_alias_pluck_distinct = saved_flag
+      end
     end
 
-    it 'expands the alias' do
-      query
+    context 'top level field' do
+      let(:query) do
+        Person.pluck(:test)
+      end
 
-      command['projection'].should == {'phone_numbers.ext' => 1}
+      it 'expands the alias' do
+        query
+
+        command['projection'].should == {'t' => 1}
+      end
+    end
+
+    context 'embedded document field' do
+      let(:query) do
+        Person.pluck('phone_numbers.extension')
+      end
+
+      it 'does not expand the alias' do
+        query
+
+        command['projection'].should == {'phone_numbers.extension' => 1}
+      end
     end
   end
 end
