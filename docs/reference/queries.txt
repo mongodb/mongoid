@@ -1788,6 +1788,7 @@ at runtime:
   ``Mongoid::restore_previous_scope`` global flag to true in order to get the
   correct functionality.
 
+
 Class Methods
 -------------
 
