@@ -374,7 +374,8 @@ for details on driver options.
 
       # In Mongoid 7.3.3 and earlier, the BSON::ObjectId#as_json method would
       # default to returning { "$oid" => id.to_s }. Turning off this flag will
-      # defer the as_json call to bson-ruby's implementation of BSON::ObjectId#as_json.
+      # defer the as_json call to bson-ruby's implementation of 
+      # BSON::ObjectId#as_json. (default: true)
       use_bson_ruby_as_json: true
 
       # Return stored times as UTC. See the time zone section below for
