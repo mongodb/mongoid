@@ -28,7 +28,11 @@ module Mongoid
         def aggregates(field)
           result = collection.find.aggregate(pipeline(field), session: _session).to_a
           if result.empty?
-            Aggregable::EMPTY_RESULT.dup
+            if Mongoid::return_nil_on_aggregate_none
+              Aggregable::EMPTY_RESULT.dup
+            else
+              { "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil }
+            end
           else
             result.first
           end

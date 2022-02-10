@@ -87,6 +87,7 @@ module Mongoid
 
     # Restore previous scope after with_scope returns.
     option :restore_previous_scope, default: false
+    option :return_nil_on_aggregate_none, default: false
 
     # Respect aliased fields in pluck/distinct by recursively considering
     # embedded documents.
