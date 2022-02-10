@@ -851,7 +851,7 @@ The opposite of ``only``, ``without`` causes the specified fields to be omitted:
 .. code-block:: ruby
 
   Band.without(:name)
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {}
   #   options:  {:fields=>{"name"=>0}}
@@ -864,7 +864,7 @@ as its ``id`` alias) cannot be omitted via ``without``:
 .. code-block:: ruby
 
   Band.without(:name, :id)
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {}
   #   options:  {:fields=>{"name"=>0}}
@@ -872,7 +872,7 @@ as its ``id`` alias) cannot be omitted via ``without``:
   #   embedded: false>
 
   Band.without(:name, :_id)
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {}
   #   options:  {:fields=>{"name"=>0}}
@@ -1191,10 +1191,10 @@ Mongoid also has some helpful methods on criteria.
 
        *Get a list of distinct values for a single field. Note this will always hit
        the database for the distinct values.*
-       
+
        *This method accepts the dot notation, thus permitting referencing
        fields in embedded associations.*
-       
+
        *This method respects :ref:`field aliases <field-aliases>`,
        including those defined in embedded documents.*
 
@@ -1206,14 +1206,14 @@ Mongoid also has some helpful methods on criteria.
             distinct(:name)
 
           Band.distinct('cities.name')
-          
+
           # Assuming an aliased field:
           class Manager
             include Mongoid::Document
             embedded_in :band
             field :name, as: :n
           end
-          
+
           # Expands out to "managers.name" in the query:
           Band.distinct('managers.n')
 
@@ -1362,10 +1362,10 @@ Mongoid also has some helpful methods on criteria.
 
        *Get all the values for the provided field.
        Returns nil for unset fields and for non-existent fields.*
-       
+
        *This method accepts the dot notation, thus permitting referencing
        fields in embedded associations.*
-       
+
        *This method respects :ref:`field aliases <field-aliases>`,
        including those defined in embedded documents.*
 
@@ -1457,10 +1457,10 @@ field, a ``Date`` field and an implicit ``Object`` field, and also
 intentionally does not define a field called ``deregistered_at``:
 
   .. code-block:: ruby
-  
+
     class Voter
       include Mongoid::Document
-      
+
       field :born_on, type: Date
       field :registered_at, type: Time
       field :voted_at
@@ -1473,7 +1473,7 @@ values, respectively, are straightforward:
 
     Voter.where(born_on: Date.today).selector
     # => {"born_on"=>2020-12-18 00:00:00 UTC}
-    
+
     Voter.where(registered_at: Time.now).selector
     # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
 
@@ -1484,13 +1484,13 @@ in all possible scenarios:
 
     Voter.where(born_on: Date.today).selector
     # => {"born_on"=>2020-12-18 00:00:00 UTC}
-    
+
     Voter.where(registered_at: Date.today).selector
     # => {"registered_at"=>2020-12-18 00:00:00 -0500}
-    
+
     Voter.where(voted_at: Date.today).selector
     # => {"voted_at"=>Fri, 18 Dec 2020}
-    
+
     Voter.where(deregistered_at: Date.today).selector
     # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
 
@@ -1715,38 +1715,38 @@ that would affect its visibility within the scoped association.
 
     class Band
       include Mongoid::Document
-      
+
       field :name
       field :active
       field :touring
-      
+
       default_scope ->{ where(active: true) }
     end
-    
+
     Band.where(name: 'Infected Mushroom')
-    # => 
+    # =>
     # #<Mongoid::Criteria
     #   selector: {"active"=>true, "name"=>"Infected Mushroom"}
     #   options:  {}
     #   class:    Band
     #   embedded: false>
-    
+
     Band.where(name: 'Infected Mushroom').or(touring: true)
-    # => 
+    # =>
     # #<Mongoid::Criteria
     #   selector: {"$or"=>[{"active"=>true, "name"=>"Infected Mushroom"}, {"touring"=>true}]}
     #   options:  {}
     #   class:    Band
     #   embedded: false>
-    
+
     Band.or(touring: true)
-    # => 
+    # =>
     # #<Mongoid::Criteria
     #   selector: {"$or"=>[{"active"=>true}, {"touring"=>true}]}
     #   options:  {}
     #   class:    Band
     #   embedded: false>
-    
+
   In the last example, you might expect the two conditions
   (``active: true`` and ``touring: true``) to be combined with an ``$and``,
   but because the ``Band`` class already has the scope applied to it,
@@ -1772,14 +1772,21 @@ at runtime:
   criteria = Band.with_scope(Band.english) do
     Band.all
   end
-  
+
   criteria
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {"country"=>"England"}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
+
+.. note::
+
+  In Mongoid versions 7.3.3 and earlier, there is a bug in ``with_scope``
+  where the previous scope is lost after the function returns. Set the
+  ``Mongoid::restore_previous_scope`` global flag to true in order to get the
+  correct functionality.
 
 
 Class Methods

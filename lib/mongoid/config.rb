@@ -82,6 +82,9 @@ module Mongoid
     # ruby behavior. See the following PR for an explanation: https://github.com/mongodb/mongoid/pull/5013
     option :triple_equals_uses_is_a, default: false
 
+    # Restore previous scope after with_scope returns.
+    option :restore_previous_scope, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
