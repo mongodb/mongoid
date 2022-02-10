@@ -165,9 +165,40 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           expect(aggregates["min"]).to be_nil
         end
 
-        it "returns a sum" do
-          expect(aggregates["sum"]).to eq 0
+        context "when return_zero_on_sum_none feature flag is set" do
+
+          around do |example|
+            saved_flag = Mongoid::return_zero_on_sum_none
+            Mongoid::return_zero_on_sum_none = true
+            begin
+              example.run
+            ensure
+              Mongoid::return_zero_on_sum_none = saved_flag
+            end
+          end
+
+          it "returns a sum" do
+            expect(aggregates["sum"]).to eq 0
+          end
         end
+
+        context "when return_zero_on_sum_none feature flag is not set" do
+
+          around do |example|
+            saved_flag = Mongoid::return_zero_on_sum_none
+            Mongoid::return_zero_on_sum_none = false
+            begin
+              example.run
+            ensure
+              Mongoid::return_zero_on_sum_none = saved_flag
+            end
+          end
+
+          it "returns nil" do
+            expect(aggregates["sum"]).to be_nil
+          end
+        end
+
       end
 
       context "when the field sometimes exists" do
@@ -238,8 +269,38 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           context.aggregates(:non_existent)
         end
 
-        it "returns nil" do
-          expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => nil, "min" => nil, "max" => nil })
+        context "when return_zero_on_sum_none feature flag is set" do
+
+          around do |example|
+            saved_flag = Mongoid::return_zero_on_sum_none
+            Mongoid::return_zero_on_sum_none = true
+            begin
+              example.run
+            ensure
+              Mongoid::return_zero_on_sum_none = saved_flag
+            end
+          end
+
+          it "returns empty result" do
+            expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => nil, "min" => nil, "max" => nil })
+          end
+        end
+
+        context "when return_zero_on_sum_none feature flag is not set" do
+
+          around do |example|
+            saved_flag = Mongoid::return_zero_on_sum_none
+            Mongoid::return_zero_on_sum_none = false
+            begin
+              example.run
+            ensure
+              Mongoid::return_zero_on_sum_none = saved_flag
+            end
+          end
+
+          it "returns empty result" do
+            expect(aggregates).to eq({ "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil })
+          end
         end
       end
     end
