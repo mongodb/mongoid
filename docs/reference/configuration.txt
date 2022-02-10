@@ -292,6 +292,11 @@ for details on driver options.
       # (default: true)
       raise_not_found_error: true
 
+      # In Mongoid 7.3.3 and earlier, there was a bug when using with_scope
+      # that after the function returned, any previous scopes were lost.
+      # Turning this flag on fixes that bug. (default: false)
+      restore_previous_scope: false
+
       # Raise an error when defining a scope with the same name as an
       # existing method. (default: false)
       scope_overwrite_exception: false
