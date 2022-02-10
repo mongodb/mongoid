@@ -270,6 +270,51 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the update_embedded_after_nil option is set in the config' do
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { update_embedded_after_nil: false })
+      end
+
+      it 'sets the Mongoid.update_embedded_after_nil option to the provided value' do
+        expect(Mongoid.update_embedded_after_nil).to be(false)
+      end
+    end
+
+    context 'when the value is true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { update_embedded_after_nil: true })
+      end
+
+      it 'sets the Mongoid.update_embedded_after_nil option to the provided value' do
+        expect(Mongoid.update_embedded_after_nil).to be(true)
+      end
+    end
+  end
+
+  context 'when the update_embedded_after_nil option is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'does not set the Mongoid.update_embedded_after_nil option' do
+      expect(Mongoid.update_embedded_after_nil).to be(false)
+    end
+  end
+
   context 'when the triple_equals_uses_is_a option is set in the config' do
 
 
