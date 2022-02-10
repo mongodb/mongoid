@@ -26,12 +26,12 @@ describe Mongoid::Contextual::Aggregable::None do
     context "when return_zero_on_sum_none feature flag is set" do
 
       around do |example|
-        saved_flag = Mongoid::return_zero_on_sum_none
-        Mongoid::return_zero_on_sum_none = true
+        saved_flag = Mongoid.return_zero_on_sum_none
+        Mongoid.return_zero_on_sum_none = true
         begin
           example.run
         ensure
-          Mongoid::return_zero_on_sum_none = saved_flag
+          Mongoid.return_zero_on_sum_none = saved_flag
         end
       end
 
@@ -43,12 +43,12 @@ describe Mongoid::Contextual::Aggregable::None do
     context "when return_zero_on_sum_none feature flag is not set" do
 
       around do |example|
-        saved_flag = Mongoid::return_zero_on_sum_none
-        Mongoid::return_zero_on_sum_none = false
+        saved_flag = Mongoid.return_zero_on_sum_none
+        Mongoid.return_zero_on_sum_none = false
         begin
           example.run
         ensure
-          Mongoid::return_zero_on_sum_none = saved_flag
+          Mongoid.return_zero_on_sum_none = saved_flag
         end
       end
 

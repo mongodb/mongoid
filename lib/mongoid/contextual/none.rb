@@ -26,7 +26,7 @@ module Mongoid
       #   turn one, this will always be zero. Otherwise, it will return the
       #   field name as a symbol.
       def sum(_field = nil)
-        Mongoid::return_zero_on_sum_none ? new_sum(_field) : old_sum(_field)
+        Mongoid.return_zero_on_sum_none ? new_sum(_field) : old_sum(_field)
       end
 
       # Check if the context is equal to the other object.
@@ -116,7 +116,7 @@ module Mongoid
       #
       # @return [ Integer ] Always zero.
       def length
-        Mongoid::return_zero_on_sum_none ? 0 : entries.length
+        Mongoid.return_zero_on_sum_none ? 0 : entries.length
       end
       alias :size :length
 
