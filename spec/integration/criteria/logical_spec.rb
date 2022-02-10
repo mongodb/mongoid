@@ -29,12 +29,12 @@ describe 'Criteria logical operations' do
     context "when fix_multiple_ands feature flag is set" do
 
       around do |example|
-        saved_flag = Mongoid::fix_multiple_ands
-        Mongoid::fix_multiple_ands = true
+        saved_flag = Mongoid.fix_multiple_ands
+        Mongoid.fix_multiple_ands = true
         begin
           example.run
         ensure
-          Mongoid::fix_multiple_ands = saved_flag
+          Mongoid.fix_multiple_ands = saved_flag
         end
       end
 
@@ -53,12 +53,12 @@ describe 'Criteria logical operations' do
     context "when fix_multiple_ands feature flag is not set" do
 
       around do |example|
-        saved_flag = Mongoid::fix_multiple_ands
-        Mongoid::fix_multiple_ands = false
+        saved_flag = Mongoid.fix_multiple_ands
+        Mongoid.fix_multiple_ands = false
         begin
           example.run
         ensure
-          Mongoid::fix_multiple_ands = saved_flag
+          Mongoid.fix_multiple_ands = saved_flag
         end
       end
 
