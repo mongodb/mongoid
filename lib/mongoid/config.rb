@@ -95,6 +95,10 @@ module Mongoid
     # embedded documents.
     option :fix_embedded_alias_pluck_distinct, default: false
 
+    # Fixes add_logical_operator_expression when attempting to add multiple
+    # clauses that use the same operator on the same field.
+    option :fix_multiple_ands, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

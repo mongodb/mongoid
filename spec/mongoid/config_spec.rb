@@ -307,6 +307,52 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when the fix_multiple_ands option is set in the config' do
+
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { fix_multiple_ands: false })
+      end
+
+      it 'sets the Mongoid.fix_multiple_ands option to the provided value' do
+        expect(Mongoid.fix_multiple_ands).to be(false)
+      end
+    end
+
+    context 'when the value is true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { fix_multiple_ands: true })
+      end
+
+      it 'sets the Mongoid.fix_multiple_ands option to the provided value' do
+        expect(Mongoid.fix_multiple_ands).to be(true)
+      end
+    end
+  end
+
+  context 'when the fix_multiple_ands option is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'does not set the Mongoid.fix_multiple_ands option' do
+      expect(Mongoid.fix_multiple_ands).to be(false)
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do
