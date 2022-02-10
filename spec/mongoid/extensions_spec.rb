@@ -12,12 +12,12 @@ describe BSON::ObjectId do
 
     context "when use_bson_ruby_as_json is set" do
       around do |example|
-        saved_flag = Mongoid::use_bson_ruby_as_json
-        Mongoid::use_bson_ruby_as_json = true
+        saved_flag = Mongoid.use_bson_ruby_as_json
+        Mongoid.use_bson_ruby_as_json = true
         begin
           example.run
         ensure
-          Mongoid::use_bson_ruby_as_json = saved_flag
+          Mongoid.use_bson_ruby_as_json = saved_flag
         end
       end
 
@@ -28,12 +28,12 @@ describe BSON::ObjectId do
 
     context "when use_bson_ruby_as_json is not set" do
       around do |example|
-        saved_flag = Mongoid::use_bson_ruby_as_json
-        Mongoid::use_bson_ruby_as_json = false
+        saved_flag = Mongoid.use_bson_ruby_as_json
+        Mongoid.use_bson_ruby_as_json = false
         begin
           example.run
         ensure
-          Mongoid::use_bson_ruby_as_json = saved_flag
+          Mongoid.use_bson_ruby_as_json = saved_flag
         end
       end
 
