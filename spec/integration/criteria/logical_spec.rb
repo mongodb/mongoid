@@ -26,15 +26,52 @@ describe 'Criteria logical operations' do
       expect(bands.to_a).to eq([sp])
     end
 
-    it 'combines existing `$and` clause in query and `where` condition' do
-      bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
-      expect(bands.selector).to eq(
-        {
-          "_id"=>1,
-          "year"=>{"$in"=>[2020]},
-          "$and"=>[{"year"=>{"$in"=>[2021]}}, {"_id"=>2}]
-        }
-      )
+    context "when fix_multiple_ands feature flag is set" do
+
+      around do |example|
+        saved_flag = Mongoid::fix_multiple_ands
+        Mongoid::fix_multiple_ands = true
+        begin
+          example.run
+        ensure
+          Mongoid::fix_multiple_ands = saved_flag
+        end
+      end
+
+      it 'combines existing `$and` clause in query and `where` condition' do
+        bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
+        expect(bands.selector).to eq(
+          {
+            "_id"=>1,
+            "year"=>{"$in"=>[2020]},
+            "$and"=>[{"year"=>{"$in"=>[2021]}}, {"_id"=>2}]
+          }
+        )
+      end
+    end
+
+    context "when fix_multiple_ands feature flag is not set" do
+
+      around do |example|
+        saved_flag = Mongoid::fix_multiple_ands
+        Mongoid::fix_multiple_ands = false
+        begin
+          example.run
+        ensure
+          Mongoid::fix_multiple_ands = saved_flag
+        end
+      end
+
+      it 'combines existing `$and` clause in query and `where` condition' do
+        bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
+        expect(bands.selector).to eq(
+          {
+            "_id"=>1,
+            "year"=>{"$in"=>[2020]},
+            "$and"=>[{"_id"=>2}]
+          }
+        )
+      end
     end
   end
 

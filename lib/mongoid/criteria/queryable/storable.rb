@@ -123,7 +123,7 @@ module Mongoid
           elsif operator == '$and' || selector.empty?
             # $and can always be added to top level and it will be combined
             # with whatever other conditions exist.
-            if current_value = selector[operator]
+            if Mongoid::fix_multiple_ands && current_value = selector[operator]
               new_value = current_value + op_expr
               selector.store(operator, new_value)
             else
