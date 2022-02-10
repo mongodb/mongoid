@@ -224,6 +224,52 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the triple_equals_uses_is_a option is set in the config' do
+
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { triple_equals_uses_is_a: false })
+      end
+
+      it 'sets the Mongoid.triple_equals_uses_is_a option to the provided value' do
+        expect(Mongoid.triple_equals_uses_is_a).to be(false)
+      end
+    end
+
+    context 'when the value is true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { triple_equals_uses_is_a: true })
+      end
+
+      it 'sets the Mongoid.triple_equals_uses_is_a option to the provided value' do
+        expect(Mongoid.triple_equals_uses_is_a).to be(true)
+      end
+    end
+  end
+
+  context 'when the triple_equals_uses_is_a option is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'does not set the Mongoid.triple_equals_uses_is_a option' do
+      expect(Mongoid.triple_equals_uses_is_a).to be(false)
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do

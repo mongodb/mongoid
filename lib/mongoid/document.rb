@@ -273,7 +273,11 @@ module Mongoid
       #
       # @return [ true, false ] True if the classes are equal, false if not.
       def ===(other)
-        other.is_a?(self)
+        if Mongoid.triple_equals_uses_is_a
+          other.is_a?(self)
+        else
+          other.class == Class ? self <= other : other.is_a?(self)
+        end
       end
 
       # Instantiate a new object, only when loaded from the database or when

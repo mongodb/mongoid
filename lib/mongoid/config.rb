@@ -78,6 +78,10 @@ module Mongoid
     # and resetting it. See MONGOID-5206 and MONGOId-5240 for more details.
     option :update_embedded_after_nil, default: false
 
+    # Update the triple equals operator to use only is_a? in alignment with
+    # ruby behavior. See the following PR for an explanation: https://github.com/mongodb/mongoid/pull/5013
+    option :triple_equals_uses_is_a, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
