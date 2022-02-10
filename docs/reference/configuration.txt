@@ -296,6 +296,10 @@ for details on driver options.
       # existing method. (default: false)
       scope_overwrite_exception: false
 
+      # Corrects === behavior to be consistent with Ruby by only calling is_a?
+      # (default: false)
+      triple_equals_uses_is_a: false
+
       # In Mongoid 7.3.3 and earlier, when setting an embedded document, setting
       # it to nil, and then setting it again to that same original value, the
       # second update would not work and the value for the embedded document

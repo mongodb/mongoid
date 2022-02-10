@@ -35,12 +35,18 @@ side with the left hand side as the argument:
 .. code-block:: ruby
 
   ModelClass === instance
-  
+
   # equivalent to:
   instance.is_a?(ModelClass)
 
 Previously, ``===`` returned ``true`` for some cases when the equivalent Ruby
 ``===`` implementation returned false.
+
+.. note::
+
+  In order to get this functionality, the ``Mongoid::triple_equals_uses_is_a``
+  global flag must be set to true. If it is set to false, the ``===`` operator
+  will function as it did in Mongoid 7.3.
 
 Mongoid 7.4 behavior:
 
@@ -49,25 +55,25 @@ Mongoid 7.4 behavior:
   class Band
     include Mongoid::Document
   end
-  
+
   class CoverBand < Band
   end
-  
+
   band = Band.new
   cover_band = CoverBand.new
-  
+
   band === Band
   # => false
-  
+
   cover_band === Band
   # => false
-  
+
   Band === Band
   # => false
-  
+
   CoverBand === Band
   # => false
-  
+
 Mongoid 7.3 behavior:
 
 .. code-block:: ruby
@@ -77,10 +83,10 @@ Mongoid 7.3 behavior:
 
   cover_band === Band
   # => true
-  
+
   Band === Band
   # => true
-  
+
   CoverBand === Band
   # => true
 
@@ -92,7 +98,7 @@ and matches the core Ruby behavior:
 
   Band === band
   # => true
-  
+
   Band === cover_band
   # => true
 
@@ -132,11 +138,11 @@ documents, the aliases are now expanded. Given the following definitions:
     include Mongoid::Document
     embeds_many :managers
   end
-  
+
   class Manager
     include Mongoid::Document
     embedded_in :band
-    
+
     field :name, as: :n
   end
 
