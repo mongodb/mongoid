@@ -1662,12 +1662,12 @@ describe Mongoid::Fields do
 
     context "when the fix_embedded_alias_pluck_distinct is set" do
       around do |example|
-        saved_flag = Mongoid::fix_embedded_alias_pluck_distinct
-        Mongoid::fix_embedded_alias_pluck_distinct = true
+        saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
+        Mongoid.fix_embedded_alias_pluck_distinct = true
         begin
           example.run
         ensure
-          Mongoid::fix_embedded_alias_pluck_distinct = saved_flag
+          Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
         end
       end
 
@@ -1694,12 +1694,12 @@ describe Mongoid::Fields do
 
     context "when the fix_embedded_alias_pluck_distinct is not set" do
       around do |example|
-        saved_flag = Mongoid::fix_embedded_alias_pluck_distinct
-        Mongoid::fix_embedded_alias_pluck_distinct = false
+        saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
+        Mongoid.fix_embedded_alias_pluck_distinct = false
         begin
           example.run
         ensure
-          Mongoid::fix_embedded_alias_pluck_distinct = saved_flag
+          Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
         end
       end
 
