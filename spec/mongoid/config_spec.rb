@@ -361,6 +361,52 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the fix_embedded_alias_pluck_distinct option is set in the config' do
+
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { fix_embedded_alias_pluck_distinct: false })
+      end
+
+      it 'sets the Mongoid.fix_embedded_alias_pluck_distinct option to the provided value' do
+        expect(Mongoid.fix_embedded_alias_pluck_distinct).to be(false)
+      end
+    end
+
+    context 'when the value is true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { fix_embedded_alias_pluck_distinct: true })
+      end
+
+      it 'sets the Mongoid.fix_embedded_alias_pluck_distinct option to the provided value' do
+        expect(Mongoid.fix_embedded_alias_pluck_distinct).to be(true)
+      end
+    end
+  end
+
+  context 'when the fix_embedded_alias_pluck_distinct option is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'does not set the Mongoid.fix_embedded_alias_pluck_distinct option' do
+      expect(Mongoid.fix_embedded_alias_pluck_distinct).to be(false)
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do

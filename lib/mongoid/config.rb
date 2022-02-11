@@ -85,6 +85,10 @@ module Mongoid
     # Restore previous scope after with_scope returns.
     option :restore_previous_scope, default: false
 
+    # Respect aliased fields in pluck/distinct by recursively considering
+    # embedded documents.
+    option :fix_embedded_alias_pluck_distinct, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
