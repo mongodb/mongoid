@@ -559,21 +559,23 @@ the database:
 If the model has a :ref:`shard key <shard-keys>` defined, the shard key value
 is included in the reloading query.
 
-.. note::
 
-  ``reload`` also works when the document has not been persisted, in which case
-  it performs a query using the ``id`` value (and shard key value, if a shard
-  key is defined):
+Reloading Unsaved Documents
+---------------------------
 
-  .. code-block:: ruby
+``reload`` can be called when the document has not yet been persisted.
+In this case ``reload`` performs a ``find`` query using the ``id`` value
+specified in the document (and the shard key value, if a shard key is defined):
 
-    existing = Band.create!(name: 'Photek')
-    
-    # Unsaved document
-    band = Band.new(id: existing.id)
-    band.reload
-    band.name
-    # => "Photek"
+.. code-block:: ruby
+
+  existing = Band.create!(name: 'Photek')
+  
+  # Unsaved document
+  band = Band.new(id: existing.id)
+  band.reload
+  band.name
+  # => "Photek"
 
 
 Accessing Field Values
