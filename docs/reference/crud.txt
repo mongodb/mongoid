@@ -549,15 +549,44 @@ Reloading
 =========
 
 Use the ``reload`` method to fetch the most recent version of a document from
-the database:
+the database. Any unsaved modifications to the document's attributes are lost:
 
 .. code-block:: ruby
 
-  band = Band.find(..)
+  band = Band.create!(name: 'foo')
+  # => #<Band _id: 6206d06de1b8324561f179c9, name: "foo", description: nil, likes: nil>
+
+  band.name = 'bar'
+  band
+  # => #<Band _id: 6206d06de1b8324561f179c9, name: "bar", description: nil, likes: nil>
+
   band.reload
+  # => #<Band _id: 6206d06de1b8324561f179c9, name: "foo", description: nil, likes: nil>
 
 If the model has a :ref:`shard key <shard-keys>` defined, the shard key value
 is included in the reloading query.
+
+If the database does not contain a matching document, Mongoid normally raises
+``Mongoid::Errors::DocumentNotFound``. However, if the configuration option
+``raise_not_found_error`` is set to ``false``, and the database does not
+contain a matching document, Mongoid replaces the current document with a newly
+created document whose attributes are set to default values. Importantly, this
+generally causes the ``_id`` of the document to change, as the following
+example demonstrates:
+
+.. code-block:: ruby
+
+  band = Band.create!
+  # => #<Band _id: 6206d00de1b8324561f179c7, name: "foo", description: nil, likes: nil>
+
+  Mongoid.raise_not_found_error = false
+  band.destroy
+  
+  band.reload
+  # => #<Band _id: 6206d031e1b8324561f179c8, name: nil, description: nil, likes: nil>
+
+For this reason, it is not recommended to use ``reload`` when
+``raise_not_found_error`` is set to ``false``.
 
 
 Reloading Unsaved Documents
