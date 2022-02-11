@@ -44,12 +44,46 @@ describe 'Matcher operators' do
         end
       end
 
-      context 'with $in' do
-        let(:query) do
-          {'started_at' => {:$in => [time_millis]}}
+      context "when compare_time_by_ms feature flag is set" do
+
+        around do |example|
+          saved_flag = Mongoid.compare_time_by_ms
+          Mongoid.compare_time_by_ms = true
+          begin
+            example.run
+          ensure
+            Mongoid.compare_time_by_ms = saved_flag
+          end
         end
 
-        it_behaves_like 'is true'
+        context 'with $in' do
+          let(:query) do
+            {'started_at' => {:$in => [time_millis]}}
+          end
+
+          it_behaves_like 'is true'
+        end
+      end
+
+      context "when compare_time_by_ms feature flag is not set" do
+
+        around do |example|
+          saved_flag = Mongoid.compare_time_by_ms
+          Mongoid.compare_time_by_ms = false
+          begin
+            example.run
+          ensure
+            Mongoid.compare_time_by_ms = saved_flag
+          end
+        end
+
+        context 'with $in' do
+          let(:query) do
+            {'started_at' => {:$in => [time_millis]}}
+          end
+
+          it_behaves_like 'is false'
+        end
       end
 
       context 'when matching an element in an array' do
