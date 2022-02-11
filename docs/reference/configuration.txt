@@ -266,6 +266,12 @@ for details on driver options.
       # Raise an exception when a field is redefined. (default: false)
       duplicate_fields_exception: false
 
+      # In Mongoid 7.3.3 and earlier, the pluck and distinct operations did
+      # not respect aliased fields for embedded documents. Turning on this
+      # flag changes those functions to recognize those aliases.
+      # (default: false)
+      fix_embedded_alias_pluck_distinct: false
+
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
 

@@ -266,17 +266,23 @@ module Mongoid
       #
       # @return [ String ] The name of the field as stored in the database.
       def database_field_name(name)
-        return nil unless name.present?
-        key = name.to_s
-        segment, remaining = key.split('.', 2)
-        segment = aliased_fields[segment]&.dup || segment
-        return segment unless remaining
-
-        relation = relations[aliased_associations[segment] || segment]
-        if relation
-          "#{segment}.#{relation.klass.database_field_name(remaining)}"
+        unless Mongoid::fix_embedded_alias_pluck_distinct
+          return nil unless name
+          normalized = name.to_s
+          aliased_fields[normalized] || normalized
         else
-          "#{segment}.#{remaining}"
+          return nil unless name.present?
+          key = name.to_s
+          segment, remaining = key.split('.', 2)
+          segment = aliased_fields[segment]&.dup || segment
+          return segment unless remaining
+
+          relation = relations[aliased_associations[segment] || segment]
+          if relation
+            "#{segment}.#{relation.klass.database_field_name(remaining)}"
+          else
+            "#{segment}.#{remaining}"
+          end
         end
       end
 

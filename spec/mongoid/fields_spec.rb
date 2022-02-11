@@ -1571,24 +1571,157 @@ describe Mongoid::Fields do
       end
     end
 
-    context 'given nil' do
-      subject { Person.database_field_name(nil) }
-      it { is_expected.to eq nil }
+    shared_examples_for 'pre-fix database_field_name' do
+      subject { Person.database_field_name(key) }
+
+      context 'non-aliased field name' do
+        let(:key) { 't' }
+        it { is_expected.to eq 't' }
+      end
+
+      context 'aliased field name' do
+        let(:key) { 'test' }
+        it { is_expected.to eq 't' }
+      end
+
+      context 'non-aliased embeds one relation' do
+        let(:key) { 'pass' }
+        it { is_expected.to eq 'pass' }
+      end
+
+      context 'aliased embeds one relation' do
+        let(:key) { 'passport' }
+        it { is_expected.to eq 'pass' }
+      end
+
+      context 'non-aliased embeds many relation' do
+        let(:key) { 'mobile_phones' }
+        it { is_expected.to eq 'mobile_phones' }
+      end
+
+      context 'aliased embeds many relation' do
+        let(:key) { 'phones' }
+        it { is_expected.to eq 'mobile_phones' }
+      end
+
+      context 'non-aliased embeds one field' do
+        let(:key) { 'pass.exp' }
+        it { is_expected.to eq 'pass.exp' }
+      end
+
+      context 'aliased embeds one field' do
+        let(:key) { 'passport.expiration_date' }
+        it { is_expected.to eq 'passport.expiration_date' }
+      end
+
+      context 'non-aliased embeds many field' do
+        let(:key) { 'mobile_phones.landline' }
+        it { is_expected.to eq 'mobile_phones.landline' }
+      end
+
+      context 'aliased embeds many field' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'phones.extension' }
+      end
+
+      context 'aliased multi-level embedded document' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'phones.extension' }
+      end
+
+      context 'non-aliased multi-level embedded document' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'phones.extension' }
+      end
+
+      context 'aliased multi-level embedded document field' do
+        let(:key) { 'mobile_phones.country_code.code' }
+        it { is_expected.to eq 'mobile_phones.country_code.code' }
+      end
+
+      context 'non-aliased multi-level embedded document field' do
+        let(:key) { 'phones.country_code.iso_alpha2_code' }
+        it { is_expected.to eq 'phones.country_code.iso_alpha2_code' }
+      end
+
+      context 'when field is unknown' do
+        let(:key) { 'shenanigans' }
+        it { is_expected.to eq 'shenanigans' }
+      end
+
+      context 'when embedded field is unknown' do
+        let(:key) { 'phones.bamboozle' }
+        it { is_expected.to eq 'phones.bamboozle' }
+      end
+
+      context 'when multi-level embedded field is unknown' do
+        let(:key) { 'phones.bamboozle.brouhaha' }
+        it { is_expected.to eq 'phones.bamboozle.brouhaha' }
+      end
     end
 
-    context 'given an empty String' do
-      subject { Person.database_field_name('') }
-      it { is_expected.to eq nil }
+    context "when the fix_embedded_alias_pluck_distinct is set" do
+      around do |example|
+        saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
+        Mongoid.fix_embedded_alias_pluck_distinct = true
+        begin
+          example.run
+        ensure
+          Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
+        end
+      end
+
+      context 'given nil' do
+        subject { Person.database_field_name(nil) }
+        it { is_expected.to eq nil }
+      end
+
+      context 'given an empty String' do
+        subject { Person.database_field_name('') }
+        it { is_expected.to eq nil }
+      end
+
+      context 'given a String' do
+        subject { Person.database_field_name(key.to_s) }
+        it_behaves_like 'database_field_name'
+      end
+
+      context 'given a Symbol' do
+        subject { Person.database_field_name(key.to_sym) }
+        it_behaves_like 'database_field_name'
+      end
     end
 
-    context 'given a String' do
-      subject { Person.database_field_name(key.to_s) }
-      it_behaves_like 'database_field_name'
-    end
+    context "when the fix_embedded_alias_pluck_distinct is not set" do
+      around do |example|
+        saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
+        Mongoid.fix_embedded_alias_pluck_distinct = false
+        begin
+          example.run
+        ensure
+          Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
+        end
+      end
 
-    context 'given a Symbol' do
-      subject { Person.database_field_name(key.to_sym) }
-      it_behaves_like 'database_field_name'
+      context 'given nil' do
+        subject { Person.database_field_name(nil) }
+        it { is_expected.to eq nil }
+      end
+
+      context 'given an empty String' do
+        subject { Person.database_field_name('') }
+        it { is_expected.to eq "" }
+      end
+
+      context 'given a String' do
+        subject { Person.database_field_name(key.to_s) }
+        it_behaves_like 'pre-fix database_field_name'
+      end
+
+      context 'given a Symbol' do
+        subject { Person.database_field_name(key.to_sym) }
+        it_behaves_like 'pre-fix database_field_name'
+      end
     end
   end
 end
