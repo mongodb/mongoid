@@ -563,6 +563,12 @@ the database. Any unsaved modifications to the document's attributes are lost:
   band.reload
   # => #<Band _id: 6206d06de1b8324561f179c9, name: "foo", description: nil, likes: nil>
 
+When a document is reloaded, all of its embedded associations are also reloaded
+in the same query (since embedded documents are stored in the parent document
+on the server). If a document has referenced associations, the loaded
+associations' are not reloaded but their values are cleared, such that these
+associations would be loaded from the database at the next access.
+
 If the model has a :ref:`shard key <shard-keys>` defined, the shard key value
 is included in the reloading query.
 
