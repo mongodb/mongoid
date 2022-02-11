@@ -260,6 +260,11 @@ for details on driver options.
       # error. (default: true)
       belongs_to_required_by_default: true
 
+      # In Mongoid 7.3.3 and earlier, the _matches? function does not use
+      # millisecond precision when comparing time objects. Turning on this
+      # feature flag enables this. (default: false)
+      compare_time_by_ms: false
+
       # Set the global discriminator key. (default: "_type")
       discriminator_key: "_type"
 
