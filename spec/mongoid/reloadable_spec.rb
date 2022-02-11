@@ -641,5 +641,25 @@ describe Mongoid::Reloadable do
         end
       end
     end
+
+    context 'when document has referenced associations' do
+      let!(:band) do
+        Band.create!(name: 'Sun Project', artists: [Artist.new(name: 'Borg')])
+      end
+
+      before do
+        band.artists.first.name = 'test'
+      end
+
+      it 'resets the associations' do
+        band.artists.first.name.should == 'test'
+
+        band.reload
+
+        band.artists._loaded?.should be false
+
+        band.artists.first.name.should == 'Borg'
+      end
+    end
   end
 end
