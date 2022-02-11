@@ -99,7 +99,7 @@ module Mongoid
     # clauses that use the same operator on the same field.
     option :fix_multiple_ands, default: false
 
-    # Use millisecond precision when comparing Time objects with the _matches
+    # Use millisecond precision when comparing Time objects with the _matches?
     # function.
     option :compare_time_by_ms, default: false
 
