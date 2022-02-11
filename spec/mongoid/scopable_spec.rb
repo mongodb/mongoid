@@ -1146,12 +1146,12 @@ describe Mongoid::Scopable do
 
       context "when the restore_previous_scope is set" do
         around do |example|
-          saved_flag = Mongoid::restore_previous_scope
-          Mongoid::restore_previous_scope = true
+          saved_flag = Mongoid.restore_previous_scope
+          Mongoid.restore_previous_scope = true
           begin
             example.run
           ensure
-            Mongoid::restore_previous_scope = saved_flag
+            Mongoid.restore_previous_scope = saved_flag
           end
         end
 
@@ -1173,12 +1173,12 @@ describe Mongoid::Scopable do
 
       context "when the restore_previous_scope is not set" do
         around do |example|
-          saved_flag = Mongoid::restore_previous_scope
-          Mongoid::restore_previous_scope = false
+          saved_flag = Mongoid.restore_previous_scope
+          Mongoid.restore_previous_scope = false
           begin
             example.run
           ensure
-            Mongoid::restore_previous_scope = saved_flag
+            Mongoid.restore_previous_scope = saved_flag
           end
         end
 

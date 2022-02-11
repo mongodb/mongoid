@@ -108,12 +108,12 @@ describe Mongoid::Equality do
       context "when triple_equals_uses_is_a is set" do
 
         around do |example|
-          saved_flag = Mongoid::triple_equals_uses_is_a
-          Mongoid::triple_equals_uses_is_a = true
+          saved_flag = Mongoid.triple_equals_uses_is_a
+          Mongoid.triple_equals_uses_is_a = true
           begin
             example.run
           ensure
-            Mongoid::triple_equals_uses_is_a = saved_flag
+            Mongoid.triple_equals_uses_is_a = saved_flag
           end
         end
 
@@ -125,12 +125,12 @@ describe Mongoid::Equality do
       context "when triple_equals_uses_is_a is not set" do
 
         around do |example|
-          saved_flag = Mongoid::triple_equals_uses_is_a
-          Mongoid::triple_equals_uses_is_a = false
+          saved_flag = Mongoid.triple_equals_uses_is_a
+          Mongoid.triple_equals_uses_is_a = false
           begin
             example.run
           ensure
-            Mongoid::triple_equals_uses_is_a = saved_flag
+            Mongoid.triple_equals_uses_is_a = saved_flag
           end
         end
 
@@ -186,12 +186,12 @@ describe Mongoid::Equality do
       context "when triple_equals_uses_is_a is set" do
 
         around do |example|
-          saved_flag = Mongoid::triple_equals_uses_is_a
-          Mongoid::triple_equals_uses_is_a = true
+          saved_flag = Mongoid.triple_equals_uses_is_a
+          Mongoid.triple_equals_uses_is_a = true
           begin
             example.run
           ensure
-            Mongoid::triple_equals_uses_is_a = saved_flag
+            Mongoid.triple_equals_uses_is_a = saved_flag
           end
         end
 
@@ -220,12 +220,12 @@ describe Mongoid::Equality do
       context "when triple_equals_uses_is_a is not set" do
 
         around do |example|
-          saved_flag = Mongoid::triple_equals_uses_is_a
-          Mongoid::triple_equals_uses_is_a = false
+          saved_flag = Mongoid.triple_equals_uses_is_a
+          Mongoid.triple_equals_uses_is_a = false
           begin
             example.run
           ensure
-            Mongoid::triple_equals_uses_is_a = saved_flag
+            Mongoid.triple_equals_uses_is_a = saved_flag
           end
         end
 
