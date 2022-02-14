@@ -261,7 +261,7 @@ describe Mongoid::Config do
       before do
         Mongoid::Config.reset
         Mongoid.configure do |config|
-          config.load_configuration(CONFIG)
+          config.load_configuration(conf)
         end
       end
 
