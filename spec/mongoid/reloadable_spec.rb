@@ -643,22 +643,22 @@ describe Mongoid::Reloadable do
     end
 
     context 'when document has referenced associations' do
-      let!(:band) do
-        Band.create!(name: 'Sun Project', artists: [Artist.new(name: 'Borg')])
+      let!(:church) do
+        Church.create!(name: 'Test', acolytes: [Acolyte.new(name: 'Borg')])
       end
 
       before do
-        band.artists.first.name = 'test'
+        church.acolytes.first.name = 'test'
       end
 
       it 'resets the associations' do
-        band.artists.first.name.should == 'test'
+        church.acolytes.first.name.should == 'test'
 
-        band.reload
+        church.reload
 
-        band.artists._loaded?.should be false
+        church.acolytes._loaded?.should be false
 
-        band.artists.first.name.should == 'Borg'
+        church.acolytes.first.name.should == 'Borg'
       end
     end
   end
