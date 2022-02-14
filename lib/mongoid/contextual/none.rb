@@ -6,10 +6,28 @@ module Mongoid
   module Contextual
     class None
       include Enumerable
+      alias :old_sum :sum
+
       include Aggregable::None
       include Queryable
 
       attr_reader :criteria, :klass
+
+      alias :new_sum :sum
+
+      # Get the sum in the null context.
+      #
+      # @example Get the sum of null context.
+      #     context.sum(_field)
+      #
+      # @param [ Symbol ] _field The field to sum.
+      #
+      # @return [ Integer | Symbol ] If the return_zero_on_sum_none is
+      #   turn one, this will always be zero. Otherwise, it will return the
+      #   field name as a symbol.
+      def sum(_field = nil)
+        Mongoid.return_zero_on_sum_none ? new_sum(_field) : old_sum(_field)
+      end
 
       # Check if the context is equal to the other object.
       #
@@ -98,7 +116,7 @@ module Mongoid
       #
       # @return [ Integer ] Always zero.
       def length
-        0
+        Mongoid.return_zero_on_sum_none ? 0 : entries.length
       end
       alias :size :length
 
