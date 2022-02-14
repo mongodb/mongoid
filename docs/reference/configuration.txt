@@ -272,6 +272,28 @@ for details on driver options.
       # (default: false)
       fix_embedded_alias_pluck_distinct: false
 
+      # In Mongoid 7.3.3 and earlier, there was a bug when adding expressions
+      # using the #and function. In certain situations, an $and clause would be
+      # lost and replaced by one of the previous $and clauses. This would
+      # happen when using the same operator on the same field multiple times.
+      # For example:
+      #
+      # Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
+      #
+      # yields the following criteria:
+      #
+      # <Mongoid::Criteria
+      # selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"_id"=>2}]}
+      # options:  {}
+      # class:    Band
+      # embedded: false>
+      #
+      # This is obviously incorrect as the {"$in"=>[2021]} clause is lost.
+      # Notice that the clause is only lost when both clauses are added using
+      # the #and function. Turning on this feature flag fixes this bug.
+      # (default: false)
+      fix_multiple_ands: false
+
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
 

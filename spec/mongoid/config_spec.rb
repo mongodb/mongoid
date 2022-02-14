@@ -307,6 +307,13 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the fix_multiple_ands option in the config' do
+    let(:option) { :fix_multiple_ands }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
   describe "#load!" do
 
     before(:all) do

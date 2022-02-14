@@ -67,21 +67,61 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
-      context '$and to query with $and onto query whose first one is not $and' do
-        let(:query) do
-          Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
+      context "when fix_multiple_ands feature flag is set" do
+
+        around do |example|
+          saved_flag = Mongoid.fix_multiple_ands
+          Mongoid.fix_multiple_ands = true
+          begin
+            example.run
+          ensure
+            Mongoid.fix_multiple_ands = saved_flag
+          end
         end
 
-        let(:modified) do
-          query.send(query_method, '$and', [{'foo' => 'bar'}])
-        end
+        context '$and to query with $and onto query whose first one is not $and' do
+          let(:query) do
+            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
+          end
 
-        it 'adds to existing $and' do
-          modified.selector.should == {
-            '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
+          let(:modified) do
+            query.send(query_method, '$and', [{'foo' => 'bar'}])
+          end
+
+          it 'adds to existing $and' do
+            modified.selector.should == {
+              '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
+          end
         end
       end
 
+      context "when fix_multiple_ands feature flag is not set" do
+
+        around do |example|
+          saved_flag = Mongoid.fix_multiple_ands
+          Mongoid.fix_multiple_ands = false
+          begin
+            example.run
+          ensure
+            Mongoid.fix_multiple_ands = saved_flag
+          end
+        end
+
+        context '$and to query with $and onto query whose first one is not $and' do
+          let(:query) do
+            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
+          end
+
+          let(:modified) do
+            query.send(query_method, '$and', [{'foo' => 'bar'}])
+          end
+
+          it 'does not add to existing $and' do
+            modified.selector.should == {
+              '$and' => [{'foo' => 'bar'}], 'foo' => 'baz'}
+          end
+        end
+      end
     end
 
     context '$or operator' do
