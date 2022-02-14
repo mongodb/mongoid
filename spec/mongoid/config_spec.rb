@@ -227,6 +227,7 @@ describe Mongoid::Config do
   shared_examples "a config option" do
 
     before do
+      Mongoid::Config.reset
       Mongoid.configure do |config|
         config.load_configuration(conf)
       end
@@ -257,13 +258,6 @@ describe Mongoid::Config do
     context "when it is not set in the config" do
 
       let(:conf) { CONFIG }
-
-      before do
-        Mongoid::Config.reset
-        Mongoid.configure do |config|
-          config.load_configuration(conf)
-        end
-      end
 
       it "it is set to its default" do
         expect(Mongoid.send(option)).to be(default)
