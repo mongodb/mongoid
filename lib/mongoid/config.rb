@@ -88,6 +88,9 @@ module Mongoid
     # Restore previous scope after with_scope returns.
     option :restore_previous_scope, default: false
 
+    # Returns zeros when doing a sum with a field on a null context.
+    option :return_zero_on_sum_none, default: false
+
     # Respect aliased fields in pluck/distinct by recursively considering
     # embedded documents.
     option :fix_embedded_alias_pluck_distinct, default: false

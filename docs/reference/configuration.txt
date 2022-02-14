@@ -303,6 +303,16 @@ for details on driver options.
       # Turning this flag on fixes that bug. (default: false)
       restore_previous_scope: false
 
+      # In Mongoid 7.3.3 and earlier, when doing a sum on a field with a null
+      # context, for example:
+      #
+      # Product.none.sum(:price)
+      #
+      # the sum incorrectly returned the field name as a Symbol. Turning on
+      # this feature flag fixes this functionality to automatically return 0.
+      # (default: false)
+      return_zero_on_sum_none: false
+
       # Raise an error when defining a scope with the same name as an
       # existing method. (default: false)
       scope_overwrite_exception: false
