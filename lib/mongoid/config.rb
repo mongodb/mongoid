@@ -78,7 +78,7 @@ module Mongoid
     option :map_big_decimal_to_decimal128, default: false
 
     # Update embedded documents correctly when setting it, unsetting it
-    # and resetting it. See MONGOID-5206 and MONGOId-5240 for more details.
+    # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
     option :update_embedded_after_nil, default: false
 
     # Update the triple equals operator to use only is_a? in alignment with
