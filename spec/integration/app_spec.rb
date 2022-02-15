@@ -138,7 +138,8 @@ describe 'Mongoid application tests' do
     check_call(%w(gem uni rails -a))
     if (rails_version = SpecConfig.instance.rails_version) == 'master'
     else
-      check_call(%w(gem install rails --no-document -v) + [rails_version])
+      check_call(%w(gem list))
+      check_call(%w(gem install rails --no-document -v) + ["~> #{rails_version}.0"])
     end
   end
 

@@ -97,17 +97,10 @@ if test -n "$TEST_CMD"; then
 elif test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb
 elif test -n "$APP_TESTS"; then
-  # Need recent node for rails
-  export N_PREFIX=$HOME/.n
-  curl -o $HOME/n --retry 3 https://raw.githubusercontent.com/tj/n/master/bin/n
-  # Fails intermittently with:
-  # + bash /root/n stable
-  # curl: (6) Could not resolve host: nodejs.org
-  # Error: failed to download version index (https://nodejs.org/dist/index.tab)
-  bash $HOME/n stable || (sleep 1 && bash $HOME/n stable)
-  export PATH=$HOME/.n/bin:$PATH
-  npm -g install yarn
-
+  if test -z "$DOCKER_PRELOAD"; then
+    ./spec/shared/bin/install-node
+  fi
+  
   bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake ci
