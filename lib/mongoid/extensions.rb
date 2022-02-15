@@ -4,8 +4,7 @@ class BSON::ObjectId
   alias :bson_ruby_as_json :as_json
 
   # Return a string representation of the object id for use in
-  # application-level JSON serialization. This method is intentionally
-  # different from #as_extended_json.
+  # application-level JSON serialization.
   #
   # @example Get the object id as a JSON-serializable object.
   #   object_id.as_json
