@@ -176,8 +176,6 @@ describe 'Mongoid application tests' do
                 end
                 index.should be nil
 
-                p env
-                check_call(%w(zsh))
                 check_call(%w(bundle exec rake db:mongoid:create_indexes -t),
                   cwd: APP_PATH, env: env)
 
