@@ -24,19 +24,24 @@ module Mongoid
 =end
         else
           # When doing a comparison with Time objects, compare using millisecond precision
-          if value.kind_of?(Time) && condition.kind_of?(Time)
-            time_eq?(value, condition)
-          elsif value.is_a?(Array) && condition.kind_of?(Time)
-            value.map do |v|
-              if v.kind_of?(Time)
-                time_rounded_to_millis(v)
-              else
-                v
-              end
-            end.include?(time_rounded_to_millis(condition))
-          else
+          if Mongoid.compare_time_by_ms
             value == condition ||
             value.is_a?(Array) && value.include?(condition)
+          else
+            if value.kind_of?(Time) && condition.kind_of?(Time)
+              time_eq?(value, condition)
+            elsif value.is_a?(Array) && condition.kind_of?(Time)
+              value.map do |v|
+                if v.kind_of?(Time)
+                  time_rounded_to_millis(v)
+                else
+                  v
+                end
+              end.include?(time_rounded_to_millis(condition))
+            else
+              value == condition ||
+              value.is_a?(Array) && value.include?(condition)
+            end
           end
         end
       end
