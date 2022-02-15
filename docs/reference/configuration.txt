@@ -260,6 +260,13 @@ for details on driver options.
       # error. (default: true)
       belongs_to_required_by_default: true
 
+      # In Mongoid 7.3 and earlier, embedded matching performed time comparisons
+      # with full (microsecond) precision. However, MongoDB server is only
+      # capable of storing times with millisecond precision. Enabling this
+      # option makes Mongoid truncate times to millisecond precision for
+      # comparison purposes, to match the server behavior. (default: false)
+      compare_time_by_ms: false
+
       # Set the global discriminator key. (default: "_type")
       discriminator_key: "_type"
 

@@ -13,7 +13,8 @@ module Mongoid
         when ::BSON::Regexp::Raw
           value =~ condition.compile
         else
-          if value.kind_of?(Time) && condition.kind_of?(Time)
+          if Mongoid.compare_time_by_ms &&
+            value.kind_of?(Time) && condition.kind_of?(Time)
             EqImpl.time_eq?(value, condition)
           else
             value == condition

@@ -99,6 +99,10 @@ module Mongoid
     # clauses that use the same operator on the same field.
     option :fix_multiple_ands, default: false
 
+    # Use millisecond precision when comparing Time objects with the _matches?
+    # function.
+    option :compare_time_by_ms, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
