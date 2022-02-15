@@ -19,6 +19,12 @@ set_fcv
 set_env_vars
 set_env_ruby
 
+if test -n "$APP_TESTS"; then
+  # Node from toolchain
+  export PATH=/opt/node/bin:$PATH
+  node -v
+fi
+
 prepare_server $arch
 
 install_mlaunch_virtualenv
