@@ -16,5 +16,17 @@ module Mongoid
         end
       end
     end
+
+    def config_override(key, value)
+      around do |example|
+        existing = Mongoid.send(key)
+
+        Mongoid.send("#{key}=", value)
+
+        example.run
+
+        Mongoid.send("#{key}=", existing)
+      end
+    end
   end
 end

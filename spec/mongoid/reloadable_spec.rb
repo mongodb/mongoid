@@ -601,5 +601,65 @@ describe Mongoid::Reloadable do
         end
       end
     end
+
+    context 'when raise_not_found_error is false' do
+      config_override :raise_not_found_error, false
+
+      let!(:band) { Band.create!(name: 'Sun Project') }
+
+      context 'when document exists in the database' do
+        before do
+          band.name = 'test'
+        end
+
+        it 'reloads the document' do
+          band.name.should == 'test'
+
+          band.reload
+
+          band.name.should == 'Sun Project'
+        end
+      end
+
+      context 'when document does not exist in the database' do
+        before do
+          band.name = 'test'
+
+          band.destroy
+        end
+
+        it 'creates a new document with default values' do
+          original_id = band.id
+          band.name.should == 'test'
+
+          band.reload
+
+          band.name.should be nil
+          band.id.should_not be nil
+          # _id changes
+          band.id.should_not == original_id
+        end
+      end
+    end
+
+    context 'when document has referenced associations' do
+      let!(:church) do
+        Church.create!(name: 'Test', acolytes: [Acolyte.new(name: 'Borg')])
+      end
+
+      before do
+        church.acolytes.first.name = 'test'
+      end
+
+      it 'resets the associations' do
+        church.acolytes.first.name.should == 'test'
+
+        church.reload
+
+        church.acolytes._loaded?.should be false
+
+        church.acolytes.first.name.should == 'Borg'
+      end
+    end
   end
 end
