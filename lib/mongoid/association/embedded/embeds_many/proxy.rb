@@ -514,7 +514,7 @@ module Mongoid
           def as_attributes
             attributes = []
             _unscoped.each do |doc|
-              attributes.push(doc.as_document)
+              attributes.push(doc.attributes)
             end
             attributes
           end

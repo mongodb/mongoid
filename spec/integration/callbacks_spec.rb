@@ -188,8 +188,6 @@ describe 'callbacks integration tests' do
           end
 
           it 'persists the attribute value' do
-            pending 'MONGOID-4476'
-
             Galaxy.find(instance.id).stars.first.planets.first.age.should == 2_000
           end
         end
