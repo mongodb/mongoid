@@ -372,6 +372,14 @@ for details on driver options.
       # further information. (default: true)
       use_activesupport_time_zone: true
 
+      # In Mongoid 7.3.3 and earlier, the BSON::ObjectId#as_json method would
+      # default to returning { "$oid" => id.to_s }. Turning on this flag will
+      # defer the as_json call to bson-ruby's implementation of
+      # BSON::ObjectId#as_json. In bson-ruby 5.x.x as_json will return
+      # the id as a string. In bson-ruby 4.x.x as_json will return
+      # { "$oid" => id.to_s }. (default: false)
+      use_bson_ruby_as_json: false
+
       # Return stored times as UTC. See the time zone section below for
       # further information. Most applications should not use this option.
       # (default: false)

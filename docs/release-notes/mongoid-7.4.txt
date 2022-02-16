@@ -118,6 +118,10 @@ Mongoid 7.4 and later will inherit the new implementation provided by
 ``bson-ruby`` while Mongoid 7.3 and earlier will continue with the
 implementation returning a hash of ``{"$oid" => "..."}``.
 
+..  note::
+
+  In order to get this functionality, the ``Mongoid.use_bson_ruby_as_json``
+  feature flag must be turned on.
 
 Scoped Associations
 -------------------
