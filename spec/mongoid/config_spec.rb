@@ -314,6 +314,13 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the use_bson_ruby_as_json option in the config' do
+    let(:option) { :use_bson_ruby_as_json }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
   describe "#load!" do
 
     before(:all) do
