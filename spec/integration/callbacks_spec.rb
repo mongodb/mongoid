@@ -188,8 +188,6 @@ describe 'callbacks integration tests' do
           end
 
           it 'persists the attribute value' do
-            pending 'MONGOID-4476'
-
             Galaxy.find(instance.id).stars.first.planets.first.age.should == 2_000
           end
         end
@@ -205,6 +203,68 @@ describe 'callbacks integration tests' do
         context 'set as attributes on parent' do
           before do
             instance.update_attributes!(stars: [planets: [{}]])
+          end
+
+          include_examples 'persists the attribute value'
+        end
+      end
+    end
+
+    context 'when updating top-level embeds_one document via #update_attributes!' do
+      let!(:instance) do
+        Country.create!
+      end
+
+      context 'embedded document' do
+        shared_examples 'persists the attribute value' do
+          it 'writes the attribute value into the model' do
+            instance.president.age.should == 79
+          end
+
+          it 'persists the attribute value' do
+            Country.find(instance.id).president.age.should == 79
+          end
+        end
+
+        context 'set as a document instance' do
+          before do
+            instance.update_attributes!(president: President.new)
+          end
+
+          include_examples 'persists the attribute value'
+        end
+
+        context 'set as attributes on parent' do
+          before do
+            instance.update_attributes!(president: { name: "Abraham Lincoln" })
+          end
+
+          include_examples 'persists the attribute value'
+        end
+      end
+
+      context 'nested embedded document' do
+        shared_examples 'persists the attribute value' do
+          it 'writes the attribute value into the model' do
+            instance.president.first_spouse.age.should == 70
+          end
+
+          it 'persists the attribute value' do
+            Country.find(instance.id).president.first_spouse.age.should == 70
+          end
+        end
+
+        context 'set as a document instance' do
+          before do
+            instance.update_attributes!(president: President.new(first_spouse: FirstSpouse.new))
+          end
+
+          include_examples 'persists the attribute value'
+        end
+
+        context 'set as attributes on parent' do
+          before do
+            instance.update_attributes!(president: { first_spouse: { name: "Mary Todd Lincoln" } })
           end
 
           include_examples 'persists the attribute value'

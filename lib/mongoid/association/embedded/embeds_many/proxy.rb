@@ -511,12 +511,11 @@ module Mongoid
             @_unscoped = docs
           end
 
+          # Returns a list of attributes hashes for each document.
+          #
+          # @return [ Array<Hash> ] The list of attributes hashes
           def as_attributes
-            attributes = []
-            _unscoped.each do |doc|
-              attributes.push(doc.as_document)
-            end
-            attributes
+            _unscoped.map { |doc| doc.send(:as_attributes) }
           end
 
           class << self
