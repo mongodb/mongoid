@@ -59,3 +59,56 @@ class Emission
 
   attr_reader :previous
 end
+
+class Country
+  include Mongoid::Document
+
+  field :age
+
+  before_validation :set_age
+
+  embeds_one :president
+
+  private
+
+  def set_age
+    self.age ||= 245
+  end
+end
+
+class President
+  include Mongoid::Document
+
+  embedded_in :country
+
+  field :age
+
+  field :name
+
+  before_validation :set_age
+
+  embeds_one :first_spouse
+
+  private
+
+  def set_age
+    self.age ||= 79
+  end
+end
+
+class FirstSpouse
+  include Mongoid::Document
+
+  embedded_in :president
+
+  field :name
+  field :age, type: Integer
+
+  before_validation :set_age
+
+  private
+
+  def set_age
+    self.age ||= 70
+  end
+end

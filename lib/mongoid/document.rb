@@ -245,6 +245,14 @@ module Mongoid
       @model_cache_key ||= self.class.model_name.cache_key
     end
 
+    # Returns a hash of the attributes.
+    #
+    # Note this method modifies the attributes hash that already exists on the
+    # class and returns it. This means that the hash returned by this method
+    # refers to the same hash as calling #attributes on the instance. See
+    # MONGOID-4476 for an explanation on how this is used.
+    #
+    # @return [ Hash ] The attributes hash
     def as_attributes
       return attributes if frozen?
       embedded_relations.each_pair do |name, meta|
