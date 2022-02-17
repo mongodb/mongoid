@@ -252,7 +252,7 @@ module Mongoid
     # refers to the same hash as calling #attributes on the instance. See
     # MONGOID-4476 for an explanation on how this is used.
     #
-    # @return [ Hash ] The attributes hash
+    # @return [ Hash ] The attributes hash.
     def as_attributes
       return attributes if frozen?
       embedded_relations.each_pair do |name, meta|
