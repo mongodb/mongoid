@@ -332,4 +332,32 @@ describe 'callbacks integration tests' do
       expect(planet.was_touched_after_parent).to be true
     end
   end
+
+  context "when reloading has_and_belongs_to_many after_save and after_remove callbacks" do
+
+    let(:architect) { Architect.create }
+
+    let(:b1) { Building.create }
+
+    let(:b2) { Building.create }
+
+    let(:b3) { Building.create }
+
+    it "counts added/removed buildings correctly" do
+      architect.buildings << b1
+      expect(architect.after_add_num_buildings).to eq(1)
+
+      architect.reload
+      architect.buildings << b2
+      expect(architect.after_add_num_buildings).to eq(2)
+
+      architect.reload
+      architect.buildings << b3
+      expect(architect.after_add_num_buildings).to eq(3)
+
+      architect.reload
+      architect.buildings.delete(b3)
+      expect(architect.after_remove_num_buildings).to eq(2)
+    end
+  end
 end

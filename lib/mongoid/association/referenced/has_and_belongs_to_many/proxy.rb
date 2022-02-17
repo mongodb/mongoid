@@ -28,10 +28,12 @@ module Mongoid
             docs = args.flatten
             return concat(docs) if docs.size > 1
             if doc = docs.first
-              append(doc)
-              _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
-              if child_persistable?(doc)
-                doc.save
+              append(doc) do
+                _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
+                if child_persistable?(doc)
+                  doc.save
+                end
+                reset_unloaded
               end
             end
             unsynced(_base, foreign_key) and self
@@ -203,11 +205,12 @@ module Mongoid
           #
           # @param [ Document ] document The document to append to the target.
           def append(document)
-            execute_callback :before_add, document
-            _target.push(document)
-            characterize_one(document)
-            bind_one(document)
-            execute_callback :after_add, document
+            execute_callbacks_around(:add, document) do
+              _target.push(document)
+              characterize_one(document)
+              bind_one(document)
+              yield if block_given?
+            end
           end
 
           # Instantiate the binding associated with this association.
