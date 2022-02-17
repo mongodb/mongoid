@@ -168,6 +168,9 @@ Please refer to `the driver compatibility page
 <https://docs.mongodb.com/ruby-driver/current/reference/driver-compatibility/>`_
 for driver compatibility matrices.
 
+"D" in a column means support for that MongoDB server version is deprecated
+and will be removed in a next version.
+
 .. list-table::
    :header-rows: 1
    :stub-columns: 1
@@ -190,10 +193,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - D
+     - D
+     - D
+     - D
 
    * - 7.3
      - |checkmark|
@@ -201,10 +204,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - D
+     - D
+     - D
+     - D
 
    * - 7.2
      - |checkmark|
@@ -212,10 +215,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - D
+     - D
+     - D
+     - D
 
    * - 7.1
      - |checkmark|
@@ -223,10 +226,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - D
+     - D
+     - D
+     - D
 
    * - 7.0
      - |checkmark|
@@ -234,10 +237,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - D
+     - D
+     - D
+     - D
 
    * - 6.4
      - |checkmark|
@@ -245,10 +248,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
+     - D
+     - D
+     - D
+     - D
 
 
 .. _rails-compatibility:
