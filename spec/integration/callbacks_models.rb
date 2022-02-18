@@ -45,6 +45,7 @@ end
 
 class Planet
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   embedded_in :star
 
