@@ -192,7 +192,7 @@ for details on driver options.
           connect: :direct
 
           # To disable the deployment type discovery and force all operations to be
-          # performed on a particular server, specify the ``direct_connection`` option
+          # performed on a particular server, specify the direct_connection option
           # as true. (default: false)
           direct_connection: false
 
