@@ -1,11 +1,16 @@
 class Galaxy
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :age, type: Integer
-
+  field :was_touched, type: Mongoid::Boolean, default: false
   before_validation :set_age
 
   embeds_many :stars
+
+  set_callback(:touch, :before) do |document|
+    self.was_touched = true
+  end
 
   private
 
@@ -16,14 +21,20 @@ end
 
 class Star
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   embedded_in :galaxy
 
   field :age, type: Integer
+  field :was_touched_after_parent, type: Mongoid::Boolean, default: false
 
   before_validation :set_age
 
   embeds_many :planets
+
+  set_callback(:touch, :before) do |document|
+    self.was_touched_after_parent = true if galaxy.was_touched
+  end
 
   private
 
@@ -38,8 +49,13 @@ class Planet
   embedded_in :star
 
   field :age, type: Integer
+  field :was_touched_after_parent, type: Mongoid::Boolean, default: false
 
   before_validation :set_age
+
+  set_callback(:touch, :before) do |document|
+    self.was_touched_after_parent = true if star.was_touched_after_parent
+  end
 
   private
 

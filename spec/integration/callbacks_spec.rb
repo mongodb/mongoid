@@ -314,4 +314,22 @@ describe 'callbacks integration tests' do
       ).to eq(new_name)
     end
   end
+
+  context "When touching an embedded document" do
+    let(:planet) { Planet.new }
+    let(:star) { Star.new }
+    let(:galaxy) { Galaxy.create! }
+
+    before do
+      star.planets << planet
+      galaxy.stars << star
+    end
+
+    it "the parent document touch callback gets called before the child" do
+      planet.touch
+      expect(galaxy.was_touched).to be true
+      expect(star.was_touched_after_parent).to be true
+      expect(planet.was_touched_after_parent).to be true
+    end
+  end
 end
