@@ -332,4 +332,39 @@ describe 'callbacks integration tests' do
       expect(planet.was_touched_after_parent).to be true
     end
   end
+
+  context "Embedded document with cascade_callbacks" do
+    class EDWCCParent
+      include Mongoid::Document
+
+      embeds_one :child, class_name: "EDWCCChild", cascade_callbacks: true
+    end
+
+    class EDWCCChild
+      include Mongoid::Document
+
+      embedded_in :parent, class_name: 'EDWCCParent'
+
+      after_save do
+        @count_after_save.call
+      end
+
+      def initialize(count_after_save)
+        @count_after_save = count_after_save
+        super()
+      end
+    end
+
+    it " does not call after_save when removed from parent" do
+      number_of_after_save_calls = 0
+      count_after_save = -> {
+        number_of_after_save_calls += 1
+      }
+      parent = EDWCCParent.new(child: EDWCCChild.new(count_after_save))
+      parent.save!
+      parent.update_attributes!(child: nil)
+      parent.save!
+      expect(number_of_after_save_calls).to eq(1)
+    end
+  end
 end
