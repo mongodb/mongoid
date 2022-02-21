@@ -59,10 +59,15 @@ module Mongoid
           removals = pre_process_batch_remove(docs, method)
           if !docs.empty?
             collection.find(selector).update_one(
-                positionally(selector, "$pullAll" => { path => removals }),
-                session: _session
+              positionally(selector, "$pullAll" => { path => removals }),
+              session: _session
             )
             post_process_batch_remove(docs, method)
+          else
+            collection.find(selector).update_one(
+              positionally(selector, "$set" => { path => [] }),
+              session: _session
+            )
           end
           reindex
         end
@@ -232,7 +237,11 @@ module Mongoid
         #
         # @return [ String ] The atomic path.
         def path
-          @path ||= _unscoped.first.atomic_path
+          unless _unscoped.empty?
+            @path ||= _unscoped.first.atomic_path
+          else
+            @path ||= Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
+          end
         end
 
         # Set the atomic path.

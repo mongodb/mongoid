@@ -44,6 +44,6 @@ class Label
 
   private
   def cleanup
-    self.name = self.name.downcase.capitalize
+    self.name = self.name.downcase.capitalize if self.name
   end
 end
