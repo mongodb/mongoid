@@ -91,7 +91,7 @@ describe Mongoid::Copyable do
           end
 
           it 'calls constructor with explicitly declared attributes only' do
-            expect(cls).to receive(:new).with('name' => 'test').and_call_original
+            expect(cls).to receive(:new).with({'name' => 'test'}).and_call_original
             cloned
           end
         end
