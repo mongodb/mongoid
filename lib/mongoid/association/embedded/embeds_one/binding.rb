@@ -21,7 +21,10 @@ module Mongoid
           def bind_one
             _target.parentize(_base)
             binding do
-              _target.do_or_do_not(_association.inverse_setter(_target), _base)
+              begin
+                _target.do_or_do_not(_association.inverse_setter(_target), _base)
+              rescue Mongoid::Errors::AmbiguousRelationship => exception
+              end
             end
           end
 

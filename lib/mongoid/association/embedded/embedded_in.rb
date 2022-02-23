@@ -114,7 +114,15 @@ module Mongoid
                   rel.as == name &&
                   rel.relation_class_name == inverse_class_name
             end
-            matches.collect { |m| m.name }
+
+            candidates = matches.collect { |m| m.name }
+            klasses = other.relations.values.map(&:class_name)
+
+            if dup_klass = klasses.detect{ |e| klasses.count(e) > 1 }
+              raise Errors::AmbiguousRelationship.new(other.class, dup_klass, name, candidates)
+            end
+
+            candidates
           end
         end
 
