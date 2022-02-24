@@ -1785,7 +1785,7 @@ at runtime:
 
   In Mongoid versions 7.3.3 and earlier, there is a bug in ``with_scope``
   where the previous scope is lost after the function returns. Set the
-  ``Mongoid::restore_previous_scope`` global flag to true in order to get the
+  ``Mongoid.restore_previous_scope`` global flag to true in order to get the
   correct functionality.
 
 
