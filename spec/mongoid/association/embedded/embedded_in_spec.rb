@@ -290,9 +290,11 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
 
           context 'when inverse_of is not specified' do
 
-            it 'returns the list of relations whose :as attribute matches the name of this association' do
-              expect(association.inverses(instance_of_other_class)).to match_array([ :embedded_objects,
-                                                                                     :other_embedded_object ])
+            # See MONGOID-5096 as to why this raises an error instead of returning both inverses.
+            it 'raises an error' do
+              expect do
+                association.inverses(instance_of_other_class)
+              end.to raise_error(Mongoid::Errors::AmbiguousRelationship)
             end
           end
         end
