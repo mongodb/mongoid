@@ -42,7 +42,7 @@ module Mongoid
             # embedded document. Previously, since the embedded document was
             # already marked not a "new_record", it wouldn't be persisted to
             # the second time. This change fixes that and allows it to be persisted.
-            docs.each { |doc| doc.new_record = true } if Mongoid::update_embedded_after_nil
+            docs.each { |doc| doc.new_record = true } if Mongoid.update_embedded_after_nil
             post_process_batch_remove(docs, :delete)
           end
           _unscoped.clear

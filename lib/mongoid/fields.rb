@@ -266,7 +266,7 @@ module Mongoid
       #
       # @return [ String ] The name of the field as stored in the database.
       def database_field_name(name)
-        unless Mongoid::fix_embedded_alias_pluck_distinct
+        unless Mongoid.fix_embedded_alias_pluck_distinct
           return nil unless name
           normalized = name.to_s
           aliased_fields[normalized] || normalized
