@@ -24,16 +24,7 @@ describe Mongoid::Contextual::Aggregable::None do
     end
 
     context "when return_zero_on_sum_none feature flag is set" do
-
-      around do |example|
-        saved_flag = Mongoid.return_zero_on_sum_none
-        Mongoid.return_zero_on_sum_none = true
-        begin
-          example.run
-        ensure
-          Mongoid.return_zero_on_sum_none = saved_flag
-        end
-      end
+      config_override :return_zero_on_sum_none, true
 
       it "returns zero when arg given" do
         expect(context.sum(:likes)).to eq(0)
@@ -41,16 +32,7 @@ describe Mongoid::Contextual::Aggregable::None do
     end
 
     context "when return_zero_on_sum_none feature flag is not set" do
-
-      around do |example|
-        saved_flag = Mongoid.return_zero_on_sum_none
-        Mongoid.return_zero_on_sum_none = false
-        begin
-          example.run
-        ensure
-          Mongoid.return_zero_on_sum_none = saved_flag
-        end
-      end
+      config_override :return_zero_on_sum_none, false
 
       it "returns the input when arg given" do
         expect(context.sum(:likes)).to eq(:likes)
