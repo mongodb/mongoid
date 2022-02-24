@@ -81,8 +81,8 @@ module Mongoid
               return nil unless replacement
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
               self._target = replacement
-              bind_one
               characterize_one(_target)
+              bind_one
               _target.save if persistable?
             end
             self
