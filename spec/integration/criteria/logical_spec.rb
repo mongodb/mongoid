@@ -27,16 +27,7 @@ describe 'Criteria logical operations' do
     end
 
     context "when fix_multiple_ands feature flag is set" do
-
-      around do |example|
-        saved_flag = Mongoid.fix_multiple_ands
-        Mongoid.fix_multiple_ands = true
-        begin
-          example.run
-        ensure
-          Mongoid.fix_multiple_ands = saved_flag
-        end
-      end
+      config_override :fix_multiple_ands, true
 
       it 'combines existing `$and` clause in query and `where` condition' do
         bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
@@ -51,16 +42,7 @@ describe 'Criteria logical operations' do
     end
 
     context "when fix_multiple_ands feature flag is not set" do
-
-      around do |example|
-        saved_flag = Mongoid.fix_multiple_ands
-        Mongoid.fix_multiple_ands = false
-        begin
-          example.run
-        ensure
-          Mongoid.fix_multiple_ands = saved_flag
-        end
-      end
+      config_override :fix_multiple_ands, false
 
       it 'combines existing `$and` clause in query and `where` condition' do
         bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)

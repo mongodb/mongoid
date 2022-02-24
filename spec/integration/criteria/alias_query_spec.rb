@@ -25,16 +25,7 @@ describe 'distinct on aliased fields' do
   let(:command) { event.command }
 
   context 'when fix_embedded_alias_pluck_distinct is set' do
-
-    around do |example|
-      saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
-      Mongoid.fix_embedded_alias_pluck_distinct = true
-      begin
-        example.run
-      ensure
-        Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
-      end
-    end
+    config_override :fix_embedded_alias_pluck_distinct, true
 
     context 'top level field' do
       let(:query) do
@@ -62,16 +53,7 @@ describe 'distinct on aliased fields' do
   end
 
   context 'when fix_embedded_alias_pluck_distinct is not set' do
-
-    around do |example|
-      saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
-      Mongoid.fix_embedded_alias_pluck_distinct = false
-      begin
-        example.run
-      ensure
-        Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
-      end
-    end
+    config_override :fix_embedded_alias_pluck_distinct, false
 
     context 'top level field' do
       let(:query) do
@@ -122,16 +104,7 @@ describe 'pluck on aliased fields' do
   let(:command) { event.command }
 
   context 'when fix_embedded_alias_pluck_distinct is set' do
-
-    around do |example|
-      saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
-      Mongoid.fix_embedded_alias_pluck_distinct = true
-      begin
-        example.run
-      ensure
-        Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
-      end
-    end
+    config_override :fix_embedded_alias_pluck_distinct, true
 
     context 'top level field' do
       let(:query) do
@@ -159,16 +132,7 @@ describe 'pluck on aliased fields' do
   end
 
   context 'when fix_embedded_alias_pluck_distinct is not set' do
-
-    around do |example|
-      saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
-      Mongoid.fix_embedded_alias_pluck_distinct = false
-      begin
-        example.run
-      ensure
-        Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
-      end
-    end
+    config_override :fix_embedded_alias_pluck_distinct, false
 
     context 'top level field' do
       let(:query) do

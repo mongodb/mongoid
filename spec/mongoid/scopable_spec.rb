@@ -442,13 +442,9 @@ describe Mongoid::Scopable do
       context "when the name conflict with an existing method" do
 
         context "when raising an error" do
-
-          before do
-            Mongoid.scope_overwrite_exception = true
-          end
+          config_override :scope_overwrite_exception, true
 
           after do
-            Mongoid.scope_overwrite_exception = false
             class << Band
               undef_method :active
             end
@@ -464,9 +460,9 @@ describe Mongoid::Scopable do
         end
 
         context "when not raising an error" do
+          config_override :scope_overwrite_exception, false
 
           after do
-            Mongoid.scope_overwrite_exception = false
             class << Band
               undef_method :active
             end
@@ -717,13 +713,9 @@ describe Mongoid::Scopable do
       context "when the name conflict with an existing method" do
 
         context "when raising an error" do
-
-          before do
-            Mongoid.scope_overwrite_exception = true
-          end
+          config_override :scope_overwrite_exception, true
 
           after do
-            Mongoid.scope_overwrite_exception = false
             class << Band
               undef_method :active
             end
@@ -739,9 +731,9 @@ describe Mongoid::Scopable do
         end
 
         context "when not raising an error" do
+          config_override :scope_overwrite_exception, false
 
           after do
-            Mongoid.scope_overwrite_exception = false
             class << Band
               undef_method :active
             end
@@ -1145,15 +1137,7 @@ describe Mongoid::Scopable do
       let(:c2) { Band.where(active: false) }
 
       context "when the restore_previous_scope is set" do
-        around do |example|
-          saved_flag = Mongoid.restore_previous_scope
-          Mongoid.restore_previous_scope = true
-          begin
-            example.run
-          ensure
-            Mongoid.restore_previous_scope = saved_flag
-          end
-        end
+        config_override :restore_previous_scope, true
 
         it 'restores previous scope' do
           Band.with_scope(c1) do |crit|
@@ -1172,15 +1156,7 @@ describe Mongoid::Scopable do
       end
 
       context "when the restore_previous_scope is not set" do
-        around do |example|
-          saved_flag = Mongoid.restore_previous_scope
-          Mongoid.restore_previous_scope = false
-          begin
-            example.run
-          ensure
-            Mongoid.restore_previous_scope = saved_flag
-          end
-        end
+        config_override :restore_previous_scope, false
 
         it 'does not restore previous scope' do
           Band.with_scope(c1) do |crit|

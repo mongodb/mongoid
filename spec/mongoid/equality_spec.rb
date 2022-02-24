@@ -106,16 +106,7 @@ describe Mongoid::Equality do
     context "when comparable is the same class" do
 
       context "when triple_equals_uses_is_a is set" do
-
-        around do |example|
-          saved_flag = Mongoid.triple_equals_uses_is_a
-          Mongoid.triple_equals_uses_is_a = true
-          begin
-            example.run
-          ensure
-            Mongoid.triple_equals_uses_is_a = saved_flag
-          end
-        end
+        config_override :triple_equals_uses_is_a, true
 
         it "returns false" do
           expect(klass === Person).to be false
@@ -123,16 +114,7 @@ describe Mongoid::Equality do
       end
 
       context "when triple_equals_uses_is_a is not set" do
-
-        around do |example|
-          saved_flag = Mongoid.triple_equals_uses_is_a
-          Mongoid.triple_equals_uses_is_a = false
-          begin
-            example.run
-          ensure
-            Mongoid.triple_equals_uses_is_a = saved_flag
-          end
-        end
+        config_override :triple_equals_uses_is_a, false
 
         it "returns true" do
           expect(klass === Person).to be true
@@ -184,16 +166,7 @@ describe Mongoid::Equality do
     context "when comparing to a class" do
 
       context "when triple_equals_uses_is_a is set" do
-
-        around do |example|
-          saved_flag = Mongoid.triple_equals_uses_is_a
-          Mongoid.triple_equals_uses_is_a = true
-          begin
-            example.run
-          ensure
-            Mongoid.triple_equals_uses_is_a = saved_flag
-          end
-        end
+        config_override :triple_equals_uses_is_a, true
 
         context "when the class is the same" do
 
@@ -218,16 +191,7 @@ describe Mongoid::Equality do
       end
 
       context "when triple_equals_uses_is_a is not set" do
-
-        around do |example|
-          saved_flag = Mongoid.triple_equals_uses_is_a
-          Mongoid.triple_equals_uses_is_a = false
-          begin
-            example.run
-          ensure
-            Mongoid.triple_equals_uses_is_a = saved_flag
-          end
-        end
+        config_override :triple_equals_uses_is_a, false
 
         context "when the class is the same" do
 
