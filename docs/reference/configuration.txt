@@ -268,11 +268,17 @@ for details on driver options.
       # error. (default: true)
       belongs_to_required_by_default: true
 
-      # In Mongoid 7.3 and earlier, embedded matching performed time comparisons
-      # with full (microsecond) precision. However, MongoDB server is only
-      # capable of storing times with millisecond precision. Enabling this
-      # option makes Mongoid truncate times to millisecond precision for
-      # comparison purposes, to match the server behavior. (default: false)
+      # Time objects in Ruby have nanosecond precision, whereas MongoDB server
+      # can only store times with millisecond precision. Set this option to
+      # true to truncate times to millisecond precision when performing
+      # queries on already loaded embedded associations (this is also called
+      # "embedded matching" and is done completely in Ruby), to obtain the
+      # same query results when performing time comparisons regardless of
+      # which documents are being queried. Setting this option to false will
+      # produce different results for queries on embedded associations that
+      # are already loaded into memory vs queries on unloaded associations and
+      # top-level models. (default: false in Mongoid 7, will change to true
+      # in Mongoid 8).
       compare_time_by_ms: false
 
       # Set the global discriminator key. (default: "_type")
