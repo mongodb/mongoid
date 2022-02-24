@@ -300,9 +300,9 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the fix_embedded_alias_pluck_distinct option in the config' do
-    let(:option) { :fix_embedded_alias_pluck_distinct }
-    let(:default) { false }
+  context 'when setting the broken_alias_handling option in the config' do
+    let(:option) { :broken_alias_handling }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end

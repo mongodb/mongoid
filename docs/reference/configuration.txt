@@ -287,11 +287,10 @@ for details on driver options.
       # Raise an exception when a field is redefined. (default: false)
       duplicate_fields_exception: false
 
-      # In Mongoid 7.3.3 and earlier, the pluck and distinct operations did
-      # not respect aliased fields for embedded documents. Turning on this
-      # flag changes those functions to recognize those aliases.
-      # (default: false)
-      fix_embedded_alias_pluck_distinct: false
+      # Ignore aliased fields in embedded documents when performing pluck and
+      # distinct operations, for backwards compatibility.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_alias_handling: true
 
       # In Mongoid 7.3.3 and earlier, there was a bug when adding expressions
       # using the #and function. In certain situations, an $and clause would be

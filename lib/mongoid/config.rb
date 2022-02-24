@@ -91,9 +91,9 @@ module Mongoid
     # Returns zeros when doing a sum with a field on a null context.
     option :return_zero_on_sum_none, default: false
 
-    # Respect aliased fields in pluck/distinct by recursively considering
-    # embedded documents.
-    option :fix_embedded_alias_pluck_distinct, default: false
+    # Ignore aliased fields in embedded documents when performing pluck and
+    # distinct operations, for backwards compatibility.
+    option :broken_alias_handling, default: true
 
     # Fixes add_logical_operator_expression when attempting to add multiple
     # clauses that use the same operator on the same field.
