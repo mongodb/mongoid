@@ -3,10 +3,7 @@
 require "spec_helper"
 
 describe Mongoid::Fields do
-
-  before(:all) do
-    Mongoid.use_activesupport_time_zone = false
-  end
+  config_override :use_activesupport_time_zone, false
 
   describe "#\{field}_translations" do
 
@@ -871,25 +868,23 @@ describe Mongoid::Fields do
     end
 
     context "when field already exist and validate_duplicate is enable" do
+      context 'when exception is enabled' do
+        config_override :duplicate_fields_exception, true
 
-      before do
-        Mongoid.duplicate_fields_exception = true
+        it "raises an error" do
+          expect {
+            Person.field(:title)
+          }.to raise_error(Mongoid::Errors::InvalidField)
+        end
       end
 
-      after do
-        Mongoid.duplicate_fields_exception = false
-      end
-
-      it "raises an error" do
-        expect {
-          Person.field(:title)
-        }.to raise_error(Mongoid::Errors::InvalidField)
-      end
-
-      it "doesn't raise an error" do
-        expect {
-          Class.new(Person)
-        }.to_not raise_error
+      context 'when exception is disabled' do
+        config_override :duplicate_fields_exception, false
+        it "doesn't raise an error" do
+          expect {
+            Class.new(Person)
+          }.to_not raise_error
+        end
       end
     end
 
@@ -1579,15 +1574,7 @@ describe Mongoid::Fields do
     end
 
     context "when the fix_embedded_alias_pluck_distinct is set" do
-      around do |example|
-        saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
-        Mongoid.fix_embedded_alias_pluck_distinct = true
-        begin
-          example.run
-        ensure
-          Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
-        end
-      end
+      config_override :fix_embedded_alias_pluck_distinct, true
 
       context 'given nil' do
         subject { Person.database_field_name(nil) }
@@ -1611,15 +1598,7 @@ describe Mongoid::Fields do
     end
 
     context "when the fix_embedded_alias_pluck_distinct is not set" do
-      around do |example|
-        saved_flag = Mongoid.fix_embedded_alias_pluck_distinct
-        Mongoid.fix_embedded_alias_pluck_distinct = false
-        begin
-          example.run
-        ensure
-          Mongoid.fix_embedded_alias_pluck_distinct = saved_flag
-        end
-      end
+      config_override :fix_embedded_alias_pluck_distinct, false
 
       context 'given nil' do
         subject { Person.database_field_name(nil) }

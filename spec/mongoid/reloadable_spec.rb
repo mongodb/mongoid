@@ -291,15 +291,7 @@ describe Mongoid::Reloadable do
     context "when embedded documents are unasssigned and reassigned" do
 
       context "when update_embedded_after_nil feature flag is set" do
-        around do |example|
-          saved_flag = Mongoid.update_embedded_after_nil
-          Mongoid.update_embedded_after_nil = true
-          begin
-            example.run
-          ensure
-            Mongoid.update_embedded_after_nil = saved_flag
-          end
-        end
+        config_override :update_embedded_after_nil, true
 
         let(:palette) do
           Palette.new
@@ -323,16 +315,7 @@ describe Mongoid::Reloadable do
       end
 
       context "when update_embedded_after_nil feature flag is not set" do
-
-        around do |example|
-          saved_flag = Mongoid.update_embedded_after_nil
-          Mongoid.update_embedded_after_nil = false
-          begin
-            example.run
-          ensure
-            Mongoid.update_embedded_after_nil = saved_flag
-          end
-        end
+        config_override :update_embedded_after_nil, false
 
         let(:palette) do
           Palette.new
@@ -359,15 +342,7 @@ describe Mongoid::Reloadable do
     context "when embeds_many documents are cleared and reassigned" do
 
       context "when update_embedded_after_nil feature flag is set" do
-        around do |example|
-          saved_flag = Mongoid.update_embedded_after_nil
-          Mongoid.update_embedded_after_nil = true
-          begin
-            example.run
-          ensure
-            Mongoid.update_embedded_after_nil = saved_flag
-          end
-        end
+        config_override :update_embedded_after_nil, true
 
         let(:contractor) do
           Contractor.new(name: 'contractor')
@@ -391,15 +366,7 @@ describe Mongoid::Reloadable do
       end
 
       context "when update_embedded_after_nil feature flag is not set" do
-        around do |example|
-          saved_flag = Mongoid.update_embedded_after_nil
-          Mongoid.update_embedded_after_nil = false
-          begin
-            example.run
-          ensure
-            Mongoid.update_embedded_after_nil = saved_flag
-          end
-        end
+        config_override :update_embedded_after_nil, false
 
         let(:contractor) do
           Contractor.new(name: 'contractor')

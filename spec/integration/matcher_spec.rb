@@ -45,16 +45,7 @@ describe 'Matcher operators' do
       end
 
       context "when compare_time_by_ms feature flag is set" do
-
-        around do |example|
-          saved_flag = Mongoid.compare_time_by_ms
-          Mongoid.compare_time_by_ms = true
-          begin
-            example.run
-          ensure
-            Mongoid.compare_time_by_ms = saved_flag
-          end
-        end
+        config_override :compare_time_by_ms, true
 
         context 'with $in' do
           let(:query) do
@@ -66,16 +57,7 @@ describe 'Matcher operators' do
       end
 
       context "when compare_time_by_ms feature flag is not set" do
-
-        around do |example|
-          saved_flag = Mongoid.compare_time_by_ms
-          Mongoid.compare_time_by_ms = false
-          begin
-            example.run
-          ensure
-            Mongoid.compare_time_by_ms = saved_flag
-          end
-        end
+        config_override :compare_time_by_ms, false
 
         context 'with $in' do
           let(:query) do
