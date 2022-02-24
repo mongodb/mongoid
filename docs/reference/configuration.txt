@@ -182,19 +182,19 @@ for details on driver options.
           # determined by the driver will be used. Please refer to:
           # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
           auth_source: admin
+          
+          # Connect directly to and perform all operations on the specified
+          # server, bypassing replica set node discovery and monitoring.
+          # Exactly one host address must be specified. (default: false)
+          #direct_connection: true
 
-          # Force the driver to connect in a specific way instead of auto-
-          # discovering. Can be one of: :direct, :replica_set, :sharded. Set to :direct
-          # when connecting to hidden members of a replica set. This option is deprecated
-          # and using it to specify :replica_set or :sharded is generally unnecessary.
-          # To force the client to use a direct connection, it is recommended that the
-          # direct_connection option be used.
-          connect: :direct
-
-          # To disable the deployment type discovery and force all operations to be
-          # performed on a particular server, specify the direct_connection option
-          # as true. (default: false)
-          direct_connection: false
+          # Deprecated. Force the driver to connect in a specific way instead
+          # of automatically discovering the deployment type and connecting
+          # accordingly. To connect directly to a replica set node bypassing
+          # node discovery and monitoring, use direct_connection: true instead
+          # of this option. Possible values: :direct, :replica_set, :sharded.
+          # (default: none)
+          #connect: :direct
 
           # Change the default time in seconds the server monitors refresh their status
           # via hello commands. (default: 10)
