@@ -547,7 +547,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
         expect do
           customer.work_address.addressable = customer
-        end.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+        end.to raise_error(Mongoid::Errors::InvalidSetPolymorphicRelation)
       end
     end
 
@@ -606,7 +606,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
         expect do
           customer.acquaintances[0].befriendable = customer
-        end.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+        end.to raise_error(Mongoid::Errors::InvalidSetPolymorphicRelation)
       end
     end
   end

@@ -115,13 +115,7 @@ module Mongoid
                   rel.relation_class_name == inverse_class_name
             end
 
-            candidates = matches.collect { |m| m.name }
-
-            if matches.length > 1
-              raise Errors::AmbiguousRelationship.new(other.class, inverse_class_name, name, candidates)
-            end
-
-            candidates
+            matches.map { |m| m.name }
           end
         end
 
