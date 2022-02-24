@@ -537,6 +537,9 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
         expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
         expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+
+        expect(customer.home_address.addressable).to eq(customer)
+        expect(customer.work_address.addressable).to eq(customer)
       end
     end
 
@@ -596,6 +599,9 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
         expect(customer.close_friends[0].instance_eval { _association.store_as }).to eq("close_friends")
         expect(customer.acquaintances[0].instance_eval { _association.store_as }).to eq("acquaintances")
+
+        expect(customer.close_friends[0].befriendable).to eq(customer)
+        expect(customer.acquaintances[0].befriendable).to eq(customer)
       end
     end
 
