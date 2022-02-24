@@ -252,12 +252,12 @@ for details on driver options.
           # Compressors to use. (default is to not use compression)
           compressors: [zlib]
 
-    # Configure Mongoid specific options. (optional)
+    # Configure Mongoid-specific options. (optional)
     options:
-      # Application name that is printed to the mongodb logs upon establishing
-      # a connection in server versions >= 3.4. Note that the name cannot
-      # exceed 128 bytes. It is also used as the database name if the
-      # database name is not explicitly defined. (default: nil)
+      # Application name that is printed to the MongoDB logs upon establishing
+      # a connection in server versions 3.4 or greater. Note that the name
+      # cannot exceed 128 bytes in length. It is also used as the database name
+      # if the database name is not explicitly defined. (default: nil)
       app_name: MyApplicationName
 
       # Create indexes in background by default. (default: false)
