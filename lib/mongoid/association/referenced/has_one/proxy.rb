@@ -49,17 +49,14 @@ module Mongoid
           #
           # @return [ One ] The association.
           def substitute(replacement)
-            # If the same object currently associated is being assigned,
-            # rebind the association and save the target but do not destroy
-            # the target.
-
-            unbind_one
-            if persistable?
-              # TODO can this entire method be skipped if self == replacement?
-              if _association.destructive? && self != replacement
-                send(_association.dependent)
-              else
-                save if persisted?
+            if replacement != self
+              unbind_one
+              if persistable?
+                if _association.destructive?
+                  send(_association.dependent)
+                else
+                  save if persisted?
+                end
               end
             end
             HasOne::Proxy.new(_base, replacement, _association) if replacement

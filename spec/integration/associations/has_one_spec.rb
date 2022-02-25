@@ -173,4 +173,46 @@ describe 'has_one associations' do
       end
     end
   end
+
+  context "when assigning the same value to a belongs_to" do
+    let(:post) { HomPost.create! }
+    let(:comment) { HomComment.create! }
+    let(:comment2) { HomComment.create! }
+
+    it "persists it correctly" do
+      post.comment = comment
+      post.reload
+      expect(post.comment).to eq(comment)
+
+      post.comment = comment
+      post.reload
+      expect(post.comment).to eq(comment)
+
+      post.comment = comment2
+      post.reload
+      post.comment = comment
+      post.reload
+      expect(post.comment).to eq(comment)
+    end
+  end
+
+  context "when reassigning the same value to a belongs_to" do
+    let(:post) { HomPost.create! }
+    let(:comment1) { HomComment.create! }
+    let(:comment2) { HomComment.create! }
+
+    it "persists it correctly" do
+      post.comment = comment1
+      post.reload
+      expect(post.comment).to eq(comment1)
+
+      post.comment = comment2
+      post.reload
+      expect(post.comment).to eq(comment2)
+
+      post.comment = comment1
+      post.reload
+      expect(post.comment).to eq(comment1)
+    end
+  end
 end

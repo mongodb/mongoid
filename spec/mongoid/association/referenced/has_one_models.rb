@@ -95,3 +95,19 @@ class HomAnimal
 
   belongs_to :trainer, class_name: 'HomTrainer', scope: -> { where(name: 'Dave') }
 end
+
+class HomPost
+  include Mongoid::Document
+
+  field :title, type: String
+
+  has_one :comment, inverse_of: :post, class_name: 'HomComment'
+end
+
+class HomComment
+  include Mongoid::Document
+
+  field :content, type: Hash
+
+  belongs_to :post, inverse_of: :comment, optional: true, class_name: 'HomPost'
+end
