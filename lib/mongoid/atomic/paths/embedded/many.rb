@@ -41,7 +41,7 @@ module Mongoid
             # association. The use case for this function is when trying to
             # persist an empty list for an embedded association. All of the
             # existing functions for getting the position to store a document
-            # require passing in a docuent to store, which we don't have when
+            # require passing in a document to store, which we don't have when
             # trying to store the empty list.
             #
             # @param [ Document ] parent The parent document to store in.

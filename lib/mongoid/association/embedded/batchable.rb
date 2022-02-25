@@ -237,10 +237,10 @@ module Mongoid
         #
         # @return [ String ] The atomic path.
         def path
-          unless _unscoped.empty?
-            @path ||= _unscoped.first.atomic_path
+          @path ||= if _unscoped.empty?
+            Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
           else
-            @path ||= Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
+            _unscoped.first.atomic_path
           end
         end
 
