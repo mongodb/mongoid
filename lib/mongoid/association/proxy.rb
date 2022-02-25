@@ -169,6 +169,18 @@ module Mongoid
         end
       end
 
+      # Execute the before and after callbacks for the given method.
+      #
+      # @param [ Symbol ] name The name of the callbacks to execute.
+      #
+      # @return [ Object ] The result of the given block
+      def execute_callbacks_around(name, doc)
+        execute_callback :"before_#{name.to_s}", doc
+        yield.tap do
+          execute_callback :"after_#{name.to_s}", doc
+        end
+      end
+
       class << self
 
         # Apply ordering to the criteria if it was defined on the association.

@@ -129,3 +129,27 @@ class FirstSpouse
     self.age ||= 70
   end
 end
+
+class Architect
+  include Mongoid::Document
+
+  has_and_belongs_to_many :buildings, after_add: :after_add_callback,
+    after_remove: :after_remove_callback, dependent: :nullify
+
+  field :after_add_num_buildings, type: Integer
+  field :after_remove_num_buildings, type: Integer
+
+  def after_add_callback(obj)
+    self.after_add_num_buildings = self.buildings.length
+  end
+
+  def after_remove_callback(obj)
+    self.after_remove_num_buildings = self.buildings.length
+  end
+end
+
+class Building
+  include Mongoid::Document
+
+  has_and_belongs_to_many :architects, dependent: :nullify
+end

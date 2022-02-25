@@ -92,13 +92,15 @@ module Mongoid
           #
           # @return [ Document ] The matching document.
           def delete(document)
-            execute_callback :before_remove, document
-            _target.delete(document) do |doc|
-              if doc
-                unbind_one(doc)
-                cascade!(doc) if !_assigning?
+            execute_callbacks_around(:remove, document) do
+              _target.delete(document) do |doc|
+                if doc
+                  unbind_one(doc)
+                  cascade!(doc) if !_assigning?
+                end
+              end.tap do
+                reset_unloaded
               end
-              execute_callback :after_remove, doc
             end
           end
 
