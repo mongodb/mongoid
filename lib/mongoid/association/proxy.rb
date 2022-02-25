@@ -170,9 +170,10 @@ module Mongoid
       end
 
       # Execute the before and after callbacks for the given method.
-      # Returns the result of the given block
       #
       # @param [ Symbol ] name The name of the callbacks to execute.
+      #
+      # @return [ Object ] The result of the given block
       def execute_callbacks_around(name, doc)
         execute_callback :"before_#{name.to_s}", doc
         yield.tap do
