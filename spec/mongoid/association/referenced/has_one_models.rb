@@ -107,7 +107,7 @@ end
 class HomComment
   include Mongoid::Document
 
-  field :content, type: Hash
+  field :content, type: String
 
   belongs_to :post, inverse_of: :comment, optional: true, class_name: 'HomPost'
 end

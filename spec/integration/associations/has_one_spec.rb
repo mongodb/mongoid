@@ -187,21 +187,17 @@ describe 'has_one associations' do
       post.comment = comment
       post.reload
       expect(post.comment).to eq(comment)
-
-      post.comment = comment2
-      post.reload
-      post.comment = comment
-      post.reload
-      expect(post.comment).to eq(comment)
     end
   end
 
   context "when reassigning the same value to a belongs_to" do
     let(:post) { HomPost.create! }
-    let(:comment1) { HomComment.create! }
-    let(:comment2) { HomComment.create! }
+    let(:comment1) { HomComment.create!(content: "Comment 1") }
+    let(:comment2) { HomComment.create!(content: "Comment 2") }
 
     it "persists it correctly" do
+      pending "MONGOID-5254"
+
       post.comment = comment1
       post.reload
       expect(post.comment).to eq(comment1)
