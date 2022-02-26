@@ -4649,4 +4649,53 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
     end
   end
+
+  context "when trying to persist the empty list" do
+
+    context "in an embeds_many relation" do
+
+      let(:band) { Band.create! }
+
+      before do
+        band.labels = []
+        band.save!
+      end
+
+      let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+
+      it "persists the empty list" do
+        expect(reloaded_band).to have_key(:labels)
+        expect(reloaded_band[:labels]).to eq []
+      end
+    end
+
+    context "in a nested embeds_many relation" do
+
+      let(:survey) { Survey.create!(questions: [Question.new]) }
+
+      before do
+        survey.questions.first.answers = []
+        survey.save!
+      end
+
+      let(:reloaded_survey) { Survey.collection.find(_id: survey._id).first }
+
+      it "persists the empty list" do
+        expect(reloaded_survey).to have_key(:questions)
+        expect(reloaded_survey[:questions][0]).to have_key(:answers)
+        expect(reloaded_survey[:questions][0][:answers]).to eq []
+      end
+    end
+
+    context "when not setting the embeds_many field" do
+
+      let(:band) { Band.create! }
+
+      let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+
+      it "does not persist the empty list" do
+        expect(reloaded_band).to_not have_key(:labels)
+      end
+    end
+  end
 end
