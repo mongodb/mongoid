@@ -59,8 +59,10 @@ module Mongoid
                 end
               end
             end
-            reset_foreign_key!(replacement)
-            HasOne::Proxy.new(_base, replacement, _association) if replacement
+            if replacement
+              reset_foreign_key!(replacement)
+              HasOne::Proxy.new(_base, replacement, _association)
+            end
           end
 
           private
