@@ -59,6 +59,7 @@ module Mongoid
                 end
               end
             end
+            reset_foreign_key!(replacement)
             HasOne::Proxy.new(_base, replacement, _association) if replacement
           end
 
@@ -82,6 +83,19 @@ module Mongoid
           # @return [ true, false ] If the association is persistable.
           def persistable?
             _base.persisted? && !_binding? && !_building?
+          end
+
+          # Sets the foreign key of the... TODO finish this if it works
+          def reset_foreign_key!(replacement)
+            foreign_key = _association.foreign_key
+            if replacement.changed_attributes.key?(foreign_key)
+              old_id = replacement.changed_attributes[_association.foreign_key]
+              replacement.send(_association.foreign_key_setter, nil)
+              replacement.changed_attributes[_association.foreign_key] = old_id
+            else
+              replacement.send(_association.foreign_key_setter, nil)
+              replacement.changed_attributes.delete(_association.foreign_key)
+            end
           end
 
           class << self

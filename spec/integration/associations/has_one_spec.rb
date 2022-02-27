@@ -196,8 +196,6 @@ describe 'has_one associations' do
     let(:comment2) { HomComment.create!(content: "Comment 2") }
 
     it "persists it correctly" do
-      pending "MONGOID-5254"
-
       post.comment = comment1
       post.reload
       expect(post.comment).to eq(comment1)
