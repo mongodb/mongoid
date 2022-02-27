@@ -87,7 +87,25 @@ module Mongoid
             _base.persisted? && !_binding? && !_building?
           end
 
-          # Sets the foreign key of the... TODO finish this if it works
+          # Sets the foreign key of the replacement document to nil without
+          # modifying the changed_attributes of that document.
+          #
+          # The use case for this function is when assigning a replacement
+          # document that has a stale value for the foreign key. Previously,
+          # we  would attempt to update the replacement document with the new
+          # foreign key, replacing it's current value as nil in the database,
+          # however, the update wouldn't be persisted because the replacement
+          # document currently has a stale value that is equivalent to the
+          # value of the foreign key we're trying to assign. This function,
+          # clears that value and allows for any value of the foreign key to
+          # persisted, regardless of the stale state of the replacement
+          # document's foreign key. This function also has to update the
+          # changed_attributes of the document so that the update will not
+          # think that the attribute didn't change and fail to execute the
+          # update.
+          #
+          # @param [ Document ] replacement The document to clear the value for
+          #   the foreign key
           def reset_foreign_key!(replacement)
             foreign_key = _association.foreign_key
             if replacement.changed_attributes.key?(foreign_key)
