@@ -190,6 +190,36 @@ describe 'has_one associations' do
     end
   end
 
+  context "when assigning two values with the same _id to a belong to" do
+    let(:post) { HomPost.create! }
+    let(:comment) { HomComment.create! }
+    let(:comment2) { HomComment.new(id: comment.id) }
+
+    it "raises a duplicate key error" do
+      post.comment = comment
+      expect do
+        post.comment = comment2
+      end.to raise_error(Mongo::Error::OperationFailure, /duplicate key/)
+    end
+  end
+
+  context "when explicitly setting the foreign key" do
+    let(:post) { HomPost.create! }
+    let(:comment) { HomComment.create!(content: "1") }
+    let(:comment2) { HomComment.new(post_id: post.id, content: "2") }
+
+    it "persists the new comment" do
+      post.comment = comment
+      post.reload
+
+      post.comment = comment2
+      post.reload
+
+      expect(post.comment).to eq(comment2)
+      expect(post.comment.content).to eq(comment2.content)
+    end
+  end
+
   context "when reassigning the same value to a belongs_to" do
     let(:post) { HomPost.create! }
     let(:comment1) { HomComment.create!(content: "Comment 1") }
