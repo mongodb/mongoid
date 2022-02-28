@@ -49,7 +49,9 @@ module Mongoid
           #
           # @return [ One ] The association.
           def substitute(replacement)
-            if replacement != self
+            if equal?(replacement)
+              self
+            else
               unbind_one
               if persistable?
                 if _association.destructive?
@@ -58,8 +60,8 @@ module Mongoid
                   save if persisted?
                 end
               end
+              HasOne::Proxy.new(_base, replacement, _association) if replacement
             end
-            HasOne::Proxy.new(_base, replacement, _association) if replacement
           end
 
           private
