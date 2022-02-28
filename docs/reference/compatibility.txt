@@ -10,7 +10,6 @@ Compatibility
    :depth: 2
    :class: singlecol
 
-
 Ruby MongoDB Driver Compatibility
 =================================
 
@@ -31,7 +30,7 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.16-2.10
+     - Driver 2.17-2.10
      - Driver 2.9-2.7
 
    * - 7.5
@@ -286,7 +285,7 @@ are supported by Mongoid.
      -
 
    * - 7.3
-     -
+     - |checkmark| [#rails-7-Mongoid-7.3]_
      - |checkmark|
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
@@ -390,5 +389,7 @@ are supported by Mongoid.
 
 .. [#rails-6.1] Rails 6.1 requires Mongoid 7.0.12, 7.1.7 or 7.2.1 in the
   respective 7.0, 7.1 and 7.2 stable branches.
+
+.. [#rails-7-Mongoid-7.3] Rails 7.x requires Mongoid 7.3.4 or later.
 
 .. include:: /includes/unicode-checkmark.rst
