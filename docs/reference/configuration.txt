@@ -341,10 +341,10 @@ for details on driver options.
       # (default: true)
       raise_not_found_error: true
 
-      # In Mongoid 7.3.3 and earlier, there was a bug when using with_scope
-      # that after the function returned, any previous scopes were lost.
-      # Turning this flag on fixes that bug. (default: false)
-      restore_previous_scope: false
+      # When exiting a nested `with_scope' block, set the current scope to
+      # nil instead of the parent scope for backwards compatibility.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_scoping: true
 
       # In Mongoid 7.3.3 and earlier, when doing a sum on a field with a null
       # context, for example:

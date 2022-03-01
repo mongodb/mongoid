@@ -286,9 +286,9 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the restore_previous_scope option in the config' do
-    let(:option) { :restore_previous_scope }
-    let(:default) { false }
+  context 'when setting the broken_scoping option in the config' do
+    let(:option) { :broken_scoping }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end

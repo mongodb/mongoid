@@ -85,8 +85,9 @@ module Mongoid
     # ruby behavior. See the following PR for an explanation: https://github.com/mongodb/mongoid/pull/5013
     option :triple_equals_uses_is_a, default: false
 
-    # Restore previous scope after with_scope returns.
-    option :restore_previous_scope, default: false
+    # When exiting a nested `with_scope' block, set the current scope to
+    # nil instead of the parent scope for backwards compatibility.
+    option :broken_scoping, default: true
 
     # Returns zeros when doing a sum with a field on a null context.
     option :return_zero_on_sum_none, default: false
