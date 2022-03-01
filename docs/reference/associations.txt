@@ -27,7 +27,7 @@ a separate collection. The child is optional by default:
 
   class Band
     include Mongoid::Document
-    
+
     has_one :studio
   end
 
@@ -38,7 +38,7 @@ association with the parent:
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band
   end
 
@@ -59,9 +59,9 @@ Use validations to require that the child is present:
 
   class Band
     include Mongoid::Document
-    
+
     has_one :studio
-    
+
     validates_presence_of :studio
   end
 
@@ -76,7 +76,7 @@ children stored in a separate collection:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :members
   end
 
@@ -87,7 +87,7 @@ association with the parent:
 
   class Member
     include Mongoid::Document
-    
+
     belongs_to :band
   end
 
@@ -108,9 +108,9 @@ Use validations to require that at least one child is present:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :members
-    
+
     validates_presence_of :members
   end
 
@@ -147,7 +147,7 @@ filtering with a block:
 
   class Drummer < Member
   end
-  
+
   band = Band.first
   band.members.any?(Drummer)
 
@@ -159,9 +159,9 @@ documents and does not query the database:
   band = Band.first
   # Queries the database
   band.members.any?
-  
+
   band.members.to_a
-  
+
   # Does not query the database
   band.members.any?
 
@@ -188,15 +188,15 @@ The following example illustrates the difference between ``exists?`` and
   band = Band.create!
   # Member is not persisted.
   band.members.build
-  
+
   band.members.any?
   # => true
   band.members.exists?
   # => false
-  
+
   # Persist the member.
   band.members.map(&:save!)
-  
+
   band.members.any?
   # => true
   band.members.exists?
@@ -218,16 +218,16 @@ option to make the instances persistable without specifying the parent:
 
   class Band
     include Mongoid::Document
-    
+
     has_one :studio
   end
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band, optional: true
   end
-  
+
   studio = Studio.create!
   # => #<Studio _id: 600118184896684987aa884f, band_id: nil>
 
@@ -249,7 +249,7 @@ but the parent is accessible from the child:
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band
   end
 
@@ -264,7 +264,7 @@ the parent does not define the association:
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band, inverse_of: nil
   end
 
@@ -279,13 +279,13 @@ association:
 
   class Band
     include Mongoid::Document
-    
+
     has_and_belongs_to_many :tags
   end
 
   class Tag
     include Mongoid::Document
-    
+
     has_and_belongs_to_many :bands
   end
 
@@ -295,7 +295,7 @@ Both model instances store a list of ids of the associated models, if any:
 
   band = Band.create!(tags: [Tag.create!])
   # => #<Band _id: 60011d554896684b8b910a2a, tag_ids: [BSON::ObjectId('60011d554896684b8b910a29')]>
-  
+
   band.tags
   # => [#<Tag _id: 60011d554896684b8b910a29, band_ids: [BSON::ObjectId('60011d554896684b8b910a2a')]>]
 
@@ -306,7 +306,7 @@ the ids only in one document using the ``inverse_of: nil`` option:
 
   class Band
     include Mongoid::Document
-    
+
     has_and_belongs_to_many :tags, inverse_of: nil
   end
 
@@ -344,26 +344,26 @@ For example, given the following models:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :tours
     has_many :awards
-    
+
     field :name, type: String
   end
 
   class Tour
     include Mongoid::Document
-    
+
     belongs_to :band
-    
+
     field :year, type: Integer
   end
 
   class Award
     include Mongoid::Document
-    
+
     belongs_to :band
-    
+
     field :name, type: String
   end
 
@@ -585,6 +585,58 @@ help of MongoDB projection operation:
   #  "projection"=>{"_id"=>1, "label"=>1}}
   Band.where(started_on: {'$gt' => Time.now - 1.year}).only(:label).map(&:label).compact.uniq
 
+Setting Stale Values on Referenced Associations
+``````````````````````````````````````````````
+
+Setting a stale value to a referenced association can sometimes result in
+a ``nil`` value being persisted to the database. Take the following case:
+
+.. code-block:: ruby
+
+  class Post
+    include Mongoid::Document
+
+    has_one :comment, inverse_of: :post
+  end
+
+  class Comment
+    include Mongoid::Document
+
+    belongs_to :post, inverse_of: :comment, optional: true
+  end
+
+  post.comment = comment1
+  post.reload
+
+At this point, ``post.comment`` is set to ``comment1``, however since a reload
+happened, ``post.comment`` does not refer to the same object as ``comment1``.
+Meaning, updating one object does not implicitly update the other. This matters
+for the next operation:
+
+.. code-block:: ruby
+
+  post.comment = comment2
+  post.reload
+
+Now, ``post.comment`` is set to ``comment2``, and the ``post_id`` of the old
+comment is set to ``nil``. However, the value that was assigned to
+``post.comment`` did not refer to the same object as ``comment1``, therefore,
+while the old value of ``post.comment`` was updated to have a ``nil``
+``post_id``, ``comment1`` still has the ``post_id`` set.
+
+.. code-block:: ruby
+
+  post.comment = comment1
+  post.reload
+
+Finally, this last assignment attempts to set the ``post_id`` on ``comment1``,
+which should be ``nil`` at this point, but is set to the old ``post_id``.
+During this operation, the ``post_id`` is cleared from ``comment2``, and the
+new ``post_id`` is set on ``comment1``. However, since the ``post_id`` was
+already set on ``comment1``, nothing is persisted, and we end up with both
+comments having a ``nil`` ``post_id``. At this point, running ``post.comment``
+returns ``nil``.
+
 
 Querying Embedded Associations
 ------------------------------
@@ -683,7 +735,7 @@ The following deviations are known:
   As such, it is possible for Mongoid to deviate from server behavior if
   the server itself behaves differently in different versions. All operators are implemented in
   Mongoid regardless of backing deployment's server version.
-  
+
   As of this writing, the known cases of such deviation are:
 
    - 3.2 and earlier servers not validating ``$size`` arguments as strictly as newer versions do.
@@ -725,15 +777,15 @@ and remove the default value:
 
   class Order
     include Mongoid::Document
-    
+
     embeds_many :line_items
   end
-  
+
   class LineItem
     include Mongoid::Document
-    
+
     embedded_in :order
-    
+
     field :_id, type: Object
   end
 
@@ -774,11 +826,11 @@ document's ``_id``:
 
   band = Band.find(...)
   band.tours << Tour.new(...)
-  
+
   unsaved_band = Band.new(id: band.id, tours: [Tour.new])
   # Removes all tours from the persisted band due to _id match.
   unsaved_band.tours.clear
-  
+
   band.tours
   # => []
 
@@ -1175,8 +1227,8 @@ to be deleted. The options are as follows:
 - ``:restrict_with_exception``: ``raise`` an error if the child is not empty.
 - ``:restrict_with_error``: Cancel operation and return false if the child is not empty.
 
-If no ``:dependent`` option is provided, deleting the parent record leaves the child record unmodified 
-(in other words, the child record continues to reference the now deleted parent record via the foreign key field). 
+If no ``:dependent`` option is provided, deleting the parent record leaves the child record unmodified
+(in other words, the child record continues to reference the now deleted parent record via the foreign key field).
 The child may become orphaned if it is ordinarily only referenced via the parent.
 
 .. code-block:: ruby
@@ -1298,7 +1350,7 @@ be touched on the parent association in addition to updated_at:
     include Mongoid::Document
     belongs_to :label, touch: :bands_updated_at
   end
-  
+
   label = Label.create!
   band = Band.create!(label: label)
 
@@ -1354,9 +1406,9 @@ accessed, depending on the association:
   class Order
     include Mongoid::Document
     belongs_to :customer
-    
+
     private
-    
+
     def internal_status
       'new'
     end
@@ -1365,21 +1417,21 @@ accessed, depending on the association:
   class Customer
     include Mongoid::Document
     has_many :orders
-    
+
     private
-    
+
     def internal_id
       42
     end
   end
-  
+
   order = Order.new
   customer = Customer.create!(orders: [order])
-  
+
   # has_many does not permit calling private methods on the target
   customer.orders.first.internal_status
   # NoMethodError (private method `internal_status' called for #<Order:0x000055af2ec46c50>)
-  
+
   # belongs_to permits calling private methods on the target
   order.customer.internal_id
   # => 42
@@ -1598,18 +1650,18 @@ For example, given the following models:
 
   class Tour
     include Mongoid::Document
-    
+
     embeds_many :participants
-    
+
     field :name, type: String
     field :states, type: Array
   end
-  
+
   class Participant
     include Mongoid::Document
-    
+
     embedded_in :tour
-    
+
     field :name, type: String
   end
 
@@ -1621,13 +1673,13 @@ We could find out which states a participant visited:
     unwind(:states).
     group(_id: 'states', :states.add_to_set => '$states').
     project(_id: 0, states: 1)
-  
+
   pp criteria.pipeline
   # => [{"$match"=>{"participants.name"=>"Serenity"}},
   #     {"$unwind"=>"$states"},
   #     {"$group"=>{"_id"=>"states", "states"=>{"$addToSet"=>"$states"}}},
   #     {"$project"=>{"_id"=>0, "states"=>1}}]
-  
+
   Tour.collection.aggregate(criteria.pipeline).to_a
 
 group
@@ -1681,7 +1733,7 @@ a Hash or a ``BSON::Document`` instance:
     criteria = Tour.all.unwind('states')
     criteria.pipeline
     # => [{"$unwind"=>"$states"}]
-    
+
     criteria = Tour.all.unwind(path: '$states')
     criteria.pipeline
     # => [{"$unwind"=>{:path=>"$states"}}]
