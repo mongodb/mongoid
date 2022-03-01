@@ -585,10 +585,10 @@ help of MongoDB projection operation:
   #  "projection"=>{"_id"=>1, "label"=>1}}
   Band.where(started_on: {'$gt' => Time.now - 1.year}).only(:label).map(&:label).compact.uniq
 
-Setting Stale Values on Reference Associations
+Setting Stale Values on Referenced Associations
 ``````````````````````````````````````````````
 
-Setting a stale value to a reference association can sometimes result in
+Setting a stale value to a referenced association can sometimes result in
 a ``nil`` value being persisted to the database. Take the following case:
 
 .. code-block:: ruby
