@@ -95,9 +95,9 @@ module Mongoid
     # distinct operations, for backwards compatibility.
     option :broken_alias_handling, default: true
 
-    # Fixes add_logical_operator_expression when attempting to add multiple
-    # clauses that use the same operator on the same field.
-    option :fix_multiple_ands, default: false
+    # Maintain broken `and' behavior when using the same operator on the same
+    # field multiple times for backwards compatibility.
+    option :broken_and, default: true
 
     # Use millisecond precision when comparing Time objects with the _matches?
     # function.

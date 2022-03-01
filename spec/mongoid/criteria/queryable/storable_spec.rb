@@ -67,8 +67,8 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
-      context "when fix_multiple_ands feature flag is set" do
-        config_override :fix_multiple_ands, true
+      context "when broken_and feature flag is not set" do
+        config_override :broken_and, false
 
         context '$and to query with $and onto query whose first one is not $and' do
           let(:query) do
@@ -86,8 +86,8 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
-      context "when fix_multiple_ands feature flag is not set" do
-        config_override :fix_multiple_ands, false
+      context "when broken_and feature flag is set" do
+        config_override :broken_and, true
 
         context '$and to query with $and onto query whose first one is not $and' do
           let(:query) do

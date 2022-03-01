@@ -292,11 +292,12 @@ for details on driver options.
       # (default: true in Mongoid 7, will change to false in Mongoid 8)
       broken_alias_handling: true
 
-      # In Mongoid 7.3.3 and earlier, there was a bug when adding expressions
-      # using the #and function. In certain situations, an $and clause would be
-      # lost and replaced by one of the previous $and clauses. This would
-      # happen when using the same operator on the same field multiple times.
-      # For example:
+      # Maintain broken `and' method behavior that existed in Mongoid 7.3
+      # and earlier for backwards compatibility: in some situations, conditions
+      # already present in a Criteria object would be replaced by newer
+      # conditions when `and' method is used instead of the new conditions
+      # being added to the existing conditions. This would happen when using
+      # the same operator on the same field multiple times. For example:
       #
       # Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
       #
@@ -310,9 +311,9 @@ for details on driver options.
       #
       # This is obviously incorrect as the {"$in"=>[2021]} clause is lost.
       # Notice that the clause is only lost when both clauses are added using
-      # the #and function. Turning on this feature flag fixes this bug.
-      # (default: false)
-      fix_multiple_ands: false
+      # the #and method.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_and: true
 
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
