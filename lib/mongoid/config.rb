@@ -89,8 +89,9 @@ module Mongoid
     # nil instead of the parent scope for backwards compatibility.
     option :broken_scoping, default: true
 
-    # Returns zeros when doing a sum with a field on a null context.
-    option :return_zero_on_sum_none, default: false
+    # Maintain broken behavior of sum over empty result sets for backwards
+    # compatibility.
+    option :broken_aggregables, default: true
 
     # Ignore aliased fields in embedded documents when performing pluck and
     # distinct operations, for backwards compatibility.

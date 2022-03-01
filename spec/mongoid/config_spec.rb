@@ -293,9 +293,9 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the return_zero_on_sum_none option in the config' do
-    let(:option) { :return_zero_on_sum_none }
-    let(:default) { false }
+  context 'when setting the broken_aggregables option in the config' do
+    let(:option) { :broken_aggregables }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
