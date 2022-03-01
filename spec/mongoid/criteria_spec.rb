@@ -3644,6 +3644,16 @@ describe Mongoid::Criteria do
           'active' => true, '$and' => [{'active' => false}])
       end
     end
+
+    context "when searching by _id twice" do
+      let(:_id) { BSON::ObjectId.new }
+      let(:criteria) { Band.where(_id: _id) }
+      let(:dup_criteria) { criteria.where(_id: _id)}
+
+      it "does not duplicate the criteria" do
+        expect(dup_criteria.selector).to eq({ "_id" => _id })
+      end
+    end
   end
 
   describe "#for_js" do
