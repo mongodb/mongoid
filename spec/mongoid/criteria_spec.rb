@@ -3507,6 +3507,21 @@ describe Mongoid::Criteria do
           'active' => true, '$and' => [{'active' => false}])
       end
     end
+
+    # Used to test MONGOID-5251 where the find command was adding unnecessary
+    # and clauses. Since the find command creates the criteria and executes it,
+    # it is difficult to analyze the criteria used. For this reason, I have
+    # extracted the crux of the issue, adding an _id to the the criteria twice, 
+    # and used that for the test case.
+    context "when searching by _id twice" do
+      let(:_id) { BSON::ObjectId.new }
+      let(:criteria) { Band.where(_id: _id) }
+      let(:dup_criteria) { criteria.where(_id: _id)}
+
+      it "does not duplicate the criteria" do
+        expect(dup_criteria.selector).to eq({ "_id" => _id })
+      end
+    end
   end
 
   describe "#for_js" do
