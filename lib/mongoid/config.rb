@@ -108,7 +108,7 @@ module Mongoid
 
     # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
     # the one monkey-patched into Mongoid.
-    option :use_bson_ruby_as_json, default: false
+    option :object_id_as_json_oid, default: true
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.

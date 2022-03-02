@@ -321,9 +321,9 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the use_bson_ruby_as_json option in the config' do
-    let(:option) { :use_bson_ruby_as_json }
-    let(:default) { false }
+  context 'when setting the object_id_as_json_oid option in the config' do
+    let(:option) { :object_id_as_json_oid }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
