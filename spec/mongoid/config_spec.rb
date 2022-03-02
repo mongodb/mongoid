@@ -279,9 +279,9 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the triple_equals_uses_is_a option in the config' do
-    let(:option) { :triple_equals_uses_is_a }
-    let(:default) { false }
+  context 'when setting the broken_triple_equals option in the config' do
+    let(:option) { :broken_triple_equals }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end

@@ -105,16 +105,16 @@ describe Mongoid::Equality do
 
     context "when comparable is the same class" do
 
-      context "when triple_equals_uses_is_a is set" do
-        config_override :triple_equals_uses_is_a, true
+      context "when broken_triple_equals is not set" do
+        config_override :broken_triple_equals, false
 
         it "returns false" do
           expect(klass === Person).to be false
         end
       end
 
-      context "when triple_equals_uses_is_a is not set" do
-        config_override :triple_equals_uses_is_a, false
+      context "when broken_triple_equals is set" do
+        config_override :broken_triple_equals, true
 
         it "returns true" do
           expect(klass === Person).to be true
@@ -133,6 +133,59 @@ describe Mongoid::Equality do
 
       it "returns true" do
         expect(Person === Doctor.new).to be true
+      end
+    end
+
+    context "when comparing to a class" do
+
+      context "when broken_triple_equals is not set" do
+        config_override :broken_triple_equals, false
+
+        context "when the class is the same" do
+
+          it "returns false" do
+            expect(Person === Person).to be false
+          end
+        end
+
+        context "when the class is a subclass" do
+
+          it "returns false" do
+            expect(Person === Doctor).to be false
+          end
+        end
+
+        context "when the class is a superclass" do
+
+          it "returns false" do
+            expect(Doctor === Person).to be false
+          end
+        end
+      end
+
+      context "when broken_triple_equals is set" do
+        config_override :broken_triple_equals, true
+
+        context "when the class is the same" do
+
+          it "returns true" do
+            expect(Person === Person).to be true
+          end
+        end
+
+        context "when the class is a subclass" do
+
+          it "returns false" do
+            expect(Person === Doctor).to be false
+          end
+        end
+
+        context "when the class is a superclass" do
+
+          it "returns true" do
+            expect(Doctor === Person).to be true
+          end
+        end
       end
     end
   end
@@ -165,8 +218,8 @@ describe Mongoid::Equality do
 
     context "when comparing to a class" do
 
-      context "when triple_equals_uses_is_a is set" do
-        config_override :triple_equals_uses_is_a, true
+      context "when broken_triple_equals is not set" do
+        config_override :broken_triple_equals, false
 
         context "when the class is the same" do
 
@@ -190,8 +243,8 @@ describe Mongoid::Equality do
         end
       end
 
-      context "when triple_equals_uses_is_a is not set" do
-        config_override :triple_equals_uses_is_a, false
+      context "when broken_triple_equals is set" do
+        config_override :broken_triple_equals, true
 
         context "when the class is the same" do
 

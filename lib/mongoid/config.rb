@@ -81,9 +81,10 @@ module Mongoid
     # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
     option :update_embedded_after_nil, default: false
 
-    # Update the triple equals operator to use only is_a? in alignment with
-    # ruby behavior. See the following PR for an explanation: https://github.com/mongodb/mongoid/pull/5013
-    option :triple_equals_uses_is_a, default: false
+    # Maintain legacy behavior of === on Mongoid documents, which returns
+    # true in a number of cases where Ruby's === implementation would
+    # return false.
+    option :broken_triple_equals, default: true
 
     # When exiting a nested `with_scope' block, set the current scope to
     # nil instead of the parent scope for backwards compatibility.

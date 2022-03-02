@@ -367,9 +367,14 @@ for details on driver options.
       # existing method. (default: false)
       scope_overwrite_exception: false
 
-      # Corrects === behavior to be consistent with Ruby by only calling is_a?
-      # (default: false)
-      triple_equals_uses_is_a: false
+      # Maintain legacy behavior of === on Mongoid document classes, which
+      # returns true in a number of cases where Ruby's === implementation would
+      # return false. Note that the behavior of === on Mongoid document
+      # instances differs from both the behavior of === on document classes
+      # and from Ruby's behavior of === on simple object instances regardless
+      # of the value of this option.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_triple_equals: true
 
       # In Mongoid 7.3.3 and earlier, when setting an embedded document, setting
       # it to nil, and then setting it again to that same original value, the
