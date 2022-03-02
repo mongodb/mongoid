@@ -168,8 +168,8 @@ describe Mongoid::Association::Accessors do
       end
 
       context "when the association is set to nil first" do
-        context "when update_embedded_after_nil feature flag is set" do
-          config_override :update_embedded_after_nil, true
+        context "when broken_updates feature flag is not set" do
+          config_override :broken_updates, false
 
           let!(:name) do
             person.build_name
@@ -182,8 +182,8 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context "when update_embedded_after_nil feature flag is not set" do
-          config_override :update_embedded_after_nil, false
+        context "when broken_updates feature flag is set" do
+          config_override :broken_updates, true
 
           let!(:name) do
             person.build_name

@@ -79,7 +79,7 @@ module Mongoid
 
     # Update embedded documents correctly when setting it, unsetting it
     # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
-    option :update_embedded_after_nil, default: false
+    option :broken_updates, default: true
 
     # Maintain legacy behavior of === on Mongoid documents, which returns
     # true in a number of cases where Ruby's === implementation would

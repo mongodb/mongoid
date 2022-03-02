@@ -272,9 +272,9 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the update_embedded_after_nil option in the config' do
-    let(:option) { :update_embedded_after_nil }
-    let(:default) { false }
+  context 'when setting the broken_updates option in the config' do
+    let(:option) { :broken_updates }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
