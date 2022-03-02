@@ -28,5 +28,15 @@ module Mongoid
         Mongoid.send("#{key}=", existing)
       end
     end
+
+    def with_config_values(key, *values)
+      values.each do |value|
+        context "when #{key} is #{value}" do
+          config_override key, value
+
+          yield
+        end
+      end
+    end
   end
 end

@@ -87,8 +87,10 @@ describe Mongoid::Equality do
 
     context "when comparable is an instance of this document" do
 
-      it "returns true" do
-        expect(klass === person).to be true
+      with_config_values :broken_triple_equals, false, true do
+        it "returns true" do
+          expect(klass === person).to be true
+        end
       end
     end
 
@@ -98,8 +100,10 @@ describe Mongoid::Equality do
         Post.new(person: person).person
       end
 
-      it "returns true" do
-        expect(klass === relation).to be true
+      with_config_values :broken_triple_equals, false, true do
+        it "returns true" do
+          expect(klass === relation).to be true
+        end
       end
     end
 
@@ -124,15 +128,19 @@ describe Mongoid::Equality do
 
     context "when the comparable is a subclass" do
 
-      it "returns false" do
-        expect(Person === Doctor).to be false
+      with_config_values :broken_triple_equals, false, true do
+        it "returns false" do
+          expect(Person === Doctor).to be false
+        end
       end
     end
 
     context "when the comparable is an instance of a subclass" do
 
-      it "returns true" do
-        expect(Person === Doctor.new).to be true
+      with_config_values :broken_triple_equals, false, true do
+        it "returns true" do
+          expect(Person === Doctor.new).to be true
+        end
       end
     end
 
@@ -211,8 +219,10 @@ describe Mongoid::Equality do
 
     context "when the comparable is a subclass" do
 
-      it "returns false" do
-        expect(person === Doctor.new).to be false
+      with_config_values :broken_triple_equals, false, true do
+        it "returns false" do
+          expect(person === Doctor.new).to be false
+        end
       end
     end
 
