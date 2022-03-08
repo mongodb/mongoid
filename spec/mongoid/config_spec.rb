@@ -279,8 +279,8 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the broken_triple_equals option in the config' do
-    let(:option) { :broken_triple_equals }
+  context 'when setting the legacy_triple_equals option in the config' do
+    let(:option) { :legacy_triple_equals }
     let(:default) { true }
 
     it_behaves_like "a config option"

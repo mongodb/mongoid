@@ -87,7 +87,7 @@ describe Mongoid::Equality do
 
     context "when comparable is an instance of this document" do
 
-      with_config_values :broken_triple_equals, false, true do
+      with_config_values :legacy_triple_equals, false, true do
         it "returns true" do
           expect(klass === person).to be true
         end
@@ -100,7 +100,7 @@ describe Mongoid::Equality do
         Post.new(person: person).person
       end
 
-      with_config_values :broken_triple_equals, false, true do
+      with_config_values :legacy_triple_equals, false, true do
         it "returns true" do
           expect(klass === relation).to be true
         end
@@ -109,16 +109,16 @@ describe Mongoid::Equality do
 
     context "when comparable is the same class" do
 
-      context "when broken_triple_equals is not set" do
-        config_override :broken_triple_equals, false
+      context "when legacy_triple_equals is not set" do
+        config_override :legacy_triple_equals, false
 
         it "returns false" do
           expect(klass === Person).to be false
         end
       end
 
-      context "when broken_triple_equals is set" do
-        config_override :broken_triple_equals, true
+      context "when legacy_triple_equals is set" do
+        config_override :legacy_triple_equals, true
 
         it "returns true" do
           expect(klass === Person).to be true
@@ -128,7 +128,7 @@ describe Mongoid::Equality do
 
     context "when the comparable is a subclass" do
 
-      with_config_values :broken_triple_equals, false, true do
+      with_config_values :legacy_triple_equals, false, true do
         it "returns false" do
           expect(Person === Doctor).to be false
         end
@@ -137,7 +137,7 @@ describe Mongoid::Equality do
 
     context "when the comparable is an instance of a subclass" do
 
-      with_config_values :broken_triple_equals, false, true do
+      with_config_values :legacy_triple_equals, false, true do
         it "returns true" do
           expect(Person === Doctor.new).to be true
         end
@@ -146,8 +146,8 @@ describe Mongoid::Equality do
 
     context "when comparing to a class" do
 
-      context "when broken_triple_equals is not set" do
-        config_override :broken_triple_equals, false
+      context "when legacy_triple_equals is not set" do
+        config_override :legacy_triple_equals, false
 
         context "when the class is the same" do
 
@@ -171,8 +171,8 @@ describe Mongoid::Equality do
         end
       end
 
-      context "when broken_triple_equals is set" do
-        config_override :broken_triple_equals, true
+      context "when legacy_triple_equals is set" do
+        config_override :legacy_triple_equals, true
 
         context "when the class is the same" do
 
@@ -219,7 +219,7 @@ describe Mongoid::Equality do
 
     context "when the comparable is a subclass" do
 
-      with_config_values :broken_triple_equals, false, true do
+      with_config_values :legacy_triple_equals, false, true do
         it "returns false" do
           expect(person === Doctor.new).to be false
         end
@@ -228,8 +228,8 @@ describe Mongoid::Equality do
 
     context "when comparing to a class" do
 
-      context "when broken_triple_equals is not set" do
-        config_override :broken_triple_equals, false
+      context "when legacy_triple_equals is not set" do
+        config_override :legacy_triple_equals, false
 
         context "when the class is the same" do
 
@@ -253,8 +253,8 @@ describe Mongoid::Equality do
         end
       end
 
-      context "when broken_triple_equals is set" do
-        config_override :broken_triple_equals, true
+      context "when legacy_triple_equals is set" do
+        config_override :legacy_triple_equals, true
 
         context "when the class is the same" do
 

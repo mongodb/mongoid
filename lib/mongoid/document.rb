@@ -281,7 +281,7 @@ module Mongoid
       #
       # @return [ true, false ] True if the classes are equal, false if not.
       def ===(other)
-        if Mongoid.broken_triple_equals
+        if Mongoid.legacy_triple_equals
           other.class == Class ? self <= other : other.is_a?(self)
         else
           other.is_a?(self)

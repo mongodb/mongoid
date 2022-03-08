@@ -44,7 +44,7 @@ Previously, ``===`` returned ``true`` for some cases when the equivalent Ruby
 
 .. note::
 
-  In order to get this functionality, the ``Mongoid.broken_triple_equals``
+  In order to get this functionality, the ``Mongoid.legacy_triple_equals``
   global flag must be set to false. If it is set to true, the ``===`` operator
   will function as it did in Mongoid 7.3.
 

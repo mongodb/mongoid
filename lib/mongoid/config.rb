@@ -84,7 +84,7 @@ module Mongoid
     # Maintain legacy behavior of === on Mongoid documents, which returns
     # true in a number of cases where Ruby's === implementation would
     # return false.
-    option :broken_triple_equals, default: true
+    option :legacy_triple_equals, default: true
 
     # When exiting a nested `with_scope' block, set the current scope to
     # nil instead of the parent scope for backwards compatibility.

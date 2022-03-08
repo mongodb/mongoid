@@ -374,7 +374,7 @@ for details on driver options.
       # and from Ruby's behavior of === on simple object instances regardless
       # of the value of this option.
       # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      broken_triple_equals: true
+      legacy_triple_equals: true
 
       # Maintain broken update behavior in some cases for backwards
       # compatibility.
