@@ -40,7 +40,11 @@ module Mongoid
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
-      other.class == Class ? self.class === other : self == other
+      if Mongoid.triple_equals_uses_is_a
+        super
+      else
+        other.class == Class ? self.class === other : self == other
+      end
     end
 
     # Delegates to ==. Used when needing checks in hashes.
