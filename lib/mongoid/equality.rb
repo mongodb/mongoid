@@ -43,7 +43,7 @@ module Mongoid
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
-      if Mongoid.triple_equals_uses_is_a
+      if Mongoid.legacy_triple_equals
         super
       else
         other.class == Class ? self.class === other : self == other
@@ -72,7 +72,7 @@ module Mongoid
       #
       # @return [ true, false ] True if the classes are equal, false if not.
       def ===(other)
-        if Mongoid.triple_equals_uses_is_a
+        if Mongoid.legacy_triple_equals
           other.is_a?(self)
         else
           other.class == Class ? self <= other : other.is_a?(self)
