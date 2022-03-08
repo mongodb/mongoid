@@ -268,24 +268,22 @@ for details on driver options.
       # error. (default: true)
       belongs_to_required_by_default: true
 
-      # Time objects in Ruby have nanosecond precision, whereas MongoDB server
-      # can only store times with millisecond precision. Set this option to
-      # true to truncate times to millisecond precision when performing
-      # queries on already loaded embedded associations (this is also called
-      # "embedded matching" and is done completely in Ruby), to obtain the
-      # same query results when performing time comparisons regardless of
-      # which documents are being queried. Setting this option to false will
-      # produce different results for queries on embedded associations that
-      # are already loaded into memory vs queries on unloaded associations and
-      # top-level models. (default: false in Mongoid 7, will change to true
-      # in Mongoid 8).
-      compare_time_by_ms: false
-
-      # Set the global discriminator key. (default: "_type")
-      discriminator_key: "_type"
-
-      # Raise an exception when a field is redefined. (default: false)
-      duplicate_fields_exception: false
+      # Maintain broken behavior of sum over empty result sets for backwards
+      # compatibility. When calculating a sum on a field with a null context,
+      # for example:
+      #
+      # Product.none.sum(:price)
+      #
+      # ... return field name (`:price') instead of 0.
+      #
+      # When calculating a sum via a database query with an empty result set,
+      # for example:
+      #
+      # Product.where(impossible_condition: true).sum(:price)
+      #
+      # ... return nil instead of 0.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_aggregables: true
 
       # Ignore aliased fields in embedded documents when performing pluck and
       # distinct operations, for backwards compatibility.
@@ -315,66 +313,10 @@ for details on driver options.
       # (default: true in Mongoid 7, will change to false in Mongoid 8)
       broken_and: true
 
-      # Include the root model name in json serialization. (default: false)
-      include_root_in_json: false
-
-      # Include the _type field in serialization. (default: false)
-      include_type_for_serialization: false
-
-      # Whether to join nested persistence contexts for atomic operations
-      # to parent contexts by default. (default: false)
-      join_contexts: false
-
-      # Set the Mongoid and Ruby driver log levels when Mongoid is not using
-      # Ruby on Rails logger instance. (default: :info)
-      log_level: :info
-
-      # When using the BigDecimal field type, store the value in the database
-      # as a BSON::Decimal128 instead of a string. (default: false)
-      map_big_decimal_to_decimal128: false
-
-      # Preload all models in development, needed when models use
-      # inheritance. (default: false)
-      preload_models: false
-
-      # Raise an error when performing a #find and the document is not found.
-      # (default: true)
-      raise_not_found_error: true
-
       # When exiting a nested `with_scope' block, set the current scope to
       # nil instead of the parent scope for backwards compatibility.
       # (default: true in Mongoid 7, will change to false in Mongoid 8)
       broken_scoping: true
-
-      # Maintain broken behavior of sum over empty result sets for backwards
-      # compatibility. When calculating a sum on a field with a null context,
-      # for example:
-      #
-      # Product.none.sum(:price)
-      #
-      # ... return field name (`:price') instead of 0.
-      #
-      # When calculating a sum via a database query with an empty result set,
-      # for example:
-      #
-      # Product.where(impossible_condition: true).sum(:price)
-      #
-      # ... return nil instead of 0.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      broken_aggregables: true
-
-      # Raise an error when defining a scope with the same name as an
-      # existing method. (default: false)
-      scope_overwrite_exception: false
-
-      # Maintain legacy behavior of === on Mongoid document classes, which
-      # returns true in a number of cases where Ruby's === implementation would
-      # return false. Note that the behavior of === on Mongoid document
-      # instances differs from both the behavior of === on document classes
-      # and from Ruby's behavior of === on simple object instances regardless
-      # of the value of this option.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      legacy_triple_equals: true
 
       # Maintain broken update behavior in some cases for backwards
       # compatibility.
@@ -396,16 +338,74 @@ for details on driver options.
       # (default: true in Mongoid 7, will change to false in Mongoid 8)
       broken_updates: true
 
-      # Use ActiveSupport's time zone in time operations instead of
-      # the Ruby default time zone. See the time zone section below for
-      # further information. (default: true)
-      use_activesupport_time_zone: true
+      # Time objects in Ruby have nanosecond precision, whereas MongoDB server
+      # can only store times with millisecond precision. Set this option to
+      # true to truncate times to millisecond precision when performing
+      # queries on already loaded embedded associations (this is also called
+      # "embedded matching" and is done completely in Ruby), to obtain the
+      # same query results when performing time comparisons regardless of
+      # which documents are being queried. Setting this option to false will
+      # produce different results for queries on embedded associations that
+      # are already loaded into memory vs queries on unloaded associations and
+      # top-level models. (default: false in Mongoid 7, will change to true
+      # in Mongoid 8).
+      compare_time_by_ms: false
+
+      # Set the global discriminator key. (default: "_type")
+      discriminator_key: "_type"
+
+      # Raise an exception when a field is redefined. (default: false)
+      duplicate_fields_exception: false
+
+      # Include the root model name in json serialization. (default: false)
+      include_root_in_json: false
+
+      # Include the _type field in serialization. (default: false)
+      include_type_for_serialization: false
+
+      # Whether to join nested persistence contexts for atomic operations
+      # to parent contexts by default. (default: false)
+      join_contexts: false
+
+      # Maintain legacy behavior of === on Mongoid document classes, which
+      # returns true in a number of cases where Ruby's === implementation would
+      # return false. Note that the behavior of === on Mongoid document
+      # instances differs from both the behavior of === on document classes
+      # and from Ruby's behavior of === on simple object instances regardless
+      # of the value of this option.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      legacy_triple_equals: true
+
+      # Set the Mongoid and Ruby driver log levels when Mongoid is not using
+      # Ruby on Rails logger instance. (default: :info)
+      log_level: :info
+
+      # When using the BigDecimal field type, store the value in the database
+      # as a BSON::Decimal128 instead of a string. (default: false)
+      map_big_decimal_to_decimal128: false
 
       # Force ``BSON::ObjectId#as_json`` method to return the hash
       # { "$oid" => id.to_s }. When this option is false, and bson-ruby 5
       # is used, the return value will be the hexadecimal ObjectId string only.
       # (default: true in Mongoid 7, will change to false in Mongoid 8)
       object_id_as_json_oid: true
+
+      # Preload all models in development, needed when models use
+      # inheritance. (default: false)
+      preload_models: false
+
+      # Raise an error when performing a #find and the document is not found.
+      # (default: true)
+      raise_not_found_error: true
+
+      # Raise an error when defining a scope with the same name as an
+      # existing method. (default: false)
+      scope_overwrite_exception: false
+
+      # Use ActiveSupport's time zone in time operations instead of
+      # the Ruby default time zone. See the time zone section below for
+      # further information. (default: true)
+      use_activesupport_time_zone: true
 
       # Return stored times as UTC. See the time zone section below for
       # further information. Most applications should not use this option.
