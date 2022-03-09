@@ -41,7 +41,6 @@ unless SpecConfig.instance.ci?
   end
 end
 
-
 require 'mongoid'
 
 if SpecConfig.instance.mri?
