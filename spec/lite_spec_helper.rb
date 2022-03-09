@@ -18,7 +18,7 @@ autoload :Timecop, 'timecop'
 
 require 'support/spec_config'
 require 'mrss/lite_constraints'
-require "support/session_registry"
+require "mrss/session_registry"
 
 unless SpecConfig.instance.ci?
   begin
@@ -33,6 +33,8 @@ unless SpecConfig.instance.ci?
     end
   end
 end
+
+Mrss.patch_mongo_for_session_registry
 
 require 'mongoid'
 
