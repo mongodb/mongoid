@@ -18,7 +18,14 @@ autoload :Timecop, 'timecop'
 
 require 'support/spec_config'
 require 'mrss/lite_constraints'
-require "mrss/session_registry"
+
+if Gem::Version.new(Mongo::VERSION) < Gem::Version.new('2.18')
+  require "support/session_registry"
+else
+  require "mrss/session_registry"
+end
+
+Mrss.patch_mongo_for_session_registry
 
 unless SpecConfig.instance.ci?
   begin
@@ -34,7 +41,6 @@ unless SpecConfig.instance.ci?
   end
 end
 
-Mrss.patch_mongo_for_session_registry
 
 require 'mongoid'
 
