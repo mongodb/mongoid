@@ -19,7 +19,14 @@ autoload :Timecop, 'timecop'
 
 require 'support/spec_config'
 require 'mrss/lite_constraints'
-require "support/session_registry"
+
+if Gem::Version.new(Mongo::VERSION) < Gem::Version.new('2.18.0.alpha')
+  require "mrss/session_registry_legacy"
+else
+  require "mrss/session_registry"
+end
+
+Mrss.patch_mongo_for_session_registry
 
 unless SpecConfig.instance.ci?
   begin

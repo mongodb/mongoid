@@ -17,11 +17,11 @@ describe Mongoid::QueryCache do
     # occur only within the scope of these tests.
     #
     # Other session leaks will be detected and addressed as part of RUBY-2391.
-    SessionRegistry.instance.clear_registry
+    Mrss::SessionRegistry.instance.clear_registry
   end
 
   after do
-    SessionRegistry.instance.verify_sessions_ended!
+    Mrss::SessionRegistry.instance.verify_sessions_ended!
   end
 
   let(:reset_legacy_qc_warning) do
