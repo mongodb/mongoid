@@ -4,6 +4,9 @@ module Mongoid
 
   # This module contains the behavior of Mongoid's clone/dup of documents.
   module Equality
+    # Leave the current contents of this module outside of InstanceMethods
+    # to prevent cherry picking conflicts. For now...
+    extend ActiveSupport::Concern
 
     # Default comparison is via the string version of the id.
     #
@@ -40,7 +43,11 @@ module Mongoid
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
-      other.class == Class ? self.class === other : self == other
+      if Mongoid.legacy_triple_equals
+        super
+      else
+        other.class == Class ? self.class === other : self == other
+      end
     end
 
     # Delegates to ==. Used when needing checks in hashes.
@@ -53,6 +60,24 @@ module Mongoid
     # @return [ true, false ] True if equal, false if not.
     def eql?(other)
       self == (other)
+    end
+
+    module ClassMethods
+      # Performs class equality checking.
+      #
+      # @example Compare the classes.
+      #   document === other
+      #
+      # @param [ Document, Object ] other The other object to compare with.
+      #
+      # @return [ true, false ] True if the classes are equal, false if not.
+      def ===(other)
+        if Mongoid.legacy_triple_equals
+          other.is_a?(self)
+        else
+          other.class == Class ? self <= other : other.is_a?(self)
+        end
+      end
     end
   end
 end
