@@ -161,6 +161,16 @@ describe Mongoid::Interceptable do
           expect(from_db.impressions).to eq(1)
         end
       end
+
+      context "when accessing the embedded_in from the callback" do
+        let(:from_db) do
+          Player.find(player.id).implants.first
+        end
+
+        it "accesses the correct player" do
+          expect(from_db.after_find_player).to eq(player)
+        end
+      end
     end
   end
 
