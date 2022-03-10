@@ -105,6 +105,12 @@ module Mongoid
       #
       # @return [ Proxy ] The association.
       def get_relation(name, association, object, reload = false)
+        field_name = database_field_name(name)
+
+        if attribute_missing?(field_name)
+          raise ActiveModel::MissingAttributeError, "Missing attribute: '#{field_name}'"
+        end
+
         if !reload && (value = ivar(name)) != false
           value
         else

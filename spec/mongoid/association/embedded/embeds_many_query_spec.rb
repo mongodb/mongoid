@@ -47,5 +47,17 @@ describe Mongoid::Association::Embedded::EmbedsMany do
         expect(patient.addresses.first.number).to eq(123)
       end
     end
+
+    context "when excluding the relation" do
+      let(:congress) do
+        EmmCongress.where(name: 'foo').only(:_id).first
+      end
+
+      it 'raises a MissingAttributeError' do
+        expect do
+          congress.legislators
+        end.to raise_error(ActiveModel::MissingAttributeError)
+      end
+    end
   end
 end
