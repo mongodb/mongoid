@@ -24,8 +24,8 @@ describe 'distinct on aliased fields' do
 
   let(:command) { event.command }
 
-  context 'when fix_embedded_alias_pluck_distinct is set' do
-    config_override :fix_embedded_alias_pluck_distinct, true
+  context 'when broken_alias_handling is not set' do
+    config_override :broken_alias_handling, false
 
     context 'top level field' do
       let(:query) do
@@ -52,8 +52,8 @@ describe 'distinct on aliased fields' do
     end
   end
 
-  context 'when fix_embedded_alias_pluck_distinct is not set' do
-    config_override :fix_embedded_alias_pluck_distinct, false
+  context 'when broken_alias_handling is set' do
+    config_override :broken_alias_handling, true
 
     context 'top level field' do
       let(:query) do
@@ -103,8 +103,8 @@ describe 'pluck on aliased fields' do
 
   let(:command) { event.command }
 
-  context 'when fix_embedded_alias_pluck_distinct is set' do
-    config_override :fix_embedded_alias_pluck_distinct, true
+  context 'when broken_alias_handling is not set' do
+    config_override :broken_alias_handling, false
 
     context 'top level field' do
       let(:query) do
@@ -131,8 +131,8 @@ describe 'pluck on aliased fields' do
     end
   end
 
-  context 'when fix_embedded_alias_pluck_distinct is not set' do
-    config_override :fix_embedded_alias_pluck_distinct, false
+  context 'when broken_alias_handling is set' do
+    config_override :broken_alias_handling, true
 
     context 'top level field' do
       let(:query) do

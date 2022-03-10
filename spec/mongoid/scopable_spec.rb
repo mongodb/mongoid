@@ -1134,8 +1134,8 @@ describe Mongoid::Scopable do
       let(:c1) { Band.where(active: true) }
       let(:c2) { Band.where(active: false) }
 
-      context "when the restore_previous_scope is set" do
-        config_override :restore_previous_scope, true
+      context "when the broken_scoping is not set" do
+        config_override :broken_scoping, false
 
         it 'restores previous scope' do
           Band.with_scope(c1) do |crit|
@@ -1153,8 +1153,8 @@ describe Mongoid::Scopable do
         end
       end
 
-      context "when the restore_previous_scope is not set" do
-        config_override :restore_previous_scope, false
+      context "when the broken_scoping is set" do
+        config_override :broken_scoping, true
 
         it 'does not restore previous scope' do
           Band.with_scope(c1) do |crit|

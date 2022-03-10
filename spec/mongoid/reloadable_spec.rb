@@ -290,8 +290,8 @@ describe Mongoid::Reloadable do
 
     context "when embedded documents are unasssigned and reassigned" do
 
-      context "when update_embedded_after_nil feature flag is set" do
-        config_override :update_embedded_after_nil, true
+      context "when broken_updates feature flag is not set" do
+        config_override :broken_updates, false
 
         let(:palette) do
           Palette.new
@@ -314,8 +314,8 @@ describe Mongoid::Reloadable do
         end
       end
 
-      context "when update_embedded_after_nil feature flag is not set" do
-        config_override :update_embedded_after_nil, false
+      context "when broken_updates feature flag is set" do
+        config_override :broken_updates, true
 
         let(:palette) do
           Palette.new
@@ -341,8 +341,8 @@ describe Mongoid::Reloadable do
 
     context "when embeds_many documents are cleared and reassigned" do
 
-      context "when update_embedded_after_nil feature flag is set" do
-        config_override :update_embedded_after_nil, true
+      context "when broken_updates feature flag is not set" do
+        config_override :broken_updates, false
 
         let(:contractor) do
           Contractor.new(name: 'contractor')
@@ -365,8 +365,8 @@ describe Mongoid::Reloadable do
         end
       end
 
-      context "when update_embedded_after_nil feature flag is not set" do
-        config_override :update_embedded_after_nil, false
+      context "when broken_updates feature flag is set" do
+        config_override :broken_updates, true
 
         let(:contractor) do
           Contractor.new(name: 'contractor')

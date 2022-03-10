@@ -1573,8 +1573,8 @@ describe Mongoid::Fields do
       end
     end
 
-    context "when the fix_embedded_alias_pluck_distinct is set" do
-      config_override :fix_embedded_alias_pluck_distinct, true
+    context "when the broken_alias_handling is not set" do
+      config_override :broken_alias_handling, false
 
       context 'given nil' do
         subject { Person.database_field_name(nil) }
@@ -1597,8 +1597,8 @@ describe Mongoid::Fields do
       end
     end
 
-    context "when the fix_embedded_alias_pluck_distinct is not set" do
-      config_override :fix_embedded_alias_pluck_distinct, false
+    context "when the broken_alias_handling is set" do
+      config_override :broken_alias_handling, true
 
       context 'given nil' do
         subject { Person.database_field_name(nil) }

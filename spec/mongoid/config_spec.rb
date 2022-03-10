@@ -265,44 +265,44 @@ describe Mongoid::Config do
     end
   end
 
-  context 'when setting the update_embedded_after_nil option in the config' do
-    let(:option) { :update_embedded_after_nil }
-    let(:default) { false }
+  context 'when setting the broken_updates option in the config' do
+    let(:option) { :broken_updates }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
 
-  context 'when setting the triple_equals_uses_is_a option in the config' do
-    let(:option) { :triple_equals_uses_is_a }
-    let(:default) { false }
+  context 'when setting the legacy_triple_equals option in the config' do
+    let(:option) { :legacy_triple_equals }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
 
-  context 'when setting the restore_previous_scope option in the config' do
-    let(:option) { :restore_previous_scope }
-    let(:default) { false }
+  context 'when setting the broken_scoping option in the config' do
+    let(:option) { :broken_scoping }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
 
-  context 'when setting the return_zero_on_sum_none option in the config' do
-    let(:option) { :return_zero_on_sum_none }
-    let(:default) { false }
+  context 'when setting the broken_aggregables option in the config' do
+    let(:option) { :broken_aggregables }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
 
-  context 'when setting the fix_embedded_alias_pluck_distinct option in the config' do
-    let(:option) { :fix_embedded_alias_pluck_distinct }
-    let(:default) { false }
+  context 'when setting the broken_alias_handling option in the config' do
+    let(:option) { :broken_alias_handling }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
 
-  context 'when setting the fix_multiple_ands option in the config' do
-    let(:option) { :fix_multiple_ands }
-    let(:default) { false }
+  context 'when setting the broken_and option in the config' do
+    let(:option) { :broken_and }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
@@ -314,9 +314,9 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the use_bson_ruby_as_json option in the config' do
-    let(:option) { :use_bson_ruby_as_json }
-    let(:default) { false }
+  context 'when setting the object_id_as_json_oid option in the config' do
+    let(:option) { :object_id_as_json_oid }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end

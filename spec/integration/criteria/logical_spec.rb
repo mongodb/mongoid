@@ -26,8 +26,8 @@ describe 'Criteria logical operations' do
       expect(bands.to_a).to eq([sp])
     end
 
-    context "when fix_multiple_ands feature flag is set" do
-      config_override :fix_multiple_ands, true
+    context "when broken_and feature flag is not set" do
+      config_override :broken_and, false
 
       it 'combines existing `$and` clause in query and `where` condition' do
         bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
@@ -41,8 +41,8 @@ describe 'Criteria logical operations' do
       end
     end
 
-    context "when fix_multiple_ands feature flag is not set" do
-      config_override :fix_multiple_ands, false
+    context "when broken_and feature flag is set" do
+      config_override :broken_and, true
 
       it 'combines existing `$and` clause in query and `where` condition' do
         bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
