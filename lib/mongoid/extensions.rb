@@ -11,10 +11,10 @@ class BSON::ObjectId
   #
   # @return [ String ] The object id as a string.
   def as_json(*args)
-    if Mongoid.use_bson_ruby_as_json
-      bson_ruby_as_json(*args)
-    else
+    if Mongoid.object_id_as_json_oid
       { "$oid" => to_s }
+    else
+      bson_ruby_as_json(*args)
     end
   end
 end

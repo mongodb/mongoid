@@ -1783,10 +1783,11 @@ at runtime:
 
 .. note::
 
-  In Mongoid versions 7.3.3 and earlier, there is a bug in ``with_scope``
-  where the previous scope is lost after the function returns. Set the
-  ``Mongoid.restore_previous_scope`` global flag to true in order to get the
-  correct functionality.
+  If with_scope calls are nested, when the nested with_scope block completes
+  Mongoid 7 sets the current scope to nil instead of the parent scope.
+  Mongoid 8 will set the current scope to the correct parent scope.
+  To get Mongoid 8 behavior in Mongoid 7.4 and higher, set the
+  ``Mongoid.broken_scoping`` global option to false.
 
 
 Class Methods

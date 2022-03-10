@@ -44,8 +44,8 @@ Previously, ``===`` returned ``true`` for some cases when the equivalent Ruby
 
 .. note::
 
-  In order to get this functionality, the ``Mongoid.triple_equals_uses_is_a``
-  global flag must be set to true. If it is set to false, the ``===`` operator
+  In order to get this functionality, the ``Mongoid.legacy_triple_equals``
+  global flag must be set to false. If it is set to true, the ``===`` operator
   will function as it did in Mongoid 7.3.
 
 Mongoid 7.4 behavior:
@@ -103,25 +103,42 @@ and matches the core Ruby behavior:
   # => true
 
 
-``BSON::ObjectId#as_json`` Implementation Removed
--------------------------------------------------
+``BSON::ObjectId#as_json`` Override Is Made Optional
+----------------------------------------------------
 
-Mongoid in versions up to 7.3 used to provide a ``BSON::ObjectId#as_json``
+Mongoid 7.3 and earlier provided a ``BSON::ObjectId#as_json``
 implementation that was identical to the one provided by ``bson-ruby``.
-Mongoid 7.4 removes its copy of this implementation.
+Mongoid 7.4 adds an option to bypass its copy of this implementation,
+delegating to ``BSON::ObjectId#as_json``: ``Mongoid.object_id_as_json_oid``.
 
-This change has no immediate impact on applications - ``BSON::ObjectId#as_json``
-behaves the same in Mongoid 7.4 as it did in Mongoid 7.3. However, if
-this implementation is changed in a future version of ``bson-ruby``
-which is `under consideration <https://jira.mongodb.org/browse/MONGOID-5158>`_,
-Mongoid 7.4 and later will inherit the new implementation provided by
-``bson-ruby`` while Mongoid 7.3 and earlier will continue with the
-implementation returning a hash of ``{"$oid" => "..."}``.
+When ``Mongoid.object_id_as_json_oid`` is set to ``true``, Mongoid will
+install an implementation of ``BSON::ObjectId#as_json`` which returns
+the hash ``{"$oid" => "..."}`` as it did in Mongoid 7.3 and earlier.
 
-..  note::
+When ``Mongoid.object_id_as_json_oid`` is set to ``false``, Mongoid will
+delegate to ``bson-ruby`` implementation of ``BSON::ObjectId#as_json``, which
+in ``bson-ruby`` 4 continues to return the hash ``{"$oid" => "..."}`` but
+in ``bson-ruby`` 5 will return only the hexadecimal ObjectId string.
 
-  In order to get this functionality, the ``Mongoid.use_bson_ruby_as_json``
-  feature flag must be turned on.
+The behavior of ``as_json`` is summarized in the following table:
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - ``Mongoid.object_id_as_json_oid`` value
+     - true
+     - false
+
+   * - ``bson-ruby`` 4
+     - ``{"$oid"=>"621ed7fda15d5d231594627c"}``
+     - ``{"$oid"=>"621ed7fda15d5d231594627c"}``
+
+   * - ``bson-ruby`` 5
+     - ``{"$oid"=>"621ed7fda15d5d231594627c"}``
+     - ``"621ed7fda15d5d231594627c"``
+
 
 Scoped Associations
 -------------------

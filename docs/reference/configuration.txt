@@ -252,12 +252,12 @@ for details on driver options.
           # Compressors to use. (default is to not use compression)
           compressors: [zlib]
 
-    # Configure Mongoid specific options. (optional)
+    # Configure Mongoid-specific options. (optional)
     options:
-      # Application name that is printed to the mongodb logs upon establishing
-      # a connection in server versions >= 3.4. Note that the name cannot
-      # exceed 128 bytes. It is also used as the database name if the
-      # database name is not explicitly defined. (default: nil)
+      # Application name that is printed to the MongoDB logs upon establishing
+      # a connection in server versions 3.4 or greater. Note that the name
+      # cannot exceed 128 bytes in length. It is also used as the database name
+      # if the database name is not explicitly defined. (default: nil)
       app_name: MyApplicationName
 
       # Create indexes in background by default. (default: false)
@@ -268,30 +268,34 @@ for details on driver options.
       # error. (default: true)
       belongs_to_required_by_default: true
 
-      # In Mongoid 7.3 and earlier, embedded matching performed time comparisons
-      # with full (microsecond) precision. However, MongoDB server is only
-      # capable of storing times with millisecond precision. Enabling this
-      # option makes Mongoid truncate times to millisecond precision for
-      # comparison purposes, to match the server behavior. (default: false)
-      compare_time_by_ms: false
+      # Maintain broken behavior of sum over empty result sets for backwards
+      # compatibility. When calculating a sum on a field with a null context,
+      # for example:
+      #
+      # Product.none.sum(:price)
+      #
+      # ... return field name (`:price') instead of 0.
+      #
+      # When calculating a sum via a database query with an empty result set,
+      # for example:
+      #
+      # Product.where(impossible_condition: true).sum(:price)
+      #
+      # ... return nil instead of 0.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_aggregables: true
 
-      # Set the global discriminator key. (default: "_type")
-      discriminator_key: "_type"
+      # Ignore aliased fields in embedded documents when performing pluck and
+      # distinct operations, for backwards compatibility.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_alias_handling: true
 
-      # Raise an exception when a field is redefined. (default: false)
-      duplicate_fields_exception: false
-
-      # In Mongoid 7.3.3 and earlier, the pluck and distinct operations did
-      # not respect aliased fields for embedded documents. Turning on this
-      # flag changes those functions to recognize those aliases.
-      # (default: false)
-      fix_embedded_alias_pluck_distinct: false
-
-      # In Mongoid 7.3.3 and earlier, there was a bug when adding expressions
-      # using the #and function. In certain situations, an $and clause would be
-      # lost and replaced by one of the previous $and clauses. This would
-      # happen when using the same operator on the same field multiple times.
-      # For example:
+      # Maintain broken `and' method behavior that existed in Mongoid 7.3
+      # and earlier for backwards compatibility: in some situations, conditions
+      # already present in a Criteria object would be replaced by newer
+      # conditions when `and' method is used instead of the new conditions
+      # being added to the existing conditions. This would happen when using
+      # the same operator on the same field multiple times. For example:
       #
       # Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
       #
@@ -305,9 +309,53 @@ for details on driver options.
       #
       # This is obviously incorrect as the {"$in"=>[2021]} clause is lost.
       # Notice that the clause is only lost when both clauses are added using
-      # the #and function. Turning on this feature flag fixes this bug.
-      # (default: false)
-      fix_multiple_ands: false
+      # the #and method.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_and: true
+
+      # When exiting a nested `with_scope' block, set the current scope to
+      # nil instead of the parent scope for backwards compatibility.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_scoping: true
+
+      # Maintain broken update behavior in some cases for backwards
+      # compatibility.
+      #
+      # In Mongoid 7.3 and earlier, when assigning a value to an embedded
+      # document, then setting it to nil, then assigning the original value
+      # to it again, the second update would not work and the value for the
+      # embedded document would remain nil. Take this case:
+      #
+      # canvas.palette = palette
+      # canvas.palette = nil
+      # canvas.palette = palette
+      #
+      # ... where canvas embeds_one palette.
+      #
+      # In Mongoid 7.3 and earlier, canvas.palette would be nil when we would
+      # expect it to be palette. Set this option to true to keep this behavior,
+      # set the option to false to perform the second update correctly.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      broken_updates: true
+
+      # Time objects in Ruby have nanosecond precision, whereas MongoDB server
+      # can only store times with millisecond precision. Set this option to
+      # true to truncate times to millisecond precision when performing
+      # queries on already loaded embedded associations (this is also called
+      # "embedded matching" and is done completely in Ruby), to obtain the
+      # same query results when performing time comparisons regardless of
+      # which documents are being queried. Setting this option to false will
+      # produce different results for queries on embedded associations that
+      # are already loaded into memory vs queries on unloaded associations and
+      # top-level models. (default: false in Mongoid 7, will change to true
+      # in Mongoid 8).
+      compare_time_by_ms: false
+
+      # Set the global discriminator key. (default: "_type")
+      discriminator_key: "_type"
+
+      # Raise an exception when a field is redefined. (default: false)
+      duplicate_fields_exception: false
 
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
@@ -319,6 +367,15 @@ for details on driver options.
       # to parent contexts by default. (default: false)
       join_contexts: false
 
+      # Maintain legacy behavior of === on Mongoid document classes, which
+      # returns true in a number of cases where Ruby's === implementation would
+      # return false. Note that the behavior of === on Mongoid document
+      # instances differs from both the behavior of === on document classes
+      # and from Ruby's behavior of === on simple object instances regardless
+      # of the value of this option.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      legacy_triple_equals: true
+
       # Set the Mongoid and Ruby driver log levels when Mongoid is not using
       # Ruby on Rails logger instance. (default: :info)
       log_level: :info
@@ -326,6 +383,12 @@ for details on driver options.
       # When using the BigDecimal field type, store the value in the database
       # as a BSON::Decimal128 instead of a string. (default: false)
       map_big_decimal_to_decimal128: false
+
+      # Force ``BSON::ObjectId#as_json`` method to return the hash
+      # { "$oid" => id.to_s }. When this option is false, and bson-ruby 5
+      # is used, the return value will be the hexadecimal ObjectId string only.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      object_id_as_json_oid: true
 
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
@@ -335,58 +398,14 @@ for details on driver options.
       # (default: true)
       raise_not_found_error: true
 
-      # In Mongoid 7.3.3 and earlier, there was a bug when using with_scope
-      # that after the function returned, any previous scopes were lost.
-      # Turning this flag on fixes that bug. (default: false)
-      restore_previous_scope: false
-
-      # In Mongoid 7.3.3 and earlier, when doing a sum on a field with a null
-      # context, for example:
-      #
-      # Product.none.sum(:price)
-      #
-      # the sum incorrectly returned the field name as a Symbol. Turning on
-      # this feature flag fixes this functionality to automatically return 0.
-      # (default: false)
-      return_zero_on_sum_none: false
-
       # Raise an error when defining a scope with the same name as an
       # existing method. (default: false)
       scope_overwrite_exception: false
-
-      # Corrects === behavior to be consistent with Ruby by only calling is_a?
-      # (default: false)
-      triple_equals_uses_is_a: false
-
-      # In Mongoid 7.3.3 and earlier, when setting an embedded document, setting
-      # it to nil, and then setting it again to that same original value, the
-      # second update would not work and the value for the embedded document
-      # would remain nil. Take this case:
-      #
-      # canvas.palette = palette
-      # canvas.palette = nil
-      # canvas.palette = palette
-      # Where canvas embeds_one palette.
-      #
-      # In 7.3.3 and earlier, canvas.palette would be nil when we would expect
-      # it to be palette. Since fixing this would be a breaking change, we have
-      # put this fix behind this feature flag. Turning this flag on fixes this
-      # bug, and canvas.palette would contain the correct value: the assigned
-      # palette. (default: false)
-      update_embedded_after_nil: false
 
       # Use ActiveSupport's time zone in time operations instead of
       # the Ruby default time zone. See the time zone section below for
       # further information. (default: true)
       use_activesupport_time_zone: true
-
-      # In Mongoid 7.3.3 and earlier, the BSON::ObjectId#as_json method would
-      # default to returning { "$oid" => id.to_s }. Turning on this flag will
-      # defer the as_json call to bson-ruby's implementation of
-      # BSON::ObjectId#as_json. In bson-ruby 5.x.x as_json will return
-      # the id as a string. In bson-ruby 4.x.x as_json will return
-      # { "$oid" => id.to_s }. (default: false)
-      use_bson_ruby_as_json: false
 
       # Return stored times as UTC. See the time zone section below for
       # further information. Most applications should not use this option.
