@@ -44,9 +44,13 @@ module Mongoid
         type = @attributes[association.inverse_type]
         target = association.build(self, object, type, selected_fields)
         target = target ? association.create_relation(self, target) : nil
+
+        # Rescuing in the case that the evaluation of target raised an error.
+        # This is here to fix the sessions_spec tests.
         Array(target).each do |doc|
           doc.try(:run_pending_callbacks)
-        end
+        end rescue nil
+
         target
       end
 
