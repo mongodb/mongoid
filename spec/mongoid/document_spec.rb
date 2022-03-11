@@ -339,23 +339,6 @@ describe Mongoid::Document do
 
   describe ".instantiate" do
 
-    context "when passing a block" do
-
-      let(:id) do
-        BSON::ObjectId.new
-      end
-
-      let(:document) do
-        Band.instantiate("_id" => id, "name" => "Depeche Mode") do |band|
-          band.likes = 1000
-        end
-      end
-
-      it "yields to the block" do
-        expect(document.likes).to eq(1000)
-      end
-    end
-
     context "when an id exists" do
 
       let(:id) do

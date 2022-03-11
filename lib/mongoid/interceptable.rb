@@ -152,9 +152,11 @@ module Mongoid
       end
     end
 
-    # Returns the pending callbacks. This is used to store callbacks to be
-    # executed later. A good use case for this is delaying the after_find
-    # callback until the associations are set on the object.
+    # This is used to store callbacks to be executed later. A good use case for
+    # this is delaying the after_find callback until the associations are set
+    # on the document.
+    #
+    # @return [ Array<Symbol> ] an array of symbols that represent the pending callbacks.
     def pending_callbacks
       @pending_callbacks ||= []
     end
