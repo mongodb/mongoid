@@ -68,11 +68,11 @@ module Mongoid
       end
       type = (attributes || {})[klass.discriminator_key]
       if type.blank?
-        obj = klass.instantiate(attributes, selected_fields)
-        if criteria && criteria.association && criteria.parent_document
-          obj.set_relation(criteria.association.inverse, criteria.parent_document)
+        klass.instantiate(attributes, selected_fields) do |obj|
+          if criteria && criteria.association && criteria.parent_document
+            obj.set_relation(criteria.association.inverse, criteria.parent_document)
+          end
         end
-        obj
       else
         constantized = klass.get_discriminator_mapping(type)
 

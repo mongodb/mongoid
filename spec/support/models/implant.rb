@@ -14,11 +14,8 @@ class Implant
 
   field :after_find_player
 
-  set_callback(:find, :before) do |doc|
-  end
-
   after_find do |doc|
     doc.impressions += 1
-    after_find_player = player
+    doc.after_find_player = player
   end
 end
