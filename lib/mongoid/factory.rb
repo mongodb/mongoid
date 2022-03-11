@@ -60,19 +60,21 @@ module Mongoid
     # @param [ Hash ] selected_fields Fields which were retrieved via
     #   #only. If selected_fields are specified, fields not listed in it
     #   will not be accessible in the returned document.
+    # @param [ true | false ] execute_callbacks Flag specifies whether find
+    #   callbacks should be run.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
+    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
       type = (attributes || {})[klass.discriminator_key]
-      if type.blank?
-        klass.instantiate(attributes, selected_fields) do |obj|
-          if criteria && criteria.association && criteria.parent_document
-            obj.set_relation(criteria.association.inverse, criteria.parent_document)
-          end
+      doc = if type.blank?
+        obj = klass.instantiate(attributes, selected_fields)
+        if criteria && criteria.association && criteria.parent_document
+          obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
+        obj
       else
         constantized = klass.get_discriminator_mapping(type)
 
@@ -94,6 +96,12 @@ module Mongoid
 
         constantized.instantiate(attributes, selected_fields)
       end
+      if execute_callbacks
+        doc.run_callbacks(:find, with_children: false)
+      else
+        doc.pending_callbacks << :find
+      end
+      doc
     end
   end
 end

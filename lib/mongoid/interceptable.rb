@@ -152,6 +152,18 @@ module Mongoid
       end
     end
 
+    # Returns the pending callbacks. This is used to store callbacks to be
+    # executed later. A good use case for this is delaying the after_find
+    # callback until the associations are set on the object.
+    def pending_callbacks
+      @pending_callbacks ||= []
+    end
+
+    # Run the pending callbacks.
+    def run_pending_callbacks
+      pending_callbacks.each { |cb| self.run_callbacks(cb, with_children: false) }
+    end
+
     private
 
     # We need to hook into this for autosave, since we don't want it firing if

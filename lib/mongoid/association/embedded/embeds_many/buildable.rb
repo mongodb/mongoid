@@ -31,10 +31,7 @@ module Mongoid
             docs = []
             object.each do |attrs|
               if _loading? && base.persisted?
-                c = Criteria.new(klass)
-                c.association = self
-                c.parent_document = base
-                docs.push(Factory.from_db(klass, attrs, c, selected_fields))
+                docs.push(Factory.from_db(klass, attrs, nil, selected_fields, execute_callbacks: false))
               else
                 docs.push(Factory.build(klass, attrs))
               end

@@ -290,7 +290,6 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
         yield(doc) if block_given?
-        doc.run_callbacks(:find) unless doc._find_callbacks.empty?
         doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         doc
       end
