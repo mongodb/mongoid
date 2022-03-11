@@ -18,4 +18,8 @@ class Implant
     doc.impressions += 1
     doc.after_find_player = player
   end
+
+  after_initialize do |doc|
+    doc.after_initialize_player = player
+  end
 end

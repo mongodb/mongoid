@@ -170,6 +170,10 @@ describe Mongoid::Interceptable do
         it "accesses the correct player" do
           expect(from_db.after_find_player).to eq(player)
         end
+
+        it "accesses the correct player" do
+          expect(from_db.after_initialize_player).to eq(player)
+        end
       end
     end
   end
