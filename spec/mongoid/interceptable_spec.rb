@@ -172,6 +172,7 @@ describe Mongoid::Interceptable do
         end
 
         it "accesses the correct player" do
+          pending "MONGOID-2586"
           expect(from_db.after_initialize_player).to eq(player)
         end
       end

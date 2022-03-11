@@ -13,6 +13,7 @@ class Implant
   end
 
   field :after_find_player
+  field :after_initialize_player
 
   after_find do |doc|
     doc.impressions += 1
