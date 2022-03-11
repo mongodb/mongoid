@@ -167,13 +167,9 @@ describe Mongoid::Interceptable do
           Player.find(player.id).implants.first
         end
 
+        # TODO: 1) do the same for belongs_to 2) move defaults
         it "accesses the correct player" do
           expect(from_db.after_find_player).to eq(player)
-        end
-
-        it "accesses the correct player" do
-          pending "MONGOID-2586"
-          expect(from_db.after_initialize_player).to eq(player)
         end
       end
     end
@@ -241,6 +237,22 @@ describe Mongoid::Interceptable do
 
       it 'runs the callback on the embedded documents and saves the parent document' do
         expect(expected_messages.all? { |m| m == new_message }).to be(true)
+      end
+
+      context "when accessing the embedded_in from the callback" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.implants.create!
+          end
+        end
+
+        let(:from_db) do
+          Player.find(player.id).implants.first
+        end
+
+        it "accesses the correct player" do
+          expect(from_db.after_initialize_player).to eq(player)
+        end
       end
     end
   end

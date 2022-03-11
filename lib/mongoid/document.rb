@@ -289,7 +289,6 @@ module Mongoid
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
-        doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         doc
       end
 
