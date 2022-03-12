@@ -217,3 +217,23 @@ an index where it wouldn't before:
 .. code-block:: ruby
 
   Band.desc(:name).count
+
+
+Return ``0`` When Aggregating Empty Result Sets
+-----------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_aggregables`` option set to ``false``
+will return ``0`` from the ``sum`` method over an empty result set, for example:
+
+.. code-block:: ruby
+
+  Product.where(impossible_condition: true).sum(:price)
+  # => 0
+
+Mongoid 7.3 and Mongoid 7.4 with the ``Mongoid.broken_aggregables`` option
+set to ``true`` (the default) returns ``nil`` in this case.
+
+.. note::
+
+  The value of ``Mongoid.broken_aggregables`` option will change to ``false``
+  by default in Mongoid 8.0.
