@@ -156,6 +156,30 @@ Associations now support the ``:scope`` argument, yielding
 :ref:`scoped associations <association-scope>`.
 
 
+Compare Times With Millisecond Precision When Embedded Matching
+---------------------------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.compare_time_by_ms`` option set to ``true``
+will truncate the times to millisecond precision when comparing them while
+performing embedded matching.
+
+Time objects in Ruby have nanosecond precision, whereas MongoDB server
+can only store times with millisecond precision. Set the
+``Mongoid.compare_time_by_ms`` option to ``true`` to
+true to truncate times to millisecond precision when performing
+queries on already loaded embedded associations (this is also called
+"embedded matching" and is done completely in Ruby), to obtain the
+same query results when performing time comparisons regardless of
+which documents are being queried. Setting this option to ``false`` will
+produce different results for queries on embedded associations that
+are already loaded into memory vs queries on unloaded associations and
+top-level models.
+
+The ``Mongoid.compare_time_by_ms`` option is set to ``false`` by default
+in Mongoid 7.4 for backwards compatibility. In Mongoid 8 the default value
+will change to ``true``.
+
+
 Respect Field Aliases In Embedded Documents When Using ``distinct`` And ``pluck`` 
 ---------------------------------------------------------------------------------
 
