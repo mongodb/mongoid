@@ -237,3 +237,32 @@ set to ``true`` (the default) returns ``nil`` in this case.
 
   The value of ``Mongoid.broken_aggregables`` option will change to ``false``
   by default in Mongoid 8.0.
+
+
+Correct Update Behavior When Replacing Association
+--------------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_updates`` option set to ``false``
+will correctly persist an ``embeds_one`` association target it is set to nil
+and then to a non-nil value, for example:
+
+.. code-block:: ruby
+
+  class Canvas
+    include Mongoid::Document
+    
+    embeds_one :palette
+  end
+  
+  canvas.palette = palette
+  canvas.palette = nil
+  canvas.palette = palette
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_aggregables``
+option set to ``true`` (the default), ``canvas.palette`` would be ``nil`` when
+we would expect it to be ``palette``.
+
+.. note::
+
+  The value of ``Mongoid.broken_update`` option will change to ``false``
+  by default in Mongoid 8.0.
