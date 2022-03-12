@@ -290,3 +290,44 @@ we would expect it to be ``palette``.
 
   The value of ``Mongoid.broken_update`` option will change to ``false``
   by default in Mongoid 8.0.
+
+
+Correct Logical ``and`` Query Generation
+----------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_and`` option set to ``false``
+will preserve existing conditions when using ``and`` to add new conditions
+to a query when the same operator is used on the same field multiple times.
+For example, in the following query:
+
+.. code-block:: ruby
+
+  Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
+
+Mongoid 7.4 with the ``Mongoid.broken_and`` option set to ``false`` will
+generate the following criteria:
+
+.. code-block:: ruby
+
+  <Mongoid::Criteria
+    selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"_id"=>2}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_and``
+option set to ``true`` (the default), the following criteria would be
+generated instead:
+
+.. code-block:: ruby
+
+  <Mongoid::Criteria
+    selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"_id"=>2}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+.. note::
+
+  The value of ``Mongoid.broken_and`` option will change to ``false``
+  by default in Mongoid 8.0.
