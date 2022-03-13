@@ -45,11 +45,12 @@ module Mongoid
         target = association.build(self, object, type, selected_fields)
         target = target ? association.create_relation(self, target) : nil
 
-        # Rescuing in the case that the evaluation of target raised an error.
-        # This is here to fix the sessions_spec tests.
+        # Excluding HasMany enumerables from this because calling each on them
+        # cause the loading of unloaded documents. These have not been found
+        # yet so there is no pending callbacks yet.
         Array(target).each do |doc|
           doc.try(:run_pending_callbacks)
-        end rescue nil
+        end unless target.is_a? Referenced::HasMany::Enumerable
 
         target
       end
