@@ -504,7 +504,6 @@ describe Mongoid::Factory do
     context "when deferring callbacks" do
 
       let(:person) do
-        byebug
         described_class.from_db(Person, {}, nil, nil, true)
       end
 
