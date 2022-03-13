@@ -162,7 +162,7 @@ describe Mongoid::Interceptable do
         end
       end
 
-      context "when accessing the embedded_in from the callback" do
+      context "when accessing the embedded_in from the callback; embeds_many" do
         let(:from_db) do
           Player.find(player.id).implants.first
         end

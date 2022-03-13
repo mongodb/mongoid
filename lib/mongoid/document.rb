@@ -111,8 +111,6 @@ module Mongoid
           yield(self) if block_given?
         end
         apply_post_processed_defaults
-        # @todo: #2586: Need to have access to parent document in these
-        #   callbacks.
         run_callbacks(:initialize) unless _initialize_callbacks.empty?
       end
     end
