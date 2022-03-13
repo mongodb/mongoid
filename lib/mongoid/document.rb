@@ -290,7 +290,7 @@ module Mongoid
       #   should be run.
       #
       # @return [ Document ] A new document.
-      def instantiate(attrs = nil, selected_fields = nil, defer_callbacks: false)
+      def instantiate(attrs = nil, selected_fields = nil, defer_callbacks = false)
         attributes = attrs || {}
         doc = allocate
         doc.__selected_fields = selected_fields
