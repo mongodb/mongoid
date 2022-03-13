@@ -60,11 +60,12 @@ module Mongoid
     # @param [ Hash ] selected_fields Fields which were retrieved via
     #   #only. If selected_fields are specified, fields not listed in it
     #   will not be accessible in the returned document.
-    # @param [ true | false ] defer_callbacks Flag specifies whether find
-    #   callbacks should be run.
+    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    #   should be run.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks: true)
+    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks: false)
+      byebug
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
