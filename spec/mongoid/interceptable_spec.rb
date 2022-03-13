@@ -172,6 +172,21 @@ describe Mongoid::Interceptable do
         end
       end
 
+      context "when accessing the embedded_in from the callback; embeds_one" do
+        before do
+          player.augmentation = Augmentation.new
+        end
+
+
+        let(:from_db) do
+          Player.find(player.id).augmentation
+        end
+
+        it "accesses the correct player" do
+          expect(from_db.after_find_player).to eq(player)
+        end
+      end
+
       context "when accessing the belongs_to from the callback; has_many" do
         let!(:weapon) do
           player.weapons.create!
@@ -266,7 +281,7 @@ describe Mongoid::Interceptable do
         expect(expected_messages.all? { |m| m == new_message }).to be(true)
       end
 
-      context "when accessing the embedded_in from the callback" do
+      context "when accessing the embedded_in from the callback; embeds_many" do
         let!(:player) do
           Player.create!.tap do |player|
             player.implants.create!
@@ -275,6 +290,22 @@ describe Mongoid::Interceptable do
 
         let(:from_db) do
           Player.find(player.id).implants.first
+        end
+
+        it "accesses the correct player" do
+          expect(from_db.after_initialize_player).to eq(player)
+        end
+      end
+
+      context "when accessing the embedded_in from the callback; embeds_one" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.augmentation = Augmentation.new
+          end
+        end
+
+        let(:from_db) do
+          Player.find(player.id).augmentation
         end
 
         it "accesses the correct player" do
