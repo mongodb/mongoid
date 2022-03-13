@@ -44,18 +44,14 @@ module Mongoid
         type = @attributes[association.inverse_type]
         target = association.build(self, object, type, selected_fields)
         target = target ? association.create_relation(self, target) : nil
-        # byebug if target.is_a? Referenced::HasMany::Enumerable
-        # target = association.build(self, object, type, selected_fields)
-        # target = target ? association.create_relation(self, target) : nil
 
-        # Excluding HasMany enumerables from this because calling each on them
-        # cause the loading of unloaded documents. These have not been found
-        # yet so there is no pending callbacks yet.
-        unless target.class == Mongoid::Association::Referenced::HasMany::Enumerable
-          Array(target).each do |doc|
-            doc.try(:run_pending_callbacks)
-          end
-        end
+        # Only need to do this on embedded. The pending associations are only
+        # added when materializing the documents. This only happens on an
+        # embedded association, while on referenced associations, a criteria
+        # is converted into a reference for later materialization.
+        Array(target).each do |doc|
+          doc.try(:run_pending_callbacks)
+        end if association.embedded?
 
         target
       end
