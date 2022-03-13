@@ -474,7 +474,7 @@ describe Mongoid::Factory do
     context "when not deferring callbacks" do
 
       let(:person) do
-        described_class.from_db(Person, {}, defer_callbacks=false)
+        described_class.from_db(Person, {}, false)
       end
 
       before do
@@ -504,7 +504,8 @@ describe Mongoid::Factory do
     context "when deferring callbacks" do
 
       let(:person) do
-        described_class.from_db(Person, {}, defer_callbacks=true)
+        byebug
+        described_class.from_db(Person, {}, nil, nil, true)
       end
 
       before do
