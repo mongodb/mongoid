@@ -13,13 +13,13 @@ class Weapon
 
   field :after_find_player
   field :after_initialize_player
-  field :after_default_player, default: ->{ self.player ? 1 : 2 }
+  field :after_default_player, default: ->{ self.player&._id }
 
   after_find do |doc|
-    doc.after_find_player = player
+    doc.after_find_player = player&._id
   end
 
   after_initialize do |doc|
-    doc.after_initialize_player = player
+    doc.after_initialize_player = player&._id
   end
 end

@@ -23,16 +23,18 @@ module Mongoid
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
+    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    #   should be run.
     #
     # @return [ Document ] The instantiated document.
-    def build(klass, attributes = nil)
+    def build(klass, attributes = nil, defer_callbacks: false)
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
       if type
-        type.new(attributes)
+        type.new(attributes, defer_callbacks: defer_callbacks)
       else
-        klass.new(attributes)
+        klass.new(attributes, defer_callbacks: defer_callbacks)
       end
     end
 
@@ -69,8 +71,8 @@ module Mongoid
         selected_fields ||= criteria.options[:fields]
       end
       type = (attributes || {})[klass.discriminator_key]
-      doc = if type.blank?
-        obj = klass.instantiate(attributes, selected_fields)
+      if type.blank?
+        obj = klass.instantiate(attributes, selected_fields, defer_callbacks: defer_callbacks)
         if criteria && criteria.association && criteria.parent_document
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
@@ -94,16 +96,8 @@ module Mongoid
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate(attributes, selected_fields)
+        constantized.instantiate(attributes, selected_fields, defer_callbacks: defer_callbacks)
       end
-      if defer_callbacks
-        doc.pending_callbacks.push(*[:default, :find, :initialize])
-      else
-        doc.apply_defaults
-        doc.run_callbacks(:find, with_children: false)
-        doc.run_callbacks(:initialize, with_children: false)
-      end
-      doc
     end
   end
 end

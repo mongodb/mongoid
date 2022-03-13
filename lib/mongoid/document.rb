@@ -98,9 +98,11 @@ module Mongoid
     #   Person.new(:title => "Sir")
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
+    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    #   should be run.
     #
     # @return [ Document ] A new document.
-    def initialize(attrs = nil)
+    def initialize(attrs = nil, defer_callbacks: false)
       @__parent = nil
       _building do
         @new_record = true
@@ -111,7 +113,12 @@ module Mongoid
           yield(self) if block_given?
         end
         apply_post_processed_defaults
-        run_callbacks(:initialize) unless _initialize_callbacks.empty?
+
+        if defer_callbacks
+          pending_callbacks << :initialize
+        else
+          run_callbacks(:initialize) unless _initialize_callbacks.empty?
+        end
       end
     end
 
@@ -279,13 +286,24 @@ module Mongoid
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
       # @param [ Integer ] selected_fields The selected fields from the
       #   criteria.
+      # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+      #   should be run.
       #
       # @return [ Document ] A new document.
-      def instantiate(attrs = nil, selected_fields = nil)
+      def instantiate(attrs = nil, selected_fields = nil, defer_callbacks: false)
         attributes = attrs || {}
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
+
+        if defer_callbacks
+          doc.pending_callbacks.push(*[:default, :find, :initialize])
+        else
+          doc.apply_defaults
+          doc.run_callbacks(:find) unless doc._find_callbacks.empty?
+          doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
+        end
+
         doc
       end
 
