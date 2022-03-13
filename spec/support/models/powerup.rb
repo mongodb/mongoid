@@ -10,4 +10,15 @@ class Powerup
   after_build do
     self.name = "Quad Damage (#{player.frags})"
   end
+
+  field :after_find_player
+  field :after_initialize_player
+
+  after_find do |doc|
+    doc.after_find_player = player
+  end
+
+  after_initialize do |doc|
+    doc.after_initialize_player = player
+  end
 end

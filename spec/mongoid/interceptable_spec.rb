@@ -167,7 +167,34 @@ describe Mongoid::Interceptable do
           Player.find(player.id).implants.first
         end
 
-        # TODO: 1) do the same for belongs_to 2) move defaults
+        it "accesses the correct player" do
+          expect(from_db.after_find_player).to eq(player)
+        end
+      end
+
+      context "when accessing the belongs_to from the callback; has_many" do
+        let!(:weapon) do
+          player.weapons.create!
+        end
+
+        let(:from_db) do
+          Player.find(player.id).weapons.first
+        end
+
+        it "accesses the correct player" do
+          expect(from_db.after_find_player).to eq(player)
+        end
+      end
+
+      context "when accessing the belongs_to from the callback; has_one" do
+        before do
+          player.powerup = Powerup.new
+        end
+
+        let(:from_db) do
+          Player.find(player.id).powerup
+        end
+
         it "accesses the correct player" do
           expect(from_db.after_find_player).to eq(player)
         end
@@ -252,6 +279,38 @@ describe Mongoid::Interceptable do
 
         it "accesses the correct player" do
           expect(from_db.after_initialize_player).to eq(player)
+        end
+      end
+
+      context "when accessing the belongs_to from the callback; has_many" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.weapons.create!
+          end
+        end
+
+        let(:from_db) do
+          Player.find(player.id).weapons.first
+        end
+
+        it "accesses the correct player" do
+          expect(from_db.after_initialize_player).to eq(player)
+        end
+      end
+
+      context "when accessing the belongs_to from the callback; has_one" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.powerup = Powerup.new
+          end
+        end
+
+        let(:from_db) do
+          Player.find(player.id).powerup
+        end
+
+        it "accesses the correct player" do
+          expect(from_db.after_find_player).to eq(player)
         end
       end
     end

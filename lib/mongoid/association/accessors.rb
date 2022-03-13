@@ -45,10 +45,10 @@ module Mongoid
         target = association.build(self, object, type, selected_fields)
         target = target ? association.create_relation(self, target) : nil
 
-        # Only need to do this on embedded. The pending associations are only
-        # added when materializing the documents. This only happens on an
-        # embedded association, while on referenced associations, a criteria
-        # is converted into a reference for later materialization.
+        # Only need to do this on embedded associations. The pending callbacks
+        # are only added when materializing the documents, which only happens
+        # on embedded associations. There is no call to the database in the
+        # construction of a referenced association.
         Array(target).each do |doc|
           doc.try(:run_pending_callbacks)
         end if association.embedded?

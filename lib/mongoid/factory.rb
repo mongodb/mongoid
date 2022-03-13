@@ -65,7 +65,6 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks: false)
-      byebug
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
