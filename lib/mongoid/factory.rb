@@ -72,7 +72,7 @@ module Mongoid
       end
       type = (attributes || {})[klass.discriminator_key]
       if type.blank?
-        obj = klass.instantiate(attributes, selected_fields, defer_callbacks: defer_callbacks)
+        obj = klass.instantiate(attributes, selected_fields, defer_callbacks=defer_callbacks)
         if criteria && criteria.association && criteria.parent_document
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
@@ -96,7 +96,7 @@ module Mongoid
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate(attributes, selected_fields, defer_callbacks: defer_callbacks)
+        constantized.instantiate(attributes, selected_fields, defer_callbacks=defer_callbacks)
       end
     end
   end
