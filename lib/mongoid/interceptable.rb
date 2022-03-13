@@ -162,7 +162,9 @@ module Mongoid
       @pending_callbacks ||= []
     end
 
-    # Run the pending callbacks.
+    # Run the pending callbacks. If the callback is :default, we will apply
+    # the defaults for this document. Otherwise, the callback is passed to the
+    # run_callbacks function.
     def run_pending_callbacks
       pending_callbacks.each do |cb|
         if cb == :default

@@ -2101,6 +2101,12 @@ describe Mongoid::Interceptable do
       end
 
       before do
+        # The default is originally set when creating this document, and it is
+        # subsequently persisted to the database. Therefore when we retrieve
+        # this document from the database, this field is already set, and
+        # the default Proc is not called. This unset is needed to allow the
+        # default Proc to be called when the document is retrieved from the
+        # database.
         Player.find(player.id).implants.first.unset(:after_default_player)
       end
 
