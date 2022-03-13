@@ -2088,12 +2088,12 @@ describe Mongoid::Interceptable do
         expect(from_db.after_initialize_player).to eq(player)
       end
 
-      it "accesses the correct parent in default" do
+      it "has the correct default value" do
         expect(from_db.after_default_player).to eq(1)
       end
     end
 
-    context "when child is an embeds_many association" do
+    context "when the child is an embeds_many association" do
       let!(:player) do
         Player.create!.tap do |player|
           player.implants.create!
@@ -2117,7 +2117,7 @@ describe Mongoid::Interceptable do
       include_examples 'accesses the correct parent'
     end
 
-    context "when child is an embeds_one association" do
+    context "when the child is an embeds_one association" do
       let!(:player) do
         Player.create!.tap do |player|
           player.augmentation = Augmentation.new
@@ -2135,7 +2135,7 @@ describe Mongoid::Interceptable do
       include_examples 'accesses the correct parent'
     end
 
-    context "when child is a has_many association" do
+    context "when the child is a has_many association" do
       let!(:player) do
         Player.create!.tap do |player|
           player.weapons.create!
@@ -2153,7 +2153,7 @@ describe Mongoid::Interceptable do
       include_examples 'accesses the correct parent'
     end
 
-    context "when child is a has_one association" do
+    context "when the child is a has_one association" do
       let!(:player) do
         Player.create!.tap do |player|
           player.powerup = Powerup.new
