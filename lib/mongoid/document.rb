@@ -102,7 +102,7 @@ module Mongoid
     #   should be run.
     #
     # @return [ Document ] A new document.
-    def initialize(attrs = nil, defer_callbacks: false)
+    def initialize(attrs = nil, defer_callbacks = false)
       @__parent = nil
       _building do
         @new_record = true

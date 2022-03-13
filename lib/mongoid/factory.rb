@@ -32,9 +32,9 @@ module Mongoid
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
       if type
-        type.new(attributes, defer_callbacks: defer_callbacks)
+        type.new(attributes, defer_callbacks=defer_callbacks)
       else
-        klass.new(attributes, defer_callbacks: defer_callbacks)
+        klass.new(attributes, defer_callbacks=defer_callbacks)
       end
     end
 
