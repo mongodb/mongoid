@@ -154,7 +154,8 @@ module Mongoid
 
     # This is used to store callbacks to be executed later. A good use case for
     # this is delaying the after_find callback until the associations are set
-    # on the document.
+    # on the document. This can also be used to delay applying the defaults on
+    # a document
     #
     # @return [ Array<Symbol> ] an array of symbols that represent the pending callbacks.
     def pending_callbacks
@@ -163,7 +164,13 @@ module Mongoid
 
     # Run the pending callbacks.
     def run_pending_callbacks
-      pending_callbacks.each { |cb| self.run_callbacks(cb, with_children: false) }
+      pending_callbacks.each do |cb|
+        if cb == :default
+          self.apply_defaults
+        else
+          self.run_callbacks(cb, with_children: false)
+        end
+      end
     end
 
     private

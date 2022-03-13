@@ -286,7 +286,6 @@ module Mongoid
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
-        doc.apply_defaults
         doc
       end
 

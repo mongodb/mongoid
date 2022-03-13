@@ -161,59 +161,6 @@ describe Mongoid::Interceptable do
           expect(from_db.impressions).to eq(1)
         end
       end
-
-      context "when accessing the embedded_in from the callback; embeds_many" do
-        let(:from_db) do
-          Player.find(player.id).implants.first
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_find_player).to eq(player)
-        end
-      end
-
-      context "when accessing the embedded_in from the callback; embeds_one" do
-        before do
-          player.augmentation = Augmentation.new
-        end
-
-
-        let(:from_db) do
-          Player.find(player.id).augmentation
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_find_player).to eq(player)
-        end
-      end
-
-      context "when accessing the belongs_to from the callback; has_many" do
-        let!(:weapon) do
-          player.weapons.create!
-        end
-
-        let(:from_db) do
-          Player.find(player.id).weapons.first
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_find_player).to eq(player)
-        end
-      end
-
-      context "when accessing the belongs_to from the callback; has_one" do
-        before do
-          player.powerup = Powerup.new
-        end
-
-        let(:from_db) do
-          Player.find(player.id).powerup
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_find_player).to eq(player)
-        end
-      end
     end
   end
 
@@ -279,70 +226,6 @@ describe Mongoid::Interceptable do
 
       it 'runs the callback on the embedded documents and saves the parent document' do
         expect(expected_messages.all? { |m| m == new_message }).to be(true)
-      end
-
-      context "when accessing the embedded_in from the callback; embeds_many" do
-        let!(:player) do
-          Player.create!.tap do |player|
-            player.implants.create!
-          end
-        end
-
-        let(:from_db) do
-          Player.find(player.id).implants.first
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_initialize_player).to eq(player)
-        end
-      end
-
-      context "when accessing the embedded_in from the callback; embeds_one" do
-        let!(:player) do
-          Player.create!.tap do |player|
-            player.augmentation = Augmentation.new
-          end
-        end
-
-        let(:from_db) do
-          Player.find(player.id).augmentation
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_initialize_player).to eq(player)
-        end
-      end
-
-      context "when accessing the belongs_to from the callback; has_many" do
-        let!(:player) do
-          Player.create!.tap do |player|
-            player.weapons.create!
-          end
-        end
-
-        let(:from_db) do
-          Player.find(player.id).weapons.first
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_initialize_player).to eq(player)
-        end
-      end
-
-      context "when accessing the belongs_to from the callback; has_one" do
-        let!(:player) do
-          Player.create!.tap do |player|
-            player.powerup = Powerup.new
-          end
-        end
-
-        let(:from_db) do
-          Player.find(player.id).powerup
-        end
-
-        it "accesses the correct player" do
-          expect(from_db.after_find_player).to eq(player)
-        end
       end
     end
   end
@@ -2192,6 +2075,94 @@ describe Mongoid::Interceptable do
         parent.save!
         expect(registry.calls).to eq expected
       end
+    end
+  end
+
+  context "when accessing parent document from callbacks" do
+    shared_examples 'accesses the correct parent' do
+      it "accesses the correct parent in after_find" do
+        expect(from_db.after_find_player).to eq(player)
+      end
+
+      it "accesses the correct parent in after_initialize" do
+        expect(from_db.after_initialize_player).to eq(player)
+      end
+
+      it "accesses the correct parent in default" do
+        expect(from_db.after_default_player).to eq(1)
+      end
+    end
+
+    context "when child is an embeds_many association" do
+      let!(:player) do
+        Player.create!.tap do |player|
+          player.implants.create!
+        end
+      end
+
+      before do
+        Player.find(player.id).implants.first.unset(:after_default_player)
+      end
+
+      let(:from_db) do
+        Player.find(player.id).implants.first
+      end
+
+      include_examples 'accesses the correct parent'
+    end
+
+    context "when child is an embeds_one association" do
+      let!(:player) do
+        Player.create!.tap do |player|
+          player.augmentation = Augmentation.new
+        end
+      end
+
+      before do
+        Player.find(player.id).augmentation.unset(:after_default_player)
+      end
+
+      let(:from_db) do
+        Player.find(player.id).augmentation
+      end
+
+      include_examples 'accesses the correct parent'
+    end
+
+    context "when child is a has_many association" do
+      let!(:player) do
+        Player.create!.tap do |player|
+          player.weapons.create!
+        end
+      end
+
+      before do
+        Player.find(player.id).weapons.first.unset(:after_default_player)
+      end
+
+      let(:from_db) do
+        Player.find(player.id).weapons.first
+      end
+
+      include_examples 'accesses the correct parent'
+    end
+
+    context "when child is a has_one association" do
+      let!(:player) do
+        Player.create!.tap do |player|
+          player.powerup = Powerup.new
+        end
+      end
+
+      before do
+        Player.find(player.id).powerup.unset(:after_default_player)
+      end
+
+      let(:from_db) do
+        Player.find(player.id).powerup
+      end
+
+      include_examples 'accesses the correct parent'
     end
   end
 end

@@ -13,6 +13,7 @@ class Augmentation
 
   field :after_find_player
   field :after_initialize_player
+  field :after_default_player, default: ->{ self.player ? 1 : 2 }
 
   after_find do |doc|
     doc.after_find_player = player

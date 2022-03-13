@@ -97,9 +97,9 @@ module Mongoid
         constantized.instantiate(attributes, selected_fields)
       end
       if defer_callbacks
-        doc.pending_callbacks << :find
-        doc.pending_callbacks << :initialize
+        doc.pending_callbacks.push(*[:default, :find, :initialize])
       else
+        doc.apply_defaults
         doc.run_callbacks(:find, with_children: false)
         doc.run_callbacks(:initialize, with_children: false)
       end
