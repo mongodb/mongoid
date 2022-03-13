@@ -44,13 +44,18 @@ module Mongoid
         type = @attributes[association.inverse_type]
         target = association.build(self, object, type, selected_fields)
         target = target ? association.create_relation(self, target) : nil
+        # byebug if target.is_a? Referenced::HasMany::Enumerable
+        # target = association.build(self, object, type, selected_fields)
+        # target = target ? association.create_relation(self, target) : nil
 
         # Excluding HasMany enumerables from this because calling each on them
         # cause the loading of unloaded documents. These have not been found
         # yet so there is no pending callbacks yet.
-        Array(target).each do |doc|
-          doc.try(:run_pending_callbacks)
-        end unless target.is_a? Referenced::HasMany::Enumerable
+        unless target.class == Mongoid::Association::Referenced::HasMany::Enumerable
+          Array(target).each do |doc|
+            doc.try(:run_pending_callbacks)
+          end
+        end
 
         target
       end
