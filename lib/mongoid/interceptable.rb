@@ -173,6 +173,7 @@ module Mongoid
           self.run_callbacks(cb, with_children: false)
         end
       end
+      pending_callbacks.clear
     end
 
     private
