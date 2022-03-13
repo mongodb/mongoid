@@ -101,6 +101,7 @@ module Mongoid
         doc.pending_callbacks << :initialize
       else
         doc.run_callbacks(:find, with_children: false)
+        doc.run_callbacks(:initialize, with_children: false)
       end
       doc
     end
