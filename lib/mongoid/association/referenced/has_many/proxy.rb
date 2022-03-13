@@ -71,7 +71,7 @@ module Mongoid
           #
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
-            doc = Factory.build(type || klass, attributes, defer_callbacks: true)
+            doc = Factory.build(type || klass, attributes, defer_callbacks=true)
             append(doc)
             doc.apply_post_processed_defaults
             yield(doc) if block_given?

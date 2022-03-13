@@ -27,7 +27,7 @@ module Mongoid
     #   should be run.
     #
     # @return [ Document ] The instantiated document.
-    def build(klass, attributes = nil, defer_callbacks: false)
+    def build(klass, attributes = nil, defer_callbacks = false)
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
@@ -66,13 +66,13 @@ module Mongoid
     #   should be run.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks: false)
+    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks = false)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
       type = (attributes || {})[klass.discriminator_key]
       if type.blank?
-        obj = klass.instantiate(attributes, selected_fields, defer_callbacks=defer_callbacks)
+        obj = klass.instantiate(attributes, selected_fields, defer_callbacks)
         if criteria && criteria.association && criteria.parent_document
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
@@ -96,7 +96,7 @@ module Mongoid
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate(attributes, selected_fields, defer_callbacks=defer_callbacks)
+        constantized.instantiate(attributes, selected_fields, defer_callbacks)
       end
     end
   end
