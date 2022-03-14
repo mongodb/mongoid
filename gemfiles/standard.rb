@@ -3,6 +3,11 @@ def standard_dependencies
 
   group :development do
     gem 'yard'
+
+    platform :mri do
+      gem 'debase'
+      gem 'ruby-debug-ide'
+    end
   end
 
   group :development, :test do
