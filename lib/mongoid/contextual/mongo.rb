@@ -125,7 +125,7 @@ module Mongoid
       def distinct(field)
         field_name = klass.database_field_name(field)
         view.distinct(field_name).map do |value|
-          if field = klass.fields[field_name]
+          if !Mongoid.legacy_pluck_distinct && field = klass.fields[field_name]
             field.demongoize(value)
           else
             value.class.demongoize(value)
@@ -428,7 +428,9 @@ module Mongoid
         view.projection(normalized_select).reduce([]) do |plucked, doc|
           values = normalized_select.keys.map do |n|
             res = n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
-            if field = klass.fields[n]
+            if Mongoid.legacy_pluck_distinct
+              res
+            elsif field = klass.fields[n]
               field.demongoize(res)
             else
               res.class.demongoize(res)

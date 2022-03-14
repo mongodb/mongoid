@@ -3053,13 +3053,16 @@ describe Mongoid::Criteria do
     end
 
     context 'when plucking a field to be demongoized' do
-      let(:plucked) do
-        Band.where(name: maniacs.name).pluck(:sales)
-      end
+      with_config_values(:legacy_pluck_distinct, true, false) do |val|
+        let(:plucked) do
+          Band.where(name: maniacs.name).pluck(:sales)
+        end
 
-      it "demongoizes the field" do
-        expect(plucked.first).to be_a(BigDecimal)
-        expect(plucked.first).to eq(BigDecimal(100))
+        it "demongoizes the field" do
+          res = val ? "1E2" : BigDecimal("1E2")
+          expect(plucked.first).to be_a(res.class)
+          expect(plucked.first).to eq(res)
+        end
       end
     end
   end
