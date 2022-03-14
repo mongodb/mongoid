@@ -361,7 +361,7 @@ all scopes are cleared:
     end
     
     # No scope is applied here
-  entd
+  end
 
 .. note::
 
