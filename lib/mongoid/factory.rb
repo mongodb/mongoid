@@ -27,7 +27,21 @@ module Mongoid
     #   should be run.
     #
     # @return [ Document ] The instantiated document.
-    def build(klass, attributes = nil, defer_callbacks = false)
+    def build(klass, attributes = nil)
+      execute_build(klass, attributes, defer_callbacks: false)
+    end
+
+    # Execute the build.
+    #
+    # @param [ Class ] klass The class to instantiate from if _type is not present.
+    # @param [ Hash ] attributes The document attributes.
+    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    #   should be run.
+    #
+    # @return [ Document ] The instantiated document.
+    #
+    # @api private
+    def execute_build(klass, attributes = nil, defer_callbacks: false)
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
@@ -62,11 +76,27 @@ module Mongoid
     # @param [ Hash ] selected_fields Fields which were retrieved via
     #   #only. If selected_fields are specified, fields not listed in it
     #   will not be accessible in the returned document.
+    #
+    # @return [ Document ] The instantiated document.
+    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
+      execute_from_db(klass, attributes, criteria, selected_fields, defer_callbacks: false)
+    end
+
+    # Execute from_db.
+    #
+    # @param [ Class ] klass The class to instantiate from if _type is not present.
+    # @param [ Hash ] attributes The document attributes.
+    # @param [ Criteria ] criteria Optional criteria object.
+    # @param [ Hash ] selected_fields Fields which were retrieved via
+    #   #only. If selected_fields are specified, fields not listed in it
+    #   will not be accessible in the returned document.
     # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
     #   should be run.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks = false)
+    #
+    # @api private
+    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks: false)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end

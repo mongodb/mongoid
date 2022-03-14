@@ -83,7 +83,7 @@ module Mongoid
           #
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
-            doc = Factory.build(type || klass, attributes, true)
+            doc = Factory.execute_build(type || klass, attributes, defer_callbacks: true)
             _base.public_send(foreign_key).push(doc.public_send(_association.primary_key))
             append(doc)
             doc.apply_post_processed_defaults
