@@ -326,7 +326,6 @@ describe Mongoid::Document do
 
       let(:document) do
         Band.instantiate("_id" => id, "name" => "Depeche Mode") do |band|
-          byebug
           band.likes = 1000
         end
       end
