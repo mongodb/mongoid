@@ -23,32 +23,32 @@ module Mongoid
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
-    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
     #   should be run.
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      execute_build(klass, attributes, defer_callbacks: false)
+      execute_build(klass, attributes, execute_callbacks: true)
     end
 
     # Execute the build.
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
-    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
     #   should be run.
     #
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_build(klass, attributes = nil, defer_callbacks: false)
+    def execute_build(klass, attributes = nil, execute_callbacks: true)
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
       if type
-        type.construct_document(attributes, defer_callbacks: defer_callbacks)
+        type.construct_document(attributes, execute_callbacks: execute_callbacks)
       else
-        klass.construct_document(attributes, defer_callbacks: defer_callbacks)
+        klass.construct_document(attributes, execute_callbacks: execute_callbacks)
       end
     end
 
@@ -79,7 +79,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
-      execute_from_db(klass, attributes, criteria, selected_fields, defer_callbacks: false)
+      execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
     end
 
     # Execute from_db.
@@ -90,19 +90,19 @@ module Mongoid
     # @param [ Hash ] selected_fields Fields which were retrieved via
     #   #only. If selected_fields are specified, fields not listed in it
     #   will not be accessible in the returned document.
-    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
     #   should be run.
     #
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, defer_callbacks: false)
+    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
       type = (attributes || {})[klass.discriminator_key]
       if type.blank?
-        obj = klass.instantiate_document(attributes, selected_fields, defer_callbacks: defer_callbacks)
+        obj = klass.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
         if criteria && criteria.association && criteria.parent_document
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
@@ -126,7 +126,7 @@ module Mongoid
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate_document(attributes, selected_fields, defer_callbacks: defer_callbacks)
+        constantized.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
       end
     end
   end
