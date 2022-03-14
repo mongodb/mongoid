@@ -422,7 +422,12 @@ module Mongoid
 
         view.projection(normalized_select).reduce([]) do |plucked, doc|
           values = normalized_select.keys.map do |n|
-            n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
+            res = n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
+            if field = klass.fields[n]
+              field.demongoize(res)
+            else
+              res
+            end
           end
           plucked << (values.size == 1 ? values.first : values)
         end

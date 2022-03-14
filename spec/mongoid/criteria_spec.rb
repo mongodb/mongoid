@@ -2830,6 +2830,10 @@ describe Mongoid::Criteria do
       Band.create!(name: "Photek", likes: 1)
     end
 
+    let(:maniacs) do
+      Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
+    end
+
     context "when the field is aliased" do
 
       let!(:expensive) do
@@ -3032,7 +3036,7 @@ describe Mongoid::Criteria do
         end
 
         it 'returns all translations' do
-          expect(plucked.first).to eq({'en' => 'english-text', 'de' => 'deutsch-text'})
+          expect(plucked.first).to eq('deutsch-text')
         end
       end
 
@@ -3045,6 +3049,17 @@ describe Mongoid::Criteria do
         it 'returns the specific translations' do
           expect(plucked.first).to eq({'de' => 'deutsch-text'})
         end
+      end
+    end
+
+    context 'when plucking a field to be demongoized' do
+      let(:plucked) do
+        Band.where(name: maniacs.name).pluck(:sales)
+      end
+
+      it "demongoizes the field" do
+        expect(plucked.first).to be_a(BigDecimal)
+        expect(plucked.first).to eq(BigDecimal(100))
       end
     end
   end
@@ -3648,7 +3663,7 @@ describe Mongoid::Criteria do
     # Used to test MONGOID-5251 where the find command was adding unnecessary
     # and clauses. Since the find command creates the criteria and executes it,
     # it is difficult to analyze the criteria used. For this reason, I have
-    # extracted the crux of the issue, adding an _id to the the criteria twice, 
+    # extracted the crux of the issue, adding an _id to the the criteria twice,
     # and used that for the test case.
     context "when searching by _id twice" do
       let(:_id) { BSON::ObjectId.new }
