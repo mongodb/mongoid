@@ -267,7 +267,7 @@ Correct Update Behavior When Replacing Association
 --------------------------------------------------
 
 Mongoid 7.4 with the ``Mongoid.broken_updates`` option set to ``false``
-will correctly persist an ``embeds_one`` association target it is set to nil
+will correctly persist an ``embeds_one`` association target that is set to nil
 and then to a non-nil value, for example:
 
 .. code-block:: ruby
