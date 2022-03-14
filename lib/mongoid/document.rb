@@ -98,28 +98,10 @@ module Mongoid
     #   Person.new(:title => "Sir")
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
-    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
-    #   should be run.
     #
     # @return [ Document ] A new document.
-    def initialize(attrs = nil, defer_callbacks = false)
-      @__parent = nil
-      _building do
-        @new_record = true
-        @attributes ||= {}
-        apply_pre_processed_defaults
-        apply_default_scoping
-        process_attributes(attrs) do
-          yield(self) if block_given?
-        end
-        apply_post_processed_defaults
-
-        if defer_callbacks
-          pending_callbacks << :initialize
-        else
-          run_callbacks(:initialize) unless _initialize_callbacks.empty?
-        end
-      end
+    def initialize(attrs = nil, &block)
+      construct_document(attrs, &block)
     end
 
     # Return the model name of the document.
@@ -233,6 +215,34 @@ module Mongoid
 
     private
 
+    # Does the construction of a document.
+    #
+    # @param [ Hash ] attrs The attributes to set up the document with.
+    # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+    #   should be run.
+    #
+    # @return [ Document ] A new document.
+    def construct_document(attrs = nil, defer_callbacks = false)
+      @__parent = nil
+      _building do
+        @new_record = true
+        @attributes ||= {}
+        apply_pre_processed_defaults
+        apply_default_scoping
+        process_attributes(attrs) do
+          yield(self) if block_given?
+        end
+        apply_post_processed_defaults
+
+        if defer_callbacks
+          pending_callbacks << :initialize
+        else
+          run_callbacks(:initialize) unless _initialize_callbacks.empty?
+        end
+      end
+      self
+    end
+
     # Returns the logger
     #
     # @return [ Logger ] The configured logger or a default Logger instance.
@@ -305,6 +315,18 @@ module Mongoid
         end
 
         doc
+      end
+
+      # Allocates and constructs a document.
+      #
+      # @param [ Hash ] attrs The attributes to set up the document with.
+      # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+      #   should be run.
+      #
+      # @return [ Document ] A new document.
+      def construct_document(attrs = nil, defer_callbacks = false)
+        doc = allocate
+        doc.send(:construct_document, attrs, defer_callbacks)
       end
 
       # Returns all types to query for when using this class as the base.
