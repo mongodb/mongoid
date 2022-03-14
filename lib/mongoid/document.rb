@@ -300,8 +300,8 @@ module Mongoid
       #   should be run.
       #
       # @return [ Document ] A new document.
-      def instantiate(attrs = nil, selected_fields = nil)
-        instantiate_document(attrs, selected_fields, defer_callbacks: false)
+      def instantiate(attrs = nil, selected_fields = nil, &block)
+        instantiate_document(attrs, selected_fields, defer_callbacks: false, &block)
       end
 
       # Instantiate the document.
