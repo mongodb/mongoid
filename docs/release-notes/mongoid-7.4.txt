@@ -394,7 +394,7 @@ For example:
 
 In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.legacy_pluck_distinct``
 option set to ``true`` (the default), the value returned from the pluck and
-distinct functions will not be demongoized. For example:
+distinct methods will not be demongoized. For example:
 
 .. code-block:: ruby
 
