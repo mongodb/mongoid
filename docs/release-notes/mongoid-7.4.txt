@@ -308,15 +308,15 @@ generate the following criteria:
 
 .. code-block:: ruby
 
-  <Mongoid::Criteria
-    selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"_id"=>2}]}
+  #<Mongoid::Criteria
+    selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2021]}}, {"_id"=>2}]}
     options:  {}
     class:    Band
     embedded: false>
 
 In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_and``
 option set to ``true`` (the default), the following criteria would be
-generated instead:
+generated instead which omit the {"$in" => [2021]} condition:
 
 .. code-block:: ruby
 
