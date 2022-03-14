@@ -90,8 +90,12 @@ module Mongoid
     # @param [ Hash ] selected_fields Fields which were retrieved via
     #   #only. If selected_fields are specified, fields not listed in it
     #   will not be accessible in the returned document.
-    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-    #   should be run.
+    # @param [ true | false ] execute_callbacks Whether this method should
+    #   invoke the callbacks. If true, the callbacks will be invoked normally.
+    #   If false, the callbacks will be stored in the +pending_callbacks+ list
+    #   and caller is responsible for invoking +run_pending_callbacks+ at a
+    #   later time. Use this option to defer callback execution until the
+    #   entire object graph containing embedded associations is constructed.
     #
     # @return [ Document ] The instantiated document.
     #

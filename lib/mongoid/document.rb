@@ -222,6 +222,8 @@ module Mongoid
     #   should be run.
     #
     # @return [ Document ] A new document.
+    #
+    # @api private
     def construct_document(attrs = nil, execute_callbacks: true)
       @__parent = nil
       _building do
