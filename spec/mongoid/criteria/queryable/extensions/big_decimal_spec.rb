@@ -7,6 +7,7 @@ describe BigDecimal do
   describe ".evolve" do
 
     context 'when map_big_decimal_to_decimal128 is false' do
+      config_override :map_big_decimal_to_decimal128, false
 
       context "when provided a big decimal" do
 
@@ -62,14 +63,7 @@ describe BigDecimal do
     end
 
     context 'when map_big_decimal_to_decimal128 is true' do
-
-      before do
-        Mongoid.map_big_decimal_to_decimal128 = true
-      end
-
-      after do
-        Mongoid.map_big_decimal_to_decimal128 = false
-      end
+      config_override :map_big_decimal_to_decimal128, true
 
       context "when provided a big decimal" do
 

@@ -267,63 +267,63 @@ describe Mongoid::Config do
 
   context 'when setting the map_big_decimal_to_decimal128 option in the config' do
     let(:option) { :map_big_decimal_to_decimal128 }
-    let(:default) { false }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the broken_updates option in the config' do
     let(:option) { :broken_updates }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the legacy_triple_equals option in the config' do
     let(:option) { :legacy_triple_equals }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the broken_scoping option in the config' do
     let(:option) { :broken_scoping }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the broken_aggregables option in the config' do
     let(:option) { :broken_aggregables }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the broken_alias_handling option in the config' do
     let(:option) { :broken_alias_handling }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the broken_and option in the config' do
     let(:option) { :broken_and }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the compare_time_by_ms option in the config' do
     let(:option) { :compare_time_by_ms }
-    let(:default) { false }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
 
   context 'when setting the object_id_as_json_oid option in the config' do
     let(:option) { :object_id_as_json_oid }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
