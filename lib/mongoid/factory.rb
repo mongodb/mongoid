@@ -46,9 +46,9 @@ module Mongoid
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
       if type
-        type.construct_document(attributes, defer_callbacks)
+        type.construct_document(attributes, defer_callbacks: defer_callbacks)
       else
-        klass.construct_document(attributes, defer_callbacks)
+        klass.construct_document(attributes, defer_callbacks: defer_callbacks)
       end
     end
 
@@ -102,7 +102,7 @@ module Mongoid
       end
       type = (attributes || {})[klass.discriminator_key]
       if type.blank?
-        obj = klass.instantiate(attributes, selected_fields, defer_callbacks)
+        obj = klass.instantiate_document(attributes, selected_fields, defer_callbacks: defer_callbacks)
         if criteria && criteria.association && criteria.parent_document
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
@@ -126,7 +126,7 @@ module Mongoid
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate(attributes, selected_fields, defer_callbacks)
+        constantized.instantiate_document(attributes, selected_fields, defer_callbacks: defer_callbacks)
       end
     end
   end

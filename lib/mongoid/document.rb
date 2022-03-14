@@ -101,7 +101,7 @@ module Mongoid
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, &block)
-      construct_document(attrs, &block)
+      construct_document(attrs, defer_callbacks: false, &block)
     end
 
     # Return the model name of the document.
@@ -222,7 +222,7 @@ module Mongoid
     #   should be run.
     #
     # @return [ Document ] A new document.
-    def construct_document(attrs = nil, defer_callbacks = false)
+    def construct_document(attrs = nil, defer_callbacks: false)
       @__parent = nil
       _building do
         @new_record = true
@@ -300,16 +300,33 @@ module Mongoid
       #   should be run.
       #
       # @return [ Document ] A new document.
-      def instantiate(attrs = nil, selected_fields = nil, defer_callbacks = false)
+      def instantiate(attrs = nil, selected_fields = nil)
+        instantiate_document(attrs, selected_fields, defer_callbacks: false)
+      end
+
+      # Instantiate the document.
+      #
+      # @param [ Hash ] attrs The hash of attributes to instantiate with.
+      # @param [ Integer ] selected_fields The selected fields from the
+      #   criteria.
+      # @param [ true | false ] defer_callbacks Flag specifies whether callbacks
+      #   should be run.
+      #
+      # @return [ Document ] A new document.
+      #
+      # @api private
+      def instantiate_document(attrs = nil, selected_fields = nil, defer_callbacks: false)
         attributes = attrs || {}
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
 
         if defer_callbacks
+          yield(doc) if block_given?
           doc.pending_callbacks.push(:apply_defaults, :find, :initialize)
         else
           doc.apply_defaults
+          yield(doc) if block_given?
           doc.run_callbacks(:find) unless doc._find_callbacks.empty?
           doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         end
@@ -326,9 +343,9 @@ module Mongoid
       # @return [ Document ] A new document.
       #
       # @api private
-      def construct_document(attrs = nil, defer_callbacks = false)
+      def construct_document(attrs = nil, defer_callbacks: false)
         doc = allocate
-        doc.send(:construct_document, attrs, defer_callbacks)
+        doc.send(:construct_document, attrs, defer_callbacks: defer_callbacks)
       end
 
       # Returns all types to query for when using this class as the base.
