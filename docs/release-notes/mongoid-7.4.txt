@@ -347,7 +347,7 @@ For example:
     end
     
     # {year: 2020} condition is applied here
-  entd
+  end
 
 In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_scoping``
 option set to ``true`` (the default), once any ``with_scope`` block finishes,
