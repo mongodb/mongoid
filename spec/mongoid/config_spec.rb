@@ -260,7 +260,6 @@ describe Mongoid::Config do
       let(:conf) { CONFIG }
 
       it "it is set to its default" do
-        byebug if Mongoid.send(option) != default
         expect(Mongoid.send(option)).to be(default)
       end
     end
