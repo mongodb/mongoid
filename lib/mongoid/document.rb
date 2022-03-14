@@ -307,7 +307,7 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
 
         if defer_callbacks
-          doc.pending_callbacks.push(*[:default, :find, :initialize])
+          doc.pending_callbacks.push(:default, :find, :initialize)
         else
           doc.apply_defaults
           doc.run_callbacks(:find) unless doc._find_callbacks.empty?
