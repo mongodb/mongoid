@@ -123,8 +123,13 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        view.distinct(klass.database_field_name(field)).map do |value|
-          value.class.demongoize(value)
+        field_name = klass.database_field_name(field)
+        view.distinct(field_name).map do |value|
+          if field = klass.fields[field_name]
+            field.demongoize(value)
+          else
+            value.class.demongoize(value)
+          end
         end
       end
 
@@ -426,7 +431,7 @@ module Mongoid
             if field = klass.fields[n]
               field.demongoize(res)
             else
-              res
+              res.class.demongoize(res)
             end
           end
           plucked << (values.size == 1 ? values.first : values)

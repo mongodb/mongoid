@@ -473,8 +473,9 @@ describe Mongoid::Contextual::Mongo do
   describe "#distinct" do
 
     before do
-      Band.create!(name: "Depeche Mode", years: 30)
-      Band.create!(name: "New Order", years: 25)
+      Band.create!(name: "Depeche Mode", years: 30, sales: "1E2")
+      Band.create!(name: "New Order", years: 25, sales: "2E3")
+      Band.create!(name: "10,000 Maniacs", years: 20, sales: "1E2")
     end
 
     context "when limiting the result set" do
@@ -543,6 +544,21 @@ describe Mongoid::Contextual::Mongo do
 
       it 'applies the collation' do
         expect(context.distinct(:name)).to eq(expected_results)
+      end
+    end
+
+    context "when providing an demongoizable field" do
+
+      let(:criteria) do
+        Band.criteria
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the distinct field values" do
+        expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
       end
     end
   end
