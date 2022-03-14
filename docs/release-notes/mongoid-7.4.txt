@@ -17,6 +17,10 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+All behavior changes in Mongoid 7.4 must be explicitly requested by changing
+the value of configuration options as detailed below. By default,
+Mongoid 7.4 behaves the same as Mongoid 7.3.
+
 
 Ruby Version Support
 --------------------
@@ -25,11 +29,12 @@ As of version 7.4, Mongoid supports Ruby 2.5+.
 Support for Ruby 2.4 and earlier has been dropped.
 
 
-``===`` Operator Matches Ruby Semantics
----------------------------------------
+Change ``===`` Operator To Match Ruby Semantics
+-----------------------------------------------
 
-**Breaking change:** In Mongoid 7.4, the ``===`` operator works the same way
-as it does in Ruby, and is equivalent to calling ``is_a?`` on the right hand
+In Mongoid 7.4, the ``===`` operator on ``Mongoid::Document`` classes and
+instances can be configured to behave the same way as it does in Ruby,
+and is equivalent to calling ``is_a?`` on the right hand
 side with the left hand side as the argument:
 
 .. code-block:: ruby
@@ -39,14 +44,11 @@ side with the left hand side as the argument:
   # equivalent to:
   instance.is_a?(ModelClass)
 
-Previously, ``===`` returned ``true`` for some cases when the equivalent Ruby
-``===`` implementation returned false.
-
-.. note::
-
-  In order to get this functionality, the ``Mongoid.legacy_triple_equals``
-  global flag must be set to false. If it is set to true, the ``===`` operator
-  will function as it did in Mongoid 7.3.
+In order to get this functionality, the ``Mongoid.legacy_triple_equals``
+option must be set to false. If it is set to true, which is the default for
+Mongoid 7.4, the ``===`` operator will function as it did in Mongoid 7.3:
+``===`` returned ``true`` for some cases when the equivalent Ruby
+``===`` implementation returned false, as per the examples below.
 
 Mongoid 7.4 behavior:
 
@@ -102,23 +104,30 @@ and matches the core Ruby behavior:
   Band === cover_band
   # => true
 
+.. note::
 
-``BSON::ObjectId#as_json`` Override Is Made Optional
-----------------------------------------------------
+  The value of ``Mongoid.legacy_triple_equals`` option will change to ``false``
+  by default in Mongoid 8.0.
 
-Mongoid 7.3 and earlier provided a ``BSON::ObjectId#as_json``
-implementation that was identical to the one provided by ``bson-ruby``.
-Mongoid 7.4 adds an option to bypass its copy of this implementation,
-delegating to ``BSON::ObjectId#as_json``: ``Mongoid.object_id_as_json_oid``.
+
+Return Hexadecimal ``_id`` Value from ``BSON::ObjectId#as_json``
+----------------------------------------------------------------
+
+Mongoid 7.4 permits configuring the ``BSON::ObjectId#as_json`` method
+to return the ``_id`` value as a hexadecimal string instead of the
+``{"$oid" => "..."}`` hash it has returned in Mongoid 7.3 and previous
+versions.
+
+When ``Mongoid.object_id_as_json_oid`` is set to ``false``, Mongoid will
+delegate to ``bson-ruby`` implementation of ``BSON::ObjectId#as_json``.
+In ``bson-ruby`` 4 the ``BSON::ObjectId#as_json`` method will continue
+to return the hash ``{"$oid" => "..."}`` for backwards compatibility, but
+in ``bson-ruby`` 5 the ``BSON::ObjectId#as_json`` method will return only
+the hexadecimal ObjectId string.
 
 When ``Mongoid.object_id_as_json_oid`` is set to ``true``, Mongoid will
 install an implementation of ``BSON::ObjectId#as_json`` which returns
 the hash ``{"$oid" => "..."}`` as it did in Mongoid 7.3 and earlier.
-
-When ``Mongoid.object_id_as_json_oid`` is set to ``false``, Mongoid will
-delegate to ``bson-ruby`` implementation of ``BSON::ObjectId#as_json``, which
-in ``bson-ruby`` 4 continues to return the hash ``{"$oid" => "..."}`` but
-in ``bson-ruby`` 5 will return only the hexadecimal ObjectId string.
 
 The behavior of ``as_json`` is summarized in the following table:
 
@@ -147,11 +156,37 @@ Associations now support the ``:scope`` argument, yielding
 :ref:`scoped associations <association-scope>`.
 
 
-``distinct`` and ``pluck`` Respect Field Aliases In Embedded Documents
-----------------------------------------------------------------------
+Compare Times With Millisecond Precision When Embedded Matching
+---------------------------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.compare_time_by_ms`` option set to ``true``
+will truncate the times to millisecond precision when comparing them while
+performing embedded matching.
+
+Time objects in Ruby have nanosecond precision, whereas MongoDB server
+can only store times with millisecond precision. Set the
+``Mongoid.compare_time_by_ms`` option to ``true`` to truncate times to
+millisecond precision when performing queries on already loaded embedded
+associations (this is also called "embedded matching" and is done completely
+in Ruby), to obtain the same query results when performing time comparisons
+regardless of which documents are being queried. Setting this option to
+``false`` will produce different results for queries on embedded associations
+that are already loaded into memory vs queries on unloaded associations and
+top-level models.
+
+The ``Mongoid.compare_time_by_ms`` option is set to ``false`` by default
+in Mongoid 7.4 for backwards compatibility. In Mongoid 8 the default value
+will change to ``true``.
+
+
+Respect Field Aliases In Embedded Documents When Using ``distinct`` And ``pluck`` 
+---------------------------------------------------------------------------------
 
 When ``distinct`` and ``pluck`` are used with aliased fields in embedded
-documents, the aliases are now expanded. Given the following definitions:
+documents, the aliases can be expanded if the ``Mongoid.broken_alias_handling``
+option is set to ``false``. By default, for backwards compatibility, in
+Mongoid 7.4 this option is set to true, yielding Mongoid 7.3 and earlier
+behavior. Given the following definitions:
 
 .. code-block:: ruby
 
@@ -167,7 +202,7 @@ documents, the aliases are now expanded. Given the following definitions:
     field :name, as: :n
   end
 
-Mongoid 7.4 behavior:
+Mongoid 7.4 behavior with ``Mongoid.broken_alias_handling`` set to ``false``:
 
 .. code-block:: ruby
 
@@ -175,7 +210,7 @@ Mongoid 7.4 behavior:
   Band.distinct('managers.n')
   Band.pluck('managers.n')
 
-Mongoid 7.3 behavior:
+Mongoid 7.3 and 7.4 with ``Mongoid.broken_alias_handling`` set to ``true`` behavior:
 
 .. code-block:: ruby
 
@@ -183,8 +218,14 @@ Mongoid 7.3 behavior:
   Band.distinct('managers.n')
   Band.pluck('managers.n')
 
-Note that the alias expansion for top-level fields has already been
-done by Mongoid 7.3.
+.. note::
+
+  The alias expansion for top-level fields has already been done by Mongoid 7.3.
+
+.. note::
+
+  The value of ``Mongoid.broken_alias_handling`` option will change to ``false``
+  by default in Mongoid 8.0.
 
 
 ``count``, ``sum``, ``avg``, ``min``, ``max`` Ignore Sort If Not Limiting/Skipping
@@ -199,3 +240,130 @@ an index where it wouldn't before:
 .. code-block:: ruby
 
   Band.desc(:name).count
+
+
+Return ``0`` When Aggregating Empty Result Sets
+-----------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_aggregables`` option set to ``false``
+will return ``0`` from the ``sum`` method over an empty result set, for example:
+
+.. code-block:: ruby
+
+  Product.where(impossible_condition: true).sum(:price)
+  # => 0
+
+Mongoid 7.3 and Mongoid 7.4 with the ``Mongoid.broken_aggregables`` option
+set to ``true`` (the default) returns ``nil`` in this case.
+
+.. note::
+
+  The value of ``Mongoid.broken_aggregables`` option will change to ``false``
+  by default in Mongoid 8.0.
+
+
+Correct Update Behavior When Replacing Association
+--------------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_updates`` option set to ``false``
+will correctly persist an ``embeds_one`` association target that is set to nil
+and then to a non-nil value, for example:
+
+.. code-block:: ruby
+
+  class Canvas
+    include Mongoid::Document
+    
+    embeds_one :palette
+  end
+  
+  canvas.palette = palette
+  canvas.palette = nil
+  canvas.palette = palette
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_aggregables``
+option set to ``true`` (the default), ``canvas.palette`` would be ``nil`` when
+we would expect it to be ``palette``.
+
+.. note::
+
+  The value of ``Mongoid.broken_update`` option will change to ``false``
+  by default in Mongoid 8.0.
+
+
+Correct Logical ``and`` Query Generation
+----------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_and`` option set to ``false``
+will preserve existing conditions when using ``and`` to add new conditions
+to a query when the same operator is used on the same field multiple times.
+For example, in the following query:
+
+.. code-block:: ruby
+
+  Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
+
+Mongoid 7.4 with the ``Mongoid.broken_and`` option set to ``false`` will
+generate the following criteria:
+
+.. code-block:: ruby
+
+  #<Mongoid::Criteria
+    selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2021]}}, {"_id"=>2}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_and``
+option set to ``true`` (the default), the following criteria would be
+generated instead which omit the {"$in" => [2021]} condition:
+
+.. code-block:: ruby
+
+  <Mongoid::Criteria
+    selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"_id"=>2}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+.. note::
+
+  The value of ``Mongoid.broken_and`` option will change to ``false``
+  by default in Mongoid 8.0.
+
+
+Restore Parent Scope When Exiting ``with_scope`` Block
+------------------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_scoping`` option set to ``false``
+will restore the parent scope when exiting a ``with_scope`` block.
+For example:
+
+.. code-block:: ruby
+
+  Band.with_scope(year: 2020) do
+    Band.with_scope(active: true) do
+      # ...
+    end
+    
+    # {year: 2020} condition is applied here
+  end
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_scoping``
+option set to ``true`` (the default), once any ``with_scope`` block finishes,
+all scopes are cleared:
+
+.. code-block:: ruby
+
+  Band.with_scope(year: 2020) do
+    Band.with_scope(active: true) do
+      # ...
+    end
+    
+    # No scope is applied here
+  end
+
+.. note::
+
+  The value of ``Mongoid.broken_scoping`` option will change to ``false``
+  by default in Mongoid 8.0.
