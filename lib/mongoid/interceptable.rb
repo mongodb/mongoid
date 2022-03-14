@@ -158,6 +158,8 @@ module Mongoid
     # applying the defaults on a document.
     #
     # @return [ Array<Symbol> ] an array of symbols that represent the pending callbacks.
+    #
+    # @api private
     def pending_callbacks
       @pending_callbacks ||= []
     end
@@ -165,9 +167,11 @@ module Mongoid
     # Run the pending callbacks. If the callback is :default, we will apply
     # the defaults for this document. Otherwise, the callback is passed to the
     # run_callbacks function.
+    #
+    # @api private
     def run_pending_callbacks
       pending_callbacks.each do |cb|
-        if cb == :default
+        if cb == :apply_defaults
           self.apply_defaults
         else
           self.run_callbacks(cb, with_children: false)

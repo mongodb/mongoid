@@ -307,7 +307,7 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
 
         if defer_callbacks
-          doc.pending_callbacks.push(:default, :find, :initialize)
+          doc.pending_callbacks.push(:apply_defaults, :find, :initialize)
         else
           doc.apply_defaults
           doc.run_callbacks(:find) unless doc._find_callbacks.empty?
@@ -324,6 +324,8 @@ module Mongoid
       #   should be run.
       #
       # @return [ Document ] A new document.
+      #
+      # @api private
       def construct_document(attrs = nil, defer_callbacks = false)
         doc = allocate
         doc.send(:construct_document, attrs, defer_callbacks)
