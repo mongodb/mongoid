@@ -332,6 +332,43 @@ generated instead which omit the {"$in" => [2021]} condition:
   by default in Mongoid 8.0.
 
 
+Restore Parent Scope When Exiting ``with_scope`` Block
+------------------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.broken_scoping`` option set to ``false``
+will restore the parent scope when exiting a ``with_scope`` block.
+For example:
+
+.. code-block:: ruby
+
+  Band.with_scope(year: 2020) do
+    Band.with_scope(active: true) do
+      # ...
+    end
+
+    # {year: 2020} condition is applied here
+  end
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.broken_scoping``
+option set to ``true`` (the default), once any ``with_scope`` block finishes,
+all scopes are cleared:
+
+.. code-block:: ruby
+
+  Band.with_scope(year: 2020) do
+    Band.with_scope(active: true) do
+      # ...
+    end
+
+    # No scope is applied here
+  end
+
+.. note::
+
+  The value of ``Mongoid.broken_scoping`` option will change to ``false``
+  by default in Mongoid 8.0.
+
+
 Demongoize Values Returned from Pluck and Distinct
 --------------------------------------------------
 
