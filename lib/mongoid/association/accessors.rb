@@ -107,7 +107,10 @@ module Mongoid
       def get_relation(name, association, object, reload = false)
         field_name = database_field_name(name)
 
-        if attribute_missing?(field_name)
+        # As per the comments under MONGOID-5034, I've decided to only raise on
+        # embedded associations for a missing attribute. Rails does not raise
+        # for a missing attribute on referenced associations.
+        if association.embedded? && attribute_missing?(field_name)
           raise ActiveModel::MissingAttributeError, "Missing attribute: '#{field_name}'"
         end
 
