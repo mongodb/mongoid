@@ -182,7 +182,7 @@ for details on driver options.
           # determined by the driver will be used. Please refer to:
           # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
           auth_source: admin
-          
+
           # Connect directly to and perform all operations on the specified
           # server, bypassing replica set node discovery and monitoring.
           # Exactly one host address must be specified. (default: false)
@@ -366,6 +366,12 @@ for details on driver options.
       # Whether to join nested persistence contexts for atomic operations
       # to parent contexts by default. (default: false)
       join_contexts: false
+
+      # Maintain legacy behavior of pluck and distinct, which does not demongoize
+      # values on returning them. Setting this option to false will cause
+      # pluck and distinct to return demongoized values.
+      # (default: true in Mongoid 7, will change to false in Mongoid 8)
+      legacy_pluck_distinct: true
 
       # Maintain legacy behavior of === on Mongoid document classes, which
       # returns true in a number of cases where Ruby's === implementation would

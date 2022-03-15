@@ -107,6 +107,10 @@ module Mongoid
     # the one monkey-patched into Mongoid.
     option :object_id_as_json_oid, default: true
 
+    # Maintain legacy behavior of pluck and distinct, which does not
+    # demongoize the values on returning them.
+    option :legacy_pluck_distinct, default: true
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
