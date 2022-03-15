@@ -113,54 +113,85 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
 
   describe "#===" do
 
-    let(:enumerable) do
-      described_class.new([])
-    end
+    let(:data) { [] }
 
-    context "when compared to an array class" do
-
-      it "returns true" do
-        expect(enumerable === Array).to be true
-      end
-    end
-
-    context "when compared to an enumerable class" do
-
-      it "returns true" do
-        expect(enumerable === described_class).to be true
-      end
-    end
-
-    context "when compared to a different class" do
-
-      it "returns false" do
-        expect(enumerable === Mongoid::Document).to be false
-      end
-    end
-
-    context "when compared to an array instance" do
-
-      context "when the entries are equal" do
-
-        let(:other) do
-          described_class.new([])
-        end
-
-        it "returns true" do
-          expect(enumerable === other).to be true
-        end
-      end
-
-      context "when the entries are not equal" do
-
-        let(:other) do
-          described_class.new([ Band.new ])
-        end
+    shared_examples 'standard library-compatible enumerable' do
+      context "when compared to an array class" do
 
         it "returns false" do
-          expect(enumerable === other).to be false
+          expect(enumerable === Array).to be false
         end
       end
+
+      context "when compared to an enumerable class" do
+
+        it "returns false" do
+          expect(enumerable === described_class).to be false
+        end
+      end
+
+      context "when compared to a different class" do
+
+        it "returns false" do
+          expect(enumerable === Mongoid::Document).to be false
+        end
+      end
+
+      context "when compared to an array instance" do
+
+        context "when the entries are equal" do
+
+          let(:data) do
+            [Post.new(id: 2)]
+          end
+
+          let(:other) do
+            described_class.new([Post.new(id: 2)])
+          end
+
+          it "returns true" do
+            expect(enumerable === other).to be true
+          end
+        end
+
+        context "when the entries are both empty" do
+
+          let(:other) do
+            described_class.new([])
+          end
+
+          it "returns true" do
+            expect(enumerable === other).to be true
+          end
+        end
+
+        context "when the entries are not equal" do
+
+          let(:other) do
+            described_class.new([ Band.new ])
+          end
+
+          it "returns false" do
+            expect(enumerable === other).to be false
+          end
+        end
+      end
+    end
+
+    context 'enumerable' do
+      let(:enumerable) do
+        described_class.new(data)
+      end
+
+      include_examples 'standard library-compatible enumerable'
+    end
+
+    context 'Array instance' do
+      let(:enumerable) do
+        data
+      end
+
+      include_examples 'standard library-compatible enumerable'
     end
   end
 
