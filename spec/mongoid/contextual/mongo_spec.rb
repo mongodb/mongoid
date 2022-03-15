@@ -504,7 +504,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "returns the distinct field values" do
-        expect(context.distinct(:name)).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ])
+        expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
       end
     end
 
@@ -543,7 +543,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it 'applies the collation' do
-        expect(context.distinct(:name)).to eq(expected_results)
+        expect(context.distinct(:name).sort).to eq(expected_results.sort)
       end
     end
 
