@@ -3034,11 +3034,20 @@ describe Mongoid::Criteria do
           Dictionary.all.pluck(:description)
         end
 
+        let(:plucked_translations) do
+          Dictionary.all.pluck(:description_translations)
+        end
+
         context "when legacy_pluck_distinct is set" do
           config_override :legacy_pluck_distinct, true
 
           it 'returns the non-demongoized translations' do
             expect(plucked.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+
+          it 'returns the full translations hash to _translations' do
+            pending "MONGOID-5260"
+            expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
           end
         end
 
@@ -3047,6 +3056,11 @@ describe Mongoid::Criteria do
 
           it 'returns the demongoized translations' do
             expect(plucked.first).to eq('deutsch-text')
+          end
+
+          it 'returns the full translations hash to _translations' do
+            pending "MONGOID-5260"
+            expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
           end
         end
       end
