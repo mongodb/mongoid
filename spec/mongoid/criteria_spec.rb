@@ -3030,13 +3030,23 @@ describe Mongoid::Criteria do
       end
 
       context 'when plucking the entire field' do
-        with_config_values(:legacy_pluck_distinct, true, false) do |val|
-          let(:plucked) do
-            Dictionary.all.pluck(:description)
-          end
+        let(:plucked) do
+          Dictionary.all.pluck(:description)
+        end
 
-          it 'returns all translations' do
-            expect(plucked.first).to eq(val ? {"de"=>"deutsch-text", "en"=>"english-text"} : 'deutsch-text')
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the non-demongoized translations' do
+            expect(plucked.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the demongoized translations' do
+            expect(plucked.first).to eq('deutsch-text')
           end
         end
       end

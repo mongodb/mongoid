@@ -548,17 +548,27 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when providing a demongoizable field" do
-      with_config_values(:legacy_pluck_distinct, true, false) do |val|
-        let(:criteria) do
-          Band.criteria
-        end
+      let(:criteria) do
+        Band.criteria
+      end
 
-        let(:context) do
-          described_class.new(criteria)
-        end
+      let(:context) do
+        described_class.new(criteria)
+      end
 
-        it "returns the distinct field values" do
-          expect(context.distinct(:sales).sort).to eq([ "1E2", "2E3" ].map{ |x| val ? x : BigDecimal(x) })
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+
+        it "returns the non-demongoized distinct field values" do
+          expect(context.distinct(:sales).sort).to eq([ "1E2", "2E3" ])
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "returns the non-demongoized distinct field values" do
+          expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
         end
       end
     end
