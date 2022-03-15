@@ -50,15 +50,23 @@ Mongoid 7.4, the ``===`` operator will function as it did in Mongoid 7.3:
 ``===`` returned ``true`` for some cases when the equivalent Ruby
 ``===`` implementation returned false, as per the examples below.
 
-Mongoid 7.4 behavior:
+Mongoid 7.4 with ``Mongoid.legacy_triple_equals`` set to ``false`` behavior:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+    
+    has_many :members
   end
 
   class CoverBand < Band
+  end
+
+  class Member
+    include Mongoid::Document
+    
+    belongs_to :band
   end
 
   band = Band.new
@@ -75,8 +83,15 @@ Mongoid 7.4 behavior:
 
   CoverBand === Band
   # => false
+  
+  band.members === Array
+  # => false
+  
+  band.members === Mongoid::Association::Referenced::HasMany::Enumerable
+  # => false
 
-Mongoid 7.3 behavior:
+Mongoid 7.3 and 7.4 with ``Mongoid.legacy_triple_equals`` set to ``true``
+behavior:
 
 .. code-block:: ruby
 
@@ -90,6 +105,12 @@ Mongoid 7.3 behavior:
   # => true
 
   CoverBand === Band
+  # => true
+  
+  band.members === Array
+  # => true
+  
+  band.members === Mongoid::Association::Referenced::HasMany::Enumerable
   # => true
 
 The standard invocation of ``===``, that is having the class on the left and
