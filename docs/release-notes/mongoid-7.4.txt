@@ -179,7 +179,7 @@ in Mongoid 7.4 for backwards compatibility. In Mongoid 8 the default value
 will change to ``true``.
 
 
-Respect Field Aliases In Embedded Documents When Using ``distinct`` And ``pluck`` 
+Respect Field Aliases In Embedded Documents When Using ``distinct`` And ``pluck``
 ---------------------------------------------------------------------------------
 
 When ``distinct`` and ``pluck`` are used with aliased fields in embedded
@@ -273,10 +273,10 @@ and then to a non-nil value, for example:
 
   class Canvas
     include Mongoid::Document
-    
+
     embeds_one :palette
   end
-  
+
   canvas.palette = palette
   canvas.palette = nil
   canvas.palette = palette
@@ -345,7 +345,7 @@ For example:
     Band.with_scope(active: true) do
       # ...
     end
-    
+
     # {year: 2020} condition is applied here
   end
 
@@ -359,11 +359,51 @@ all scopes are cleared:
     Band.with_scope(active: true) do
       # ...
     end
-    
+
     # No scope is applied here
   end
 
 .. note::
 
   The value of ``Mongoid.broken_scoping`` option will change to ``false``
+  by default in Mongoid 8.0.
+
+
+Demongoize Values Returned from Pluck and Distinct
+--------------------------------------------------
+
+Mongoid 7.4 with the ``Mongoid.legacy_pluck_distinct`` option set to ``false``
+will demongoize values returned from the pluck and distinct methods.
+For example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    field :sales, type: BigDecimal
+  end
+
+  Band.create!(sales: "1E2")
+  Band.create!(sales: "2E2")
+  Band.pluck(:sales)
+  # => [0.1e3, 0.2e3]
+  Band.distinct(:sales)
+  # => [0.1e3, 0.2e3]
+
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.legacy_pluck_distinct``
+option set to ``true`` (the default), the value returned from the pluck and
+distinct methods will not be demongoized. For example:
+
+.. code-block:: ruby
+
+  Band.pluck(:sales)
+  # => ["1E2", "2E2"]
+  Band.distinct(:sales)
+  # => ["1E2", "2E2"]
+
+.. note::
+
+  The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
   by default in Mongoid 8.0.

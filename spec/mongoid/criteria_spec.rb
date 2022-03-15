@@ -2830,6 +2830,10 @@ describe Mongoid::Criteria do
       Band.create!(name: "Photek", likes: 1)
     end
 
+    let(:maniacs) do
+      Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
+    end
+
     context "when the field is aliased" do
 
       let!(:expensive) do
@@ -3026,13 +3030,24 @@ describe Mongoid::Criteria do
       end
 
       context 'when plucking the entire field' do
-
         let(:plucked) do
           Dictionary.all.pluck(:description)
         end
 
-        it 'returns all translations' do
-          expect(plucked.first).to eq({'en' => 'english-text', 'de' => 'deutsch-text'})
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the non-demongoized translations' do
+            expect(plucked.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the demongoized translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
         end
       end
 
@@ -3044,6 +3059,31 @@ describe Mongoid::Criteria do
 
         it 'returns the specific translations' do
           expect(plucked.first).to eq({'de' => 'deutsch-text'})
+        end
+      end
+    end
+
+    context 'when plucking a field to be demongoized' do
+
+      let(:plucked) do
+        Band.where(name: maniacs.name).pluck(:sales)
+      end
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+
+        it "does not demongoize the field" do
+          expect(plucked.first).to be_a(String)
+          expect(plucked.first).to eq("1E2")
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "demongoizes the field" do
+          expect(plucked.first).to be_a(BigDecimal)
+          expect(plucked.first).to eq(BigDecimal("1E2"))
         end
       end
     end
@@ -3648,7 +3688,7 @@ describe Mongoid::Criteria do
     # Used to test MONGOID-5251 where the find command was adding unnecessary
     # and clauses. Since the find command creates the criteria and executes it,
     # it is difficult to analyze the criteria used. For this reason, I have
-    # extracted the crux of the issue, adding an _id to the the criteria twice, 
+    # extracted the crux of the issue, adding an _id to the the criteria twice,
     # and used that for the test case.
     context "when searching by _id twice" do
       let(:_id) { BSON::ObjectId.new }
