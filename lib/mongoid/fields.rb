@@ -76,6 +76,25 @@ module Mongoid
         end
         nil
       end
+
+      # Retrieves the field for the given klass and field_name.
+      #
+      # If the field ends in _translations and that field does not exist on the
+      # given klass, get the field for the string without _translations.
+      #
+      # @param [ String | Symbol ] name The name of the field to retrieve.
+      #
+      # @return [ Field ] The field retrieved from the klass
+      def get_field(name)
+        name = database_field_name(name.to_s)
+
+        unless fields.has_key?(name)
+          if tr = name.match(/(.*)_translations\z/).captures&.first
+            name = tr
+          end
+        end
+        fields[name]
+      end
     end
 
     included do

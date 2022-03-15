@@ -3038,6 +3038,10 @@ describe Mongoid::Criteria do
           Dictionary.all.pluck(:description_translations)
         end
 
+        let(:plucked_translations_both) do
+          Dictionary.all.pluck(:description_translations)
+        end
+
         context "when legacy_pluck_distinct is set" do
           config_override :legacy_pluck_distinct, true
 
@@ -3046,8 +3050,11 @@ describe Mongoid::Criteria do
           end
 
           it 'returns the full translations hash to _translations' do
-            pending "MONGOID-5260"
             expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+
+          it 'returns both' do
+            expect(plucked_translations_both.first).to eq([{"de"=>"deutsch-text", "en"=>"english-text"}, {"de"=>"deutsch-text", "en"=>"english-text"}])
           end
         end
 
@@ -3059,7 +3066,6 @@ describe Mongoid::Criteria do
           end
 
           it 'returns the full translations hash to _translations' do
-            pending "MONGOID-5260"
             expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
           end
         end

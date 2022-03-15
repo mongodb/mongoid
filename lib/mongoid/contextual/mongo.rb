@@ -420,15 +420,20 @@ module Mongoid
       #
       # @return [ Array<Object, Array> ] The plucked values.
       def pluck(*fields)
+        fs = fields.to_set.map(&:to_s)
         normalized_select = fields.inject({}) do |hash, f|
-          hash[klass.database_field_name(f)] = 1
+          field_name = klass.get_field(f)&.name || klass.database_field_name(f)
+          hash[field_name] = 1
           hash
         end
 
         view.projection(normalized_select).reduce([]) do |plucked, doc|
           values = normalized_select.keys.map do |n|
             res = n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
-            if Mongoid.legacy_pluck_distinct
+            if Mongoid.legacy_pluck_distinct || fs.include?("#{n}_translations")
+              # This is done in the case that both a field and it's _translation
+              # are attempting to be plucked.
+              fs.delete("#{n}_translations")
               res
             elsif field = klass.fields[n]
               field.demongoize(res)

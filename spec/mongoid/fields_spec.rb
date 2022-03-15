@@ -1697,4 +1697,46 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  describe "#get_field" do
+
+    let(:klass) { Person }
+    let(:field) { klass.get_field(field_name) }
+
+    context "when getting a field" do
+      let(:field_name) { "employer_id" }
+      it "returns the correct field" do
+        expect(field).to eq(klass.fields[field_name])
+      end
+    end
+
+    context "when getting a localized field" do
+      let(:field_name) { "desc" }
+      it "returns the correct field" do
+        expect(field).to eq(klass.fields[field_name])
+      end
+    end
+
+    context "when getting a translation field" do
+      let(:field_name) { "desc_translations" }
+      it "returns the correct field" do
+        expect(field).to eq(klass.fields["desc"])
+      end
+    end
+
+    context "when getting an existing translation field" do
+      let(:field_name) { "localized_translations" }
+      it "returns the correct field" do
+        byebug
+        expect(field).to eq(klass.fields[field_name])
+      end
+    end
+
+    context "when getting an existing translation field with a _translations" do
+      let(:field_name) { "localized_translations_translations" }
+      it "returns the correct field" do
+        expect(field).to eq(klass.fields["localized_translations"])
+      end
+    end
+  end
 end
