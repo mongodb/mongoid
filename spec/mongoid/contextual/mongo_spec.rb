@@ -504,7 +504,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "returns the distinct field values" do
-        expect(context.distinct(:name)).to eq([ "Depeche Mode", "New Order" ])
+        expect(context.distinct(:name)).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ])
       end
     end
 
@@ -519,7 +519,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "returns the distinct field values" do
-        expect(context.distinct(:years).sort).to eq([ 25, 30 ])
+        expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
       end
     end
 
@@ -535,7 +535,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:expected_results) do
-        ["Depeche Mode", "New Order"]
+        ["10,000 Maniacs", "Depeche Mode", "New Order"]
       end
 
       let(:criteria) do
