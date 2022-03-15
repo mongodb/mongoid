@@ -71,10 +71,11 @@ module Mongoid
           #
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
-            doc = Factory.build(type || klass, attributes)
+            doc = Factory.execute_build(type || klass, attributes, execute_callbacks: false)
             append(doc)
             doc.apply_post_processed_defaults
             yield(doc) if block_given?
+            doc.run_pending_callbacks
             doc.run_callbacks(:build) { doc }
             doc
           end

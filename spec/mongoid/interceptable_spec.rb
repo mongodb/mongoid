@@ -2077,4 +2077,240 @@ describe Mongoid::Interceptable do
       end
     end
   end
+
+  context "when accessing parent document from callbacks" do
+    shared_examples 'accesses the correct parent' do
+      it "accesses the correct parent in after_find" do
+        expect(from_db.after_find_player).to eq(player._id)
+      end
+
+      it "accesses the correct parent in after_initialize" do
+        expect(from_db.after_initialize_player).to eq(player._id)
+      end
+
+      it "accesses the correct parent in default" do
+        expect(from_db.after_default_player).to eq(player._id)
+      end
+
+      it "accesses the correct parent in unpersisted after_initialize" do
+        expect(unpersisted.after_initialize_player).to eq(player._id)
+      end
+    end
+
+    context "when using create methods" do
+      context "when the child is an embeds_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.implants.create!
+          end
+        end
+
+        let(:unpersisted) { player.implants.first }
+
+        before do
+          # The default is originally set when creating this document, and it is
+          # subsequently persisted to the database. Therefore when we retrieve
+          # this document from the database, this field is already set, and
+          # the default Proc is not called. This unset is needed to allow the
+          # default Proc to be called when the document is retrieved from the
+          # database.
+          Player.find(player.id).implants.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).implants.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is an embeds_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.create_augmentation
+          end
+        end
+
+        let(:unpersisted) { player.augmentation }
+
+        before do
+          Player.find(player.id).augmentation.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).augmentation
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.weapons.create!
+          end
+        end
+
+        let(:unpersisted) { player.weapons.first }
+
+        before do
+          Player.find(player.id).weapons.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).weapons.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.create_powerup
+            player.save!
+          end
+        end
+
+        let(:unpersisted) { player.powerup }
+
+        before do
+          Player.find(player.id).powerup.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).powerup
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_and_belongs_to_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.shields.create!
+          end
+        end
+
+        let(:unpersisted) { player.shields.first }
+
+        before do
+          Player.find(player.id).shields.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).shields.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+    end
+
+    context "when using build methods" do
+      context "when the child is an embeds_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.implants.build
+            player.implants.first.save!
+          end
+        end
+
+        let(:unpersisted) { player.implants.first }
+
+        before do
+          Player.find(player.id).implants.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).implants.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is an embeds_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.build_augmentation
+            player.save!
+          end
+        end
+
+        let(:unpersisted) { player.augmentation }
+
+        before do
+          Player.find(player.id).augmentation.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).augmentation
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.weapons.build
+            player.weapons.first.save!
+          end
+        end
+
+        let(:unpersisted) { player.weapons.first }
+
+        before do
+          Player.find(player.id).weapons.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).weapons.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.build_powerup
+            player.powerup.save!
+          end
+        end
+
+        let(:unpersisted) { player.powerup }
+
+        before do
+          Player.find(player.id).powerup.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).powerup
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_and_belongs_to_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.shields.build
+            player.shields.first.save!
+          end
+        end
+
+        let(:unpersisted) { player.shields.first }
+
+        before do
+          Player.find(player.id).shields.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).shields.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+    end
+  end
 end

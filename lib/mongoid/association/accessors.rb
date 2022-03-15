@@ -42,8 +42,23 @@ module Mongoid
       # @return [ Proxy ] The association.
       def create_relation(object, association, selected_fields = nil)
         type = @attributes[association.inverse_type]
-        target = association.build(self, object, type, selected_fields)
-        target ? association.create_relation(self, target) : nil
+        target = if t = association.build(self, object, type, selected_fields)
+          association.create_relation(self, t)
+        else
+          nil
+        end
+
+        # Only need to do this on embedded associations. The pending callbacks
+        # are only added when materializing the documents, which only happens
+        # on embedded associations. There is no call to the database in the
+        # construction of a referenced association.
+        if association.embedded?
+          Array(target).each do |doc|
+            doc.try(:run_pending_callbacks)
+          end
+        end
+
+        target
       end
 
       # Resets the criteria inside the association proxy. Used by many-to-many
