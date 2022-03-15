@@ -6,8 +6,7 @@ def standard_dependencies
 
     platform :mri do
       # Debugger for VSCode.
-      # 2.5 is too old for debase, 3.1 is too new as of March 2022
-      if RUBY_VERSION >= '2.6' && RUBY_VERSION < '3.1'
+      unless ENV['CI']
         gem 'debase'
         gem 'ruby-debug-ide'
       end
