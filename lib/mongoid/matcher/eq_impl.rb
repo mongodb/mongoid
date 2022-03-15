@@ -25,9 +25,6 @@ module Mongoid
         else
           # When doing a comparison with Time objects, compare using millisecond precision
           if Mongoid.compare_time_by_ms
-            value == condition ||
-            value.is_a?(Array) && value.include?(condition)
-          else
             if value.kind_of?(Time) && condition.kind_of?(Time)
               time_eq?(value, condition)
             elsif value.is_a?(Array) && condition.kind_of?(Time)
@@ -42,6 +39,9 @@ module Mongoid
               value == condition ||
               value.is_a?(Array) && value.include?(condition)
             end
+          else
+            value == condition ||
+            value.is_a?(Array) && value.include?(condition)
           end
         end
       end
