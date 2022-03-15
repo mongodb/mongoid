@@ -3,6 +3,14 @@ def standard_dependencies
 
   group :development do
     gem 'yard'
+
+    platform :mri do
+      # Debugger for VSCode.
+      unless ENV['CI']
+        gem 'debase'
+        gem 'ruby-debug-ide'
+      end
+    end
   end
 
   group :development, :test do
