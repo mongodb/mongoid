@@ -112,7 +112,7 @@ module Mongoid
 
     # Maintain legacy behavior of pluck and distinct, which does not
     # demongoize the values on returning them.
-    option :legacy_pluck_distinct, default: true
+    option :legacy_pluck_distinct, default: false
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.

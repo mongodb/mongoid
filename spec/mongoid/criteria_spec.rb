@@ -3072,18 +3072,44 @@ describe Mongoid::Criteria do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
 
-        it "does not demongoize the field" do
-          expect(plucked.first).to be_a(String)
-          expect(plucked.first).to eq("1E2")
+        context 'when value is stored as string' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          it "does not demongoize the field" do
+            expect(plucked.first).to be_a(String)
+            expect(plucked.first).to eq("1E2")
+          end
+        end
+
+        context 'when value is stored as decimal128' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          it "does not demongoize the field" do
+            expect(plucked.first).to be_a(BSON::Decimal128)
+            expect(plucked.first).to eq(BSON::Decimal128.new("1E2"))
+          end
         end
       end
 
       context "when legacy_pluck_distinct is not set" do
         config_override :legacy_pluck_distinct, false
 
-        it "demongoizes the field" do
-          expect(plucked.first).to be_a(BigDecimal)
-          expect(plucked.first).to eq(BigDecimal("1E2"))
+        context 'when value is stored as string' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          it "demongoizes the field" do
+            expect(plucked.first).to be_a(BigDecimal)
+            expect(plucked.first).to eq(BigDecimal("1E2"))
+          end
+        end
+
+        context 'when value is stored as decimal128' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          it "demongoizes the field" do
+            expect(plucked.first).to be_a(BigDecimal)
+            expect(plucked.first).to eq(BigDecimal("1E2"))
+          end
         end
       end
     end
