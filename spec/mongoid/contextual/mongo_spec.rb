@@ -708,12 +708,6 @@ describe Mongoid::Contextual::Mongo do
         it "returns the distinct matching fields" do
           expect(context.distinct("label.sales")).to eq([ BigDecimal("1E2") ])
         end
-
-        it "the parent is available in the callbacks" do
-          label.reload
-          expect(label.after_find_called).to be true
-          expect(label.after_initialize_called).to be true
-        end
       end
     end
   end

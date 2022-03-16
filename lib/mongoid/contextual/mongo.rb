@@ -697,14 +697,17 @@ module Mongoid
 
       # Extracts the value for the given field name from the given attribute
       # hash. Note, this is assuming the attributes were just retrieved from
-      # the database, and will trigger the appropriate callbacks.
+      # the database. The after_find and after_initialize callbacks are not
+      # called
       #
       # @param [ Hash ] attrs The attributes hash.
       # @param [ String ] field_name The name of the field to extract.
       #
       # @param [ Any ] The value for the given field name
       def extract_value(attrs, field_name)
-        d = Factory.from_db(klass, attrs)
+        d = Factory.execute_from_db(klass, attrs, defer_callbacks: false)
+        d.pending_callbacks.clear
+
         # splits up the method and calls them in succession on the document
         field_name.split('.').inject(d) do |curr, meth|
           if curr.is_a? Array

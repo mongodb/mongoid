@@ -3245,12 +3245,6 @@ describe Mongoid::Criteria do
         it "demongoizes the field" do
           expect(plucked.first).to eq(BigDecimal("1E2"))
         end
-
-        it "the parent is available in the callbacks" do
-          label.reload
-          expect(label.after_find_called).to be true
-          expect(label.after_initialize_called).to be true
-        end
       end
     end
 
