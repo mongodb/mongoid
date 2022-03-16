@@ -370,7 +370,7 @@ for details on driver options.
       # values on returning them. Setting this option to false will cause
       # pluck and distinct to return demongoized values.
       # (default: false)
-      #legacy_pluck_distinct: false
+      #legacy_pluck_distinct: true
 
       # Maintain legacy behavior of === on Mongoid document classes, which
       # returns true in a number of cases where Ruby's === implementation would
@@ -379,7 +379,7 @@ for details on driver options.
       # and from Ruby's behavior of === on simple object instances regardless
       # of the value of this option.
       # (default: false)
-      #legacy_triple_equals: false
+      #legacy_triple_equals: true
 
       # Set the Mongoid and Ruby driver log levels when Mongoid is not using
       # Ruby on Rails logger instance. (default: :info)
@@ -393,7 +393,7 @@ for details on driver options.
       # { "$oid" => id.to_s }. When this option is false, and bson-ruby 5
       # is used, the return value will be the hexadecimal ObjectId string only.
       # (default: false)
-      object_id_as_json_oid: false
+      #object_id_as_json_oid: true
 
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
