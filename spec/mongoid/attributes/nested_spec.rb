@@ -4934,7 +4934,6 @@ describe Mongoid::Attributes::Nested do
     end
 
     before do
-      byebug
       school.attributes = {
         '_id': school.id,
         'students_attributes': [{
