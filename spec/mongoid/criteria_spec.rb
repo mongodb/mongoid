@@ -3489,13 +3489,7 @@ describe Mongoid::Criteria do
       context "when querying on a big decimal" do
 
         context 'when map_big_decimal_to_decimal128 is false' do
-
-          around do |example|
-            current = Mongoid.map_big_decimal_to_decimal128
-            Mongoid.map_big_decimal_to_decimal128 = false
-            example.run
-            Mongoid.map_big_decimal_to_decimal128 = current
-          end
+          config_override :map_big_decimal_to_decimal128, false
 
           let(:sales) do
             BigDecimal('0.1')
@@ -3515,13 +3509,7 @@ describe Mongoid::Criteria do
         end
 
         context 'when map_big_decimal_to_decimal128 is true' do
-
-          around do |example|
-            current = Mongoid.map_big_decimal_to_decimal128
-            Mongoid.map_big_decimal_to_decimal128 = true
-            example.run
-            Mongoid.map_big_decimal_to_decimal128 = current
-          end
+          config_override :map_big_decimal_to_decimal128, true
 
           let(:sales) do
             BigDecimal('0.1')
@@ -3541,13 +3529,7 @@ describe Mongoid::Criteria do
         end
 
         context 'when map_big_decimal_to_decimal128 was false and is now true' do
-
-          around do |example|
-            current = Mongoid.map_big_decimal_to_decimal128
-            Mongoid.map_big_decimal_to_decimal128 = false
-            example.run
-            Mongoid.map_big_decimal_to_decimal128 = current
-          end
+          config_override :map_big_decimal_to_decimal128, false
 
           let(:sales) do
             BigDecimal('0.1')
@@ -3572,13 +3554,7 @@ describe Mongoid::Criteria do
       context "when querying on a big decimal from a dynamic field" do
 
         context 'when map_big_decimal_to_decimal128 is false' do
-
-          around do |example|
-            current = Mongoid.map_big_decimal_to_decimal128
-            Mongoid.map_big_decimal_to_decimal128 = false
-            example.run
-            Mongoid.map_big_decimal_to_decimal128 = current
-          end
+          config_override :map_big_decimal_to_decimal128, false
 
           let(:fans) do
             BigDecimal('139432.0002')
@@ -3598,13 +3574,7 @@ describe Mongoid::Criteria do
         end
 
         context 'when map_big_decimal_to_decimal128 is true' do
-
-          around do |example|
-            current = Mongoid.map_big_decimal_to_decimal128
-            Mongoid.map_big_decimal_to_decimal128 = true
-            example.run
-            Mongoid.map_big_decimal_to_decimal128 = current
-          end
+          config_override :map_big_decimal_to_decimal128, true
 
           let(:fans) do
             BigDecimal('139432.0002')
