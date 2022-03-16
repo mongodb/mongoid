@@ -77,23 +77,41 @@ module Mongoid
         nil
       end
 
-      # Retrieves the field for the given klass and field_name.
+      # Removes the _translations from the given field name. This is done only
+      # when there doesn't already exist a field name or relation with the
+      # same name (i.e. with the _translations suffix). This check for an
+      # existing field is done recursively
       #
-      # If the field ends in _translations and that field does not exist on the
-      # given klass, get the field for the string without _translations.
+      # @param [ String | Symbol ] name The name of the field to cleanse.
       #
-      # @param [ String | Symbol ] name The name of the field to retrieve.
-      #
-      # @return [ Field ] The field retrieved from the klass
-      def get_field(name)
+      # @return [ Field ] The field name without _translations
+      def cleanse_localized_field_names(name)
         name = database_field_name(name.to_s)
 
-        unless fields.has_key?(name)
-          if tr = name.match(/(.*)_translations\z/)&.captures&.first
-            name = tr
+        klass = self
+
+        ar = name.split('.')
+        [].tap do |res |
+        ar.each_with_index do |fn, i|
+          key = fn
+          unless klass.fields.has_key?(fn) || klass.relations.has_key?(fn)
+            if tr = fn.match(/(.*)_translations\z/)&.captures&.first
+              key = tr
+            else
+              key = fn
+            end
+
+          end
+          res.push("#{key}")
+
+          if klass.fields.has_key?(fn)
+            res.push(ar.drop(i+1).join('.')) unless i == ar.length - 1
+            break
+          elsif klass.relations.has_key?(fn)
+            klass = klass.relations[key].klass
           end
         end
-        fields[name]
+        res.join('.')
       end
     end
 

@@ -3149,6 +3149,29 @@ describe Mongoid::Criteria do
           end
         end
       end
+
+      context 'when plucking a specific locale from _translations field' do
+
+        let(:plucked) do
+          Dictionary.all.pluck(:'description_translations.de')
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq(nil)
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+      end
     end
 
     context 'when plucking a field to be demongoized' do

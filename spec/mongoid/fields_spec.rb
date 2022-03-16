@@ -1701,41 +1701,54 @@ describe Mongoid::Fields do
   describe "#get_field" do
 
     let(:klass) { Person }
-    let(:field) { klass.get_field(field_name) }
+    let(:field) { klass.cleanse_localized_field_names(field_name) }
 
-    context "when getting a field" do
+    context "when cleansing a field" do
       let(:field_name) { "employer_id" }
-      it "returns the correct field" do
-        expect(field).to eq(klass.fields[field_name])
+      it "returns the correct field name" do
+        expect(field).to eq(field_name)
       end
     end
 
-    context "when getting a localized field" do
+    context "when cleansing a localized field" do
       let(:field_name) { "desc" }
-      it "returns the correct field" do
-        expect(field).to eq(klass.fields[field_name])
+      it "returns the correct field name" do
+        expect(field).to eq(field_name)
       end
     end
 
-    context "when getting a translation field" do
+    context "when cleansing a translation field" do
       let(:field_name) { "desc_translations" }
-      it "returns the correct field" do
-        expect(field).to eq(klass.fields["desc"])
+      it "returns the correct field name" do
+        expect(field).to eq("desc")
       end
     end
 
-    context "when getting an existing translation field" do
+    context "when cleansing an existing translation field" do
       let(:field_name) { "localized_translations" }
-      it "returns the correct field" do
-        byebug
-        expect(field).to eq(klass.fields[field_name])
+      it "returns the correct field name" do
+        expect(field).to eq(field_name)
       end
     end
 
-    context "when getting an existing translation field with a _translations" do
+    context "when cleansing an existing translation field with a _translations" do
       let(:field_name) { "localized_translations_translations" }
-      it "returns the correct field" do
-        expect(field).to eq(klass.fields["localized_translations"])
+      it "returns the correct field name" do
+        expect(field).to eq("localized_translations")
+      end
+    end
+
+    context "when cleansing dotted translation field" do
+      let(:field_name) { "passport.name_translations.asd" }
+      it "returns the correct field name" do
+        expect(field).to eq("passport.name.asd")
+      end
+    end
+
+    context "when cleansing dotted existing translation field" do
+      let(:field_name) { "passport.localized_translations.asd" }
+      it "returns the correct field name" do
+        expect(field).to eq("passport.localized_translations.asd")
       end
     end
   end

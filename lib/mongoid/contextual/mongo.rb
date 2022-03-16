@@ -428,8 +428,7 @@ module Mongoid
           db_fn = klass.database_field_name(f)
           normalized_field_names.push(db_fn)
 
-          field_name = klass.get_field(f)&.name || db_fn
-          hash[field_name] = 1
+          hash[klass.cleanse_localized_field_names(f)] = 1
           hash
         end
 
@@ -442,10 +441,10 @@ module Mongoid
               # splits up the method and calls them in succession on the document
               n.split('.').inject(d) do |curr, meth|
                 if curr.is_a? Array
-                  res = curr.map { |x| x.try(meth) }
+                  res = curr.map { |x| x.try(meth) || x.try(:fetch, meth) }
                   res.empty? ? nil : res
                 else
-                  curr.try(meth)
+                  curr.try(meth) || curr.try(:fetch, meth)
                 end
               end
             end
