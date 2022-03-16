@@ -65,3 +65,24 @@ class HabtmmAnimal
 
   has_and_belongs_to_many :trainers, inverse_of: :animals, class_name: 'HabtmmTrainer', scope: -> { where(name: 'Dave') }
 end
+
+class HabtmmSchool
+  include Mongoid::Document
+
+  has_and_belongs_to_many :students, class_name: 'HabtmmStudent'
+
+  field :after_destroy_triggered, default: false
+
+  accepts_nested_attributes_for :students, allow_destroy: true
+end
+
+class HabtmmStudent
+  include Mongoid::Document
+
+  has_and_belongs_to_many :schools, class_name: 'HabtmmSchool'
+
+  after_destroy do |doc|
+    schools.first.update_attributes!(after_destroy_triggered: true) unless schools.empty?
+  end
+end
+

@@ -136,20 +136,20 @@ module Mongoid
           #
           # @return [ Document, nil ] The deleted document or nil if nothing deleted.
           def delete(document)
-            execute_callback :before_remove, document
-            doc = _target.delete_one(document)
-            if doc && !_binding?
-              _unscoped.delete_one(doc)
-              if _assigning?
-                _base.add_atomic_pull(doc)
-              else
-                doc.delete(suppress: true)
-                unbind_one(doc)
+            execute_callbacks_around(:remove, document) do
+              doc = _target.delete_one(document)
+              if doc && !_binding?
+                _unscoped.delete_one(doc)
+                if _assigning?
+                  _base.add_atomic_pull(doc)
+                else
+                  doc.delete(suppress: true)
+                  unbind_one(doc)
+                end
               end
+              reindex
+              doc
             end
-            reindex
-            execute_callback :after_remove, document
-            doc
           end
 
           # Delete all the documents in the association without running callbacks.
