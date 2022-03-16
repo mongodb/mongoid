@@ -330,7 +330,7 @@ describe Mongoid::Config do
 
   context 'when setting the legacy_pluck_distinct option in the config' do
     let(:option) { :legacy_pluck_distinct }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
