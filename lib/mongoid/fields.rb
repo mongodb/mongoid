@@ -89,7 +89,7 @@ module Mongoid
         name = database_field_name(name.to_s)
 
         unless fields.has_key?(name)
-          if tr = name.match(/(.*)_translations\z/).captures&.first
+          if tr = name.match(/(.*)_translations\z/)&.captures&.first
             name = tr
           end
         end

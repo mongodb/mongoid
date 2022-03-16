@@ -420,25 +420,34 @@ module Mongoid
       #
       # @return [ Array<Object, Array> ] The plucked values.
       def pluck(*fields)
-        fs = fields.to_set.map(&:to_s)
+        # Multiple fields can map to the same field name. For example, plucking
+        # a field and its _translations field map to the same field in the database.
+        # because of this, we need to keep track of the fields inputted.
+        normalized_field_names = []
         normalized_select = fields.inject({}) do |hash, f|
-          field_name = klass.get_field(f)&.name || klass.database_field_name(f)
+          db_fn = klass.database_field_name(f)
+          normalized_field_names.push(db_fn)
+
+          field_name = klass.get_field(f)&.name || db_fn
           hash[field_name] = 1
           hash
         end
 
         view.projection(normalized_select).reduce([]) do |plucked, doc|
-          values = normalized_select.keys.map do |n|
-            res = n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
-            if Mongoid.legacy_pluck_distinct || fs.include?("#{n}_translations")
-              # This is done in the case that both a field and it's _translation
-              # are attempting to be plucked.
-              fs.delete("#{n}_translations")
-              res
-            elsif field = klass.fields[n]
-              field.demongoize(res)
+          values = normalized_field_names.map do |n|
+            if Mongoid.legacy_pluck_distinct
+              n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
             else
-              res.class.demongoize(res)
+              d = Factory.from_db(klass, doc)
+              # splits up the method and calls them in succession on the document
+              n.split('.').inject(d) do |curr, meth|
+                if curr.is_a? Array
+                  res = curr.map { |x| x.try(meth) }
+                  res.empty? ? nil : res
+                else
+                  curr.try(meth)
+                end
+              end
             end
           end
           plucked << (values.size == 1 ? values.first : values)
