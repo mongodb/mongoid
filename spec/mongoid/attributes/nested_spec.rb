@@ -4926,7 +4926,7 @@ describe Mongoid::Attributes::Nested do
 
   context "when destroying has_many child using nested attributes" do
     let(:school) do
-      HmmSchool.create
+      School.create
     end
 
     let!(:student) do

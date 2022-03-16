@@ -47,10 +47,6 @@ class HmmSchool
 
   field :district, type: String
   field :team, type: String
-
-  field :after_destroy_triggered, default: false
-
-  accepts_nested_attributes_for :students, allow_destroy: true
 end
 
 class HmmStudent
@@ -60,10 +56,6 @@ class HmmStudent
 
   field :name, type: String
   field :grade, type: Integer, default: 3
-
-  after_destroy do |doc|
-    school.after_destroy_triggered = true if school
-  end
 end
 
 class HmmTicket
