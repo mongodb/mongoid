@@ -705,7 +705,7 @@ module Mongoid
       #
       # @param [ Any ] The value for the given field name
       def extract_value(attrs, field_name)
-        d = Factory.execute_from_db(klass, attrs, defer_callbacks: false)
+        d = Factory.execute_from_db(klass, attrs, execute_callbacks: false)
         d.pending_callbacks.clear
 
         # splits up the method and calls them in succession on the document
