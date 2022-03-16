@@ -89,29 +89,28 @@ module Mongoid
         name = database_field_name(name.to_s)
 
         klass = self
+        [].tap do |res|
+          ar = name.split('.')
+          ar.each_with_index do |fn, i|
+            key = fn
+            unless klass.fields.has_key?(fn) || klass.relations.has_key?(fn)
+              if tr = fn.match(/(.*)_translations\z/)&.captures&.first
+                key = tr
+              else
+                key = fn
+              end
 
-        ar = name.split('.')
-        [].tap do |res |
-        ar.each_with_index do |fn, i|
-          key = fn
-          unless klass.fields.has_key?(fn) || klass.relations.has_key?(fn)
-            if tr = fn.match(/(.*)_translations\z/)&.captures&.first
-              key = tr
-            else
-              key = fn
             end
+            res.push("#{key}")
 
+            if klass.fields.has_key?(fn)
+              res.push(ar.drop(i+1).join('.')) unless i == ar.length - 1
+              break
+            elsif klass.relations.has_key?(fn)
+              klass = klass.relations[key].klass
+            end
           end
-          res.push("#{key}")
-
-          if klass.fields.has_key?(fn)
-            res.push(ar.drop(i+1).join('.')) unless i == ar.length - 1
-            break
-          elsif klass.relations.has_key?(fn)
-            klass = klass.relations[key].klass
-          end
-        end
-        res.join('.')
+        end.join('.')
       end
     end
 

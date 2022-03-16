@@ -428,7 +428,11 @@ module Mongoid
           db_fn = klass.database_field_name(f)
           normalized_field_names.push(db_fn)
 
-          hash[klass.cleanse_localized_field_names(f)] = 1
+          if Mongoid.legacy_pluck_distinct
+            hash[db_fn] = 1
+          else
+            hash[klass.cleanse_localized_field_names(f)] = 1
+          end
           hash
         end
 
