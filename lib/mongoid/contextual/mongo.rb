@@ -123,12 +123,18 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        field_name = klass.database_field_name(field)
-        view.distinct(field_name).map do |value|
-          if !Mongoid.legacy_pluck_distinct && field = klass.fields[field_name]
-            field.demongoize(value)
-          else
+        name = if Mongoid.legacy_pluck_distinct
+          klass.database_field_name(field)
+        else
+          klass.cleanse_localized_field_names(field)
+        end
+
+        view.distinct(name).map do |value|
+          if Mongoid.legacy_pluck_distinct
             value.class.demongoize(value)
+          else
+            is_translation = "#{name}_translations" == field.to_s
+            recursive_demongoize(name, value, is_translation)
           end
         end
       end
@@ -441,16 +447,7 @@ module Mongoid
             if Mongoid.legacy_pluck_distinct
               n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
             else
-              d = Factory.from_db(klass, doc)
-              # splits up the method and calls them in succession on the document
-              n.split('.').inject(d) do |curr, meth|
-                if curr.is_a? Array
-                  res = curr.map { |x| x.try(meth) || x.try(:fetch, meth) }
-                  res.empty? ? nil : res
-                else
-                  curr.try(meth) || curr.try(:fetch, meth)
-                end
-              end
+              extract_value(doc, n)
             end
           end
           plucked << (values.size == 1 ? values.first : values)
@@ -696,6 +693,57 @@ module Mongoid
 
       def acknowledged_write?
         collection.write_concern.nil? || collection.write_concern.acknowledged?
+      end
+
+      # Extracts the value for the given field name from the given attribute
+      # hash. Note, this is assuming the attributes were just retrieved from
+      # the database, and will trigger the appropriate callbacks.
+      #
+      # @param [ Hash ] attrs The attributes hash.
+      # @param [ String ] field_name The name of the field to extract.
+      #
+      # @param [ Any ] The value for the given field name
+      def extract_value(attrs, field_name)
+        d = Factory.from_db(klass, attrs)
+        # splits up the method and calls them in succession on the document
+        field_name.split('.').inject(d) do |curr, meth|
+          if curr.is_a? Array
+            res = curr.map { |x| x.try(meth) || x.try(:fetch, meth) }
+            res.empty? ? nil : res
+          else
+            curr.try(meth) || curr.try(:fetch, meth)
+          end
+        end
+      end
+
+      # Recursively demongoize the given value. This method recursively traverses
+      # the class tree to find the correct field to use to demongoize the value.
+      #
+      # @param [ String ] field_name The name of the field to demongoize.
+      # @param [ Any ] value The value to demongoize.
+      # @param [ Boolean ] is_translation The field we are retrieving is an
+      #   _translations field.
+      #
+      # @return [ Any ] The demongoized value.
+      def recursive_demongoize(field_name, value, is_translation)
+        k = klass
+        field_name.split('.').each do |meth|
+          if relation = k.relations[meth]
+            k = relation.klass
+          elsif field = k.fields[meth]
+            # If it's a localized field that's not a hash, don't demongoize
+            # again, we already have the translation. If it's an _translation
+            # field, don't demongoize, we want the full hash not just a
+            # specific translation.
+            if field.localized? && (!value.is_a?(Hash) || is_translation)
+              return value.class.demongoize(value)
+            else
+              return field.demongoize(value)
+            end
+          else
+            return value.class.demongoize(value)
+          end
+        end
       end
     end
   end
