@@ -3180,7 +3180,7 @@ describe Mongoid::Criteria do
           require "i18n/backend/fallbacks"
           I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
-          I18n.fallbacks[:fr] = [ :en ]
+          I18n.fallbacks[:he] = [ :en ]
         end
 
         let(:plucked) do
@@ -3201,7 +3201,7 @@ describe Mongoid::Criteria do
           it "correctly uses the fallback" do
             I18n.locale = :en
             d = Dictionary.create!(description: 'english-text')
-            I18n.locale = :fr
+            I18n.locale = :he
             plucked.should == "english-text"
           end
         end
