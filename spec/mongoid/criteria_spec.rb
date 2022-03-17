@@ -3145,7 +3145,7 @@ describe Mongoid::Criteria do
           config_override :legacy_pluck_distinct, false
 
           it 'returns the specific translations' do
-            expect(plucked.first).to eq(nil)
+            expect(plucked.first).to eq('deutsch-text')
           end
         end
       end

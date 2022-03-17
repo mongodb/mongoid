@@ -698,7 +698,7 @@ module Mongoid
       # Extracts the value for the given field name from the given attribute
       # hash. Note, this is assuming the attributes were just retrieved from
       # the database. The after_find and after_initialize callbacks are not
-      # called
+      # called.
       #
       # @param [ Hash ] attrs The attributes hash.
       # @param [ String ] field_name The name of the field to extract.
@@ -708,11 +708,28 @@ module Mongoid
         d = Factory.execute_from_db(klass, attrs, execute_callbacks: false)
         d.pending_callbacks.clear
 
-        # splits up the method and calls them in succession on the document
-        field_name.split('.').inject(d) do |curr, meth|
+        # Splits up the method and calls them in succession on the document.
+        meths = field_name.split('.')
+        meths.each_with_index.inject(d) do |curr, (meth, i)|
+          # 1. If curr is an array apply the method to all elements in the array.
+          # 2. If the field is localized, and is not an _translations field
+          #    (_translations fields don't show up in the fields hash).
+          #    - If this is the end of the methods, return the translation for
+          #      the current locale.
+          #    - Otherwise, return the whole translations hash so the next method
+          #      can select the language it wants.
+          # 3. Otherwise, execute the method on curr, or fetch the value for
+          #    the key meth. The latter generally happens when the _translations
+          #    field is passed.
           if curr.is_a? Array
             res = curr.map { |x| x.try(meth) || x.try(:fetch, meth) }
             res.empty? ? nil : res
+          elsif curr.is_a?(Mongoid::Document) && curr.fields[meth]&.localized?
+            if i < meths.length-1
+              curr.try("#{meth}_translations")
+            else
+              curr.try(meth)
+            end
           else
             curr.try(meth) || curr.try(:fetch, meth)
           end
