@@ -687,6 +687,40 @@ describe Mongoid::Contextual::Mongo do
           end
         end
       end
+
+      context 'when fallbacks are enabled with a locale list' do
+        before(:all) do
+          puts "I18n version: #{I18n::VERSION}"
+
+          require "i18n/backend/fallbacks"
+          I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+
+          I18n.fallbacks[:fr] = [ :en ]
+        end
+
+        let(:distinct) do
+          context.distinct(:description).first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "does not correctly use the fallback" do
+            distinct.should == {"de"=>"deutsch-text", "en"=>"english-text"}
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "correctly uses the fallback" do
+            I18n.locale = :en
+            d = Dictionary.create!(description: 'english-text')
+            I18n.locale = :fr
+            distinct.should == "english-text"
+          end
+        end
+      end
     end
 
     context "when getting an embedded field" do
