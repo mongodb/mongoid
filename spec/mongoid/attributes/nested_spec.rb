@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../association/referenced/has_many_models'
+require_relative '../association/referenced/has_and_belongs_to_many_models'
 
 describe Mongoid::Attributes::Nested do
 
@@ -4919,6 +4921,55 @@ describe Mongoid::Attributes::Nested do
           end
         end
       end
+    end
+  end
+
+  context "when destroying has_many child using nested attributes" do
+    let(:school) do
+      School.create
+    end
+
+    let!(:student) do
+      school.students.create
+    end
+
+    before do
+      school.attributes = {
+        '_id': school.id,
+        'students_attributes': [{
+          '_id': student.id,
+          '_destroy': 1
+          }]
+        }
+    end
+
+    it "is able to access the parent in the after_destroy callback" do
+      expect(school.after_destroy_triggered).to eq(true)
+    end
+  end
+
+  context "when destroying has_many child using nested attributes" do
+    let(:school) do
+      HabtmmSchool.create!(students: [student])
+    end
+
+    let(:student) do
+      HabtmmStudent.create!
+    end
+
+    before do
+      student.schools << school
+      school.attributes = {
+        '_id': school.id,
+        'students_attributes': [{
+          '_id': student.id,
+          '_destroy': 1
+          }]
+        }
+    end
+
+    it "is able to access the parent in the after_destroy callback" do
+      expect(school.reload.after_destroy_triggered).to eq(true)
     end
   end
 end
