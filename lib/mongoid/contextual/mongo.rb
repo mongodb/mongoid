@@ -696,9 +696,7 @@ module Mongoid
       end
 
       # Extracts the value for the given field name from the given attribute
-      # hash. Note, this is assuming the attributes were just retrieved from
-      # the database. The after_find and after_initialize callbacks are not
-      # called.
+      # hash.
       #
       # @param [ Hash ] attrs The attributes hash.
       # @param [ String ] field_name The name of the field to extract.
