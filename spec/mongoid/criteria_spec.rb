@@ -3323,9 +3323,10 @@ describe Mongoid::Criteria do
 
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
+        config_override :map_big_decimal_to_decimal128, true
 
         it "returns a hash with a non-demongoized field" do
-          expect(plucked.first).to eq({ 'sales' => "1E2" })
+          expect(plucked.first).to eq({ 'sales' => BSON::Decimal128.new('1E+2') })
         end
       end
 
@@ -3346,9 +3347,10 @@ describe Mongoid::Criteria do
 
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
+        config_override :map_big_decimal_to_decimal128, true
 
         it "returns a hash with a non-demongoized field" do
-          expect(plucked.first).to eq([{ 'sales' => "1E2" }])
+          expect(plucked.first).to eq([{ 'sales' => BSON::Decimal128.new('1E+2') }])
         end
       end
 
