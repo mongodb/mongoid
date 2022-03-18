@@ -3174,6 +3174,8 @@ describe Mongoid::Criteria do
       end
 
       context 'when fallbacks are enabled with a locale list' do
+        require_fallbacks
+
         around(:all) do |example|
           prev_fallbacks = I18n.fallbacks.dup
           I18n.fallbacks[:he] = [ :en ]
