@@ -705,39 +705,62 @@ module Mongoid
       #
       # @param [ Any ] The value for the given field name
       def extract_value(attrs, field_name)
-        d = Factory.execute_from_db(klass, attrs, execute_callbacks: false)
-        d.pending_callbacks.clear
+        def fetch_and_demongoize(d, meth, klass)
+          res = d.try(:fetch, meth, nil)
+          if field = klass.fields[meth]
+            field.demongoize(res)
+          else
+            res
+          end
+        end
 
-        # Splits up the method and calls them in succession on the document.
+        k = klass
         meths = field_name.split('.')
-        meths.each_with_index.inject(d) do |curr, (meth, i)|
-          # 1. If curr is an array apply the method to all elements in the array.
+        meths.each_with_index.inject(attrs) do |curr, (meth, i)|
+          # 1. If curr is an array fetch from all elements in the array.
           # 2. If the field is localized, and is not an _translations field
           #    (_translations fields don't show up in the fields hash).
           #    - If this is the end of the methods, return the translation for
           #      the current locale.
           #    - Otherwise, return the whole translations hash so the next method
           #      can select the language it wants.
-          # 3. Otherwise, execute the method on curr, or fetch the value for
-          #    the key meth. The latter generally happens when the _translations
-          #    field is passed. If meth is an aliased association, change meth
-          #    to the real association name, so we get a Document and not a hash.
+          # 3. Otherwise, fetch the value for the key meth. If the meth is an
+          #    _translations field, do not demongoize the value so the full
+          #    hash is returned
+
+          is_translation = false
+          if !k.fields.key?(meth) && !k.relations.key?(meth)
+            if tr = meth.match(/(.*)_translations\z/)&.captures&.first
+              is_translation = true
+              meth = tr
+            end
+          end
+
           if curr.is_a? Array
-            res = curr.map { |x| x.try(meth) || x.try(:fetch, meth) }
+            res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
             res.empty? ? nil : res
-          elsif curr.is_a?(Mongoid::Document) && curr.fields[meth]&.localized?
+          elsif !is_translation && k.fields[meth]&.localized?
             if i < meths.length-1
-              curr.try("#{meth}_translations")
+              curr.try(:fetch, meth, nil)
             else
-              curr.try(meth)
+              fetch_and_demongoize(curr, meth, k)
             end
           else
-            if as = curr.try(:aliased_associations)
+            if is_translation
+              curr.try(:fetch, meth, nil)
+            else
+              fetch_and_demongoize(curr, meth, k)
+            end
+          end.tap do
+            if as = k.try(:aliased_associations)
               if a = as.fetch(meth, nil)
                 meth = a
               end
             end
-            curr.try(meth) || curr.try(:fetch, meth)
+
+            if relation = k.relations[meth]
+              k = relation.klass
+            end
           end
         end
       end

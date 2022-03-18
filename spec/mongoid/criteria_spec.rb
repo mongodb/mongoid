@@ -3336,6 +3336,29 @@ describe Mongoid::Criteria do
       end
     end
 
+    context "when plucking an embeds_many field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(labels: [label]) }
+
+      let(:plucked) { Band.where(_id: band.id).pluck("labels.sales") }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+
+        it "returns a hash with a non-demongoized field" do
+          expect(plucked.first).to eq([{ 'sales' => "1E2" }])
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "demongoizes the field" do
+          expect(plucked.first).to eq([BigDecimal("1E2")])
+        end
+      end
+    end
+
     context "when plucking a nonexistent embedded field" do
       let(:label) { Label.new(sales: "1E2") }
       let!(:band) { Band.create!(label: label) }
