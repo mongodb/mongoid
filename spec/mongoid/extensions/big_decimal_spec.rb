@@ -9,13 +9,7 @@ describe Mongoid::Extensions::BigDecimal do
   end
 
   context 'when map_big_decimal_to_decimal128 is false' do
-
-    around do |example|
-      current = Mongoid.map_big_decimal_to_decimal128
-      Mongoid.map_big_decimal_to_decimal128 = false
-      example.run
-      Mongoid.map_big_decimal_to_decimal128 = current
-    end
+    config_override :map_big_decimal_to_decimal128, false
 
     describe ".demongoize" do
 
@@ -448,13 +442,7 @@ describe Mongoid::Extensions::BigDecimal do
   end
 
   context 'when map_big_decimal_to_decimal128 is true' do
-
-    around do |example|
-      current = Mongoid.map_big_decimal_to_decimal128
-      Mongoid.map_big_decimal_to_decimal128 = true
-      example.run
-      Mongoid.map_big_decimal_to_decimal128 = current
-    end
+    config_override :map_big_decimal_to_decimal128, true
 
     describe ".demongoize" do
 

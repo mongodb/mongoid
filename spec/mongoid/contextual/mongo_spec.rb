@@ -559,8 +559,22 @@ describe Mongoid::Contextual::Mongo do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
 
-        it "returns the non-demongoized distinct field values" do
-          expect(context.distinct(:sales).sort).to eq([ "1E2", "2E3" ])
+        context 'when storing BigDecimal as string' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          it "returns the non-demongoized distinct field values" do
+            expect(context.distinct(:sales).sort).to eq([ "1E2", "2E3" ])
+          end
+        end
+
+        context 'when storing BigDecimal as decimal128' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          it "returns the non-demongoized distinct field values" do
+            pending 'RUBY-2928'
+
+            expect(context.distinct(:sales).sort).to eq([ BSON::Decimal128.new("1E2"), BSON::Decimal128.new("2E3") ])
+          end
         end
       end
 

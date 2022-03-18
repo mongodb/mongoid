@@ -282,13 +282,13 @@ for details on driver options.
       # Product.where(impossible_condition: true).sum(:price)
       #
       # ... return nil instead of 0.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      broken_aggregables: true
+      # (default: false)
+      #broken_aggregables: true
 
       # Ignore aliased fields in embedded documents when performing pluck and
       # distinct operations, for backwards compatibility.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      broken_alias_handling: true
+      # (default: false)
+      #broken_alias_handling: true
 
       # Maintain broken `and' method behavior that existed in Mongoid 7.3
       # and earlier for backwards compatibility: in some situations, conditions
@@ -310,13 +310,13 @@ for details on driver options.
       # This is obviously incorrect as the {"$in"=>[2021]} clause is lost.
       # Notice that the clause is only lost when both clauses are added using
       # the #and method.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      broken_and: true
+      # (default: false)
+      #broken_and: true
 
       # When exiting a nested `with_scope' block, set the current scope to
       # nil instead of the parent scope for backwards compatibility.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      broken_scoping: true
+      # (default: false)
+      #broken_scoping: true
 
       # Maintain broken update behavior in some cases for backwards
       # compatibility.
@@ -335,8 +335,8 @@ for details on driver options.
       # In Mongoid 7.3 and earlier, canvas.palette would be nil when we would
       # expect it to be palette. Set this option to true to keep this behavior,
       # set the option to false to perform the second update correctly.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      broken_updates: true
+      # (default: false)
+      #broken_updates: true
 
       # Time objects in Ruby have nanosecond precision, whereas MongoDB server
       # can only store times with millisecond precision. Set this option to
@@ -347,9 +347,8 @@ for details on driver options.
       # which documents are being queried. Setting this option to false will
       # produce different results for queries on embedded associations that
       # are already loaded into memory vs queries on unloaded associations and
-      # top-level models. (default: false in Mongoid 7, will change to true
-      # in Mongoid 8).
-      compare_time_by_ms: false
+      # top-level models. (default: true)
+      #compare_time_by_ms: false
 
       # Set the global discriminator key. (default: "_type")
       discriminator_key: "_type"
@@ -370,8 +369,8 @@ for details on driver options.
       # Maintain legacy behavior of pluck and distinct, which does not demongoize
       # values on returning them. Setting this option to false will cause
       # pluck and distinct to return demongoized values.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      legacy_pluck_distinct: true
+      # (default: false)
+      #legacy_pluck_distinct: true
 
       # Maintain legacy behavior of === on Mongoid document classes, which
       # returns true in a number of cases where Ruby's === implementation would
@@ -379,8 +378,8 @@ for details on driver options.
       # instances differs from both the behavior of === on document classes
       # and from Ruby's behavior of === on simple object instances regardless
       # of the value of this option.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      legacy_triple_equals: true
+      # (default: false)
+      #legacy_triple_equals: true
 
       # Set the Mongoid and Ruby driver log levels when Mongoid is not using
       # Ruby on Rails logger instance. (default: :info)
@@ -393,8 +392,8 @@ for details on driver options.
       # Force ``BSON::ObjectId#as_json`` method to return the hash
       # { "$oid" => id.to_s }. When this option is false, and bson-ruby 5
       # is used, the return value will be the hexadecimal ObjectId string only.
-      # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      object_id_as_json_oid: true
+      # (default: false)
+      #object_id_as_json_oid: true
 
       # Preload all models in development, needed when models use
       # inheritance. (default: false)

@@ -75,44 +75,44 @@ module Mongoid
     option :use_utc, default: false
 
     # Store BigDecimals as Decimal128s instead of strings in the db.
-    option :map_big_decimal_to_decimal128, default: false
+    option :map_big_decimal_to_decimal128, default: true
 
     # Update embedded documents correctly when setting it, unsetting it
     # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
-    option :broken_updates, default: true
+    option :broken_updates, default: false
 
     # Maintain legacy behavior of === on Mongoid documents, which returns
     # true in a number of cases where Ruby's === implementation would
     # return false.
-    option :legacy_triple_equals, default: true
+    option :legacy_triple_equals, default: false
 
     # When exiting a nested `with_scope' block, set the current scope to
     # nil instead of the parent scope for backwards compatibility.
-    option :broken_scoping, default: true
+    option :broken_scoping, default: false
 
     # Maintain broken behavior of sum over empty result sets for backwards
     # compatibility.
-    option :broken_aggregables, default: true
+    option :broken_aggregables, default: false
 
     # Ignore aliased fields in embedded documents when performing pluck and
     # distinct operations, for backwards compatibility.
-    option :broken_alias_handling, default: true
+    option :broken_alias_handling, default: false
 
     # Maintain broken `and' behavior when using the same operator on the same
     # field multiple times for backwards compatibility.
-    option :broken_and, default: true
+    option :broken_and, default: false
 
     # Use millisecond precision when comparing Time objects with the _matches?
     # function.
-    option :compare_time_by_ms, default: false
+    option :compare_time_by_ms, default: true
 
     # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
     # the one monkey-patched into Mongoid.
-    option :object_id_as_json_oid, default: true
+    option :object_id_as_json_oid, default: false
 
     # Maintain legacy behavior of pluck and distinct, which does not
     # demongoize the values on returning them.
-    option :legacy_pluck_distinct, default: true
+    option :legacy_pluck_distinct, default: false
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.

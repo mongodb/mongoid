@@ -18,6 +18,27 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Default Option Values Changed
+-----------------------------
+
+**Breaking change:** The following options have had their default values
+changed in Mongoid 7.5:
+
+- ``:broken_aggregables`` => ``false``
+- ``:broken_alias_handling`` => ``false``
+- ``:broken_and`` => ``false``
+- ``:broken_scoping`` => ``false``
+- ``:broken_updates`` => ``false``
+- ``:compare_time_by_ms`` => ``true``
+- ``:legacy_pluck_distinct`` => ``false``
+- ``:legacy_triple_equals`` => ``false``
+- ``:map_big_decimal_to_decimal128`` => ``true``
+- ``:object_id_as_json_oid`` => ``false``
+
+Please refer to :ref:`configuration option <configuration-options>` for
+the description and effects of each of these options.
+
+
 Order of Callback Invocation
 ----------------------------
 
