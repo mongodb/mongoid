@@ -797,7 +797,7 @@ describe Mongoid::Contextual::Mongo do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
         it "returns the distinct matching fields" do
-          expect(context.distinct("label.sales")).to eq([ "1E2" ])
+          expect(context.distinct("label.sales")).to eq([ BSON::Decimal128.new('1E+2') ])
         end
       end
 
