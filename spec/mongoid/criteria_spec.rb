@@ -3174,13 +3174,11 @@ describe Mongoid::Criteria do
       end
 
       context 'when fallbacks are enabled with a locale list' do
-        before(:all) do
-          puts "I18n version: #{I18n::VERSION}"
-
-          require "i18n/backend/fallbacks"
-          I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-
+        around(:all) do |example|
+          prev_fallbacks = I18n.fallbacks.dup
           I18n.fallbacks[:he] = [ :en ]
+          example.run
+          I18n.fallbacks = prev_fallbacks
         end
 
         let(:plucked) do
