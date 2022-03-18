@@ -92,6 +92,14 @@ module Mongoid
 
         private
 
+        # Retrieves the serializer for the given name. If the name exists in
+        # the serializers hash then return that immediately, otherwise
+        # recursively look through the relations and find the appropriate
+        # field.
+        #
+        # @param [ String ] name The name of the db field.
+        #
+        # @return [ Object ] The serializer.
         def get_serializer(name)
           if s = serializers[name]
             s
