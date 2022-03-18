@@ -230,7 +230,7 @@ module Mongoid
       @klass = klass
       @embedded = nil
       @none = nil
-      klass ? super(klass.aliased_fields, klass.fields) : super({}, {})
+      klass ? super(klass.aliased_fields, klass.fields, klass.relations) : super({}, {}, {})
     end
 
     # Merges another object with this +Criteria+ and returns a new criteria.

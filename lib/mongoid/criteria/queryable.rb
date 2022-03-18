@@ -60,10 +60,10 @@ module Mongoid
       # @param [ Hash ] aliases The optional field aliases.
       # @param [ Hash ] serializers The optional field serializers.
       # @param [ Symbol ] driver The driver being used.
-      def initialize(aliases = {}, serializers = {}, driver = :mongo)
+      def initialize(aliases = {}, serializers = {}, relations = {}, driver = :mongo)
         @aliases, @driver, @serializers = aliases, driver.to_sym, serializers
         @options = Options.new(aliases, serializers)
-        @selector = Selector.new(aliases, serializers)
+        @selector = Selector.new(aliases, serializers, relations)
         @pipeline = Pipeline.new(aliases)
         @aggregating = nil
         yield(self) if block_given?

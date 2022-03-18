@@ -3699,6 +3699,14 @@ describe Mongoid::Criteria do
         expect(dup_criteria.selector).to eq({ "_id" => _id })
       end
     end
+
+    context "when querying an embedded field" do
+      let(:criteria) { Band.where("label.name": 12345) }
+
+      it "mongoizes the embedded field in the selector" do
+        expect(criteria.selector).to eq("label.name" => "12345")
+      end
+    end
   end
 
   describe "#for_js" do

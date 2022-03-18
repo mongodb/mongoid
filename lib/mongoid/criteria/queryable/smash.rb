@@ -9,7 +9,7 @@ module Mongoid
 
         # @attribute [r] aliases The aliases.
         # @attribute [r] serializers The serializers.
-        attr_reader :aliases, :serializers
+        attr_reader :aliases, :serializers, :relations
 
         # Perform a deep copy of the smash.
         #
@@ -18,7 +18,7 @@ module Mongoid
         #
         # @return [ Smash ] The copied hash.
         def __deep_copy__
-          self.class.new(aliases, serializers) do |copy|
+          self.class.new(aliases, serializers, relations) do |copy|
             each_pair do |key, value|
               copy.store(key, value.__deep_copy__)
             end
@@ -36,8 +36,8 @@ module Mongoid
         #   responsible for serializing values. The keys of the hash must be
         #   strings that match the field name, and the values must respond to
         #   #localized? and #evolve(object).
-        def initialize(aliases = {}, serializers = {})
-          @aliases, @serializers = aliases, serializers
+        def initialize(aliases = {}, serializers = {}, relations = {})
+          @aliases, @serializers, @relations = aliases, serializers, relations
           yield(self) if block_given?
         end
 
@@ -87,7 +87,30 @@ module Mongoid
         def storage_pair(key)
           field = key.to_s
           name = aliases[field] || field
-          [ name, serializers[name] ]
+          [ name, get_serializer(name) ]
+        end
+
+        private
+
+        def get_serializer(name)
+          if s = serializers[name]
+            s
+          else
+            klass = nil
+            serializer = nil
+            name.split('.').each do |meth|
+              fs = klass ? klass.fields : serializers
+              if field = fs[meth]
+                serializer = field
+              else
+                rs = klass ? klass.relations : relations
+                if rel = rs[meth]
+                  klass = rel.klass
+                end
+              end
+            end
+            serializer
+          end
         end
       end
     end
