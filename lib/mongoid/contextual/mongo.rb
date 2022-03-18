@@ -708,7 +708,7 @@ module Mongoid
           if field = klass.fields[meth]
             field.demongoize(res)
           else
-            res
+            res.class.demongoize(res)
           end
         end
 
@@ -730,9 +730,9 @@ module Mongoid
           #      the current locale.
           #    - Otherwise, return the whole translations hash so the next method
           #      can select the language it wants.
-          # 3. Otherwise, fetch the value for the key meth. If the meth is an
-          #    _translations field, do not demongoize the value so the full
-          #    hash is returned.
+          # 3. If the meth is an _translations field, do not demongoize the
+          #    value so the full hash is returned.
+          # 4. Otherwise, fetch and demongoize the value for the key meth.
           if curr.is_a? Array
             res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
             res.empty? ? nil : res
@@ -742,12 +742,10 @@ module Mongoid
             else
               fetch_and_demongoize(curr, meth, k)
             end
+          elsif is_translation
+            curr.try(:fetch, meth, nil)
           else
-            if is_translation
-              curr.try(:fetch, meth, nil)
-            else
-              fetch_and_demongoize(curr, meth, k)
-            end
+            fetch_and_demongoize(curr, meth, k)
           end.tap do
             if as = k.try(:aliased_associations)
               if a = as.fetch(meth, nil)
