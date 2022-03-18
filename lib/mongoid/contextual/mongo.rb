@@ -720,7 +720,8 @@ module Mongoid
           #      can select the language it wants.
           # 3. Otherwise, execute the method on curr, or fetch the value for
           #    the key meth. The latter generally happens when the _translations
-          #    field is passed.
+          #    field is passed. If meth is an aliased association, change meth
+          #    to the real association name, so we get a Document and not a hash.
           if curr.is_a? Array
             res = curr.map { |x| x.try(meth) || x.try(:fetch, meth) }
             res.empty? ? nil : res
@@ -731,6 +732,11 @@ module Mongoid
               curr.try(meth)
             end
           else
+            if as = curr.try(:aliased_associations)
+              if a = as.fetch(meth, nil)
+                meth = a
+              end
+            end
             curr.try(meth) || curr.try(:fetch, meth)
           end
         end
@@ -748,6 +754,12 @@ module Mongoid
       def recursive_demongoize(field_name, value, is_translation)
         k = klass
         field_name.split('.').each do |meth|
+          if as = k.try(:aliased_associations)
+            if a = as.fetch(meth, nil)
+              meth = a.to_s
+            end
+          end
+
           if relation = k.relations[meth]
             k = relation.klass
           elsif field = k.fields[meth]

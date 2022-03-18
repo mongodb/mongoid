@@ -3206,6 +3206,62 @@ describe Mongoid::Criteria do
           end
         end
       end
+
+      context "when the localized field is embedded" do
+        before do
+          p = Passport.new
+          I18n.locale = :en
+          p.name = "Neil"
+          I18n.locale = :he
+          p.name = "Nissim"
+
+          Person.create!(passport: p, employer_id: 12345)
+        end
+
+        let(:plucked) do
+          Person.where(employer_id: 12345).pluck("pass.name").first
+        end
+
+        let(:plucked_translations) do
+          Person.where(employer_id: 12345).pluck("pass.name_translations").first
+        end
+
+        let(:plucked_translations_field) do
+          Person.where(employer_id: 12345).pluck("pass.name_translations.en").first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "returns the full hash embedded" do
+            expect(plucked).to eq({ "name" => { "en" => "Neil", "he" => "Nissim" } })
+          end
+
+          it "returns the empty hash" do
+            expect(plucked_translations).to eq({})
+          end
+
+          it "returns the empty hash" do
+            expect(plucked_translations_field).to eq({})
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "returns the translation for the current locale" do
+            expect(plucked).to eq("Nissim")
+          end
+
+          it "returns the full _translation hash" do
+            expect(plucked_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the translation for the requested locale" do
+            expect(plucked_translations_field).to eq("Neil")
+          end
+        end
+      end
     end
 
     context 'when plucking a field to be demongoized' do

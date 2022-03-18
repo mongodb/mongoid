@@ -1745,10 +1745,24 @@ describe Mongoid::Fields do
       end
     end
 
+    context "when cleansing dotted translation field as a symbol" do
+      let(:field_name) { "passport.name_translations.asd".to_sym }
+      it "returns the correct field name" do
+        expect(field).to eq("passport.name.asd")
+      end
+    end
+
     context "when cleansing dotted existing translation field" do
       let(:field_name) { "passport.localized_translations.asd" }
       it "returns the correct field name" do
         expect(field).to eq("passport.localized_translations.asd")
+      end
+    end
+
+    context "when cleansing aliased dotted translation field" do
+      let(:field_name) { "pass.name_translations.asd" }
+      it "returns the correct field name" do
+        expect(field).to eq("pass.name.asd")
       end
     end
   end

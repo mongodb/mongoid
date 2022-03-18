@@ -721,6 +721,70 @@ describe Mongoid::Contextual::Mongo do
           end
         end
       end
+
+      context "when the localized field is embedded" do
+        before do
+          p = Passport.new
+          I18n.locale = :en
+          p.name = "Neil"
+          I18n.locale = :he
+          p.name = "Nissim"
+
+          Person.create!(passport: p, employer_id: 12345)
+        end
+
+        let(:criteria) do
+          Person.where(employer_id: 12345)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let(:distinct) do
+          context.distinct("pass.name").first
+        end
+
+        let(:distinct_translations) do
+          context.distinct("pass.name_translations").first
+        end
+
+        let(:distinct_translations_field) do
+          context.distinct("pass.name_translations.en").first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "returns the full hash" do
+            expect(distinct).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the empty hash" do
+            expect(distinct_translations).to eq(nil)
+          end
+
+          it "returns the empty hash" do
+            expect(distinct_translations_field).to eq(nil)
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "returns the translation for the current locale" do
+            expect(distinct).to eq("Nissim")
+          end
+
+          it "returns the full _translation hash" do
+            expect(distinct_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the translation for the requested locale" do
+            expect(distinct_translations_field).to eq("Neil")
+          end
+        end
+      end
     end
 
     context "when getting an embedded field" do

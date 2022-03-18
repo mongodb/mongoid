@@ -93,7 +93,7 @@ module Mongoid
           ar = name.split('.')
           ar.each_with_index do |fn, i|
             key = fn
-            unless klass.fields.has_key?(fn) || klass.relations.has_key?(fn)
+            unless klass.fields.key?(fn) || klass.relations.key?(fn)
               if tr = fn.match(/(.*)_translations\z/)&.captures&.first
                 key = tr
               else
@@ -101,12 +101,12 @@ module Mongoid
               end
 
             end
-            res.push("#{key}")
+            res.push(key)
 
-            if klass.fields.has_key?(fn)
+            if klass.fields.key?(fn)
               res.push(ar.drop(i+1).join('.')) unless i == ar.length - 1
               break
-            elsif klass.relations.has_key?(fn)
+            elsif klass.relations.key?(fn)
               klass = klass.relations[key].klass
             end
           end
