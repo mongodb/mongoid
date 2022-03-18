@@ -717,6 +717,14 @@ module Mongoid
         k = klass
         meths = field_name.split('.')
         meths.each_with_index.inject(attrs) do |curr, (meth, i)|
+          is_translation = false
+          if !k.fields.key?(meth) && !k.relations.key?(meth)
+            if tr = meth.match(/(.*)_translations\z/)&.captures&.first
+              is_translation = true
+              meth = tr
+            end
+          end
+
           # 1. If curr is an array fetch from all elements in the array.
           # 2. If the field is localized, and is not an _translations field
           #    (_translations fields don't show up in the fields hash).
@@ -726,16 +734,7 @@ module Mongoid
           #      can select the language it wants.
           # 3. Otherwise, fetch the value for the key meth. If the meth is an
           #    _translations field, do not demongoize the value so the full
-          #    hash is returned
-
-          is_translation = false
-          if !k.fields.key?(meth) && !k.relations.key?(meth)
-            if tr = meth.match(/(.*)_translations\z/)&.captures&.first
-              is_translation = true
-              meth = tr
-            end
-          end
-
+          #    hash is returned.
           if curr.is_a? Array
             res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
             res.empty? ? nil : res
