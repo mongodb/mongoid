@@ -111,6 +111,7 @@ module Mongoid
               if field = fs[meth]
                 serializer = field
               else
+                serializer = nil
                 rs = klass ? klass.relations : relations
                 if rel = rs[meth]
                   klass = rel.klass
