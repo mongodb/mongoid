@@ -373,7 +373,7 @@ for details on driver options.
       # and will return embedded values themselves (i.e. without putting them
       # in a hash).
       # (default: true in Mongoid 7, will change to false in Mongoid 8)
-      legacy_pluck_distinct: true
+      #legacy_pluck_distinct: true
 
       # Maintain legacy behavior of === on Mongoid document classes, which
       # returns true in a number of cases where Ruby's === implementation would
