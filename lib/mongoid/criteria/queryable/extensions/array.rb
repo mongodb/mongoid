@@ -148,7 +148,7 @@ module Mongoid
               if object.is_a?(::Array)
                 object.map { |obj| obj.class.evolve(obj) }
               else
-                object.class.evolve(object)
+                object
               end
             end
           end
