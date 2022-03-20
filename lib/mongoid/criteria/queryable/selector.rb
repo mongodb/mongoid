@@ -139,8 +139,6 @@ module Mongoid
             evolve_hash(serializer, value)
           when Array
             evolve_array(serializer, value)
-          when Range
-            Range.evolve(value)
           else
             (serializer || value.class).evolve(value)
           end
