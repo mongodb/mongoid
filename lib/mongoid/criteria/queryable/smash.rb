@@ -8,8 +8,13 @@ module Mongoid
       class Smash < Hash
 
         # @attribute [r] aliases The aliases.
+        attr_reader :aliases
+
         # @attribute [r] serializers The serializers.
-        attr_reader :aliases, :serializers, :relations
+        attr_reader :serializers
+
+        # @attribute [r] associations The associations.
+        attr_reader :associations
 
         # Perform a deep copy of the smash.
         #
@@ -18,7 +23,7 @@ module Mongoid
         #
         # @return [ Smash ] The copied hash.
         def __deep_copy__
-          self.class.new(aliases, serializers, relations) do |copy|
+          self.class.new(aliases, serializers, associations) do |copy|
             each_pair do |key, value|
               copy.store(key, value.__deep_copy__)
             end
@@ -36,8 +41,8 @@ module Mongoid
         #   responsible for serializing values. The keys of the hash must be
         #   strings that match the field name, and the values must respond to
         #   #localized? and #evolve(object).
-        def initialize(aliases = {}, serializers = {}, relations = {})
-          @aliases, @serializers, @relations = aliases, serializers, relations
+        def initialize(aliases = {}, serializers = {}, associations = {})
+          @aliases, @serializers, @associations = aliases, serializers, associations
           yield(self) if block_given?
         end
 
@@ -94,7 +99,7 @@ module Mongoid
 
         # Retrieves the serializer for the given name. If the name exists in
         # the serializers hash then return that immediately, otherwise
-        # recursively look through the relations and find the appropriate
+        # recursively look through the associations and find the appropriate
         # field.
         #
         # @param [ String ] name The name of the db field.
@@ -112,7 +117,7 @@ module Mongoid
                 serializer = field
               else
                 serializer = nil
-                rs = klass ? klass.relations : relations
+                rs = klass ? klass.associations : associations
                 if rel = rs[meth]
                   klass = rel.klass
                 end

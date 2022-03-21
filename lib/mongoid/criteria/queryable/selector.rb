@@ -193,10 +193,7 @@ module Mongoid
         #
         # @return [ Range ] The serialized Range.
         def evolve_range(serializer, value)
-          hash = {}
-          hash['$gte'] = evolve(serializer, value.begin) if value.begin
-          hash[value.exclude_end? ? "$lt" : "$lte"] = evolve(serializer, value.end) if value.end
-          hash
+          value.__evolve_range__(serializer)
         end
 
         # Determines if the selection is a multi-select, like an $and or $or or $nor

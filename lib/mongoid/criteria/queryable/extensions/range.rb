@@ -44,12 +44,16 @@ module Mongoid
           #   (11231312..213123131).__evolve_range__
           #
           # @return [ Hash ] The $gte/$lte range query.
-          def __evolve_range__
+          def __evolve_range__(serializer = nil)
             __evolve_range_naive__.transform_values! do |value|
-              case value
-              when Time, DateTime then value.__evolve_time__
-              when Date then value.__evolve_date__
-              else value
+              if serializer
+                serializer.evolve(value)
+              else
+                case value
+                when Time, DateTime then value.__evolve_time__
+                when Date then value.__evolve_date__
+                else value
+                end
               end
             end
           end
