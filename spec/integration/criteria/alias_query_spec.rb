@@ -114,7 +114,7 @@ describe 'pluck on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['projection'].should == {'t' => 1}
+        command['projection'].should == {'t' => true}
       end
     end
 
@@ -126,7 +126,7 @@ describe 'pluck on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['projection'].should == {'phone_numbers.ext' => 1}
+        command['projection'].should == {'phone_numbers.ext' => true}
       end
     end
   end
@@ -142,7 +142,7 @@ describe 'pluck on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['projection'].should == {'t' => 1}
+        command['projection'].should == {'t' => true}
       end
     end
 
@@ -154,7 +154,7 @@ describe 'pluck on aliased fields' do
       it 'does not expand the alias' do
         query
 
-        command['projection'].should == {'phone_numbers.extension' => 1}
+        command['projection'].should == {'phone_numbers.extension' => true}
       end
     end
   end
