@@ -85,6 +85,17 @@ is deprecated.
      - Ruby 2.2
      - JRuby 9.2
 
+   * - 8.0
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+     -
+     - |checkmark|
+
    * - 7.4
      - |checkmark|
      - |checkmark|
@@ -193,6 +204,17 @@ and will be removed in a next version.
      - MongoDB 3.0
      - MongoDB 2.6
 
+   * - 8.0
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+     -
+     -
+
    * - 7.4
      - |checkmark|
      - |checkmark|
@@ -279,8 +301,13 @@ are supported by Mongoid.
      - Rails 6.0
      - Rails 5.2
      - Rails 5.1
-     - Rails 5.0
-     - Rails 4.2
+
+   * - 8.0
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - |checkmark| [#rails-5-ruby-3.0]_
 
    * - 7.4
      - |checkmark|
@@ -288,8 +315,6 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
      - |checkmark| [#rails-5-ruby-3.0]_
-     -
-     -
 
    * - 7.3
      - |checkmark| [#rails-7-Mongoid-7.3]_
@@ -297,8 +322,6 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
      - |checkmark| [#rails-5-ruby-3.0]_
-     -
-     -
 
    * - 7.2
      -
@@ -306,8 +329,6 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
      - |checkmark| [#rails-5-ruby-3.0]_
-     -
-     -
 
    * - 7.1
      -
@@ -315,8 +336,6 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     -
-     -
 
    * - 7.0
      -
@@ -324,70 +343,12 @@ are supported by Mongoid.
      - |checkmark| [#rails-6]_
      - |checkmark|
      - |checkmark|
-     -
-     -
 
    * - 6.4
      -
      -
      -
      - |checkmark|
-     - |checkmark|
-     -
-     -
-
-   * - 6.3
-     -
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     -
-     -
-
-   * - 6.2
-     -
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     -
-     -
-
-   * - 6.1
-     -
-     -
-     -
-     -
-     -
-     - |checkmark|
-     -
-
-   * - 6.0
-     -
-     -
-     -
-     -
-     -
-     - |checkmark|
-     -
-
-   * - 5.4
-     -
-     -
-     -
-     -
-     -
-     -
-     - |checkmark|
-
-   * - 5.2
-     -
-     -
-     -
-     -
-     -
-     -
      - |checkmark|
 
 .. [#rails-5-ruby-3.0] Using Rails 5.x with Ruby 3 is not supported.
