@@ -76,6 +76,42 @@ module Mongoid
         end
         nil
       end
+
+      # Removes the _translations from the given field name. This is done only
+      # when there doesn't already exist a field name or relation with the
+      # same name (i.e. with the _translations suffix). This check for an
+      # existing field is done recursively
+      #
+      # @param [ String | Symbol ] name The name of the field to cleanse.
+      #
+      # @return [ Field ] The field name without _translations
+      def cleanse_localized_field_names(name)
+        name = database_field_name(name.to_s)
+
+        klass = self
+        [].tap do |res|
+          ar = name.split('.')
+          ar.each_with_index do |fn, i|
+            key = fn
+            unless klass.fields.key?(fn) || klass.relations.key?(fn)
+              if tr = fn.match(/(.*)_translations\z/)&.captures&.first
+                key = tr
+              else
+                key = fn
+              end
+
+            end
+            res.push(key)
+
+            if klass.fields.key?(fn)
+              res.push(ar.drop(i+1).join('.')) unless i == ar.length - 1
+              break
+            elsif klass.relations.key?(fn)
+              klass = klass.relations[key].klass
+            end
+          end
+        end.join('.')
+      end
     end
 
     included do

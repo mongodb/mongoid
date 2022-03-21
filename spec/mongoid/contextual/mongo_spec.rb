@@ -478,72 +478,74 @@ describe Mongoid::Contextual::Mongo do
       Band.create!(name: "10,000 Maniacs", years: 20, sales: "1E2")
     end
 
-    context "when limiting the result set" do
+    with_config_values :legacy_pluck_distinct, true, false do
+      context "when limiting the result set" do
 
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns the distinct matching fields" do
+          expect(context.distinct(:name)).to eq([ "Depeche Mode" ])
+        end
       end
 
-      let(:context) do
-        described_class.new(criteria)
+      context "when not limiting the result set" do
+
+        let(:criteria) do
+          Band.criteria
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns the distinct field values" do
+          expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
+        end
       end
 
-      it "returns the distinct matching fields" do
-        expect(context.distinct(:name)).to eq([ "Depeche Mode" ])
-      end
-    end
+      context "when providing an aliased field" do
 
-    context "when not limiting the result set" do
+        let(:criteria) do
+          Band.criteria
+        end
 
-      let(:criteria) do
-        Band.criteria
-      end
+        let(:context) do
+          described_class.new(criteria)
+        end
 
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns the distinct field values" do
-        expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
-      end
-    end
-
-    context "when providing an aliased field" do
-
-      let(:criteria) do
-        Band.criteria
+        it "returns the distinct field values" do
+          expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
+        end
       end
 
-      let(:context) do
-        described_class.new(criteria)
-      end
+      context 'when a collation is specified' do
+        min_server_version '3.4'
 
-      it "returns the distinct field values" do
-        expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
-      end
-    end
+        before do
+          Band.create!(name: 'DEPECHE MODE')
+        end
 
-    context 'when a collation is specified' do
-      min_server_version '3.4'
+        let(:context) do
+          described_class.new(criteria)
+        end
 
-      before do
-        Band.create!(name: 'DEPECHE MODE')
-      end
+        let(:expected_results) do
+          ["10,000 Maniacs", "Depeche Mode", "New Order"]
+        end
 
-      let(:context) do
-        described_class.new(criteria)
-      end
+        let(:criteria) do
+          Band.where({}).collation(locale: 'en_US', strength: 2)
+        end
 
-      let(:expected_results) do
-        ["10,000 Maniacs", "Depeche Mode", "New Order"]
-      end
-
-      let(:criteria) do
-        Band.where({}).collation(locale: 'en_US', strength: 2)
-      end
-
-      it 'applies the collation' do
-        expect(context.distinct(:name).sort).to eq(expected_results.sort)
+        it 'applies the collation' do
+          expect(context.distinct(:name).sort).to eq(expected_results.sort)
+        end
       end
     end
 
@@ -583,6 +585,228 @@ describe Mongoid::Contextual::Mongo do
 
         it "returns the non-demongoized distinct field values" do
           expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
+        end
+      end
+    end
+
+    context "when getting a localized field" do
+      before do
+        I18n.locale = :en
+        d = Dictionary.create!(description: 'english-text')
+        I18n.locale = :de
+        d.description = 'deutsch-text'
+        d.save!
+      end
+
+      let(:criteria) do
+        Dictionary.criteria
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when getting the field without _translations" do
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "gets the full hash" do
+            expect(context.distinct(:description)).to eq([{ "de" => "deutsch-text", "en" => "english-text" }])
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "gets the demongoized localized field" do
+            expect(context.distinct(:description)).to eq([ 'deutsch-text' ])
+          end
+        end
+      end
+
+      context "when getting the field with _translations" do
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "gets an empty list" do
+            expect(context.distinct(:description_translations)).to eq([])
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "gets the full hash" do
+            expect(context.distinct(:description_translations)).to eq([ { "de" => "deutsch-text", "en" => "english-text" } ])
+          end
+        end
+      end
+
+      context 'when plucking a specific locale' do
+
+        let(:distinct) do
+          context.distinct(:'description.de')
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the specific translation' do
+            expect(distinct).to eq([ 'deutsch-text' ])
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the specific translation' do
+            expect(distinct).to eq([ "deutsch-text" ])
+          end
+        end
+      end
+
+      context 'when plucking a specific locale from _translations field' do
+
+        let(:distinct) do
+          context.distinct(:'description_translations.de')
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the empty list' do
+            expect(distinct).to eq([])
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the specific translations' do
+            expect(distinct).to eq(['deutsch-text'])
+          end
+        end
+      end
+
+      context 'when fallbacks are enabled with a locale list' do
+        require_fallbacks
+
+        around(:all) do |example|
+          prev_fallbacks = I18n.fallbacks.dup
+          I18n.fallbacks[:he] = [ :en ]
+          example.run
+          I18n.fallbacks = prev_fallbacks
+        end
+
+        let(:distinct) do
+          context.distinct(:description).first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "does not correctly use the fallback" do
+            distinct.should == {"de"=>"deutsch-text", "en"=>"english-text"}
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "correctly uses the fallback" do
+            I18n.locale = :en
+            d = Dictionary.create!(description: 'english-text')
+            I18n.locale = :he
+            distinct.should == "english-text"
+          end
+        end
+      end
+
+      context "when the localized field is embedded" do
+        before do
+          p = Passport.new
+          I18n.locale = :en
+          p.name = "Neil"
+          I18n.locale = :he
+          p.name = "Nissim"
+
+          Person.create!(passport: p, employer_id: 12345)
+        end
+
+        let(:criteria) do
+          Person.where(employer_id: 12345)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let(:distinct) do
+          context.distinct("pass.name").first
+        end
+
+        let(:distinct_translations) do
+          context.distinct("pass.name_translations").first
+        end
+
+        let(:distinct_translations_field) do
+          context.distinct("pass.name_translations.en").first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "returns the full hash" do
+            expect(distinct).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the empty hash" do
+            expect(distinct_translations).to eq(nil)
+          end
+
+          it "returns the empty hash" do
+            expect(distinct_translations_field).to eq(nil)
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "returns the translation for the current locale" do
+            expect(distinct).to eq("Nissim")
+          end
+
+          it "returns the full _translation hash" do
+            expect(distinct_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the translation for the requested locale" do
+            expect(distinct_translations_field).to eq("Neil")
+          end
+        end
+      end
+    end
+
+    context "when getting an embedded field" do
+
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(label: label) }
+      let(:criteria) { Band.where(_id: band.id) }
+      let(:context) { described_class.new(criteria) }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+        config_override :map_big_decimal_to_decimal128, true
+
+        it "returns the distinct matching fields" do
+          expect(context.distinct("label.sales")).to eq([ BSON::Decimal128.new('1E+2') ])
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+        it "returns the distinct matching fields" do
+          expect(context.distinct("label.sales")).to eq([ BigDecimal("1E2") ])
         end
       end
     end

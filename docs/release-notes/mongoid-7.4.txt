@@ -63,7 +63,7 @@ Mongoid 7.4 with ``Mongoid.legacy_triple_equals`` set to ``false`` behavior:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :members
   end
 
@@ -72,7 +72,7 @@ Mongoid 7.4 with ``Mongoid.legacy_triple_equals`` set to ``false`` behavior:
 
   class Member
     include Mongoid::Document
-    
+
     belongs_to :band
   end
 
@@ -90,10 +90,10 @@ Mongoid 7.4 with ``Mongoid.legacy_triple_equals`` set to ``false`` behavior:
 
   CoverBand === Band
   # => false
-  
+
   band.members === Array
   # => false
-  
+
   band.members === Mongoid::Association::Referenced::HasMany::Enumerable
   # => false
 
@@ -113,10 +113,10 @@ behavior:
 
   CoverBand === Band
   # => true
-  
+
   band.members === Array
   # => true
-  
+
   band.members === Mongoid::Association::Referenced::HasMany::Enumerable
   # => true
 
@@ -205,55 +205,6 @@ top-level models.
 The ``Mongoid.compare_time_by_ms`` option is set to ``false`` by default
 in Mongoid 7.4 for backwards compatibility. In Mongoid 8 the default value
 will change to ``true``.
-
-
-Respect Field Aliases In Embedded Documents When Using ``distinct`` And ``pluck``
----------------------------------------------------------------------------------
-
-When ``distinct`` and ``pluck`` are used with aliased fields in embedded
-documents, the aliases can be expanded if the ``Mongoid.broken_alias_handling``
-option is set to ``false``. By default, for backwards compatibility, in
-Mongoid 7.4 this option is set to true, yielding Mongoid 7.3 and earlier
-behavior. Given the following definitions:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    embeds_many :managers
-  end
-
-  class Manager
-    include Mongoid::Document
-    embedded_in :band
-
-    field :name, as: :n
-  end
-
-Mongoid 7.4 behavior with ``Mongoid.broken_alias_handling`` set to ``false``:
-
-.. code-block:: ruby
-
-  # Expands out to "managers.name" in the query:
-  Band.distinct('managers.n')
-  Band.pluck('managers.n')
-
-Mongoid 7.3 and 7.4 with ``Mongoid.broken_alias_handling`` set to ``true`` behavior:
-
-.. code-block:: ruby
-
-  # Sends "managers.n" without expanding the alias:
-  Band.distinct('managers.n')
-  Band.pluck('managers.n')
-
-.. note::
-
-  The alias expansion for top-level fields has already been done by Mongoid 7.3.
-
-.. note::
-
-  The value of ``Mongoid.broken_alias_handling`` option will change to ``false``
-  by default in Mongoid 8.0.
 
 
 ``count``, ``sum``, ``avg``, ``min``, ``max`` Ignore Sort If Not Limiting/Skipping
@@ -397,12 +348,64 @@ all scopes are cleared:
   by default in Mongoid 8.0.
 
 
-Demongoize Values Returned from Pluck and Distinct
---------------------------------------------------
+Changes to ``distinct`` and ``pluck``
+-------------------------------------
+
+Respect Field Aliases In Embedded Documents When Using ``distinct`` and ``pluck``
+`````````````````````````````````````````````````````````````````````````````````
+
+When ``distinct`` and ``pluck`` are used with aliased fields in embedded
+documents, the aliases can be expanded if the ``Mongoid.broken_alias_handling``
+option is set to ``false``. By default, for backwards compatibility, in
+Mongoid 7.4 this option is set to true, yielding Mongoid 7.3 and earlier
+behavior. Given the following definitions:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :managers
+  end
+
+  class Manager
+    include Mongoid::Document
+    embedded_in :band
+
+    field :name, as: :n
+  end
+
+Mongoid 7.4 behavior with ``Mongoid.broken_alias_handling`` set to ``false``:
+
+.. code-block:: ruby
+
+  # Expands out to "managers.n" in the query:
+  Band.distinct('managers.name')
+  Band.pluck('managers.name')
+
+Mongoid 7.3 and 7.4 with ``Mongoid.broken_alias_handling`` set to ``true`` behavior:
+
+.. code-block:: ruby
+
+  # Sends "managers.name" without expanding the alias:
+  Band.distinct('managers.name')
+  Band.pluck('managers.name')
+
+.. note::
+
+  The alias expansion for top-level fields has already been done by Mongoid 7.3.
+
+.. note::
+
+  The value of ``Mongoid.broken_alias_handling`` option will change to ``false``
+  by default in Mongoid 8.0.
+
+
+Demongoize Values Returned from ``pluck`` and ``distinct``
+``````````````````````````````````````````````````````````
 
 Mongoid 7.4 with the ``Mongoid.legacy_pluck_distinct`` option set to ``false``
-will demongoize values returned from the pluck and distinct methods.
-For example:
+will demongoize values returned from the ``pluck`` and ``distinct`` methods.
+Given the following definitions:
 
 .. code-block:: ruby
 
@@ -414,6 +417,11 @@ For example:
 
   Band.create!(sales: "1E2")
   Band.create!(sales: "2E2")
+
+Mongoid 7.4 behavior with ``Mongoid.legacy_pluck_distinct`` set to ``false``:
+
+.. code-block:: ruby
+
   Band.pluck(:sales)
   # => [0.1e3, 0.2e3]
   Band.distinct(:sales)
@@ -435,3 +443,95 @@ distinct methods will not be demongoized. For example:
 
   The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
   by default in Mongoid 8.0.
+
+Localized Fields with ``pluck`` and ``distinct``
+````````````````````````````````````````````````
+Mongoid 7.4 with the ``Mongoid.legacy_pluck_distinct`` option set to ``false``
+changes the behavior of using ``pluck`` and ``distinct`` with localized fields.
+Now, when retrieving a localized field using these methods, the translation for
+the current locale will be returned. To get the full translations hash the
+``_translations`` field can be used. Given the following definitions:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    field :name, localize: true
+  end
+
+  I18n.locale = :en
+  band = Band.create!(name: 'english-name')
+  I18n.locale = :de
+  band.name = 'deutsch-name'
+  band.save!
+
+Mongoid 7.4 behavior with ``Mongoid.legacy_pluck_distinct`` set to ``false``:
+
+.. code-block:: ruby
+
+  Band.pluck(:name)
+  # => ["deutsch-name"]
+  Band.pluck(:name_translations)
+  # => [{"en"=>"english-name", "de"=>"deutsch-name"}, {"en"=>"english-name", "de"=>"deutsch-name"}]
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.legacy_pluck_distinct``
+option set to ``true`` (the default), inputting a localized field returns the
+full translations hash. Inputting the ``_translations`` field will return ``nil``.
+For example:
+
+.. code-block:: ruby
+
+  Band.pluck(:name)
+  # => [{"en"=>"english-name", "de"=>"deutsch-name"}, {"en"=>"english-name", "de"=>"deutsch-name"}]
+  Band.pluck(:name_translations)
+  # => [nil, nil]
+
+.. note::
+
+  The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
+  by default in Mongoid 8.0.
+
+
+Embedded Fields with ``pluck``
+``````````````````````````````
+Mongoid 7.4 with the ``Mongoid.legacy_pluck_distinct`` option set to ``false``
+returns the embedded values themselves, i.e. not inside a hash. Given the
+following definitions:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    embeds_one :label
+  end
+
+  class Label
+    include Mongoid::Document
+
+    embedded_in :band
+    field :sales, type: BigDecimal
+  end
+
+Mongoid 7.4 behavior with ``Mongoid.legacy_pluck_distinct`` set to ``false``:
+
+.. code-block:: ruby
+
+  Band.pluck("label.sales")
+  # => [0.1e3]
+
+In Mongoid 7.3 and earlier, and in 7.4 with the ``Mongoid.legacy_pluck_distinct``
+option set to ``true`` (the default), plucking embedded attributes returns them
+inside a hash. For example:
+
+.. code-block:: ruby
+
+  Band.pluck("label.sales")
+  # => [{"sales"=>"1E2"}]
+
+.. note::
+
+  The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
+  by default in Mongoid 8.0.
+

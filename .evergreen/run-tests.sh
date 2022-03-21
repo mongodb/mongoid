@@ -99,7 +99,7 @@ set +e
 if test -n "$TEST_CMD"; then
   eval $TEST_CMD
 elif test -n "$TEST_I18N_FALLBACKS"; then
-  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
+  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb
 elif test -n "$APP_TESTS"; then
   # Need recent node for rails
   export N_PREFIX=$HOME/.n

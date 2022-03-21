@@ -5,6 +5,7 @@ class Label
   include Mongoid::Timestamps::Updated::Short
 
   field :name, type: String
+  field :sales, type: BigDecimal
   field :after_create_called, type: Mongoid::Boolean, default: false
   field :after_save_called, type: Mongoid::Boolean, default: false
   field :after_update_called, type: Mongoid::Boolean, default: false

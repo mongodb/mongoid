@@ -34,6 +34,7 @@ class Person
   field :i, as: :inte, type: Integer
   field :a, as: :array, type: Array
   field :desc, localize: true
+  field :localized_translations, localize: true
   field :test_array, type: Array
   field :overridden_setter, type: String
   field :arrays, type: Array

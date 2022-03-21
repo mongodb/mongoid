@@ -368,7 +368,10 @@ for details on driver options.
 
       # Maintain legacy behavior of pluck and distinct, which does not demongoize
       # values on returning them. Setting this option to false will cause
-      # pluck and distinct to return demongoized values.
+      # pluck and distinct to return demongoized values. Setting this option to
+      # false will also allow retrieving *_translations fields from pluck and
+      # distinct and will return embedded values themselves (i.e. without
+      # putting them in a hash).
       # (default: false)
       #legacy_pluck_distinct: true
 
