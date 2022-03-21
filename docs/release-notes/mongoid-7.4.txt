@@ -371,17 +371,17 @@ Mongoid 7.4 behavior with ``Mongoid.broken_alias_handling`` set to ``false``:
 
 .. code-block:: ruby
 
-  # Expands out to "managers.name" in the query:
-  Band.distinct('managers.n')
-  Band.pluck('managers.n')
+  # Expands out to "managers.n" in the query:
+  Band.distinct('managers.name')
+  Band.pluck('managers.name')
 
 Mongoid 7.3 and 7.4 with ``Mongoid.broken_alias_handling`` set to ``true`` behavior:
 
 .. code-block:: ruby
 
-  # Sends "managers.n" without expanding the alias:
-  Band.distinct('managers.n')
-  Band.pluck('managers.n')
+  # Sends "managers.name" without expanding the alias:
+  Band.distinct('managers.name')
+  Band.pluck('managers.name')
 
 .. note::
 
@@ -441,7 +441,7 @@ Localized Fields with ``pluck`` and ``distinct``
 ````````````````````````````````````````````````
 Mongoid 7.4 with the ``Mongoid.legacy_pluck_distinct`` option set to ``false``
 changes the behavior of using ``pluck`` and ``distinct`` with localized fields.
-Now when inputting a localized field into these functions, the translation for
+Now, when retrieving a localized field using these methods, the translation for
 the current locale will be returned. To get the full translations hash the
 ``_translations`` field can be used. Given the following definitions:
 

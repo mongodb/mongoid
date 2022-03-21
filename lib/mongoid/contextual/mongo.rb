@@ -428,16 +428,16 @@ module Mongoid
       def pluck(*fields)
         # Multiple fields can map to the same field name. For example, plucking
         # a field and its _translations field map to the same field in the database.
-        # because of this, we need to keep track of the fields inputted.
+        # because of this, we need to keep track of the fields requested.
         normalized_field_names = []
         normalized_select = fields.inject({}) do |hash, f|
           db_fn = klass.database_field_name(f)
           normalized_field_names.push(db_fn)
 
           if Mongoid.legacy_pluck_distinct
-            hash[db_fn] = 1
+            hash[db_fn] = true
           else
-            hash[klass.cleanse_localized_field_names(f)] = 1
+            hash[klass.cleanse_localized_field_names(f)] = true
           end
           hash
         end
@@ -445,7 +445,7 @@ module Mongoid
         view.projection(normalized_select).reduce([]) do |plucked, doc|
           values = normalized_field_names.map do |n|
             if Mongoid.legacy_pluck_distinct
-              n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
+              n.include?('.') ? doc[n.partition('.')[0]] : doc[n]
             else
               extract_value(doc, n)
             end
@@ -701,7 +701,7 @@ module Mongoid
       # @param [ Hash ] attrs The attributes hash.
       # @param [ String ] field_name The name of the field to extract.
       #
-      # @param [ Any ] The value for the given field name
+      # @param [ Object ] The value for the given field name
       def extract_value(attrs, field_name)
         def fetch_and_demongoize(d, meth, klass)
           res = d.try(:fetch, meth, nil)
@@ -764,11 +764,11 @@ module Mongoid
       # the class tree to find the correct field to use to demongoize the value.
       #
       # @param [ String ] field_name The name of the field to demongoize.
-      # @param [ Any ] value The value to demongoize.
+      # @param [ Object ] value The value to demongoize.
       # @param [ Boolean ] is_translation The field we are retrieving is an
       #   _translations field.
       #
-      # @return [ Any ] The demongoized value.
+      # @return [ Object ] The demongoized value.
       def recursive_demongoize(field_name, value, is_translation)
         k = klass
         field_name.split('.').each do |meth|
