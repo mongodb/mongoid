@@ -18,6 +18,13 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Support for MongoDB 3.4 and Earlier Servers Dropped
+---------------------------------------------------
+
+Mongoid 8 requires MongoDB 3.6 or newer. Earlier server versions are not
+supported.
+
+
 Default Option Values Changed
 -----------------------------
 
