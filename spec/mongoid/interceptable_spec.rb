@@ -5,6 +5,14 @@ require_relative './interceptable_spec_models'
 
 describe Mongoid::Interceptable do
 
+  before do
+    # The find and initialize callbacks I added were causing failures
+    # because they were causing updates when we were asserting no updates
+    # happened.
+    Label.reset_callbacks(:initialize)
+    Label.reset_callbacks(:find)
+  end
+
   class TestClass
     include Mongoid::Interceptable
 
