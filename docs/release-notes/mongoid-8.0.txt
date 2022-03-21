@@ -1,5 +1,5 @@
 ***********
-Mongoid 7.5
+Mongoid 8.0
 ***********
 
 .. default-domain:: mongodb
@@ -10,7 +10,7 @@ Mongoid 7.5
    :depth: 2
    :class: singlecol
 
-This page describes significant changes and improvements in Mongoid 7.5.
+This page describes significant changes and improvements in Mongoid 8.0.
 The complete list of releases is available `on GitHub
 <https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
 <https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
@@ -22,7 +22,7 @@ Default Option Values Changed
 -----------------------------
 
 **Breaking change:** The following options have had their default values
-changed in Mongoid 7.5:
+changed in Mongoid 8.0:
 
 - ``:broken_aggregables`` => ``false``
 - ``:broken_alias_handling`` => ``false``
@@ -42,13 +42,13 @@ the description and effects of each of these options.
 Order of Callback Invocation
 ----------------------------
 
-**Breaking change:** Mongoid 7.5 changes the order of _create and _save callback
+**Breaking change:** Mongoid 8.0 changes the order of _create and _save callback
 invocation for documents with associations.
 
 Referenced associations (``has_one`` and ``has_many``):
 
 +---------------------------------------+---------------------------------------+
-| Mongoid 7.5                           | Mongoid 7.4                           |
+| Mongoid 8.0                           | Mongoid 7                             |
 +=======================================+=======================================+
 | Parent :before_save                   | Parent :before_save                   |
 +---------------------------------------+---------------------------------------+
@@ -94,7 +94,7 @@ Referenced associations (``has_one`` and ``has_many``):
 Embedded associations (``embeds_one`` and ``embeds_many``):
 
 +---------------------------------------+---------------------------------------+
-| Mongoid 7.5                           | Mongoid 7.4                           |
+| Mongoid 8.0                           | Mongoid 7                             |
 +=======================================+=======================================+
 | Parent :before_save                   | Child :before_save                    |
 +---------------------------------------+---------------------------------------+
@@ -150,7 +150,7 @@ conditions were provided, and the criteria already had an ``$or`` operator,
 the new conditions would be added to the existing ``$or`` as an additional
 branch.
 
-Mongoid 7.5 behavior:
+Mongoid 8.0 behavior:
 
 .. code-block:: ruby
 
@@ -172,7 +172,7 @@ Mongoid 7.5 behavior:
   #   class:    Band
   #   embedded: false>
 
-Mongoid 7.4 behavior:
+Mongoid 7 behavior:
 
 .. code-block:: ruby
 
@@ -218,7 +218,7 @@ in ``after_*`` callbacks. This follows ActiveRecord/ActiveModel behavior.
   a.age = 2
   a.save!
 
-Mongoid 7.5 output:
+Mongoid 8.0 output:
 
 .. code-block:: ruby
 
@@ -226,12 +226,12 @@ Mongoid 7.5 output:
   2
 
 
-Mongoid 7.4 output:
+Mongoid 7 output:
 
 .. code-block:: ruby
 
   #<Cat _id: 60aef1652c97a617438dc9bb, age: 2>
   nil
 
-Notice that in 7.4 ``attribute_was(:age)`` returns the old attribute value,
-while in 7.5 ``attribute_was(:age)`` returns the new value.
+Notice that in 7 ``attribute_was(:age)`` returns the old attribute value,
+while in 8.0 ``attribute_was(:age)`` returns the new value.
