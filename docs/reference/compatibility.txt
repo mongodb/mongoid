@@ -33,7 +33,7 @@ specified Mongoid versions.
      - Driver 2.17-2.10
      - Driver 2.9-2.7
 
-   * - 7.5
+   * - 8.0
      - |checkmark|
      -
 
