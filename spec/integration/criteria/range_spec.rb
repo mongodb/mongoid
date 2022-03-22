@@ -302,5 +302,29 @@ describe 'Queries with Range criteria' do
         end
       end
     end
+
+    context 'Range<Integer> criteria vs Array<Integer>' do
+      let!(:band6) { Band.create!(genres: [12, 16]) }
+
+      it 'returns objects within the range' do
+        expect(Band.where("genres" => 10..18).to_a).to eq [band6]
+      end
+
+      it "does not return objects out of range" do
+        expect(Band.where("genres" => 13..14).to_a).to eq []
+      end
+    end
+
+    context 'Range<Integer> criteria vs Array<Hash<Integer>>' do
+      let!(:band6) { Band.create!(genres: [{x: 12}, {x: 16}]) }
+
+      it 'returns objects within the range' do
+        expect(Band.where("genres.x" => 10..18).to_a).to eq [band6]
+      end
+
+      it "does not return objects out of range" do
+        expect(Band.where("genres.x" => 13..14).to_a).to eq []
+      end
+    end
   end
 end
