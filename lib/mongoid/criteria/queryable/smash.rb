@@ -109,21 +109,7 @@ module Mongoid
           if s = serializers[name]
             s
           else
-            klass = nil
-            serializer = nil
-            name.split('.').each do |meth|
-              fs = klass ? klass.fields : serializers
-              if field = fs[meth]
-                serializer = field
-              else
-                serializer = nil
-                rs = klass ? klass.associations : associations
-                if rel = rs[meth]
-                  klass = rel.klass
-                end
-              end
-            end
-            serializer
+            Fields.traverse_association_tree(name, serializers, associations)
           end
         end
       end
