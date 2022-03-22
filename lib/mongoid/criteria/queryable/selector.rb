@@ -156,7 +156,7 @@ module Mongoid
           when Array
             evolve_array(serializer, value)
           when Range
-            value.__evolve_range__(serializer)
+            value.__evolve_range__(serializer: serializer)
           else
             (serializer || value.class).evolve(value)
           end
@@ -223,7 +223,7 @@ module Mongoid
         #        }
         #
         # (3) This is the easy part. This is calculated by
-        #     value.__evolve_range__(serializer).
+        #     value.__evolve_range__(serializer: serializer).
         #
         # @api private
         #
@@ -233,7 +233,7 @@ module Mongoid
         #
         # @return [ Array<String, Hash> ] The store name and serialized Range.
         def evolve_range(key, serializer, value)
-          v = value.__evolve_range__(serializer)
+          v = value.__evolve_range__(serializer: serializer)
           rels = []
           Fields.traverse_association_tree(key, serializers, associations) do |meth, obj, is_field|
             rels.push([meth, obj, is_field])

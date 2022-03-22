@@ -4131,6 +4131,21 @@ describe Mongoid::Criteria do
           )
         end
       end
+
+      context "when there are multiple conditions" do
+        let(:criteria) do
+          Band.where("$or" => [{"labels" => 10..15}, {labels: 8}])
+        end
+
+        it "correctly combines the conditions" do
+          expect(criteria.selector).to eq("$or" => [
+            { "labels" => {
+              "$elemMatch" => {"$gte" => 10, "$lte" => 15}
+              } },
+            { "labels" => 8 }
+          ])
+        end
+      end
     end
   end
 
