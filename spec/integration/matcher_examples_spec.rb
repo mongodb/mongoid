@@ -688,8 +688,16 @@ describe 'Matcher' do
           band.records.where(producers: 100..200).first
         end
 
-        it 'finds' do
+        let(:no_record) do
+          band.records.where(producers: 199..200).first
+        end
+
+        it 'finds correctly' do
           expect(found_record).to eq(record)
+        end
+
+        it "does not find correctly" do
+          expect(no_record).to eq(nil)
         end
       end
     end
