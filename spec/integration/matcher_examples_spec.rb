@@ -669,14 +669,13 @@ describe 'Matcher' do
           expect(found_band).to eq(band)
         end
 
-        # https://jira.mongodb.org/browse/MONGOID-4911
         context 'no match' do
 
-        let!(:band) do
-          Band.create!(records: [
-            Record.new(producers: [50]),
-          ])
-        end
+          let!(:band) do
+            Band.create!(records: [
+              Record.new(producers: [50, 250]),
+            ])
+          end
 
           it 'does not find' do
             expect(found_band).to be nil
