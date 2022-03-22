@@ -193,7 +193,7 @@ module Mongoid
         #
         # @return [ Range ] The serialized Range.
         def evolve_range(serializer, value)
-          value.__evolve_range__(serializer)
+          value.__evolve_range__(serializer: serializer)
         end
 
         # Determines if the selection is a multi-select, like an $and or $or or $nor

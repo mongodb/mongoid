@@ -46,7 +46,7 @@ module Mongoid
           # @param [ Object ] serializer The optional serializer for the field.
           #
           # @return [ Hash ] The $gte/$lte range query.
-          def __evolve_range__(serializer = nil)
+          def __evolve_range__(serializer: nil)
             __evolve_range_naive__.transform_values! do |value|
               if serializer
                 serializer.evolve(value)
