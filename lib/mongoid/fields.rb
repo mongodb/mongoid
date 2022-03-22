@@ -270,6 +270,48 @@ module Mongoid
       def options
         @options ||= {}
       end
+
+      # Traverse down the association tree and search for the field for the
+      # given key. To do this, split the key by '.' and for each part (meth) of
+      # the key:
+      #
+      # - If the meth is a field, yield the meth, field, and is_field as true.
+      # - If the meth is a association, update the klass to the associations klass,
+      #   and yield the meth, klass, and is_field as false.
+      #
+      # The next iteration will use klass's fields and associations to continue
+      # traversing the tree.
+      #
+      # @param [ String ] key The key used to search the association tree.
+      # @param [ Hash ] fields The fields to begin the search with.
+      # @param [ Hash ] associations The associations to beging the search with.
+      # @param [ Proc ] block The block takes in three paramaters, the current
+      #   meth, the field or the relation, and whether the second parameter is a
+      #   field or not.
+      #
+      # @return [ Field ] The field found for the given key at the end of the
+      #   search. This will return nil if the last thing found is an association
+      #   or no field was found for the given key.
+      def traverse_association_tree(key, fields, associations)
+        klass = nil
+        field = nil
+        key.split('.').each do |meth|
+          fs = klass ? klass.fields : fields
+          rs = klass ? klass.relations : associations
+
+          field = nil
+          if f = fs[meth]
+            field = f
+            yield(meth, f, true) if block_given?
+          elsif rel = rs[meth]
+            klass = rel.klass
+            yield(meth, rel, false) if block_given?
+          else
+            yield(meth, nil, false) if block_given?
+          end
+        end
+        field
+      end
     end
 
     module ClassMethods

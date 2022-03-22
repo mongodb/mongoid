@@ -10,4 +10,6 @@ end
 class Deepest
   include Mongoid::Document
   embedded_in :code
+
+  field :array, type: Array
 end

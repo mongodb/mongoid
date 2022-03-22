@@ -53,8 +53,7 @@ module Mongoid
             store_name = name
             store_value = evolve_multi(value)
           else
-            store_name = localized_key(name, serializer)
-            store_value = evolve(serializer, value)
+            store_name, store_value = store_creds(name, serializer, value)
           end
           super(store_name, store_value)
         end
@@ -73,6 +72,24 @@ module Mongoid
         end
 
         private
+
+        # Get the store name and store value. If the value is of type range,
+        # we need may need to change the store_name as well as the store_value,
+        # therefore, we cannot just use the evole method.
+        #
+        # @param [ String ] name The name of the field.
+        # @param [ Object ] serializer The optional serializer for the field.
+        # @param [ Object ] value The value to serialize.
+        #
+        # @return [ Array<String, String> ] The store name and store value.
+        def store_creds(name, serializer, value)
+          store_name = localized_key(name, serializer)
+          if Range === value
+            evolve_range(store_name, serializer, value)
+          else
+            [ store_name, evolve(serializer, value) ]
+          end
+        end
 
         # Evolves a multi-list selection, like an $and or $or criterion, and
         # performs the necessary serialization.
@@ -103,11 +120,10 @@ module Mongoid
               # some reason, although per its documentation Smash supposedly
               # owns both.
               name, serializer = storage_pair(key)
-              final_key = localized_key(name, serializer)
               # This performs type conversions on the value and transformations
               # that depend on the type of the field that the value is stored
               # in, but not transformations that have to do with query shape.
-              evolved_value = evolve(serializer, value)
+              final_key, evolved_value = store_creds(name, serializer, value)
 
               # This builds a query shape around the value, when the query
               # involves complex keys. For example, {:foo.lt => 5} produces
@@ -140,7 +156,7 @@ module Mongoid
           when Array
             evolve_array(serializer, value)
           when Range
-            evolve_range(serializer, value)
+            value.__evolve_range__(serializer)
           else
             (serializer || value.class).evolve(value)
           end
@@ -184,16 +200,70 @@ module Mongoid
           end
         end
 
-        # Evolve a single key selection with range values.
+        # Evolve a single key selection with range values. This method traverses
+        # the association tree to build a query for the given key.
+        # There are three parts to the query here:
         #
+        # (1) "klass.child.gchild" => {
+        #       "$elemMatch" => {
+        #     (2) "ggchild.field" => (3) { "$gte" => 6, "$lte" => 10 }
+        #       }
+        #     }
+        # (1) The first n fields are dotted together until the last
+        #     embeds_many or field of type array. In the above case, gchild
+        #     would be an embeds_many, and ggchild would be an embeds_one or
+        #     a hash.
+        # (2) The last fields are used inside the $elemMatch. This one is
+        #     actually optional, and will be ignored if the last field is
+        #     an array. If the last field is an array (1), (2) and (3) will
+        #     look like:
+        #
+        #        "klass.child.gchild.ggchild.field" => {
+        #          { "$elemMatch" => { "$gte" => 6, "$lte" => 10 } }
+        #        }
+        #
+        # (3) This is the easy part. This is calculated by
+        #     value.__evolve_range__(serializer).
+        #
+        # @api private
+        #
+        # @param [ String ] key The to store the range for.
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Range ] value The Range to serialize.
         #
-        # @return [ Range ] The serialized Range.
-        #
-        # @api private
-        def evolve_range(serializer, value)
-          value.__evolve_range__(serializer: serializer)
+        # @return [ Array<String, Hash> ] The store name and serialized Range.
+        def evolve_range(key, serializer, value)
+          v = value.__evolve_range__(serializer)
+          rels = []
+          Fields.traverse_association_tree(key, serializers, associations) do |meth, obj, is_field|
+            rels.push([meth, obj, is_field])
+          end
+
+          # Iterate backwards until you get a field with type
+          # Array or an embeds_many association.
+          inner_key = ""
+          loop do
+            # If there are no arrays or embeds_many associations, just return
+            # the key and value without $elemMatch.
+            return [ key, v ] if rels.empty?
+
+            meth, obj, is_field = rels.last
+            break if (is_field && obj.type == Array) || (!is_field && obj.is_a?(Association::Embedded::EmbedsMany))
+
+            rels.pop
+            inner_key = "#{meth}.#{inner_key}"
+          end
+
+          # If the last array or embeds_many association is the last field,
+          # the inner key (2) will be ignored, and the other fields are
+          # dotted together for the outer key.
+          if inner_key.blank?
+            [ key, { "$elemMatch" => v }]
+          else
+            store_key = rels.map(&:first).join('.')
+            store_value = { "$elemMatch" => { inner_key.chop => v } }
+            [ store_key,  store_value ]
+          end
         end
 
         # Determines if the selection is a multi-select, like an $and or $or or $nor
