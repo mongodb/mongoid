@@ -43,6 +43,8 @@ module Mongoid
           # @example Evolve the range.
           #   (11231312..213123131).__evolve_range__
           #
+          # @param [ Object ] serializer The optional serializer for the field.
+          #
           # @return [ Hash ] The $gte/$lte range query.
           def __evolve_range__(serializer = nil)
             __evolve_range_naive__.transform_values! do |value|
