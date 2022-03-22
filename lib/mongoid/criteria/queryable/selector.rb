@@ -186,12 +186,12 @@ module Mongoid
 
         # Evolve a single key selection with range values.
         #
-        # @api private
-        #
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Range ] value The Range to serialize.
         #
         # @return [ Range ] The serialized Range.
+        #
+        # @api private
         def evolve_range(serializer, value)
           value.__evolve_range__(serializer: serializer)
         end
