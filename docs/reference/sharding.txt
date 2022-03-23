@@ -41,7 +41,7 @@ advantage of.
 
 Mongoid supports two syntaxes for declaring shard keys. The standard syntax
 follows the format of MongoDB `shardCollection shell helper
-<https://docs.mongodb.com/manual/reference/method/sh.shardCollection/#sh.shardCollection>`_
+<https://mongodb.com/docs/manual/reference/method/sh.shardCollection/#sh.shardCollection>`_
 and allows specifying ranged and hashed shard keys, compound shard keys and
 collection sharding options:
 
@@ -125,5 +125,5 @@ sharding collections:
   sharding collections as described in this document, or creating or dropping
   collections or databases, cluster nodes may end up with out of date local
   configuration-related cache data. Execute the `flushRouterConfig
-  <https://docs.mongodb.com/manual/reference/command/flushRouterConfig/>`_
+  <https://mongodb.com/docs/manual/reference/command/flushRouterConfig/>`_
   command on each ``mongos`` node to clear these caches.

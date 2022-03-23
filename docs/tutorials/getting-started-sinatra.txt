@@ -66,7 +66,7 @@ Run MongoDB Locally
 -------------------
 
 To develop locally with MongoDB, `download and install MongoDB
-<https://docs.mongodb.com/manual/installation/>`_.
+<https://mongodb.com/docs/manual/installation/>`_.
 
 Once MongoDB is installed and running, create a file named ``config/mongoid.yml``
 pointing to your deployment. For example, if you launched a standalone
@@ -89,7 +89,7 @@ Use MongoDB Atlas
 
 Instead of downloading, installing and running MongoDB locally, you can create
 a free MongoDB Atlas account and create a `free MongoDB cluster in Atlas
-<https://docs.mongodb.com/manual/tutorial/atlas-free-tier-setup/>`_.
+<https://mongodb.com/docs/manual/tutorial/atlas-free-tier-setup/>`_.
 Once the cluster is created, follow the instructions in `connect to the cluster
 page <https://docs.atlas.mongodb.com/connect-to-cluster/#connect-to-a-cluster>`_
 to obtain the URI. Use the *Ruby driver 2.5 or later* format.

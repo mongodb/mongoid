@@ -402,7 +402,7 @@ Mongoid query cache. If you plan to use the query cache, it is recommended
 that you upgrade to driver version 2.14.
 
 To read more about the query cache improvements made in the driver, see
-`the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_.
+`the Ruby driver documentation <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_.
 
 To read more about using the query cache with Mongoid and the limitations
 of the legacy query cache, see :ref:`the query cache documentation <query-cache>`.
@@ -424,13 +424,13 @@ Example Mongoid 7.2 behavior:
 
   class Offer
     include Mongoid::Document
-    
+
     field :constraint, type: Regexp
   end
-  
+
   offer = Offer.create!(constraint: /foo/)
   # => #<Offer _id: 6082df412c97a66be6ba9970, constraint: /foo/>
-  
+
   Offer.collection.aggregate([
     {'$match' => {_id: offer.id}},
     {'$set' => {type: {'$type' => '$constraint'}}},
@@ -441,7 +441,7 @@ Example Mongoid 7.2 behavior:
 
   offer = Offer.create!(constraint: 'foo')
   # => #<Offer _id: 6082df412c97a66be6ba9971, constraint: /foo/>
-  
+
   Offer.collection.aggregate([
     {'$match' => {_id: offer.id}},
     {'$set' => {type: {'$type' => '$constraint'}}},
@@ -456,7 +456,7 @@ Mongoid 7.1 behavior with the same model class:
 
   offer = Offer.create!(constraint: /foo/)
   # => #<Offer _id: 6082e0182c97a66c21e3f721, constraint: /foo/>
-  
+
   Offer.collection.aggregate([
     {'$match' => {_id: offer.id}},
     {'$set' => {type: {'$type' => '$constraint'}}},
@@ -467,7 +467,7 @@ Mongoid 7.1 behavior with the same model class:
 
   offer = Offer.create!(constraint: 'foo')
   # => #<Offer _id: 6082e05c2c97a66c21e3f723, constraint: "foo">
-  
+
   Offer.collection.aggregate([
     {'$match' => {_id: offer.id}},
     {'$set' => {type: {'$type' => '$constraint'}}},

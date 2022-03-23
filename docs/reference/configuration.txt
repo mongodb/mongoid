@@ -117,7 +117,7 @@ The following annotated example ``mongoid.yml`` demonstrates how Mongoid
 can be configured.
 
 Mongoid delegates to the Ruby driver for client configuration. Please review
-`the driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/>`_
+`the driver documentation <https://mongodb.com/docs/ruby-driver/current/reference/create-client/>`_
 for details on driver options.
 
 .. code-block:: yaml
@@ -143,7 +143,7 @@ for details on driver options.
           - myhost3.mydomain.com:27017
         options:
           # These options are Ruby driver options, documented in
-          # https://docs.mongodb.com/ruby-driver/current/reference/create-client/
+          # https://mongodb.com/docs/ruby-driver/current/reference/create-client/
 
           # Change the default write concern. (default = { w: 1 })
           write:
@@ -177,10 +177,10 @@ for details on driver options.
           # Specify the auth source, i.e. the database or other source which
           # contains the user's login credentials. Allowed values for auth source
           # depend on the authentication mechanism, as explained in the server documentation:
-          # https://docs.mongodb.com/manual/reference/connection-string/#mongodb-urioption-urioption.authSource
+          # https://mongodb.com/docs/manual/reference/connection-string/#mongodb-urioption-urioption.authSource
           # If no auth source is specified, the default auth source as
           # determined by the driver will be used. Please refer to:
-          # https://docs.mongodb.com/ruby-driver/current/reference/authentication/#auth-source
+          # https://mongodb.com/docs/ruby-driver/current/reference/authentication/#auth-source
           auth_source: admin
 
           # Connect directly to and perform all operations on the specified
@@ -723,7 +723,7 @@ be executed sequentially during socket creation.
   in an application.
 
 For more information about TLS context hooks, including best practices for
-assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/reference/create-client/#modifying-sslcontext>`_.
+assigning and removing them, see `the Ruby driver documentation <https://mongodb.com/docs/ruby-driver/current/reference/create-client/#modifying-sslcontext>`_.
 
 Usage with Forking Servers
 ==========================
