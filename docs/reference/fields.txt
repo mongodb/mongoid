@@ -1169,7 +1169,7 @@ dots and dollars entirely.
 
 As further explanation, the MongoDB Query Language (MQL) reserves the dot
 character as a delimiter to traverse field names in embedded documents
-(example: ``addresses.geocode.latitude``) and uses the dollar character
+(example: ``addresses.geocode.latitude``) and reserves the dollar character
 (``$``) to denote operators (example: ``"$and", "$or", "$in"``). Prior to
 MongoDB 5.0, MongoDB drivers prohibited inserting and querying on field names
 containing dots and dollars. Beginning in MongoDB 5.0, the database supports
@@ -1177,8 +1177,9 @@ containing dots and dollars. Beginning in MongoDB 5.0, the database supports
 <https://docs.mongodb.com/manual/core/dot-dollar-considerations/#std-label-crud-concepts-dot-dollar-considerations>`_
 to insert and query on dot and dollar fields.
 
-The required Ruby driver changes to support these methods `have not yet been implemented
-<https://jira.mongodb.org/browse/RUBY-2528>`. Even if Ruby driver support is added,
-Mongoid's query DSL relies on MQL's existing usage of dot and dollar symbols and
-would not be able to add robust support in a non-conflicting manner. Hence Mongoid
-does not plan to support for dot and dollar fields in the near future.
+The required Ruby driver changes to support these special helper methods
+`have not yet been implemented <https://jira.mongodb.org/browse/RUBY-2528>`.
+Even if Ruby driver support is added, Mongoid's query DSL relies on MQL's
+aforementioned usage of dot and dollar symbols and would not be able to add
+robust support without conflict. Hence Mongoid does not plan to support for
+dot and dollar fields in the near future.
