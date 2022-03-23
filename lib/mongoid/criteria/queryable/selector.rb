@@ -139,6 +139,8 @@ module Mongoid
             evolve_hash(serializer, value)
           when Array
             evolve_array(serializer, value)
+          when Range
+            evolve_range(serializer, value)
           else
             (serializer || value.class).evolve(value)
           end
@@ -180,6 +182,18 @@ module Mongoid
               value[operator] = evolve(serializer, _value)
             end
           end
+        end
+
+        # Evolve a single key selection with range values.
+        #
+        # @param [ Object ] serializer The optional serializer for the field.
+        # @param [ Range ] value The Range to serialize.
+        #
+        # @return [ Range ] The serialized Range.
+        #
+        # @api private
+        def evolve_range(serializer, value)
+          value.__evolve_range__(serializer: serializer)
         end
 
         # Determines if the selection is a multi-select, like an $and or $or or $nor

@@ -652,10 +652,12 @@ describe 'Matcher' do
 
     describe 'range match on array element' do
 
+      let(:record) do
+        Record.new(producers: [123, 456])
+      end
+
       let!(:band) do
-        Band.create!(records: [
-          Record.new(producers: [123, 456]),
-        ])
+        Band.create!(records: [ record ])
       end
 
       describe 'MongoDB query' do
@@ -687,10 +689,8 @@ describe 'Matcher' do
           band.records.where(producers: 100..200).first
         end
 
-        it 'raises InvalidQuery' do
-          lambda do
-            found_record
-          end.should raise_error(Mongoid::Errors::InvalidQuery)
+        it 'finds' do
+          expect(found_record).to eq(record)
         end
       end
     end
