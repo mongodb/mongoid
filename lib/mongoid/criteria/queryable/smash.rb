@@ -44,6 +44,10 @@ module Mongoid
         #   responsible for serializing values. The keys of the hash must be
         #   strings that match the field name, and the values must respond to
         #   #localized? and #evolve(object).
+        # @param [ Hash ] associations An optional hash of names to association
+        #   objects.
+        # @param [ Hash ] aliased_associations An optional hash of mappings from
+        #   aliases for associations to their actual field names in the database.
         def initialize(aliases = {}, serializers = {}, associations = {}, aliased_associations = {})
           @aliases = aliases
           @serializers = serializers

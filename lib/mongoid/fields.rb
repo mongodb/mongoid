@@ -284,7 +284,9 @@ module Mongoid
       #
       # @param [ String ] key The key used to search the association tree.
       # @param [ Hash ] fields The fields to begin the search with.
-      # @param [ Hash ] associations The associations to beging the search with.
+      # @param [ Hash ] associations The associations to begin the search with.
+      # @param [ Hash ] aliased_associations The alaised associations to begin
+      #   the search with.
       # @param [ Proc ] block The block takes in three paramaters, the current
       #   meth, the field or the relation, and whether the second parameter is a
       #   field or not.
@@ -295,10 +297,10 @@ module Mongoid
       def traverse_association_tree(key, fields, associations, aliased_associations)
         klass = nil
         field = nil
-        key.split('.').each do |meth|
-          fs = klass ? klass.fields : fields
-          rs = klass ? klass.relations : associations
-          as = klass ? klass.aliased_associations : aliased_associations
+        key.split('.').each_with_index do |meth, i|
+          fs = i == 0 ? fields : klass&.fields
+          rs = i == 0 ? associations : klass&.relations
+          as = i == 0 ? aliased_associations : klass&.aliased_associations
 
           # Associations can possibly have two "keys", their name and their alias.
           # The fields name is what is used to store it in the klass's relations
@@ -312,10 +314,11 @@ module Mongoid
           end
 
           field = nil
-          if f = fs[aliased]
+          klass = nil
+          if fs && f = fs[aliased]
             field = f
             yield(meth, f, true) if block_given?
-          elsif rel = rs[aliased]
+          elsif rs && rel = rs[aliased]
             klass = rel.klass
             yield(meth, rel, false) if block_given?
           else

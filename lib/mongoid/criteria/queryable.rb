@@ -60,6 +60,7 @@ module Mongoid
       # @param [ Hash ] aliases The optional field aliases.
       # @param [ Hash ] serializers The optional field serializers.
       # @param [ Hash ] associations The optional associations.
+      # @param [ Hash ] aliased_associations The optional aliased associations.
       # @param [ Symbol ] driver The driver being used.
       #
       # @api private
