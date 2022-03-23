@@ -333,6 +333,28 @@ module Mongoid
       # finds aliases for embedded documents and fields, delimited with
       # period "." character.
       #
+      # This method, will not expand the alias of a referenced association that
+      # is not the last item. For example, if we had a School that has_many
+      # Students, and the field name passed was:
+      #
+      #   school._id
+      #
+      # The alias for a referenced association is that association's _id field.
+      # Therefore, expanding out this association would yield:
+      #
+      #   school_id._id
+      #
+      # This is not the correct field name, because the intention here was not
+      # to get a property of the _id field. The intention was to get a property
+      # of the referenced document. Therefore, if a part of the name passed is
+      # a referenced association that is not the last part of the name, we
+      # won't expand its alias, and return:
+      #
+      #   school._id
+      #
+      # If the referenced association is the last part of the name, we will
+      # pass back the _id field.
+      #
       # @param [ String, Symbol ] name The name to get.
       # @param [ Hash ] relations The associations.
       # @param [ Hash ] alaiased_fields The aliased fields.
@@ -349,10 +371,6 @@ module Mongoid
           key = name.to_s
           segment, remaining = key.split('.', 2)
 
-          # If it's a reference association and there's still remaining, don't
-          # get the alias for this. This is going to retrieve the _id field for
-          # the association name, and getting another property from the _id field
-          # is not the intended functionality.
           unless remaining && relations.key?(segment) && !relations[segment].embedded?
             segment = aliased_fields[segment]&.dup || segment
           end
