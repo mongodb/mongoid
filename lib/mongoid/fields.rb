@@ -348,7 +348,15 @@ module Mongoid
           return nil unless name.present?
           key = name.to_s
           segment, remaining = key.split('.', 2)
-          segment = aliased_fields[segment]&.dup || segment
+
+          # If it's a reference association and there's still remaining, don't
+          # get the alias for this. This is going to retrieve the _id field for
+          # the association name, and getting another property from the _id field
+          # is not the intended functionality.
+          unless remaining && relations.key?(segment) && !relations[segment].embedded?
+            segment = aliased_fields[segment]&.dup || segment
+          end
+
           return segment unless remaining
 
           relation = relations[aliased_associations[segment] || segment]

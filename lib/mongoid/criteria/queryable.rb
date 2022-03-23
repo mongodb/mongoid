@@ -66,7 +66,7 @@ module Mongoid
       # @api private
       def initialize(aliases = {}, serializers = {}, associations = {}, aliased_associations = {}, driver = :mongo)
         @aliases, @driver, @serializers = aliases, driver.to_sym, serializers
-        @options = Options.new(aliases, serializers)
+        @options = Options.new(aliases, serializers, associations, aliased_associations)
         @selector = Selector.new(aliases, serializers, associations, aliased_associations)
         @pipeline = Pipeline.new(aliases)
         @aggregating = nil

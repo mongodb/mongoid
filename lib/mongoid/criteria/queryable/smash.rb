@@ -101,7 +101,7 @@ module Mongoid
         #   serializer.
         def storage_pair(key)
           field = key.to_s
-          name = Fields.database_field_name(key, associations, aliases, aliased_associations)
+          name = Fields.database_field_name(field, associations, aliases, aliased_associations)
           [ name, get_serializer(name) ]
         end
 
