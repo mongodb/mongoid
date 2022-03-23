@@ -4146,6 +4146,22 @@ describe Mongoid::Criteria do
           ])
         end
       end
+
+      context "when the association is aliased" do
+        let(:criteria) do
+          Person.where("passport.passport_pages.num_stamps" => 10..18)
+        end
+
+        it "correctly combines the conditions" do
+          expect(criteria.selector).to eq(
+            "pass.passport_pages" => {
+              "$elemMatch" => {
+                "num_stamps" => { "$gte" => 10, "$lte" => 18 }
+              }
+            }
+          )
+        end
+      end
     end
   end
 

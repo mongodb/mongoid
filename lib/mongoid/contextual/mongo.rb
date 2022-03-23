@@ -770,17 +770,9 @@ module Mongoid
       #
       # @return [ Object ] The demongoized value.
       def recursive_demongoize(field_name, value, is_translation)
-        k = klass
-        field_name.split('.').each do |meth|
-          if as = k.try(:aliased_associations)
-            if a = as.fetch(meth, nil)
-              meth = a.to_s
-            end
-          end
-
-          if relation = k.relations[meth]
-            k = relation.klass
-          elsif field = k.fields[meth]
+        klass.traverse_association_tree(field_name) do |meth, obj, is_field|
+          if is_field
+            field = obj
             # If it's a localized field that's not a hash, don't demongoize
             # again, we already have the translation. If it's an _translation
             # field, don't demongoize, we want the full hash not just a
@@ -790,10 +782,11 @@ module Mongoid
             else
               return field.demongoize(value)
             end
-          else
+          elsif obj.nil?
             return value.class.demongoize(value)
           end
         end
+        value.class.demongoize(value)
       end
     end
   end

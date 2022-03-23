@@ -63,10 +63,10 @@ module Mongoid
       # @param [ Symbol ] driver The driver being used.
       #
       # @api private
-      def initialize(aliases = {}, serializers = {}, associations = {}, driver = :mongo)
+      def initialize(aliases = {}, serializers = {}, associations = {}, aliased_associations = {}, driver = :mongo)
         @aliases, @driver, @serializers = aliases, driver.to_sym, serializers
         @options = Options.new(aliases, serializers)
-        @selector = Selector.new(aliases, serializers, associations)
+        @selector = Selector.new(aliases, serializers, associations, aliased_associations)
         @pipeline = Pipeline.new(aliases)
         @aggregating = nil
         yield(self) if block_given?

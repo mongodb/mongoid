@@ -235,7 +235,7 @@ module Mongoid
         def evolve_range(key, serializer, value)
           v = value.__evolve_range__(serializer: serializer)
           rels = []
-          Fields.traverse_association_tree(key, serializers, associations) do |meth, obj, is_field|
+          Fields.traverse_association_tree(key, serializers, associations, aliased_associations) do |meth, obj, is_field|
             rels.push([meth, obj, is_field])
           end
 

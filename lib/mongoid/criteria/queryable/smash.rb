@@ -16,6 +16,9 @@ module Mongoid
         # @attribute [r] associations The associations.
         attr_reader :associations
 
+        # @attribute [r] aliased_associations The aliased_associations.
+        attr_reader :aliased_associations
+
         # Perform a deep copy of the smash.
         #
         # @example Perform a deep copy.
@@ -23,7 +26,7 @@ module Mongoid
         #
         # @return [ Smash ] The copied hash.
         def __deep_copy__
-          self.class.new(aliases, serializers, associations) do |copy|
+          self.class.new(aliases, serializers, associations, aliased_associations) do |copy|
             each_pair do |key, value|
               copy.store(key, value.__deep_copy__)
             end
@@ -41,8 +44,11 @@ module Mongoid
         #   responsible for serializing values. The keys of the hash must be
         #   strings that match the field name, and the values must respond to
         #   #localized? and #evolve(object).
-        def initialize(aliases = {}, serializers = {}, associations = {})
-          @aliases, @serializers, @associations = aliases, serializers, associations
+        def initialize(aliases = {}, serializers = {}, associations = {}, aliased_associations = {})
+          @aliases = aliases
+          @serializers = serializers
+          @associations = associations
+          @aliased_associations = aliased_associations
           yield(self) if block_given?
         end
 
@@ -91,7 +97,7 @@ module Mongoid
         #   serializer.
         def storage_pair(key)
           field = key.to_s
-          name = aliases[field] || field
+          name = Fields.database_field_name(key, associations, aliases, aliased_associations)
           [ name, get_serializer(name) ]
         end
 
@@ -109,7 +115,7 @@ module Mongoid
           if s = serializers[name]
             s
           else
-            Fields.traverse_association_tree(name, serializers, associations)
+            Fields.traverse_association_tree(name, serializers, associations, aliased_associations)
           end
         end
       end

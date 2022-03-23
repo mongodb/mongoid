@@ -267,64 +267,81 @@ describe 'Queries with Range criteria' do
     end
   end
 
-  context "when the field is embedded" do
-    context 'Range<Integer> criteria vs Integer field' do
+  context 'Range<Integer> criteria vs embedded Integer field' do
 
-      it 'returns objects within the range' do
-        expect(Band.where("labels.age" => 10..18).to_a).to eq [band5]
-        expect(Band.where("labels.age" => 13...16).to_a).to eq []
+    it 'returns objects within the range' do
+      expect(Band.where("labels.age" => 10..18).to_a).to eq [band5]
+      expect(Band.where("labels.age" => 13...16).to_a).to eq []
+    end
+
+    it "does not return objects out of range" do
+      expect(Band.where("labels.age" => 13..14).to_a).to eq []
+    end
+
+    context 'endless range' do
+      ruby_version_gte '2.6'
+
+      it 'returns all objects above the value' do
+        expect(Band.where("labels.age": eval('1..')).to_a).to eq [band5]
       end
 
-      it "does not return objects out of range" do
-        expect(Band.where("labels.age" => 13..14).to_a).to eq []
-      end
-
-      context 'endless range' do
-        ruby_version_gte '2.6'
-
-        it 'returns all objects above the value' do
-          expect(Band.where("labels.age": eval('1..')).to_a).to eq [band5]
-        end
-
-        it 'does not return the objects under the value' do
-          expect(Band.where("labels.age": eval('100..')).to_a).to eq []
-        end
-      end
-
-      context 'beginless range' do
-        ruby_version_gte '2.7'
-
-        it 'returns all objects under the value' do
-          expect(Band.where("labels.age": eval('..16')).to_a).to eq [band5]
-        end
-        it 'does not return the objects above the value' do
-          expect(Band.where("labels.age": eval('...12')).to_a).to eq []
-        end
+      it 'does not return the objects under the value' do
+        expect(Band.where("labels.age": eval('100..')).to_a).to eq []
       end
     end
 
-    context 'Range<Integer> criteria vs Array<Integer>' do
-      let!(:band6) { Band.create!(genres: [12, 16]) }
+    context 'beginless range' do
+      ruby_version_gte '2.7'
 
-      it 'returns objects within the range' do
-        expect(Band.where("genres" => 10..18).to_a).to eq [band6]
+      it 'returns all objects under the value' do
+        expect(Band.where("labels.age": eval('..16')).to_a).to eq [band5]
       end
+      it 'does not return the objects above the value' do
+        expect(Band.where("labels.age": eval('...12')).to_a).to eq []
+      end
+    end
+  end
 
-      it "does not return objects out of range" do
-        expect(Band.where("genres" => 13..14).to_a).to eq []
+  context 'Range<Integer> criteria vs Array<Integer>' do
+    let!(:band6) { Band.create!(genres: [12, 16]) }
+
+    it 'returns objects within the range' do
+      expect(Band.where("genres" => 10..18).to_a).to eq [band6]
+    end
+
+    it "does not return objects out of range" do
+      expect(Band.where("genres" => 13..14).to_a).to eq []
+    end
+  end
+
+  context 'Range<Integer> criteria vs Array<Hash<Symbol, Integer>>' do
+    let!(:band6) { Band.create!(genres: [{x: 12}, {x: 16}]) }
+
+    it 'returns objects within the range' do
+      expect(Band.where("genres.x" => 10..18).to_a).to eq [band6]
+    end
+
+    it "does not return objects out of range" do
+      expect(Band.where("genres.x" => 13..14).to_a).to eq []
+    end
+  end
+
+  context 'Range<Integer> criteria vs aliased/doubly embedded Integer' do
+    let!(:person) do
+      Person.create!(passport: Passport.new).tap do |b|
+        b.passport.passport_pages.create!(num_stamps: 12)
+        b.passport.passport_pages.create!(num_stamps: 16)
       end
     end
 
-    context 'Range<Integer> criteria vs Array<Hash<Integer>>' do
-      let!(:band6) { Band.create!(genres: [{x: 12}, {x: 16}]) }
+    config_override :broken_alias_handling, false
 
-      it 'returns objects within the range' do
-        expect(Band.where("genres.x" => 10..18).to_a).to eq [band6]
-      end
+    it 'returns objects within the range' do
+      expect(Person.where("passport.passport_pages.num_stamps" => 10..18).to_a).to eq [person]
+    end
 
-      it "does not return objects out of range" do
-        expect(Band.where("genres.x" => 13..14).to_a).to eq []
-      end
+    it "does not return objects out of range" do
+      expect(Person.where("passport.passport_pages.num_stamps" => 13..14).to_a).to eq []
     end
   end
 end

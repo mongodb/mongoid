@@ -292,18 +292,30 @@ module Mongoid
       # @return [ Field ] The field found for the given key at the end of the
       #   search. This will return nil if the last thing found is an association
       #   or no field was found for the given key.
-      def traverse_association_tree(key, fields, associations)
+      def traverse_association_tree(key, fields, associations, aliased_associations)
         klass = nil
         field = nil
         key.split('.').each do |meth|
           fs = klass ? klass.fields : fields
           rs = klass ? klass.relations : associations
+          as = klass ? klass.aliased_associations : aliased_associations
+
+          # Fields can possibly have two "keys", their name and their alias.
+          # The fields name is what is used to store it in the klass's relations
+          # and field hashes, and the alias is what's used to store that field
+          # in the database. The key inputted to this function is the aliased
+          # key. We can convert them back to their names by looking in the
+          # aliased_associations hash.
+          aliased = meth
+          if as && a = as.fetch(meth, nil)
+            aliased = a.to_s
+          end
 
           field = nil
-          if f = fs[meth]
+          if f = fs[aliased]
             field = f
             yield(meth, f, true) if block_given?
-          elsif rel = rs[meth]
+          elsif rel = rs[aliased]
             klass = rel.klass
             yield(meth, rel, false) if block_given?
           else
@@ -311,6 +323,39 @@ module Mongoid
           end
         end
         field
+      end
+
+      # Get the name of the provided field as it is stored in the database.
+      # Used in determining if the field is aliased or not. Recursively
+      # finds aliases for embedded documents and fields, delimited with
+      # period "." character.
+      #
+      # @param [ String, Symbol ] name The name to get.
+      # @param [ Hash ] relations The associations.
+      # @param [ Hash ] alaiased_fields The aliased fields.
+      # @param [ Hash ] alaiased_associations The aliased associations.
+      #
+      # @return [ String ] The name of the field as stored in the database.
+      def database_field_name(name, relations, aliased_fields, aliased_associations)
+        if Mongoid.broken_alias_handling
+          return nil unless name
+          normalized = name.to_s
+          aliased_fields[normalized] || normalized
+        else
+          return nil unless name.present?
+          key = name.to_s
+          segment, remaining = key.split('.', 2)
+          segment = aliased_fields[segment]&.dup || segment
+          return segment unless remaining
+
+          relation = relations[aliased_associations[segment] || segment]
+          if relation
+            k = relation.klass
+            "#{segment}.#{database_field_name(remaining, k.relations, k.aliased_fields, k.aliased_associations)}"
+          else
+            "#{segment}.#{remaining}"
+          end
+        end
       end
     end
 
@@ -330,38 +375,13 @@ module Mongoid
       end
 
       # Get the name of the provided field as it is stored in the database.
-      # Used in determining if the field is aliased or not. Recursively
-      # finds aliases for embedded documents and fields, delimited with
-      # period "." character.
-      #
-      # @example Get the database field name of a field.
-      #   Model.database_field_name(:authorization)
-      #
-      # @example Get the database field name of an embedded field.
-      #   Model.database_field_name('customers.addresses.city')
+      # Used in determining if the field is aliased or not.
       #
       # @param [ String, Symbol ] name The name to get.
       #
-      # @return [ String ] The name of the field as stored in the database.
+      # @return [ String ] The name of the field as it's stored in the db.
       def database_field_name(name)
-        if Mongoid.broken_alias_handling
-          return nil unless name
-          normalized = name.to_s
-          aliased_fields[normalized] || normalized
-        else
-          return nil unless name.present?
-          key = name.to_s
-          segment, remaining = key.split('.', 2)
-          segment = aliased_fields[segment]&.dup || segment
-          return segment unless remaining
-
-          relation = relations[aliased_associations[segment] || segment]
-          if relation
-            "#{segment}.#{relation.klass.database_field_name(remaining)}"
-          else
-            "#{segment}.#{remaining}"
-          end
-        end
+        Fields.database_field_name(name, relations, aliased_fields, aliased_associations)
       end
 
       # Defines all the fields that are accessible on the Document
@@ -412,6 +432,21 @@ module Mongoid
       # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
       def using_object_ids?
         fields["_id"].object_id_field?
+      end
+
+      # Traverse down the association tree and search for the field for the
+      # given key.
+      #
+      # @param [ String ] key The key used to search the association tree.
+      # @param [ Proc ] block The block takes in three paramaters, the current
+      #   meth, the field or the relation, and whether the second parameter is a
+      #   field or not.
+      #
+      # @return [ Field ] The field found for the given key at the end of the
+      #   search. This will return nil if the last thing found is an association
+      #   or no field was found for the given key.
+      def traverse_association_tree(key, &block)
+        Fields.traverse_association_tree(key, fields, relations, aliased_associations, &block)
       end
 
       protected
