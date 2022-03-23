@@ -1175,8 +1175,10 @@ MongoDB 5.0, MongoDB drivers prohibited inserting and querying on field names
 containing dots and dollars. Beginning in MongoDB 5.0, the database supports
 `special helper methods
 <https://docs.mongodb.com/manual/core/dot-dollar-considerations/#std-label-crud-concepts-dot-dollar-considerations>`_
-to insert and query on dot and dollar fields. However, the required
-Ruby driver changes to support these methods `have not yet been implemented
-<https://jira.mongodb.org/browse/RUBY-2528>`. Even with Ruby driver support,
-Mongoid will not change its aforementioned existing MQL usage of dot and dollar symbols,
-and hence Mongoid does not plan to support dot and dollar fields in the near future.
+to insert and query on dot and dollar fields.
+
+The required Ruby driver changes to support these methods `have not yet been implemented
+<https://jira.mongodb.org/browse/RUBY-2528>`. Even if Ruby driver support is added,
+Mongoid's query DSL relies on MQL's existing usage of dot and dollar symbols and
+would not be able to add robust support in a non-conflicting manner. Hence Mongoid
+does not plan to support for dot and dollar fields in the near future.
