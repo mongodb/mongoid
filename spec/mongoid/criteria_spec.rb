@@ -4022,6 +4022,20 @@ describe Mongoid::Criteria do
         end
       end
 
+      context "when querying an aliased field of type array" do
+        let(:criteria) do
+          Person.where("array" => 10..15)
+        end
+
+        it "correctly uses elemMatch without an inner key" do
+          expect(criteria.selector).to eq(
+            "a" => {
+              "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+            }
+          )
+        end
+      end
+
       context "when querying a field inside an array" do
         let(:criteria) do
           Band.where("genres.age" => 10..15)

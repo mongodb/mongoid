@@ -300,7 +300,7 @@ module Mongoid
           rs = klass ? klass.relations : associations
           as = klass ? klass.aliased_associations : aliased_associations
 
-          # Fields can possibly have two "keys", their name and their alias.
+          # Associations can possibly have two "keys", their name and their alias.
           # The fields name is what is used to store it in the klass's relations
           # and field hashes, and the alias is what's used to store that field
           # in the database. The key inputted to this function is the aliased

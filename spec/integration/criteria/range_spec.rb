@@ -314,6 +314,18 @@ describe 'Queries with Range criteria' do
     end
   end
 
+  context 'Range<Integer> criteria vs aliased Array<Integer>' do
+    let!(:person) { Person.create!(array: [12, 16]) }
+
+    it 'returns objects within the range' do
+      expect(Person.where("array" => 10..18).to_a).to eq [person]
+    end
+
+    it "does not return objects out of range" do
+      expect(Person.where("array" => 13..14).to_a).to eq []
+    end
+  end
+
   context 'Range<Integer> criteria vs Array<Hash<Symbol, Integer>>' do
     let!(:band6) { Band.create!(genres: [{x: 12}, {x: 16}]) }
 
