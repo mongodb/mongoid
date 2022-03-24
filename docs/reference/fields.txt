@@ -1320,8 +1320,9 @@ you can include the short versions of the modules.
 Field Names with Dots/Periods (``.``) and Dollar Signs (``$``)
 ==============================================================
 
-It is recommended to not use dots/periods (``.``) in field names, and to not
-start field names with the dollar sign (``$``).
+Using dots/periods (``.``) in fields names and starting a field name with
+a dollar sign (``$``) is not recommended, as Mongoid provides limited support
+for retrieving and operating on the documents stored in those fields.
 
 Both Mongoid and MongoDB query language (MQL) generally use the dot/period
 character (``.``) to separate field names in a field path that traverses
