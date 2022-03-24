@@ -336,6 +336,8 @@ describe Mongoid::Traversable do
     end
 
     context "when the discriminator key is changed at the global level" do
+      config_override :discriminator_key, 'hello'
+
       before do
         Mongoid.discriminator_key = "hello"
       end
@@ -904,10 +906,9 @@ describe Mongoid::Traversable do
     end
 
     context "when the global discriminator key conflicts with mongoid's internals" do
-
-      after do
-        Mongoid.discriminator_key = "_type"
-      end
+      # This is not an override, it is meant to restore the original value
+      # after the test only.
+      config_override :discriminator_key, '_type'
 
       [:_association, :invalid].each do |meth|
         context "when the field is named #{meth}" do
