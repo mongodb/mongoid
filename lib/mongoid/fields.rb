@@ -294,6 +294,8 @@ module Mongoid
       # @return [ Field ] The field found for the given key at the end of the
       #   search. This will return nil if the last thing found is an association
       #   or no field was found for the given key.
+      #
+      # @api private
       def traverse_association_tree(key, fields, associations, aliased_associations)
         klass = nil
         field = nil
@@ -333,13 +335,13 @@ module Mongoid
       # finds aliases for embedded documents and fields, delimited with
       # period "." character.
       #
-      # This method will not expand the alias of a referenced association that
+      # This method will not expand the alias of a belongs_to association that
       # is not the last item. For example, if we had a School that has_many
-      # Students, and the field name passed was:
+      # Students, and the field name passed was (from the Student's perspective):
       #
       #   school._id
       #
-      # The alias for a referenced association is that association's _id field.
+      # The alias for a belongs_to association is that association's _id field.
       # Therefore, expanding out this association would yield:
       #
       #   school_id._id
@@ -347,12 +349,12 @@ module Mongoid
       # This is not the correct field name, because the intention here was not
       # to get a property of the _id field. The intention was to get a property
       # of the referenced document. Therefore, if a part of the name passed is
-      # a referenced association that is not the last part of the name, we
+      # a belongs_to association that is not the last part of the name, we
       # won't expand its alias, and return:
       #
       #   school._id
       #
-      # If the referenced association is the last part of the name, we will
+      # If the belongs_to association is the last part of the name, we will
       # pass back the _id field.
       #
       # @param [ String, Symbol ] name The name to get.
@@ -361,6 +363,8 @@ module Mongoid
       # @param [ Hash ] alaiased_associations The aliased associations.
       #
       # @return [ String ] The name of the field as stored in the database.
+      #
+      # @api private
       def database_field_name(name, relations, aliased_fields, aliased_associations)
         if Mongoid.broken_alias_handling
           return nil unless name
@@ -371,7 +375,13 @@ module Mongoid
           key = name.to_s
           segment, remaining = key.split('.', 2)
 
-          unless remaining && relations.key?(segment) && !relations[segment].embedded?
+          # Don't get the alias for the field when a belongs_to association
+          # is not the last item. Therefore, get the alias when one of the
+          # following is true:
+          # 1. This is the last item, i.e. there is no remaining.
+          # 2. It is not an association.
+          # 3. It is not a belongs association
+          if !remaining || !relations.key?(segment) || !relations[segment].is_a?(Association::Referenced::BelongsTo)
             segment = aliased_fields[segment]&.dup || segment
           end
 
@@ -474,6 +484,8 @@ module Mongoid
       # @return [ Field ] The field found for the given key at the end of the
       #   search. This will return nil if the last thing found is an association
       #   or no field was found for the given key.
+      #
+      # @api private
       def traverse_association_tree(key, &block)
         Fields.traverse_association_tree(key, fields, relations, aliased_associations, &block)
       end

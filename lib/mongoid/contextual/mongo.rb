@@ -719,7 +719,7 @@ module Mongoid
 
         klass.traverse_association_tree(field_name) do |meth, obj, is_field|
           is_translation = false
-          # If no relation or field was found, check if the meth is an
+          # If no association or field was found, check if the meth is an
           # _translations field.
           if obj.nil? & tr = meth.match(/(.*)_translations\z/)&.captures&.first
             is_translation = true

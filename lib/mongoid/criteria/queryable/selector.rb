@@ -235,9 +235,9 @@ module Mongoid
         # @return [ Array<String, Hash> ] The store name and serialized Range.
         def evolve_range(key, serializer, value)
           v = value.__evolve_range__(serializer: serializer)
-          rels = []
+          assocs = []
           Fields.traverse_association_tree(key, serializers, associations, aliased_associations) do |meth, obj, is_field|
-            rels.push([meth, obj, is_field])
+            assocs.push([meth, obj, is_field])
           end
 
           # Iterate backwards until you get a field with type
@@ -246,12 +246,12 @@ module Mongoid
           loop do
             # If there are no arrays or embeds_many associations, just return
             # the key and value without $elemMatch.
-            return [ key, v ] if rels.empty?
+            return [ key, v ] if assocs.empty?
 
-            meth, obj, is_field = rels.last
+            meth, obj, is_field = assocs.last
             break if (is_field && obj.type == Array) || (!is_field && obj.is_a?(Association::Embedded::EmbedsMany))
 
-            rels.pop
+            assocs.pop
             inner_key = "#{meth}.#{inner_key}"
           end
 
@@ -261,7 +261,7 @@ module Mongoid
           if inner_key.blank?
             [ key, { "$elemMatch" => v }]
           else
-            store_key = rels.map(&:first).join('.')
+            store_key = assocs.map(&:first).join('.')
             store_value = { "$elemMatch" => { inner_key.chop => v } }
             [ store_key,  store_value ]
           end
