@@ -201,8 +201,8 @@ module Mongoid
         end
 
         # Evolve a single key selection with range values. This method traverses
-        # the association tree to build a query for the given key.
-        # There are three parts to the query here:
+        # the association tree to build a query for the given value and
+        # serializer. There are three parts to the query here:
         #
         # (1) "klass.child.gchild" => {
         #       "$elemMatch" => {
@@ -211,19 +211,20 @@ module Mongoid
         #     }
         # (1) The first n fields are dotted together until the last
         #     embeds_many or field of type array. In the above case, gchild
-        #     would be an embeds_many, and ggchild would be an embeds_one or
-        #     a hash.
+        #     would be an embeds_many or Array, and ggchild would be an
+        #     embeds_one or a hash.
         # (2) The last fields are used inside the $elemMatch. This one is
-        #     actually optional, and will be ignored if the last field is
-        #     an array. If the last field is an array (1), (2) and (3) will
-        #     look like:
+        #     actually optional, and will be ignored if the last field is an
+        #     array or embeds_many. If the last field is an array (1), (2) and
+        #     (3) will look like:
         #
-        #        "klass.child.gchild.ggchild.field" => {
-        #          { "$elemMatch" => { "$gte" => 6, "$lte" => 10 } }
-        #        }
+        #       "klass.child.gchild.ggchild.field" => {
+        #         { "$elemMatch" => { "$gte" => 6, "$lte" => 10 } }
+        #       }
         #
-        # (3) This is the easy part. This is calculated by
-        #     value.__evolve_range__(serializer: serializer).
+        # (3) This is calculated by:
+        #
+        #       value.__evolve_range__(serializer: serializer).
         #
         # @api private
         #
@@ -255,8 +256,8 @@ module Mongoid
           end
 
           # If the last array or embeds_many association is the last field,
-          # the inner key (2) will be ignored, and the other fields are
-          # dotted together for the outer key.
+          # the inner key (2) is ignored, and the outer key (1) is the original
+          # key.
           if inner_key.blank?
             [ key, { "$elemMatch" => v }]
           else

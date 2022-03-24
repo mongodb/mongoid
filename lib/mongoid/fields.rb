@@ -276,8 +276,8 @@ module Mongoid
       # the key:
       #
       # - If the meth is a field, yield the meth, field, and is_field as true.
-      # - If the meth is a association, update the klass to the associations klass,
-      #   and yield the meth, klass, and is_field as false.
+      # - If the meth is an association, update the klass to the association's
+      #   klass, and yield the meth, klass, and is_field as false.
       #
       # The next iteration will use klass's fields and associations to continue
       # traversing the tree.
@@ -333,7 +333,7 @@ module Mongoid
       # finds aliases for embedded documents and fields, delimited with
       # period "." character.
       #
-      # This method, will not expand the alias of a referenced association that
+      # This method will not expand the alias of a referenced association that
       # is not the last item. For example, if we had a School that has_many
       # Students, and the field name passed was:
       #

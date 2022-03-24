@@ -4027,7 +4027,7 @@ describe Mongoid::Criteria do
           Person.where("array" => 10..15)
         end
 
-        it "correctly uses elemMatch without an inner key" do
+        it "correctly uses the aliased field and elemMatch" do
           expect(criteria.selector).to eq(
             "a" => {
               "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
@@ -4148,14 +4148,15 @@ describe Mongoid::Criteria do
 
       context "when there are multiple conditions" do
         let(:criteria) do
-          Band.where("$or" => [{"labels" => 10..15}, {labels: 8}])
+          Band.where("$or" => [{"labels.age" => 10..15}, {labels: 8}])
         end
 
         it "correctly combines the conditions" do
           expect(criteria.selector).to eq("$or" => [
             { "labels" => {
-              "$elemMatch" => {"$gte" => 10, "$lte" => 15}
-              } },
+              "$elemMatch" => {
+                "age" => { "$gte" => 10, "$lte" => 15 }
+              } } },
             { "labels" => 8 }
           ])
         end
@@ -4166,7 +4167,7 @@ describe Mongoid::Criteria do
           Person.where("passport.passport_pages.num_stamps" => 10..18)
         end
 
-        it "correctly combines the conditions" do
+        it "correctly uses the aliased association" do
           expect(criteria.selector).to eq(
             "pass.passport_pages" => {
               "$elemMatch" => {
