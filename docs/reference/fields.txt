@@ -1160,12 +1160,11 @@ you can include the short versions of the modules.
 Field Names with Dots/Periods (``.``) and Dollar Signs (``$``)
 ==============================================================
 
-At present, neither Mongoid nor the Mongo Ruby Driver support inserting
-or querying against fields whose name contains the dot/period (``.``)
-character or begins with the dollar sign (``$``) character.
-Although it is possible to retrieve data in such fields if present in
-existing documents, it is recommended to avoid using field names containing
-dots and dollars entirely.
+At present, Mongoid does not support inserting or querying against
+fields whose name contains the dot/period (``.``) character or
+begins with the dollar sign (``$``) character. Although it is possible
+to retrieve data in such fields if present in existing documents, it is
+recommended to avoid using field names containing dots and dollars entirely.
 
 As further explanation, the MongoDB Query Language (MQL) reserves the dot
 character as a delimiter to traverse field names in embedded documents
@@ -1179,7 +1178,11 @@ to insert and query on dot and dollar fields.
 
 The required Ruby driver changes to support these special helper methods
 `have not yet been implemented <https://jira.mongodb.org/browse/RUBY-2528>`.
-Even if Ruby driver support is added, Mongoid's query DSL relies on MQL's
+To be 100% accurate: the Ruby driver technically *can* insert dot/dollar
+fields, but cannot query against them. The current version of BSON Ruby,
+and hence Mongoid, does not yet allow inserting dot/dollar fields.
+
+Even if full Ruby driver support is added, Mongoid's query DSL relies on MQL's
 aforementioned usage of dot and dollar symbols and would not be able to add
 robust support without conflict. Hence Mongoid does not plan to support for
 dot and dollar fields in the near future.
