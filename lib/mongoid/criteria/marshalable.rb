@@ -9,6 +9,9 @@ module Mongoid
       # @example Dump the criteria.
       #   Marshal.dump(criteria)
       #
+      # Note :mongo is written here for backwards compatibility with Mongoid 7
+      # and earlier.
+      #
       # @return [ Array<Object> ] The dumped data.
       def marshal_dump
         data = [ klass, :mongo, inclusions, documents, strategy, negating ]
@@ -23,9 +26,9 @@ module Mongoid
       # @param [ Array ] data The raw data.
       def marshal_load(data)
         @scoping_options, raw_selector, raw_options = data.pop(3)
-        @klass, @driver, @inclusions, @documents, @strategy, @negating = data
+        @klass, driver, @inclusions, @documents, @strategy, @negating = data
 
-        if @driver == :mongo1x
+        if driver == :mongo1x
           raise NotImplementedError, "Mongoid no longer supports marshalling with driver version 1.x."
         end
 
