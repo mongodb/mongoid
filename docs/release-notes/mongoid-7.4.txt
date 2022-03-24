@@ -28,6 +28,9 @@ Ruby Version Support
 As of version 7.4, Mongoid supports Ruby 2.5+.
 Support for Ruby 2.4 and earlier has been dropped.
 
+As of Mongoid 7.4, JRuby support is deprecated. Mongoid 8 will not support
+JRuby.
+
 
 Support for MongoDB 3.4 and Earlier Servers Deprecated
 ------------------------------------------------------
