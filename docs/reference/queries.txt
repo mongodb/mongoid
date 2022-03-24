@@ -488,7 +488,7 @@ an ``{'$and' => [{'$nor' => ...}]}`` construct:
 
 If using ``not`` with arrays or regular expressions, please note the
 caveats/limitations of ``$not`` `stated in the MongoDB server documentation
-<https://docs.mongodb.com/manual/reference/operator/query/not/>`_.
+<https://mongodb.com/docs/manual/reference/operator/query/not/>`_.
 
 
 Incremental Query Construction
@@ -1038,7 +1038,7 @@ to be combined with :ref:`ordering <ordering>` to ensure consistent results.
 
 When executing large queries, or when iterating over query results with an enumerator method such as
 ``Criteria#each``, Mongoid automatically uses the `MongoDB getMore command
-<https://docs.mongodb.com/manual/reference/command/getMore/>`_ to load results in batches.
+<https://mongodb.com/docs/manual/reference/command/getMore/>`_ to load results in batches.
 The default ``batch_size`` is 1000, however you may set it explicitly:
 
 .. code-block:: ruby
@@ -2017,7 +2017,7 @@ with driver versions 2.13.x and earlier, Mongoid utilizes its own, legacy,
 query cache implementation.
 
 Please review the `driver query cache documentation
-<https://docs.mongodb.com/ruby-driver/current/reference/query-cache/>`_
+<https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_
 for details about the driver's query cache behavior.
 
 .. warning::

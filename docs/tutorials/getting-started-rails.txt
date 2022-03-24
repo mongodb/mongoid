@@ -60,7 +60,7 @@ Use the ``rails`` command to create the application skeleton, as follows:
 
         Could not find gem 'puma (~> 3.11)' in any of the gem sources listed in your Gemfile.
         Run `bundle install` to install missing gems.
-        
+
     Disregard it as we will be taking care of gem installation
     in a moment.
 
@@ -133,7 +133,7 @@ Run MongoDB Locally
 The configuration created in the previous step is suitable when
 a MongoDB server is running locally. If you do not already have a
 local MongoDB server, `download and install MongoDB
-<https://docs.mongodb.com/manual/installation/>`_.
+<https://mongodb.com/docs/manual/installation/>`_.
 
 While the generated ``mongoid.yml`` will work without modifications,
 we recommend reducing the server selection timeout for development.
@@ -157,7 +157,7 @@ Use MongoDB Atlas
 
 Instead of downloading, installing and running MongoDB locally, you can create
 a free MongoDB Atlas account and create a `free MongoDB cluster in Atlas
-<https://docs.mongodb.com/manual/tutorial/atlas-free-tier-setup/>`_.
+<https://mongodb.com/docs/manual/tutorial/atlas-free-tier-setup/>`_.
 Once the cluster is created, follow the instructions in `connect to the cluster
 page <https://docs.atlas.mongodb.com/connect-to-cluster/#connect-to-a-cluster>`_
 to obtain the URI. Use the *Ruby driver 2.5 or later* format.
@@ -192,7 +192,7 @@ Finally, install webpacker:
 
 .. code-block:: sh
 
-    rails webpacker:install 
+    rails webpacker:install
 
 
 Run Application
@@ -247,7 +247,7 @@ association for the comments:
 
     class Post
       include Mongoid::Document
-      
+
       field :title, type: String
       field :body, type: String
 
@@ -263,7 +263,7 @@ generated ``embedded_in`` association to ``belongs_to``:
 
     class Comment
       include Mongoid::Document
-      
+
       field :name, type: String
       field :message, type: String
 
@@ -398,7 +398,7 @@ via ``require 'rails/all'``, change it to require individual frameworks:
 
   # Add this require instead of "rails/all":
   require "rails"
-  
+
   # Pick the frameworks you want:
   require "active_model/railtie"
   require "active_job/railtie"
@@ -410,7 +410,7 @@ via ``require 'rails/all'``, change it to require individual frameworks:
   require "action_cable/engine"
   require "sprockets/railtie"
   require "rails/test_unit/railtie"
-  
+
   # Remove or comment out ActiveRecord and ActiveStorage:
   # require "active_record/railtie"
   # require "active_storage/engine"
@@ -497,7 +497,7 @@ The same model may look like this in Mongoid:
 
   class Post
     include Mongoid::Document
-    
+
     field :title, type: String
     field :body, type: String
 
@@ -513,7 +513,7 @@ Or like this with dynamic fields:
   class Post
     include Mongoid::Document
     include Mongoid::Attributes::Dynamic
-    
+
     has_many :comments, dependent: :destroy
   end
 
