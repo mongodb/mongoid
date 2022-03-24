@@ -11,7 +11,7 @@ module Mongoid
       #
       # @return [ Array<Object> ] The dumped data.
       def marshal_dump
-        data = [ klass, driver, inclusions, documents, strategy, negating ]
+        data = [ klass, :mongo, inclusions, documents, strategy, negating ]
         data.push(scoping_options).push(dump_hash(:selector)).push(dump_hash(:options))
       end
 
