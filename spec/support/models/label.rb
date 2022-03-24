@@ -6,6 +6,8 @@ class Label
 
   field :name, type: String
   field :sales, type: BigDecimal
+  field :age, type: Integer
+
   field :after_create_called, type: Mongoid::Boolean, default: false
   field :after_save_called, type: Mongoid::Boolean, default: false
   field :after_update_called, type: Mongoid::Boolean, default: false

@@ -1696,6 +1696,33 @@ describe Mongoid::Fields do
         it_behaves_like 'pre-fix database_field_name'
       end
     end
+
+    context 'when getting the database field name of a belongs_to associations' do
+      # These tests only apply when the flag is not set
+      config_override :broken_alias_handling, false
+
+      context "when the broken_alias_handling is not set" do
+        context "when the association is the last item" do
+          let(:name) do
+            Game.database_field_name("person")
+          end
+
+          it "gets the alias" do
+            expect(name).to eq("person_id")
+          end
+        end
+
+        context "when the association is not the last item" do
+          let(:name) do
+            Game.database_field_name("person.name")
+          end
+
+          it "gets the alias" do
+            expect(name).to eq("person.name")
+          end
+        end
+      end
+    end
   end
 
   describe "#get_field" do

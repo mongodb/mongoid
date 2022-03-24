@@ -712,15 +712,18 @@ module Mongoid
           end
         end
 
+        i = 1
+        num_meths = field_name.count('.') + 1
         k = klass
-        meths = field_name.split('.')
-        meths.each_with_index.inject(attrs) do |curr, (meth, i)|
+        curr = attrs.dup
+
+        klass.traverse_association_tree(field_name) do |meth, obj, is_field|
           is_translation = false
-          if !k.fields.key?(meth) && !k.relations.key?(meth)
-            if tr = meth.match(/(.*)_translations\z/)&.captures&.first
-              is_translation = true
-              meth = tr
-            end
+          # If no association or field was found, check if the meth is an
+          # _translations field.
+          if obj.nil? & tr = meth.match(/(.*)_translations\z/)&.captures&.first
+            is_translation = true
+            meth = tr
           end
 
           # 1. If curr is an array fetch from all elements in the array.
@@ -733,11 +736,11 @@ module Mongoid
           # 3. If the meth is an _translations field, do not demongoize the
           #    value so the full hash is returned.
           # 4. Otherwise, fetch and demongoize the value for the key meth.
-          if curr.is_a? Array
+          curr = if curr.is_a? Array
             res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
             res.empty? ? nil : res
           elsif !is_translation && k.fields[meth]&.localized?
-            if i < meths.length-1
+            if i < num_meths
               curr.try(:fetch, meth, nil)
             else
               fetch_and_demongoize(curr, meth, k)
@@ -746,18 +749,15 @@ module Mongoid
             curr.try(:fetch, meth, nil)
           else
             fetch_and_demongoize(curr, meth, k)
-          end.tap do
-            if as = k.try(:aliased_associations)
-              if a = as.fetch(meth, nil)
-                meth = a
-              end
-            end
-
-            if relation = k.relations[meth]
-              k = relation.klass
-            end
           end
+
+          # If it's a relation, update the current klass with the relation klass.
+          if !is_field && !obj.nil?
+            k = obj.klass
+          end
+          i += 1
         end
+        curr
       end
 
       # Recursively demongoize the given value. This method recursively traverses
@@ -770,29 +770,20 @@ module Mongoid
       #
       # @return [ Object ] The demongoized value.
       def recursive_demongoize(field_name, value, is_translation)
-        k = klass
-        field_name.split('.').each do |meth|
-          if as = k.try(:aliased_associations)
-            if a = as.fetch(meth, nil)
-              meth = a.to_s
-            end
-          end
+        field = klass.traverse_association_tree(field_name)
 
-          if relation = k.relations[meth]
-            k = relation.klass
-          elsif field = k.fields[meth]
-            # If it's a localized field that's not a hash, don't demongoize
-            # again, we already have the translation. If it's an _translation
-            # field, don't demongoize, we want the full hash not just a
-            # specific translation.
-            if field.localized? && (!value.is_a?(Hash) || is_translation)
-              return value.class.demongoize(value)
-            else
-              return field.demongoize(value)
-            end
+        if field
+          # If it's a localized field that's not a hash, don't demongoize
+          # again, we already have the translation. If it's an _translations
+          # field, don't demongoize, we want the full hash not just a
+          # specific translation.
+          if field.localized? && (!value.is_a?(Hash) || is_translation)
+            value.class.demongoize(value)
           else
-            return value.class.demongoize(value)
+            field.demongoize(value)
           end
+        else
+          value.class.demongoize(value)
         end
       end
     end

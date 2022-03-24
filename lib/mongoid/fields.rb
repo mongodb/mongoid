@@ -270,6 +270,132 @@ module Mongoid
       def options
         @options ||= {}
       end
+
+      # Traverse down the association tree and search for the field for the
+      # given key. To do this, split the key by '.' and for each part (meth) of
+      # the key:
+      #
+      # - If the meth is a field, yield the meth, field, and is_field as true.
+      # - If the meth is an association, update the klass to the association's
+      #   klass, and yield the meth, klass, and is_field as false.
+      #
+      # The next iteration will use klass's fields and associations to continue
+      # traversing the tree.
+      #
+      # @param [ String ] key The key used to search the association tree.
+      # @param [ Hash ] fields The fields to begin the search with.
+      # @param [ Hash ] associations The associations to begin the search with.
+      # @param [ Hash ] aliased_associations The alaised associations to begin
+      #   the search with.
+      # @param [ Proc ] block The block takes in three paramaters, the current
+      #   meth, the field or the relation, and whether the second parameter is a
+      #   field or not.
+      #
+      # @return [ Field ] The field found for the given key at the end of the
+      #   search. This will return nil if the last thing found is an association
+      #   or no field was found for the given key.
+      #
+      # @api private
+      def traverse_association_tree(key, fields, associations, aliased_associations)
+        klass = nil
+        field = nil
+        key.split('.').each_with_index do |meth, i|
+          fs = i == 0 ? fields : klass&.fields
+          rs = i == 0 ? associations : klass&.relations
+          as = i == 0 ? aliased_associations : klass&.aliased_associations
+
+          # Associations can possibly have two "keys", their name and their alias.
+          # The fields name is what is used to store it in the klass's relations
+          # and field hashes, and the alias is what's used to store that field
+          # in the database. The key inputted to this function is the aliased
+          # key. We can convert them back to their names by looking in the
+          # aliased_associations hash.
+          aliased = meth
+          if as && a = as.fetch(meth, nil)
+            aliased = a.to_s
+          end
+
+          field = nil
+          klass = nil
+          if fs && f = fs[aliased]
+            field = f
+            yield(meth, f, true) if block_given?
+          elsif rs && rel = rs[aliased]
+            klass = rel.klass
+            yield(meth, rel, false) if block_given?
+          else
+            yield(meth, nil, false) if block_given?
+          end
+        end
+        field
+      end
+
+      # Get the name of the provided field as it is stored in the database.
+      # Used in determining if the field is aliased or not. Recursively
+      # finds aliases for embedded documents and fields, delimited with
+      # period "." character.
+      #
+      # This method will not expand the alias of a belongs_to association that
+      # is not the last item. For example, if we had a School that has_many
+      # Students, and the field name passed was (from the Student's perspective):
+      #
+      #   school._id
+      #
+      # The alias for a belongs_to association is that association's _id field.
+      # Therefore, expanding out this association would yield:
+      #
+      #   school_id._id
+      #
+      # This is not the correct field name, because the intention here was not
+      # to get a property of the _id field. The intention was to get a property
+      # of the referenced document. Therefore, if a part of the name passed is
+      # a belongs_to association that is not the last part of the name, we
+      # won't expand its alias, and return:
+      #
+      #   school._id
+      #
+      # If the belongs_to association is the last part of the name, we will
+      # pass back the _id field.
+      #
+      # @param [ String, Symbol ] name The name to get.
+      # @param [ Hash ] relations The associations.
+      # @param [ Hash ] alaiased_fields The aliased fields.
+      # @param [ Hash ] alaiased_associations The aliased associations.
+      #
+      # @return [ String ] The name of the field as stored in the database.
+      #
+      # @api private
+      def database_field_name(name, relations, aliased_fields, aliased_associations)
+        if Mongoid.broken_alias_handling
+          return nil unless name
+          normalized = name.to_s
+          aliased_fields[normalized] || normalized
+        else
+          return nil unless name.present?
+          key = name.to_s
+          segment, remaining = key.split('.', 2)
+
+          # Don't get the alias for the field when a belongs_to association
+          # is not the last item. Therefore, get the alias when one of the
+          # following is true:
+          # 1. This is the last item, i.e. there is no remaining.
+          # 2. It is not an association.
+          # 3. It is not a belongs association
+          if !remaining || !relations.key?(segment) || !relations[segment].is_a?(Association::Referenced::BelongsTo)
+            segment = aliased_fields[segment]&.dup || segment
+          end
+
+          return segment unless remaining
+
+          relation = relations[aliased_associations[segment] || segment]
+          if relation
+            k = relation.klass
+            "#{segment}.#{database_field_name(remaining, k.relations, k.aliased_fields, k.aliased_associations)}"
+          else
+            "#{segment}.#{remaining}"
+          end
+        end
+      end
     end
 
     module ClassMethods
@@ -288,38 +414,13 @@ module Mongoid
       end
 
       # Get the name of the provided field as it is stored in the database.
-      # Used in determining if the field is aliased or not. Recursively
-      # finds aliases for embedded documents and fields, delimited with
-      # period "." character.
-      #
-      # @example Get the database field name of a field.
-      #   Model.database_field_name(:authorization)
-      #
-      # @example Get the database field name of an embedded field.
-      #   Model.database_field_name('customers.addresses.city')
+      # Used in determining if the field is aliased or not.
       #
       # @param [ String, Symbol ] name The name to get.
       #
-      # @return [ String ] The name of the field as stored in the database.
+      # @return [ String ] The name of the field as it's stored in the db.
       def database_field_name(name)
-        if Mongoid.broken_alias_handling
-          return nil unless name
-          normalized = name.to_s
-          aliased_fields[normalized] || normalized
-        else
-          return nil unless name.present?
-          key = name.to_s
-          segment, remaining = key.split('.', 2)
-          segment = aliased_fields[segment]&.dup || segment
-          return segment unless remaining
-
-          relation = relations[aliased_associations[segment] || segment]
-          if relation
-            "#{segment}.#{relation.klass.database_field_name(remaining)}"
-          else
-            "#{segment}.#{remaining}"
-          end
-        end
+        Fields.database_field_name(name, relations, aliased_fields, aliased_associations)
       end
 
       # Defines all the fields that are accessible on the Document
@@ -370,6 +471,23 @@ module Mongoid
       # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
       def using_object_ids?
         fields["_id"].object_id_field?
+      end
+
+      # Traverse down the association tree and search for the field for the
+      # given key.
+      #
+      # @param [ String ] key The key used to search the association tree.
+      # @param [ Proc ] block The block takes in three paramaters, the current
+      #   meth, the field or the relation, and whether the second parameter is a
+      #   field or not.
+      #
+      # @return [ Field ] The field found for the given key at the end of the
+      #   search. This will return nil if the last thing found is an association
+      #   or no field was found for the given key.
+      #
+      # @api private
+      def traverse_association_tree(key, &block)
+        Fields.traverse_association_tree(key, fields, relations, aliased_associations, &block)
       end
 
       protected

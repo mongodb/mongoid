@@ -3975,6 +3975,209 @@ describe Mongoid::Criteria do
         expect(criteria.selector).to eq("label.name" => "12345")
       end
     end
+
+    context "when querying with a range" do
+
+      context "when querying an embeds_many association" do
+        let(:criteria) do
+          Band.where("labels" => 10..15)
+        end
+
+        it "correctly uses elemMatch without an inner key" do
+          expect(criteria.selector).to eq(
+            "labels" => {
+              "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+            }
+          )
+        end
+      end
+
+      context "when querying an element in an embeds_many association" do
+        let(:criteria) do
+          Band.where("labels.age" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "labels" => {
+              "$elemMatch" => {
+                "age" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when querying a field of type array" do
+        let(:criteria) do
+          Band.where("genres" => 10..15)
+        end
+
+        it "correctly uses elemMatch without an inner key" do
+          expect(criteria.selector).to eq(
+            "genres" => {
+              "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+            }
+          )
+        end
+      end
+
+      context "when querying an aliased field of type array" do
+        let(:criteria) do
+          Person.where("array" => 10..15)
+        end
+
+        it "correctly uses the aliased field and elemMatch" do
+          expect(criteria.selector).to eq(
+            "a" => {
+              "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+            }
+          )
+        end
+      end
+
+      context "when querying a field inside an array" do
+        let(:criteria) do
+          Band.where("genres.age" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "genres" => {
+              "$elemMatch" => {
+                "age" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when there are no embeds_manys or Arrays" do
+        let(:criteria) do
+          Band.where("fans.info.age" => 10..15)
+        end
+
+        it "does not use elemMatch" do
+          expect(criteria.selector).to eq(
+            "fans.info.age" => { "$gte" => 10, "$lte" => 15 }
+          )
+        end
+      end
+
+      context "when querying a nested element in an embeds_many association" do
+        let(:criteria) do
+          Band.where("labels.age.number" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "labels" => {
+              "$elemMatch" => {
+                "age.number" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when querying a nested element in an Array" do
+        let(:criteria) do
+          Band.where("genres.name.length" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "genres" => {
+              "$elemMatch" => {
+                "name.length" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when querying a nested element in a nested embeds_many association" do
+        context "when the outer association is an embeds_many" do
+          let(:criteria) do
+            Band.where("records.tracks.name.length" => 10..15)
+          end
+
+          it "correctly uses elemMatch" do
+            expect(criteria.selector).to eq(
+              "records.tracks" => {
+                "$elemMatch" => {
+                  "name.length" => { "$gte" => 10, "$lte" => 15 }
+                }
+              }
+            )
+          end
+        end
+
+        context "when the outer association is an embeds_one" do
+          let(:criteria) do
+            Person.where("name.translations.language.length" => 10..15)
+          end
+
+          it "correctly uses elemMatch" do
+            expect(criteria.selector).to eq(
+              "name.translations" => {
+                "$elemMatch" => {
+                  "language.length" => { "$gte" => 10, "$lte" => 15 }
+                }
+              }
+            )
+          end
+        end
+      end
+
+      context "when querying a deeply nested array" do
+        let(:criteria) do
+          Person.where("addresses.code.deepest.array.element.item" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "addresses.code.deepest.array" => {
+              "$elemMatch" => {
+                "element.item" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when there are multiple conditions" do
+        let(:criteria) do
+          Band.where("$or" => [{"labels.age" => 10..15}, {labels: 8}])
+        end
+
+        it "correctly combines the conditions" do
+          expect(criteria.selector).to eq("$or" => [
+            { "labels" => {
+              "$elemMatch" => {
+                "age" => { "$gte" => 10, "$lte" => 15 }
+              } } },
+            { "labels" => 8 }
+          ])
+        end
+      end
+
+      context "when the association is aliased" do
+        let(:criteria) do
+          Person.where("passport.passport_pages.num_stamps" => 10..18)
+        end
+
+        it "correctly uses the aliased association" do
+          expect(criteria.selector).to eq(
+            "pass.passport_pages" => {
+              "$elemMatch" => {
+                "num_stamps" => { "$gte" => 10, "$lte" => 18 }
+              }
+            }
+          )
+        end
+      end
+    end
   end
 
   describe "#for_js" do

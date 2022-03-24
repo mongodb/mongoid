@@ -10,4 +10,13 @@ class Passport
   field :localized_translations, localize: true
 
   embedded_in :person, autobuild: true
+
+  embeds_many :passport_pages
+end
+
+class PassportPage
+  include Mongoid::Document
+
+  field :num_stamps, type: Integer
+  embedded_in :passport
 end
