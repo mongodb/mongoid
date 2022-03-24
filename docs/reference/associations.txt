@@ -554,7 +554,7 @@ often a good idea to use embedded associations.
 
 Using embedded associations allows using MongoDB tools like the
 `aggregation pipeline
-<https://docs.mongodb.com/manual/core/aggregation-pipeline/>`_ to query
+<https://mongodb.com/docs/manual/core/aggregation-pipeline/>`_ to query
 these documents in a powerful way.
 
 Because embedded documents are stored as part of their parent top-level
@@ -696,8 +696,8 @@ is not implemented for :ref:`text search <text-search>`, :manual:`geospatial que
 operators </reference/operator/query-geospatial/>`,
 operators that execute JavaScript code (:manual:`$where </reference/operator/query/where/>`)
 and operators that are implemented via other server functionality such as
-:manual:`$expr <https://docs.mongodb.com/manual/reference/operator/query/expr/>`
-and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/>`.
+:manual:`$expr <https://mongodb.com/docs/manual/reference/operator/query/expr/>`
+and :manual:`$jsonSchema <https://mongodb.com/docs/manual/reference/operator/query/jsonSchema/>`.
 
 The following operators are supported:
 
@@ -1635,9 +1635,9 @@ Mongoid provides limited support for constructing the aggregation pipeline
 itself using a high-level DSL. The following aggregation pipeline operators
 are supported:
 
-- `$group <https://docs.mongodb.com/manual/reference/operator/aggregation/group/>`_
-- `$project <https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_
-- `$unwind <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_
+- `$group <https://mongodb.com/docs/manual/reference/operator/aggregation/group/>`_
+- `$project <https://mongodb.com/docs/manual/reference/operator/aggregation/project/>`_
+- `$unwind <https://mongodb.com/docs/manual/reference/operator/aggregation/unwind/>`_
 
 To construct a pipeline, call the corresponding aggregation pipeline methods
 on a ``Criteria`` instance. Aggregation pipeline operations are added to the
@@ -1686,7 +1686,7 @@ group
 `````
 
 The ``group`` method adds a `$group aggregation pipeline stage
-<https://docs.mongodb.com/manual/reference/operator/aggregation/group/>`_.
+<https://mongodb.com/docs/manual/reference/operator/aggregation/group/>`_.
 
 The field expressions support Mongoid symbol-operator syntax:
 
@@ -1706,7 +1706,7 @@ project
 ```````
 
 The ``project`` method adds a `$project aggregation pipeline stage
-<https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_.
+<https://mongodb.com/docs/manual/reference/operator/aggregation/project/>`_.
 
 The argument should be a Hash specifying the projection:
 
@@ -1722,7 +1722,7 @@ unwind
 ``````
 
 The ``unwind`` method adds an `$unwind aggregation pipeline stage
-<https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_.
+<https://mongodb.com/docs/manual/reference/operator/aggregation/unwind/>`_.
 
 The argument can be a field name, specifiable as a symbol or a string, or
 a Hash or a ``BSON::Document`` instance:

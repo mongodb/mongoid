@@ -13,7 +13,7 @@ Transactions
    :class: singlecol
 
 Version 4.0 of the MongoDB server introduces
-`multi-document transactions <https://docs.mongodb.com/manual/core/transactions/>`_.
+`multi-document transactions <https://mongodb.com/docs/manual/core/transactions/>`_.
 (Updates to multiple fields within a single document are atomic in all
 versions of MongoDB). Transactions require Mongoid version 6.4 or higher and Ruby driver version
 2.6 or higher.
@@ -67,9 +67,9 @@ A transaction may be committed or aborted. The corresponding methods to do so ar
   end
 
 If a session ends with an open transaction,
-`the transaction is aborted <https://docs.mongodb.com/manual/core/transactions/#transactions-and-sessions>`_.
+`the transaction is aborted <https://mongodb.com/docs/manual/core/transactions/#transactions-and-sessions>`_.
 
-The transaction commit `can be retried <https://docs.mongodb.com/manual/core/transactions/#retry-commit-operation>`_
+The transaction commit `can be retried <https://mongodb.com/docs/manual/core/transactions/#retry-commit-operation>`_
 if it fails. Here is the Ruby code to do so:
 
 .. code-block:: ruby

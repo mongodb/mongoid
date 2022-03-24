@@ -14,7 +14,7 @@ Ruby MongoDB Driver Compatibility
 =================================
 
 The following compatibility table specifies the versions of `Ruby driver for
-MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
+MongoDB <https://mongodb.com/docs/ruby-driver/current/>`_
 (the ``mongo`` gem) supported by the most recent patch releases of the
 specified Mongoid versions.
 
@@ -182,7 +182,7 @@ version(s) of Mongoid for use with a specific version of MongoDB server.
 Note that in order to use features of a particular MongoDB server version,
 both the driver and Mongoid must support that server version.
 Please refer to `the driver compatibility page
-<https://docs.mongodb.com/ruby-driver/current/reference/driver-compatibility/>`_
+<https://mongodb.com/docs/ruby-driver/current/reference/driver-compatibility/>`_
 for driver compatibility matrices.
 
 "D" in a column means support for that MongoDB server version is deprecated

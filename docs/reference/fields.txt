@@ -19,7 +19,7 @@ Field Types
 ===========
 
 MongoDB stores underlying document data using
-`BSON types <https://docs.mongodb.com/manual/reference/bson-types/>`_, and
+`BSON types <https://mongodb.com/docs/manual/reference/bson-types/>`_, and
 Mongoid converts BSON types to Ruby types at runtime in your application.
 For example, a field defined with `type: :float` will use the Ruby ``Float``
 class in-memory and will persist in the database as the the BSON ``double`` type.
@@ -1327,7 +1327,7 @@ names containing the dot and dollar characters, however it is recommended to
 avoid these characters for ease of querying.
 
 MongoDB 5.0 adds `special operators
-<https://docs.mongodb.com/manual/core/dot-dollar-considerations/#std-label-crud-concepts-dot-dollar-considerations>`_
+<https://mongodb.com/docs/manual/core/dot-dollar-considerations/#std-label-crud-concepts-dot-dollar-considerations>`_
 for querying and modifying documents using field names containing dots and
 dollars. Previous MongoDB versions do not provide a mechanism for querying
 documents on fields whose names contain dots and dollars, though such documents

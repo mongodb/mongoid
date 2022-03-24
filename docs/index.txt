@@ -16,7 +16,7 @@ for MongoDB in Ruby.
   tutorials
   schema-configuration
   working-with-data
-  API <https://docs.mongodb.com/mongoid/master/api/>
+  API <https://mongodb.com/docs/mongoid/master/api/>
   release-notes
   additional-resources
   ecosystem
