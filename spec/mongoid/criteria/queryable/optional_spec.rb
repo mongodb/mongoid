@@ -146,7 +146,7 @@ describe Mongoid::Criteria::Queryable::Optional do
       context "when using the mongo-1.x driver syntax" do
 
         let(:query) do
-          Mongoid::Query.new({}, {}, {}, {}, :mongo1x)
+          Mongoid::Query.new({}, {}, {}, {})
         end
 
         context "when provided symbols" do
@@ -419,7 +419,7 @@ describe Mongoid::Criteria::Queryable::Optional do
       context "when using the mongo-1.x driver syntax" do
 
         let(:query) do
-          Mongoid::Query.new({}, {}, {}, {}, :mongo1x)
+          Mongoid::Query.new({}, {}, {}, {})
         end
 
         context "when provided symbols" do
@@ -1176,7 +1176,7 @@ describe Mongoid::Criteria::Queryable::Optional do
       context "when using the mongo-1.x driver syntax" do
 
         let(:query) do
-          Mongoid::Query.new({}, {}, {}, {}, :mongo1x)
+          Mongoid::Query.new({}, {}, {}, {})
         end
 
         context "when provided a hash" do
