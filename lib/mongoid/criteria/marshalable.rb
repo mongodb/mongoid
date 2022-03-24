@@ -24,6 +24,11 @@ module Mongoid
       def marshal_load(data)
         @scoping_options, raw_selector, raw_options = data.pop(3)
         @klass, @driver, @inclusions, @documents, @strategy, @negating = data
+
+        if @driver == :mongo1x
+          raise NotImplementedError, "Mongoid no longer supports marshalling with driver version 1.x."
+        end
+
         @selector = load_hash(Queryable::Selector, raw_selector)
         @options = load_hash(Queryable::Options, raw_options)
       end
