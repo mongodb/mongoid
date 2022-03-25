@@ -1076,6 +1076,65 @@ describe Mongoid::Criteria::Includable do
         expect(criteria).to eq([ person ])
       end
     end
+
+    context "when including a nested belongs_to" do
+
+      before(:all) do
+        class A
+          include Mongoid::Document
+
+          has_one :b
+        end
+
+        class B
+          include Mongoid::Document
+
+          belongs_to :a
+          has_one :c
+        end
+
+        class C
+          include Mongoid::Document
+
+          belongs_to :b
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :A)
+        Object.send(:remove_const, :B)
+        Object.send(:remove_const, :C)
+      end
+
+      let!(:a) do
+        A.create
+      end
+
+      let!(:b) do
+        B.create!
+      end
+
+      let!(:c) do
+        C.create!
+      end
+
+      before do
+        b.c = c
+        a.b = b
+      end
+
+      let(:criteria) do
+        C.includes(b: :a)
+      end
+
+      let(:result) { criteria.first }
+
+      it "executes the query" do
+        expect_query(0) do
+          result.b.a
+        end
+      end
+    end
   end
 
   describe "#inclusions" do
