@@ -318,15 +318,9 @@ module Mongoid
         #
         # @return [ Optional ] The cloned optional.
         def add_sort_option(options, field, direction)
-          if driver == :mongo1x
-            sorting = (options[:sort] || []).dup
-            sorting.push([ field, direction ])
-            options.store(:sort, sorting)
-          else
-            sorting = (options[:sort] || {}).dup
-            sorting[field] = direction
-            options.store(:sort, sorting)
-          end
+          sorting = (options[:sort] || {}).dup
+          sorting[field] = direction
+          options.store(:sort, sorting)
         end
 
         # Take the provided criterion and store it as an option in the query
