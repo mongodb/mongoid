@@ -94,7 +94,7 @@ is deprecated.
      -
      -
      -
-     - |checkmark|
+     -
 
    * - 7.4
      - |checkmark|
