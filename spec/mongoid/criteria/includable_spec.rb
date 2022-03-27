@@ -1144,7 +1144,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not execute a query" do
-          expect_query(0) do
+          expect_no_queries do
             result.b.a
           end
         end
@@ -1163,7 +1163,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not execute a query" do
-          expect_query(0) do
+          expect_no_queries do
             result.c.b.a
           end
         end
@@ -1181,7 +1181,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not executes a query" do
-          expect_query(0) do
+          expect_no_queries do
             result.b.c
           end
         end
@@ -1200,7 +1200,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not execute a query" do
-          expect_query(0) do
+          expect_no_queries do
             result.b.c.d
           end
         end
@@ -1231,7 +1231,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not execute a query" do
-          expect_query(0) do
+          expect_no_queries do
             results.each do |a|
               a.b.c
             end
@@ -1272,7 +1272,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not execute a query" do
-          expect_query(0) do
+          expect_no_queries do
             results.c.d
             results.b.c.d
           end

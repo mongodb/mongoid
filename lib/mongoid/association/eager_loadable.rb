@@ -35,7 +35,7 @@ module Mongoid
           if as = assoc_map.delete(klass)
             as.group_by(&:relation)
             .each do |relation, assocs|
-              assocs.each { |a| queue << a.klass.to_s }
+              assocs.each { |a| queue << a.class_name }
 
               docs = docs_map[klass] || []
               res = relation.eager_loader(assocs, docs.to_a).run
