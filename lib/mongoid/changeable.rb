@@ -69,6 +69,7 @@ module Mongoid
     #   person.move_changes
     def move_changes
       @previous_changes = changes
+      @previous_attributes = attributes
       Atomic::UPDATES.each do |update|
         send(update).clear
       end
@@ -92,6 +93,10 @@ module Mongoid
     # @return [ Hash<String, Array<Object, Object> ] The previous changes.
     def previous_changes
       @previous_changes ||= {}
+    end
+
+    def previous_attributes
+      @previous_attributes ||= {}
     end
 
     # Remove a change from the dirty attributes hash. Used by the single field
@@ -185,12 +190,21 @@ module Mongoid
       attribute_changed?(attr) ? changed_attributes[attr] : attributes[attr]
     end
 
+    # Get the previous attribute value that was changed
+    # before the document was saved.
+    #
+    # Calling `reset` on the document clears
+    #
+    # @param [ String ] attr The attribute name.
+    #
+    # @return [ Object | nil ] Attribute value before the document was saved,
+    #   or nil if the document was not saved of was resetted.
     def attribute_previously_was(attr)
       attr = database_field_name(attr)
       if previous_changes.key?(attr)
         previous_changes[attr].first
       else
-        attributes[attr]
+        previous_attributes[attr]
       end
     end
 

@@ -360,4 +360,44 @@ describe 'callbacks integration tests' do
       expect(architect.after_remove_num_buildings).to eq(2)
     end
   end
+
+  context '_previously was methods in after_save callback' do
+    let(:title) do
+      "Title"
+    end
+
+    let(:updated_title) do
+      "Updated title"
+    end
+
+    let(:age) do
+      10
+    end
+
+    it do
+      class PreviouslyWasPerson
+        include Mongoid::Document
+
+        field :title, type: String
+        field :age, type: Integer
+
+        attr_reader :after_save_vals
+
+        set_callback :save, :after do |doc|
+          @after_save_vals ||= []
+          @after_save_vals << [doc.title_previously_was, doc.age_previously_was]
+        end
+      end
+
+      person = PreviouslyWasPerson.create!(title: title, age: age)
+      person.title = updated_title
+      person.save!
+      expect(person.after_save_vals).to eq([
+        # Field values are nil before create
+        [nil, nil],
+        [title, age]
+        ])
+    end
+
+  end
 end

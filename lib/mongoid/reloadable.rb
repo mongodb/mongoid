@@ -28,6 +28,8 @@ module Mongoid
       @attributes = reloaded
       @attributes_before_type_cast = {}
       changed_attributes.clear
+      previous_changes.clear
+      previous_attributes.clear
       reset_readonly
       apply_defaults
       reload_relations

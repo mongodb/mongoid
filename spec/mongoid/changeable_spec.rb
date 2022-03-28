@@ -597,6 +597,12 @@ describe Mongoid::Changeable do
       end
     end
 
+    it 'clears after reload' do
+      person.reload
+      expect(person.title_previously_was).to be_nil
+      expect(person.age_previously_was).to be_nil
+    end
+
   end
 
   describe "#attribute_will_change!" do
