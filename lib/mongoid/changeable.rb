@@ -185,6 +185,15 @@ module Mongoid
       attribute_changed?(attr) ? changed_attributes[attr] : attributes[attr]
     end
 
+    def attribute_previously_was(attr)
+      attr = database_field_name(attr)
+      if previous_changes.key?(attr)
+        previous_changes[attr].first
+      else
+        attributes[attr]
+      end
+    end
+
     # Flag an attribute as going to change.
     #
     # @example Flag the attribute.
@@ -239,7 +248,7 @@ module Mongoid
         create_dirty_change_check(name, meth)
         create_dirty_change_flag(name, meth)
         create_dirty_default_change_check(name, meth)
-        create_dirty_previous_value_accessor(name, meth)
+        create_dirty_previous_value_accessors(name, meth)
         create_dirty_reset(name, meth)
         create_dirty_reset_to_default(name, meth)
         create_dirty_previously_changed?(name, meth)
@@ -291,17 +300,20 @@ module Mongoid
         end
       end
 
-      # Creates the dirty change previous value accessor.
+      # Creates the dirty change previous value accessors.
       #
       # @example Create the accessor.
-      #   Model.create_dirty_previous_value_accessor("name", "alias")
+      #   Model.create_dirty_previous_value_accessors("name", "alias")
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      def create_dirty_previous_value_accessor(name, meth)
+      def create_dirty_previous_value_accessors(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_was") do
             attribute_was(name)
+          end
+          re_define_method("#{meth}_previously_was") do
+            attribute_previously_was(name)
           end
         end
       end
