@@ -32,6 +32,13 @@ As of Mongoid 7.4, JRuby support is deprecated. Mongoid 8 will not support
 JRuby.
 
 
+Support for MongoDB 3.4 and Earlier Servers Deprecated
+------------------------------------------------------
+
+Mongoid 7.4 deprecates support for MongoDB 3.4 and earlier.
+Mongoid 8 will require MongoDB 3.6 or newer.
+
+
 Change ``===`` Operator To Match Ruby Semantics
 -----------------------------------------------
 
