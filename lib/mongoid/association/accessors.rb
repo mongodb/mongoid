@@ -110,6 +110,9 @@ module Mongoid
         # As per the comments under MONGOID-5034, I've decided to only raise on
         # embedded associations for a missing attribute. Rails does not raise
         # for a missing attribute on referenced associations.
+        # We also don't want to raise if we're binding, as the binding process
+        # needs to retrieve the inverse association of the association we're
+        # retrieving.
         if !_binding? && association.embedded? && attribute_missing?(field_name)
           raise ActiveModel::MissingAttributeError, "Missing attribute: '#{field_name}'"
         end
