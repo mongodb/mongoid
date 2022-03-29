@@ -69,7 +69,7 @@ module Mongoid
     #   person.move_changes
     def move_changes
       @previous_changes = changes
-      @previous_attributes = attributes
+      @previous_attributes = attributes.dup
       Atomic::UPDATES.each do |update|
         send(update).clear
       end
