@@ -40,6 +40,42 @@ describe Mongoid::Stateful do
     end
   end
 
+  describe '#previously_new_record?' do
+    context "when calling new on the document" do
+
+      let(:person) do
+        Person.new("_id" => BSON::ObjectId.new)
+      end
+
+      it "returns false" do
+        expect(person).not_to be_a_previously_new_record
+      end
+    end
+
+    context "when the object has been saved" do
+
+      let(:person) do
+        Person.create!("_id" => BSON::ObjectId.new)
+      end
+
+      it "returns true" do
+        expect(person).to be_a_previously_new_record
+      end
+    end
+
+    context "resets after reload" do
+
+      let(:person) do
+        Person.create!("_id" => BSON::ObjectId.new)
+      end
+
+      it "returns false" do
+        person.reload
+        expect(person).not_to be_a_previously_new_record
+      end
+    end
+  end
+
   describe "#persisted?" do
 
     let(:person) do

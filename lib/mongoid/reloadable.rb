@@ -30,6 +30,7 @@ module Mongoid
       changed_attributes.clear
       previous_changes.clear
       previous_attributes.clear
+      @previously_new_record = false
       reset_readonly
       apply_defaults
       reload_relations
