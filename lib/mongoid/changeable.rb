@@ -193,12 +193,13 @@ module Mongoid
     # Get the previous attribute value that was changed
     # before the document was saved.
     #
-    # Calling `reset` on the document clears
+    # It the document has not been saved yet, or was just loaded from database,
+    # this method returns nil for all attributes.
     #
     # @param [ String ] attr The attribute name.
     #
     # @return [ Object | nil ] Attribute value before the document was saved,
-    #   or nil if the document was not saved of was resetted.
+    #   or nil if the document has not been saved yet.
     def attribute_previously_was(attr)
       attr = database_field_name(attr)
       if previous_changes.key?(attr)

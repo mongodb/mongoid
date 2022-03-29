@@ -28,7 +28,7 @@ module Mongoid
       @new_record ||= false
     end
 
-    # Returns true if this object was just created -- that is, prior to the last
+    # Returns true if this document was just created -- that is, prior to the last
     # save, the object didn't exist in the database and new_record? would have
     # returned true.
     #
