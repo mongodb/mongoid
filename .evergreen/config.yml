@@ -15,9 +15,8 @@ pre_error_fails_task: true
 # Actual testing tasks are marked with `type: test`
 command_type: system
 
-# Protect ourself against rogue test case, or curl gone wild, that runs forever
-# jruby runs take over two hours sometimes
-exec_timeout_secs: 10800
+# Protect ourself against rogue test case, or curl gone wild, that runs forever.
+exec_timeout_secs: 2500
 
 # What to do when evergreen hits the timeout (`post:` tasks are run automatically)
 timeout:
@@ -412,13 +411,6 @@ axes:
         display_name: ruby-head
         variables:
            RVM_RUBY: "ruby-head"
-  - id: "jruby"
-    display_name: JRuby Version
-    values:
-      - id: "jruby-9.2"
-        display_name: jruby-9.2
-        variables:
-           RVM_RUBY: "jruby-9.2"
   - id: "os"
     display_name: OS
     values:
@@ -448,34 +440,18 @@ axes:
         display_name: "Driver-master"
         variables:
           DRIVER: "master"
-      - id: master-jruby
-        display_name: "Driver-master (JRuby)"
-        variables:
-          DRIVER: "master-jruby"
       - id: stable
         display_name: "Driver-stable"
         variables:
           DRIVER: "stable"
-      - id: stable-jruby
-        display_name: "Driver-stable (JRuby)"
-        variables:
-          DRIVER: "stable-jruby"
       - id: oldstable
         display_name: "Driver-oldstable"
         variables:
           DRIVER: "oldstable"
-      - id: oldstable-jruby
-        display_name: "Driver-oldstable (JRuby)"
-        variables:
-          DRIVER: "oldstable-jruby"
       - id: min
         display_name: "Driver-min"
         variables:
           DRIVER: "min"
-      - id: min-jruby
-        display_name: "Driver-min (JRuby)"
-        variables:
-          DRIVER: "min-jruby"
       - id: bson-min
         display_name: "BSON-min"
         variables:
@@ -553,18 +529,6 @@ buildvariants:
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu2004-small
-  tasks:
-    - name: "test"
-
-- matrix_name: "jruby"
-  matrix_spec:
-    jruby: "jruby-9.2"
-    driver: ["current"]
-    topology: ['replica-set', 'sharded-cluster']
-    mongodb-version: '5.0'
-  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1804-small
   tasks:
     - name: "test"
 
@@ -742,20 +706,6 @@ buildvariants:
     app-tests: yes
     rails: ['5.1', '5.2']
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  run_on:
-    - ubuntu1804-small
-  tasks:
-     - name: "test"
-
-- matrix_name: app-tests-jruby
-  matrix_spec:
-    jruby: jruby-9.2
-    driver: ["current"]
-    mongodb-version: '5.0'
-    topology: standalone
-    app-tests: yes
-    rails: ['6.0']
-  display_name: "app tests ${driver}, ${jruby}"
   run_on:
     - ubuntu1804-small
   tasks:

@@ -6,7 +6,7 @@ set -o errexit  # Exit the script with error if any of the commands fail
 # Supported/used environment variables:
 #       MONGODB_URI             Set the suggested connection MONGODB_URI (including credentials and topology info)
 #       RVM_RUBY                Define the Ruby version to test with, using its RVM identifier.
-#                               For example: "ruby-3.0" or "jruby-9.2"
+#                               For example: "ruby-3.0"
 
 . `dirname "$0"`/../spec/shared/shlib/distro.sh
 . `dirname "$0"`/../spec/shared/shlib/set_env.sh
@@ -44,16 +44,6 @@ fi
 which bundle
 bundle --version
 
-if echo $RVM_RUBY |grep -q jruby && test "$DRIVER" = master-jruby; then
-  # See https://jira.mongodb.org/browse/RUBY-2156
-  git clone https://github.com/mongodb/bson-ruby
-  (cd bson-ruby &&
-    bundle install &&
-    rake compile &&
-    gem build *.gemspec &&
-    gem install *.gem)
-fi
-
 if test "$DRIVER" = "master"; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_master.gemfile
@@ -69,18 +59,6 @@ elif test "$DRIVER" = "min"; then
 elif test "$DRIVER" = "bson-min"; then
   bundle install --gemfile=gemfiles/bson_min.gemfile
   BUNDLE_GEMFILE=gemfiles/bson_min.gemfile
-elif test "$DRIVER" = "stable-jruby"; then
-  bundle install --gemfile=gemfiles/driver_stable_jruby.gemfile
-  BUNDLE_GEMFILE=gemfiles/driver_stable_jruby.gemfile
-elif test "$DRIVER" = "oldstable-jruby"; then
-  bundle install --gemfile=gemfiles/driver_oldstable_jruby.gemfile
-  BUNDLE_GEMFILE=gemfiles/driver_oldstable_jruby.gemfile
-elif test "$DRIVER" = "min-jruby"; then
-  bundle install --gemfile=gemfiles/driver_min_jruby.gemfile
-  BUNDLE_GEMFILE=gemfiles/driver_min_jruby.gemfile
-elif test "$RAILS" = "master-jruby"; then
-  bundle install --gemfile=gemfiles/rails-master_jruby.gemfile
-  BUNDLE_GEMFILE=gemfiles/rails-master_jruby.gemfile
 elif test -n "$RAILS" && test "$RAILS" != 6.1; then
   bundle install --gemfile=gemfiles/rails-"$RAILS".gemfile
   BUNDLE_GEMFILE=gemfiles/rails-"$RAILS".gemfile

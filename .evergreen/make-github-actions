@@ -48,7 +48,7 @@ class EvergreenConfig < YamlConfig
         # matrix_name:  name,
         # display_name: var[:display_name],
         mongodb:  spec[:'mongodb-version'],
-        ruby:     spec[:jruby] || spec[:ruby],
+        ruby:     spec[:ruby],
         topology: spec[:topology],
         task:     tasks.first,
 

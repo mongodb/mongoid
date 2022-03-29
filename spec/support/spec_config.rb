@@ -26,14 +26,6 @@ class SpecConfig
     end
   end
 
-  def mri?
-    !jruby?
-  end
-
-  def jruby?
-    RUBY_PLATFORM =~ /\bjava\b/
-  end
-
   def platform
     RUBY_PLATFORM
   end

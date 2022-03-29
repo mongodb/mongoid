@@ -31,24 +31,11 @@ unless SpecConfig.instance.ci?
   begin
     require 'byebug'
   rescue LoadError
-    # jruby - try pry
-    begin
-      require 'pry'
-    # jruby likes to raise random error classes, in this case
-    # NameError in addition to LoadError
-    rescue Exception
-    end
   end
 end
 
 require 'mongoid'
-
-if SpecConfig.instance.mri?
-  require 'timeout_interrupt'
-else
-  require 'timeout'
-  TimeoutInterrupt = Timeout
-end
+require 'timeout_interrupt'
 
 RSpec.configure do |config|
   config.expect_with(:rspec) do |c|
@@ -61,8 +48,8 @@ RSpec.configure do |config|
 
   if SpecConfig.instance.ci? && !%w(1 true yes).include?(ENV['INTERACTIVE']&.downcase)
     timeout = if SpecConfig.instance.app_tests?
-      # App tests under JRuby take a REALLY long time (over 5 minutes per test).
-      500
+      # App tests take longer.
+      120
     else
       # Allow a max of 30 seconds per test.
       # Tests should take under 10 seconds ideally but it seems
