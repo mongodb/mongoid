@@ -105,6 +105,19 @@ module Mongoid
       #
       # @return [ Proxy ] The association.
       def get_relation(name, association, object, reload = false)
+        field_name = database_field_name(name)
+
+        # As per the comments under MONGOID-5034, I've decided to only raise on
+        # embedded associations for a missing attribute. Rails does not raise
+        # for a missing attribute on referenced associations.
+        # We also don't want to raise if we're retrieving an association within
+        # the codebase. This is often done when retrieving the inverse association
+        # during binding or when cascading callbacks. Whenever we retrieve
+        # associations within the codebase, we use without_autobuild.
+        if !without_autobuild? && association.embedded? && attribute_missing?(field_name)
+          raise ActiveModel::MissingAttributeError, "Missing attribute: '#{field_name}'"
+        end
+
         if !reload && (value = ivar(name)) != false
           value
         else
