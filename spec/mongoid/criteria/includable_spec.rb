@@ -1079,202 +1079,315 @@ describe Mongoid::Criteria::Includable do
 
     context "when including nested referenced associations" do
 
-      before(:all) do
-        class A
-          include Mongoid::Document
-          has_one :b
-        end
-
-        class B
-          include Mongoid::Document
-          belongs_to :a
-          has_one :c
-        end
-
-        class C
-          include Mongoid::Document
-          belongs_to :b
-          has_one :d
-        end
-
-        class D
-          include Mongoid::Document
-          belongs_to :c
-        end
-      end
-
-      after(:all) do
-        Object.send(:remove_const, :A)
-        Object.send(:remove_const, :B)
-        Object.send(:remove_const, :C)
-        Object.send(:remove_const, :D)
-      end
-
-      let!(:a) do
-        A.create!
-      end
-
-      let!(:b) do
-        B.create!
-      end
-
-      let!(:c) do
-        C.create!
-      end
-
-      let!(:d) do
-        D.create!
-      end
-
-      before do
-        c.d = d
-        b.c = c
-        a.b = b
-      end
-
-      context "when including the belongs_to assocation" do
-        let!(:result) do
-          C.includes(b: :a).first
-        end
-
-        it "finds the right document" do
-          expect(result).to eq(c)
-          expect(result.b).to eq(c.b)
-          expect(result.b.a).to eq(c.b.a)
-        end
-
-        it "does not execute a query" do
-          expect_no_queries do
-            result.b.a
-          end
-        end
-      end
-
-      context "when including a doubly-nested belongs_to assocation" do
-        let!(:result) do
-          D.includes(c: { b: :a }).first
-        end
-
-        it "finds the right document" do
-          expect(result).to eq(d)
-          expect(result.c).to eq(d.c)
-          expect(result.c.b).to eq(d.c.b)
-          expect(result.c.b.a).to eq(d.c.b.a)
-        end
-
-        it "does not execute a query" do
-          expect_no_queries do
-            result.c.b.a
-          end
-        end
-      end
-
-      context "when including the has_many assocation" do
-        let!(:result) do
-          A.includes(b: :c).first
-        end
-
-        it "finds the right document" do
-          expect(result).to eq(a)
-          expect(result.b).to eq(a.b)
-          expect(result.b.c).to eq(a.b.c)
-        end
-
-        it "does not executes a query" do
-          expect_no_queries do
-            result.b.c
-          end
-        end
-      end
-
-      context "when including a doubly-nested has_many assocation" do
-        let!(:result) do
-          A.includes(b: { c: :d }).first
-        end
-
-        it "finds the right document" do
-          expect(result).to eq(a)
-          expect(result.b).to eq(a.b)
-          expect(result.b.c).to eq(a.b.c)
-          expect(result.b.c.d).to eq(a.b.c.d)
-        end
-
-        it "does not execute a query" do
-          expect_no_queries do
-            result.b.c.d
-          end
-        end
-      end
-
-      context "when there are multiple documents" do
-        let!(:as) do
-          res = 9.times.map do |i|
-            A.create!.tap do |a|
-              a.b = B.create!.tap do |b|
-                b.c = C.create!
-              end
-            end
-          end
-          [a, *res]
-        end
-
-        let!(:results) do
-          A.includes(b: :c).entries.sort
-        end
-
-        it "finds the right document" do
-          as.length.times do |i|
-            expect(as[i]).to eq(results[i])
-            expect(as[i].b).to eq(results[i].b)
-            expect(as[i].b.c).to eq(results[i].b.c)
-          end
-        end
-
-        it "does not execute a query" do
-          expect_no_queries do
-            results.each do |a|
-              a.b.c
-            end
-          end
-        end
-      end
-
-      context "when there are multiple associations" do
+      context "when using a has_one association" do
         before(:all) do
           class A
+            include Mongoid::Document
+            has_one :b
+          end
+
+          class B
+            include Mongoid::Document
+            belongs_to :a
             has_one :c
           end
 
           class C
-            belongs_to :a
+            include Mongoid::Document
+            belongs_to :b
+            has_one :d
+          end
+
+          class D
+            include Mongoid::Document
+            belongs_to :c
           end
         end
 
-        let(:c2) { C.create! }
-        let(:d2) { D.create! }
+        after(:all) do
+          Object.send(:remove_const, :A)
+          Object.send(:remove_const, :B)
+          Object.send(:remove_const, :C)
+          Object.send(:remove_const, :D)
+        end
+
+        let!(:a) do
+          A.create!
+        end
+
+        let!(:b) do
+          B.create!
+        end
+
+        let!(:c) do
+          C.create!
+        end
+
+        let!(:d) do
+          D.create!
+        end
 
         before do
-          a.c = c2
-          a.c.d = d2
+          c.d = d
+          b.c = c
+          a.b = b
         end
 
+        context "when including the belongs_to assocation" do
+          let!(:result) do
+            C.includes(b: :a).first
+          end
+
+          it "finds the right document" do
+            expect(result).to eq(c)
+            expect(result.b).to eq(c.b)
+            expect(result.b.a).to eq(c.b.a)
+          end
+
+          it "does not execute a query" do
+            expect_no_queries do
+              result.b.a
+            end
+          end
+        end
+
+        context "when including a doubly-nested belongs_to assocation" do
+          let!(:result) do
+            D.includes(c: { b: :a }).first
+          end
+
+          it "finds the right document" do
+            expect(result).to eq(d)
+            expect(result.c).to eq(d.c)
+            expect(result.c.b).to eq(d.c.b)
+            expect(result.c.b.a).to eq(d.c.b.a)
+          end
+
+          it "does not execute a query" do
+            expect_no_queries do
+              result.c.b.a
+            end
+          end
+        end
+
+        context "when including the has_many assocation" do
+          let!(:result) do
+            A.includes(b: :c).first
+          end
+
+          it "finds the right document" do
+            expect(result).to eq(a)
+            expect(result.b).to eq(a.b)
+            expect(result.b.c).to eq(a.b.c)
+          end
+
+          it "does not executes a query" do
+            expect_no_queries do
+              result.b.c
+            end
+          end
+        end
+
+        context "when including a doubly-nested has_many assocation" do
+          let!(:result) do
+            A.includes(b: { c: :d }).first
+          end
+
+          it "finds the right document" do
+            expect(result).to eq(a)
+            expect(result.b).to eq(a.b)
+            expect(result.b.c).to eq(a.b.c)
+            expect(result.b.c.d).to eq(a.b.c.d)
+          end
+
+          it "does not execute a query" do
+            expect_no_queries do
+              result.b.c.d
+            end
+          end
+        end
+
+        context "when there are multiple documents" do
+          let!(:as) do
+            res = 9.times.map do |i|
+              A.create!.tap do |a|
+                a.b = B.create!.tap do |b|
+                  b.c = C.create!
+                end
+              end
+            end
+            [a, *res]
+          end
+
+          let!(:results) do
+            A.includes(b: :c).entries.sort
+          end
+
+          it "finds the right document" do
+            as.length.times do |i|
+              expect(as[i]).to eq(results[i])
+              expect(as[i].b).to eq(results[i].b)
+              expect(as[i].b.c).to eq(results[i].b.c)
+            end
+          end
+
+          it "does not execute a query" do
+            expect_no_queries do
+              results.each do |a|
+                a.b.c
+              end
+            end
+          end
+        end
+
+        context "when there are multiple associations" do
+          before(:all) do
+            class A
+              has_one :c
+            end
+
+            class C
+              belongs_to :a
+            end
+          end
+
+          let(:c2) { C.create! }
+          let(:d2) { D.create! }
+
+          before do
+            a.c = c2
+            a.c.d = d2
+          end
+
+          let!(:results) do
+            A.includes(b: { c: :d }, c: :d).first
+          end
+
+          it "finds the right document" do
+            expect(results).to eq(a)
+            expect(results.b).to eq(a.b)
+            expect(results.b.c).to eq(a.b.c)
+            expect(results.b.c.d).to eq(a.b.c.d)
+            expect(results.c).to eq(a.c)
+            expect(results.c.d).to eq(a.c.d)
+          end
+
+          it "does not execute a query" do
+            expect_no_queries do
+              results.c.d
+              results.b.c.d
+            end
+          end
+        end
+      end
+    end
+
+    context "when using a has_many association" do
+      before(:all) do
+        class IncUser
+          include Mongoid::Document
+          has_many :posts, class_name: 'IncPost'
+          has_many :comments, class_name: 'IncComment'
+        end
+
+        class IncPost
+          include Mongoid::Document
+          belongs_to :user, class_name: 'IncUser'
+          has_many :comments, class_name: 'IncComment'
+        end
+
+        class IncComment
+          include Mongoid::Document
+          belongs_to :posts, class_name: 'IncPost'
+          belongs_to :user, class_name: 'IncUser'
+          belongs_to :thread, class_name: 'IncThread'
+        end
+
+        class IncThread
+          include Mongoid::Document
+          has_many :comments, class_name: 'IncComment'
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :IncUser)
+        Object.send(:remove_const, :IncPost)
+        Object.send(:remove_const, :IncComment)
+        Object.send(:remove_const, :IncThread)
+      end
+
+      let!(:user) do
+        IncUser.create!(posts: posts, comments: user_comments)
+      end
+
+      let!(:posts) do
+        [ IncPost.create!(comments: post_comments) ]
+      end
+
+      let!(:user_comments) do
+        2.times.map{ IncComment.create! }
+      end
+
+      let!(:post_comments) do
+        2.times.map{ IncComment.create! }
+      end
+
+      context "when including the same class twice" do
         let!(:results) do
-          A.includes(b: { c: :d }, c: :d).first
+          IncPost.includes({ user: :comments }, :comments).entries.sort
         end
 
-        it "finds the right document" do
-          expect(results).to eq(a)
-          expect(results.b).to eq(a.b)
-          expect(results.b.c).to eq(a.b.c)
-          expect(results.b.c.d).to eq(a.b.c.d)
-          expect(results.c).to eq(a.c)
-          expect(results.c.d).to eq(a.c.d)
+        it "finds the right documents" do
+          posts.length.times do |i|
+            expect(posts[i]).to eq(results[i])
+            expect(posts[i].user).to eq(results[i].user)
+            expect(posts[i].user.comments).to eq(results[i].user.comments)
+            expect(posts[i].comments).to eq(results[i].comments)
+          end
         end
 
         it "does not execute a query" do
           expect_no_queries do
-            results.c.d
-            results.b.c.d
+            results.each do |res|
+              res.user
+              res.user.comments.to_a
+              res.comments.to_a
+            end
+          end
+        end
+      end
+
+      context "when the association chain has a class name twice" do
+        let!(:thread) { IncThread.create!(comments: user_comments) }
+
+        let!(:result) do
+          IncThread.includes(comments: { user: { posts: :comments } }).first
+        end
+
+        it "finds the right document" do
+          expect(result).to eq(thread)
+          result.comments.length.times do |i|
+            c1 = result.comments[i]
+            c2 = thread.comments[i]
+            expect(c1).to eq(c2)
+            expect(c1.user).to eq(c2.user)
+            c1.user.posts.length.times do |i|
+              p1 = c1.user.posts[i]
+              p2 = c2.user.posts[i]
+
+              expect(p1).to eq(p2)
+              expect(p1.comments).to eq(p2.comments)
+            end
+          end
+        end
+
+        it "does not execute a query" do
+          expect_no_queries do
+            result.comments.each do |comment|
+              comment.user.posts.each do |post|
+                post.comments.to_a
+              end
+            end
           end
         end
       end
