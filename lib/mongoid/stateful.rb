@@ -48,6 +48,15 @@ module Mongoid
       !new_record? && !destroyed?
     end
 
+    # Checks if the document was previously saved to the database
+    # but now it has been deleted.
+    #
+    # @return [ true, false ] True if was persisted but now destroyed,
+    #   otherwise false.
+    def previously_persisted?
+      !new_record? && destroyed?
+    end
+
     # Returns whether or not the document has been flagged for deletion, but
     # not destroyed yet. Used for atomic pulls of child documents.
     #

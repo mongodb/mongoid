@@ -98,6 +98,19 @@ describe Mongoid::Stateful do
     end
   end
 
+  describe "#previously_persisted?" do
+    let(:person) do
+      Person.new
+    end
+
+    it "returns true after being destroyed" do
+      person.save!
+      expect(person).not_to be_previously_persisted
+      person.destroy
+      expect(person).to be_previously_persisted
+    end
+  end
+
   describe "destroyed?" do
 
     let(:person) do
