@@ -169,7 +169,7 @@ Mongoid 8.0 behavior:
 
   Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
     any_of({members: 2}, {last_tour: 1995})
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}],
   #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
@@ -178,7 +178,7 @@ Mongoid 8.0 behavior:
   #   embedded: false>
 
   Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
   #   options:  {}
@@ -191,7 +191,7 @@ Mongoid 7 behavior:
 
   Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
     any_of({members: 2}, {last_tour: 1995})
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990},
   #     {"members"=>2}, {"last_tour"=>1995}]}
@@ -200,7 +200,7 @@ Mongoid 7 behavior:
   #   embedded: false>
 
   Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
   #   options:  {}
@@ -257,6 +257,7 @@ as well as ActiveRecord compatible ``previously_new_record?`` and
 ``previously_persisted?`` helpers.
 
 .. code-block:: ruby
+
   class User
     include Mongoid::Document
 
@@ -274,4 +275,4 @@ as well as ActiveRecord compatible ``previously_new_record?`` and
   user.previously_new_record?     # => false
 
   user.destroy
-  pp user.previously_persisted?   # => true
+  user.previously_persisted?   # => true
