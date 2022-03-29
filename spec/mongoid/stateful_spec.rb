@@ -41,38 +41,21 @@ describe Mongoid::Stateful do
   end
 
   describe '#previously_new_record?' do
-    context "when calling new on the document" do
-
-      let(:person) do
-        Person.new("_id" => BSON::ObjectId.new)
-      end
-
-      it "returns false" do
-        expect(person).not_to be_a_previously_new_record
-      end
+    it "returns correct values" do
+      person = Person.new("_id" => BSON::ObjectId.new)
+      expect(person).not_to be_a_previously_new_record
+      person.save!
+      expect(person).to be_a_previously_new_record
+      person.title = "Title"
+      person.save!
+      expect(person).not_to be_a_previously_new_record
     end
 
-    context "when the object has been saved" do
-
-      let(:person) do
-        Person.create!("_id" => BSON::ObjectId.new)
-      end
-
-      it "returns true" do
-        expect(person).to be_a_previously_new_record
-      end
-    end
-
-    context "resets after reload" do
-
-      let(:person) do
-        Person.create!("_id" => BSON::ObjectId.new)
-      end
-
-      it "returns false" do
-        person.reload
-        expect(person).not_to be_a_previously_new_record
-      end
+    it "resets after reload" do
+      person = Person.create!("_id" => BSON::ObjectId.new)
+      expect(person).to be_a_previously_new_record
+      person.reload
+      expect(person).not_to be_a_previously_new_record
     end
   end
 

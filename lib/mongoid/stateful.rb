@@ -6,7 +6,7 @@ module Mongoid
   # document can transition through.
   module Stateful
 
-    attr_writer :destroyed, :flagged_for_destroy
+    attr_writer :destroyed, :flagged_for_destroy, :previously_new_record
 
     def new_record=(new_value)
       @new_record ||= false

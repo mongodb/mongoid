@@ -398,6 +398,28 @@ describe 'callbacks integration tests' do
         [title, age]
         ])
     end
+  end
 
+  context 'previously_new_record? in after_save' do
+    it do
+      class PreviouslyNewRecordPerson
+        include Mongoid::Document
+
+        field :title, type: String
+        field :age, type: Integer
+
+        attr_reader :previously_new_record_value
+
+        set_callback :save, :after do |doc|
+          @previously_new_record_value = doc.previously_new_record?
+        end
+      end
+
+      person = PreviouslyNewRecordPerson.create!(title: "title", age: 55)
+      expect(person.previously_new_record_value).to be_truthy
+      person.title = "New title"
+      person.save!
+      expect(person.previously_new_record_value).to be_falsey
+    end
   end
 end
