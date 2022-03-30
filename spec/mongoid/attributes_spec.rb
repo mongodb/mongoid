@@ -2214,4 +2214,19 @@ describe Mongoid::Attributes do
       end
     end
   end
+
+  context "when an attribute is removed then set" do
+    let(:cat) { Cat.create!(name: "Neil") }
+
+    before do
+      cat.remove_attribute("name")
+      cat.name = "Nissim"
+      cat.save!
+      cat.reload
+    end
+
+    it "correctly sets the attribute" do
+      expect(cat.name).to eq("Nissim")
+    end
+  end
 end

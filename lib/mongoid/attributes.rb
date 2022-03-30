@@ -164,6 +164,11 @@ module Mongoid
           else
             attributes[field_name] = typed_value
           end
+
+          # when writing an attribute, also remove it from the unsets,
+          # so that removing then writing doesn't result in a removal.
+          delayed_atomic_unsets.delete(field_name)
+
           typed_value
         end
       else
