@@ -252,9 +252,9 @@ while in 8.0 ``attribute_was(:age)`` returns the new value.
 ``*_previously_was``, ``previously_new_record?``, and ``previously_persisted?`` helpers
 ---------------------------------------------------------------------------------------
 
-Mongoid 8.0 introduces ActiveModel compatible ``*_previously_was`` helpers,
-as well as ActiveRecord compatible ``previously_new_record?`` and
-``previously_persisted?`` helpers.
+Mongoid 8.0 introduces ActiveModel-compatible ``*_previously_was`` helpers,
+as well as ActiveRecord-compatible ``previously_new_record?`` and
+``previously_persisted?`` helpers:
 
 .. code-block:: ruby
 

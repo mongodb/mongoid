@@ -95,10 +95,6 @@ module Mongoid
       @previous_changes ||= {}
     end
 
-    def previous_attributes
-      @previous_attributes ||= {}
-    end
-
     # Remove a change from the dirty attributes hash. Used by the single field
     # atomic updaters.
     #
@@ -137,6 +133,13 @@ module Mongoid
     end
 
     private
+
+    # Get attributes of the document before the document was saved.
+    #
+    # @return [ Hash ] Previous attributes
+    def previous_attributes
+      @previous_attributes ||= {}
+    end
 
     # Get the old and new value for the provided attribute.
     #

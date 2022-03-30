@@ -42,7 +42,7 @@ describe Mongoid::Stateful do
 
   describe '#previously_new_record?' do
     it "returns correct values" do
-      person = Person.new("_id" => BSON::ObjectId.new)
+      person = Person.new
       expect(person).not_to be_a_previously_new_record
       person.save!
       expect(person).to be_a_previously_new_record
@@ -52,7 +52,7 @@ describe Mongoid::Stateful do
     end
 
     it "resets after reload" do
-      person = Person.create!("_id" => BSON::ObjectId.new)
+      person = Person.create!
       expect(person).to be_a_previously_new_record
       person.reload
       expect(person).not_to be_a_previously_new_record
@@ -82,12 +82,8 @@ describe Mongoid::Stateful do
   end
 
   describe "#previously_persisted?" do
-    let(:person) do
-      Person.new
-    end
-
     it "returns true after being destroyed" do
-      person.save!
+      person = Person.create!
       expect(person).not_to be_previously_persisted
       person.destroy
       expect(person).to be_previously_persisted

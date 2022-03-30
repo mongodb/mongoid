@@ -422,4 +422,29 @@ describe 'callbacks integration tests' do
       expect(person.previously_new_record_value).to be_falsey
     end
   end
+
+  context 'previously_persisted? in after_destroy' do
+    it do
+      class PreviouslyPersistedPerson
+        include Mongoid::Document
+
+        field :title, type: String
+        field :age, type: Integer
+
+        attr_reader :previously_persisted_value
+
+        set_callback :destroy, :after do |doc|
+          @previously_persisted_value = doc.previously_persisted?
+        end
+      end
+
+      unsaved_person = PreviouslyPersistedPerson.new(title: "title", age: 55)
+      unsaved_person.destroy
+      expect(unsaved_person.previously_persisted_value).to be_falsey
+
+      saved_person = PreviouslyPersistedPerson.create(title: "title", age: 55)
+      saved_person.destroy
+      expect(saved_person.previously_persisted_value).to be_truthy
+    end
+  end
 end
