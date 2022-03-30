@@ -2221,7 +2221,7 @@ describe Mongoid::Attributes do
     before do
       cat.remove_attribute("name")
       cat.name = "Nissim"
-      cat.save
+      cat.save!
       cat.reload
     end
 
