@@ -266,7 +266,7 @@ module Mongoid
         create_dirty_change_check(name, meth)
         create_dirty_change_flag(name, meth)
         create_dirty_default_change_check(name, meth)
-        create_dirty_previous_value_accessors(name, meth)
+        create_dirty_previous_value_accessor(name, meth)
         create_dirty_reset(name, meth)
         create_dirty_reset_to_default(name, meth)
         create_dirty_previously_changed?(name, meth)
@@ -321,11 +321,11 @@ module Mongoid
       # Creates the dirty change previous value accessors.
       #
       # @example Create the accessor.
-      #   Model.create_dirty_previous_value_accessors("name", "alias")
+      #   Model.create_dirty_previous_value_accessor("name", "alias")
       #
       # @param [ String ] name The attribute name.
       # @param [ String ] meth The name of the accessor.
-      def create_dirty_previous_value_accessors(name, meth)
+      def create_dirty_previous_value_accessor(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_was") do
             attribute_was(name)

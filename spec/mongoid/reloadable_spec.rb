@@ -628,5 +628,38 @@ describe Mongoid::Reloadable do
         church.acolytes.first.name.should == 'Borg'
       end
     end
+
+    context 'when document has previous changes' do
+      context 'when document was updated' do
+        let(:person) do
+          Person.create!(title: 'Sir')
+        end
+
+        before do
+          person.title = 'Madam'
+          person.save!
+          person.reload
+        end
+
+        it "resets previous changes" do
+          expect(person.title_previously_was).to be_nil
+          expect(person).not_to be_previously_persisted
+        end
+      end
+
+      context 'when document was created' do
+        let(:person) do
+          Person.create!(title: 'Sir')
+        end
+
+        before do
+          person.reload
+        end
+
+        it "resets previous changes" do
+          expect(person).not_to be_previously_new_record
+        end
+      end
+    end
   end
 end
