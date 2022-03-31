@@ -6,7 +6,15 @@ module Mongoid
   # document can transition through.
   module Stateful
 
-    attr_writer :destroyed, :flagged_for_destroy, :new_record
+    attr_writer :destroyed, :flagged_for_destroy, :previously_new_record
+
+    def new_record=(new_value)
+      @new_record ||= false
+      if @new_record && !new_value
+        @previously_new_record = true
+      end
+      @new_record = new_value
+    end
 
     # Returns true if the +Document+ has not been persisted to the database,
     # false if it has. This is determined by the variable @new_record
@@ -20,6 +28,15 @@ module Mongoid
       @new_record ||= false
     end
 
+    # Returns true if this document was just created -- that is, prior to the last
+    # save, the object didn't exist in the database and new_record? would have
+    # returned true.
+    #
+    # @return [ true, false ] True if was just created, false if not.
+    def previously_new_record?
+      @previously_new_record ||= false
+    end
+
     # Checks if the document has been saved to the database. Returns false
     # if the document has been destroyed.
     #
@@ -29,6 +46,15 @@ module Mongoid
     # @return [ true, false ] True if persisted, false if not.
     def persisted?
       !new_record? && !destroyed?
+    end
+
+    # Checks if the document was previously saved to the database
+    # but now it has been deleted.
+    #
+    # @return [ true, false ] True if was persisted but now destroyed,
+    #   otherwise false.
+    def previously_persisted?
+      !new_record? && destroyed?
     end
 
     # Returns whether or not the document has been flagged for deletion, but

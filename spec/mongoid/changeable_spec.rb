@@ -555,6 +555,56 @@ describe Mongoid::Changeable do
     end
   end
 
+  describe '#attribute_previously_was' do
+    let(:previous_title) do
+      "Grand Poobah"
+    end
+
+    let(:age) do
+      10
+    end
+
+    let(:person) do
+      Person.create!(title: previous_title, age: age)
+    end
+
+    let(:updated_title) do
+      "Captain Obvious"
+    end
+
+    before do
+      person.title = updated_title
+      person.save!
+    end
+
+    context 'when attribute changed' do
+      it "returns the old value" do
+        expect(person.send(:attribute_previously_was, "title")).to eq(previous_title)
+      end
+
+      it "allows access via (attribute)_was" do
+        expect(person.title_previously_was).to eq(previous_title)
+      end
+    end
+
+    context 'when attribute did not change' do
+      it "returns the same value" do
+        expect(person.send(:attribute_previously_was, "age")).to eq(age)
+      end
+
+      it "allows access via (attribute)_was" do
+        expect(person.age_previously_was).to eq(age)
+      end
+    end
+
+    it 'clears after reload' do
+      person.reload
+      expect(person.title_previously_was).to be_nil
+      expect(person.age_previously_was).to be_nil
+    end
+
+  end
+
   describe "#attribute_will_change!" do
 
     let(:aliases) do

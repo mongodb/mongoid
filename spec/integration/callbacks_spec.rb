@@ -360,4 +360,91 @@ describe 'callbacks integration tests' do
       expect(architect.after_remove_num_buildings).to eq(2)
     end
   end
+
+  context '_previously was methods in after_save callback' do
+    let(:title) do
+      "Title"
+    end
+
+    let(:updated_title) do
+      "Updated title"
+    end
+
+    let(:age) do
+      10
+    end
+
+    it do
+      class PreviouslyWasPerson
+        include Mongoid::Document
+
+        field :title, type: String
+        field :age, type: Integer
+
+        attr_reader :after_save_vals
+
+        set_callback :save, :after do |doc|
+          @after_save_vals ||= []
+          @after_save_vals << [doc.title_previously_was, doc.age_previously_was]
+        end
+      end
+
+      person = PreviouslyWasPerson.create!(title: title, age: age)
+      person.title = updated_title
+      person.save!
+      expect(person.after_save_vals).to eq([
+        # Field values are nil before create
+        [nil, nil],
+        [title, age]
+        ])
+    end
+  end
+
+  context 'previously_new_record? in after_save' do
+    it do
+      class PreviouslyNewRecordPerson
+        include Mongoid::Document
+
+        field :title, type: String
+        field :age, type: Integer
+
+        attr_reader :previously_new_record_value
+
+        set_callback :save, :after do |doc|
+          @previously_new_record_value = doc.previously_new_record?
+        end
+      end
+
+      person = PreviouslyNewRecordPerson.create!(title: "title", age: 55)
+      expect(person.previously_new_record_value).to be_truthy
+      person.title = "New title"
+      person.save!
+      expect(person.previously_new_record_value).to be_falsey
+    end
+  end
+
+  context 'previously_persisted? in after_destroy' do
+    it do
+      class PreviouslyPersistedPerson
+        include Mongoid::Document
+
+        field :title, type: String
+        field :age, type: Integer
+
+        attr_reader :previously_persisted_value
+
+        set_callback :destroy, :after do |doc|
+          @previously_persisted_value = doc.previously_persisted?
+        end
+      end
+
+      unsaved_person = PreviouslyPersistedPerson.new(title: "title", age: 55)
+      unsaved_person.destroy
+      expect(unsaved_person.previously_persisted_value).to be_falsey
+
+      saved_person = PreviouslyPersistedPerson.create(title: "title", age: 55)
+      saved_person.destroy
+      expect(saved_person.previously_persisted_value).to be_truthy
+    end
+  end
 end
