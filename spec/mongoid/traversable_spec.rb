@@ -338,14 +338,6 @@ describe Mongoid::Traversable do
     context "when the discriminator key is changed at the global level" do
       config_override :discriminator_key, 'hello'
 
-      before do
-        Mongoid.discriminator_key = "hello"
-      end
-
-      after do
-        Mongoid.discriminator_key = "_type"
-      end
-
       it "sets the correct value globally" do
         expect(Mongoid.discriminator_key).to eq("hello")
       end
