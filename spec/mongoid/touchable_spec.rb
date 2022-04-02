@@ -7,28 +7,113 @@ describe Mongoid::Touchable do
 
   describe "#touch" do
 
-    context "when the document has no associations" do
-      let(:updatable) do
-        Updatable.create!
+    context "when the document has no timestamps" do
+      let(:model) do
+        TouchableSpec::NoTimestamps.create!
       end
 
       it "responds to #touch" do
-        expect(updatable).to respond_to(:touch)
+        expect(model).to respond_to(:touch)
       end
 
-      it "updates the timestamp when called" do
-        expect(updatable.updated_at).to be_nil
+      it "does not raise an error when called without a field" do
+        model.touch
+      end
 
-        updatable.touch
-        updated_at = updatable.updated_at
-        expect(updated_at).not_to be_nil
+      it "can touch an additional field" do
+        expect(model.last_used_at).to be_nil
 
-        updatable.touch
-        expect(updatable.updated_at).to be > updated_at
+        model.touch(:last_used_at)
+        last_used_at = model.last_used_at
+        expect(last_used_at).to be_within(1).of(Time.now)
+        expect(model.reload.last_used_at).to be_within(0.001).of(last_used_at)
+        last_used_at = model.last_used_at
+
+        model.touch
+        expect(model.last_used_at).to eq last_used_at
+        expect(model.reload.last_used_at).to eq last_used_at
+
+        model.touch(:last_used_at)
+        expect(model.last_used_at).to be > last_used_at
+        expect(model.reload.last_used_at).to be > last_used_at
+      end
+
+      it "can touch an additional field using alias" do
+        expect(model.last_used_at).to be_nil
+
+        model.touch(:aliased_field)
+        last_used_at = model.last_used_at
+        expect(last_used_at).to be_within(1).of(Time.now)
+        expect(model.reload.last_used_at).to be_within(0.001).of(last_used_at)
       end
     end
 
-    context 'when the document has a parent association' do
+    context "when the document has no associations" do
+      let(:model) do
+        TouchableSpec::NoAssociations.create!
+      end
+
+      it "responds to #touch" do
+        expect(model).to respond_to(:touch)
+      end
+
+      it "updates the timestamp when called" do
+        model
+        time_before_action = Time.now
+        model.touch
+        updated_at = model.updated_at
+        expect(updated_at).to be > time_before_action
+        expect(model.reload.updated_at).to be_within(0.001).of(updated_at)
+
+        model.touch
+        expect(model.updated_at).to be > updated_at
+        expect(model.reload.updated_at).to be > updated_at
+      end
+
+      it "can touch an additional field" do
+        model
+        time_before_action = Time.now
+        model.touch(:last_used_at)
+
+        updated_at = model.updated_at
+        expect(updated_at).to be > time_before_action
+        expect(model.last_used_at).to eq updated_at
+        model.reload
+        expect(model.updated_at).to be_within(0.001).of(updated_at)
+        expect(model.last_used_at).to eq model.updated_at
+        updated_at = model.updated_at
+
+        model.touch
+        expect(model.updated_at).to be > updated_at
+        expect(model.last_used_at).to eq updated_at
+        model.reload
+        expect(model.updated_at).to be > updated_at
+        expect(model.last_used_at).to eq updated_at
+
+        updated_at = model.updated_at
+        model.touch(:last_used_at)
+        expect(model.updated_at).to be > updated_at
+        expect(model.last_used_at).to eq model.updated_at
+        model.reload
+        expect(model.updated_at).to be > updated_at
+        expect(model.last_used_at).to eq model.updated_at
+      end
+
+      it "can touch an additional field" do
+        model
+        time_before_action = Time.now
+        model.touch(:aliased_field)
+
+        updated_at = model.updated_at
+        expect(updated_at).to be > time_before_action
+        expect(model.last_used_at).to eq updated_at
+        model.reload
+        expect(model.updated_at).to be_within(0.001).of(updated_at)
+        expect(model.last_used_at).to eq model.updated_at
+      end
+    end
+
+    context 'associations' do
 
       let(:building) do
         parent_cls.create!
@@ -42,121 +127,281 @@ describe Mongoid::Touchable do
         building.floors.create!
       end
 
-      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
-
-      let(:update_time) do
-        Timecop.freeze(Time.at(Time.now.to_i) + 2)
-      end
-
-      after do
-        Timecop.return
-      end
-
-      shared_examples 'updates the child' do
-        it "updates the updated_at timestamp" do
-          entrance
-          update_time
-          entrance.touch
-
-          entrance.updated_at.should == update_time
-        end
-
-        it "persists the changes" do
-          entrance
-          update_time
-          entrance.touch
-
-          entrance.reload.updated_at.should == update_time
-        end
-      end
-
-      shared_examples 'updates the parent when :touch is true' do
-
-        it 'updates updated_at on parent' do
-          floor
-          update_time
-          floor.touch
-
-          building.updated_at.should == update_time
-        end
-
-        it 'persists updated updated_at on parent' do
-          floor
-          update_time
-          floor.touch
-
-          building.reload.updated_at.should == update_time
-        end
-      end
-
-      shared_examples 'updates the parent when :touch is not set' do
-        it 'does not update updated_at on parent' do
-          entrance
-          update_time
-          entrance.touch
-
-          building.updated_at.should == update_time
-        end
-
-        it 'does not persist updated updated_at on parent' do
-          entrance
-          update_time
-          entrance.touch
-
-          building.reload.updated_at.should == update_time
-        end
-      end
-
-      shared_examples 'does not update the parent when :touch is not set' do
-        it 'does not update updated_at on parent' do
-          entrance
-          update_time
-          entrance.touch
-
-          building.updated_at.should == start_time
-        end
-
-        it 'does not persist updated updated_at on parent' do
-          entrance
-          update_time
-          entrance.touch
-
-          building.reload.updated_at.should == start_time
-        end
-      end
-
-      context "when the document is embedded" do
+      context 'when embedded' do
         let(:parent_cls) { TouchableSpec::Embedded::Building }
 
-        include_examples 'updates the child'
-        include_examples 'updates the parent when :touch is true'
-        include_examples 'updates the parent when :touch is not set'
+        context 'when :touch option is true' do
 
-        context 'when also updating an additional field' do
-          it 'persists the update to the additional field' do
+          it '#touch persists synchronized updated_at on both parent and child' do
+            floor
+            time_before_action = Time.now
+            floor.touch
+
+            floor_updated = floor.updated_at
+            expect(floor_updated).to be > time_before_action
+            expect(building.updated_at).to be > time_before_action
+
+            floor.reload
+            building.reload
+            expect(floor.updated_at).to be_within(0.001).of(floor_updated)
+            expect(building.updated_at).to eq floor.updated_at
+          end
+
+          it '#touch with additional field persists synchronized values on both parent and child' do
+            floor
+            time_before_action = Time.now
+            floor.touch(:last_used_at)
+
+            floor_updated = floor.updated_at
+            expect(floor_updated).to be > time_before_action
+            expect(floor.last_used_at).to eq floor_updated
+            expect(building.updated_at).to be > time_before_action
+
+            floor.reload
+            building.reload
+            expect(floor.updated_at).to be_within(0.001).of(floor_updated)
+            expect(floor.last_used_at).to eq floor.updated_at
+            expect(building.updated_at).to eq floor.updated_at
+          end
+
+          it '#save! persists non-synchronized updated_at on both parent and child' do
+            # TODO: Nice-to-have: #save! on embedded models should have synchronized timestamps between parent and child.
+            floor
+            floor.last_used_at = Time.now
+            time_before_action = Time.now
+            floor.save!
+
+            # TODO: BROKEN! For some reason floor.building is nil and this causes the touch callbacks to not run on it.
+            puts "This should exist: #{floor.building.inspect}"
+            puts "It should be the same as this: #{floor._parent.inspect}"
+
+            floor_updated = floor.updated_at
+            building_updated = building.updated_at
+            expect(floor_updated).to be > time_before_action
+            expect(building_updated).to be > time_before_action
+
+            floor.reload
+            building.reload
+            expect(floor.updated_at).to be_within(0.001).of(floor_updated)
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
+
+          it '#destroy persists updated_at on parent' do
+            floor
+            time_before_action = Time.now
+            floor.destroy
+
+            # TODO: BROKEN! For some reason floor.building is nil and this causes the touch callbacks to not run on it.
+            puts "This should exist: #{floor.building.inspect}"
+            puts "It should be the same as this: #{floor._parent.inspect}"
+
+            building_updated = building.updated_at
+            expect(building_updated).to be > time_before_action
+
+            building.reload
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
+        end
+
+        context 'when :touch option is not set' do
+
+          it '#touch persists updated_at on child but not parent' do
+            # TODO: BROKEN! This needs a guard method to prevent case when touch: false
+            # lib/mongoid/touchable.rb line 34 `if parent` needs a guard so that it does not proceed if touch: false.
+
             entrance
-            update_time
+            time_before_action = Time.now
+            entrance.touch
+
+            entrance_updated = entrance.updated_at
+            building_updated = entrance.updated_at
+            expect(entrance_updated).to be > time_before_action
+            expect(building_updated).to be < time_before_action
+
+            expect(entrance.reload.updated_at).to be_within(0.001).of(entrance_updated)
+            expect(building.reload.updated_at).to be_within(0.001).of(building_updated)
+          end
+
+          it '#touch with additional field persists synchonized values on child but not parent' do
+            # TODO: BROKEN! This needs a guard method to prevent case when touch: false
+            # lib/mongoid/touchable.rb line 34 `if parent` needs a guard so that it does not proceed if touch: false.
+
+            entrance
+            time_before_action = Time.now
             entrance.touch(:last_used_at)
+
+            entrance_updated = entrance.updated_at
+            building_updated = entrance.updated_at
+            expect(entrance_updated).to be > time_before_action
+            expect(entrance.last_used_at).to eq entrance_updated
+            expect(building_updated).to be < time_before_action
 
             entrance.reload
             building.reload
+            expect(entrance.updated_at).to be_within(0.001).of(entrance_updated)
+            expect(entrance.last_used_at).to be_within(0.001).of(entrance_updated)
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
 
-            # This is the assertion we want.
-            entrance.last_used_at.should == update_time
+          it '#save! persists updated_at on child but not parent' do
+            entrance
+            entrance.last_used_at = Time.now
+            time_before_action = Time.now
+            entrance.save!
 
-            # Check other timestamps for good measure.
-            entrance.updated_at.should == update_time
-            building.updated_at.should == update_time
+            entrance_updated = entrance.updated_at
+            building_updated = building.updated_at
+            expect(entrance_updated).to be > time_before_action
+            expect(building_updated).to be < time_before_action
+
+            entrance.reload
+            building.reload
+            expect(entrance.updated_at).to be_within(0.001).of(entrance_updated)
+          end
+
+          it '#destroy does not set updated_at on parent' do
+            entrance
+            time_before_action = Time.now
+            entrance.destroy
+
+            expect(entrance.updated_at).to be < time_before_action
+            expect(building.updated_at).to be < time_before_action
           end
         end
       end
 
-      context "when the document is referenced" do
+      context 'when referenced' do
         let(:parent_cls) { TouchableSpec::Referenced::Building }
 
-        include_examples 'updates the child'
-        include_examples 'updates the parent when :touch is true'
-        include_examples 'does not update the parent when :touch is not set'
+        context 'when :touch option is true' do
+
+          it '#touch persists non-synchronized updated_at on both parent and child' do
+            floor
+            time_before_action = Time.now
+            floor.touch
+
+            floor_updated = floor.updated_at
+            building_updated = building.updated_at
+            expect(floor_updated).to be > time_before_action
+            expect(building_updated).to be > time_before_action
+
+            floor.reload
+            building.reload
+            expect(floor.updated_at).to be_within(0.001).of(floor_updated)
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
+
+          it '#touch with additional field persists non-synchronized values on both parent and child' do
+            floor
+            time_before_action = Time.now
+            floor.touch(:last_used_at)
+
+            floor_updated = floor.updated_at
+            building_updated = building.updated_at
+            expect(floor_updated).to be > time_before_action
+            expect(floor.last_used_at).to eq floor_updated
+            expect(building_updated).to be > time_before_action
+
+            floor.reload
+            building.reload
+            expect(floor.updated_at).to be_within(0.001).of(floor_updated)
+            expect(floor.last_used_at).to eq floor.updated_at
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
+
+          it '#save! persists non-synchronized updated_at on both parent and child' do
+            floor
+            floor.last_used_at = Time.now
+            time_before_action = Time.now
+            floor.save!
+
+            floor_updated = floor.updated_at
+            building_updated = building.updated_at
+            expect(floor_updated).to be > time_before_action
+            expect(building_updated).to be > time_before_action
+
+            floor.reload
+            building.reload
+            expect(floor.updated_at).to be_within(0.001).of(floor_updated)
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
+
+          it '#destroy persists updated_at on parent' do
+            floor
+            time_before_action = Time.now
+            floor.destroy
+
+            building_updated = building.updated_at
+            expect(building_updated).to be > time_before_action
+
+            building.reload
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
+        end
+
+        context 'when :touch option is not set' do
+
+          it '#touch sets and persists updated_at on child but not parent' do
+            # TODO: BROKEN! :touch callbacks need a guard so the don't run unless association has touch: true
+
+            entrance
+            time_before_action = Time.now
+            entrance.touch
+
+            entrance_updated = entrance.updated_at
+            building_updated = entrance.updated_at
+            expect(entrance_updated).to be > time_before_action
+            expect(building_updated).to be < time_before_action
+
+            expect(entrance.reload.updated_at).to be_within(0.001).of(entrance_updated)
+            expect(building.reload.updated_at).to be_within(0.001).of(building_updated)
+          end
+
+          it '#touch with additional field persists synchronized values on child but not parent' do
+            # TODO: BROKEN! :touch callbacks need a guard so the don't run unless association has touch: true
+
+            entrance
+            time_before_action = Time.now
+            entrance.touch(:last_used_at)
+
+            entrance_updated = entrance.updated_at
+            building_updated = entrance.updated_at
+            expect(entrance_updated).to be > time_before_action
+            expect(entrance.last_used_at).to eq entrance_updated
+            expect(building_updated).to be < time_before_action
+
+            entrance.reload
+            building.reload
+            expect(entrance.updated_at).to be_within(0.001).of(entrance_updated)
+            expect(entrance.last_used_at).to be_within(0.001).of(entrance_updated)
+            expect(building.updated_at).to be_within(0.001).of(building_updated)
+          end
+
+          it '#save! persists updated_at on child but not parent' do
+            entrance
+            entrance.last_used_at = Time.now
+            time_before_action = Time.now
+            entrance.save!
+
+            entrance_updated = entrance.updated_at
+            building_updated = building.updated_at
+            expect(entrance_updated).to be > time_before_action
+            expect(building_updated).to be < time_before_action
+
+            entrance.reload
+            building.reload
+            expect(entrance.updated_at).to be_within(0.001).of(entrance_updated)
+          end
+
+          it '#destroy does not set updated_at on parent' do
+            entrance
+            time_before_action = Time.now
+            entrance.destroy
+
+            expect(entrance.updated_at).to be < time_before_action
+            expect(building.updated_at).to be < time_before_action
+          end
+        end
       end
     end
 

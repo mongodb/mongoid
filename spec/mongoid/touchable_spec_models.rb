@@ -1,6 +1,19 @@
 # frozen_string_literal: true
 
 module TouchableSpec
+  class NoTimestamps
+    include Mongoid::Document
+
+    field :last_used_at, as: :aliased_field, type: Time
+  end
+
+  class NoAssociations
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    field :last_used_at, as: :aliased_field, type: Time
+  end
+
   module Embedded
     class Building
       include Mongoid::Document
@@ -24,6 +37,8 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       embedded_in :building, touch: true
+
+      field :last_used_at, type: Time
     end
   end
 
@@ -41,6 +56,8 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       belongs_to :building
+
+      field :last_used_at, type: Time
     end
 
     class Floor
@@ -48,6 +65,8 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       belongs_to :building, touch: true
+
+      field :last_used_at, type: Time
     end
   end
 end
