@@ -637,7 +637,6 @@ describe Mongoid::Touchable do
         end
     context "when the touch option is false" do
       shared_examples "does not update the parent" do
-        let(:parent_cls) { TouchableSpec::Referenced::Hospital }
         let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
         let(:update_time) do
@@ -648,33 +647,37 @@ describe Mongoid::Touchable do
           Timecop.return
         end
 
-
         let(:building) do
           parent_cls.create!
         end
 
-        let(:floor) do
-          building.floors.create!
+        let(:entrance) do
+          building.entrances.create!
         end
 
         it "does not update the parent's timestamp" do
-          floor
+          entrance
           update_time
-          floor.touch
+          entrance.touch
+
+          entrance.updated_at.should == update_time
+          building.updated_at.should == start_time
+
+          entrance.reload.updated_at.should == update_time
           building.reload.updated_at.should == start_time
         end
       end
 
       context "when touch is false on belongs_to" do
         # pending "MONGOID-5274"
-        let(:parent_cls) { TouchableSpec::Referenced::Hospital }
+        let(:parent_cls) { TouchableSpec::Referenced::Building }
 
         include_examples "does not update the parent"
       end
 
       context "when touch is false on embedded_in" do
-        pending "MONGOID-5274"
-        let(:parent_cls) { TouchableSpec::Embedded::Hospital }
+        # pending "MONGOID-5274"
+        let(:parent_cls) { TouchableSpec::Embedded::Building }
 
         include_examples "does not update the parent"
       end
