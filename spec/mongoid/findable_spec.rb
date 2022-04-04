@@ -521,10 +521,10 @@ describe Mongoid::Findable do
   end
 
   context 'when Mongoid is configured to use activesupport time zone' do
+    config_override :use_utc, false
+    config_override :use_activesupport_time_zone, true
 
     before do
-      Mongoid.use_utc = false
-      Mongoid.use_activesupport_time_zone = true
       Time.zone = "Asia/Kolkata"
     end
 
@@ -569,11 +569,8 @@ describe Mongoid::Findable do
   end
 
   context 'when Mongoid is not configured to use activesupport time zone' do
-
-    before do
-      Mongoid.use_utc = true
-      Mongoid.use_activesupport_time_zone = false
-    end
+    config_override :use_utc, true
+    config_override :use_activesupport_time_zone, false
 
     let!(:time) do
       Time.now.tap do |t|

@@ -30,16 +30,13 @@ describe "Rails::Mongoid" do
     end
 
     context "when preload models config is false" do
+      config_override :preload_models, false
 
       let(:files) do
         [
           "/rails/root/app/models/user.rb",
           "/rails/root/app/models/address.rb"
         ]
-      end
-
-      before(:all) do
-        Mongoid.preload_models = false
       end
 
       it "does not load any models" do
@@ -50,10 +47,7 @@ describe "Rails::Mongoid" do
     end
 
     context "when preload models config is true" do
-
-      before(:all) do
-        Mongoid.preload_models = true
-      end
+      config_override :preload_models, true
 
       context "when all models are in the models directory" do
 
@@ -112,16 +106,13 @@ describe "Rails::Mongoid" do
     end
 
     context "even when preload models config is false" do
+      config_override :preload_models, false
 
       let(:files) do
         [
           "/rails/root/app/models/user.rb",
           "/rails/root/app/models/address.rb"
         ]
-      end
-
-      before(:all) do
-        Mongoid.preload_models = false
       end
 
       it "loads all models" do
@@ -133,16 +124,13 @@ describe "Rails::Mongoid" do
     end
 
     context "when list of models to load was configured" do
+      config_override :preload_models, %w(user AddressNumber)
 
       let(:files) do
         [
           "/rails/root/app/models/user.rb",
           "/rails/root/app/models/address.rb"
         ]
-      end
-
-      before(:all) do
-        Mongoid.preload_models = ["user", "AddressNumber"]
       end
 
       it "loads selected models only" do

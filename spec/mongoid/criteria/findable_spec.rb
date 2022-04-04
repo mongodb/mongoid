@@ -108,10 +108,7 @@ describe Mongoid::Criteria::Findable do
         context "when the id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(BSON::ObjectId.new)
@@ -125,14 +122,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(BSON::ObjectId.new)
@@ -180,10 +170,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(band.id, BSON::ObjectId.new)
@@ -197,14 +184,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(band.id, BSON::ObjectId.new)
@@ -252,10 +232,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find([ band.id, BSON::ObjectId.new ])
@@ -269,14 +246,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find([ band.id, BSON::ObjectId.new ])
@@ -305,10 +275,7 @@ describe Mongoid::Criteria::Findable do
         context "when the id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(BSON::ObjectId.new.as_json)
@@ -322,14 +289,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(BSON::ObjectId.new.as_json)
@@ -377,10 +337,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(band.id.as_json, BSON::ObjectId.new.as_json)
@@ -394,14 +351,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(band.id.as_json, BSON::ObjectId.new.as_json)
@@ -449,10 +399,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find([ band.id.as_json, BSON::ObjectId.new.as_json ])
@@ -466,14 +413,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find([ band.id.as_json, BSON::ObjectId.new.as_json ])
@@ -519,10 +459,7 @@ describe Mongoid::Criteria::Findable do
         context "when the id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find("depeche-mode")
@@ -536,14 +473,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find("depeche-mode")
@@ -582,10 +512,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(band.id, "new-order")
@@ -599,14 +526,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(band.id, "new-order")
@@ -645,10 +565,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find([ band.id, "new-order" ])
@@ -662,14 +579,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find([ band.id, "new-order" ])
@@ -715,10 +625,7 @@ describe Mongoid::Criteria::Findable do
         context "when the id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find({"new-order" => false, "Faith no More" => true})
@@ -732,14 +639,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find({"new-order" => false, "Faith no More" => true})
@@ -778,10 +678,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(band.id, {"Radiohead" => true, "Nirvana"=> false})
@@ -795,14 +692,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(band.id, {"Radiohead" => true, "Nirvana"=> false})
@@ -841,10 +731,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find([ band.id, {"Radiohead" => true, "Nirvana"=> false} ])
@@ -858,14 +745,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find([ band.id, {"Radiohead" => true, "Nirvana"=> false} ])
@@ -911,10 +791,7 @@ describe Mongoid::Criteria::Findable do
         context "when the id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(3)
@@ -928,14 +805,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(3)
@@ -974,10 +844,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(band.id, 3)
@@ -991,14 +858,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(band.id, 3)
@@ -1037,10 +897,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find([ band.id, 3 ])
@@ -1054,14 +911,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find([ band.id, 3 ])
@@ -1100,10 +950,7 @@ describe Mongoid::Criteria::Findable do
         context "when any id does not match" do
 
           context "when raising a not found error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             let(:found) do
               Band.find(1..3)
@@ -1117,14 +964,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when raising no error" do
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, false
 
             let(:found) do
               Band.find(1..3)
