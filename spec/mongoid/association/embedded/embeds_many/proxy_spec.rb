@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../embeds_many_models.rb'
 
 describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
@@ -4696,6 +4697,16 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       it "does not persist the empty list" do
         expect(reloaded_band).to_not have_key(:labels)
       end
+    end
+  end
+
+  context "when the document and embedded document's klass is in a submodule" do
+
+    let(:car) { EmmSpec::Car.create! }
+    let(:door) { car.doors.create! }
+
+    it "has the correct inverses" do
+      expect(door._association.inverse_association).to_not be nil
     end
   end
 end

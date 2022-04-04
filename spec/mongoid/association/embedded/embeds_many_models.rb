@@ -90,3 +90,17 @@ class EmmCustomer
   embeds_many :close_friends, class_name: 'EmmFriend', as: :befriendable
   embeds_many :acquaintances, class_name: 'EmmFriend', as: :befriendable
 end
+
+module EmmSpec
+  class Car
+    include Mongoid::Document
+
+    embeds_many :doors
+  end
+
+  class Door
+    include Mongoid::Document
+
+    embedded_in :car
+  end
+end
