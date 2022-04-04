@@ -693,24 +693,24 @@ describe Mongoid::Touchable do
 
     context "when the touch option is true" do
 
-      context 'when updating the child' do
+      context 'when updating an embedded child' do
+
+        let(:parent_cls) { TouchableSpec::Embedded::Building }
+
         before do
           skip "MONGOID-5274 and possibly MONGOID-4882"
         end
+
         shared_examples "when updating" do
+
           let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
           let(:update_time) do
             Timecop.freeze(Time.at(Time.now.to_i) + 2)
           end
 
-          let(:parent_cls) { TouchableSpec::Embedded::Building }
           let(:building) do
             parent_cls.create!
-          end
-
-          let(:entrance) do
-            building.entrances.create!
           end
 
           let(:floor) do
