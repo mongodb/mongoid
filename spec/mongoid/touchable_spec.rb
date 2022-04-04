@@ -636,7 +636,9 @@ describe Mongoid::Touchable do
           include_examples "when updating"
         end
     context "when the touch option is false" do
+
       shared_examples "does not update the parent" do
+
         let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
         let(:update_time) do
@@ -655,31 +657,94 @@ describe Mongoid::Touchable do
           building.entrances.create!
         end
 
-        it "does not update the parent's timestamp" do
+        before do
           entrance
           update_time
           entrance.touch
+        end
 
+        it "updates the child's timestamp" do
           entrance.updated_at.should == update_time
-          building.updated_at.should == start_time
-
           entrance.reload.updated_at.should == update_time
+        end
+
+        it "does not update the parent's timestamp" do
+          building.updated_at.should == start_time
           building.reload.updated_at.should == start_time
         end
       end
 
       context "when touch is false on belongs_to" do
-        # pending "MONGOID-5274"
         let(:parent_cls) { TouchableSpec::Referenced::Building }
 
         include_examples "does not update the parent"
       end
 
       context "when touch is false on embedded_in" do
-        # pending "MONGOID-5274"
         let(:parent_cls) { TouchableSpec::Embedded::Building }
 
+        before do
+          skip "MONGOID-5274"
+        end
+
         include_examples "does not update the parent"
+      end
+    end
+
+    context "when the touch option is true" do
+
+      context 'when updating the child' do
+        before do
+          skip "MONGOID-5274 and possibly MONGOID-4882"
+        end
+        shared_examples "when updating" do
+          let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+          let(:update_time) do
+            Timecop.freeze(Time.at(Time.now.to_i) + 2)
+          end
+
+          let(:parent_cls) { TouchableSpec::Embedded::Building }
+          let(:building) do
+            parent_cls.create!
+          end
+
+          let(:entrance) do
+            building.entrances.create!
+          end
+
+          let(:floor) do
+            building.floors.create!
+          end
+
+          before do
+            floor
+            update_time
+            floor.level = 9
+            floor.send(meth)
+          end
+
+          it "the parent is not nil" do
+            expect(floor.building).to_not be nil
+          end
+
+          it "updates the parent's timestamp" do
+            building.updated_at.should == update_time
+            building.reload.updated_at.should == update_time
+          end
+        end
+
+        context "with save!" do
+          let(:meth) { "save!".to_sym }
+
+          include_examples "when updating"
+        end
+
+        context "with destroy" do
+          let(:meth) { :destroy }
+
+          include_examples "when updating"
+        end
       end
     end
   end

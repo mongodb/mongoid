@@ -10,13 +10,6 @@ module TouchableSpec
       embeds_many :floors
     end
 
-    class Hospital
-      include Mongoid::Document
-      include Mongoid::Timestamps
-
-      embeds_many :floors, inverse_of: :hospital
-    end
-
     class Entrance
       include Mongoid::Document
       include Mongoid::Timestamps
@@ -50,18 +43,10 @@ module TouchableSpec
       belongs_to :building
     end
 
-    class Hospital
-      include Mongoid::Document
-      include Mongoid::Timestamps
-
-      has_many :floors, inverse_of: :hospital
-    end
-
     class Floor
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      belongs_to :hospital, touch: false
       belongs_to :building, touch: true
     end
   end
