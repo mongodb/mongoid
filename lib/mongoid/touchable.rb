@@ -60,7 +60,6 @@ module Mongoid
 
         # Callbacks are invoked on the composition root first and on the
         # leaf-most embedded document last.
-        # TODO add tests, see MONGOID-5015.
         run_callbacks(:touch)
         true
       end
