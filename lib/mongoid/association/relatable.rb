@@ -145,7 +145,7 @@ module Mongoid
       #
       # @return [ String ] The association objects' class name.
       def relation_class_name
-        @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name)
+        @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name_with_module)
       end
       alias :class_name :relation_class_name
 
@@ -300,6 +300,10 @@ module Mongoid
       end
 
       private
+
+      def name_with_module
+        @module_path + name.to_s.capitalize
+      end
 
       # Gets the model classes with inverse associations of this model. This is used to determine
       # the classes on the other end of polymorphic associations with models.
