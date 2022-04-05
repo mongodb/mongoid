@@ -23,6 +23,8 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      field :level, type: Integer
+
       embedded_in :building, touch: true
     end
   end

@@ -584,5 +584,62 @@ describe Mongoid::Touchable do
         end
       end
     end
+
+    context "when the touch option is true" do
+
+      context 'when updating an embedded child' do
+
+        let(:parent_cls) { TouchableSpec::Embedded::Building }
+
+        # before do
+        #   skip "MONGOID-5274 and possibly MONGOID-4882"
+        # end
+
+        shared_examples "when updating" do
+
+          let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+          let(:update_time) do
+            Timecop.freeze(Time.at(Time.now.to_i) + 2)
+          end
+
+          let(:building) do
+            parent_cls.create!
+          end
+
+          let(:floor) do
+            building.floors.create!
+          end
+
+          before do
+            floor
+            update_time
+            floor.level = 9
+            floor.send(meth)
+          end
+
+          it "the parent is not nil" do
+            expect(floor.building).to_not be nil
+          end
+
+          it "updates the parent's timestamp" do
+            building.updated_at.should == update_time
+            building.reload.updated_at.should == update_time
+          end
+        end
+
+        context "with save!" do
+          let(:meth) { "save!".to_sym }
+
+          include_examples "when updating"
+        end
+
+        context "with destroy" do
+          let(:meth) { :destroy }
+
+          include_examples "when updating"
+        end
+      end
+    end
   end
 end
