@@ -4,6 +4,7 @@ require "mongoid/fields/standard"
 require "mongoid/fields/foreign_key"
 require "mongoid/fields/localized"
 require "mongoid/fields/validators"
+require "mongoid/fields/field_types"
 
 module Mongoid
 
@@ -11,29 +12,9 @@ module Mongoid
   module Fields
     extend ActiveSupport::Concern
 
+    # @deprecated Remove class aliases in Mongoid 8.0.
     StringifiedSymbol = Mongoid::StringifiedSymbol
     Boolean = Mongoid::Boolean
-
-    # For fields defined with symbols use the correct class.
-    TYPE_MAPPINGS = {
-      array: Array,
-      big_decimal: BigDecimal,
-      binary: BSON::Binary,
-      boolean: Mongoid::Boolean,
-      date: Date,
-      date_time: DateTime,
-      float: Float,
-      hash: Hash,
-      integer: Integer,
-      object_id: BSON::ObjectId,
-      range: Range,
-      regexp: Regexp,
-      set: Set,
-      string: String,
-      stringified_symbol: StringifiedSymbol,
-      symbol: Symbol,
-      time: Time
-    }.with_indifferent_access
 
     # Constant for all names of the _id field in a document.
     #
@@ -241,6 +222,27 @@ module Mongoid
 
     class << self
 
+      # DSL method used for configuration readability, typically in
+      # an initializer.
+      #
+      # @example
+      #   Mongoid::Fields.configure do
+      #     # do configuration
+      #   end
+      def configure(&block)
+        instance_exec(&block)
+      end
+
+      # Defines a field type mapping, for later use in field :type option.
+      #
+      # @example
+      #   Mongoid::Fields.configure do
+      #     type :point, Point
+      #   end
+      def type(symbol, klass)
+        Fields::FieldTypes.define(symbol, klass)
+      end
+
       # Stores the provided block to be run when the option name specified is
       # defined on a field.
       #
@@ -249,8 +251,10 @@ module Mongoid
       # provided in the field definition -- even if it is false or nil.
       #
       # @example
-      #   Mongoid::Fields.option :required do |model, field, value|
-      #     model.validates_presence_of field if value
+      #   Mongoid::Fields.configure do
+      #     option :required do |model, field, value|
+      #       model.validates_presence_of field.name if value
+      #     end
       #   end
       #
       # @param [ Symbol ] option_name the option name to match against
@@ -729,19 +733,16 @@ module Mongoid
 
       def field_for(name, options)
         opts = options.merge(klass: self)
-        type_mapping = TYPE_MAPPINGS[options[:type]]
-        opts[:type] = type_mapping || unmapped_type(options)
+        opts[:type] = field_type_klass_for(name, options[:type])
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
         Fields::Standard.new(name, opts)
       end
 
-      def unmapped_type(options)
-        if "Boolean" == options[:type].to_s
-          Mongoid::Boolean
-        else
-          options[:type] || Object
-        end
+      def field_type_klass_for(field, type)
+        klass = Fields::FieldTypes.get(type)
+        return klass if klass
+        raise Mongoid::Errors::InvalidFieldType.new(self.name, field, type)
       end
     end
   end
