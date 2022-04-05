@@ -145,7 +145,7 @@ module Mongoid
       #
       # @return [ String ] The association objects' class name.
       def relation_class_name
-        @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name_with_module)
+        @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name)
       end
       alias :class_name :relation_class_name
 
