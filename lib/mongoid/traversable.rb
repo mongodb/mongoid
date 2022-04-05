@@ -178,7 +178,7 @@ module Mongoid
         to_expand = []
         expanding.each do |child|
           next if expanded[child]
-          expanded[child] = true
+          expanded[child] = true if child.id
           children << child
           to_expand += child._children
         end
