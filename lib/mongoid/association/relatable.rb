@@ -301,10 +301,6 @@ module Mongoid
 
       private
 
-      def name_with_module
-        @module_path + name.to_s.capitalize
-      end
-
       # Gets the model classes with inverse associations of this model. This is used to determine
       # the classes on the other end of polymorphic associations with models.
       def inverse_association_classes
