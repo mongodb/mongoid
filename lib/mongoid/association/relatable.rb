@@ -149,7 +149,10 @@ module Mongoid
       end
       alias :class_name :relation_class_name
 
-      # TODO docs
+      # Retrieves the relation class name including the module prefix.
+      #
+      # @return [ String ] The association objects' class name.
+      #
       # @api private
       def relation_class_name_with_module
         @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name_with_module)
