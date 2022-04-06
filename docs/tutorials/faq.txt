@@ -112,7 +112,7 @@ If you are getting the following error when trying to read the ``local`` databas
 You can fix this by adjusting the roles your user has and ensuring that it has
 privileges to the local database. If you specifically want to access the oplog,
 you can also create a custom role with read access to the local database's
-oplog.rs collection. You can find more information about role management
+``oplog.rs`` collection. You can find more information about role management
 `here <https://www.mongodb.com/docs/manual/reference/method/js-role-management/>`_.
 
 See more on this issue here:
