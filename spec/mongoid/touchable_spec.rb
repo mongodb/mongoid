@@ -591,10 +591,6 @@ describe Mongoid::Touchable do
 
         let(:parent_cls) { TouchableSpec::Embedded::Building }
 
-        # before do
-        #   skip "MONGOID-5274 and possibly MONGOID-4882"
-        # end
-
         shared_examples "when updating" do
 
           let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
