@@ -44,7 +44,7 @@ If you are encountering the following error:
 This error is caused by Moped, a Ruby driver that is no longer in use by
 Mongoid. Upgrading to Mongoid 5+ should fix this issue.
 
-See more on this issue here:
+You can find more information about this issue here:
 `MONGOID-4067 <https://jira.mongodb.org/browse/MONGOID-4067>`_.
 
 
@@ -95,7 +95,7 @@ as follows:
   the answer `here <https://askubuntu.com/questions/157154/how-do-i-include-lines-in-resolv-conf-that-wont-get-lost-on-reboot?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa>`_
   and setting the nameservers to Google NS I was able to fix this issue.
 
-See more on this issue here:
+You can find more information about this issue here:
 `MONGOID-4527 <https://jira.mongodb.org/browse/MONGOID-4527>`_.
 
 
@@ -115,6 +115,6 @@ you can also create a custom role with read access to the local database's
 ``oplog.rs`` collection. You can find more information about role management
 `here <https://www.mongodb.com/docs/manual/reference/method/js-role-management/>`_.
 
-See more on this issue here:
+You can find more information about this issue here:
 `MONGOID-4446 <https://jira.mongodb.org/browse/MONGOID-4446>`_.
 
