@@ -168,9 +168,8 @@ module Mongoid
 
         def determine_inverses(other)
           matches = relation_class.relations.values.select do |rel|
-            assoc_class = rel.relation_class rescue next
             relation_complements.include?(rel.class) &&
-              assoc_class == inverse_class
+              rel.relation_class_name_with_module.sub(/\A::/, '') == inverse_class_name.sub(/\A::/, '')
           end
           if matches.size > 1
             raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)
