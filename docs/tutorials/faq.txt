@@ -87,7 +87,7 @@ If you are getting the following error:
   /var/lib/gems/2.3.0/gems/mongoid-5.1.4/lib/mongoid/contextual.rb:20:in `find_first'
   /var/lib/gems/2.3.0/gems/mongoid-5.1.4/lib/mongoid/findable.rb:114:in `find_by'
 
-This error was last reported on Driver version 2.5.1, so updating the Driver
+This error was last reported on Ruby Driver version 2.5.1, so updating the driver
 can potentially solve this issue. A user has reported that they solved this issue
 as follows:
 
@@ -99,22 +99,21 @@ You can find more information about this issue here:
 `MONGOID-4527 <https://jira.mongodb.org/browse/MONGOID-4527>`_.
 
 
-``OperationFailure`` When Reading ``local`` With Auth On
-========================================================
+``Mongo::Auth::Unauthorized`` User is Not Authorized to Access
+==============================================================
 
-If you are getting the following error when trying to read the ``local`` database:
+If you are getting the following error:
 
 .. code-block:: ruby
 
-  Mongo::Error::OperationFailure: not authorized on local to execute command { find: "oplog.rs", filter: { ts:
-    { $gte: Timestamp 1497449043000|0 } }, sort: { $natural: 1 } } (13)
+  Mongo::Auth::Unauthorized: User ... is not authorized to access ...
 
-You can fix this by adjusting the roles your user has and ensuring that it has
-privileges to the local database. If you specifically want to access the oplog,
-you can also create a custom role with read access to the local database's
-``oplog.rs`` collection. You can find more information about role management
-`here <https://www.mongodb.com/docs/manual/reference/method/js-role-management/>`_.
+After upgrading your Ruby Driver version to 2.5+, the default authorization
+mechanism changed to use scram by default. The error might be happen if the
+authorization mechanism your user was created with does not match the
+authorization mechanism used by the driver. You can specify the preferred
+authorization mechanism using the ``auth_mech`` in the ``mongoid.yml`` file.
 
-You can find more information about this issue here:
-`MONGOID-4446 <https://jira.mongodb.org/browse/MONGOID-4446>`_.
+See more on this issue here:
+`RUBY-1281 <https://jira.mongodb.org/browse/RUBY-1684>`_.
 
