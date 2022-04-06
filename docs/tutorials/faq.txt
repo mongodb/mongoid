@@ -1,0 +1,120 @@
+*************
+Common Errors
+*************
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+Mongoid/Moped Authentication Error: failed with error 13
+========================================================
+
+If you are encountering the following error:
+
+.. code-block:: ruby
+
+  Moped::Errors::OperationFailure: The operation: #<Moped::Protocol::Command
+    @length=83
+    @request_id=5
+    @response_to=0
+    @op_code=2004
+    @flags=[]
+    @full_collection_name="mongose_development.$cmd"
+    @skip=0
+    @limit=-1
+    @selector={:getlasterror=>1, :w=>1}
+    @fields=nil>
+  failed with error 13: "not authorized for insert on mongose_development.people"
+
+  See https://github.com/mongodb/mongo/blob/master/docs/errors.md
+  for details about this error.
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/bundler/gems/moped-10abbf3eac37/lib/moped/operation/read.rb:50:in `block in execute'
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/bundler/gems/moped-10abbf3eac37/lib/moped/node.rb:594:in `[]'
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/bundler/gems/moped-10abbf3eac37/lib/moped/node.rb:594:in `block (2 levels) in flush'
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/bundler/gems/moped-10abbf3eac37/lib/moped/node.rb:593:in `map'
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/bundler/gems/moped-10abbf3eac37/lib/moped/node.rb:593:in `block in flush'
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/bundler/gems/moped-10abbf3eac37/lib/moped/node.rb:617:in `block in logging'
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/gems/activesupport-4.2.0/lib/active_support/notifications.rb:164:in `block in instrument'
+    from /.rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/gems/activesupport-4.2.0/lib/active_support/notifications/instrumenter.rb:20:in `instrumen
+
+This error is caused by Moped, a Ruby driver that is no longer in use by
+Mongoid. Upgrading to Mongoid 5+ should fix this issue.
+
+See more on this issue here:
+`MONGOID-4067 <https://jira.mongodb.org/browse/MONGOID-4067>`_.
+
+
+``SocketTimeoutError`` and name resolution errors on EC2
+========================================================
+
+If you are getting the following error:
+
+.. code-block:: ruby
+
+  Exception
+  Mongo::Error::SocketTimeoutError
+  Error
+  execution expired
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/socket/ssl.rb:57:in `pack_sockaddr_in'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/socket/ssl.rb:57:in `block (2 levels) in connect!'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/socket.rb:199:in `handle_errors'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/socket/ssl.rb:57:in `block in connect!'
+  /usr/lib/ruby/2.3.0/timeout.rb:101:in `timeout'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/socket/ssl.rb:56:in `connect!'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/address.rb:172:in `connect_socket!'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server/connection.rb:86:in `connect!'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server/connectable.rb:84:in `ensure_connected'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server/connection.rb:256:in `write'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server/connection.rb:215:in `deliver'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server/connection.rb:132:in `block in dispatch'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/monitoring/publishable.rb:47:in `publish_command'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server/connection.rb:131:in `dispatch'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/operation/executable.rb:37:in `block in execute'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server/connection_pool.rb:110:in `with_connection'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/server.rb:250:in `with_connection'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/operation/executable.rb:35:in `execute'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/collection/view/iterable.rb:82:in `send_initial_query'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/collection/view/iterable.rb:42:in `block in each'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/retryable.rb:44:in `read_with_retry'
+  /var/lib/gems/2.3.0/gems/mongo-2.5.0/lib/mongo/collection/view/iterable.rb:40:in `each'
+  /var/lib/gems/2.3.0/gems/mongoid-5.1.4/lib/mongoid/query_cache.rb:207:in `each'
+  /var/lib/gems/2.3.0/gems/mongoid-5.1.4/lib/mongoid/contextual/mongo.rb:252:in `first'
+  /var/lib/gems/2.3.0/gems/mongoid-5.1.4/lib/mongoid/contextual/mongo.rb:252:in `find_first'
+  /var/lib/gems/2.3.0/gems/mongoid-5.1.4/lib/mongoid/contextual.rb:20:in `find_first'
+  /var/lib/gems/2.3.0/gems/mongoid-5.1.4/lib/mongoid/findable.rb:114:in `find_by'
+
+This error was last reported on Driver version 2.5.1, so updating the Driver
+can potentially solve this issue. A user has reported that they solved this issue
+as follows:
+
+  DNS servers on EC2 are generated in /etc/resolv.conf by default. Following
+  the answer `here <https://askubuntu.com/questions/157154/how-do-i-include-lines-in-resolv-conf-that-wont-get-lost-on-reboot?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa>`_
+  and setting the nameservers to Google NS I was able to fix this issue.
+
+See more on this issue here:
+`MONGOID-4527 <https://jira.mongodb.org/browse/MONGOID-4527>`_.
+
+
+``OperationFailure`` When Reading ``local`` With Auth On
+========================================================
+
+If you are getting the following error when trying to read the ``local`` database:
+
+.. code-block:: ruby
+
+  Mongo::Error::OperationFailure: not authorized on local to execute command { find: "oplog.rs", filter: { ts:
+    { $gte: Timestamp 1497449043000|0 } }, sort: { $natural: 1 } } (13)
+
+You can fix this by adjusting the roles your user has and ensuring that it has
+privileges to the local database. If you specifically want to access the oplog,
+you can also create a custom role with read access to the local database's
+oplog.rs collection. You can find more information about role management
+`here <https://www.mongodb.com/docs/manual/reference/method/js-role-management/>`_.
+
+See more on this issue here:
+`MONGOID-4446 <https://jira.mongodb.org/browse/MONGOID-4446>`_.
+
