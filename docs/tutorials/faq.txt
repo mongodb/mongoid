@@ -51,7 +51,7 @@ You can find more information about this issue here:
 ``SocketTimeoutError`` and name resolution errors on EC2
 ========================================================
 
-If you are getting the following error:
+Some users reported getting the following error:
 
 .. code-block:: ruby
 
@@ -102,17 +102,18 @@ You can find more information about this issue here:
 ``Mongo::Auth::Unauthorized`` User is Not Authorized to Access
 ==============================================================
 
-If you are getting the following error:
+Some users reported getting the following error:
 
 .. code-block:: ruby
 
   Mongo::Auth::Unauthorized: User ... is not authorized to access ...
 
-After upgrading your Ruby Driver version to 2.5+, the default authorization
-mechanism changed to use scram by default. The error might be happen if the
+After upgrading to Ruby Driver version 2.5+, the driver was changed to use
+the scram authorization mechanism by default. This error might be happen if the
 authorization mechanism your user was created with does not match the
 authorization mechanism used by the driver. You can specify the preferred
-authorization mechanism using the ``auth_mech`` in the ``mongoid.yml`` file.
+authorization mechanism using the ``auth_mech`` option in your ``mongoid.yml``
+file.
 
 See more on this issue here:
 `RUBY-1281 <https://jira.mongodb.org/browse/RUBY-1684>`_.
