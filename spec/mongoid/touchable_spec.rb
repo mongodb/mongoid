@@ -587,54 +587,56 @@ describe Mongoid::Touchable do
 
     context "when the touch option is true" do
 
-      context 'when updating an embedded child' do
+      shared_examples "when updating" do
 
-        let(:parent_cls) { TouchableSpec::Embedded::Building }
+        let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
-        shared_examples "when updating" do
-
-          let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
-
-          let(:update_time) do
-            Timecop.freeze(Time.at(Time.now.to_i) + 2)
-          end
-
-          let(:building) do
-            parent_cls.create!
-          end
-
-          let(:floor) do
-            building.floors.create!
-          end
-
-          before do
-            floor
-            update_time
-            floor.level = 9
-            floor.send(meth)
-          end
-
-          it "the parent is not nil" do
-            expect(floor.building).to_not be nil
-          end
-
-          it "updates the parent's timestamp" do
-            building.updated_at.should == update_time
-            building.reload.updated_at.should == update_time
-          end
+        let(:update_time) do
+          Timecop.freeze(Time.at(Time.now.to_i) + 2)
         end
 
-        context "with save!" do
-          let(:meth) { "save!".to_sym }
+        let(:building) do
+          parent_cls.create!
+        end
+
+        let(:floor) do
+          building.floors.create!
+        end
+
+        before do
+          floor
+          update_time
+          floor.level = 9
+          floor.send(meth)
+        end
+
+        it "the parent is not nil" do
+          expect(floor.building).to_not be nil
+        end
+
+        it "updates the parent's timestamp" do
+          building.updated_at.should == update_time
+          building.reload.updated_at.should == update_time
+        end
+      end
+
+      [ "save!".to_sym, :destroy, :touch].each do |meth|
+        context "with #{meth} on referenced associations" do
+          let(:parent_cls) { TouchableSpec::Referenced::Building }
+          let(:meth) { meth }
 
           include_examples "when updating"
         end
 
-        context "with destroy" do
-          let(:meth) { :destroy }
+        context "with #{meth} on embedded associations" do
+          let(:parent_cls) { TouchableSpec::Embedded::Building }
+          let(:meth) { meth }
 
           include_examples "when updating"
         end
+      end
+    end
+
     context "when the touch option is false" do
 
       shared_examples "does not update the parent" do
@@ -660,6 +662,7 @@ describe Mongoid::Touchable do
         before do
           entrance
           update_time
+          # byebug if parent_cls == TouchableSpec::Embedded::Building
           entrance.touch
         end
 
@@ -674,18 +677,21 @@ describe Mongoid::Touchable do
         end
       end
 
-      context "when touch is false on belongs_to" do
+
+      context "on belongs_to" do
+        let(:meth) { meth }
         let(:parent_cls) { TouchableSpec::Referenced::Building }
 
         include_examples "does not update the parent"
       end
 
-      context "when touch is false on embedded_in" do
+      context "on embedded_in" do
+        let(:meth) { meth }
         let(:parent_cls) { TouchableSpec::Embedded::Building }
 
-        before do
-          skip "MONGOID-5274"
-        end
+        # before do
+        #   skip "MONGOID-5274"
+        # end
 
         include_examples "does not update the parent"
       end
