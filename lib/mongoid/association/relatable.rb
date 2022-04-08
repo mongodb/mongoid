@@ -299,6 +299,13 @@ module Mongoid
                       end
       end
 
+      # @return [ Array<String> ] The associations above this one in the inclusion tree.
+      attr_accessor :parent_inclusions
+
+      def parent_inclusions
+        @parent_inclusions ||= []
+      end
+
       private
 
       # Gets the model classes with inverse associations of this model. This is used to determine
