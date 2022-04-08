@@ -32,16 +32,16 @@ module Mongoid
 
       # Get a list of criteria that are to be executed for eager loading.
       #
-      # @return [ Array<Association> ] The associations.
+      # @return [ Array<Association> ] The inclusions.
       def inclusions
         @inclusions ||= []
       end
 
       # Set the inclusions for the criteria.
       #
-      # @param [ Array<Association> ] value The associations.
+      # @param [ Array<Association> ] value The inclusions.
       #
-      # @return [ Array<Association> ] The new associations.
+      # @return [ Array<Association> ] The new inclusions.
       def inclusions=(value)
         @inclusions = value
       end

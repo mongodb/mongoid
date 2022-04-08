@@ -1429,7 +1429,7 @@ describe Mongoid::Criteria::Includable do
     end
   end
 
-  context "When multiple inclusion objects for the same association" do
+  context "When multiple parent_inclusions for the same association" do
     before do
       IncBlog.create(
         posts: [

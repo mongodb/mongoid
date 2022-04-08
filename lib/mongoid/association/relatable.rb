@@ -299,7 +299,7 @@ module Mongoid
                       end
       end
 
-      # @return [ Array<String> ] The association above this one in the inclusion tree.
+      # @return [ Array<String> ] The associations above this one in the inclusion tree.
       attr_accessor :parent_inclusions
 
       def parent_inclusions
