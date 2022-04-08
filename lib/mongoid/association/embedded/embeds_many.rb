@@ -166,6 +166,14 @@ module Mongoid
           [ as ]
         end
 
+        # Get the inverse names.
+        #
+        # Used when the association is not polymorphic.
+        #
+        # @param [ Object ] other The other model class or model object to use when
+        #   determining inverses.
+        #
+        # @return [ Array<Symbol> ] The list of inverse names.
         def determine_inverses(other)
           matches = relation_class.relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
