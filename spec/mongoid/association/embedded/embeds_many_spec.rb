@@ -865,11 +865,27 @@ describe Mongoid::Association::Embedded::EmbedsMany do
 
   context "when the document and embedded document's klass is in a submodule" do
 
-    let(:car) { EmmSpec::Car.create! }
-    let(:door) { car.doors.create! }
+    let(:tank) { EmmSpec::Tank.create! }
+    let(:gun) { tank.guns.create! }
+
+    let(:inverse_assoc) { gun._association.inverse_association }
 
     it "has the correct inverses" do
-      expect(door._association.inverse_association).to_not be nil
+      inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+      inverse_assoc.name.should == :tank
+    end
+
+    context "when the class names exist on top level and namespaced" do
+
+      let(:car) { EmmSpec::Car.create! }
+      let(:door) { car.doors.create! }
+
+      let(:inverse_assoc) { door._association.inverse_association }
+
+      it "has the correct inverses" do
+        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        inverse_assoc.name.should == :car
+      end
     end
   end
 end

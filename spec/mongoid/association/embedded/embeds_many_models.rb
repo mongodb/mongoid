@@ -92,6 +92,7 @@ class EmmCustomer
 end
 
 module EmmSpec
+  # There is also a top-level Car class defined.
   class Car
     include Mongoid::Document
 
@@ -102,5 +103,17 @@ module EmmSpec
     include Mongoid::Document
 
     embedded_in :car
+  end
+
+  class Tank
+    include Mongoid::Document
+
+    embeds_many :guns
+  end
+
+  class Gun
+    include Mongoid::Document
+
+    embedded_in :tank
   end
 end
