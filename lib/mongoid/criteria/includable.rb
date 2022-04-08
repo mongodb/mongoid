@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "mongoid/criteria/inclusion"
-
 module Mongoid
   class Criteria
 
@@ -52,17 +50,17 @@ module Mongoid
 
       # Add an inclusion definition to the list of inclusions for the criteria.
       #
-      # @example Add an inclusion.
-      #   criteria.add_inclusion(Person, :posts)
-      #
       # @param [ Association ] association The association.
       # @param [ String ] parent The name of the association above this one in
       #   the inclusion tree, if it is a nested inclusion.
-      #
-      # @raise [ Errors::InvalidIncludes ] If no association is found.
       def add_inclusion(association, parent = nil)
-        association.parent_inclusions.push(parent) if parent
-        inclusions.push(association) unless inclusions.include?(association)
+        if assoc = inclusions.detect { |a| a == association }
+          assoc.parent_inclusions.push(parent) if parent
+        else
+          assoc = association.dup
+          assoc.parent_inclusions.push(parent) if parent
+          inclusions.push(assoc)
+        end
       end
 
       # Iterate through the list of relations and create the inclusions list.
