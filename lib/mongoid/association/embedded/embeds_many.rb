@@ -166,19 +166,11 @@ module Mongoid
           [ as ]
         end
 
-        # Get the inverse names.
-        #
-        # Used when the association is not polymorphic.
-        #
-        # @param [ Object ] other The other model class or model object to use when
-        #   determining inverses.
-        #
-        # @return [ Array<Symbol> ] The list of inverse names.
         def determine_inverses(other)
           matches = relation_class.relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
               # https://jira.mongodb.org/browse/MONGOID-4882
-              rel.relation_class_name_with_module.sub(/\A::/, '') == inverse_class_name.sub(/\A::/, '')
+              rel.relation_class_name.sub(/\A::/, '') == inverse_class_name
           end
           if matches.size > 1
             raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)
