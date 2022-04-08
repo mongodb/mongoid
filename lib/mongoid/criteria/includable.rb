@@ -34,22 +34,16 @@ module Mongoid
 
       # Get a list of criteria that are to be executed for eager loading.
       #
-      # @example Get the eager loading inclusions.
-      #   Person.includes(:game).inclusions
-      #
-      # @return [ Array<Association> ] The inclusions.
+      # @return [ Array<Inclusion> ] The inclusions.
       def inclusions
         @inclusions ||= []
       end
 
       # Set the inclusions for the criteria.
       #
-      # @example Set the inclusions.
-      #   criteria.inclusions = [ association ]
+      # @param [ Array<Inclusion> ] value The inclusions.
       #
-      # @param [ Array<Association> ] value The inclusions.
-      #
-      # @return [ Array<Association> ] The new inclusions.
+      # @return [ Array<Inclusion> ] The new inclusions.
       def inclusions=(value)
         @inclusions = value
       end
@@ -61,12 +55,13 @@ module Mongoid
       # @example Add an inclusion.
       #   criteria.add_inclusion(Person, :posts)
       #
-      # @param [ Class, String, Symbol ] _klass The class or string/symbol of the class name.
-      # @param [ Symbol ] association The association.
+      # @param [ Association ] association The association.
+      # @param [ String ] parent The name of the association above this one in
+      #   the inclusion tree, if it is a nested inclusion.
       #
       # @raise [ Errors::InvalidIncludes ] If no association is found.
-      def add_inclusion(previous, association)
-        inc = Inclusion.new(association, previous)
+      def add_inclusion(association, parent = nil)
+        inc = Inclusion.new(association, parent)
         inclusions.push(inc) unless inclusions.include?(inc)
       end
 
@@ -74,22 +69,22 @@ module Mongoid
       #
       # @param [ Class, String, Symbol ] _parent_class The class from which the
       #   association originates.
-      # @param [ Association ] previous The association above this one in the
-      #   inclusion tree, if it is a nested inclusion.
+      # @param [ String ] parent The name of the association above this one in
+      #   the inclusion tree, if it is a nested inclusion.
       # @param relations_list The names of the associations to eager load.
-      def extract_includes_list(_parent_class, previous, *relations_list)
+      def extract_includes_list(_parent_class, parent, *relations_list)
         relations_list.flatten.each do |relation_object|
           if relation_object.is_a?(Hash)
             relation_object.each do |relation, _includes|
               association = _parent_class.reflect_on_association(relation)
               raise Errors::InvalidIncludes.new(_klass, [ relation ]) unless association
-              add_inclusion(nil, association)
-              extract_includes_list(association.klass, association, _includes)
+              add_inclusion(association, parent)
+              extract_includes_list(association.klass, association.name, _includes)
             end
           else
             association = _parent_class.reflect_on_association(relation_object)
             raise Errors::InvalidIncludes.new(_parent_class, [ relation_object ]) unless association
-            add_inclusion(previous, association)
+            add_inclusion(association, parent)
           end
         end
       end
