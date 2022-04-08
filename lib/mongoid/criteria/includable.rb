@@ -34,16 +34,16 @@ module Mongoid
 
       # Get a list of criteria that are to be executed for eager loading.
       #
-      # @return [ Array<Inclusion> ] The inclusions.
+      # @return [ Array<Association> ] The associations.
       def inclusions
         @inclusions ||= []
       end
 
       # Set the inclusions for the criteria.
       #
-      # @param [ Array<Inclusion> ] value The inclusions.
+      # @param [ Array<Association> ] value The associations.
       #
-      # @return [ Array<Inclusion> ] The new inclusions.
+      # @return [ Array<Association> ] The new associations.
       def inclusions=(value)
         @inclusions = value
       end
@@ -61,8 +61,8 @@ module Mongoid
       #
       # @raise [ Errors::InvalidIncludes ] If no association is found.
       def add_inclusion(association, parent = nil)
-        inc = Inclusion.new(association, parent)
-        inclusions.push(inc) unless inclusions.include?(inc)
+        association.parent_inclusions.push(parent) if parent
+        inclusions.push(association) unless inclusions.include?(association)
       end
 
       # Iterate through the list of relations and create the inclusions list.

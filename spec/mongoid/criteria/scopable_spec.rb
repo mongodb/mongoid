@@ -87,7 +87,7 @@ describe Mongoid::Criteria::Scopable do
         end
 
         it "merges in the inclusions" do
-          expect(scoped.inclusions.map(&:association)).to eq(
+          expect(scoped.inclusions).to eq(
             [ Band.relations["records"] ]
           )
         end
@@ -106,7 +106,7 @@ describe Mongoid::Criteria::Scopable do
         end
 
         it "merges in the inclusions" do
-          expect(scoped.inclusions.map(&:association)).to eq(
+          expect(scoped.inclusions).to eq(
             [ Band.relations["records"], Band.relations["label"] ]
           )
         end
@@ -314,7 +314,7 @@ describe Mongoid::Criteria::Scopable do
       end
 
       it "removes the matching inclusions" do
-        expect(criteria.inclusions.map(&:association)).to eq([ Band.relations["records"] ])
+        expect(criteria.inclusions).to eq([ Band.relations["records"] ])
       end
     end
   end

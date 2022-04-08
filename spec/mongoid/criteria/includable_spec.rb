@@ -323,7 +323,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       it "does not duplicate the association in the inclusions" do
-        expect(criteria.inclusions.map(&:association)).to eq([ association ])
+        expect(criteria.inclusions).to eq([ association ])
       end
     end
 
@@ -1003,7 +1003,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         before do
-          expect(context).to receive(:execute_preload).twice.and_call_original
+          expect(context).to receive(:preload).twice.and_call_original
         end
 
         let!(:documents) do
@@ -1066,7 +1066,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       before do
-        expect(context).to receive(:execute_preload).twice.and_call_original
+        expect(context).to receive(:preload).twice.and_call_original
       end
 
       let!(:documents) do
@@ -1374,7 +1374,7 @@ describe Mongoid::Criteria::Includable do
     end
 
     it "returns the inclusions" do
-      expect(criteria.inclusions.map(&:association)).to eq([ association ])
+      expect(criteria.inclusions).to eq([ association ])
     end
   end
 

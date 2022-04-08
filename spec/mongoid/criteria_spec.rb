@@ -458,7 +458,7 @@ describe Mongoid::Criteria do
       end
 
       it "contains equal inclusions" do
-        expect(clone.inclusions.map(&:association)).to eq([ Band.relations["records"] ])
+        expect(clone.inclusions).to eq([ Band.relations["records"] ])
       end
 
       it "clones the inclusions" do
@@ -1423,7 +1423,7 @@ describe Mongoid::Criteria do
       end
 
       it "merges the inclusions" do
-        expect(merged.inclusions.map(&:association)).to eq([ association ])
+        expect(merged.inclusions).to eq([ association ])
       end
 
       it "returns a new criteria" do
@@ -1458,7 +1458,7 @@ describe Mongoid::Criteria do
       end
 
       it "merges the inclusions" do
-        expect(merged.inclusions.map(&:association)).to eq([ association ])
+        expect(merged.inclusions).to eq([ association ])
       end
 
       it "returns a new criteria" do
@@ -1508,7 +1508,7 @@ describe Mongoid::Criteria do
     end
 
     it "merges the inclusions" do
-      expect(merged.inclusions.map(&:association)).to eq([ association ])
+      expect(merged.inclusions).to eq([ association ])
     end
 
     it "returns the same criteria" do
