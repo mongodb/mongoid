@@ -1428,4 +1428,38 @@ describe Mongoid::Criteria::Includable do
       end
     end
   end
+
+  context "When multiple inclusion objects for the same association" do
+    before do
+      IncBlog.create(
+        posts: [
+          IncBlogPost.create(author: IncAuthor.create),
+          IncBlogPost.create(author: IncAuthor.create),
+          IncBlogPost.create(author: IncAuthor.create),
+        ],
+        highlighted_post: IncBlogPost.create(author: IncAuthor.create),
+        pinned_post: IncBlogPost.create(author: IncAuthor.create)
+      )
+    end
+
+    let!(:result) do
+      IncBlog.includes(:posts, highlighted_post: :author, pinned_post: :author).first
+    end
+
+    it "does not execute a query" do
+      expect_no_queries do
+        result.posts.to_a
+        result.highlighted_post
+        result.pinned_post
+      end
+    end
+
+    it "executes a query for the non-retrieved elements" do
+      expect_query(3) do
+        result.posts.each do |post|
+          post.author
+        end
+      end
+    end
+  end
 end

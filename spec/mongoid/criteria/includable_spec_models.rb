@@ -29,6 +29,7 @@ class IncBlog
 
   has_and_belongs_to_many :posts, class_name: "IncBlogPost"
   belongs_to :highlighted_post, class_name: "IncBlogPost"
+  belongs_to :pinned_post, class_name: "IncBlogPost"
 end
 
 class IncBlogPost
