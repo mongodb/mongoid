@@ -300,7 +300,7 @@ module Mongoid
       end
 
       # @return [ Array<String> ] The association above this one in the inclusion tree.
-      attr_reader :parent_inclusions
+      attr_accessor :parent_inclusions
 
       def parent_inclusions
         @parent_inclusions ||= []

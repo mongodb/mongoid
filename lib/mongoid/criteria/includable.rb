@@ -58,7 +58,7 @@ module Mongoid
           assoc.parent_inclusions.push(parent) if parent
         else
           assoc = association.dup
-          assoc.parent_inclusions.push(parent) if parent
+          assoc.parent_inclusions = [ parent ] if parent
           inclusions.push(assoc)
         end
       end
