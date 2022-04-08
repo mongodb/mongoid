@@ -910,5 +910,17 @@ describe Mongoid::Association::Embedded::EmbedsMany do
         inverse_assoc.name.should == :car
       end
     end
+
+    context "when the association has an unqualified class_name in same module" do
+
+      let(:launcher) { tank.launchers.create! }
+
+      let(:inverse_assoc) { launcher._association.inverse_association }
+
+      it "has the correct inverses" do
+        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        inverse_assoc.name.should == :tank
+      end
+    end
   end
 end

@@ -114,12 +114,23 @@ module EmmSpec
     # and it does not define class_name hence Mongoid will not be able to
     # figure out the inverse for this association.
     embeds_many :emm_hatches
+
+    # class_name is intentionally unqualified, references a class in the
+    # same module. Rails permits class_name to be unqualified like this.
+    embeds_many :launchers, class_name: 'Launcher'
   end
 
   class Gun
     include Mongoid::Document
 
     embedded_in :tank
+  end
+
+  class Launcher
+    include Mongoid::Document
+
+    # class_name is intentionally unqualified.
+    embedded_in :tank, class_name: 'Tank'
   end
 end
 
