@@ -12,3 +12,4 @@ Tutorials
   tutorials/getting-started-sinatra
   tutorials/getting-started-rails
   tutorials/documents
+  tutorials/common-errors
