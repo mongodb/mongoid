@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative 'embeds_many_models'
 
 describe Mongoid::Association::Embedded::EmbedsMany do
 
@@ -859,6 +860,16 @@ describe Mongoid::Association::Embedded::EmbedsMany do
 
     it 'returns an instance of Mongoid::Atomic::Paths::Root' do
       expect(association.path(double( :_parent => true))).to be_a(Mongoid::Atomic::Paths::Embedded::Many)
+    end
+  end
+
+  context "when the document and embedded document's klass is in a submodule" do
+
+    let(:car) { EmmSpec::Car.create! }
+    let(:door) { car.doors.create! }
+
+    it "has the correct inverses" do
+      expect(door._association.inverse_association).to_not be nil
     end
   end
 end

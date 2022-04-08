@@ -4699,14 +4699,4 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
     end
   end
-
-  context "when the document and embedded document's klass is in a submodule" do
-
-    let(:car) { EmmSpec::Car.create! }
-    let(:door) { car.doors.create! }
-
-    it "has the correct inverses" do
-      expect(door._association.inverse_association).to_not be nil
-    end
-  end
 end
