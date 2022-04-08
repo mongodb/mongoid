@@ -109,6 +109,7 @@ module EmmSpec
     include Mongoid::Document
 
     embeds_many :guns
+    embeds_many :emm_turrets
   end
 
   class Gun
@@ -116,4 +117,11 @@ module EmmSpec
 
     embedded_in :tank
   end
+end
+
+# This is intentionally on top level.
+class EmmTurret
+  include Mongoid::Document
+
+  embedded_in :tank, class_name: 'EmmSpec::Tank'
 end

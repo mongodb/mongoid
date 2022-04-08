@@ -875,6 +875,18 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       inverse_assoc.name.should == :tank
     end
 
+    context "when embedded association is not namespaced" do
+
+      let(:turret) { tank.emm_turrets.create! }
+
+      let(:inverse_assoc) { turret._association.inverse_association }
+
+      it "has the correct inverses" do
+        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        inverse_assoc.name.should == :tank
+      end
+    end
+
     context "when the class names exist on top level and namespaced" do
 
       let(:car) { EmmSpec::Car.create! }
