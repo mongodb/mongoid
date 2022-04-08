@@ -110,6 +110,10 @@ module EmmSpec
 
     embeds_many :guns
     embeds_many :emm_turrets
+    # This association references a model that is not in our module,
+    # and it does not define class_name hence Mongoid will not be able to
+    # figure out the inverse for this association.
+    embeds_many :emm_hatches
   end
 
   class Gun
@@ -124,4 +128,12 @@ class EmmTurret
   include Mongoid::Document
 
   embedded_in :tank, class_name: 'EmmSpec::Tank'
+end
+
+# This is intentionally on top level.
+class EmmHatch
+  include Mongoid::Document
+
+  # No :class_name option on this association intentionally.
+  embedded_in :tank
 end
