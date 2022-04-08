@@ -177,6 +177,7 @@ module Mongoid
         def determine_inverses(other)
           matches = relation_class.relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
+              # https://jira.mongodb.org/browse/MONGOID-4882
               rel.relation_class_name_with_module.sub(/\A::/, '') == inverse_class_name.sub(/\A::/, '')
           end
           if matches.size > 1
