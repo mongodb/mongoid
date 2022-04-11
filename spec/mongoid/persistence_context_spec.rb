@@ -39,7 +39,6 @@ describe Mongoid::PersistenceContext do
     end
   end
 
-
   describe '.get' do
 
     let(:options) do
@@ -132,6 +131,32 @@ describe Mongoid::PersistenceContext do
             described_class.clear(object, client.cluster.dup)
           end
         end
+      end
+    end
+
+    context 'with reusable client' do
+      let(:options) do
+        {client: :some_client}
+      end
+
+      let(:cluster) do
+        double(Mongo::Cluster)
+      end
+
+      let(:client) do
+        double(Mongo::Client).tap do |client|
+          allow(client).to receive(:cluster).and_return(cluster)
+        end
+      end
+
+      before do
+        expect(Mongoid::Clients).to receive(:with_name).with(:some_client).and_return(client)
+        expect(client).not_to receive(:close)
+      end
+
+      it 'does not close the client' do
+        described_class.set(object, options)
+        described_class.clear(object, cluster.dup)
       end
     end
   end

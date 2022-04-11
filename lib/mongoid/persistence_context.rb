@@ -122,6 +122,21 @@ module Mongoid
       options == other.options
     end
 
+    # Whether the client of the context can be reused later, and therefore should
+    # not be closed.
+    #
+    # If the persistence context is requested with :client option only, it means
+    # that the context should use a client configured in mongoid.yml.
+    # Such clients should not be closed when the context is cleared since they
+    # will be reused later.
+    #
+    # @return [ true | false ] True if client can be reused, otherwise false.
+    #
+    # @api private
+    def reusable_client?
+      @options.keys == [:client]
+    end
+
     private
 
     def set_options!(opts)
@@ -210,7 +225,7 @@ module Mongoid
       def clear(object, cluster = nil, original_context = nil)
         if context = get(object)
           unless cluster.nil? || context.cluster.equal?(cluster)
-            context.client.close
+            context.client.close unless context.reusable_client?
           end
         end
       ensure
