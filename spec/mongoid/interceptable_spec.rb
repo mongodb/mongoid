@@ -2106,6 +2106,7 @@ describe Mongoid::Interceptable do
     end
 
     context "when using create methods" do
+
       context "when the child is an embeds_many association" do
         let!(:player) do
           Player.create!.tap do |player|
@@ -2212,9 +2213,19 @@ describe Mongoid::Interceptable do
 
         include_examples 'accesses the correct parent'
       end
+
+      context "when accessing the child directly" do
+        let(:band) { InterceptableBand.create(name: "Molejo") }
+        let(:song) { band.songs.create(name: "Cilada") }
+
+        it "assigns the default correctly" do
+          expect(song.band_name).to eq("Molejo")
+        end
+      end
     end
 
     context "when using build methods" do
+
       context "when the child is an embeds_many association" do
         let!(:player) do
           Player.create!.tap do |player|

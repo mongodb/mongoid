@@ -234,11 +234,12 @@ module Mongoid
         process_attributes(attrs) do
           yield(self) if block_given?
         end
-        apply_post_processed_defaults
 
         if execute_callbacks
+          apply_post_processed_defaults
           run_callbacks(:initialize) unless _initialize_callbacks.empty?
         else
+          pending_callbacks << :apply_post_processed_defaults
           pending_callbacks << :initialize
         end
       end

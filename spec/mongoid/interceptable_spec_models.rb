@@ -226,3 +226,18 @@ module InterceptableSpec
     include CallbackTracking
   end
 end
+
+class InterceptableBand
+  include Mongoid::Document
+
+  has_many :songs, class_name: "InterceptableSong"
+  field :name
+end
+
+class InterceptableSong
+  include Mongoid::Document
+
+  belongs_to :band, class_name: "InterceptableBand"
+  field :band_name, default: -> { band.name }
+  field :name
+end
