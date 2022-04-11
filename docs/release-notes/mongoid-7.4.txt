@@ -538,3 +538,8 @@ inside a hash. For example:
   The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
   by default in Mongoid 8.0.
 
+
+``Document#to_a`` deprecated
+````````````````````````````
+
+The ``Document#to_a`` method is deprecated in Mongoid 7.x.
