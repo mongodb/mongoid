@@ -454,6 +454,27 @@ module Mongoid
         end
       end
 
+      def tally(field)
+        name = klass.cleanse_localized_field_names(field)
+
+        field, pipeline = build_tally_pipeline(name)
+
+        view.aggregate(pipeline).reduce({}) do |tallies, doc|
+          is_translation = "#{name}_translations" == field.to_s
+          key = demongoize_with_field(field, doc["_id"], is_translation)
+
+          # The only time where a key will already exist in the tallies hash
+          # is when the values are stored differently in the database, but
+          # demongoize to the same value. A good example of when this happens
+          # is when using localized fields. While the server query won't group
+          # together hashes that have other values in different languages, the
+          # demongoized value is just the translation in the current locale,
+          # which can be the same across multiple of those unequal hashes.
+          tallies[key] ||= 0
+          tallies[key] += doc["counts"]
+          tallies
+        end
+      end
       # Skips the provided number of documents.
       #
       # @example Skip the documents.
@@ -771,7 +792,19 @@ module Mongoid
       # @return [ Object ] The demongoized value.
       def recursive_demongoize(field_name, value, is_translation)
         field = klass.traverse_association_tree(field_name)
+        demongoize_with_field(field, value, is_translation)
+      end
 
+      # Demongoize the value for the given field. If the field is nil or the
+      # field is a translations field, the value is demongoized using its class.
+      #
+      # @param [ Field ] field The field to use to demongoize.
+      # @param [ Object ] value The value to demongoize.
+      # @param [ Boolean ] is_translation The field we are retrieving is an
+      #   _translations field.
+      #
+      # @return [ Object ] The demongoized value.
+      def demongoize_with_field(field, value, is_translation)
         if field
           # If it's a localized field that's not a hash, don't demongoize
           # again, we already have the translation. If it's an _translations
@@ -785,6 +818,47 @@ module Mongoid
         else
           value.class.demongoize(value)
         end
+      end
+
+      # If there are arrays or embeds_many associations we need to unwind each
+      # of them and group the results. The unwind key is built up from the base
+      # document. Take the following example:
+      #
+      #   User embeds_many Accounts
+      #   Account embeds_one Holding
+      #   Holding embeds_many Assets
+      #
+      # and we want to tally the name field on Asset. The following pipeline
+      # will be built:
+      #
+      #   { $unwind: { path: "$accounts" } }
+      #   { $unwind: { path: "$accounts.holding.assets" } }
+      #   { $group: { _id: "$accounts.holding.assets.name" } }
+      #
+      # @param [ String ] name The field name.
+      # @return [ Array<Field, Array<Hash>> ] The field for the given field name
+      #   and the built pipeline.
+      def build_tally_pipeline(name)
+        current = ""
+        pipeline = []
+        num_meths = name.count('.') + 1
+        i = 1
+        field = klass.traverse_association_tree(name) do |meth, obj, is_field|
+          current += "." unless current.blank?
+          current += meth
+
+          if (is_field && obj.type == Array) || (!is_field && obj.is_a?(Association::Embedded::EmbedsMany))
+            if i < num_meths
+              pipeline.push({ "$unwind": { path: "$#{current}" }})
+            end
+          end
+
+          i += 1
+        end
+
+        pipeline.push( { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } })
+
+        [ field, pipeline ]
       end
     end
   end

@@ -813,6 +813,314 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#tally" do
+    before do
+      Band.create!(origin: "tally", name: "Depeche Mode", years: 30, sales: "1E2", label: Label.new(name: "Atlantic"))
+      Band.create!(origin: "tally", name: "New Order", years: 30, sales: "2E3", label: Label.new(name: "Atlantic"))
+      Band.create!(origin: "tally", name: "10,000 Maniacs", years: 30, sales: "1E2", label: Label.new(name: "Columbia"))
+      Band.create!(origin: "tally2", labels: [Label.new(age:1), Label.new(age:2)])
+      Band.create!(origin: "tally2", labels: [Label.new(age:1), Label.new(age:2)])
+      Band.create!(origin: "tally2", labels: [Label.new(age:1), Label.new(age:3)])
+    end
+
+    let(:criteria) { Band.where(origin: "tally") }
+
+    context "when tallying a string" do
+      let(:tally) do
+        criteria.tally(:name)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq("Depeche Mode" => 1, "New Order" => 1, "10,000 Maniacs" => 1)
+      end
+    end
+
+    context "using an aliased field" do
+      let(:tally) do
+        criteria.tally(:years)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(30 => 3)
+      end
+    end
+
+    context "when tallying a demongoizable field" do
+      let(:tally) do
+        criteria.tally(:sales)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(BigDecimal("1E2") => 2, BigDecimal("2E3") => 1)
+      end
+    end
+
+    context "when tallying a localized field" do
+      before do
+        I18n.locale = :en
+        d1 = Dictionary.create!(description: 'en1')
+        d2 = Dictionary.create!(description: 'en1')
+        d3 = Dictionary.create!(description: 'en1')
+        d4 = Dictionary.create!(description: 'en2')
+        I18n.locale = :de
+        d1.description = 'de1'
+        d2.description = 'de1'
+        d3.description = 'de2'
+        d4.description = 'de3'
+        d1.save!
+        d2.save!
+        d3.save!
+        d4.save!
+
+        I18n.locale = :en
+      end
+
+      context "when getting the demongoized field" do
+        let(:tallied) do
+          Dictionary.tally(:description)
+        end
+
+        it "returns the translation for the current locale" do
+          expect(tallied).to eq("en1" => 3, "en2" => 1)
+        end
+      end
+
+      context "when getting a specific locale" do
+        let(:tallied) do
+          Dictionary.tally("description.de")
+        end
+
+        it "returns the translation for the the specifiec locale" do
+          expect(tallied).to eq("de1" => 2, "de2" => 1, "de3" => 1)
+        end
+      end
+
+      context "when getting the full hash" do
+        let(:tallied) do
+          Dictionary.tally("description_translations")
+        end
+
+        it "returns the correct hash" do
+          expect(tallied).to eq(
+            {"de" => "de1", "en" => "en1" } => 2,
+            {"de" => "de2", "en" => "en1" } => 1,
+            {"de" => "de3", "en" => "en2" } => 1
+          )
+        end
+      end
+    end
+
+    context "when tallying an embedded field" do
+      let(:tally) do
+        criteria.tally("label.name")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq("Atlantic" => 2, "Columbia" => 1)
+      end
+    end
+
+    context "when tallying an element in an embeds_many field" do
+      let(:criteria) { Band.where(origin: "tally2") }
+
+      let(:tally) do
+        criteria.tally("labels.age")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying an embeds_many field" do
+      let(:criteria) { Band.where(origin: "tally2") }
+
+      let(:tally) do
+        criteria.tally("labels")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    ## PASTING - Finish testing tally
+    # context "when querying an embeds_many association" do
+    #   let(:criteria) do
+    #     Band.where("labels" => 10..15)
+    #   end
+
+    #   it "correctly uses elemMatch without an inner key" do
+    #     expect(criteria.selector).to eq(
+    #       "labels" => {
+    #         "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+    #       }
+    #     )
+    #   end
+    # end
+
+    # context "when querying an element in an embeds_many association" do
+    #   let(:criteria) do
+    #     Band.where("labels.age" => 10..15)
+    #   end
+
+    #   it "correctly uses elemMatch" do
+    #     expect(criteria.selector).to eq(
+    #       "labels" => {
+    #         "$elemMatch" => {
+    #           "age" => { "$gte" => 10, "$lte" => 15 }
+    #         }
+    #       }
+    #     )
+    #   end
+    # end
+
+    # context "when querying a field of type array" do
+    #   let(:criteria) do
+    #     Band.where("genres" => 10..15)
+    #   end
+
+    #   it "correctly uses elemMatch without an inner key" do
+    #     expect(criteria.selector).to eq(
+    #       "genres" => {
+    #         "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+    #       }
+    #     )
+    #   end
+    # end
+
+    # context "when querying an aliased field of type array" do
+    #   let(:criteria) do
+    #     Person.where("array" => 10..15)
+    #   end
+
+    #   it "correctly uses the aliased field and elemMatch" do
+    #     expect(criteria.selector).to eq(
+    #       "a" => {
+    #         "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+    #       }
+    #     )
+    #   end
+    # end
+
+    # context "when querying a field inside an array" do
+    #   let(:criteria) do
+    #     Band.where("genres.age" => 10..15)
+    #   end
+
+    #   it "correctly uses elemMatch" do
+    #     expect(criteria.selector).to eq(
+    #       "genres" => {
+    #         "$elemMatch" => {
+    #           "age" => { "$gte" => 10, "$lte" => 15 }
+    #         }
+    #       }
+    #     )
+    #   end
+    # end
+
+    # context "when there are no embeds_manys or Arrays" do
+    #   let(:criteria) do
+    #     Band.where("fans.info.age" => 10..15)
+    #   end
+
+    #   it "does not use elemMatch" do
+    #     expect(criteria.selector).to eq(
+    #       "fans.info.age" => { "$gte" => 10, "$lte" => 15 }
+    #     )
+    #   end
+    # end
+
+    # context "when querying a nested element in an embeds_many association" do
+    #   let(:criteria) do
+    #     Band.where("labels.age.number" => 10..15)
+    #   end
+
+    #   it "correctly uses elemMatch" do
+    #     expect(criteria.selector).to eq(
+    #       "labels" => {
+    #         "$elemMatch" => {
+    #           "age.number" => { "$gte" => 10, "$lte" => 15 }
+    #         }
+    #       }
+    #     )
+    #   end
+    # end
+
+    # context "when querying a nested element in an Array" do
+    #   let(:criteria) do
+    #     Band.where("genres.name.length" => 10..15)
+    #   end
+
+    #   it "correctly uses elemMatch" do
+    #     expect(criteria.selector).to eq(
+    #       "genres" => {
+    #         "$elemMatch" => {
+    #           "name.length" => { "$gte" => 10, "$lte" => 15 }
+    #         }
+    #       }
+    #     )
+    #   end
+    # end
+
+    # context "when querying a nested element in a nested embeds_many association" do
+    #   context "when the outer association is an embeds_many" do
+    #     let(:criteria) do
+    #       Band.where("records.tracks.name.length" => 10..15)
+    #     end
+
+    #     it "correctly uses elemMatch" do
+    #       expect(criteria.selector).to eq(
+    #         "records.tracks" => {
+    #           "$elemMatch" => {
+    #             "name.length" => { "$gte" => 10, "$lte" => 15 }
+    #           }
+    #         }
+    #       )
+    #     end
+    #   end
+
+    #   context "when the outer association is an embeds_one" do
+    #     let(:criteria) do
+    #       Person.where("name.translations.language.length" => 10..15)
+    #     end
+
+    #     it "correctly uses elemMatch" do
+    #       expect(criteria.selector).to eq(
+    #         "name.translations" => {
+    #           "$elemMatch" => {
+    #             "language.length" => { "$gte" => 10, "$lte" => 15 }
+    #           }
+    #         }
+    #       )
+    #     end
+    #   end
+    # end
+
+    # context "when querying a deeply nested array" do
+    #   let(:criteria) do
+    #     Person.where("addresses.code.deepest.array.element.item" => 10..15)
+    #   end
+
+    #   it "correctly uses elemMatch" do
+    #     expect(criteria.selector).to eq(
+    #       "addresses.code.deepest.array" => {
+    #         "$elemMatch" => {
+    #           "element.item" => { "$gte" => 10, "$lte" => 15 }
+    #         }
+    #       }
+    #     )
+    #   end
+    # end
+    ## END PASTE
+  end
+
   describe "#each" do
 
     before do
