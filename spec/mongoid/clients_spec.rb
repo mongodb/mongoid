@@ -1019,11 +1019,15 @@ describe Mongoid::Clients do
           allow(client).to receive(:cluster).and_return(double("cluster"))
         end
       end
-      before do
 
+      before do
         expect(Mongoid::Clients::Factory).to receive(:create)
           .with(:secondary)
           .and_return(secondary_client)
+      end
+
+      after do
+        Mongoid::Clients.clients.delete(:secondary)
       end
 
       it 'does not close the client' do
