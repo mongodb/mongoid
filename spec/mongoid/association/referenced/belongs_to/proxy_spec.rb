@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../belongs_to_models.rb'
 
 describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
@@ -1370,6 +1371,21 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         game.person.set_personal_data(ssn: '123', age: 25)
       end.not_to raise_error
     end
+  end
 
+  # This is a very specific case, see MONGOID-5089 for more details.
+  context "when required is false, child is an orphan, and parent has explicit _id" do
+    let(:comment) { BTMComment.create! }
+    let(:article) do
+      byebug
+      BTMArticle.new(
+        comment_ids: [comment.id],
+        id: 1
+      )
+    end
+
+    it "uses the correct explicit id" do
+      expect(article.comments.first.article_id).to eq(1)
+    end
   end
 end
