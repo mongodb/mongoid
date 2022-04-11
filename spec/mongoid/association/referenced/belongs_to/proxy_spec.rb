@@ -1377,7 +1377,6 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
   context "when required is false, child is an orphan, and parent has explicit _id" do
     let(:comment) { BTMComment.create! }
     let(:article) do
-      byebug
       BTMArticle.new(
         comment_ids: [comment.id],
         id: 1
