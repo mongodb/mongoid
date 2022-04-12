@@ -161,7 +161,7 @@ module Mongoid
     #
     # @api private
     def pending_callbacks
-      @pending_callbacks ||= []
+      @pending_callbacks ||= [].to_set
     end
 
     # Run the pending callbacks. If the callback is :apply_defaults, we will apply

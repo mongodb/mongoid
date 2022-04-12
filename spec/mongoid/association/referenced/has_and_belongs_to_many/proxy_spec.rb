@@ -1995,12 +1995,16 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
             Agent.create!(number: "007")
           end
 
-          before do
+          let!(:account) do
             agent.accounts.send(method, name: "test again")
           end
 
           it "does not convert the string key to an object id" do
             expect(agent.account_ids).to eq([ "test-again" ])
+          end
+
+          it "the parent does not have the childs _id at the time of the default" do
+            expect(account.primary_account_id).to be nil
           end
         end
 

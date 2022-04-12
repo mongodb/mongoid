@@ -331,7 +331,7 @@ module Mongoid
           doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         else
           yield(doc) if block_given?
-          doc.pending_callbacks.push(:apply_defaults, :find, :initialize)
+          doc.pending_callbacks += [:apply_defaults, :find, :initialize]
         end
 
         doc
