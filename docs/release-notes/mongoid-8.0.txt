@@ -276,3 +276,9 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
 
   user.destroy
   user.previously_persisted?   # => true
+
+
+Removed ``Document#to_a`` method
+--------------------------------
+
+The ``Document#to_a`` method has been removed in Mongoid 8.
