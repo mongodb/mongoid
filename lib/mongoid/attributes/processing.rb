@@ -43,7 +43,13 @@ module Mongoid
       # @return [ true, false ] True if pending, false if not.
       def pending_attribute?(key, value)
         name = key.to_s
-        aliased = aliased_associations[name] if aliased_associations.key?(name)
+
+        aliased = if aliased_associations.key?(name)
+          aliased_associations[name]
+        else
+          name
+        end
+
         if relations.has_key?(aliased)
           pending_relations[name] = value
           return true
