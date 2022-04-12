@@ -13,7 +13,7 @@ class Account
 
   field :overridden, type: String
 
-  field :primary_account_id, default: ->{ agents.first.account_ids.first }
+  field :primary_account_id, default: ->{ agents.first.account_ids.first if agents.first }
 
   embeds_many :memberships
   belongs_to :creator, class_name: "User", foreign_key: :creator_id
