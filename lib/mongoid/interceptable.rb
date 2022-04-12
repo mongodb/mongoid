@@ -168,7 +168,6 @@ module Mongoid
       @pending_callbacks = value
     end
 
-
     # Run the pending callbacks. If the callback is :apply_defaults, we will apply
     # the defaults for this document. Otherwise, the callback is passed to the
     # run_callbacks function.
