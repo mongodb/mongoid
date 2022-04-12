@@ -23,7 +23,15 @@ module Mongoid
     #
     # @return [ true, false ] If the document is changed.
     def changed?
-      changes.values.any? { |val| val } || children_changed?
+      changes.any? do |name, val|
+        aliased = if aliased_associations.key?(name)
+          aliased_associations[name]
+        else
+          name
+        end
+
+        val unless relations.has_key?(aliased)
+      end || children_changed?
     end
 
     # Have any children (embedded documents) of this document changed?

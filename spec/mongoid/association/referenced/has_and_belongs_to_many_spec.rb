@@ -1076,4 +1076,29 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
       expect(association.inverse_foreign_key_setter).to eq('has_many_left_object_ids=')
     end
   end
+
+  context "when manually setting the _ids field" do
+    let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+    let(:update_time) do
+      Timecop.freeze(Time.at(Time.now.to_i) + 2)
+    end
+
+    after do
+      Timecop.return
+    end
+
+    let!(:school) { HabtmmSchool.create! }
+    let!(:student) { HabtmmStudent.create! }
+
+    before do
+      update_time
+      school.update(student_ids: [student.id])
+    end
+
+
+    it "does not update the updated at" do
+      expect(school.updated_at).to eq(start_time)
+    end
+  end
 end
