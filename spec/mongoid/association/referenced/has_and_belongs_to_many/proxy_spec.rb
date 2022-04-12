@@ -1996,7 +1996,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           end
 
           let!(:account) do
-            agent.accounts.send(method, name: "test again")
+            agent.accounts.send(method, name: "test again", execute_default: true)
           end
 
           it "does not convert the string key to an object id" do
