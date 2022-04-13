@@ -43,7 +43,7 @@ end
 
 require 'mongoid'
 
-if SpecConfig.instance.mri? && SpecConfig.instance.windows?
+if SpecConfig.instance.mri? && !SpecConfig.instance.windows?
   require 'timeout_interrupt'
 else
   require 'timeout'
