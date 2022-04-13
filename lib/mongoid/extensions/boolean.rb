@@ -11,7 +11,7 @@ module Mongoid
       # @example Mongoize the object.
       #   Boolean.mongoize("123.11")
       #
-      # @return [ String ] The object mongoized.
+      # @return [ true | false ] The object mongoized.
       def mongoize(object)
         evolve(object)
       end

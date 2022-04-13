@@ -49,5 +49,14 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
         expect(actual).to eq(12)
       end
     end
+
+    context "when the string is non-numeric" do
+
+      let(:str) { 'foo' }
+
+      it "returns the value as integer" do
+        expect { actual }.to raise_error(ArgumentError)
+      end
+    end
   end
 end
