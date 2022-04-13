@@ -388,21 +388,6 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#to_a" do
-
-    let(:person) do
-      Person.new
-    end
-
-    let(:people) do
-      person.to_a
-    end
-
-    it "returns the document in an array" do
-      expect(people).to eq([ person ])
-    end
-  end
-
   describe "#as_json" do
 
     let!(:person) do

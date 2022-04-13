@@ -386,5 +386,27 @@ describe Mongoid::Atomic do
         end
       end
     end
+
+    context "when adding embedded documents with nil ids" do
+      let(:account) { Account.create!(name: "acc") }
+
+      before do
+        account.memberships.build(id: nil, name: "m1")
+        account.memberships.build(id: nil, name: "m2")
+      end
+
+      it "has the correct updates" do
+        account.atomic_updates.should == {
+          "$push" => {
+            "memberships" => {
+              "$each" => [
+                { "_id" => nil, "name" => "m1" },
+                { "_id" => nil, "name" => "m2" }
+              ]
+            }
+          }
+        }
+      end
+    end
   end
 end

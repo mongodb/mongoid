@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "./includable_spec_models.rb"
 
 describe Mongoid::Criteria::Includable do
 
@@ -1283,38 +1284,6 @@ describe Mongoid::Criteria::Includable do
     end
 
     context "when using a has_many association" do
-      before(:all) do
-        class IncUser
-          include Mongoid::Document
-          has_many :posts, class_name: 'IncPost'
-          has_many :comments, class_name: 'IncComment'
-        end
-
-        class IncPost
-          include Mongoid::Document
-          belongs_to :user, class_name: 'IncUser'
-          has_many :comments, class_name: 'IncComment'
-        end
-
-        class IncComment
-          include Mongoid::Document
-          belongs_to :posts, class_name: 'IncPost'
-          belongs_to :user, class_name: 'IncUser'
-          belongs_to :thread, class_name: 'IncThread'
-        end
-
-        class IncThread
-          include Mongoid::Document
-          has_many :comments, class_name: 'IncComment'
-        end
-      end
-
-      after(:all) do
-        Object.send(:remove_const, :IncUser)
-        Object.send(:remove_const, :IncPost)
-        Object.send(:remove_const, :IncComment)
-        Object.send(:remove_const, :IncThread)
-      end
 
       let!(:user) do
         IncUser.create!(posts: posts, comments: user_comments)
@@ -1425,6 +1394,72 @@ describe Mongoid::Criteria::Includable do
 
     it "sets the inclusions" do
       expect(criteria.inclusions).to eq([ association ])
+    end
+  end
+
+  context "When multiple associations reference the same class" do
+    before do
+      IncBlog.create(
+        posts: [
+          IncBlogPost.create(author: IncAuthor.create),
+          IncBlogPost.create(author: IncAuthor.create),
+          IncBlogPost.create(author: IncAuthor.create),
+        ],
+        highlighted_post: IncBlogPost.create(author: IncAuthor.create)
+      )
+    end
+
+    let!(:result) do
+      IncBlog.includes(:posts, highlighted_post: :author).first
+    end
+
+    it "does not execute a query" do
+      expect_no_queries do
+        result.posts.to_a
+        result.highlighted_post
+      end
+    end
+
+    it "executes a query for the non-retrieved elements" do
+      expect_query(3) do
+        result.posts.each do |post|
+          post.author
+        end
+      end
+    end
+  end
+
+  context "When multiple parent_inclusions for the same association" do
+    before do
+      IncBlog.create(
+        posts: [
+          IncBlogPost.create(author: IncAuthor.create),
+          IncBlogPost.create(author: IncAuthor.create),
+          IncBlogPost.create(author: IncAuthor.create),
+        ],
+        highlighted_post: IncBlogPost.create(author: IncAuthor.create),
+        pinned_post: IncBlogPost.create(author: IncAuthor.create)
+      )
+    end
+
+    let!(:result) do
+      IncBlog.includes(:posts, highlighted_post: :author, pinned_post: :author).first
+    end
+
+    it "does not execute a query" do
+      expect_no_queries do
+        result.posts.to_a
+        result.highlighted_post
+        result.pinned_post
+      end
+    end
+
+    it "executes a query for the non-retrieved elements" do
+      expect_query(3) do
+        result.posts.each do |post|
+          post.author
+        end
+      end
     end
   end
 end

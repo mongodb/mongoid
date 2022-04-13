@@ -124,16 +124,6 @@ module Mongoid
       (persisted? || destroyed?) ? [ _id.to_s ] : nil
     end
 
-    # Return an array with this +Document+ only in it.
-    #
-    # @example Return the document in an array.
-    #   document.to_a
-    #
-    # @return [ Array<Document> ] An array with the document as its only item.
-    def to_a
-      [ self ]
-    end
-
     # Return a hash of the entire document hierarchy from this document and
     # below. Used when the attributes are needed for everything and not just
     # the current document.
