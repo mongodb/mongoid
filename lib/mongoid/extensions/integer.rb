@@ -42,7 +42,7 @@ module Mongoid
         # @example Mongoize the object.
         #   BigDecimal.mongoize("123.11")
         #
-        # @return [ String ] The object mongoized.
+        # @return [ Integer ] The object mongoized.
         def mongoize(object)
           return nil if object.blank?
           Integer(__numeric__(object)) rescue nil
