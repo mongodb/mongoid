@@ -143,6 +143,8 @@ module Mongoid
     #   document.to_a
     #
     # @return [ Array<Document> ] An array with the document as its only item.
+    #
+    # @deprecated
     def to_a
       [ self ]
     end
