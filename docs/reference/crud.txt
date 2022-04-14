@@ -569,6 +569,31 @@ on the server). If a document has referenced associations, the loaded
 associations' are not reloaded but their values are cleared, such that these
 associations would be loaded from the database at the next access.
 
+.. note::
+
+  Some operations on associations, for example assignment, persists the new
+  document. In these cases there may not be any unsaved modifications to
+  revert by reloading. In the following example, the assignment of the
+  empty array to the association is immediately persisted and reloading
+  does not make any changes to the document:
+
+  .. code-block:: ruby
+  
+    # Assuming band has many tours, which could be referenced:
+    band = Band.create!(tours: [Tour.create!])
+    # ... or embedded:
+    band = Band.create!(tours: [Tour.new])
+    
+    # This writes the empty tour list into the database.
+    band.tours = []
+    
+    # There are no unsaved modifications in band at this point to be reverted.
+    band.reload
+    
+    # Returns the empty array since this is what is in the database.
+    band.tours
+    # => []
+
 If the model has a :ref:`shard key <shard-keys>` defined, the shard key value
 is included in the reloading query.
 
