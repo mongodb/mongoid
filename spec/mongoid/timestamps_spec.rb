@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './timestamps_spec_models'
 
 describe Mongoid::Timestamps do
 
@@ -105,6 +106,276 @@ describe Mongoid::Timestamps do
 
     it "updates the root document updated at" do
       expect(document.updated_at).to be_within(1).of(Time.now)
+    end
+  end
+
+  # This section of tests describes the behavior of the updated_at field for
+  # different updates on associations, as outlined in PR #5219.
+  describe "updated_at attribute" do
+    let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+    let(:update_time) do
+      Timecop.freeze(Time.at(Time.now.to_i) + 2)
+    end
+
+    after do
+      Timecop.return
+    end
+
+    context "when touch: true" do
+      let(:user) { TimestampsSpec::Touch::User.create! }
+      let(:address) { TimestampsSpec::Touch::Address.create! }
+      let(:account) { TimestampsSpec::Touch::Account.create! }
+      let(:pet) { TimestampsSpec::Touch::Pet.create! }
+
+      before do
+        [user, address, account, pet]
+        update_time
+      end
+
+      context "when HABTM association" do
+
+        context "when updating the association itself" do
+          before do
+            user.update(addresses: [address])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            address.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            user.update(address_ids: [address.id])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            # Don't update the address's updated_at here because it is
+            # inefficient to touch all of the changed documents.
+            address.updated_at.should == start_time
+          end
+        end
+      end
+
+      context "when has_many association" do
+
+        context "when updating the association itself" do
+          before do
+            user.update(accounts: [account])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            account.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            user.update(account_ids: [account.id])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            account.updated_at.should == start_time
+          end
+        end
+      end
+
+      context "when belongs_to association; on has_many" do
+
+        context "when updating the association itself" do
+          before do
+            account.update(user: user)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            account.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            account.update(user_id: user.id)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            account.updated_at.should == update_time
+          end
+        end
+      end
+
+      context "when has_one association" do
+
+        context "when updating the association itself" do
+          before do
+            user.update(pet: pet)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            pet.updated_at.should == update_time
+          end
+        end
+      end
+
+      context "when belongs_to association; on has_one" do
+
+        context "when updating the association itself" do
+          before do
+            pet.update(user: user)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            pet.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            pet.update(user_id: pet.id)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            pet.updated_at.should == update_time
+          end
+        end
+      end
+    end
+
+    context "when touch: false" do
+      let(:user) { TimestampsSpec::NoTouch::User.create! }
+      let(:address) { TimestampsSpec::NoTouch::Address.create! }
+      let(:account) { TimestampsSpec::NoTouch::Account.create! }
+      let(:pet) { TimestampsSpec::NoTouch::Pet.create! }
+
+      before do
+        [user, address, account, pet]
+        update_time
+      end
+
+      context "when HABTM association" do
+
+        context "when updating the association itself" do
+          before do
+            user.update(addresses: [address])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            address.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            user.update(address_ids: [address.id])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == update_time
+            # Don't update the address's updated_at here because it is
+            # inefficient to touch all of the changed documents.
+            address.updated_at.should == start_time
+          end
+        end
+      end
+
+      context "when has_many association" do
+
+        context "when updating the association itself" do
+          before do
+            user.update(accounts: [account])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            account.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            user.update(account_ids: [account.id])
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            account.updated_at.should == start_time
+          end
+        end
+      end
+
+      context "when belongs_to association; on has_many" do
+
+        context "when updating the association itself" do
+          before do
+            account.update(user: user)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            account.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            account.update(user_id: user.id)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            account.updated_at.should == update_time
+          end
+        end
+      end
+
+      context "when has_one association" do
+
+        context "when updating the association itself" do
+          before do
+            user.update(pet: pet)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            pet.updated_at.should == update_time
+          end
+        end
+      end
+
+      context "when belongs_to association; on has_one" do
+
+        context "when updating the association itself" do
+          before do
+            pet.update(user: user)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            pet.updated_at.should == update_time
+          end
+        end
+
+        context "when updating the association's foreign key" do
+          before do
+            pet.update(user_id: pet.id)
+          end
+
+          it "updates the timestamps correctly" do
+            user.updated_at.should == start_time
+            pet.updated_at.should == update_time
+          end
+        end
+      end
     end
   end
 end
