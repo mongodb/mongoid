@@ -30,6 +30,7 @@ module Mongoid
             if doc = docs.first
               append(doc) do
                 _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
+                _base.set_updated_at_changed
                 if child_persistable?(doc)
                   doc.save
                 end

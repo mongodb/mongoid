@@ -1077,7 +1077,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
     end
   end
 
-  context "when manually setting the _ids field" do
+  context "when adding an object to the association" do
     let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
     let(:update_time) do
@@ -1093,12 +1093,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
     before do
       update_time
-      school.update(student_ids: [student.id])
+      school.update(students: [student])
     end
 
-
-    it "does not update the updated at" do
-      expect(school.updated_at).to eq(start_time)
+    it "updates the updated at" do
+      expect(school.updated_at).to eq(update_time)
     end
   end
 end

@@ -39,6 +39,16 @@ module Mongoid
       def able_to_set_updated_at?
         !frozen? && !timeless? && (new_record? || changed?)
       end
+
+      # Set the updated at for a change that's already happened. This is used
+      # to set the updated_at for updating the foreign key of a HABTM association.
+      #
+      # @api private
+      def set_updated_at_changed
+        if !frozen? && !timeless?
+          self.updated_at = Time.now.utc unless updated_at_changed?
+        end
+      end
     end
   end
 end
