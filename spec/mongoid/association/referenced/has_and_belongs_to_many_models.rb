@@ -32,6 +32,8 @@ end
 class HabtmmSignature
   include Mongoid::Document
 
+  field :favorite_signature, default: ->{ contracts.first.signature_ids.first if contracts.first }
+
   has_and_belongs_to_many :contracts, class_name: 'HabtmmContract'
 
   field :name, type: String

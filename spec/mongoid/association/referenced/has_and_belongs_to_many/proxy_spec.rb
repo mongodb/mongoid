@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "../has_and_belongs_to_many_models"
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
@@ -1995,16 +1996,12 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
             Agent.create!(number: "007")
           end
 
-          let!(:account) do
-            agent.accounts.send(method, name: "test again", execute_default: true)
+          before do
+            agent.accounts.send(method, name: "test again")
           end
 
           it "does not convert the string key to an object id" do
             expect(agent.account_ids).to eq([ "test-again" ])
-          end
-
-          it "the parent does not have the childs _id at the time of the default" do
-            expect(account.primary_account_id).to be nil
           end
         end
 
@@ -3772,6 +3769,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       d2.projects << p2
       expect(d2.p_ids).to match_array([p2.id])
       expect(p2.d_ids).to match_array([d2.id])
+    end
+  end
+
+  context "when accesing own _id from parent's foreign key in default" do
+    let!(:contract) { HabtmmContract.create! }
+    let!(:signature) { contract.signatures.create! }
+
+    it "is nil" do
+      expect(signature.favorite_signature).to be nil
     end
   end
 end

@@ -2213,15 +2213,6 @@ describe Mongoid::Interceptable do
 
         include_examples 'accesses the correct parent'
       end
-
-      context "when accessing the child directly" do
-        let(:band) { InterceptableBand.create(name: "Molejo") }
-        let(:song) { band.songs.create(name: "Cilada") }
-
-        it "assigns the default correctly" do
-          expect(song.band_name).to eq("Molejo")
-        end
-      end
     end
 
     context "when using build methods" do
@@ -2329,6 +2320,36 @@ describe Mongoid::Interceptable do
         end
 
         include_examples 'accesses the correct parent'
+      end
+    end
+  end
+
+  context "when accessing associations in defaults" do
+    context "when not using autobuilding" do
+      let(:band) { InterceptableBand.create(name: "Molejo") }
+      let(:song) { band.songs.create(name: "Cilada") }
+
+      it "assigns the default correctly" do
+        expect(song.band_name).to eq("Molejo")
+      end
+    end
+
+    context "when using autobuilding" do
+      before do
+        InterceptablePlane.create!.tap do |plane|
+          plane.wings.create!
+        end
+      end
+
+      let(:plane) { InterceptablePlane.first }
+      let(:wing) { InterceptableWing.first }
+      let(:engine) { wing.engine }
+
+      it "sets the defaults correctly" do
+        expect(wing._id).to eq("hello-wing")
+        expect(wing.p_id).to eq(plane._id.to_s)
+        expect(wing.e_id).to eq(engine._id.to_s)
+        expect(engine._id).to eq("hello-engine-#{wing.id}")
       end
     end
   end
