@@ -1321,7 +1321,6 @@ add the ``:autosave`` option to the association:
   album.band_id
   # => BSON::ObjectId('62576b4b53aefe178b65b8e3')
   
-  # Band does not exist.
   album.band
   # => #<Band _id: 62576b4b53aefe178b65b8e3, >
 
