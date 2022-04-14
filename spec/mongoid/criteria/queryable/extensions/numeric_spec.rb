@@ -49,7 +49,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
       end
     end
 
-    context "when the string is numeric with a trailing dot" do
+    context "when the string is a number with a trailing dot" do
       let(:str) { '123.' }
 
       it "returns zero" do
