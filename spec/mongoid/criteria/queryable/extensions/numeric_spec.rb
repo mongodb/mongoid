@@ -18,6 +18,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
 
       it "returns the value as integer" do
         expect(actual).to eq(123)
+        expect(actual).to be_a Integer
       end
     end
 
@@ -26,6 +27,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
 
       it "returns the value as a float" do
         expect(actual).to eq(123.45)
+        expect(actual).to be_a Float
       end
     end
 
@@ -34,6 +36,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
 
       it "returns the value as a float" do
         expect(actual).to eq(0.45)
+        expect(actual).to be_a Float
       end
     end
 
@@ -42,6 +45,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
 
       it "returns zero" do
         expect(actual).to eq(0)
+        expect(actual).to be_a Integer
       end
     end
 
@@ -50,6 +54,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
 
       it "returns zero" do
         expect(actual).to eq(123)
+        expect(actual).to be_a Integer
       end
     end
 
@@ -58,6 +63,16 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
 
       it "returns the value as integer" do
         expect(actual).to eq(12)
+        expect(actual).to be_a Integer
+      end
+    end
+
+    context "when the string is a number with leading dot then zeros" do
+      let(:str) { '.000' }
+
+      it "returns the value as integer" do
+        expect(actual).to eq(0)
+        expect(actual).to be_a Integer
       end
     end
 
