@@ -153,8 +153,6 @@ describe Mongoid::Timestamps do
 
           it "updates the timestamps correctly" do
             user.updated_at.should == update_time
-            # Don't update the address's updated_at here because it is
-            # inefficient to touch all of the changed documents.
             address.updated_at.should == start_time
           end
         end
@@ -281,8 +279,6 @@ describe Mongoid::Timestamps do
 
           it "updates the timestamps correctly" do
             user.updated_at.should == update_time
-            # Don't update the address's updated_at here because it is
-            # inefficient to touch all of the changed documents.
             address.updated_at.should == start_time
           end
         end
