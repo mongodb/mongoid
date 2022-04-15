@@ -119,6 +119,8 @@ module Mongoid
             @options[:inverse_foreign_key]
           elsif @options.key?(:inverse_of)
             inverse_of ? "#{inverse_of.to_s.singularize}#{FOREIGN_KEY_SUFFIX}" : nil
+          elsif inv = inverse_association&.foreign_key
+            inv
           else
             "#{inverse_class_name.demodulize.underscore}#{FOREIGN_KEY_SUFFIX}"
           end
