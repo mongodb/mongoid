@@ -3781,7 +3781,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
   end
 
-  context "when setting association on model that uses the class_name option" do
+  context "when setting an association on a model that uses the class_name option" do
     let!(:contract) { HabtmmContract.create! }
     let!(:signature) { HabtmmSignature.create!(contracts: [contract]) }
 

@@ -1062,7 +1062,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
       end
     end
 
-    context "when using the class_name option" do
+    context "when using a model that uses the class_name option" do
       let(:inverse_foreign_key) { HabtmmSchool.relations[:students].inverse_foreign_key }
       it "gets the correct inverse foreign key" do
         expect(inverse_foreign_key).to eq("school_ids")
