@@ -156,6 +156,7 @@ module Mongoid
     #
     # @return [ Array<String ] The names of the proc defaults.
     def apply_post_processed_defaults
+      pending_callbacks.delete(:apply_post_processed_defaults)
       post_processed_defaults.each do |name|
         apply_default(name)
       end
@@ -184,6 +185,7 @@ module Mongoid
     # @example Apply all the defaults.
     #   model.apply_defaults
     def apply_defaults
+      pending_callbacks.delete(:apply_defaults)
       apply_pre_processed_defaults
       apply_post_processed_defaults
     end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "../has_and_belongs_to_many_models"
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
@@ -3768,6 +3769,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       d2.projects << p2
       expect(d2.p_ids).to match_array([p2.id])
       expect(p2.d_ids).to match_array([d2.id])
+    end
+  end
+
+  context "when accesing own _id from parent's foreign key in default" do
+    let!(:contract) { HabtmmContract.create! }
+    let!(:signature) { contract.signatures.create! }
+
+    it "is nil" do
+      expect(signature.favorite_signature).to be nil
     end
   end
 end

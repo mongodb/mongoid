@@ -84,9 +84,9 @@ module Mongoid
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
             doc = Factory.execute_build(type || klass, attributes, execute_callbacks: false)
-            _base.public_send(foreign_key).push(doc.public_send(_association.primary_key))
             append(doc)
             doc.apply_post_processed_defaults
+            _base.public_send(foreign_key).push(doc.public_send(_association.primary_key))
             unsynced(doc, inverse_foreign_key)
             yield(doc) if block_given?
             doc.run_pending_callbacks
