@@ -1255,30 +1255,101 @@ The child may become orphaned if it is ordinarily only referenced via the parent
 
    Band.first.delete # Will delete all associated albums.
 
+
 Autosaving
 ----------
 
-One core difference between Mongoid and Active Record from a behavior standpoint
-is that Mongoid does not automatically save associated documents for
-non-embedded associations. This is for performance reasons.
+One core difference between Mongoid and ActiveRecord is that Mongoid does not
+automatically save associated documents for referenced (i.e., non-embedded)
+associations when the parent is saved, for performance reasons.
 
-To enable an autosave on a non-embedded association (embedded associations do not need
-this since they are actually part of the parent in the database) add the autosave
-option to the association.
-
-Note that autosave functionality will automatically be added to an association when using
-``accepts_nested_attributes_for`` or validating presence of the association.
+If autosaving is not used, it is possible to create dangling references
+to non-existent documents via associations:
 
 .. code-block:: ruby
 
-   class Band
-     include Mongoid::Document
-     has_many :albums, autosave: true
-   end
+  class Band
+    include Mongoid::Document
+    
+    has_many :albums
+  end
 
-   band = Band.first
-   band.albums.build(name: "101")
-   band.save # Will save the album as well.
+  class Album
+    include Mongoid::Document
+    
+    belongs_to :band
+  end
+  
+  band = Band.new
+  album = Album.create!(band: band)
+  
+  # The band is not persisted at this point.
+  
+  album.reload
+  
+  album.band_id
+  # => BSON::ObjectId('6257699753aefe153121a3d5')
+  
+  # Band does not exist.
+  album.band
+  # => nil
+
+To make referenced associations save automatically when the parent is saved,
+add the ``:autosave`` option to the association:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    has_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    
+    belongs_to :band, autosave: true
+  end
+  
+  band = Band.new
+  album = Album.create!(band: band)
+  
+  # The band is persisted at this point.
+  
+  album.reload
+  
+  album.band_id
+  # => BSON::ObjectId('62576b4b53aefe178b65b8e3')
+  
+  album.band
+  # => #<Band _id: 62576b4b53aefe178b65b8e3, >
+
+The autosaving functionality is automatically added to an association when
+using ``accepts_nested_attributes_for``, so that the application does not
+need to track which associations were modified when processing a form
+submission.
+
+Embedded associations always autosave, because they are stored as part of the
+parent document.
+
+Some operations on associations always save the parent and the child documents
+as part of the operation, regardless of whether autosaving is enabled.
+A non-exhaustive list of these operations is as follows:
+
+- Assignment to the association:
+
+  .. code-block:: ruby
+  
+    # Saves the band and the album.
+    band.albums = [Album.new]
+
+- ``push``, ``<<``:
+
+  .. code-block:: ruby
+  
+    band.albums << Album.new
+    band.albums.push(Album.new)
+
 
 Existence Predicates
 --------------------
