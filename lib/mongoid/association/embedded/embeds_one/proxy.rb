@@ -31,6 +31,7 @@ module Mongoid
               characterize_one(_target)
               bind_one
               characterize_one(_target)
+              update_attributes_hash
               _base._reset_memoized_descendants!
               _target.save if persistable?
             end
@@ -110,6 +111,15 @@ module Mongoid
           # @return [ true, false ] If the association is persistable.
           def persistable?
             _base.persisted? && !_binding? && !_building? && !_assigning?
+          end
+
+          # Update the _base's attributes hash with the _target's attributes
+          def update_attributes_hash
+            if _target
+              _base.attributes.merge!(_association.name.to_s => _target.attributes)
+            else
+              _base.attributes.delete(_association.name.to_s)
+            end
           end
 
           class << self

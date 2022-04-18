@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './attributes/nested_spec_models'
 
 describe Mongoid::Attributes do
 
@@ -2227,6 +2228,94 @@ describe Mongoid::Attributes do
 
     it "correctly sets the attribute" do
       expect(cat.name).to eq("Nissim")
+    end
+  end
+
+  describe "attributes after setting an association without reloading" do
+
+    context "on embeds_many" do
+
+      context "when using nested attributes" do
+        let(:doc) { NestedBook.create! }
+
+        before do
+          doc.update_attributes({ pages_attributes: [ {} ] })
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when doing assignments" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [NestedPage.new]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when pushing" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages << NestedPage.new
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+    end
+
+    context "on embeds_one" do
+
+      let(:attrs) { { "title" => "Title" } }
+
+      context "when using nested attributes" do
+        let(:doc) { NestedBook.create! }
+
+        before do
+          doc.update_attributes({ cover_attributes: attrs })
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when doing assignments" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = NestedCover.new(attrs)
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
     end
   end
 end

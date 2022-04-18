@@ -257,6 +257,7 @@ module Mongoid
                 integrate(doc)
                 doc._index = index
               end
+              update_attributes_hash
               @_unscoped = _target.dup
               @_target = scope(_target)
             end
@@ -366,6 +367,7 @@ module Mongoid
             end
             _unscoped.push(document)
             integrate(document)
+            update_attributes_hash
             document._index = _unscoped.size - 1
             execute_callback :after_add, document
           end
@@ -517,6 +519,15 @@ module Mongoid
           # @return [ Array<Hash> ] The list of attributes hashes
           def as_attributes
             _unscoped.map { |doc| doc.send(:as_attributes) }
+          end
+
+          # Update the _base's attributes hash with the _target's attributes
+          def update_attributes_hash
+            if !_target.empty?
+              _base.attributes.merge!(_association.name.to_s => _target.map(&:attributes))
+            else
+              _base.attributes.delete(_association.name.to_s)
+            end
           end
 
           class << self

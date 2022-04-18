@@ -23,3 +23,26 @@ class NestedPost
   has_many :comments, class_name: "NestedComment"
   accepts_nested_attributes_for :comments
 end
+
+class NestedBook
+  include Mongoid::Document
+
+  embeds_one :cover, class_name: "NestedCover"
+  embeds_many :pages, class_name: "NestedPage"
+
+  accepts_nested_attributes_for :cover, :pages
+end
+
+class NestedCover
+  include Mongoid::Document
+
+  field :title, type: String
+  embedded_in :book, class_name: "NestedBook"
+end
+
+class NestedPage
+  include Mongoid::Document
+
+  field :number, type: Integer
+  embedded_in :book, class_name: "NestedBook"
+end
