@@ -367,6 +367,9 @@ module Mongoid
             _unscoped.push(document)
             integrate(document)
             document._index = _unscoped.size - 1
+            # TODO extract?
+            _base.attributes[association.name.to_s] ||= []
+            _base.attributes[association.name.to_s] << document.attributes
             execute_callback :after_add, document
           end
 
