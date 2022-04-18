@@ -265,4 +265,19 @@ describe 'embedded associations' do
       end
     end
   end
+
+  context "when summing properties on an embedded child" do
+    let(:user) { EmmUser.new }
+    before do
+      user.orders.build(amount: 200)
+      expect(user.orders.sum(:amount)).to eq(200)
+
+      user.orders.delete_all
+      user.orders.build(amount: 500)
+    end
+
+    it "the cache is cleared after deletion" do
+      expect(user.orders.sum(:amount)).to eq(500)
+    end
+  end
 end
