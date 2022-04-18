@@ -61,7 +61,8 @@ module Mongoid
                 if association.polymorphic? and association.inverse_type
                   options = options.merge!(:class_name => self.send(association.inverse_type))
                 end
-                association.nested_builder(attrs, options).build(self)
+                attributes.merge!(association.name.to_s =>
+                  association.nested_builder(attrs, options).build(self))
               end
             end
           end
