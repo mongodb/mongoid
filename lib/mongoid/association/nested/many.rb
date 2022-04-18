@@ -25,14 +25,13 @@ module Mongoid
           if over_limit?(attributes)
             raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
           end
-
           attributes.map do |attrs|
             if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
             else
               process_attributes(parent, attrs[1].with_indifferent_access)
             end
-          end.flatten.compact
+          end.flatten.map(&:attributes)
         end
 
         # Create the new builder for nested attributes on one-to-many
@@ -96,18 +95,12 @@ module Mongoid
         #
         # @param [ Document ] parent The parent document.
         # @param [ Hash ] attrs The single document attributes to process.
-        #
-        # @return [ Hash ] The attributes with the _id field.
         def process_attributes(parent, attrs)
           return if reject?(parent, attrs)
-          as = attrs.dup
           if id = attrs.extract_id
             update_nested_relation(parent, id, attrs)
-            as
-          elsif !destroyable?(attrs)
-            doc = Factory.build(@class_name, attrs)
-            existing.push(doc)
-            doc.attributes
+          else
+            existing.push(Factory.build(@class_name, attrs)) unless destroyable?(attrs)
           end
         end
 
