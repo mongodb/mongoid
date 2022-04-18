@@ -25,13 +25,13 @@ module Mongoid
           if over_limit?(attributes)
             raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
           end
-          attributes.map do |attrs|
+          attributes.each do |attrs|
             if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
             else
               process_attributes(parent, attrs[1].with_indifferent_access)
             end
-          end.flatten.map(&:attributes)
+          end
         end
 
         # Create the new builder for nested attributes on one-to-many
