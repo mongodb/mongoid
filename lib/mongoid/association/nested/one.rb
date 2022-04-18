@@ -21,18 +21,15 @@ module Mongoid
         #
         # @param [ Document ] parent The parent document.
         #
-        # @return [ Hash ] The document's attributes.
+        # @return [ Document ] The built document.
         def build(parent)
           return if reject?(parent, attributes)
           @existing = parent.send(association.name)
           if update?
             attributes.delete_id
             existing.assign_attributes(attributes)
-            existing.attributes
           elsif replace?
-            doc = Factory.build(@class_name, attributes)
-            parent.send(association.setter, doc)
-            doc.attributes
+            parent.send(association.setter, Factory.build(@class_name, attributes))
           elsif delete?
             parent.send(association.setter, nil)
           end
