@@ -16,7 +16,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is a whole number" do
       let(:str) { '123' }
 
-      it "returns the value as integer" do
+      it "returns the value as an integer" do
         expect(actual).to eq(123)
         expect(actual).to be_a Integer
       end
@@ -61,7 +61,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is a number with fractional part consisting of zeros" do
       let(:str) { '12.000' }
 
-      it "returns the value as integer" do
+      it "returns the value as an integer" do
         expect(actual).to eq(12)
         expect(actual).to be_a Integer
       end
@@ -70,7 +70,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is a number with leading dot then zeros" do
       let(:str) { '.000' }
 
-      it "returns the value as integer" do
+      it "returns the value as an integer" do
         expect(actual).to eq(0)
         expect(actual).to be_a Integer
       end
@@ -79,7 +79,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is non-numeric" do
       let(:str) { 'foo' }
 
-      it "returns the value as integer" do
+      it "raises ArgumentError" do
         expect { actual }.to raise_error(ArgumentError)
       end
     end
@@ -87,7 +87,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is non-numeric with leading dot" do
       let(:str) { '.foo' }
 
-      it "returns the value as integer" do
+      it "raises ArgumentError" do
         expect { actual }.to raise_error(ArgumentError)
       end
     end
@@ -95,7 +95,7 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is non-numeric with trailing dot" do
       let(:str) { 'foo.' }
 
-      it "returns the value as integer" do
+      it "raises ArgumentError" do
         expect { actual }.to raise_error(ArgumentError)
       end
     end
@@ -103,7 +103,15 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is non-numeric with trailing dot and zeroes" do
       let(:str) { 'foo.000' }
 
-      it "returns the value as integer" do
+      it "raises ArgumentError" do
+        expect { actual }.to raise_error(ArgumentError)
+      end
+    end
+
+    context "when the string is empty" do
+      let(:str) { '' }
+
+      it "raises ArgumentError" do
         expect { actual }.to raise_error(ArgumentError)
       end
     end
