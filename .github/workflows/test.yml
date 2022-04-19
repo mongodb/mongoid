@@ -59,7 +59,7 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '5.0'
-          ruby: jruby-9.2
+          ruby: jruby-9.3
           topology: replica_set
           os: ubuntu-20.04
           task: test
@@ -299,7 +299,7 @@ jobs:
           gemfile: gemfiles/rails-5.2.gemfile
           experimental: false
         - mongodb: '5.0'
-          ruby: jruby-9.2
+          ruby: jruby-9.3
           topology: server
           os: ubuntu-20.04
           task: test
