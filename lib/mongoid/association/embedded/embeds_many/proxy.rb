@@ -408,6 +408,7 @@ module Mongoid
           def delete_one(document)
             _target.delete_one(document)
             _unscoped.delete_one(document)
+            update_attributes_hash
             reindex
           end
 
@@ -534,9 +535,9 @@ module Mongoid
           # @api private
           def update_attributes_hash
             if !_target.empty?
-              _base.attributes.merge!(_association.name.to_s => _target.map(&:attributes))
+              _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
             else
-              _base.attributes.delete(_association.name.to_s)
+              _base.attributes.delete(_association.store_as)
             end
           end
 

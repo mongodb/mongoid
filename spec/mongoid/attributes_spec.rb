@@ -2239,7 +2239,7 @@ describe Mongoid::Attributes do
         let(:doc) { NestedBook.create! }
 
         it "doesn't add attributes" do
-          expect(doc.attributes.key?("pages")).to be false
+          expect(doc.attributes).to_not have_key("pages")
         end
 
         it "has the same attributes after reloading" do
@@ -2302,7 +2302,7 @@ describe Mongoid::Attributes do
         end
 
         it "updates the attributes" do
-          expect(doc.attributes.key?("pages")).to be false
+          expect(doc.attributes).to_not have_key("pages")
         end
 
         it "has the same attributes after reloading" do
@@ -2409,7 +2409,7 @@ describe Mongoid::Attributes do
         end
 
         it "updates the attributes" do
-          expect(doc.attributes.key?("pages")).to be false
+          expect(doc.attributes).to_not have_key("pages")
         end
 
         it "has the same attributes after reloading" do
@@ -2429,7 +2429,7 @@ describe Mongoid::Attributes do
           end
 
           it "updates the attributes" do
-            expect(doc.attributes.key?("pages")).to be false
+            expect(doc.attributes).to_not have_key("pages")
           end
 
           it "has the same attributes after reloading" do
@@ -2455,6 +2455,22 @@ describe Mongoid::Attributes do
 
         it "has the same attributes after reloading" do
           expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when doing delete_one" do
+        let(:doc) { NestedBook.create! }
+        let(:page) { NestedPage.new }
+        before do
+          doc.pages << page
+          doc.pages << NestedPage.new
+          doc.pages << NestedPage.new
+
+          doc.pages.send(:delete_one, page)
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"].count).to eq 2
         end
       end
     end
