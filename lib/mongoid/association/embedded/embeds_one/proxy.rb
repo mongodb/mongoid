@@ -31,7 +31,7 @@ module Mongoid
               characterize_one(_target)
               bind_one
               characterize_one(_target)
-              update_attributes_hash
+              update_attributes_hash(_target)
               _base._reset_memoized_descendants!
               _target.save if persistable?
             end
@@ -80,6 +80,7 @@ module Mongoid
                   _target.new_record = true
                 end
               end
+              update_attributes_hash(replacement)
               unbind_one
               return nil unless replacement
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
@@ -114,9 +115,11 @@ module Mongoid
           end
 
           # Update the _base's attributes hash with the _target's attributes
-          def update_attributes_hash
-            if _target
-              _base.attributes.merge!(_association.name.to_s => _target.attributes)
+          #
+          # @api private
+          def update_attributes_hash(replacement)
+            if replacement
+              _base.attributes.merge!(_association.name.to_s => replacement.attributes)
             else
               _base.attributes.delete(_association.name.to_s)
             end

@@ -95,6 +95,7 @@ module Mongoid
           # @return [ self ] The empty association.
           def clear
             batch_clear(_target.dup)
+            update_attributes_hash
             self
           end
 
@@ -146,6 +147,7 @@ module Mongoid
                   doc.delete(suppress: true)
                   unbind_one(doc)
                 end
+                update_attributes_hash
               end
               reindex
               doc
@@ -293,6 +295,8 @@ module Mongoid
               end
             else
               delete(_target[-1])
+            end.tap do
+              update_attributes_hash
             end
           end
 
@@ -316,6 +320,8 @@ module Mongoid
               end
             else
               delete(_target[0])
+            end.tap do
+              update_attributes_hash
             end
           end
 
@@ -330,6 +336,7 @@ module Mongoid
           # @return [ Many ] The proxied association.
           def substitute(docs)
             batch_replace(docs)
+            update_attributes_hash
             self
           end
 
@@ -489,6 +496,7 @@ module Mongoid
             criteria = where(conditions || {})
             removed = criteria.size
             batch_remove(criteria, method)
+            update_attributes_hash
             removed
           end
 
@@ -522,6 +530,8 @@ module Mongoid
           end
 
           # Update the _base's attributes hash with the _target's attributes
+          #
+          # @api private
           def update_attributes_hash
             if !_target.empty?
               _base.attributes.merge!(_association.name.to_s => _target.map(&:attributes))
