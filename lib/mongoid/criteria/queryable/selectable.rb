@@ -867,7 +867,7 @@ module Mongoid
         # @param [ Hash ] criterion The criterion.
         def typed_override(criterion, operator)
           if criterion
-            criterion.update_values do |value|
+            criterion.transform_values! do |value|
               yield(value)
             end
           end
