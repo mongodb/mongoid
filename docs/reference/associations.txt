@@ -323,6 +323,12 @@ the ids only in one document using the ``inverse_of: nil`` option:
 A one-sided ``has_and_belongs_to_many`` association is, naturally, only
 usable from the model where it is defined.
 
+.. note::
+
+  Unlike Rails, Mongoid will update the ``updated_at`` field when adding a new
+  foreign key to a ``has_and_belongs_to_many`` association. This is because Mongoid
+  updates the actual document the foreign keys are stored under whereas this is
+  not true for ``has_and_belongs_to_many`` relationships in Rails.
 
 Querying Referenced Associations
 --------------------------------
