@@ -105,7 +105,7 @@ is deprecated.
      -
      -
      -
-     - D
+     - |checkmark|
 
    * - 7.3
      - |checkmark| [#mongoid-7.3-ruby-3.0]_
