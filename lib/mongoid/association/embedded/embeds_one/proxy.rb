@@ -118,7 +118,7 @@ module Mongoid
           #
           # @api private
           def update_attributes_hash(replacement)
-            if replacement
+            if replacement && replacement.is_a?(Document)
               _base.attributes.merge!(_association.store_as => replacement.attributes)
             else
               _base.attributes.delete(_association.store_as)
