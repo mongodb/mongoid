@@ -1067,12 +1067,22 @@ describe Mongoid::Association::Accessors do
 
   describe "AssociationTypeMismatch" do
 
-    context "When assigning association of the wrong type" do
+    context "When assigning association of the wrong type; embedded" do
       let(:person) { Person.create! }
 
       it "raise an AssociationTypeMismatch error" do
         expect do
           person.pet = Passport.new
+        end.to raise_error(Mongoid::Errors::AssociationTypeMismatch)
+      end
+    end
+
+    context "When assigning association of the wrong type; referenced" do
+      let(:person) { Person.create! }
+
+      it "raise an AssociationTypeMismatch error" do
+        expect do
+          person.game = Passport.new
         end.to raise_error(Mongoid::Errors::AssociationTypeMismatch)
       end
     end
