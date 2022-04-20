@@ -18,7 +18,7 @@ module Mongoid
       def process_attributes(attrs = nil)
         attrs ||= {}
         if !attrs.empty?
-          attrs = sanitize_for_mass_assignment(attrs)
+          attrs = sanitize_forbidden_attributes(attrs)
           attrs.each_pair do |key, value|
             next if pending_attribute?(key, value)
             process_attribute(key, value)
