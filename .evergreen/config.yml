@@ -415,6 +415,10 @@ axes:
   - id: "jruby"
     display_name: JRuby Version
     values:
+      - id: "jruby-9.2"
+        display_name: jruby-9.2
+        variables:
+           RVM_RUBY: "jruby-9.2"
       - id: "jruby-9.3"
         display_name: jruby-9.3
         variables:
@@ -558,7 +562,7 @@ buildvariants:
 
 - matrix_name: "jruby"
   matrix_spec:
-    jruby: "jruby-9.3"
+    jruby: ["jruby-9.2", "jruby-9.3"]
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
@@ -749,7 +753,7 @@ buildvariants:
 
 - matrix_name: app-tests-jruby
   matrix_spec:
-    jruby: jruby-9.3
+    jruby: ["jruby-9.2", "jruby-9.3"]
     driver: ["current"]
     mongodb-version: '5.0'
     topology: standalone

@@ -68,6 +68,16 @@ jobs:
           i18n:
           gemfile: Gemfile
           experimental: false
+        - mongodb: '5.0'
+          ruby: jruby-9.2
+          topology: replica_set
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails:
+          i18n:
+          gemfile: Gemfile
+          experimental: false
         - mongodb: '4.4'
           ruby: ruby-2.7
           topology: server
@@ -300,6 +310,16 @@ jobs:
           experimental: false
         - mongodb: '5.0'
           ruby: jruby-9.3
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '6.0'
+          i18n:
+          gemfile: gemfiles/rails-6.0.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: jruby-9.2
           topology: server
           os: ubuntu-20.04
           task: test
