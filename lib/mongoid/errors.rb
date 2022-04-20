@@ -2,6 +2,7 @@
 
 require "mongoid/errors/mongoid_error"
 require "mongoid/errors/ambiguous_relationship"
+require "mongoid/errors/association_type_mismatch"
 require "mongoid/errors/callback"
 require "mongoid/errors/criteria_argument_required"
 require "mongoid/errors/document_not_destroyed"

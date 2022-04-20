@@ -42,6 +42,7 @@ module Mongoid
       # @return [ Proxy ] The association.
       def create_relation(object, association, selected_fields = nil)
         type = @attributes[association.inverse_type]
+        check_type!(object, association)
         target = if t = association.build(self, object, type, selected_fields)
           association.create_relation(self, t)
         else
@@ -424,6 +425,23 @@ module Mongoid
             save if new_record? && association.stores_foreign_key?
             doc
           end
+        end
+      end
+
+      # Checks that the given objects are the correct type for the given
+      # association. If they are not, raise an AssociationTypeMismatch error.
+      #
+      # @param [ Document, Array<Document> ] object The association target.
+      # @param [ Association ] association The association.
+      #
+      # @raise [ Errors::AssociationTypeMismatch ] If a document of the wrong
+      #   type is given.
+      #
+      # @api private
+      def check_type!(object, assoc)
+        ar = Array.wrap(object).filter { |d| d.is_a?(Document) && !d.is_a?(assoc.klass) }
+        unless ar.empty?
+          raise Errors::AssociationTypeMismatch.new(ar.first.class, assoc.klass, assoc.name)
         end
       end
     end

@@ -19,6 +19,14 @@ en:
           resolution: "On the %{name} association on %{inverse} you must add an
             :inverse_of option to specify the exact association on %{klass}
             that is the opposite of %{name}."
+        association_type_mismatch:
+          message: "Document expected of type %{assoc_klass} for association %{name} but received %{klass}."
+          summary:
+            "The type of Document assigned to an association must match that
+            association's class. The association %{name} expects a document of
+            type %{assoc_klass} but received a document of type %{klass}."
+          resolution: "On the %{name} association you can only assign a Document
+          of type %{assoc_klass}."
         callbacks:
           message: "Calling %{method} on %{klass} resulted in a false return
             from a callback."

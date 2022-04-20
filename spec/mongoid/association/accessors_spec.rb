@@ -1064,4 +1064,27 @@ describe Mongoid::Association::Accessors do
       end
     end
   end
+
+  describe "AssociationTypeMismatch" do
+
+    context "When assigning association of the wrong type" do
+      let(:person) { Person.create! }
+
+      it "raise an AssociationTypeMismatch error" do
+        expect do
+          person.pet = Passport.new
+        end.to raise_error(Mongoid::Errors::AssociationTypeMismatch)
+      end
+    end
+
+    context "When assigning a hash" do
+      let(:person) { Person.create! }
+
+      it "does not raise an AssociationTypeMismatch error" do
+        expect do
+          person.pet = { "_id" => BSON::ObjectId.new }
+        end.to_not raise_error
+      end
+    end
+  end
 end
