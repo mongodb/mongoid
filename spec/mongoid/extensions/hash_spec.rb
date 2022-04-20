@@ -365,7 +365,7 @@ describe Mongoid::Extensions::Hash do
     end
   end
 
-  shared_examples_for 'unsatisfiable criteria method' do
+  describe "#_mongoid_unsatisfiable_criteria?" do
 
     context "when the hash has only an empty _id criteria" do
 
@@ -374,7 +374,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is true" do
-        expect(hash.send(meth)).to be true
+        expect(hash._mongoid_unsatisfiable_criteria?).to be true
       end
     end
 
@@ -385,7 +385,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash.send(meth)).to be false
+        expect(hash._mongoid_unsatisfiable_criteria?).to be false
       end
     end
 
@@ -396,7 +396,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is true" do
-        expect(hash.send(meth)).to be true
+        expect(hash._mongoid_unsatisfiable_criteria?).to be true
       end
     end
 
@@ -407,7 +407,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash.send(meth)).to be false
+        expect(hash._mongoid_unsatisfiable_criteria?).to be false
       end
     end
 
@@ -418,7 +418,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is true" do
-        expect(hash.send(meth)).to be true
+        expect(hash._mongoid_unsatisfiable_criteria?).to be true
       end
     end
 
@@ -429,7 +429,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash.send(meth)).to be false
+        expect(hash._mongoid_unsatisfiable_criteria?).to be false
       end
     end
 
@@ -440,7 +440,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash.send(meth)).to be false
+        expect(hash._mongoid_unsatisfiable_criteria?).to be false
       end
     end
 
@@ -451,20 +451,8 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash.send(meth)).to be false
+        expect(hash._mongoid_unsatisfiable_criteria?).to be false
       end
     end
-  end
-
-  describe "#blank_criteria?" do
-    let(:meth) { :blank_criteria? }
-
-    it_behaves_like 'unsatisfiable criteria method'
-  end
-
-  describe "#_mongoid_unsatisfiable_criteria?" do
-    let(:meth) { :_mongoid_unsatisfiable_criteria? }
-
-    it_behaves_like 'unsatisfiable criteria method'
   end
 end

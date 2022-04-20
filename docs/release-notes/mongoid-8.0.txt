@@ -281,4 +281,12 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
 Removed ``Document#to_a`` method
 --------------------------------
 
-The ``Document#to_a`` method has been removed in Mongoid 8.
+The previously-deprecated ``Document#to_a`` method has been removed in Mongoid 8.
+
+
+Removed ``Object#blank_criteria?`` method
+-----------------------------------------
+
+The previously-deprecated ``Object#blank_criteria?`` method has been removed in Mongoid 8.
+For Hash objects, you may replace any existing usages with ``Hash#_mongoid_unsatisfiable_criteria?``.
+For all other objects, you may replace any existing usages with ``false``.
