@@ -32,6 +32,7 @@ class BSON::Document
   end
 end
 
+require "mongoid/extensions/action_controller_parameters"
 require "mongoid/extensions/array"
 require "mongoid/extensions/big_decimal"
 require "mongoid/extensions/binary"
