@@ -161,7 +161,6 @@ module Mongoid
             # @return [ Object ] The evolved object.
             def __evolve__(object)
               return nil if object.nil?
-              return Hash.evolve(object) if defined?(ActionController::Parameters) && object.is_a?(ActionController::Parameters)
               case object
               when ::Array
                 object.map{ |obj| evolve(obj) }
