@@ -228,6 +228,25 @@ module Mongoid
           end
         end
 
+        # Evolve the object when the serializer is defined as a hash.
+        #
+        # @example Evolve the object.
+        #   Hash.evolve([[:foo, :bar]])
+        #
+        # @param [ Object ] object The object to evolve.
+        #
+        # @return [ Object ] The evolved object.
+        def evolve(object)
+          return if object.nil?
+          if object.is_a?(::Hash)
+            object
+          elsif object.respond_to?(:to_h)
+            object.to_h
+          else
+            object
+          end
+        end
+
         # Can the size of this object change?
         #
         # @example Is the hash resizable?
