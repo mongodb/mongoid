@@ -11,7 +11,7 @@ module Mongoid
       #
       # @return [ Object ] The object.
       def mongoize
-        Hash.mongoize(self)
+        ::Hash.mongoize(self)
       end
 
       module ClassMethods
@@ -25,7 +25,7 @@ module Mongoid
         #
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
-          Hash.mongoize(object)
+          ::Hash.mongoize(object)
         end
       end
     end
