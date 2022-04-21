@@ -144,6 +144,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == update_time
             address.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            address.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -154,6 +159,11 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == update_time
             address.updated_at.should == start_time
+          end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            address.reload.updated_at.should == start_time
           end
         end
       end
@@ -169,6 +179,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == update_time
             account.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            account.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -179,6 +194,15 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == update_time
             account.updated_at.should == start_time
+          end
+
+          # The Account object's updated_at is updated in the database but not
+          # locally, since, in this case, the Account object is not passed into
+          # the update function, so the Account object updated locally is not
+          # the same as the one that we have locally here.
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            account.reload.updated_at.should == update_time
           end
         end
       end
@@ -194,6 +218,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == update_time
             account.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            account.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -204,6 +233,15 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == start_time
             account.updated_at.should == update_time
+          end
+
+          # The User object's updated_at is updated in the database but not
+          # locally, since, in this case, the User object is not passed into
+          # the update function, so the User object updated locally is not
+          # the same as the one that we have locally here.
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            account.reload.updated_at.should == update_time
           end
         end
       end
@@ -219,6 +257,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == update_time
             pet.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            pet.reload.updated_at.should == update_time
+          end
         end
       end
 
@@ -233,6 +276,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == update_time
             pet.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            pet.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -243,6 +291,11 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == start_time
             pet.updated_at.should == update_time
+          end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            pet.reload.updated_at.should == update_time
           end
         end
       end
@@ -270,6 +323,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == update_time
             address.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            address.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -280,6 +338,11 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == update_time
             address.updated_at.should == start_time
+          end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == update_time
+            address.reload.updated_at.should == start_time
           end
         end
       end
@@ -295,6 +358,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == start_time
             account.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            account.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -305,6 +373,15 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == start_time
             account.updated_at.should == start_time
+          end
+
+          # The Account object's updated_at is updated in the database but not
+          # locally, since, in this case, the Account object is not passed into
+          # the update function, so the Account object updated locally is not
+          # the same as the one that we have locally here.
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            account.reload.updated_at.should == update_time
           end
         end
       end
@@ -320,6 +397,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == start_time
             account.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            account.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -330,6 +412,11 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == start_time
             account.updated_at.should == update_time
+          end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            account.reload.updated_at.should == update_time
           end
         end
       end
@@ -345,6 +432,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == start_time
             pet.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            pet.reload.updated_at.should == update_time
+          end
         end
       end
 
@@ -359,6 +451,11 @@ describe Mongoid::Timestamps do
             user.updated_at.should == start_time
             pet.updated_at.should == update_time
           end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            pet.reload.updated_at.should == update_time
+          end
         end
 
         context "when updating the association's foreign key" do
@@ -369,6 +466,11 @@ describe Mongoid::Timestamps do
           it "updates the timestamps correctly" do
             user.updated_at.should == start_time
             pet.updated_at.should == update_time
+          end
+
+          it "updates the timestamps in the db correctly" do
+            user.reload.updated_at.should == start_time
+            pet.reload.updated_at.should == update_time
           end
         end
       end
