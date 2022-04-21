@@ -4114,4 +4114,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       expect(person2.posts_count).to eq 0
     end
   end
+
+  context "when there is a foreign key in the aliased associations" do
+    it "has the correct aliases" do
+      expect(Band.aliased_associations["artist_ids"]).to eq("artists")
+      expect(Artist.aliased_associations.key?("band_id")).to be false
+      expect(Artist.aliased_fields["band"]).to eq("band_id")
+    end
+  end
 end
