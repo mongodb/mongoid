@@ -118,7 +118,7 @@ module Mongoid
           #
           # @api private
           def update_attributes_hash(replacement)
-            unless replacement.is_a?(Document)
+            if replacement && !replacement.is_a?(Document)
               raise "replacement is #{replacement.inspect}"
             end
 
