@@ -118,6 +118,10 @@ module Mongoid
           #
           # @api private
           def update_attributes_hash(replacement)
+            unless replacement.is_a?(Document)
+              raise "replacement is #{replacement.inspect}"
+            end
+
             if replacement && replacement.is_a?(Document)
               _base.attributes.merge!(_association.store_as => replacement.attributes)
             else
