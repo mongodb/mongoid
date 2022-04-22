@@ -36,6 +36,34 @@ Mongoid 7.4 deprecates support for MongoDB 3.4 and earlier.
 Mongoid 8 will require MongoDB 3.6 or newer.
 
 
+Feature Flags Summary
+---------------------
+
+To ensure a stable upgrade path from Mongoid 7.3, Mongoid 7.4
+introduces feature flags which are further explained in the
+sections below.
+
+To enable all new behavior in Mongoid 7.4, please use the following
+:ref:`configuration options <configuration-options>` in your mongoid.yml file.
+We recommend newly created apps to do this as well.
+
+.. code-block:: yaml
+
+  development:
+    ...
+    options:
+      # Enable all new behavior in Mongoid 7.4
+      legacy_triple_equals: false
+      object_id_as_json_oid: false
+      compare_time_by_ms: true
+      broken_aggregables: false
+      broken_updates: false
+      broken_and: false
+      broken_scoping: false
+      broken_alias_handling: false
+      legacy_pluck_distinct: false
+
+
 Change ``===`` Operator To Match Ruby Semantics
 -----------------------------------------------
 
