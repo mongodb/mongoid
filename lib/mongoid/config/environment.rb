@@ -44,21 +44,37 @@ module Mongoid
       #   override the current Mongoid environment.
       #
       # @return [ Hash ] The settings.
+      #
       # @api private
       def load_yaml(path, environment = nil)
         env = environment ? environment.to_s : env_name
-        contents = File.new(path).read
+
+        contents = File.read(path)
         if contents.empty?
           raise Mongoid::Errors::EmptyConfigFile.new(path)
         end
-        data = if RUBY_VERSION.start_with?("2.5")
-          YAML.safe_load(ERB.new(contents).result, [Symbol], [], true)
+
+        # These are the classes that can be used in a Mongoid
+        # configuration file in addition to standard YAML types.
+        permitted_classes = [
+          # Symbols occur as values for read preference, for example.
+          Symbol,
+          # BSON::Binary occur as keyId values for FLE (more precisely,
+          # the keyIds are UUIDs).
+          BSON::Binary,
+        ]
+
+        result = ERB.new(contents).result
+        data = if RUBY_VERSION < '2.6'
+          YAML.safe_load(result, permitted_classes, [], true)
         else
-          YAML.safe_load(ERB.new(contents).result, permitted_classes: [Symbol], aliases: true)
+          YAML.safe_load(result, permitted_classes: permitted_classes, aliases: true)
         end
+
         unless data.is_a?(Hash)
           raise Mongoid::Errors::InvalidConfigFile.new(path)
         end
+
         data[env]
       end
     end
