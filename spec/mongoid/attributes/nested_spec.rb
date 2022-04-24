@@ -3,6 +3,7 @@
 require "spec_helper"
 require_relative '../association/referenced/has_many_models'
 require_relative '../association/referenced/has_and_belongs_to_many_models'
+require_relative './nested_spec_models'
 
 describe Mongoid::Attributes::Nested do
 
@@ -4970,6 +4971,30 @@ describe Mongoid::Attributes::Nested do
 
     it "is able to access the parent in the after_destroy callback" do
       expect(school.reload.after_destroy_triggered).to eq(true)
+    end
+  end
+
+  context "when using a multi-leveled nested attribute on a referenced association" do
+    let(:author) { NestedAuthor.create }
+    let(:one_level_params) { { post_attributes: { title: 'test' } } }
+    let(:two_levels_params) { { post_attributes: { comments_attributes: [ { body: 'test' } ] } } }
+
+    it "creates a 1st-depth child model" do
+      author.update_attributes(one_level_params)
+      expect(author.post.persisted?).to be true
+    end
+
+    it "creates a 1st-depth child model, and a 2nd-depth child model" do
+      author.update_attributes(two_levels_params)
+      expect(author.post.comments.count).to eq 1
+    end
+
+    context "the 1st-depth child model already exists" do
+      it "creates a 2nd-depth child model" do
+        author.create_post(title: 'test')
+        author.update_attributes(two_levels_params)
+        expect(author.post.comments.count).to eq 1
+      end
     end
   end
 end

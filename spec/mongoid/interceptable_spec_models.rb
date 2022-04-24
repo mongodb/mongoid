@@ -226,3 +226,44 @@ module InterceptableSpec
     include CallbackTracking
   end
 end
+
+class InterceptableBand
+  include Mongoid::Document
+
+  has_many :songs, class_name: "InterceptableSong"
+  field :name
+end
+
+class InterceptableSong
+  include Mongoid::Document
+
+  belongs_to :band, class_name: "InterceptableBand"
+  field :band_name, default: -> { band.name }
+  field :name
+end
+
+class InterceptablePlane
+  include Mongoid::Document
+
+  has_many :wings, class_name: "InterceptableWing"
+end
+
+class InterceptableWing
+  include Mongoid::Document
+
+  belongs_to :plane, class_name: "InterceptablePlane"
+  has_one :engine, autobuild: true, class_name: "InterceptableEngine"
+
+  field :_id, type: String, default: -> { 'hello-wing' }
+
+  field :p_id, type: String, default: -> { plane&.id }
+  field :e_id, type: String, default: -> { engine&.id }
+end
+
+class InterceptableEngine
+  include Mongoid::Document
+
+  belongs_to :wing, class_name: "InterceptableWing"
+
+  field :_id, type: String, default: -> { "hello-engine-#{wing&.id}" }
+end
