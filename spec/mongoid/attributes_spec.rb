@@ -2473,6 +2473,37 @@ describe Mongoid::Attributes do
           expect(doc.attributes["pages"].count).to eq 2
         end
       end
+
+      context "when assigning an array of hashes" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [{}]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when assigning twice" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [{ number: 1 }]
+          doc.pages = [{}]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
     end
 
     context "on embeds_one" do
@@ -2575,6 +2606,37 @@ describe Mongoid::Attributes do
             doc.cover.save
             expect(doc.attributes).to eq(doc.reload.attributes)
           end
+        end
+      end
+
+      context "when assigning a hash" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = attrs
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when assigning twice" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = { "title" => "1984" }
+          doc.cover = attrs
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
         end
       end
     end

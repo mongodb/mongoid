@@ -534,7 +534,7 @@ module Mongoid
           #
           # @api private
           def update_attributes_hash
-            if !_target.empty? && _target.all? { |d| d.is_a?(Document) }
+            if !_target.empty?
               _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
             else
               _base.attributes.delete(_association.store_as)
