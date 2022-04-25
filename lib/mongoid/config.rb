@@ -23,7 +23,8 @@ module Mongoid
     # database name is not explicitly defined.
     option :app_name, default: nil
 
-    # Create indexes in background by default.
+    # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
+    # indexes in the background by default. (default: false)
     option :background_indexing, default: false
 
     # Mark belongs_to associations as required by default, so that saving a
