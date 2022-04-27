@@ -60,11 +60,12 @@ on a person by using the ``field`` macro.
      field :weight, type: Float
    end
 
-Below is a list of valid types for fields.
+The valid types for fields are as follows:
 
 - ``Array``
 - ``BigDecimal``
-- ``Boolean``
+- ``Mongoid::Boolean``, which may be specified simply as ``Boolean`` in the
+  scope of a class which included ``Mongoid::Document``.
 - ``Date``
 - ``DateTime``
 - ``Float``
@@ -76,10 +77,15 @@ Below is a list of valid types for fields.
 - ``Regexp``
 - ``Set``
 - ``String``
-- ``StringifiedSymbol``
+- ``Mongoid::StringifiedSymbol``, which may be specified simply as 
+  ``StringifiedSymbol`` in the scope of a class which included
+  ``Mongoid::Document``.
 - ``Symbol``
 - ``Time``
-- ``TimeWithZone``
+- ``ActiveSupport::TimeWithZone``
+
+Mongoid also recognizes the string ``"Boolean"`` as an alias for the
+``Mongoid::Boolean`` class.
 
 To define custom field types, refer to :ref:`Custom Field Types <custom-field-types>` below.
 
@@ -516,6 +522,47 @@ you have three options:
 
    This query will find all values that are either a ``decimal128`` value or
    a string that match that value.
+
+
+Using Symbols Or Strings Instead Of Classes
+-------------------------------------------
+
+Mongoid permits using symbols or strings instead of classes to specify the
+type of fields, for example:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+
+    field :state, type: :integer
+    # Equivalent to:
+    field :state, type: "integer"
+    # Equivalent to:
+    field :state, type: Integer
+  end
+
+Only standard field types as listed below can be specified using symbols or
+strings in this manner. Mongoid recognizes the following expansions:
+
+- ``:array`` => ``Array``
+- ``:big_decimal`` => ``BigDecimal``
+- ``:binary`` => ``BSON::Binary``
+- ``:boolean`` => ``Mongoid::Boolean``
+- ``:date`` => ``Date``
+- ``:date_time`` => ``DateTime``
+- ``:float`` => ``Float``
+- ``:hash`` => ``Hash``
+- ``:integer`` => ``Integer``
+- ``:object_id`` => ``BSON::ObjectId``
+- ``:range`` => ``Range``
+- ``:regexp`` => ``Regexp``
+- ``:set`` => ``Set``
+- ``:string`` => ``String``
+- ``:stringified_symbol`` => ``StringifiedSymbol``
+- ``:symbol`` => ``Symbol``
+- ``:time`` => ``Time``
+
 
 .. _field-default-values:
 
@@ -1208,6 +1255,7 @@ alter the criteria to match the current locale.
    # Match all products with Marvelous as the description. Locale is en.
    Product.where(description: "Marvelous!")
    # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
+
 
 Indexing
 --------
