@@ -1097,6 +1097,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
     end
 
     it "updates the updated at" do
+      pending "MONGOID-4953"
       expect(school.updated_at).to eq(update_time)
     end
   end
