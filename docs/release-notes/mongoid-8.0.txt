@@ -18,12 +18,6 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
-Ruby Version Support
---------------------
-
-Mongoid 8.0 removes support for JRuby.
-
-
 Support for MongoDB 3.4 and Earlier Servers Dropped
 ---------------------------------------------------
 
