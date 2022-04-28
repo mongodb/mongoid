@@ -733,6 +733,9 @@ module Mongoid
         opts = options.merge(klass: self)
         type_mapping = TYPE_MAPPINGS[options[:type]]
         opts[:type] = type_mapping || unmapped_type(options)
+        unless opts[:type].is_a?(Class)
+          raise Errors::InvalidFieldType.new(self, name, options[:type])
+        end
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
         Fields::Standard.new(name, opts)
