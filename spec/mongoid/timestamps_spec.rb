@@ -141,11 +141,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
+            pending "MONGOID-4953"
             user.updated_at.should == update_time
             address.updated_at.should == update_time
           end
 
           it "updates the timestamps in the db correctly" do
+            pending "MONGOID-4953"
             user.reload.updated_at.should == update_time
             address.reload.updated_at.should == update_time
           end
@@ -320,11 +322,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
+            pending "MONGOID-4953"
             user.updated_at.should == update_time
             address.updated_at.should == update_time
           end
 
           it "updates the timestamps in the db correctly" do
+            pending "MONGOID-4953"
             user.reload.updated_at.should == update_time
             address.reload.updated_at.should == update_time
           end
