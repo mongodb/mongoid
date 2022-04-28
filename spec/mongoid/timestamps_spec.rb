@@ -14,6 +14,15 @@ describe Mongoid::Timestamps do
       Dokument.fields
     end
 
+    let(:time_zone) { "Pacific Time (US & Canada)" }
+
+    around do |ex|
+      z = Time.zone
+      Time.zone = time_zone
+      ex.run
+      Time.zone = z
+    end
+
     before do
       document.run_callbacks(:create)
       document.run_callbacks(:save)
@@ -33,6 +42,14 @@ describe Mongoid::Timestamps do
 
     it "forces the updated_at timestamps to UTC" do
       expect(document.updated_at).to be_within(10).of(Time.now.utc)
+    end
+
+    it "sets the created_at to the correct time zone" do
+      expect(document.created_at.time_zone.name).to eq(time_zone)
+    end
+
+    it "sets the updated_at to the correct time zone" do
+      expect(document.updated_at.time_zone.name).to eq(time_zone)
     end
 
     it "ensures created_at equals updated_at on new records" do
