@@ -3789,4 +3789,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       expect(signature.contracts.first.signature_ids).to eq([signature.id])
     end
   end
+
+  context "when there is a foreign key in the aliased associations" do
+    it "has the correct aliases" do
+      expect(Dog.aliased_associations["breed_ids"]).to eq("breeds")
+      expect(Breed.aliased_associations["dog_ids"]).to eq("dogs")
+    end
+  end
 end

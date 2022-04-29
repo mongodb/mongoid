@@ -181,6 +181,13 @@ en:
             \_\_end\n\n
             Refer to:
             https://docs.mongodb.com/mongoid/current/reference/fields/#custom-field-options"
+        invalid_field_type:
+          message: "Invalid field type %{type_inspection} for field '%{field}' on model '%{klass}'."
+          summary: "Model '%{klass}' defines a field '%{field}' with an unknown type value
+            %{type_inspection}."
+          resolution: "Please provide a valid type value for the field.
+            Refer to:
+            https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
