@@ -233,6 +233,7 @@ module Mongoid
     def remove_child(child)
       name = child.association_name
       if child.embedded_one?
+        self.attributes.delete(child._association.store_as)
         remove_ivar(name)
       else
         relation = send(name)

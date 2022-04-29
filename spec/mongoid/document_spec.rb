@@ -591,7 +591,7 @@ describe Mongoid::Document do
       end
 
       it "does not include the document in the hash" do
-        expect(person.as_document["addresses"]).to be_empty
+        expect(person.as_document).to_not have_key("addresses")
       end
     end
 

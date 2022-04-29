@@ -319,7 +319,7 @@ module Mongoid
         ids_method = "#{association.name.to_s.singularize}_ids"
         association.inverse_class.tap do |klass|
           klass.re_define_method(ids_method) do
-            send(association.name).only(:_id).map(&:_id)
+            send(association.name).pluck(:_id)
           end
         end
       end
