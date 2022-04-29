@@ -267,3 +267,41 @@ class InterceptableEngine
 
   field :_id, type: String, default: -> { "hello-engine-#{wing&.id}" }
 end
+
+class InterceptableCompany
+  include Mongoid::Document
+
+  has_many :users, class_name: "InterceptableUser"
+  has_many :shops, class_name: "InterceptableShop"
+end
+
+class InterceptableShop
+  include Mongoid::Document
+
+  embeds_one :address, class_name: "InterceptableAddress"
+  belongs_to :company, class_name: "InterceptableCompany"
+
+  after_initialize :build_address1
+
+  def build_address1
+    self.address ||= Address.new
+  end
+end
+
+class InterceptableAddress
+  include Mongoid::Document
+  embedded_in :shop, class_name: "InterceptableShop"
+end
+
+class InterceptableUser
+  include Mongoid::Document
+
+  belongs_to :company, class_name: "InterceptableCompany"
+
+  validate :break_mongoid
+
+  def break_mongoid
+    company.shop_ids
+  end
+end
+

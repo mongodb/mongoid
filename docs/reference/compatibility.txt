@@ -84,6 +84,7 @@ is deprecated.
      - Ruby 2.3
      - Ruby 2.2
      - JRuby 9.2
+     - JRuby 9.3
 
    * - 8.0
      - |checkmark|
@@ -95,6 +96,7 @@ is deprecated.
      -
      -
      -
+     - |checkmark|
 
    * - 7.4
      - |checkmark|
@@ -105,7 +107,8 @@ is deprecated.
      -
      -
      -
-     - D
+     - |checkmark|
+     -
 
    * - 7.3
      - |checkmark| [#mongoid-7.3-ruby-3.0]_
@@ -117,6 +120,7 @@ is deprecated.
      - D
      -
      - |checkmark|
+     -
 
    * - 7.2
      - |checkmark| [#mongoid-7.2-ruby-3.0]_
@@ -128,6 +132,7 @@ is deprecated.
      - D
      -
      - |checkmark|
+     -
 
    * - 7.1
      - |checkmark| [#mongoid-7.1-ruby-3.0]_
@@ -139,6 +144,7 @@ is deprecated.
      - |checkmark|
      -
      - |checkmark|
+     -
 
    * - 7.0
      -
@@ -150,6 +156,7 @@ is deprecated.
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
      - |checkmark|
+     -
 
    * - 6.4
      -
@@ -161,6 +168,7 @@ is deprecated.
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
      - |checkmark|
+     -
 
 .. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.2 or higher is required.
 

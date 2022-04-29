@@ -3780,4 +3780,20 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       expect(signature.favorite_signature).to be nil
     end
   end
+
+  context "when setting an association on a model that uses the class_name option" do
+    let!(:contract) { HabtmmContract.create! }
+    let!(:signature) { HabtmmSignature.create!(contracts: [contract]) }
+
+    it "populates the inverse foreign key" do
+      expect(signature.contracts.first.signature_ids).to eq([signature.id])
+    end
+  end
+
+  context "when there is a foreign key in the aliased associations" do
+    it "has the correct aliases" do
+      expect(Dog.aliased_associations["breed_ids"]).to eq("breeds")
+      expect(Breed.aliased_associations["dog_ids"]).to eq("dogs")
+    end
+  end
 end

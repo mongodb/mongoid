@@ -281,4 +281,5 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
 Removed ``Document#to_a`` method
 --------------------------------
 
-The ``Document#to_a`` method has been removed in Mongoid 8.
+The previously deprecated ``Document#to_a`` method has been removed in
+Mongoid 8.
