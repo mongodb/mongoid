@@ -272,6 +272,37 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
   user.previously_persisted?   # => true
 
 
+Unknown Field Type Symbols/Strings Prohibited
+---------------------------------------------
+
+Mongoid 8 prohibits using symbols and strings as field types when these symbols
+and strings do not map to a known type. Previously such usage would create a
+field of type ``Object``.
+
+Mongoid 8 behavior:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :bogus
+    # => raises Mongoid::Errors::InvalidFieldType
+  end
+
+Mongoid 7 behavior:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :bogus
+    # Equivalent to:
+    field :name
+  end
+
+
 Removed ``Document#to_a`` method
 --------------------------------
 
