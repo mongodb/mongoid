@@ -4,12 +4,6 @@ module Mongoid
   module Extensions
     module Date
 
-      # Constant for epoch - used when passing invalid times.
-      #
-      # @deprecated No longer used as a return value from #mongoize passed
-      #   an invalid date string.
-      EPOCH = ::Date.new(1970, 1, 1)
-
       # Convert the date into a time.
       #
       # @example Convert the date to a time.
