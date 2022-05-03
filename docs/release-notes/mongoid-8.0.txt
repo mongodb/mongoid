@@ -316,3 +316,12 @@ Replaced ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
 The previously deprecated ``Mongoid::Criteria#geo_spacial`` method has been
 removed in Mongoid 8. It has been replaced one-for-one with ``#geo_spatial``
 which was added in Mongoid 7.2.0.
+
+
+Removed Deprecated Constants
+----------------------------
+
+Mongoid 8 removes the following deprecated constants that are not expected
+to have been used outside of Mongoid:
+
+- ``Mongoid::Factory::TYPE``
