@@ -285,8 +285,9 @@ The previously deprecated ``Document#to_a`` method has been removed in
 Mongoid 8.
 
 
-Replace ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
----------------------------------------------------------------
+Replaced ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
+----------------------------------------------------------------
 
-The previously-deprecated ``Mongoid::Criteria#geo_spacial`` method has been removed in Mongoid 8.
-It has been replaced one-for-one with ``#geo_spatial``, which also existed in previous Mongoid versions.
+The previously deprecated ``Mongoid::Criteria#geo_spacial`` method has been
+removed in Mongoid 8. It has been replaced one-for-one with ``#geo_spatial``
+which was added in Mongoid 7.2.0.
