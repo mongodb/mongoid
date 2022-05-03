@@ -303,7 +303,7 @@ Mongoid 7 behavior:
   end
 
 
-Removed ``Document#to_a`` method
+Removed ``Document#to_a`` Method
 --------------------------------
 
 The previously deprecated ``Document#to_a`` method has been removed in
