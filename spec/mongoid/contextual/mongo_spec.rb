@@ -571,10 +571,9 @@ describe Mongoid::Contextual::Mongo do
 
         context 'when storing BigDecimal as decimal128' do
           config_override :map_big_decimal_to_decimal128, true
+          min_bson_version '4.15.0'
 
           it "returns the non-demongoized distinct field values" do
-            pending 'RUBY-2928'
-
             expect(context.distinct(:sales).sort).to eq([ BSON::Decimal128.new("1E2"), BSON::Decimal128.new("2E3") ])
           end
         end

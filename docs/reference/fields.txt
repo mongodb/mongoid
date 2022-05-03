@@ -60,7 +60,7 @@ on a person by using the ``field`` macro.
      field :weight, type: :float
    end
 
-Below is a list of valid types for fields.
+The valid types for fields are as follows:
 
 - ``:array``
 - ``:big_decimal``
@@ -522,6 +522,47 @@ you have three options:
 
    This query will find all values that are either a ``decimal128`` value or
    a string that match that value.
+
+
+Using Symbols Or Strings Instead Of Classes
+-------------------------------------------
+
+Mongoid permits using symbols or strings instead of classes to specify the
+type of fields, for example:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+
+    field :state, type: :integer
+    # Equivalent to:
+    field :state, type: "integer"
+    # Equivalent to:
+    field :state, type: Integer
+  end
+
+Only standard field types as listed below can be specified using symbols or
+strings in this manner. Mongoid recognizes the following expansions:
+
+- ``:array`` => ``Array``
+- ``:big_decimal`` => ``BigDecimal``
+- ``:binary`` => ``BSON::Binary``
+- ``:boolean`` => ``Mongoid::Boolean``
+- ``:date`` => ``Date``
+- ``:date_time`` => ``DateTime``
+- ``:float`` => ``Float``
+- ``:hash`` => ``Hash``
+- ``:integer`` => ``Integer``
+- ``:object_id`` => ``BSON::ObjectId``
+- ``:range`` => ``Range``
+- ``:regexp`` => ``Regexp``
+- ``:set`` => ``Set``
+- ``:string`` => ``String``
+- ``:stringified_symbol`` => ``StringifiedSymbol``
+- ``:symbol`` => ``Symbol``
+- ``:time`` => ``Time``
+
 
 .. _field-default-values:
 
@@ -1227,6 +1268,7 @@ alter the criteria to match the current locale.
    # Match all products with Marvelous as the description. Locale is en.
    Product.where(description: "Marvelous!")
    # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
+
 
 Indexing
 --------

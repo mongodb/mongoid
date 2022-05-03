@@ -364,6 +364,22 @@ describe Mongoid::Fields do
           expect(klass.field(:test, type: field_type.to_s).type).to be(field_klass)
         end
       end
+
+      context 'when using an unknown symbol' do
+        it 'raises InvalidFieldType' do
+          lambda do
+            klass.field(:test, type:  :bogus)
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value :bogus/)
+        end
+      end
+
+      context 'when using an unknown string' do
+        it 'raises InvalidFieldType' do
+          lambda do
+            klass.field(:test, type:  'bogus')
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
+        end
+      end
     end
 
     context "when the options are valid" do

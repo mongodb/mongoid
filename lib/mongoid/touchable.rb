@@ -22,7 +22,7 @@ module Mongoid
       # @return [ true/false ] false if record is new_record otherwise true.
       def touch(field = nil)
         return false if _root.new_record?
-        current = Time.now
+        current = Time.configured.now
         field = database_field_name(field)
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
         write_attribute(field, current) if field

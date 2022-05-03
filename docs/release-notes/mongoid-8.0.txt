@@ -18,12 +18,6 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
-Ruby Version Support
---------------------
-
-Mongoid 8.0 removes support for JRuby.
-
-
 Support for MongoDB 3.4 and Earlier Servers Dropped
 ---------------------------------------------------
 
@@ -278,10 +272,35 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
   user.previously_persisted?   # => true
 
 
-Removed ``Document#to_a`` method
---------------------------------
+Unknown Field Type Symbols/Strings Prohibited
+---------------------------------------------
 
-The ``Document#to_a`` method has been removed in Mongoid 8.
+Mongoid 8 prohibits using symbols and strings as field types when these symbols
+and strings do not map to a known type. Previously such usage would create a
+field of type ``Object``.
+
+Mongoid 8 behavior:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :bogus
+    # => raises Mongoid::Errors::InvalidFieldType
+  end
+
+Mongoid 7 behavior:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :bogus
+    # Equivalent to:
+    field :name
+  end
 
 
 Setting Field Type as a Class is Deprecated
@@ -319,3 +338,38 @@ Mongoid 8.0 adds the ability to define custom ``field :type`` Symbol values as f
   end
 
 Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
+
+
+Removed ``Document#to_a`` Method
+--------------------------------
+
+The previously deprecated ``Document#to_a`` method has been removed in
+Mongoid 8.
+
+
+Removed ``Mongoid::Errors::EagerLoad`` Exception Class
+------------------------------------------------------
+
+The previously deprecated ``Mongoid::Errors::EagerLoad`` exception class
+has been removed in Mongoid 8. It has not been used by Mongoid since
+version 7.1.1 when eager loading for polymorphic ``belongs_to`` associations
+was implemented.
+
+
+Replaced ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
+----------------------------------------------------------------
+
+The previously deprecated ``Mongoid::Criteria#geo_spacial`` method has been
+removed in Mongoid 8. It has been replaced one-for-one with ``#geo_spatial``
+which was added in Mongoid 7.2.0.
+
+
+Removed Deprecated Constants
+----------------------------
+
+Mongoid 8 removes the following deprecated constants that are not expected
+to have been used outside of Mongoid:
+
+- ``Mongoid::Extensions::Date::EPOCH``
+- ``Mongoid::Extensions::Time::EPOCH``
+- ``Mongoid::Factory::TYPE``

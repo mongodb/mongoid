@@ -32,6 +32,8 @@ end
 class HabtmmSignature
   include Mongoid::Document
 
+  field :favorite_signature, default: ->{ contracts.first.signature_ids.first if contracts.first }
+
   has_and_belongs_to_many :contracts, class_name: 'HabtmmContract'
 
   field :name, type: String
@@ -68,6 +70,7 @@ end
 
 class HabtmmSchool
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   has_and_belongs_to_many :students, class_name: 'HabtmmStudent'
 
@@ -78,6 +81,7 @@ end
 
 class HabtmmStudent
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   has_and_belongs_to_many :schools, class_name: 'HabtmmSchool'
 

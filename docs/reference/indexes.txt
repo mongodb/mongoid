@@ -61,8 +61,9 @@ Indexes can be sparse:
       index({ ssn: -1 }, { sparse: true })
     end
 
-Indexes can be specified to be created in the background in cases where
-the collection is large and index creation may take a long time:
+*Deprecated:* In MongoDB 4.0 and earlier, users could control whether to build indexes
+in the foreground (blocking) or background (non-blocking, but less efficient) using the
+``background`` option.
 
 .. code-block:: ruby
 
@@ -72,9 +73,11 @@ the collection is large and index creation may take a long time:
       index({ ssn: 1 }, { unique: true, background: true })
     end
 
-If the ``background_indexing`` :ref:`configuration option
-<configuration-options>` is true, the indexes are created in the background
-unless the ``background: false`` option is provided.
+The default value of ``background`` is controlled by Mongoid's
+``background_indexing`` :ref:`configuration option <configuration-options>`.
+
+The ``background`` option has `no effect as of MongoDB 4.2
+<https://www.mongodb.com/docs/manual/core/index-creation/#comparison-to-foreground-and-background-builds>`_.
 
 *Deprecated:* When using MongoDB 2.6, you can drop the duplicate entries
 for unique indexes that are defined for a column that might

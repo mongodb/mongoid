@@ -161,7 +161,12 @@ module Mongoid
     #
     # @api private
     def pending_callbacks
-      @pending_callbacks ||= []
+      @pending_callbacks ||= [].to_set
+    end
+
+    # @api private
+    def pending_callbacks=(value)
+      @pending_callbacks = value
     end
 
     # Run the pending callbacks. If the callback is :apply_defaults, we will apply
@@ -171,8 +176,8 @@ module Mongoid
     # @api private
     def run_pending_callbacks
       pending_callbacks.each do |cb|
-        if cb == :apply_defaults
-          self.apply_defaults
+        if [:apply_defaults, :apply_post_processed_defaults].include?(cb)
+          send(cb)
         else
           self.run_callbacks(cb, with_children: false)
         end

@@ -260,9 +260,6 @@ for details on driver options.
       # if the database name is not explicitly defined. (default: nil)
       app_name: MyApplicationName
 
-      # Create indexes in background by default. (default: false)
-      background_indexing: false
-
       # Mark belongs_to associations as required by default, so that saving a
       # model with a missing belongs_to association will trigger a validation
       # error. (default: true)
@@ -419,6 +416,10 @@ for details on driver options.
       # further information. Most applications should not use this option.
       # (default: false)
       use_utc: false
+
+      # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
+      # indexes in the background by default. (default: false)
+      background_indexing: false
 
 ERb Preprocessing
 =================

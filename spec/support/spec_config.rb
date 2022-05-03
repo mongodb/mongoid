@@ -34,6 +34,10 @@ class SpecConfig
     RUBY_PLATFORM =~ /\bjava\b/
   end
 
+  def windows?
+    ENV['OS'] == 'Windows_NT' && !RUBY_PLATFORM.match?(/cygwin/)
+  end
+
   def platform
     RUBY_PLATFORM
   end
