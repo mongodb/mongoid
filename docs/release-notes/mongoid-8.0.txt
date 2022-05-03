@@ -310,6 +310,15 @@ The previously deprecated ``Document#to_a`` method has been removed in
 Mongoid 8.
 
 
+Removed ``Mongoid::Errors::EagerLoad`` Exception Class
+------------------------------------------------------
+
+The previously deprecated ``Mongoid::Errors::EagerLoad`` exception class
+has been removed in Mongoid 8. It has not been used by Mongoid since
+version 7.1.1 when eager loading for polymorphic ``belongs_to`` associations
+was implemented.
+
+
 Replaced ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
 ----------------------------------------------------------------
 
