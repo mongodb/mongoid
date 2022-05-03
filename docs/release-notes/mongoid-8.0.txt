@@ -324,4 +324,6 @@ Removed Deprecated Constants
 Mongoid 8 removes the following deprecated constants that are not expected
 to have been used outside of Mongoid:
 
+- ``Mongoid::Extensions::Date::EPOCH``
+- ``Mongoid::Extensions::Time::EPOCH``
 - ``Mongoid::Factory::TYPE``
