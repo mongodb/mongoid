@@ -323,6 +323,12 @@ the ids only in one document using the ``inverse_of: nil`` option:
 A one-sided ``has_and_belongs_to_many`` association is, naturally, only
 usable from the model where it is defined.
 
+.. note::
+
+  Given two models, A and B where A ``has_and_belongs_to_many`` B,
+  when adding a document of type B to the HABTM association on a document of
+  type A, Mongoid will not update the ``updated_at`` field for the document of
+  type A, but will update the ``updated_at`` field for the document of type B.
 
 Querying Referenced Associations
 --------------------------------
@@ -1270,26 +1276,26 @@ to non-existent documents via associations:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :albums
   end
 
   class Album
     include Mongoid::Document
-    
+
     belongs_to :band
   end
-  
+
   band = Band.new
   album = Album.create!(band: band)
-  
+
   # The band is not persisted at this point.
-  
+
   album.reload
-  
+
   album.band_id
   # => BSON::ObjectId('6257699753aefe153121a3d5')
-  
+
   # Band does not exist.
   album.band
   # => nil
@@ -1301,26 +1307,26 @@ add the ``:autosave`` option to the association:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :albums
   end
 
   class Album
     include Mongoid::Document
-    
+
     belongs_to :band, autosave: true
   end
-  
+
   band = Band.new
   album = Album.create!(band: band)
-  
+
   # The band is persisted at this point.
-  
+
   album.reload
-  
+
   album.band_id
   # => BSON::ObjectId('62576b4b53aefe178b65b8e3')
-  
+
   album.band
   # => #<Band _id: 62576b4b53aefe178b65b8e3, >
 
@@ -1339,14 +1345,14 @@ A non-exhaustive list of these operations is as follows:
 - Assignment to the association:
 
   .. code-block:: ruby
-  
+
     # Saves the band and the album.
     band.albums = [Album.new]
 
 - ``push``, ``<<``:
 
   .. code-block:: ruby
-  
+
     band.albums << Album.new
     band.albums.push(Album.new)
 
