@@ -52,6 +52,22 @@ module Mongoid
           self
         end
 
+        # Merge criteria with operators using the and function.
+        #
+        # @param [ Hash ] The criterion to add to the criteria.
+        # @param [ String ] operator The MongoDB operator.
+        #
+        # @return [ Criteria ] The resulting criteria.
+        def and_with_operator(criterion, operator)
+          crit = self
+          if criterion
+            criterion.each_pair do |field, value|
+              crit = crit.and(field => prepare(field, "$gt", value))
+            end
+          end
+          crit
+        end
+
         private
 
         # Adds the criterion to the existing selection.

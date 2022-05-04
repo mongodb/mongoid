@@ -1114,7 +1114,6 @@ describe Mongoid::Criteria do
       end
 
       it 'does not duplicate criteria' do
-        pending "MONGOID-5330"
         expect(criteria.selector).to eq(
           "age" => { "$gt" => 2 }, "$and" => [ { "age" => { "$gt" => 1 } } ]
         )

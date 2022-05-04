@@ -277,7 +277,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :gt
           end
 
-          __override__(criterion, "$gt")
+          and_with_operator(criterion, "$gt")
         end
         key :gt, :override, "$gt"
 
