@@ -142,6 +142,8 @@ module Mongoid
           # @param [ Proc ] block The block to execute on each value.
           #
           # @return [ Hash ] the hash.
+          #
+          # @deprecated
           def update_values(&block)
             each_pair do |key, value|
               store(key, block[value])

@@ -116,6 +116,8 @@ module Mongoid
           # @param [ Proc ] block The block to execute on each value.
           #
           # @return [ Array ] the array.
+          #
+          # @deprecated
           def update_values(&block)
             replace(map(&block))
           end
