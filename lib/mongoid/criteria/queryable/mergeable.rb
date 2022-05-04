@@ -62,7 +62,7 @@ module Mongoid
           crit = self
           if criterion
             criterion.each_pair do |field, value|
-              crit = crit.and(field => prepare(field, "$gt", value))
+              crit = crit.and(field => prepare(field, operator, value))
             end
           end
           crit
