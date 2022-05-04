@@ -11,7 +11,7 @@ module Mongoid
       #
       # @return [ Hash ] The converted hash.
       def __evolve_object_id__
-        update_values(&:__evolve_object_id__)
+        transform_values!(&:__evolve_object_id__)
       end
 
       # Mongoizes each value in the hash to an object id if it is convertable.
@@ -24,7 +24,7 @@ module Mongoid
         if id = self['$oid']
           BSON::ObjectId.from_string(id)
         else
-          update_values(&:__mongoize_object_id__)
+          transform_values!(&:__mongoize_object_id__)
         end
       end
 
@@ -220,7 +220,7 @@ module Mongoid
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
           return if object.nil?
-          evolve(object.dup).update_values { |value| value.mongoize }
+          evolve(object.dup).transform_values!(&:mongoize)
         end
 
         # Can the size of this object change?

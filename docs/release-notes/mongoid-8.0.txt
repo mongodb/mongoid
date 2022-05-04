@@ -336,3 +336,10 @@ to have been used outside of Mongoid:
 - ``Mongoid::Extensions::Date::EPOCH``
 - ``Mongoid::Extensions::Time::EPOCH``
 - ``Mongoid::Factory::TYPE``
+
+
+Removed ``Array#update_values`` and ``Hash#update_values`` methods
+------------------------------------------------------------------
+
+The previously deprecated ``Array#update_values`` and ``Hash#update_values``
+methods have been removed in Mongoid 8.
