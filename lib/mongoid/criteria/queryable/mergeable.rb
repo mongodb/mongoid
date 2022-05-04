@@ -62,7 +62,12 @@ module Mongoid
           crit = self
           if criterion
             criterion.each_pair do |field, value|
-              crit = crit.and(field => prepare(field, operator, value))
+              val = prepare(field, operator, value)
+              # The prepare method already takes the negation into account. We
+              # set negating to false here so that ``and`` doesn't also apply
+              # negation and we have a double negative.
+              crit.negating = false
+              crit = crit.and(field => val)
             end
           end
           crit

@@ -885,7 +885,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "overwrites the first $gt selector" do
           expect(selection.selector).to eq({
-            "first" => { "$gt" => 15 }
+            "first" => { "$gt" => 10 },
+            "$and" => [{ "first" => { "$gt" => 15 } }]
           })
         end
 
