@@ -283,3 +283,10 @@ Removed ``Document#to_a`` method
 
 The previously deprecated ``Document#to_a`` method has been removed in
 Mongoid 8.
+
+
+``Array#update_values`` and ``Hash#update_values`` deprecated
+-------------------------------------------------------------
+
+The previously deprecated ``Array#update_values`` and ``Hash#update_values``
+methods have been removed in Mongoid 8.
