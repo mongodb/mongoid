@@ -13,7 +13,6 @@ module Mongoid
           :database,
           :default_language,
           :language_override,
-          :drop_dups,
           :name,
           :sparse,
           :unique,

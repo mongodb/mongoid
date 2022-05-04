@@ -61,39 +61,6 @@ Indexes can be sparse:
       index({ ssn: -1 }, { sparse: true })
     end
 
-*Deprecated:* In MongoDB 4.0 and earlier, users could control whether to build indexes
-in the foreground (blocking) or background (non-blocking, but less efficient) using the
-``background`` option.
-
-.. code-block:: ruby
-
-    class Person
-      include Mongoid::Document
-      field :ssn
-      index({ ssn: 1 }, { unique: true, background: true })
-    end
-
-The default value of ``background`` is controlled by Mongoid's
-``background_indexing`` :ref:`configuration option <configuration-options>`.
-
-The ``background`` option has `no effect as of MongoDB 4.2
-<https://www.mongodb.com/docs/manual/core/index-creation/#comparison-to-foreground-and-background-builds>`_.
-
-*Deprecated:* When using MongoDB 2.6, you can drop the duplicate entries
-for unique indexes that are defined for a column that might
-already have duplicate values by specifying the ``drop_dups`` option:
-
-.. code-block:: ruby
-
-    class Person
-      include Mongoid::Document
-      field :ssn
-      index({ ssn: 1 }, { unique: true, drop_dups: true })
-    end
-
-The ``drop_dups`` option has been `removed as of MongoDB 3.0
-<https://mongodb.com/docs/manual/release-notes/3.0-compatibility/#remove-dropdups-option>`_.
-
 For geospatial indexes, make sure the field being indexed is of type Array:
 
 .. code-block:: ruby
@@ -125,6 +92,25 @@ This only works on the association macro that the foreign key is stored on:
       belongs_to :post, index: true
       has_and_belongs_to_many :preferences, index: true
     end
+
+*Deprecated:* In MongoDB 4.0 and earlier, users could control whether to build indexes
+in the foreground (blocking) or background (non-blocking, but less efficient) using the
+``background`` option.
+
+.. code-block:: ruby
+
+    class Person
+      include Mongoid::Document
+      field :ssn
+      index({ ssn: 1 }, { unique: true, background: true })
+    end
+
+The default value of ``background`` is controlled by Mongoid's
+``background_indexing`` :ref:`configuration option <configuration-options>`.
+
+The ``background`` option has `no effect as of MongoDB 4.2
+<https://www.mongodb.com/docs/manual/core/index-creation/#comparison-to-foreground-and-background-builds>`_.
+
 
 Index Management Rake Tasks
 ===========================

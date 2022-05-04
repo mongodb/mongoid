@@ -303,6 +303,13 @@ Mongoid 7 behavior:
   end
 
 
+Removed ``:drop_dups`` Option from Indexes
+------------------------------------------
+
+The ``:drop_dups`` option has been removed from the ``index`` macro. This option
+was specific to MongoDB server 2.6 and earlier, which Mongoid no longer supports.
+
+
 Removed ``Document#to_a`` Method
 --------------------------------
 
