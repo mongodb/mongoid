@@ -21,7 +21,8 @@ the complete list of issues fixed in each release, including bug fixes.
 `````````````````````````````````````````````````````````````
 
 The ``Array#update_values`` and ``Hash#update_values`` methods are deprecated in
-Mongoid 7.5.
+Mongoid 7.5. It is recommended to use ActiveSupport's ``transform_values!`` 
+method instead.
 
 
 ``Document#to_a`` deprecated
