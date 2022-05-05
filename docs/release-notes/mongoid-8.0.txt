@@ -161,20 +161,20 @@ Mongoid 8.0 behavior:
 
 .. code-block:: ruby
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
     any_of({members: 2}, {last_tour: 1995})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}],
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}],
   #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
@@ -183,20 +183,20 @@ Mongoid 7 behavior:
 
 .. code-block:: ruby
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
     any_of({members: 2}, {last_tour: 1995})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990},
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990},
   #     {"members"=>2}, {"last_tour"=>1995}]}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
@@ -343,3 +343,50 @@ Removed ``Array#update_values`` and ``Hash#update_values`` methods
 
 The previously deprecated ``Array#update_values`` and ``Hash#update_values``
 methods have been removed in Mongoid 8.
+
+
+Combine Chained Operators Using ``and`` Instead of ``override``
+---------------------------------------------------------------
+
+Mongoid 8.0 with the ``Mongoid.and_chained_operators`` option set to ``true``
+will combine conditions that use the same operator and field using an ``and``.
+For example, in the following query:
+
+.. code-block:: ruby
+
+  Band.ne(name: "The Rolling Stones").ne(name: "The Beatles")
+
+Mongoid 8.0 with the ``Mongoid.and_chained_operators`` option set to ``true``
+will generate the following criteria:
+
+.. code-block:: ruby
+
+  #<Mongoid::Criteria
+    selector: {"name"=>{"$ne"=>"The Rolling Stones"}, "$and"=>[{"name"=>{"$ne"=>"The Beatles"}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+In Mongoid 7.5 and earlier, and in 8.0 with the ``Mongoid.and_chained_operators``
+option set to ``false`` (the default), the following criteria would be
+generated instead which overwrites the first condition:
+
+.. code-block:: ruby
+
+  #<Mongoid::Criteria
+    selector: {"name"=>{"$ne"=>"The Beatles"}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+The following functions are affected by this change:
+
+- ``eq``
+- ``gt``
+- ``gte``
+- ``lt``
+- ``lte``
+- ``mod``
+- ``ne``
+- ``near``
+- ``near_sphere``
