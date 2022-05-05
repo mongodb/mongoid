@@ -1107,18 +1107,6 @@ describe Mongoid::Criteria do
     it "returns the matching documents" do
       expect(criteria).to eq([ match ])
     end
-
-    context "when duplicating gt conditions with different values" do
-      let(:criteria) do
-        Person.gt(age: 2).gt(age: 1)
-      end
-
-      it 'does not duplicate criteria' do
-        expect(criteria.selector).to eq(
-          "age" => { "$gt" => 2 }, "$and" => [ { "age" => { "$gt" => 1 } } ]
-        )
-      end
-    end
   end
 
   describe "#gte" do

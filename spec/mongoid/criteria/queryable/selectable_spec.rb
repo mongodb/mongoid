@@ -879,19 +879,40 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        let(:selection) do
-          query.gt(first: 10).gt(first: 15)
+        context "when and_chained_operators is false" do
+          config_override :and_chained_operators, false
+
+          let(:selection) do
+            query.gt(first: 10).gt(first: 15)
+          end
+
+          it "overwrites the first $gt selector" do
+            expect(selection.selector).to eq({
+              "first" => { "$gt" => 15 },
+              })
+          end
+
+          it "returns a cloned query" do
+            expect(selection).to_not equal(query)
+          end
         end
 
-        it "overwrites the first $gt selector" do
-          expect(selection.selector).to eq({
-            "first" => { "$gt" => 10 },
-            "$and" => [{ "first" => { "$gt" => 15 } }]
-          })
-        end
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+          let(:selection) do
+            query.gt(first: 10).gt(first: 15)
+          end
 
-        it "returns a cloned query" do
-          expect(selection).to_not equal(query)
+          it "overwrites the first $gt selector" do
+            expect(selection.selector).to eq({
+              "first" => { "$gt" => 10 },
+              "$and" => [{ "first" => { "$gt" => 15 } }]
+              })
+          end
+
+          it "returns a cloned query" do
+            expect(selection).to_not equal(query)
+          end
         end
       end
     end

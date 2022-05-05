@@ -335,6 +335,12 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the and_chained_operators option in the config' do
+    let(:option) { :and_chained_operators }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
 
   describe "#load!" do
 
