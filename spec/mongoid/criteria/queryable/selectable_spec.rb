@@ -2308,4 +2308,52 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
   end
+
+  describe "Mongoid.and_chained_operators" do
+    [ :eq, :gt, :gte, :lt, :lte, :mod, :ne, :near, :near_sphere ].each do |meth|
+
+      context "when chaining the #{meth} method when using the same field" do
+        let(:operator_map) do
+          {
+            eq: "$eq",
+            gt: "$gt",
+            gte: "$gte",
+            lt: "$lt",
+            lte: "$lte",
+            mod: "$mod",
+            ne: "$ne",
+            near: "$near",
+            near_sphere: "$nearSphere"
+          }
+        end
+
+        let(:criteria) do
+          Band.send(meth, {views: 1}).send(meth, {views:2})
+        end
+
+        let(:op) { operator_map[meth] }
+
+        context "when and_chained_operators is false" do
+          config_override :and_chained_operators, false
+
+          it "overrides the previous operators" do
+            expect(criteria.selector).to eq({
+              "views" => { op => 2 },
+            })
+          end
+        end
+
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+
+          it "overrides the previous operators" do
+            expect(criteria.selector).to eq({
+              "views" => { op => 1 },
+              "$and" => [{ "views" => { op => 2 } }]
+            })
+          end
+        end
+      end
+    end
+  end
 end

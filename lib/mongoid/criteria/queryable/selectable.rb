@@ -257,7 +257,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :eq
           end
 
-          __override__(criterion, "$eq")
+          and_or_override(criterion, "$eq")
         end
         key :eq, :override, "$eq"
 
