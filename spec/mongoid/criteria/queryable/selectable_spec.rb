@@ -2313,7 +2313,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
     [ :eq, :gt, :gte, :lt, :lte, :mod, :ne, :near, :near_sphere ].each do |meth|
 
       context "when chaining the #{meth} method when using the same field" do
-        let(:operator_map) do
+        let(:op) do
           {
             eq: "$eq",
             gt: "$gt",
@@ -2324,14 +2324,12 @@ describe Mongoid::Criteria::Queryable::Selectable do
             ne: "$ne",
             near: "$near",
             near_sphere: "$nearSphere"
-          }
+          }[meth]
         end
 
         let(:criteria) do
           Band.send(meth, {views: 1}).send(meth, {views:2})
         end
-
-        let(:op) { operator_map[meth] }
 
         context "when and_chained_operators is false" do
           config_override :and_chained_operators, false
