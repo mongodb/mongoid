@@ -369,7 +369,7 @@ describe Mongoid::Fields do
         it 'raises InvalidFieldType' do
           lambda do
             klass.field(:test, type:  :bogus)
-          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value :bogus/)
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field :test with an unknown :type value :bogus/)
         end
       end
 
@@ -377,7 +377,7 @@ describe Mongoid::Fields do
         it 'raises InvalidFieldType' do
           lambda do
             klass.field(:test, type:  'bogus')
-          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field :test with an unknown :type value "bogus"/)
         end
       end
     end
