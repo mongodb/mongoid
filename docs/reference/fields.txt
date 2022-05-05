@@ -524,46 +524,6 @@ you have three options:
    a string that match that value.
 
 
-Using Symbols Or Strings Instead Of Classes
--------------------------------------------
-
-Mongoid permits using symbols or strings instead of classes to specify the
-type of fields, for example:
-
-.. code-block:: ruby
-
-  class Order
-    include Mongoid::Document
-
-    field :state, type: :integer
-    # Equivalent to:
-    field :state, type: "integer"
-    # Equivalent to:
-    field :state, type: Integer
-  end
-
-Only standard field types as listed below can be specified using symbols or
-strings in this manner. Mongoid recognizes the following expansions:
-
-- ``:array`` => ``Array``
-- ``:big_decimal`` => ``BigDecimal``
-- ``:binary`` => ``BSON::Binary``
-- ``:boolean`` => ``Mongoid::Boolean``
-- ``:date`` => ``Date``
-- ``:date_time`` => ``DateTime``
-- ``:float`` => ``Float``
-- ``:hash`` => ``Hash``
-- ``:integer`` => ``Integer``
-- ``:object_id`` => ``BSON::ObjectId``
-- ``:range`` => ``Range``
-- ``:regexp`` => ``Regexp``
-- ``:set`` => ``Set``
-- ``:string`` => ``String``
-- ``:stringified_symbol`` => ``StringifiedSymbol``
-- ``:symbol`` => ``Symbol``
-- ``:time`` => ``Time``
-
-
 .. _field-default-values:
 
 Specifying Field Default Values
