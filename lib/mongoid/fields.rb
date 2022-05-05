@@ -12,7 +12,7 @@ module Mongoid
   module Fields
     extend ActiveSupport::Concern
 
-    # @deprecated Remove class aliases in Mongoid 8.0.
+    # @deprecated These class aliases should be removed in Mongoid 9.0.
     StringifiedSymbol = Mongoid::StringifiedSymbol
     Boolean = Mongoid::Boolean
 
