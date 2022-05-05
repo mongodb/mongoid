@@ -52,14 +52,7 @@ describe Mongoid::Extensions::DateTime do
     end
 
     context "when using utc" do
-
-      before do
-        Mongoid.use_utc = true
-      end
-
-      after do
-        Mongoid.use_utc = false
-      end
+      config_override :use_utc, true
 
       context "when setting a utc time" do
 

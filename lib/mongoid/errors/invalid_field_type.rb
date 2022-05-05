@@ -14,10 +14,11 @@ module Mongoid
       #
       # @param [ String ] klass The model class.
       # @param [ String ] field The field on which the invalid type is used.
-      # @param [ String ] type The value of the field :type option.
+      # @param [ Symbol | String ] type The value of the field :type option.
       def initialize(klass, field, type)
         super(
-          compose_message('invalid_field_type', { klass: klass, field: field, type: type })
+          compose_message('invalid_field_type',
+            klass: klass, field: field, type_inspection: type.inspect)
         )
       end
     end

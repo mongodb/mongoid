@@ -28,13 +28,13 @@ describe Mongoid::Reloadable do
     context "when using bson ids" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:from_db) do
         Person.find(person.id).tap do |peep|
           peep.age = 35
-          peep.save
+          peep.save!
         end
       end
 
@@ -51,13 +51,13 @@ describe Mongoid::Reloadable do
     context "when using string ids" do
 
       let(:account) do
-        Account.create(name: "bank", number: "1000")
+        Account.create!(name: "bank", number: "1000")
       end
 
       let!(:from_db) do
         Account.find(account.id).tap do |acc|
           acc.number = "1001"
-          acc.save
+          acc.save!
         end
       end
 
@@ -74,7 +74,7 @@ describe Mongoid::Reloadable do
     context "when an after initialize callback is defined" do
 
       let!(:book) do
-        Book.create(title: "Snow Crash")
+        Book.create!(title: "Snow Crash")
       end
 
       before do
@@ -90,7 +90,7 @@ describe Mongoid::Reloadable do
     context "when the document was dirty" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       before do
@@ -139,7 +139,7 @@ describe Mongoid::Reloadable do
     context "when the document is embedded" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when embedded a single level" do
@@ -148,13 +148,13 @@ describe Mongoid::Reloadable do
 
           let(:person) do
             Person.with(collection: 'other') do |person_class|
-              person_class.create
+              person_class.create!
             end
           end
 
           let!(:address) do
             person.with(collection: 'other') do |person_object|
-              person_object.addresses.create(street: "Abbey Road", number: 4)
+              person_object.addresses.create!(street: "Abbey Road", number: 4)
             end
           end
 
@@ -179,7 +179,7 @@ describe Mongoid::Reloadable do
         context "when the relation is an embeds many" do
 
           let!(:address) do
-            person.addresses.create(street: "Abbey Road", number: 4)
+            person.addresses.create!(street: "Abbey Road", number: 4)
           end
 
           before do
@@ -237,11 +237,11 @@ describe Mongoid::Reloadable do
       context "when the relation is embedded multiple levels" do
 
         let!(:address) do
-          person.addresses.create(street: "Abbey Road", number: 3)
+          person.addresses.create!(street: "Abbey Road", number: 3)
         end
 
         let!(:location) do
-          address.locations.create(name: "home")
+          address.locations.create!(name: "home")
         end
 
         before do
@@ -270,11 +270,11 @@ describe Mongoid::Reloadable do
     context "when embedded documents change" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:address) do
-        person.addresses.create(number: 27, street: "Maiden Lane")
+        person.addresses.create!(number: 27, street: "Maiden Lane")
       end
 
       before do
@@ -290,24 +290,103 @@ describe Mongoid::Reloadable do
 
     context "when embedded documents are unasssigned and reassigned" do
 
-      let(:palette) do
-        Palette.new
+      context "when broken_updates feature flag is not set" do
+        config_override :broken_updates, false
+
+        let(:palette) do
+          Palette.new
+        end
+
+        let(:canvas) do
+          Canvas.create!
+        end
+
+        before do
+          canvas.palette = palette
+          canvas.palette = nil
+          canvas.palette = palette
+          canvas.save!
+          canvas.reload
+        end
+
+        it "reloads the embedded document correctly" do
+          expect(canvas.palette).to eq(palette)
+        end
       end
 
-      let(:canvas) do
-        Canvas.create!
+      context "when broken_updates feature flag is set" do
+        config_override :broken_updates, true
+
+        let(:palette) do
+          Palette.new
+        end
+
+        let(:canvas) do
+          Canvas.create!
+        end
+
+        before do
+          canvas.palette = palette
+          canvas.palette = nil
+          canvas.palette = palette
+          canvas.save!
+          canvas.reload
+        end
+
+        it "does not reload the embedded document correctly" do
+          expect(canvas.palette).to be_nil
+        end
+      end
+    end
+
+    context "when embeds_many documents are cleared and reassigned" do
+
+      context "when broken_updates feature flag is not set" do
+        config_override :broken_updates, false
+
+        let(:contractor) do
+          Contractor.new(name: 'contractor')
+        end
+
+        let(:building) do
+          Building.create!
+        end
+
+        it "persists an embedded document correctly the second time" do
+          building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
+          building.contractors.clear
+          expect(building.contractors).to eq([])
+
+          building.contractors << contractor
+          building.reload
+          expect(building.contractors).to eq([contractor])
+        end
       end
 
-      before do
-        canvas.palette = palette
-        canvas.palette = nil
-        canvas.palette = palette
-        canvas.save!
-        canvas.reload
-      end
+      context "when broken_updates feature flag is set" do
+        config_override :broken_updates, true
 
-      it "reloads the embedded document correctly" do
-        expect(canvas.palette).to eq(palette)
+        let(:contractor) do
+          Contractor.new(name: 'contractor')
+        end
+
+        let(:building) do
+          Building.create!
+        end
+
+        it "doesn't persist the embedded document correctly the second time" do
+          building.contractors << contractor
+          expect(building.contractors).to eq([contractor])
+
+          building.contractors.clear
+          expect(building.contractors).to eq([])
+
+          building.contractors << contractor
+          building.reload
+          expect(building.contractors).to eq([])
+        end
       end
     end
 
@@ -339,7 +418,7 @@ describe Mongoid::Reloadable do
     context "with relational associations" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "for a has_one" do
@@ -383,13 +462,13 @@ describe Mongoid::Reloadable do
     context "when overriding #id alias" do
 
       let!(:object) do
-        IdKey.create(key: 'foo')
+        IdKey.create!(key: 'foo')
       end
 
       let!(:from_db) do
         IdKey.find(object._id).tap do |object|
           object.key = 'bar'
-          object.save
+          object.save!
         end
       end
 
@@ -406,7 +485,7 @@ describe Mongoid::Reloadable do
     context 'when the document is readonly' do
 
       before do
-        Person.create
+        Person.create!
       end
 
       let(:reloaded) do
@@ -448,7 +527,7 @@ describe Mongoid::Reloadable do
       context 'without embedded document' do
         let(:profile) do
           Profile.with(client: :other) do |klass|
-            klass.create
+            klass.create!
           end
         end
 
@@ -470,8 +549,8 @@ describe Mongoid::Reloadable do
       context 'with embedded document' do
         let(:profile_image) do
           Profile.with(client: :other) do |klass|
-            profile = klass.create
-            ProfileImage.create(profile: profile)
+            profile = klass.create!
+            ProfileImage.create!(profile: profile)
           end
         end
 
@@ -486,6 +565,99 @@ describe Mongoid::Reloadable do
 
           event = find_events.first
           expect(event.command['filter'].keys).to include('name')
+        end
+      end
+    end
+
+    context 'when raise_not_found_error is false' do
+      config_override :raise_not_found_error, false
+
+      let!(:band) { Band.create!(name: 'Sun Project') }
+
+      context 'when document exists in the database' do
+        before do
+          band.name = 'test'
+        end
+
+        it 'reloads the document' do
+          band.name.should == 'test'
+
+          band.reload
+
+          band.name.should == 'Sun Project'
+        end
+      end
+
+      context 'when document does not exist in the database' do
+        before do
+          band.name = 'test'
+
+          band.destroy
+        end
+
+        it 'creates a new document with default values' do
+          original_id = band.id
+          band.name.should == 'test'
+
+          band.reload
+
+          band.name.should be nil
+          band.id.should_not be nil
+          # _id changes
+          band.id.should_not == original_id
+        end
+      end
+    end
+
+    context 'when document has referenced associations' do
+      let!(:church) do
+        Church.create!(name: 'Test', acolytes: [Acolyte.new(name: 'Borg')])
+      end
+
+      before do
+        church.acolytes.first.name = 'test'
+      end
+
+      it 'resets the associations' do
+        church.acolytes.first.name.should == 'test'
+
+        church.reload
+
+        church.acolytes._loaded?.should be false
+
+        church.acolytes.first.name.should == 'Borg'
+      end
+    end
+
+    context 'when document has previous changes' do
+      context 'when document was updated' do
+        let(:person) do
+          Person.create!(title: 'Sir')
+        end
+
+        before do
+          person.title = 'Madam'
+          person.save!
+          person.reload
+        end
+
+        it "resets previous changes" do
+          expect(person.title_previously_was).to be_nil
+          expect(person).not_to be_previously_persisted
+        end
+      end
+
+      context 'when document was created' do
+        let(:person) do
+          Person.create!(title: 'Sir')
+        end
+
+        before do
+          person.reload
+        end
+
+        it "resets previous changes" do
+          expect(person).not_to be_previously_new_record
         end
       end
     end

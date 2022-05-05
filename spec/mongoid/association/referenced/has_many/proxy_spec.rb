@@ -115,8 +115,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             context "when subsequently saving the parent" do
 
               before do
-                person.save
-                post.save
+                person.save!
+                post.save!
               end
 
               it "returns the correct count of the association" do
@@ -1681,7 +1681,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       let!(:posts) do
-        person.posts.create([{ text: "Test1" }, { text: "Test2" }])
+        person.posts.create!([{ text: "Test1" }, { text: "Test2" }])
       end
 
       it "creates multiple documents" do
@@ -1710,7 +1710,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
 
         let(:post) do
-          person.posts.create(text: "Testing")
+          person.posts.create!(text: "Testing")
         end
 
         it "raises an unsaved document error" do
@@ -1747,7 +1747,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "raises an error" do
             expect {
-              person.posts.create do |doc|
+              person.posts.create! do |doc|
                 doc._id = existing.id
               end
             }.to raise_error(Mongo::Error::OperationFailure)
@@ -3820,8 +3820,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       before do
         artist.albums << album
-        album.save
-        artist.save
+        album.save!
+        artist.save!
         expect(artist).not_to receive(:after_add_album)
       end
 
@@ -4064,7 +4064,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
 
     it 'saves the document correctly' do
-      expect(agent.save).to be(true)
+      expect(agent.save!).to be(true)
     end
   end
 
@@ -4087,6 +4087,39 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     it 'constructs the correct criteria' do
       expect(band.same_name).to eq([agent])
+    end
+  end
+
+  context "when removing a document with counter_cache on" do
+    let(:post) { Post.create! }
+    let(:person1) { Person.create! }
+    let(:person2) { Person.create! }
+
+    before do
+      post.update_attribute(:person, person1)
+      expect(person1.posts_count).to eq 1
+
+      person2
+      post.update_attribute(:person, person2)
+      person1.reload
+      expect(person1.posts_count).to eq 0
+      expect(person2.posts_count).to eq 1
+
+      post.update_attribute(:person, nil)
+      person1.reload
+      person2.reload
+    end
+
+    it "the count field is updated" do
+      expect(person2.posts_count).to eq 0
+    end
+  end
+
+  context "when there is a foreign key in the aliased associations" do
+    it "has the correct aliases" do
+      expect(Band.aliased_associations["artist_ids"]).to eq("artists")
+      expect(Artist.aliased_associations.key?("band_id")).to be false
+      expect(Artist.aliased_fields["band"]).to eq("band_id")
     end
   end
 end

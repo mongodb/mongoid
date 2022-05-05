@@ -40,6 +40,25 @@ describe Mongoid::Stateful do
     end
   end
 
+  describe '#previously_new_record?' do
+    it "returns correct values" do
+      person = Person.new
+      expect(person).not_to be_a_previously_new_record
+      person.save!
+      expect(person).to be_a_previously_new_record
+      person.title = "Title"
+      person.save!
+      expect(person).not_to be_a_previously_new_record
+    end
+
+    it "resets after reload" do
+      person = Person.create!
+      expect(person).to be_a_previously_new_record
+      person.reload
+      expect(person).not_to be_a_previously_new_record
+    end
+  end
+
   describe "#persisted?" do
 
     let(:person) do
@@ -52,13 +71,22 @@ describe Mongoid::Stateful do
 
     context "when the object has been destroyed" do
       before do
-        person.save
+        person.save!
         person.destroy
       end
 
       it "returns false" do
         expect(person).to_not be_persisted
       end
+    end
+  end
+
+  describe "#previously_persisted?" do
+    it "returns true after being destroyed" do
+      person = Person.create!
+      expect(person).not_to be_previously_persisted
+      person.destroy
+      expect(person).to be_previously_persisted
     end
   end
 

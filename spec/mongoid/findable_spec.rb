@@ -521,10 +521,10 @@ describe Mongoid::Findable do
   end
 
   context 'when Mongoid is configured to use activesupport time zone' do
+    config_override :use_utc, false
+    config_override :use_activesupport_time_zone, true
 
     before do
-      Mongoid.use_utc = false
-      Mongoid.use_activesupport_time_zone = true
       Time.zone = "Asia/Kolkata"
     end
 
@@ -534,8 +534,33 @@ describe Mongoid::Findable do
       end
     end
 
-    it 'uses activesupport time zone' do
-      expect(User.distinct(:last_login).first.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
+    context 'when distinct does not demongoize' do
+      config_override :legacy_pluck_distinct, true
+
+      let(:distinct) do
+        User.distinct(:last_login).first
+      end
+
+      it 'uses activesupport time zone' do
+        distinct.should be_a(ActiveSupport::TimeWithZone)
+        expect(distinct.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
+      end
+    end
+
+    context 'when distinct demongoizes' do
+      config_override :legacy_pluck_distinct, false
+
+      let(:distinct) do
+        User.distinct(:last_login).first
+      end
+
+      it 'uses activesupport time zone' do
+        distinct.should be_a(DateTime)
+        # Time and DateTime have different stringifications:
+        # 2022-03-16T21:12:32+00:00
+        # 2022-03-16 21:12:32 UTC
+        expect(distinct.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_datetime.to_s)
+      end
     end
 
     it 'loads other fields accurately' do
@@ -544,11 +569,8 @@ describe Mongoid::Findable do
   end
 
   context 'when Mongoid is not configured to use activesupport time zone' do
-
-    before do
-      Mongoid.use_utc = true
-      Mongoid.use_activesupport_time_zone = false
-    end
+    config_override :use_utc, true
+    config_override :use_activesupport_time_zone, false
 
     let!(:time) do
       Time.now.tap do |t|
@@ -556,8 +578,33 @@ describe Mongoid::Findable do
       end
     end
 
-    it 'uses utc' do
-      expect(User.distinct(:last_login).first.to_s).to eql(time.utc.to_s)
+    context 'when distinct does not demongoize' do
+      config_override :legacy_pluck_distinct, true
+
+      let(:distinct) do
+        User.distinct(:last_login).first
+      end
+
+      it 'uses utc' do
+        distinct.should be_a(Time)
+        expect(distinct.to_s).to eql(time.utc.to_s)
+      end
+    end
+
+    context 'when distinct demongoizes' do
+      config_override :legacy_pluck_distinct, false
+
+      let(:distinct) do
+        User.distinct(:last_login).first
+      end
+
+      it 'uses utc' do
+        distinct.should be_a(DateTime)
+        # Time and DateTime have different stringifications:
+        # 2022-03-16T21:12:32+00:00
+        # 2022-03-16 21:12:32 UTC
+        expect(distinct.to_s).to eql(time.utc.to_datetime.to_s)
+      end
     end
 
     it 'loads other fields accurately' do

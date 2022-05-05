@@ -449,7 +449,7 @@ describe Mongoid::Factory do
 
     context 'when type is correct but the instantiation raises a NoMethodError' do
       class BadPerson < Person
-        def self.instantiate(*args)
+        def self.instantiate_document(*args)
           call_some_nonexistent_method(*args)
           super
         end
@@ -469,6 +469,66 @@ describe Mongoid::Factory do
         }.to raise_exception(NoMethodError)
       end
 
+    end
+
+    context "when not deferring callbacks" do
+
+      let(:person) do
+        described_class.execute_from_db(Person, {}, execute_callbacks: true)
+      end
+
+      before do
+        Person.set_callback :initialize, :after do |doc|
+          doc.title = "Madam"
+        end
+
+        Person.set_callback :find, :after do |doc|
+          doc.ssn = 1234
+        end
+      end
+
+      after do
+        Person.reset_callbacks(:initialize)
+        Person.reset_callbacks(:find)
+      end
+
+      it "runs the initialize callbacks" do
+        expect(person.title).to eq("Madam")
+      end
+
+      it "runs the find callbacks" do
+        expect(person.ssn).to eq(1234)
+      end
+    end
+
+    context "when deferring callbacks" do
+
+      let(:person) do
+        described_class.execute_from_db(Person, {}, nil, nil, execute_callbacks: false)
+      end
+
+      before do
+        Person.set_callback :initialize, :after do |doc|
+          doc.title = "Madam"
+        end
+
+        Person.set_callback :find, :after do |doc|
+          doc.ssn = 1234
+        end
+      end
+
+      after do
+        Person.reset_callbacks(:initialize)
+        Person.reset_callbacks(:find)
+      end
+
+      it "runs the initialize callbacks" do
+        expect(person.title).to be nil
+      end
+
+      it "runs the find callbacks" do
+        expect(person.ssn).to be nil
+      end
     end
   end
 end

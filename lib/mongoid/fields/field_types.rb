@@ -39,14 +39,17 @@ module Mongoid
       }.with_indifferent_access.freeze
 
       def get(value)
+        value = value.to_sym if value.is_a?(String)
         mapping[value] || handle_unmapped_type(value)
       end
 
       def define(symbol, klass)
-        mapping[symbol] = klass
+        mapping[symbol.to_sym] = klass
       end
 
       delegate :delete, to: :mapping
+
+      private
 
       def mapping
         @mapping ||= DEFAULT_MAPPING.dup
@@ -56,16 +59,27 @@ module Mongoid
         return Object if type.nil?
 
         if type.is_a?(Module)
-          symbol = type.name.demodulize.underscore
-          Mongoid.logger.warn(
-            "Using a Class (#{type}) as the field :type option is deprecated and will be removed in Mongoid 8.0. " +
-            "Please use a Symbol (:#{symbol}) instead."
-          )
+          warn_class_type(type.name)
           return Mongoid::Boolean if type.to_s == 'Boolean'
           return type
         end
 
         nil
+      end
+
+      def warn_class_type(type)
+        return if warned_class_types.include?(type)
+        symbol = type.demodulize.underscore
+        Mongoid.logger.warn(
+          "Using a Class (#{type}) in the field :type option is deprecated " +
+          "and will be removed in a future major Mongoid version. " +
+          "Please use a Symbol (:#{symbol}) instead."
+        )
+        warned_class_types << type
+      end
+
+      def warned_class_types
+        @warned_class_types ||= []
       end
     end
   end

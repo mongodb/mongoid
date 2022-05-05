@@ -32,6 +32,8 @@ end
 class HabtmmSignature
   include Mongoid::Document
 
+  field :favorite_signature, default: ->{ contracts.first.signature_ids.first if contracts.first }
+
   has_and_belongs_to_many :contracts, class_name: 'HabtmmContract'
 
   field :name, type: :string
@@ -65,3 +67,26 @@ class HabtmmAnimal
 
   has_and_belongs_to_many :trainers, inverse_of: :animals, class_name: 'HabtmmTrainer', scope: -> { where(name: 'Dave') }
 end
+
+class HabtmmSchool
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  has_and_belongs_to_many :students, class_name: 'HabtmmStudent'
+
+  field :after_destroy_triggered, default: false
+
+  accepts_nested_attributes_for :students, allow_destroy: true
+end
+
+class HabtmmStudent
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  has_and_belongs_to_many :schools, class_name: 'HabtmmSchool'
+
+  after_destroy do |doc|
+    schools.first.update_attributes!(after_destroy_triggered: true) unless schools.empty?
+  end
+end
+

@@ -5,6 +5,9 @@ class Label
   include Mongoid::Timestamps::Updated::Short
 
   field :name, type: :string
+  field :sales, type: :big_decimal
+  field :age, type: :integer
+
   field :after_create_called, type: :boolean, default: false
   field :after_save_called, type: :boolean, default: false
   field :after_update_called, type: :boolean, default: false
@@ -44,6 +47,6 @@ class Label
 
   private
   def cleanup
-    self.name = self.name.downcase.capitalize
+    self.name = self.name.downcase.capitalize if self.name
   end
 end

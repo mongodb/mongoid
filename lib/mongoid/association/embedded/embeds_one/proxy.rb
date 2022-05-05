@@ -31,6 +31,7 @@ module Mongoid
               characterize_one(_target)
               bind_one
               characterize_one(_target)
+              update_attributes_hash(_target)
               _base._reset_memoized_descendants!
               _target.save if persistable?
             end
@@ -54,35 +55,41 @@ module Mongoid
                 # run the callbacks and state-changing code by passing persist: false in that case.
                 _target.destroy(persist: !replacement) if persistable?
 
-                # A little explanation on why this is needed... Say we have three assignments:
-                #
-                # canvas.palette = palette
-                # canvas.palette = nil
-                # canvas.palette = palette
-                # Where canvas embeds_one palette.
-                #
-                # Previously, what was happening was, on the first assignment,
-                # palette was considered a "new record" (new_record?=true) and
-                # thus palette was being inserted into the database. However,
-                # on the third assignment, we're trying to reassign the palette,
-                # palette is no longer considered a new record, because it had
-                # been inserted previously. This is not exactly accurate,
-                # because the second assignment ultimately removed the palette
-                # from the database, so it needs to be reinserted. Since the
-                # palette's new_record is false, Mongoid ends up "updating" the
-                # document, which doesn't reinsert it into the database.
-                #
-                # The change I introduce here, respecifies palette as a "new
-                # record" when it gets removed from the database, so if it is
-                # reassigned, it will be reinserted into the database.
-                _target.new_record = true
+                unless Mongoid.broken_updates
+                  # A little explanation on why this is needed... Say we have three assignments:
+                  #
+                  # canvas.palette = palette
+                  # canvas.palette = nil
+                  # canvas.palette = palette
+                  # Where canvas embeds_one palette.
+                  #
+                  # Previously, what was happening was, on the first assignment,
+                  # palette was considered a "new record" (new_record?=true) and
+                  # thus palette was being inserted into the database. However,
+                  # on the third assignment, we're trying to reassign the palette,
+                  # palette is no longer considered a new record, because it had
+                  # been inserted previously. This is not exactly accurate,
+                  # because the second assignment ultimately removed the palette
+                  # from the database, so it needs to be reinserted. Since the
+                  # palette's new_record is false, Mongoid ends up "updating" the
+                  # document, which doesn't reinsert it into the database.
+                  #
+                  # The change I introduce here, respecifies palette as a "new
+                  # record" when it gets removed from the database, so if it is
+                  # reassigned, it will be reinserted into the database.
+                  _target.new_record = true
+                end
               end
               unbind_one
-              return nil unless replacement
+              unless replacement
+                update_attributes_hash(replacement)
+                return nil
+              end
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
               self._target = replacement
-              bind_one
               characterize_one(_target)
+              bind_one
+              update_attributes_hash(_target)
               _target.save if persistable?
             end
             self
@@ -108,6 +115,20 @@ module Mongoid
           # @return [ true, false ] If the association is persistable.
           def persistable?
             _base.persisted? && !_binding? && !_building? && !_assigning?
+          end
+
+          # Update the _base's attributes hash with the _target's attributes
+          #
+          # @param replacement [ Document | nil ] The doc to use to update the
+          #   attributes hash.
+          #
+          # @api private
+          def update_attributes_hash(replacement)
+            if replacement
+              _base.attributes.merge!(_association.store_as => replacement.attributes)
+            else
+              _base.attributes.delete(_association.store_as)
+            end
           end
 
           class << self

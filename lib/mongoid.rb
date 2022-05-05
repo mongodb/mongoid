@@ -16,6 +16,7 @@ require "mongo"
 require 'mongo/active_support'
 
 require "mongoid/version"
+require "mongoid/deprecable"
 require "mongoid/config"
 require "mongoid/persistence_context"
 require "mongoid/loggable"

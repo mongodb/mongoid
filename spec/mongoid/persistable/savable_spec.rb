@@ -46,7 +46,7 @@ describe Mongoid::Persistable::Savable do
       context "when saving document that is a belongs to child" do
 
         let(:account) do
-          Account.create
+          Account.create!(name: 'Foobar')
         end
 
         let(:alert) do
@@ -482,7 +482,7 @@ describe Mongoid::Persistable::Savable do
 
         it "saves the document" do
           person.aliased_timestamp = Time.now
-          expect(person.save(validate: false)).to be true
+          expect(person.save!(validate: false)).to be true
         end
       end
     end
@@ -494,21 +494,26 @@ describe Mongoid::Persistable::Savable do
     end
 
     context "when validation context exists" do
+
       context "on new document" do
+
         it "returns true" do
           contextable_item.title = "sir"
           expect(contextable_item.save(context: :in_context)).to be true
         end
+
         it "returns false" do
           expect(contextable_item.save(context: :in_context)).to be false
         end
       end
 
       context "on persisted document" do
+
         it "returns true" do
           persisted_contextable_item.title = "lady"
           expect(persisted_contextable_item.save(context: :in_context)).to be true
         end
+
         it "returns false" do
           persisted_contextable_item.title = nil
           expect(persisted_contextable_item.save(context: :in_context)).to be false
@@ -626,7 +631,7 @@ describe Mongoid::Persistable::Savable do
     context "when the document has associations" do
 
       let!(:firefox) do
-        Firefox.create(name: "firefox")
+        Firefox.create!(name: "firefox")
       end
 
       let!(:writer) do

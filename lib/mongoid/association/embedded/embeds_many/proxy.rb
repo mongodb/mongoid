@@ -67,10 +67,11 @@ module Mongoid
           #
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
-            doc = Factory.build(type || _association.klass, attributes)
+            doc = Factory.execute_build(type || _association.klass, attributes, execute_callbacks: false)
             append(doc)
             doc.apply_post_processed_defaults
             yield(doc) if block_given?
+            doc.run_pending_callbacks
             doc.run_callbacks(:build) { doc }
             _base._reset_memoized_descendants!
             doc
@@ -94,6 +95,7 @@ module Mongoid
           # @return [ self ] The empty association.
           def clear
             batch_clear(_target.dup)
+            update_attributes_hash
             self
           end
 
@@ -135,20 +137,21 @@ module Mongoid
           #
           # @return [ Document, nil ] The deleted document or nil if nothing deleted.
           def delete(document)
-            execute_callback :before_remove, document
-            doc = _target.delete_one(document)
-            if doc && !_binding?
-              _unscoped.delete_one(doc)
-              if _assigning?
-                _base.add_atomic_pull(doc)
-              else
-                doc.delete(suppress: true)
-                unbind_one(doc)
+            execute_callbacks_around(:remove, document) do
+              doc = _target.delete_one(document)
+              if doc && !_binding?
+                _unscoped.delete_one(doc)
+                if _assigning?
+                  _base.add_atomic_pull(doc)
+                else
+                  doc.delete(suppress: true)
+                  unbind_one(doc)
+                end
+                update_attributes_hash
               end
+              reindex
+              doc
             end
-            reindex
-            execute_callback :after_remove, document
-            doc
           end
 
           # Delete all the documents in the association without running callbacks.
@@ -256,6 +259,7 @@ module Mongoid
                 integrate(doc)
                 doc._index = index
               end
+              update_attributes_hash
               @_unscoped = _target.dup
               @_target = scope(_target)
             end
@@ -291,6 +295,8 @@ module Mongoid
               end
             else
               delete(_target[-1])
+            end.tap do
+              update_attributes_hash
             end
           end
 
@@ -314,6 +320,8 @@ module Mongoid
               end
             else
               delete(_target[0])
+            end.tap do
+              update_attributes_hash
             end
           end
 
@@ -328,6 +336,7 @@ module Mongoid
           # @return [ Many ] The proxied association.
           def substitute(docs)
             batch_replace(docs)
+            update_attributes_hash
             self
           end
 
@@ -365,6 +374,7 @@ module Mongoid
             end
             _unscoped.push(document)
             integrate(document)
+            update_attributes_hash
             document._index = _unscoped.size - 1
             execute_callback :after_add, document
           end
@@ -398,6 +408,7 @@ module Mongoid
           def delete_one(document)
             _target.delete_one(document)
             _unscoped.delete_one(document)
+            update_attributes_hash
             reindex
           end
 
@@ -486,6 +497,7 @@ module Mongoid
             criteria = where(conditions || {})
             removed = criteria.size
             batch_remove(criteria, method)
+            update_attributes_hash
             removed
           end
 
@@ -511,12 +523,22 @@ module Mongoid
             @_unscoped = docs
           end
 
+          # Returns a list of attributes hashes for each document.
+          #
+          # @return [ Array<Hash> ] The list of attributes hashes
           def as_attributes
-            attributes = []
-            _unscoped.each do |doc|
-              attributes.push(doc.as_document)
+            _unscoped.map { |doc| doc.send(:as_attributes) }
+          end
+
+          # Update the _base's attributes hash with the _target's attributes
+          #
+          # @api private
+          def update_attributes_hash
+            if !_target.empty?
+              _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
+            else
+              _base.attributes.delete(_association.store_as)
             end
-            attributes
           end
 
           class << self

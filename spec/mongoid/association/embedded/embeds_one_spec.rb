@@ -953,4 +953,32 @@ describe Mongoid::Association::Embedded::EmbedsOne do
       expect(association.create_relation(owner, target)).to be_a(EmbeddedObject)
     end
   end
+
+  context "when multiple embeds_one associations reference the same class" do
+    let(:acme) { EomCompany.create(address: { city: 'Gotham' }, delivery_address: { city: 'Parcelville' }) }
+
+    context "when the first assignment is modified" do
+      before do
+        acme.update(address: EomAddress.new(city: 'Bigville'))
+        acme.reload
+      end
+
+      it "updates the correct association" do
+        expect(acme.address.city).to eq("Bigville")
+        expect(acme.delivery_address.city).to eq("Parcelville")
+      end
+    end
+
+    context "when the second assignment is modified" do
+      before do
+        acme.update(delivery_address: EomAddress.new(city: 'Bigville'))
+        acme.reload
+      end
+
+      it "updates the correct association" do
+        expect(acme.address.city).to eq("Gotham")
+        expect(acme.delivery_address.city).to eq("Bigville")
+      end
+    end
+  end
 end

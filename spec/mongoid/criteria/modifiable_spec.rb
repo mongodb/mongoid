@@ -12,7 +12,7 @@ describe Mongoid::Criteria::Modifiable do
 
     context "when provided valid attributes" do
       let(:band) do
-        criteria.create(genres: [ "electro" ])
+        criteria.create!(genres: [ "electro" ])
       end
 
       it "returns the created document" do
@@ -33,7 +33,7 @@ describe Mongoid::Criteria::Modifiable do
       context "when provided valid attributes & using block" do
 
         let(:band) do
-          criteria.create do |c|
+          criteria.create! do |c|
             c.genres = [ "electro" ]
           end
         end
@@ -63,7 +63,7 @@ describe Mongoid::Criteria::Modifiable do
       end
 
       let(:document) do
-        criteria.create
+        criteria.create!
       end
 
       it 'sets the polymorphic id' do

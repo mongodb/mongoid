@@ -166,32 +166,13 @@ describe Mongoid::Clients::Sessions do
         end
       end
     end
-
-    context 'when sessions are not supported' do
-      max_server_version '3.4'
-
-      let!(:error) do
-        e = nil
-        begin
-          Person.with_session {}
-        rescue => ex
-          e = ex
-        end
-        e
-      end
-
-      it 'raises a sessions not supported error' do
-        expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
-        expect(error.message).to include('not supported')
-      end
-    end
   end
 
   context 'when a session is used on a model instance' do
 
     let!(:person) do
       Person.with(client: :other) do |klass|
-        klass.create
+        klass.create!
       end
     end
 
@@ -212,9 +193,9 @@ describe Mongoid::Clients::Sessions do
         before do
           person.with_session do
             person.username = 'Emily'
-            person.save
+            person.save!
             person.age = 80
-            person.save
+            person.save!
           end
         end
 
@@ -235,8 +216,8 @@ describe Mongoid::Clients::Sessions do
             Post.with(client: :other) do
               person.with_session do
                 person.username = 'Emily'
-                person.save
-                person.posts << Post.create
+                person.save!
+                person.posts << Post.create!
               end
             end
           end
@@ -261,8 +242,8 @@ describe Mongoid::Clients::Sessions do
             begin
               person.with_session do
                 person.username = 'Emily'
-                person.save
-                person.posts << Post.create
+                person.save!
+                person.posts << Post.create!
               end
             rescue => ex
               e = ex
@@ -290,8 +271,8 @@ describe Mongoid::Clients::Sessions do
               person.with_session do
                 person.with_session do
                   person.username = 'Emily'
-                  person.save
-                  person.posts << Post.create
+                  person.save!
+                  person.posts << Post.create!
                 end
               end
             rescue => ex
@@ -310,25 +291,6 @@ describe Mongoid::Clients::Sessions do
             expect(update_events).to be_empty
           end
         end
-      end
-    end
-
-    context 'when sessions are not supported' do
-      max_server_version '3.4'
-
-      let!(:error) do
-        e = nil
-        begin
-          person.with_session {}
-        rescue => ex
-          e = ex
-        end
-        e
-      end
-
-      it 'raises a sessions not supported error' do
-        expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
-        expect(error.message).to include('not supported')
       end
     end
   end

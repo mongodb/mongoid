@@ -67,21 +67,43 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
-      context '$and to query with $and onto query whose first one is not $and' do
-        let(:query) do
-          Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
-        end
+      context "when broken_and feature flag is not set" do
+        config_override :broken_and, false
 
-        let(:modified) do
-          query.send(query_method, '$and', [{'foo' => 'bar'}])
-        end
+        context '$and to query with $and onto query whose first one is not $and' do
+          let(:query) do
+            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
+          end
 
-        it 'adds to existing $and' do
-          modified.selector.should == {
-            '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
+          let(:modified) do
+            query.send(query_method, '$and', [{'foo' => 'bar'}])
+          end
+
+          it 'adds to existing $and' do
+            modified.selector.should == {
+              '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
+          end
         end
       end
 
+      context "when broken_and feature flag is set" do
+        config_override :broken_and, true
+
+        context '$and to query with $and onto query whose first one is not $and' do
+          let(:query) do
+            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
+          end
+
+          let(:modified) do
+            query.send(query_method, '$and', [{'foo' => 'bar'}])
+          end
+
+          it 'does not add to existing $and' do
+            modified.selector.should == {
+              '$and' => [{'foo' => 'bar'}], 'foo' => 'baz'}
+          end
+        end
+      end
     end
 
     context '$or operator' do

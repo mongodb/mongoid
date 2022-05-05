@@ -114,7 +114,8 @@ module Mongoid
                   rel.as == name &&
                   rel.relation_class_name == inverse_class_name
             end
-            matches.collect { |m| m.name }
+
+            matches.map { |m| m.name }
           end
         end
 

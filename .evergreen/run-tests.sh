@@ -66,6 +66,9 @@ elif test "$DRIVER" = "oldstable"; then
 elif test "$DRIVER" = "min"; then
   bundle install --gemfile=gemfiles/driver_min.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_min.gemfile
+elif test "$DRIVER" = "bson-min"; then
+  bundle install --gemfile=gemfiles/bson_min.gemfile
+  BUNDLE_GEMFILE=gemfiles/bson_min.gemfile
 elif test "$DRIVER" = "stable-jruby"; then
   bundle install --gemfile=gemfiles/driver_stable_jruby.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_stable_jruby.gemfile
@@ -96,7 +99,7 @@ set +e
 if test -n "$TEST_CMD"; then
   eval $TEST_CMD
 elif test -n "$TEST_I18N_FALLBACKS"; then
-  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
+  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb
 elif test -n "$APP_TESTS"; then
   # Need recent node for rails
   export N_PREFIX=$HOME/.n
@@ -104,7 +107,7 @@ elif test -n "$APP_TESTS"; then
   bash $HOME/n stable
   export PATH=$HOME/.n/bin:$PATH
   npm -g install yarn
-  
+
   bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake ci
@@ -118,6 +121,6 @@ if test -f tmp/rspec-all.json; then
   mv tmp/rspec-all.json tmp/rspec.json
 fi
 
-python -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
+python2 -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
 
 exit ${test_status}

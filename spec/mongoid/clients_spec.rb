@@ -791,11 +791,11 @@ describe Mongoid::Clients do
         end
       end
 
-      describe ".create" do
+      describe ".create!" do
 
         let!(:band) do
           Band.with(database: database_id_alt) do |klass|
-            klass.create
+            klass.create!
           end
         end
 
@@ -829,11 +829,11 @@ describe Mongoid::Clients do
 
     context "when sending operations to a different collection" do
 
-      describe ".create" do
+      describe ".create!" do
 
         let!(:band) do
           Band.with(collection: "artists") do |klass|
-            klass.create
+            klass.create!
           end
         end
 
@@ -944,7 +944,7 @@ describe Mongoid::Clients do
       describe ".save" do
 
         before do
-          Person.create(ssn: "432-97-1113")
+          Person.create!(ssn: "432-97-1113")
         end
 
         context "when a mongodb error occurs" do
@@ -1012,6 +1012,36 @@ describe Mongoid::Clients do
         end
       end
     end
+
+    context 'when requesting named client' do
+      let(:secondary_client) do
+        double(Mongo::Client).tap do |client|
+          allow(client).to receive(:cluster).and_return(double("cluster"))
+        end
+      end
+
+      before do
+        expect(Mongoid::Clients::Factory).to receive(:create)
+          .with(:secondary)
+          .and_return(secondary_client)
+      end
+
+      after do
+        Mongoid::Clients.clients.delete(:secondary)
+      end
+
+      it 'does not close the client' do
+        expect(secondary_client).not_to receive(:close)
+
+        Band.with(client: :default) do |klass|
+          klass.mongo_client
+        end
+
+        Band.with(client: :secondary) do |klass|
+          klass.mongo_client
+        end
+      end
+    end
   end
 
   context "when overriding the default database" do
@@ -1037,7 +1067,7 @@ describe Mongoid::Clients do
       end
 
       let!(:band) do
-        Band.create(name: "Tool")
+        Band.create!(name: "Tool")
       end
 
       it "persists to the overridden database" do

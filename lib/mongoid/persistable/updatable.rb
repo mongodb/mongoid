@@ -102,6 +102,7 @@ module Mongoid
               _mongoid_run_child_callbacks(:save) do
                 _mongoid_run_child_callbacks(:update) do
                   result = yield(self)
+                  self.previously_new_record = false
                   post_process_persist(result, options)
                   true
                 end

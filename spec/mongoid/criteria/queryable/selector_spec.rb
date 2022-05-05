@@ -387,8 +387,20 @@ describe Mongoid::Criteria::Queryable::Selector do
             selector.send(method, "key", array)
           end
 
-          it "serializes each element in the array" do
-            expect(selector["key"]).to eq([ big_one.to_s, big_two.to_s ])
+          context 'when serializing bigdecimal to string' do
+            config_override :map_big_decimal_to_decimal128, false
+
+            it "serializes each element in the array" do
+              expect(selector["key"]).to eq([ big_one.to_s, big_two.to_s ])
+            end
+          end
+
+          context 'when serializing bigdecimal to decimal128' do
+            config_override :map_big_decimal_to_decimal128, true
+
+            it "serializes each element in the array" do
+              expect(selector["key"]).to eq([ BSON::Decimal128.new(big_one), BSON::Decimal128.new(big_two)])
+            end
           end
         end
       end

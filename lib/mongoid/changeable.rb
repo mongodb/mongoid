@@ -69,6 +69,7 @@ module Mongoid
     #   person.move_changes
     def move_changes
       @previous_changes = changes
+      @previous_attributes = attributes.dup
       Atomic::UPDATES.each do |update|
         send(update).clear
       end
@@ -133,6 +134,13 @@ module Mongoid
 
     private
 
+    # Get attributes of the document before the document was saved.
+    #
+    # @return [ Hash ] Previous attributes
+    def previous_attributes
+      @previous_attributes ||= {}
+    end
+
     # Get the old and new value for the provided attribute.
     #
     # @example Get the attribute change.
@@ -183,6 +191,25 @@ module Mongoid
     def attribute_was(attr)
       attr = database_field_name(attr)
       attribute_changed?(attr) ? changed_attributes[attr] : attributes[attr]
+    end
+
+    # Get the previous attribute value that was changed
+    # before the document was saved.
+    #
+    # It the document has not been saved yet, or was just loaded from database,
+    # this method returns nil for all attributes.
+    #
+    # @param [ String ] attr The attribute name.
+    #
+    # @return [ Object | nil ] Attribute value before the document was saved,
+    #   or nil if the document has not been saved yet.
+    def attribute_previously_was(attr)
+      attr = database_field_name(attr)
+      if previous_changes.key?(attr)
+        previous_changes[attr].first
+      else
+        previous_attributes[attr]
+      end
     end
 
     # Flag an attribute as going to change.
@@ -291,7 +318,7 @@ module Mongoid
         end
       end
 
-      # Creates the dirty change previous value accessor.
+      # Creates the dirty change previous value accessors.
       #
       # @example Create the accessor.
       #   Model.create_dirty_previous_value_accessor("name", "alias")
@@ -302,6 +329,9 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method("#{meth}_was") do
             attribute_was(name)
+          end
+          re_define_method("#{meth}_previously_was") do
+            attribute_previously_was(name)
           end
         end
       end

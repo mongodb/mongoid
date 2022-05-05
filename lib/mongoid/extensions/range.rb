@@ -44,9 +44,13 @@ module Mongoid
         #
         # @param [ Hash ] object The object to demongoize.
         #
-        # @return [ Range ] The range.
+        # @return [ Range | nil ] The range, or nil if object cannot be represented as range.
+        #
+        # @note Ruby 2.6 and lower do not support endless ranges that Ruby 2.7+ support.
         def demongoize(object)
           object.nil? ? nil : ::Range.new(object["min"], object["max"], object["exclude_end"])
+        rescue ArgumentError # can be removed when Ruby version >= 2.7
+          nil
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -59,12 +63,30 @@ module Mongoid
         #
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
-          return nil if object.nil?
-          return object if object.is_a?(::Hash)
-          return object if object.is_a?(String)
-          hash = { "min" => object.first, "max" => object.last }
+          case object
+          when NilClass then nil
+          when String then object
+          when Hash then __mongoize_hash__(object)
+          else __mongoize_range__(object)
+          end
+        end
+
+        private
+
+        def __mongoize_hash__(object)
+          hash = object.stringify_keys
+          hash.slice!('min', 'max', 'exclude_end')
+          hash.compact!
+          hash.transform_values!(&:mongoize)
+          hash
+        end
+
+        def __mongoize_range__(object)
+          hash = {}
+          hash['min'] = object.begin.mongoize if object.begin
+          hash['max'] = object.end.mongoize if object.end
           if object.respond_to?(:exclude_end?) && object.exclude_end?
-            hash.merge!("exclude_end" => true)
+            hash['exclude_end'] = true
           end
           hash
         end

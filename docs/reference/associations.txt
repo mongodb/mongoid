@@ -27,7 +27,7 @@ a separate collection. The child is optional by default:
 
   class Band
     include Mongoid::Document
-    
+
     has_one :studio
   end
 
@@ -38,7 +38,7 @@ association with the parent:
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band
   end
 
@@ -59,9 +59,9 @@ Use validations to require that the child is present:
 
   class Band
     include Mongoid::Document
-    
+
     has_one :studio
-    
+
     validates_presence_of :studio
   end
 
@@ -76,7 +76,7 @@ children stored in a separate collection:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :members
   end
 
@@ -87,7 +87,7 @@ association with the parent:
 
   class Member
     include Mongoid::Document
-    
+
     belongs_to :band
   end
 
@@ -108,9 +108,9 @@ Use validations to require that at least one child is present:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :members
-    
+
     validates_presence_of :members
   end
 
@@ -147,7 +147,7 @@ filtering with a block:
 
   class Drummer < Member
   end
-  
+
   band = Band.first
   band.members.any?(Drummer)
 
@@ -159,9 +159,9 @@ documents and does not query the database:
   band = Band.first
   # Queries the database
   band.members.any?
-  
+
   band.members.to_a
-  
+
   # Does not query the database
   band.members.any?
 
@@ -188,15 +188,15 @@ The following example illustrates the difference between ``exists?`` and
   band = Band.create!
   # Member is not persisted.
   band.members.build
-  
+
   band.members.any?
   # => true
   band.members.exists?
   # => false
-  
+
   # Persist the member.
   band.members.map(&:save!)
-  
+
   band.members.any?
   # => true
   band.members.exists?
@@ -218,16 +218,16 @@ option to make the instances persistable without specifying the parent:
 
   class Band
     include Mongoid::Document
-    
+
     has_one :studio
   end
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band, optional: true
   end
-  
+
   studio = Studio.create!
   # => #<Studio _id: 600118184896684987aa884f, band_id: nil>
 
@@ -249,7 +249,7 @@ but the parent is accessible from the child:
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band
   end
 
@@ -264,7 +264,7 @@ the parent does not define the association:
 
   class Studio
     include Mongoid::Document
-    
+
     belongs_to :band, inverse_of: nil
   end
 
@@ -279,13 +279,13 @@ association:
 
   class Band
     include Mongoid::Document
-    
+
     has_and_belongs_to_many :tags
   end
 
   class Tag
     include Mongoid::Document
-    
+
     has_and_belongs_to_many :bands
   end
 
@@ -295,7 +295,7 @@ Both model instances store a list of ids of the associated models, if any:
 
   band = Band.create!(tags: [Tag.create!])
   # => #<Band _id: 60011d554896684b8b910a2a, tag_ids: [BSON::ObjectId('60011d554896684b8b910a29')]>
-  
+
   band.tags
   # => [#<Tag _id: 60011d554896684b8b910a29, band_ids: [BSON::ObjectId('60011d554896684b8b910a2a')]>]
 
@@ -306,7 +306,7 @@ the ids only in one document using the ``inverse_of: nil`` option:
 
   class Band
     include Mongoid::Document
-    
+
     has_and_belongs_to_many :tags, inverse_of: nil
   end
 
@@ -323,6 +323,12 @@ the ids only in one document using the ``inverse_of: nil`` option:
 A one-sided ``has_and_belongs_to_many`` association is, naturally, only
 usable from the model where it is defined.
 
+.. note::
+
+  Given two models, A and B where A ``has_and_belongs_to_many`` B,
+  when adding a document of type B to the HABTM association on a document of
+  type A, Mongoid will not update the ``updated_at`` field for the document of
+  type A, but will update the ``updated_at`` field for the document of type B.
 
 Querying Referenced Associations
 --------------------------------
@@ -344,27 +350,27 @@ For example, given the following models:
 
   class Band
     include Mongoid::Document
-    
+
     has_many :tours
     has_many :awards
-    
-    field :name, type: :string
+
+    field :name, type: String
   end
 
   class Tour
     include Mongoid::Document
-    
+
     belongs_to :band
-    
-    field :year, type: :integer
+
+    field :year, type: Integer
   end
 
   class Award
     include Mongoid::Document
-    
+
     belongs_to :band
-    
-    field :name, type: :string
+
+    field :name, type: String
   end
 
 One could retrieve all bands that have toured since 2000 as follows:
@@ -554,7 +560,7 @@ often a good idea to use embedded associations.
 
 Using embedded associations allows using MongoDB tools like the
 `aggregation pipeline
-<https://docs.mongodb.com/manual/core/aggregation-pipeline/>`_ to query
+<https://mongodb.com/docs/manual/core/aggregation-pipeline/>`_ to query
 these documents in a powerful way.
 
 Because embedded documents are stored as part of their parent top-level
@@ -584,6 +590,58 @@ help of MongoDB projection operation:
   #  "filter"=>{"started_on"=>{"$gt"=>2018-07-01 00:00:00 UTC}},
   #  "projection"=>{"_id"=>1, "label"=>1}}
   Band.where(started_on: {'$gt' => Time.now - 1.year}).only(:label).map(&:label).compact.uniq
+
+Setting Stale Values on Referenced Associations
+``````````````````````````````````````````````
+
+Setting a stale value to a referenced association can sometimes result in
+a ``nil`` value being persisted to the database. Take the following case:
+
+.. code-block:: ruby
+
+  class Post
+    include Mongoid::Document
+
+    has_one :comment, inverse_of: :post
+  end
+
+  class Comment
+    include Mongoid::Document
+
+    belongs_to :post, inverse_of: :comment, optional: true
+  end
+
+  post.comment = comment1
+  post.reload
+
+At this point, ``post.comment`` is set to ``comment1``, however since a reload
+happened, ``post.comment`` does not refer to the same object as ``comment1``.
+Meaning, updating one object does not implicitly update the other. This matters
+for the next operation:
+
+.. code-block:: ruby
+
+  post.comment = comment2
+  post.reload
+
+Now, ``post.comment`` is set to ``comment2``, and the ``post_id`` of the old
+comment is set to ``nil``. However, the value that was assigned to
+``post.comment`` did not refer to the same object as ``comment1``, therefore,
+while the old value of ``post.comment`` was updated to have a ``nil``
+``post_id``, ``comment1`` still has the ``post_id`` set.
+
+.. code-block:: ruby
+
+  post.comment = comment1
+  post.reload
+
+Finally, this last assignment attempts to set the ``post_id`` on ``comment1``,
+which should be ``nil`` at this point, but is set to the old ``post_id``.
+During this operation, the ``post_id`` is cleared from ``comment2``, and the
+new ``post_id`` is set on ``comment1``. However, since the ``post_id`` was
+already set on ``comment1``, nothing is persisted, and we end up with both
+comments having a ``nil`` ``post_id``. At this point, running ``post.comment``
+returns ``nil``.
 
 
 Querying Embedded Associations
@@ -644,8 +702,8 @@ is not implemented for :ref:`text search <text-search>`, :manual:`geospatial que
 operators </reference/operator/query-geospatial/>`,
 operators that execute JavaScript code (:manual:`$where </reference/operator/query/where/>`)
 and operators that are implemented via other server functionality such as
-:manual:`$expr <https://docs.mongodb.com/manual/reference/operator/query/expr/>`
-and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/>`.
+:manual:`$expr <https://mongodb.com/docs/manual/reference/operator/query/expr/>`
+and :manual:`$jsonSchema <https://mongodb.com/docs/manual/reference/operator/query/jsonSchema/>`.
 
 The following operators are supported:
 
@@ -683,7 +741,7 @@ The following deviations are known:
   As such, it is possible for Mongoid to deviate from server behavior if
   the server itself behaves differently in different versions. All operators are implemented in
   Mongoid regardless of backing deployment's server version.
-  
+
   As of this writing, the known cases of such deviation are:
 
    - 3.2 and earlier servers not validating ``$size`` arguments as strictly as newer versions do.
@@ -725,16 +783,16 @@ and remove the default value:
 
   class Order
     include Mongoid::Document
-    
+
     embeds_many :line_items
   end
-  
+
   class LineItem
     include Mongoid::Document
-    
+
     embedded_in :order
     
-    field :_id, type: :object
+    field :_id, type: Object
   end
 
 In the current version of Mongoid the field definition is required, but
@@ -774,11 +832,11 @@ document's ``_id``:
 
   band = Band.find(...)
   band.tours << Tour.new(...)
-  
+
   unsaved_band = Band.new(id: band.id, tours: [Tour.new])
   # Removes all tours from the persisted band due to _id match.
   unsaved_band.tours.clear
-  
+
   band.tours
   # => []
 
@@ -988,6 +1046,7 @@ documents which satisfy the scope condition.. The scope may be either:
   associated model.
 
 .. code-block:: ruby
+
   class Trainer
     has_many :pets, scope: -> { where(species: 'dog') }
     has_many :toys, scope: :rubber
@@ -1177,8 +1236,8 @@ to be deleted. The options are as follows:
 - ``:restrict_with_exception``: ``raise`` an error if the child is not empty.
 - ``:restrict_with_error``: Cancel operation and return false if the child is not empty.
 
-If no ``:dependent`` option is provided, deleting the parent record leaves the child record unmodified 
-(in other words, the child record continues to reference the now deleted parent record via the foreign key field). 
+If no ``:dependent`` option is provided, deleting the parent record leaves the child record unmodified
+(in other words, the child record continues to reference the now deleted parent record via the foreign key field).
 The child may become orphaned if it is ordinarily only referenced via the parent.
 
 .. code-block:: ruby
@@ -1205,30 +1264,101 @@ The child may become orphaned if it is ordinarily only referenced via the parent
 
    Band.first.delete # Will delete all associated albums.
 
+
 Autosaving
 ----------
 
-One core difference between Mongoid and Active Record from a behavior standpoint
-is that Mongoid does not automatically save associated documents for
-non-embedded associations. This is for performance reasons.
+One core difference between Mongoid and ActiveRecord is that Mongoid does not
+automatically save associated documents for referenced (i.e., non-embedded)
+associations when the parent is saved, for performance reasons.
 
-To enable an autosave on a non-embedded association (embedded associations do not need
-this since they are actually part of the parent in the database) add the autosave
-option to the association.
-
-Note that autosave functionality will automatically be added to an association when using
-``accepts_nested_attributes_for`` or validating presence of the association.
+If autosaving is not used, it is possible to create dangling references
+to non-existent documents via associations:
 
 .. code-block:: ruby
 
-   class Band
-     include Mongoid::Document
-     has_many :albums, autosave: true
-   end
+  class Band
+    include Mongoid::Document
 
-   band = Band.first
-   band.albums.build(name: "101")
-   band.save # Will save the album as well.
+    has_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+
+    belongs_to :band
+  end
+
+  band = Band.new
+  album = Album.create!(band: band)
+
+  # The band is not persisted at this point.
+
+  album.reload
+
+  album.band_id
+  # => BSON::ObjectId('6257699753aefe153121a3d5')
+
+  # Band does not exist.
+  album.band
+  # => nil
+
+To make referenced associations save automatically when the parent is saved,
+add the ``:autosave`` option to the association:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    has_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+
+    belongs_to :band, autosave: true
+  end
+
+  band = Band.new
+  album = Album.create!(band: band)
+
+  # The band is persisted at this point.
+
+  album.reload
+
+  album.band_id
+  # => BSON::ObjectId('62576b4b53aefe178b65b8e3')
+
+  album.band
+  # => #<Band _id: 62576b4b53aefe178b65b8e3, >
+
+The autosaving functionality is automatically added to an association when
+using ``accepts_nested_attributes_for``, so that the application does not
+need to track which associations were modified when processing a form
+submission.
+
+Embedded associations always autosave, because they are stored as part of the
+parent document.
+
+Some operations on associations always save the parent and the child documents
+as part of the operation, regardless of whether autosaving is enabled.
+A non-exhaustive list of these operations is as follows:
+
+- Assignment to the association:
+
+  .. code-block:: ruby
+
+    # Saves the band and the album.
+    band.albums = [Album.new]
+
+- ``push``, ``<<``:
+
+  .. code-block:: ruby
+
+    band.albums << Album.new
+    band.albums.push(Album.new)
+
 
 Existence Predicates
 --------------------
@@ -1300,7 +1430,7 @@ be touched on the parent association in addition to updated_at:
     include Mongoid::Document
     belongs_to :label, touch: :bands_updated_at
   end
-  
+
   label = Label.create!
   band = Band.create!(label: label)
 
@@ -1356,9 +1486,9 @@ accessed, depending on the association:
   class Order
     include Mongoid::Document
     belongs_to :customer
-    
+
     private
-    
+
     def internal_status
       'new'
     end
@@ -1367,21 +1497,21 @@ accessed, depending on the association:
   class Customer
     include Mongoid::Document
     has_many :orders
-    
+
     private
-    
+
     def internal_id
       42
     end
   end
-  
+
   order = Order.new
   customer = Customer.create!(orders: [order])
-  
+
   # has_many does not permit calling private methods on the target
   customer.orders.first.internal_status
   # NoMethodError (private method `internal_status' called for #<Order:0x000055af2ec46c50>)
-  
+
   # belongs_to permits calling private methods on the target
   order.customer.internal_id
   # => 42
@@ -1585,9 +1715,9 @@ Mongoid provides limited support for constructing the aggregation pipeline
 itself using a high-level DSL. The following aggregation pipeline operators
 are supported:
 
-- `$group <https://docs.mongodb.com/manual/reference/operator/aggregation/group/>`_
-- `$project <https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_
-- `$unwind <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_
+- `$group <https://mongodb.com/docs/manual/reference/operator/aggregation/group/>`_
+- `$project <https://mongodb.com/docs/manual/reference/operator/aggregation/project/>`_
+- `$unwind <https://mongodb.com/docs/manual/reference/operator/aggregation/unwind/>`_
 
 To construct a pipeline, call the corresponding aggregation pipeline methods
 on a ``Criteria`` instance. Aggregation pipeline operations are added to the
@@ -1600,19 +1730,19 @@ For example, given the following models:
 
   class Tour
     include Mongoid::Document
-    
+
     embeds_many :participants
     
-    field :name, type: :string
-    field :states, type: :array
+    field :name, type: String
+    field :states, type: Array
   end
-  
+
   class Participant
     include Mongoid::Document
-    
+
     embedded_in :tour
     
-    field :name, type: :string
+    field :name, type: String
   end
 
 We could find out which states a participant visited:
@@ -1623,20 +1753,20 @@ We could find out which states a participant visited:
     unwind(:states).
     group(_id: 'states', :states.add_to_set => '$states').
     project(_id: 0, states: 1)
-  
+
   pp criteria.pipeline
   # => [{"$match"=>{"participants.name"=>"Serenity"}},
   #     {"$unwind"=>"$states"},
   #     {"$group"=>{"_id"=>"states", "states"=>{"$addToSet"=>"$states"}}},
   #     {"$project"=>{"_id"=>0, "states"=>1}}]
-  
+
   Tour.collection.aggregate(criteria.pipeline).to_a
 
 group
 `````
 
 The ``group`` method adds a `$group aggregation pipeline stage
-<https://docs.mongodb.com/manual/reference/operator/aggregation/group/>`_.
+<https://mongodb.com/docs/manual/reference/operator/aggregation/group/>`_.
 
 The field expressions support Mongoid symbol-operator syntax:
 
@@ -1656,7 +1786,7 @@ project
 ```````
 
 The ``project`` method adds a `$project aggregation pipeline stage
-<https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_.
+<https://mongodb.com/docs/manual/reference/operator/aggregation/project/>`_.
 
 The argument should be a Hash specifying the projection:
 
@@ -1672,7 +1802,7 @@ unwind
 ``````
 
 The ``unwind`` method adds an `$unwind aggregation pipeline stage
-<https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_.
+<https://mongodb.com/docs/manual/reference/operator/aggregation/unwind/>`_.
 
 The argument can be a field name, specifiable as a symbol or a string, or
 a Hash or a ``BSON::Document`` instance:
@@ -1683,7 +1813,7 @@ a Hash or a ``BSON::Document`` instance:
     criteria = Tour.all.unwind('states')
     criteria.pipeline
     # => [{"$unwind"=>"$states"}]
-    
+
     criteria = Tour.all.unwind(path: '$states')
     criteria.pipeline
     # => [{"$unwind"=>{:path=>"$states"}}]

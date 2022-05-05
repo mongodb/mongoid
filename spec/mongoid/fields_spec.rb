@@ -3,10 +3,7 @@
 require "spec_helper"
 
 describe Mongoid::Fields do
-
-  before(:all) do
-    Mongoid.use_activesupport_time_zone = false
-  end
+  config_override :use_activesupport_time_zone, false
 
   describe "#\{field}_translations" do
 
@@ -109,7 +106,7 @@ describe Mongoid::Fields do
         context "when saving the new translations" do
 
           before do
-            product.save
+            product.save!
           end
 
           it "persists the changes" do
@@ -120,7 +117,7 @@ describe Mongoid::Fields do
 
             before do
               product.description_translations = { "en" => "overwritten" }
-              product.save
+              product.save!
             end
 
             it "persists the changes" do
@@ -151,7 +148,7 @@ describe Mongoid::Fields do
         context "when saving the new translations" do
 
           before do
-            dictionary.save
+            dictionary.save!
           end
 
           it "persists the changes" do
@@ -164,7 +161,7 @@ describe Mongoid::Fields do
 
             before do
               dictionary.description_translations = { "en" => "overwritten" }
-              dictionary.save
+              dictionary.save!
             end
 
             it "persists the changes" do
@@ -333,68 +330,55 @@ describe Mongoid::Fields do
         end
       end
 
-      it "converts :array to Array" do
-        expect(klass.field(:test, type: :array).type).to be(Array)
+      {
+        array: Array,
+        bigdecimal: BigDecimal,
+        big_decimal: BigDecimal,
+        binary: BSON::Binary,
+        boolean: Mongoid::Boolean,
+        date: Date,
+        datetime: DateTime,
+        date_time: DateTime,
+        decimal128: BSON::Decimal128,
+        double: Float,
+        float: Float,
+        hash: Hash,
+        integer: Integer,
+        object: Object,
+        object_id: BSON::ObjectId,
+        range: Range,
+        regexp: Regexp,
+        set: Set,
+        string: String,
+        stringified_symbol: Mongoid::StringifiedSymbol,
+        symbol: Symbol,
+        time: Time,
+        time_with_zone: ActiveSupport::TimeWithZone
+      }.each do |field_type, field_klass|
+
+        it "converts Symbol :#{field_type} to #{field_klass}" do
+          expect(klass.field(:test, type: field_type).type).to be(field_klass)
+        end
+
+        it "converts String \"#{field_type}\" to #{field_klass}" do
+          expect(klass.field(:test, type: field_type.to_s).type).to be(field_klass)
+        end
       end
 
-      it "converts :big_decimal to BigDecimal" do
-        expect(klass.field(:test, type: :big_decimal).type).to be(BigDecimal)
+      context 'when using an unknown symbol' do
+        it 'raises InvalidFieldType' do
+          lambda do
+            klass.field(:test, type:  :bogus)
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field :test with an unknown :type value :bogus/)
+        end
       end
 
-      it "converts :binary to BSON::Binary" do
-        expect(klass.field(:test, type: :binary).type).to be(BSON::Binary)
-      end
-
-      it "converts :boolean to Mongoid::Boolean" do
-        expect(klass.field(:test, type: :boolean).type).to be(Mongoid::Boolean)
-      end
-
-      it "converts :date to Date" do
-        expect(klass.field(:test, type: :date).type).to be(Date)
-      end
-
-      it "converts :date_time to DateTime" do
-        expect(klass.field(:test, type: :date_time).type).to be(DateTime)
-      end
-
-      it "converts :float to Float" do
-        expect(klass.field(:test, type: :float).type).to be(Float)
-      end
-
-      it "converts :hash to Hash" do
-        expect(klass.field(:test, type: :hash).type).to be(Hash)
-      end
-
-      it "converts :integer to Integer" do
-        expect(klass.field(:test, type: :integer).type).to be(Integer)
-      end
-
-      it "converts :object_id to BSON::ObjectId" do
-        expect(klass.field(:test, type: :object_id).type).to be(BSON::ObjectId)
-      end
-
-      it "converts :range to Range" do
-        expect(klass.field(:test, type: :range).type).to be(Range)
-      end
-
-      it "converts :regexp to Rexegp" do
-        expect(klass.field(:test, type: :regexp).type).to be(Regexp)
-      end
-
-      it "converts :set to Set" do
-        expect(klass.field(:test, type: :set).type).to be(Set)
-      end
-
-      it "converts :string to String" do
-        expect(klass.field(:test, type: :string).type).to be(String)
-      end
-
-      it "converts :symbol to Symbol" do
-        expect(klass.field(:test, type: :symbol).type).to be(Symbol)
-      end
-
-      it "converts :time to Time" do
-        expect(klass.field(:test, type: :time).type).to be(Time)
+      context 'when using an unknown string' do
+        it 'raises InvalidFieldType' do
+          lambda do
+            klass.field(:test, type:  'bogus')
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field :test with an unknown :type value "bogus"/)
+        end
       end
     end
 
@@ -620,14 +604,14 @@ describe Mongoid::Fields do
 
       before do
         product.stores = [ "kadewe", "karstadt" ]
-        product.save
+        product.save!
       end
 
       context "when setting the value to nil" do
 
         before do
           product.stores = nil
-          product.save
+          product.save!
         end
 
         it "allows the set" do
@@ -639,7 +623,7 @@ describe Mongoid::Fields do
 
         before do
           product.stores = [ "kadewe", nil ]
-          product.save
+          product.save!
         end
 
         it "allows the set of nil values" do
@@ -655,7 +639,7 @@ describe Mongoid::Fields do
 
         before do
           product.stores = [ "karstadt", "kadewe" ]
-          product.save
+          product.save!
         end
 
         it "reverses the values" do
@@ -871,25 +855,23 @@ describe Mongoid::Fields do
     end
 
     context "when field already exist and validate_duplicate is enable" do
+      context 'when exception is enabled' do
+        config_override :duplicate_fields_exception, true
 
-      before do
-        Mongoid.duplicate_fields_exception = true
+        it "raises an error" do
+          expect {
+            Person.field(:title)
+          }.to raise_error(Mongoid::Errors::InvalidField)
+        end
       end
 
-      after do
-        Mongoid.duplicate_fields_exception = false
-      end
-
-      it "raises an error" do
-        expect {
-          Person.field(:title)
-        }.to raise_error(Mongoid::Errors::InvalidField)
-      end
-
-      it "doesn't raise an error" do
-        expect {
-          Class.new(Person)
-        }.to_not raise_error
+      context 'when exception is disabled' do
+        config_override :duplicate_fields_exception, false
+        it "doesn't raise an error" do
+          expect {
+            Class.new(Person)
+          }.to_not raise_error
+        end
       end
     end
 
@@ -1234,71 +1216,147 @@ describe Mongoid::Fields do
 
   context "when a field is defined as a big decimal" do
 
-    let(:band) do
-      Band.new(name: "Tool")
+    context 'when Mongoid.map_big_decimal_to_decimal128 is false' do
+      config_override :map_big_decimal_to_decimal128, false
+
+      let(:band) do
+        Band.new(name: "Tool")
+      end
+
+      let(:decimal) do
+        BigDecimal("1000000.00")
+      end
+
+      context "when setting to a big decimal" do
+
+        before do
+          band.sales = decimal
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a string" do
+
+        before do
+          band.sales = decimal.to_s
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to an integer" do
+
+        before do
+          band.sales = decimal.to_i
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq("1000000")
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
+
+      context "when setting to a float" do
+
+        before do
+          band.sales = decimal.to_f
+        end
+
+        it "properly persists as a string" do
+          expect(band.attributes["sales"]).to eq(decimal.to_s)
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
+      end
     end
 
-    let(:decimal) do
-      BigDecimal("1000000.00")
-    end
+    context 'when Mongoid.map_big_decimal_to_decimal128 is true' do
+      config_override :map_big_decimal_to_decimal128, true
 
-    context "when setting to a big decimal" do
-
-      before do
-        band.sales = decimal
+      let(:band) do
+        Band.new(name: "Tool")
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
+      let(:decimal) do
+        BigDecimal("1000000.00")
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
+      context "when setting to a big decimal" do
 
-    context "when setting to a string" do
+        before do
+          band.sales = decimal
+        end
 
-      before do
-        band.sales = decimal.to_s
-      end
+        it "properly persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal))
+        end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
-      end
-
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
-      end
-    end
-
-    context "when setting to an integer" do
-
-      before do
-        band.sales = decimal.to_i
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq("1000000")
+      context "when setting to a string" do
+
+        before do
+          band.sales = decimal.to_s
+        end
+
+        it "persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
+      context "when setting to an integer" do
+
+        before do
+          band.sales = decimal.to_i
+        end
+
+        it "persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_i.to_s))
+        end
+
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
-    end
 
-    context "when setting to a float" do
+      context "when setting to a float" do
 
-      before do
-        band.sales = decimal.to_f
-      end
+        before do
+          band.sales = decimal.to_f
+        end
 
-      it "properly persists as a string" do
-        expect(band.attributes["sales"]).to eq(decimal.to_s)
-      end
+        it "properly persists as a BSON::Decimal128" do
+          expect(band.attributes["sales"]).to eq(BSON::Decimal128.new(decimal.to_f.to_s))
+        end
 
-      it "returns the proper big decimal" do
-        expect(band.sales).to eq(decimal)
+        it "returns the proper big decimal" do
+          expect(band.sales).to eq(decimal)
+        end
       end
     end
   end
@@ -1306,7 +1364,7 @@ describe Mongoid::Fields do
   context "when the field is a hash of arrays" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:map) do
@@ -1320,7 +1378,7 @@ describe Mongoid::Fields do
     before do
       person.map = map
       person.map["stack1"].reverse!
-      person.save
+      person.save!
     end
 
     it "properly updates the hash" do
@@ -1489,24 +1547,293 @@ describe Mongoid::Fields do
       end
     end
 
-    context 'given nil' do
-      subject { Person.database_field_name(nil) }
-      it { is_expected.to eq nil }
+    shared_examples_for 'pre-fix database_field_name' do
+      subject { Person.database_field_name(key) }
+
+      context 'non-aliased field name' do
+        let(:key) { 't' }
+        it { is_expected.to eq 't' }
+      end
+
+      context 'aliased field name' do
+        let(:key) { 'test' }
+        it { is_expected.to eq 't' }
+      end
+
+      context 'non-aliased embeds one relation' do
+        let(:key) { 'pass' }
+        it { is_expected.to eq 'pass' }
+      end
+
+      context 'aliased embeds one relation' do
+        let(:key) { 'passport' }
+        it { is_expected.to eq 'pass' }
+      end
+
+      context 'non-aliased embeds many relation' do
+        let(:key) { 'mobile_phones' }
+        it { is_expected.to eq 'mobile_phones' }
+      end
+
+      context 'aliased embeds many relation' do
+        let(:key) { 'phones' }
+        it { is_expected.to eq 'mobile_phones' }
+      end
+
+      context 'non-aliased embeds one field' do
+        let(:key) { 'pass.exp' }
+        it { is_expected.to eq 'pass.exp' }
+      end
+
+      context 'aliased embeds one field' do
+        let(:key) { 'passport.expiration_date' }
+        it { is_expected.to eq 'passport.expiration_date' }
+      end
+
+      context 'non-aliased embeds many field' do
+        let(:key) { 'mobile_phones.landline' }
+        it { is_expected.to eq 'mobile_phones.landline' }
+      end
+
+      context 'aliased embeds many field' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'phones.extension' }
+      end
+
+      context 'aliased multi-level embedded document' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'phones.extension' }
+      end
+
+      context 'non-aliased multi-level embedded document' do
+        let(:key) { 'phones.extension' }
+        it { is_expected.to eq 'phones.extension' }
+      end
+
+      context 'aliased multi-level embedded document field' do
+        let(:key) { 'mobile_phones.country_code.code' }
+        it { is_expected.to eq 'mobile_phones.country_code.code' }
+      end
+
+      context 'non-aliased multi-level embedded document field' do
+        let(:key) { 'phones.country_code.iso_alpha2_code' }
+        it { is_expected.to eq 'phones.country_code.iso_alpha2_code' }
+      end
+
+      context 'when field is unknown' do
+        let(:key) { 'shenanigans' }
+        it { is_expected.to eq 'shenanigans' }
+      end
+
+      context 'when embedded field is unknown' do
+        let(:key) { 'phones.bamboozle' }
+        it { is_expected.to eq 'phones.bamboozle' }
+      end
+
+      context 'when multi-level embedded field is unknown' do
+        let(:key) { 'phones.bamboozle.brouhaha' }
+        it { is_expected.to eq 'phones.bamboozle.brouhaha' }
+      end
     end
 
-    context 'given an empty String' do
-      subject { Person.database_field_name('') }
-      it { is_expected.to eq nil }
+    context "when the broken_alias_handling is not set" do
+      config_override :broken_alias_handling, false
+
+      context 'given nil' do
+        subject { Person.database_field_name(nil) }
+        it { is_expected.to eq nil }
+      end
+
+      context 'given an empty String' do
+        subject { Person.database_field_name('') }
+        it { is_expected.to eq nil }
+      end
+
+      context 'given a String' do
+        subject { Person.database_field_name(key.to_s) }
+        it_behaves_like 'database_field_name'
+      end
+
+      context 'given a Symbol' do
+        subject { Person.database_field_name(key.to_sym) }
+        it_behaves_like 'database_field_name'
+      end
     end
 
-    context 'given a String' do
-      subject { Person.database_field_name(key.to_s) }
-      it_behaves_like 'database_field_name'
+    context "when the broken_alias_handling is set" do
+      config_override :broken_alias_handling, true
+
+      context 'given nil' do
+        subject { Person.database_field_name(nil) }
+        it { is_expected.to eq nil }
+      end
+
+      context 'given an empty String' do
+        subject { Person.database_field_name('') }
+        it { is_expected.to eq "" }
+      end
+
+      context 'given a String' do
+        subject { Person.database_field_name(key.to_s) }
+        it_behaves_like 'pre-fix database_field_name'
+      end
+
+      context 'given a Symbol' do
+        subject { Person.database_field_name(key.to_sym) }
+        it_behaves_like 'pre-fix database_field_name'
+      end
     end
 
-    context 'given a Symbol' do
-      subject { Person.database_field_name(key.to_sym) }
-      it_behaves_like 'database_field_name'
+    context 'when getting the database field name of a belongs_to associations' do
+      # These tests only apply when the flag is not set
+      config_override :broken_alias_handling, false
+
+      context "when the broken_alias_handling is not set" do
+        context "when the association is the last item" do
+          let(:name) do
+            Game.database_field_name("person")
+          end
+
+          it "gets the alias" do
+            expect(name).to eq("person_id")
+          end
+        end
+
+        context "when the association is not the last item" do
+          let(:name) do
+            Game.database_field_name("person.name")
+          end
+
+          it "gets the alias" do
+            expect(name).to eq("person.name")
+          end
+        end
+      end
+    end
+  end
+
+  describe "#get_field" do
+
+    let(:klass) { Person }
+    let(:field) { klass.cleanse_localized_field_names(field_name) }
+
+    context "when cleansing a field" do
+      let(:field_name) { "employer_id" }
+      it "returns the correct field name" do
+        expect(field).to eq(field_name)
+      end
+    end
+
+    context "when cleansing a localized field" do
+      let(:field_name) { "desc" }
+      it "returns the correct field name" do
+        expect(field).to eq(field_name)
+      end
+    end
+
+    context "when cleansing a translation field" do
+      let(:field_name) { "desc_translations" }
+      it "returns the correct field name" do
+        expect(field).to eq("desc")
+      end
+    end
+
+    context "when cleansing an existing translation field" do
+      let(:field_name) { "localized_translations" }
+      it "returns the correct field name" do
+        expect(field).to eq(field_name)
+      end
+    end
+
+    context "when cleansing an existing translation field with a _translations" do
+      let(:field_name) { "localized_translations_translations" }
+      it "returns the correct field name" do
+        expect(field).to eq("localized_translations")
+      end
+    end
+
+    context "when cleansing dotted translation field" do
+      config_override :broken_alias_handling, false
+      let(:field_name) { "passport.name_translations.asd" }
+      it "returns the correct field name" do
+        expect(field).to eq("pass.name.asd")
+      end
+    end
+
+    context "when cleansing dotted translation field as a symbol" do
+      config_override :broken_alias_handling, false
+      let(:field_name) { "passport.name_translations.asd".to_sym }
+      it "returns the correct field name" do
+        expect(field).to eq("pass.name.asd")
+      end
+    end
+
+    context "when cleansing dotted existing translation field" do
+      config_override :broken_alias_handling, false
+      let(:field_name) { "passport.localized_translations.asd" }
+      it "returns the correct field name" do
+        expect(field).to eq("pass.localized_translations.asd")
+      end
+    end
+
+    context "when cleansing aliased dotted translation field" do
+      let(:field_name) { "pass.name_translations.asd" }
+      it "returns the correct field name" do
+        expect(field).to eq("pass.name.asd")
+      end
+    end
+  end
+
+  describe '.configure DSL' do
+
+    context '.type method' do
+      after do
+        klass = Mongoid::Fields::FieldTypes
+        klass.instance_variable_set(:@mapping, klass::DEFAULT_MAPPING.dup)
+      end
+
+      it 'can define a custom type' do
+        described_class.configure do
+          type :my_type, Integer
+        end
+
+        expect(described_class::FieldTypes.get(:my_type)).to eq Integer
+      end
+
+      it 'can override and existing type' do
+        described_class.configure do
+          type :integer, String
+        end
+
+        expect(described_class::FieldTypes.get(:integer)).to eq String
+      end
+    end
+
+    context '.option method' do
+      after do
+        described_class.instance_variable_set(:@options, {})
+      end
+
+      it 'can define a custom field option' do
+        described_class.configure do
+          option :my_required do |model, field, value|
+            model.validates_presence_of field.name if value
+          end
+        end
+
+        klass = Class.new do
+          include Mongoid::Document
+          field :my_field, my_required: true
+
+          def self.model_name
+            OpenStruct.new(human: 'Klass')
+          end
+        end
+
+        instance = klass.new
+        expect(instance.valid?).to eq false
+        expect(instance.errors.full_messages).to eq ["My field can't be blank"]
+      end
     end
   end
 end

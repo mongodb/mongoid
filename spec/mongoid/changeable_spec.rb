@@ -555,6 +555,56 @@ describe Mongoid::Changeable do
     end
   end
 
+  describe '#attribute_previously_was' do
+    let(:previous_title) do
+      "Grand Poobah"
+    end
+
+    let(:age) do
+      10
+    end
+
+    let(:person) do
+      Person.create!(title: previous_title, age: age)
+    end
+
+    let(:updated_title) do
+      "Captain Obvious"
+    end
+
+    before do
+      person.title = updated_title
+      person.save!
+    end
+
+    context 'when attribute changed' do
+      it "returns the old value" do
+        expect(person.send(:attribute_previously_was, "title")).to eq(previous_title)
+      end
+
+      it "allows access via (attribute)_was" do
+        expect(person.title_previously_was).to eq(previous_title)
+      end
+    end
+
+    context 'when attribute did not change' do
+      it "returns the same value" do
+        expect(person.send(:attribute_previously_was, "age")).to eq(age)
+      end
+
+      it "allows access via (attribute)_was" do
+        expect(person.age_previously_was).to eq(age)
+      end
+    end
+
+    it 'clears after reload' do
+      person.reload
+      expect(person.title_previously_was).to be_nil
+      expect(person.age_previously_was).to be_nil
+    end
+
+  end
+
   describe "#attribute_will_change!" do
 
     let(:aliases) do
@@ -856,7 +906,7 @@ describe Mongoid::Changeable do
       context "when adding via create" do
 
         before do
-          address.locations.create
+          address.locations.create!
         end
 
         it "returns false" do
@@ -1506,7 +1556,7 @@ describe Mongoid::Changeable do
     end
 
     before do
-      person.update_attributes(preference_ids: [ preference.id ])
+      person.update_attributes!(preference_ids: [ preference.id ])
     end
 
     it "records the foreign key dirty changes" do
@@ -1697,7 +1747,7 @@ describe Mongoid::Changeable do
       end
 
       it "does not retain the changes until after all callbacks" do
-        acolyte.save
+        acolyte.save!
         expect(acolyte.changed_before_in_callback["name"]).to eq([ nil, "callback-test" ])
         expect(acolyte.changed_after_in_callback["name"]).to be_nil
       end
@@ -1748,7 +1798,7 @@ describe Mongoid::Changeable do
         context 'when building the lowest level document' do
 
           before do
-            person.save
+            person.save!
           end
 
           let!(:code) do
@@ -1770,7 +1820,7 @@ describe Mongoid::Changeable do
           context 'when saving the hierarchy' do
 
             before do
-              person.save
+              person.save!
             end
 
             let(:reloaded) do
@@ -1792,7 +1842,7 @@ describe Mongoid::Changeable do
               end
 
               before do
-                reloaded.save
+                reloaded.save!
               end
 
               it 'saves the deepest embedded document' do

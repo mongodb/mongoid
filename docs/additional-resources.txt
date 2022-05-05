@@ -13,7 +13,7 @@ Additional Resources
 This page lists some of the third-party guides and blog posts about Mongoid,
 as well as sample Mongoid applications. Additional resources for the driver
 are listed on the `respective driver page
-<https://docs.mongodb.com/ruby-driver/current/reference/additional-resources/>`_.
+<https://mongodb.com/docs/ruby-driver/current/reference/additional-resources/>`_.
 
 
 Screencasts
@@ -22,15 +22,15 @@ Screencasts
 - `RailsCasts: Mongoid (revised)
   <https://www.youtube.com/watch?v=L0RqU2MdqXU>`_
 
-  An overview of Mongoid, by Ryan Bates including the basics 
-  of setting up an app, querying for records, adding embedded 
+  An overview of Mongoid, by Ryan Bates including the basics
+  of setting up an app, querying for records, adding embedded
   associations, overriding the id, and more.
 
 - `Ruby on Rails Web Services and Integration with MongoDB, Week 3: Mongoid
   <https://www.youtube.com/watch?v=9LylgiMYsUM>`_
 
   A detailed introduction to Mongoid and Ruby on Rails web services.
-  
+
 - `Create a search bar in Rails with Mongoid
   <https://www.youtube.com/watch?v=zusWR8jS5-A>`_
 
@@ -51,7 +51,7 @@ Articles
 - `Converting an existing Ruby on Rails application to MongoDB <https://ibraheem.ca/posts/convert-rails-to-mongodb>`_
 
   How to Convert an existing Ruby on Rails application to use MongoDB and Mongoid.
-  
+
 
 Sample Applications
 ===================

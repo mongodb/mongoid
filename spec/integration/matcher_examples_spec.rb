@@ -652,10 +652,12 @@ describe 'Matcher' do
 
     describe 'range match on array element' do
 
+      let(:record) do
+        Record.new(producers: [123, 456])
+      end
+
       let!(:band) do
-        Band.create!(records: [
-          Record.new(producers: [123, 456]),
-        ])
+        Band.create!(records: [ record ])
       end
 
       describe 'MongoDB query' do
@@ -667,14 +669,13 @@ describe 'Matcher' do
           expect(found_band).to eq(band)
         end
 
-        # https://jira.mongodb.org/browse/MONGOID-4911
         context 'no match' do
 
-        let!(:band) do
-          Band.create!(records: [
-            Record.new(producers: [50]),
-          ])
-        end
+          let!(:band) do
+            Band.create!(records: [
+              Record.new(producers: [50, 250]),
+            ])
+          end
 
           it 'does not find' do
             expect(found_band).to be nil
@@ -687,10 +688,16 @@ describe 'Matcher' do
           band.records.where(producers: 100..200).first
         end
 
-        it 'raises InvalidQuery' do
-          lambda do
-            found_record
-          end.should raise_error(Mongoid::Errors::InvalidQuery)
+        let(:no_record) do
+          band.records.where(producers: 199..200).first
+        end
+
+        it 'finds correctly' do
+          expect(found_record).to eq(record)
+        end
+
+        it "correctly does not find" do
+          expect(no_record).to eq(nil)
         end
       end
     end

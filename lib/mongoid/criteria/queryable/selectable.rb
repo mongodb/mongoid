@@ -227,19 +227,6 @@ module Mongoid
           __merge__(criterion)
         end
 
-        # Alias for +geo_spatial+.
-        #
-        # @deprecated
-        def geo_spacial(criterion)
-          # Duplicate method body so that we can raise this exception with
-          # geo_spacial as the indicated operator rather than geo_spatial.
-          if criterion.nil?
-            raise Errors::CriteriaArgumentRequired, :geo_spacial
-          end
-
-          __merge__(criterion)
-        end
-
         key :intersects_line, :override, "$geoIntersects", "$geometry" do |value|
           { "type" => LINE_STRING, "coordinates" => value }
         end
@@ -679,16 +666,7 @@ module Mongoid
                 end]
               end
             end
-            # Should be able to do:
-            #where('$or' => exprs)
-            # But since that is broken do instead:
-            clone.tap do |query|
-              if query.selector['$or']
-                query.selector.store('$or', query.selector['$or'] + exprs)
-              else
-                query.selector.store('$or', exprs)
-              end
-            end
+            self.and('$or' => exprs)
           end
         end
 

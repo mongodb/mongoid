@@ -60,6 +60,8 @@ module Mongoid
         if object_id_field? || object.is_a?(Document)
           if association.polymorphic?
             association.convert_to_foreign_key(object)
+          elsif object.is_a?(Document) && object.respond_to?(association.primary_key)
+            primary_key_field.evolve(object.send(association.primary_key))
           else
             object.__evolve_object_id__
           end
@@ -141,6 +143,11 @@ module Mongoid
       def related_id_field
         @related_id_field ||= association.klass.fields["_id"]
       end
+
+      def primary_key_field
+        @primary_key_field ||= association.klass.fields[association.primary_key]
+      end
+
 
       # This is used when default values need to be serialized. Most of the
       # time just return the object.

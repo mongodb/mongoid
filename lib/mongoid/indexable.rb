@@ -88,7 +88,7 @@ module Mongoid
       #     index({ name: 1 }, { background: true })
       #   end
       #
-      # @param [ Symbol ] spec The index spec.
+      # @param [ Hash ] spec The index spec.
       # @param [ Hash ] options The index options.
       #
       # @return [ Hash ] The index options.

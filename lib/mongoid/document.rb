@@ -100,21 +100,8 @@ module Mongoid
     # @param [ Hash ] attrs The attributes to set up the document with.
     #
     # @return [ Document ] A new document.
-    def initialize(attrs = nil)
-      @__parent = nil
-      _building do
-        @new_record = true
-        @attributes ||= {}
-        apply_pre_processed_defaults
-        apply_default_scoping
-        process_attributes(attrs) do
-          yield(self) if block_given?
-        end
-        apply_post_processed_defaults
-        # @todo: #2586: Need to have access to parent document in these
-        #   callbacks.
-        run_callbacks(:initialize) unless _initialize_callbacks.empty?
-      end
+    def initialize(attrs = nil, &block)
+      construct_document(attrs, execute_callbacks: true, &block)
     end
 
     # Return the model name of the document.
@@ -135,16 +122,6 @@ module Mongoid
     # @return [ String ] The id of the document or nil if new.
     def to_key
       (persisted? || destroyed?) ? [ _id.to_s ] : nil
-    end
-
-    # Return an array with this +Document+ only in it.
-    #
-    # @example Return the document in an array.
-    #   document.to_a
-    #
-    # @return [ Array<Document> ] An array with the document as its only item.
-    def to_a
-      [ self ]
     end
 
     # Return a hash of the entire document hierarchy from this document and
@@ -228,6 +205,37 @@ module Mongoid
 
     private
 
+    # Does the construction of a document.
+    #
+    # @param [ Hash ] attrs The attributes to set up the document with.
+    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
+    #   should be run.
+    #
+    # @return [ Document ] A new document.
+    #
+    # @api private
+    def construct_document(attrs = nil, execute_callbacks: true)
+      @__parent = nil
+      _building do
+        @new_record = true
+        @attributes ||= {}
+        apply_pre_processed_defaults
+        apply_default_scoping
+        process_attributes(attrs) do
+          yield(self) if block_given?
+        end
+
+        if execute_callbacks
+          apply_post_processed_defaults
+          run_callbacks(:initialize) unless _initialize_callbacks.empty?
+        else
+          pending_callbacks << :apply_post_processed_defaults
+          pending_callbacks << :initialize
+        end
+      end
+      self
+    end
+
     # Returns the logger
     #
     # @return [ Logger ] The configured logger or a default Logger instance.
@@ -245,6 +253,14 @@ module Mongoid
       @model_cache_key ||= self.class.model_name.cache_key
     end
 
+    # Returns a hash of the attributes.
+    #
+    # Note this method modifies the attributes hash that already exists on the
+    # class and returns it. This means that the hash returned by this method
+    # refers to the same hash as calling #attributes on the instance. See
+    # MONGOID-4476 for an explanation on how this is used.
+    #
+    # @return [ Hash ] The attributes hash.
     def as_attributes
       return attributes if frozen?
       embedded_relations.each_pair do |name, meta|
@@ -264,18 +280,6 @@ module Mongoid
 
     module ClassMethods
 
-      # Performs class equality checking.
-      #
-      # @example Compare the classes.
-      #   document === other
-      #
-      # @param [ Document, Object ] other The other object to compare with.
-      #
-      # @return [ true, false ] True if the classes are equal, false if not.
-      def ===(other)
-        other.is_a?(self)
-      end
-
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #
@@ -285,18 +289,56 @@ module Mongoid
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
       # @param [ Integer ] selected_fields The selected fields from the
       #   criteria.
+      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
+      #   should be run.
       #
       # @return [ Document ] A new document.
-      def instantiate(attrs = nil, selected_fields = nil)
+      def instantiate(attrs = nil, selected_fields = nil, &block)
+        instantiate_document(attrs, selected_fields, execute_callbacks: true, &block)
+      end
+
+      # Instantiate the document.
+      #
+      # @param [ Hash ] attrs The hash of attributes to instantiate with.
+      # @param [ Integer ] selected_fields The selected fields from the
+      #   criteria.
+      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
+      #   should be run.
+      #
+      # @return [ Document ] A new document.
+      #
+      # @api private
+      def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
         attributes = attrs || {}
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
-        doc.apply_defaults
-        yield(doc) if block_given?
-        doc.run_callbacks(:find) unless doc._find_callbacks.empty?
-        doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
+
+        if execute_callbacks
+          doc.apply_defaults
+          yield(doc) if block_given?
+          doc.run_callbacks(:find) unless doc._find_callbacks.empty?
+          doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
+        else
+          yield(doc) if block_given?
+          doc.pending_callbacks += [:apply_defaults, :find, :initialize]
+        end
+
         doc
+      end
+
+      # Allocates and constructs a document.
+      #
+      # @param [ Hash ] attrs The attributes to set up the document with.
+      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
+      #   should be run.
+      #
+      # @return [ Document ] A new document.
+      #
+      # @api private
+      def construct_document(attrs = nil, execute_callbacks: true)
+        doc = allocate
+        doc.send(:construct_document, attrs, execute_callbacks: execute_callbacks)
       end
 
       # Returns all types to query for when using this class as the base.

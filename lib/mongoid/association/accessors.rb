@@ -42,8 +42,23 @@ module Mongoid
       # @return [ Proxy ] The association.
       def create_relation(object, association, selected_fields = nil)
         type = @attributes[association.inverse_type]
-        target = association.build(self, object, type, selected_fields)
-        target ? association.create_relation(self, target) : nil
+        target = if t = association.build(self, object, type, selected_fields)
+          association.create_relation(self, t)
+        else
+          nil
+        end
+
+        # Only need to do this on embedded associations. The pending callbacks
+        # are only added when materializing the documents, which only happens
+        # on embedded associations. There is no call to the database in the
+        # construction of a referenced association.
+        if association.embedded?
+          Array(target).each do |doc|
+            doc.try(:run_pending_callbacks)
+          end
+        end
+
+        target
       end
 
       # Resets the criteria inside the association proxy. Used by many-to-many
@@ -90,6 +105,19 @@ module Mongoid
       #
       # @return [ Proxy ] The association.
       def get_relation(name, association, object, reload = false)
+        field_name = database_field_name(name)
+
+        # As per the comments under MONGOID-5034, I've decided to only raise on
+        # embedded associations for a missing attribute. Rails does not raise
+        # for a missing attribute on referenced associations.
+        # We also don't want to raise if we're retrieving an association within
+        # the codebase. This is often done when retrieving the inverse association
+        # during binding or when cascading callbacks. Whenever we retrieve
+        # associations within the codebase, we use without_autobuild.
+        if !without_autobuild? && association.embedded? && attribute_missing?(field_name)
+          raise ActiveModel::MissingAttributeError, "Missing attribute: '#{field_name}'"
+        end
+
         if !reload && (value = ivar(name)) != false
           value
         else
@@ -291,7 +319,7 @@ module Mongoid
         ids_method = "#{association.name.to_s.singularize}_ids"
         association.inverse_class.tap do |klass|
           klass.re_define_method(ids_method) do
-            send(association.name).only(:_id).map(&:_id)
+            send(association.name).pluck(:_id)
           end
         end
       end
@@ -341,6 +369,7 @@ module Mongoid
       #  @return [ Class ] The class being set up.
       def self.define_ids_setter!(association)
         ids_method = "#{association.name.to_s.singularize}_ids="
+        association.inverse_class.aliased_associations[ids_method.chop] = association.name.to_s
         association.inverse_class.tap do |klass|
           klass.re_define_method(ids_method) do |ids|
             send(association.setter, association.relation_class.find(ids.reject(&:blank?)))

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "../has_and_belongs_to_many_models"
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
@@ -221,7 +222,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
             before do
               person.preferences.send(method, preference)
-              person.save
+              person.save!
             end
 
             it "adds the documents to the relation" do
@@ -264,7 +265,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
             end
 
             before do
-              person.save
+              person.save!
             end
 
             it "adds the documents to the relation" do
@@ -450,11 +451,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the relation is self referencing" do
 
           let(:tag_one) do
-            Tag.create(text: "one")
+            Tag.create!(text: "one")
           end
 
           let(:tag_two) do
-            Tag.create(text: "two")
+            Tag.create!(text: "two")
           end
 
           before do
@@ -563,7 +564,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       end
 
       let(:preference) do
-        Preference.create(name: "one")
+        Preference.create!(name: "one")
       end
 
       before do
@@ -584,7 +585,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the document is persisted" do
 
         before do
-          person.save
+          person.save!
         end
 
         it "does not add the duplicates" do
@@ -655,7 +656,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         end
 
         let!(:preference) do
-          Preference.create
+          Preference.create!
         end
 
         before do
@@ -702,7 +703,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:preference) do
@@ -798,7 +799,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           context "and person is saved" do
 
             before do
-              person.save
+              person.save!
               person.reload
               another_preference.reload
             end
@@ -822,11 +823,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
   describe "when self-referencing" do
     let!(:parent) do
-      Vertex.create
+      Vertex.create!
     end
 
     let!(:child) do
-      Vertex.create(parents: [parent])
+      Vertex.create!(parents: [parent])
     end
 
     before do
@@ -963,7 +964,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           context "when the relation has been loaded" do
 
             let(:person) do
-              Person.create
+              Person.create!
             end
 
             let(:preference) do
@@ -1003,7 +1004,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
             end
 
             let(:person) do
-              Person.create.tap do |p|
+              Person.create!.tap do |p|
                 p.preferences = [ preference ]
               end
             end
@@ -1073,7 +1074,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the parent is not a new record" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:preference) do
@@ -1111,7 +1112,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           context "when saving the target" do
 
             before do
-              preference.save
+              preference.save!
             end
 
             it "persists the parent keys" do
@@ -1130,13 +1131,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the parent has been persisted" do
 
         let!(:person) do
-          Person.create
+          Person.create!
         end
 
         context "when the children are persisted" do
 
           let!(:preference) do
-            person.preferences.create(name: "settings")
+            person.preferences.create!(name: "settings")
           end
 
           let!(:relation) do
@@ -1308,7 +1309,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the parent is not a new record" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:preference) do
@@ -1352,11 +1353,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when appending in a parent create block" do
 
         let!(:preference) do
-          Preference.create(name: "testing")
+          Preference.create!(name: "testing")
         end
 
         let!(:person) do
-          Person.create do |doc|
+          Person.create! do |doc|
             doc.preferences.concat([ preference ])
           end
         end
@@ -1441,7 +1442,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the child is already persisted" do
 
           let!(:persisted) do
-            Preference.create(name: "testy")
+            Preference.create!(name: "testy")
           end
 
           let(:preference) do
@@ -1450,7 +1451,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
           before do
             person.preferences.concat([ preference ])
-            person.save
+            person.save!
           end
 
           it "adds the documents to the relation" do
@@ -1481,7 +1482,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when setting via the associated ids" do
 
           let!(:persisted) do
-            Preference.create(name: "testy")
+            Preference.create!(name: "testy")
           end
 
           let(:preference) do
@@ -1493,7 +1494,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           end
 
           before do
-            person.save
+            person.save!
           end
 
           it "adds the documents to the relation" do
@@ -1521,7 +1522,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the parent is not a new record" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:preference) do
@@ -1603,11 +1604,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when both sides have been persisted" do
 
         let(:person) do
-          Person.create
+          Person.create!
         end
 
         let(:event) do
-          Event.create
+          Event.create!
         end
 
         before do
@@ -1656,15 +1657,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the relation also includes a has_many relation" do
 
         let(:artwork) do
-          Artwork.create
+          Artwork.create!
         end
 
         let(:exhibition) do
-          Exhibition.create
+          Exhibition.create!
         end
 
         let(:exhibitor) do
-          Exhibitor.create(exhibition: exhibition)
+          Exhibitor.create!(exhibition: exhibition)
         end
 
         before do
@@ -1679,11 +1680,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the relation is self referencing" do
 
         let(:tag_one) do
-          Tag.create(text: "one")
+          Tag.create!(text: "one")
         end
 
         let(:tag_two) do
-          Tag.create(text: "two")
+          Tag.create!(text: "two")
         end
 
         before do
@@ -1734,7 +1735,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#count" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when nothing exists on the relation" do
@@ -1759,7 +1760,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     describe "#any?" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when nothing exists on the relation" do
@@ -1796,7 +1797,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when documents have been persisted" do
 
       let!(:preference) do
-        person.preferences.create(name: "setting")
+        person.preferences.create!(name: "setting")
       end
 
       it "returns the number of persisted documents" do
@@ -1807,12 +1808,12 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when appending to a loaded relation" do
 
       let!(:preference) do
-        person.preferences.create(name: "setting")
+        person.preferences.create!(name: "setting")
       end
 
       before do
         person.preferences.count
-        person.preferences << Preference.create(name: "two")
+        person.preferences << Preference.create!(name: "two")
       end
 
       it "returns the number of persisted documents" do
@@ -1836,7 +1837,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the documents are part of the relation" do
 
         before do
-          Preference.create(person_ids: [ person.id ])
+          Preference.create!(person_ids: [ person.id ])
         end
 
         it "returns the count from the db" do
@@ -1847,7 +1848,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when the documents are not part of the relation" do
 
         before do
-          Preference.create
+          Preference.create!
         end
 
         it "returns the count from the db" do
@@ -1861,7 +1862,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when documents have been persisted" do
 
         let!(:house) do
-          person.houses.create(name: "Wayne Manor")
+          person.houses.create!(name: "Wayne Manor")
         end
 
         it "returns the number of persisted documents" do
@@ -1885,7 +1886,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#any?" do
 
     let(:sandwich) do
-      Sandwich.create
+      Sandwich.create!
     end
 
     context "when nothing exists on the relation" do
@@ -1953,7 +1954,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when documents have been persisted" do
 
       let!(:meat) do
-        sandwich.meats.create
+        sandwich.meats.create!
       end
 
       it "returns true" do
@@ -1974,7 +1975,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
     context "when new documents exist in the database" do
       before do
-        Meat.create(sandwiches: [sandwich])
+        Meat.create!(sandwiches: [sandwich])
       end
 
       it "returns true" do
@@ -1992,15 +1993,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when using string keys" do
 
           let(:agent) do
-            Agent.create(number: "007")
+            Agent.create!(number: "007")
           end
 
           before do
-            agent.accounts.create(name: "testing again")
+            agent.accounts.send(method, name: "test again")
           end
 
           it "does not convert the string key to an object id" do
-            expect(agent.account_ids).to eq([ "testing-again" ])
+            expect(agent.account_ids).to eq([ "test-again" ])
           end
         end
 
@@ -2072,7 +2073,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when validation fails" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when the relation is not polymorphic" do
@@ -2089,15 +2090,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#delete" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference_one) do
-      Preference.create(name: "Testing")
+      Preference.create!(name: "Testing")
     end
 
     let(:preference_two) do
-      Preference.create(name: "Test")
+      Preference.create!(name: "Test")
     end
 
     before do
@@ -2172,7 +2173,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       context "when :inverse_of is set" do
 
         let(:event) do
-          Event.create
+          Event.create!
         end
 
         before do
@@ -2188,11 +2189,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relationships are self referencing" do
 
       let(:tag_one) do
-        Tag.create(text: "one")
+        Tag.create!(text: "one")
       end
 
       let(:tag_two) do
-        Tag.create(text: "two")
+        Tag.create!(text: "two")
       end
 
       before do
@@ -2361,15 +2362,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when conditions are provided" do
 
           let(:person) do
-            Person.create
+            Person.create!
           end
 
           let!(:preference_one) do
-            person.preferences.create(name: "Testing")
+            person.preferences.create!(name: "Testing")
           end
 
           let!(:preference_two) do
-            person.preferences.create(name: "Test")
+            person.preferences.create!(name: "Test")
           end
 
           let!(:deleted) do
@@ -2399,9 +2400,9 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when conditions are not provided" do
 
           let(:person) do
-            Person.create.tap do |person|
-              person.preferences.create(name: "Testing")
-              person.preferences.create(name: "Test")
+            Person.create!.tap do |person|
+              person.preferences.create!(name: "Testing")
+              person.preferences.create!(name: "Test")
             end
           end
 
@@ -2435,13 +2436,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#exists?" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when documents exist in the database" do
 
       before do
-        person.preferences.create
+        person.preferences.create!
       end
 
       it "returns true" do
@@ -2466,23 +2467,23 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relation is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:preference_one) do
-        person.preferences.create(name: "Test")
+        person.preferences.create!(name: "Test")
       end
 
       let!(:preference_two) do
-        person.preferences.create(name: "OMG I has relations")
+        person.preferences.create!(name: "OMG I has relations")
       end
 
       let!(:unrelated_pref) do
-        Preference.create(name: "orphan annie")
+        Preference.create!(name: "orphan annie")
       end
 
       let!(:unrelated_pref_two) do
-        Preference.create(name: "orphan two")
+        Preference.create!(name: "orphan two")
       end
 
       context "when providing an id" do
@@ -2618,11 +2619,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relation is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:preference) do
-        person.preferences.create(name: "Testing")
+        person.preferences.create!(name: "Testing")
       end
 
       context "when the document exists" do
@@ -2658,11 +2659,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relation is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:preference) do
-        person.preferences.create(name: "Testing")
+        person.preferences.create!(name: "Testing")
       end
 
       context "when the document exists" do
@@ -2707,11 +2708,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relation is not polymorphic" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:preference) do
-        person.preferences.create(name: "Testing")
+        person.preferences.create!(name: "Testing")
       end
 
       context "when the document exists" do
@@ -2745,15 +2746,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#max" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference_one) do
-      Preference.create(ranking: 5)
+      Preference.create!(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(ranking: 10)
+      Preference.create!(ranking: 10)
     end
 
     before do
@@ -2774,15 +2775,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#max_by" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference_one) do
-      Preference.create(ranking: 5)
+      Preference.create!(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(ranking: 10)
+      Preference.create!(ranking: 10)
     end
 
     before do
@@ -2801,19 +2802,19 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#method_missing" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:preference_one) do
-      person.preferences.create(name: "First", value: "Posting")
+      person.preferences.create!(name: "First", value: "Posting")
     end
 
     let!(:preference_two) do
-      person.preferences.create(name: "Second", value: "Testing")
+      person.preferences.create!(name: "Second", value: "Testing")
     end
 
     let!(:unrelated) do
-      Preference.create(name: "Third")
+      Preference.create!(name: "Third")
     end
 
     context "when providing a single criteria" do
@@ -2888,7 +2889,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the inverse relation is not defined" do
 
           let!(:house) do
-            person.houses.create(name: "Wayne Manor")
+            person.houses.create!(name: "Wayne Manor")
           end
 
           it "returns the distinct values for the fields" do
@@ -2902,15 +2903,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#min" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference_one) do
-      Preference.create(ranking: 5)
+      Preference.create!(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(ranking: 10)
+      Preference.create!(ranking: 10)
     end
 
     before do
@@ -2931,15 +2932,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#min_by" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference_one) do
-      Preference.create(ranking: 5)
+      Preference.create!(ranking: 5)
     end
 
     let(:preference_two) do
-      Preference.create(ranking: 10)
+      Preference.create!(ranking: 10)
     end
 
     before do
@@ -2965,15 +2966,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe "#nullify_all" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:preference_one) do
-      person.preferences.create(name: "One")
+      person.preferences.create!(name: "One")
     end
 
     let!(:preference_two) do
-      person.preferences.create(name: "Two")
+      person.preferences.create!(name: "Two")
     end
 
     before do
@@ -3094,13 +3095,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     describe "##{method}" do
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when documents have been persisted" do
 
         let!(:preference) do
-          person.preferences.create(name: "Testing")
+          person.preferences.create!(name: "Testing")
         end
 
         it "returns the number of documents" do
@@ -3112,7 +3113,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
         before do
           person.preferences.build(name: "Test")
-          person.preferences.create(name: "Test 2")
+          person.preferences.create!(name: "Test 2")
         end
 
         it "returns the total number of documents" do
@@ -3127,15 +3128,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relation has no default scope" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:preference_one) do
-        person.preferences.create(name: "first")
+        person.preferences.create!(name: "first")
       end
 
       let!(:preference_two) do
-        Preference.create(name: "second")
+        Preference.create!(name: "second")
       end
 
       let(:unscoped) do
@@ -3150,15 +3151,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relation has a default scope" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:house_one) do
-        person.houses.create(name: "first")
+        person.houses.create!(name: "first")
       end
 
       let!(:house_two) do
-        House.create(name: "second")
+        House.create!(name: "second")
       end
 
       let(:unscoped) do
@@ -3194,10 +3195,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
 
     before do
-      person.update_attributes(
+      person.update_attributes!(
           houses: [ wife_house, exwife_house, girlfriend_house ]
       )
-      person.update_attributes(house_ids: [ girlfriend_house.id ])
+      person.update_attributes!(house_ids: [ girlfriend_house.id ])
     end
 
     context "when reloading" do
@@ -3244,7 +3245,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       end
 
       let!(:business) do
-        Business.create(name: "serious", owners: [ user ])
+        Business.create!(name: "serious", owners: [ user ])
       end
 
       before do
@@ -3287,11 +3288,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the documents are persisted" do
 
       let(:user) do
-        User.create(name: "tst")
+        User.create!(name: "tst")
       end
 
       let(:business) do
-        Business.create(name: "srs", owners: [ user ])
+        Business.create!(name: "srs", owners: [ user ])
       end
 
       before do
@@ -3335,11 +3336,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   context "when binding the relation multiple times" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference) do
-      person.preferences.create(name: "testing")
+      person.preferences.create!(name: "testing")
     end
 
     before do
@@ -3358,19 +3359,19 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   context "when the association has order criteria" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference_one) do
-      OrderedPreference.create(name: 'preference-1', value: 10)
+      OrderedPreference.create!(name: 'preference-1', value: 10)
     end
 
     let(:preference_two) do
-      OrderedPreference.create(name: 'preference-2', value: 20)
+      OrderedPreference.create!(name: 'preference-2', value: 20)
     end
 
     let(:preference_three) do
-      OrderedPreference.create(name: 'preference-3', value: 20)
+      OrderedPreference.create!(name: 'preference-3', value: 20)
     end
 
     before do
@@ -3394,7 +3395,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   context "when the parent is not a new record and freshly loaded" do
 
     let(:person) do
-      Person.create
+      Person.create!
     end
 
     let(:preference) do
@@ -3403,7 +3404,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
     before do
       person.preferences = [ preference ]
-      person.save
+      person.save!
       person.reload
       person.preferences = nil
     end
@@ -3426,15 +3427,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   context "when reloading the relation" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     let!(:preference_one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     let!(:preference_two) do
-      Preference.create(name: "two")
+      Preference.create!(name: "two")
     end
 
     before do
@@ -3478,7 +3479,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the document is new" do
 
       let!(:person) do
-        Person.create(preference_names: "one, two")
+        Person.create!(preference_names: "one, two")
       end
 
       let(:preference_one) do
@@ -3514,23 +3515,23 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
 
     let(:preference_one) do
-      Preference.create(name: "one")
+      Preference.create!(name: "one")
     end
 
     let(:preference_two) do
-      Preference.create(name: "two")
+      Preference.create!(name: "two")
     end
 
     before do
       person.preference_ids = [ preference_one.id, preference_two.id ]
-      person.save
+      person.save!
     end
 
     context "and the order is changed" do
 
       before do
         person.preference_ids = [ preference_two.id, preference_one.id ]
-        person.save
+        person.save!
       end
 
       let(:reloaded) do
@@ -3547,13 +3548,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "and the order is changed and an element is added" do
 
       let(:preference_three) do
-        Preference.create(name: "three")
+        Preference.create!(name: "three")
       end
 
       before do
         person.preference_ids =
             [ preference_two.id, preference_one.id, preference_three.id ]
-        person.save
+        person.save!
       end
 
       let(:reloaded) do
@@ -3570,16 +3571,16 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "and the order is changed and an element is removed" do
 
       let(:preference_three) do
-        Preference.create(name: "three")
+        Preference.create!(name: "three")
       end
 
       before do
         person.preference_ids =
             [ preference_one.id, preference_two.id, preference_three.id ]
-        person.save
+        person.save!
         person.preference_ids =
             [ preference_three.id, preference_two.id ]
-        person.save
+        person.save!
       end
 
       let(:reloaded) do
@@ -3629,15 +3630,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when the relation exists" do
 
       let!(:person) do
-        Person.create
+        Person.create!
       end
 
       let!(:pref_one) do
-        person.preferences.create
+        person.preferences.create!
       end
 
       let!(:pref_two) do
-        Preference.create
+        Preference.create!
       end
 
       before do
@@ -3665,7 +3666,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
 
     let(:fire_hydrant) do
-      FireHydrant.create(location: '221B Baker Street')
+      FireHydrant.create!(location: '221B Baker Street')
     end
 
     context "when adding to a one-way many to many" do
@@ -3757,10 +3758,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
 
     it "should assign relation from both sides" do
-      p1 = Project.create name: 'Foo'
-      p2 = Project.create name: 'Bar'
-      d1 = Distributor.create name: 'Rock'
-      d2 = Distributor.create name: 'Soul'
+      p1 = Project.create! name: 'Foo'
+      p2 = Project.create! name: 'Bar'
+      d1 = Distributor.create! name: 'Rock'
+      d2 = Distributor.create! name: 'Soul'
 
       p1.distributors << d1
       expect(p1.d_ids).to match_array([d1.id])
@@ -3768,6 +3769,31 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       d2.projects << p2
       expect(d2.p_ids).to match_array([p2.id])
       expect(p2.d_ids).to match_array([d2.id])
+    end
+  end
+
+  context "when accesing own _id from parent's foreign key in default" do
+    let!(:contract) { HabtmmContract.create! }
+    let!(:signature) { contract.signatures.create! }
+
+    it "is nil" do
+      expect(signature.favorite_signature).to be nil
+    end
+  end
+
+  context "when setting an association on a model that uses the class_name option" do
+    let!(:contract) { HabtmmContract.create! }
+    let!(:signature) { HabtmmSignature.create!(contracts: [contract]) }
+
+    it "populates the inverse foreign key" do
+      expect(signature.contracts.first.signature_ids).to eq([signature.id])
+    end
+  end
+
+  context "when there is a foreign key in the aliased associations" do
+    it "has the correct aliases" do
+      expect(Dog.aliased_associations["breed_ids"]).to eq("breeds")
+      expect(Breed.aliased_associations["dog_ids"]).to eq("dogs")
     end
   end
 end

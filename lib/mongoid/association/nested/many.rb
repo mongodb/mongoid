@@ -134,8 +134,9 @@ module Mongoid
         # @param [ Proxy ] relation The association proxy.
         # @param [ Document ] doc The document to delete.
         def destroy_document(relation, doc)
+          res = doc.destroy unless doc.embedded? || doc.destroyed?
           relation.delete(doc)
-          doc.destroy unless doc.embedded? || doc.destroyed?
+          res
         end
 
         # Update the document.

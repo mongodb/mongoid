@@ -6,9 +6,6 @@ module Mongoid
   module Factory
     extend self
 
-    # @deprecated
-    TYPE = "_type".freeze
-
     # Builds a new +Document+ from the supplied attributes.
     #
     # This method either instantiates klass or a descendant of klass if the attributes include
@@ -23,16 +20,32 @@ module Mongoid
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
+    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
+    #   should be run.
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
+      execute_build(klass, attributes, execute_callbacks: true)
+    end
+
+    # Execute the build.
+    #
+    # @param [ Class ] klass The class to instantiate from if _type is not present.
+    # @param [ Hash ] attributes The document attributes.
+    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
+    #   should be run.
+    #
+    # @return [ Document ] The instantiated document.
+    #
+    # @api private
+    def execute_build(klass, attributes = nil, execute_callbacks: true)
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
       if type
-        type.new(attributes)
+        type.construct_document(attributes, execute_callbacks: execute_callbacks)
       else
-        klass.new(attributes)
+        klass.construct_document(attributes, execute_callbacks: execute_callbacks)
       end
     end
 
@@ -63,12 +76,34 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
+      execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
+    end
+
+    # Execute from_db.
+    #
+    # @param [ Class ] klass The class to instantiate from if _type is not present.
+    # @param [ Hash ] attributes The document attributes.
+    # @param [ Criteria ] criteria Optional criteria object.
+    # @param [ Hash ] selected_fields Fields which were retrieved via
+    #   #only. If selected_fields are specified, fields not listed in it
+    #   will not be accessible in the returned document.
+    # @param [ true | false ] execute_callbacks Whether this method should
+    #   invoke the callbacks. If true, the callbacks will be invoked normally.
+    #   If false, the callbacks will be stored in the +pending_callbacks+ list
+    #   and caller is responsible for invoking +run_pending_callbacks+ at a
+    #   later time. Use this option to defer callback execution until the
+    #   entire object graph containing embedded associations is constructed.
+    #
+    # @return [ Document ] The instantiated document.
+    #
+    # @api private
+    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
       type = (attributes || {})[klass.discriminator_key]
       if type.blank?
-        obj = klass.instantiate(attributes, selected_fields)
+        obj = klass.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
         if criteria && criteria.association && criteria.parent_document
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
@@ -92,7 +127,7 @@ module Mongoid
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate(attributes, selected_fields)
+        constantized.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
       end
     end
   end

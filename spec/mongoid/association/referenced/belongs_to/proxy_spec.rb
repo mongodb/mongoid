@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../belongs_to_models.rb'
 
 describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
@@ -85,7 +86,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
       end
 
       it "allows saving of the embedded document" do
-        expect(address.save).to be true
+        expect(address.save!).to be true
       end
     end
 
@@ -507,7 +508,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           Account.belongs_to :person, dependent: :destroy
           Person.has_one :account
           person.account = account
-          person.save
+          person.save!
         end
 
         after :all do
@@ -558,7 +559,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           Drug.belongs_to :person, dependent: :destroy
           Person.has_many :drugs
           person.drugs = [drug]
-          person.save
+          person.save!
         end
 
         after :all do
@@ -613,7 +614,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           Account.belongs_to :person, dependent: :delete_all
           Person.has_one :account
           person.account = account
-          person.save
+          person.save!
         end
 
         after :all do
@@ -653,7 +654,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           Drug.belongs_to :person, dependent: :delete_all
           Person.has_many :drugs
           person.drugs = [drug]
-          person.save
+          person.save!
         end
 
         after :all do
@@ -708,7 +709,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           Account.belongs_to :person, dependent: :nullify
           Person.has_one :account
           person.account = account
-          person.save
+          person.save!
         end
 
         context "when parent is persisted" do
@@ -747,7 +748,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           Drug.belongs_to :person, dependent: :nullify
           Person.has_many :drugs
           person.drugs = [drug]
-          person.save
+          person.save!
         end
 
         context "when parent exists" do
@@ -1370,6 +1371,20 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
         game.person.set_personal_data(ssn: '123', age: 25)
       end.not_to raise_error
     end
+  end
 
+  # This is a very specific case, see MONGOID-5089 for more details.
+  context "when required is false, child is an orphan, and parent has explicit _id" do
+    let(:comment) { BTMComment.create! }
+    let(:article) do
+      BTMArticle.new(
+        comment_ids: [comment.id],
+        id: 1
+      )
+    end
+
+    it "uses the correct explicit id" do
+      expect(article.comments.first.article_id).to eq(1)
+    end
   end
 end

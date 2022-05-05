@@ -224,6 +224,118 @@ describe Mongoid::Config do
     end
   end
 
+  shared_examples "a config option" do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => false })
+      end
+
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(false)
+      end
+    end
+
+    context 'when the value is true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => true })
+      end
+
+      it "is set to true" do
+        expect(Mongoid.send(option)).to be(true)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to be(default)
+      end
+    end
+  end
+
+  context 'when setting the map_big_decimal_to_decimal128 option in the config' do
+    let(:option) { :map_big_decimal_to_decimal128 }
+    let(:default) { true }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the broken_updates option in the config' do
+    let(:option) { :broken_updates }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the legacy_triple_equals option in the config' do
+    let(:option) { :legacy_triple_equals }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the broken_scoping option in the config' do
+    let(:option) { :broken_scoping }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the broken_aggregables option in the config' do
+    let(:option) { :broken_aggregables }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the broken_alias_handling option in the config' do
+    let(:option) { :broken_alias_handling }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the broken_and option in the config' do
+    let(:option) { :broken_and }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the compare_time_by_ms option in the config' do
+    let(:option) { :compare_time_by_ms }
+    let(:default) { true }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the object_id_as_json_oid option in the config' do
+    let(:option) { :object_id_as_json_oid }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the legacy_pluck_distinct option in the config' do
+    let(:option) { :legacy_pluck_distinct }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+
   describe "#load!" do
 
     before(:all) do

@@ -27,7 +27,10 @@ module Mongoid
       end
       @attributes = reloaded
       @attributes_before_type_cast = {}
-      changed_attributes.clear
+      @changed_attributes = {}
+      @previous_changes = {}
+      @previous_attributes = {}
+      @previously_new_record = false
       reset_readonly
       apply_defaults
       reload_relations

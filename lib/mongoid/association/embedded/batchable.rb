@@ -35,9 +35,16 @@ module Mongoid
           pre_process_batch_remove(docs, :delete)
           unless docs.empty?
             collection.find(selector).update_one(
-                positionally(selector, "$unset" => { path => true }),
-                session: _session
+              positionally(selector, "$unset" => { path => true }),
+              session: _session
             )
+            unless Mongoid.broken_updates
+              # This solves the case in which a user sets, clears and resets an
+              # embedded document. Previously, since the embedded document was
+              # already marked not a "new_record", it wouldn't be persisted to
+              # the second time. This change fixes that and allows it to be persisted.
+              docs.each { |doc| doc.new_record = true }
+            end
             post_process_batch_remove(docs, :delete)
           end
           _unscoped.clear
@@ -54,10 +61,15 @@ module Mongoid
           removals = pre_process_batch_remove(docs, method)
           if !docs.empty?
             collection.find(selector).update_one(
-                positionally(selector, "$pullAll" => { path => removals }),
-                session: _session
+              positionally(selector, "$pullAll" => { path => removals }),
+              session: _session
             )
             post_process_batch_remove(docs, method)
+          else
+            collection.find(selector).update_one(
+              positionally(selector, "$set" => { path => [] }),
+              session: _session
+            )
           end
           reindex
         end
@@ -227,7 +239,11 @@ module Mongoid
         #
         # @return [ String ] The atomic path.
         def path
-          @path ||= _unscoped.first.atomic_path
+          @path ||= if _unscoped.empty?
+            Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
+          else
+            _unscoped.first.atomic_path
+          end
         end
 
         # Set the atomic path.

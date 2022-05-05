@@ -20,6 +20,7 @@ class Band
   field :y, as: :years, type: :integer
   field :founded, type: :date
   field :deleted, type: :boolean
+  field :fans
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false

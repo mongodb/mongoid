@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../embeds_many_models'
 
 describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
@@ -507,7 +508,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
     end
   end
 
-  context "when the same class is embedded multiple times" do
+  context "when the same class is embedded multiple times; embeds_one" do
 
     let(:customer) do
       Customer.new
@@ -516,7 +517,6 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
     context "assignment after saving" do
 
       it "correctly sets the association for the embedded class" do
-        pending 'MONGOID-5039'
 
         customer.home_address = CustomerAddress.new
         customer.work_address = CustomerAddress.new
@@ -537,22 +537,82 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
         expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
         expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+
+        expect(customer.home_address.addressable).to eq(customer)
+        expect(customer.work_address.addressable).to eq(customer)
       end
     end
 
     context "inverse assignment" do
 
-      it "correctly sets the association for the embedded class" do
-        pending 'MONGOID-5039'
-
+      it "raises an error when trying to set the association" do
         customer.work_address = CustomerAddress.new
-        customer.work_address.addressable = customer
 
-        expect(customer.home_address._association.store_as).to eq("home_address")
-        expect(customer.work_address._association.store_as).to eq("work_address")
+        expect do
+          customer.work_address.addressable = customer
+        end.to raise_error(Mongoid::Errors::InvalidSetPolymorphicRelation)
+      end
+    end
 
-        expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
-        expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+    context "when there is an explicit inverse_of" do
+
+      let(:customer) { EmmCustomer.new }
+
+      it "correctly sets the association for the embedded class" do
+        customer.work_address = EmmCustomerAddress.new
+
+        expect do
+          customer.work_address.addressable = customer
+        end.to_not raise_error
+
+        expect(customer.work_address.addressable).to eq(customer)
+      end
+    end
+  end
+
+  context "when the same class is embedded multiple times; embeds_many" do
+
+    let(:customer) do
+      EmmCustomer.new
+    end
+
+    context "assignment after saving" do
+
+      it "correctly sets the association for the embedded class" do
+
+        customer.close_friends = [EmmFriend.new]
+        customer.acquaintances = [EmmFriend.new]
+
+        expect(customer.close_friends._association.store_as).to eq("close_friends")
+        expect(customer.acquaintances._association.store_as).to eq("acquaintances")
+
+        expect(customer.close_friends[0].instance_eval { _association.store_as }).to eq("close_friends")
+        expect(customer.acquaintances[0].instance_eval { _association.store_as }).to eq("acquaintances")
+
+        customer.save!
+
+        customer.close_friends = [EmmFriend.new]
+        customer.acquaintances = [EmmFriend.new]
+
+        expect(customer.close_friends._association.store_as).to eq("close_friends")
+        expect(customer.acquaintances._association.store_as).to eq("acquaintances")
+
+        expect(customer.close_friends[0].instance_eval { _association.store_as }).to eq("close_friends")
+        expect(customer.acquaintances[0].instance_eval { _association.store_as }).to eq("acquaintances")
+
+        expect(customer.close_friends[0].befriendable).to eq(customer)
+        expect(customer.acquaintances[0].befriendable).to eq(customer)
+      end
+    end
+
+    context "inverse assignment" do
+
+      it "raises an error when trying to set the association" do
+        customer.acquaintances = [EmmFriend.new]
+
+        expect do
+          customer.acquaintances[0].befriendable = customer
+        end.to raise_error(Mongoid::Errors::InvalidSetPolymorphicRelation)
       end
     end
   end

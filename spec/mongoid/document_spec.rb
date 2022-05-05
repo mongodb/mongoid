@@ -293,27 +293,6 @@ describe Mongoid::Document do
           expect(person.game.name).to eq("Ms. Pacman")
         end
       end
-
-      context "when instantiating model" do
-
-        let(:person) do
-          Person.instantiate("_id" => BSON::ObjectId.new, "title" => "Sir")
-        end
-
-        before do
-          Person.set_callback :initialize, :after do |doc|
-            doc.title = "Madam"
-          end
-        end
-
-        after do
-          Person.reset_callbacks(:initialize)
-        end
-
-        it "runs the callbacks" do
-          expect(person.title).to eq("Madam")
-        end
-      end
     end
 
     context "when defaults are defined" do
@@ -406,21 +385,6 @@ describe Mongoid::Document do
 
     it "returns the internal attributes" do
       expect(person.raw_attributes["title"]).to eq("Sir")
-    end
-  end
-
-  describe "#to_a" do
-
-    let(:person) do
-      Person.new
-    end
-
-    let(:people) do
-      person.to_a
-    end
-
-    it "returns the document in an array" do
-      expect(people).to eq([ person ])
     end
   end
 
@@ -622,12 +586,12 @@ describe Mongoid::Document do
     context "when removing an embedded document" do
 
       before do
-        person.save
+        person.save!
         person.addresses.delete(address)
       end
 
       it "does not include the document in the hash" do
-        expect(person.as_document["addresses"]).to be_empty
+        expect(person.as_document).to_not have_key("addresses")
       end
     end
 
@@ -635,9 +599,9 @@ describe Mongoid::Document do
 
       before do
         # Save the doc, then set an embeds_one relation to nil
-        person.save
+        person.save!
         person.name = nil
-        person.save
+        person.save!
       end
 
       it "does not include the document in the hash" do
@@ -855,7 +819,7 @@ describe Mongoid::Document do
     end
 
     before do
-      person.save
+      person.save!
     end
 
     it "persists the correct type" do
@@ -1077,7 +1041,7 @@ describe Mongoid::Document do
       context "when the document is persisted" do
 
         before do
-          manager.save
+          manager.save!
         end
 
         let(:person) do
@@ -1107,7 +1071,7 @@ describe Mongoid::Document do
       context "when the document is dirty" do
 
         before do
-          manager.save
+          manager.save!
           manager.ssn = "123-22-1234"
         end
 
@@ -1205,7 +1169,7 @@ describe Mongoid::Document do
       context "when the document is persisted" do
 
         before do
-          person.save
+          person.save!
         end
 
         let(:manager) do
@@ -1219,7 +1183,7 @@ describe Mongoid::Document do
         context "when downcasted document is saved" do
 
           before do
-            manager.save
+            manager.save!
           end
 
           it "keeps the type" do
@@ -1258,7 +1222,7 @@ describe Mongoid::Document do
       context "when the document is dirty" do
 
         before do
-          person.save
+          person.save!
           person.ssn = "123-22-1234"
         end
 

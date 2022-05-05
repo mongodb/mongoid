@@ -34,11 +34,13 @@ class Person
   field :i, as: :inte, type: :integer
   field :a, as: :array, type: :array
   field :desc, localize: true
+  field :localized_translations, localize: true
   field :test_array, type: :array
   field :overridden_setter, type: :string
   field :arrays, type: :array
   field :range, type: :range
   field :species, type: :symbol
+  field :posts_count, type: :integer, default: 0
 
   index age: 1
   index addresses: 1

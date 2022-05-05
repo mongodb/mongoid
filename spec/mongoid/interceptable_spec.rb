@@ -5,6 +5,14 @@ require_relative './interceptable_spec_models'
 
 describe Mongoid::Interceptable do
 
+  before do
+    # The find and initialize callbacks I added were causing failures
+    # because they were causing updates when we were asserting no updates
+    # happened.
+    Label.reset_callbacks(:initialize)
+    Label.reset_callbacks(:find)
+  end
+
   class TestClass
     include Mongoid::Interceptable
 
@@ -200,7 +208,7 @@ describe Mongoid::Interceptable do
           ]
         })
         book.id = '123'
-        book.save
+        book.save!
         book
       end
 
@@ -212,7 +220,7 @@ describe Mongoid::Interceptable do
         book.pages.each do | page |
           page.notes.destroy_all
           page.notes.new(message: new_message)
-          page.save
+          page.save!
         end
       end
 
@@ -275,7 +283,7 @@ describe Mongoid::Interceptable do
 
       before do
         expect(artist).to receive(:before_create_stub).once.and_return(true)
-        artist.save
+        artist.save!
       end
 
       it "gets saved" do
@@ -320,7 +328,7 @@ describe Mongoid::Interceptable do
         end
 
         it "the save returns true" do
-          expect(artist.save).to be true
+          expect(artist.save!).to be true
         end
       end
 
@@ -360,7 +368,7 @@ describe Mongoid::Interceptable do
         end
 
         it "the save returns true" do
-          expect(artist.save).to be true
+          expect(artist.save!).to be true
         end
       end
 
@@ -430,7 +438,7 @@ describe Mongoid::Interceptable do
       end
 
       let!(:record) do
-        moderat.records.create(name: "Moderat")
+        moderat.records.create!(name: "Moderat")
       end
 
       before do
@@ -544,7 +552,7 @@ describe Mongoid::Interceptable do
 
           it "does not cascade to the child" do
             Band.accepts_nested_attributes_for :records, allow_destroy: true
-            expect(band.update_attributes(attributes)).to be true
+            expect(band.update_attributes!(attributes)).to be true
           end
         end
       end
@@ -575,7 +583,7 @@ describe Mongoid::Interceptable do
 
           it "only executes the callbacks once for each embed" do
             expect(note).to receive(:update_saved).twice
-            band.save
+            band.save!
           end
         end
       end
@@ -623,7 +631,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -634,7 +642,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:label) do
@@ -642,7 +650,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -654,7 +662,7 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:label) do
@@ -663,7 +671,7 @@ describe Mongoid::Interceptable do
 
           before do
             label.after_create_called = false
-            band.save
+            band.save!
           end
 
           it "does not execute the callback" do
@@ -687,7 +695,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -698,7 +706,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:label) do
@@ -706,7 +714,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -718,7 +726,7 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:label) do
@@ -726,7 +734,7 @@ describe Mongoid::Interceptable do
           end
 
           before do
-            band.save
+            band.save!
           end
 
           it "executes the callback" do
@@ -750,7 +758,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -761,7 +769,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:label) do
@@ -769,7 +777,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -781,7 +789,7 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           context "when the child is dirty" do
@@ -792,7 +800,7 @@ describe Mongoid::Interceptable do
 
             before do
               label.name = "Nothing"
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -807,7 +815,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -832,7 +840,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -843,7 +851,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:label) do
@@ -851,7 +859,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -863,7 +871,7 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:label) do
@@ -871,7 +879,7 @@ describe Mongoid::Interceptable do
           end
 
           before do
-            band.save
+            band.save!
           end
 
           it "executes the callback" do
@@ -895,7 +903,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -906,7 +914,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -914,7 +922,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -926,16 +934,16 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           before do
             record.before_create_called = false
-            band.save
+            band.save!
           end
 
           it "does not execute the callback" do
@@ -959,7 +967,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -974,7 +982,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -982,7 +990,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -998,15 +1006,15 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           before do
-            band.save
+            band.save!
           end
 
           it "executes the callback" do
@@ -1021,7 +1029,7 @@ describe Mongoid::Interceptable do
         context "when the child is created" do
 
           let!(:band) do
-            Band.create
+            Band.create!
           end
 
           let!(:label) do
@@ -1049,7 +1057,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -1060,7 +1068,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -1068,7 +1076,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -1080,18 +1088,18 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           context "when the child is dirty" do
 
             before do
               record.name = "Nothing"
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -1106,7 +1114,7 @@ describe Mongoid::Interceptable do
           context "when the child is not dirty" do
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -1131,7 +1139,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -1146,7 +1154,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -1154,7 +1162,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -1169,7 +1177,7 @@ describe Mongoid::Interceptable do
           context 'when the parent is updated' do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             before do
@@ -1189,7 +1197,7 @@ describe Mongoid::Interceptable do
         context 'when the parent is updated' do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           before do
@@ -1208,15 +1216,15 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           before do
-            band.save
+            band.save!
           end
 
           it "executes the callback" do
@@ -1251,7 +1259,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -1262,7 +1270,7 @@ describe Mongoid::Interceptable do
           context "when the root is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -1274,7 +1282,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -1286,20 +1294,20 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           let!(:track) do
-            record.tracks.create(name: "Berlin")
+            record.tracks.create!(name: "Berlin")
           end
 
           before do
             track.before_create_called = false
-            band.save
+            band.save!
           end
 
           it "does not execute the callback" do
@@ -1327,7 +1335,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             let(:reloaded) do
@@ -1346,7 +1354,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -1358,7 +1366,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             let(:reloaded) do
@@ -1378,19 +1386,19 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           let!(:track) do
-            record.tracks.create(name: "Berlin")
+            record.tracks.create!(name: "Berlin")
           end
 
           before do
-            band.save
+            band.save!
           end
 
           let(:reloaded) do
@@ -1426,7 +1434,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -1437,7 +1445,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -1449,7 +1457,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -1461,22 +1469,22 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           let!(:track) do
-            record.tracks.create(name: "Berlin")
+            record.tracks.create!(name: "Berlin")
           end
 
           context "when the child is dirty" do
 
             before do
               track.name = "Rusty Nails"
-              band.save
+              band.save!
             end
 
             let(:reloaded) do
@@ -1495,7 +1503,7 @@ describe Mongoid::Interceptable do
           context "when the child is not dirty" do
 
             before do
-              band.save
+              band.save!
             end
 
             it "does not execute the callback" do
@@ -1543,7 +1551,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -1554,7 +1562,7 @@ describe Mongoid::Interceptable do
           context "when the parent is persisted" do
 
             let(:band) do
-              Band.create(name: "Moderat")
+              Band.create!(name: "Moderat")
             end
 
             let!(:record) do
@@ -1566,7 +1574,7 @@ describe Mongoid::Interceptable do
             end
 
             before do
-              band.save
+              band.save!
             end
 
             it "executes the callback" do
@@ -1578,19 +1586,19 @@ describe Mongoid::Interceptable do
         context "when the child is persisted" do
 
           let(:band) do
-            Band.create(name: "Moderat")
+            Band.create!(name: "Moderat")
           end
 
           let!(:record) do
-            band.records.create(name: "Moderat")
+            band.records.create!(name: "Moderat")
           end
 
           let!(:track) do
-            record.tracks.create(name: "Berlin")
+            record.tracks.create!(name: "Berlin")
           end
 
           before do
-            band.save
+            band.save!
           end
 
           it "executes the callback" do
@@ -1617,11 +1625,11 @@ describe Mongoid::Interceptable do
     end
 
     before do
-      parent.save
+      parent.save!
     end
 
     it "does not duplicate the child documents" do
-      parent.children.create(position: 1)
+      parent.children.create!(position: 1)
       expect(ParentDoc.find(parent.id).children.size).to eq(1)
     end
   end
@@ -1672,7 +1680,7 @@ describe Mongoid::Interceptable do
     context "when updating a document" do
 
       let(:person) do
-        Person.create.tap do |person|
+        Person.create!.tap do |person|
           person.attributes = {
             mode: :prevent_save,
             title: "Associate",
@@ -2075,6 +2083,291 @@ describe Mongoid::Interceptable do
         parent.save!
         expect(registry.calls).to eq expected
       end
+    end
+  end
+
+  context "when accessing parent document from callbacks" do
+    shared_examples 'accesses the correct parent' do
+      it "accesses the correct parent in after_find" do
+        expect(from_db.after_find_player).to eq(player._id)
+      end
+
+      it "accesses the correct parent in after_initialize" do
+        expect(from_db.after_initialize_player).to eq(player._id)
+      end
+
+      it "accesses the correct parent in default" do
+        expect(from_db.after_default_player).to eq(player._id)
+      end
+
+      it "accesses the correct parent in unpersisted after_initialize" do
+        expect(unpersisted.after_initialize_player).to eq(player._id)
+      end
+    end
+
+    context "when using create methods" do
+
+      context "when the child is an embeds_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.implants.create!
+          end
+        end
+
+        let(:unpersisted) { player.implants.first }
+
+        before do
+          # The default is originally set when creating this document, and it is
+          # subsequently persisted to the database. Therefore when we retrieve
+          # this document from the database, this field is already set, and
+          # the default Proc is not called. This unset is needed to allow the
+          # default Proc to be called when the document is retrieved from the
+          # database.
+          Player.find(player.id).implants.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).implants.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is an embeds_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.create_augmentation
+          end
+        end
+
+        let(:unpersisted) { player.augmentation }
+
+        before do
+          Player.find(player.id).augmentation.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).augmentation
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.weapons.create!
+          end
+        end
+
+        let(:unpersisted) { player.weapons.first }
+
+        before do
+          Player.find(player.id).weapons.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).weapons.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.create_powerup
+            player.save!
+          end
+        end
+
+        let(:unpersisted) { player.powerup }
+
+        before do
+          Player.find(player.id).powerup.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).powerup
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_and_belongs_to_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.shields.create!
+          end
+        end
+
+        let(:unpersisted) { player.shields.first }
+
+        before do
+          Player.find(player.id).shields.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).shields.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+    end
+
+    context "when using build methods" do
+
+      context "when the child is an embeds_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.implants.build
+            player.implants.first.save!
+          end
+        end
+
+        let(:unpersisted) { player.implants.first }
+
+        before do
+          Player.find(player.id).implants.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).implants.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is an embeds_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.build_augmentation
+            player.save!
+          end
+        end
+
+        let(:unpersisted) { player.augmentation }
+
+        before do
+          Player.find(player.id).augmentation.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).augmentation
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.weapons.build
+            player.weapons.first.save!
+          end
+        end
+
+        let(:unpersisted) { player.weapons.first }
+
+        before do
+          Player.find(player.id).weapons.first.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).weapons.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_one association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.build_powerup
+            player.powerup.save!
+          end
+        end
+
+        let(:unpersisted) { player.powerup }
+
+        before do
+          Player.find(player.id).powerup.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).powerup
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+
+      context "when the child is a has_and_belongs_to_many association" do
+        let!(:player) do
+          Player.create!.tap do |player|
+            player.shields.build
+            player.shields.first.save!
+          end
+        end
+
+        let(:unpersisted) { player.shields.first }
+
+        before do
+          Player.find(player.id).shields.unset(:after_default_player)
+        end
+
+        let(:from_db) do
+          Player.find(player.id).shields.first
+        end
+
+        include_examples 'accesses the correct parent'
+      end
+    end
+  end
+
+  context "when accessing associations in defaults" do
+    context "when not using autobuilding" do
+      let(:band) { InterceptableBand.create(name: "Molejo") }
+      let(:song) { band.songs.create(name: "Cilada") }
+
+      it "assigns the default correctly" do
+        expect(song.band_name).to eq("Molejo")
+      end
+    end
+
+    context "when using autobuilding" do
+      before do
+        InterceptablePlane.create!.tap do |plane|
+          plane.wings.create!
+        end
+      end
+
+      let(:plane) { InterceptablePlane.first }
+      let(:wing) { InterceptableWing.first }
+      let(:engine) { wing.engine }
+
+      it "sets the defaults correctly" do
+        expect(wing._id).to eq("hello-wing")
+        expect(wing.p_id).to eq(plane._id.to_s)
+        expect(wing.e_id).to eq(engine._id.to_s)
+        expect(engine._id).to eq("hello-engine-#{wing.id}")
+      end
+    end
+  end
+
+  # This case is rather niche. The _ids method used to use the `.only` method
+  # to get only the _ids for an association, which was causing a
+  # MissingAttributeError to be raised when accessing another association. This
+  # was fixed by using `.pluck` over `.only`. Look at MONGOID-5306 for a more
+  # detailed explanation.
+  context "when accessing _ids in validate and access an association in after_initialize" do
+    it "doesn't raise a MissingAttributeError" do
+      company = InterceptableCompany.create!
+      shop = InterceptableShop.create!(company: company)
+      user = InterceptableUser.new
+      user.company = company
+      expect do
+        user.save!
+      end.to_not raise_error(ActiveModel::MissingAttributeError)
     end
   end
 end

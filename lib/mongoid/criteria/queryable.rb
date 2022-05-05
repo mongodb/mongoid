@@ -33,9 +33,10 @@ module Mongoid
       include Optional
 
       # @attribute [r] aliases The aliases.
-      # @attribute [r] driver The Mongo driver being used.
+      attr_reader :aliases
+
       # @attribute [r] serializers The serializers.
-      attr_reader :aliases, :driver, :serializers
+      attr_reader :serializers
 
       # Is this queryable equal to another object? Is true if the selector and
       # options are equal.
@@ -59,11 +60,15 @@ module Mongoid
       #
       # @param [ Hash ] aliases The optional field aliases.
       # @param [ Hash ] serializers The optional field serializers.
+      # @param [ Hash ] associations The optional associations.
+      # @param [ Hash ] aliased_associations The optional aliased associations.
       # @param [ Symbol ] driver The driver being used.
-      def initialize(aliases = {}, serializers = {}, driver = :mongo)
-        @aliases, @driver, @serializers = aliases, driver.to_sym, serializers
-        @options = Options.new(aliases, serializers)
-        @selector = Selector.new(aliases, serializers)
+      #
+      # @api private
+      def initialize(aliases = {}, serializers = {}, associations = {}, aliased_associations = {})
+        @aliases, @serializers = aliases, serializers
+        @options = Options.new(aliases, serializers, associations, aliased_associations)
+        @selector = Selector.new(aliases, serializers, associations, aliased_associations)
         @pipeline = Pipeline.new(aliases)
         @aggregating = nil
         yield(self) if block_given?

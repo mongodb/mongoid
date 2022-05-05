@@ -25,6 +25,8 @@ class Player
   embeds_many :implants
   embeds_one :augmentation
 
+  has_and_belongs_to_many :shields
+
   after_find do |doc|
     doc.impressions += 1
   end

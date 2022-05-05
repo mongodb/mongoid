@@ -173,4 +173,100 @@ describe 'has_one associations' do
       end
     end
   end
+
+  context "when assigning to a has_one" do
+    let(:post) { HomPost.create! }
+    let(:comment1) { HomComment.create!(content: "Comment 1") }
+
+    context "when assigning the same value" do
+      let(:comment2) { HomComment.create! }
+
+      it "persists it correctly" do
+        post.comment = comment1
+        post.reload
+        expect(post.comment).to eq(comment1)
+
+        post.comment = comment1
+        post.reload
+        expect(post.comment).to eq(comment1)
+      end
+    end
+
+    context "when assigning two values with the same _id" do
+      let(:comment2) { HomComment.new(id: comment1.id) }
+
+      it "raises a duplicate key error" do
+        post.comment = comment1
+        expect do
+          post.comment = comment2
+        end.to raise_error(Mongo::Error::OperationFailure, /duplicate key/)
+      end
+    end
+
+    context "when duping the object and changing attributes" do
+      let(:comment2) { comment1.dup }
+
+      before do
+        comment2.content = "Comment 2"
+
+        post.comment = comment1
+        post.reload
+      end
+
+      it "updates the attributes correctly" do
+        post.comment = comment2
+        post.reload
+
+        expect(post.comment).to eq(comment2)
+        expect(post.comment.content).to eq(comment2.content)
+      end
+    end
+
+    context "when explicitly setting the foreign key" do
+      let(:comment2) { HomComment.new(post_id: post.id, content: "2") }
+
+      it "persists the new comment" do
+        post.comment = comment1
+        post.reload
+
+        post.comment = comment2
+        post.reload
+
+        expect(post.comment).to eq(comment2)
+        expect(post.comment.content).to eq(comment2.content)
+      end
+    end
+
+    context "when reassigning the same value" do
+      let(:comment2) { HomComment.create!(content: "Comment 2") }
+
+      it "persists it correctly" do
+        post.comment = comment1
+        post.reload
+        expect(post.comment).to eq(comment1)
+
+        post.comment = comment2
+        post.reload
+        expect(post.comment).to eq(comment2)
+
+        post.comment = comment1
+        post.reload
+        expect(post.comment).to eq(nil)
+      end
+    end
+  end
+
+  context "when overwriting an association" do
+    let(:post1) { HomPost.create!(title: "post 1") }
+    let(:post2) { HomPost.create!(title: "post 2") }
+    let(:comment) { HomComment.create(post: post1) }
+
+    it "does not overwrite the original value" do
+      pending "MONGOID-3999"
+      p1 = comment.post
+      expect(p1.title).to eq("post 1")
+      comment.post = post2
+      expect(p1.title).to eq("post 1")
+    end
+  end
 end

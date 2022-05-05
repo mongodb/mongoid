@@ -15,8 +15,7 @@ module Mongoid
     #
     # @return [ Hash ] The document's selector.
     def atomic_selector
-      @atomic_selector ||=
-        (embedded? ? embedded_atomic_selector : root_atomic_selector_in_db)
+      embedded? ? embedded_atomic_selector : root_atomic_selector_in_db
     end
 
     private

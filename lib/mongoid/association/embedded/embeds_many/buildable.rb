@@ -31,7 +31,7 @@ module Mongoid
             docs = []
             object.each do |attrs|
               if _loading? && base.persisted?
-                docs.push(Factory.from_db(klass, attrs, nil, selected_fields))
+                docs.push(Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false))
               else
                 docs.push(Factory.build(klass, attrs))
               end

@@ -37,7 +37,7 @@ Defining Text Search Index
 
 Index definition through Mongoid is described in detail on the `indexes
 <indexes>`_ page. Text search indexes are described in detail
-under `text indexes <https://docs.mongodb.com/manual/core/index-text/>`_
+under `text indexes <https://mongodb.com/docs/manual/core/index-text/>`_
 in the MongoDB manual. Below is an example definition of a Band model with
 a text index utilizing the description field:
 
@@ -69,7 +69,7 @@ Querying Using Text Index
 -------------------------
 
 To find bands whose description contains "ounces" or its variations, use the
-`$text operator <https://docs.mongodb.com/manual/reference/operator/query/text/#op._S_text>`_:
+`$text operator <https://mongodb.com/docs/manual/reference/operator/query/text/#op._S_text>`_:
 
 .. code-block:: ruby
 

@@ -329,7 +329,6 @@ describe Mongoid::Atomic::Paths do
       context "assignment after saving" do
 
         it "correctly sets the association for the embedded class" do
-          pending 'MONGOID-5039'
 
           customer.home_address = CustomerAddress.new
           customer.work_address = CustomerAddress.new
@@ -341,19 +340,6 @@ describe Mongoid::Atomic::Paths do
 
           customer.home_address = CustomerAddress.new
           customer.work_address = CustomerAddress.new
-
-          expect(customer.home_address.atomic_path).to eq("home_address")
-          expect(customer.work_address.atomic_path).to eq("work_address")
-        end
-      end
-
-      context "inverse assignment" do
-
-        it "correctly returns the path for each embedded class" do
-          pending 'MONGOID-5039'
-
-          customer.work_address = CustomerAddress.new
-          customer.work_address.addressable = customer
 
           expect(customer.home_address.atomic_path).to eq("home_address")
           expect(customer.work_address.atomic_path).to eq("work_address")

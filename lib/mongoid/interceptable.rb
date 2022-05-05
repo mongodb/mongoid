@@ -152,6 +152,39 @@ module Mongoid
       end
     end
 
+    # This is used to store callbacks to be executed later. A good use case for
+    # this is delaying the after_find and after_initialize callbacks until the
+    # associations are set on the document. This can also be used to delay
+    # applying the defaults on a document.
+    #
+    # @return [ Array<Symbol> ] an array of symbols that represent the pending callbacks.
+    #
+    # @api private
+    def pending_callbacks
+      @pending_callbacks ||= [].to_set
+    end
+
+    # @api private
+    def pending_callbacks=(value)
+      @pending_callbacks = value
+    end
+
+    # Run the pending callbacks. If the callback is :apply_defaults, we will apply
+    # the defaults for this document. Otherwise, the callback is passed to the
+    # run_callbacks function.
+    #
+    # @api private
+    def run_pending_callbacks
+      pending_callbacks.each do |cb|
+        if [:apply_defaults, :apply_post_processed_defaults].include?(cb)
+          send(cb)
+        else
+          self.run_callbacks(cb, with_children: false)
+        end
+      end
+      pending_callbacks.clear
+    end
+
     private
 
     # We need to hook into this for autosave, since we don't want it firing if

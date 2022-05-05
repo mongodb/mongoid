@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../association/referenced/has_many_models'
+require_relative '../association/referenced/has_and_belongs_to_many_models'
+require_relative './nested_spec_models'
 
 describe Mongoid::Attributes::Nested do
 
@@ -272,7 +275,7 @@ describe Mongoid::Attributes::Nested do
             context "when saving the parent" do
 
               before do
-                person.save
+                person.save!
                 person.reload
               end
 
@@ -616,7 +619,7 @@ describe Mongoid::Attributes::Nested do
 
                       before do
                         owner.pet_attributes = { id: pet.id, _destroy: truth }
-                        owner.save
+                        owner.save!
                       end
 
                       it "destroys the existing document" do
@@ -1068,7 +1071,7 @@ describe Mongoid::Attributes::Nested do
             context "when saving the parent" do
 
               before do
-                person.save
+                person.save!
                 person.reload
               end
 
@@ -1184,7 +1187,7 @@ describe Mongoid::Attributes::Nested do
             context "when the parent is saved" do
 
               before do
-                band.save
+                band.save!
               end
 
               it "runs the first child create callbacks" do
@@ -1414,17 +1417,17 @@ describe Mongoid::Attributes::Nested do
                   end
 
                   let!(:band) do
-                    Band.create
+                    Band.create!
                   end
 
                   let!(:record) do
-                    band.records.create
+                    band.records.create!
                   end
 
                   before do
                     band.records_attributes =
                       { "foo" => { "id" => record.id, "_destroy" => true }}
-                    band.save
+                    band.save!
                   end
 
                   it "deletes the child document" do
@@ -1500,7 +1503,7 @@ describe Mongoid::Attributes::Nested do
                               "bar" => { "id" => app_one.id, "_destroy" => true },
                               "foo" => { "id" => app_two.id, "_destroy" => true }
                             }
-                          from_db.save
+                          from_db.save!
                         end
 
                         it "destroys both children" do
@@ -1622,7 +1625,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.save
+                              persisted.save!
                             end
 
                             it "deletes the marked document from the relation" do
@@ -1678,7 +1681,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.save
+                              persisted.save!
                             end
 
                             it "deletes the marked document from the relation" do
@@ -2390,8 +2393,8 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                pizza.topping = Topping.create(name: "cheese")
-                pizza.update_attributes(topping_attributes: { name: "onions" })
+                pizza.topping = Topping.create!(name: "cheese")
+                pizza.update_attributes!(topping_attributes: { name: "onions" })
               end
 
               it "persists the attribute changes" do
@@ -3031,7 +3034,7 @@ describe Mongoid::Attributes::Nested do
                       "0" => { "id" => post_one.id, "title" => "testing again" },
                       "1" => { "id" => post_two.id, "title" => "$$$" }
                     }
-                  person.save
+                  person.save!
                 end
 
                 it "does not perist the invalid value" do
@@ -3307,7 +3310,7 @@ describe Mongoid::Attributes::Nested do
               context "when the parent is saved" do
 
                 before do
-                  person.save
+                  person.save!
                   person.posts_attributes =
                     [
                       { "title" => "Third" },
@@ -4304,7 +4307,7 @@ describe Mongoid::Attributes::Nested do
     end
   end
 
-  describe "#update_attributes" do
+  describe "#update_attributes!" do
 
     before do
       Person.send(:undef_method, :addresses_attributes=)
@@ -4337,7 +4340,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          node.update_attributes(attributes)
+          node.update_attributes!(attributes)
         end
 
         it "adds the new embedded document" do
@@ -4369,7 +4372,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        person.update_attributes(attributes)
+        person.update_attributes!(attributes)
       end
 
       it "removes the document from the parent" do
@@ -4420,7 +4423,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        address.update_attributes(attributes)
+        address.update_attributes!(attributes)
         address.reload
       end
 
@@ -4463,7 +4466,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person_one.update_attributes(attributes)
+            person_one.update_attributes!(attributes)
           end
 
           it "deletes the document from the relation" do
@@ -4513,7 +4516,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              band.update_attributes(attributes)
+              band.update_attributes!(attributes)
             end
 
             it "removes the child from the relation" do
@@ -4546,7 +4549,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
             end
 
             let(:address) do
@@ -4586,7 +4589,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
               person.reload
             end
 
@@ -4617,7 +4620,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.update_attributes(attributes)
+            person.update_attributes!(attributes)
           end
 
           let(:address) do
@@ -4666,7 +4669,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.update_attributes(attributes)
+            person.update_attributes!(attributes)
           end
 
           it "updates the first level embedded document" do
@@ -4706,7 +4709,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.update_attributes(attributes)
+              person.update_attributes!(attributes)
             end
 
             it "updates the first level embedded document" do
@@ -4742,7 +4745,7 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                person.update_attributes(attributes)
+                person.update_attributes!(attributes)
               end
 
               it "updates the nested embedded document" do
@@ -4769,7 +4772,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          user.update_attributes(params)
+          user.update_attributes!(params)
         end
 
         around do |example|
@@ -4891,7 +4894,7 @@ describe Mongoid::Attributes::Nested do
         end
 
         before do
-          league.update_attributes(params)
+          league.update_attributes!(params)
         end
 
         it "sets the nested attributes" do
@@ -4911,13 +4914,86 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            league.update_attributes(new_params)
+            league.update_attributes!(new_params)
           end
 
           it "sets the nested attributes" do
             expect(league.reload.divisions.first.name).to eq("Name")
           end
         end
+      end
+    end
+  end
+
+  context "when destroying has_many child using nested attributes" do
+    let(:school) do
+      School.create
+    end
+
+    let!(:student) do
+      school.students.create
+    end
+
+    before do
+      school.attributes = {
+        '_id': school.id,
+        'students_attributes': [{
+          '_id': student.id,
+          '_destroy': 1
+          }]
+        }
+    end
+
+    it "is able to access the parent in the after_destroy callback" do
+      expect(school.after_destroy_triggered).to eq(true)
+    end
+  end
+
+  context "when destroying has_many child using nested attributes" do
+    let(:school) do
+      HabtmmSchool.create!(students: [student])
+    end
+
+    let(:student) do
+      HabtmmStudent.create!
+    end
+
+    before do
+      student.schools << school
+      school.attributes = {
+        '_id': school.id,
+        'students_attributes': [{
+          '_id': student.id,
+          '_destroy': 1
+          }]
+        }
+    end
+
+    it "is able to access the parent in the after_destroy callback" do
+      expect(school.reload.after_destroy_triggered).to eq(true)
+    end
+  end
+
+  context "when using a multi-leveled nested attribute on a referenced association" do
+    let(:author) { NestedAuthor.create }
+    let(:one_level_params) { { post_attributes: { title: 'test' } } }
+    let(:two_levels_params) { { post_attributes: { comments_attributes: [ { body: 'test' } ] } } }
+
+    it "creates a 1st-depth child model" do
+      author.update_attributes(one_level_params)
+      expect(author.post.persisted?).to be true
+    end
+
+    it "creates a 1st-depth child model, and a 2nd-depth child model" do
+      author.update_attributes(two_levels_params)
+      expect(author.post.comments.count).to eq 1
+    end
+
+    context "the 1st-depth child model already exists" do
+      it "creates a 2nd-depth child model" do
+        author.create_post(title: 'test')
+        author.update_attributes(two_levels_params)
+        expect(author.post.comments.count).to eq 1
       end
     end
   end

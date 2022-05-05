@@ -344,7 +344,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         before do
-          person.update_attributes(set_addresses: [ new_address ])
+          person.update_attributes!(set_addresses: [ new_address ])
         end
 
         it "overwrites the existing addresses" do
@@ -571,7 +571,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
         before do
           attributes["addresses"][0]["city"] = "Berlin"
-          person.update_attributes(attributes)
+          person.update_attributes!(attributes)
         end
 
         it "sets the new attributes" do
@@ -607,7 +607,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         before do
           attributes["city"] = "Berlin"
           attributes["locations"][0]["name"] = "Home"
-          person.addresses.first.update_attributes(attributes)
+          person.addresses.first.update_attributes!(attributes)
         end
 
         it "sets the new attributes on the address" do
@@ -3215,7 +3215,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         context "when updating with a hash" do
 
           before do
-            address.update_attributes(locations: [{ name: "home" }])
+            address.update_attributes!(locations: [{ name: "home" }])
           end
 
           it "updates the attributes" do
@@ -3615,7 +3615,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
 
     before do
-      person.update_attributes(person.attributes)
+      person.update_attributes!(person.attributes)
     end
 
     it "does not duplicate the embedded documents" do
@@ -4076,7 +4076,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
 
       before do
-        from_db.update_attributes(
+        from_db.update_attributes!(
             addresses: [
                 { locations: [{ name: "work" }]}
             ]
@@ -4139,7 +4139,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
 
     before do
-      person.update_attributes(
+      person.update_attributes!(
           appointments: [ appointment_one.as_document, appointment_two.as_document ],
           symptoms: [ symptom_one.as_document, symptom_two.as_document ]
       )
@@ -4646,6 +4646,55 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         it "properly sets the association" do
           expect(zone.soa.delete).to be true
         end
+      end
+    end
+  end
+
+  context "when trying to persist the empty list" do
+
+    context "in an embeds_many relation" do
+
+      let(:band) { Band.create! }
+
+      before do
+        band.labels = []
+        band.save!
+      end
+
+      let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+
+      it "persists the empty list" do
+        expect(reloaded_band).to have_key(:labels)
+        expect(reloaded_band[:labels]).to eq []
+      end
+    end
+
+    context "in a nested embeds_many relation" do
+
+      let(:survey) { Survey.create!(questions: [Question.new]) }
+
+      before do
+        survey.questions.first.answers = []
+        survey.save!
+      end
+
+      let(:reloaded_survey) { Survey.collection.find(_id: survey._id).first }
+
+      it "persists the empty list" do
+        expect(reloaded_survey).to have_key(:questions)
+        expect(reloaded_survey[:questions][0]).to have_key(:answers)
+        expect(reloaded_survey[:questions][0][:answers]).to eq []
+      end
+    end
+
+    context "when not setting the embeds_many field" do
+
+      let(:band) { Band.create! }
+
+      let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+
+      it "does not persist the empty list" do
+        expect(reloaded_band).to_not have_key(:labels)
       end
     end
   end

@@ -84,7 +84,7 @@ module Mongoid
         #
         # @return [ Options ] The copied options.
         def __deep_copy__
-          self.class.new(aliases, serializers) do |copy|
+          self.class.new(aliases, serializers, associations, aliased_associations) do |copy|
             each_pair do |key, value|
               copy.merge!(key => value.__deep_copy__)
             end

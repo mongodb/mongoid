@@ -1,5 +1,5 @@
 ***********
-Mongoid 7.5
+Mongoid 8.0
 ***********
 
 .. default-domain:: mongodb
@@ -10,7 +10,7 @@ Mongoid 7.5
    :depth: 2
    :class: singlecol
 
-This page describes significant changes and improvements in Mongoid 7.5.
+This page describes significant changes and improvements in Mongoid 8.0.
 The complete list of releases is available `on GitHub
 <https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
 <https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
@@ -18,16 +18,44 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Support for MongoDB 3.4 and Earlier Servers Dropped
+---------------------------------------------------
+
+Mongoid 8 requires MongoDB 3.6 or newer. Earlier server versions are not
+supported.
+
+
+Default Option Values Changed
+-----------------------------
+
+**Breaking change:** The following options have had their default values
+changed in Mongoid 8.0:
+
+- ``:broken_aggregables`` => ``false``
+- ``:broken_alias_handling`` => ``false``
+- ``:broken_and`` => ``false``
+- ``:broken_scoping`` => ``false``
+- ``:broken_updates`` => ``false``
+- ``:compare_time_by_ms`` => ``true``
+- ``:legacy_pluck_distinct`` => ``false``
+- ``:legacy_triple_equals`` => ``false``
+- ``:map_big_decimal_to_decimal128`` => ``true``
+- ``:object_id_as_json_oid`` => ``false``
+
+Please refer to :ref:`configuration option <configuration-options>` for
+the description and effects of each of these options.
+
+
 Order of Callback Invocation
 ----------------------------
 
-**Breaking change:** Mongoid 7.5 changes the order of _create and _save callback
+**Breaking change:** Mongoid 8.0 changes the order of _create and _save callback
 invocation for documents with associations.
 
 Referenced associations (``has_one`` and ``has_many``):
 
 +---------------------------------------+---------------------------------------+
-| Mongoid 7.5                           | Mongoid 7.4                           |
+| Mongoid 8.0                           | Mongoid 7                             |
 +=======================================+=======================================+
 | Parent :before_save                   | Parent :before_save                   |
 +---------------------------------------+---------------------------------------+
@@ -73,7 +101,7 @@ Referenced associations (``has_one`` and ``has_many``):
 Embedded associations (``embeds_one`` and ``embeds_many``):
 
 +---------------------------------------+---------------------------------------+
-| Mongoid 7.5                           | Mongoid 7.4                           |
+| Mongoid 8.0                           | Mongoid 7                             |
 +=======================================+=======================================+
 | Parent :before_save                   | Child :before_save                    |
 +---------------------------------------+---------------------------------------+
@@ -119,6 +147,61 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
 +---------------------------------------+---------------------------------------+
 
 
+``any_of`` Adds Multiple Arguments As Top-Level Conditions
+----------------------------------------------------------
+
+**Breaking change:** When ``any_of`` is invoked with multiple conditions, the
+conditions are now added to the top level of the criteria, same as when
+``any_of`` is invoked with a single condition. Previously when multiple
+conditions were provided, and the criteria already had an ``$or`` operator,
+the new conditions would be added to the existing ``$or`` as an additional
+branch.
+
+Mongoid 8.0 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}],
+  #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Mongoid 7 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990},
+  #     {"members"=>2}, {"last_tour"=>1995}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+
 ``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
 --------------------------------------------------------------------------
 
@@ -133,8 +216,8 @@ in ``after_*`` callbacks. This follows ActiveRecord/ActiveModel behavior.
     field :age, type: :integer
 
     after_save do
-        p self
-        p attribute_was(:age)
+      p self
+      p attribute_was(:age)
     end
   end
 
@@ -142,7 +225,7 @@ in ``after_*`` callbacks. This follows ActiveRecord/ActiveModel behavior.
   a.age = 2
   a.save!
 
-Mongoid 7.5 output:
+Mongoid 8.0 output:
 
 .. code-block:: ruby
 
@@ -150,23 +233,83 @@ Mongoid 7.5 output:
   2
 
 
-Mongoid 7.4 output:
+Mongoid 7 output:
 
 .. code-block:: ruby
 
   #<Cat _id: 60aef1652c97a617438dc9bb, age: 2>
   nil
 
-Notice that in 7.4 ``attribute_was(:age)`` returns the old attribute value,
-while in 7.5 ``attribute_was(:age)`` returns the new value.
+Notice that in 7 ``attribute_was(:age)`` returns the old attribute value,
+while in 8.0 ``attribute_was(:age)`` returns the new value.
+
+``*_previously_was``, ``previously_new_record?``, and ``previously_persisted?`` helpers
+---------------------------------------------------------------------------------------
+
+Mongoid 8.0 introduces ActiveModel-compatible ``*_previously_was`` helpers,
+as well as ActiveRecord-compatible ``previously_new_record?`` and
+``previously_persisted?`` helpers:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :string
+    field :age, type: :integer
+  end
+
+  user = User.create!(name: 'Sam', age: 18)
+  user.previously_new_record?     # => true
+
+  user.name = "Nick"
+  user.save!
+  user.name_previously_was        # => "Sam"
+  user.age_previously_was         # => 18
+  user.previously_new_record?     # => false
+
+  user.destroy
+  user.previously_persisted?   # => true
+
+
+Unknown Field Type Symbols/Strings Prohibited
+---------------------------------------------
+
+Mongoid 8 prohibits using symbols and strings as field types when these symbols
+and strings do not map to a known type. Previously such usage would create a
+field of type ``Object``.
+
+Mongoid 8 behavior:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :bogus
+    # => raises Mongoid::Errors::InvalidFieldType
+  end
+
+Mongoid 7 behavior:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :bogus
+    # Equivalent to:
+    field :name
+  end
 
 
 Setting Field Type as a Class is Deprecated
 -------------------------------------------
 
 Mongoid has historically supported defining the ``field :type`` option
-as either a Symbol or a Class. As of Mongoid 7.5, using a Class is deprecated
-and Symbol is preferred. Support for Class will be removed entirely in Mongoid 8.0.
+as either a Symbol or a Class. As of Mongoid 8.0, using a Class is deprecated
+and Symbol is preferred. Support for ``field :type`` as a Class will be
+removed in a future major version of Mongoid.
 
 .. code-block:: ruby
 
@@ -184,7 +327,7 @@ and Symbol is preferred. Support for Class will be removed entirely in Mongoid 8
 Support for Defining Custom Field Type Values
 ---------------------------------------------
 
-Mongoid 7.5 adds the ability to define custom ``field :type`` Symbol values as follows:
+Mongoid 8.0 adds the ability to define custom ``field :type`` Symbol values as follows:
 
 .. code-block:: ruby
 
@@ -195,3 +338,38 @@ Mongoid 7.5 adds the ability to define custom ``field :type`` Symbol values as f
   end
 
 Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
+
+
+Removed ``Document#to_a`` Method
+--------------------------------
+
+The previously deprecated ``Document#to_a`` method has been removed in
+Mongoid 8.
+
+
+Removed ``Mongoid::Errors::EagerLoad`` Exception Class
+------------------------------------------------------
+
+The previously deprecated ``Mongoid::Errors::EagerLoad`` exception class
+has been removed in Mongoid 8. It has not been used by Mongoid since
+version 7.1.1 when eager loading for polymorphic ``belongs_to`` associations
+was implemented.
+
+
+Replaced ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
+----------------------------------------------------------------
+
+The previously deprecated ``Mongoid::Criteria#geo_spacial`` method has been
+removed in Mongoid 8. It has been replaced one-for-one with ``#geo_spatial``
+which was added in Mongoid 7.2.0.
+
+
+Removed Deprecated Constants
+----------------------------
+
+Mongoid 8 removes the following deprecated constants that are not expected
+to have been used outside of Mongoid:
+
+- ``Mongoid::Extensions::Date::EPOCH``
+- ``Mongoid::Extensions::Time::EPOCH``
+- ``Mongoid::Factory::TYPE``

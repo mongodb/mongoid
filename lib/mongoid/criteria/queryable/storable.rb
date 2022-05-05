@@ -54,7 +54,7 @@ module Mongoid
               # adding them to the existing hash.
               new_value = selector[field].merge(value)
               selector.store(field, new_value)
-            else
+            elsif selector[field] != value
               add_operator_expression('$and', [{field => value}])
             end
           else
@@ -123,7 +123,7 @@ module Mongoid
           elsif operator == '$and' || selector.empty?
             # $and can always be added to top level and it will be combined
             # with whatever other conditions exist.
-            if current_value = selector[operator]
+            if !Mongoid.broken_and && current_value = selector[operator]
               new_value = current_value + op_expr
               selector.store(operator, new_value)
             else

@@ -1234,1114 +1234,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#includes" do
-
-    let!(:person) do
-      Person.create!(age: 1)
-    end
-
-    context "when providing a name that is not a relation" do
-
-      it "raises an error" do
-        expect {
-          Person.includes(:members)
-        }.to raise_error(Mongoid::Errors::InvalidIncludes)
-      end
-    end
-
-    context "when providing one association" do
-
-      let!(:user) do
-        User.create!(posts: [ post1 ])
-      end
-
-      let!(:post1) do
-        Post.create!
-      end
-
-      let(:result) do
-        User.includes(:posts).first
-      end
-
-      it "executes the query" do
-        expect(result).to eq(user)
-      end
-
-      it "includes the related objects" do
-        expect(result.posts).to eq([ post1 ])
-      end
-    end
-
-    context "when providing a list of associations" do
-
-      let!(:user) do
-        User.create!(posts: [ post1 ], descriptions: [ description1 ])
-      end
-
-      let!(:post1) do
-        Post.create!
-      end
-
-      let!(:description1) do
-        Description.create!(details: 1)
-      end
-
-      let(:result) do
-        User.includes(:posts, :descriptions).first
-      end
-
-      it "executes the query" do
-        expect(result).to eq(user)
-      end
-
-      it "includes the related objects" do
-        expect(result.posts).to eq([ post1 ])
-        expect(result.descriptions).to eq([ description1 ])
-      end
-    end
-
-    context "when providing a nested association" do
-
-      let!(:user) do
-        User.create!
-      end
-
-      before do
-        p = Post.create(alerts: [ Alert.create ])
-        user.posts = [ p ]
-        user.save
-      end
-
-      let(:result) do
-        User.includes(:posts => [:alerts]).first
-      end
-
-      it "executes the query" do
-        expect(result).to eq(user)
-      end
-
-      it "includes the related objects" do
-        expect(result.posts.size).to eq(1)
-        expect(result.posts.first.alerts.size).to eq(1)
-      end
-    end
-
-    context "when providing a deeply nested association" do
-
-      let!(:user) do
-        User.create!
-      end
-
-      let(:results) do
-        User.includes(:posts => [{ :alerts => :items }]).to_a
-      end
-
-      it "executes the query" do
-        expect(results.first).to eq(user)
-      end
-    end
-
-    context "when the models are inherited" do
-
-      before(:all) do
-        class A
-          include Mongoid::Document
-        end
-
-        class B < A
-          belongs_to :c
-        end
-
-        class C
-          include Mongoid::Document
-          has_one :b
-        end
-      end
-
-      after(:all) do
-        Object.send(:remove_const, :A)
-        Object.send(:remove_const, :B)
-        Object.send(:remove_const, :C)
-      end
-
-      context "when the includes is on the subclass" do
-
-        let!(:c_one) do
-          C.create!
-        end
-
-        let!(:c_two) do
-          C.create!
-        end
-
-        let!(:b) do
-          B.create!(c: c_two)
-        end
-
-        let!(:results) do
-          C.includes(:b).to_a.detect do |c|
-            c.id == c_two.id
-          end
-        end
-
-        it "returns the correct documents" do
-          expect(results).to eq(c_two)
-        end
-
-        it "does not query the db" do
-          expect_query(0) do
-            results.b
-          end
-        end
-      end
-    end
-
-    context "when the models are inherited from another one model" do
-
-      context "when the relation is a has_one" do
-
-        before(:all) do
-          class A
-            include Mongoid::Document
-          end
-
-          class B < A
-            belongs_to :d
-          end
-
-          class C < A
-            belongs_to :d
-          end
-
-          class D
-            include Mongoid::Document
-            has_one :b
-            has_one :c
-          end
-        end
-
-        after(:all) do
-          Object.send(:remove_const, :A)
-          Object.send(:remove_const, :B)
-          Object.send(:remove_const, :C)
-          Object.send(:remove_const, :D)
-        end
-
-        context "when the includes is on the several relations" do
-
-          let!(:d_one) do
-            D.create!
-          end
-
-          let!(:d_two) do
-            D.create!
-          end
-
-          let!(:b) do
-            B.create!(d: d_two)
-          end
-
-          let!(:c) do
-            C.create!(d: d_two)
-          end
-
-          let!(:results) do
-            D.includes(:b, :c).entries.detect do |d|
-              d.id == d_two.id
-            end
-          end
-
-          it "returns the correct documents" do
-            expect(results).to eq(d_two)
-          end
-
-          it "does not query the db on b" do
-            expect_query(0) do
-              results.b
-            end
-          end
-
-          it "does not query the db on c" do
-            expect_query(0) do
-              results.b
-            end
-          end
-        end
-      end
-
-      context "when the relation is a has_many" do
-
-        before(:all) do
-          class A
-            include Mongoid::Document
-          end
-
-          class B < A
-            belongs_to :d
-          end
-
-          class C < A
-            belongs_to :d
-          end
-
-          class D
-            include Mongoid::Document
-            has_many :b
-            has_many :c
-          end
-        end
-
-        after(:all) do
-          Object.send(:remove_const, :A)
-          Object.send(:remove_const, :B)
-          Object.send(:remove_const, :C)
-          Object.send(:remove_const, :D)
-        end
-
-        context "when the includes is on the several relations" do
-
-          let!(:d_one) do
-            D.create!
-          end
-
-          let!(:d_two) do
-            D.create!
-          end
-
-          let!(:bs) do
-            2.times.map { B.create!(d: d_two) }
-          end
-
-          let!(:cs) do
-            2.times.map { C.create!(d: d_two) }
-          end
-
-          let!(:results) do
-            D.includes(:b, :c).entries.detect do |d|
-              d.id == d_two.id
-            end
-          end
-
-          it "returns the correct documents" do
-            expect(results).to eq(d_two)
-          end
-
-          it "does not query the db on b" do
-            expect_query(0) do
-              results.b
-            end
-          end
-
-          it "does not query the db on c" do
-            expect_query(0) do
-              results.b
-            end
-          end
-        end
-      end
-    end
-
-    context "when including the same association multiple times" do
-
-      let(:criteria) do
-        Person.all.includes(:posts, :posts).includes(:posts)
-      end
-
-      let(:association) do
-        Person.reflect_on_association(:posts)
-      end
-
-      it "does not duplicate the association in the inclusions" do
-        expect(criteria.inclusions).to eq([ association ])
-      end
-    end
-
-    context "when mapping the results more than once" do
-
-      let!(:post) do
-        person.posts.create!(title: "one")
-      end
-
-      let(:criteria) do
-        Post.includes(:person)
-      end
-
-      let!(:results) do
-        criteria.map { |doc| doc }
-        criteria.map { |doc| doc }
-      end
-
-      it "returns the proper results" do
-        expect(results.first.title).to eq("one")
-      end
-    end
-
-    context "when including a belongs to relation" do
-
-      context "when the criteria is from the root" do
-
-        let!(:person_two) do
-          Person.create!(age: 2)
-        end
-
-        let!(:post_one) do
-          person.posts.create!(title: "one")
-        end
-
-        let!(:post_two) do
-          person_two.posts.create!(title: "two")
-        end
-
-        context "when calling first" do
-
-          let(:criteria) do
-            Post.includes(:person)
-          end
-
-          let!(:document) do
-            criteria.first
-          end
-
-          it "eager loads the first document" do
-            expect_query(0) do
-              expect(document.person).to eq(person)
-            end
-          end
-
-          it "returns the first document" do
-            expect(document).to eq(post_one)
-          end
-        end
-
-        context "when calling last" do
-
-          let!(:criteria) do
-            Post.asc(:_id).includes(:person)
-          end
-
-          let!(:document) do
-            criteria.last
-          end
-
-          it "eager loads the last document" do
-            expect_query(0) do
-              expect(document.person).to eq(person_two)
-            end
-          end
-
-          it "returns the last document" do
-            expect(document).to eq(post_two)
-          end
-        end
-      end
-
-      context "when the criteria is from an embedded relation" do
-
-        let(:peep) do
-          Person.create!
-        end
-
-        let!(:address_one) do
-          peep.addresses.create!(street: "rosenthaler")
-        end
-
-        let!(:address_two) do
-          peep.addresses.create!(street: "weinmeister")
-        end
-
-        let!(:depeche) do
-          Band.create!(name: "Depeche Mode")
-        end
-
-        let!(:tool) do
-          Band.create!(name: "Tool")
-        end
-
-        before do
-          address_one.band = depeche
-          address_two.band = tool
-          address_one.save
-          address_two.save
-        end
-
-        context "when calling first" do
-
-          let(:criteria) do
-            peep.reload.addresses.includes(:band)
-          end
-
-          let(:context) do
-            criteria.context
-          end
-
-          let!(:document) do
-            criteria.first
-          end
-
-          it "eager loads the first document" do
-            expect_query(0) do
-              expect(document.band).to eq(depeche)
-            end
-          end
-
-          it "returns the document" do
-            expect(document).to eq(address_one)
-          end
-        end
-
-        context "when calling last" do
-
-          let(:criteria) do
-            peep.reload.addresses.includes(:band)
-          end
-
-          let(:context) do
-            criteria.context
-          end
-
-          let!(:document) do
-            criteria.last
-          end
-
-          it "eager loads the last document" do
-            expect_query(0) do
-              expect(document.band).to eq(tool)
-            end
-          end
-
-          it "returns the document" do
-            expect(document).to eq(address_two)
-          end
-        end
-
-        context "when iterating all documents" do
-
-          let(:criteria) do
-            peep.reload.addresses.includes(:band)
-          end
-
-          let(:context) do
-            criteria.context
-          end
-
-          let!(:documents) do
-            criteria.to_a
-          end
-
-          it "eager loads the first document" do
-            expect_query(0) do
-              expect(documents.first.band).to eq(depeche)
-            end
-          end
-
-          it "eager loads the last document" do
-            expect_query(0) do
-              expect(documents.last.band).to eq(tool)
-            end
-          end
-
-          it "returns the documents" do
-            expect(documents).to eq([ address_one, address_two ])
-          end
-        end
-      end
-    end
-
-    context "when providing inclusions to the default scope" do
-
-      before do
-        Person.default_scope(->{ Person.includes(:posts) })
-      end
-
-      after do
-        Person.default_scoping = nil
-      end
-
-      let!(:post_one) do
-        person.posts.create!(title: "one")
-      end
-
-      let!(:post_two) do
-        person.posts.create!(title: "two")
-      end
-
-      context "when the criteria has no options" do
-
-        let!(:criteria) do
-          Person.asc(:age).all
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ person ])
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(documents.first.posts.first).to eq(post_one)
-          end
-        end
-
-        it "eager loads the last document" do
-          expect_query(0) do
-            expect(documents.first.posts.last).to eq(post_two)
-          end
-        end
-
-        context "when executing the query twice" do
-
-          let!(:new_criteria) do
-            Person.where(id: person.id)
-          end
-
-          let!(:new_context) do
-            new_criteria.context
-          end
-
-          before do
-            expect(new_context).to receive(:eager_load).with([person]).once.and_call_original
-          end
-
-          let!(:from_db) do
-            new_criteria.first
-          end
-
-          it "does not duplicate documents in the relation" do
-            expect(person.posts.size).to eq(2)
-          end
-        end
-      end
-
-      context "when calling first on the criteria" do
-
-        let(:criteria) do
-          Person.asc(:age).all
-        end
-
-        let!(:from_db) do
-          criteria.first
-        end
-
-        it "returns the correct documents" do
-          expect(from_db).to eq(person)
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(from_db.posts.first).to eq(post_one)
-          end
-        end
-
-        it "eager loads the last document" do
-          expect_query(0) do
-            expect(from_db.posts.last).to eq(post_two)
-          end
-        end
-      end
-
-      context "when calling last on the criteria" do
-
-        let(:criteria) do
-          Person.asc(:age).all
-        end
-
-        let!(:context) do
-          criteria.context
-        end
-
-        before do
-          expect(context).to receive(:eager_load).with([person]).once.and_call_original
-        end
-
-        let!(:from_db) do
-          criteria.last
-        end
-
-        it "returns the correct documents" do
-          expect(from_db).to eq(person)
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(from_db.posts.first).to eq(post_one)
-          end
-        end
-
-        it "eager loads the last document" do
-          expect_query(0) do
-            expect(from_db.posts.last).to eq(post_two)
-          end
-        end
-      end
-
-      context "when the criteria has limiting options" do
-
-        let!(:person_two) do
-          Person.create!
-        end
-
-        let!(:post_three) do
-          person_two.posts.create!(title: "three")
-        end
-
-        let!(:criteria) do
-          Person.asc(:age).limit(1)
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(criteria).to eq([ person ])
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(documents.first.posts.first).to eq(post_one)
-          end
-        end
-
-        it "eager loads the second document" do
-          expect_query(0) do
-            expect(documents.first.posts.last).to eq(post_two)
-          end
-        end
-      end
-    end
-
-    context "when including a has and belongs to many" do
-
-      let!(:preference_one) do
-        person.preferences.create!(name: "one")
-      end
-
-      let!(:preference_two) do
-        person.preferences.create!(name: "two")
-      end
-
-      context "when one of the related items is deleted" do
-
-        before do
-          person.preferences = [ preference_one, preference_two ]
-          preference_two.delete
-        end
-
-        let(:criteria) do
-          Person.where(id: person.id).includes(:preferences)
-        end
-
-        it "only loads the existing related items" do
-          expect(criteria.entries.first.preferences).to eq([ preference_one ])
-        end
-      end
-
-      context "when the criteria has no options" do
-
-        let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ person ])
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(documents.first.preferences.first).to eq(preference_one)
-          end
-        end
-
-        it "eager loads the last document" do
-          expect_query(0) do
-            expect(documents.first.preferences.last).to eq(preference_two)
-          end
-        end
-      end
-
-      context "when calling first on the criteria" do
-
-        let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
-        end
-
-        let!(:from_db) do
-          criteria.first
-        end
-
-        it "returns the correct documents" do
-          expect(from_db).to eq(person)
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(from_db.preferences.first).to eq(preference_one)
-          end
-        end
-
-        it "eager loads the last document" do
-          expect_query(0) do
-            expect(from_db.preferences.last).to eq(preference_two)
-          end
-        end
-      end
-
-      context "when calling last on the criteria" do
-
-        let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
-        end
-
-        let!(:from_db) do
-          criteria.last
-        end
-
-        it "returns the correct documents" do
-          expect(from_db).to eq(person)
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(from_db.preferences.first).to eq(preference_one)
-          end
-        end
-
-        it "eager loads the last document" do
-          expect_query(0) do
-            expect(from_db.preferences.last).to eq(preference_two)
-          end
-        end
-      end
-    end
-
-    context "when including a has many" do
-
-      let!(:post_one) do
-        person.posts.create!(title: "one")
-      end
-
-      let!(:post_two) do
-        person.posts.create!(title: "two")
-      end
-
-      context "when the criteria has no options" do
-
-        let!(:criteria) do
-          Person.asc(:age).includes(:posts)
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ person ])
-        end
-
-        it "eager loads the first document" do
-          expect_query(0) do
-            expect(documents.first.posts.first).to eq(post_one)
-          end
-        end
-
-        it "eager loads the last document" do
-          expect_query(0) do
-            expect(documents.first.posts.last).to eq(post_two)
-          end
-        end
-      end
-
-      context "when calling first on the criteria" do
-
-        let!(:criteria) do
-          Person.asc(:age).includes(:posts)
-        end
-
-        let!(:from_db) do
-          criteria.first
-        end
-
-        it "returns the correct documents" do
-          expect(from_db).to eq(person)
-        end
-
-        context "when subsequently getting all documents" do
-
-          let!(:documents) do
-            criteria.entries
-          end
-
-          it "returns the correct documents" do
-            expect(documents).to eq([ person ])
-          end
-        end
-      end
-
-      context "when calling last on the criteria" do
-
-        let!(:criteria) do
-          Person.asc(:age).includes(:posts)
-        end
-
-        let!(:from_db) do
-          criteria.last
-        end
-
-        it "returns the correct documents" do
-          expect(from_db).to eq(person)
-        end
-
-        context "when subsequently getting all documents" do
-
-          let!(:documents) do
-            criteria.entries
-          end
-
-          it "returns the correct documents" do
-            expect(documents).to eq([ person ])
-          end
-        end
-      end
-
-      context "when the criteria has limiting options" do
-
-        let!(:person_two) do
-          Person.create!
-        end
-
-        let!(:post_three) do
-          person_two.posts.create!(title: "three")
-        end
-
-        let!(:criteria) do
-          Person.includes(:posts).asc(:age).limit(1)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ person ])
-        end
-      end
-    end
-
-    context "when including a has one" do
-
-      let!(:game_one) do
-        person.create_game(name: "one")
-      end
-
-      let!(:game_two) do
-        person.create_game(name: "two")
-      end
-
-      context "when the criteria has no options" do
-
-        let!(:criteria) do
-          Person.asc(:age).includes(:game)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ person ])
-        end
-      end
-
-      context "when the criteria has limiting options" do
-
-        let!(:person_two) do
-          Person.create!(age: 2)
-        end
-
-        let!(:game_three) do
-          person_two.create_game(name: "Skyrim")
-        end
-
-        let!(:criteria) do
-          Person.where(id: person.id).includes(:game).asc(:age).limit(1)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ person ])
-        end
-      end
-    end
-
-    context "when including a belongs to" do
-
-      let(:person_two) do
-        Person.create!(age: 2)
-      end
-
-      let!(:game_one) do
-        person.create_game(name: "one")
-      end
-
-      let!(:game_two) do
-        person_two.create_game(name: "two")
-      end
-
-      context "when providing no options" do
-
-        let!(:criteria) do
-          Game.includes(:person)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          expect(context).to receive(:preload).twice.and_call_original
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(criteria).to eq([ game_one, game_two ])
-        end
-      end
-
-      context "when the criteria has limiting options" do
-
-        let!(:criteria) do
-          Game.where(id: game_one.id).includes(:person).asc(:_id).limit(1)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          expect(context).to receive(:eager_load).with([ game_one ]).once.and_call_original
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ game_one ])
-        end
-      end
-    end
-
-    context "when including multiples in the same criteria" do
-
-      let!(:post_one) do
-        person.posts.create!(title: "one")
-      end
-
-      let!(:post_two) do
-        person.posts.create!(title: "two")
-      end
-
-      let!(:game_one) do
-        person.create_game(name: "one")
-      end
-
-      let!(:game_two) do
-        person.create_game(name: "two")
-      end
-
-      let!(:criteria) do
-        Person.includes(:posts, :game).asc(:age)
-      end
-
-      let(:context) do
-        criteria.context
-      end
-
-      before do
-        expect(context).to receive(:preload).twice.and_call_original
-      end
-
-      let!(:documents) do
-        criteria.entries
-      end
-
-      it "returns the correct documents" do
-        expect(criteria).to eq([ person ])
-      end
-    end
-  end
-
-  describe "#inclusions" do
-
-    let(:criteria) do
-      Band.includes(:records)
-    end
-
-    let(:association) do
-      Band.relations["records"]
-    end
-
-    it "returns the inclusions" do
-      expect(criteria.inclusions).to eq([ association ])
-    end
-  end
-
-  describe "#inclusions=" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:association) do
-      Band.relations["records"]
-    end
-
-    before do
-      criteria.inclusions = [ association ]
-    end
-
-    it "sets the inclusions" do
-      expect(criteria.inclusions).to eq([ association ])
-    end
-  end
-
   describe "#lt" do
 
     let!(:match) do
@@ -2830,6 +1722,10 @@ describe Mongoid::Criteria do
       Band.create!(name: "Photek", likes: 1)
     end
 
+    let(:maniacs) do
+      Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
+    end
+
     context "when the field is aliased" do
 
       let!(:expensive) do
@@ -2846,8 +1742,10 @@ describe Mongoid::Criteria do
           Product.pluck(:price)
         end
 
-        it "uses the aliases" do
-          expect(plucked).to eq([ 100000, 1 ])
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "uses the aliases" do
+            expect(plucked).to eq([ 100000, 1 ])
+          end
         end
       end
     end
@@ -2864,14 +1762,18 @@ describe Mongoid::Criteria do
           criteria.pluck(:name)
         end
 
-        it "returns the values" do
-          expect(plucked).to contain_exactly("Depeche Mode", "Tool", "Photek")
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the values" do
+            expect(plucked).to contain_exactly("Depeche Mode", "Tool", "Photek")
+          end
         end
 
         context "when subsequently executing the criteria without a pluck" do
 
-          it "does not limit the fields" do
-            expect(criteria.first.likes).to eq(3)
+          with_config_values :legacy_pluck_distinct, true, false do
+            it "does not limit the fields" do
+              expect(criteria.first.likes).to eq(3)
+            end
           end
         end
 
@@ -2882,7 +1784,6 @@ describe Mongoid::Criteria do
           end
 
           context 'when a top-level field and a subdocument field are plucked' do
-
             before do
               Band.create!(name: 'FKA Twigs')
               Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
@@ -2892,15 +1793,32 @@ describe Mongoid::Criteria do
               criteria.pluck(:name, 'records.name')
             end
 
-            let(:expected) do
-              [
-                ["FKA Twigs", nil],
-                ['FKA Twigs', [{ "name" => "LP1" }]]
-              ]
+            context "when legacy_pluck_distinct is set" do
+              config_override :legacy_pluck_distinct, true
+              let(:expected) do
+                [
+                  ["FKA Twigs", nil],
+                  ['FKA Twigs', [{ "name" => "LP1" }]]
+                ]
+              end
+
+              it 'returns the list of top-level field and subdocument values' do
+                expect(embedded_pluck).to eq(expected)
+              end
             end
 
-            it 'returns the list of top-level field and subdocument values' do
-              expect(embedded_pluck). to eq(expected)
+            context "when legacy_pluck_distinct is not set" do
+              config_override :legacy_pluck_distinct, false
+              let(:expected) do
+                [
+                  ["FKA Twigs", nil],
+                  ['FKA Twigs', ["LP1"]]
+                ]
+              end
+
+              it 'returns the list of top-level field and subdocument values' do
+                expect(embedded_pluck).to eq(expected)
+              end
             end
           end
 
@@ -2915,18 +1833,34 @@ describe Mongoid::Criteria do
               criteria.pluck('records.name')
             end
 
-            let(:expected) do
-              [
-                nil,
-                [{ "name" => "LP1" }]
-              ]
+            context "when legacy_pluck_distinct is set" do
+              config_override :legacy_pluck_distinct, true
+              let(:expected) do
+                [
+                  nil,
+                  [{ "name" => "LP1" }]
+                ]
+              end
+
+              it 'returns the list of subdocument values' do
+                expect(embedded_pluck).to eq(expected)
+              end
             end
 
-            it 'returns the list of subdocument values' do
-              expect(embedded_pluck). to eq(expected)
+            context "when legacy_pluck_distinct is not set" do
+              config_override :legacy_pluck_distinct, false
+              let(:expected) do
+                [
+                  nil,
+                  ["LP1"]
+                ]
+              end
+
+              it 'returns the list of subdocument values' do
+                expect(embedded_pluck).to eq(expected)
+              end
             end
           end
-
         end
       end
 
@@ -2936,8 +1870,10 @@ describe Mongoid::Criteria do
           Band.where(:name.exists => true).pluck(:name, :likes)
         end
 
-        it "returns the values" do
-          expect(plucked).to contain_exactly(["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the values" do
+            expect(plucked).to contain_exactly(["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
+          end
         end
       end
 
@@ -2947,8 +1883,10 @@ describe Mongoid::Criteria do
           Band.where(:name.exists => true).pluck(:likes)
         end
 
-        it "returns the duplicates" do
-          expect(plucked).to contain_exactly(3, 3, 1)
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the duplicates" do
+            expect(plucked).to contain_exactly(3, 3, 1)
+          end
         end
       end
     end
@@ -2959,8 +1897,10 @@ describe Mongoid::Criteria do
         Band.where(name: "New Order").pluck(:_id)
       end
 
-      it "returns an empty array" do
-        expect(plucked).to be_empty
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns an empty array" do
+          expect(plucked).to be_empty
+        end
       end
     end
 
@@ -2970,8 +1910,10 @@ describe Mongoid::Criteria do
         Band.all.pluck(:id)
       end
 
-      it "returns the field values" do
-        expect(plucked).to eq([ depeche.id, tool.id, photek.id ])
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns the field values" do
+          expect(plucked).to eq([ depeche.id, tool.id, photek.id ])
+        end
       end
     end
 
@@ -2981,8 +1923,10 @@ describe Mongoid::Criteria do
         Band.all.pluck(:id, :fooz)
       end
 
-      it "returns nil for the field that doesnt exist" do
-        expect(plucked).to eq([[depeche.id, nil], [tool.id, nil], [photek.id, nil] ])
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns nil for the field that doesnt exist" do
+          expect(plucked).to eq([[depeche.id, nil], [tool.id, nil], [photek.id, nil] ])
+        end
       end
     end
 
@@ -2994,8 +1938,10 @@ describe Mongoid::Criteria do
           Band.all.pluck(:foo)
         end
 
-        it "returns a array with nil values" do
-          expect(plucked).to eq([nil, nil, nil])
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns a array with nil values" do
+            expect(plucked).to eq([nil, nil, nil])
+          end
         end
       end
 
@@ -3005,8 +1951,10 @@ describe Mongoid::Criteria do
           Band.all.pluck(:foo, :bar)
         end
 
-        it "returns a nil arrays" do
-          expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns a nil arrays" do
+            expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
+          end
         end
       end
     end
@@ -3015,10 +1963,10 @@ describe Mongoid::Criteria do
 
       before do
         I18n.locale = :en
-        d = Dictionary.create(description: 'english-text')
+        d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
-        d.save
+        d.save!
       end
 
       after do
@@ -3026,13 +1974,48 @@ describe Mongoid::Criteria do
       end
 
       context 'when plucking the entire field' do
-
         let(:plucked) do
           Dictionary.all.pluck(:description)
         end
 
-        it 'returns all translations' do
-          expect(plucked.first).to eq({'en' => 'english-text', 'de' => 'deutsch-text'})
+        let(:plucked_translations) do
+          Dictionary.all.pluck(:description_translations)
+        end
+
+        let(:plucked_translations_both) do
+          Dictionary.all.pluck(:description_translations, :description)
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the non-demongoized translations' do
+            expect(plucked.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+
+          it 'returns nil' do
+            expect(plucked_translations.first).to eq(nil)
+          end
+
+          it 'returns nil for _translations' do
+            expect(plucked_translations_both.first).to eq([nil, {"de"=>"deutsch-text", "en"=>"english-text"}])
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the demongoized translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+
+          it 'returns the full translations hash to _translations' do
+            expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+
+          it 'returns both' do
+            expect(plucked_translations_both.first).to eq([{"de"=>"deutsch-text", "en"=>"english-text"}, "deutsch-text"])
+          end
         end
       end
 
@@ -3042,8 +2025,255 @@ describe Mongoid::Criteria do
           Dictionary.all.pluck(:'description.de')
         end
 
-        it 'returns the specific translations' do
-          expect(plucked.first).to eq({'de' => 'deutsch-text'})
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq({'de' => 'deutsch-text'})
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+      end
+
+      context 'when plucking a specific locale from _translations field' do
+
+        let(:plucked) do
+          Dictionary.all.pluck(:'description_translations.de')
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq(nil)
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+      end
+
+      context 'when fallbacks are enabled with a locale list' do
+        require_fallbacks
+
+        around(:all) do |example|
+          prev_fallbacks = I18n.fallbacks.dup
+          I18n.fallbacks[:he] = [ :en ]
+          example.run
+          I18n.fallbacks = prev_fallbacks
+        end
+
+        let(:plucked) do
+          Dictionary.all.pluck(:description).first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "does not correctly use the fallback" do
+            plucked.should == {"de"=>"deutsch-text", "en"=>"english-text"}
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "correctly uses the fallback" do
+            I18n.locale = :en
+            d = Dictionary.create!(description: 'english-text')
+            I18n.locale = :he
+            plucked.should == "english-text"
+          end
+        end
+      end
+
+      context "when the localized field is embedded" do
+        before do
+          p = Passport.new
+          I18n.locale = :en
+          p.name = "Neil"
+          I18n.locale = :he
+          p.name = "Nissim"
+
+          Person.create!(passport: p, employer_id: 12345)
+        end
+
+        let(:plucked) do
+          Person.where(employer_id: 12345).pluck("pass.name").first
+        end
+
+        let(:plucked_translations) do
+          Person.where(employer_id: 12345).pluck("pass.name_translations").first
+        end
+
+        let(:plucked_translations_field) do
+          Person.where(employer_id: 12345).pluck("pass.name_translations.en").first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "returns the full hash embedded" do
+            expect(plucked).to eq({ "name" => { "en" => "Neil", "he" => "Nissim" } })
+          end
+
+          it "returns the empty hash" do
+            expect(plucked_translations).to eq({})
+          end
+
+          it "returns the empty hash" do
+            expect(plucked_translations_field).to eq({})
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "returns the translation for the current locale" do
+            expect(plucked).to eq("Nissim")
+          end
+
+          it "returns the full _translation hash" do
+            expect(plucked_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the translation for the requested locale" do
+            expect(plucked_translations_field).to eq("Neil")
+          end
+        end
+      end
+    end
+
+    context 'when plucking a field to be demongoized' do
+
+      let(:plucked) do
+        Band.where(name: maniacs.name).pluck(:sales)
+      end
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+
+        context 'when value is stored as string' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          it "does not demongoize the field" do
+            expect(plucked.first).to be_a(String)
+            expect(plucked.first).to eq("1E2")
+          end
+        end
+
+        context 'when value is stored as decimal128' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          it "does not demongoize the field" do
+            expect(plucked.first).to be_a(BSON::Decimal128)
+            expect(plucked.first).to eq(BSON::Decimal128.new("1E2"))
+          end
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        context 'when value is stored as string' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          it "demongoizes the field" do
+            expect(plucked.first).to be_a(BigDecimal)
+            expect(plucked.first).to eq(BigDecimal("1E2"))
+          end
+        end
+
+        context 'when value is stored as decimal128' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          it "demongoizes the field" do
+            expect(plucked.first).to be_a(BigDecimal)
+            expect(plucked.first).to eq(BigDecimal("1E2"))
+          end
+        end
+      end
+    end
+
+    context "when plucking an embedded field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(label: label) }
+
+      let(:plucked) { Band.where(_id: band.id).pluck("label.sales") }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+        config_override :map_big_decimal_to_decimal128, true
+
+        it "returns a hash with a non-demongoized field" do
+          expect(plucked.first).to eq({ 'sales' => BSON::Decimal128.new('1E+2') })
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "demongoizes the field" do
+          expect(plucked.first).to eq(BigDecimal("1E2"))
+        end
+      end
+    end
+
+    context "when plucking an embeds_many field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(labels: [label]) }
+
+      let(:plucked) { Band.where(_id: band.id).pluck("labels.sales") }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+        config_override :map_big_decimal_to_decimal128, true
+
+        it "returns a hash with a non-demongoized field" do
+          expect(plucked.first).to eq([{ 'sales' => BSON::Decimal128.new('1E+2') }])
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "demongoizes the field" do
+          expect(plucked.first).to eq([BigDecimal("1E2")])
+        end
+      end
+    end
+
+    context "when plucking a nonexistent embedded field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(label: label) }
+
+      let(:plucked) { Band.where(_id: band.id).pluck("label.qwerty") }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+
+        it "returns an empty hash" do
+          expect(plucked.first).to eq({})
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "returns nil" do
+          expect(plucked.first).to eq(nil)
         end
       end
     end
@@ -3422,20 +2652,109 @@ describe Mongoid::Criteria do
 
       context "when querying on a big decimal" do
 
-        let(:sales) do
-          BigDecimal('0.1')
+        context 'when map_big_decimal_to_decimal128 is false' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          let(:sales) do
+            BigDecimal('0.1')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", sales: sales)
+          end
+
+          let(:from_db) do
+            Band.where(sales: sales).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
         end
 
-        let!(:band) do
-          Band.create!(name: "Boards of Canada", sales: sales)
+        context 'when map_big_decimal_to_decimal128 is true' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          let(:sales) do
+            BigDecimal('0.1')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", sales: sales)
+          end
+
+          let(:from_db) do
+            Band.where(sales: sales).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
         end
 
-        let(:from_db) do
-          Band.where(sales: sales).first
+        context 'when map_big_decimal_to_decimal128 was false and is now true' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          let(:sales) do
+            BigDecimal('0.1')
+          end
+
+          let!(:band) do
+            Mongoid.map_big_decimal_to_decimal128 = false
+            Band.create!(name: "Boards of Canada", sales: sales)
+          end
+
+          let(:from_db) do
+            Mongoid.map_big_decimal_to_decimal128 = true
+            Band.where(sales: sales.to_s).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
+        end
+      end
+
+      context "when querying on a big decimal from a dynamic field" do
+
+        context 'when map_big_decimal_to_decimal128 is false' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          let(:fans) do
+            BigDecimal('139432.0002')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", fans: fans)
+          end
+
+          let(:from_db) do
+            Band.where(fans: fans.to_s).first
+          end
+
+          it "finds the document by the big decimal value" do
+            expect(from_db).to eq(band)
+          end
         end
 
-        it "finds the document by the big decimal value" do
-          expect(from_db).to eq(band)
+        context 'when map_big_decimal_to_decimal128 is true' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          let(:fans) do
+            BigDecimal('139432.0002')
+          end
+
+          let!(:band) do
+            Band.create!(name: "Boards of Canada", fans: fans)
+          end
+
+          let(:from_db) do
+            Band.where(fans: fans).first
+          end
+
+          it "only finds the document by the string value" do
+            expect(from_db).to eq(band)
+          end
         end
       end
 
@@ -3506,6 +2825,249 @@ describe Mongoid::Criteria do
       it 'combines criteria' do
         expect(criteria.selector).to eq(
           'foo' => 1, '$and' => [{'foo' => 2}], 'bar' => 3)
+      end
+    end
+
+    context "when duplicating where conditions" do
+      let(:criteria) { Sound.where(active: true).where(active: true) }
+
+      it 'does not duplicate criteria' do
+        expect(criteria.selector).to eq('active' => true)
+      end
+    end
+
+    context "when duplicating where conditions with different values" do
+      let(:criteria) { Sound.where(active: true).where(active: false).where(active: true).where(active: false) }
+
+      it 'does not duplicate criteria' do
+        expect(criteria.selector).to eq(
+          'active' => true, '$and' => [{'active' => false}])
+      end
+    end
+
+    # Used to test MONGOID-5251 where the find command was adding unnecessary
+    # and clauses. Since the find command creates the criteria and executes it,
+    # it is difficult to analyze the criteria used. For this reason, I have
+    # extracted the crux of the issue, adding an _id to the the criteria twice,
+    # and used that for the test case.
+    context "when searching by _id twice" do
+      let(:_id) { BSON::ObjectId.new }
+      let(:criteria) { Band.where(_id: _id) }
+      let(:dup_criteria) { criteria.where(_id: _id)}
+
+      it "does not duplicate the criteria" do
+        expect(dup_criteria.selector).to eq({ "_id" => _id })
+      end
+    end
+
+    context "when querying an embedded field" do
+      let(:criteria) { Band.where("label.name": 12345) }
+
+      it "mongoizes the embedded field in the selector" do
+        expect(criteria.selector).to eq("label.name" => "12345")
+      end
+    end
+
+    context "when querying with a range" do
+
+      context "when querying an embeds_many association" do
+        let(:criteria) do
+          Band.where("labels" => 10..15)
+        end
+
+        it "correctly uses elemMatch without an inner key" do
+          expect(criteria.selector).to eq(
+            "labels" => {
+              "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+            }
+          )
+        end
+      end
+
+      context "when querying an element in an embeds_many association" do
+        let(:criteria) do
+          Band.where("labels.age" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "labels" => {
+              "$elemMatch" => {
+                "age" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when querying a field of type array" do
+        let(:criteria) do
+          Band.where("genres" => 10..15)
+        end
+
+        it "correctly uses elemMatch without an inner key" do
+          expect(criteria.selector).to eq(
+            "genres" => {
+              "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+            }
+          )
+        end
+      end
+
+      context "when querying an aliased field of type array" do
+        let(:criteria) do
+          Person.where("array" => 10..15)
+        end
+
+        it "correctly uses the aliased field and elemMatch" do
+          expect(criteria.selector).to eq(
+            "a" => {
+              "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
+            }
+          )
+        end
+      end
+
+      context "when querying a field inside an array" do
+        let(:criteria) do
+          Band.where("genres.age" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "genres" => {
+              "$elemMatch" => {
+                "age" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when there are no embeds_manys or Arrays" do
+        let(:criteria) do
+          Band.where("fans.info.age" => 10..15)
+        end
+
+        it "does not use elemMatch" do
+          expect(criteria.selector).to eq(
+            "fans.info.age" => { "$gte" => 10, "$lte" => 15 }
+          )
+        end
+      end
+
+      context "when querying a nested element in an embeds_many association" do
+        let(:criteria) do
+          Band.where("labels.age.number" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "labels" => {
+              "$elemMatch" => {
+                "age.number" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when querying a nested element in an Array" do
+        let(:criteria) do
+          Band.where("genres.name.length" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "genres" => {
+              "$elemMatch" => {
+                "name.length" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when querying a nested element in a nested embeds_many association" do
+        context "when the outer association is an embeds_many" do
+          let(:criteria) do
+            Band.where("records.tracks.name.length" => 10..15)
+          end
+
+          it "correctly uses elemMatch" do
+            expect(criteria.selector).to eq(
+              "records.tracks" => {
+                "$elemMatch" => {
+                  "name.length" => { "$gte" => 10, "$lte" => 15 }
+                }
+              }
+            )
+          end
+        end
+
+        context "when the outer association is an embeds_one" do
+          let(:criteria) do
+            Person.where("name.translations.language.length" => 10..15)
+          end
+
+          it "correctly uses elemMatch" do
+            expect(criteria.selector).to eq(
+              "name.translations" => {
+                "$elemMatch" => {
+                  "language.length" => { "$gte" => 10, "$lte" => 15 }
+                }
+              }
+            )
+          end
+        end
+      end
+
+      context "when querying a deeply nested array" do
+        let(:criteria) do
+          Person.where("addresses.code.deepest.array.element.item" => 10..15)
+        end
+
+        it "correctly uses elemMatch" do
+          expect(criteria.selector).to eq(
+            "addresses.code.deepest.array" => {
+              "$elemMatch" => {
+                "element.item" => { "$gte" => 10, "$lte" => 15 }
+              }
+            }
+          )
+        end
+      end
+
+      context "when there are multiple conditions" do
+        let(:criteria) do
+          Band.where("$or" => [{"labels.age" => 10..15}, {labels: 8}])
+        end
+
+        it "correctly combines the conditions" do
+          expect(criteria.selector).to eq("$or" => [
+            { "labels" => {
+              "$elemMatch" => {
+                "age" => { "$gte" => 10, "$lte" => 15 }
+              } } },
+            { "labels" => 8 }
+          ])
+        end
+      end
+
+      context "when the association is aliased" do
+        let(:criteria) do
+          Person.where("passport.passport_pages.num_stamps" => 10..18)
+        end
+
+        it "correctly uses the aliased association" do
+          expect(criteria.selector).to eq(
+            "pass.passport_pages" => {
+              "$elemMatch" => {
+                "num_stamps" => { "$gte" => 10, "$lte" => 18 }
+              }
+            }
+          )
+        end
       end
     end
   end
