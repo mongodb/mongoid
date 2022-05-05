@@ -154,7 +154,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :elem_match
           end
 
-          __override__(criterion, "$elemMatch")
+          and_or_override(criterion, "$elemMatch")
         end
         key :elem_match, :override, "$elemMatch"
 

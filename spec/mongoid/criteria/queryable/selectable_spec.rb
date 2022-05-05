@@ -2310,12 +2310,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
   end
 
   describe "Mongoid.and_chained_operators" do
-    [ :eq, :gt, :gte, :lt, :lte, :mod, :ne, :near, :near_sphere ].each do |meth|
+    [ :eq, :elem_match, :gt, :gte, :lt, :lte, :mod, :ne, :near, :near_sphere ].each do |meth|
 
       context "when chaining the #{meth} method when using the same field" do
         let(:op) do
           {
             eq: "$eq",
+            elem_match: "$elemMatch",
             gt: "$gt",
             gte: "$gte",
             lt: "$lt",
