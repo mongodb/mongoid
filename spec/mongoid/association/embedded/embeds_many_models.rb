@@ -80,7 +80,6 @@ class EmmFriend
   embedded_in :befriendable, polymorphic: true
 end
 
-
 class EmmCustomer
   include Mongoid::Document
 
@@ -89,6 +88,21 @@ class EmmCustomer
 
   embeds_many :close_friends, class_name: 'EmmFriend', as: :befriendable
   embeds_many :acquaintances, class_name: 'EmmFriend', as: :befriendable
+end
+
+class EmmUser
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  embeds_many :orders, class_name: 'EmmOrder'
+end
+
+class EmmOrder
+  include Mongoid::Document
+
+  field :amount, type: Integer
+
+  embedded_in :user, class_name: 'EmmUser'
 end
 
 module EmmSpec

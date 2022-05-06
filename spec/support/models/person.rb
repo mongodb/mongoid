@@ -40,6 +40,7 @@ class Person
   field :arrays, type: Array
   field :range, type: Range
   field :species, type: Symbol
+  field :posts_count, type: Integer, default: 0
 
   index age: 1
   index addresses: 1

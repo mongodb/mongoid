@@ -319,7 +319,7 @@ module Mongoid
         ids_method = "#{association.name.to_s.singularize}_ids"
         association.inverse_class.tap do |klass|
           klass.re_define_method(ids_method) do
-            send(association.name).only(:_id).map(&:_id)
+            send(association.name).pluck(:_id)
           end
         end
       end
@@ -369,6 +369,7 @@ module Mongoid
       #  @return [ Class ] The class being set up.
       def self.define_ids_setter!(association)
         ids_method = "#{association.name.to_s.singularize}_ids="
+        association.inverse_class.aliased_associations[ids_method.chop] = association.name.to_s
         association.inverse_class.tap do |klass|
           klass.re_define_method(ids_method) do |ids|
             send(association.setter, association.relation_class.find(ids.reject(&:blank?)))

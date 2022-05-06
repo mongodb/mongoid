@@ -156,6 +156,7 @@ module Mongoid
     #
     # @return [ Array<String ] The names of the proc defaults.
     def apply_post_processed_defaults
+      pending_callbacks.delete(:apply_post_processed_defaults)
       post_processed_defaults.each do |name|
         apply_default(name)
       end
@@ -184,6 +185,7 @@ module Mongoid
     # @example Apply all the defaults.
     #   model.apply_defaults
     def apply_defaults
+      pending_callbacks.delete(:apply_defaults)
       apply_pre_processed_defaults
       apply_post_processed_defaults
     end
@@ -428,14 +430,14 @@ module Mongoid
       # added as an instance method to the Document.
       #
       # @example Define a field.
-      #   field :score, :type => Integer, :default => 0
+      #   field :score, type: Integer, default: 0
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The options to pass to the field.
       #
-      # @option options [ Class ] :type The type of the field.
+      # @option options [ Class | Symbol | String ] :type The type of the field.
       # @option options [ String ] :label The label for the field.
-      # @option options [ Object, Proc ] :default The field's default
+      # @option options [ Object | Proc ] :default The field's default.
       #
       # @return [ Field ] The generated field
       def field(name, options = {})
@@ -691,10 +693,8 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method("#{meth}_translations=") do |value|
             attribute_will_change!(name)
-            if value
-              value.update_values do |_value|
-                field.type.mongoize(_value)
-              end
+            value&.transform_values! do |_value|
+              field.type.mongoize(_value)
             end
             attributes[name] = value
           end
@@ -731,6 +731,9 @@ module Mongoid
         opts = options.merge(klass: self)
         type_mapping = TYPE_MAPPINGS[options[:type]]
         opts[:type] = type_mapping || unmapped_type(options)
+        unless opts[:type].is_a?(Class)
+          raise Errors::InvalidFieldType.new(self, name, options[:type])
+        end
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
         Fields::Standard.new(name, opts)

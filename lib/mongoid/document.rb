@@ -124,16 +124,6 @@ module Mongoid
       (persisted? || destroyed?) ? [ _id.to_s ] : nil
     end
 
-    # Return an array with this +Document+ only in it.
-    #
-    # @example Return the document in an array.
-    #   document.to_a
-    #
-    # @return [ Array<Document> ] An array with the document as its only item.
-    def to_a
-      [ self ]
-    end
-
     # Return a hash of the entire document hierarchy from this document and
     # below. Used when the attributes are needed for everything and not just
     # the current document.
@@ -234,11 +224,12 @@ module Mongoid
         process_attributes(attrs) do
           yield(self) if block_given?
         end
-        apply_post_processed_defaults
 
         if execute_callbacks
+          apply_post_processed_defaults
           run_callbacks(:initialize) unless _initialize_callbacks.empty?
         else
+          pending_callbacks << :apply_post_processed_defaults
           pending_callbacks << :initialize
         end
       end
@@ -330,7 +321,7 @@ module Mongoid
           doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         else
           yield(doc) if block_given?
-          doc.pending_callbacks.push(:apply_defaults, :find, :initialize)
+          doc.pending_callbacks += [:apply_defaults, :find, :initialize]
         end
 
         doc

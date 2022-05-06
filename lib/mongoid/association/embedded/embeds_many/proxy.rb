@@ -95,6 +95,7 @@ module Mongoid
           # @return [ self ] The empty association.
           def clear
             batch_clear(_target.dup)
+            update_attributes_hash
             self
           end
 
@@ -146,6 +147,7 @@ module Mongoid
                   doc.delete(suppress: true)
                   unbind_one(doc)
                 end
+                update_attributes_hash
               end
               reindex
               doc
@@ -257,6 +259,7 @@ module Mongoid
                 integrate(doc)
                 doc._index = index
               end
+              update_attributes_hash
               @_unscoped = _target.dup
               @_target = scope(_target)
             end
@@ -292,6 +295,8 @@ module Mongoid
               end
             else
               delete(_target[-1])
+            end.tap do
+              update_attributes_hash
             end
           end
 
@@ -315,6 +320,8 @@ module Mongoid
               end
             else
               delete(_target[0])
+            end.tap do
+              update_attributes_hash
             end
           end
 
@@ -329,6 +336,7 @@ module Mongoid
           # @return [ Many ] The proxied association.
           def substitute(docs)
             batch_replace(docs)
+            update_attributes_hash
             self
           end
 
@@ -366,6 +374,7 @@ module Mongoid
             end
             _unscoped.push(document)
             integrate(document)
+            update_attributes_hash
             document._index = _unscoped.size - 1
             execute_callback :after_add, document
           end
@@ -399,6 +408,7 @@ module Mongoid
           def delete_one(document)
             _target.delete_one(document)
             _unscoped.delete_one(document)
+            update_attributes_hash
             reindex
           end
 
@@ -487,6 +497,7 @@ module Mongoid
             criteria = where(conditions || {})
             removed = criteria.size
             batch_remove(criteria, method)
+            update_attributes_hash
             removed
           end
 
@@ -517,6 +528,17 @@ module Mongoid
           # @return [ Array<Hash> ] The list of attributes hashes
           def as_attributes
             _unscoped.map { |doc| doc.send(:as_attributes) }
+          end
+
+          # Update the _base's attributes hash with the _target's attributes
+          #
+          # @api private
+          def update_attributes_hash
+            if !_target.empty?
+              _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
+            else
+              _base.attributes.delete(_association.store_as)
+            end
           end
 
           class << self

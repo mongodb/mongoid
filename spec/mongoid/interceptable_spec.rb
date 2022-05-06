@@ -2106,6 +2106,7 @@ describe Mongoid::Interceptable do
     end
 
     context "when using create methods" do
+
       context "when the child is an embeds_many association" do
         let!(:player) do
           Player.create!.tap do |player|
@@ -2215,6 +2216,7 @@ describe Mongoid::Interceptable do
     end
 
     context "when using build methods" do
+
       context "when the child is an embeds_many association" do
         let!(:player) do
           Player.create!.tap do |player|
@@ -2319,6 +2321,53 @@ describe Mongoid::Interceptable do
 
         include_examples 'accesses the correct parent'
       end
+    end
+  end
+
+  context "when accessing associations in defaults" do
+    context "when not using autobuilding" do
+      let(:band) { InterceptableBand.create(name: "Molejo") }
+      let(:song) { band.songs.create(name: "Cilada") }
+
+      it "assigns the default correctly" do
+        expect(song.band_name).to eq("Molejo")
+      end
+    end
+
+    context "when using autobuilding" do
+      before do
+        InterceptablePlane.create!.tap do |plane|
+          plane.wings.create!
+        end
+      end
+
+      let(:plane) { InterceptablePlane.first }
+      let(:wing) { InterceptableWing.first }
+      let(:engine) { wing.engine }
+
+      it "sets the defaults correctly" do
+        expect(wing._id).to eq("hello-wing")
+        expect(wing.p_id).to eq(plane._id.to_s)
+        expect(wing.e_id).to eq(engine._id.to_s)
+        expect(engine._id).to eq("hello-engine-#{wing.id}")
+      end
+    end
+  end
+
+  # This case is rather niche. The _ids method used to use the `.only` method
+  # to get only the _ids for an association, which was causing a
+  # MissingAttributeError to be raised when accessing another association. This
+  # was fixed by using `.pluck` over `.only`. Look at MONGOID-5306 for a more
+  # detailed explanation.
+  context "when accessing _ids in validate and access an association in after_initialize" do
+    it "doesn't raise a MissingAttributeError" do
+      company = InterceptableCompany.create!
+      shop = InterceptableShop.create!(company: company)
+      user = InterceptableUser.new
+      user.company = company
+      expect do
+        user.save!
+      end.to_not raise_error(ActiveModel::MissingAttributeError)
     end
   end
 end

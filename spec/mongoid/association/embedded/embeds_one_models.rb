@@ -52,3 +52,22 @@ class EomDnlChild
   embedded_in :parent, class_name: 'EomDnlParent'
   embedded_in :missing_parent, class_name: 'EomDnlMissingParent'
 end
+
+class EomAddress
+  include Mongoid::Document
+
+  field :city, type: String
+
+  embedded_in :addressable, polymorphic: true
+end
+
+# app/models/company.rb
+class EomCompany
+  include Mongoid::Document
+
+  embeds_one :address, class_name: 'EomAddress', as: :addressable
+  accepts_nested_attributes_for :address
+
+  embeds_one :delivery_address, class_name: 'EomAddress', as: :addressable
+  accepts_nested_attributes_for :delivery_address
+end

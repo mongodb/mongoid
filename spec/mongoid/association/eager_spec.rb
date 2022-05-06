@@ -244,7 +244,8 @@ describe Mongoid::Association::EagerLoadable do
       end
 
       it "runs the has_one preload" do
-        expect(Mongoid::Association::Referenced::HasOne::Eager).to receive(:new).with([book_association, cat_association], docs).once.and_call_original
+        expect(Mongoid::Association::Referenced::HasOne::Eager).to receive(:new).with([ book_association ], docs).once.and_call_original
+        expect(Mongoid::Association::Referenced::HasOne::Eager).to receive(:new).with([ cat_association ], docs).once.and_call_original
         context.eager_load(docs)
       end
     end

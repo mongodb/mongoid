@@ -31,6 +31,7 @@ module Mongoid
               characterize_one(_target)
               bind_one
               characterize_one(_target)
+              update_attributes_hash(_target)
               _base._reset_memoized_descendants!
               _target.save if persistable?
             end
@@ -80,11 +81,15 @@ module Mongoid
                 end
               end
               unbind_one
-              return nil unless replacement
+              unless replacement
+                update_attributes_hash(replacement)
+                return nil
+              end
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
               self._target = replacement
               characterize_one(_target)
               bind_one
+              update_attributes_hash(_target)
               _target.save if persistable?
             end
             self
@@ -110,6 +115,20 @@ module Mongoid
           # @return [ true, false ] If the association is persistable.
           def persistable?
             _base.persisted? && !_binding? && !_building? && !_assigning?
+          end
+
+          # Update the _base's attributes hash with the _target's attributes
+          #
+          # @param replacement [ Document | nil ] The doc to use to update the
+          #   attributes hash.
+          #
+          # @api private
+          def update_attributes_hash(replacement)
+            if replacement
+              _base.attributes.merge!(_association.store_as => replacement.attributes)
+            else
+              _base.attributes.delete(_association.store_as)
+            end
           end
 
           class << self

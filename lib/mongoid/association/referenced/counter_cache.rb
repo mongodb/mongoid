@@ -97,18 +97,18 @@ module Mongoid
 
           association.inverse_class.tap do |klass|
             klass.after_update do
-              if record = __send__(name)
-                foreign_key = association.foreign_key
+              foreign_key = association.foreign_key
 
-                if send("#{foreign_key}_previously_changed?")
-                  original, current = send("#{foreign_key}_previous_change")
+              if send("#{foreign_key}_previously_changed?")
+                original, current = send("#{foreign_key}_previous_change")
 
-                  unless original.nil?
-                    record.class.with(persistence_context) do |_class|
-                      _class.decrement_counter(cache_column, original)
-                    end
+                unless original.nil?
+                  association.klass.with(persistence_context) do |_class|
+                    _class.decrement_counter(cache_column, original)
                   end
+                end
 
+                if record = __send__(name)
                   unless current.nil?
                     record[cache_column] = (record[cache_column] || 0) + 1
                     record.class.with(record.persistence_context) do |_class|
