@@ -206,7 +206,6 @@ en:
             Valid options are:\n
             \_\_background: true|false\n
             \_\_database: 'database_name'\n
-            \_\_drop_dups: true|false\n
             \_\_name: 'index_name'\n
             \_\_sparse: true|false\n
             \_\_unique: true|false\n

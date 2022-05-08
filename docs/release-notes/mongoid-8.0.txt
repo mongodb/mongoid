@@ -272,6 +272,27 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
   user.previously_persisted?   # => true
 
 
+Setting Field Type as a Class is Deprecated
+-------------------------------------------
+
+Mongoid has historically supported defining the ``field :type`` option
+as either a Symbol or a Class. As of Mongoid 8.0, using a Class is deprecated
+and Symbol is preferred. Support for ``field :type`` as a Class will be
+removed in a future major version of Mongoid.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    # Deprecated; will log a warning message.
+    field :first_name, type: String
+
+    # Good
+    field :last_name, type: :string
+  end
+
+
 Unknown Field Type Symbols/Strings Prohibited
 ---------------------------------------------
 
@@ -303,27 +324,6 @@ Mongoid 7 behavior:
   end
 
 
-Setting Field Type as a Class is Deprecated
--------------------------------------------
-
-Mongoid has historically supported defining the ``field :type`` option
-as either a Symbol or a Class. As of Mongoid 8.0, using a Class is deprecated
-and Symbol is preferred. Support for ``field :type`` as a Class will be
-removed in a future major version of Mongoid.
-
-.. code-block:: ruby
-
-  class Person
-    include Mongoid::Document
-
-    # Deprecated; will log an warning message.
-    field :first_name, type: String
-
-    # Good
-    field :last_name, type: :string
-  end
-
-
 Support for Defining Custom Field Type Values
 ---------------------------------------------
 
@@ -338,6 +338,13 @@ Mongoid 8.0 adds the ability to define custom ``field :type`` Symbol values as f
   end
 
 Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
+
+
+Removed ``:drop_dups`` Option from Indexes
+------------------------------------------
+
+The ``:drop_dups`` option has been removed from the ``index`` macro. This option
+was specific to MongoDB server 2.6 and earlier, which Mongoid no longer supports.
 
 
 Removed ``Document#to_a`` Method

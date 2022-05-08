@@ -262,21 +262,6 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when providing a drop_dups option" do
-
-      before do
-        klass.index({ name: 1 }, drop_dups: true)
-      end
-
-      let(:options) do
-        klass.index_specification(name: 1).options
-      end
-
-      it "sets the index with drop_dups option" do
-        expect(options).to eq(drop_dups: true)
-      end
-    end
-
     context "when providing a sparse option" do
 
       before do
