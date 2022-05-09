@@ -86,7 +86,7 @@ module Mongoid
       # @api private
       #
       # @example Normalize the index options.
-      #   specification.normalize_options(drop_dups: true)
+      #   specification.normalize_options(unique: true)
       #
       # @param [ Hash ] opts The index options.
       #
