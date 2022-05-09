@@ -3796,4 +3796,31 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       expect(Breed.aliased_associations["dog_ids"]).to eq("dogs")
     end
   end
+
+  # This test is for MONGOID-5344 which tests that the initial call to
+  # signature_ids refers to the same array as subsequent calls to signature_ids.
+  # Prior to the change in that ticket, this test broke because the array
+  # returned from write_attribute (which is triggered the first time the
+  # foreign key array is referenced, to set the default), refers to a different
+  # array to the one stored in the attributes hash. This happened because,
+  # when retrieving a document from the database, the attributes hash is actually
+  # a BSON::Document, which applies a transformation to the array before
+  # storing it.
+  context "when executing concat on foreign key array from the db" do
+    before do
+      HabtmmContract.create!
+      HabtmmSignature.create!
+    end
+
+    let!(:contract) { HabtmmContract.first }
+    let!(:signature) { HabtmmSignature.first }
+
+    before do
+      contract.signature_ids.concat([signature.id])
+    end
+
+    it "works on the first attempt" do
+      expect(contract.signature_ids).to eq([signature.id])
+    end
+  end
 end
