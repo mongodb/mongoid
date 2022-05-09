@@ -411,7 +411,7 @@ module Mongoid
       def namespace_hierarchy(mod)
         parent = Object
         hier = [parent]
-        mod.name.split('::').each do |part|
+        mod.name&.split('::')&.each do |part|
           parent = parent.const_get(part)
           hier << parent
         end
