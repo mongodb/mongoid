@@ -52,7 +52,7 @@ module Mongoid
           self
         end
 
-        # Merge criteria with operators using the and function.
+        # Merge criteria with operators using the and method.
         #
         # @param [ Hash ] The criterion to add to the criteria.
         # @param [ String ] operator The MongoDB operator.
