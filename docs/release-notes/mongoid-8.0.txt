@@ -31,6 +31,7 @@ Default Option Values Changed
 **Breaking change:** The following options have had their default values
 changed in Mongoid 8.0:
 
+- ``:and_chained_operators`` => ``true``
 - ``:broken_aggregables`` => ``false``
 - ``:broken_alias_handling`` => ``false``
 - ``:broken_and`` => ``false``
@@ -345,48 +346,3 @@ The previously deprecated ``Array#update_values`` and ``Hash#update_values``
 methods have been removed in Mongoid 8.
 
 
-Combine Chained Operators Using ``and`` Instead of ``override``
----------------------------------------------------------------
-
-Mongoid 8.0 with the ``Mongoid.and_chained_operators`` option set to ``true``
-will combine conditions that use the same operator and field using an ``and``.
-For example, in the following query:
-
-.. code-block:: ruby
-
-  Band.ne(name: "The Rolling Stones").ne(name: "The Beatles")
-
-Mongoid 8.0 with the ``Mongoid.and_chained_operators`` option set to ``true``
-will generate the following criteria:
-
-.. code-block:: ruby
-
-  #<Mongoid::Criteria
-    selector: {"name"=>{"$ne"=>"The Rolling Stones"}, "$and"=>[{"name"=>{"$ne"=>"The Beatles"}}]}
-    options:  {}
-    class:    Band
-    embedded: false>
-
-In Mongoid 7.5 and earlier, and in 8.0 with the ``Mongoid.and_chained_operators``
-option set to ``false`` (the default), the following criteria would be
-generated instead which overwrites the first condition:
-
-.. code-block:: ruby
-
-  #<Mongoid::Criteria
-    selector: {"name"=>{"$ne"=>"The Beatles"}}
-    options:  {}
-    class:    Band
-    embedded: false>
-
-The following functions are affected by this change:
-
-- ``eq``
-- ``gt``
-- ``gte``
-- ``lt``
-- ``lte``
-- ``mod``
-- ``ne``
-- ``near``
-- ``near_sphere``

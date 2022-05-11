@@ -117,7 +117,7 @@ module Mongoid
 
     # Combine chained operators, which use the same field and operator,
     # using and's instead of overwriting them.
-    option :and_chained_operators, default: false
+    option :and_chained_operators, default: true
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.

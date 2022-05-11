@@ -337,7 +337,7 @@ describe Mongoid::Config do
 
   context 'when setting the and_chained_operators option in the config' do
     let(:option) { :and_chained_operators }
-    let(:default) { false }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
