@@ -258,7 +258,7 @@ for details on driver options.
       # feature flag to true will cause those operators to be combined using an
       # and. Setting this feature flag to false will cause the later chained
       # operators to overwrite the earlier ones. (default: false)
-      and_chained_operators: false
+      #and_chained_operators: true
 
       # Application name that is printed to the MongoDB logs upon establishing
       # a connection in server versions 3.4 or greater. Note that the name
