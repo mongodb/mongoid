@@ -273,7 +273,11 @@ module Mongoid
       end
 
       if hash_dot_syntax?(normalized)
-        attributes.__nested__(normalized)
+        if fields.key?(normalized)
+          attributes[normalized]
+        else
+          attributes.__nested__(normalized)
+        end
       else
         attributes[normalized]
       end
