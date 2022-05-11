@@ -344,5 +344,3 @@ Removed ``Array#update_values`` and ``Hash#update_values`` methods
 
 The previously deprecated ``Array#update_values`` and ``Hash#update_values``
 methods have been removed in Mongoid 8.
-
-
