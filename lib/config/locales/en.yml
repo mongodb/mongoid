@@ -72,14 +72,6 @@ en:
           resolution: "Search for attributes that are in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
             which will cause a nil to be returned instead of raising this error."
-        eager_load:
-          message: "Eager loading :%{name} is not supported since it is a
-            polymorphic belongs_to association."
-          summary: "Mongoid cannot currently determine the classes it needs to
-            eager load when the association is polymorphic. The parents reside in
-            different collections so a simple id lookup is not sufficient enough."
-          resolution: "Don't attempt to perform this action and have patience,
-            maybe this will be supported in the future."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
@@ -181,6 +173,13 @@ en:
             \_\_end\n\n
             Refer to:
             https://docs.mongodb.com/mongoid/current/reference/fields/#custom-field-options"
+        invalid_field_type:
+          message: "Invalid field type %{type_inspection} for field '%{field}' on model '%{klass}'."
+          summary: "Model '%{klass}' defines a field '%{field}' with an unknown type value
+            %{type_inspection}."
+          resolution: "Please provide a valid type value for the field.
+            Refer to:
+            https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
@@ -196,7 +195,6 @@ en:
             Valid options are:\n
             \_\_background: true|false\n
             \_\_database: 'database_name'\n
-            \_\_drop_dups: true|false\n
             \_\_name: 'index_name'\n
             \_\_sparse: true|false\n
             \_\_unique: true|false\n

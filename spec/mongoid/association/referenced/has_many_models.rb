@@ -42,6 +42,7 @@ end
 
 class HmmSchool
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   has_many :students, class_name: 'HmmStudent'
 
@@ -51,8 +52,9 @@ end
 
 class HmmStudent
   include Mongoid::Document
+  include Mongoid::Timestamps
 
-  belongs_to :school, class_name: 'HmmSchool'
+  belongs_to :school, class_name: 'HmmSchool', touch: true
 
   field :name, type: String
   field :grade, type: Integer, default: 3

@@ -503,23 +503,4 @@ describe Array do
       end
     end
   end
-
-  describe "#update_values" do
-
-    let(:array) do
-      [ 1, 2, 3 ]
-    end
-
-    let(:updated) do
-      array.update_values(&:to_s)
-    end
-
-    it "replaces each of the values with the result of the block" do
-      expect(updated).to eq([ "1", "2", "3" ])
-    end
-
-    it "returns the same instance of the array" do
-      expect(updated).to equal(array)
-    end
-  end
 end

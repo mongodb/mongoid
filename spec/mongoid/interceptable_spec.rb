@@ -2353,4 +2353,21 @@ describe Mongoid::Interceptable do
       end
     end
   end
+
+  # This case is rather niche. The _ids method used to use the `.only` method
+  # to get only the _ids for an association, which was causing a
+  # MissingAttributeError to be raised when accessing another association. This
+  # was fixed by using `.pluck` over `.only`. Look at MONGOID-5306 for a more
+  # detailed explanation.
+  context "when accessing _ids in validate and access an association in after_initialize" do
+    it "doesn't raise a MissingAttributeError" do
+      company = InterceptableCompany.create!
+      shop = InterceptableShop.create!(company: company)
+      user = InterceptableUser.new
+      user.company = company
+      expect do
+        user.save!
+      end.to_not raise_error(ActiveModel::MissingAttributeError)
+    end
+  end
 end

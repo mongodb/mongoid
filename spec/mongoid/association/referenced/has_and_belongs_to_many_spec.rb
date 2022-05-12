@@ -1076,4 +1076,29 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
       expect(association.inverse_foreign_key_setter).to eq('has_many_left_object_ids=')
     end
   end
+
+  context "when adding an object to the association" do
+    let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+    let(:update_time) do
+      Timecop.freeze(Time.at(Time.now.to_i) + 2)
+    end
+
+    after do
+      Timecop.return
+    end
+
+    let!(:school) { HabtmmSchool.create! }
+    let!(:student) { HabtmmStudent.create! }
+
+    before do
+      update_time
+      school.update(students: [student])
+    end
+
+    it "updates the updated at" do
+      pending "MONGOID-4953"
+      expect(school.updated_at).to eq(update_time)
+    end
+  end
 end

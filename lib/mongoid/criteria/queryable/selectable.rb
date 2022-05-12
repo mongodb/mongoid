@@ -10,8 +10,6 @@ module Mongoid
       module Selectable
         extend Macroable
 
-        Mongoid.deprecate(self, :geo_spacial)
-
         # Constant for a LineString $geometry.
         LINE_STRING = "LineString"
 
@@ -224,19 +222,6 @@ module Mongoid
         def geo_spatial(criterion)
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :geo_spatial
-          end
-
-          __merge__(criterion)
-        end
-
-        # Alias for +geo_spatial+.
-        #
-        # @deprecated
-        def geo_spacial(criterion)
-          # Duplicate method body so that we can raise this exception with
-          # geo_spacial as the indicated operator rather than geo_spatial.
-          if criterion.nil?
-            raise Errors::CriteriaArgumentRequired, :geo_spacial
           end
 
           __merge__(criterion)
@@ -867,7 +852,7 @@ module Mongoid
         # @param [ Hash ] criterion The criterion.
         def typed_override(criterion, operator)
           if criterion
-            criterion.update_values do |value|
+            criterion.transform_values! do |value|
               yield(value)
             end
           end

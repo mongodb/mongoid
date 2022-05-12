@@ -104,3 +104,61 @@ class EmmOrder
 
   embedded_in :user, class_name: 'EmmUser'
 end
+
+module EmmSpec
+  # There is also a top-level Car class defined.
+  class Car
+    include Mongoid::Document
+
+    embeds_many :doors
+  end
+
+  class Door
+    include Mongoid::Document
+
+    embedded_in :car
+  end
+
+  class Tank
+    include Mongoid::Document
+
+    embeds_many :guns
+    embeds_many :emm_turrets
+    # This association references a model that is not in our module,
+    # and it does not define class_name hence Mongoid will not be able to
+    # figure out the inverse for this association.
+    embeds_many :emm_hatches
+
+    # class_name is intentionally unqualified, references a class in the
+    # same module. Rails permits class_name to be unqualified like this.
+    embeds_many :launchers, class_name: 'Launcher'
+  end
+
+  class Gun
+    include Mongoid::Document
+
+    embedded_in :tank
+  end
+
+  class Launcher
+    include Mongoid::Document
+
+    # class_name is intentionally unqualified.
+    embedded_in :tank, class_name: 'Tank'
+  end
+end
+
+# This is intentionally on top level.
+class EmmTurret
+  include Mongoid::Document
+
+  embedded_in :tank, class_name: 'EmmSpec::Tank'
+end
+
+# This is intentionally on top level.
+class EmmHatch
+  include Mongoid::Document
+
+  # No :class_name option on this association intentionally.
+  embedded_in :tank
+end
