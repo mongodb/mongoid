@@ -575,11 +575,26 @@ describe Mongoid::Criteria::Queryable::Selectable do
             elem_match(comments: { text: "value" })
         end
 
-        it "adds the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { "name" => "value" }},
-            "comments" => { "$elemMatch" => { "text" => "value" }}
-          })
+        context "when and_chained_operators is, true" do
+          config_override :and_chained_operators, true
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" }},
+              "comments" => { "$elemMatch" => { "text" => "value" }}
+            })
+          end
+        end
+
+        context "when and_chained_operators is, false" do
+          config_override :and_chained_operators, false
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { name: "value" }},
+              "comments" => { "$elemMatch" => { text: "value" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
