@@ -10,10 +10,10 @@ module Mongoid
       # Create the new error.
       #
       # @param [ Class ] klass The class of the document.
-      # @param [ Class ] meth The method attempted to be called.
-      def initialize(klass, meth)
+      # @param [ Class ] attr The attribute attempted to be written.
+      def initialize(klass, attr)
         super(
-          compose_message("prohibited_setter", { klass: klass, meth: meth })
+          compose_message("prohibited_setter", { klass: klass, attr: attr })
         )
       end
     end

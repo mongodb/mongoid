@@ -520,7 +520,7 @@ en:
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
         prohibited_setter:
-          message: "Cannot call the %{meth} setter on the %{klass} class."
+          message: "Cannot set the %{attr} attribute on the %{klass} class."
           summary: "Calling the setters for fields that start with a dollar
             sign ($) or contain a dot/period (.) is prohibited. See the
             Mongoid documentation on Field Names with Dots/Periods (.) and
