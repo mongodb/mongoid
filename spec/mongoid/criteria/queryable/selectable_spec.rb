@@ -479,10 +479,24 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.elem_match(users: { name: "value" })
         end
 
-        it "adds the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { name: "value" }}
-          })
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" }}
+            })
+          end
+        end
+
+        context "when and_chained_operators is false" do
+          config_override :and_chained_operators, false
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { name: "value" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -523,11 +537,26 @@ describe Mongoid::Criteria::Queryable::Selectable do
           )
         end
 
-        it "adds the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { name: "value" }},
-            "comments" => { "$elemMatch" => { text: "value" }}
-          })
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" }},
+              "comments" => { "$elemMatch" => { "text" => "value" }}
+            })
+          end
+        end
+
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, false
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { name: "value" }},
+              "comments" => { "$elemMatch" => { text: "value" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -548,8 +577,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "adds the $elemMatch expression" do
           expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { name: "value" }},
-            "comments" => { "$elemMatch" => { text: "value" }}
+            "users" => { "$elemMatch" => { "name" => "value" }},
+            "comments" => { "$elemMatch" => { "text" => "value" }}
           })
         end
 
@@ -566,10 +595,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
             elem_match(users: { state: "new" })
         end
 
-        it "overrides the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { state: "new" }}
-          })
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+
+          it "adds an $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" } },
+              "$and" => [ { "users" => { "$elemMatch" => { "state" => "new" } } } ],
+            })
+          end
+        end
+
+        context "when and_chained_operators is false" do
+          config_override :and_chained_operators, false
+
+          it "overrides the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { state: "new" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -989,10 +1033,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.gte(first: 10).gte(first: 15)
         end
 
-        it "overwrites the first $gte selector" do
-          expect(selection.selector).to eq({
-            "first" =>  { "$gte" => 15 }
-          })
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+
+          it "adds a second $gte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$gte" => 10 },
+              "$and" => [ { "first" => { "$gte" => 15 } } ]
+            })
+          end
+        end
+
+        context "when and_chained_operators is false" do
+          config_override :and_chained_operators, false
+
+          it "overwrites the first $gte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$gte" => 15 }
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -1166,10 +1225,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.lt(first: 10).lt(first: 15)
         end
 
-        it "overwrites the first $lt selector" do
-          expect(selection.selector).to eq({
-            "first" =>  { "$lt" => 15 }
-          })
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+
+          it "adds a second $lt selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lt" => 10 },
+              "$and" => [ { "first" => { "$lt" => 15 } } ]
+            })
+          end
+        end
+
+        context "when and_chained_operators is false" do
+          config_override :and_chained_operators, false
+
+          it "overwrites the first $lt selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lt" => 15 }
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -1250,10 +1324,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.lte(first: 10).lte(first: 15)
         end
 
-        it "overwrites the first $lte selector" do
-          expect(selection.selector).to eq({
-            "first" =>  { "$lte" => 15 }
-          })
+        context "when and_chained_operators is true" do
+          config_override :and_chained_operators, true
+
+          it "adds a second $lte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lte" => 10 },
+              "$and" => [ { "first" => { "$lte" => 15 } } ]
+            })
+          end
+        end
+
+        context "when and_chained_operators is false" do
+          config_override :and_chained_operators, false
+
+          it "overwrites the first $lte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lte" => 15 }
+            })
+          end
         end
 
         it "returns a cloned query" do
