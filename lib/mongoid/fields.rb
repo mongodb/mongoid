@@ -453,6 +453,11 @@ module Mongoid
       # @return [ Field ] The generated field
       def field(name, options = {})
         named = name.to_s
+
+        if named.include?('.') || named.start_with?("$")
+          readonly_attributes << named
+        end
+
         Validators::Macro.validate(self, name, options)
         added = add_field(named, options)
         descendants.each do |subclass|
