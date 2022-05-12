@@ -479,8 +479,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.elem_match(users: { name: "value" })
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "adds the $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -489,8 +489,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "adds the $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -537,8 +537,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           )
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "adds the $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -548,8 +548,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "adds the $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -575,8 +575,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
             elem_match(comments: { text: "value" })
         end
 
-        context "when and_chained_operators is, true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "adds the $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -586,8 +586,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is, false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "adds the $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -610,8 +610,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
             elem_match(users: { state: "new" })
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "adds an $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -621,8 +621,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "overrides the $elemMatch expression" do
             expect(selection.selector).to eq({
@@ -938,8 +938,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when and_chained_operators is false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           let(:selection) do
             query.gt(first: 10).gt(first: 15)
@@ -956,8 +956,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
           let(:selection) do
             query.gt(first: 10).gt(first: 15)
           end
@@ -1048,8 +1048,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.gte(first: 10).gte(first: 15)
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "adds a second $gte selector" do
             expect(selection.selector).to eq({
@@ -1059,8 +1059,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "overwrites the first $gte selector" do
             expect(selection.selector).to eq({
@@ -1240,8 +1240,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.lt(first: 10).lt(first: 15)
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "adds a second $lt selector" do
             expect(selection.selector).to eq({
@@ -1251,8 +1251,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "overwrites the first $lt selector" do
             expect(selection.selector).to eq({
@@ -1339,8 +1339,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.lte(first: 10).lte(first: 15)
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "adds a second $lte selector" do
             expect(selection.selector).to eq({
@@ -1350,8 +1350,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "overwrites the first $lte selector" do
             expect(selection.selector).to eq({
@@ -2413,7 +2413,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
-  describe "Mongoid.and_chained_operators" do
+  describe "Mongoid.overwrite_chained_operators" do
     [ :eq, :elem_match, :gt, :gte, :lt, :lte, :mod, :ne, :near, :near_sphere ].each do |meth|
 
       context "when chaining the #{meth} method when using the same field" do
@@ -2436,8 +2436,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           Band.send(meth, {views: 1}).send(meth, {views:2})
         end
 
-        context "when and_chained_operators is false" do
-          config_override :and_chained_operators, false
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
 
           it "overrides the previous operators" do
             expect(criteria.selector).to eq({
@@ -2446,8 +2446,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when and_chained_operators is true" do
-          config_override :and_chained_operators, true
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
 
           it "overrides the previous operators" do
             expect(criteria.selector).to eq({

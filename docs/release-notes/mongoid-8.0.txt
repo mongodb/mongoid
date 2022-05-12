@@ -31,7 +31,7 @@ Default Option Values Changed
 **Breaking change:** The following options have had their default values
 changed in Mongoid 8.0:
 
-- ``:and_chained_operators`` => ``true``
+- ``:overwrite_chained_operators`` => ``false``
 - ``:broken_aggregables`` => ``false``
 - ``:broken_alias_handling`` => ``false``
 - ``:broken_and`` => ``false``

@@ -904,17 +904,17 @@ module Mongoid
 
         # Combine operator expessions onto a Criteria using either
         # an override or ands depending on the status of the
-        # Mongoid.and_chained_operators feature flag.
+        # Mongoid.overwrite_chained_operators feature flag.
         #
         # @param [ Hash ] The criterion to add to the criteria.
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Criteria ] The resulting criteria.
         def and_or_override(criterion, operator)
-          if Mongoid.and_chained_operators
-            and_with_operator(criterion, operator)
-          else
+          if Mongoid.overwrite_chained_operators
             __override__(criterion, operator)
+          else
+            and_with_operator(criterion, operator)
           end
         end
 

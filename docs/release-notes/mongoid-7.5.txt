@@ -27,7 +27,7 @@ The ``Document#to_a`` method is deprecated in Mongoid 7.5.
 Combine Chained Operators Using ``and`` Instead of ``override``
 ```````````````````````````````````````````````````````````````
 
-Mongoid 7.5 with the ``Mongoid.and_chained_operators`` option set to ``true``
+Mongoid 7.5 with the ``Mongoid.overwrite_chained_operators`` option set to ``false``
 will combine conditions that use the same operator and field using an ``and``.
 For example, in the following query:
 
@@ -35,7 +35,7 @@ For example, in the following query:
 
   Band.ne(name: "The Rolling Stones").ne(name: "The Beatles")
 
-Mongoid 7.5 with the ``Mongoid.and_chained_operators`` option set to ``true``
+Mongoid 7.5 with the ``Mongoid.overwrite_chained_operators`` option set to ``false``
 will generate the following criteria:
 
 .. code-block:: ruby
@@ -46,9 +46,9 @@ will generate the following criteria:
     class:    Band
     embedded: false>
 
-In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.and_chained_operators``
-option set to ``false`` (the default), the following criteria would be
-generated instead which overwrites the first condition:
+In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.overwrite_chained_operators``
+option set to ``true``, the following criteria would be generated instead which
+overwrites the first condition:
 
 .. code-block:: ruby
 
@@ -73,10 +73,10 @@ The following functions are affected by this change:
 
 .. note::
 
-   In Mongoid 7.5 with the ``Mongoid.and_chained_operators`` option set to
-   ``true``, nested keys in the generated selector will always be strings,
+   In Mongoid 7.5 with the ``Mongoid.overwrite_chained_operators`` option set to
+   ``false``, nested keys in the generated selector will always be strings,
    whereas in Mongoid 7.4 and earlier, and in 7.5 with the
-   ``Mongoid.and_chained_operators`` option set to ``false``, nested keys in
+   ``Mongoid.overwrite_chained_operators`` option set to ``true``, nested keys in
    the selector can be strings or symbols, depending on what was passed to the
    operator.
 
