@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../embeds_many_models.rb'
 
 describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
