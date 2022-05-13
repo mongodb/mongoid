@@ -22,3 +22,61 @@ the complete list of issues fixed in each release, including bug fixes.
 ````````````````````````````
 
 The ``Document#to_a`` method is deprecated in Mongoid 7.5.
+
+
+Combine Chained Operators Using ``and`` Instead of ``override``
+```````````````````````````````````````````````````````````````
+
+Mongoid 7.5 with the ``Mongoid.overwrite_chained_operators`` option set to ``false``
+will combine conditions that use the same operator and field using an ``and``.
+For example, in the following query:
+
+.. code-block:: ruby
+
+  Band.ne(name: "The Rolling Stones").ne(name: "The Beatles")
+
+Mongoid 7.5 with the ``Mongoid.overwrite_chained_operators`` option set to ``false``
+will generate the following criteria:
+
+.. code-block:: ruby
+
+  #<Mongoid::Criteria
+    selector: {"name"=>{"$ne"=>"The Rolling Stones"}, "$and"=>[{"name"=>{"$ne"=>"The Beatles"}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.overwrite_chained_operators``
+option set to ``true``, the following criteria would be generated instead which
+overwrites the first condition:
+
+.. code-block:: ruby
+
+  #<Mongoid::Criteria
+    selector: {"name"=>{"$ne"=>"The Beatles"}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+The following functions are affected by this change:
+
+- ``eq``
+- ``elem_match``
+- ``gt``
+- ``gte``
+- ``lt``
+- ``lte``
+- ``mod``
+- ``ne``
+- ``near``
+- ``near_sphere``
+
+.. note::
+
+   In Mongoid 7.5 with the ``Mongoid.overwrite_chained_operators`` option set to
+   ``false``, nested keys in the generated selector will always be strings,
+   whereas in Mongoid 7.4 and earlier, and in 7.5 with the
+   ``Mongoid.overwrite_chained_operators`` option set to ``true``, nested keys in
+   the selector can be strings or symbols, depending on what was passed to the
+   operator.
+

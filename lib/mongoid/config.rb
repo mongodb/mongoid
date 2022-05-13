@@ -112,6 +112,10 @@ module Mongoid
     # demongoize the values on returning them.
     option :legacy_pluck_distinct, default: true
 
+    # Combine chained operators, which use the same field and operator,
+    # using and's instead of overwriting them.
+    option :overwrite_chained_operators, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
