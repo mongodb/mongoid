@@ -1440,5 +1440,5 @@ will raise an error:
     user.set(:"first.last=", "Shohei.Ohtani")
     # raises a ProhibitedSetter error
     user.send(:"$_amount=", 8500000)
-    # raise a ProhibitedSetter error
+    # raises a ProhibitedSetter error
 
