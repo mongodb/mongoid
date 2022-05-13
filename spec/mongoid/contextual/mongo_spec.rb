@@ -572,6 +572,7 @@ describe Mongoid::Contextual::Mongo do
         context 'when storing BigDecimal as decimal128' do
           config_override :map_big_decimal_to_decimal128, true
           min_bson_version '4.15.0'
+          max_bson_version '4.99.99'
 
           it "returns the non-demongoized distinct field values" do
             expect(context.distinct(:sales).sort).to eq([ BSON::Decimal128.new("1E2"), BSON::Decimal128.new("2E3") ])
@@ -796,6 +797,7 @@ describe Mongoid::Contextual::Mongo do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
         config_override :map_big_decimal_to_decimal128, true
+        max_bson_version '4.99.99'
 
         it "returns the distinct matching fields" do
           expect(context.distinct("label.sales")).to eq([ BSON::Decimal128.new('1E+2') ])
