@@ -31,6 +31,7 @@ Default Option Values Changed
 **Breaking change:** The following options have had their default values
 changed in Mongoid 8.0:
 
+- ``:overwrite_chained_operators`` => ``false``
 - ``:broken_aggregables`` => ``false``
 - ``:broken_alias_handling`` => ``false``
 - ``:broken_and`` => ``false``
@@ -161,20 +162,20 @@ Mongoid 8.0 behavior:
 
 .. code-block:: ruby
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
     any_of({members: 2}, {last_tour: 1995})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}],
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}],
   #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
@@ -183,20 +184,20 @@ Mongoid 7 behavior:
 
 .. code-block:: ruby
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
     any_of({members: 2}, {last_tour: 1995})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990},
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990},
   #     {"members"=>2}, {"last_tour"=>1995}]}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
 
-  Band.any_of({name: 'Rolling Stone'}, {founded: 1990}).any_of({members: 2})
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
   # =>
   # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"Rolling Stone"}, {"founded"=>1990}], "members"=>2}
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
   #   options:  {}
   #   class:    Band
   #   embedded: false>

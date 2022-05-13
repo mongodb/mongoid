@@ -395,6 +395,12 @@ for details on driver options.
       # (default: false)
       #object_id_as_json_oid: true
 
+      # When chaining the same operators that use the same field, setting this
+      # feature flag to false will cause those operators to be combined using an
+      # and. Setting this feature flag to true will cause the later chained
+      # operators to overwrite the earlier ones. (default: false)
+      #overwrite_chained_operators: false
+
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
       preload_models: false
