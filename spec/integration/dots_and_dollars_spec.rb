@@ -3,6 +3,7 @@
 require "spec_helper"
 
 describe "Dots and Dollars" do
+  min_driver_version '2.18'
 
   before(:all) do
     class DADMUser
