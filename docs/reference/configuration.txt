@@ -769,57 +769,6 @@ as the following example shows:
                       algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
                 bsonType: "object"
 
-The schema map can be stored in a file for convenience. The schema map from
-the above example can be stored in ``config/schema_map.json`` in extended
-JSON format with the following contents:
-
-.. code-block:: json
-
-  {
-    "blog_development.comments": {
-      "properties": {
-        "message": {
-          "encrypt": {
-            "keyId": [
-              {
-                "$binary": {
-                  "base64": "R/AgNcxASFiiJWKXqWGo5w==",
-                  "subType": "04"
-                }
-              }
-            ],
-            "bsonType": "string",
-            "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
-          }
-        }
-      },
-      "bsonType": "object"
-    }
-  }
-
-To load this schema map, ``config/mongoid.yml`` could be as follows:
-
-.. code-block:: yaml
-
-  development:
-    clients:
-      default:
-        database: blog_development
-        hosts: [localhost:27017]
-        options:
-          auto_encryption_options:
-            key_vault_namespace: 'keyvault.datakeys'
-            kms_providers:
-              local:
-                key: "z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U"
-            schema_map: <%=
-              BSON::ExtJSON.parse(
-                File.read(File.join(RAILS_ROOT, 'config', 'schema_map.json'))
-              ).to_yaml.sub(/\A---/, '').gsub(/\n/, "\n" + ' '*100)
-            %>
-
-The last ``gsub`` indents the schema map to a suitable level in the YAML file.
-
 
 Usage with Forking Servers
 ==========================
