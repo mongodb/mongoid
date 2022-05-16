@@ -50,10 +50,6 @@ module Mongoid
             # @return [ String ] The position string.
             def position_without_document(parent, association)
               pos = parent.atomic_position
-              # Clear the cache here since this method can be called before the
-              # associations are set, which can cause the atomic paths to be
-              # calculated incorrectly later.
-              parent.instance_variable_set("@atomic_paths", nil)
               "#{pos}#{"." unless pos.blank?}#{association.store_as}"
             end
           end
