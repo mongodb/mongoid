@@ -1437,7 +1437,7 @@ will raise an error:
     end
 
     user = User.new
-    user.set(:"first.last=", "Shohei.Ohtani")
+    user.send(:"first.last=", "Shohei.Ohtani")
     # raises a ProhibitedSetter error
     user.send(:"$_amount=", 8500000)
     # raises a ProhibitedSetter error
