@@ -97,7 +97,7 @@ module Mongoid
             _base.delayed_atomic_sets.clear unless _assigning?
             docs = normalize_docs(docs).compact
             _target.clear and _unscoped.clear
-            _base.delayed_atomic_unsets.clear unless _assigning?
+            _base.delayed_atomic_unsets.delete(path)
             inserts = execute_batch_set(docs)
             add_atomic_sets(inserts)
           end
