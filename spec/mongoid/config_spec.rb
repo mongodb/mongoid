@@ -330,7 +330,7 @@ describe Mongoid::Config do
 
   context 'when setting the overwrite_chained_operators option in the config' do
     let(:option) { :overwrite_chained_operators }
-    let(:default) { false }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
