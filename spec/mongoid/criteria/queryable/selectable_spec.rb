@@ -479,10 +479,24 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.elem_match(users: { name: "value" })
         end
 
-        it "adds the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { name: "value" }}
-          })
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" }}
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { name: "value" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -523,11 +537,26 @@ describe Mongoid::Criteria::Queryable::Selectable do
           )
         end
 
-        it "adds the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { name: "value" }},
-            "comments" => { "$elemMatch" => { text: "value" }}
-          })
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" }},
+              "comments" => { "$elemMatch" => { "text" => "value" }}
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { name: "value" }},
+              "comments" => { "$elemMatch" => { text: "value" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -546,11 +575,26 @@ describe Mongoid::Criteria::Queryable::Selectable do
             elem_match(comments: { text: "value" })
         end
 
-        it "adds the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { name: "value" }},
-            "comments" => { "$elemMatch" => { text: "value" }}
-          })
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" }},
+              "comments" => { "$elemMatch" => { "text" => "value" }}
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "adds the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { name: "value" }},
+              "comments" => { "$elemMatch" => { text: "value" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -566,10 +610,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
             elem_match(users: { state: "new" })
         end
 
-        it "overrides the $elemMatch expression" do
-          expect(selection.selector).to eq({
-            "users" => { "$elemMatch" => { state: "new" }}
-          })
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "adds an $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { "name" => "value" } },
+              "$and" => [ { "users" => { "$elemMatch" => { "state" => "new" } } } ],
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "overrides the $elemMatch expression" do
+            expect(selection.selector).to eq({
+              "users" => { "$elemMatch" => { state: "new" }}
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -695,127 +754,119 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
-  %i(geo_spatial geo_spacial).each do |meth|
-    describe "#geo_spacial" do
+  describe "#geo_spatial" do
 
-      let(:query_method) { meth }
+    let(:query_method) { :geo_spatial }
 
-      it_behaves_like 'requires an argument'
-      it_behaves_like 'requires a non-nil argument'
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
-      context "when provided a criterion" do
+    context "when provided a criterion" do
 
-        context "when the geometry is a point intersection" do
+      context "when the geometry is a point intersection" do
 
-          let(:selection) do
-            query.public_send(query_method, :location.intersects_point => [ 1, 10 ])
-          end
-
-          it "adds the $geoIntersects expression" do
-            expect(selection.selector).to eq({
-              "location" => {
-                "$geoIntersects" => {
-                  "$geometry" => {
-                    "type" => "Point",
-                    "coordinates" => [ 1, 10 ]
-                  }
-                }
-              }
-            })
-          end
-
-          it_behaves_like "returns a cloned query"
+        let(:selection) do
+          query.geo_spatial(:location.intersects_point => [ 1, 10 ])
         end
 
-        context "when the geometry is a line intersection" do
-
-          let(:selection) do
-            query.public_send(query_method, :location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
-          end
-
-          it "adds the $geoIntersects expression" do
-            expect(selection.selector).to eq({
-              "location" => {
-                "$geoIntersects" => {
-                  "$geometry" => {
-                    "type" => "LineString",
-                    "coordinates" => [[ 1, 10 ], [ 2, 10 ]]
-                  }
+        it "adds the $geoIntersects expression" do
+          expect(selection.selector).to eq({
+            "location" => {
+              "$geoIntersects" => {
+                "$geometry" => {
+                  "type" => "Point",
+                  "coordinates" => [ 1, 10 ]
                 }
               }
-            })
-          end
-
-          it_behaves_like "returns a cloned query"
+            }
+          })
         end
 
-        context "when the geometry is a polygon intersection" do
+        it_behaves_like "returns a cloned query"
+      end
 
-          let(:selection) do
-            query.public_send(query_method,
-              :location.intersects_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-            )
-          end
+      context "when the geometry is a line intersection" do
 
-          it "adds the $geoIntersects expression" do
-            expect(selection.selector).to eq({
-              "location" => {
-                "$geoIntersects" => {
-                  "$geometry" => {
-                    "type" => "Polygon",
-                    "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-                  }
+        let(:selection) do
+          query.geo_spatial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
+        end
+
+        it "adds the $geoIntersects expression" do
+          expect(selection.selector).to eq({
+            "location" => {
+              "$geoIntersects" => {
+                "$geometry" => {
+                  "type" => "LineString",
+                  "coordinates" => [[ 1, 10 ], [ 2, 10 ]]
                 }
               }
-            })
-          end
-
-          it_behaves_like "returns a cloned query"
+            }
+          })
         end
 
-        context "when the geometry is within a polygon" do
+        it_behaves_like "returns a cloned query"
+      end
 
+      context "when the geometry is a polygon intersection" do
+
+        let(:selection) do
+          query.geo_spatial(:location.intersects_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]])
+        end
+
+        it "adds the $geoIntersects expression" do
+          expect(selection.selector).to eq({
+            "location" => {
+              "$geoIntersects" => {
+                "$geometry" => {
+                  "type" => "Polygon",
+                  "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
+                }
+              }
+            }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the geometry is within a polygon" do
+
+        let(:selection) do
+          query.geo_spatial(:location.within_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]])
+        end
+
+        it "adds the $geoIntersects expression" do
+          expect(selection.selector).to eq({
+            "location" => {
+              "$geoWithin" => {
+                "$geometry" => {
+                  "type" => "Polygon",
+                  "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
+                }
+              }
+            }
+          })
+        end
+
+        context "when used with the $box operator ($geoWithin query) " do
           let(:selection) do
-            query.public_send(query_method,
-              :location.within_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-            )
+            query.geo_spatial(:location.within_box => [[ 1, 10 ], [ 2, 10 ]])
           end
 
           it "adds the $geoIntersects expression" do
             expect(selection.selector).to eq({
               "location" => {
                 "$geoWithin" => {
-                  "$geometry" => {
-                    "type" => "Polygon",
-                    "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-                  }
+                  "$box" => [
+                    [ 1, 10 ], [ 2, 10 ]
+                  ]
                 }
               }
             })
           end
-
-          context "when used with the $box operator ($geoWithin query) " do
-            let(:selection) do
-              query.public_send(query_method,
-                :location.within_box => [[ 1, 10 ], [ 2, 10 ]]
-              )
-            end
-
-            it "adds the $geoIntersects expression" do
-              expect(selection.selector).to eq({
-                "location" => {
-                  "$geoWithin" => {
-                    "$box" => [
-                      [ 1, 10 ], [ 2, 10 ]
-                    ]
-                  }
-                }
-              })
-            end
-          end
-
-          it_behaves_like "returns a cloned query"
         end
+
+        it_behaves_like "returns a cloned query"
       end
     end
   end
@@ -887,18 +938,40 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        let(:selection) do
-          query.gt(first: 10).gt(first: 15)
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          let(:selection) do
+            query.gt(first: 10).gt(first: 15)
+          end
+
+          it "overwrites the first $gt selector" do
+            expect(selection.selector).to eq({
+              "first" => { "$gt" => 15 },
+              })
+          end
+
+          it "returns a cloned query" do
+            expect(selection).to_not equal(query)
+          end
         end
 
-        it "overwrites the first $gt selector" do
-          expect(selection.selector).to eq({
-            "first" => { "$gt" => 15 }
-          })
-        end
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+          let(:selection) do
+            query.gt(first: 10).gt(first: 15)
+          end
 
-        it "returns a cloned query" do
-          expect(selection).to_not equal(query)
+          it "overwrites the first $gt selector" do
+            expect(selection.selector).to eq({
+              "first" => { "$gt" => 10 },
+              "$and" => [{ "first" => { "$gt" => 15 } }]
+              })
+          end
+
+          it "returns a cloned query" do
+            expect(selection).to_not equal(query)
+          end
         end
       end
     end
@@ -975,10 +1048,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.gte(first: 10).gte(first: 15)
         end
 
-        it "overwrites the first $gte selector" do
-          expect(selection.selector).to eq({
-            "first" =>  { "$gte" => 15 }
-          })
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "adds a second $gte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$gte" => 10 },
+              "$and" => [ { "first" => { "$gte" => 15 } } ]
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "overwrites the first $gte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$gte" => 15 }
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -1152,10 +1240,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.lt(first: 10).lt(first: 15)
         end
 
-        it "overwrites the first $lt selector" do
-          expect(selection.selector).to eq({
-            "first" =>  { "$lt" => 15 }
-          })
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "adds a second $lt selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lt" => 10 },
+              "$and" => [ { "first" => { "$lt" => 15 } } ]
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "overwrites the first $lt selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lt" => 15 }
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -1236,10 +1339,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.lte(first: 10).lte(first: 15)
         end
 
-        it "overwrites the first $lte selector" do
-          expect(selection.selector).to eq({
-            "first" =>  { "$lte" => 15 }
-          })
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "adds a second $lte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lte" => 10 },
+              "$and" => [ { "first" => { "$lte" => 15 } } ]
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "overwrites the first $lte selector" do
+            expect(selection.selector).to eq({
+              "first" =>  { "$lte" => 15 }
+            })
+          end
         end
 
         it "returns a cloned query" do
@@ -2290,6 +2408,53 @@ describe Mongoid::Criteria::Queryable::Selectable do
           expect(selection.selector).to eq(
             "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }
           )
+        end
+      end
+    end
+  end
+
+  describe "Mongoid.overwrite_chained_operators" do
+    [ :eq, :elem_match, :gt, :gte, :lt, :lte, :mod, :ne, :near, :near_sphere ].each do |meth|
+
+      context "when chaining the #{meth} method when using the same field" do
+        let(:op) do
+          {
+            eq: "$eq",
+            elem_match: "$elemMatch",
+            gt: "$gt",
+            gte: "$gte",
+            lt: "$lt",
+            lte: "$lte",
+            mod: "$mod",
+            ne: "$ne",
+            near: "$near",
+            near_sphere: "$nearSphere"
+          }[meth]
+        end
+
+        let(:criteria) do
+          Band.send(meth, {views: 1}).send(meth, {views:2})
+        end
+
+        context "when overwrite_chained_operators is true" do
+          config_override :overwrite_chained_operators, true
+
+          it "overrides the previous operators" do
+            expect(criteria.selector).to eq({
+              "views" => { op => 2 },
+            })
+          end
+        end
+
+        context "when overwrite_chained_operators is false" do
+          config_override :overwrite_chained_operators, false
+
+          it "overrides the previous operators" do
+            expect(criteria.selector).to eq({
+              "views" => { op => 1 },
+              "$and" => [{ "views" => { op => 2 } }]
+            })
+          end
         end
       end
     end

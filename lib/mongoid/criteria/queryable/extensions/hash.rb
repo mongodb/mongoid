@@ -134,20 +134,6 @@ module Mongoid
             replacement
           end
 
-          # Update all the values in the hash with the provided block.
-          #
-          # @example Update the values in place.
-          #   { field: "1" }.update_values(&:to_i)
-          #
-          # @param [ Proc ] block The block to execute on each value.
-          #
-          # @return [ Hash ] the hash.
-          def update_values(&block)
-            each_pair do |key, value|
-              store(key, block[value])
-            end
-          end
-
           private
 
           # Apply the provided strategy for the hash with the given object.

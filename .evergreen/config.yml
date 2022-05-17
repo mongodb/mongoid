@@ -484,6 +484,10 @@ axes:
         display_name: "BSON-min"
         variables:
           DRIVER: "bson-min"
+      - id: bson-master
+        display_name: "BSON-master"
+        variables:
+          DRIVER: "bson-master"
   - id: "rails"
     display_name: Rails Version
     values:
@@ -659,7 +663,7 @@ buildvariants:
 
 - matrix_name: "bson-min"
   matrix_spec:
-    driver: [min]
+    driver: [bson-min]
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
     topology: "standalone"
@@ -668,6 +672,19 @@ buildvariants:
     - ubuntu1804-small
   tasks:
     - name: "test"
+
+- matrix_name: "bson-master"
+  matrix_spec:
+    driver: [bson-master]
+    ruby: ["ruby-3.0"]
+    mongodb-version: "5.0"
+    topology: "standalone"
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1804-small
+  tasks:
+    - name: "test"
+
 
 - matrix_name: "rails-6"
   matrix_spec:
