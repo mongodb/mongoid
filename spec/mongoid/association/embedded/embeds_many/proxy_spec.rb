@@ -4706,11 +4706,11 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     before do
       post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'a'}],
         user_tags: [{id: BSON::ObjectId.new, title: 'b'}])
-      post.save
+      post.save!
       post.reload
       post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'c'}],
         user_tags: [])
-      post.save
+      post.save!
       post.reload
     end
 
