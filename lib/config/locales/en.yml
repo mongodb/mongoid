@@ -128,6 +128,17 @@ en:
             allowed."
           resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
             ancestors."
+        invalid_dot_dollar_assignment:
+          message: "Cannot set the %{attr} attribute on the %{klass} class."
+          summary: "Calling the setters for fields that start with a dollar
+            sign ($) or contain a dot/period (.) is prohibited. See the
+            Mongoid documentation on Field Names with Dots/Periods (.) and
+            Dollar Signs ($) for more information."
+          resolution: "In order to set fields that start with a dollar
+            sign ($) or contain a dot/period (.), the aggregation pipeline can
+            be used. MongoDB provides specific operators for working with these
+            fields. Refer to the MongoDB documentation here:
+            https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/"
         invalid_elem_match_operator:
           message: "Invalid $elemMatch operator '%{operator}'."
           summary: "You misspelled an operator or are using an operator that
@@ -519,17 +530,6 @@ en:
             \_\_\_\_\_\_\_\_database: my_app_db\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
-        prohibited_setter:
-          message: "Cannot set the %{attr} attribute on the %{klass} class."
-          summary: "Calling the setters for fields that start with a dollar
-            sign ($) or contain a dot/period (.) is prohibited. See the
-            Mongoid documentation on Field Names with Dots/Periods (.) and
-            Dollar Signs ($) for more information."
-          resolution: "In order to set fields that start with a dollar
-            sign ($) or contain a dot/period (.), the aggregation pipeline can
-            be used. MongoDB provides specific operators for working with these
-            fields. Refer to the MongoDB documentation here:
-            https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/"
         readonly_attribute:
           message: "Attempted to set the readonly attribute '%{name}' with
             the value: %{value}."

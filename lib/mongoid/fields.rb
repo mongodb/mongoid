@@ -259,12 +259,12 @@ module Mongoid
     # Validate whether or not the field starts with a dollar sign ($) or
     # contains a dot/period (.).
     #
-    # @raise [ ProhibitedSetter ] If contains dots or starts with a dollar.
+    # @raise [ InvalidDotDollarAssignment ] If contains dots or starts with a dollar.
     #
     # @param [ String ] name The field name.
-    def validate_dots_and_dollars!(name)
+    def validate_writable_field_name!(name)
       if dot_dollar_field?(name)
-        raise Errors::ProhibitedSetter.new(self.class, name)
+        raise Errors::InvalidDotDollarAssignment.new(self.class, name)
       end
     end
 

@@ -5,7 +5,7 @@ module Mongoid
 
     # This error is raised when trying to use the setter for a field that starts
     # with a dollar sign ($) or contains a dot/period (.).
-    class ProhibitedSetter < MongoidError
+    class InvalidDotDollarAssignment < MongoidError
 
       # Create the new error.
       #
@@ -13,7 +13,7 @@ module Mongoid
       # @param [ Class ] attr The attribute attempted to be written.
       def initialize(klass, attr)
         super(
-          compose_message("prohibited_setter", { klass: klass, attr: attr })
+          compose_message("invalid_dot_dollar_assignment", { klass: klass, attr: attr })
         )
       end
     end

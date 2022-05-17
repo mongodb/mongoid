@@ -39,13 +39,34 @@ describe "Dots and Dollars" do
       end
     end
 
+    context "when using the read_attribute" do
+
+      context "on dotted fields" do
+        it "gets the right value" do
+          expect(user.read_attribute("first.last")).to eq("Neil.Shweky")
+        end
+      end
+
+      context "on dollared fields" do
+        it "gets the right value" do
+          expect(user.read_attribute("$_amount")).to eq(0)
+        end
+      end
+
+      context "on dotted and dollared fields" do
+        it "gets the right value" do
+          expect(user.read_attribute("$a.b")).to be true
+        end
+      end
+    end
+
     context "when using the field setters" do
 
       context "on dotted fields" do
         it "raises an error" do
           expect do
             user.send(:"first.last=", "Nissim.Shweky")
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -53,7 +74,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.send(:"$_amount=", 1)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -61,7 +82,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.send(:"$a.b=", false)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
     end
@@ -72,7 +93,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.write_attribute("first.last", "Nissim.Shweky")
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -80,7 +101,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.write_attribute("$_amount", 1)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -88,7 +109,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.write_attribute("$a.b", false)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
     end
@@ -99,7 +120,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.update_attribute("first.last", "Nissim.Shweky")
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -107,7 +128,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.update_attribute("$_amount", 1)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -115,7 +136,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.update_attribute("$a.b", false)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
     end
@@ -126,7 +147,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.update_attributes!("first.last": "Nissim.Shweky")
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -134,7 +155,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.update_attributes!("$_amount": 1)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -142,7 +163,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.update_attributes!("$a.b": false)
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
     end
@@ -153,7 +174,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user[:"first.last"] = "Nissim.Shweky"
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -161,7 +182,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user[:"$_amount"] = 1
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -169,7 +190,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user[:"$a.b"] = false
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
     end
@@ -180,7 +201,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.remove_attribute("first.last")
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -188,7 +209,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.remove_attribute("$_amount")
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
 
@@ -196,7 +217,7 @@ describe "Dots and Dollars" do
         it "raises an error" do
           expect do
             user.remove_attribute("$a.b")
-          end.to raise_error(Mongoid::Errors::ProhibitedSetter)
+          end.to raise_error(Mongoid::Errors::InvalidDotDollarAssignment)
         end
       end
     end

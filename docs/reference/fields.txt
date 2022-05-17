@@ -1424,8 +1424,16 @@ method as follows:
     user.send(:"$_amount")
     # => 42650000
 
-Since the update operations will not function correctly on these fields, as
-explained above, the setters for these fields are prohibited for use and
+It is also possible to use ``read_attribute`` to access these fields:
+
+.. code::
+
+    user.read_attribute("first.last")
+    # => Mike.Trout
+
+Due to `server limitations <https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/>`_,
+updating and replacing fields containing dots and dollars requires using special
+operators. For this reason, calling setters on these fields is prohibited and
 will raise an error:
 
 .. code::
@@ -1438,7 +1446,7 @@ will raise an error:
 
     user = User.new
     user.send(:"first.last=", "Shohei.Ohtani")
-    # raises a ProhibitedSetter error
+    # raises a InvalidDotDollarAssignment error
     user.send(:"$_amount=", 8500000)
-    # raises a ProhibitedSetter error
+    # raises a InvalidDotDollarAssignment error
 
