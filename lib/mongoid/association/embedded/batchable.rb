@@ -248,9 +248,9 @@ module Mongoid
           end
         end
 
-        # Retrieve the path and invalidate the cache afterwards. This method
-        # is used for when the association has not been set on the document
-        # yet, which can cause path and atomic_paths to be calculated
+        # Clear the cache for path and atomic_paths. This method is used when
+        # the path method is used, and the association has not been set on the
+        # document yet, which can cause path and atomic_paths to be calculated
         # incorrectly later.
         #
         # @api private
