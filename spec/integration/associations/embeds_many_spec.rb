@@ -203,4 +203,19 @@ describe 'embeds_many associations' do
       end
     end
   end
+
+  context 'when an anonymous class defines an embeds_many association' do
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+        embeds_many :addresses
+      end
+    end
+
+    it 'loads the association correctly' do
+      expect { klass }.to_not raise_error
+      expect { klass.new.addresses }.to_not raise_error
+      expect(klass.new.addresses.build).to be_a Address
+    end
+  end
 end
