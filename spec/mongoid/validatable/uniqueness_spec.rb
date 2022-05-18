@@ -2495,6 +2495,10 @@ describe Mongoid::Validatable::UniquenessValidator do
         I18n.backend.store_translations(:fr, { errors: { messages: { taken: 'est déjà utilisé(e)' } } })
       end
 
+      after do
+        I18n.backend.instance_variable_get(:@translations).delete(:fr)
+      end
+
       it "correctly translates the error message" do
         Dictionary.create!(name: 'Littré')
         dict = Dictionary.new(name: 'Littré')
