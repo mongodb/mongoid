@@ -1,5 +1,4 @@
 en:
-  # For ActiveRecord parity.
   errors:
     messages:
       taken: "has already been taken"
