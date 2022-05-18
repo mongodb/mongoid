@@ -732,6 +732,44 @@ be executed sequentially during socket creation.
 For more information about TLS context hooks, including best practices for
 assigning and removing them, see `the Ruby driver documentation <https://mongodb.com/docs/ruby-driver/current/reference/create-client/#modifying-sslcontext>`_.
 
+
+Client-Side Encryption
+======================
+
+When loading the configuration file, Mongoid permits the file to contain
+``BSON::Binary`` instances which are used for specifying ``keyId`` in
+the schema map for `client-side encryption
+<https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/>`_,
+as the following example shows:
+
+.. code-block:: yaml
+
+  development:
+    clients:
+      default:
+        database: blog_development
+        hosts: [localhost:27017]
+        options:
+          auto_encryption_options:
+            key_vault_namespace: 'keyvault.datakeys'
+            kms_providers:
+              local:
+                key: "z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U"
+            schema_map:
+              blog_development.comments:
+                properties:
+                  message:
+                    encrypt:
+                      keyId:
+                        - !ruby/object:BSON::Binary
+                          data: !binary |-
+                            R/AgNcxASFiiJWKXqWGo5w==
+                          type: :uuid
+                      bsonType: "string"
+                      algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                bsonType: "object"
+
+
 Usage with Forking Servers
 ==========================
 

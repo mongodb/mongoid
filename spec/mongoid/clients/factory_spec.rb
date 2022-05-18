@@ -36,6 +36,7 @@ describe Mongoid::Clients::Factory do
       context "when the configuration exists" do
 
         context "when the configuration is standard" do
+          restore_config_clients
 
           let(:config) do
             {
@@ -46,7 +47,6 @@ describe Mongoid::Clients::Factory do
 
           before do
             Mongoid::Config.send(:clients=, config)
-            # TODO: We should restore overwritten configuration in after block
           end
 
           after do
@@ -118,6 +118,7 @@ describe Mongoid::Clients::Factory do
         end
 
         context "when the configuration has no ports" do
+          restore_config_clients
 
           let(:config) do
             {
@@ -128,7 +129,6 @@ describe Mongoid::Clients::Factory do
 
           before do
             Mongoid::Config.send(:clients=, config)
-            # TODO: We should restore overwritten configuration in after block
           end
 
           after do
@@ -163,6 +163,7 @@ describe Mongoid::Clients::Factory do
         context "when configured via a uri" do
 
           context "when the uri has a single host:port" do
+            restore_config_clients
 
             let(:config) do
               {
@@ -173,7 +174,6 @@ describe Mongoid::Clients::Factory do
 
             before do
               Mongoid::Config.send(:clients=, config)
-              # TODO: We should restore overwritten configuration in after block
             end
 
             after do
@@ -202,6 +202,7 @@ describe Mongoid::Clients::Factory do
           end
 
           context "when the uri has multiple host:port pairs" do
+            restore_config_clients
 
             let(:config) do
               {
@@ -212,7 +213,6 @@ describe Mongoid::Clients::Factory do
 
             before do
               Mongoid::Config.send(:clients=, config)
-              # TODO: We should restore overwritten configuration in after block
             end
 
             after do
@@ -253,6 +253,7 @@ describe Mongoid::Clients::Factory do
     end
 
     context "when no name is provided" do
+      restore_config_clients
 
       let(:config) do
         { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
@@ -260,7 +261,6 @@ describe Mongoid::Clients::Factory do
 
       before do
         Mongoid::Config.send(:clients=, config)
-        # TODO: We should restore overwritten configuration in after block
       end
 
       after do
@@ -287,12 +287,12 @@ describe Mongoid::Clients::Factory do
     end
 
     context "when nil is provided and no default config" do
+      restore_config_clients
 
       let(:config) { nil }
 
       before do
         Mongoid.clients[:default] = nil
-        # TODO: We should restore overwritten configuration in after block
       end
 
       it "raises NoClientsConfig error" do
@@ -302,6 +302,7 @@ describe Mongoid::Clients::Factory do
   end
 
   describe ".default" do
+    restore_config_clients
 
     let(:config) do
       { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
@@ -309,7 +310,6 @@ describe Mongoid::Clients::Factory do
 
     before do
       Mongoid::Config.send(:clients=, config)
-      # TODO: We should restore overwritten configuration in after block
     end
 
     after do
@@ -336,6 +336,7 @@ describe Mongoid::Clients::Factory do
   end
 
   context "when options are provided with string keys" do
+    restore_config_clients
 
     let(:config) do
       {
@@ -352,7 +353,6 @@ describe Mongoid::Clients::Factory do
 
     before do
       Mongoid::Config.send(:clients=, config)
-      # TODO: We should restore overwritten configuration in after block
     end
 
     after do
@@ -391,6 +391,8 @@ describe Mongoid::Clients::Factory do
   end
 
   context "unexpected config options" do
+    restore_config_clients
+
     let(:unknown_opts) do
       {
         bad_one: 1,
@@ -408,11 +410,8 @@ describe Mongoid::Clients::Factory do
       }
     end
 
-    around(:each) do |example|
-      old_config = Mongoid::Config.clients
+    before do
       Mongoid::Config.send(:clients=, config)
-      example.run
-      Mongoid::Config.send(:clients=, old_config)
     end
 
     [:bad_one, :bad_two].each do |env|

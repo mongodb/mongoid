@@ -106,7 +106,7 @@ describe Mongoid::Config::Environment do
 
     context 'when file found' do
       before do
-        allow(File).to receive(:new).with('mongoid.yml').and_return(StringIO.new(file_contents))
+        allow(File).to receive(:read).with('mongoid.yml').and_return(file_contents)
       end
 
       let(:file_contents) do
@@ -160,6 +160,44 @@ describe Mongoid::Config::Environment do
         let(:environment) { 'staging' }
 
         it { is_expected.to be_nil }
+      end
+    end
+
+    context 'when configuration includes schema map' do
+      paths = Dir.glob(File.join(File.dirname(__FILE__), '../../support/schema_maps/*.json'))
+
+      if paths.empty?
+        raise "Expected to find some schema maps"
+      end
+
+      before do
+        allow(File).to receive(:read).with('mongoid.yml').and_return(file_contents)
+      end
+
+      let(:file_contents) do
+        <<~FILE
+          test:
+            clients:
+              default:
+                database: mongoid_test
+                hosts: [localhost]
+                options:
+                  auto_encryption_options:
+                    schema_map: #{schema_map.to_yaml.sub(/\A---/, '').gsub(/\n/, "\n" + ' '*100)}
+        FILE
+      end
+
+      paths.each do |path|
+        context File.basename(path) do
+          let(:schema_map) do
+            BSON::ExtJSON.parse(File.read(path))
+          end
+
+          it 'loads successfully' do
+            subject.should be_a(Hash)
+            subject.fetch('clients').fetch('default').fetch('options').fetch('auto_encryption_options').fetch('schema_map').should be_a(Hash)
+          end
+        end
       end
     end
   end
