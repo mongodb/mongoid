@@ -600,9 +600,6 @@ module Mongoid
               write_attribute(name, field.eval_default(self))
             else
               value = field.demongoize(raw)
-              # We don't want to mark the foreign key value as changed since
-              # the attributes_changed hash is used for attributes, whereas
-              # the foreign key is part of the association.
               attribute_will_change!(name) if value.resizable? && !field.foreign_key?
               value
             end
