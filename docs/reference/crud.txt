@@ -863,7 +863,6 @@ the database up to the time it is saved. Any persistence operation clears the ch
    # Get the previous value for a field.
    person.name_was # "Alan Parsons"
 
-
 .. note::
 
   Setting the associations on a document does not cause the ``changed`` or
