@@ -540,7 +540,7 @@ en:
           resolution: "Verify that all servers in your deployment are at least
             version 3.6 or don't attempt to use sessions with older server versions."
         taken:
-          "is already taken"
+          "has already been taken"
         too_many_nested_attribute_records:
           message: "Accepting nested attributes for %{association} is limited
             to %{limit} records."
