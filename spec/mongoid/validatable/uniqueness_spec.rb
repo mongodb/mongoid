@@ -2475,14 +2475,6 @@ describe Mongoid::Validatable::UniquenessValidator do
 
   describe "i18n" do
 
-    before do
-      Dictionary.validates_uniqueness_of :name
-    end
-
-    after do
-      Dictionary.reset_callbacks(:validate)
-    end
-
     context 'when using a different locale' do
 
       around do |example|
@@ -2500,10 +2492,10 @@ describe Mongoid::Validatable::UniquenessValidator do
       end
 
       it "correctly translates the error message" do
-        Dictionary.create!(name: 'Littré')
-        dict = Dictionary.new(name: 'Littré')
+        Circus.create!(slogan: 'The Greatest Show on Mars')
+        dict = Circus.new(slogan: 'The Greatest Show on Mars')
         dict.valid?
-        expect(dict.errors.messages[:name]).to eq(["est déjà utilisé(e)"])
+        expect(dict.errors.messages[:slogan]).to eq(["est déjà utilisé(e)"])
       end
     end
   end
