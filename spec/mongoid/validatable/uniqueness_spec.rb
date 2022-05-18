@@ -2472,4 +2472,32 @@ describe Mongoid::Validatable::UniquenessValidator do
       }.to raise_error(Mongo::Error::OperationFailure)
     end
   end
+
+  describe "i18n" do
+
+    before do
+      Dictionary.validates_uniqueness_of :name
+    end
+
+    after do
+      Dictionary.reset_callbacks(:validate)
+    end
+
+    around do |example|
+      I18n.with_locale(:fr) { example.run }
+    end
+
+    before do
+      # Translation key location is as per rails-i18n gem.
+      # See: https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/en.yml
+      I18n.backend.store_translations(:fr, { errors: { messages: { taken: 'est déjà utilisé(e)' } } })
+    end
+
+    it "uses the correct language translation" do
+      Dictionary.create!(name: 'Littré')
+      dict = Dictionary.new(name: 'Littré')
+      dict.valid?
+      expect(dict.errors.messages[:name]).to eq(["est déjà utilisé(e)"])
+    end
+  end
 end
