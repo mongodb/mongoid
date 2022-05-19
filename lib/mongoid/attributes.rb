@@ -17,7 +17,17 @@ module Mongoid
     include Processing
     include Readonly
 
-    attr_reader :attributes
+    def attributes
+    #byebug if self.class.name=='Cat' && $a
+      @attributes&.tap do |a|
+        a.each do |k, v|
+          unless String === k
+            raise "k is #{k.class}: #{self}"
+          end
+        end
+      end
+    end
+
     alias :raw_attributes :attributes
 
     # Determine if an attribute is present.
