@@ -69,7 +69,7 @@ module Mongoid
       elsif fields[attribute].try(:localized?)
         attributes[attribute]
       else
-        send(attr)
+        read_attribute(attr)
       end
     end
 

@@ -62,6 +62,21 @@ describe Mongoid::Validatable do
         expect(value).to be_empty
       end
     end
+
+    context "when validating a mongoizable field" do
+
+      let(:princess) do
+        Princess.new(family: :fam)
+      end
+
+      let(:value) do
+        princess.read_attribute_for_validation(:family)
+      end
+
+      it "validates the demongoized value" do
+        expect(value).to eq(:fam)
+      end
+    end
   end
 
   describe "#valid?" do

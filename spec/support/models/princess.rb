@@ -4,6 +4,8 @@ class Princess
   include Mongoid::Document
   field :primary_color
   field :name, type: String
+  field :family, type: StringifiedSymbol
+
   def color
     primary_color.to_s
   end
