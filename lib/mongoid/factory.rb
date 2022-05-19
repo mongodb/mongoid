@@ -76,6 +76,16 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
+      if attributes && attributes.class != Hash
+        raise ArgumentError, "Attributes was not a hash: #{attributes.class}"
+      end
+      if attributes
+        attributes.each do |k, v|
+          unless String === k
+            raise "Key is not a string: #{k.class}: #{attributes}"
+          end
+        end
+      end
       execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
     end
 
