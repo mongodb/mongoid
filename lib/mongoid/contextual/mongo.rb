@@ -677,7 +677,7 @@ module Mongoid
       #     ...
       #   end
       #
-      # @param [ Document ] document The document to yield to.
+      # @param [ BSON::Document ] document The document to yield to.
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
