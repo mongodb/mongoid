@@ -865,9 +865,11 @@ the database up to the time it is saved. Any persistence operation clears the ch
 
 .. note::
 
-  Setting the associations on a document does not cause the ``changed`` or
+  Setting the associations on a document does not cause the ``changes`` or
   ``changed_attributes`` hashes to be modified. This is true for all associations
-  whether referenced or embedded.
+  whether referenced or embedded. Note that changing the _id(s) field on
+  referenced associations does cause the changes to show up in the ``changes``
+  and the ``changed_attributes`` hashes.
 
 
 Resetting Changes
