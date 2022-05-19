@@ -679,6 +679,11 @@ module Mongoid
       #
       # @param [ BSON::Document ] document The document to yield to.
       def yield_document(document, &block)
+      attributes=document
+      if attributes && attributes.class != Hash && attributes.class != BSON::Document
+        raise ArgumentError, "Document was not a hash: #{attributes.class}"
+      end
+      p document.class
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
         yield(doc)
