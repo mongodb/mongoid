@@ -472,8 +472,8 @@ module Mongoid
             selector = conditions || {}
             removed = klass.send(method, selector.merge!(criteria.selector))
             _target.delete_if do |doc|
-              doc._matches?(selector).tap do
-                unbind_one(doc)
+              doc._matches?(selector).tap do |b|
+                unbind_one(doc) if b
               end
             end
             removed
