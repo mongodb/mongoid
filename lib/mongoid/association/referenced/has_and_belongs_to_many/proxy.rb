@@ -34,14 +34,7 @@ module Mongoid
                   doc.save
                 end
                 reset_unloaded
-                # reset_unloaded accesses the value for the foreign key on
-                # _base, which causes it to get added to the changed_attributes
-                # hash. This happens because when reading a "resizable" attribute
-                # it is automatically added to the changed_attributes hash.
-                # this is true only for the foreign key value for HABTM associations
-                # as the other associations use strings for their foreign key values.
-                # See MONGOID-4843 for a longer discussion about this.
-                _base.changed_attributes.delete(foreign_key)
+                clear_foreign_key_changes
               end
             end
             unsynced(_base, foreign_key) and self
@@ -189,6 +182,7 @@ module Mongoid
               push(replacement.compact.uniq)
             else
               reset_unloaded
+              clear_foreign_key_changes
             end
             self
           end
@@ -205,6 +199,23 @@ module Mongoid
           end
 
           private
+
+          # Clears the foreign key from the changed_attributes hash.
+          #
+          # reset_unloaded accesses the value for the foreign key on
+          # _base, which causes it to get added to the changed_attributes
+          # hash. This happens because when reading a "resizable" attribute
+          # it is automatically added to the changed_attributes hash.
+          # this is true only for the foreign key value for HABTM associations
+          # as the other associations use strings for their foreign key values.
+          # For consistency with the other associations, we clear the foreign
+          # key from the changed_attributes hash.
+          # See MONGOID-4843 for a longer discussion about this.
+          #
+          # @api private
+          def clear_foreign_key_changes
+            _base.changed_attributes.delete(foreign_key)
+          end
 
           # Appends the document to the target array, updating the index on the
           # document at the same time.
