@@ -76,7 +76,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
-      if attributes && attributes.class != Hash
+      if attributes && attributes.class != Hash && attributes.class != BSON::Document
         raise ArgumentError, "Attributes was not a hash: #{attributes.class}"
       end
       if attributes
