@@ -86,11 +86,7 @@ module Mongoid
     def read_attribute(name)
       field = fields[name.to_s]
       raw = read_raw_attribute(name)
-      value = if field
-        field.demongoize(raw)
-      else
-        raw
-      end
+      value = field ? field.demongoize(raw) : raw
       attribute_will_change!(name.to_s) if value.resizable?
       value
     end
