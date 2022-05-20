@@ -31,7 +31,7 @@ module Mongoid
         # all the way through the composition hierarchy to the root object,
         # because when an embedded document is changed the write is actually
         # performed by the composition root. See MONGOID-3468.
-        if _parent &&  _association.touch_field
+        if _parent
           # This will persist updated_at on this document as well as parents.
           # TODO support passing the field name to the parent's touch method;
           # I believe it should be read out of

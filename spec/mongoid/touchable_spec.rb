@@ -587,7 +587,7 @@ describe Mongoid::Touchable do
 
     context "when the touch option is true" do
 
-      shared_examples "when updating" do
+      shared_examples "updates the updated_at" do
 
         let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
@@ -625,14 +625,14 @@ describe Mongoid::Touchable do
           let(:parent_cls) { TouchableSpec::Referenced::Building }
           let(:meth) { meth }
 
-          include_examples "when updating"
+          include_examples "updates the updated_at"
         end
 
         context "with #{meth} on embedded associations" do
           let(:parent_cls) { TouchableSpec::Embedded::Building }
           let(:meth) { meth }
 
-          include_examples "when updating"
+          include_examples "updates the updated_at"
         end
       end
     end
@@ -662,7 +662,6 @@ describe Mongoid::Touchable do
         before do
           entrance
           update_time
-          # byebug if parent_cls == TouchableSpec::Embedded::Building
           entrance.touch
         end
 
@@ -689,9 +688,9 @@ describe Mongoid::Touchable do
         let(:meth) { meth }
         let(:parent_cls) { TouchableSpec::Embedded::Building }
 
-        # before do
-        #   skip "MONGOID-5274"
-        # end
+        before do
+          skip "MONGOID-5274"
+        end
 
         include_examples "does not update the parent"
       end
