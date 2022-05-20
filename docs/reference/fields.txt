@@ -1304,7 +1304,7 @@ a ``ReadonlyAttribute`` exception will be raised:
    band.update_attribute(:name, "Tool") # Raises the error.
    band.remove_attribute(:name) # Raises the error.
 
-Assignments to the setters of read-only attributes will be ignored:
+Assignments to read-only attributes using their setters will be ignored:
 
 .. code-block:: ruby
 
@@ -1315,8 +1315,8 @@ Assignments to the setters of read-only attributes will be ignored:
   b.name
   # => "The Rolling Stones"
 
-Calls to persistent operators, like ``bit`` and ``inc``, will persist changes
-to readonly fields.
+Calls to atomic persistence operators, like ``bit`` and ``inc``, will persist
+changes to readonly fields.
 
 Timestamp Fields
 ================
