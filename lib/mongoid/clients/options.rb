@@ -46,7 +46,7 @@ module Mongoid
       end
 
       def persistence_context?
-        !!PersistenceContext.get(self) || PersistenceContext.get(self.class)
+        !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
       end
 
       private
