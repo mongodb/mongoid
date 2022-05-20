@@ -42,7 +42,7 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      belongs_to :building, class_name: "TouchableSpec::Referenced::Building"
+      belongs_to :building, touch: false, class_name: "TouchableSpec::Referenced::Building"
     end
 
     class Floor

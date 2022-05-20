@@ -676,23 +676,24 @@ describe Mongoid::Touchable do
         end
       end
 
+      [ "save!".to_sym, :destroy, :touch].each do |meth|
+        context "with #{meth} on belongs_to" do
+          let(:meth) { meth }
+          let(:parent_cls) { TouchableSpec::Referenced::Building }
 
-      context "on belongs_to" do
-        let(:meth) { meth }
-        let(:parent_cls) { TouchableSpec::Referenced::Building }
-
-        include_examples "does not update the parent"
-      end
-
-      context "on embedded_in" do
-        let(:meth) { meth }
-        let(:parent_cls) { TouchableSpec::Embedded::Building }
-
-        before do
-          skip "MONGOID-5274"
+          include_examples "does not update the parent"
         end
 
-        include_examples "does not update the parent"
+        context "with #{meth} on embedded_in" do
+          let(:meth) { meth }
+          let(:parent_cls) { TouchableSpec::Embedded::Building }
+
+          before do
+            skip "MONGOID-5274"
+          end
+
+          include_examples "does not update the parent"
+        end
       end
     end
   end
