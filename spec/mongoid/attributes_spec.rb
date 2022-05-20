@@ -2684,4 +2684,18 @@ describe Mongoid::Attributes do
       end
     end
   end
+
+  context "when modifiying a hash referenced with the [] notation" do
+    let(:church) { Church.create!(location: { x: 1 }) }
+
+    before do
+      church[:location].merge!(y: 2)
+      church.save!
+      church.reload
+    end
+
+    it "persists the updated hash" do
+      church.location.should == { "x" => 1, "y" => 2 }
+    end
+  end
 end
