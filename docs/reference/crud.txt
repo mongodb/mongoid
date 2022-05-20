@@ -41,17 +41,17 @@ operations with examples.
 
        *Insert a document or multiple documents into the database, raising an
        error if a validation or server error occurs.*
-       
+
        *Pass a hash of attributes to create one document with the specified
        attributes, or an array of hashes to create multiple documents.
        If a single hash is passed, the corresponding document is returned.
        If an array of hashes is passed, an array of documents corresponding
        to the hashes is returned.*
-       
+
        *If a block is given to* ``create!`` *, it will be invoked with each
        document as the argument in turn prior to attempting to save that
        document.*
-       
+
        *If there is a problem saving any of the documents, such as
        a validation error or a server error, an exception is raised
        and, consequently, none of the documents are returned.
@@ -78,12 +78,12 @@ operations with examples.
 
        *Instantiate a document or multiple documents and, if validations pass,
        insert them into the database.*
-       
+
        ``create`` *is similar to* ``create!`` *but does not raise
        exceptions on validation errors. It still raises errors on server
        errors, such as trying to insert a document with an* ``_id`` *that
        already exists in the collection.*
-       
+
        *If any validation errors are encountered, the respective document
        is not inserted but is returned along with documents that were inserted.
        Use* ``persisted?`` *,* ``new_record?`` *or* ``errors`` *methods
@@ -105,13 +105,13 @@ operations with examples.
           Person.create(first_name: "Heinrich") do |doc|
             doc.last_name = "Heine"
           end # => Person instance
-          
+
           class Post
             include Mongoid::Document
-            
+
             validates_uniqueness_of :title
           end
-          
+
           posts = Post.create([{title: "test"}, {title: "test"}])
           # => array of two Post instances
           posts.map { |post| post.persisted? } # => [true, false]
@@ -120,7 +120,7 @@ operations with examples.
 
        *Save the changed attributes to the database atomically, or insert the document if
        new. Raises an exception if validations fail or there is a server error.*
-       
+
        *Returns true if the changed attributes were saved, raises an exception otherwise.*
      -
         .. code-block:: ruby
@@ -138,12 +138,12 @@ operations with examples.
 
        *Save the changed attributes to the database atomically, or insert the document
        if new.*
-       
+
        *Returns true if the changed attributes were saved. Returns false
        if there were any validation errors. Raises an exception if
        the document passed validation but there was a server error during
        the save.*
-       
+
        *Pass* ``validate: false`` *option to bypass validations.*
      -
         .. code-block:: ruby
@@ -210,7 +210,7 @@ operations with examples.
        provided time field. This will cascade the touch to all*
        ``belongs_to`` *associations of the document with the option set.
        This operation skips validations and callbacks.*
-       
+
        *Attempting to touch a destroyed document will raise* ``FrozenError``
        * (as of Ruby 2.5,* ``RuntimeError`` *on previous Ruby versions),
        same as if attempting to update an attribute on a destroyed
@@ -224,14 +224,14 @@ operations with examples.
    * - ``Model#delete``
 
        *Deletes the document from the database without running callbacks.*
-       
+
        *If the document is not persisted, Mongoid will attempt to delete from
        the database any document with the same* ``_id``.
      -
         .. code-block:: ruby
 
           person.delete
-          
+
           person = Person.create!(...)
           unsaved_person = Person.new(id: person.id)
           unsaved_person.delete
@@ -241,14 +241,14 @@ operations with examples.
    * - ``Model#destroy``
 
        *Deletes the document from the database while running destroy callbacks.*
-       
+
        *If the document is not persisted, Mongoid will attempt to delete from
        the database any document with the same* ``_id``.
      -
         .. code-block:: ruby
 
           person.destroy
-          
+
           person = Person.create!(...)
           unsaved_person = Person.new(id: person.id)
           unsaved_person.destroy
@@ -399,9 +399,9 @@ are not invoked.
        *Updates an attribute on the model instance and, if the instance
        is already persisted, performs an atomic $set on the field, bypassing
        validations.*
-       
+
        ``set`` *can also deeply set values on Hash fields.*
-       
+
        ``set`` *can also deeply set values on* ``embeds_one`` *associations.
        If such an association's document is nil, one will be created prior
        to the update.*
@@ -424,14 +424,14 @@ are not invoked.
 
     	  class Post
     	    include Mongoid::Document
-    	    
+
     	    field :metadata, type: Hash
     	  end
-    	  
+
           post = Post.create!
           post.set('metadata.published_at' => Time.now)
           post.metadata['published_at'] # => Time instance
-          
+
           post.set('metadata.approved.today' => true)
           post.metadata['approved'] # => {'today' => true}
 
@@ -449,7 +449,7 @@ are not invoked.
 
             field :route, type: String
           end
-          
+
           flight = Flight.create!
           flight.plan # => nil
           flight.set('plan.route', 'test route')
@@ -578,18 +578,18 @@ associations would be loaded from the database at the next access.
   does not make any changes to the document:
 
   .. code-block:: ruby
-  
+
     # Assuming band has many tours, which could be referenced:
     band = Band.create!(tours: [Tour.create!])
     # ... or embedded:
     band = Band.create!(tours: [Tour.new])
-    
+
     # This writes the empty tour list into the database.
     band.tours = []
-    
+
     # There are no unsaved modifications in band at this point to be reverted.
     band.reload
-    
+
     # Returns the empty array since this is what is in the database.
     band.tours
     # => []
@@ -612,7 +612,7 @@ example demonstrates:
 
   Mongoid.raise_not_found_error = false
   band.destroy
-  
+
   band.reload
   # => #<Band _id: 6206d031e1b8324561f179c8, name: nil, description: nil, likes: nil>
 
@@ -630,7 +630,7 @@ specified in the document (and the shard key value, if a shard key is defined):
 .. code-block:: ruby
 
   existing = Band.create!(name: 'Photek')
-  
+
   # Unsaved document
   band = Band.new(id: existing.id)
   band.reload
@@ -665,9 +665,9 @@ each declared field:
 
     field :first_name
   end
-  
+
   person = Person.new
-  
+
   person.first_name = "Artem"
   person.first_name
   # => "Artem"
@@ -693,18 +693,18 @@ write the values directly into the attributes hash:
     def first_name
       read_attribute(:fn)
     end
-    
+
     def first_name=(value)
       write_attribute(:fn, value)
     end
   end
-  
+
   person = Person.new
-  
+
   person.first_name = "Artem"
   person.first_name
   # => "Artem"
-  
+
   person.attributes
   # => {"_id"=>BSON::ObjectId('606477dc2c97a628cf47075b'), "fn"=>"Artem"}
 
@@ -727,7 +727,7 @@ accept either the declared field name or the storage field name for operations:
     field :first_name, as: :fn
     field :last_name, as: :ln
   end
-  
+
   person = Person.new(first_name: "Artem")
   # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): nil>
 
@@ -736,11 +736,11 @@ accept either the declared field name or the storage field name for operations:
 
   person.read_attribute(:fn)
   # => "Artem"
-  
+
   person.write_attribute(:last_name, "Pushkin")
   person
   # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Pushkin">
-  
+
   person.write_attribute(:ln, "Medvedev")
   person
   # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Medvedev">
@@ -756,7 +756,7 @@ does not cause the respective field to be defined either:
   # => #<Person _id: 60647b212c97a6292c195b4c, first_name(fn): "Artem", last_name(ln): "Medvedev">
   person.attributes
   # => {"_id"=>BSON::ObjectId('60647b212c97a6292c195b4c'), "first_name"=>"Artem", "last_name"=>"Medvedev", "undefined"=>"Hello"}
-  
+
   person.read_attribute(:undefined)
   # => "Hello"
   person.undefined
@@ -784,17 +784,17 @@ for the detailed description of their behavior.
   end
 
   person = Person.new(first_name: "Artem")
-  
+
   person["fn"]
   # => "Artem"
-  
+
   person[:first_name]
   # => "Artem"
-  
+
   person[:ln] = "Medvedev"
   person
   # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Medvedev">
-  
+
   person["last_name"] = "Pushkin"
   person
   # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Pushkin">
@@ -862,6 +862,14 @@ the database up to the time it is saved. Any persistence operation clears the ch
 
    # Get the previous value for a field.
    person.name_was # "Alan Parsons"
+
+.. note::
+
+  Setting the associations on a document does not cause the ``changes`` or
+  ``changed_attributes`` hashes to be modified. This is true for all associations
+  whether referenced or embedded. Note that changing the _id(s) field on
+  referenced associations does cause the changes to show up in the ``changes``
+  and the ``changed_attributes`` hashes.
 
 
 Resetting Changes
