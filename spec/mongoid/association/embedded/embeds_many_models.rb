@@ -162,3 +162,29 @@ class EmmHatch
   # No :class_name option on this association intentionally.
   embedded_in :tank
 end
+
+class EmmPost
+  include Mongoid::Document
+
+  embeds_many :company_tags, class_name: "EmmCompanyTag"
+  embeds_many :user_tags, class_name: "EmmUserTag"
+end
+
+
+class EmmCompanyTag
+  include Mongoid::Document
+
+  field :title, type: String
+
+  embedded_in :post, class_name: "EmmPost"
+end
+
+
+class EmmUserTag
+  include Mongoid::Document
+
+  field :title, type: String
+
+  embedded_in :post, class_name: "EmmPost"
+end
+
