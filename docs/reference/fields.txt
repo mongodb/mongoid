@@ -77,7 +77,7 @@ The valid types for fields are as follows:
 - ``Regexp``
 - ``Set``
 - ``String``
-- ``Mongoid::StringifiedSymbol``, which may be specified simply as 
+- ``Mongoid::StringifiedSymbol``, which may be specified simply as
   ``StringifiedSymbol`` in the scope of a class which included
   ``Mongoid::Document``.
 - ``Symbol``
@@ -1304,6 +1304,19 @@ a ``ReadonlyAttribute`` exception will be raised:
    band.update_attribute(:name, "Tool") # Raises the error.
    band.remove_attribute(:name) # Raises the error.
 
+Assignments to read-only attributes using their setters will be ignored:
+
+.. code-block:: ruby
+
+  b = Band.create!(name: "The Rolling Stones")
+  # => #<Band _id: 6287a3d5d1327a5292535383, name: "The Rolling Stones", origin: nil>
+  b.name = "The Smashing Pumpkins"
+  # => "The Smashing Pumpkins"
+  b.name
+  # => "The Rolling Stones"
+
+Calls to atomic persistence operators, like ``bit`` and ``inc``, will persist
+changes to readonly fields.
 
 Timestamp Fields
 ================
