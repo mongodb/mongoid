@@ -45,6 +45,10 @@ module Mongoid
             PersistenceContext.new(self.class)
       end
 
+      def persistence_context?
+        !!PersistenceContext.get(self) || PersistenceContext.get(self.class)
+      end
+
       private
 
       def set_persistence_context(options_or_context)

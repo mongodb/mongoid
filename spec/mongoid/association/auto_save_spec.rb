@@ -151,45 +151,6 @@ describe Mongoid::Association::Referenced::AutoSave do
               end
             end
           end
-
-          context 'when persistence options are nested' do
-
-            let(:other_db_person) do
-              :other_person
-            end
-
-            let(:other_db_drug) do
-              :other_drug
-            end
-
-            before do
-              Person.has_many :drugs, validate: false, autosave: true
-            end
-
-            after do
-              Person.with(database: other_db_person) do |person_class|
-                person_class.delete_all
-              end
-              Drug.with(database: other_db_drug) do |drug_class|
-                drug_class.delete_all
-              end
-            end
-
-            before do
-              person.with(database: other_db_person) do |per|
-                drug.with(database: other_db_drug) do |d|
-                  d.person = per
-                  per.save!
-                end
-              end
-            end
-
-            it 'saves the relation with the correct persistence options' do
-              Drug.with(database: other_db_drug) do |drug_class|
-                expect(drug_class.count).to eq(1)
-              end
-            end
-          end
         end
 
         context "when saving an existing parent document" do
