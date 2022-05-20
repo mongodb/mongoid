@@ -86,7 +86,13 @@ module Mongoid
     def read_attribute(name)
       field = fields[name.to_s]
       raw = read_raw_attribute(name)
-      field ? field.demongoize(raw) : raw
+      value = if field
+        field.demongoize(raw)
+      else
+        raw
+      end
+      attribute_will_change!(name.to_s) if value.resizable?
+      value
     end
     alias :[] :read_attribute
 
