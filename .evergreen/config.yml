@@ -620,7 +620,7 @@ buildvariants:
     topology: ['replica-set', 'sharded-cluster']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel80-small
+    - ubuntu2004-small
   tasks:
      - name: "test"
 
@@ -632,7 +632,7 @@ buildvariants:
     topology: ['replica-set', 'sharded-cluster']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu2004-small
   tasks:
      - name: "test"
 
@@ -657,7 +657,7 @@ buildvariants:
     rails: ['7.0']
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - ubuntu2004-small
   tasks:
     - name: "test"
 
@@ -695,7 +695,7 @@ buildvariants:
     rails: ['6.0', '6.1']
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel80-small
+    - ubuntu2004-small
   tasks:
      - name: "test"
 
@@ -708,7 +708,7 @@ buildvariants:
     rails: ['5.1', '5.2']
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - ubuntu2004-small
   tasks:
      - name: "test"
 
@@ -721,7 +721,7 @@ buildvariants:
     i18n: '1.0'
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - ubuntu2004-small
   tasks:
      - name: "test"
 
@@ -735,7 +735,7 @@ buildvariants:
     test-i18n-fallbacks: yes
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
   run_on:
-    - rhel70-small
+    - ubuntu2004-small
   tasks:
      - name: "test"
 
