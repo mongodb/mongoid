@@ -2214,10 +2214,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             Person.create(username: 'durran')
           end
 
-          before do
-            person.posts.create(title: "Testing")
-            person.posts.create(title: "Test")
-          end
+          let!(:post1) { person.posts.create!(title: "Testing") }
+          let!(:post2) { person.posts.create!(title: "Test") }
 
           it "removes the correct posts" do
             person.posts.send(method, { title: "Testing" })
@@ -2232,6 +2230,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(person.posts.send(method, { title: "Testing" })).to eq(1)
+          end
+
+          it "sets the association locally" do
+            person.posts.send(method, { title: "Testing" })
+            expect(person.posts).to eq([post2])
           end
         end
 
@@ -2259,6 +2262,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           it "returns the number of documents deleted" do
             expect(person.posts.send(method)).to eq(2)
           end
+
+          it "sets the association locally" do
+            person.posts.send(method)
+            expect(person.posts).to eq([])
+          end
         end
       end
 
@@ -2270,10 +2278,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             Movie.create(title: "Bladerunner")
           end
 
-          before do
-            movie.ratings.create(value: 1)
-            movie.ratings.create(value: 2)
-          end
+          let!(:rating1) { movie.ratings.create!(value: 1) }
+          let!(:rating2) { movie.ratings.create!(value: 2) }
 
           it "removes the correct ratings" do
             movie.ratings.send(method, { value: 1 })
@@ -2287,6 +2293,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(movie.ratings.send(method, { value: 1 })).to eq(1)
+          end
+
+          it "sets the association locally" do
+            movie.ratings.send(method, { value: 1 })
+            expect(movie.ratings).to eq([rating2])
           end
         end
 
@@ -2313,6 +2324,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(movie.ratings.send(method)).to eq(2)
+          end
+
+          it "sets the association locally" do
+            movie.ratings.send(method)
+            expect(movie.ratings).to eq([])
           end
         end
       end

@@ -2395,6 +2395,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           it "removes the ids from the foreign key" do
             expect(person.preference_ids).to eq([ preference_two.id ])
           end
+
+          it "sets the association locally" do
+            expect(person.preferences).to eq([preference_two])
+          end
         end
 
         context "when conditions are not provided" do
@@ -2420,6 +2424,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(deleted).to eq(2)
+          end
+
+          it "sets the association locally" do
+            expect(person.preferences).to eq([])
           end
         end
       end
