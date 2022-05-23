@@ -595,6 +595,10 @@ describe Mongoid::Touchable do
           Timecop.freeze(Time.at(Time.now.to_i) + 2)
         end
 
+        after do
+          Timecop.return
+        end
+
         let(:building) do
           parent_cls.create!
         end
@@ -620,7 +624,7 @@ describe Mongoid::Touchable do
         end
       end
 
-      [ "save!".to_sym, :destroy, :touch].each do |meth|
+      [ :save!, :destroy, :touch].each do |meth|
         context "with #{meth} on referenced associations" do
           let(:parent_cls) { TouchableSpec::Referenced::Building }
           let(:meth) { meth }
@@ -676,7 +680,7 @@ describe Mongoid::Touchable do
         end
       end
 
-      [ "save!".to_sym, :destroy, :touch].each do |meth|
+      [ :save!, :destroy, :touch].each do |meth|
         context "with #{meth} on belongs_to" do
           let(:meth) { meth }
           let(:parent_cls) { TouchableSpec::Referenced::Building }
