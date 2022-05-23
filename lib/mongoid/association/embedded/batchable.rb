@@ -236,7 +236,11 @@ module Mongoid
         #
         # @return [ String ] The atomic path.
         def path
-          @path ||= _unscoped.first.atomic_path
+          @path ||= if _unscoped.empty?
+            Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
+          else
+            _unscoped.first.atomic_path
+          end
         end
 
         # Clear the cache for path and atomic_paths. This method is used when
