@@ -13,13 +13,14 @@ module Mongoid
       #   InvalidField.new(person, :crazy_method_name)
       #
       # @param [ Class ] klass The document class.
+      # @param [ Symbol ] field The field name.
       # @param [ Symbol ] name The method name.
-      def initialize(klass, name)
+      def initialize(klass, field, name)
         super(
           compose_message(
             "invalid_field",
             {
-              name: name,
+              name: field,
               origin: origin(klass, name),
               file: location(klass, name)[0],
               line: location(klass, name)[1]
