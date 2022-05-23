@@ -17,6 +17,7 @@ arch=`host_distro`
 
 set_fcv
 set_env_vars
+set_env_python
 set_env_ruby
 
 if test -n "$APP_TESTS"; then
