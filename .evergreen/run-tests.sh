@@ -17,7 +17,15 @@ arch=`host_distro`
 
 set_fcv
 set_env_vars
+set_env_python
+set_env_node
 set_env_ruby
+
+if test -n "$APP_TESTS"; then
+  # Node from toolchain
+  export PATH=/opt/node/bin:$PATH
+  node -v
+fi
 
 prepare_server $arch
 
@@ -33,13 +41,6 @@ calculate_server_args
 launch_server "$dbdir"
 
 uri_options="$URI_OPTIONS"
-
-# This is needed because of ruby 3.0.0.
-# We should remove this when moving to 3.0.1
-# See https://jira.mongodb.org/browse/MONGOID-5115
-if test "$RVM_RUBY" = "ruby-3.0"; then
-  gem update --system
-fi
 
 which bundle
 bundle --version
@@ -104,13 +105,10 @@ if test -n "$TEST_CMD"; then
 elif test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb
 elif test -n "$APP_TESTS"; then
-  # Need recent node for rails
-  export N_PREFIX=$HOME/.n
-  curl -o $HOME/n --retry 3 https://raw.githubusercontent.com/tj/n/master/bin/n
-  bash $HOME/n stable
-  export PATH=$HOME/.n/bin:$PATH
-  npm -g install yarn
-
+  if test -z "$DOCKER_PRELOAD"; then
+    ./spec/shared/bin/install-node
+  fi
+  
   bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake ci
@@ -124,6 +122,6 @@ if test -f tmp/rspec-all.json; then
   mv tmp/rspec-all.json tmp/rspec.json
 fi
 
-python2 -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
+python3 -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
 
 exit ${test_status}
