@@ -12,6 +12,8 @@ module Mongoid
       # @example Create the error.
       #   InvalidField.new(person, :crazy_method_name)
       #
+      # @api private
+      #
       # @param [ Class ] klass The document class.
       # @param [ Symbol ] field The field name.
       # @param [ Symbol ] name The method name.
@@ -20,7 +22,8 @@ module Mongoid
           compose_message(
             "invalid_field",
             {
-              name: field,
+              name: name,
+              field: field,
               origin: origin(klass, name),
               file: location(klass, name)[0],
               line: location(klass, name)[1]
