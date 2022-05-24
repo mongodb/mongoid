@@ -83,8 +83,8 @@ module Mongoid
           #
           # @param [ Document ] doc The document to remove.
           def remove_associated(doc)
-            if _association.inverse_association.is_a?(HasOne)
-              if associated = doc.send(_association.inverse)
+            if _association.inverse_association(doc).is_a?(HasOne)
+              if associated = doc.send(_association.inverse(doc))
                 associated.send(_association.setter, nil)
               end
             end
