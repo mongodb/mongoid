@@ -238,25 +238,52 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
 
   context 'when the object is already related to another object' do
 
-    let(:drug1) do
-      Drug.new
+    context "when inverse is has_many" do
+
+      let(:drug1) do
+        Drug.new
+      end
+
+      let(:drug2) do
+        Drug.new
+      end
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        drug1.person = person
+        drug2.person = person
+      end
+
+      it 'clears the object of its previous relation' do
+        expect(drug1.person).to be_nil
+      end
     end
 
-    let(:drug2) do
-      Drug.new
-    end
+    context "when inverse is has_one" do
 
-    let(:person) do
-      Person.new
-    end
+      let(:account1) do
+        Account.new
+      end
 
-    before do
-      drug1.person = person
-      drug2.person = person
-    end
+      let(:account2) do
+        Account.new
+      end
 
-    it 'clears the object of its previous relation' do
-      expect(drug1.person).to be_nil
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        account1.person = person
+        account2.person = person
+      end
+
+      it 'clears the object of its previous relation' do
+        expect(account1.person).to be_nil
+      end
     end
   end
 end
