@@ -262,6 +262,37 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       end
     end
 
+    context "when inverse is has_many and has multiple" do
+
+      let(:drug1) do
+        Drug.new
+      end
+
+      let(:drug2) do
+        Drug.new
+      end
+
+      let(:drug3) do
+        Drug.new
+      end
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.drugs = [drug3]
+        drug1.person = person
+        expect(person.drugs).to eq([drug3, drug1])
+        drug2.person = person
+      end
+
+      it 'clears both objects of its previous relation' do
+        expect(drug1.person).to be_nil
+        expect(drug3.person).to be_nil
+      end
+    end
+
     context "when inverse is has_one" do
 
       let(:account1) do
