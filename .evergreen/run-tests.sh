@@ -17,7 +17,15 @@ arch=`host_distro`
 
 set_fcv
 set_env_vars
+set_env_python
+set_env_node
 set_env_ruby
+
+if test -n "$APP_TESTS"; then
+  # Node from toolchain
+  export PATH=/opt/node/bin:$PATH
+  node -v
+fi
 
 prepare_server $arch
 
@@ -33,13 +41,6 @@ calculate_server_args
 launch_server "$dbdir"
 
 uri_options="$URI_OPTIONS"
-
-# This is needed because of ruby 3.0.0.
-# We should remove this when moving to 3.0.1
-# See https://jira.mongodb.org/browse/MONGOID-5115
-if test "$RVM_RUBY" = "ruby-3.0"; then
-  gem update --system
-fi
 
 which bundle
 bundle --version
@@ -118,6 +119,6 @@ if test -f tmp/rspec-all.json; then
   mv tmp/rspec-all.json tmp/rspec.json
 fi
 
-python2 -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
+python3 -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
 
 exit ${test_status}
