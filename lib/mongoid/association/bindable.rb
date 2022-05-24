@@ -64,9 +64,13 @@ module Mongoid
       #
       # This method assumes that an inverse does exist.
       #
+      # This method only removes the associated on HasMany relationships,
+      # as the embedded, has_one, and belongs_to relationships have their
+      # own methods that accomplish this.
+      #
       # @param [ Document ] doc The document to remove.
       def remove_associated(doc)
-        if inv = doc.send(_association.inverse)
+        if _association.is_a?(Referenced::HasMany) && inv = doc.send(_association.inverse)
           if associated = inv.send(_association.name)
             associated.delete(doc)
           end
