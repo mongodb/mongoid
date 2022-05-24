@@ -20,4 +20,22 @@ describe 'embeds_one associations' do
       end
     end
   end
+
+  context 'when an anonymous class defines an embeds_one association' do
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+        embeds_one :address
+      end
+    end
+
+    it 'loads the association correctly' do
+      expect { klass }.to_not raise_error
+      expect { klass.new.address }.to_not raise_error
+      instance = klass.new
+      address = Address.new
+      instance.address = address
+      expect(instance.address).to eq address
+    end
+  end
 end

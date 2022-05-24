@@ -411,10 +411,15 @@ module Mongoid
       def namespace_hierarchy(mod)
         parent = Object
         hier = [parent]
-        mod.name.split('::').each do |part|
-          parent = parent.const_get(part)
-          hier << parent
+
+        # name is not present on anonymous modules
+        if mod.name
+          mod.name.split('::').each do |part|
+            parent = parent.const_get(part)
+            hier << parent
+          end
         end
+
         hier.reverse
       end
 
