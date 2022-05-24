@@ -78,4 +78,30 @@ describe Mongoid::Association::Embedded::EmbedsOne::Buildable do
       end
     end
   end
+
+  context 'when the object is already related to another object' do
+
+    let(:person1) do
+      Person.create!
+    end
+
+    let(:person2) do
+      Person.create!
+    end
+
+    let(:passport) do
+      Passport.new
+    end
+
+    before do
+      person1.passport = passport
+      byebug
+      person2.passport = passport
+    end
+
+    it 'clears the object of its previous relation' do
+      expect(person1.passport).to be_nil
+      expect(person2.passport).to eq(passport)
+    end
+  end
 end
