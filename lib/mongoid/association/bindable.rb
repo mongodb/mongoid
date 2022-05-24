@@ -60,6 +60,19 @@ module Mongoid
         end
       end
 
+      # Remove the associated document from the inverse's association.
+      #
+      # This method assumes that an inverse does exist.
+      #
+      # @param [ Document ] doc The document to remove.
+      def remove_associated(doc)
+        if inv = doc.send(_association.inverse)
+          if associated = inv.send(_association.name)
+            associated.delete(doc)
+          end
+        end
+      end
+
       # Set the id of the related document in the foreign key field on the
       # keyed document.
       #
@@ -134,6 +147,7 @@ module Mongoid
       # @param [ Document ] doc The document to bind.
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
+        remove_associated(doc)
         bind_foreign_key(doc, record_id(_base))
         bind_polymorphic_type(doc, _base.class.name)
         bind_inverse(doc, _base)

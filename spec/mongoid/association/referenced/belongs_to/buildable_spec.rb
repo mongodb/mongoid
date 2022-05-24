@@ -235,4 +235,28 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       end
     end
   end
+
+  context 'when the object is already related to another object' do
+
+    let(:drug1) do
+      Drug.new
+    end
+
+    let(:drug2) do
+      Drug.new
+    end
+
+    let(:person) do
+      Person.new
+    end
+
+    before do
+      drug1.person = person
+      drug2.person = person
+    end
+
+    it 'clears the object of its previous relation' do
+      expect(drug1.person).to be_nil
+    end
+  end
 end
