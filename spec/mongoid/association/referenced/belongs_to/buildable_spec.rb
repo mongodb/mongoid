@@ -241,15 +241,15 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     context "when inverse is has_many" do
 
       let(:drug1) do
-        Drug.new
+        Drug.create!
       end
 
       let(:drug2) do
-        Drug.new
+        Drug.create!
       end
 
       let(:person) do
-        Person.new
+        Person.create!
       end
 
       before do
@@ -267,15 +267,15 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     context "when inverse is has_one" do
 
       let(:account1) do
-        Account.new
+        Account.create!
       end
 
       let(:account2) do
-        Account.new
+        Account.create!
       end
 
       let(:person) do
-        Person.new
+        Person.create!
       end
 
       before do
