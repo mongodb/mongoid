@@ -24,11 +24,11 @@ module Mongoid
               bind_foreign_key(_base, record_id(_target))
               bind_polymorphic_inverse_type(_base, _target.class.name)
               if inverse = _association.inverse(_target)
-                remove_associated(_target)
                 if set_base_association
                   if _base.referenced_many?
                     _target.__send__(inverse).push(_base)
                   else
+                    remove_associated_one(_target)
                     _target.set_relation(inverse, _base)
                   end
                 end
@@ -74,21 +74,6 @@ module Mongoid
               raise Errors::InvalidSetPolymorphicRelation.new(
                   _association.name, _base.class.name, _target.class.name
               )
-            end
-          end
-
-          # Remove the associated document from the inverse's association.
-          #
-          # This method assumes that an inverse does exist.
-          #
-          # @param [ Document ] doc The document to remove.
-          def remove_associated(doc)
-            if _association.inverse_association(doc).is_a?(HasOne)
-              # We only want to remove the inverse association when the inverse
-              # document is in memory.
-              if associated = doc.ivar(_association.inverse(doc))
-                associated.send(_association.setter, nil)
-              end
             end
           end
         end

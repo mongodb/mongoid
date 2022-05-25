@@ -19,7 +19,7 @@ module Mongoid
           def bind_one(doc)
             doc.parentize(_base)
             binding do
-              remove_associated(doc)
+              remove_associated_many(doc)
               doc.do_or_do_not(_association.inverse_setter(_target), _base)
             end
           end

@@ -64,23 +64,41 @@ module Mongoid
       #
       # This method assumes that an inverse does exist.
       #
-      # This method only removes the associated on HasMany relationships,
-      # as the embedded, has_one, and belongs_to relationships have their
-      # own methods that accomplish this.
+      # This method only removes the associated on *_many relationships.
       #
       # @param [ Document ] doc The document to remove.
-      def remove_associated(doc)
-        if _association.is_a?(Referenced::HasMany)
+      def remove_associated_many(doc)
+        if [Referenced::HasMany, Embedded::EmbedsMany].any? { |a| _association.is_a?(a) }
           # We only want to remove the inverse association when the inverse
           # document is in memory.
-          if inv = doc.ivar(_association.inverse(doc))
-            if associated = inv.ivar(_association.name)
-              associated.delete(doc)
+          if inverse = _association.inverse(doc)
+            if inv = doc.ivar(inverse)
+              # This first condition is needed because when assigning the
+              # embeds_many association using the same embeds_many
+              # association, we delete from the array we are about to assign.
+              if _base != inv && (associated = inv.ivar(_association.name))
+                associated.delete(doc)
+              end
             end
           end
         end
       end
 
+      # Remove the associated document from the inverse's association.
+      #
+      # This method only removes the associated on belongs_to and embedded_in
+      # associations.
+      #
+      # @param [ Document ] doc The document to remove.
+      def remove_associated_one(doc)
+        if [Referenced::BelongsTo, Embedded::EmbeddedIn].any? { |a| _association.is_a?(a) }
+          # We only want to remove the inverse association when the inverse
+          # document is in memory.
+          if associated = doc.ivar(_association.inverse(doc))
+            associated.send(_association.setter, nil)
+          end
+        end
+      end
       # Set the id of the related document in the foreign key field on the
       # keyed document.
       #
@@ -155,7 +173,7 @@ module Mongoid
       # @param [ Document ] doc The document to bind.
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
-        remove_associated(doc)
+        remove_associated_many(doc)
         bind_foreign_key(doc, record_id(_base))
         bind_polymorphic_type(doc, _base.class.name)
         bind_inverse(doc, _base)
