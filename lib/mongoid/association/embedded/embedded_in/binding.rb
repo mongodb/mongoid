@@ -26,7 +26,7 @@ module Mongoid
               if _base.embedded_many?
                 _target.do_or_do_not(_association.inverse(_target)).push(_base)
               else
-                remove_associated_in_to(_target)
+                remove_associated(_target)
                 _target.do_or_do_not(_association.inverse_setter(_target), _base)
               end
             end

@@ -62,41 +62,48 @@ module Mongoid
 
       # Remove the associated document from the inverse's association.
       #
-      # This method assumes that an inverse does exist.
-      #
-      # This method only removes the associated on *_many relationships.
-      #
       # @param [ Document ] doc The document to remove.
-      def remove_associated_many(doc)
-        if _association.many?
-          # We only want to remove the inverse association when the inverse
-          # document is in memory.
-          if inverse = _association.inverse(doc)
-            if inv = doc.ivar(inverse)
-              # This first condition is needed because when assigning the
-              # embeds_many association using the same embeds_many
-              # association, we delete from the array we are about to assign.
-              if _base != inv && (associated = inv.ivar(_association.name))
-                associated.delete(doc)
-              end
-            end
+      def remove_associated(doc)
+        if inverse = _association.inverse(doc)
+          if _association.many?
+            remove_associated_many(doc, inverse)
+          elsif _association.in_to?
+            remove_associated_in_to(doc, inverse)
           end
         end
       end
 
       # Remove the associated document from the inverse's association.
       #
-      # This method only removes the associated on belongs_to and embedded_in
+      # This method removes the associated on *_many relationships.
+      #
+      # @param [ Document ] doc The document to remove.
+      # @param [ Symbol ] inverse The name of the inverse.
+      def remove_associated_many(doc, inverse)
+        # We only want to remove the inverse association when the inverse
+        # document is in memory.
+        if inv = doc.ivar(inverse)
+          # This first condition is needed because when assigning the
+          # embeds_many association using the same embeds_many
+          # association, we delete from the array we are about to assign.
+          if _base != inv && (associated = inv.ivar(_association.name))
+            associated.delete(doc)
+          end
+        end
+      end
+
+      # Remove the associated document from the inverse's association.
+      #
+      # This method removes associated on belongs_to and embedded_in
       # associations.
       #
       # @param [ Document ] doc The document to remove.
-      def remove_associated_in_to(doc)
-        if _association.in_to?
-          # We only want to remove the inverse association when the inverse
-          # document is in memory.
-          if associated = doc.ivar(_association.inverse(doc))
-            associated.send(_association.setter, nil)
-          end
+      # @param [ Symbol ] inverse The name of the inverse.
+      def remove_associated_in_to(doc, inverse)
+        # We only want to remove the inverse association when the inverse
+        # document is in memory.
+        if associated = doc.ivar(inverse)
+          associated.send(_association.setter, nil)
         end
       end
 
@@ -174,7 +181,7 @@ module Mongoid
       # @param [ Document ] doc The document to bind.
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
-        remove_associated_many(doc)
+        remove_associated(doc)
         bind_foreign_key(doc, record_id(_base))
         bind_polymorphic_type(doc, _base.class.name)
         bind_inverse(doc, _base)
