@@ -95,11 +95,12 @@ describe Mongoid::Association::Embedded::EmbedsOne::Buildable do
 
     before do
       person1.passport = passport
-      byebug
+      # byebug
       person2.passport = passport
     end
 
     it 'clears the object of its previous relation' do
+      pending "3291"
       expect(person1.passport).to be_nil
       expect(person2.passport).to eq(passport)
     end
