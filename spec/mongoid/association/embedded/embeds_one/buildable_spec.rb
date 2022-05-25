@@ -81,28 +81,26 @@ describe Mongoid::Association::Embedded::EmbedsOne::Buildable do
 
   context 'when the object is already related to another object' do
 
-    let(:person1) do
-      Person.create!
+    let(:owner1) do
+      Owner.create!
     end
 
-    let(:person2) do
-      Person.create!
+    let(:owner2) do
+      Owner.create!
     end
 
-    let(:passport) do
-      Passport.new
+    let(:scribe) do
+      Scribe.new
     end
 
     before do
-      person1.passport = passport
-      # byebug
-      person2.passport = passport
+      owner1.scribe = scribe
+      owner2.scribe = scribe
     end
 
     it 'clears the object of its previous relation' do
-      pending "3291"
-      expect(person1.passport).to be_nil
-      expect(person2.passport).to eq(passport)
+      expect(owner1.scribe).to be_nil
+      expect(owner2.scribe).to eq(scribe)
     end
   end
 end
