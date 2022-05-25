@@ -68,7 +68,7 @@ module Mongoid
       #
       # @param [ Document ] doc The document to remove.
       def remove_associated_many(doc)
-        if [Referenced::HasMany, Embedded::EmbedsMany].any? { |a| _association.is_a?(a) }
+        if _association.many?
           # We only want to remove the inverse association when the inverse
           # document is in memory.
           if inverse = _association.inverse(doc)
@@ -90,8 +90,8 @@ module Mongoid
       # associations.
       #
       # @param [ Document ] doc The document to remove.
-      def remove_associated_one(doc)
-        if [Referenced::BelongsTo, Embedded::EmbeddedIn].any? { |a| _association.is_a?(a) }
+      def remove_associated_in_to(doc)
+        if _association.in_to?
           # We only want to remove the inverse association when the inverse
           # document is in memory.
           if associated = doc.ivar(_association.inverse(doc))
@@ -99,6 +99,7 @@ module Mongoid
           end
         end
       end
+
       # Set the id of the related document in the foreign key field on the
       # keyed document.
       #
