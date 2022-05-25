@@ -877,7 +877,7 @@ describe Mongoid::Fields do
           it "raises an error" do
             expect {
               Person.field(meth)
-            }.to raise_error(Mongoid::Errors::InvalidField)
+            }.to raise_error(Mongoid::Errors::InvalidField, /Defining a field named '#{meth}' is not allowed/)
           end
         end
       end

@@ -138,7 +138,7 @@ en:
           resolution: "Valid expression operators are: %{valid_operators}.
             Ensure you are using one of these operators."
         invalid_field:
-          message: "Defining a field named '%{name}' is not allowed."
+          message: "Defining a field named '%{field}' is not allowed."
           summary: "Defining this field would override the method '%{name}',
             which would cause issues with expectations around the original
             method and cause extremely hard to debug issues. The original
