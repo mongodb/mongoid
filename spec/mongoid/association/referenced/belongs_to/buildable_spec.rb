@@ -267,11 +267,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     context "when inverse is has_one" do
 
       let(:account1) do
-        Account.create!
+        Account.create!(name: "1")
       end
 
       let(:account2) do
-        Account.create!
+        Account.create!(name: "2")
       end
 
       let(:person) do
