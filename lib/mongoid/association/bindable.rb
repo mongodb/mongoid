@@ -71,8 +71,10 @@ module Mongoid
       # @param [ Document ] doc The document to remove.
       def remove_associated(doc)
         if _association.is_a?(Referenced::HasMany)
-          if inv = doc.send(_association.inverse(doc))
-            if associated = inv.send(_association.name)
+          # We only want to remove the inverse association when the inverse
+          # document is in memory.
+          if inv = doc.ivar(_association.inverse(doc))
+            if associated = inv.ivar(_association.name)
               associated.delete(doc)
             end
           end
