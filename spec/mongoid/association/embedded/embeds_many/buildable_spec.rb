@@ -103,4 +103,57 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
       end
     end
   end
+
+  context 'when the object is already related to another object' do
+
+    context "when using <<" do
+
+      let(:person1) do
+        Person.new
+      end
+
+      let(:person2) do
+        Person.new
+      end
+
+      let(:appointment) do
+        Appointment.new
+      end
+
+      before do
+        person1.appointments << appointment
+        person2.appointments << appointment
+      end
+
+      it 'clears the object of its previous relation' do
+        expect(person1.appointments).to eq([])
+        expect(person2.appointments).to eq([appointment])
+      end
+    end
+
+    context "when using concat" do
+
+      let(:person1) do
+        Person.new
+      end
+
+      let(:person2) do
+        Person.new
+      end
+
+      let(:appointment) do
+        Appointment.new
+      end
+
+      before do
+        person1.appointments.concat([appointment])
+        person2.appointments.concat([appointment])
+      end
+
+      it 'clears the object of its previous relation' do
+        expect(person1.appointments).to eq([])
+        expect(person2.appointments).to eq([appointment])
+      end
+    end
+  end
 end

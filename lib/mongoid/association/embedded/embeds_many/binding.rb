@@ -19,6 +19,7 @@ module Mongoid
           def bind_one(doc)
             doc.parentize(_base)
             binding do
+              remove_associated(doc)
               doc.do_or_do_not(_association.inverse_setter(_target), _base)
             end
           end
@@ -32,6 +33,23 @@ module Mongoid
           def unbind_one(doc)
             binding do
               doc.do_or_do_not(_association.inverse_setter(_target), nil)
+            end
+          end
+
+          private
+
+          # Remove the associated document from the inverse's association.
+          #
+          # @param [ Document ] doc The document to remove.
+          def remove_associated(doc)
+            # We only want to remove the inverse association when the inverse
+            # document is in memory.
+            if inverse = _association.inverse(doc)
+              if inv = doc.ivar(inverse)
+                if associated = inv.ivar(_association.name)
+                  associated.delete(doc)
+                end
+              end
             end
           end
         end

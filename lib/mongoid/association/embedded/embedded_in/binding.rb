@@ -26,6 +26,7 @@ module Mongoid
               if _base.embedded_many?
                 _target.do_or_do_not(_association.inverse(_target)).push(_base)
               else
+                remove_associated(_target)
                 _target.do_or_do_not(_association.inverse_setter(_target), _base)
               end
             end
@@ -64,6 +65,19 @@ module Mongoid
                     _association.name, _base.class.name, _target.class.name
                 )
               end
+            end
+          end
+
+          # Remove the associated document from the inverse's association.
+          #
+          # This method assumes that an inverse does exist.
+          #
+          # @param [ Document ] doc The document to remove.
+          def remove_associated(doc)
+            # We only want to remove the inverse association when the inverse
+            # document is in memory.
+            if associated = doc.ivar(_association.inverse(doc))
+              associated.send(_association.setter, nil)
             end
           end
         end
