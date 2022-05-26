@@ -362,7 +362,7 @@ module Mongoid
     def __read_attribute__(name, field = nil, write_default_value = false)
       raw = read_raw_attribute(name)
       field ||= fields[name.to_s]
-      if write_default_value && lazy_settable?(field, raw)
+      if field && write_default_value && lazy_settable?(field, raw)
         write_attribute(name, field.eval_default(self))
       else
         value = field ? field.demongoize(raw) : raw
