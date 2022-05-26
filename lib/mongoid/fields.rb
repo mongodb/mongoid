@@ -731,8 +731,19 @@ module Mongoid
         opts = options.merge(klass: self)
         type_mapping = TYPE_MAPPINGS[options[:type]]
         opts[:type] = type_mapping || unmapped_type(options)
-        unless opts[:type].is_a?(Class)
+        if !opts[:type].is_a?(Class)
           raise Errors::InvalidFieldType.new(self, name, options[:type])
+        else
+          invalid_bson_classes = [ BSON::Boolean, BSON::ByteBuffer, BSON::Code, BSON::CodeWithScope, BSON::DBRef, BSON::DbPointer, BSON::Decimal128, BSON::Document, BSON::Error, BSON::Int32, BSON::Int64, BSON::InvalidKey, BSON::MaxKey, BSON::MinKey, BSON::Timestamp, BSON::Undefined ]
+          if invalid_bson_classes.include?(opts[:type])
+            warn_message = "Using BSON classes, like #{opts[:type]}, as the field type is not supported. "
+            if opts[:type] == BSON::Decimal128
+              warn_message += "In BSON <=4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
+            else
+              warn_message += "Saving these types to the database will work as expected, however, querying them will return the corresponding native Ruby types."
+            end
+            Mongoid.logger.warn(warn_message)
+          end
         end
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
