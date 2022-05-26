@@ -595,7 +595,7 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
-            read_attribute(name, field)
+            __read_attribute__(name, field, true)
           end
         end
       end

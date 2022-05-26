@@ -83,16 +83,8 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute.
-    def read_attribute(name, field = nil)
-      raw = read_raw_attribute(name)
-      field ||= fields[name.to_s]
-      if field && lazy_settable?(field, raw)
-        write_attribute(name, field.eval_default(self))
-      else
-        value = field ? field.demongoize(raw) : raw
-        attribute_will_change!(name) if value.resizable?
-        value
-      end
+    def read_attribute(name)
+      __read_attribute__(name)
     end
     alias :[] :read_attribute
 
@@ -365,6 +357,18 @@ module Mongoid
         value = localized_fields[name].send(:lookup, value)
       end
       value.present?
+    end
+
+    def __read_attribute__(name, field = nil, write_default_value = false)
+      raw = read_raw_attribute(name)
+      field ||= fields[name.to_s]
+      if write_default_value && lazy_settable?(field, raw)
+        write_attribute(name, field.eval_default(self))
+      else
+        value = field ? field.demongoize(raw) : raw
+        attribute_will_change!(name) if value.resizable?
+        value
+      end
     end
   end
 end
