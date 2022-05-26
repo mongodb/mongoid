@@ -734,7 +734,7 @@ module Mongoid
         if !opts[:type].is_a?(Class)
           raise Errors::InvalidFieldType.new(self, name, options[:type])
         else
-          invalid_bson_classes = [ BSON::Boolean, BSON::ByteBuffer, BSON::Code, BSON::CodeWithScope, BSON::DBRef, BSON::DbPointer, BSON::Decimal128, BSON::Document, BSON::Error, BSON::Int32, BSON::Int64, BSON::InvalidKey, BSON::MaxKey, BSON::MinKey, BSON::Timestamp, BSON::Undefined ]
+          invalid_bson_classes = [ BSON::Decimal128, BSON::Int32, BSON::Int64 ]
           if invalid_bson_classes.include?(opts[:type])
             warn_message = "Using BSON classes, like #{opts[:type]}, as the field type is not supported. "
             if opts[:type] == BSON::Decimal128

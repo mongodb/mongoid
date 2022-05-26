@@ -91,10 +91,10 @@ To define custom field types, refer to :ref:`Custom Field Types <custom-field-ty
 
 .. note::
 
-  Using the other ``BSON::*`` types as field types is unsupported. Saving these
-  types to the database will work as expected, however, querying them will
-  return the corresponding native Ruby types. Querying fields
-  of type ``BSON::Decimal128`` will return values of type ``BSON::Decimal128`` in
+  Using the ``BSON::Int64`` and ``BSON::Int32`` types as field types is unsupported.
+  Saving these types to the database will work as expected, however, querying them
+  will return the native Ruby ``Integer`` type. Querying fields of type
+  ``BSON::Decimal128`` will return values of type ``BSON::Decimal128`` in
   BSON <=4 and values of type ``BigDecimal`` in BSON 5+.
 
 .. _omitting-field-type-definition:
