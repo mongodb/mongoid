@@ -595,14 +595,7 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
-            raw = read_raw_attribute(name)
-            if lazy_settable?(field, raw)
-              write_attribute(name, field.eval_default(self))
-            else
-              value = field.demongoize(raw)
-              attribute_will_change!(name) if value.resizable?
-              value
-            end
+            read_attribute(name, field)
           end
         end
       end

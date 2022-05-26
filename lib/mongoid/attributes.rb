@@ -83,12 +83,16 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute.
-    def read_attribute(name)
-      field = fields[name.to_s]
+    def read_attribute(name, field = nil)
       raw = read_raw_attribute(name)
-      value = field ? field.demongoize(raw) : raw
-      attribute_will_change!(name.to_s) if value.resizable?
-      value
+      field ||= fields[name.to_s]
+      if field && lazy_settable?(field, raw)
+        write_attribute(name, field.eval_default(self))
+      else
+        value = field ? field.demongoize(raw) : raw
+        attribute_will_change!(name) if value.resizable?
+        value
+      end
     end
     alias :[] :read_attribute
 
