@@ -740,7 +740,7 @@ module Mongoid
             if opts[:type] == BSON::Decimal128
               warn_message += "In BSON <=4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
             else
-              warn_message += "Saving these types to the database will work as expected, however, querying them will return the corresponding native Ruby types."
+              warn_message += "Saving this type to the database will work as expected, however, querying them will return the corresponding native Ruby types."
             end
             Mongoid.logger.warn(warn_message)
           end
