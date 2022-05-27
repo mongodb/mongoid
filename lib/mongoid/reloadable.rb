@@ -23,7 +23,7 @@ module Mongoid
 
       reloaded = _reload
       if Mongoid.raise_not_found_error && (reloaded.nil? || reloaded.empty?)
-        raise Errors::DocumentNotFound.new(self.class, _id, _id)
+        raise Errors::DocumentNotFound.new(self.class, atomic_selector, atomic_selector)
       end
       @attributes = reloaded
       @attributes_before_type_cast = {}
