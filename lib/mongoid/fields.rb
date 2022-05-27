@@ -219,14 +219,13 @@ module Mongoid
     # Is the provided field a lazy evaluation?
     #
     # @example If the field is lazy settable.
-    #   doc.lazy_settable?(field, nil)
+    #   doc.lazy_settable?(field)
     #
     # @param [ Field ] field The field.
-    # @param [ Object ] value The current value.
     #
     # @return [ true, false ] If we set the field lazily.
-    def lazy_settable?(field, value)
-      !frozen? && value.nil? && field.lazy?
+    def lazy_settable?(field)
+      !frozen? && field.lazy?
     end
 
     # Is the document using object ids?
@@ -595,9 +594,7 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
-            raw = read_raw_attribute(name)
-
-            if lazy_settable?(field, raw)
+            if lazy_settable?(field) && !read_raw_attribute(name).nil?
               return write_attribute(name, field.eval_default(self))
             end
 
