@@ -595,10 +595,10 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method(meth) do
             if lazy_settable?(field) && read_raw_attribute(name).nil?
-              return write_attribute(name, field.eval_default(self))
+              write_attribute(name, field.eval_default(self))
+            else
+              __read_attribute__(name, field)
             end
-
-            __read_attribute__(name, field)
           end
         end
       end
