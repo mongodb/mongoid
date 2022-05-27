@@ -84,7 +84,9 @@ module Mongoid
     #
     # @return [ Object ] The value of the attribute.
     def read_attribute(name)
-      __read_attribute__(name, fields[name.to_s])
+      field = fields[name.to_s]
+      raw = read_raw_attribute(name)
+      __read_attribute__(name, field, raw)
     end
     alias :[] :read_attribute
 
@@ -359,15 +361,10 @@ module Mongoid
       value.present?
     end
 
-    def __read_attribute__(name, field, called_from_getter = false)
-      raw = read_raw_attribute(name)
-      if field && called_from_getter && lazy_settable?(field, raw)
-        write_attribute(name, field.eval_default(self))
-      else
-        value = field ? field.demongoize(raw) : raw
-        attribute_will_change!(name) if value.resizable?
-        value
-      end
+    def __read_attribute__(name, field, raw)
+      value = field ? field.demongoize(raw) : raw
+      attribute_will_change!(name) if value.resizable?
+      value
     end
   end
 end

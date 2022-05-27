@@ -595,7 +595,13 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
-            __read_attribute__(name, field, true)
+            raw = read_raw_attribute(name)
+
+            if lazy_settable?(field, raw)
+              return write_attribute(name, field.eval_default(self))
+            end
+
+            __read_attribute__(name, field, raw)
           end
         end
       end
