@@ -111,7 +111,7 @@ module Mongoid
 
       # Get the shard key from the unmatched hash.
       #
-      # @return [ String ] the shard key and value
+      # @return [ String ] the shard key and value.
       def shard_key(unmatched)
         if Hash === unmatched
           h = unmatched.dup
