@@ -74,8 +74,6 @@ module Mongoid
       def searched(params)
         if params.is_a?(::Array)
           params.take(3).join(", ") + " ..."
-        elsif params.is_a?(::Hash)
-          params[:_id] || params["_id"]
         else
           params
         end
