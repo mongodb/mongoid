@@ -100,9 +100,9 @@ module Mongoid
       #
       # @return [ String ] The problem.
       def message_key(params, unmatched)
-        if Hash === params && !unmatched
-            "document_with_attributes_not_found"
-        elsif Hash === params && params.size >= 2
+        if Hash === params
+          "document_with_attributes_not_found"
+        elsif Hash === unmatched && unmatched.size >= 2
           "document_with_shard_key_not_found"
         else
           "document_not_found"
@@ -117,7 +117,7 @@ module Mongoid
           h = unmatched.dup
           h.delete("_id")
           h.delete(:_id)
-          "#{h.keys.first}: #{h.values.first}"
+          h.map{|k,v| "#{k}: #{v}" }.join(", ")
         end
       end
     end

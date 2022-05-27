@@ -86,7 +86,7 @@ describe Mongoid::Errors::DocumentNotFound do
       let(:id) { BSON::ObjectId.new }
       let(:doc) { { _id: id, a: "syd" } }
       let(:error) do
-        described_class.new(Person, doc, doc)
+        described_class.new(Person, id, doc)
       end
 
       it "contains the problem in the message" do
@@ -111,7 +111,7 @@ describe Mongoid::Errors::DocumentNotFound do
     context "when providing an id in a hash without a shard key" do
 
       let(:error) do
-        described_class.new(Person, { _id: 1 }, { _id: 1 })
+        described_class.new(Person, 1, { _id: 1 })
       end
 
       it "contains the problem in the message" do
