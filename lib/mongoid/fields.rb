@@ -598,7 +598,7 @@ module Mongoid
               return write_attribute(name, field.eval_default(self))
             end
 
-            __read_attribute__(name, field, raw)
+            __read_attribute__(name, field)
           end
         end
       end
