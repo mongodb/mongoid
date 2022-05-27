@@ -738,7 +738,7 @@ module Mongoid
           if invalid_bson_classes.include?(opts[:type])
             warn_message = "Using #{opts[:type]}, as the field type is not supported. "
             if opts[:type] == BSON::Decimal128
-              warn_message += "In BSON <=4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
+              warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
             else
               warn_message += "Saving this type to the database will work as expected, however, querying them will return the corresponding native Ruby types."
             end
