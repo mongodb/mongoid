@@ -100,7 +100,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def prepare_insert(options = {})
-        return nil if performing_validations?(options) &&
+        return self if performing_validations?(options) &&
           invalid?(options[:context] || :create)
         run_callbacks(:save, with_children: false) do
           run_callbacks(:create, with_children: false) do
@@ -108,8 +108,12 @@ module Mongoid
               _mongoid_run_child_callbacks(:save) do
                 _mongoid_run_child_callbacks(:create) do
                   result = yield(self)
-                  post_process_insert
-                  post_process_persist(result, options)
+                  # If this is an embedded document and the parent has not been
+                  # persisted then this document has not been peristed.
+                  unless embedded? && !_parent.persisted?
+                    post_process_insert
+                    post_process_persist(result, options)
+                  end
                 end
               end
             end

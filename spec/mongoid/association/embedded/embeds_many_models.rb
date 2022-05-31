@@ -188,3 +188,18 @@ class EmmUserTag
   embedded_in :post, class_name: "EmmPost"
 end
 
+class EmmSchool
+  include Mongoid::Document
+
+  embeds_many :students, class_name: "EmmStudent"
+
+  field :name, type: :string
+
+  validates :name, presence: true
+end
+
+class EmmStudent
+  include Mongoid::Document
+
+  embedded_in :school, class_name: "EmmSchool"
+end
