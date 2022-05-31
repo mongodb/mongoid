@@ -4720,7 +4720,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
-  context "when parent fails validation" do
+  context "when the parent fails validation" do
     let(:school) { EmmSchool.new }
     let(:student) { school.students.new }
 
@@ -4735,6 +4735,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     it "does not mark the child as persisted" do
       expect(student.persisted?).to be false
     end
+
     it "does not persist the parent" do
       expect(School.count).to eq(0)
     end
