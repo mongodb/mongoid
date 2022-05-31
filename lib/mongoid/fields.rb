@@ -42,6 +42,11 @@ module Mongoid
     # @api private
     IDS = [ :_id, '_id', ].freeze
 
+    # BSON classes that are not supported as field types
+    #
+    # @api private
+    INVALID_BSON_CLASSES = [ BSON::Decimal128, BSON::Int32, BSON::Int64 ].freeze
+
     module ClassMethods
       # Returns the list of id fields for this model class, as both strings
       # and symbols.
@@ -731,8 +736,18 @@ module Mongoid
         opts = options.merge(klass: self)
         type_mapping = TYPE_MAPPINGS[options[:type]]
         opts[:type] = type_mapping || unmapped_type(options)
-        unless opts[:type].is_a?(Class)
+        if !opts[:type].is_a?(Class)
           raise Errors::InvalidFieldType.new(self, name, options[:type])
+        else
+          if INVALID_BSON_CLASSES.include?(opts[:type])
+            warn_message = "Using #{opts[:type]} as the field type is not supported. "
+            if opts[:type] == BSON::Decimal128
+              warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
+            else
+              warn_message += "Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type."
+            end
+            Mongoid.logger.warn(warn_message)
+          end
         end
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]

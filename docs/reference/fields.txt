@@ -89,6 +89,13 @@ Mongoid also recognizes the string ``"Boolean"`` as an alias for the
 
 To define custom field types, refer to :ref:`Custom Field Types <custom-field-types>` below.
 
+.. note::
+
+  Using the ``BSON::Int64`` and ``BSON::Int32`` types as field types is unsupported.
+  Saving these types to the database will work as expected, however, querying them
+  will return the native Ruby ``Integer`` type. Querying fields of type
+  ``BSON::Decimal128`` will return values of type ``BSON::Decimal128`` in
+  BSON <=4 and values of type ``BigDecimal`` in BSON 5+.
 
 .. _omitting-field-type-definition:
 
