@@ -497,7 +497,7 @@ describe "Syncable Association" do
     end
   end
 
-  context "when setting one on unpersisted HABTM association" do
+  context "when setting one document on unpersisted HABTM association" do
     let!(:dog) { Dog.create! }
     let!(:breed) { Breed.new }
 
