@@ -100,7 +100,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def prepare_insert(options = {})
-        return self if performing_validations?(options) &&
+        return nil if performing_validations?(options) &&
           invalid?(options[:context] || :create)
         run_callbacks(:save, with_children: false) do
           run_callbacks(:create, with_children: false) do
