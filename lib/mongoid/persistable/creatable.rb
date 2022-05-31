@@ -108,9 +108,7 @@ module Mongoid
               _mongoid_run_child_callbacks(:save) do
                 _mongoid_run_child_callbacks(:create) do
                   result = yield(self)
-                  # If this is an embedded document and the parent has not been
-                  # persisted then this document has not been peristed.
-                  unless embedded? && !_parent.persisted?
+                  if result.errors.empty?
                     post_process_insert
                     post_process_persist(result, options)
                   end
