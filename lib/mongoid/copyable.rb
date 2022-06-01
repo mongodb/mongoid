@@ -45,7 +45,7 @@ module Mongoid
           true
         end
       end
-      # Use Factory#build method because it takes the discriminator key into account. remove me.
+
       Factory.build(klass, attrs).tap do |object|
         dynamic_attrs.each do |attr_name, value|
           assoc = object.embedded_relations[attr_name]
