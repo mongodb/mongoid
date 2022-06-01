@@ -75,7 +75,7 @@ end
 class EomUser
   include Mongoid::Document
 
-  embeds_one :auth_data, class_name: 'EomUserAuthData',  autobuild: true
+  embeds_one :auth_data, class_name: 'EomUserAuthData', autobuild: true
   accepts_nested_attributes_for :auth_data
   validates :auth_data, presence: true
 end
