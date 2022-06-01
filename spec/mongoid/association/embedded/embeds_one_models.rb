@@ -73,18 +73,18 @@ class EomCompany
 end
 
 class EomUser
-	include Mongoid::Document
+  include Mongoid::Document
 
-	embeds_one :auth_data,	class_name: 'EomUserAuthData',	autobuild: true
-	accepts_nested_attributes_for	:auth_data
-	validates	:auth_data,	presence: true
+  embeds_one :auth_data, class_name: 'EomUserAuthData',  autobuild: true
+  accepts_nested_attributes_for :auth_data
+  validates :auth_data, presence: true
 end
 
 
 class EomUserAuthData
-	include Mongoid::Document
+  include Mongoid::Document
 
-	embedded_in :user, class_name: 'EomUser'
+  embedded_in :user, class_name: 'EomUser'
 
   field :name
   validates_presence_of :name
