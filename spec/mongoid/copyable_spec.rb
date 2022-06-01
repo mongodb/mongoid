@@ -752,7 +752,7 @@ describe Mongoid::Copyable do
           end
 
           let(:parent) { CloneParent.last }
-          let(:clone) { parent.clone }
+          let(:clone) { parent.send(method) }
 
           it "doesn't have the removed field" do
             expect do
@@ -796,7 +796,7 @@ describe Mongoid::Copyable do
           end
 
           let(:parent) { CloneParent.last }
-          let(:clone) { parent.clone }
+          let(:clone) { parent.send(method) }
 
           it "doesn't have the removed field" do
             expect do
@@ -856,7 +856,7 @@ describe Mongoid::Copyable do
           end
 
           let(:parent) { CloneParent.last }
-          let(:clone) { parent.clone }
+          let(:clone) { parent.send(method) }
 
           it "doesn't have the removed field" do
             expect do
@@ -941,7 +941,7 @@ describe Mongoid::Copyable do
           end
 
           let(:parent) { CloneParent.last }
-          let(:clone) { parent.clone }
+          let(:clone) { parent.send(method) }
 
           it "doesn't have the removed field" do
             expect do
@@ -985,7 +985,7 @@ describe Mongoid::Copyable do
           end
 
           let(:parent) { CloneParent.last }
-          let(:clone) { parent.clone }
+          let(:clone) { parent.send(method) }
 
           it "doesn't have the removed field" do
             parent.clone_children.each do |clone_child|
@@ -1053,7 +1053,7 @@ describe Mongoid::Copyable do
           end
 
           let(:parent) { CloneParent.last }
-          let(:clone) { parent.clone }
+          let(:clone) { parent.send(method) }
 
           it "doesn't have the removed field" do
             parent.clone_children.each do |cc|
@@ -1097,6 +1097,51 @@ describe Mongoid::Copyable do
                 expect(cg.attributes).to include({ "f" => "6" })
               end
             end
+          end
+        end
+      end
+
+      context "when using embedded_in associations" do
+
+        before do
+          class CloneParent
+            include Mongoid::Document
+
+            embeds_one :clone_child
+
+            field :a, type: :string
+            field :b, type: :string
+          end
+
+          class CloneChild
+            include Mongoid::Document
+
+            embedded_in :clone_parent
+
+            field :c, type: :string
+            field :d, type: :string
+          end
+        end
+
+        after do
+          Object.send(:remove_const, :CloneParent)
+          Object.send(:remove_const, :CloneChild)
+        end
+
+
+        context "when accessing the parent" do
+
+          before do
+            parent = CloneParent.new(a: "1", b: "2")
+            parent.clone_child = CloneChild.new(c: "3", d: "4")
+            parent.save
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.clone_child.send(method) }
+
+          it "doesn't clone the parent" do
+            expect(clone.clone_parent).to be_nil
           end
         end
       end

@@ -48,13 +48,12 @@ module Mongoid
       # Use Factory#build method because it takes the discriminator key into account. remove me.
       Factory.build(klass, attrs).tap do |object|
         dynamic_attrs.each do |attr_name, value|
-          if assoc = object.embedded_relations[attr_name]
-            if Hash === value && assoc.one?
-              object.send("#{attr_name}=", clone_with_hash(assoc.klass, value))
-            elsif Array === value && assoc.many?
-              docs = value.map { |h| clone_with_hash(assoc.klass, h) }
-              object.send("#{attr_name}=", docs)
-            end
+          assoc = object.embedded_relations[attr_name]
+          if assoc&.one? && Hash === value
+            object.send("#{attr_name}=", clone_with_hash(assoc.klass, value))
+          elsif assoc&.many? && Array === value
+            docs = value.map { |h| clone_with_hash(assoc.klass, h) }
+            object.send("#{attr_name}=", docs)
           elsif object.respond_to?("#{attr_name}=")
             object.send("#{attr_name}=", value)
           else
