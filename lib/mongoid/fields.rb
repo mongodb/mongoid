@@ -337,6 +337,12 @@ module Mongoid
       # finds aliases for embedded documents and fields, delimited with
       # period "." character.
       #
+      # Note that this method returns the name of associations as they're
+      # stored in the database, whereas the `relations` hash uses their in-code
+      # aliases. In order to check for membership in the relations hash, you
+      # would first have to look up the string returned from this method in
+      # the aliased_associations hash.
+      #
       # This method will not expand the alias of a belongs_to association that
       # is not the last item. For example, if we had a School that has_many
       # Students, and the field name passed was (from the Student's perspective):

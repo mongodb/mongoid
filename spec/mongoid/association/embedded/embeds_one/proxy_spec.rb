@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../embeds_one_models.rb'
 
 describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
 
@@ -202,7 +203,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
             end
           end
         end
-        
+
         context 'when the original document does not need to be unset because it will be replaced by the $set' do
 
           let!(:pet_owner) do
@@ -1020,6 +1021,17 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
 
     it "parent successfully embeds an invalid child" do
       expect(building.building_address).to be_a(BuildingAddress)
+    end
+  end
+
+  context "when the child fails validation on create! with autobuild" do
+
+    let(:user) { u.create! }
+
+    it "the create! raises an error" do
+      expect do
+        EomUser.create!
+      end.to raise_error(Mongoid::Errors::Validations)
     end
   end
 end

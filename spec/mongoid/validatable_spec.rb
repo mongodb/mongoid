@@ -62,6 +62,18 @@ describe Mongoid::Validatable do
         expect(value).to be_empty
       end
     end
+
+    context "when getting an autobuilt association" do
+      let(:person) { Person.new }
+
+      let(:value) do
+        person.read_attribute_for_validation(:passport)
+      end
+
+      it "does not return nil" do
+        expect(value).to_not be_nil
+      end
+    end
   end
 
   describe "#valid?" do

@@ -113,7 +113,9 @@ module Mongoid
         # We also don't want to raise if we're retrieving an association within
         # the codebase. This is often done when retrieving the inverse association
         # during binding or when cascading callbacks. Whenever we retrieve
-        # associations within the codebase, we use without_autobuild.
+        # associations within the codebase, we use without_autobuild. There are
+        # some exceptions to this, namely during validations, but __selected_fields
+        # should be nil in those cases, so attribute_missing? will return false.
         if !without_autobuild? && association.embedded? && attribute_missing?(field_name)
           raise ActiveModel::MissingAttributeError, "Missing attribute: '#{field_name}'"
         end
@@ -390,6 +392,7 @@ module Mongoid
         name = association.name
         association.inverse_class.tap do |klass|
           klass.re_define_method("build_#{name}") do |*args|
+            byebug
             attributes, _options = parse_args(*args)
             document = Factory.build(association.relation_class, attributes)
             _building do

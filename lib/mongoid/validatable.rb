@@ -61,9 +61,9 @@ module Mongoid
     # @return [ Object ] The value of the field or the association.
     def read_attribute_for_validation(attr)
       attribute = database_field_name(attr)
-      if relations.key?(attribute)
+      if relations.key?(attr)
         begin_validate
-        relation = without_autobuild { send(attr) }
+        relation = send(attr)
         exit_validate
         relation.do_or_do_not(:in_memory) || relation
       elsif fields[attribute].try(:localized?)
