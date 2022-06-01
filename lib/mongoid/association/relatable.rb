@@ -306,6 +306,18 @@ module Mongoid
         @parent_inclusions ||= []
       end
 
+      def many?
+        [Referenced::HasMany, Embedded::EmbedsMany].any? { |a| self.is_a?(a) }
+      end
+
+      def one?
+        [Referenced::HasOne, Embedded::EmbedsOne].any? { |a| self.is_a?(a) }
+      end
+
+      def in_to?
+        [Referenced::BelongsTo, Embedded::EmbeddedIn].any? { |a| self.is_a?(a) }
+      end
+
       private
 
       # Gets the model classes with inverse associations of this model. This is used to determine
