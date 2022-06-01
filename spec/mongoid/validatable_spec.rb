@@ -70,8 +70,8 @@ describe Mongoid::Validatable do
         person.read_attribute_for_validation(:passport)
       end
 
-      it "does not return nil" do
-        expect(value).to_not be_nil
+      it "returns the correct document" do
+        expect(value).to eq(person.passport)
       end
     end
   end
