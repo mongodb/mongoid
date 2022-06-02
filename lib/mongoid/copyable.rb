@@ -10,7 +10,11 @@ module Mongoid
     # the exception of the document's id, and will reset all the
     # instance variables.
     #
-    # This clone also includes embedded documents.
+    # This clone also includes embedded documents. If there is an _id field in
+    # the embedded document, it will be maintained, unlike the root's _id.
+    #
+    # If cloning an embedded child, the embedded parent is not cloned and the
+    # embedded_in association is not set.
     #
     # @example Clone the document.
     #   document.clone
@@ -20,9 +24,9 @@ module Mongoid
       # @note This next line is here to address #2704, even though having an
       # _id and id field in the document would cause problems with Mongoid
       # elsewhere. Note this is only done on the root document as we want
-      # to maintian the same _id on the embedded documents.
+      # to maintain the same _id on the embedded documents.
       attrs = clone_document.except(*self.class.id_fields)
-      clone_with_hash(self.class, attrs)
+      Copyable.clone_with_hash(self.class, attrs)
     end
     alias :dup :clone
 
@@ -36,7 +40,7 @@ module Mongoid
     # @param attrs [ Hash ] The hash of the attributes.
     #
     # @return [ Document ] The new document.
-    def clone_with_hash(klass, attrs)
+    def self.clone_with_hash(klass, attrs)
       dynamic_attrs = {}
       _attribute_names = klass.attribute_names
       attrs.reject! do |attr_name, value|

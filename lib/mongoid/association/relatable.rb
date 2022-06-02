@@ -306,14 +306,24 @@ module Mongoid
         @parent_inclusions ||= []
       end
 
+      # Is this association an embeds_many or has_many association?
+      #
+      # @return [ true | false ] true if it is a *_many association, false if not.
       def many?
         [Referenced::HasMany, Embedded::EmbedsMany].any? { |a| self.is_a?(a) }
       end
 
+      # Is this association an embeds_one or has_one association?
+      #
+      # @return [ true | false ] true if it is a *_one association, false if not.
       def one?
         [Referenced::HasOne, Embedded::EmbedsOne].any? { |a| self.is_a?(a) }
       end
 
+      # Is this association an embedded_in or belongs_to association?
+      #
+      # @return [ true | false ] true if it is an embedded_in or belongs_to
+      #   association, false if not.
       def in_to?
         [Referenced::BelongsTo, Embedded::EmbeddedIn].any? { |a| self.is_a?(a) }
       end
