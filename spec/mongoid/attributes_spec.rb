@@ -1678,6 +1678,7 @@ describe Mongoid::Attributes do
     end
 
     context "when comparing the object_ids of the written value" do
+      config_override :attributes_as_hash, true
 
       before do
         Person.create!
