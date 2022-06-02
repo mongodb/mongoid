@@ -58,7 +58,7 @@ module Mongoid
                     Array(assoc_value).each do |doc|
                       pc = doc.persistence_context? ? doc.persistence_context : persistence_context
                       doc.with(pc) do |d|
-                        d.save
+                        d.save!
                       end
                     end
                   end
