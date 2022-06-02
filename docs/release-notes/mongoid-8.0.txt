@@ -31,7 +31,7 @@ Default Option Values Changed
 **Breaking change:** The following options have had their default values
 changed in Mongoid 8.0:
 
-- ``:overwrite_chained_operators`` => ``false``
+- ``:attributes_as_hash`` => true
 - ``:broken_aggregables`` => ``false``
 - ``:broken_alias_handling`` => ``false``
 - ``:broken_and`` => ``false``
@@ -42,6 +42,7 @@ changed in Mongoid 8.0:
 - ``:legacy_triple_equals`` => ``false``
 - ``:map_big_decimal_to_decimal128`` => ``true``
 - ``:object_id_as_json_oid`` => ``false``
+- ``:overwrite_chained_operators`` => ``false``
 
 Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.

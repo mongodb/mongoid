@@ -342,6 +342,13 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the attributes_as_hash option in the config' do
+    let(:option) { :attributes_as_hash }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
   describe "#load!" do
 
     before(:all) do

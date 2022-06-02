@@ -265,6 +265,11 @@ for details on driver options.
       # if the database name is not explicitly defined. (default: nil)
       app_name: MyApplicationName
 
+      # Force the attributes method to always return a Hash. When this flag
+      # is false, the attributes method on a document will return a BSON::Document
+      # when that document is retrieved from the database.
+      #attributes_as_hash: true
+
       # Mark belongs_to associations as required by default, so that saving a
       # model with a missing belongs_to association will trigger a validation
       # error. (default: true)

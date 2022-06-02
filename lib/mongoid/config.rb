@@ -119,6 +119,11 @@ module Mongoid
     # using and's instead of overwriting them.
     option :overwrite_chained_operators, default: false
 
+    # Force the attributes hash on a document to always be a hash.
+    # When this flag is off, the attributes method on a document will return a
+    # BSON::Docoment on retrieving that document from the database.
+    option :attributes_as_hash, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
