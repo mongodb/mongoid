@@ -309,10 +309,10 @@ module Mongoid
       #
       # @api private
       def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
-        attributes = if Mongoid.attributes_as_hash
-          attrs&.to_h
-        else
+        attributes = if Mongoid.legacy_attributes
           attrs
+        else
+          attrs&.to_h
         end || {}
 
         doc = allocate
