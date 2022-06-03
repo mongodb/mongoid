@@ -31,13 +31,13 @@ Default Option Values Changed
 **Breaking change:** The following options have had their default values
 changed in Mongoid 8.0:
 
-- ``:attributes_as_hash`` => true
 - ``:broken_aggregables`` => ``false``
 - ``:broken_alias_handling`` => ``false``
 - ``:broken_and`` => ``false``
 - ``:broken_scoping`` => ``false``
 - ``:broken_updates`` => ``false``
 - ``:compare_time_by_ms`` => ``true``
+- ``:legacy_attributes`` => true
 - ``:legacy_pluck_distinct`` => ``false``
 - ``:legacy_triple_equals`` => ``false``
 - ``:map_big_decimal_to_decimal128`` => ``true``

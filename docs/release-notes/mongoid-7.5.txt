@@ -92,7 +92,7 @@ replacing upsert, and Mongoid 7.5 correctly calls ``replace_one``.
 Force the ``attributes`` Method to Always Return a ``Hash``
 ```````````````````````````````````````````````````````````
 
-Mongoid 7.5 with the ``Mongoid.attributes_as_hash`` option set to ``true``
+Mongoid 7.5 with the ``Mongoid.legacy_attributes`` option set to ``false``
 will always return a ``Hash`` when calling the ``attributes`` method.
 For example:
 
@@ -112,8 +112,8 @@ For example:
   p band.attributes.class
   # => Hash
 
-In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.attributes_as_hash``
-option set to ``false``, the ``attributes`` method on a document will return a
+In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.legacy_attributes``
+option set to ``true``, the ``attributes`` method on a document will return a
 ``BSON::Document`` when retrieving that document from the database, but will
 return a ``Hash`` when instantiating a new document:
 
