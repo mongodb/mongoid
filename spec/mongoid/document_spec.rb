@@ -187,7 +187,7 @@ describe Mongoid::Document do
         config_override :attributes_as_hash, true
 
         it "returns a Hash" do
-          expect(from_db.attributes).to be_a(Hash)
+          expect(from_db.attributes.class).to be Hash
         end
       end
 
@@ -195,7 +195,7 @@ describe Mongoid::Document do
         config_override :attributes_as_hash, false
 
         it "returns a BSON::Document" do
-          expect(from_db.attributes).to be_a(BSON::Document)
+          expect(from_db.attributes.class).to be BSON::Document
         end
       end
     end
