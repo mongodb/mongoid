@@ -183,16 +183,16 @@ describe Mongoid::Document do
 
       let(:from_db) { Person.first }
 
-      context "when attributes_as_hash is true" do
-        config_override :attributes_as_hash, true
+      context "when legacy_attributes is false" do
+        config_override :legacy_attributes, false
 
         it "returns a Hash" do
           expect(from_db.attributes.class).to be Hash
         end
       end
 
-      context "when attributes_as_hash is false" do
-        config_override :attributes_as_hash, false
+      context "when legacy_attributes is true" do
+        config_override :legacy_attributes, true
 
         it "returns a BSON::Document" do
           expect(from_db.attributes.class).to be BSON::Document
