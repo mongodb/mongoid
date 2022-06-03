@@ -76,7 +76,7 @@ module Mongoid
         as_attributes.reject do |k, v|
           if field = fields[k]
             if field.foreign_key? && val = ivar(field.association&.name)
-              val.is_a?(Document) && val.invalid?
+              val.is_a?(Document) && val.invalid? && !val.persisted?
             end
           end
         end
