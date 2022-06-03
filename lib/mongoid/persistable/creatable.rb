@@ -69,7 +69,17 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def insert_as_root
-        collection.insert_one(as_attributes, session: _session)
+        collection.insert_one(insert_attributes, session: _session)
+      end
+
+      def insert_attributes
+        as_attributes.reject do |k, v|
+          if field = fields[k]
+            if field.foreign_key? && val = ivar(field.association&.name)
+              val.is_a?(Document) && val.invalid?
+            end
+          end
+        end
       end
 
       # Post process an insert, which sets the new record attribute to false
