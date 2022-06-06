@@ -202,6 +202,7 @@ and will be removed in a next version.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - MongoDB 6.0
      - MongoDB 5.0
      - MongoDB 4.4
      - MongoDB 4.2
@@ -218,12 +219,26 @@ and will be removed in a next version.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
      -
      -
      -
      -
 
+   * - 7.5
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     - D
+     - D
+     - D
+
    * - 7.4
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -240,12 +255,14 @@ and will be removed in a next version.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
      - D
      - D
      - D
      - D
 
    * - 7.2
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -257,6 +274,7 @@ and will be removed in a next version.
      - D
 
    * - 7.1
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -268,6 +286,7 @@ and will be removed in a next version.
      - D
 
    * - 7.0
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -279,6 +298,7 @@ and will be removed in a next version.
      - D
 
    * - 6.4
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
