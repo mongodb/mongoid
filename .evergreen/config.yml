@@ -96,6 +96,7 @@ functions:
               export AUTH=${AUTH}
               export SSL=${SSL}
               export APP_TESTS=${APP_TESTS}
+              export DOCKER_DISTRO=${DOCKER_DISTRO}
            EOT
            # See what we've done
            cat expansion.yml
@@ -283,7 +284,7 @@ functions:
             DRIVER="${DRIVER}" \
             I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
-            ./egos .evergreen/run-tests.sh
+            ./egos .evergreen/run-tests-docker.sh
 
   "fix absolute paths":
     - command: shell.exec
@@ -433,18 +434,28 @@ axes:
       - id: ubuntu-16.04
         display_name: "Ubuntu 16.04"
         run_on: ubuntu1604-small
+        variables:
+          DOCKER_DISTRO: ubuntu1604
       - id: ubuntu-18.04
         display_name: "Ubuntu 18.04"
         run_on: ubuntu1804-small
+        variables:
+          DOCKER_DISTRO: ubuntu1804
       - id: ubuntu-20.04
         display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
+        variables:
+          DOCKER_DISTRO: ubuntu2004
       - id: rhel70
         display_name: "RHEL 7.0"
         run_on: rhel70-small
+        variables:
+          DOCKER_DISTRO: rheal70
       - id: rhel80
         display_name: "RHEL 8.0"
         run_on: rhel80-small
+        variables:
+          DOCKER_DISTRO: rhel80
   - id: "driver"
     display_name: Driver Version
     values:
