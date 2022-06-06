@@ -572,3 +572,11 @@ inside a hash. For example:
 
   In Mongoid 8.0, the default value of the ``Mongoid.legacy_pluck_distinct`` option will
   change to ``false``.
+
+
+``update_one`` Warnings in ``upsert``
+-------------------------------------
+
+Mongoid 7.4.1 fixes incorrect usage of the driver's ``update_one`` method from
+Mongoid's ``upsert`` method. Mongoid's ``upsert`` actually performs a
+replacing upsert, and Mongoid 7.4.1 and later correctly call ``replace_one``.

@@ -584,5 +584,121 @@ describe Mongoid::Touchable do
         end
       end
     end
+
+    context "when the touch option is true" do
+
+      shared_examples "updates the updated_at" do
+
+        let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+        let(:update_time) do
+          Timecop.freeze(Time.at(Time.now.to_i) + 2)
+        end
+
+        after do
+          Timecop.return
+        end
+
+        let(:building) do
+          parent_cls.create!
+        end
+
+        let(:floor) do
+          building.floors.create!
+        end
+
+        before do
+          floor
+          update_time
+          floor.level = 9
+          floor.send(meth)
+        end
+
+        it "the parent is not nil" do
+          expect(floor.building).to_not be nil
+        end
+
+        it "updates the parent's timestamp" do
+          building.updated_at.should == update_time
+          building.reload.updated_at.should == update_time
+        end
+      end
+
+      [ :save!, :destroy, :touch].each do |meth|
+        context "with #{meth} on referenced associations" do
+          let(:parent_cls) { TouchableSpec::Referenced::Building }
+          let(:meth) { meth }
+
+          include_examples "updates the updated_at"
+        end
+
+        context "with #{meth} on embedded associations" do
+          let(:parent_cls) { TouchableSpec::Embedded::Building }
+          let(:meth) { meth }
+
+          include_examples "updates the updated_at"
+        end
+      end
+    end
+
+    context "when the touch option is false" do
+
+      shared_examples "does not update the parent" do
+
+        let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+        let(:update_time) do
+          Timecop.freeze(Time.at(Time.now.to_i) + 2)
+        end
+
+        after do
+          Timecop.return
+        end
+
+        let(:building) do
+          parent_cls.create!
+        end
+
+        let(:entrance) do
+          building.entrances.create!
+        end
+
+        before do
+          entrance
+          update_time
+          entrance.touch
+        end
+
+        it "updates the child's timestamp" do
+          entrance.updated_at.should == update_time
+          entrance.reload.updated_at.should == update_time
+        end
+
+        it "does not update the parent's timestamp" do
+          building.updated_at.should == start_time
+          building.reload.updated_at.should == start_time
+        end
+      end
+
+      [ :save!, :destroy, :touch].each do |meth|
+        context "with #{meth} on belongs_to" do
+          let(:meth) { meth }
+          let(:parent_cls) { TouchableSpec::Referenced::Building }
+
+          include_examples "does not update the parent"
+        end
+
+        context "with #{meth} on embedded_in" do
+          let(:meth) { meth }
+          let(:parent_cls) { TouchableSpec::Embedded::Building }
+
+          before do
+            skip "MONGOID-5274"
+          end
+
+          include_examples "does not update the parent"
+        end
+      end
+    end
   end
 end

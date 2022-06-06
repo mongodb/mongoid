@@ -80,3 +80,10 @@ The following functions are affected by this change:
    the selector can be strings or symbols, depending on what was passed to the
    operator.
 
+
+``update_one`` Warnings in ``upsert``
+-------------------------------------
+
+Mongoid 7.5 fixes incorrect usage of the driver's ``update_one`` method from
+Mongoid's ``upsert`` method. Mongoid's ``upsert`` actually performs a
+replacing upsert, and Mongoid 7.5 correctly calls ``replace_one``.

@@ -76,6 +76,16 @@ en:
           resolution: "Search for attributes that are in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
             which will cause a nil to be returned instead of raising this error."
+        document_with_shard_key_not_found:
+          message: "Document not found for class %{klass} with id %{missing} and
+            shard key %{shard_key}."
+          summary: "When calling %{klass}.find with an id and a shard key, each
+            parameter must match a document in the database or this error will
+            be raised. The search was for the id: %{missing} with
+            shard_key: %{shard_key} and it was not found."
+          resolution: "Search for an id/shard key that is in the database or set
+            the Mongoid.raise_not_found_error configuration option to false,
+            which will cause a nil to be returned instead of raising this error."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
@@ -142,7 +152,7 @@ en:
           resolution: "Valid expression operators are: %{valid_operators}.
             Ensure you are using one of these operators."
         invalid_field:
-          message: "Defining a field named '%{name}' is not allowed."
+          message: "Defining a field named '%{field}' is not allowed."
           summary: "Defining this field would override the method '%{name}',
             which would cause issues with expectations around the original
             method and cause extremely hard to debug issues. The original

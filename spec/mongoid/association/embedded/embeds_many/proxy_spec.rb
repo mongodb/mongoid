@@ -4699,4 +4699,45 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
     end
   end
+
+  context "when using assign_attributes with an already populated array" do
+    let(:post) { EmmPost.create! }
+
+    before do
+      post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'a'}],
+        user_tags: [{id: BSON::ObjectId.new, title: 'b'}])
+      post.save!
+      post.reload
+      post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'c'}],
+        user_tags: [])
+      post.save!
+      post.reload
+    end
+
+    it "has the correct embedded documents" do
+      expect(post.company_tags.length).to eq(1)
+      expect(post.company_tags.first.title).to eq("c")
+    end
+  end
+
+  context "when the parent fails validation" do
+    let(:school) { EmmSchool.new }
+    let(:student) { school.students.new }
+
+    before do
+      student.save
+    end
+
+    it "does not mark the parent as persisted" do
+      expect(school.persisted?).to be false
+    end
+
+    it "does not mark the child as persisted" do
+      expect(student.persisted?).to be false
+    end
+
+    it "does not persist the parent" do
+      expect(School.count).to eq(0)
+    end
+  end
 end
