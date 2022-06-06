@@ -1,6 +1,5 @@
-########################################
-# Evergreen Template for MongoDB Drivers
-########################################
+# GENERATED FILE - DO NOT EDIT.
+# Run ./.evergreen/update-evergreen-configs to regenerate this file.
 
 # When a task that used to pass starts to fail
 # Go through all versions that may have been skipped to detect
@@ -25,7 +24,6 @@ timeout:
     params:
       script: |
         ls -la
-
 functions:
   "fetch source":
     # Executes git clone and applies the submitted patch, if any
@@ -323,7 +321,6 @@ tasks:
     - name: "test"
       commands:
         - func: "run tests"
-
 axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
@@ -553,7 +550,6 @@ axes:
         display_name: Yes
         variables:
           APP_TESTS: yes
-
 buildvariants:
 - matrix_name: "ruby-3.1"
   matrix_spec:
