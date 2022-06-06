@@ -3,6 +3,11 @@
 set -e
 set -o pipefail
 
+if test -z "$DOCKER_DISTRO"; then
+  echo "DOCKER_DISTRO not set" 1>&2
+  exit 2
+fi
+
 params=
 for var in MONGODB_VERSION TOPOLOGY RVM_RUBY \
   SINGLE_MONGOS AUTH SSL APP_TESTS
@@ -18,4 +23,4 @@ if test -f .env.private; then
   gem install dotenv || gem install --user dotenv
 fi
 
-./.evergreen/test-on-docker -p -d $DOCKER_DISTRO $params
+./.evergreen/test-on-docker -p -d "$DOCKER_DISTRO" $params
