@@ -175,7 +175,7 @@ describe Mongoid::Document do
 
     context "when instantiating a new document" do
       it "returns a Hash" do
-        expect(person.attributes).to be_a(Hash)
+        expect(person.attributes.class).to eq(Hash)
       end
     end
 
@@ -187,7 +187,7 @@ describe Mongoid::Document do
         config_override :legacy_attributes, false
 
         it "returns a Hash" do
-          expect(from_db.attributes.class).to be Hash
+          expect(from_db.attributes.class).to eq(Hash)
         end
       end
 
@@ -195,7 +195,7 @@ describe Mongoid::Document do
         config_override :legacy_attributes, true
 
         it "returns a BSON::Document" do
-          expect(from_db.attributes.class).to be BSON::Document
+          expect(from_db.attributes.class).to eq(BSON::Document)
         end
       end
     end
