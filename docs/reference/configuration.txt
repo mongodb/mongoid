@@ -368,6 +368,12 @@ for details on driver options.
       # to parent contexts by default. (default: false)
       join_contexts: false
 
+      # When this flag is true, the attributes method on a document will return
+      # a BSON::Document when that document is retrieved from the database, and
+      # a Hash otherwise. When this flag is false, the attributes method will
+      # always return a Hash. (default: false)
+      #legacy_attributes: true
+
       # Maintain legacy behavior of pluck and distinct, which does not demongoize
       # values on returning them. Setting this option to false will cause
       # pluck and distinct to return demongoized values. Setting this option to

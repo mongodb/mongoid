@@ -87,3 +87,42 @@ The following functions are affected by this change:
 Mongoid 7.5 fixes incorrect usage of the driver's ``update_one`` method from
 Mongoid's ``upsert`` method. Mongoid's ``upsert`` actually performs a
 replacing upsert, and Mongoid 7.5 correctly calls ``replace_one``.
+
+
+Force the ``attributes`` Method to Always Return a ``Hash``
+```````````````````````````````````````````````````````````
+
+Mongoid 7.5 with the ``Mongoid.legacy_attributes`` option set to ``false``
+will always return a ``Hash`` when calling the ``attributes`` method.
+For example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    field :name
+  end
+
+  band = Band.create!(name: "The Rolling Stones")
+  p band.attributes.class
+  # => Hash
+
+  band = Band.first
+  p band.attributes.class
+  # => Hash
+
+In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.legacy_attributes``
+option set to ``true``, the ``attributes`` method on a document will return a
+``BSON::Document`` when retrieving that document from the database, but will
+return a ``Hash`` when instantiating a new document:
+
+.. code-block:: ruby
+
+  band = Band.create!(name: "The Rolling Stones")
+  p band.attributes.class
+  # => Hash
+
+  band = Band.first
+  p band.attributes.class
+  # => BSON::Document
