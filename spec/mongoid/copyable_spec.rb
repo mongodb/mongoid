@@ -90,7 +90,7 @@ describe Mongoid::Copyable do
           end
 
           it 'calls constructor with explicitly declared attributes only' do
-            expect(cls).to receive(:new).with('name' => 'test').and_call_original
+            expect(Mongoid::Factory).to receive(:build).with(cls, 'name' => 'test').and_call_original
             cloned
           end
         end
@@ -692,6 +692,456 @@ describe Mongoid::Copyable do
           it 'works' do
             copy.class.should be original.class
             copy.object_id.should_not == original.object_id
+          end
+        end
+      end
+    end
+
+    context "when fields are removed before cloning" do
+
+      context "when using embeds_one associations" do
+
+        before do
+          class CloneParent
+            include Mongoid::Document
+
+            embeds_one :clone_child
+
+            field :a, type: :string
+            field :b, type: :string
+          end
+
+          class CloneChild
+            include Mongoid::Document
+
+            embedded_in :clone_parent
+            embeds_one :clone_grandchild
+
+            field :c, type: :string
+            field :d, type: :string
+          end
+
+          class CloneGrandchild
+            include Mongoid::Document
+
+            embedded_in :clone_child
+
+            field :e, type: :string
+            field :f, type: :string
+          end
+
+        end
+
+        after do
+          Object.send(:remove_const, :CloneParent)
+          Object.send(:remove_const, :CloneChild)
+          Object.send(:remove_const, :CloneGrandchild)
+        end
+
+        context "when removing from the parent" do
+
+          before do
+            CloneParent.create(a: "1", b: "2")
+
+            Object.send(:remove_const, :CloneParent)
+
+            class CloneParent
+              include Mongoid::Document
+              field :a, type: :string
+            end
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.send(method) }
+
+          it "doesn't have the removed field" do
+            expect do
+              parent.b
+            end.to raise_error(NoMethodError)
+          end
+
+          it "contains the missing field in the attributes" do
+            expect(parent.attributes).to include({ "b" => "2" })
+          end
+
+          it "clones correctly" do
+            expect(clone).to be_a(CloneParent)
+            expect(clone.a).to eq("1")
+            expect(clone.attributes).to include({ "b" => "2" })
+          end
+        end
+
+        context "when removing from the child" do
+
+          before do
+            parent = CloneParent.new(a: "1", b: "2")
+            parent.clone_child = CloneChild.new(c: "3", d: "4")
+            parent.save
+
+            Object.send(:remove_const, :CloneParent)
+            Object.send(:remove_const, :CloneChild)
+
+            class CloneParent
+              include Mongoid::Document
+              embeds_one :clone_child
+              field :a, type: :string
+              field :b, type: :string
+            end
+
+            class CloneChild
+              include Mongoid::Document
+              embedded_in :clone_parent
+              field :c, type: :string
+            end
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.send(method) }
+
+          it "doesn't have the removed field" do
+            expect do
+              parent.clone_child.d
+            end.to raise_error(NoMethodError)
+          end
+
+          it "contains the missing field in the attributes" do
+            expect(parent.clone_child.attributes).to include({ "d" => "4" })
+          end
+
+          it "clones the parent correctly" do
+            expect(clone).to be_a(CloneParent)
+            expect(clone.a).to eq("1")
+            expect(clone.b).to eq("2")
+          end
+
+          it "clones the child correctly" do
+            expect(clone.clone_child).to be_a(CloneChild)
+            expect(clone.clone_child.c).to eq("3")
+            expect(clone.clone_child.attributes).to include({ "d" => "4" })
+          end
+        end
+
+        context "when removing from the grandchild" do
+
+          before do
+            parent = CloneParent.new(a: "1", b: "2")
+            parent.clone_child = CloneChild.new(c: "3", d: "4")
+            parent.clone_child.clone_grandchild = CloneGrandchild.new(e: "5", f: "6")
+            parent.save
+
+            Object.send(:remove_const, :CloneParent)
+            Object.send(:remove_const, :CloneChild)
+            Object.send(:remove_const, :CloneGrandchild)
+
+            class CloneParent
+              include Mongoid::Document
+              embeds_one :clone_child
+              field :a, type: :string
+              field :b, type: :string
+            end
+
+            class CloneChild
+              include Mongoid::Document
+              embedded_in :clone_parent
+              embeds_one :clone_grandchild
+              field :c, type: :string
+              field :d, type: :string
+            end
+
+            class CloneGrandchild
+              include Mongoid::Document
+              embedded_in :clone_child
+              field :e, type: :string
+            end
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.send(method) }
+
+          it "doesn't have the removed field" do
+            expect do
+              parent.clone_child.clone_grandchild.f
+            end.to raise_error(NoMethodError)
+          end
+
+          it "contains the missing field in the attributes" do
+            expect(parent.clone_child.clone_grandchild.attributes).to include({ "f" => "6" })
+          end
+
+          it "clones the parent correctly" do
+            expect(clone).to be_a(CloneParent)
+            expect(clone.a).to eq("1")
+            expect(clone.b).to eq("2")
+          end
+
+          it "clones the child correctly" do
+            expect(clone.clone_child).to be_a(CloneChild)
+            expect(clone.clone_child.c).to eq("3")
+            expect(clone.clone_child.d).to eq("4")
+          end
+
+          it "clones the child correctly" do
+            expect(clone.clone_child.clone_grandchild).to be_a(CloneGrandchild)
+            expect(clone.clone_child.clone_grandchild.e).to eq("5")
+            expect(clone.clone_child.clone_grandchild.attributes).to include({ "f" => "6" })
+          end
+        end
+      end
+
+      context "when using embeds_many associations" do
+
+        before do
+          class CloneParent
+            include Mongoid::Document
+
+            embeds_many :clone_children
+
+            field :a, type: :string
+            field :b, type: :string
+          end
+
+          class CloneChild
+            include Mongoid::Document
+
+            embedded_in :clone_parent
+            embeds_many :clone_grandchildren
+
+            field :c, type: :string
+            field :d, type: :string
+          end
+
+          class CloneGrandchild
+            include Mongoid::Document
+
+            embedded_in :clone_child
+
+            field :e, type: :string
+            field :f, type: :string
+          end
+
+        end
+
+        after do
+          Object.send(:remove_const, :CloneParent)
+          Object.send(:remove_const, :CloneChild)
+          Object.send(:remove_const, :CloneGrandchild)
+        end
+
+        context "when removing from the parent" do
+
+          before do
+            CloneParent.create(a: "1", b: "2")
+
+            Object.send(:remove_const, :CloneParent)
+
+            class CloneParent
+              include Mongoid::Document
+              field :a, type: :string
+            end
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.send(method) }
+
+          it "doesn't have the removed field" do
+            expect do
+              parent.b
+            end.to raise_error(NoMethodError)
+          end
+
+          it "contains the missing field in the attributes" do
+            expect(parent.attributes).to include({ "b" => "2" })
+          end
+
+          it "clones correctly" do
+            expect(clone).to be_a(CloneParent)
+            expect(clone.a).to eq("1")
+            expect(clone.attributes).to include({ "b" => "2" })
+          end
+        end
+
+        context "when removing from the child" do
+
+          before do
+            parent = CloneParent.new(a: "1", b: "2")
+            parent.clone_children = [ CloneChild.new(c: "3", d: "4"), CloneChild.new(c: "3", d: "4") ]
+            parent.save
+
+            Object.send(:remove_const, :CloneParent)
+            Object.send(:remove_const, :CloneChild)
+
+            class CloneParent
+              include Mongoid::Document
+              embeds_many :clone_children
+              field :a, type: :string
+              field :b, type: :string
+            end
+
+            class CloneChild
+              include Mongoid::Document
+              embedded_in :clone_parent
+              field :c, type: :string
+            end
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.send(method) }
+
+          it "doesn't have the removed field" do
+            parent.clone_children.each do |clone_child|
+              expect do
+                clone_child.d
+              end.to raise_error(NoMethodError)
+            end
+          end
+
+          it "contains the missing field in the attributes" do
+            expect(parent.clone_children[0].attributes).to include({ "d" => "4" })
+            expect(parent.clone_children[1].attributes).to include({ "d" => "4" })
+          end
+
+          it "clones the parent correctly" do
+            expect(clone).to be_a(CloneParent)
+            expect(clone.a).to eq("1")
+            expect(clone.b).to eq("2")
+          end
+
+          it "clones the child correctly" do
+            expect(clone.clone_children.length).to eq(2)
+            clone.clone_children.each do |clone_child|
+              expect(clone_child).to be_a(CloneChild)
+              expect(clone_child.c).to eq("3")
+              expect(clone_child.attributes).to include({ "d" => "4" })
+            end
+          end
+        end
+
+        context "when removing from the grandchild" do
+
+          before do
+            parent = CloneParent.new(a: "1", b: "2")
+            parent.clone_children = [ CloneChild.new(c: "3", d: "4"), CloneChild.new(c: "3", d: "4") ]
+            parent.clone_children.each do |cc|
+              cc.clone_grandchildren = [ CloneGrandchild.new(e: "5", f: "6"), CloneGrandchild.new(e: "5", f: "6") ]
+            end
+            parent.save
+
+            Object.send(:remove_const, :CloneParent)
+            Object.send(:remove_const, :CloneChild)
+            Object.send(:remove_const, :CloneGrandchild)
+
+            class CloneParent
+              include Mongoid::Document
+              embeds_many :clone_children
+              field :a, type: :string
+              field :b, type: :string
+            end
+
+            class CloneChild
+              include Mongoid::Document
+              embedded_in :clone_parent
+              embeds_many :clone_grandchildren
+              field :c, type: :string
+              field :d, type: :string
+            end
+
+            class CloneGrandchild
+              include Mongoid::Document
+              embedded_in :clone_child
+              field :e, type: :string
+            end
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.send(method) }
+
+          it "doesn't have the removed field" do
+            parent.clone_children.each do |cc|
+              cc.clone_grandchildren.each do |cg|
+                expect do
+                  cg.f
+                end.to raise_error(NoMethodError)
+              end
+            end
+          end
+
+          it "contains the missing field in the attributes" do
+            parent.clone_children.each do |cc|
+              cc.clone_grandchildren.each do |cg|
+                expect(cg.attributes).to include({ "f" => "6" })
+              end
+            end
+          end
+
+          it "clones the parent correctly" do
+            expect(clone).to be_a(CloneParent)
+            expect(clone.a).to eq("1")
+            expect(clone.b).to eq("2")
+          end
+
+          it "clones the child correctly" do
+            expect(clone.clone_children.length).to eq(2)
+            clone.clone_children.each do |clone_child|
+              expect(clone_child).to be_a(CloneChild)
+              expect(clone_child.c).to eq("3")
+              expect(clone_child.attributes).to include({ "d" => "4" })
+            end
+          end
+
+          it "clones the grandchild correctly" do
+            parent.clone_children.each do |cc|
+              expect(cc.clone_grandchildren.length).to eq(2)
+              cc.clone_grandchildren.each do |cg|
+                expect(cg).to be_a(CloneGrandchild)
+                expect(cg.e).to eq("5")
+                expect(cg.attributes).to include({ "f" => "6" })
+              end
+            end
+          end
+        end
+      end
+
+      context "when using embedded_in associations" do
+
+        before do
+          class CloneParent
+            include Mongoid::Document
+
+            embeds_one :clone_child
+
+            field :a, type: :string
+            field :b, type: :string
+          end
+
+          class CloneChild
+            include Mongoid::Document
+
+            embedded_in :clone_parent
+
+            field :c, type: :string
+            field :d, type: :string
+          end
+        end
+
+        after do
+          Object.send(:remove_const, :CloneParent)
+          Object.send(:remove_const, :CloneChild)
+        end
+
+
+        context "when accessing the parent" do
+
+          before do
+            parent = CloneParent.new(a: "1", b: "2")
+            parent.clone_child = CloneChild.new(c: "3", d: "4")
+            parent.save
+          end
+
+          let(:parent) { CloneParent.last }
+          let(:clone) { parent.clone_child.send(method) }
+
+          it "doesn't clone the parent" do
+            expect(clone.clone_parent).to be_nil
           end
         end
       end
