@@ -750,7 +750,7 @@ buildvariants:
     mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
-    rails: ['6.0', '6.1']
+    rails: ['6.0', '6.1', '7.0']
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   run_on:
     - ubuntu2004-small
