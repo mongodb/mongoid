@@ -250,7 +250,7 @@ and will be removed in a next version.
      - D
 
    * - 7.3
-     - |checkmark|
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
