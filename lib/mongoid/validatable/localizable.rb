@@ -20,6 +20,8 @@ module Mongoid
           value.values.each do |_value|
             super(document, attribute, _value)
           end
+        elsif assoc = document.relations[attribute]
+          super(document, assoc.foreign_key, document.send(assoc.foreign_key))
         else
           super
         end

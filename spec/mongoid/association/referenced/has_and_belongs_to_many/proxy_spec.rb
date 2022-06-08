@@ -3833,4 +3833,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       expect(contract.signature_ids).to eq([signature.id])
     end
   end
+
+  context "when there is a minimum length validator" do
+
+    let(:user) { HabtmmUser.create! }
+    let(:post) { user.posts.create! }
+    it "doesn't raise when creating enough documents" do
+      expect do
+        post
+      end.to_not raise_error
+    end
+  end
 end

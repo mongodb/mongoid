@@ -90,3 +90,13 @@ class HabtmmStudent
   end
 end
 
+class HabtmmUser
+  include Mongoid::Document
+  has_and_belongs_to_many :posts, class_name: "HabtmmPost"
+end
+
+class HabtmmPost
+  include Mongoid::Document
+  has_and_belongs_to_many :users, class_name: "HabtmmUser"
+  validates :users, length: { minimum: 1, maximum: 2 }
+end
