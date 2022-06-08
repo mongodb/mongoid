@@ -2488,7 +2488,7 @@ describe Mongoid::Validatable::UniquenessValidator do
       end
 
       after do
-        I18n.backend.translations.delete(:fr)
+        I18n.backend.send(:translations).delete(:fr)
       end
 
       it "correctly translates the error message" do
