@@ -2472,4 +2472,33 @@ describe Mongoid::Validatable::UniquenessValidator do
       }.to raise_error(Mongo::Error::OperationFailure)
     end
   end
+
+  describe "i18n" do
+
+    context 'when using a different locale' do
+
+      around do |example|
+        I18n.with_locale(:fr) { example.run }
+      end
+
+      before do
+        # Translation key location is as per rails-i18n gem.
+        # See: https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/en.yml
+        I18n.backend.store_translations(:fr, { errors: { messages: { taken: 'est déjà utilisé(e)' } } })
+      end
+
+      after do
+        # i18n 1.0 requires +send+ because +translations+ aren't public.
+        # Newer i18n versions have it as public.
+        I18n.backend.send(:translations).delete(:fr)
+      end
+
+      it "correctly translates the error message" do
+        Circus.create!(slogan: 'The Greatest Show on Mars')
+        dict = Circus.new(slogan: 'The Greatest Show on Mars')
+        dict.valid?
+        expect(dict.errors.messages[:slogan]).to eq(["est déjà utilisé(e)"])
+      end
+    end
+  end
 end

@@ -1,4 +1,8 @@
 en:
+  errors:
+    messages:
+      taken: "has already been taken"
+
   mongoid:
     errors:
       messages:
@@ -549,8 +553,6 @@ en:
             server versions 3.6 and higher."
           resolution: "Verify that all servers in your deployment are at least
             version 3.6 or don't attempt to use sessions with older server versions."
-        taken:
-          "has already been taken"
         too_many_nested_attribute_records:
           message: "Accepting nested attributes for %{association} is limited
             to %{limit} records."
