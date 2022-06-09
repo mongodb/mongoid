@@ -629,13 +629,22 @@ being operated on:
   }
 
 When defining a default value as a ``Proc``, Mongoid will apply the default
-after all other attributes are set. To have the default be applied before
-the other attributes are set, use the ``pre_processed: true`` field option:
+after all other attributes are set and associations are initialized.
+To have the default be applied before the other attributes are set,
+use the ``pre_processed: true`` field option:
 
 .. code-block:: ruby
 
   field :fulfill_by, type: Time, default: ->{ Time.now + 3.days },
     pre_processed: true
+
+The ``pre_processed: true`` option is also necessary when specifying a custom
+default value via a ``Proc`` for the ``_id`` field, to ensure the ``_id``
+is set correctly via associations:
+
+.. code-block:: ruby
+
+  field :_id, type: String, default: -> { 'hello' }, pre_processed: true
 
 
 .. _storage-field-names:
