@@ -34,7 +34,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Buildable do
     end
   end
 
-  context 'when the object is already related to another object' do
+  context 'when the object is already associated with another object' do
 
     context "when inverse is embeds_many" do
 
@@ -55,7 +55,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Buildable do
         appointment2.person = person
       end
 
-      it 'does not clear the object of its previous relation' do
+      it 'does not clear the object of its previous association' do
         expect(appointment1.person).to eq(person)
         expect(appointment2.person).to eq(person)
         expect(person.appointments).to eq([appointment1, appointment2])
@@ -81,7 +81,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Buildable do
         scribe2.owner = owner
       end
 
-      it 'clears the object of its previous relation' do
+      it 'clears the object of its previous association' do
         expect(scribe1.owner).to be_nil
         expect(scribe2.owner).to eq(owner)
       end

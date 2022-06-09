@@ -236,7 +236,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
     end
   end
 
-  context 'when the object is already related to another object' do
+  context 'when the object is already associated with another object' do
 
     context "when inverse is has_many" do
 
@@ -257,7 +257,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
         drug2.person = person
       end
 
-      it 'does not clear the object of its previous relation' do
+      it 'does not clear the object of its previous association' do
         expect(drug1.person).to eq(person)
         expect(drug2.person).to eq(person)
         expect(person.drugs).to eq([drug1, drug2])
@@ -283,7 +283,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
         account2.person = person
       end
 
-      it 'clears the object of its previous relation' do
+      it 'clears the object of its previous association' do
         expect(account1.person).to be_nil
         expect(account2.person).to eq(person)
       end

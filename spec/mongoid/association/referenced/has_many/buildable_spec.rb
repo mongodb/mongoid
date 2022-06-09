@@ -139,7 +139,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
       end
     end
 
-    context 'when the object is already related to another object' do
+    context 'when the object is already associated with another object' do
 
       context "when using <<" do
 
@@ -160,7 +160,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
           person2.drugs << drug
         end
 
-        it 'clears the object of its previous relation' do
+        it 'clears the object of its previous association' do
           expect(person1.drugs).to eq([])
           expect(person1.drug_ids).to eq([])
           expect(person2.drugs).to eq([drug])
@@ -187,7 +187,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
           person2.drugs.concat([drug])
         end
 
-        it 'clears the object of its previous relation' do
+        it 'clears the object of its previous association' do
           expect(person1.drugs).to eq([])
           expect(person1.drug_ids).to eq([])
           expect(person2.drugs).to eq([drug])
@@ -214,7 +214,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
           person2.drugs = [drug]
         end
 
-        it 'clears the object of its previous relation' do
+        it 'clears the object of its previous association' do
           expect(person1.drugs).to eq([])
           expect(person1.drug_ids).to eq([])
           expect(person2.drugs).to eq([drug])
@@ -241,7 +241,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
           person1.drugs = [drug]
         end
 
-        it 'clears the object of its previous relation' do
+        it 'clears the object of its previous association' do
           expect(person1.drugs).to eq([drug])
           expect(person1.drug_ids).to eq([drug._id])
         end

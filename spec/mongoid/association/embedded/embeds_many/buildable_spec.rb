@@ -104,7 +104,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
     end
   end
 
-  context 'when the object is already related to another object' do
+  context 'when the object is already associated with another object' do
 
     context "when using <<" do
 
@@ -125,7 +125,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
         person2.appointments << appointment
       end
 
-      it 'clears the object of its previous relation' do
+      it 'clears the object of its previous association' do
         expect(person1.appointments).to eq([])
         expect(person2.appointments).to eq([appointment])
       end
@@ -150,7 +150,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
         person2.appointments.concat([appointment])
       end
 
-      it 'clears the object of its previous relation' do
+      it 'clears the object of its previous association' do
         expect(person1.appointments).to eq([])
         expect(person2.appointments).to eq([appointment])
       end
@@ -178,7 +178,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
         expect(apts).to eq([ appointment ])
       end
 
-      it 'clears the object of its previous relation' do
+      it 'clears the object of its previous association' do
         expect(person1.appointments).to eq([])
         expect(person2.appointments).to eq([appointment])
       end
@@ -210,7 +210,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
         expect(apts).to eq([ appointment1, appointment2  ])
       end
 
-      it 'clears the object of its previous relation' do
+      it 'clears the object of its previous association' do
         expect(person1.appointments).to eq([ appointment2, appointment1 ])
       end
     end
