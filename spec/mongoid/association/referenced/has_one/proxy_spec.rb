@@ -1149,7 +1149,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     end
   end
 
-  context "when the document is unpersisted and the association is invalid" do
+  context "when the document is not persisted and the association is invalid" do
 
     before do
       class HomParent

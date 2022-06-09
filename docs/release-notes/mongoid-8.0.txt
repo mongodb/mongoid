@@ -386,7 +386,7 @@ models:
 In this case, both the child and the parent will not be persisted.
 
 .. note::
-  If ``save!`` were called, a validation error would raised.
+  If ``save!`` were called, a validation error would be raised.
 
 If optional is false, then the Child will be persisted with a parent_id, but the
 parent will not be persisted:
@@ -403,7 +403,7 @@ parent will not be persisted:
   p Parent.first
   # => nil
 
-If you want the functionality of neither document being persisted in Mongoid 7
+If you want the functionality of neither document being persisted in Mongoid 7 or 8
 and earlier, the ``validate: true`` option can be set on the association. If
 you want the functionality of only the Child being persisted, the ``validate:
 false`` option can be set on the association.
