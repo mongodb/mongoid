@@ -557,9 +557,8 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['6.0']
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu2004-small
   tasks:
     - name: "test"
 
@@ -569,9 +568,8 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set']
     mongodb-version: ['5.0']
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu2004-small
   tasks:
     - name: "test"
 
@@ -581,9 +579,8 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
+    os: ubuntu-18.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1804-small
   tasks:
     - name: "test"
 
@@ -593,9 +590,8 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['4.4']
+    os: ubuntu-18.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1804-small
   tasks:
     - name: "test"
 
@@ -605,9 +601,8 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set']
     mongodb-version: ['4.0']
+    os: ubuntu-16.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1604-small
   tasks:
     - name: "test"
 
@@ -617,9 +612,8 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set']
     mongodb-version: ['3.6']
+    os: ubuntu-16.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1604-small
   tasks:
     - name: "test"
 
@@ -629,9 +623,8 @@ buildvariants:
     ruby: ["ruby-3.1"]
     mongodb-version: "5.0"
     topology: ['replica-set', 'sharded-cluster']
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu2004-small
   tasks:
      - name: "test"
 
@@ -641,9 +634,8 @@ buildvariants:
     ruby: ["ruby-2.5"]
     mongodb-version: "4.0"
     topology: ['replica-set', 'sharded-cluster']
+    os: ubuntu-18.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1804-small
   tasks:
      - name: "test"
 
@@ -653,9 +645,8 @@ buildvariants:
     ruby: ["ruby-2.5"]
     mongodb-version: "3.6"
     topology: "standalone"
+    os: ubuntu-16.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1604-small
   tasks:
      - name: "test"
 
@@ -666,9 +657,8 @@ buildvariants:
     mongodb-version: "5.0"
     topology: "standalone"
     rails: ['7.0']
+    os: ubuntu-20.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
-  run_on:
-    - ubuntu2004-small
   tasks:
     - name: "test"
 
@@ -678,9 +668,8 @@ buildvariants:
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
     topology: "standalone"
+    os: ubuntu-18.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1804-small
   tasks:
     - name: "test"
 
@@ -690,9 +679,8 @@ buildvariants:
     ruby: ["ruby-3.0"]
     mongodb-version: "5.0"
     topology: "standalone"
+    os: ubuntu-18.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - ubuntu1804-small
   tasks:
     - name: "test"
 
@@ -704,9 +692,8 @@ buildvariants:
     mongodb-version: "5.0"
     topology: "standalone"
     rails: ['6.0', '6.1']
+    os: ubuntu-20.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
-  run_on:
-    - ubuntu2004-small
   tasks:
      - name: "test"
 
@@ -717,9 +704,8 @@ buildvariants:
     mongodb-version: "4.0"
     topology: "standalone"
     rails: ['5.1', '5.2']
+    os: ubuntu-18.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
-  run_on:
-    - ubuntu1804-small
   tasks:
      - name: "test"
 
@@ -730,9 +716,8 @@ buildvariants:
     mongodb-version: "4.4"
     topology: "standalone"
     i18n: '1.0'
+    os: ubuntu-18.04
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
-  run_on:
-    - ubuntu1804-small
   tasks:
      - name: "test"
 
@@ -744,9 +729,8 @@ buildvariants:
     topology: "standalone"
     i18n: '*'
     test-i18n-fallbacks: yes
+    os: ubuntu-18.04
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
-  run_on:
-    - ubuntu1804-small
   tasks:
      - name: "test"
 
@@ -758,9 +742,8 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0', '6.1', '7.0']
+    os: ubuntu-20.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  run_on:
-    - ubuntu2004-small
   tasks:
     - name: "test"
 
@@ -772,9 +755,8 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['5.1', '5.2']
+    os: ubuntu-18.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  run_on:
-    - ubuntu1804-small
   tasks:
      - name: "test"
 
@@ -786,8 +768,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0']
+    os: ubuntu-18.04
   display_name: "app tests ${driver}, ${jruby}"
-  run_on:
-    - ubuntu1804-small
   tasks:
      - name: "test"
