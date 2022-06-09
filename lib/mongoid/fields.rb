@@ -248,6 +248,8 @@ module Mongoid
 
     # Does this field start with a dollar sign ($) or contain a dot/period (.)?
     #
+    # @api private
+    #
     # @param [ String ] name The field name.
     #
     # @return [ true, false ] If this field is dotted or dollared.
@@ -258,6 +260,8 @@ module Mongoid
 
     # Validate whether or not the field starts with a dollar sign ($) or
     # contains a dot/period (.).
+    #
+    # @api private
     #
     # @raise [ InvalidDotDollarAssignment ] If contains dots or starts with a dollar.
     #

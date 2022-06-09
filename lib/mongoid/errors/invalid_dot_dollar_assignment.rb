@@ -11,6 +11,8 @@ module Mongoid
       #
       # @param [ Class ] klass The class of the document.
       # @param [ Class ] attr The attribute attempted to be written.
+      #
+      # @api private
       def initialize(klass, attr)
         super(
           compose_message("invalid_dot_dollar_assignment", { klass: klass, attr: attr })
