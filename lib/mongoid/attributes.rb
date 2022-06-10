@@ -86,6 +86,7 @@ module Mongoid
     def read_attribute(name)
       field = fields[name.to_s]
       raw = read_raw_attribute(name)
+      # Keep this code consistent with Mongoid::Fields.create_field_getter
       value = field ? field.demongoize(raw) : raw
       attribute_will_change!(name.to_s) if value.resizable?
       value
