@@ -24,6 +24,7 @@ require "mongoid/errors/invalid_persistence_option"
 require "mongoid/errors/invalid_query"
 # Must be after invalid_query.
 require "mongoid/errors/invalid_discriminator_key_target"
+require "mongoid/errors/invalid_dot_dollar_assignment"
 require "mongoid/errors/invalid_elem_match_operator"
 require "mongoid/errors/invalid_estimated_count_criteria"
 require "mongoid/errors/invalid_expression_operator"

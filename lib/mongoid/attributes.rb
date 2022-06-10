@@ -123,6 +123,7 @@ module Mongoid
     # @raise [ Errors::ReadonlyAttribute ] If the field cannot be removed due
     #   to being flagged as reaodnly.
     def remove_attribute(name)
+      validate_writable_field_name!(name.to_s)
       as_writable_attribute!(name) do |access|
         _assigning do
           attribute_will_change!(access)
@@ -145,6 +146,8 @@ module Mongoid
     # @param [ String, Symbol ] name The name of the attribute to update.
     # @param [ Object ] value The value to set for the attribute.
     def write_attribute(name, value)
+      validate_writable_field_name!(name.to_s)
+
       field_name = database_field_name(name)
 
       if attribute_missing?(field_name)
@@ -273,7 +276,11 @@ module Mongoid
       end
 
       if hash_dot_syntax?(normalized)
-        attributes.__nested__(normalized)
+        if fields.key?(normalized)
+          attributes[normalized]
+        else
+          attributes.__nested__(normalized)
+        end
       else
         attributes[normalized]
       end

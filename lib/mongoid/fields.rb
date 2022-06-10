@@ -246,6 +246,32 @@ module Mongoid
       self.class.using_object_ids?
     end
 
+    # Does this field start with a dollar sign ($) or contain a dot/period (.)?
+    #
+    # @api private
+    #
+    # @param [ String ] name The field name.
+    #
+    # @return [ true, false ] If this field is dotted or dollared.
+    def dot_dollar_field?(name)
+      n = aliased_fields[name] || name
+      fields.key?(n) && (n.include?('.') || n.start_with?('$'))
+    end
+
+    # Validate whether or not the field starts with a dollar sign ($) or
+    # contains a dot/period (.).
+    #
+    # @api private
+    #
+    # @raise [ InvalidDotDollarAssignment ] If contains dots or starts with a dollar.
+    #
+    # @param [ String ] name The field name.
+    def validate_writable_field_name!(name)
+      if dot_dollar_field?(name)
+        raise Errors::InvalidDotDollarAssignment.new(self.class, name)
+      end
+    end
+
     class << self
 
       # Stores the provided block to be run when the option name specified is

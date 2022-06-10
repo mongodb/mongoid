@@ -1415,8 +1415,47 @@ requiring the usage of the aggregation pipeline for both queries and updates,
 applications should avoid using dots in field names and starting field names
 with the dollar sign if possible.
 
-The Ruby driver `currently prohibits
-<https://jira.mongodb.org/browse/RUBY-2528>`_ inserting documents whose
-field names contain dots or begin with the dollar sign. However, if such
-documents are inserted using other software, Mongoid and the Ruby driver
-provide limited support for retrieving and operating on these documents.
+Mongoid, starting in version 8, now allows users to access fields that begin with
+dollar signs and that contain dots/periods. They can be accessed using the ``send``
+method as follows:
+
+.. code::
+
+    class User
+      include Mongoid::Document
+      field :"first.last", type: String
+      field :"$_amount", type: Integer
+    end
+
+    user = User.first
+    user.send(:"first.last")
+    # => Mike.Trout
+    user.send(:"$_amount")
+    # => 42650000
+
+It is also possible to use ``read_attribute`` to access these fields:
+
+.. code::
+
+    user.read_attribute("first.last")
+    # => Mike.Trout
+
+Due to `server limitations <https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/>`_,
+updating and replacing fields containing dots and dollars requires using special
+operators. For this reason, calling setters on these fields is prohibited and
+will raise an error:
+
+.. code::
+
+    class User
+      include Mongoid::Document
+      field :"first.last", type: String
+      field :"$_amount", type: Integer
+    end
+
+    user = User.new
+    user.send(:"first.last=", "Shohei.Ohtani")
+    # raises a InvalidDotDollarAssignment error
+    user.send(:"$_amount=", 8500000)
+    # raises a InvalidDotDollarAssignment error
+
