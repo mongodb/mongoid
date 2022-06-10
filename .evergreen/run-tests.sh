@@ -18,13 +18,10 @@ arch=`host_distro`
 set_fcv
 set_env_vars
 set_env_python
-set_env_node
 set_env_ruby
 
 if test -n "$APP_TESTS"; then
-  # Node from toolchain
-  export PATH=/opt/node/bin:$PATH
-  node -v
+  set_env_node
 fi
 
 prepare_server $arch

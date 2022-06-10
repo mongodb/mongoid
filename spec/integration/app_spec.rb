@@ -163,6 +163,14 @@ describe 'Mongoid application tests' do
               before do
                 Dir.chdir(APP_PATH) do
                   remove_bundler_req
+
+                  if BSON::Environment.jruby?
+                    # Remove existing Gemfile.lock - see
+                    # https://github.com/rubygems/rubygems/issues/3231
+                    require 'fileutils'
+                    FileUtils.rm_f('Gemfile.lock')
+                  end
+
                   check_call(%w(bundle install), env: env)
                   write_mongoid_yml
                 end
