@@ -8,9 +8,13 @@ module Mongoid
     # This class is the superclass for all association proxy objects, and contains
     # common behavior for all of them.
     class Proxy < BasicObject
-      extend Forwardable
+      extend ::Forwardable
 
-      alias :extend_proxy :extend
+      def extend_proxy(*args, **kwargs, &block)
+        extend(*args, **kwargs, &block)
+      end
+
+      #alias :extend_proxy :extend
 
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
