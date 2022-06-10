@@ -352,3 +352,59 @@ Removed ``Array#update_values`` and ``Hash#update_values`` methods
 
 The previously deprecated ``Array#update_values`` and ``Hash#update_values``
 methods have been removed in Mongoid 8.
+
+
+No Longer Persisting Documents with Invalid ``belongs_to`` Associations
+-----------------------------------------------------------------------
+
+In Mongoid 8, if an invalid document is assigned to a ``belongs_to`` association,
+and the base document is saved, if the ``belongs_to`` association had the
+option ``optional: false`` or ``optional`` is unset and the global flag
+``require_belongs_to_by_default`` is true, neither the document nor the
+associated document will be persisted. For example, given the following
+models:
+
+.. code::
+
+  class Parent
+    include Mongoid::Document
+    has_one :child
+    field :name
+    validates :name, presence: true
+  end
+
+  class Child
+    include Mongoid::Document
+
+    belongs_to :parent, autosave: true, validate: false, optional: false
+  end
+
+  child = Child.new
+  parent = Parent.new
+  child.parent = parent # parent is invalid, it does not have a name
+  child.save
+
+In this case, both the child and the parent will not be persisted.
+
+.. note::
+  If ``save!`` were called, a validation error would be raised.
+
+If optional is false, then the Child will be persisted with a parent_id, but the
+parent will not be persisted:
+
+.. code::
+
+  child = Child.new
+  parent = Parent.new
+  child.parent = parent # parent is invalid, it does not have a name
+  child.save
+
+  p Child.first
+  # => <Child _id: 629a50b0d1327aad89d214d2, parent_id: BSON::ObjectId('629a50b0d1327aad89d214d3')>
+  p Parent.first
+  # => nil
+
+If you want the functionality of neither document being persisted in Mongoid 7 or 8
+and earlier, the ``validate: true`` option can be set on the association. If
+you want the functionality of only the Child being persisted, the ``validate:
+false`` option can be set on the association.

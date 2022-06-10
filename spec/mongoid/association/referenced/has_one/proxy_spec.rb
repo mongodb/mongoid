@@ -1148,4 +1148,101 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       expect(Vehicle.aliased_fields["driver"]).to eq("driver_id")
     end
   end
+
+  context "when the document is not persisted and the association is invalid" do
+
+    before do
+      class HomParent
+        include Mongoid::Document
+        has_one :child, class_name: "HomChild"
+        field :name
+        validates :name, presence: true
+      end
+
+      class HomChild; include Mongoid::Document; end
+
+      belongs_to
+      child.parent = parent
+      child.save
+    end
+
+    after do
+      Object.send(:remove_const, :HomParent)
+      Object.send(:remove_const, :HomChild)
+    end
+
+    let(:belongs_to) do
+      HomChild.belongs_to :parent, autosave: true, validate: false, optional: optional
+    end
+
+    let(:child) { HomChild.new }
+    let(:parent) { HomParent.new }
+
+
+    context "when belongs_to_required_by_default is true" do
+      config_override :belongs_to_required_by_default, true
+
+      context "when optional is true" do
+        let(:optional) { true }
+
+        it "persists the child with the parent_id" do
+          expect(HomChild.first.parent_id).to eq(parent._id)
+          expect(HomParent.count).to eq(0)
+        end
+      end
+
+      context "when optional is false" do
+        let(:optional) { false }
+
+        it "doesn't persist the parent or the child" do
+          expect(HomChild.count).to eq(0)
+          expect(HomParent.count).to eq(0)
+        end
+      end
+
+      context "when optional is not set" do
+        let(:belongs_to) do
+          HomChild.belongs_to :parent, autosave: true, validate: false
+        end
+
+        it "doesn't persist the parent or the child" do
+          expect(HomChild.count).to eq(0)
+          expect(HomParent.count).to eq(0)
+        end
+      end
+    end
+
+    context "when belongs_to_required_by_default is false" do
+      config_override :belongs_to_required_by_default, false
+
+      context "when optional is true" do
+        let(:optional) { true }
+
+        it "persists the child with the parent_id" do
+          expect(HomChild.first.parent_id).to eq(parent._id)
+          expect(HomParent.count).to eq(0)
+        end
+      end
+
+      context "when optional is false" do
+        let(:optional) { false }
+
+        it "doesn't persist the parent or the child" do
+          expect(HomChild.count).to eq(0)
+          expect(HomParent.count).to eq(0)
+        end
+      end
+
+      context "when optional is not set" do
+        let(:belongs_to) do
+          HomChild.belongs_to :parent, autosave: true, validate: false
+        end
+
+        it "persists the child with the parent_id" do
+          expect(HomChild.first.parent_id).to eq(parent._id)
+          expect(HomParent.count).to eq(0)
+        end
+      end
+    end
+  end
 end
