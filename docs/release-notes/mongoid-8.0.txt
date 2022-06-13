@@ -408,3 +408,42 @@ If you want the functionality of neither document being persisted in Mongoid 7 o
 and earlier, the ``validate: true`` option can be set on the association. If
 you want the functionality of only the Child being persisted, the ``validate:
 false`` option can be set on the association.
+
+
+Update Local HABTM Association Correctly
+----------------------------------------
+
+In Mongoid 8, when pushing persisted elements to a HABTM association, the
+association will now update correctly without requiring a reload.
+For example:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+    has_and_belongs_to_many :posts
+  end
+
+  class Post
+    include Mongoid::Document
+    has_and_belongs_to_many :users
+  end
+
+  user1 = User.create!
+  user2 = User.create!
+
+  post = user1.posts.create!
+
+  p post.users.length
+  # => 1
+
+  post.users << user2
+
+  p post.users.length
+  # => 1 in Mongoid 7, 2 in Mongoid 8
+
+  p post.reload.users.length
+  # => 2
+
+As you can see from this example, after pushing ``user2`` to the users array,
+Mongoid 8 correctly updates the number of elements without requiring a reload.
