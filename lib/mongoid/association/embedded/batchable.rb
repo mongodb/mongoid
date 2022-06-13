@@ -80,7 +80,8 @@ module Mongoid
         def batch_replace(docs)
           if docs.blank?
             if _assigning? && !empty?
-              _base.delayed_atomic_sets.clear
+              _base.delayed_atomic_sets.delete(path)
+              clear_atomic_path_cache
               _base.add_atomic_unset(first)
               target_duplicate = _target.dup
               pre_process_batch_remove(target_duplicate, :delete)
@@ -92,7 +93,8 @@ module Mongoid
             _base.delayed_atomic_sets.clear unless _assigning?
             docs = normalize_docs(docs).compact
             _target.clear and _unscoped.clear
-            _base.delayed_atomic_unsets.clear
+            _base.delayed_atomic_unsets.delete(path)
+            clear_atomic_path_cache
             inserts = execute_batch_set(docs)
             add_atomic_sets(inserts)
           end
@@ -234,7 +236,22 @@ module Mongoid
         #
         # @return [ String ] The atomic path.
         def path
-          @path ||= _unscoped.first.atomic_path
+          @path ||= if _unscoped.empty?
+            Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
+          else
+            _unscoped.first.atomic_path
+          end
+        end
+
+        # Clear the cache for path and atomic_paths. This method is used when
+        # the path method is used, and the association has not been set on the
+        # document yet, which can cause path and atomic_paths to be calculated
+        # incorrectly later.
+        #
+        # @api private
+        def clear_atomic_path_cache
+          self.path = nil
+          _base.instance_variable_set("@atomic_paths", nil)
         end
 
         # Set the atomic path.
