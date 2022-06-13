@@ -29,12 +29,33 @@ module Mongoid
             return concat(docs) if docs.size > 1
             if doc = docs.first
               append(doc) do
-                _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
-                if child_persistable?(doc)
-                  doc.save
+                # We ignore the changes to the value for the foreign key in the
+                # changed_attributes hash in this block of code for two reasons:
+                #
+                # 1) The add_to_set method deletes the value for the foreign
+                #    key in the changed_attributes hash, but if we enter this
+                #    method with a value for the foreign key in the
+                #    changed_attributes hash, then we want it to exist outside
+                #    this method as well. It's used later on in the Syncable
+                #    module to set the inverse foreign keys.
+                # 2) The reset_unloaded method accesses the value for the foreign
+                #    key on _base, which causes it to get added to the
+                #    changed_attributes hash. This happens because when reading
+                #    a "resizable" attribute, it is automatically added to the
+                #    changed_attributes hash. This is true only for the foreign
+                #    key value for HABTM associations as the other associations
+                #    use strings for their foreign key values. For consistency
+                #    with the other associations, we ignore this addition to
+                #    the changed_attributes hash.
+                #    See MONGOID-4843 for a longer discussion about this.
+                reset_foreign_key_changes do
+                  _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
+
+                  if child_persistable?(doc)
+                    doc.save
+                  end
+                  reset_unloaded
                 end
-                reset_unloaded
-                clear_foreign_key_changes
               end
             end
             unsynced(_base, foreign_key) and self
@@ -202,19 +223,28 @@ module Mongoid
 
           # Clears the foreign key from the changed_attributes hash.
           #
-          # reset_unloaded accesses the value for the foreign key on
-          # _base, which causes it to get added to the changed_attributes
-          # hash. This happens because when reading a "resizable" attribute
-          # it is automatically added to the changed_attributes hash.
-          # this is true only for the foreign key value for HABTM associations
-          # as the other associations use strings for their foreign key values.
-          # For consistency with the other associations, we clear the foreign
-          # key from the changed_attributes hash.
-          # See MONGOID-4843 for a longer discussion about this.
+          # This is, in general, used to clear the foreign key from the
+          # changed_attributes hash for consistency with the other referenced
+          # associations.
           #
           # @api private
           def clear_foreign_key_changes
             _base.changed_attributes.delete(foreign_key)
+          end
+
+          # Reset the value in the changed_attributes hash for the foreign key
+          # to its value before executing the given block.
+          #
+          # @api private
+          def reset_foreign_key_changes
+            if _base.changed_attributes.key?(foreign_key)
+              fk = _base.changed_attributes[foreign_key].dup
+              yield if block_given?
+              _base.changed_attributes[foreign_key] = fk
+            else
+              yield if block_given?
+              clear_foreign_key_changes
+            end
           end
 
           # Appends the document to the target array, updating the index on the
