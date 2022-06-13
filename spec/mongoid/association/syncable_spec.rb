@@ -503,7 +503,7 @@ describe "Syncable Association" do
 
     before do
       breed.dogs = Dog.all
-      breed.save
+      breed.save!
     end
 
     it "sets the foreign key on the other side" do
