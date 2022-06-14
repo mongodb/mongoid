@@ -95,6 +95,115 @@ describe Mongoid::Document do
     end
   end
 
+  describe 'BSON::ObjectId field' do
+    context 'when assigned a BSON::ObjectId instance' do
+      let(:obj_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:registry) do
+        Registry.new(obj_id: obj_id)
+      end
+
+      it 'does not freeze the specified data' do
+        registry
+
+        obj_id.should_not be_frozen
+      end
+
+      it 'persists' do
+        registry.save!
+
+        _registry = Registry.find(registry.id)
+        _registry.obj_id.should == obj_id
+      end
+    end
+
+    context 'when assigned a valid string' do
+      let(:obj_id) do
+        BSON::ObjectId.new.to_s
+      end
+
+      let(:registry) do
+        Registry.new(obj_id: obj_id)
+      end
+
+      it 'assigns as a BSON::Binary object' do
+        registry.obj_id.should be_a(BSON::ObjectId)
+      end
+
+      it 'persists' do
+        registry.save!
+
+        _registry = Registry.find(registry.id)
+        _registry.obj_id.should == BSON::ObjectId.from_string(obj_id)
+      end
+    end
+
+    context 'when assigned nil' do
+      let(:obj_id) do
+        nil
+      end
+
+      let(:registry) do
+        Registry.new(obj_id: obj_id)
+      end
+
+      it 'assigns nil' do
+        registry.obj_id.should be nil
+      end
+
+      it 'persists' do
+        registry.save!
+
+        _registry = Registry.find(registry.id)
+        _registry.obj_id.should be nil
+      end
+    end
+
+    context 'when assigned an invalid string' do
+      let(:obj_id) do
+        "hello"
+      end
+
+      let(:registry) do
+        Registry.new(obj_id: obj_id)
+      end
+
+      it 'assigns nil' do
+        registry.obj_id.should == "hello"
+      end
+
+      it 'persists' do
+        registry.save!
+
+        _registry = Registry.find(registry.id)
+        _registry.obj_id.should == "hello"
+      end
+    end
+
+    context 'when assigned an invalid type' do
+      let(:obj_id) do
+        :sym
+      end
+
+      let(:registry) do
+        Registry.new(obj_id: obj_id)
+      end
+
+      it 'assigns nil' do
+        registry.obj_id.should == :sym
+      end
+
+      it 'persists' do
+        registry.save!
+
+        _registry = Registry.find(registry.id)
+        _registry.obj_id.should == :sym
+      end
+    end
+  end
+
   describe 'Hash field' do
     context 'with symbol key and value' do
       let(:church) do
