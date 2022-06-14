@@ -10,6 +10,17 @@ buildvariants:
   tasks:
     - name: "test"
 
+- matrix_name: "mongodb-5.3"
+  matrix_spec:
+    ruby: ["ruby-3.1"]
+    driver: ["current"]
+    topology: '*'
+    mongodb-version: ['5.3']
+    os: ubuntu-20.04
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tasks:
+    - name: "test"
+
 - matrix_name: "ruby-3.0"
   matrix_spec:
     ruby: ["ruby-3.0"]
