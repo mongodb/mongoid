@@ -15,6 +15,54 @@ describe BSON::Binary do
     end
   end
 
+  describe ".mongoize" do
+
+    let(:binary) do
+      BSON::Binary.new("testing")
+    end
+
+    let(:mongoized) do
+      BSON::Binary.mongoize(value)
+    end
+
+    context "when mongoizing a BSON::Binary" do
+
+      let(:value) { binary }
+
+      it "returns the binary" do
+        expect(mongoized).to eq(binary)
+      end
+    end
+
+    context "when mongoizing a String" do
+
+      let(:value) { "testing" }
+
+      it "returns it as binary" do
+        expect(mongoized).to eq(binary)
+      end
+    end
+
+    context "when mongoizing nil" do
+
+      let(:value) { nil }
+
+      it "returns nil" do
+        expect(mongoized).to eq(nil)
+      end
+    end
+
+    context "when mongoizing an invalid type" do
+
+      let(:value) { :sym }
+
+      # TODO: MONGOID-5222 test with feature flag on and off
+      it "returns nil" do
+        expect(mongoized).to eq(nil)
+      end
+    end
+  end
+
   describe ".demongoize" do
 
     let(:binary) do

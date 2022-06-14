@@ -40,18 +40,57 @@ describe Mongoid::Document do
       end
 
       it 'assigns as a BSON::Binary object' do
-        pending 'https://jira.mongodb.org/browse/MONGOID-4823'
-
         registry.data.should be_a(BSON::Binary)
       end
 
       it 'persists' do
-        pending 'https://jira.mongodb.org/browse/MONGOID-4823'
-
         registry.save!
 
         _registry = Registry.find(registry.id)
         _registry.data.should == BSON::Binary.new(data)
+      end
+    end
+
+    context 'when assigned nil' do
+      let(:data) do
+        nil
+      end
+
+      let(:registry) do
+        Registry.new(data: data)
+      end
+
+      it 'assigns nil' do
+        registry.data.should be nil
+      end
+
+      it 'persists' do
+        registry.save!
+
+        _registry = Registry.find(registry.id)
+        _registry.data.should be nil
+      end
+    end
+
+    # TODO: MONGOID-5222 test with uncastable feature flag
+    context 'when assigned an invalid type' do
+      let(:data) do
+        :sym
+      end
+
+      let(:registry) do
+        Registry.new(data: data)
+      end
+
+      it 'assigns nil' do
+        registry.data.should be nil
+      end
+
+      it 'persists' do
+        registry.save!
+
+        _registry = Registry.find(registry.id)
+        _registry.data.should be nil
       end
     end
   end
