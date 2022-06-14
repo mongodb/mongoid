@@ -11,6 +11,10 @@ def standard_dependencies
         gem 'ruby-debug-ide'
       end
     end
+
+    # Evergreen configuration generation
+    gem 'erubi'
+    gem 'tilt'
   end
 
   group :development, :test do
