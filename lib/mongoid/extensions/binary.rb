@@ -24,7 +24,7 @@ module Mongoid
         #
         # @param [ Object ] object The object to Mongoize
         #
-        # @return [ String | BSON::Decimal128 | nil ] A String or Decimal128
+        # @return [ String | BSON::Binary | nil ] A String or Binary
         #   representing the object or nil.
         def mongoize(object)
           return if object.nil?
