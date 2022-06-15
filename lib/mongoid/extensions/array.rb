@@ -146,8 +146,11 @@ module Mongoid
         #
         # @return [ Array ] The object mongoized.
         def mongoize(object)
+          return unless object
           if object.is_a?(::Array)
             evolve(object).collect{ |obj| obj.class.mongoize(obj) }
+          else
+            raise Errors::InvalidValue.new(self, object.class)
           end
         end
 
