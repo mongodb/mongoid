@@ -116,7 +116,7 @@ describe "Mongoize methods" do
   end
 
   describe BSON::Binary do
-    let(:invalid_value) { :sym }
+    let(:invalid_value) { true }
     let(:klass) { described_class }
     let(:field_name) { :binary_field }
 
