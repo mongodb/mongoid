@@ -19,6 +19,7 @@ describe ActiveModel::Validations::NumericalityValidator do
     end
 
     context "when the value is non numeric" do
+      config_override :validate_attribute_types, false
 
       let(:model) do
         TestModel.new(amount: "asdf")
