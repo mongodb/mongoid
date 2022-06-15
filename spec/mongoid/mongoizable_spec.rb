@@ -8,8 +8,8 @@ describe "Mongoize methods" do
 
   shared_examples "handles uncastable values" do
 
-    context "when passing an invalid value to mongoize" do
-      context "when using mongoize" do
+    context "when passing an invalid value" do
+      context "to mongoize" do
         it "raises an error" do
           expect do
             klass.mongoize(invalid_value)
@@ -17,9 +17,15 @@ describe "Mongoize methods" do
         end
       end
 
-      context "when using mongoize_safe" do
+      context "to mongoize_safe" do
         it "return nil" do
           expect(klass.mongoize_safe(invalid_value)).to be_nil
+        end
+      end
+
+      context "to evolve" do
+        it "passes through" do
+          expect(klass.evolve(invalid_value)).to eq(invalid_value)
         end
       end
     end
@@ -54,16 +60,22 @@ describe "Mongoize methods" do
 
   shared_examples "pushes through uncastable values" do
 
-    context "when passing an invalid value to mongoize" do
-      context "when using mongoize" do
+    context "when passing an invalid value" do
+      context "to mongoize" do
         it "returns that value" do
           expect(klass.mongoize(invalid_value)).to eq(mongoized_value)
         end
       end
 
-      context "when using mongoize_safe" do
+      context "to mongoize_safe" do
         it "returns that value" do
           expect(klass.mongoize_safe(invalid_value)).to eq(mongoized_value)
+        end
+      end
+
+      context "to evolve" do
+        it "passes through" do
+          expect(klass.evolve(invalid_value)).to eq(mongoized_value)
         end
       end
     end
