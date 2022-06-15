@@ -13,7 +13,9 @@ module Mongoid
       #
       # @return [ String ] The object mongoized.
       def mongoize(object)
-        evolve(object)
+        wrap_mongoize(object) do
+          evolve(object)
+        end
       end
     end
   end

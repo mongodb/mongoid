@@ -259,6 +259,15 @@ module Mongoid
         def mongoize_safe(object)
           mongoize(object) rescue nil
         end
+
+        def wrap_mongoize(object)
+          return if object.nil?
+          yield.tap do |res|
+            if res.nil?
+              raise Errors::InvalidValue.new(self, object.class)
+            end
+          end
+        end
       end
     end
   end

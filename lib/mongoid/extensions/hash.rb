@@ -219,8 +219,11 @@ module Mongoid
         #
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
-          return if object.nil? || !object.is_a?(Hash)
-          evolve(object.dup).transform_values!(&:mongoize)
+          wrap_mongoize(object) do
+            if object.is_a?(Hash)
+              evolve(object.dup).transform_values!(&:mongoize)
+            end
+          end
         end
 
         # Can the size of this object change?

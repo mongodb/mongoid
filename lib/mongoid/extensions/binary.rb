@@ -27,16 +27,13 @@ module Mongoid
         # @return [ String | Symbol | BSON::Binary | nil ] A String or Binary
         #   representing the object or nil.
         def mongoize(object)
-          return if object.nil?
-
-          case object
-          when BSON::Binary
-            object
-          when String, Symbol
-            BSON::Binary.new(object.to_s)
-          else
-            # TODO: MONGOID-5222 raise on the setting of feature flag.
-            nil
+          wrap_mongoize(object) do
+            case object
+            when BSON::Binary
+              object
+            when String, Symbol
+              BSON::Binary.new(object.to_s)
+            end
           end
         end
       end
