@@ -144,7 +144,7 @@ module Mongoid
       #
       # @return [ String, BSON::ObjectId ] The string or the id.
       def convert_to_object_id
-        BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
+        ::BSON::ObjectId.legal?(self) ? ::BSON::ObjectId.from_string(self) : self
       end
 
       module ClassMethods
