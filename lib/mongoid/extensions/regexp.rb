@@ -18,7 +18,7 @@ module Mongoid
         def mongoize(object)
           wrap_mongoize(object) do
             case object
-            when String, Regexp
+            when String, ::Regexp
               ::Regexp.new(object)
             end
           end
