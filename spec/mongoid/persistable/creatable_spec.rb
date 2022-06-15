@@ -234,11 +234,11 @@ describe Mongoid::Persistable::Creatable do
       end
 
       let(:attributes) do
-        collection.find({ name: "Testy"}).first
+        collection.find({ name: "Testy" }).first
       end
 
       before do
-        Browser.create(name: 'Safari', version: '4.0.0')
+        Browser.create(name: 'Safari', version: 4.0)
       end
 
       it "persists the versions" do
