@@ -157,10 +157,15 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
-          validate_attribute_value(field_name, value) if Mongoid.validate_attribute_types
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
-          typed_value = typed_value_for(field_name, value)
+
+          typed_value = if Mongoid.validate_attribute_types
+            typed_value_for(field_name, value)
+          else
+            typed_value_for(field_name, value) rescue nil
+          end
+
           unless attributes[field_name] == typed_value || attribute_changed?(field_name)
             attribute_will_change!(field_name)
           end
