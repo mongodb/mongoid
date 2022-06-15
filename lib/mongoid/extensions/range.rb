@@ -64,10 +64,8 @@ module Mongoid
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
           case object
-          when NilClass then nil
-          when String then object
           when Hash then __mongoize_hash__(object)
-          else __mongoize_range__(object)
+          when Range then __mongoize_range__(object)
           end
         end
 

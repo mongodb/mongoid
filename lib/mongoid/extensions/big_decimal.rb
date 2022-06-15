@@ -22,11 +22,7 @@ module Mongoid
       #
       # @return [ Object ] The object.
       def mongoize
-        if Mongoid.map_big_decimal_to_decimal128
-          BSON::Decimal128.new(self)
-        else
-          to_s
-        end
+        BigDecimal.mongoize(self)
       end
 
       # Is the BigDecimal a number?

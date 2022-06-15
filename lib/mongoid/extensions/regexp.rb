@@ -16,8 +16,10 @@ module Mongoid
         #
         # @return [ Regexp ] The object mongoized.
         def mongoize(object)
-          return nil if object.nil?
-          ::Regexp.new(object)
+          case object
+          when String, Regexp
+            ::Regexp.new(object)
+          end
         end
       end
     end

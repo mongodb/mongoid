@@ -37,7 +37,7 @@ module Mongoid
         # @return [ String ] The object mongoized.
         def mongoize(object)
           unless object.blank?
-            __numeric__(object).to_f rescue 0.0
+            __numeric__(object).to_f rescue nil
           else
             nil
           end
