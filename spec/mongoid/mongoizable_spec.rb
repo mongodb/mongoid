@@ -12,7 +12,6 @@ describe "Mongoize methods" do
       context "when using mongoize" do
         it "raises an error" do
           expect do
-            byebug
             klass.mongoize(invalid_value)
           end.to raise_error(Mongoid::Errors::InvalidValue)
         end
@@ -33,11 +32,11 @@ describe "Mongoize methods" do
         config_override :validate_attribute_types, false
 
         it "returns nil" do
-          catalog.array_field.should be_nil
+          catalog.attributes[field_name].should be_nil
         end
 
         it "persists nil" do
-          Catalog.find(catalog._id).array_field.should be_nil
+          Catalog.find(catalog._id).attributes[field_name].should be_nil
         end
       end
 
@@ -48,6 +47,38 @@ describe "Mongoize methods" do
           expect do
             catalog
           end.to raise_error(Mongoid::Errors::InvalidValue)
+        end
+      end
+    end
+  end
+
+  shared_examples "pushes through uncastable values" do
+
+    context "when passing an invalid value to mongoize" do
+      context "when using mongoize" do
+        it "returns that value" do
+          expect(klass.mongoize(invalid_value)).to eq(mongoized_value)
+        end
+      end
+
+      context "when using mongoize_safe" do
+        it "returns that value" do
+          expect(klass.mongoize_safe(invalid_value)).to eq(mongoized_value)
+        end
+      end
+    end
+
+    context "when assigning an invalid value to a field" do
+      with_config_values :validate_attribute_types, true, false do
+
+        let(:catalog) { Catalog.create!(field_name => invalid_value) }
+
+        it "returns the inputted value" do
+          catalog.attributes[field_name].should be_nil
+        end
+
+        it "persists the inputted value" do
+          Catalog.find(catalog._id).attributes[field_name].should be_nil
         end
       end
     end
@@ -118,12 +149,13 @@ describe "Mongoize methods" do
   end
 
 
-  xdescribe BSON::ObjectId do
+  describe BSON::ObjectId do
     let(:invalid_value) { "invalid value" }
+    let(:mongoized_value) { invalid_value }
     let(:klass) { described_class }
     let(:field_name) { :object_id_field }
 
-    include_examples "handles uncastable values"
+    include_examples "pushes through uncastable values"
   end
 
   describe BSON::Binary do
@@ -158,20 +190,22 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe String do
+  describe String do
     let(:invalid_value) { 1 }
+    let(:mongoized_value) { "1" }
     let(:klass) { described_class }
     let(:field_name) { :string_field }
 
-    include_examples "handles uncastable values"
+    include_examples "pushes through uncastable values"
   end
 
-  xdescribe Mongoid::StringifiedSymbol do
+  describe Mongoid::StringifiedSymbol do
     let(:invalid_value) { [] }
+    let(:mongoized_value) { "[]" }
     let(:klass) { described_class }
-    let(:field_name) { :stringifiedsymbol_field }
+    let(:field_name) { :stringified_symbol_field }
 
-    include_examples "handles uncastable values"
+    include_examples "pushes through uncastable values"
   end
 
   describe Symbol do
