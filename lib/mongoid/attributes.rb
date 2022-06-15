@@ -371,7 +371,8 @@ module Mongoid
       return unless field
 
       # TODO: make mongoizable? method
-      if field.mongoize(value).nil?
+      empty_fk = field.foreign_key? && value == ""
+      if field.mongoize(value).nil? && !empty_fk
         raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
       end
     end
