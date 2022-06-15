@@ -358,30 +358,6 @@ module Mongoid
 
     private
 
-    # Validates an attribute value as being assignable to the specified field.
-    #
-    # For now, only Hash and Array fields are validated, and the value is
-    # being checked to be of an appropriate type (i.e. either Hash or Array,
-    # respectively, or nil).
-    #
-    # This method takes the name of the field as stored in the document
-    # in the database, not (necessarily) the Ruby method name used to read/write
-    # the said field.
-    #
-    # @param [ String, Symbol ] field_name The name of the field.
-    # @param [ Object ] value The value to be validated.
-    def validate_attribute_value(field_name, value)
-      return if value.nil?
-      field = fields[field_name]
-      return unless field
-
-      # TODO: make mongoizable? method
-      empty_fk = field.foreign_key? && value == ""
-      if field.mongoize(value).nil? && !empty_fk
-        raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
-      end
-    end
-
     def lookup_attribute_presence(name, value)
       if localized_fields.has_key?(name) && value
         value = localized_fields[name].send(:lookup, value)
