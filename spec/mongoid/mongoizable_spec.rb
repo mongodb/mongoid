@@ -12,6 +12,7 @@ describe "Mongoize methods" do
       context "when using mongoize" do
         it "raises an error" do
           expect do
+            byebug
             klass.mongoize(invalid_value)
           end.to raise_error(Mongoid::Errors::InvalidValue)
         end
