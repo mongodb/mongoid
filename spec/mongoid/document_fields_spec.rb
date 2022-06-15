@@ -72,25 +72,46 @@ describe Mongoid::Document do
       end
     end
 
-    # TODO: MONGOID-5222 test with uncastable feature flag
     context 'when assigned an invalid type' do
-      let(:data) do
-        true
+      context "when validate_attribute_types is false" do
+        config_override :validate_attribute_types, false
+
+        let(:data) do
+          true
+        end
+
+        let(:registry) do
+          Registry.new(data: data)
+        end
+
+        it 'assigns nil' do
+          registry.data.should be nil
+        end
+
+        it 'persists' do
+          registry.save!
+
+          _registry = Registry.find(registry.id)
+          _registry.data.should be nil
+        end
       end
 
-      let(:registry) do
-        Registry.new(data: data)
-      end
+      context "when validate_attribute_types is true" do
+        config_override :validate_attribute_types, true
 
-      it 'assigns nil' do
-        registry.data.should be nil
-      end
+        let(:data) do
+          true
+        end
 
-      it 'persists' do
-        registry.save!
+        let(:registry) do
+          Registry.new(data: data)
+        end
 
-        _registry = Registry.find(registry.id)
-        _registry.data.should be nil
+        it 'raises an error' do
+          expect do
+            registry
+          end.to raise_error(Mongoid::Errors::InvalidValue)
+        end
       end
     end
   end

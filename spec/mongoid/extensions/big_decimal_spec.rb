@@ -234,8 +234,10 @@ describe Mongoid::Extensions::BigDecimal do
           ""
         end
 
-        it "returns nil" do
-          expect(mongoized).to be_nil
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -267,8 +269,10 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "returns nil" do
-          expect(mongoized).to be_nil
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -289,8 +293,10 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "returns nil" do
-          expect(mongoized).to be_nil
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -300,8 +306,10 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "returns nil" do
-          expect(mongoized).to be_nil
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -662,8 +670,10 @@ describe Mongoid::Extensions::BigDecimal do
           ""
         end
 
-        it "returns an empty String" do
-          expect(mongoized).to eq(value)
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -695,8 +705,10 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "returns the non-numeric String" do
-          expect(mongoized).to eq(value)
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -717,8 +729,10 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "returns true" do
-          expect(mongoized).to eq(value)
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -728,8 +742,10 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "returns false" do
-          expect(mongoized).to eq(value)
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 

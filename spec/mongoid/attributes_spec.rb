@@ -803,6 +803,7 @@ describe Mongoid::Attributes do
     end
 
     context "when supplied hash has string values" do
+      config_override :validate_attribute_types, false
 
       let(:bson_id) do
         BSON::ObjectId.new
@@ -1076,6 +1077,7 @@ describe Mongoid::Attributes do
     end
 
     context "after the attribute has been assigned" do
+      config_override :validate_attribute_types, false
 
       it "returns the default value" do
         person.age = "old"
@@ -1272,6 +1274,7 @@ describe Mongoid::Attributes do
     end
 
     context "after the attribute has been assigned" do
+      config_override :validate_attribute_types, false
 
       it "returns true" do
         person.age = 'old'
@@ -1529,6 +1532,8 @@ describe Mongoid::Attributes do
     end
 
     context "when setting an attribute that needs type casting" do
+      config_override :validate_attribute_types, false
+
       let(:person) do
         Person.new(age: "old")
       end
@@ -2035,6 +2040,7 @@ describe Mongoid::Attributes do
     end
 
     context "when checking against the alias" do
+      config_override :validate_attribute_types, false
 
       before do
         product.cost = 500

@@ -22,7 +22,7 @@ module Mongoid
       #
       # @return [ Object ] The object.
       def mongoize
-        BigDecimal.mongoize(self)
+        ::BigDecimal.mongoize(self)
       end
 
       # Is the BigDecimal a number?

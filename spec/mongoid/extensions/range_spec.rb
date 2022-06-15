@@ -267,14 +267,6 @@ describe Mongoid::Extensions::Range do
       end
     end
 
-    context 'given a String' do
-      let(:range) { '3' }
-
-      it 'returns a string' do
-        is_expected.to eq('3')
-      end
-    end
-
     context "given nil" do
       let(:range) { nil }
 
@@ -287,11 +279,29 @@ describe Mongoid::Extensions::Range do
   describe "#mongoize" do
     subject { range.mongoize }
 
+    context 'given a String' do
+      let(:range) { '3' }
+
+      it 'returns a string' do
+        is_expected.to eq('3')
+      end
+    end
+
     it_behaves_like 'mongoize range'
   end
 
   describe ".mongoize" do
     subject { Range.mongoize(range) }
+
+    context 'given a String' do
+      let(:range) { '3' }
+
+      it 'raises an error' do
+        expect do
+          subject
+        end.to raise_error(Mongoid::Errors::InvalidValue)
+      end
+    end
 
     it_behaves_like 'mongoize range'
   end

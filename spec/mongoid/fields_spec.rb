@@ -582,6 +582,7 @@ describe Mongoid::Fields do
     end
 
     context "when the attribute has been assigned" do
+      config_override :validate_attribute_types, false
 
       it "returns the attribute before type cast" do
         person.age = "old"
@@ -994,6 +995,7 @@ describe Mongoid::Fields do
     end
 
     context "when as is specified" do
+      config_override :validate_attribute_types, false
 
       let(:person) do
         Person.new(alias: true)

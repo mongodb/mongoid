@@ -60,8 +60,10 @@ describe Mongoid::Extensions::Float do
 
     context "when the value is not a float string" do
 
-      it "returns a float" do
-        expect(Float.demongoize('asdf')).to eq(0)
+      it "raises an error" do
+        expect do
+          Float.demongoize('asdf')
+        end.to raise_error(Mongoid::Errors::InvalidValue)
       end
     end
   end
@@ -124,8 +126,10 @@ describe Mongoid::Extensions::Float do
 
       context "when the string is non numerical" do
 
-        it "returns 0" do
-          expect(Float.mongoize("foo")).to eq(0.0)
+        it "raises an error" do
+          expect do
+            Float.mongoize("foo")
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -138,8 +142,10 @@ describe Mongoid::Extensions::Float do
 
       context "when the string is empty" do
 
-        it "returns nil" do
-          expect(Float.mongoize("")).to be_nil
+        it "raises an error" do
+          expect do
+            Float.mongoize("")
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
