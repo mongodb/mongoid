@@ -87,10 +87,10 @@ module Mongoid
             # @param [ Range ] object The range to evolve.
             #
             # @return [ Hash ] The range as a gte/lte criteria.
-            def evolve(object)
-              return object unless object.is_a?(::Range)
-              object.__evolve_range__
-            end
+            # def evolve(object)
+            #   return object unless object.is_a?(::Range)
+            #   object.__evolve_range__
+            # end
           end
         end
       end

@@ -26,11 +26,11 @@ module Mongoid
             # @param [ Regexp, String ] object The object to evolve.
             #
             # @return [ Regexp ] The evolved regex.
-            def evolve(object)
-              __evolve__(object) do |obj|
-                ::Regexp.new(obj)
-              end
-            end
+            # def evolve(object)
+            #   __evolve__(object) do |obj|
+            #     ::Regexp.new(obj)
+            #   end
+            # end
           end
 
           module Raw_
@@ -53,11 +53,11 @@ module Mongoid
               # @param [ BSON::Regexp::Raw, String ] object The object to evolve.
               #
               # @return [ BSON::Regexp::Raw ] The evolved raw regex.
-              def evolve(object)
-                __evolve__(object) do |obj|
-                  obj.is_a?(String) ? BSON::Regexp::Raw.new(obj) : obj
-                end
-              end
+              # def evolve(object)
+              #   __evolve__(object) do |obj|
+              #     obj.is_a?(String) ? BSON::Regexp::Raw.new(obj) : obj
+              #   end
+              # end
             end
           end
         end

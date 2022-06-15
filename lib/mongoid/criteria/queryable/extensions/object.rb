@@ -142,7 +142,7 @@ module Mongoid
             #
             # @return [ Object ] The provided object.
             def evolve(object)
-              object
+              mongoize(object) rescue object
             end
 
             private

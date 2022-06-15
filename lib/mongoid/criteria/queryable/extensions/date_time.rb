@@ -33,9 +33,9 @@ module Mongoid
             # @param [ Object ] object The object to evolve.
             #
             # @return [ Time ] The evolved date time.
-            def evolve(object)
-              object.__evolve_time__
-            end
+            # def evolve(object)
+            #   object.__evolve_time__
+            # end
           end
         end
       end
