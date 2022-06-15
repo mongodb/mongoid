@@ -20,5 +20,5 @@ class Catalog
   field :stringified_symbol_field, type: StringifiedSymbol
   field :symbol_field, type: Symbol
   field :time_field, type: Time
-  # field :time_with_zone_field, type: TimeWithZone
+  field :time_with_zone_field, type: ActiveSupport::TimeWithZone
 end

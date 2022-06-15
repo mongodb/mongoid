@@ -156,33 +156,33 @@ describe "Mongoize methods" do
   end
 
   xdescribe Mongoid::StringifiedSymbol do
-    let(:invalid_value) { 1 }
+    let(:invalid_value) { [] }
     let(:klass) { described_class }
     let(:field_name) { :stringifiedsymbol_field }
 
     include_examples "handles uncastable values"
   end
 
-  xdescribe Symbol do
-    let(:invalid_value) { 1 }
+  describe Symbol do
+    let(:invalid_value) { [] }
     let(:klass) { described_class }
     let(:field_name) { :symbol_field }
 
     include_examples "handles uncastable values"
   end
 
-  xdescribe Time do
-    let(:invalid_value) { 1 }
+  describe Time do
+    let(:invalid_value) { "invalid value" }
     let(:klass) { described_class }
     let(:field_name) { :time_field }
 
     include_examples "handles uncastable values"
   end
 
-  xdescribe ActiveSupport::TimeWithZone do
-    let(:invalid_value) { 1 }
+  describe ActiveSupport::TimeWithZone do
+    let(:invalid_value) { "invalid value" }
     let(:klass) { described_class }
-    let(:field_name) { :timewithzone_field }
+    let(:field_name) { :time_with_zone_field }
 
     include_examples "handles uncastable values"
   end
