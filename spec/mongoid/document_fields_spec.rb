@@ -75,7 +75,7 @@ describe Mongoid::Document do
     # TODO: MONGOID-5222 test with uncastable feature flag
     context 'when assigned an invalid type' do
       let(:data) do
-        :sym
+        true
       end
 
       let(:registry) do
