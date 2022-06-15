@@ -22,12 +22,6 @@ describe "Mongoize methods" do
           expect(klass.mongoize_safe(invalid_value)).to be_nil
         end
       end
-
-      context "to evolve" do
-        it "passes through" do
-          expect(klass.evolve(invalid_value)).to eq(invalid_value)
-        end
-      end
     end
 
     context "when assigning an invalid value to a field" do
@@ -70,12 +64,6 @@ describe "Mongoize methods" do
       context "to mongoize_safe" do
         it "returns that value" do
           expect(klass.mongoize_safe(invalid_value)).to eq(mongoized_value)
-        end
-      end
-
-      context "to evolve" do
-        it "passes through" do
-          expect(klass.evolve(invalid_value)).to eq(mongoized_value)
         end
       end
     end
