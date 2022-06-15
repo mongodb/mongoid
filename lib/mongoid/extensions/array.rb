@@ -148,8 +148,6 @@ module Mongoid
         def mongoize(object)
           if object.is_a?(::Array)
             evolve(object).collect{ |obj| obj.class.mongoize(obj) }
-          else
-            evolve(object)
           end
         end
 

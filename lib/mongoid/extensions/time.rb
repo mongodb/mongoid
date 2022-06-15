@@ -68,6 +68,7 @@ module Mongoid
           return nil if object.blank?
           begin
             time = object.__mongoize_time__
+            return unless time.acts_like?(:time)
             if object.respond_to?(:sec_fraction)
               ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
             elsif time.respond_to?(:subsec)
