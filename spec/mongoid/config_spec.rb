@@ -349,6 +349,13 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the validate_attribute_types option in the config' do
+    let(:option) { :validate_attribute_types }
+    let(:default) { true }
+
+    it_behaves_like "a config option"
+  end
+
   describe "#load!" do
 
     before(:all) do
