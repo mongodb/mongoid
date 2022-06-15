@@ -39,7 +39,9 @@ module Mongoid
         #
         # @return [ Array ] The object mongoized.
         def mongoize(object)
-          object.to_a
+          return unless Set === object
+          # remove me. Is this better?
+          Array.mongoize(object.to_a)
         end
       end
     end

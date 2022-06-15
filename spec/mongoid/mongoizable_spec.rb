@@ -139,7 +139,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Set do
+  describe Set do
     let(:invalid_value) { 1 }
     let(:klass) { described_class }
     let(:field_name) { :set_field }
