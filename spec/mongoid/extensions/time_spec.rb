@@ -163,8 +163,10 @@ describe Mongoid::Extensions::Time do
 
     context "when string is empty" do
 
-      it "returns nil" do
-        expect(Time.mongoize("")).to be_nil
+      it "raises an error" do
+        expect do
+          Time.mongoize("")
+        end.to raise_error(Mongoid::Errors::InvalidValue)
       end
     end
 
@@ -189,8 +191,10 @@ describe Mongoid::Extensions::Time do
 
       context "when the string is an invalid time" do
 
-        it "converts the time to nil" do
-          expect(Time.mongoize("time")).to eq(nil)
+        it "raises an error" do
+          expect do
+            Time.mongoize("time")
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
