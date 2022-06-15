@@ -19,10 +19,10 @@ module Mongoid
             # @param [ Set, Object ] object The object to evolve.
             #
             # @return [ Array ] The evolved set.
-            def evolve(object)
-              return object if !object || !object.respond_to?(:map)
-              object.map{ |obj| obj.class.evolve(obj) }
-            end
+            # def evolve(object)
+            #   return object if !object || !object.respond_to?(:map)
+            #   object.map{ |obj| obj.class.evolve(obj) }
+            # end
           end
         end
       end

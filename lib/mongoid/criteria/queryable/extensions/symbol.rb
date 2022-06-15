@@ -58,9 +58,9 @@ module Mongoid
             # @param [ Object ] object The object to convert.
             #
             # @return [ Symbol ] The value as a symbol.
-            def evolve(object)
-              __evolve__(object) { |obj| obj.to_sym }
-            end
+            # def evolve(object)
+            #   __evolve__(object) { |obj| obj.to_sym }
+            # end
           end
         end
       end

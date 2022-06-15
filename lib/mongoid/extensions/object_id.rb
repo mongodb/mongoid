@@ -25,9 +25,9 @@ module Mongoid
         # @param [ Object ] object The object to evolve.
         #
         # @return [ BSON::ObjectId ] The object id.
-        def evolve(object)
-          object.__evolve_object_id__
-        end
+        # def evolve(object)
+        #   object.__evolve_object_id__
+        # end
 
         # Convert the object into a mongo-friendly value to store.
         #
