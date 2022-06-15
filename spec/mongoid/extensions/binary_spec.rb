@@ -54,7 +54,7 @@ describe BSON::Binary do
 
     context "when mongoizing an invalid type" do
 
-      let(:value) { :sym }
+      let(:value) { true }
 
       # TODO: MONGOID-5222 test with feature flag on and off
       it "returns nil" do
