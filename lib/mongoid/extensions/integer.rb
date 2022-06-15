@@ -44,10 +44,8 @@ module Mongoid
         #
         # @return [ String ] The object mongoized.
         def mongoize(object)
-          unless object.blank?
+          wrap_mongoize(object) do
             __numeric__(object).to_i rescue nil
-          else
-            nil
           end
         end
         alias :demongoize :mongoize

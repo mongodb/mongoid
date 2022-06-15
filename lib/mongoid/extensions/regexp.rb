@@ -16,9 +16,11 @@ module Mongoid
         #
         # @return [ Regexp ] The object mongoized.
         def mongoize(object)
-          case object
-          when String, Regexp
-            ::Regexp.new(object)
+          wrap_mongoize(object) do
+            case object
+            when String, Regexp
+              ::Regexp.new(object)
+            end
           end
         end
       end

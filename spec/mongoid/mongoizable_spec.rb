@@ -60,7 +60,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe BigDecimal do
+  describe BigDecimal do
     let(:invalid_value) { "invalid_value" }
     let(:klass) { described_class }
     let(:field_name) { :big_decimal_field }
@@ -68,7 +68,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Mongoid::Boolean do
+  describe Mongoid::Boolean do
     let(:invalid_value) { "invalid_value" }
     let(:klass) { described_class }
     let(:field_name) { :boolean_field }
@@ -76,7 +76,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Date do
+  describe Date do
     let(:invalid_value) { :hello }
     let(:klass) { described_class }
     let(:field_name) { :date_field }
@@ -84,7 +84,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe DateTime do
+  describe DateTime do
     let(:invalid_value) { :hello }
     let(:klass) { described_class }
     let(:field_name) { :date_time_field }
@@ -92,7 +92,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Float do
+  describe Float do
     let(:invalid_value) { "invalid value" }
     let(:klass) { described_class }
     let(:field_name) { :float_field }
@@ -100,7 +100,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Hash do
+  describe Hash do
     let(:invalid_value) { 1 }
     let(:klass) { described_class }
     let(:field_name) { :hash_field }
@@ -108,7 +108,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Integer do
+  describe Integer do
     let(:invalid_value) { "invalid value" }
     let(:klass) { described_class }
     let(:field_name) { :integer_field }
@@ -125,7 +125,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe BSON::Binary do
+  describe BSON::Binary do
     let(:invalid_value) { true }
     let(:klass) { described_class }
     let(:field_name) { :binary_field }
@@ -133,7 +133,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Range do
+  describe Range do
     let(:invalid_value) { "invalid value" }
     let(:klass) { described_class }
     let(:field_name) { :range_field }
@@ -141,7 +141,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Regexp do
+  describe Regexp do
     let(:invalid_value) { 1 }
     let(:klass) { described_class }
     let(:field_name) { :regexp_field }
@@ -149,7 +149,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Set do
+  describe Set do
     let(:invalid_value) { 1 }
     let(:klass) { described_class }
     let(:field_name) { :set_field }
@@ -173,7 +173,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Symbol do
+  describe Symbol do
     let(:invalid_value) { [] }
     let(:klass) { described_class }
     let(:field_name) { :symbol_field }
@@ -181,7 +181,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe Time do
+  describe Time do
     let(:invalid_value) { "invalid value" }
     let(:klass) { described_class }
     let(:field_name) { :time_field }
@@ -189,7 +189,7 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-  xdescribe ActiveSupport::TimeWithZone do
+  describe ActiveSupport::TimeWithZone do
     let(:invalid_value) { "invalid value" }
     let(:klass) { described_class }
     let(:field_name) { :time_with_zone_field }
