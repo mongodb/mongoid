@@ -157,7 +157,7 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
-          validate_attribute_value(field_name, value)
+          validate_attribute_value(field_name, value) if Mongoid.validate_attribute_types
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
@@ -356,11 +356,10 @@ module Mongoid
       return if value.nil?
       field = fields[field_name]
       return unless field
-      validatable_types = [ Hash, Array ]
-      if validatable_types.include?(field.type)
-        unless value.is_a?(field.type)
-          raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
-        end
+
+      # TODO: make mongoizable? method
+      if field.mongoize(value).nil?
+        raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
       end
     end
 
