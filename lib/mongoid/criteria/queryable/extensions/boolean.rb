@@ -18,15 +18,15 @@ module Mongoid
             # @param [ Object ] object The object to evolve.
             #
             # @return [ true, false ] The boolean value.
-            # def evolve(object)
-            #   __evolve__(object) do |obj|
-            #     if obj.to_s =~ (/\A(true|t|yes|y|on|1|1.0)\z/i)
-            #       true
-            #     elsif obj.to_s =~ (/\A(false|f|no|n|off|0|0.0)\z/i)
-            #       false
-            #     end
-            #   end
-            # end
+            def evolve(object)
+              __evolve__(object) do |obj|
+                if obj.to_s =~ (/\A(true|t|yes|y|on|1|1.0)\z/i)
+                  true
+                elsif obj.to_s =~ (/\A(false|f|no|n|off|0|0.0)\z/i)
+                  false
+                end
+              end
+            end
           end
         end
       end

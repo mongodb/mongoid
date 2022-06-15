@@ -24,9 +24,9 @@ module Mongoid
         # @param [ Object ] object The object to evolve.
         #
         # @return [ BSON::Decimal128 ] The decimal128.
-        # def evolve(object)
-        #   object.__evolve_decimal128__
-        # end
+        def evolve(object)
+          object.__evolve_decimal128__
+        end
       end
     end
   end
