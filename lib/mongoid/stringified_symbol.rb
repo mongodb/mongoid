@@ -44,9 +44,9 @@ module Mongoid
       end
 
       # @api private
-      # def evolve(object)
-      #   mongoize(object)
-      # end
+      def evolve(object)
+        mongoize(object)
+      end
     end
   end
 end

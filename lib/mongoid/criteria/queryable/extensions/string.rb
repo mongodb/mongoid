@@ -106,11 +106,11 @@ module Mongoid
             # @param [ Object ] object The object to convert.
             #
             # @return [ String ] The value as a string.
-            # def evolve(object)
-            #   __evolve__(object) do |obj|
-            #     obj.regexp? ? obj : obj.to_s
-            #   end
-            # end
+            def evolve(object)
+              __evolve__(object) do |obj|
+                obj.regexp? ? obj : obj.to_s
+              end
+            end
           end
         end
       end
