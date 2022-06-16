@@ -834,7 +834,7 @@ Assigning Uncastable Values
 
 In Mongoid 8, Mongoid has standardized the treatment of the assignment of
 "uncastable" values. A value is considered "uncastable" when it cannot be
-coerced to the type of the assigning field. For example:
+coerced to the type of the field. For example:
 
 .. code::
 
@@ -1010,7 +1010,7 @@ setter methods for fields of your custom type.
 .. note::
 
   The ``mongoize`` method should raise a ``Mongoid::Errors::InvalidValue`` on values that
-  are uncastable to your custom type. Mongoid will handle catching that error
+  are uncastable to your custom type. Mongoid will handle rescuing that error
   and writing ``nil`` if the ``validate_attribute_types`` flag is turned off.
   See the secion on :ref:`Uncastable Values <uncastable-values>` for more
   details.
