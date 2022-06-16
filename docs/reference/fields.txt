@@ -849,7 +849,7 @@ be coerced to an Integer. To deal with this case, Mongoid has introduced the
 ``validate_attribute_types`` flag.
 
 When the ``validate_attribute_types`` flag is turned on, the assignment of uncastable
-values to a field will cause an ``InvalidValue`` error to be raised.
+values to a field will cause a ``Mongoid::Errors::InvalidValue`` exception being raised.
 
 When the ``validate_attribute_types`` flag is turned off, the assignment of uncastable
 values to a field will cause a ``nil`` to be written.
