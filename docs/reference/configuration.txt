@@ -434,7 +434,7 @@ for details on driver options.
       # (default: false)
       use_utc: false
 
-      # Raise an error on the assignment of a value that cannot be casted to
+      # Raise an error on the assignment of a value that cannot be cast to
       # the assigning field type. If this flag is off, no error will be raised
       # and nil will be written.
       validate_attribute_types: true
