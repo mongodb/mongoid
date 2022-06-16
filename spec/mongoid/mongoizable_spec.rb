@@ -81,7 +81,7 @@ describe "Mongoize methods" do
   end
 
   describe BigDecimal do
-    let(:invalid_value) { "invalid_value" }
+    let(:invalid_value) { [] }
     let(:klass) { described_class }
     let(:field_name) { :big_decimal_field }
 
