@@ -72,6 +72,8 @@ module Mongoid
                 object
               elsif object.is_a?(BigDecimal)
                 BSON::Decimal128.new(object)
+              elsif object.numeric?
+                BSON::Decimal128.new(object.to_s)
               elsif object.respond_to?(:to_d)
                 BSON::Decimal128.new(object.to_d)
               end
