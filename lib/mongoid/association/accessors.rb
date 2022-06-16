@@ -25,6 +25,9 @@ module Mongoid
       # @return [ Proxy ] The association.
       def __build__(name, object, association, selected_fields = nil)
         relation = create_relation(object, association, selected_fields)
+        if relation && association.is_a?(Association::Referenced::HasOne)
+          relation = relation._target
+        end
         set_relation(name, relation)
       end
 
