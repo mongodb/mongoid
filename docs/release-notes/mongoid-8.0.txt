@@ -57,6 +57,40 @@ changed in Mongoid 8.0:
 Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.
 
+Storing Uncastable Types and the ``validate_attribute_types`` Flag
+------------------------------------------------------------------
+
+In Mongoid 8, Mongoid deals with "uncastable values" based on the values of the
+``validates_attribute_types`` flag. If the ``validates_attribute_types`` flag
+is set to true, an ``InvalidValue`` error is raise, and if it is set to false
+a ``nil`` is written. See the secion on :ref:`Uncastable Values <uncastable-values>`
+for more details.
+
+Some ``mongoize`` methods were also changed to perform consistently with rails
+and the other mongoize methods. The following is a table of the changes in
+functionality:
+
++--------------+------------------------+------------------------+-------------------+
+| Field Type   | Situation              | Previous Functionality | New Functionality |
++==============+========================+========================+===================+
+| Integer/Float| When a non-numeric     | return ``nil``         | return ``42``     |
+|              | string starts with a   |                        |                   |
+|              | number: "42bogus"      |                        |                   |
++--------------+------------------------+------------------------+-------------------+
+| Boolean      | When a non-boolean     | return ``false``       | return ``nil`` or |
+|              | string is assigned:    |                        | raise             |
+|              | "bogus value"          |                        | ``InvalidError``  |
++--------------+------------------------+------------------------+-------------------+
+| Symbol       | When a value that does | return ``nil``         | return ``nil`` or |
+|              | not respond to         |                        | raise             |
+|              | ``to_sym`` is          |                        | ``InvalidError``  |
+|              | assigned: ``[]``       |                        |                   |
++--------------+------------------------+------------------------+-------------------+
+| All Other    | When an uncastable     | undefined behavior,    | return ``nil`` or |
+| Types        | value is assigned      | occasionally raises    | raise             |
+|              |                        | ``NoMethodError``      | ``InvalidError``  |
++--------------+------------------------+------------------------+-------------------+
+
 
 Order of Callback Invocation
 ----------------------------
