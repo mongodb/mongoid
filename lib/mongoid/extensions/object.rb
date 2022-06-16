@@ -239,15 +239,6 @@ module Mongoid
         def mongoize(object)
           object.mongoize
         end
-
-        def _mongoid_wrap_mongoize(object)
-          return if object.nil?
-          yield.tap do |res|
-            if res.nil?
-              raise Errors::InvalidValue.new(self, object)
-            end
-          end
-        end
       end
     end
   end

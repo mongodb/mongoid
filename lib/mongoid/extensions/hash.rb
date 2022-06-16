@@ -219,10 +219,11 @@ module Mongoid
         #
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
-          _mongoid_wrap_mongoize(object) do
-            if object.is_a?(Hash)
-              evolve(object.dup).transform_values!(&:mongoize)
-            end
+          return if object.nil?
+          if object.is_a?(Hash)
+            evolve(object.dup).transform_values!(&:mongoize)
+          else
+            raise Errors::InvalidValue.new(self, object)
           end
         end
 

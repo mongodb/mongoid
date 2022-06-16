@@ -38,8 +38,9 @@ module Mongoid
         #
         # @return [ Symbol ] The object mongoized.
         def mongoize(object)
-          _mongoid_wrap_mongoize(object) do
-            demongoize(object)
+          return if object.nil?
+          demongoize(object).tap do |res|
+            raise Errors::InvalidValue.new(self, object) unless res
           end
         end
       end

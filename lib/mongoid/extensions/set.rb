@@ -39,11 +39,10 @@ module Mongoid
         #
         # @return [ Array ] The object mongoized.
         def mongoize(object)
-          _mongoid_wrap_mongoize(object) do
-            case object
-            when Array, Set
-              ::Array.mongoize(object.to_a)
-            end
+          return if object.nil?
+          case object
+          when Array, Set then ::Array.mongoize(object.to_a)
+          else raise Errors::InvalidValue.new(self, object)
           end
         end
       end

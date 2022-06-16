@@ -16,11 +16,10 @@ module Mongoid
         #
         # @return [ Regexp ] The object mongoized.
         def mongoize(object)
-          _mongoid_wrap_mongoize(object) do
-            case object
-            when String, ::Regexp
-              ::Regexp.new(object)
-            end
+          return if object.nil?
+          case object
+          when String, ::Regexp then ::Regexp.new(object)
+          else raise Errors::InvalidValue.new(self, object)
           end
         end
       end

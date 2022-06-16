@@ -44,11 +44,12 @@ module Mongoid
         #
         # @return [ String ] The object mongoized.
         def mongoize(object)
-          return nil if object.is_a?(String) && object.blank?
-          _mongoid_wrap_mongoize(object) do
-            if object.respond_to?(:to_i)
-              object.to_i
-            end
+          return if object.nil?
+          return if object.is_a?(String) && object.blank?
+          if object.respond_to?(:to_i)
+            object.to_i
+          else
+            raise Errors::InvalidValue.new(self, object)
           end
         end
         alias :demongoize :mongoize

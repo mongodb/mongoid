@@ -13,8 +13,13 @@ module Mongoid
       #
       # @return [ String ] The object mongoized.
       def mongoize(object)
-        _mongoid_wrap_mongoize(object) do
-          evolve(object)
+        return if object.nil?
+        if object.to_s =~ (/\A(true|t|yes|y|on|1|1.0)\z/i)
+          true
+        elsif object.to_s =~ (/\A(false|f|no|n|off|0|0.0)\z/i)
+          false
+        else
+          raise Errors::InvalidValue.new(self, object)
         end
       end
     end
