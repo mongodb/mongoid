@@ -274,6 +274,22 @@ describe Mongoid::Extensions::Range do
         is_expected.to be_nil
       end
     end
+
+    context "given a hash" do
+      let(:range) { { 'min' => 1, 'max' => 5, 'exclude_end' => true } }
+
+      it "returns the hash" do
+        is_expected.to eq(range)
+      end
+    end
+
+    context "given a hash missing fields" do
+      let(:range) { { 'min' => 1 } }
+
+      it "returns the hash" do
+        is_expected.to eq(range)
+      end
+    end
   end
 
   describe "#mongoize" do
@@ -297,6 +313,24 @@ describe Mongoid::Extensions::Range do
       let(:range) { '3' }
 
       it 'raises an error' do
+        expect do
+          subject
+        end.to raise_error(Mongoid::Errors::InvalidValue)
+      end
+    end
+
+    context "given a hash with wrong fields" do
+      let(:range) { { 'min' => 1, 'max' => 5, 'exclude_end^' => true} }
+
+      it "removes the bogus fields" do
+        is_expected.to eq({ 'min' => 1, 'max' => 5 })
+      end
+    end
+
+    context "given a hash with no correct fields" do
+      let(:range) { { 'min^' => 1, 'max^' => 5, 'exclude_end^' => true} }
+
+      it "raises an error" do
         expect do
           subject
         end.to raise_error(Mongoid::Errors::InvalidValue)
