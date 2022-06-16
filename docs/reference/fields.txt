@@ -1009,7 +1009,7 @@ setter methods for fields of your custom type.
 
 .. note::
 
-  The ``mongoize`` method should raise an "InvalidValue" error on values that
+  The ``mongoize`` method should raise a ``Mongoid::Errors::InvalidValue`` on values that
   are uncastable to your custom type. Mongoid will handle catching that error
   and writing ``nil`` if the ``validate_attribute_types`` flag is turned off.
   See the secion on :ref:`Uncastable Values <uncastable-values>` for more
