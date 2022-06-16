@@ -447,3 +447,28 @@ For example:
 
 As you can see from this example, after pushing ``user2`` to the users array,
 Mongoid 8 correctly updates the number of elements without requiring a reload.
+
+
+Repaired Storing Strings in BSON::Binary fields
+-----------------------------------------------
+
+In Mongoid 8, storing a String in a field of type ``BSON::Binary`` will be
+stored in and returned from the database as a ``BSON::Binary``. Prior to Mongoid 8
+it was stored and returned as a String.
+
+.. code::
+
+  class Registry
+    include Mongoid::Document
+    field :data, type: BSON::Binary
+  end
+
+  registry = Registry.create!(data: "data!")
+  p registry.data
+  # => Mongoid 7: "data!"
+  # => Mongoid 8: <BSON::Binary:0x2580 type=generic data=0x6461746121...>
+
+  registry = Registry.find(registry.id)
+  p registry.data
+  # => Mongoid 7: "data!"
+  # => Mongoid 8: <BSON::Binary:0x2600 type=generic data=0x6461746121...>

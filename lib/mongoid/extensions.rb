@@ -34,6 +34,7 @@ end
 
 require "mongoid/extensions/array"
 require "mongoid/extensions/big_decimal"
+require "mongoid/extensions/binary"
 require "mongoid/extensions/boolean"
 require "mongoid/extensions/date"
 require "mongoid/extensions/date_time"
