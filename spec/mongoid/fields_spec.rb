@@ -582,11 +582,10 @@ describe Mongoid::Fields do
     end
 
     context "when the attribute has been assigned" do
-      config_override :validate_attribute_types, false
 
       it "returns the attribute before type cast" do
-        person.age = "old"
-        expect(person.age_before_type_cast).to eq("old")
+        person.age = "42"
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
   end
@@ -995,7 +994,6 @@ describe Mongoid::Fields do
     end
 
     context "when as is specified" do
-      config_override :validate_attribute_types, false
 
       let(:person) do
         Person.new(alias: true)
@@ -1006,7 +1004,7 @@ describe Mongoid::Fields do
       end
 
       it "uses the alias to write the attribute" do
-        (person.alias = expect(true)).to be true
+        expect(person.alias = true).to be true
       end
 
       it "uses the alias to read the attribute" do
@@ -1018,7 +1016,7 @@ describe Mongoid::Fields do
       end
 
       it "uses the name to write the attribute" do
-        (person.aliased = expect(true)).to be true
+        expect(person.aliased = true).to be true
       end
 
       it "uses the name to read the attribute" do

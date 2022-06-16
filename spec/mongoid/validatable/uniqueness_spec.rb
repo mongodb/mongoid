@@ -2363,7 +2363,6 @@ describe Mongoid::Validatable::UniquenessValidator do
         end
 
         context "when allowing blank" do
-          config_override :validate_attribute_types, false
 
           before do
             WordOrigin.validates_uniqueness_of :origin_id, allow_blank: true
