@@ -52,21 +52,22 @@ module Mongoid
         #
         # @return [ Time ] The object mongoized.
         def mongoize(object)
-          _mongoid_wrap_mongoize(object) do
-            unless object.blank?
-              begin
-                if object.is_a?(String)
-                  # https://jira.mongodb.org/browse/MONGOID-4460
-                  time = ::Time.parse(object)
-                else
-                  time = object.__mongoize_time__
-                end
-                if time.acts_like?(:time)
-                  ::Time.utc(time.year, time.month, time.day)
-                end
-              rescue ArgumentError
-                nil
-              end
+          return if object.nil? || object.blank?
+          begin
+            if object.is_a?(String)
+              # https://jira.mongodb.org/browse/MONGOID-4460
+              time = ::Time.parse(object)
+            else
+              time = object.__mongoize_time__
+            end
+            if time.acts_like?(:time)
+              ::Time.utc(time.year, time.month, time.day)
+            end
+          rescue ArgumentError
+            nil
+          end.tap do |res|
+            if res.nil?
+              raise Errors::InvalidValue.new(self, object)
             end
           end
         end

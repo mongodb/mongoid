@@ -65,21 +65,22 @@ module Mongoid
         #
         # @return [ Time ] The object mongoized.
         def mongoize(object)
-          _mongoid_wrap_mongoize(object) do
-            begin
-              time = object.__mongoize_time__
-              if time.acts_like?(:time)
-                if object.respond_to?(:sec_fraction)
-                  ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
-                elsif time.respond_to?(:subsec)
-                  ::Time.at(time.to_i, time.subsec * 10**6).utc
-                else
-                  ::Time.at(time.to_i, time.usec).utc
-                end
+          return if object.nil?
+          begin
+            time = object.__mongoize_time__
+            if time.acts_like?(:time)
+              if object.respond_to?(:sec_fraction)
+                ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
+              elsif time.respond_to?(:subsec)
+                ::Time.at(time.to_i, time.subsec * 10**6).utc
+              else
+                ::Time.at(time.to_i, time.usec).utc
               end
-            rescue ArgumentError
-              nil
             end
+          rescue ArgumentError
+            nil
+          end.tap do |res|
+            raise Errors::InvalidValue.new(self, object) unless res
           end
         end
       end

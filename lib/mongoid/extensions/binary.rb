@@ -27,13 +27,11 @@ module Mongoid
         # @return [ String | Symbol | BSON::Binary | nil ] A String or Binary
         #   representing the object or nil.
         def mongoize(object)
-          _mongoid_wrap_mongoize(object) do
-            case object
-            when BSON::Binary
-              object
-            when String, Symbol
-              BSON::Binary.new(object.to_s)
-            end
+          return if object.nil?
+          case object
+          when BSON::Binary then object
+          when String, Symbol then BSON::Binary.new(object.to_s)
+          else raise Errors::InvalidValue.new(self, object)
           end
         end
       end
