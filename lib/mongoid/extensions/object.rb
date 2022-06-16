@@ -127,15 +127,6 @@ module Mongoid
         self
       end
 
-      # Mongoize the given value and return nil if an error is raised.
-      #
-      # @return [ Object ] The object.
-      #
-      # @api private
-      def mongoize_safe
-        mongoize rescue nil
-      end
-
       # Is the object multi args.
       #
       # @example Is the object multi args?
@@ -247,17 +238,6 @@ module Mongoid
         # @return [ Object ] The object mongoized.
         def mongoize(object)
           object.mongoize
-        end
-
-        # Mongoize the given value and return nil if an error is raised.
-        #
-        # @param [ Object ] object The object to mongoize.
-        #
-        # @return [ Object ] The object mongoized.
-        #
-        # @api private
-        def mongoize_safe(object)
-          mongoize(object) rescue nil
         end
 
         def _mongoid_wrap_mongoize(object)
