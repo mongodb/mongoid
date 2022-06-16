@@ -825,6 +825,35 @@ Mongoid also defines the ``id`` field aliased to ``_id``. The ``id``
 alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
 
+.. _uncastable-values:
+
+Assigning Uncastable Values
+---------------------------
+
+In Mongoid 8, Mongoid has standardized the treatment of the assignment of
+"uncastable" values. A value is considered "uncastable" when it cannot be
+coerced to the type of the assigning field. For example:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+  User.new(name: [ "hello" ])
+
+Assigning an array to a field of type Integer doesn't work since an array can't
+be coerced to an Integer. To deal with this case, Mongoid has introduced the
+``validate_attribute_types`` flag.
+
+When the ``validate_attribute_types`` flag is turned on, the assignment of uncastable
+values to a field will cause an ``InvalidValue`` error to be raised.
+
+When the ``validate_attribute_types`` flag is turned off, the assignment of uncastable
+values to a field will cause a ``nil`` to be written.
+
 
 .. _customizing-field-behavior:
 
