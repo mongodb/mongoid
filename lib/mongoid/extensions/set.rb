@@ -39,7 +39,7 @@ module Mongoid
         #
         # @return [ Array ] The object mongoized.
         def mongoize(object)
-          wrap_mongoize(object) do
+          _mongoid_wrap_mongoize(object) do
             case object
             when Array, Set
               ::Array.mongoize(object.to_a)

@@ -63,7 +63,7 @@ module Mongoid
         #
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
-          wrap_mongoize(object) do
+          _mongoid_wrap_mongoize(object) do
             case object
             when Hash then __mongoize_hash__(object)
             when Range then __mongoize_range__(object)

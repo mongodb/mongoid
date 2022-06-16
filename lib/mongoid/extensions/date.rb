@@ -52,7 +52,7 @@ module Mongoid
         #
         # @return [ Time ] The object mongoized.
         def mongoize(object)
-          wrap_mongoize(object) do
+          _mongoid_wrap_mongoize(object) do
             unless object.blank?
               begin
                 if object.is_a?(String)

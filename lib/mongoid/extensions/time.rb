@@ -65,7 +65,7 @@ module Mongoid
         #
         # @return [ Time ] The object mongoized.
         def mongoize(object)
-          wrap_mongoize(object) do
+          _mongoid_wrap_mongoize(object) do
             begin
               time = object.__mongoize_time__
               if time.acts_like?(:time)

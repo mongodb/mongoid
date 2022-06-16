@@ -219,7 +219,7 @@ module Mongoid
         #
         # @return [ Hash ] The object mongoized.
         def mongoize(object)
-          wrap_mongoize(object) do
+          _mongoid_wrap_mongoize(object) do
             if object.is_a?(Hash)
               evolve(object.dup).transform_values!(&:mongoize)
             end
