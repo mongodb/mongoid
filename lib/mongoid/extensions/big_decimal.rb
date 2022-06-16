@@ -65,17 +65,22 @@ module Mongoid
         # @return [ String | BSON::Decimal128 | nil ] A String or Decimal128
         #   representing the object or nil.
         def mongoize(object)
+          return nil if object.is_a?(String) && object.blank?
           _mongoid_wrap_mongoize(object) do
-            if object.is_a?(BSON::Decimal128)
-              object
-            elsif Mongoid.map_big_decimal_to_decimal128
-              if object.is_a?(BigDecimal)
+            if Mongoid.map_big_decimal_to_decimal128
+              if object.is_a?(BSON::Decimal128)
+                object
+              elsif object.is_a?(BigDecimal)
                 BSON::Decimal128.new(object)
-              elsif object.numeric?
-                BSON::Decimal128.new(object.to_s)
+              elsif object.respond_to?(:to_d)
+                BSON::Decimal128.new(object.to_d)
               end
-            elsif object.numeric?
-              object.to_s
+            else
+              if object.is_a?(BSON::Decimal128) || object.numeric?
+                object.to_s
+              elsif object.respond_to?(:to_d)
+                object.to_d.to_s
+              end
             end
           end
         end
