@@ -38,7 +38,7 @@ module Mongoid
         #
         # @return [ Symbol ] The object mongoized.
         def mongoize(object)
-          wrap_mongoize(object) do
+          _mongoid_wrap_mongoize(object) do
             demongoize(object)
           end
         end

@@ -37,7 +37,7 @@ module Mongoid
         # @return [ String ] The object mongoized.
         def mongoize(object)
           return nil if object.to_s.blank?
-          wrap_mongoize(object) do
+          _mongoid_wrap_mongoize(object) do
             if object.respond_to?(:to_f)
               object.to_f
             end

@@ -260,7 +260,7 @@ module Mongoid
           mongoize(object) rescue nil
         end
 
-        def wrap_mongoize(object)
+        def _mongoid_wrap_mongoize(object)
           return if object.nil?
           yield.tap do |res|
             if res.nil?
