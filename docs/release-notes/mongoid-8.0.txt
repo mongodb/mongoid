@@ -52,7 +52,7 @@ Storing Uncastable Types and the ``validate_attribute_types`` Flag
 
 In Mongoid 8, Mongoid deals with "uncastable values" based on the values of the
 ``validates_attribute_types`` flag. If the ``validates_attribute_types`` flag
-is set to true, an ``InvalidValue`` error is raise, and if it is set to false
+is set to true, a ``Mongoid:Errors::InvalidValue`` exception is raised, and if it is set to false
 a ``nil`` is written. See the secion on :ref:`Uncastable Values <uncastable-values>`
 for more details.
 
