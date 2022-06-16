@@ -7,9 +7,17 @@ module Mongoid
     # For example when try to set an Array value to a Hash attribute.
     #
     class InvalidValue < MongoidError
-      def initialize(field_class, value_class)
+
+      # Create the new error.
+      #
+      # @param [ Class ] field_class The class of the field attempting to be
+      #   assigned to.
+      # @param [ Object ] value The value being assigned.
+      #
+      # @api private
+      def initialize(field_class, value)
         super(
-          compose_message("invalid_value", { value_class: value_class, field_class: field_class  })
+          compose_message("invalid_value", { value: value, field_class: field_class  })
         )
       end
     end

@@ -244,7 +244,7 @@ module Mongoid
           return if object.nil?
           yield.tap do |res|
             if res.nil?
-              raise Errors::InvalidValue.new(self, object.class)
+              raise Errors::InvalidValue.new(self, object)
             end
           end
         end
