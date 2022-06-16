@@ -125,7 +125,7 @@ describe "Mongoize methods" do
   end
 
   describe Float do
-    let(:invalid_value) { "invalid value" }
+    let(:invalid_value) { [] }
     let(:klass) { described_class }
     let(:field_name) { :float_field }
 
