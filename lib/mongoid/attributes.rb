@@ -163,7 +163,11 @@ module Mongoid
           typed_value = if Mongoid.validate_attribute_types
             typed_value_for(field_name, value)
           else
-            typed_value_for(field_name, value) rescue nil
+            begin
+              typed_value_for(field_name, value)
+            rescue Errors::InvalidValue
+              nil
+            end
           end
 
           unless attributes[field_name] == typed_value || attribute_changed?(field_name)
