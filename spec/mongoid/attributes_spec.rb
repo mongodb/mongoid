@@ -803,7 +803,6 @@ describe Mongoid::Attributes do
     end
 
     context "when supplied hash has string values" do
-      config_override :validate_attribute_types, false
 
       let(:bson_id) do
         BSON::ObjectId.new
@@ -1077,11 +1076,10 @@ describe Mongoid::Attributes do
     end
 
     context "after the attribute has been assigned" do
-      config_override :validate_attribute_types, false
 
       it "returns the default value" do
-        person.age = "old"
-        expect(person.age_before_type_cast).to eq("old")
+        person.age = "42"
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
 
@@ -1274,10 +1272,9 @@ describe Mongoid::Attributes do
     end
 
     context "after the attribute has been assigned" do
-      config_override :validate_attribute_types, false
 
       it "returns true" do
-        person.age = 'old'
+        person.age = '42'
         expect(person.has_attribute_before_type_cast?(:age)).to be true
       end
     end
@@ -1532,14 +1529,13 @@ describe Mongoid::Attributes do
     end
 
     context "when setting an attribute that needs type casting" do
-      config_override :validate_attribute_types, false
 
       let(:person) do
-        Person.new(age: "old")
+        Person.new(age: "42")
       end
 
       it "should store the attribute before type cast" do
-        expect(person.age_before_type_cast).to eq("old")
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
 
@@ -2040,7 +2036,6 @@ describe Mongoid::Attributes do
     end
 
     context "when checking against the alias" do
-      config_override :validate_attribute_types, false
 
       before do
         product.cost = 500
@@ -2080,8 +2075,8 @@ describe Mongoid::Attributes do
       end
 
       it "aliases *_before_type_cast" do
-        product.cost = "expensive"
-        expect(product.cost_before_type_cast).to eq("expensive")
+        product.cost = "42"
+        expect(product.cost_before_type_cast).to eq("42")
       end
     end
 

@@ -111,10 +111,8 @@ describe Mongoid::Extensions::Integer do
 
       context "when the string is non numerical" do
 
-        it "raises an error" do
-          expect do
-            Integer.mongoize("foo")
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns 0" do
+          expect(Integer.mongoize("foo")).to eq(0)
         end
       end
 
@@ -127,10 +125,8 @@ describe Mongoid::Extensions::Integer do
 
       context "when the string is empty" do
 
-        it "raises an error" do
-          expect do
-            Integer.mongoize("")
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(Integer.mongoize("")).to be_nil
         end
       end
 

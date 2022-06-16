@@ -141,7 +141,7 @@ describe "Mongoize methods" do
   end
 
   describe Integer do
-    let(:invalid_value) { "invalid value" }
+    let(:invalid_value) { [] }
     let(:klass) { described_class }
     let(:field_name) { :integer_field }
 
