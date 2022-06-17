@@ -637,7 +637,15 @@ module Mongoid
               write_attribute(name, field.eval_default(self))
             else
               # Keep this code consistent with Mongoid::Attributes#read_attribute
-              value = field.demongoize(raw)
+              value = begin
+                field.demongoize(raw)
+              rescue Errors::InvalidValue
+                if Mongoid.validate_db_attribute_types
+                  raise Errors::InvalidDBValue.new(self._id, self, raw)
+                else
+                  nil
+                end
+              end
               attribute_will_change!(name) if value.resizable?
               value
             end
