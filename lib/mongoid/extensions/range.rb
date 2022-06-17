@@ -67,7 +67,8 @@ module Mongoid
           case object
           when Hash then __mongoize_hash__(object)
           when Range then __mongoize_range__(object)
-          else raise Errors::InvalidValue.new(self, object)
+          end.tap do |res|
+            raise Errors::InvalidValue.new(self, object) unless res
           end
         end
 

@@ -1586,13 +1586,13 @@ describe Mongoid::Attributes do
       it "raises an error when trying to set a value of invalid type - array" do
         expect do
           person.map = []
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Array cannot be written to a field of type Hash/)
+        end.to raise_error(Mongoid::Errors::InvalidValue, /The value \[\] cannot be written to a field of type Hash/)
       end
 
       it "raises an error when trying to set a value of invalid type - boolean" do
         expect do
           person.map = false
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Hash/)
+        end.to raise_error(Mongoid::Errors::InvalidValue, /The value false cannot be written to a field of type Hash/)
       end
 
       it "can set a Hash value" do
@@ -1610,13 +1610,13 @@ describe Mongoid::Attributes do
       it "raises an error when trying to set a value of invalid type - hash" do
         expect do
           person.aliases = {}
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Hash cannot be written to a field of type Array/)
+        end.to raise_error(Mongoid::Errors::InvalidValue, /The value {} cannot be written to a field of type Array/)
       end
 
       it "raises an error when trying to set a value of invalid type - boolean" do
         expect do
           person.aliases = false
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Array/)
+        end.to raise_error(Mongoid::Errors::InvalidValue, /The value false cannot be written to a field of type Array/)
       end
     end
 
