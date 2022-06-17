@@ -132,6 +132,12 @@ module Mongoid
     # on save.
     option :validate_attribute_types, default: true
 
+    # When this flag is true, Mongoid will validate the type of the value
+    # retrieved from the db, such that it can be coerced to a value of the field
+    # type. If it is "uncastable," an InvalidDBValue error will be raised. If this
+    # feature flag is off, nil will be returned from the attribute.
+    option :validate_db_attribute_types, default: true
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
