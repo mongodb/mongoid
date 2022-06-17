@@ -16,18 +16,6 @@ module Mongoid
 
       module ClassMethods
 
-        # Convert the object from its mongo friendly ruby type to this type.
-        #
-        # @example Demongoize the object.
-        #   Symbol.demongoize(object)
-        #
-        # @param [ Object ] object The object to demongoize.
-        #
-        # @return [ Symbol ] The object.
-        def demongoize(object)
-          object.try(:to_sym)
-        end
-
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
         #
@@ -39,10 +27,11 @@ module Mongoid
         # @return [ Symbol ] The object mongoized.
         def mongoize(object)
           return if object.nil?
-          demongoize(object).tap do |res|
+          object.try(:to_sym).tap do |res|
             raise Errors::InvalidValue.new(self, object) unless res
           end
         end
+        alias :demongoize :mongoize
       end
     end
   end

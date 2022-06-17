@@ -54,7 +54,6 @@ describe "mongoize/demongoize methods" do
         context "to demongoize" do
           it "raises an error" do
             expect do
-              byebug
               klass.demongoize(invalid_value)
             end.to raise_error(Mongoid::Errors::InvalidValue)
           end
