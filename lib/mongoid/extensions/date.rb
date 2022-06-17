@@ -37,9 +37,20 @@ module Mongoid
         #
         # @param [ Time ] object The time from Mongo.
         #
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
         # @return [ Date ] The object as a date.
         def demongoize(object)
-          ::Date.new(object.year, object.month, object.day) if object
+          return nil if object.nil?
+          if object.acts_like?(:time)
+            ::Time.demongoize(object).to_date
+          elsif object.acts_like?(:date)
+            ::Date.new(object.year, object.month, object.day)
+          elsif object.respond_to?(:to_date)
+            object.to_date
+          else
+            raise Errors::InvalidValue.new(self, object)
+          end
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

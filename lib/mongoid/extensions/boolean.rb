@@ -22,6 +22,7 @@ module Mongoid
           raise Errors::InvalidValue.new(self, object)
         end
       end
+      alias :demongoize :mongoize
     end
   end
 end

@@ -4,43 +4,86 @@ require "spec_helper"
 
 # This file is for testing the functionality of uncastable values for all
 # mongoizable classes.
-describe "Mongoize methods" do
+describe "mongoize/demongoize methods" do
 
   shared_examples "handles uncastable values" do
 
-    context "when passing an invalid value" do
-      context "to mongoize" do
-        it "raises an error" do
-          expect do
-            klass.mongoize(invalid_value)
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+    describe ".mongoize" do
+
+      context "when passing an invalid value" do
+        context "to mongoize" do
+          it "raises an error" do
+            expect do
+              klass.mongoize(invalid_value)
+            end.to raise_error(Mongoid::Errors::InvalidValue)
+          end
+        end
+      end
+
+      context "when assigning an invalid value to a field" do
+
+        let(:catalog) { Catalog.create!(field_name => invalid_value) }
+
+        context "when validate_attribute_types is false" do
+          config_override :validate_attribute_types, false
+
+          it "returns nil" do
+            catalog.attributes[field_name].should be_nil
+          end
+
+          it "persists nil" do
+            Catalog.find(catalog._id).attributes[field_name].should be_nil
+          end
+        end
+
+        context "when validate_attribute_types is true" do
+          config_override :validate_attribute_types, true
+
+          it "raises an error" do
+            expect do
+              catalog
+            end.to raise_error(Mongoid::Errors::InvalidValue)
+          end
         end
       end
     end
 
-    context "when assigning an invalid value to a field" do
+    describe ".demongoize" do
 
-      let(:catalog) { Catalog.create!(field_name => invalid_value) }
-
-      context "when validate_attribute_types is false" do
-        config_override :validate_attribute_types, false
-
-        it "returns nil" do
-          catalog.attributes[field_name].should be_nil
-        end
-
-        it "persists nil" do
-          Catalog.find(catalog._id).attributes[field_name].should be_nil
+      context "when passing an invalid value" do
+        context "to demongoize" do
+          it "raises an error" do
+            expect do
+              byebug
+              klass.demongoize(invalid_value)
+            end.to raise_error(Mongoid::Errors::InvalidValue)
+          end
         end
       end
 
-      context "when validate_attribute_types is true" do
-        config_override :validate_attribute_types, true
+      context "when retrieving an invalid value from the db" do
 
-        it "raises an error" do
-          expect do
-            catalog
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        before do
+          Catalog.collection.insert_one(field_name => invalid_value)
+        end
+        let(:catalog) { Catalog.first }
+
+        context "when validate_db_attribute_types is false" do
+          config_override :validate_db_attribute_types, false
+
+          it "returns nil" do
+            catalog.send(field_name).should be_nil
+          end
+        end
+
+        context "when validate_db_attribute_types is true" do
+          config_override :validate_db_attribute_types, true
+
+          it "raises an error" do
+            expect do
+              catalog.send(field_name)
+            end.to raise_error(Mongoid::Errors::InvalidDBValue)
+          end
         end
       end
     end
@@ -135,7 +178,6 @@ describe "Mongoize methods" do
 
     include_examples "handles uncastable values"
   end
-
 
   describe BSON::ObjectId do
     let(:invalid_value) { "invalid value" }

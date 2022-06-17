@@ -227,6 +227,22 @@ module Mongoid
           end
         end
 
+        # Convert the object from its mongo friendly ruby type to this type.
+        #
+        # @param [ Object ] object The object from Mongo.
+        #
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ Hash ] The object as a hash.
+        def demongoize(object)
+          return if object.nil?
+          if object.is_a?(Hash)
+            object
+          else
+            raise Errors::InvalidValue.new(self, object)
+          end
+        end
+
         # Can the size of this object change?
         #
         # @example Is the hash resizable?

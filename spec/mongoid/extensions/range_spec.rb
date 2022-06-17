@@ -145,6 +145,16 @@ describe Mongoid::Extensions::Range do
         end
       end
     end
+
+    context "when the range doesn't have any correct keys" do
+      let(:hash) { { "min^" => "a", "max^" => "z", "exclude_end^" => true } }
+
+      it "raises an error" do
+        expect do
+          subject
+        end.to raise_error(Mongoid::Errors::InvalidValue)
+      end
+    end
   end
 
   shared_examples_for 'mongoize range' do

@@ -154,6 +154,24 @@ module Mongoid
           end
         end
 
+        # Convert the object from its mongo friendly ruby type to this type.
+        #
+        # @param [ Object ] object The object to demongoize.
+        #
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ Array ] The object.
+        #
+        # @api private
+        def demongoize(object)
+          return if object.nil?
+          if object.is_a?(::Array)
+            object
+          else
+            raise Errors::InvalidValue.new(self, object)
+          end
+        end
+
         # Returns whether the object's size can be changed.
         #
         # @example Is the object resizable?
