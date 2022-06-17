@@ -42,9 +42,7 @@ module Mongoid
         # @return [ Date ] The object as a date.
         def demongoize(object)
           return nil if object.nil?
-          if object.acts_like?(:time)
-            ::Time.demongoize(object).to_date
-          elsif object.acts_like?(:date)
+          if object.acts_like?(:time) || object.acts_like?(:date)
             ::Date.new(object.year, object.month, object.day)
           elsif object.respond_to?(:to_date)
             object.to_date
