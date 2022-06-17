@@ -1077,9 +1077,9 @@ documents which satisfy the scope condition.. The scope may be either:
 
 .. note::
 
-  Mongoid's syntax for scoped association differs from that of Active Record.
+  Mongoid's syntax for scoped association differs from that of ActiveRecord.
   Mongoid uses the ``:scope`` keyword argument for consistency with other
-  association options, whereas in Active Record the scope is a positional
+  association options, whereas in ActiveRecord the scope is a positional
   argument.
 
 
@@ -1233,8 +1233,8 @@ to be deleted. The options are as follows:
 - ``:restrict_with_exception``: ``raise`` an error if the child is not empty.
 - ``:restrict_with_error``: Cancel operation and return false if the child is not empty.
 
-If no ``:dependent`` option is provided, deleting the parent record leaves the child record unmodified
-(in other words, the child record continues to reference the now deleted parent record via the foreign key field).
+If no ``:dependent`` option is provided, deleting the parent document leaves the child document unmodified
+(in other words, the child document continues to reference the now deleted parent document via the foreign key field).
 The child may become orphaned if it is ordinarily only referenced via the parent.
 
 .. code-block:: ruby
@@ -1620,7 +1620,7 @@ with, and is useful for developers of extensions to Mongoid.
    * - ``Association#name``
      - Returns the association name.
    * - ``Association#options``
-     - Returns self, for API compatibility with Active Record.
+     - Returns self, for API compatibility with ActiveRecord.
    * - ``Association#order``
      - Returns the custom sorting options on the association.
    * - ``Association#polymorphic?``
