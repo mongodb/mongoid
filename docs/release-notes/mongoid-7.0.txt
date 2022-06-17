@@ -38,3 +38,31 @@ supports Rails 5.1-6.0.
 New in version 7.0.3: Embedded matchers now support the ``$eq`` operator.
 
 New in version 7.0.5: Mongoid now officially supports Rails 6.0.
+
+
+``set`` Overwrites Complete Document
+------------------------------------
+
+**Breaking change:** In Mongoid 7.0.2 and higher, ``set`` writes
+the provided attributes as the complete document (or sub-document), replacing
+any other attributes stored in the database. This behavior matches that of
+MongoDB ``$set`` operator. In Mongoid 7.0.1 and lower, ``set`` retained other
+attributes present in the database below the document being written:
+
+.. code-block:: ruby
+
+  class Product
+    include Mongoid::Document
+    
+    field :tags, type: Hash
+  end
+  
+  product = Product.new(tags: {color: 'black'})
+  product.set(tags: {size: 'large'})
+  
+  product
+  # Mongoid 7.0.2+:
+  # => #<Product _id: 62ab9770ce4ef31ac572679c, tags: {:size=>"large"}>
+  #
+  # Mongoid 7.0.1:
+  # => #<Product _id: 62ab9770ce4ef31ac572679c, tags: {:color=>"black", :size=>"large"}>
