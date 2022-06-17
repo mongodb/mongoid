@@ -46,6 +46,7 @@ module Mongoid
         # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
         def demongoize(object)
           return if object.nil?
+          return if object.is_a?(String) && object.blank?
           if object.is_a?(BSON::Decimal128)
             object.to_big_decimal
           elsif object.numeric?
