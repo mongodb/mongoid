@@ -85,7 +85,10 @@ describe Mongoid::Indexable::Specification do
         Band,
         { name: 1, title: 1, years: -1 },
         background: true,
-        unique: true
+        unique: true,
+        wildcard_projection: {
+          views: 1
+        }
       )
     end
 
@@ -98,7 +101,11 @@ describe Mongoid::Indexable::Specification do
     end
 
     it "normalizes the options" do
-      expect(spec.options).to eq(background: true, unique: true)
+      expect(spec.options).to eq(background: true,
+                                 unique: true,
+                                 wildcard_projection: {
+                                   views: 1
+                                 })
     end
   end
 
