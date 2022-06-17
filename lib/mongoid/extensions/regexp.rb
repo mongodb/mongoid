@@ -18,7 +18,9 @@ module Mongoid
         def mongoize(object)
           return if object.nil?
           case object
-          when String, ::Regexp then ::Regexp.new(object)
+          when String then ::Regexp.new(object)
+          when ::Regexp then object
+          when BSON::Regexp::Raw then object.compile
           else raise Errors::InvalidValue.new(self, object)
           end
         end
