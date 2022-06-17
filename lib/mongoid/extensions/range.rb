@@ -48,7 +48,18 @@ module Mongoid
         #
         # @note Ruby 2.6 and lower do not support endless ranges that Ruby 2.7+ support.
         def demongoize(object)
-          object.nil? ? nil : ::Range.new(object["min"], object["max"], object["exclude_end"])
+          return if object.nil?
+          if object.is_a?(Hash)
+            hash = object.stringify_keys
+            hash.slice!('min', 'max', 'exclude_end')
+            unless hash.blank?
+              ::Range.new(hash["min"], hash["max"], hash["exclude_end"])
+            end
+          end.tap do |res|
+            if res.nil?
+              raise Errors::InvalidValue.new(self, object) unless res
+            end
+          end
         rescue ArgumentError # can be removed when Ruby version >= 2.7
           nil
         end

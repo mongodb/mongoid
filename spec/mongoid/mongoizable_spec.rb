@@ -4,7 +4,7 @@ require "spec_helper"
 
 # This file is for testing the functionality of uncastable values for all
 # mongoizable classes.
-describe "Mongoize methods" do
+describe "mongoize/demongoize methods" do
 
   shared_examples "handles uncastable values" do
 
@@ -14,7 +14,6 @@ describe "Mongoize methods" do
           expect(klass.mongoize(invalid_value)).to be_nil
         end
       end
-    end
 
     context "when assigning an invalid value to a field" do
       let(:catalog) { Catalog.create!(field_name => invalid_value) }
@@ -115,7 +114,6 @@ describe "Mongoize methods" do
 
     include_examples "handles uncastable values"
   end
-
 
   describe BSON::ObjectId do
     let(:invalid_value) { "invalid value" }
