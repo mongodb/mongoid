@@ -63,10 +63,6 @@ functionality:
 +--------------+------------------------+------------------------+-------------------+
 | Field Type   | Situation              | Previous Functionality | New Functionality |
 +==============+========================+========================+===================+
-| Integer/Float| When a non-numeric     | return ``nil``         | return ``42``     |
-|              | string starts with a   |                        |                   |
-|              | number: "42bogus"      |                        |                   |
-+--------------+------------------------+------------------------+-------------------+
 | Boolean      | When a non-boolean     | return ``false``       | return ``nil`` or |
 |              | string is assigned:    |                        | raise             |
 |              | "bogus value"          |                        | ``InvalidError``  |

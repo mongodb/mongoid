@@ -61,7 +61,9 @@ describe Mongoid::Extensions::Float do
     context "when the value is not a float string" do
 
       it "return 0" do
-        expect(Float.demongoize('asdf')).to eq(0)
+        expect do
+          Float.demongoize('asdf')
+        end.to raise_error(Mongoid::Errors::InvalidValue)
       end
     end
   end
@@ -125,7 +127,9 @@ describe Mongoid::Extensions::Float do
       context "when the string is non numerical" do
 
         it "return 0" do
-          expect(Float.mongoize("foo")).to eq(0)
+          expect do
+            Float.mongoize("foo")
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
