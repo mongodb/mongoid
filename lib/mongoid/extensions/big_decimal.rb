@@ -74,13 +74,11 @@ module Mongoid
               BSON::Decimal128.new(object)
             elsif object.numeric?
               BSON::Decimal128.new(object.to_s)
-            elsif object.respond_to?(:to_d)
-              BSON::Decimal128.new(object.to_d)
             end
           else
             if object.is_a?(BSON::Decimal128) || object.numeric?
               object.to_s
-            elsif object.respond_to?(:to_d)
+            elsif object.numeric?
               object.to_d.to_s
             end
           end.tap do |res|

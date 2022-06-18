@@ -268,8 +268,10 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "returns a string" do
-          expect(mongoized).to eq("1.0")
+        it "raises an error" do
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 
@@ -711,7 +713,9 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a decimal128" do
-          expect(mongoized).to eq(BSON::Decimal128.new("1"))
+          expect do
+            mongoized
+          end.to raise_error(Mongoid::Errors::InvalidValue)
         end
       end
 

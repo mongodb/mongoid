@@ -38,7 +38,7 @@ module Mongoid
         def mongoize(object)
           return if object.nil?
           return if object.is_a?(String) && object.blank?
-          if object.respond_to?(:to_f)
+          if object.numeric?
             object.to_f
           else
             raise Errors::InvalidValue.new(self, object)
