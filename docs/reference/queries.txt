@@ -1373,12 +1373,45 @@ Mongoid also has some helpful methods on criteria.
         .. code-block:: ruby
 
           Band.all.pluck(:name)
+            #=> ["Daft Punk", "Aphex Twin", "Ween"]
 
           Band.all.pluck('cities.name')
+            #=> ["Paris", "Limerick", "New Hope"]
 
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.pluck('managers.n')
+            #=> ["Giorgio", "Richard", "Quincy"]
+
+          # Accepts multiple field arguments, in which case
+          # the result will be returned as an Array of Arrays.
+          Band.all.pluck(:name, :likes)
+            #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
+
+   * - ``Criteria#pluck_each``
+
+       *This method returns an Enumerator for the results of ``pluck``.
+       A block may optionally be given, which will be called once for
+       each result.*
+
+       *Similar to the ``each`` method, this method will use the
+       `MongoDB getMore command
+       <https://mongodb.com/docs/manual/reference/command/getMore/>`_
+       to load results in batches. This is useful for working with
+       large query results.*
+
+       *The method arguments and behavior are otherwise
+       identical to ``pluck``.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.pluck_each(:name)
+            #=> #<Enumerator: ... >
+
+          Band.all.pluck_each(:name, 'cities.name') do |name, city|
+            puts "#{name} is from #{city}."
+          end
 
 
 Eager Loading
