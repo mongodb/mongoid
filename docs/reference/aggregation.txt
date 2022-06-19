@@ -21,8 +21,8 @@ which is used to construct flows of operations that process and return results.
 The aggregation pipeline is a superset of the deprecated
 :ref:`map/reduce framework <map-reduce>` functionality.
 
-.. _aggregation-pipeline-example-multiple-collections:
 
+.. _aggregation-pipeline-example-multiple-collections:
 
 Example: Querying Across Multiple Collections
 `````````````````````````````````````````````
