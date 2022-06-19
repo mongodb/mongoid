@@ -14,9 +14,12 @@ module Mongoid
 
         def each(&block)
           return to_enum unless block_given?
+
           @view.projection(normalized_field_names.index_with(true)).each do |doc|
             yield_result(doc, &block)
           end
+
+          self
         end
 
         private
