@@ -193,7 +193,7 @@ module Mongoid
       # @example Get the values in memory.
       #   context.pluck(:name)
       #
-      # @param [ String, Symbol, Array ] fields Field or fields to pluck.
+      # @param [ Array<String | Symbol> ] *fields Field(s) to pluck.
       #
       # @return [ Array ] The array of plucked values.
       def pluck(*fields)
