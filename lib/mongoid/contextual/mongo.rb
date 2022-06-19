@@ -439,10 +439,11 @@ module Mongoid
       # @param [ Proc ] block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator ] An enumerator, or the plucked
-      #   results if block given.
+      # @return [ Enumerator | Mongo ] The enumerator, or the context
+      #   if block was given.
       def pluck_each(*fields, &block)
-        PluckEnumerator.new(klass, view, fields).each(&block)
+        enum = PluckEnumerator.new(klass, view, fields).each(&block)
+        block_given? ? self : enum
       end
 
       # Skips the provided number of documents.

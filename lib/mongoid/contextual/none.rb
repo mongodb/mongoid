@@ -102,10 +102,11 @@ module Mongoid
       #
       # @param [ Array<String | Symbol> ] *_fields Field(s) to pluck.
       #
-      # @return [ Enumerator, Array ] An enumerator, or an empty array
-      #   if block given.
+      # @return [ Enumerator | None ] An enumerator, or the context
+      #   if block was given.
       def pluck_each(*_fields, &block)
-        pluck(*_fields).each(&block)
+        enum = pluck(*_fields).each(&block)
+        block_given? ? self : enum
       end
 
       # Create the new null context.

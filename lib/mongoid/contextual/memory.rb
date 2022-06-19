@@ -182,7 +182,7 @@ module Mongoid
       #
       # @param [ Integer ] value The number of documents to return.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def limit(value)
         self.limiting = value
         self
@@ -208,10 +208,11 @@ module Mongoid
       # @param [ Proc ] block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator, Array ] An enumerator, or the plucked
-      #   results if block given.
+      # @return [ Enumerator | Memory ] An enumerator, or the context
+      #   if block was given.
       def pluck_each(*fields, &block)
-        pluck(*fields).each(&block)
+        enum = pluck(*fields).each(&block)
+        block_given? ? self : enum
       end
 
       # Skips the provided number of documents.
@@ -221,7 +222,7 @@ module Mongoid
       #
       # @param [ Integer ] value The number of documents to skip.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def skip(value)
         self.skipping = value
         self
@@ -235,7 +236,7 @@ module Mongoid
       # @param [ Hash ] values The sorting values as field/direction(1/-1)
       #   pairs.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def sort(values)
         in_place_sort(values) and self
       end
