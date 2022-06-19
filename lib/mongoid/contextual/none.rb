@@ -88,11 +88,24 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String, Symbol, Array ] args Field or fields to pluck.
+      # @param [ Array<String | Symbol> ] *_fields Field(s) to pluck.
       #
       # @return [ Array ] An empty Array.
-      def pluck(*args)
+      def pluck(*_fields)
         []
+      end
+
+      # Iterate through plucked field values in null context.
+      #
+      # @example Iterate through the values for null context.
+      #   context.pluck_each(:name) { |name| puts name }
+      #
+      # @param [ Array<String | Symbol> ] *_fields Field(s) to pluck.
+      #
+      # @return [ Enumerator, Array ] An enumerator, or an empty array
+      #   if block given.
+      def pluck_each(*_fields, &block)
+        pluck(*_fields).each(&block)
       end
 
       # Create the new null context.

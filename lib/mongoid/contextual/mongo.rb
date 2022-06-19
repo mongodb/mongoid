@@ -5,6 +5,7 @@ require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
 require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
+require "mongoid/contextual/mongo/pluck_enumerator"
 require "mongoid/association/eager_loadable"
 
 module Mongoid
@@ -422,36 +423,26 @@ module Mongoid
       # @note This method will return the raw db values - it performs no custom
       #   serialization.
       #
-      # @param [ String, Symbol, Array ] fields Fields to pluck.
+      # @param [ Array<String | Symbol> ] *fields Field(s) to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
       def pluck(*fields)
-        # Multiple fields can map to the same field name. For example, plucking
-        # a field and its _translations field map to the same field in the database.
-        # because of this, we need to keep track of the fields requested.
-        normalized_field_names = []
-        normalized_select = fields.inject({}) do |hash, f|
-          db_fn = klass.database_field_name(f)
-          normalized_field_names.push(db_fn)
+        pluck_each(*fields).to_a
+      end
 
-          if Mongoid.legacy_pluck_distinct
-            hash[db_fn] = true
-          else
-            hash[klass.cleanse_localized_field_names(f)] = true
-          end
-          hash
-        end
-
-        view.projection(normalized_select).reduce([]) do |plucked, doc|
-          values = normalized_field_names.map do |n|
-            if Mongoid.legacy_pluck_distinct
-              n.include?('.') ? doc[n.partition('.')[0]] : doc[n]
-            else
-              extract_value(doc, n)
-            end
-          end
-          plucked << (values.size == 1 ? values.first : values)
-        end
+      # Iterate through plucked field values in memory.
+      #
+      # @example Iterate through the values for null context.
+      #   context.pluck_each(:name) { |name| puts name }
+      #
+      # @param [ Array<String | Symbol> ] *fields Field(s) to pluck.
+      # @param [ Proc ] block The block to call once for each plucked
+      #   result.
+      #
+      # @return [ Enumerator, Array ] An enumerator, or the plucked
+      #   results if block given.
+      def pluck_each(*fields, &block)
+        PluckEnumerator.new(klass, view, fields).each(&block)
       end
 
       # Skips the provided number of documents.
@@ -693,71 +684,6 @@ module Mongoid
 
       def acknowledged_write?
         collection.write_concern.nil? || collection.write_concern.acknowledged?
-      end
-
-      # Extracts the value for the given field name from the given attribute
-      # hash.
-      #
-      # @param [ Hash ] attrs The attributes hash.
-      # @param [ String ] field_name The name of the field to extract.
-      #
-      # @param [ Object ] The value for the given field name
-      def extract_value(attrs, field_name)
-        def fetch_and_demongoize(d, meth, klass)
-          res = d.try(:fetch, meth, nil)
-          if field = klass.fields[meth]
-            field.demongoize(res)
-          else
-            res.class.demongoize(res)
-          end
-        end
-
-        i = 1
-        num_meths = field_name.count('.') + 1
-        k = klass
-        curr = attrs.dup
-
-        klass.traverse_association_tree(field_name) do |meth, obj, is_field|
-          is_translation = false
-          # If no association or field was found, check if the meth is an
-          # _translations field.
-          if obj.nil? & tr = meth.match(/(.*)_translations\z/)&.captures&.first
-            is_translation = true
-            meth = tr
-          end
-
-          # 1. If curr is an array fetch from all elements in the array.
-          # 2. If the field is localized, and is not an _translations field
-          #    (_translations fields don't show up in the fields hash).
-          #    - If this is the end of the methods, return the translation for
-          #      the current locale.
-          #    - Otherwise, return the whole translations hash so the next method
-          #      can select the language it wants.
-          # 3. If the meth is an _translations field, do not demongoize the
-          #    value so the full hash is returned.
-          # 4. Otherwise, fetch and demongoize the value for the key meth.
-          curr = if curr.is_a? Array
-            res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
-            res.empty? ? nil : res
-          elsif !is_translation && k.fields[meth]&.localized?
-            if i < num_meths
-              curr.try(:fetch, meth, nil)
-            else
-              fetch_and_demongoize(curr, meth, k)
-            end
-          elsif is_translation
-            curr.try(:fetch, meth, nil)
-          else
-            fetch_and_demongoize(curr, meth, k)
-          end
-
-          # If it's a relation, update the current klass with the relation klass.
-          if !is_field && !obj.nil?
-            k = obj.klass
-          end
-          i += 1
-        end
-        curr
       end
 
       # Recursively demongoize the given value. This method recursively traverses

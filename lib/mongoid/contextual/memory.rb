@@ -199,6 +199,21 @@ module Mongoid
         end.compact
       end
 
+      # Iterate through plucked field values in memory.
+      #
+      # @example Iterate through the values for null context.
+      #   context.pluck_each(:name) { |name| puts name }
+      #
+      # @param [ Array<String | Symbol> ] *fields Field(s) to pluck.
+      # @param [ Proc ] block The block to call once for each plucked
+      #   result.
+      #
+      # @return [ Enumerator, Array ] An enumerator, or the plucked
+      #   results if block given.
+      def pluck_each(*fields, &block)
+        pluck(*fields).each(&block)
+      end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.
