@@ -14,7 +14,7 @@ module Mongoid
 
         def each(&block)
           return to_enum unless block_given?
-          @view.projection(database_field_names.index_with(true)).each do |doc|
+          @view.projection(normalized_field_names.index_with(true)).each do |doc|
             yield_result(doc, &block)
           end
         end
@@ -34,7 +34,7 @@ module Mongoid
         end
 
         def yield_result(doc)
-          values = normalized_field_names.map do |n|
+          values = database_field_names.map do |n|
             if Mongoid.legacy_pluck_distinct
               n.include?('.') ? doc[n.partition('.')[0]] : doc[n]
             else
