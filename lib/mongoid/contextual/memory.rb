@@ -197,7 +197,7 @@ module Mongoid
       #
       # @return [ Array ] The array of plucked values.
       def pluck(*fields)
-        documents.pluck(*Array.wrap(fields))
+        documents.pluck(*fields)
       end
 
       # Skips the provided number of documents.
