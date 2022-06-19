@@ -188,15 +188,16 @@ module Mongoid
         self
       end
 
+      # Pluck the field values in memory.
+      #
+      # @example Get the values in memory.
+      #   context.pluck(:name)
+      #
+      # @param [ String, Symbol, Array ] fields Field or fields to pluck.
+      #
+      # @return [ Array ] The array of plucked values.
       def pluck(*fields)
-        fields = Array.wrap(fields)
-        documents.map do |doc|
-          if fields.size == 1
-            doc[fields.first]
-          else
-            fields.map { |n| doc[n] }.compact
-          end
-        end.compact
+        documents.pluck(*Array.wrap(fields))
       end
 
       # Skips the provided number of documents.
