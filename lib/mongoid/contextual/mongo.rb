@@ -439,7 +439,7 @@ module Mongoid
       # @param [ Proc ] block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator, Array ] An enumerator, or the plucked
+      # @return [ Enumerator ] An enumerator, or the plucked
       #   results if block given.
       def pluck_each(*fields, &block)
         PluckEnumerator.new(klass, view, fields).each(&block)
