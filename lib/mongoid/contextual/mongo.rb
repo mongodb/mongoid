@@ -423,7 +423,7 @@ module Mongoid
       # @note This method will return the raw db values - it performs no custom
       #   serialization.
       #
-      # @param [ Array<String | Symbol> ] *fields Field(s) to pluck.
+      # @param [ String, Symbol ] *fields Field(s) to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
       def pluck(*fields)
@@ -435,7 +435,7 @@ module Mongoid
       # @example Iterate through the values for null context.
       #   context.pluck_each(:name) { |name| puts name }
       #
-      # @param [ Array<String | Symbol> ] *fields Field(s) to pluck.
+      # @param [ String, Symbol ] *fields Field(s) to pluck.
       # @param [ Proc ] block The block to call once for each plucked
       #   result.
       #

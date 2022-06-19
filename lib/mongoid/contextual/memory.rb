@@ -204,11 +204,11 @@ module Mongoid
       # @example Iterate through the values for null context.
       #   context.pluck_each(:name) { |name| puts name }
       #
-      # @param [ Array<String | Symbol> ] *fields Field(s) to pluck.
+      # @param [ String, Symbol ] *fields Field(s) to pluck.
       # @param [ Proc ] block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator | Memory ] An enumerator, or the context
+      # @return [ Enumerator, Memory ] An enumerator, or the context
       #   if block was given.
       def pluck_each(*fields, &block)
         enum = pluck(*fields).each(&block)
