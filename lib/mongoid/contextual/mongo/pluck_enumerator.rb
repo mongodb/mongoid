@@ -3,15 +3,47 @@
 module Mongoid
   module Contextual
     class Mongo
+
+      # Utility class to add enumerable behavior for
+      # Criteria#pluck_each. Should not be directly instantiated
+      # outside of Criteria#pluck_each.
+      #
+      # @api private
       class PluckEnumerator
         include Enumerable
 
+        # Create the new PluckEnumerator.
+        #
+        # @api private
+        #
+        # @example Initialize a PluckEnumerator.
+        #   PluckEnumerator.new(klass, view, fields)
+        #
+        # @param [ Class ] klass The base of the binding.
+        # @param [ Mongo::Collection::View ] view The Mongo view context.
+        # @param [ String, Symbol ] *fields Field(s) to pluck,
+        #   which may include nested fields using dot-notation.
         def initialize(klass, view, fields)
           @klass = klass
           @view = view
           @fields = fields
         end
 
+        # Iterate through plucked field value(s) from the database
+        # for the view context. Yields result values progressively as
+        # they are read from the database. The yielded results are
+        # normalized according to their Mongoid field types.
+        #
+        # @api private
+        #
+        # @example Iterate through the plucked values from the database.
+        #   context.pluck_each(:name) { |name| puts name }
+        #
+        # @param [ Proc ] block The block to call once for each plucked
+        #   result.
+        #
+        # @return [ Enumerator, PluckEnumerator ] The enumerator, or
+        #   self if a block was given.
         def each(&block)
           return to_enum unless block_given?
 
@@ -47,13 +79,13 @@ module Mongoid
           yield(values.size == 1 ? values.first : values)
         end
 
-        # Extracts the value for the given field name from the given attribute
-        # hash.
+        # Extracts the value for the given field name from the given
+        # attribute hash.
         #
         # @param [ Hash ] attrs The attributes hash.
         # @param [ String ] field_name The name of the field to extract.
         #
-        # @param [ Object ] The value for the given field name
+        # @param [ Object ] The value for the given field name.
         def extract_value(attrs, field_name)
           i = 1
           num_meths = field_name.count('.') + 1

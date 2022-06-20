@@ -209,7 +209,7 @@ module Mongoid
       #   result.
       #
       # @return [ Enumerator, Memory ] An enumerator, or the context
-      #   if block was given.
+      #   if a block was given.
       def pluck_each(*fields, &block)
         enum = pluck(*fields).each(&block)
         block_given? ? self : enum

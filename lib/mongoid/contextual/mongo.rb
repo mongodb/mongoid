@@ -378,7 +378,8 @@ module Mongoid
         end
       end
 
-      # Get's the number of documents matching the query selector.
+      # Returns the number of documents in the database matching
+      # the query selector.
       #
       # @example Get the length.
       #   context.length
@@ -414,33 +415,41 @@ module Mongoid
         MapReduce.new(collection, criteria, map, reduce)
       end
 
-      # Pluck the single field values from the database. Will return duplicates
-      # if they exist and only works for top level fields.
+      # Pluck the field value(s) from the database. Returns one
+      # result for each document found in the database for
+      # the context. The results are normalized according to their
+      # Mongoid field types. Note that the results may include
+      # duplicates and nil values.
       #
       # @example Pluck a field.
       #   context.pluck(:_id)
       #
-      # @note This method will return the raw db values - it performs no custom
-      #   serialization.
-      #
-      # @param [ String, Symbol ] *fields Field(s) to pluck.
+      # @param [ String, Symbol ] *fields Field(s) to pluck,
+      #   which may include nested fields using dot-notation.
       #
       # @return [ Array<Object, Array> ] The plucked values.
+      #   If the *fields arg contains a single value, each result
+      #   in the array will be a single value. Otherwise, each
+      #   result in the array will be an array of values.
       def pluck(*fields)
         pluck_each(*fields).to_a
       end
 
-      # Iterate through plucked field values in memory.
+      # Iterate through plucked field value(s) from the database
+      # for the context. Yields result values progressively as they are
+      # read from the database. The yielded results are normalized
+      # according to their Mongoid field types.
       #
-      # @example Iterate through the values for null context.
+      # @example Iterate through the plucked values from the database.
       #   context.pluck_each(:name) { |name| puts name }
       #
-      # @param [ String, Symbol ] *fields Field(s) to pluck.
+      # @param [ String, Symbol ] *fields Field(s) to pluck,
+      #   which may include nested fields using dot-notation.
       # @param [ Proc ] block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator | Mongo ] The enumerator, or the context
-      #   if block was given.
+      # @return [ Enumerator, Mongo ] The enumerator, or the context
+      #   if a block was given.
       def pluck_each(*fields, &block)
         enum = PluckEnumerator.new(klass, view, fields).each(&block)
         block_given? ? self : enum
