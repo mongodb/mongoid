@@ -1375,13 +1375,13 @@ Mongoid also has some helpful methods on criteria.
           Band.all.pluck(:name)
             #=> ["Daft Punk", "Aphex Twin", "Ween"]
 
-          Band.all.pluck('cities.name')
+          Band.all.pluck('address.city')
             #=> ["Paris", "Limerick", "New Hope"]
 
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.pluck('managers.n')
-            #=> ["Giorgio", "Richard", "Quincy"]
+            #=> [ ["Berry Gordy", "Tommy Mottola"], [], ["Quincy Jones"] ]
 
           # Accepts multiple field arguments, in which case
           # the result will be returned as an Array of Arrays.
@@ -1400,18 +1400,39 @@ Mongoid also has some helpful methods on criteria.
        to load results in batches. This is useful for working with
        large query results.*
 
-       *The method arguments and behavior are otherwise
-       identical to ``pluck``.*
+       *The method arguments and field normalization behavior are
+       otherwise identical to ``pluck``.*
 
      -
-        .. code-block:: ruby
+       .. code-block:: ruby
 
-          Band.all.pluck_each(:name)
-            #=> #<Enumerator: ... >
+         Band.all.pluck_each(:name)
+           #=> #<Enumerator: ... >
 
-          Band.all.pluck_each(:name, 'cities.name') do |name, city|
-            puts "#{name} is from #{city}."
-          end
+         Band.all.pluck_each(:name, 'address.city', :founded) do |name, city, founded|
+           puts "#{name} from #{city} started in #{founded}"
+         end
+           # =>
+           # The Rolling Stones from London started in 1962
+           # The Beatles from Liverpool started in 1960
+           # The Monkees from Los Angeles started in 1966
+
+   * - ``Criteria#pick``
+
+       *This method returns the first result ``pluck``. It is shorthand
+       for ``criteria.limit(1).pluck(*fields).first``.*
+
+       *The method arguments and field normalization behavior are
+       otherwise identical to ``pluck``.*
+
+     -
+       .. code-block:: ruby
+
+         Band.all.pick(:name)
+           #=> "The Rolling Stones"
+
+         Band.all.pick(:name, 'address.city')
+           #=> ["The Rolling Stones", "London"]
 
 
 Eager Loading
