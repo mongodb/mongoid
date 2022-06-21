@@ -37,11 +37,11 @@ Mongoid supports the following callbacks for :doc:`documents </tutorials/documen
 -  ``after_destroy``
 
 Callbacks are available on any document, whether it is embedded within
-another document or not. Note that to be efficient, Mongoid only fires
-the callback of the document that the persistence action was executed on.
-This is that Mongoid aims to support large hierarchies and to handle
-optimized atomic updates callbacks can't be firing all over the document
-hierarchy.
+another document or not. Note that to be efficient, Mongoid only invokes
+the callback on the document that the persistence action was executed on.
+This enables Mongoid to support large hierarchies and to handle optimized
+atomic updates efficiently (without invoking callbacks throughout the document
+hierarchy).
 
 Note that using callbacks for domain logic is a bad design practice, and can
 lead to unexpected errors that are hard to debug when callbacks in
@@ -82,20 +82,20 @@ syntax as well:
      end
    end
 
+
 Association Callbacks
 =====================
 
-Mongoid has a set of callbacks that are specific to collection based
-associations - these are:
+Mongoid has a set of callbacks that are specific to associations - these are:
 
 - ``after_add``
 - ``after_remove``
 - ``before_add``
 - ``before_remove``
 
-Each time a document is added or removed from any of the following associations,
-the respective callbacks are invoked: ``embeds_many``,
-``has_many``, and ``has_and_belongs_to_many``.
+Each time a document is added or removed from any of the following
+associations, the respective callbacks are invoked: ``embeds_many``,
+``has_many`` and ``has_and_belongs_to_many``.
 
 Association callbacks are specified as options on the respective association.
 The document added/removed will be passed as the parameter to the specified
