@@ -463,10 +463,10 @@ module Mongoid
       # @param [ String, Symbol ] *fields Field(s) to pick from
       #   the first result in the database.
       #
-      # @return [ Array<Object, Array> ] The picked value.
+      # @return [ Object, Array ] The picked value.
       #   If the *fields arg contains multiple values,
       #   an array will be returned with one value per field.
-      def pick(*_fields)
+      def pick(*fields)
         PluckEnumerator.new(klass, view.limit(1), fields).first
       end
 

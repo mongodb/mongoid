@@ -40,6 +40,7 @@ module Mongoid
       :none,
       :pluck,
       :pluck_each,
+      :pick,
       :read,
       :sum,
       :text_search,

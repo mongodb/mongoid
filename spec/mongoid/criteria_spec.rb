@@ -2887,6 +2887,388 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#pick" do
+
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 3)
+    end
+
+    let!(:photek) do
+      Band.create!(name: "Photek", likes: 1)
+    end
+
+    let(:maniacs) do
+      Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
+    end
+
+    context "when the field is aliased" do
+
+      let!(:expensive) do
+        Product.create!(price: 100000)
+      end
+
+      let!(:cheap) do
+        Product.create!(price: 1)
+      end
+
+      context "when using alias_attribute" do
+
+        let(:picked) do
+          Product.pick(:price)
+        end
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "uses the aliases" do
+            expect(picked).to eq(100000)
+          end
+        end
+      end
+    end
+
+    context "when the criteria matches" do
+
+      context "when there are no duplicate values" do
+
+        let(:criteria) do
+          Band.where(:name.exists => true)
+        end
+
+        let!(:picked) do
+          criteria.pick(:name)
+        end
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the value" do
+            expect(picked).to eq("Depeche Mode")
+          end
+        end
+
+        context "when subsequently executing the criteria without a pick" do
+
+          with_config_values :legacy_pluck_distinct, true, false do
+            it "does not limit the fields" do
+              expect(criteria.first.likes).to eq(3)
+            end
+
+            it "does set a result limit" do
+              expect(criteria.to_a.size).to eq(3)
+            end
+          end
+        end
+
+        context 'when the field is a subdocument' do
+
+          let(:criteria) do
+            Band.where(name: 'FKA Twigs')
+          end
+
+          context 'when a top-level field and a subdocument field are picked' do
+            before do
+              Band.create!(name: 'FKA Twigs')
+              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+            end
+
+            let(:embedded_pick) do
+              criteria.pick(:name, 'records.name')
+            end
+
+            let(:expected) do
+              ["FKA Twigs", nil]
+            end
+
+            it 'returns the list of top-level field and subdocument values' do
+              expect(embedded_pick).to eq(expected)
+            end
+          end
+
+          context 'when only a subdocument field is picked' do
+
+            before do
+              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP2') ])
+            end
+
+            let(:embedded_pick) do
+              criteria.pick('records.name')
+            end
+
+            let(:expected) do
+              ["LP1"]
+            end
+
+            it 'returns the list of subdocument value' do
+              expect(embedded_pick).to eq(expected)
+            end
+          end
+        end
+      end
+
+      context "when picking multi-fields" do
+
+        let(:picked) do
+          Band.where(:name.exists => true).pick(:name, :likes)
+        end
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the values" do
+            expect(picked).to eq(["Depeche Mode", 3])
+          end
+        end
+      end
+    end
+
+    context "when the criteria does not match" do
+
+      let(:picked) do
+        Band.where(name: "New Order").pick(:_id)
+      end
+
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns nil" do
+          expect(picked).to eq nil
+        end
+      end
+    end
+
+    context "when picking an aliased field" do
+
+      let(:picked) do
+        Band.all.pick(:id)
+      end
+
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns the field value" do
+          expect(picked).to eq(depeche.id)
+        end
+      end
+    end
+
+    context "when picking existent and non-existent fields" do
+
+      let(:picked) do
+        Band.all.pick(:id, :fooz)
+      end
+
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns nil for the field that doesnt exist" do
+          expect(picked).to eq([depeche.id, nil])
+        end
+      end
+    end
+
+    context "when picking a field that doesnt exist" do
+
+      context "when pick one field" do
+
+        let(:picked) do
+          Band.all.pick(:foo)
+        end
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns nil" do
+            expect(picked).to eq(nil)
+          end
+        end
+      end
+
+      context "when pick multiple fields" do
+
+        let(:picked) do
+          Band.all.pick(:foo, :bar)
+        end
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns a array of nils" do
+            expect(picked).to eq([nil, nil])
+          end
+        end
+      end
+    end
+
+    context 'when picking a localized field' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create!(description: 'english-text')
+        I18n.locale = :de
+        d.description = 'deutsch-text'
+        d.save!
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      context 'when picking the entire field' do
+        let(:picked) do
+          Dictionary.all.pick(:description)
+        end
+
+        let(:picked_translations) do
+          Dictionary.all.pick(:description_translations)
+        end
+
+        let(:picked_translations_both) do
+          Dictionary.all.pick(:description_translations, :description)
+        end
+
+        it 'returns the demongoized translations' do
+          expect(picked).to eq('deutsch-text')
+        end
+
+        it 'returns the full translations hash to _translations' do
+          expect(picked_translations).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+        end
+
+        it 'returns both' do
+          expect(picked_translations_both).to eq([{"de"=>"deutsch-text", "en"=>"english-text"}, "deutsch-text"])
+        end
+      end
+
+      context 'when picking a specific locale' do
+
+        let(:picked) do
+          Dictionary.all.pick(:'description.de')
+        end
+
+        it 'returns the specific translation' do
+          expect(picked).to eq('deutsch-text')
+        end
+      end
+
+      context 'when picking a specific locale from _translations field' do
+
+        let(:picked) do
+          Dictionary.all.pick(:'description_translations.de')
+        end
+
+        it 'returns the specific translation' do
+          expect(picked).to eq('deutsch-text')
+        end
+      end
+
+      context 'when fallbacks are enabled with a locale list' do
+        require_fallbacks
+
+        around(:all) do |example|
+          prev_fallbacks = I18n.fallbacks.dup
+          I18n.fallbacks[:he] = [ :en ]
+          example.run
+          I18n.fallbacks = prev_fallbacks
+        end
+
+        let(:picked) do
+          Dictionary.all.pick(:description)
+        end
+
+        it "correctly uses the fallback" do
+          I18n.locale = :en
+          d = Dictionary.create!(description: 'english-text')
+          I18n.locale = :he
+          expect(picked).to eq "english-text"
+        end
+      end
+
+      context "when the localized field is embedded" do
+        before do
+          p = Passport.new
+          I18n.locale = :en
+          p.name = "Neil"
+          I18n.locale = :he
+          p.name = "Nissim"
+
+          Person.create!(passport: p, employer_id: 12345)
+        end
+
+        let(:picked) do
+          Person.where(employer_id: 12345).pick("pass.name")
+        end
+
+        let(:picked_translations) do
+          Person.where(employer_id: 12345).pick("pass.name_translations")
+        end
+
+        let(:picked_translations_field) do
+          Person.where(employer_id: 12345).pick("pass.name_translations.en")
+        end
+
+        it "returns the translation for the current locale" do
+          expect(picked).to eq("Nissim")
+        end
+
+        it "returns the full _translation hash" do
+          expect(picked_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+        end
+
+        it "returns the translation for the requested locale" do
+          expect(picked_translations_field).to eq("Neil")
+        end
+      end
+    end
+
+    context 'when picking a field to be demongoized' do
+
+      let(:picked) do
+        Band.where(name: maniacs.name).pick(:sales)
+      end
+
+      context 'when value is stored as string' do
+        config_override :map_big_decimal_to_decimal128, false
+
+        it "demongoizes the field" do
+          expect(picked).to be_a(BigDecimal)
+          expect(picked).to eq(BigDecimal("1E2"))
+        end
+      end
+
+      context 'when value is stored as decimal128' do
+        config_override :map_big_decimal_to_decimal128, true
+
+        it "demongoizes the field" do
+          expect(picked).to be_a(BigDecimal)
+          expect(picked).to eq(BigDecimal("1E2"))
+        end
+      end
+    end
+
+    context "when picking an embedded field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(label: label) }
+
+      let(:picked) { Band.where(_id: band.id).pick("label.sales") }
+
+      it "demongoizes the field" do
+        expect(picked).to eq(BigDecimal("1E2"))
+      end
+    end
+
+    context "when picking an embeds_many field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(labels: [label]) }
+
+      let(:picked) { Band.where(_id: band.id).pick("labels.sales") }
+
+      it "demongoizes the field" do
+        expect(picked).to eq([BigDecimal("1E2")])
+      end
+    end
+
+    context "when picking a nonexistent embedded field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(label: label) }
+
+      let(:picked) { Band.where(_id: band.id).pick("label.qwerty") }
+
+      it "returns nil" do
+        expect(picked).to eq(nil)
+      end
+    end
+  end
+
   describe "#respond_to?" do
 
     let(:criteria) do
