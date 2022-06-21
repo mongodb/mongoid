@@ -428,6 +428,8 @@ matches strings containing "hello" before a newline, besides strings ending in
 This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
 
+.. _bigdecimal-fields:
+
 BigDecimal Fields
 -----------------
 
