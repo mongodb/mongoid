@@ -62,8 +62,6 @@ module Mongoid
         #
         # @param [ Object ] object The object to Mongoize
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
         # @return [ String | BSON::Decimal128 | nil ] A String or Decimal128
         #   representing the object or nil. String if Mongoid.map_big_decimal_to_decimal128
         #   is false, BSON::Decimal128 otherwise.
@@ -83,10 +81,6 @@ module Mongoid
               object.to_s
             elsif object.numeric?
               object.to_d.to_s
-            end
-          end.tap do |res|
-            if res.nil?
-              raise Errors::InvalidValue.new(self, object)
             end
           end
         end

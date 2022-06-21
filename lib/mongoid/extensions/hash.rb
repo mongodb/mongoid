@@ -217,15 +217,11 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
         # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
             evolve(object.dup).transform_values!(&:mongoize)
-          else
-            raise Errors::InvalidValue.new(self, object)
           end
         end
 

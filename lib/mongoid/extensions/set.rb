@@ -37,14 +37,11 @@ module Mongoid
         #
         # @param [ Set ] object The object to mongoize.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
         # @return [ Array | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           case object
           when Array, Set then ::Array.mongoize(object.to_a)
-          else raise Errors::InvalidValue.new(self, object)
           end
         end
       end

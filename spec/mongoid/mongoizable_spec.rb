@@ -10,38 +10,21 @@ describe "Mongoize methods" do
 
     context "when passing an invalid value" do
       context "to mongoize" do
-        it "raises an error" do
-          expect do
-            klass.mongoize(invalid_value)
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(klass.mongoize(invalid_value)).to be_nil
         end
       end
     end
 
     context "when assigning an invalid value to a field" do
-
       let(:catalog) { Catalog.create!(field_name => invalid_value) }
 
-      context "when validate_attribute_types is false" do
-        config_override :validate_attribute_types, false
-
-        it "returns nil" do
-          catalog.attributes[field_name].should be_nil
-        end
-
-        it "persists nil" do
-          Catalog.find(catalog._id).attributes[field_name].should be_nil
-        end
+      it "returns nil" do
+        catalog.attributes[field_name].should be_nil
       end
 
-      context "when validate_attribute_types is true" do
-        config_override :validate_attribute_types, true
-
-        it "raises an error" do
-          expect do
-            catalog
-          end.to raise_error(Mongoid::Errors::InvalidValue)
-        end
+      it "persists nil" do
+        Catalog.find(catalog._id).attributes[field_name].should be_nil
       end
     end
   end
@@ -57,17 +40,14 @@ describe "Mongoize methods" do
     end
 
     context "when assigning an invalid value to a field" do
-      with_config_values :validate_attribute_types, true, false do
+      let(:catalog) { Catalog.create!(field_name => invalid_value) }
 
-        let(:catalog) { Catalog.create!(field_name => invalid_value) }
+      it "returns the inputted value" do
+        catalog.attributes[field_name].should be_nil
+      end
 
-        it "returns the inputted value" do
-          catalog.attributes[field_name].should be_nil
-        end
-
-        it "persists the inputted value" do
-          Catalog.find(catalog._id).attributes[field_name].should be_nil
-        end
+      it "persists the inputted value" do
+        Catalog.find(catalog._id).attributes[field_name].should be_nil
       end
     end
   end

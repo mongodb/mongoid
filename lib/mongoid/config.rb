@@ -125,13 +125,6 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
-    # When this flag is true, Mongoid will validate the type of the value
-    # assigned to a field, such that it can be coerced to a value of the field
-    # type. If it is "uncastable," an InvalidValue error will be raised. If this
-    # feature flag is off, nil will be written to the attribute and the database
-    # on save.
-    option :validate_attribute_types, default: true
-
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

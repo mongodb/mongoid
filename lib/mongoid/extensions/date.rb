@@ -50,8 +50,6 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
         # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
@@ -68,10 +66,6 @@ module Mongoid
               end
             rescue ArgumentError
               nil
-            end
-          end.tap do |res|
-            if res.nil?
-              raise Errors::InvalidValue.new(self, object)
             end
           end
         end

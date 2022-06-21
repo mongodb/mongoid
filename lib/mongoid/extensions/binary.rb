@@ -24,15 +24,12 @@ module Mongoid
         #
         # @param [ Object ] object The object to Mongoize
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
         # @return [ BSON::Binary | nil ] A Binary representing the object or nil.
         def mongoize(object)
           return if object.nil?
           case object
           when BSON::Binary then object
           when String, Symbol then BSON::Binary.new(object.to_s)
-          else raise Errors::InvalidValue.new(self, object)
           end
         end
       end

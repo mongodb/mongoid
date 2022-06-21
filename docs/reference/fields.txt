@@ -847,14 +847,13 @@ coerced to the type of the field. For example:
   User.new(name: [ "hello" ])
 
 Assigning an array to a field of type Integer doesn't work since an array can't
-be coerced to an Integer. To deal with this case, Mongoid has introduced the
-``validate_attribute_types`` flag.
+be coerced to an Integer. The assignment of uncastable values to a field will
+cause a ``nil`` to be written:
 
-When the ``validate_attribute_types`` flag is turned on, the assignment of uncastable
-values to a field will cause a ``Mongoid::Errors::InvalidValue`` exception being raised.
+.. code::
 
-When the ``validate_attribute_types`` flag is turned off, the assignment of uncastable
-values to a field will cause a ``nil`` to be written.
+  User.new(name: [ "hello" ])
+  # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
 
 
 .. _customizing-field-behavior:
@@ -1009,11 +1008,9 @@ setter methods for fields of your custom type.
 
 .. note::
 
-  The ``mongoize`` method should raise a ``Mongoid::Errors::InvalidValue`` on values that
-  are uncastable to your custom type. Mongoid will handle rescuing that error
-  and writing ``nil`` if the ``validate_attribute_types`` flag is turned off.
-  See the secion on :ref:`Uncastable Values <uncastable-values>` for more
-  details.
+  The ``mongoize`` method should return ``nil`` on values that are uncastable to
+  your custom type. See the secion on :ref:`Uncastable Values <uncastable-values>`
+  for more details.
 
 The class method ``demongoize`` does the inverse of ``mongoize``. It takes the raw object
 from the MongoDB Ruby driver and converts it to an instance of your custom type.

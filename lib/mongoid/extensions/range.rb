@@ -61,16 +61,12 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
         # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           case object
           when Hash then __mongoize_hash__(object)
           when Range then __mongoize_range__(object)
-          end.tap do |res|
-            raise Errors::InvalidValue.new(self, object) unless res
           end
         end
 
