@@ -56,10 +56,8 @@ describe BSON::Binary do
 
       let(:value) { true }
 
-      it "raises an error" do
-        expect do
-          mongoized
-        end.to raise_error(Mongoid::Errors::InvalidValue)
+      it "returns nil" do
+        expect(mongoized).to be_nil
       end
     end
   end

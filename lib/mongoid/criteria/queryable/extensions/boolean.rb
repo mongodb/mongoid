@@ -20,11 +20,8 @@ module Mongoid
             # @return [ true, false ] The boolean value.
             def evolve(object)
               __evolve__(object) do |obj|
-                begin
-                  mongoize(object)
-                rescue InvalidValue
-                  object
-                end
+                res = mongoize(object)
+                res.nil? ? object : res
               end
             end
           end

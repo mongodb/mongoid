@@ -268,10 +268,8 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "raises an error" do
-          expect do
-            mongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -292,10 +290,8 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
-          expect do
-            mongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -305,10 +301,8 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
-          expect do
-            mongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -712,10 +706,8 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "returns a decimal128" do
-          expect do
-            mongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -736,10 +728,8 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
-          expect do
-            mongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -749,10 +739,8 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
-          expect do
-            mongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 

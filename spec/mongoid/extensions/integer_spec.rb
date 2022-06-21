@@ -111,10 +111,12 @@ describe Mongoid::Extensions::Integer do
 
       context "when the string is non numerical" do
 
-        it "returns 0" do
-          expect do
-            Integer.mongoize("foo")
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        let(:mongoized) do
+          Integer.mongoize("foo")
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 

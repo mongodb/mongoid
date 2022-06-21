@@ -312,10 +312,8 @@ describe Mongoid::Extensions::Range do
     context 'given a String' do
       let(:range) { '3' }
 
-      it 'raises an error' do
-        expect do
-          subject
-        end.to raise_error(Mongoid::Errors::InvalidValue)
+      it "returns nil" do
+        is_expected.to be_nil
       end
     end
 
@@ -330,10 +328,8 @@ describe Mongoid::Extensions::Range do
     context "given a hash with no correct fields" do
       let(:range) { { 'min^' => 1, 'max^' => 5, 'exclude_end^' => true} }
 
-      it "raises an error" do
-        expect do
-          subject
-        end.to raise_error(Mongoid::Errors::InvalidValue)
+      it "returns nil" do
+        is_expected.to be_nil
       end
     end
 

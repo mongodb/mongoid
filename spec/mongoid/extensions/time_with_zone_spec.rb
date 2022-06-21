@@ -163,10 +163,12 @@ describe Mongoid::Extensions::TimeWithZone do
 
     context "when string is empty" do
 
-      it "raises an error" do
-        expect do
-          ActiveSupport::TimeWithZone.mongoize("")
-        end.to raise_error(Mongoid::Errors::InvalidValue)
+      let(:mongoized) do
+        ActiveSupport::TimeWithZone.mongoize("")
+      end
+
+      it "returns nil" do
+        expect(mongoized).to be_nil
       end
     end
 
@@ -190,10 +192,12 @@ describe Mongoid::Extensions::TimeWithZone do
       end
 
       context "when the string is an invalid time" do
-        it "raises an error" do
-          expect do
-            ActiveSupport::TimeWithZone.mongoize("time")
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        let(:mongoized) do
+          ActiveSupport::TimeWithZone.mongoize("time")
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 

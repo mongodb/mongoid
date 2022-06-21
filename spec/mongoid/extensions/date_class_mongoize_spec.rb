@@ -102,19 +102,19 @@ describe Mongoid::Extensions::Date do
           Date.mongoize("")
         end
 
-        it "raises an error" do
-          expect do
-            evolved
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(evolved).to be_nil
         end
       end
 
       context "when the string is an invalid time" do
 
-        it "raises an error" do
-          expect do
-            Date.mongoize("time")
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        let(:evolved) do
+          Date.mongoize("time")
+        end
+
+        it "returns nil" do
+          expect(evolved).to be_nil
         end
       end
     end
