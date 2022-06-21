@@ -42,7 +42,9 @@ module Mongoid
         # @example Mongoize the object.
         #   BigDecimal.mongoize("123.11")
         #
-        # @return [ String ] The object mongoized.
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ Integer | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           return if object.is_a?(String) && object.blank?

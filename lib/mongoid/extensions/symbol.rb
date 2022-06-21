@@ -36,7 +36,9 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Symbol ] The object mongoized.
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ Symbol | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           demongoize(object).tap do |res|

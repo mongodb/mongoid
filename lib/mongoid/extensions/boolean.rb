@@ -11,7 +11,9 @@ module Mongoid
       # @example Mongoize the object.
       #   Boolean.mongoize("123.11")
       #
-      # @return [ String ] The object mongoized.
+      # @raise [ Errors::InvalidValue ] if the value is uncastable.
+      #
+      # @return [ true | false | nil ] The object mongoized or nil.
       def mongoize(object)
         return if object.nil?
         if object.to_s =~ (/\A(true|t|yes|y|on|1|1.0)\z/i)

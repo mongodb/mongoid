@@ -87,7 +87,7 @@ module Mongoid
       # @example Mongoize the object.
       #   object.mongoize
       #
-      # @return [ Array ] The object.
+      # @return [ Array | nil ] The object or nil.
       def mongoize
         ::Array.mongoize(self)
       end
@@ -144,7 +144,9 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Array ] The object mongoized.
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ Array | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           if object.is_a?(::Array)
