@@ -40,7 +40,6 @@ changed in Mongoid 8.0:
 - ``:legacy_attributes`` => true
 - ``:legacy_pluck_distinct`` => ``false``
 - ``:legacy_triple_equals`` => ``false``
-- ``:map_big_decimal_to_decimal128`` => ``true``
 - ``:object_id_as_json_oid`` => ``false``
 - ``:overwrite_chained_operators`` => ``false``
 

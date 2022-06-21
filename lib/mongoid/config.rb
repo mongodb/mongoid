@@ -76,7 +76,7 @@ module Mongoid
     option :use_utc, default: false
 
     # Store BigDecimals as Decimal128s instead of strings in the db.
-    option :map_big_decimal_to_decimal128, default: true
+    option :map_big_decimal_to_decimal128, default: false
 
     # Update embedded documents correctly when setting it, unsetting it
     # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
@@ -124,6 +124,12 @@ module Mongoid
     # a Hash otherwise. When this flag is false, the attributes method will
     # always return a Hash.
     option :legacy_attributes, default: false
+
+    # When this flag is true, Mongoid will validate the type of the value
+    # retrieved from the db, such that it can be coerced to a value of the field
+    # type. If it is "uncastable," an InvalidDBValue error will be raised. If this
+    # feature flag is off, nil will be returned from the attribute.
+    option :validate_db_attribute_types, default: true
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.

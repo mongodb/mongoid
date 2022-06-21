@@ -267,7 +267,7 @@ describe Mongoid::Config do
 
   context 'when setting the map_big_decimal_to_decimal128 option in the config' do
     let(:option) { :map_big_decimal_to_decimal128 }
-    let(:default) { true }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end
