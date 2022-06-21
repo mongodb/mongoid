@@ -16,7 +16,7 @@ module Mongoid
     #   end
     #
     # It is also possible to limit the uniqueness constraint to a set of
-    # records matching certain conditions:
+    # documents matching certain conditions:
     #   class Person
     #     include Mongoid::Document
     #     field :title
