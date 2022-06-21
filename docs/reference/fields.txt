@@ -1163,6 +1163,11 @@ Attributes can always be read using mass attribute access or ``read_attribute``
   bob.read_attribute(:age)
   # => 42
 
+.. note::
+
+  The values returned from the ``read_attribute`` method, and those stored in
+  the ``attributes`` hash, are the ``mongoized`` values.
+
 
 Special Characters in Field Names
 ---------------------------------
