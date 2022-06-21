@@ -163,7 +163,7 @@ Mongoid 8.0 behavior:
 
 .. code-block:: ruby
 
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1962}).
     any_of({members: 2}, {last_tour: 1995})
   # =>
   # #<Mongoid::Criteria
@@ -173,7 +173,7 @@ Mongoid 8.0 behavior:
   #   class:    Band
   #   embedded: false>
 
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1962}).any_of({members: 2})
   # =>
   # #<Mongoid::Criteria
   #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
@@ -185,7 +185,7 @@ Mongoid 7 behavior:
 
 .. code-block:: ruby
 
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1962}).
     any_of({members: 2}, {last_tour: 1995})
   # =>
   # #<Mongoid::Criteria
@@ -195,7 +195,7 @@ Mongoid 7 behavior:
   #   class:    Band
   #   embedded: false>
 
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1962}).any_of({members: 2})
   # =>
   # #<Mongoid::Criteria
   #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
@@ -221,6 +221,16 @@ This is useful for working with large query results.
 
 The method arguments and behavior of ``pluck_each`` are otherwise
 identical to ``pluck``.
+
+.. code-block:: ruby
+
+  Band.all.pluck_each(:name, 'address.city', :founded) do |name, city, founded|
+    puts "#{name} from #{city} started in #{founded}"
+  end
+  # =>
+  # The Rolling Stones from London started in 1962
+  # The Beatles from Liverpool started in 1960
+  # The Monkees from Los Angeles started in 1966
 
 
 ``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``

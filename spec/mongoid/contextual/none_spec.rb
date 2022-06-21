@@ -54,8 +54,17 @@ describe Mongoid::Contextual::None do
   end
 
   describe "#pluck" do
-    it "returns an empty array" do
-      expect(context.pluck(:id)).to eq([])
+
+    context "when plucking one field" do
+      it "returns an empty array" do
+        expect(context.pluck(:id)).to eq([])
+      end
+    end
+
+    context "when plucking multiple fields" do
+      it "returns an empty array" do
+        expect(context.pluck(:id, :foo)).to eq([])
+      end
     end
   end
 
