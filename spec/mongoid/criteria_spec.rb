@@ -2905,7 +2905,7 @@ describe Mongoid::Criteria do
       Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
     end
 
-    context "when the field is aliased" do
+    context "when picking an aliased field" do
 
       let!(:expensive) do
         Product.create!(price: 100000)
@@ -2922,7 +2922,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "uses the aliases" do
+          it "uses the alias" do
             expect(picked).to eq(100000)
           end
         end
@@ -2931,83 +2931,80 @@ describe Mongoid::Criteria do
 
     context "when the criteria matches" do
 
-      context "when there are no duplicate values" do
+      let(:criteria) do
+        Band.where(:name.exists => true)
+      end
 
-        let(:criteria) do
-          Band.where(:name.exists => true)
-        end
+      let!(:picked) do
+        criteria.pick(:name)
+      end
 
-        let!(:picked) do
-          criteria.pick(:name)
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns the value" do
+          expect(picked).to eq("Depeche Mode")
         end
+      end
+
+      context "when subsequently executing the criteria without a pick" do
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns the value" do
-            expect(picked).to eq("Depeche Mode")
-          end
-        end
-
-        context "when subsequently executing the criteria without a pick" do
-
-          with_config_values :legacy_pluck_distinct, true, false do
-            it "does not limit the fields" do
-              expect(criteria.first.likes).to eq(3)
-            end
-
-            it "does set a result limit" do
-              expect(criteria.to_a.size).to eq(3)
-            end
-          end
-        end
-
-        context 'when the field is a subdocument' do
-
-          let(:criteria) do
-            Band.where(name: 'FKA Twigs')
+          it "does not limit the fields" do
+            expect(criteria.first.likes).to eq(3)
           end
 
-          context 'when a top-level field and a subdocument field are picked' do
-            before do
-              Band.create!(name: 'FKA Twigs')
-              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
-            end
-
-            let(:embedded_pick) do
-              criteria.pick(:name, 'records.name')
-            end
-
-            let(:expected) do
-              ["FKA Twigs", nil]
-            end
-
-            it 'returns the list of top-level field and subdocument values' do
-              expect(embedded_pick).to eq(expected)
-            end
-          end
-
-          context 'when only a subdocument field is picked' do
-
-            before do
-              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
-              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP2') ])
-            end
-
-            let(:embedded_pick) do
-              criteria.pick('records.name')
-            end
-
-            let(:expected) do
-              ["LP1"]
-            end
-
-            it 'returns the list of subdocument value' do
-              expect(embedded_pick).to eq(expected)
-            end
+          it "does set a result limit" do
+            expect(criteria.to_a.size).to eq(3)
           end
         end
       end
 
-      context "when picking multi-fields" do
+      context 'when the field is a subdocument' do
+
+        let(:criteria) do
+          Band.where(name: 'FKA Twigs')
+        end
+
+        context 'when only a subdocument field is picked' do
+
+          before do
+            Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+            Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP2') ])
+          end
+
+          let(:embedded_pick) do
+            criteria.pick('records.name')
+          end
+
+          let(:expected) do
+            ["LP1"]
+          end
+
+          it 'returns the list of subdocument value' do
+            expect(embedded_pick).to eq(expected)
+          end
+        end
+
+        context 'when a top-level field and a subdocument field are picked' do
+          before do
+            Band.create!(name: 'FKA Twigs')
+            Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+          end
+
+          let(:embedded_pick) do
+            criteria.pick(:name, 'records.name')
+          end
+
+          let(:expected) do
+            ["FKA Twigs", nil]
+          end
+
+          it 'returns the list of top-level field and subdocument values' do
+            expect(embedded_pick).to eq(expected)
+          end
+        end
+      end
+
+      context "when picking multiple fields" do
 
         let(:picked) do
           Band.where(:name.exists => true).pick(:name, :likes)
@@ -3034,15 +3031,28 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when picking an aliased field" do
+    context "when picking a field that doesnt exist" do
 
       let(:picked) do
-        Band.all.pick(:id)
+        Band.all.pick(:foo)
       end
 
       with_config_values :legacy_pluck_distinct, true, false do
-        it "returns the field value" do
-          expect(picked).to eq(depeche.id)
+        it "returns nil" do
+          expect(picked).to eq(nil)
+        end
+      end
+    end
+
+    context "when picking multiple fields that don't exist" do
+
+      let(:picked) do
+        Band.all.pick(:foo, :bar)
+      end
+
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns a array of nils" do
+          expect(picked).to eq([nil, nil])
         end
       end
     end
@@ -3056,35 +3066,6 @@ describe Mongoid::Criteria do
       with_config_values :legacy_pluck_distinct, true, false do
         it "returns nil for the field that doesnt exist" do
           expect(picked).to eq([depeche.id, nil])
-        end
-      end
-    end
-
-    context "when picking a field that doesnt exist" do
-
-      context "when pick one field" do
-
-        let(:picked) do
-          Band.all.pick(:foo)
-        end
-
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "returns nil" do
-            expect(picked).to eq(nil)
-          end
-        end
-      end
-
-      context "when pick multiple fields" do
-
-        let(:picked) do
-          Band.all.pick(:foo, :bar)
-        end
-
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a array of nils" do
-            expect(picked).to eq([nil, nil])
-          end
         end
       end
     end
