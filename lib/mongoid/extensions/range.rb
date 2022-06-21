@@ -20,7 +20,7 @@ module Mongoid
       # @example Mongoize the object.
       #   range.mongoize
       #
-      # @return [ Range | nil ] The object mongoized or nil.
+      # @return [ Hash | nil ] The object mongoized or nil.
       def mongoize
         ::Range.mongoize(self)
       end
@@ -63,7 +63,7 @@ module Mongoid
         #
         # @raise [ Errors::InvalidValue ] if the value is uncastable.
         #
-        # @return [ Range | nil ] The object mongoized or nil.
+        # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           case object
