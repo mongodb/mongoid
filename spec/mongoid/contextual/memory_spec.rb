@@ -920,11 +920,11 @@ describe Mongoid::Contextual::Memory do
   describe "#pluck" do
 
     let(:hobrecht) do
-      Address.new(street: "hobrecht")
+      Address.new(street: "hobrecht", number: 213)
     end
 
     let(:friedel) do
-      Address.new(street: "friedel")
+      Address.new(street: "friedel", number: 11)
     end
 
     let(:criteria) do
@@ -937,7 +937,7 @@ describe Mongoid::Contextual::Memory do
       described_class.new(criteria)
     end
 
-    context "when plucking" do
+    context "when plucking a single field" do
 
       let!(:plucked) do
         context.pluck(:street)
@@ -945,6 +945,17 @@ describe Mongoid::Contextual::Memory do
 
       it "returns the values" do
         expect(plucked).to eq([ "hobrecht", "friedel" ])
+      end
+    end
+
+    context "when plucking multiple fields" do
+
+      let!(:plucked) do
+        context.pluck(:street, :number)
+      end
+
+      it "returns the values as an array" do
+        expect(plucked).to eq([ ["hobrecht", 213], ["friedel", 11] ])
       end
     end
 
@@ -969,6 +980,126 @@ describe Mongoid::Contextual::Memory do
 
         it "returns a empty array" do
           expect(plucked).to eq([[], []])
+        end
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.pluck(:foo, :bar)
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
+  end
+
+  describe "#pluck_each" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht", number: 213)
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel", number: 11)
+    end
+
+    let(:criteria) do
+      Address.all.tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when block given" do
+
+      let!(:plucked_values) { [] }
+
+      let!(:plucked) do
+        context.pluck_each(:street) { |value| plucked_values << value }
+      end
+
+      it "returns the context" do
+        expect(plucked).to eq context
+      end
+
+      it "yields values to the block" do
+        expect(plucked_values).to eq([ "hobrecht", "friedel" ])
+      end
+    end
+
+    context "when block not given" do
+
+      let!(:plucked) do
+        context.pluck_each(:street)
+      end
+
+      it "returns an Enumerator" do
+        expect(plucked).to be_an Enumerator
+      end
+
+      it "can yield the values" do
+        expect(plucked.map { |value| value }).to eq([ "hobrecht", "friedel" ])
+      end
+    end
+
+    context "when plucking multiple fields" do
+
+      let!(:plucked_values) { [] }
+
+      let!(:plucked) do
+        context.pluck_each(:street, :number) { |value| plucked_values << value }
+      end
+
+      it "returns the context" do
+        expect(plucked).to eq context
+      end
+
+      it "yields values to the block" do
+        expect(plucked_values).to eq([ ["hobrecht", 213], ["friedel", 11] ])
+      end
+    end
+
+    context "when plucking a field that doesnt exist" do
+
+      let!(:plucked_values) { [] }
+
+      let!(:plucked) do
+        context.pluck_each(*pluck_args) { |value| plucked_values << value }
+      end
+
+      context "when pluck one field" do
+
+        let(:pluck_args) { [:foo] }
+
+        it "returns the context" do
+          expect(plucked).to eq context
+        end
+
+        it "yields the plucked values" do
+          expect(plucked_values).to eq([])
+        end
+      end
+
+      context "when plucking multiple fields" do
+
+        let(:pluck_args) { [:foo, :bar] }
+
+        it "returns the context" do
+          expect(plucked).to eq context
+        end
+
+        it "yields the plucked values" do
+          expect(plucked_values).to eq([[], []])
         end
       end
     end
