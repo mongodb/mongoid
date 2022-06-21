@@ -10,6 +10,10 @@ Callbacks
    :depth: 2
    :class: singlecol
 
+Mongoid implements many of the `ActiveRecord callbacks
+<https://guides.rubyonrails.org/active_record_callbacks.html>`_.
+
+
 Document Callbacks
 ==================
 
