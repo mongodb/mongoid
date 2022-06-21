@@ -111,6 +111,18 @@ module Mongoid
         block_given? ? self : enum
       end
 
+      # Pick the field value(s) from the first result in null context.
+      #
+      # @example Get the first value for null context.
+      #   context.pick(:name)
+      #
+      # @param [ String, Symbol ] *_fields Field(s) to pick.
+      #
+      # @return [ nil ] Nil result.
+      def pick(*_fields)
+        nil
+      end
+
       # Create the new null context.
       #
       # @example Create the new context.

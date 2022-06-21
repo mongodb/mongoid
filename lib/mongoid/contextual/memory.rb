@@ -199,6 +199,21 @@ module Mongoid
         end.compact
       end
 
+      # Pick the field value(s) from the first result in memory.
+      #
+      # @example Get the first value in memory.
+      #   context.pick(:name)
+      #
+      # @param [ String, Symbol ] *fields Field(s) to pick from
+      #   the first result in memory.
+      #
+      # @return [ Array<Object, Array> ] The picked value.
+      #   If the *fields arg contains multiple values,
+      #   an array will be returned with one value per field.
+      def pick(*fields)
+        documents.pick(*fields)
+      end
+
       # Iterate through plucked field values in memory.
       #
       # @example Iterate through the values for null context.

@@ -54,8 +54,17 @@ describe Mongoid::Contextual::None do
   end
 
   describe "#pluck" do
-    it "returns an empty array" do
-      expect(context.pluck(:id)).to eq([])
+
+    context "when plucking one field" do
+      it "returns an empty array" do
+        expect(context.pluck(:id)).to eq([])
+      end
+    end
+
+    context "when plucking multiple fields" do
+      it "returns an empty array" do
+        expect(context.pluck(:id, :foo)).to eq([])
+      end
     end
   end
 
@@ -90,6 +99,21 @@ describe Mongoid::Contextual::None do
 
       it "does not yield any values" do
         expect(plucked.map { |value| value }).to eq([])
+      end
+    end
+  end
+
+  describe "#pick" do
+
+    context "when picking one field" do
+      it "returns nil" do
+        expect(context.pick(:id)).to eq(nil)
+      end
+    end
+
+    context "when picking multiple fields" do
+      it "returns nil" do
+        expect(context.pick(:id, :foo)).to eq(nil)
       end
     end
   end

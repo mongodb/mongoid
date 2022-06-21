@@ -1120,6 +1120,89 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
+  describe "#pick" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht", number: 213)
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel", number: 11)
+    end
+
+    let(:criteria) do
+      Address.all.tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when picking a single field" do
+
+      let!(:picked) do
+        context.pick(:street)
+      end
+
+      it "returns the values" do
+        expect(picked).to eq("hobrecht")
+      end
+    end
+
+    context "when picking multiple fields" do
+
+      let!(:picked) do
+        context.pick(:street, :number)
+      end
+
+      it "returns the values as an array" do
+        expect(picked).to eq(["hobrecht", 213])
+      end
+    end
+
+    context "when picking a field that doesnt exist" do
+
+      context "when picking one field" do
+
+        let(:picked) do
+          context.pick(:foo)
+        end
+
+        it "returns a empty array" do
+          expect(picked).to eq(nil)
+        end
+      end
+
+      context "when picking multiple fields" do
+
+        let(:picked) do
+          context.pick(:foo, :bar)
+        end
+
+        it "returns a empty array" do
+          expect(picked).to eq([nil, nil])
+        end
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.pick(:foo, :bar)
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
+  end
+
   describe '#inc' do
 
     let(:criteria) do

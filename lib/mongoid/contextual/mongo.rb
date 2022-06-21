@@ -455,6 +455,21 @@ module Mongoid
         block_given? ? self : enum
       end
 
+      # Pick the field value(s) from the first result in the database.
+      #
+      # @example Get the first value in the database.
+      #   context.pick(:name)
+      #
+      # @param [ String, Symbol ] *fields Field(s) to pick from
+      #   the first result in the database.
+      #
+      # @return [ Array<Object, Array> ] The picked value.
+      #   If the *fields arg contains multiple values,
+      #   an array will be returned with one value per field.
+      def pick(*_fields)
+        PluckEnumerator.new(klass, view.limit(1), fields).first
+      end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.
