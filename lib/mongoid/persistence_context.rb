@@ -57,7 +57,7 @@ module Mongoid
     # @return [ Mongo::Collection ] The collection for this persistence
     #   context.
     def collection(parent = nil)
-      parent ? parent.collection.with(client_options) : client[collection_name.to_sym]
+      parent ? parent.collection.with(client_options.except(:database)) : client[collection_name.to_sym]
     end
 
     # Get the collection name for this persistence context.
