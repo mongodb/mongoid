@@ -305,13 +305,13 @@ Mongoid 7 behavior:
   end
 
 
-`#pluck` on Embedded Criteria Returns Nil Values
+``#pluck`` on Embedded Criteria Returns Nil Values
 ------------------------------------------------
 
-Mongoid 8 fixes a bug where calling `#pluck` on a Mongoid::Criteria
-for embedded documents discards nil values. This behavior was inconsistent
-with the `#pluck` method in ActiveSupport, and also with how
-`#pluck` works when reading documents from the database.
+Mongoid 8 fixes a bug where calling ``#pluck`` on a Mongoid::Criteria
+for embedded documents discarded nil values. This behavior was
+inconsistent with both the ``#pluck`` method in ActiveSupport and
+with how ``#pluck`` works when reading documents from the database.
 
 The following example illustrates the bug:
 
