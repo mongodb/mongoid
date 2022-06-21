@@ -737,7 +737,7 @@ describe Mongoid::PersistenceContext do
     end
 
     it "persists the update" do
-      User.with(database: database_id_alt) do |klass|
+      User.with("database" => database_id_alt) do |klass|
         expect(klass.find(user._id).name).to eq("2")
       end
     end
