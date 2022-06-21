@@ -360,7 +360,7 @@ No Longer Persisting Documents with Invalid ``belongs_to`` Associations
 In Mongoid 8, if an invalid document is assigned to a ``belongs_to`` association,
 and the base document is saved, if the ``belongs_to`` association had the
 option ``optional: false`` or ``optional`` is unset and the global flag
-``require_belongs_to_by_default`` is true, neither the document nor the
+``belongs_to_required_by_default`` is true, neither the document nor the
 associated document will be persisted. For example, given the following
 models:
 
