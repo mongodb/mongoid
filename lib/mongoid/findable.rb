@@ -39,6 +39,7 @@ module Mongoid
       :min,
       :none,
       :pluck,
+      :pluck_each,
       :read,
       :sum,
       :text_search,
