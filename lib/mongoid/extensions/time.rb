@@ -20,7 +20,7 @@ module Mongoid
       # @example Mongoize the object.
       #   time.mongoize
       #
-      # @return [ Time ] The object mongoized.
+      # @return [ Time | nil ] The object mongoized or nil.
       def mongoize
         ::Time.mongoize(self)
       end
@@ -63,7 +63,9 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Time ] The object mongoized.
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           begin

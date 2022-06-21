@@ -10,7 +10,7 @@ module Mongoid
       # @example Mongoize the object.
       #   object.mongoize
       #
-      # @return [ Object ] The object.
+      # @return [ BSON::Binary | nil ] The object.
       def mongoize
         BSON::Binary.mongoize(self)
       end
@@ -24,8 +24,9 @@ module Mongoid
         #
         # @param [ Object ] object The object to Mongoize
         #
-        # @return [ String | Symbol | BSON::Binary | nil ] A String or Binary
-        #   representing the object or nil.
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ BSON::Binary | nil ] A Binary representing the object or nil.
         def mongoize(object)
           return if object.nil?
           case object

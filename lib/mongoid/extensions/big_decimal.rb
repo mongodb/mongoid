@@ -20,7 +20,7 @@ module Mongoid
       # @example Mongoize the object.
       #   object.mongoize
       #
-      # @return [ Object ] The object.
+      # @return [ String | BSON::Decimal128 | nil ] The object or nil.
       def mongoize
         ::BigDecimal.mongoize(self)
       end
@@ -62,8 +62,11 @@ module Mongoid
         #
         # @param [ Object ] object The object to Mongoize
         #
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
         # @return [ String | BSON::Decimal128 | nil ] A String or Decimal128
-        #   representing the object or nil.
+        #   representing the object or nil. String if Mongoid.map_big_decimal_to_decimal128
+        #   is false, BSON::Decimal128 otherwise.
         def mongoize(object)
           return if object.nil?
           return if object.is_a?(String) && object.blank?

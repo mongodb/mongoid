@@ -34,7 +34,9 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ String ] The object mongoized.
+        # @raise [ Errors::InvalidValue ] if the value is uncastable.
+        #
+        # @return [ Float | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
           return if object.is_a?(String) && object.blank?
