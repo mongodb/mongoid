@@ -2210,6 +2210,24 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           end
         end
       end
+
+      context "when modifying the document beforehand" do
+        let(:parent) { EmmParent.new }
+
+        before do
+
+          parent.blocks << EmmBlock.new(name: 'test', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[0].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "deletes the parent in the database" do
+          expect(parent.reload.blocks.length).to eq(0)
+        end
+      end
     end
   end
 

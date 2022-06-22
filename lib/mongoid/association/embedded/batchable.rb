@@ -58,10 +58,10 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to remove.
         # @param [ Symbol ] method Delete or destroy.
         def batch_remove(docs, method = :delete)
-          removals = pre_process_batch_remove(docs, method)
+          removal_ids = pre_process_batch_remove(docs, method).pluck("_id")
           if !docs.empty?
             collection.find(selector).update_one(
-              positionally(selector, "$pullAll" => { path => removals }),
+              positionally(selector, "$pull" => { path => { "_id" => { "$in" => removal_ids } } }),
               session: _session
             )
             post_process_batch_remove(docs, method)
