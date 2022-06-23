@@ -2224,7 +2224,62 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           parent.blocks.destroy_all(:name => 'test')
         end
 
-        it "deletes the parent in the database" do
+        it "deletes the correct document in the database" do
+          expect(parent.reload.blocks.length).to eq(0)
+        end
+      end
+
+      context "when nil _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test2', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "deletes only the matching documents in the database" do
+          expect(parent.reload.blocks.length).to eq(1)
+        end
+      end
+
+      # Since without an _id field we must us a $pullAll with the attributes of
+      # the embedded document, if you modify it beforehand, the query will not
+      # be able to find the correct document to pull.
+      context "when modifying the document with nil _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test2', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[0].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "does not delete the correct documents" do
+          expect(parent.reload.blocks.length).to eq(2)
+        end
+      end
+
+      context "when documents with and without _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(name: 'test', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[1].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "does not delete the correct documents" do
           expect(parent.reload.blocks.length).to eq(0)
         end
       end

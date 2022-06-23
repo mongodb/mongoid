@@ -50,7 +50,7 @@ module Mongoid
           _unscoped.clear
         end
 
-        # Batch remove the provided documents as a $pullAll.
+        # Batch remove the provided documents as a $pullAll or $pull.
         #
         # @example Batch remove the documents.
         #   batchable.batch_remove([ doc_one, doc_two ])
@@ -58,12 +58,28 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to remove.
         # @param [ Symbol ] method Delete or destroy.
         def batch_remove(docs, method = :delete)
-          removal_ids = pre_process_batch_remove(docs, method).pluck("_id")
-          if !docs.empty?
-            collection.find(selector).update_one(
-              positionally(selector, "$pull" => { path => { "_id" => { "$in" => removal_ids } } }),
-              session: _session
-            )
+          # If the _id is nil, we cannot use $pull and delete by searching for
+          # the id. Therefore we have to user pullAll with the documents
+          # attributes.
+          pulls, pull_alls = pre_process_batch_remove(docs, method).partition do |o|
+            o.key?("_id") && !o["_id"].nil?
+          end
+
+          if !pulls.empty? || !pull_alls.empty?
+            if !pulls.empty?
+              collection.find(selector).update_one(
+                positionally(selector, "$pull" => { path => { "_id" => { "$in" => pulls.pluck("_id") } } }),
+                session: _session
+              )
+            end
+
+            if !pull_alls.empty?
+              collection.find(selector).update_one(
+                positionally(selector, "$pullAll" => { path => pull_alls }),
+                session: _session
+              )
+            end
+
             post_process_batch_remove(docs, method)
           else
             collection.find(selector).update_one(
