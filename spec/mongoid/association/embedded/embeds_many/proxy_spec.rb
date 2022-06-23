@@ -3964,15 +3964,21 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     let(:congress) { EmmCongress.create! }
 
     before do
-      congress.legislators << EmmLegislator.new(_id: nil)
-      congress.legislators << EmmLegislator.new(_id: nil)
+      congress.legislators << EmmLegislator.new(_id: nil, a: 1)
+      congress.legislators << EmmLegislator.new(_id: nil, a: 2)
 
-      congress.legislators.first.destroy
-      congress.reload
+      congress.legislators[0].destroy
+    end
+
+    it "deletes the correct document locally" do
+      pending "MONGOID-5394"
+      expect(congress.legislators.length).to eq(1)
+      expect(congress.legislators.first.a).to eq(1)
     end
 
     it "only deletes the one document" do
-      expect(congress.legislators.length).to eq(1)
+      pending "MONGOID-5394"
+      expect(congress.reload.legislators.length).to eq(1)
     end
   end
 
