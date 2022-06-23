@@ -65,7 +65,12 @@ module Mongoid
             o.key?("_id") && !o["_id"].nil?
           end
 
-          if !pulls.empty? || !pull_alls.empty?
+          if !_base.persisted?
+            post_process_batch_remove(docs, method) unless docs.empty?
+            return reindex
+          end
+
+          if !docs.empty?
             if !pulls.empty?
               collection.find(selector).update_one(
                 positionally(selector, "$pull" => { path => { "_id" => { "$in" => pulls.pluck("_id") } } }),
