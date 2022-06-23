@@ -72,14 +72,12 @@ module Mongoid
                 session: _session
               )
             end
-
             if !pull_alls.empty?
               collection.find(selector).update_one(
                 positionally(selector, "$pullAll" => { path => pull_alls }),
                 session: _session
               )
             end
-
             post_process_batch_remove(docs, method)
           else
             collection.find(selector).update_one(
