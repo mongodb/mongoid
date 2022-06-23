@@ -3960,6 +3960,22 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
+  context "when destroying a document with multiple nil _ids" do
+    let(:congress) { EmmCongress.create! }
+
+    before do
+      congress.legislators << EmmLegislator.new(_id: nil)
+      congress.legislators << EmmLegislator.new(_id: nil)
+
+      congress.legislators.first.destroy
+      congress.reload
+    end
+
+    it "only deletes the one document" do
+      expect(congress.legislators.length).to eq(1)
+    end
+  end
+
   context "when adding a document" do
 
     let(:person) do
