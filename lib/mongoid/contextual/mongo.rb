@@ -499,7 +499,15 @@ module Mongoid
 
         collection.aggregate(pipeline).reduce({}) do |tallies, doc|
           is_translation = "#{name}_translations" == field_name.to_s
-          key = demongoize_with_field(field, doc["_id"], is_translation)
+          val = doc["_id"]
+
+          key = if val.is_a?(Array)
+            val.map do |v|
+              demongoize_with_field(field, v, is_translation)
+            end
+          else
+            demongoize_with_field(field, val, is_translation)
+          end
 
           # The only time where a key will already exist in the tallies hash
           # is when the values are stored differently in the database, but
@@ -846,16 +854,14 @@ module Mongoid
       # @api private
       def demongoize_with_field(field, value, is_translation)
         if field
-          # If it's a localized field that's not a hash or an array, don't demongoize
+          # If it's a localized field that's not a hash, don't demongoize
           # again, we already have the translation. If it's an _translations
           # field, don't demongoize, we want the full hash not just a
           # specific translation.
-          # If it is a hash or array, and it's not a transaltions field, we
-          # need to demongoize to get the correct translation.
-          if field.localized? && (!(value.is_a?(Hash) || value.is_a?(Array)) || is_translation)
+          # If it is a hash, and it's not a transaltions field, we need to
+          # demongoize to get the correct translation.
+          if field.localized? && (!value.is_a?(Hash) || is_translation)
             value.class.demongoize(value)
-          elsif value.is_a?(Array)
-            value.map { |v| field.demongoize(v) }
           else
             field.demongoize(value)
           end
