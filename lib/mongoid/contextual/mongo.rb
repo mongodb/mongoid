@@ -454,13 +454,51 @@ module Mongoid
         end
       end
 
-      def tally(field)
-        name = klass.cleanse_localized_field_names(field)
+      # Get a hash of counts for the values of a single field. For example,
+      # if the following documents were in the database:
+      #
+      #   { _id: 1, age: 21 }
+      #   { _id: 2, age: 21 }
+      #   { _id: 3, age: 22 }
+      #
+      #   Model.tally("age")
+      #
+      # would yield the following result:
+      #
+      #   { 21 => 2, 22 => 1 }
+      #
+      # When tallying a field inside an array or embeds many association:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 }] }
+      #   { _id: 2, array: [ { x: 1 }, { x: 2 }] }
+      #   { _id: 3, array: [ { x: 1 }, { x: 3 }] }
+      #
+      #   Model.tally("array.x")
+      #
+      # The keys of the resulting hash are arrays:
+      #
+      #   { [ 1, 2 ] => 2, [ 1, 3 ] => 1 }
+      #
+      # Note that if tallying an element in an array of hashes, and the key
+      # doesn't exist in some of the documents, tally will not include those
+      # nil keys in the resulting hash:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 }, { y: 3 } ] }
+      #
+      #   Model.tally("array.x")
+      #   # => { [ 1, 2 ] => 1 }
+      #
+      # @param [ String | Symbol ] field_name The field name.
+      #
+      # @return [ Hash ] The hash of counts.
+      def tally(field_name)
+        name = klass.cleanse_localized_field_names(field_name)
 
         field, pipeline = build_tally_pipeline(name)
+        pipeline.unshift("$match" => view.filter) unless view.filter.blank?
 
-        view.aggregate(pipeline).reduce({}) do |tallies, doc|
-          is_translation = "#{name}_translations" == field.to_s
+        collection.aggregate(pipeline).reduce({}) do |tallies, doc|
+          is_translation = "#{name}_translations" == field_name.to_s
           key = demongoize_with_field(field, doc["_id"], is_translation)
 
           # The only time where a key will already exist in the tallies hash
@@ -804,14 +842,20 @@ module Mongoid
       #   _translations field.
       #
       # @return [ Object ] The demongoized value.
+      #
+      # @api private
       def demongoize_with_field(field, value, is_translation)
         if field
-          # If it's a localized field that's not a hash, don't demongoize
+          # If it's a localized field that's not a hash or an array, don't demongoize
           # again, we already have the translation. If it's an _translations
           # field, don't demongoize, we want the full hash not just a
           # specific translation.
-          if field.localized? && (!value.is_a?(Hash) || is_translation)
+          # If it is a hash or array, and it's not a transaltions field, we
+          # need to demongoize to get the correct translation.
+          if field.localized? && (!(value.is_a?(Hash) || value.is_a?(Array)) || is_translation)
             value.class.demongoize(value)
+          elsif value.is_a?(Array)
+            value.map { |v| field.demongoize(v) }
           else
             field.demongoize(value)
           end
@@ -821,8 +865,8 @@ module Mongoid
       end
 
       # If there are arrays or embeds_many associations we need to unwind each
-      # of them and group the results. The unwind key is built up from the base
-      # document. Take the following example:
+      # of them and group the results, except for the last one. The unwind key
+      # is built up from the base document. Take the following example:
       #
       #   User embeds_many Accounts
       #   Account embeds_one Holding
@@ -835,9 +879,26 @@ module Mongoid
       #   { $unwind: { path: "$accounts.holding.assets" } }
       #   { $group: { _id: "$accounts.holding.assets.name" } }
       #
+      # We don't unwind the last embeds_many/array so that the results come
+      # back in array form. Meaning, if we had the following documents:
+      #
+      #   { _id: 1, ages: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 2, ages: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 3, ages: [ { x: 1 }, { x: 3 } ] }
+      #
+      # and we tally on `ages.x`, I expect the results to be:
+      #
+      #   [1, 2] => 2
+      #   [1, 3] => 1
+      #
+      # If you unwind ages, then the result you get has integer keys instead
+      # of array keys: `{ 1 => 3, 2 => 2, 3 => 1 }`
+      #
       # @param [ String ] name The field name.
       # @return [ Array<Field, Array<Hash>> ] The field for the given field name
       #   and the built pipeline.
+      #
+      # @api private
       def build_tally_pipeline(name)
         current = ""
         pipeline = []
@@ -848,16 +909,14 @@ module Mongoid
           current += meth
 
           if (is_field && obj.type == Array) || (!is_field && obj.is_a?(Association::Embedded::EmbedsMany))
-            if i < num_meths
-              pipeline.push({ "$unwind": { path: "$#{current}" }})
-            end
+            pipeline.push({ "$unwind": { path: "$#{current}" }})
           end
 
           i += 1
         end
-
+        # Get rid of the last unwind so that results come in array form.
+        pipeline.pop
         pipeline.push( { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } })
-
         [ field, pipeline ]
       end
     end

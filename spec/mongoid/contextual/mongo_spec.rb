@@ -814,13 +814,25 @@ describe Mongoid::Contextual::Mongo do
   end
 
   describe "#tally" do
+    let(:fans1) { [ Fanatic.new(age:1), Fanatic.new(age:2) ] }
+    let(:fans2) { [ Fanatic.new(age:1), Fanatic.new(age:2) ] }
+    let(:fans3) { [ Fanatic.new(age:1), Fanatic.new(age:3) ] }
+
+    let(:genres1) { [ { x: 1, y: { z: 1 } }, { x: 2, y: { z: 2 } }, { y: 3 } ]}
+    let(:genres2) { [ { x: 1, y: { z: 1 } }, { x: 2, y: { z: 2 } }, { y: 4 } ]}
+    let(:genres3) { [ { x: 1, y: { z: 1 } }, { x: 3, y: { z: 3 } }, { y: 5 } ]}
+
+    let(:label1) {  Label.new(name: "Atlantic") }
+    let(:label2) {  Label.new(name: "Atlantic") }
+    let(:label3) {  Label.new(name: "Columbia") }
+
     before do
-      Band.create!(origin: "tally", name: "Depeche Mode", years: 30, sales: "1E2", label: Label.new(name: "Atlantic"))
-      Band.create!(origin: "tally", name: "New Order", years: 30, sales: "2E3", label: Label.new(name: "Atlantic"))
-      Band.create!(origin: "tally", name: "10,000 Maniacs", years: 30, sales: "1E2", label: Label.new(name: "Columbia"))
-      Band.create!(origin: "tally2", labels: [Label.new(age:1), Label.new(age:2)])
-      Band.create!(origin: "tally2", labels: [Label.new(age:1), Label.new(age:2)])
-      Band.create!(origin: "tally2", labels: [Label.new(age:1), Label.new(age:3)])
+      Band.create!(origin: "tally", name: "Depeche Mode", years: 30, sales: "1E2", label: label1, genres: genres1)
+      Band.create!(origin: "tally", name: "New Order", years: 30, sales: "2E3", label: label2, genres: genres2)
+      Band.create!(origin: "tally", name: "10,000 Maniacs", years: 30, sales: "1E2", label: label3, genres: genres3)
+      Band.create!(origin: "tally2", fanatics: fans1, genres: [1, 2])
+      Band.create!(origin: "tally2", fanatics: fans2, genres: [1, 2])
+      Band.create!(origin: "tally2", fanatics: fans3, genres: [1, 3])
     end
 
     let(:criteria) { Band.where(origin: "tally") }
@@ -890,7 +902,7 @@ describe Mongoid::Contextual::Mongo do
           Dictionary.tally("description.de")
         end
 
-        it "returns the translation for the the specifiec locale" do
+        it "returns the translation for the the specific locale" do
           expect(tallied).to eq("de1" => 2, "de2" => 1, "de3" => 1)
         end
       end
@@ -910,6 +922,66 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
+    context "when tallying an embedded localized field" do
+
+      before do
+        I18n.locale = :en
+        address1a = Address.new(name: "en1")
+        address1b = Address.new(name: "en2")
+        address2a = Address.new(name: "en1")
+        address2b = Address.new(name: "en3")
+        I18n.locale = :de
+        address1a.name = "de1"
+        address1b.name = "de2"
+        address2a.name = "de1"
+        address2b.name = "de3"
+        Person.create!(addresses: [ address1a, address1b ])
+        Person.create!(addresses: [ address2a, address2b ])
+
+        I18n.locale = :en
+      end
+
+      context "when getting the demongoized field" do
+        let(:tallied) do
+          Person.tally("addresses.name")
+        end
+
+        it "returns the translation for the current locale" do
+          expect(tallied).to eq(
+            [ "en1", "en2" ] => 1,
+            [ "en1", "en3" ] => 1,
+          )
+        end
+      end
+
+      context "when getting a specific locale" do
+        let(:tallied) do
+          Person.tally("addresses.name.de")
+        end
+
+        it "returns the translation for the the specific locale" do
+          expect(tallied).to eq(
+            [ "de1", "de2" ] => 1,
+            [ "de1", "de3" ] => 1,
+          )
+        end
+      end
+
+      context "when getting the full hash" do
+        let(:tallied) do
+          Person.tally("addresses.name_translations")
+        end
+
+        it "returns the correct hash" do
+          expect(tallied).to eq(
+            [{ "de" => "de1", "en" => "en1" }, { "de" => "de2", "en" => "en2" }] => 1,
+            [{ "de" => "de1", "en" => "en1" }, { "de" => "de3", "en" => "en3" }] => 1,
+          )
+        end
+      end
+
+    end
+
     context "when tallying an embedded field" do
       let(:tally) do
         criteria.tally("label.name")
@@ -924,7 +996,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("labels.age")
+        criteria.tally("fanatics.age")
       end
 
       it "returns the correct hash" do
@@ -939,7 +1011,23 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("labels")
+        criteria.tally("fanatics")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          fans1.map(&:attributes) => 1,
+          fans2.map(&:attributes) => 1,
+          fans3.map(&:attributes) => 1,
+        )
+      end
+    end
+
+    context "when tallying a field of type array" do
+      let(:criteria) { Band.where(origin: "tally2") }
+
+      let(:tally) do
+        criteria.tally("genres")
       end
 
       it "returns the correct hash" do
@@ -950,175 +1038,108 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    ## PASTING - Finish testing tally
-    # context "when querying an embeds_many association" do
-    #   let(:criteria) do
-    #     Band.where("labels" => 10..15)
-    #   end
+    context "when tallying an element from an array of hashes" do
+      let(:criteria) { Band.where(origin: "tally") }
 
-    #   it "correctly uses elemMatch without an inner key" do
-    #     expect(criteria.selector).to eq(
-    #       "labels" => {
-    #         "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
-    #       }
-    #     )
-    #   end
-    # end
+      let(:tally) do
+        criteria.tally("genres.x")
+      end
 
-    # context "when querying an element in an embeds_many association" do
-    #   let(:criteria) do
-    #     Band.where("labels.age" => 10..15)
-    #   end
+      it "returns the correct hash without the nil keys" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
 
-    #   it "correctly uses elemMatch" do
-    #     expect(criteria.selector).to eq(
-    #       "labels" => {
-    #         "$elemMatch" => {
-    #           "age" => { "$gte" => 10, "$lte" => 15 }
-    #         }
-    #       }
-    #     )
-    #   end
-    # end
+    context "when tallying an aliased field of type array" do
 
-    # context "when querying a field of type array" do
-    #   let(:criteria) do
-    #     Band.where("genres" => 10..15)
-    #   end
+      before do
+        Person.create(array: [ 1, 2 ])
+        Person.create(array: [ 1, 3 ])
+      end
 
-    #   it "correctly uses elemMatch without an inner key" do
-    #     expect(criteria.selector).to eq(
-    #       "genres" => {
-    #         "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
-    #       }
-    #     )
-    #   end
-    # end
+      let(:tally) do
+        Person.tally("array")
+      end
 
-    # context "when querying an aliased field of type array" do
-    #   let(:criteria) do
-    #     Person.where("array" => 10..15)
-    #   end
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 1,
+          [1, 3] => 1
+        )
+      end
+    end
 
-    #   it "correctly uses the aliased field and elemMatch" do
-    #     expect(criteria.selector).to eq(
-    #       "a" => {
-    #         "$elemMatch" => { "$gte" => 10, "$lte" => 15 }
-    #       }
-    #     )
-    #   end
-    # end
+    context "when going multiple levels deep in arrays" do
+      let(:criteria) { Band.where(origin: "tally") }
 
-    # context "when querying a field inside an array" do
-    #   let(:criteria) do
-    #     Band.where("genres.age" => 10..15)
-    #   end
+      let(:tally) do
+        criteria.tally("genres.y.z")
+      end
 
-    #   it "correctly uses elemMatch" do
-    #     expect(criteria.selector).to eq(
-    #       "genres" => {
-    #         "$elemMatch" => {
-    #           "age" => { "$gte" => 10, "$lte" => 15 }
-    #         }
-    #       }
-    #     )
-    #   end
-    # end
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
 
-    # context "when there are no embeds_manys or Arrays" do
-    #   let(:criteria) do
-    #     Band.where("fans.info.age" => 10..15)
-    #   end
+    context "when going multiple levels deep in an array" do
+      let(:criteria) { Band.where(origin: "tally") }
 
-    #   it "does not use elemMatch" do
-    #     expect(criteria.selector).to eq(
-    #       "fans.info.age" => { "$gte" => 10, "$lte" => 15 }
-    #     )
-    #   end
-    # end
+      let(:tally) do
+        criteria.tally("genres.y.z")
+      end
 
-    # context "when querying a nested element in an embeds_many association" do
-    #   let(:criteria) do
-    #     Band.where("labels.age.number" => 10..15)
-    #   end
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
 
-    #   it "correctly uses elemMatch" do
-    #     expect(criteria.selector).to eq(
-    #       "labels" => {
-    #         "$elemMatch" => {
-    #           "age.number" => { "$gte" => 10, "$lte" => 15 }
-    #         }
-    #       }
-    #     )
-    #   end
-    # end
+    context "when querying a deeply nested arrays/embedded associations" do
 
-    # context "when querying a nested element in an Array" do
-    #   let(:criteria) do
-    #     Band.where("genres.name.length" => 10..15)
-    #   end
+      before do
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
 
-    #   it "correctly uses elemMatch" do
-    #     expect(criteria.selector).to eq(
-    #       "genres" => {
-    #         "$elemMatch" => {
-    #           "name.length" => { "$gte" => 10, "$lte" => 15 }
-    #         }
-    #       }
-    #     )
-    #   end
-    # end
+      let(:tally) do
+        Person.tally("addresses.code.deepest.array.y.z")
+      end
 
-    # context "when querying a nested element in a nested embeds_many association" do
-    #   context "when the outer association is an embeds_many" do
-    #     let(:criteria) do
-    #       Band.where("records.tracks.name.length" => 10..15)
-    #     end
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
 
-    #     it "correctly uses elemMatch" do
-    #       expect(criteria.selector).to eq(
-    #         "records.tracks" => {
-    #           "$elemMatch" => {
-    #             "name.length" => { "$gte" => 10, "$lte" => 15 }
-    #           }
-    #         }
-    #       )
-    #     end
-    #   end
+    context "when the first element is an embeds_one" do
+      before do
+        Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 2) ]))
+        Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 2) ]))
+        Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 3) ]))
+      end
 
-    #   context "when the outer association is an embeds_one" do
-    #     let(:criteria) do
-    #       Person.where("name.translations.language.length" => 10..15)
-    #     end
+      let(:tally) do
+        Person.tally("name.translations.language")
+      end
 
-    #     it "correctly uses elemMatch" do
-    #       expect(criteria.selector).to eq(
-    #         "name.translations" => {
-    #           "$elemMatch" => {
-    #             "language.length" => { "$gte" => 10, "$lte" => 15 }
-    #           }
-    #         }
-    #       )
-    #     end
-    #   end
-    # end
-
-    # context "when querying a deeply nested array" do
-    #   let(:criteria) do
-    #     Person.where("addresses.code.deepest.array.element.item" => 10..15)
-    #   end
-
-    #   it "correctly uses elemMatch" do
-    #     expect(criteria.selector).to eq(
-    #       "addresses.code.deepest.array" => {
-    #         "$elemMatch" => {
-    #           "element.item" => { "$gte" => 10, "$lte" => 15 }
-    #         }
-    #       }
-    #     )
-    #   end
-    # end
-    ## END PASTE
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
   end
 
   describe "#each" do
