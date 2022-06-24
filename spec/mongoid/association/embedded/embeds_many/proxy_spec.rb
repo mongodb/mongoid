@@ -4835,4 +4835,29 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       expect(School.count).to eq(0)
     end
   end
+
+  context "when doing assign_attributes then assignment" do
+
+    let(:post) do
+      EmmPost.create!(
+        company_tags: [ EmmCompanyTag.new(title: "1"), EmmCompanyTag.new(title: "1") ],
+        user_tags: [ EmmUserTag.new(title: "1"), EmmUserTag.new(title: "1") ]
+      )
+    end
+
+    let(:from_db) { EmmPost.find(post.id) }
+
+    before do
+      post.assign_attributes(
+        company_tags: [ EmmCompanyTag.new(title: '3'), EmmCompanyTag.new(title: '4') ]
+      )
+      post.user_tags = [ EmmUserTag.new(title: '3'), EmmUserTag.new(title: '4') ]
+      post.save!
+    end
+
+    it "persists the associations correctly" do
+      expect(from_db.user_tags.size).to eq(2)
+      expect(from_db.company_tags.size).to eq(2)
+    end
+  end
 end
