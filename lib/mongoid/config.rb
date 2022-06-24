@@ -76,7 +76,7 @@ module Mongoid
     option :use_utc, default: false
 
     # Store BigDecimals as Decimal128s instead of strings in the db.
-    option :map_big_decimal_to_decimal128, default: false
+    option :map_big_decimal_to_decimal128, default: true
 
     # Update embedded documents correctly when setting it, unsetting it
     # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
