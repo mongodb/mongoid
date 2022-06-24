@@ -305,7 +305,7 @@ Mongoid 7 behavior:
   end
 
 
-``#pluck`` on Embedded Criteria Returns Nil Values
+``#pluck`` on Embedded Criteria Returns ``nil`` Values
 ------------------------------------------------
 
 Mongoid 8 fixes a bug where calling ``#pluck`` on a Mongoid::Criteria
