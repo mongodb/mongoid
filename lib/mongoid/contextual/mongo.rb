@@ -467,11 +467,11 @@ module Mongoid
       #
       #   { 21 => 2, 22 => 1 }
       #
-      # When tallying a field inside an array or embeds many association:
+      # When tallying a field inside an array or embeds_many association:
       #
-      #   { _id: 1, array: [ { x: 1 }, { x: 2 }] }
-      #   { _id: 2, array: [ { x: 1 }, { x: 2 }] }
-      #   { _id: 3, array: [ { x: 1 }, { x: 3 }] }
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 2, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 3, array: [ { x: 1 }, { x: 3 } ] }
       #
       #   Model.tally("array.x")
       #
@@ -480,7 +480,7 @@ module Mongoid
       #   { [ 1, 2 ] => 2, [ 1, 3 ] => 1 }
       #
       # Note that if tallying an element in an array of hashes, and the key
-      # doesn't exist in some of the documents, tally will not include those
+      # doesn't exist in some of the hashes, tally will not include those
       # nil keys in the resulting hash:
       #
       #   { _id: 1, array: [ { x: 1 }, { x: 2 }, { y: 3 } ] }
@@ -871,7 +871,7 @@ module Mongoid
       end
 
       # If there are arrays or embeds_many associations we need to unwind each
-      # of them and group the results, except for the last one. The unwind key
+      # of them, except for the last one, and group the results. The unwind key
       # is built up from the base document. Take the following example:
       #
       #   User embeds_many Accounts
@@ -882,7 +882,6 @@ module Mongoid
       # will be built:
       #
       #   { $unwind: { path: "$accounts" } }
-      #   { $unwind: { path: "$accounts.holding.assets" } }
       #   { $group: { _id: "$accounts.holding.assets.name" } }
       #
       # We don't unwind the last embeds_many/array so that the results come
@@ -898,7 +897,8 @@ module Mongoid
       #   [1, 3] => 1
       #
       # If you unwind ages, then the result you get has integer keys instead
-      # of array keys: `{ 1 => 3, 2 => 2, 3 => 1 }`
+      # of array keys: { 1 => 3, 2 => 2, 3 => 1 }, which is not the correct
+      # functionality.
       #
       # @param [ String ] name The field name.
       # @return [ Array<Field, Array<Hash>> ] The field for the given field name
