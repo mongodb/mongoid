@@ -927,13 +927,9 @@ describe Mongoid::Contextual::Memory do
       Address.new(street: "friedel")
     end
 
-    let(:empty_doc) do
-      Address.new(street: nil)
-    end
-
     let(:criteria) do
       Address.all.tap do |crit|
-        crit.documents = [ hobrecht, friedel, empty_doc ]
+        crit.documents = [ hobrecht, friedel ]
       end
     end
 
@@ -942,6 +938,27 @@ describe Mongoid::Contextual::Memory do
     end
 
     context "when plucking" do
+
+      let!(:plucked) do
+        context.pluck(:street)
+      end
+
+      it "returns the values" do
+        expect(plucked).to eq([ "hobrecht", "friedel" ])
+      end
+    end
+
+    context "when plucking a mix of empty and non-empty values" do
+
+      let(:empty_doc) do
+        Address.new(street: nil)
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel, empty_doc ]
+        end
+      end
 
       let!(:plucked) do
         context.pluck(:street)
@@ -961,7 +978,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns a empty array" do
-          expect(plucked).to eq([nil, nil, nil])
+          expect(plucked).to eq([nil, nil])
         end
       end
 
@@ -972,7 +989,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns a empty array" do
-          expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
+          expect(plucked).to eq([[nil, nil], [nil, nil]])
         end
       end
     end
