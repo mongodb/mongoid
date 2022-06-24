@@ -313,7 +313,7 @@ for embedded documents discarded nil values. This behavior was
 inconsistent with both the ``#pluck`` method in ActiveSupport and
 with how ``#pluck`` works when reading documents from the database.
 
-The following example illustrates the bug:
+The following example illustrates the behavior change:
 
 .. code-block:: ruby
 
@@ -337,16 +337,16 @@ The following example illustrates the bug:
 
   # Pluck from database
   Mall.all.pluck('addresses.street')
-    #=> Correct: Mongoid 7 and 8 both return [ ['Elm Street', nil] ]
+    #=> Mongoid 7 and 8 both return [ ['Elm Street', nil] ]
 
   # Pluck using ActiveSupport Array#pluck
   mall.addresses.pluck(:street)
-    #=> Correct: Mongoid 7 and 8 both return ['Elm Street', nil]
+    #=> Mongoid 7 and 8 both return ['Elm Street', nil]
 
   # Pluck from embedded document criteria
   mall.addresses.all.pluck(:street)
-    #=> Bug: Mongoid 7 returns ['Elm Street']
-    #=> Correct: Mongoid 8 returns ['Elm Street', nil]
+    #=> Mongoid 7 returns ['Elm Street']
+    #=> Mongoid 8 returns ['Elm Street', nil]
 
 
 Removed ``:drop_dups`` Option from Indexes
