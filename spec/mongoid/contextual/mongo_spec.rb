@@ -1140,6 +1140,43 @@ describe Mongoid::Contextual::Mongo do
         )
       end
     end
+
+    context "when tallying demongoizable values from typeless fields" do
+
+      let!(:person1) { Person.create!(ssn: /hello/) }
+      let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
+      let(:tally) { Person.tally("ssn") }
+
+      context "< BSON 5" do
+        max_bson_version '4.99.99'
+
+        it "stores the correct types in the database" do
+          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
+          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+        end
+
+        it "tallies the correct type" do
+          tally.keys.map(&:class).sort do |a,b|
+            a.to_s <=> b.to_s
+          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+        end
+      end
+
+      context ">= BSON 5" do
+        min_bson_version "5.0"
+
+        it "stores the correct types in the database" do
+          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
+          Person.find(person2.id).ssn.should be_a BigDeimal
+        end
+
+        it "tallies the correct type" do
+          tally.keys.map(&:class).sort do |a,b|
+            a.to_s <=> b.to_s
+          end.should == [BigDecimal, BSON::Regexp::Raw]
+        end
+      end
+    end
   end
 
   describe "#each" do
