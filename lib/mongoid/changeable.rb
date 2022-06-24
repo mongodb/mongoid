@@ -62,7 +62,7 @@ module Mongoid
 
     # Call this method after save, so the changes can be properly switched.
     #
-    # This will unset the memoized children array, set new record to
+    # This will unset the memoized children array, set new record flag to
     # false, set the document as validated, and move the dirty changes.
     #
     # @example Move the changes to previous.
