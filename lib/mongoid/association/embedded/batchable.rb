@@ -59,7 +59,7 @@ module Mongoid
         # @param [ Symbol ] method Delete or destroy.
         def batch_remove(docs, method = :delete)
           # If the _id is nil, we cannot use $pull and delete by searching for
-          # the id. Therefore we have to user pullAll with the documents
+          # the id. Therefore we have to use pullAll with the documents'
           # attributes.
           removals = pre_process_batch_remove(docs, method)
           pulls, pull_alls = removals.partition { |o| !o["_id"].nil? }
