@@ -313,7 +313,7 @@ for embedded documents discarded nil values. This behavior was
 inconsistent with both the ``#pluck`` method in ActiveSupport and
 with how ``#pluck`` works when reading documents from the database.
 
-Mongoid 8 behavior:
+Mongoid 8.0 behavior:
 
 .. code-block:: ruby
 
@@ -339,7 +339,7 @@ Mongoid 8 behavior:
   mall.addresses.all.pluck(:street)
     #=> ['Elm Street', nil]
 
-Given the same setup, Mongoid 7 has the following behavior:
+Mongoid 7 behavior, given the same setup:
 
 .. code-block:: ruby
 
@@ -358,10 +358,6 @@ For clarity, the following behavior is unchanged from Mongoid 7 to Mongoid 8.0:
   # Pluck using ActiveSupport Array#pluck
   mall.addresses.pluck(:street)
     #=> ['Elm Street', nil]
-
-  # Pluck from embedded document criteria
-  mall.addresses.all.pluck(:street)
-    #=> ['Elm Street']
 
 
 Removed ``:drop_dups`` Option from Indexes
