@@ -61,9 +61,8 @@ module Mongoid
           # If the _id is nil, we cannot use $pull and delete by searching for
           # the id. Therefore we have to user pullAll with the documents
           # attributes.
-          pulls, pull_alls = pre_process_batch_remove(docs, method).partition do |o|
-            o.key?("_id") && !o["_id"].nil?
-          end
+          removals = pre_process_batch_remove(docs, method)
+          pulls, pull_alls = removals.partition { |o| !o["_id"].nil? }
 
           if !_base.persisted?
             post_process_batch_remove(docs, method) unless docs.empty?
