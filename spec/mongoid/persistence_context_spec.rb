@@ -718,4 +718,28 @@ describe Mongoid::PersistenceContext do
       end
     end
   end
+
+  context "when using an alternate database to update a document" do
+    let(:user) do
+      User.new(name: '1')
+    end
+
+    before do
+      user.with(database: database_id_alt) do |u|
+        u.save!
+      end
+
+      expect do
+        user.with(database: database_id_alt) do |u|
+          u.update(name:'2')
+        end
+      end.to_not raise_error
+    end
+
+    it "persists the update" do
+      User.with("database" => database_id_alt) do |klass|
+        expect(klass.find(user._id).name).to eq("2")
+      end
+    end
+  end
 end
