@@ -123,6 +123,30 @@ module Mongoid
       alias :one :first
       alias :find_first :first
 
+      # Invoke the block for each element of Contextual. Create a new array
+      # containing the values returned by the block.
+      #
+      # If the field name(s) are passed instead of the block, the result
+      # will be identical to #pluck.
+      #
+      # @example Map by some field.
+      #   context.map(:field1)
+      #
+      # @example Map with block.
+      #   context.map(&:field1)
+      #
+      # @param [ String | Symbol ] *fields The field name(s).
+      #
+      # @return [ Array ] The result of mapping, or the plucked
+      #   field values if no block was given.
+      def map(*fields, &block)
+        if block_given?
+          super(&block)
+        else
+          pluck(fields)
+        end
+      end
+
       # Create the new in memory context.
       #
       # @example Create the new context.

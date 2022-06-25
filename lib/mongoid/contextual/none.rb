@@ -83,6 +83,21 @@ module Mongoid
       # @return [ false ] Always false.
       def exists?; false; end
 
+      # Map fields in null context.
+      #
+      # @example Map by some field.
+      #   context.map(:field1)
+      #
+      # @example Map with block.
+      #   context.map(&:field1)
+      #
+      # @param [ String | Symbol ] *fields The field name(s).
+      #
+      # @return [ Array ] An empty Array.
+      def map(*_fields, &block)
+        []
+      end
+
       # Pluck the field values in null context.
       #
       # @example Get the values for null context.

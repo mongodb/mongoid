@@ -314,8 +314,8 @@ module Mongoid
       # Invoke the block for each element of Contextual. Create a new array
       # containing the values returned by the block.
       #
-      # If the symbol field name is passed instead of the block, additional
-      # optimizations would be used.
+      # If the field name(s) are passed instead of the block, the result
+      # will be identical to #pluck.
       #
       # @example Map by some field.
       #   context.map(:field1)
@@ -323,14 +323,15 @@ module Mongoid
       # @example Map with block.
       #   context.map(&:field1)
       #
-      # @param [ Symbol ] field The field name.
+      # @param [ String | Symbol ] *fields The field name(s).
       #
-      # @return [ Array ] The result of mapping.
-      def map(field = nil, &block)
+      # @return [ Array ] The result of mapping, or the plucked
+      #   field values if no block was given.
+      def map(*fields, &block)
         if block_given?
           super(&block)
         else
-          criteria.pluck(field)
+          pluck(fields)
         end
       end
 
