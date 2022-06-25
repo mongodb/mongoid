@@ -18,7 +18,7 @@ module Mongoid
       # @return [ true ] True.
       def upsert(options = {})
         prepare_upsert(options) do
-          collection.find(atomic_selector).update_one(
+          collection.find(atomic_selector).replace_one(
               as_attributes, upsert: true, session: _session)
         end
       end

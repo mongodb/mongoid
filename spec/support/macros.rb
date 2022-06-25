@@ -38,5 +38,14 @@ module Mongoid
         end
       end
     end
+
+    def restore_config_clients
+      around do |example|
+        # Duplicate the config because some tests mutate it.
+        old_config = Mongoid::Config.clients.dup
+        example.run
+        Mongoid::Config.send(:clients=, old_config)
+      end
+    end
   end
 end

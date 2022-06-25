@@ -19,7 +19,7 @@ module Mongoid
       #
       # @param [ Symbol ] field The name of an additional field to update.
       #
-      # @return [ true/false ] false if record is new_record otherwise true.
+      # @return [ true/false ] false if document is new_record otherwise true.
       def touch(field = nil)
         return false if _root.new_record?
         current = Time.configured.now
@@ -60,7 +60,6 @@ module Mongoid
 
         # Callbacks are invoked on the composition root first and on the
         # leaf-most embedded document last.
-        # TODO add tests, see MONGOID-5015.
         run_callbacks(:touch)
         true
       end

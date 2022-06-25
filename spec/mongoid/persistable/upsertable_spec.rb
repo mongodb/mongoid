@@ -53,6 +53,20 @@ describe Mongoid::Persistable::Upsertable do
         it "flags the document as persisted" do
           expect(existing).to be_persisted
         end
+
+        context 'when existing document contains other fields' do
+          let!(:existing) do
+            Band.create!(name: "Photek", views: 42)
+          end
+
+          it 'removes the existing fields' do
+            Band.count.should == 1
+
+            existing.reload
+            existing.views.should be nil
+            existing.name.should == 'Tool'
+          end
+        end
       end
 
       context "when no matching document exists in the db" do

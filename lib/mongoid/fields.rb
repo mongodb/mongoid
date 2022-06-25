@@ -23,6 +23,11 @@ module Mongoid
     # @api private
     IDS = [ :_id, '_id', ].freeze
 
+    # BSON classes that are not supported as field types
+    #
+    # @api private
+    INVALID_BSON_CLASSES = [ BSON::Decimal128, BSON::Int32, BSON::Int64 ].freeze
+
     module ClassMethods
       # Returns the list of id fields for this model class, as both strings
       # and symbols.
@@ -222,6 +227,32 @@ module Mongoid
       self.class.using_object_ids?
     end
 
+    # Does this field start with a dollar sign ($) or contain a dot/period (.)?
+    #
+    # @api private
+    #
+    # @param [ String ] name The field name.
+    #
+    # @return [ true, false ] If this field is dotted or dollared.
+    def dot_dollar_field?(name)
+      n = aliased_fields[name] || name
+      fields.key?(n) && (n.include?('.') || n.start_with?('$'))
+    end
+
+    # Validate whether or not the field starts with a dollar sign ($) or
+    # contains a dot/period (.).
+    #
+    # @api private
+    #
+    # @raise [ InvalidDotDollarAssignment ] If contains dots or starts with a dollar.
+    #
+    # @param [ String ] name The field name.
+    def validate_writable_field_name!(name)
+      if dot_dollar_field?(name)
+        raise Errors::InvalidDotDollarAssignment.new(self.class, name)
+      end
+    end
+
     class << self
 
       # DSL method used for configuration readability, typically in
@@ -340,6 +371,12 @@ module Mongoid
       # Used in determining if the field is aliased or not. Recursively
       # finds aliases for embedded documents and fields, delimited with
       # period "." character.
+      #
+      # Note that this method returns the name of associations as they're
+      # stored in the database, whereas the `relations` hash uses their in-code
+      # aliases. In order to check for membership in the relations hash, you
+      # would first have to look up the string returned from this method in
+      # the aliased_associations hash.
       #
       # This method will not expand the alias of a belongs_to association that
       # is not the last item. For example, if we had a School that has_many
@@ -603,6 +640,7 @@ module Mongoid
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
             else
+              # Keep this code consistent with Mongoid::Attributes#read_attribute
               value = field.demongoize(raw)
               attribute_will_change!(name) if value.resizable?
               value
@@ -733,7 +771,21 @@ module Mongoid
 
       def field_for(name, options)
         opts = options.merge(klass: self)
-        opts[:type] = field_type_klass_for(name, options[:type])
+        type_mapping = TYPE_MAPPINGS[options[:type]]
+        opts[:type] = type_mapping || unmapped_type(options)
+        if !opts[:type].is_a?(Class)
+          raise Errors::InvalidFieldType.new(self, name, options[:type])
+        else
+          if INVALID_BSON_CLASSES.include?(opts[:type])
+            warn_message = "Using #{opts[:type]} as the field type is not supported. "
+            if opts[:type] == BSON::Decimal128
+              warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
+            else
+              warn_message += "Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type."
+            end
+            Mongoid.logger.warn(warn_message)
+          end
+        end
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
         Fields::Standard.new(name, opts)

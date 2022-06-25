@@ -154,7 +154,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :elem_match
           end
 
-          __override__(criterion, "$elemMatch")
+          and_or_override(criterion, "$elemMatch")
         end
         key :elem_match, :override, "$elemMatch"
 
@@ -257,7 +257,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :eq
           end
 
-          __override__(criterion, "$eq")
+          and_or_override(criterion, "$eq")
         end
         key :eq, :override, "$eq"
 
@@ -277,7 +277,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :gt
           end
 
-          __override__(criterion, "$gt")
+          and_or_override(criterion, "$gt")
         end
         key :gt, :override, "$gt"
 
@@ -297,7 +297,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :gte
           end
 
-          __override__(criterion, "$gte")
+          and_or_override(criterion, "$gte")
         end
         key :gte, :override, "$gte"
 
@@ -353,7 +353,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :lt
           end
 
-          __override__(criterion, "$lt")
+          and_or_override(criterion, "$lt")
         end
         key :lt, :override, "$lt"
 
@@ -373,7 +373,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :lte
           end
 
-          __override__(criterion, "$lte")
+          and_or_override(criterion, "$lte")
         end
         key :lte, :override, "$lte"
 
@@ -410,7 +410,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :mod
           end
 
-          __override__(criterion, "$mod")
+          and_or_override(criterion, "$mod")
         end
         key :mod, :override, "$mod"
 
@@ -430,7 +430,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :ne
           end
 
-          __override__(criterion, "$ne")
+          and_or_override(criterion, "$ne")
         end
         alias :excludes :ne
         key :ne, :override, "$ne"
@@ -451,7 +451,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :near
           end
 
-          __override__(criterion, "$near")
+          and_or_override(criterion, "$near")
         end
         key :near, :override, "$near"
 
@@ -471,7 +471,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :near_sphere
           end
 
-          __override__(criterion, "$nearSphere")
+          and_or_override(criterion, "$nearSphere")
         end
         key :near_sphere, :override, "$nearSphere"
 
@@ -899,6 +899,22 @@ module Mongoid
               end
             end
             query.reset_strategies!
+          end
+        end
+
+        # Combine operator expessions onto a Criteria using either
+        # an override or ands depending on the status of the
+        # Mongoid.overwrite_chained_operators feature flag.
+        #
+        # @param [ Hash ] The criterion to add to the criteria.
+        # @param [ String ] operator The MongoDB operator.
+        #
+        # @return [ Criteria ] The resulting criteria.
+        def and_or_override(criterion, operator)
+          if Mongoid.overwrite_chained_operators
+            __override__(criterion, operator)
+          else
+            and_with_operator(criterion, operator)
           end
         end
 

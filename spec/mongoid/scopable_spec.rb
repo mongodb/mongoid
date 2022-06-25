@@ -1172,6 +1172,24 @@ describe Mongoid::Scopable do
         end
       end
     end
+
+    context 'when nesting unsoped under with_scope' do
+      let(:c1) { Band.where(active: true) }
+
+      it 'restores previous scope' do
+        pending 'MONGOID-5214'
+
+        Band.with_scope(c1) do |crit|
+          Band.unscoped do |crit2|
+            Mongoid::Threaded.current_scope(Band).should be nil
+          end
+
+          Mongoid::Threaded.current_scope(Band).selector.should == {
+            'active' => true,
+          }
+        end
+      end
+    end
   end
 
   describe ".without_default_scope" do

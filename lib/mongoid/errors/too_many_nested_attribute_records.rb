@@ -3,7 +3,7 @@
 module Mongoid
   module Errors
 
-    # This error is raised when trying to create set nested records above the
+    # This error is raised when trying to create set nested documents above the
     # specified :limit
     #
     # @example Create the error.

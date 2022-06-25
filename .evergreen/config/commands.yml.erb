@@ -1,0 +1,297 @@
+functions:
+  "fetch source":
+    # Executes git clone and applies the submitted patch, if any
+    - command: git.get_project
+      params:
+        directory: "src"
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+
+          git submodule update --init --recursive
+
+  "fetch egos":
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+
+          curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
+          chmod +x ./egos
+
+  "create expansions":
+    # Make an evergreen exapanstion file with dynamic values
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+           # Get the current unique version of this checkout
+           if [ "${is_patch}" = "true" ]; then
+              CURRENT_VERSION=$(git describe)-patch-${version_id}
+           else
+              CURRENT_VERSION=latest
+           fi
+
+           export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
+
+           export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
+           export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
+           export UPLOAD_BUCKET="${project}"
+           export PROJECT_DIRECTORY="$(pwd)"
+
+           cat <<EOT > expansion.yml
+           CURRENT_VERSION: "$CURRENT_VERSION"
+           DRIVERS_TOOLS: "$DRIVERS_TOOLS"
+           MONGO_ORCHESTRATION_HOME: "$MONGO_ORCHESTRATION_HOME"
+           MONGODB_BINARIES: "$MONGODB_BINARIES"
+           UPLOAD_BUCKET: "$UPLOAD_BUCKET"
+           PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
+           PREPARE_SHELL: |
+              set -o errexit
+              set -o xtrace
+              export DRIVERS_TOOLS="$DRIVERS_TOOLS"
+              export MONGO_ORCHESTRATION_HOME="$MONGO_ORCHESTRATION_HOME"
+              export MONGODB_BINARIES="$MONGODB_BINARIES"
+              export UPLOAD_BUCKET="$UPLOAD_BUCKET"
+              export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
+
+              export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
+              export PATH="$MONGODB_BINARIES:$PATH"
+              export PROJECT="${project}"
+
+              export MONGODB_VERSION=${VERSION}
+              export TOPOLOGY=${TOPOLOGY}
+              export SINGLE_MONGOS=${SINGLE_MONGOS}
+              export AUTH=${AUTH}
+              export SSL=${SSL}
+              export APP_TESTS=${APP_TESTS}
+              export DOCKER_DISTRO=${DOCKER_DISTRO}
+           EOT
+           # See what we've done
+           cat expansion.yml
+
+    # Load the expansion file to make an evergreen variable with the current unique version
+    - command: expansions.update
+      params:
+        file: src/expansion.yml
+
+  "exec script" :
+    - command: shell.exec
+      type: test
+      params:
+        working_dir: "src"
+        script: |
+          ${PREPARE_SHELL}
+          [ -f ${PROJECT_DIRECTORY}/${file} ] && sh ${PROJECT_DIRECTORY}/${file} || echo "${PROJECT_DIRECTORY}/${file} not available, skipping"
+
+  "upload docs" :
+    - command: shell.exec
+      params:
+        silent: true
+        script: |
+           export AWS_ACCESS_KEY_ID=${aws_key}
+           export AWS_SECRET_ACCESS_KEY=${aws_secret}
+           aws s3 cp ${PROJECT_DIRECTORY}/doc/html s3://mciuploads/${UPLOAD_BUCKET}/docs/${CURRENT_VERSION} --recursive --acl public-read --region us-east-1
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file:  ${PROJECT_DIRECTORY}/doc/html/index.html
+        remote_file: ${UPLOAD_BUCKET}/docs/${CURRENT_VERSION}/index.html
+        bucket: mciuploads
+        permissions: public-read
+        content_type: text/html
+        display_name: "Rendered docs"
+
+  "upload coverage" :
+    - command: shell.exec
+      params:
+        silent: true
+        script: |
+           export AWS_ACCESS_KEY_ID=${aws_key}
+           export AWS_SECRET_ACCESS_KEY=${aws_secret}
+           aws s3 cp ${PROJECT_DIRECTORY}/coverage s3://mciuploads/${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/coverage/ --recursive --acl public-read --region us-east-1
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file:  ${PROJECT_DIRECTORY}/coverage/index.html
+        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/coverage/index.html
+        bucket: mciuploads
+        permissions: public-read
+        content_type: text/html
+        display_name: "Coverage Report"
+
+  "upload mo artifacts":
+    - command: shell.exec
+      params:
+        script: |
+          ${PREPARE_SHELL}
+          find $MONGO_ORCHESTRATION_HOME -name \*.log | xargs tar czf mongodb-logs.tar.gz
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: mongodb-logs.tar.gz
+        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/logs/${task_id}-${execution}-mongodb-logs.tar.gz
+        bucket: mciuploads
+        permissions: public-read
+        content_type: ${content_type|application/x-gzip}
+        display_name: "mongodb-logs.tar.gz"
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: ${DRIVERS_TOOLS}/.evergreen/orchestration/server.log
+        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/logs/${task_id}-${execution}-orchestration.log
+        bucket: mciuploads
+        permissions: public-read
+        content_type: ${content_type|text/plain}
+        display_name: "orchestration.log"
+
+  "upload working dir":
+    - command: archive.targz_pack
+      params:
+        target: "working-dir.tar.gz"
+        source_dir: ${PROJECT_DIRECTORY}/
+        include:
+          - "./**"
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: working-dir.tar.gz
+        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/artifacts/${task_id}-${execution}-working-dir.tar.gz
+        bucket: mciuploads
+        permissions: public-read
+        content_type: ${content_type|application/x-gzip}
+        display_name: "working-dir.tar.gz"
+    - command: archive.targz_pack
+      params:
+        target: "drivers-dir.tar.gz"
+        source_dir: ${DRIVERS_TOOLS}
+        include:
+          - "./**"
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        local_file: drivers-dir.tar.gz
+        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/artifacts/${task_id}-${execution}-drivers-dir.tar.gz
+        bucket: mciuploads
+        permissions: public-read
+        content_type: ${content_type|application/x-gzip}
+        display_name: "drivers-dir.tar.gz"
+
+  "upload test results to s3":
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.json
+        display_name: rspec.json
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json
+        content_type: application/json
+        permissions: public-read
+        bucket: mciuploads
+    # AWS does not appear to support on-the-fly gzip encoding; compress
+    # the results manually and upload a compressed file.
+    # Typical size reduction: 50 MB -> 800 KB
+    - command: shell.exec
+      params:
+        script: |
+          gzip <src/tmp/rspec.json >src/tmp/rspec.json.gz
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.json.gz
+        display_name: rspec.json.gz
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json.gz
+        content_type: application/gzip
+        permissions: public-read
+        bucket: mciuploads
+    - command: shell.exec
+      params:
+        script: |
+          xz -9 <src/tmp/rspec.json >src/tmp/rspec.json.xz
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.json.xz
+        display_name: rspec.json.xz
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json.xz
+        content_type: application/x-xz
+        permissions: public-read
+        bucket: mciuploads
+
+  "upload test results":
+    - command: attach.xunit_results
+      params:
+        file: ./src/tmp/rspec.xml
+
+  "run tests":
+    - command: shell.exec
+      type: test
+      params:
+        shell: bash
+        working_dir: "src"
+        script: |
+          ${PREPARE_SHELL}
+          env \
+            MONGODB_URI="${MONGODB_URI}" \
+            TOPOLOGY=${TOPOLOGY} \
+            RVM_RUBY="${RVM_RUBY}" \
+            RAILS="${RAILS}" \
+            DRIVER="${DRIVER}" \
+            I18N="${I18N}" \
+            TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
+            ./egos .evergreen/run-tests-docker.sh
+
+  "fix absolute paths":
+    - command: shell.exec
+      params:
+        script: |
+          ${PREPARE_SHELL}
+          for filename in $(find ${DRIVERS_TOOLS} -name \*.json); do
+            perl -p -i -e "s|ABSOLUTE_PATH_REPLACEMENT_TOKEN|${DRIVERS_TOOLS}|g" $filename
+          done
+
+  "install dependencies":
+    - command: shell.exec
+      type: test
+      params:
+        working_dir: "src"
+        script: |
+          ${PREPARE_SHELL}
+          file="${PROJECT_DIRECTORY}/.evergreen/install-dependencies.sh"
+          [ -f ${file} ] && sh ${file} || echo "${file} not available, skipping"
+
+pre:
+  - func: "fetch source"
+  - func: "fetch egos"
+  - func: "create expansions"
+  - func: "fix absolute paths"
+  - func: "install dependencies"
+
+post:
+  # Removed, causing timeouts
+  # - func: "upload working dir"
+  - func: "upload mo artifacts"
+  #- func: "upload test results"
+  - func: "upload test results to s3"
+
+tasks:
+    - name: "test"
+      commands:
+        - func: "run tests"

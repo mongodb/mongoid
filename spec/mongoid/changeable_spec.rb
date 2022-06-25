@@ -1012,12 +1012,69 @@ describe Mongoid::Changeable do
         person.user_accounts << user_account
       end
 
-      it 'returns a hash of changes' do
-        pending 'https://jira.mongodb.org/browse/MONGOID-4843'
+      it 'should not add to the changes or changed_attributes hash' do
+        person.changes.should == {}
+        person.changed_attributes.should == {}
+      end
+    end
 
-        person.changes.should == {
-          user_account_ids: [[], [user_account.id]]
-        }
+    context 'when habtm association _ids changes' do
+
+      let(:person) do
+        Person.create!(title: "Grand Poobah")
+      end
+
+      let(:user_account) do
+        UserAccount.create!
+      end
+
+      before do
+        person.user_account_ids << user_account._id
+      end
+
+      it 'should add to the changes or changed_attributes hash' do
+        person.changes.should == { "user_account_ids" => [ nil, [ user_account._id ] ] }
+        person.changed_attributes.should == { "user_account_ids" => nil }
+      end
+    end
+
+    context 'when assigning empty list to habtm association' do
+
+      let(:person) do
+        Person.create!(title: "Grand Poobah", user_accounts: [user_account])
+      end
+
+      let(:user_account) do
+        UserAccount.create!
+      end
+
+      before do
+        person.user_accounts = []
+      end
+
+      it 'should not add to the changes or changed_attributes hash' do
+        person.changes.should == {}
+        person.changed_attributes.should == {}
+      end
+    end
+
+    context 'when assigning empty list to habtm association _ids' do
+
+      let(:person) do
+        Person.create!(title: "Grand Poobah", user_accounts: [user_account])
+      end
+
+      let(:user_account) do
+        UserAccount.create!
+      end
+
+      before do
+        person.user_account_ids = []
+      end
+
+      it 'should not add to the changes or changed_attributes hash' do
+        person.changes.should == { "user_account_ids" => [ [ user_account._id ], [] ] }
+        person.changed_attributes.should ==  { "user_account_ids" => [ user_account._id ] }
       end
     end
 

@@ -83,7 +83,8 @@ describe Mongoid::Association::Referenced::BelongsTo::Binding do
         end
 
         it "does nothing" do
-          expect(game).to receive(:person=).never
+          expect(game).to receive(:person=).with(person).never
+          expect(game).to receive(:person=).with(nil).once
           binding.bind_one
         end
       end

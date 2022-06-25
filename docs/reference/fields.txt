@@ -89,6 +89,13 @@ Specifying as a ``Class`` is deprecated and will be no longer supported in a
 future major version of Mongoid. Unrecognized field type symbols will result
 in an `InvalidFieldType` error when the model class is loaded.
 
+.. note::
+
+  Using the ``BSON::Int64`` and ``BSON::Int32`` types as field types is unsupported.
+  Saving these types to the database will work as expected, however, querying them
+  will return the native Ruby ``Integer`` type. Querying fields of type
+  ``BSON::Decimal128`` will return values of type ``BSON::Decimal128`` in
+  BSON <=4 and values of type ``BigDecimal`` in BSON 5+.
 
 .. _omitting-field-type-definition:
 
@@ -582,13 +589,22 @@ being operated on:
   }
 
 When defining a default value as a ``Proc``, Mongoid will apply the default
-after all other attributes are set. To have the default be applied before
-the other attributes are set, use the ``pre_processed: true`` field option:
+after all other attributes are set and associations are initialized.
+To have the default be applied before the other attributes are set,
+use the ``pre_processed: true`` field option:
 
 .. code-block:: ruby
 
   field :fulfill_by, type: Time, default: ->{ Time.now + 3.days },
     pre_processed: true
+
+The ``pre_processed: true`` option is also necessary when specifying a custom
+default value via a ``Proc`` for the ``_id`` field, to ensure the ``_id``
+is set correctly via associations:
+
+.. code-block:: ruby
+
+  field :_id, type: String, default: -> { 'hello' }, pre_processed: true
 
 
 .. _storage-field-names:
@@ -1120,6 +1136,11 @@ Attributes can always be read using mass attribute access or ``read_attribute``
   bob.read_attribute(:age)
   # => 42
 
+.. note::
+
+  The values returned from the ``read_attribute`` method, and those stored in
+  the ``attributes`` hash, are the ``mongoized`` values.
+
 
 Special Characters in Field Names
 ---------------------------------
@@ -1277,6 +1298,19 @@ a ``ReadonlyAttribute`` exception will be raised:
    band.update_attribute(:name, "Tool") # Raises the error.
    band.remove_attribute(:name) # Raises the error.
 
+Assignments to read-only attributes using their setters will be ignored:
+
+.. code-block:: ruby
+
+  b = Band.create!(name: "The Rolling Stones")
+  # => #<Band _id: 6287a3d5d1327a5292535383, name: "The Rolling Stones", origin: nil>
+  b.name = "The Smashing Pumpkins"
+  # => "The Smashing Pumpkins"
+  b.name
+  # => "The Rolling Stones"
+
+Calls to atomic persistence operators, like ``bit`` and ``inc``, will persist
+changes to readonly fields.
 
 Timestamp Fields
 ================
@@ -1359,8 +1393,47 @@ requiring the usage of the aggregation pipeline for both queries and updates,
 applications should avoid using dots in field names and starting field names
 with the dollar sign if possible.
 
-The Ruby driver `currently prohibits
-<https://jira.mongodb.org/browse/RUBY-2528>`_ inserting documents whose
-field names contain dots or begin with the dollar sign. However, if such
-documents are inserted using other software, Mongoid and the Ruby driver
-provide limited support for retrieving and operating on these documents.
+Mongoid, starting in version 8, now allows users to access fields that begin with
+dollar signs and that contain dots/periods. They can be accessed using the ``send``
+method as follows:
+
+.. code::
+
+    class User
+      include Mongoid::Document
+      field :"first.last", type: String
+      field :"$_amount", type: Integer
+    end
+
+    user = User.first
+    user.send(:"first.last")
+    # => Mike.Trout
+    user.send(:"$_amount")
+    # => 42650000
+
+It is also possible to use ``read_attribute`` to access these fields:
+
+.. code::
+
+    user.read_attribute("first.last")
+    # => Mike.Trout
+
+Due to `server limitations <https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/>`_,
+updating and replacing fields containing dots and dollars requires using special
+operators. For this reason, calling setters on these fields is prohibited and
+will raise an error:
+
+.. code::
+
+    class User
+      include Mongoid::Document
+      field :"first.last", type: String
+      field :"$_amount", type: Integer
+    end
+
+    user = User.new
+    user.send(:"first.last=", "Shohei.Ohtani")
+    # raises a InvalidDotDollarAssignment error
+    user.send(:"$_amount=", 8500000)
+    # raises a InvalidDotDollarAssignment error
+

@@ -26,7 +26,7 @@ module Mongoid
         #   If no documents are found, then returned Hash will have
         #   count, sum of 0 and max, min, avg of nil.
         def aggregates(field)
-          result = collection.find.aggregate(pipeline(field), session: _session).to_a
+          result = collection.aggregate(pipeline(field), session: _session).to_a
           if result.empty?
             if Mongoid.broken_aggregables
               { "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil }

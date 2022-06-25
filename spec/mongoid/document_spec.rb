@@ -165,12 +165,39 @@ describe Mongoid::Document do
 
   describe "#attributes" do
 
-    let(:person) do
-      Person.new(title: "Sir")
+    let!(:person) do
+      Person.create!(title: "Sir")
     end
 
     it "returns the attributes with indifferent access" do
       expect(person[:title]).to eq("Sir")
+    end
+
+    context "when instantiating a new document" do
+      it "returns a Hash" do
+        expect(person.attributes.class).to eq(Hash)
+      end
+    end
+
+    context "when retrieving a document from the database" do
+
+      let(:from_db) { Person.first }
+
+      context "when legacy_attributes is false" do
+        config_override :legacy_attributes, false
+
+        it "returns a Hash" do
+          expect(from_db.attributes.class).to eq(Hash)
+        end
+      end
+
+      context "when legacy_attributes is true" do
+        config_override :legacy_attributes, true
+
+        it "returns a BSON::Document" do
+          expect(from_db.attributes.class).to eq(BSON::Document)
+        end
+      end
     end
   end
 

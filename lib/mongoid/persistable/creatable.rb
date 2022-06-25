@@ -108,8 +108,10 @@ module Mongoid
               _mongoid_run_child_callbacks(:save) do
                 _mongoid_run_child_callbacks(:create) do
                   result = yield(self)
-                  post_process_insert
-                  post_process_persist(result, options)
+                  if !result.is_a?(Document) || result.errors.empty?
+                    post_process_insert
+                    post_process_persist(result, options)
+                  end
                 end
               end
             end

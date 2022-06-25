@@ -309,7 +309,12 @@ module Mongoid
       #
       # @api private
       def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
-        attributes = attrs || {}
+        attributes = if Mongoid.legacy_attributes
+          attrs
+        else
+          attrs&.to_h
+        end || {}
+
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)

@@ -78,4 +78,29 @@ describe Mongoid::Association::Embedded::EmbedsOne::Buildable do
       end
     end
   end
+
+  context 'when the object is already associated with another object' do
+
+    let(:owner1) do
+      Owner.create!
+    end
+
+    let(:owner2) do
+      Owner.create!
+    end
+
+    let(:scribe) do
+      Scribe.new
+    end
+
+    before do
+      owner1.scribe = scribe
+      owner2.scribe = scribe
+    end
+
+    it 'clears the object of its previous association' do
+      expect(owner1.scribe).to be_nil
+      expect(owner2.scribe).to eq(scribe)
+    end
+  end
 end

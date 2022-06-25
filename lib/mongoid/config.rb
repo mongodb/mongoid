@@ -115,6 +115,16 @@ module Mongoid
     # demongoize the values on returning them.
     option :legacy_pluck_distinct, default: false
 
+    # Combine chained operators, which use the same field and operator,
+    # using and's instead of overwriting them.
+    option :overwrite_chained_operators, default: false
+
+    # When this flag is true, the attributes method on a document will return
+    # a BSON::Document when that document is retrieved from the database, and
+    # a Hash otherwise. When this flag is false, the attributes method will
+    # always return a Hash.
+    option :legacy_attributes, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

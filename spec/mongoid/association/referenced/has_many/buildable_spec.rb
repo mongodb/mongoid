@@ -138,5 +138,114 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         end
       end
     end
+
+    context 'when the object is already associated with another object' do
+
+      context "when using <<" do
+
+        let(:person1) do
+          Person.new
+        end
+
+        let(:person2) do
+          Person.new
+        end
+
+        let(:drug) do
+          Drug.new
+        end
+
+        before do
+          person1.drugs << drug
+          person2.drugs << drug
+        end
+
+        it 'clears the object of its previous association' do
+          expect(person1.drugs).to eq([])
+          expect(person1.drug_ids).to eq([])
+          expect(person2.drugs).to eq([drug])
+          expect(person2.drug_ids).to eq([drug._id])
+        end
+      end
+
+      context "when using concat" do
+
+        let(:person1) do
+          Person.new
+        end
+
+        let(:person2) do
+          Person.new
+        end
+
+        let(:drug) do
+          Drug.new
+        end
+
+        before do
+          person1.drugs.concat([drug])
+          person2.drugs.concat([drug])
+        end
+
+        it 'clears the object of its previous association' do
+          expect(person1.drugs).to eq([])
+          expect(person1.drug_ids).to eq([])
+          expect(person2.drugs).to eq([drug])
+          expect(person2.drug_ids).to eq([drug._id])
+        end
+      end
+
+      context "when using =" do
+
+        let(:person1) do
+          Person.new
+        end
+
+        let(:person2) do
+          Person.new
+        end
+
+        let(:drug) do
+          Drug.new
+        end
+
+        before do
+          person1.drugs = [drug]
+          person2.drugs = [drug]
+        end
+
+        it 'clears the object of its previous association' do
+          expect(person1.drugs).to eq([])
+          expect(person1.drug_ids).to eq([])
+          expect(person2.drugs).to eq([drug])
+          expect(person2.drug_ids).to eq([drug._id])
+        end
+      end
+
+      context "when using = on the same document twice" do
+
+        let(:person1) do
+          Person.new
+        end
+
+        let(:person2) do
+          Person.new
+        end
+
+        let(:drug) do
+          Drug.new
+        end
+
+        before do
+          person1.drugs = [drug]
+          person1.drugs = [drug]
+        end
+
+        it 'clears the object of its previous association' do
+          expect(person1.drugs).to eq([drug])
+          expect(person1.drug_ids).to eq([drug._id])
+        end
+      end
+    end
   end
 end

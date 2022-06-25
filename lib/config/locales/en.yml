@@ -1,4 +1,8 @@
 en:
+  errors:
+    messages:
+      taken: "has already been taken"
+
   mongoid:
     errors:
       messages:
@@ -72,6 +76,16 @@ en:
           resolution: "Search for attributes that are in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
             which will cause a nil to be returned instead of raising this error."
+        document_with_shard_key_not_found:
+          message: "Document not found for class %{klass} with id %{missing} and
+            shard key %{shard_key}."
+          summary: "When calling %{klass}.find with an id and a shard key, each
+            parameter must match a document in the database or this error will
+            be raised. The search was for the id: %{missing} with
+            shard_key: %{shard_key} and it was not found."
+          resolution: "Search for an id/shard key that is in the database or set
+            the Mongoid.raise_not_found_error configuration option to false,
+            which will cause a nil to be returned instead of raising this error."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
@@ -118,6 +132,17 @@ en:
             allowed."
           resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
             ancestors."
+        invalid_dot_dollar_assignment:
+          message: "Cannot set the %{attr} attribute on the %{klass} class."
+          summary: "Calling the setters for fields that start with a dollar
+            sign ($) or contain a dot/period (.) is prohibited. See the
+            Mongoid documentation on Field Names with Dots/Periods (.) and
+            Dollar Signs ($) for more information."
+          resolution: "In order to set fields that start with a dollar
+            sign ($) or contain a dot/period (.), the aggregation pipeline can
+            be used. MongoDB provides specific operators for working with these
+            fields. Refer to the MongoDB documentation here:
+            https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/"
         invalid_elem_match_operator:
           message: "Invalid $elemMatch operator '%{operator}'."
           summary: "You misspelled an operator or are using an operator that
@@ -138,7 +163,7 @@ en:
           resolution: "Valid expression operators are: %{valid_operators}.
             Ensure you are using one of these operators."
         invalid_field:
-          message: "Defining a field named '%{name}' is not allowed."
+          message: "Defining a field named '%{field}' is not allowed."
           summary: "Defining this field would override the method '%{name}',
             which would cause issues with expectations around the original
             method and cause extremely hard to debug issues. The original
@@ -550,11 +575,9 @@ en:
             server versions 3.6 and higher."
           resolution: "Verify that all servers in your deployment are at least
             version 3.6 or don't attempt to use sessions with older server versions."
-        taken:
-          "is already taken"
         too_many_nested_attribute_records:
           message: "Accepting nested attributes for %{association} is limited
-            to %{limit} records."
+            to %{limit} documents."
           summary: "More documents were sent to be processed than the allowed
             limit."
           resolution: "The limit is set as an option to the macro, for example:
