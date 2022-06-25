@@ -281,7 +281,6 @@ functions:
             RAILS="${RAILS}" \
             DRIVER="${DRIVER}" \
             I18N="${I18N}" \
-            TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             ./egos .evergreen/run-tests-docker.sh
 
   "fix absolute paths":
@@ -549,15 +548,7 @@ axes:
            I18N: "1.0"
       - id: current
         display_name: "i18n-current"
-        
-  - id: "test-i18n-fallbacks"
-    display_name: Test i18n fallbacks
-    values:
-      - id: yes
-        display_name: "i18n-fallbacks"
-        variables:
-           TEST_I18N_FALLBACKS: yes
-           
+
   - id: app-tests
     display_name: Mongoid application tests
     values:
@@ -744,19 +735,6 @@ buildvariants:
     i18n: '1.0'
     os: ubuntu-18.04
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
-- matrix_name: "i18n-fallbacks"
-  matrix_spec:
-    ruby: "ruby-2.6"
-    driver: ["current"]
-    mongodb-version: "4.2"
-    topology: "standalone"
-    i18n: '*'
-    test-i18n-fallbacks: yes
-    os: ubuntu-18.04
-  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
   tasks:
      - name: "test"
 
