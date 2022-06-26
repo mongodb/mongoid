@@ -305,6 +305,18 @@ Mongoid 7 behavior:
   end
 
 
+``Mongoid::Criteria#map`` Supports Multiple Fields
+--------------------------------------------------
+
+``Mongoid::Criteria#map`` now supports multiple field arguments as a splat.
+The behavior in this case is identical to ``#pluck``.
+
+.. code-block:: ruby
+
+  Dinosaur.all.map(:name, :color)
+    #=> [ ['Velociraptor', :green], ['Tyrannosaurus Rex', :brown] ]
+
+
 Removed ``:drop_dups`` Option from Indexes
 ------------------------------------------
 
