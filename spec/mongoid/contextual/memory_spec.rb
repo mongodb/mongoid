@@ -989,6 +989,89 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
+  # describe "#map" do
+  #
+  #   let(:hobrecht) do
+  #     Address.new(street: "hobrecht")
+  #   end
+  #
+  #   let(:friedel) do
+  #     Address.new(street: "friedel")
+  #   end
+  #
+  #   let(:criteria) do
+  #     Address.all.tap do |crit|
+  #       crit.documents = [ hobrecht, friedel ]
+  #     end
+  #   end
+  #
+  #   let(:context) do
+  #     described_class.new(criteria)
+  #   end
+  #
+  #   context "when block given" do
+  #
+  #     let!(:plucked) do
+  #       context.map { |obj| obj.street + " st" }
+  #     end
+  #
+  #     it "yields to the block and returns the result" do
+  #       expect(plucked).to eq([ "hobrecht st", "friedel st" ])
+  #     end
+  #   end
+  #
+  #   context "when block not given" do
+  #
+  #     let!(:plucked) do
+  #       context.map(:street)
+  #     end
+  #
+  #     it "delegates to #pluck" do
+  #       expect(plucked).to receive(:)
+  #     end
+  #   end
+  #
+  #   context "when plucking a field that doesnt exist" do
+  #
+  #     context "when pluck one field" do
+  #
+  #       let(:plucked) do
+  #         context.pluck(:foo)
+  #       end
+  #
+  #       it "returns a empty array" do
+  #         expect(plucked).to eq([])
+  #       end
+  #     end
+  #
+  #     context "when pluck multiple fields" do
+  #
+  #       let(:plucked) do
+  #         context.pluck(:foo, :bar)
+  #       end
+  #
+  #       it "returns a empty array" do
+  #         expect(plucked).to eq([[], []])
+  #       end
+  #     end
+  #   end
+  #
+  #   context 'when there is a collation on the criteria' do
+  #
+  #     let(:criteria) do
+  #       Address.all.tap do |crit|
+  #         crit.documents = [ hobrecht, friedel ]
+  #       end.collation(locale: 'en_US', strength: 2)
+  #     end
+  #
+  #     it "raises an exception" do
+  #       expect {
+  #         context.pluck(:foo, :bar)
+  #       }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+  #     end
+  #   end
+  # end
+
   describe '#inc' do
 
     let(:criteria) do

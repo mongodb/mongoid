@@ -314,7 +314,30 @@ The behavior in this case is identical to ``#pluck``.
 .. code-block:: ruby
 
   Dinosaur.all.map(:name, :color)
-    #=> [ ['Velociraptor', :green], ['Tyrannosaurus Rex', :brown] ]
+    #=> [ ['Velociraptor', :green], ['T-Rex', :brown] ]
+
+
+``Mongoid::Criteria#map`` Yields its Field Arguments to the Block
+----------------------------------------------------------------
+
+When passing field(s) arguments and a block to ``Mongoid::Criteria#map``,
+as of Mongoid 8.0, the field values will be yielded to the block, and the
+mapped result will be returned. In Mongoid 7, any field arguments where
+ignored when a block was given.
+
+Mongoid 8 behavior:
+
+.. code-block:: ruby
+
+  Dinosaur.all.map(:name, :color) { |result| "A scary #{result[1]} #{result[0]}!" }
+    #=> [ "A scary green Velociraptor!", "A scary brown T-Rex!" ]
+
+Mongoid 7 behavior:
+
+.. code-block:: ruby
+
+  Dinosaur.all.map(:name, :color) { |dino| "A scary #{dino.color} #{dino.name}!" }
+    #=> [ "A scary green Velociraptor!", "A scary brown T-Rex!" ]
 
 
 Removed ``:drop_dups`` Option from Indexes

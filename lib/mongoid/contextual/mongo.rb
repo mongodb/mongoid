@@ -314,8 +314,12 @@ module Mongoid
       # Invoke the block for each element of Contextual. Create a new array
       # containing the values returned by the block.
       #
-      # If the field name(s) are passed instead of the block, the result
-      # will be identical to #pluck.
+      # If the field name(s) are given without a block, the result will be
+      # identical to #pluck.
+      #
+      # If the field name(s) are given with a block, the field value(s) will
+      # be yielded to the block, and the mapped result will be returned.
+      # This calls #map on the #pluck_each enumerator.
       #
       # @example Map by some field.
       #   context.map(:field1)
@@ -329,9 +333,13 @@ module Mongoid
       #   field values if no block was given.
       def map(*fields, &block)
         if block_given?
-          super(&block)
+          if fields.none?
+            super(&block)
+          else
+            pluck_each(*fields).map(&block)
+          end
         else
-          pluck(fields)
+          pluck(*fields)
         end
       end
 

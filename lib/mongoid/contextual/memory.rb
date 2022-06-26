@@ -141,7 +141,11 @@ module Mongoid
       #   field values if no block was given.
       def map(*fields, &block)
         if block_given?
-          super(&block)
+          if fields.none?
+            super(&block)
+          else
+            pluck_each(*fields).map(&block)
+          end
         else
           pluck(fields)
         end
