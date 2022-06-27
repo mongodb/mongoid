@@ -12,8 +12,6 @@ Aggregation Pipeline
    :depth: 2
    :class: singlecol
 
-Aggregation Pipeline Overview
-=============================
 
 Mongoid exposes `MongoDB's aggregation pipeline
 <https://www.mongodb.com/docs/manual/core/aggregation-pipeline/>`_,
@@ -22,10 +20,13 @@ The aggregation pipeline is a superset of the deprecated
 :ref:`map/reduce framework <map-reduce>` functionality.
 
 
+Basic Usage
+===========
+
 .. _aggregation-pipeline-example-multiple-collections:
 
-Example: Querying Across Multiple Collections
-`````````````````````````````````````````````
+Querying Across Multiple Collections
+````````````````````````````````````
 
 The aggregation pipeline may be used for queries involving multiple
 referenced associations at the same time:
@@ -88,8 +89,8 @@ having to send the list of document ids to Mongoid in the second query
 
 .. _aggregation-pipeline-builder-dsl:
 
-Aggregation Pipeline Builder DSL
-================================
+Builder DSL
+===========
 
 Mongoid provides limited support for constructing the aggregation pipeline
 itself using a high-level DSL. The following aggregation pipeline operators
