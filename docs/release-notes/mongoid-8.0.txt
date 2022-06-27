@@ -40,7 +40,6 @@ changed in Mongoid 8.0:
 - ``:legacy_attributes`` => true
 - ``:legacy_pluck_distinct`` => ``false``
 - ``:legacy_triple_equals`` => ``false``
-- ``:map_big_decimal_to_decimal128`` => ``true``
 - ``:object_id_as_json_oid`` => ``false``
 - ``:overwrite_chained_operators`` => ``false``
 
@@ -472,3 +471,17 @@ it was stored and returned as a String.
   p registry.data
   # => Mongoid 7: "data!"
   # => Mongoid 8: <BSON::Binary:0x2600 type=generic data=0x6461746121...>
+
+``Decimal128``-backed ``BigDecimal`` fields
+-------------------------------------------
+
+Mongoid 8 introduces the ``map_big_decimal_to_decimal128`` feature flag, which
+allows values assigned to a field of type ``BigDecimal`` to be stored as type
+``String`` in the database for compatibility with Mongoid 7 and earlier. In
+Mongoid 8 by default (with this feature flag turned on), values assigned to
+fields of type ``BigDecimal`` are stored in the database as type
+``BSON::Decimal128``. In Mongoid 7 and earlier, and in Mongoid 8 with this
+feature flag turned off, values assigned to fields of type ``BigDecimal`` are
+stored as Strings. See the section on :ref:`BigDecimal Fields <bigdecimal-fields>`
+for more details.
+

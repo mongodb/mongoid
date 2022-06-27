@@ -12,6 +12,8 @@ def mop_error?(spec, kind)
 end
 
 describe 'Matcher operators' do
+  config_override :map_big_decimal_to_decimal128, true
+
   Dir[File.join(File.dirname(__FILE__), 'matcher_operator_data', '*.yml')].sort.each do |path|
     context File.basename(path) do
       permitted_classes = [ BigDecimal,
