@@ -488,25 +488,25 @@ module Mongoid
       #   Model.tally("array.x")
       #   # => { [ 1, 2 ] => 1 }
       #
-      # @param [ String | Symbol ] field_name The field name.
+      # @param [ String | Symbol ] field The field name.
       #
       # @return [ Hash ] The hash of counts.
-      def tally(field_name)
-        name = klass.cleanse_localized_field_names(field_name)
+      def tally(field)
+        name = klass.cleanse_localized_field_names(field)
 
-        field, pipeline = build_tally_pipeline(name)
+        fld, pipeline = build_tally_pipeline(name)
         pipeline.unshift("$match" => view.filter) unless view.filter.blank?
 
         collection.aggregate(pipeline).reduce({}) do |tallies, doc|
-          is_translation = "#{name}_translations" == field_name.to_s
+          is_translation = "#{name}_translations" == field.to_s
           val = doc["_id"]
 
           key = if val.is_a?(Array)
             val.map do |v|
-              demongoize_with_field(field, v, is_translation)
+              demongoize_with_field(fld, v, is_translation)
             end
           else
-            demongoize_with_field(field, val, is_translation)
+            demongoize_with_field(fld, val, is_translation)
           end
 
           # The only time where a key will already exist in the tallies hash
