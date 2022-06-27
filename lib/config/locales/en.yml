@@ -566,7 +566,7 @@ en:
             version 3.6 or don't attempt to use sessions with older server versions."
         too_many_nested_attribute_records:
           message: "Accepting nested attributes for %{association} is limited
-            to %{limit} records."
+            to %{limit} documents."
           summary: "More documents were sent to be processed than the allowed
             limit."
           resolution: "The limit is set as an option to the macro, for example:

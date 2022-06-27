@@ -172,8 +172,6 @@ describe 'embeds_many associations' do
           # Mongoid uses the new value of `x` in the $pullAll query,
           # which doesn't match the document that is in the database,
           # resulting in the empty array assignment not taking effect.
-          pending 'MONGOID-5037'
-
           canvas.shapes.first.x = 1
           canvas.shapes = []
           canvas.save!

@@ -397,8 +397,8 @@ for details on driver options.
       log_level: :info
 
       # When using the BigDecimal field type, store the value in the database
-      # as a BSON::Decimal128 instead of a string. (default: false)
-      map_big_decimal_to_decimal128: false
+      # as a BSON::Decimal128 instead of a string. (default: true)
+      #map_big_decimal_to_decimal128: true
 
       # Force ``BSON::ObjectId#as_json`` method to return the hash
       # { "$oid" => id.to_s }. When this option is false, and bson-ruby 5
