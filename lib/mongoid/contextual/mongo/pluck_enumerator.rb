@@ -4,9 +4,7 @@ module Mongoid
   module Contextual
     class Mongo
 
-      # Utility class to add enumerable behavior for
-      # Criteria#pluck_each. Should not be directly instantiated
-      # outside of Criteria#pluck_each.
+      # Utility class to add enumerable behavior for Criteria#pluck_each.
       #
       # @api private
       class PluckEnumerator
@@ -62,10 +60,10 @@ module Mongoid
 
         def normalized_field_names
           @normalized_field_names ||= if Mongoid.legacy_pluck_distinct
-                                        database_field_names
-                                      else
-                                        @fields.map {|f| @klass.cleanse_localized_field_names(f) }
-                                      end
+            database_field_names
+          else
+            @fields.map {|f| @klass.cleanse_localized_field_names(f) }
+          end
         end
 
         def yield_result(doc)
@@ -113,19 +111,19 @@ module Mongoid
             #    value so the full hash is returned.
             # 4. Otherwise, fetch and demongoize the value for the key meth.
             curr = if curr.is_a? Array
-                     res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
-                     res.empty? ? nil : res
-                   elsif !is_translation && k.fields[meth]&.localized?
-                     if i < num_meths
-                       curr.try(:fetch, meth, nil)
-                     else
-                       fetch_and_demongoize(curr, meth, k)
-                     end
-                   elsif is_translation
-                     curr.try(:fetch, meth, nil)
-                   else
-                     fetch_and_demongoize(curr, meth, k)
-                   end
+              res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
+              res.empty? ? nil : res
+            elsif !is_translation && k.fields[meth]&.localized?
+              if i < num_meths
+                curr.try(:fetch, meth, nil)
+              else
+                fetch_and_demongoize(curr, meth, k)
+              end
+            elsif is_translation
+              curr.try(:fetch, meth, nil)
+            else
+              fetch_and_demongoize(curr, meth, k)
+            end
 
             # If it's a relation, update the current klass with the relation klass.
             if !is_field && !obj.nil?
