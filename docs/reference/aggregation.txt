@@ -78,8 +78,8 @@ could do the following:
   ])
   bands = Band.find(band_ids)
 
-Since the aggregation pipeline is implemented by the MongoDB Ruby Driver
-and not Mongoid, it returns raw ``BSON::Document`` objects rather than
+Note that the aggregation pipeline, since it is implemented by the Ruby driver
+for MongoDB and not Mongoid, returns raw ``BSON::Document`` objects rather than
 ``Mongoid::Document`` model instances. The above example projects only
 the ``_id`` field which is then used to load full models. An alternative is
 to not perform such a projection and work with raw fields, which would eliminate
