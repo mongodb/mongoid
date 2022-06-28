@@ -372,10 +372,6 @@ en:
             from the child side which association to go in."
           resolution: "Set the values from the parent, or redefine the association
             with only a single definition in the parent."
-        invalid_value:
-          message: "The value %{value} cannot be written to a field of type %{field_class}."
-          summary: "The value %{value} could not be coerced to type %{field_class}."
-          resolution: "Verify that the value to be set corresponds to the field definition."
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
             document via a non-embedded association is not allowed since the
