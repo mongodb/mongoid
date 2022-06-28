@@ -521,6 +521,7 @@ module Mongoid
           tallies
         end
       end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.
