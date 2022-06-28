@@ -22,6 +22,8 @@ module Mongoid
           when ::Regexp then object
           when BSON::Regexp::Raw then object.compile
           end
+        rescue RegexpError
+          nil
         end
       end
     end

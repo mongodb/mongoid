@@ -147,7 +147,8 @@ module Mongoid
         # @return [ Array | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
-          if object.is_a?(::Array)
+          case object
+          when ::Array, ::Set
             evolve(object).collect{ |obj| obj.class.mongoize(obj) }
           end
         end
