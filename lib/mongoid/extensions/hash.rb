@@ -221,7 +221,7 @@ module Mongoid
         def mongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
-            evolve(object.dup).transform_values!(&:mongoize)
+            object.dup.transform_values!(&:mongoize)
           end
         end
 

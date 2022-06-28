@@ -66,8 +66,7 @@ module Mongoid
         #   representing the object or nil. String if Mongoid.map_big_decimal_to_decimal128
         #   is false, BSON::Decimal128 otherwise.
         def mongoize(object)
-          return if object.nil?
-          return if object.is_a?(String) && object.blank?
+          return if object.blank?
           if Mongoid.map_big_decimal_to_decimal128
             if object.is_a?(BSON::Decimal128)
               object
@@ -79,8 +78,6 @@ module Mongoid
           else
             if object.is_a?(BSON::Decimal128) || object.numeric?
               object.to_s
-            elsif object.numeric?
-              object.to_d.to_s
             end
           end
         end

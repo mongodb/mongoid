@@ -36,7 +36,7 @@ module Mongoid
         #
         # @return [ Float | nil ] The object mongoized or nil.
         def mongoize(object)
-          return if object.nil?
+          return if object.blank?
           if object.numeric?
             object.to_f
           end

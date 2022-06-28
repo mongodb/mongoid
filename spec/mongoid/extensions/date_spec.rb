@@ -76,4 +76,23 @@ describe Mongoid::Extensions::Date do
       expect(date.mongoize).to eq(time)
     end
   end
+
+  describe ".mongoize" do
+    let(:date) do
+      Date.new(2010, 1, 1)
+    end
+
+    let(:time) do
+      Time.utc(2010, 1, 1, 0, 0, 0, 0)
+    end
+
+    let(:mongoized) do
+      byebug
+      Date.mongoize(date)
+    end
+
+    it "returns the date as a time" do
+      expect(mongoized).to eq(time)
+    end
+  end
 end

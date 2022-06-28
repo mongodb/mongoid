@@ -65,7 +65,7 @@ module Mongoid
         #
         # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
-          return if object.nil?
+          return if object.blank?
           begin
             time = object.__mongoize_time__
             if time.acts_like?(:time)
