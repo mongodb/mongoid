@@ -1056,8 +1056,8 @@ describe Mongoid::Contextual::Mongo do
     context "when tallying an aliased field of type array" do
 
       before do
-        Person.create(array: [ 1, 2 ])
-        Person.create(array: [ 1, 3 ])
+        Person.create!(array: [ 1, 2 ])
+        Person.create!(array: [ 1, 3 ])
       end
 
       let(:tally) do

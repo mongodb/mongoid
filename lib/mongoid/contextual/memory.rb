@@ -199,6 +199,12 @@ module Mongoid
         end.compact
       end
 
+      def tally(field)
+        return documents.lazy
+          .map { |d| retrieve_value(d, field) }
+          .tally
+      end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.
@@ -413,6 +419,59 @@ module Mongoid
 
       def _session
         @criteria.send(:_session)
+      end
+
+      # Retrieve the value for the current document at the given field path.
+      #
+      # For example, if I have the following models:
+      #
+      #   User has_many Accounts
+      #   address is a hash on Account
+      #
+      #   u = User.new(accounts: [ Account.new(address: { street: "W 50th" }) ])
+      #   retrieve_value(u, "user.accounts.address.street")
+      #   # => [ "W 50th" ]
+      #
+      # Note that the result is in an array since accounts is an array. If it
+      # was nested in two arrays the result would be in a 2D array.
+      #
+      # @param [ Object ] document The object to traverse the field path.
+      # @param [ String ] field_path The dotted string that represents the path
+      #   to the value.
+      #
+      # @return [ Object | nil ] The value at the given field path or nil if it
+      #   doesn't exist.
+      def retrieve_value(document, field_path)
+        return if field_path.blank? || !document
+        segment, remaining = field_path.to_s.split('.', 2)
+
+        curr = if document.is_a?(Document)
+          # Retrieves field for segment to check localization. Only does one
+          # iteration since there's no dots
+          res = if remaining
+            field = document.class.traverse_association_tree(segment)
+            # If this is a localized field, and there are remaining, get the
+            # _translations hash so that we can get the specified translation in
+            # the remaining
+            if field&.localized?
+              document.send("#{segment}_translations")
+            end
+          end
+          res.nil? ? document.send(segment) : res
+        elsif document.is_a?(Hash)
+          document.with_indifferent_access.fetch(segment, nil)
+        else
+          nil
+        end
+
+        return curr unless remaining
+
+        if curr.is_a?(Array)
+          # compact is used for consistency with server behavior.
+          curr.map { |d| retrieve_value(d, remaining) }.compact
+        else
+          retrieve_value(curr, remaining)
+        end
       end
     end
   end
