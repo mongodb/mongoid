@@ -494,7 +494,8 @@ module Mongoid
       def tally(field)
         name = klass.cleanse_localized_field_names(field)
 
-        fld, pipeline = build_tally_pipeline(name)
+        fld = klass.traverse_association_tree(name)
+        pipeline = [ { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } } ]
         pipeline.unshift("$match" => view.filter) unless view.filter.blank?
 
         collection.aggregate(pipeline).reduce({}) do |tallies, doc|
@@ -772,11 +773,15 @@ module Mongoid
       # @param [ Object ] The value for the given field name
       def extract_value(attrs, field_name)
         def fetch_and_demongoize(d, meth, klass)
-          res = d.try(:fetch, meth, nil)
-          if field = klass.fields[meth]
-            field.demongoize(res)
+          if d.is_a?(Array)
+            d.map { |doc| fetch_and_demongoize(doc, meth, klass) }
           else
-            res.class.demongoize(res)
+            res = d.try(:fetch, meth, nil)
+            if field = klass.fields[meth]
+              field.demongoize(res)
+            else
+              res.class.demongoize(res)
+            end
           end
         end
 
@@ -805,7 +810,7 @@ module Mongoid
           #    value so the full hash is returned.
           # 4. Otherwise, fetch and demongoize the value for the key meth.
           curr = if curr.is_a? Array
-            res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
+            res = fetch_and_demongoize(curr, meth, k)
             res.empty? ? nil : res
           elsif !is_translation && k.fields[meth]&.localized?
             if i < num_meths
@@ -869,62 +874,6 @@ module Mongoid
         else
           value.class.demongoize(value)
         end
-      end
-
-      # If there are arrays or embeds_many associations we need to unwind each
-      # of them, except for the last one, and group the results. The unwind key
-      # is built up from the base document. Take the following example:
-      #
-      #   User embeds_many Accounts
-      #   Account embeds_one Holding
-      #   Holding embeds_many Assets
-      #
-      # and we want to tally the name field on Asset. The following pipeline
-      # will be built:
-      #
-      #   { $unwind: { path: "$accounts" } }
-      #   { $group: { _id: "$accounts.holding.assets.name" } }
-      #
-      # We don't unwind the last embeds_many/array so that the results come
-      # back in array form. Meaning, if we had the following documents:
-      #
-      #   { _id: 1, ages: [ { x: 1 }, { x: 2 } ] }
-      #   { _id: 2, ages: [ { x: 1 }, { x: 2 } ] }
-      #   { _id: 3, ages: [ { x: 1 }, { x: 3 } ] }
-      #
-      # and we tally on `ages.x`, I expect the results to be:
-      #
-      #   [1, 2] => 2
-      #   [1, 3] => 1
-      #
-      # If you unwind ages, then the result you get has integer keys instead
-      # of array keys: { 1 => 3, 2 => 2, 3 => 1 }, which is not the correct
-      # functionality.
-      #
-      # @param [ String ] name The field name.
-      # @return [ Array<Field, Array<Hash>> ] The field for the given field name
-      #   and the built pipeline.
-      #
-      # @api private
-      def build_tally_pipeline(name)
-        current = ""
-        pipeline = []
-        num_meths = name.count('.') + 1
-        i = 1
-        field = klass.traverse_association_tree(name) do |meth, obj, is_field|
-          current += "." unless current.blank?
-          current += meth
-
-          if (is_field && obj.type == Array) || (!is_field && obj.is_a?(Association::Embedded::EmbedsMany))
-            pipeline.push({ "$unwind": { path: "$#{current}" }})
-          end
-
-          i += 1
-        end
-        # Get rid of the last unwind so that results come in array form.
-        pipeline.pop
-        pipeline.push( { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } })
-        [ field, pipeline ]
       end
     end
   end

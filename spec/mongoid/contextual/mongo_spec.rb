@@ -1102,7 +1102,7 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when querying a deeply nested arrays/embedded associations" do
+    context "when tallying deeply nested arrays/embedded associations" do
 
       before do
         Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
@@ -1116,8 +1116,50 @@ describe Mongoid::Contextual::Mongo do
 
       it "returns the correct hash" do
         expect(tally).to eq(
-          [1, 2] => 2,
-          [1, 3] => 1
+          [ [ 1, 2 ] ] => 2,
+          [ [ 1, 3 ] ] => 1
+        )
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      before do
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
+
+      let(:tally) do
+        Person.tally("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [ [ 1, 2 ], [ 1, 2 ] ] => 2,
+          [ [ 1, 3 ], [ 1, 3 ] ] => 1
+        )
+      end
+    end
+
+    context "when some keys are missing" do
+      before do
+        3.times { Band.create!(origin: "tally") }
+      end
+
+      let(:tally) do
+        criteria.tally(:name)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          "Depeche Mode" => 1,
+          "New Order" => 1,
+          "10,000 Maniacs" => 1,
+          nil => 3
         )
       end
     end
