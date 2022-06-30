@@ -1261,6 +1261,29 @@ describe Mongoid::Contextual::Memory do
       end
     end
 
+    context "when tallying an element from an array of hashes; with duplicate" do
+
+      let(:band4) { Band.new(origin: "tally", genres: [ { x: 1 }, {x: 1} ] ) }
+
+      let(:criteria) do
+        Band.where(origin: "tally").all.tap do |crit|
+          crit.documents = [ band1, band2, band3, band4 ]
+        end
+      end
+
+      let(:tally) do
+        context.tally("genres.x")
+      end
+
+      it "returns the correct hash without the nil keys" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1,
+          [1, 1] => 1,
+        )
+      end
+    end
+
     context "when tallying an aliased field of type array" do
 
       let(:person1) { Person.new(array: [ 1, 2 ]) }

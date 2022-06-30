@@ -1053,6 +1053,27 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
+    context "when tallying an element from an array of hashes; with duplicate" do
+
+      before do
+        Band.create!(origin: "tally", genres: [ { x: 1 }, {x: 1} ] )
+      end
+
+      let(:criteria) { Band.where(origin: "tally") }
+
+      let(:tally) do
+        criteria.tally("genres.x")
+      end
+
+      it "returns the correct hash without the nil keys" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1,
+          [1, 1] => 1,
+        )
+      end
+    end
+
     context "when tallying an aliased field of type array" do
 
       before do
