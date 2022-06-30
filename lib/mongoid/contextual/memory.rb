@@ -200,9 +200,11 @@ module Mongoid
       end
 
       def tally(field)
-        return documents.lazy
-          .map { |d| retrieve_value(d, field) }
-          .tally
+        return documents.each_with_object({}) do |d, acc|
+          v = retrieve_value(d, field)
+          acc[v] ||= 0
+          acc[v] += 1
+        end
       end
 
       # Skips the provided number of documents.
