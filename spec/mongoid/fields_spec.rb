@@ -588,6 +588,41 @@ describe Mongoid::Fields do
         expect(person.age_before_type_cast).to eq("old")
       end
     end
+
+    context "when reloading" do
+
+      let(:product) do
+        Product.create!.tap do |product|
+          Product.collection.update_one({ _id: product.id }, { :$set => { price: '1' }})
+        end
+      end
+
+      before do
+        product.reload
+      end
+
+      it "resets the attributes_before_type_cast" do
+        expect(product.attributes_before_type_cast).to eq({})
+      end
+
+      it "the *_before_type_cast method returns the current value" do
+        expect(product.price_before_type_cast).to eq(1)
+      end
+
+      it "populates the attributes_before_type_cast after accessing" do
+        expect(product.attributes_before_type_cast).to eq({})
+        expect(product.price).to eq(1)
+        expect(product.price_before_type_cast).to eq('1')
+        expect(product.attributes_before_type_cast).to eq('price' => '1')
+      end
+
+      it "populates the attributes_before_type_cast after accessing" do
+        expect(product.attributes_before_type_cast).to eq({})
+        expect(product.read_attribute(:price)).to eq(1)
+        expect(product.price_before_type_cast).to eq('1')
+        expect(product.attributes_before_type_cast).to eq('price' => '1')
+      end
+    end
   end
 
   describe "#setter=" do
@@ -739,6 +774,22 @@ describe Mongoid::Fields do
             { "de" => "Cheaper drinks", "en" => "Cheap drinks" }
           )
         end
+      end
+    end
+
+    context "when the field needs to be mongoized" do
+
+      before do
+        product.price = "1"
+        product.save!
+      end
+
+      it "mongoizes the value" do
+        expect(product.price).to eq(1)
+      end
+
+      it "stores the unmongoized value in attributes_before_type_cast" do
+        expect(product.attributes_before_type_cast).to eq({ "price" => "1" })
       end
     end
   end

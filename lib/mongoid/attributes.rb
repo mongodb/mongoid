@@ -86,12 +86,26 @@ module Mongoid
     def read_attribute(name)
       field = fields[name.to_s]
       raw = read_raw_attribute(name)
-      # Keep this code consistent with Mongoid::Fields.create_field_getter
-      value = field ? field.demongoize(raw) : raw
-      attribute_will_change!(name.to_s) if value.resizable?
-      value
+      process_raw_attribute(name.to_s, raw, field)
     end
     alias :[] :read_attribute
+
+
+    # Process the raw attribute values just read from the documents attributes.
+    #
+    # @param [ String ] name The name of the attribute to get.
+    # @param [ Object ] raw The raw attribute value.
+    # @param [ Field | nil ] field The field to use for demongoization or nil.
+    #
+    # @return [ Object ] The value of the attribute.
+    #
+    # @api private
+    def process_raw_attribute(name, raw, field)
+      attributes_before_type_cast[name] = raw
+      value = field ? field.demongoize(raw) : raw
+      attribute_will_change!(name) if value.resizable?
+      value
+    end
 
     # Read a value from the attributes before type cast. If the value has not
     # yet been assigned then this will return the attribute's existing value
