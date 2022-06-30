@@ -789,7 +789,7 @@ describe Mongoid::Fields do
       end
 
       it "stores the unmongoized value in attributes_before_type_cast" do
-        expect(product.attributes_before_type_cast).to eq({ "price" => "1" })
+        expect(product.attributes_before_type_cast["price"]).to eq("1")
       end
     end
   end
