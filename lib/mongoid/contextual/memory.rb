@@ -201,7 +201,7 @@ module Mongoid
 
       def tally(field)
         return documents.each_with_object({}) do |d, acc|
-          v = retrieve_value(d, field)
+          v = retrieve_value_at_path(d, field)
           acc[v] ||= 0
           acc[v] += 1
         end
@@ -431,7 +431,7 @@ module Mongoid
       #   address is a hash on Account
       #
       #   u = User.new(accounts: [ Account.new(address: { street: "W 50th" }) ])
-      #   retrieve_value(u, "user.accounts.address.street")
+      #   retrieve_value_at_path(u, "user.accounts.address.street")
       #   # => [ "W 50th" ]
       #
       # Note that the result is in an array since accounts is an array. If it
@@ -443,7 +443,7 @@ module Mongoid
       #
       # @return [ Object | nil ] The value at the given field path or nil if it
       #   doesn't exist.
-      def retrieve_value(document, field_path)
+      def retrieve_value_at_path(document, field_path)
         return if field_path.blank? || !document
         segment, remaining = field_path.to_s.split('.', 2)
 
@@ -461,7 +461,10 @@ module Mongoid
           end
           res.nil? ? document.send(segment) : res
         elsif document.is_a?(Hash)
-          document.with_indifferent_access.fetch(segment, nil)
+          # TODO: Remove the indifferent access when implementing MONGOID-5410.
+          document.key?(segment.to_s) ?
+            document[segment.to_s] :
+            document[segment.to_sym]
         else
           nil
         end
@@ -470,9 +473,9 @@ module Mongoid
 
         if curr.is_a?(Array)
           # compact is used for consistency with server behavior.
-          curr.map { |d| retrieve_value(d, remaining) }.compact
+          curr.map { |d| retrieve_value_at_path(d, remaining) }.compact
         else
-          retrieve_value(curr, remaining)
+          retrieve_value_at_path(curr, remaining)
         end
       end
     end

@@ -764,6 +764,26 @@ module Mongoid
         collection.write_concern.nil? || collection.write_concern.acknowledged?
       end
 
+      # Fetch the element from the given hash and demongoize it using the
+      # given field. If the obj is an array, map over it and call this method
+      # on all of its elements.
+      #
+      # @param [ Hash | Array<Hash> ] obj The hash or array of hashes to fetch from.
+      # @param [ String ] meth The key to fetch from the hash.
+      # @param [ Field ] field The field to use for demongoization.
+      #
+      # @return [ Object ] The demongoized value.
+      #
+      # @api private
+      def fetch_and_demongoize(obj, meth, field)
+        if obj.is_a?(Array)
+          obj.map { |doc| fetch_and_demongoize(doc, meth, field) }
+        else
+          res = obj.try(:fetch, meth, nil)
+          field ? field.demongoize(res) : res.class.demongoize(res)
+        end
+      end
+
       # Extracts the value for the given field name from the given attribute
       # hash.
       #
@@ -772,25 +792,13 @@ module Mongoid
       #
       # @param [ Object ] The value for the given field name
       def extract_value(attrs, field_name)
-        def fetch_and_demongoize(d, meth, klass)
-          if d.is_a?(Array)
-            d.map { |doc| fetch_and_demongoize(doc, meth, klass) }
-          else
-            res = d.try(:fetch, meth, nil)
-            if field = klass.fields[meth]
-              field.demongoize(res)
-            else
-              res.class.demongoize(res)
-            end
-          end
-        end
-
         i = 1
         num_meths = field_name.count('.') + 1
         k = klass
         curr = attrs.dup
 
         klass.traverse_association_tree(field_name) do |meth, obj, is_field|
+          field = obj if is_field
           is_translation = false
           # If no association or field was found, check if the meth is an
           # _translations field.
@@ -810,18 +818,18 @@ module Mongoid
           #    value so the full hash is returned.
           # 4. Otherwise, fetch and demongoize the value for the key meth.
           curr = if curr.is_a? Array
-            res = fetch_and_demongoize(curr, meth, k)
+            res = fetch_and_demongoize(curr, meth, field)
             res.empty? ? nil : res
-          elsif !is_translation && k.fields[meth]&.localized?
+          elsif !is_translation && field&.localized?
             if i < num_meths
               curr.try(:fetch, meth, nil)
             else
-              fetch_and_demongoize(curr, meth, k)
+              fetch_and_demongoize(curr, meth, field)
             end
           elsif is_translation
             curr.try(:fetch, meth, nil)
           else
-            fetch_and_demongoize(curr, meth, k)
+            fetch_and_demongoize(curr, meth, field)
           end
 
           # If it's a relation, update the current klass with the relation klass.
