@@ -27,7 +27,7 @@ module Mongoid
         raise Errors::DocumentNotFound.new(self.class, _id, shard_keys)
       end
       @attributes = reloaded
-      @attributes_before_type_cast = {}
+      @attributes_before_type_cast = @attributes.dup
       @changed_attributes = {}
       @previous_changes = {}
       @previous_attributes = {}

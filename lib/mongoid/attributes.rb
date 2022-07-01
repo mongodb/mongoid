@@ -101,7 +101,6 @@ module Mongoid
     #
     # @api private
     def process_raw_attribute(name, raw, field)
-      attributes_before_type_cast[name] = raw
       value = field ? field.demongoize(raw) : raw
       attribute_will_change!(name) if value.resizable?
       value

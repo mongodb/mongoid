@@ -103,7 +103,7 @@ describe Mongoid::Reloadable do
       end
 
       it "resets attributes_before_type_cast" do
-        expect(person.attributes_before_type_cast).to be_empty
+        expect(person.attributes_before_type_cast).to eq(person.attributes)
       end
     end
 
