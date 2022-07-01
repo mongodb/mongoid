@@ -295,18 +295,6 @@ describe 'Mongoid application tests' do
         f << lines.join
       end
     end
-
-    if rails_version == '5.1'
-      secrets = {
-        'development' => {
-          'secret_key_base' => 'abracadabra',
-          'my_secret_token' => 'very_secret',
-        },
-      }
-      File.open('config/secrets.yml', 'w') do |f|
-        f << YAML.dump(secrets)
-      end
-    end
   end
 
   def remove_bundler_req

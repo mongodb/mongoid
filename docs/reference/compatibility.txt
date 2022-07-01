@@ -91,7 +91,7 @@ is deprecated.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
+     -
      -
      -
      -
@@ -335,7 +335,7 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
-     - |checkmark| [#rails-5-ruby-3.0]_
+     -
 
    * - 7.4
      - |checkmark|

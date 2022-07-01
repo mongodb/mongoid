@@ -37,11 +37,7 @@ describe 'Matcher operators' do
                             BSON::Timestamp,
                             BSON::Undefined ]
 
-      specs = if RUBY_VERSION.start_with?("2.5")
-                YAML.safe_load(File.read(path), permitted_classes, [], true)
-              else
-                YAML.safe_load(File.read(path), permitted_classes: permitted_classes, aliases: true)
-              end
+      specs = YAML.safe_load(File.read(path), permitted_classes: permitted_classes, aliases: true)
 
       specs.each do |spec|
         context spec['name'] do

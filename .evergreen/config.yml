@@ -353,7 +353,7 @@ axes:
         display_name: "MongoDB 3.6"
         variables:
            VERSION: "3.6"
-  
+
   - id: "topology"
     display_name: Topology
     values:
@@ -370,7 +370,7 @@ axes:
         variables:
            TOPOLOGY: "sharded-cluster"
            SINGLE_MONGOS: true
-  
+
   - id: "auth"
     display_name: Authentication
     values:
@@ -382,7 +382,7 @@ axes:
         display_name: NoAuth
         variables:
            AUTH: "noauth"
-  
+
   - id: "ssl"
     display_name: SSL
     values:
@@ -394,14 +394,10 @@ axes:
         display_name: NoSSL
         variables:
            SSL: "nossl"
-  
+
   - id: "ruby"
     display_name: Ruby Version
     values:
-      - id: "ruby-2.5"
-        display_name: ruby-2.5
-        variables:
-           RVM_RUBY: "ruby-2.5"
       - id: "ruby-2.6"
         display_name: ruby-2.6
         variables:
@@ -422,7 +418,7 @@ axes:
         display_name: ruby-head
         variables:
            RVM_RUBY: "ruby-head"
-  
+
   - id: "jruby"
     display_name: JRuby Version
     values:
@@ -434,7 +430,7 @@ axes:
         display_name: jruby-9.3
         variables:
            RVM_RUBY: "jruby-9.3"
-  
+
   - id: "os"
     display_name: OS
     values:
@@ -463,7 +459,7 @@ axes:
         run_on: rhel80-small
         variables:
           DOCKER_DISTRO: rhel80
-          
+
   - id: "driver"
     display_name: Driver Version
     values:
@@ -511,7 +507,7 @@ axes:
         display_name: "BSON-master"
         variables:
           DRIVER: "bson-master"
-          
+
   - id: "rails"
     display_name: Rails Version
     values:
@@ -519,10 +515,6 @@ axes:
         display_name: "Rails master"
         variables:
           RAILS: "master"
-      - id: "5.1"
-        display_name: "Rails 5.1"
-        variables:
-          RAILS: "5.1"
       - id: "5.2"
         display_name: "Rails 5.2"
         variables:
@@ -539,7 +531,7 @@ axes:
         display_name: "Rails 7.0"
         variables:
           RAILS: "7.0"
-          
+
   - id: "i18n"
     display_name: I18n version
     values:
@@ -549,7 +541,7 @@ axes:
            I18N: "1.0"
       - id: current
         display_name: "i18n-current"
-        
+
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
     values:
@@ -557,7 +549,7 @@ axes:
         display_name: "i18n-fallbacks"
         variables:
            TEST_I18N_FALLBACKS: yes
-           
+
   - id: app-tests
     display_name: Mongoid application tests
     values:
@@ -632,17 +624,6 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-2.5"
-  matrix_spec:
-    ruby: ["ruby-2.5"]
-    driver: ["current"]
-    topology: ['replica-set']
-    mongodb-version: ['3.6']
-    os: ubuntu-16.04
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
 - matrix_name: "driver-upcoming"
   matrix_spec:
     driver: [master, stable]
@@ -657,7 +638,7 @@ buildvariants:
 - matrix_name: "driver-oldstable"
   matrix_spec:
     driver: [oldstable, min]
-    ruby: ["ruby-2.5"]
+    ruby: ["ruby-2.6"]
     mongodb-version: "4.0"
     topology: ['replica-set', 'sharded-cluster']
     os: ubuntu-18.04
@@ -668,7 +649,7 @@ buildvariants:
 - matrix_name: "driver-min"
   matrix_spec:
     driver: [min]
-    ruby: ["ruby-2.5"]
+    ruby: ["ruby-2.6"]
     mongodb-version: "3.6"
     topology: "standalone"
     os: ubuntu-16.04
@@ -729,7 +710,7 @@ buildvariants:
     driver: ["current"]
     mongodb-version: "4.0"
     topology: "standalone"
-    rails: ['5.1', '5.2']
+    rails: ['5.2']
     os: ubuntu-18.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
@@ -737,7 +718,7 @@ buildvariants:
 
 - matrix_name: "i18n-1.0"
   matrix_spec:
-    ruby: "ruby-2.5"
+    ruby: "ruby-2.6"
     driver: ["current"]
     mongodb-version: "4.4"
     topology: "standalone"
@@ -780,7 +761,7 @@ buildvariants:
     mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
-    rails: ['5.1', '5.2']
+    rails: ['5.2']
     os: ubuntu-18.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
