@@ -889,8 +889,8 @@ describe Mongoid::Fields do
         expect(product.price).to eq(1)
       end
 
-      it "stores the unmongoized value in attributes_before_type_cast" do
-        expect(product.attributes_before_type_cast["price"]).to eq("1")
+      it "stores the value in the mongoized form" do
+        expect(product.attributes_before_type_cast["price"]).to eq(1)
       end
     end
   end

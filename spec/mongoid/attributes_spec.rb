@@ -1266,8 +1266,8 @@ describe Mongoid::Attributes do
 
     context "before the attribute has been assigned" do
 
-      it "returns false" do
-        expect(person.has_attribute_before_type_cast?(:age)).to be false
+      it "returns true" do
+        expect(person.has_attribute_before_type_cast?(:age)).to be true
       end
     end
 
