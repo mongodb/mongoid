@@ -204,7 +204,7 @@ describe Mongoid::Config do
 
         Mongoid.configure { |config| config.load_configuration(configuration) }
 
-        expect(Mongoid::Config.discriminator_key).to eq("_type")
+        expect(Mongoid::Config.discriminator_key).to be("_type")
       end
     end
 
@@ -215,11 +215,11 @@ describe Mongoid::Config do
 
         Mongoid.configure { |config| config.load_configuration(configuration) }
 
-        expect(Mongoid::Config.discriminator_key).to eq("test")
+        expect(Mongoid::Config.discriminator_key).to be("test")
       end
 
       it 'is set globally' do
-        expect(Mongoid.discriminator_key).to eq("test")
+        expect(Mongoid.discriminator_key).to be("test")
       end
     end
   end
@@ -260,7 +260,7 @@ describe Mongoid::Config do
       let(:conf) { CONFIG }
 
       it "it is set to its default" do
-        expect(Mongoid.send(option)).to eq(default)
+        expect(Mongoid.send(option)).to be(default)
       end
     end
   end
