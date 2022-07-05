@@ -575,6 +575,16 @@ Since ``ne`` does not support merge strategies, the ``union`` strategy was
 ignored and reset and when ``in`` was invoked the second time there was no
 strategy active.
 
+.. warning::
+
+  Merge strategies currently assume the previous condition(s) have been added
+  to the top level of the query, however this is not always the case
+  (conditions may be nested under an ``$and`` clause). Using merge strategies
+  with complex criteria may cause incorrect queries to be constructed.
+  This misbehavior is `intended to be fixed in the future
+  <https://jira.mongodb.org/browse/MONGOID-5350>`_.
+
+
 Supported Operator Methods
 --------------------------
 
