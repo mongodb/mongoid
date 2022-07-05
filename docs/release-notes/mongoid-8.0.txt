@@ -527,6 +527,7 @@ it was stored and returned as a String.
   # => Mongoid 7: "data!"
   # => Mongoid 8: <BSON::Binary:0x2600 type=generic data=0x6461746121...>
 
+
 ``Decimal128``-backed ``BigDecimal`` fields
 -------------------------------------------
 
@@ -540,3 +541,35 @@ feature flag turned off, values assigned to fields of type ``BigDecimal`` are
 stored as Strings. See the section on :ref:`BigDecimal Fields <bigdecimal-fields>`
 for more details.
 
+
+Implemented ``.tally`` method on ``Mongoid#Criteria``
+-----------------------------------------------------
+
+Mongoid 8 implements the ``.tally`` method on ``Mongoid#Criteria``. ``tally``
+takes a field name as a parameter and returns a mapping from values to their
+counts. For example, take the following model:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+    field :age
+  end
+
+and the following documents in the database:
+
+.. code::
+
+  { _id: 1, age: 21 }
+  { _id: 2, age: 21 }
+  { _id: 3, age: 22 }
+
+Calling ``tally`` on the age field yields the following:
+
+.. code::
+
+  User.tally("age")
+  # => { 21 => 2, 22 => 1 }
+
+The ``tally`` method accepts the dot notation and field aliases. It also
+allows for tallying localized fields.
