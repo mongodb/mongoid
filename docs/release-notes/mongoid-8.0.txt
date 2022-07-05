@@ -304,6 +304,61 @@ Mongoid 7 behavior:
   end
 
 
+``#pluck`` on Embedded Criteria Returns ``nil`` Values
+------------------------------------------------
+
+Mongoid 8 fixes a bug where calling ``#pluck`` on a Mongoid::Criteria
+for embedded documents discarded nil values. This behavior was
+inconsistent with both the ``#pluck`` method in ActiveSupport and
+with how ``#pluck`` works when reading documents from the database.
+
+Mongoid 8.0 behavior:
+
+.. code-block:: ruby
+
+  class Address
+    include Mongoid::Document
+
+    embedded_in :mall
+
+    field :street, type: String
+  end
+
+  class Mall
+    include Mongoid::Document
+
+    embeds_many :addresses
+  end
+
+  mall = Mall.create!
+  mall.addresses.create!(street: "Elm Street")
+  mall.addresses.create!(street: nil)
+
+  # Pluck from embedded document criteria
+  mall.addresses.all.pluck(:street)
+    #=> ['Elm Street', nil]
+
+Mongoid 7 behavior, given the same setup:
+
+.. code-block:: ruby
+
+  # Pluck from embedded document criteria
+  mall.addresses.all.pluck(:street)
+    #=> ['Elm Street']
+
+For clarity, the following behavior is unchanged from Mongoid 7 to Mongoid 8.0:
+
+.. code-block:: ruby
+
+  # Pluck from database
+  Mall.all.pluck('addresses.street')
+    #=> [ ['Elm Street', nil] ]
+
+  # Pluck using ActiveSupport Array#pluck
+  mall.addresses.pluck(:street)
+    #=> ['Elm Street', nil]
+
+
 Removed ``:drop_dups`` Option from Indexes
 ------------------------------------------
 
