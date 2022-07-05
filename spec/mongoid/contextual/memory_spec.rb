@@ -988,7 +988,7 @@ describe Mongoid::Contextual::Memory do
           context.pluck(:foo)
         end
 
-        it "returns a empty array" do
+        it "returns an empty array" do
           expect(plucked).to eq([nil, nil])
         end
       end
@@ -999,7 +999,7 @@ describe Mongoid::Contextual::Memory do
           context.pluck(:foo, :bar)
         end
 
-        it "returns a empty array" do
+        it "returns an empty array" do
           expect(plucked).to eq([[nil, nil], [nil, nil]])
         end
       end
@@ -1098,7 +1098,7 @@ describe Mongoid::Contextual::Memory do
         context.pluck_each(*pluck_args) { |value| plucked_values << value }
       end
 
-      context "when pluck one field" do
+      context "when plucking one field" do
 
         let(:pluck_args) { [:foo] }
 
