@@ -19,7 +19,7 @@ module Mongoid
       #
       # @param [ Symbol ] field The name of an additional field to update.
       #
-      # @return [ true/false ] false if record is new_record otherwise true.
+      # @return [ true/false ] false if document is new_record otherwise true.
       def touch(field = nil)
         return false if _root.new_record?
         current = Time.configured.now
