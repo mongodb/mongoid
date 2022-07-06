@@ -44,7 +44,8 @@ module Mongoid
       :sum,
       :text_search,
       :update,
-      :update_all
+      :update_all,
+      :tally,
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.

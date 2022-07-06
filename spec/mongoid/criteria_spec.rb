@@ -2228,7 +2228,7 @@ describe Mongoid::Criteria do
         config_override :legacy_pluck_distinct, false
 
         it "demongoizes the field" do
-          expect(plucked.first).to eq(BigDecimal("1E2"))
+          expect(plucked).to eq([ BigDecimal("1E2") ])
         end
       end
     end
@@ -2253,7 +2253,7 @@ describe Mongoid::Criteria do
         config_override :legacy_pluck_distinct, false
 
         it "demongoizes the field" do
-          expect(plucked.first).to eq([BigDecimal("1E2")])
+          expect(plucked.first).to eq([ BigDecimal("1E2") ])
         end
       end
     end
@@ -2278,6 +2278,25 @@ describe Mongoid::Criteria do
         it "returns nil" do
           expect(plucked.first).to eq(nil)
         end
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      before do
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
+
+      let(:plucked) do
+        Person.pluck("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(plucked).to eq([
+          [ [ 1, 2 ] ], [ [ 1, 2 ] ], [ [ 1, 3 ] ]
+        ])
       end
     end
   end
