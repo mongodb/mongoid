@@ -410,11 +410,7 @@ module Mongoid
       # @return [ Document | Array<Document> ] The list of documents, or one
       #   document if no value was given.
       def take(value = nil)
-        if value
-          limit(value).to_a
-        else
-          first
-        end
+        value ? limit(value).to_a : first
       end
 
       # Take one document from the database and raise an error if there are none.

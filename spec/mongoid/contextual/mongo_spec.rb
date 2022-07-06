@@ -2337,7 +2337,7 @@ describe Mongoid::Contextual::Mongo do
       it "raises an error" do
         expect do
           Person.take!
-        end.to raise_error(/Could not find a document of class Person./)
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Person./)
       end
     end
   end
