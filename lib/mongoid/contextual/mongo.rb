@@ -410,7 +410,13 @@ module Mongoid
       # @return [ Document | Array<Document> ] The list of documents, or one
       #   document if no value was given.
       def take(value = nil)
-        value ? limit(value).to_a : first
+        if value
+          limit(value).to_a
+        else
+          # Do to_a first so that the Mongo#first method is not used and the
+          # result is not sorted.
+          limit(1).to_a.first
+        end
       end
 
       # Take one document from the database and raise an error if there are none.
@@ -420,7 +426,9 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def take!
-        if fst = first
+        # Do to_a first so that the Mongo#first method is not used and the
+        # result is not sorted.
+        if fst = limit(1).to_a.first
           fst
         else
           raise Errors::DocumentNotFound.new(klass, nil, nil)
