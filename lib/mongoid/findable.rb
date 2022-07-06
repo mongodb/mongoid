@@ -195,8 +195,8 @@ module Mongoid
     #   Person.first
     #
     # @return [ Document ] The first matching document.
-    def first
-      with_default_scope.first
+    def first(opts = {})
+      with_default_scope.first(opts)
     end
     alias :one :first
 

@@ -255,23 +255,27 @@ module Mongoid
       #
       # @param [ Hash ] opts The options for the query returning the first document.
       #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
+      # @option opts [ :none ] :id_sort Support for this option has been dropped.
+      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      # @options opts [ Integer ] :limit The number of documents to return.
       #
       # @return [ Document ] The first document.
       def first(opts = {})
-        return documents.first if cached? && cache_loaded?
-        try_cache(:first) do
-          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
-            if raw_doc = view.sort(sort).limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
+        if opts.key?(:id_sort)
+          Mongoid.logger.warn('Support for the :id_sort option has been dropped. Use Mongo#take to get a document without a sort on _id.')
+        end
+        limit = opts.fetch(:limit, 1)
+        if cached? && cache_loaded?
+          return opts[:limit] ? documents.first(limit) : documents.first
+        end
+        try_numbered_cache(:first, opts[:limit], :first) do
+          sort = view.sort || { _id: 1 }
+          if raw_docs = view.sort(sort).limit(limit).to_a
+            docs = raw_docs.map do |d|
+              Factory.from_db(klass, d, criteria)
             end
-          else
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
+            docs = eager_load(docs)
+            opts[:limit] ? docs : docs.first
           end
         end
       end
@@ -634,10 +638,35 @@ module Mongoid
       # @return the result of the block
       def try_cache(key, &block)
         unless cached?
-          yield
+          yield if block_given?
         else
           unless ret = instance_variable_get("@#{key}")
             instance_variable_set("@#{key}", ret = yield)
+          end
+          ret
+        end
+      end
+
+      # yield the block given or return the cached value
+      #
+      # @param [ String, Symbol ] key The instance variable name
+      # @param [ Integer | nil ] n The number of documents requested or nil
+      #   if none is requested.
+      # @param [ Symbol ] meth Method to extract the correct number of elements.
+      #
+      # @return [ Object ] the result of the block
+      def try_numbered_cache(key, n, meth, &block)
+        unless cached?
+          yield if block_given?
+        else
+          len = n || 1
+          ret = instance_variable_get("@#{key}")
+          if !ret || ret.length < len
+            instance_variable_set("@#{key}", ret = Array.wrap(yield))
+          elsif !n
+            ret = obj.is_a?(Array) ? obj.first : obj
+          elsif ret.length > len
+            ret = ret.send(meth, n)
           end
           ret
         end
