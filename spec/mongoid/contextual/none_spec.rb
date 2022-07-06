@@ -118,6 +118,12 @@ describe Mongoid::Contextual::None do
     end
   end
 
+  describe "#tally" do
+    it "returns an empty hash" do
+      expect(context.tally(:id)).to eq({})
+    end
+  end
+
   describe "#first" do
     it "returns nil" do
       expect(context.first).to be_nil

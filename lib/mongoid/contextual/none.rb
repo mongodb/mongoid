@@ -123,6 +123,18 @@ module Mongoid
         nil
       end
 
+      # Tally the field values in null context.
+      #
+      # @example Get the values for null context.
+      #   context.tally(:name)
+      #
+      # @param [ String, Symbol ] _field Field to tally.
+      #
+      # @return [ Hash ] An empty Hash.
+      def tally(_field)
+        {}
+      end
+
       # Create the new null context.
       #
       # @example Create the new context.

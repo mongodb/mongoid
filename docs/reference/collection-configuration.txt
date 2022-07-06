@@ -18,11 +18,20 @@ Mongoid does not provide a mechanism for creating capped collections on the fly 
 will need to create these yourself one time up front either with the driver or via the
 Mongo console.
 
-To create a capped collection with the driver:
+To create a capped collection with the driver, first retrieve the client:
 
 .. code-block:: ruby
 
-  client["name", :capped => true, :size => 1024].create
+  class Name
+    include Mongoid::Document
+  end
+  client = Name.collection.client
+
+Then create the collection:
+
+.. code-block:: ruby
+
+  client["names", :capped => true, :size => 1024].create
 
 To create a capped collection from the Mongo console:
 

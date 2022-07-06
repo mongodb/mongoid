@@ -50,7 +50,7 @@ module Mongoid
           _unscoped.clear
         end
 
-        # Batch remove the provided documents as a $pullAll.
+        # Batch remove the provided documents as a $pullAll or $pull.
         #
         # @example Batch remove the documents.
         #   batchable.batch_remove([ doc_one, doc_two ])
@@ -58,12 +58,30 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to remove.
         # @param [ Symbol ] method Delete or destroy.
         def batch_remove(docs, method = :delete)
+          # If the _id is nil, we cannot use $pull and delete by searching for
+          # the id. Therefore we have to use pullAll with the documents'
+          # attributes.
           removals = pre_process_batch_remove(docs, method)
+          pulls, pull_alls = removals.partition { |o| !o["_id"].nil? }
+
+          if !_base.persisted?
+            post_process_batch_remove(docs, method) unless docs.empty?
+            return reindex
+          end
+
           if !docs.empty?
-            collection.find(selector).update_one(
-              positionally(selector, "$pullAll" => { path => removals }),
-              session: _session
-            )
+            if !pulls.empty?
+              collection.find(selector).update_one(
+                positionally(selector, "$pull" => { path => { "_id" => { "$in" => pulls.pluck("_id") } } }),
+                session: _session
+              )
+            end
+            if !pull_alls.empty?
+              collection.find(selector).update_one(
+                positionally(selector, "$pullAll" => { path => pull_alls }),
+                session: _session
+              )
+            end
             post_process_batch_remove(docs, method)
           else
             collection.find(selector).update_one(
@@ -95,7 +113,7 @@ module Mongoid
               batch_remove(_target.dup)
             end
           elsif _target != docs
-            _base.delayed_atomic_sets.clear unless _assigning?
+            _base.delayed_atomic_sets.delete(path) unless _assigning?
             docs = normalize_docs(docs).compact
             _target.clear and _unscoped.clear
             _base.delayed_atomic_unsets.delete(path)

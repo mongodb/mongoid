@@ -2210,6 +2210,79 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           end
         end
       end
+
+      context "when modifying the document beforehand" do
+        let(:parent) { EmmParent.new }
+
+        before do
+
+          parent.blocks << EmmBlock.new(name: 'test', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[0].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "deletes the correct document in the database" do
+          expect(parent.reload.blocks.length).to eq(0)
+        end
+      end
+
+      context "when nil _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test2', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "deletes only the matching documents in the database" do
+          expect(parent.reload.blocks.length).to eq(1)
+        end
+      end
+
+      # Since without an _id field we must us a $pullAll with the attributes of
+      # the embedded document, if you modify it beforehand, the query will not
+      # be able to find the correct document to pull.
+      context "when modifying the document with nil _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test2', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[0].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "does not delete the correct documents" do
+          expect(parent.reload.blocks.length).to eq(2)
+        end
+      end
+
+      context "when documents with and without _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(name: 'test', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[1].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "does not delete the correct documents" do
+          expect(parent.reload.blocks.length).to eq(0)
+        end
+      end
     end
   end
 
@@ -3960,6 +4033,28 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
+  context "when destroying a document with multiple nil _ids" do
+    let(:congress) { EmmCongress.create! }
+
+    before do
+      congress.legislators << EmmLegislator.new(_id: nil, a: 1)
+      congress.legislators << EmmLegislator.new(_id: nil, a: 2)
+
+      congress.legislators[0].destroy
+    end
+
+    it "deletes the correct document locally" do
+      pending "MONGOID-5394"
+      expect(congress.legislators.length).to eq(1)
+      expect(congress.legislators.first.a).to eq(1)
+    end
+
+    it "only deletes the one document" do
+      pending "MONGOID-5394"
+      expect(congress.reload.legislators.length).to eq(1)
+    end
+  end
+
   context "when adding a document" do
 
     let(:person) do
@@ -4738,6 +4833,31 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
     it "does not persist the parent" do
       expect(School.count).to eq(0)
+    end
+  end
+
+  context "when doing assign_attributes then assignment" do
+
+    let(:post) do
+      EmmPost.create!(
+        company_tags: [ EmmCompanyTag.new(title: "1"), EmmCompanyTag.new(title: "1") ],
+        user_tags: [ EmmUserTag.new(title: "1"), EmmUserTag.new(title: "1") ]
+      )
+    end
+
+    let(:from_db) { EmmPost.find(post.id) }
+
+    before do
+      post.assign_attributes(
+        company_tags: [ EmmCompanyTag.new(title: '3'), EmmCompanyTag.new(title: '4') ]
+      )
+      post.user_tags = [ EmmUserTag.new(title: '3'), EmmUserTag.new(title: '4') ]
+      post.save!
+    end
+
+    it "persists the associations correctly" do
+      expect(from_db.user_tags.size).to eq(2)
+      expect(from_db.company_tags.size).to eq(2)
     end
   end
 end

@@ -470,6 +470,75 @@ module Mongoid
         PluckEnumerator.new(klass, view.limit(1), fields).first
       end
 
+      # Get a hash of counts for the values of a single field. For example,
+      # if the following documents were in the database:
+      #
+      #   { _id: 1, age: 21 }
+      #   { _id: 2, age: 21 }
+      #   { _id: 3, age: 22 }
+      #
+      #   Model.tally("age")
+      #
+      # would yield the following result:
+      #
+      #   { 21 => 2, 22 => 1 }
+      #
+      # When tallying a field inside an array or embeds_many association:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 2, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 3, array: [ { x: 1 }, { x: 3 } ] }
+      #
+      #   Model.tally("array.x")
+      #
+      # The keys of the resulting hash are arrays:
+      #
+      #   { [ 1, 2 ] => 2, [ 1, 3 ] => 1 }
+      #
+      # Note that if tallying an element in an array of hashes, and the key
+      # doesn't exist in some of the hashes, tally will not include those
+      # nil keys in the resulting hash:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 }, { y: 3 } ] }
+      #
+      #   Model.tally("array.x")
+      #   # => { [ 1, 2 ] => 1 }
+      #
+      # @param [ String | Symbol ] field The field name.
+      #
+      # @return [ Hash ] The hash of counts.
+      def tally(field)
+        name = klass.cleanse_localized_field_names(field)
+
+        fld = klass.traverse_association_tree(name)
+        pipeline = [ { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } } ]
+        pipeline.unshift("$match" => view.filter) unless view.filter.blank?
+
+        collection.aggregate(pipeline).reduce({}) do |tallies, doc|
+          is_translation = "#{name}_translations" == field.to_s
+          val = doc["_id"]
+
+          key = if val.is_a?(Array)
+            val.map do |v|
+              demongoize_with_field(fld, v, is_translation)
+            end
+          else
+            demongoize_with_field(fld, val, is_translation)
+          end
+
+          # The only time where a key will already exist in the tallies hash
+          # is when the values are stored differently in the database, but
+          # demongoize to the same value. A good example of when this happens
+          # is when using localized fields. While the server query won't group
+          # together hashes that have other values in different languages, the
+          # demongoized value is just the translation in the current locale,
+          # which can be the same across multiple of those unequal hashes.
+          tallies[key] ||= 0
+          tallies[key] += doc["counts"]
+          tallies
+        end
+      end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.
@@ -722,12 +791,28 @@ module Mongoid
       # @return [ Object ] The demongoized value.
       def recursive_demongoize(field_name, value, is_translation)
         field = klass.traverse_association_tree(field_name)
+        demongoize_with_field(field, value, is_translation)
+      end
 
+      # Demongoize the value for the given field. If the field is nil or the
+      # field is a translations field, the value is demongoized using its class.
+      #
+      # @param [ Field ] field The field to use to demongoize.
+      # @param [ Object ] value The value to demongoize.
+      # @param [ Boolean ] is_translation The field we are retrieving is an
+      #   _translations field.
+      #
+      # @return [ Object ] The demongoized value.
+      #
+      # @api private
+      def demongoize_with_field(field, value, is_translation)
         if field
           # If it's a localized field that's not a hash, don't demongoize
           # again, we already have the translation. If it's an _translations
           # field, don't demongoize, we want the full hash not just a
           # specific translation.
+          # If it is a hash, and it's not a translations field, we need to
+          # demongoize to get the correct translation.
           if field.localized? && (!value.is_a?(Hash) || is_translation)
             value.class.demongoize(value)
           else
