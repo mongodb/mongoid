@@ -837,8 +837,8 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when given a Proc" do
-      it "behaves as Enumerable" do
+    context "when given a Proc without a block" do
+      it "raises an error" do
         lambda do
           criteria.find(-> {"default"})
         # Proc is not serializable to a BSON type
