@@ -1107,7 +1107,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "yields the plucked values" do
-          expect(plucked_values).to eq([])
+          expect(plucked_values).to eq([nil, nil])
         end
       end
 
@@ -1120,7 +1120,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "yields the plucked values" do
-          expect(plucked_values).to eq([[], []])
+          expect(plucked_values).to eq([[nil, nil], [nil, nil]])
         end
       end
     end
