@@ -119,6 +119,14 @@ module Mongoid
 
       # Always returns nil.
       #
+      # @example Get the first document in null context.
+      #   context.first
+      #
+      # @return [ nil ] Always nil.
+      def first(*args); nil; end
+
+      # Always returns nil.
+      #
       # @example Get the last document in null context.
       #   context.last
       #
