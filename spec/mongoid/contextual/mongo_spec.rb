@@ -2268,6 +2268,80 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#take" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "takes the correct number results" do
+      expect(context.take(2)).to eq([ depeche_mode, new_order ])
+    end
+
+    it "returns an array when passing 1" do
+      expect(context.take(1)).to eq([ depeche_mode ])
+    end
+
+    it "does not return an array when not passing an argument" do
+      expect(context.take).to eq(depeche_mode)
+    end
+
+    it "returns all the documents taking more than whats in the db" do
+      expect(context.take(5)).to eq([ depeche_mode, new_order, rolling_stones ])
+    end
+  end
+
+  describe "#take!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "takes the first document" do
+      expect(context.take!).to eq(depeche_mode)
+    end
+
+    context "when there are no documents" do
+      it "raises an error" do
+        expect do
+          Person.take!
+        end.to raise_error(/Could not find a document of class Person./)
+      end
+    end
+  end
+
   describe "#map" do
 
     before do
