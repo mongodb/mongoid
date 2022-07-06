@@ -14,7 +14,7 @@ module Mongoid
         class_attribute :relations
 
         # A hash that maps aliases to their associations. This is used when
-        # associations specify the `as` option, or on a referenced association.
+        # associations specify the `store_as` option, or on a referenced association.
         # On a referenced association, this is used to map the foreign key to
         # the association's name. For example, if we had the following
         # relationship:

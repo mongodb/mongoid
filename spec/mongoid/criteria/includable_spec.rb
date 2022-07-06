@@ -1461,5 +1461,32 @@ describe Mongoid::Criteria::Includable do
         end
       end
     end
+
+    context "when including an association and using each twice on a criteria" do
+
+      let(:criteria) { IncPost.all.includes(:person) }
+
+      before do
+        p = IncPerson.create!(name: "name")
+        4.times { IncPost.create!(person: p)}
+        criteria
+        expect_query(2) do
+          criteria.each(&:person)
+        end
+      end
+
+      # The reason we are checking for two operations here is:
+      #   - The first operation gets all of the posts
+      #   - The second operation gets the person from the first post
+      # Now, all subsequent posts should use the eager loaded person when
+      # trying to retrieve their person.
+      # MONGOID-3942 reported that after iterating the criteria a second time,
+      # the posts would not get the eager loaded person.
+      it "eager loads the criteria" do
+        expect_query(2) do
+          criteria.each(&:person)
+        end
+      end
+    end
   end
 end
