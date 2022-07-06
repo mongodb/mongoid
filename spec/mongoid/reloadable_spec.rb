@@ -114,7 +114,7 @@ describe Mongoid::Reloadable do
         it "raises an error" do
           expect {
             Person.new.reload
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
         end
       end
 

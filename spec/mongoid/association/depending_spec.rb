@@ -73,7 +73,7 @@ describe Mongoid::Association::Depending do
             r = DependentReportCard.create!(dependent_student: s)
             s.destroy!
 
-            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class DependentReportCard with id\(s\)/)
           end
 
           it 'facilitates proper transitive destroying of the object' do
@@ -84,7 +84,7 @@ describe Mongoid::Association::Depending do
             r = DependentReportCard.create!(dependent_student: s)
             s.destroy!
 
-            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class DependentReportCard with id\(s\)/)
           end
 
           it 'adds the dependent to subclasses' do
@@ -105,7 +105,7 @@ describe Mongoid::Association::Depending do
             r = DependentReportCard.create!(dependent_student: s)
             s.destroy!
 
-            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class DependentReportCard with id\(s\)/)
           end
 
           it "doesn't add the dependent to sibling classes" do
@@ -177,7 +177,7 @@ describe Mongoid::Association::Depending do
 
             expect {
               DependentOwnedOne.find(owned.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class DependentOwnedOne with id\(s\)/)
           end
         end
 
@@ -250,7 +250,7 @@ describe Mongoid::Association::Depending do
             dep = Dep.create!(double_assoc: two)
             two.destroy!
 
-            expect { Dep.find(dep.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            expect { Dep.find(dep.id) }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Dep with id\(s\)/)
           end
         end
       end
@@ -362,7 +362,7 @@ describe Mongoid::Association::Depending do
           it "deletes the associated documents" do
             expect {
               child.class.find(child.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class #{child.class.to_s} with id\(s\)/)
           end
         end
 
@@ -674,7 +674,7 @@ describe Mongoid::Association::Depending do
           it "persists the deletion" do
             expect {
               home.reload
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Home with id\(s\)/)
           end
         end
 
@@ -733,13 +733,13 @@ describe Mongoid::Association::Depending do
             it "persists the first deletion" do
               expect {
                 post_one.reload
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
             end
 
             it "persists the second deletion" do
               expect {
                 post_two.reload
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
             end
           end
         end

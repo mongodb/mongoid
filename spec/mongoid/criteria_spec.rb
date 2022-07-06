@@ -1000,7 +1000,7 @@ describe Mongoid::Criteria do
         it "deletes the document from the database" do
           expect {
             depeche.reload
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
         end
       end
     end
