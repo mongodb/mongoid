@@ -261,21 +261,17 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       def first(opts = {})
-        if opts.key?(:id_sort)
-          Mongoid.logger.warn('Support for the :id_sort option has been dropped. Use Mongo#take to get a document without a sort on _id.')
-        end
         limit = opts.fetch(:limit, 1)
         if cached? && cache_loaded?
           return opts[:limit] ? documents.first(limit) : documents.first
         end
         try_numbered_cache(:first, opts[:limit], :first) do
+          if opts.key?(:id_sort)
+            Mongoid.logger.warn('Support for the :id_sort option has been dropped. Use Mongo#take to get a document without a sort on _id.')
+          end
           sort = view.sort || { _id: 1 }
           if raw_docs = view.sort(sort).limit(limit).to_a
-            docs = raw_docs.map do |d|
-              Factory.from_db(klass, d, criteria)
-            end
-            docs = eager_load(docs)
-            opts[:limit] ? docs : docs.first
+            process_raw_docs(raw_docs, opts[:limit])
           end
         end
       end
@@ -368,14 +364,20 @@ module Mongoid
       #
       # @param [ Hash ] opts The options for the query returning the first document.
       #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
+      # @option opts [ :none ] :id_sort Support for this option has been dropped.
+      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      # @options opts [ Integer ] :limit The number of documents to return.
+      #
+      # @return [ Document ] The last document.
       def last(opts = {})
-        try_cache(:last) do
+        limit = opts.fetch(:limit, 1)
+        if cached? && cache_loaded?
+          return opts[:limit] ? documents.last(limit) : documents.last
+        end
+        try_numbered_cache(:last, opts[:limit], :last) do
           with_inverse_sorting(opts) do
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
+            if raw_docs = view.limit(limit).to_a.reverse
+              process_raw_docs(raw_docs, opts[:limit])
             end
           end
         end
@@ -664,7 +666,7 @@ module Mongoid
           if !ret || ret.length < len
             instance_variable_set("@#{key}", ret = Array.wrap(yield))
           elsif !n
-            ret = obj.is_a?(Array) ? obj.first : obj
+            ret = ret.is_a?(Array) ? ret.first : ret
           elsif ret.length > len
             ret = ret.send(meth, n)
           end
@@ -736,10 +738,13 @@ module Mongoid
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
       def with_inverse_sorting(opts = {})
+        if opts.key?(:id_sort)
+          Mongoid.logger.warn('Support for the :id_sort option has been dropped. Use Mongo#take to get a document without a sort on _id.')
+        end
+
         begin
-          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
-            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
-          end
+          sort = criteria.options[:sort] || { _id: 1 }
+          @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
           yield
         ensure
           apply_option(:sort)
@@ -949,6 +954,18 @@ module Mongoid
         else
           value.class.demongoize(value)
         end
+      end
+
+      # Process the raw documents retrieved for #first/#last.
+      #
+      # @return [ Array<Document> | Document ] The list of documents or a
+      #   single document.
+      def process_raw_docs(raw_docs, limit)
+        docs = raw_docs.map do |d|
+          Factory.from_db(klass, d, criteria)
+        end
+        docs = eager_load(docs)
+        limit ? docs : docs.first
       end
     end
   end
