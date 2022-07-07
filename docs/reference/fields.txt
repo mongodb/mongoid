@@ -1015,7 +1015,7 @@ in the database:
       'white' => 1,
     }.freeze
     
-    INVERSE_MAPPING = MAPPING.invert
+    INVERSE_MAPPING = MAPPING.invert.freeze
 
     class << self
 
