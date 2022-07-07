@@ -250,8 +250,8 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
       # @param [ Integer ] limit The number of documents to return.
       #
@@ -357,14 +357,10 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
-      #
-      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
-      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The last document.
       def last(limit = nil)
@@ -736,7 +732,7 @@ module Mongoid
       #
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
-      def with_inverse_sorting(opts = {})
+      def with_inverse_sorting
         begin
           if sort = criteria.options[:sort] || ( { _id: 1 } unless opts.try(:fetch, :id_sort) == :none )
             @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])

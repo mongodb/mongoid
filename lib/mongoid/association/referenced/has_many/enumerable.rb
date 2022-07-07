@@ -240,8 +240,8 @@ module Mongoid
           # @note Automatically adding a sort on _id when no other sort is
           #   defined on the criteria has the potential to cause bad performance issues.
           #   If you experience unexpected poor performance when using #first or #last,
-          #   use the option { id_sort: :none }.
-          #   Be aware that #first/#last won't guarantee order in this case.
+          #   use #take instead.
+          #   Be aware that #take won't guarantee order.
           #
           # @param [ Integer ] limit The number of documents to return.
           #
@@ -325,8 +325,8 @@ module Mongoid
           # @note Automatically adding a sort on _id when no other sort is
           #   defined on the criteria has the potential to cause bad performance issues.
           #   If you experience unexpected poor performance when using #first or #last,
-          #   use the option { id_sort: :none }.
-          #   Be aware that #first/#last won't guarantee order in this case.
+          #   use #take instead.
+          #   Be aware that #take won't guarantee order.
           #
           # @param [ Integer ] limit The number of documents to return.
           #

@@ -230,14 +230,8 @@ describe Mongoid::Findable do
         expect(Person.send(method)).to eq(person)
       end
 
-      it "doen't raise when passing options" do
-        expect do
-          Person.first(id_sort: :none)
-        end.to_not raise_error
-      end
-
       it "passes the limit through" do
-        Person.first(1).length.should == 1
+        expect(Person.last(1)).to eq([ person ])
       end
     end
   end
@@ -251,14 +245,8 @@ describe Mongoid::Findable do
       expect(Person.last).to eq(person)
     end
 
-    it "doen't raise when passing options" do
-      expect do
-        Person.last(id_sort: :none)
-      end.to_not raise_error
-    end
-
     it "passes the limit through" do
-      Person.last(1).length.should == 1
+      expect(Person.last(1)).to eq([ person ])
     end
   end
 
