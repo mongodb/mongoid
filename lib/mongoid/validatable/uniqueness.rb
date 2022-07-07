@@ -242,7 +242,7 @@ module Mongoid
         relation = document._parent.send(document.association_name)
         criteria = create_criteria(relation, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
-        add_error(document, attribute, value) if criteria.count > 1
+        add_error(document, attribute, value) if criteria.exists?
       end
 
       # Validate a root document.
