@@ -125,15 +125,17 @@ module Mongoid
       # @return [ nil ] Always nil.
       def last; nil; end
 
-      # Always returns nil.
+      # Returns nil or empty array.
       #
       # @example Take a document in null context.
       #   context.take
       #
       # @param [ Integer ] value The number of documents to take.
       #
-      # @return [ nil ] Always nil.
-      def take(value = nil); nil; end
+      # @return [ [] | nil ] Empty array or nil.
+      def take(value = nil)
+        value ? [] : nil
+      end
 
       # Always raises an error.
       #

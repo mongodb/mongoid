@@ -83,7 +83,7 @@ describe Mongoid::Contextual::None do
     end
 
     it "returns nil with params" do
-      expect(context.take(1)).to be_nil
+      expect(context.take(1)).to eq([])
     end
   end
 
