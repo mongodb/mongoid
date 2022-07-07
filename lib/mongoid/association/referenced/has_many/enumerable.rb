@@ -243,16 +243,12 @@ module Mongoid
           #   use the option { id_sort: :none }.
           #   Be aware that #first/#last won't guarantee order in this case.
           #
-          # @param [ Integer | Hash ] limit_or_opts The number of documents to
-          #   return, or a hash of options.
-          #
-          # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
-          #   Don't apply a sort on _id if no other sort is defined on the criteria.
+          # @param [ Integer ] limit The number of documents to return.
           #
           # @return [ Document ] The first document found.
-          def first(limit_or_opts = nil)
+          def first(limit = nil)
             _loaded.try(:values).try(:first) ||
-                _added[(ul = _unloaded.try(:first, limit_or_opts)).try(:_id)] ||
+                _added[(ul = _unloaded.try(:first, limit)).try(:_id)] ||
                 ul ||
                 _added.values.try(:first)
           end
@@ -332,17 +328,13 @@ module Mongoid
           #   use the option { id_sort: :none }.
           #   Be aware that #first/#last won't guarantee order in this case.
           #
-          # @param [ Integer | Hash ] limit_or_opts The number of documents to
-          #   return, or a hash of options.
-          #
-          # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
-          #   Don't apply a sort on _id if no other sort is defined on the criteria.
+          # @param [ Integer ] limit The number of documents to return.
           #
           # @return [ Document ] The last document found.
-          def last(limit_or_opts = nil)
+          def last(limit = nil)
             _added.values.try(:last) ||
                 _loaded.try(:values).try(:last) ||
-                _added[(ul = _unloaded.try(:last, limit_or_opts)).try(:_id)] ||
+                _added[(ul = _unloaded.try(:last, limit)).try(:_id)] ||
                 ul
           end
 

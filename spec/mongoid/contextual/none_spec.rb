@@ -70,16 +70,6 @@ describe Mongoid::Contextual::None do
       expect(context.first).to be_nil
     end
 
-    it "doen't raise when passing options" do
-      expect do
-        context.first(id_sort: :none)
-      end.to_not raise_error
-    end
-
-    it "returns nil when passing a hash" do
-      expect(context.first(id_sort: :none)).to be_nil
-    end
-
     it "returns [] when passing a limit" do
       expect(context.first(1)).to eq([])
     end
@@ -88,16 +78,6 @@ describe Mongoid::Contextual::None do
   describe "#last" do
     it "returns nil" do
       expect(context.last).to be_nil
-    end
-
-    it "doen't raise when passing options" do
-      expect do
-        context.last(id_sort: :none)
-      end.to_not raise_error
-    end
-
-    it "returns nil when passing a hash" do
-      expect(context.last(id_sort: :none)).to be_nil
     end
 
     it "returns [] when passing a limit" do

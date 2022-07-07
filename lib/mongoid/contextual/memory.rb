@@ -116,15 +116,14 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The first document.
-      def first(limit_or_opts = nil)
-        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
-          eager_load([documents.first]).first
+      def first(limit = nil)
+        if limit
+          eager_load(documents.first(limit))
         else
-          eager_load(documents.first(limit_or_opts))
+          eager_load([documents.first]).first
         end
       end
       alias :one :first
@@ -166,18 +165,14 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
-      #
-      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
-      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The last document.
-      def last(limit_or_opts = nil)
-        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
-          eager_load([documents.last]).first
+      def last(limit = nil)
+        if limit
+          eager_load(documents.last(limit))
         else
-          eager_load(documents.last(limit_or_opts))
+          eager_load([documents.last]).first
         end
       end
 

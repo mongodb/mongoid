@@ -253,15 +253,10 @@ module Mongoid
       #   and have no sort defined on the criteria, use the option { id_sort: :none }.
       #   Be aware that #first/#last won't guarantee order in this case.
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
-      #
-      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
-      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The first document.
-      def first(limit_or_opts = nil)
-        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
+      def first(limit = nil)
         if cached? && cache_loaded?
           return limit ? documents.first(limit) : documents.first
         end
@@ -372,8 +367,7 @@ module Mongoid
       #   Don't apply a sort on _id if no other sort is defined on the criteria.
       #
       # @return [ Document ] The last document.
-      def last(limit_or_opts = nil)
-        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
+      def last(limit = nil)
         if cached? && cache_loaded?
           return limit ? documents.last(limit) : documents.last
         end
@@ -743,8 +737,6 @@ module Mongoid
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
       def with_inverse_sorting(opts = {})
-        Mongoid::Warnings.warn_id_sort_deprecated if opts.try(:key?, :id_sort)
-
         begin
           if sort = criteria.options[:sort] || ( { _id: 1 } unless opts.try(:fetch, :id_sort) == :none )
             @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
