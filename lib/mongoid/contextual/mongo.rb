@@ -640,7 +640,7 @@ module Mongoid
       # @return the result of the block
       def try_cache(key, &block)
         unless cached?
-          yield if block_given?
+          yield
         else
           unless ret = instance_variable_get("@#{key}")
             instance_variable_set("@#{key}", ret = yield)
@@ -656,7 +656,7 @@ module Mongoid
       #   if none is requested.
       # @param [ Symbol ] meth Method to extract the correct number of elements.
       #
-      # @return [ Object ] the result of the block
+      # @return [ Object ] The result of the block.
       def try_numbered_cache(key, n, meth, &block)
         unless cached?
           yield if block_given?
