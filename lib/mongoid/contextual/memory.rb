@@ -170,6 +170,7 @@ module Mongoid
       #   context.take
       #
       # @param [ Integer ] value The number of documents to take.
+      #
       # @return [ Document ] The document.
       def take(value = nil)
         if value
@@ -185,6 +186,9 @@ module Mongoid
       #   context.take
       #
       # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
       def take!
         if documents.empty?
           raise Errors::DocumentNotFound.new(klass, nil, nil)

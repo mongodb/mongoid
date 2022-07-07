@@ -125,6 +125,26 @@ module Mongoid
       # @return [ nil ] Always nil.
       def last; nil; end
 
+      # Always returns nil.
+      #
+      # @example Take a document in null context.
+      #   context.take
+      #
+      # @param [ Integer ] value The number of documents to take.
+      #
+      # @return [ nil ] Always nil.
+      def take(value = nil); nil; end
+
+      # Always raises an error.
+      #
+      # @example Take a document in null context.
+      #   context.take!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def take!
+        raise Errors::DocumentNotFound.new(klass, nil, nil)
+      end
+
       # Always returns zero.
       #
       # @example Get the length of null context.

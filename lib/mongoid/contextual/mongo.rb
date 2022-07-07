@@ -425,6 +425,9 @@ module Mongoid
       #   context.take!
       #
       # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
       def take!
         # Do to_a first so that the Mongo#first method is not used and the
         # result is not sorted.
