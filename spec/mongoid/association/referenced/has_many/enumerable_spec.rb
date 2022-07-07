@@ -1784,7 +1784,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
 
       it 'does not use the sort on id' do
-        expect(enumerable.last(id_sort: :none)).to eq(first_post)
+        expect(enumerable.last(id_sort: :none)).to eq(second_post)
       end
     end
 
