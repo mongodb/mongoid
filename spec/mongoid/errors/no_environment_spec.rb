@@ -18,7 +18,7 @@ describe Mongoid::Errors::NoEnvironment do
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Mongoid could not find an environment setting in any of the following"
+        "Mongoid could not find an environment value in any of the following"
       )
     end
 
