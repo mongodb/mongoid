@@ -1994,6 +1994,7 @@ describe Mongoid::Contextual::Mongo do
             expect(context.last).to eq(rolling_stones)
           end
         end
+<<<<<<< HEAD
 
         context 'with option { id_sort: :none }' do
           let(:opts) do
@@ -2012,6 +2013,8 @@ describe Mongoid::Contextual::Mongo do
             end
           end
         end
+=======
+>>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
       end
 
       context 'when the criteria has a sort' do
@@ -2035,6 +2038,7 @@ describe Mongoid::Contextual::Mongo do
             expect(context.last).to eq(depeche_mode)
           end
         end
+<<<<<<< HEAD
 
         context 'with option { id_sort: :none }' do
 
@@ -2054,6 +2058,8 @@ describe Mongoid::Contextual::Mongo do
             end
           end
         end
+=======
+>>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
       end
 
       context "when using .sort" do
@@ -2434,6 +2440,7 @@ describe Mongoid::Contextual::Mongo do
           expect(context.first).to eq(depeche_mode)
         end
       end
+<<<<<<< HEAD
 
       context 'with option { id_sort: :none }' do
         let(:opts) do
@@ -2453,6 +2460,8 @@ describe Mongoid::Contextual::Mongo do
           end
         end
       end
+=======
+>>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
     end
 
     context 'when the criteria has a sort' do
@@ -2477,6 +2486,7 @@ describe Mongoid::Contextual::Mongo do
           expect(context.first).to eq(rolling_stones)
         end
       end
+<<<<<<< HEAD
 
       context 'with option { id_sort: :none }' do
 
@@ -2496,6 +2506,8 @@ describe Mongoid::Contextual::Mongo do
           end
         end
       end
+=======
+>>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
     end
 
     context "when using .sort" do
