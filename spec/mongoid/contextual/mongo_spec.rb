@@ -159,7 +159,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:count) do
-        context.count(limit: 2)
+        context.count(2)
       end
 
       it "returns the number of documents that match" do
@@ -2131,7 +2131,7 @@ describe Mongoid::Contextual::Mongo do
             end
 
             let(:docs) do
-              context.send(method, limit: 1)
+              context.send(method, 1)
             end
 
             it "returns an array of documents" do
@@ -2145,7 +2145,7 @@ describe Mongoid::Contextual::Mongo do
             end
 
             let(:docs) do
-              context.send(method, limit: 2)
+              context.send(method, 2)
             end
 
             it "returns the number of documents in order" do
@@ -2161,7 +2161,7 @@ describe Mongoid::Contextual::Mongo do
             end
 
             it "returns the first matching document" do
-              expect(context.send(method, limit: 1)).to eq([ depeche_mode ])
+              expect(context.send(method, 1)).to eq([ depeche_mode ])
             end
           end
         end
@@ -2187,7 +2187,7 @@ describe Mongoid::Contextual::Mongo do
               context "when requesting all of the documents" do
 
                 let(:docs) do
-                  context.send(method, limit: 3)
+                  context.send(method, 3)
                 end
 
                 it "returns all of the documents without touching the database" do
@@ -2199,7 +2199,7 @@ describe Mongoid::Contextual::Mongo do
               context "when requesting fewer than all of the documents" do
 
                 let(:docs) do
-                  context.send(method, limit: 2)
+                  context.send(method, 2)
                 end
 
                 it "returns all of the documents without touching the database" do
@@ -2218,7 +2218,7 @@ describe Mongoid::Contextual::Mongo do
               context "when requesting one document" do
 
                 let(:docs) do
-                  context.send(method, limit: 1)
+                  context.send(method, 1)
                 end
 
                 it "returns one document without touching the database" do
@@ -2240,11 +2240,11 @@ describe Mongoid::Contextual::Mongo do
             end
 
             before do
-              context.first(limit: before_limit)
+              context.first(before_limit)
             end
 
             let(:docs) do
-              context.send(method, limit: limit)
+              context.send(method, limit)
             end
 
             context "when getting all of the documents before" do
@@ -2316,6 +2316,34 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context "when calling #first then #last" do
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:criteria) do
+        Band.all.cache
+      end
+
+      before do
+        context.first(before_limit)
+      end
+
+      let(:docs) do
+        context.last(limit)
+      end
+
+      context "when getting one from the beginning and one from the end" do
+        let(:before_limit) { 2 }
+        let(:limit) { 1 }
+
+        it "gets the correct document" do
+          expect(docs).to eq([rolling_stones])
+        end
+      end
+    end
   end
 
   describe "#last" do
@@ -2374,6 +2402,14 @@ describe Mongoid::Contextual::Mongo do
           expect(context.last).to eq(depeche_mode)
         end
       end
+
+      context "when subsequently calling #first" do
+
+        it "returns the correct document" do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
     end
 
     context 'when the criteria has no sort' do
@@ -2390,6 +2426,15 @@ describe Mongoid::Contextual::Mongo do
         expect(context.last).to eq(rolling_stones)
       end
 
+      context 'when calling #first' do
+
+        it 'returns the first document, sorted by _id' do
+          pending "MONGOID-5416"
+          expect(context.last).to eq(rolling_stones)
+          expect(context.first).to eq(depeche_mode)
+        end
+      end
+
       context 'with option { id_sort: :none }' do
         let(:opts) do
           { id_sort: :none }
@@ -2397,6 +2442,15 @@ describe Mongoid::Contextual::Mongo do
 
         it 'applies the sort on _id' do
           expect(context.last(opts)).to eq(rolling_stones)
+        end
+
+        context 'when calling #first' do
+
+          it 'applies a sort on _id' do
+            pending "MONGOID-5416"
+            expect(context.last(opts)).to eq(rolling_stones)
+            expect(context.first(opts)).to eq(depeche_mode)
+          end
         end
       end
     end
@@ -2416,6 +2470,14 @@ describe Mongoid::Contextual::Mongo do
         expect(context.last).to eq(depeche_mode)
       end
 
+      context 'when calling #first' do
+
+        it 'applies the criteria sort' do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
+
       context 'with option { sort: :none }' do
 
         let(:opts) do
@@ -2424,6 +2486,14 @@ describe Mongoid::Contextual::Mongo do
 
         it 'does not use the option' do
           expect(context.last(opts)).to eq(depeche_mode)
+        end
+
+        context 'when calling #first' do
+
+          it 'does not use the option' do
+            expect(context.last(opts)).to eq(depeche_mode)
+            expect(context.first(opts)).to eq(rolling_stones)
+          end
         end
       end
     end
@@ -2442,6 +2512,14 @@ describe Mongoid::Contextual::Mongo do
 
         it "follows the main sort" do
           expect(context.last).to eq(depeche_mode)
+        end
+      end
+
+      context "when subsequently calling #first" do
+
+        it "returns the correct document" do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
         end
       end
     end
@@ -2495,7 +2573,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           let(:docs) do
-            context.last(limit: 1)
+            context.last(1)
           end
 
           it "returns an array of documents" do
@@ -2509,7 +2587,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           let(:docs) do
-            context.last(limit: 2)
+            context.last(2)
           end
 
           it "returns the number of documents in order" do
@@ -2525,7 +2603,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first matching document" do
-            expect(context.last(limit: 1)).to eq([ depeche_mode ])
+            expect(context.last(1)).to eq([ depeche_mode ])
           end
         end
       end
@@ -2551,7 +2629,7 @@ describe Mongoid::Contextual::Mongo do
             context "when requesting all of the documents" do
 
               let(:docs) do
-                context.last(limit: 3)
+                context.last(3)
               end
 
               it "returns all of the documents without touching the database" do
@@ -2563,7 +2641,7 @@ describe Mongoid::Contextual::Mongo do
             context "when requesting fewer than all of the documents" do
 
               let(:docs) do
-                context.last(limit: 2)
+                context.last(2)
               end
 
               it "returns all of the documents without touching the database" do
@@ -2582,7 +2660,7 @@ describe Mongoid::Contextual::Mongo do
             context "when requesting one document" do
 
               let(:docs) do
-                context.last(limit: 1)
+                context.last(1)
               end
 
               it "returns one document without touching the database" do
@@ -2604,11 +2682,11 @@ describe Mongoid::Contextual::Mongo do
           end
 
           before do
-            context.last(limit: before_limit)
+            context.last(before_limit)
           end
 
           let(:docs) do
-            context.last(limit: limit)
+            context.last(limit)
           end
 
           context "when getting all of the documents before" do
@@ -2680,7 +2758,7 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when calling #first then #last" do
+    context "when calling #last then #first" do
 
       let(:context) do
         described_class.new(criteria)
@@ -2691,19 +2769,25 @@ describe Mongoid::Contextual::Mongo do
       end
 
       before do
-        context.first(limit: before_limit)
+        context.last(before_limit)
       end
 
       let(:docs) do
-        context.last(limit: limit)
+        context.first(limit)
       end
 
       context "when getting one from the beginning and one from the end" do
         let(:before_limit) { 2 }
         let(:limit) { 1 }
 
+        it "hits the database" do
+          expect(context).to receive(:view).twice.and_call_original
+          docs
+        end
+
         it "gets the correct document" do
-          expect(docs).to eq([rolling_stones])
+          pending "MONGOID-5416"
+          expect(docs).to eq([ depeche_mode ])
         end
       end
     end

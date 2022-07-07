@@ -122,8 +122,11 @@ module Mongoid
       # @example Get the first document in null context.
       #   context.first
       #
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
+      #
       # @return [ nil ] Always nil.
-      def first(opts = {}); nil; end
+      def first(limit_or_opts = nil); nil; end
 
       # Always returns nil.
       #

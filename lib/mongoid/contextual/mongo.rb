@@ -253,25 +253,25 @@ module Mongoid
       #   and have no sort defined on the criteria, use the option { id_sort: :none }.
       #   Be aware that #first/#last won't guarantee order in this case.
       #
-      # @param [ Hash ] opts The options for the query returning the first document.
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
       #
-      # @option opts [ :none ] :id_sort Support for this option has been dropped.
+      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
       #   Don't apply a sort on _id if no other sort is defined on the criteria.
-      # @options opts [ Integer ] :limit The number of documents to return.
       #
       # @return [ Document ] The first document.
-      def first(opts = {})
-        limit = opts.fetch(:limit, 1)
+      def first(limit_or_opts = nil)
+        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
         if cached? && cache_loaded?
-          return opts[:limit] ? documents.first(limit) : documents.first
+          return limit ? documents.first(limit) : documents.first
         end
-        try_numbered_cache(:first, opts[:limit], :first) do
-          if opts.key?(:id_sort)
-            Mongoid.logger.warn('Support for the :id_sort option has been dropped. Use Mongo#take to get a document without a sort on _id.')
+        try_numbered_cache(:first, limit, :first) do
+          if limit_or_opts.try(:key?, :id_sort)
+            Mongoid::Warnings.warn_id_sort_deprecated
           end
           sort = view.sort || { _id: 1 }
-          if raw_docs = view.sort(sort).limit(limit).to_a
-            process_raw_docs(raw_docs, opts[:limit])
+          if raw_docs = view.sort(sort).limit(limit || 1).to_a
+            process_raw_docs(raw_docs, limit)
           end
         end
       end
@@ -362,22 +362,22 @@ module Mongoid
       #   and have no sort defined on the criteria, use the option { id_sort: :none }.
       #   Be aware that #first/#last won't guarantee order in this case.
       #
-      # @param [ Hash ] opts The options for the query returning the first document.
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
       #
-      # @option opts [ :none ] :id_sort Support for this option has been dropped.
+      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
       #   Don't apply a sort on _id if no other sort is defined on the criteria.
-      # @options opts [ Integer ] :limit The number of documents to return.
       #
       # @return [ Document ] The last document.
-      def last(opts = {})
-        limit = opts.fetch(:limit, 1)
+      def last(limit_or_opts = nil)
+        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
         if cached? && cache_loaded?
-          return opts[:limit] ? documents.last(limit) : documents.last
+          return limit ? documents.last(limit) : documents.last
         end
-        try_numbered_cache(:last, opts[:limit], :last) do
-          with_inverse_sorting(opts) do
-            if raw_docs = view.limit(limit).to_a.reverse
-              process_raw_docs(raw_docs, opts[:limit])
+        try_numbered_cache(:last, limit, :last) do
+          with_inverse_sorting(limit_or_opts) do
+            if raw_docs = view.limit(limit || 1).to_a.reverse
+              process_raw_docs(raw_docs, limit)
             end
           end
         end
@@ -738,9 +738,7 @@ module Mongoid
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
       def with_inverse_sorting(opts = {})
-        if opts.key?(:id_sort)
-          Mongoid.logger.warn('Support for the :id_sort option has been dropped. Use Mongo#take to get a document without a sort on _id.')
-        end
+        Mongoid::Warnings.warn_id_sort_deprecated if opts.try(:key?, :id_sort)
 
         begin
           sort = criteria.options[:sort] || { _id: 1 }

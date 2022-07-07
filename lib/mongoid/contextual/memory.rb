@@ -116,16 +116,15 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
-      # @param [ Hash ] opts The options for the query returning the first document.
-      #
-      # @options opts [ Integer ] :limit The number of documents to return.
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
       #
       # @return [ Document ] The first document.
-      def first(opts = {})
-        if opts[:limit]
-          eager_load(documents.first(opts[:limit]))
-        else
+      def first(limit_or_opts = nil)
+        if limit_or_opts.is_a?(Hash)
           eager_load([documents.first]).first
+        else
+          eager_load(documents.first(limit))
         end
       end
       alias :one :first

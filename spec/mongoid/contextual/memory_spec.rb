@@ -625,11 +625,15 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns a list when passing a limit" do
-        expect(context.send(method, limit: 2)).to eq([ hobrecht, friedel ])
+        expect(context.send(method, 2)).to eq([ hobrecht, friedel ])
       end
 
       it "returns a list when passing 1" do
-        expect(context.send(method, limit: 1)).to eq([ hobrecht ])
+        expect(context.send(method, 1)).to eq([ hobrecht ])
+      end
+
+      it "returns the matching document when passing deprecated options" do
+        expect(context.send(method, id_sort: :none)).to eq(hobrecht)
       end
 
       context 'when there is a collation on the criteria' do

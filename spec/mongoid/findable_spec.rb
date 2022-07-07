@@ -236,8 +236,8 @@ describe Mongoid::Findable do
         end.to_not raise_error
       end
 
-      it "passes the options through" do
-        Person.first(limit: 1).length.should == 1
+      it "passes the limit through" do
+        Person.first(1).length.should == 1
       end
     end
   end
@@ -257,8 +257,8 @@ describe Mongoid::Findable do
       end.to_not raise_error
     end
 
-    it "passes the options through" do
-      Person.last(limit: 1).length.should == 1
+    it "passes the limit through" do
+      Person.last(1).length.should == 1
     end
   end
 
