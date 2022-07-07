@@ -159,7 +159,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:count) do
-        context.count(2)
+        context.count(limit: 2)
       end
 
       it "returns the number of documents that match" do
@@ -2315,32 +2315,32 @@ describe Mongoid::Contextual::Mongo do
           end
         end
       end
-    end
 
-    context "when calling #first then #last" do
+      context "when calling #first then #last" do
 
-      let(:context) do
-        described_class.new(criteria)
-      end
+        let(:context) do
+          described_class.new(criteria)
+        end
 
-      let(:criteria) do
-        Band.all.cache
-      end
+        let(:criteria) do
+          Band.all.cache
+        end
 
-      before do
-        context.first(before_limit)
-      end
+        before do
+          context.first(before_limit)
+        end
 
-      let(:docs) do
-        context.last(limit)
-      end
+        let(:docs) do
+          context.last(limit)
+        end
 
-      context "when getting one from the beginning and one from the end" do
-        let(:before_limit) { 2 }
-        let(:limit) { 1 }
+        context "when getting one from the beginning and one from the end" do
+          let(:before_limit) { 2 }
+          let(:limit) { 1 }
 
-        it "gets the correct document" do
-          expect(docs).to eq([rolling_stones])
+          it "gets the correct document" do
+            expect(docs).to eq([rolling_stones])
+          end
         end
       end
     end
