@@ -1019,14 +1019,14 @@ in the database:
 
     class << self
 
-      # Takes any possible object and converts it to how it would be
+      # Takes application-scope value and converts it to how it would be
       # stored in the database. Converts invalid values to nil.
       def mongoize(object)
         MAPPING[object]
       end
 
-      # Get the object as it was stored in the database, and instantiate
-      # this custom class from it. Converts invalid values to nil.
+      # Get the value as it was stored in the database, and convert to application-scope
+      # value. Converts invalid values to nil.
       def demongoize(object)
         INVERSE_MAPPING[object]
       end
