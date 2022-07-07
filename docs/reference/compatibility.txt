@@ -111,7 +111,7 @@ is deprecated.
      -
      -
      -
-     - |checkmark|
+     - D
      -
 
    * - 7.4

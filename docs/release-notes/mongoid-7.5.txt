@@ -25,6 +25,13 @@ Mongoid 7.5 deprecates support for Ruby 2.5.
 Mongoid 8 will require Ruby 2.6 or newer.
 
 
+JRuby 9.2 Deprecated
+--------------------
+
+Mongoid 7.5 deprecates support for JRuby 9.2.
+Mongoid 8 will require JRuby 9.3 or newer.
+
+
 Rails 5.1 Deprecated
 --------------------
 
