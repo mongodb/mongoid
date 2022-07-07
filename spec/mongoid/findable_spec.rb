@@ -229,6 +229,16 @@ describe Mongoid::Findable do
       it "returns the first matching document" do
         expect(Person.send(method)).to eq(person)
       end
+
+      it "doen't raise when passing options" do
+        expect do
+          Person.first(id_sort: :none)
+        end.to_not raise_error
+      end
+
+      it "passes the options through" do
+        Person.first(limit: 1).length.should == 1
+      end
     end
   end
 

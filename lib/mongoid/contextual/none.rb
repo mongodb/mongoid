@@ -123,7 +123,7 @@ module Mongoid
       #   context.first
       #
       # @return [ nil ] Always nil.
-      def first(*args); nil; end
+      def first(opts = {}); nil; end
 
       # Always returns nil.
       #
@@ -131,7 +131,7 @@ module Mongoid
       #   context.last
       #
       # @return [ nil ] Always nil.
-      def last; nil; end
+      def last(opts = {}); nil; end
 
       # Returns nil or empty array.
       #

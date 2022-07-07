@@ -206,8 +206,8 @@ module Mongoid
     #   Person.last
     #
     # @return [ Document ] The last matching document.
-    def last
-      with_default_scope.last
+    def last(opts = {})
+      with_default_scope.last(opts)
     end
   end
 end

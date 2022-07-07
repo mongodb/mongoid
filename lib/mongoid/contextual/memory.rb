@@ -116,9 +116,17 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
+      # @param [ Hash ] opts The options for the query returning the first document.
+      #
+      # @options opts [ Integer ] :limit The number of documents to return.
+      #
       # @return [ Document ] The first document.
-      def first(*args)
-        eager_load([documents.first]).first
+      def first(opts = {})
+        if opts[:limit]
+          eager_load(documents.first(opts[:limit]))
+        else
+          eager_load([documents.first]).first
+        end
       end
       alias :one :first
       alias :find_first :first
@@ -159,9 +167,17 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
+      # @param [ Hash ] opts The options for the query returning the first document.
+      #
+      # @options opts [ Integer ] :limit The number of documents to return.
+      #
       # @return [ Document ] The last document.
-      def last
-        eager_load([documents.last]).first
+      def last(opts = {})
+        if opts[:limit]
+          eager_load(documents.last(opts[:limit]))
+        else
+          eager_load([documents.last]).first
+        end
       end
 
       # Take the given number of documents from the database.

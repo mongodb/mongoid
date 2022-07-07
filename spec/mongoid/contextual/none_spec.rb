@@ -69,11 +69,23 @@ describe Mongoid::Contextual::None do
     it "returns nil" do
       expect(context.first).to be_nil
     end
+
+    it "doen't raise when passing options" do
+      expect do
+        context.first(id_sort: :none)
+      end.to_not raise_error
+    end
   end
 
   describe "#last" do
     it "returns nil" do
       expect(context.last).to be_nil
+    end
+
+    it "doen't raise when passing options" do
+      expect do
+        context.last(id_sort: :none)
+      end.to_not raise_error
     end
   end
 
