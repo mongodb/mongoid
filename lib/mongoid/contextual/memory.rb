@@ -164,6 +164,35 @@ module Mongoid
         eager_load([documents.last]).first
       end
 
+      # Take the given number of documents from the database.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @param [ Integer ] value The number of documents to take.
+      # @return [ Document ] The document.
+      def take(value = nil)
+        if value
+          eager_load(documents.take(value))
+        else
+          eager_load([documents.first]).first
+        end
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @return [ Document ] The document.
+      def take!
+        if documents.empty?
+          raise Errors::DocumentNotFound.new(klass, nil, nil)
+        else
+          eager_load([documents.first]).first
+        end
+      end
+
       # Get the length of matching documents in the context.
       #
       # @example Get the length of matching documents.

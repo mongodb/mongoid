@@ -641,6 +641,108 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
+  describe "#take" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "returns the first matching document" do
+      expect(context.take).to eq(hobrecht)
+    end
+
+    it "returns an array when passing a limit" do
+      expect(context.take(2)).to eq([ hobrecht, friedel ])
+    end
+
+    it "returns an array when passing a limit as 1" do
+      expect(context.take(1)).to eq([ hobrecht ])
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.take
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
+  end
+
+  describe "#take!" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "returns the first matching document" do
+      expect(context.take!).to eq(hobrecht)
+    end
+
+    context "when the criteria is empty" do
+      let(:criteria) do
+        Address.where(street: "bogus").tap do |crit|
+          crit.documents = []
+        end
+      end
+
+      it "raise an error" do
+        expect do
+          context.take!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Address./)
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.take
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
+  end
+
   describe "#initialize" do
 
     context "when the criteria has no options" do

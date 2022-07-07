@@ -400,7 +400,7 @@ module Mongoid
         @view = view.limit(value) and self
       end
 
-      # Takes the given number of documents from the database.
+      # Take the given number of documents from the database.
       #
       # @example Take 10 documents
       #   context.take(10)
