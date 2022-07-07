@@ -242,6 +242,26 @@ describe Mongoid::Findable do
     end
   end
 
+  describe "#last" do
+    let!(:person) do
+      Person.create!
+    end
+
+    it "returns the first matching document" do
+      expect(Person.last).to eq(person)
+    end
+
+    it "doen't raise when passing options" do
+      expect do
+        Person.last(id_sort: :none)
+      end.to_not raise_error
+    end
+
+    it "passes the options through" do
+      Person.last(limit: 1).length.should == 1
+    end
+  end
+
   describe ".first_or_create" do
 
     context "when the document is found" do
