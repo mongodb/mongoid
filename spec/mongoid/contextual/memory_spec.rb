@@ -888,6 +888,10 @@ describe Mongoid::Contextual::Memory do
       expect(context.last(limit: 1)).to eq([ friedel ])
     end
 
+    it "returns the matching document when passing deprecated options" do
+      expect(context.last(id_sort: :none)).to eq(friedel)
+    end
+
     context 'when there is a collation on the criteria' do
 
       let(:criteria) do

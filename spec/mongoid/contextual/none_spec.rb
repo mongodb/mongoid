@@ -75,6 +75,14 @@ describe Mongoid::Contextual::None do
         context.first(id_sort: :none)
       end.to_not raise_error
     end
+
+    it "returns nil when passing a hash" do
+      expect(context.first(id_sort: :none)).to be_nil
+    end
+
+    it "returns [] when passing a limit" do
+      expect(context.first(1)).to eq([])
+    end
   end
 
   describe "#last" do
@@ -86,6 +94,14 @@ describe Mongoid::Contextual::None do
       expect do
         context.last(id_sort: :none)
       end.to_not raise_error
+    end
+
+    it "returns nil when passing a hash" do
+      expect(context.last(id_sort: :none)).to be_nil
+    end
+
+    it "returns [] when passing a limit" do
+      expect(context.last(1)).to eq([])
     end
   end
 
