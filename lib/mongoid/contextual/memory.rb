@@ -173,8 +173,8 @@ module Mongoid
       #   Don't apply a sort on _id if no other sort is defined on the criteria.
       #
       # @return [ Document ] The last document.
-      def last(limit_or_opts = {})
-        if limit_or_opts.is_a?(Hash)
+      def last(limit_or_opts = nil)
+        if !limit_or_opts || limit_or_opts.is_a?(Hash)
           eager_load([documents.last]).first
         else
           eager_load(documents.last(limit_or_opts))

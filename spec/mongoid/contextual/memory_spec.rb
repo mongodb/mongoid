@@ -881,11 +881,11 @@ describe Mongoid::Contextual::Memory do
     end
 
     it "returns a list when a limit is passed" do
-      expect(context.last(limit: 2)).to eq([ hobrecht, friedel ])
+      expect(context.last(2)).to eq([ hobrecht, friedel ])
     end
 
     it "returns a list when the limit is 1" do
-      expect(context.last(limit: 1)).to eq([ friedel ])
+      expect(context.last(1)).to eq([ friedel ])
     end
 
     it "returns the matching document when passing deprecated options" do
