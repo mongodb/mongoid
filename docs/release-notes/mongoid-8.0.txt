@@ -305,7 +305,7 @@ Mongoid 7 behavior:
 
 
 ``#pluck`` on Embedded Criteria Returns ``nil`` Values
-------------------------------------------------
+------------------------------------------------------
 
 Mongoid 8 fixes a bug where calling ``#pluck`` on a Mongoid::Criteria
 for embedded documents discarded nil values. This behavior was
@@ -573,3 +573,30 @@ Calling ``tally`` on the age field yields the following:
 
 The ``tally`` method accepts the dot notation and field aliases. It also
 allows for tallying localized fields.
+
+
+``find`` delegates to ``Enumerable#find`` when given a block
+------------------------------------------------------------
+
+When given a block, without ``_id`` arguments, ``find`` delegates to
+``Enumerable#find``. Consider the following model:
+
+.. code::
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+  end
+
+  Band.create!(name: "Depeche Mode")
+  Band.create!(name: "The Rolling Stones")
+
+Calling ``find`` with a block returns the first document for which the block
+returns ``true``:
+
+.. code::
+
+  Band.find do |b|
+    b.name == "Depeche Mode"
+  end
+  # => #<Band _id: 62c58e383282a4cbe82bd74b, name: "Depeche Mode">
