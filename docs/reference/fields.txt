@@ -1025,8 +1025,8 @@ in the database:
         MAPPING[object]
       end
 
-      # Get the value as it was stored in the database, and convert to application-scope
-      # value. Converts invalid values to nil.
+      # Get the value as it was stored in the database, and convert to
+      # application-scope value. Converts invalid values to nil.
       def demongoize(object)
         INVERSE_MAPPING[object]
       end
