@@ -434,8 +434,8 @@ en:
             the following locations: Rails.env, Sinatra::Base.environment,
             ENV[\"RACK_ENV\"], or ENV[\"MONGOID_ENV\"]. Without knowing the
             environment, Mongoid cannot load its configuration from mongoid.yml."
-          resolution: "Please ensure an environment value is set in one of
-            the mentioned locations. By design, Mongoid does not default to
+          resolution: "Please ensure an environment is set in one of the
+            mentioned locations. By design, Mongoid does not default to
             development environment."
         no_map_reduce_output:
           message: "No output location was specified for the map/reduce

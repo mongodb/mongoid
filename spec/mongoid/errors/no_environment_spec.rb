@@ -24,7 +24,7 @@ describe Mongoid::Errors::NoEnvironment do
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "Please ensure an environment value is set in one of the mentioned locations"
+        "Please ensure an environment is set in one of the mentioned locations"
       )
     end
   end
