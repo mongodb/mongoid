@@ -74,7 +74,7 @@ module Mongoid
       # @example Get the distinct values.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] field The name of the field.
+      # @param [ String | Symbol ] field The name of the field.
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
@@ -205,7 +205,7 @@ module Mongoid
       # @example Get the counts of values in memory.
       #   context.tally(:name)
       #
-      # @param [ String, Symbol ] field Field to tally.
+      # @param [ String | Symbol ] field Field to tally.
       #
       # @return [ Hash ] The hash of counts.
       def tally(field)
