@@ -85,6 +85,17 @@ is deprecated.
      - Ruby 2.2
      - JRuby 9.2
 
+   * - 7.5
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     -
+     -
+     -
+     - D
+
    * - 7.4
      - |checkmark|
      - |checkmark|
@@ -281,6 +292,15 @@ are supported by Mongoid.
      - Rails 5.1
      - Rails 5.0
      - Rails 4.2
+
+   * - 7.5
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     - D
+     -
+     -
 
    * - 7.4
      - |checkmark|
