@@ -130,11 +130,11 @@ module Mongoid
       # @example Take a document in null context.
       #   context.take
       #
-      # @param [ Integer ] value The number of documents to take.
+      # @param [ Integer | nil ] limit The number of documents to take or nil.
       #
       # @return [ [] | nil ] Empty array or nil.
-      def take(value = nil)
-        value ? [] : nil
+      def take(limit = nil)
+        limit ? [] : nil
       end
 
       # Always raises an error.

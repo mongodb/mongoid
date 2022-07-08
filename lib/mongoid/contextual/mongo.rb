@@ -405,13 +405,13 @@ module Mongoid
       # @example Take 10 documents
       #   context.take(10)
       #
-      # @param [ Integer ] value The number of documents to return.
+      # @param [ Integer | nil ] limit The number of documents to return or nil.
       #
       # @return [ Document | Array<Document> ] The list of documents, or one
       #   document if no value was given.
-      def take(value = nil)
-        if value
-          limit(value).to_a
+      def take(limit = nil)
+        if limit
+          limit(limit).to_a
         else
           # Do to_a first so that the Mongo#first method is not used and the
           # result is not sorted.

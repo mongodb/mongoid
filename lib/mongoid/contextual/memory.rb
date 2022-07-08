@@ -169,12 +169,12 @@ module Mongoid
       # @example Take a document.
       #   context.take
       #
-      # @param [ Integer ] value The number of documents to take.
+      # @param [ Integer | nil ] limit The number of documents to take or nil.
       #
       # @return [ Document ] The document.
-      def take(value = nil)
-        if value
-          eager_load(documents.take(value))
+      def take(limit = nil)
+        if limit
+          eager_load(documents.take(limit))
         else
           eager_load([documents.first]).first
         end
