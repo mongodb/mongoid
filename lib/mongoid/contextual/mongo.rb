@@ -261,14 +261,8 @@ module Mongoid
           return limit ? documents.first(limit) : documents.first
         end
         try_numbered_cache(:first, limit) do
-          if limit_or_opts.try(:key?, :id_sort)
-            Mongoid::Warnings.warn_id_sort_deprecated
-          end
-          sorted_view = view
-          if sort = view.sort || ({ _id: 1 } unless limit_or_opts.try(:fetch, :id_sort) == :none)
-            sorted_view = view.sort(sort)
-          end
-          if raw_docs = sorted_view.limit(limit || 1).to_a
+          sort = view.sort || { _id: 1 }
+          if raw_docs = view.sort(sort).limit(limit || 1).to_a
             process_raw_docs(raw_docs, limit)
           end
         end
@@ -368,7 +362,7 @@ module Mongoid
           return limit ? documents.last(limit) : documents.last
         end
         res = try_numbered_cache(:last, limit) do
-          with_inverse_sorting(limit_or_opts) do
+          with_inverse_sorting do
             if raw_docs = view.limit(limit || 1).to_a
               process_raw_docs(raw_docs, limit)
             end
