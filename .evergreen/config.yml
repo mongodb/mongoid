@@ -327,6 +327,14 @@ axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
+      - id: "6.0"
+        display_name: "MongoDB 6.0"
+        variables:
+           VERSION: "6.0"
+      - id: "5.3"
+        display_name: "MongoDB 5.3"
+        variables:
+           VERSION: "5.3"
       - id: "5.0"
         display_name: "MongoDB 5.0"
         variables:
@@ -549,7 +557,19 @@ buildvariants:
     ruby: ["ruby-3.1"]
     driver: ["current"]
     topology: '*'
-    mongodb-version: ['5.0']
+    mongodb-version: ['6.0']
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu2004-small
+  tasks:
+    - name: "test"
+
+- matrix_name: "mongodb-5.3"
+  matrix_spec:
+    ruby: ["ruby-3.1"]
+    driver: ["current"]
+    topology: '*'
+    mongodb-version: ['5.3']
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu2004-small

@@ -1,0 +1,27 @@
+test:
+  clients:
+    default:
+      database: mongoid_test
+      hosts:
+        <% SpecConfig.instance.addresses.each do |address| %>
+          - <%= address %>
+        <% end %>
+      options:
+        auto_encryption_options:
+          key_vault_namespace: 'admin.datakeys'
+          kms_providers:
+            local:
+              key: "z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U"
+          schema_map:
+            blog_development.comments:
+              properties:
+                message:
+                  encrypt:
+                    keyId:
+                      - !ruby/object:BSON::Binary
+                        data: !binary |-
+                          R/AgNcxASFiiJWKXqWGo5w==
+                        type: :uuid
+                    bsonType: "string"
+                    algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+              bsonType: "object"

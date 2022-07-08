@@ -23,3 +23,32 @@ Mongoid behaves slightly differently to Active Record when using ``#valid?``
 on already persisted data. Active Record's ``#valid?`` will run all
 validations whereas Mongoid's ``#valid?`` will only run validations on
 documents that are in memory as an optimization.
+
+
+``validates_uniqueness_of`` and ``:conditions``  Option
+=======================================================
+
+The ``:conditions`` option to ``validates_uniqueness_of`` can be used to
+provide additional conditions to add to the database query looking for
+identical documents. This option does not influence when the validation
+is executed because it is not considered when Mongoid retrieves the present
+value of the respective field from the model. Consider the following example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :year, type: Integer
+    
+    validates_uniqueness_of :name, conditions: -> { where(:year.gte => 2000) }
+  end
+  
+  # OK
+  Band.create!(name: "Sun Project", year: 2000)
+  
+  # Fails validation because there is a band with the "Sun Project" name
+  # and year 2000 in the database, even though the model being created now
+  # does not have a year.
+  Band.create!(name: "Sun Project")
