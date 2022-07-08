@@ -265,7 +265,7 @@ module Mongoid
         if cached? && cache_loaded?
           return limit ? documents.first(limit) : documents.first
         end
-        try_numbered_cache(:first, limit, :first) do
+        try_numbered_cache(:first, limit) do
           if limit_or_opts.try(:key?, :id_sort)
             Mongoid::Warnings.warn_id_sort_deprecated
           end
@@ -374,13 +374,14 @@ module Mongoid
         if cached? && cache_loaded?
           return limit ? documents.last(limit) : documents.last
         end
-        try_numbered_cache(:last, limit, :last) do
+        res = try_numbered_cache(:last, limit) do
           with_inverse_sorting(limit_or_opts) do
-            if raw_docs = view.limit(limit || 1).to_a.reverse
+            if raw_docs = view.limit(limit || 1).to_a
               process_raw_docs(raw_docs, limit)
             end
           end
         end
+        res.is_a?(Array) ? res.reverse : res
       end
 
       # Get's the number of documents matching the query selector.
@@ -654,10 +655,9 @@ module Mongoid
       # @param [ String, Symbol ] key The instance variable name
       # @param [ Integer | nil ] n The number of documents requested or nil
       #   if none is requested.
-      # @param [ Symbol ] meth Method to extract the correct number of elements.
       #
       # @return [ Object ] The result of the block.
-      def try_numbered_cache(key, n, meth, &block)
+      def try_numbered_cache(key, n, &block)
         unless cached?
           yield if block_given?
         else
@@ -666,11 +666,12 @@ module Mongoid
           if !ret || ret.length < len
             instance_variable_set("@#{key}", ret = Array.wrap(yield))
           elsif !n
-            ret = ret.is_a?(Array) ? ret.first : ret
+            ret.is_a?(Array) ? ret.first : ret
           elsif ret.length > len
-            ret = ret.send(meth, n)
+            ret.first(n)
+          else
+            ret
           end
-          ret
         end
       end
 
