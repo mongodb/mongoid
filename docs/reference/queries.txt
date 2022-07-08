@@ -1301,7 +1301,7 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#first|last``
 
-       *Finds a single document given the provided criteria. This automatically adds a sort on id.
+       *Finds a single document given the provided criteria. This automatically adds a sort on _id.
        Opt out of adding the id sort with the {id_sort: :none} option. This option is deprecated.
        Get a list of documents by passing in a limit argument.*
 
