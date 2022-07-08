@@ -429,7 +429,7 @@ en:
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
         no_documents_found:
           message: "Could not find a document of class %{klass}."
-          summary: "Mongoid attempted to find a document from the class %{klass}
+          summary: "Mongoid attempted to find a document of the class %{klass}
             but none exist."
           resolution: "Create a document of class %{klass}."
         no_environment:
