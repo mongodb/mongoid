@@ -128,8 +128,8 @@ return a ``Hash`` when instantiating a new document:
   # => BSON::Document
 
 
-Implemented ``Criteria#take`` Method
-------------------------------------
+Implemented ``Criteria#take/take!`` Method
+------------------------------------------
 
 Mongoid 7.5 introduces the ``#take`` method which returns an unsorted document
 or list of documents from the database:
@@ -151,10 +151,19 @@ or list of documents from the database:
 If a parameter is given to ``#take``, a list is returned. If no parameter is
 given, a singular document is returned.
 
-Note that the ``#take`` method does not apply a sort to the view before retrieving
-the documents from the database, and therefore it may return different results
-than the ``#first`` and ``#last`` methods. This method is equivalent to calling
-``#first`` and ``#last`` with the ``{ id_sort: :none }`` option. This option
-has been deprecated in Mongoid 7.5 and it is recommended to use ``#take``
+The ``#take!`` method does not take parameters but otherwise functions the same
+as calling ``#take``. The ``#take!`` method returns a single document, and
+raises an error if none are found.
+
+.. code:: ruby
+
+  Band.take!
+  # => #<Band _id: 62c835813282a4470c07d530, >
+
+Note that the ``#take/take!`` methods do not apply a sort to the view before
+retrieving the documents from the database, and therefore it may return different
+results than the ``#first`` and ``#last`` methods. This method is equivalent to
+calling ``#first`` and ``#last`` with the ``{ id_sort: :none }`` option. This
+option has been deprecated in Mongoid 7.5 and it is recommended to use ``#take``
 instead going forward. Support for the ``:id_sort`` option will be dropped in
 Mongoid 8.

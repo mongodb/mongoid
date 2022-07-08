@@ -1393,7 +1393,7 @@ Mongoid also has some helpful methods on criteria.
    * - ``Criteria#take``
 
        *Get a list of n documents from the database or just one if no parameter
-       is provided..*
+       is provided.*
 
        *This method does not apply a sort to the documents, so can return
        different document(s) than #first and #last.*
@@ -1403,6 +1403,18 @@ Mongoid also has some helpful methods on criteria.
 
           Band.take
           Band.take(5)
+
+   * - ``Criteria#take!``
+
+       *Get a document from the database or raise an error if none exist.*
+
+       *This method does not apply a sort to the documents, so can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take!
 
    * - ``Criteria#tally``
 
