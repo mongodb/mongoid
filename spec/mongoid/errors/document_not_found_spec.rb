@@ -146,13 +146,13 @@ describe Mongoid::Errors::DocumentNotFound do
 
       it "contains the summary in the message" do
         expect(error.message).to include(
-          "Mongoid attempted to find a document from the class Person but none exist."
+          "Mongoid attempted to find a document of the class Person but none exist."
         )
       end
 
       it "contains the resolution in the message" do
         expect(error.message).to include(
-          "Create a document of class Person."
+          "Create a document of class Person or use a finder method that returns nil when no documents are found instead of raising an exception."
         )
       end
     end
