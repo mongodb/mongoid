@@ -1390,6 +1390,32 @@ Mongoid also has some helpful methods on criteria.
           # expands out to "managers.name" in the query:
           Band.all.pluck('managers.n')
 
+   * - ``Criteria#take``
+
+       *Get a list of n documents from the database or just one if no parameter
+       is provided.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take
+          Band.take(5)
+
+   * - ``Criteria#take!``
+
+       *Get a document from the database or raise an error if none exist.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take!
+
    * - ``Criteria#tally``
 
        *Get a mapping of values to counts for the provided field.*

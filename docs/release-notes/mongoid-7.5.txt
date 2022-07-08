@@ -147,3 +147,44 @@ return a ``Hash`` when instantiating a new document:
   band = Band.first
   p band.attributes.class
   # => BSON::Document
+
+
+Implemented ``Criteria#take/take!`` Method
+------------------------------------------
+
+Mongoid 7.5 introduces the ``#take`` method which returns a document
+or a set of documents from the database without ordering by ``_id``:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+  end
+
+  Band.create!
+  Band.create!
+
+  Band.take
+  # => #<Band _id: 62c835813282a4470c07d530, >
+  Band.take(2)
+  # => [ #<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, > ]
+
+If a parameter is given to ``#take``, an array of documents is returned. If no parameter is
+given, a singular document is returned.
+
+The ``#take!`` method functions the same as calling ``#take`` without arguments,
+but raises an DocumentNotFound error instead of returning nil if no documents
+are found.
+
+.. code:: ruby
+
+  Band.take!
+  # => #<Band _id: 62c835813282a4470c07d530, >
+
+Note that the ``#take/take!`` methods do not apply a sort to the view before
+retrieving the documents from the database, and therefore they may return different
+results than the ``#first`` and ``#last`` methods. ``#take`` is equivalent to
+calling ``#first`` or ``#last`` with the ``{ id_sort: :none }`` option. This
+option has been deprecated in Mongoid 7.5 and it is recommended to use ``#take``
+instead going forward. Support for the ``:id_sort`` option will be dropped in
+Mongoid 8.
