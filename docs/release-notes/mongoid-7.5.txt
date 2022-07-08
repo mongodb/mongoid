@@ -152,7 +152,8 @@ If a parameter is given to ``#take``, an array of documents is returned. If no p
 given, a singular document is returned.
 
 The ``#take!`` method functions the same as calling ``#take`` without arguments,
-but raises an error instead of returning nil if no documents are found.
+but raises an DocumentNotFound error instead of returning nil if no documents
+are found.
 
 .. code:: ruby
 
