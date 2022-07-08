@@ -18,14 +18,35 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Ruby 2.5 Deprecated
+-------------------
+
+Mongoid 7.5 deprecates support for Ruby 2.5.
+Mongoid 8 will require Ruby 2.6 or newer.
+
+
+JRuby 9.2 Deprecated
+--------------------
+
+Mongoid 7.5 deprecates support for JRuby 9.2.
+Mongoid 8 will require JRuby 9.3 or newer.
+
+
+Rails 5.1 Deprecated
+--------------------
+
+Mongoid 7.5 deprecates support for Rails 5.1.
+Mongoid 8 will require Rails 5.2 or newer.
+
+
 ``Document#to_a`` deprecated
-````````````````````````````
+----------------------------
 
 The ``Document#to_a`` method is deprecated in Mongoid 7.5.
 
 
 Combine Chained Operators Using ``and`` Instead of ``override``
-```````````````````````````````````````````````````````````````
+---------------------------------------------------------------
 
 Mongoid 7.5 with the ``Mongoid.overwrite_chained_operators`` option set to ``false``
 will combine conditions that use the same operator and field using an ``and``.
@@ -90,7 +111,7 @@ replacing upsert, and Mongoid 7.5 correctly calls ``replace_one``.
 
 
 Force the ``attributes`` Method to Always Return a ``Hash``
-```````````````````````````````````````````````````````````
+-----------------------------------------------------------
 
 Mongoid 7.5 with the ``Mongoid.legacy_attributes`` option set to ``false``
 will always return a ``Hash`` when calling the ``attributes`` method.

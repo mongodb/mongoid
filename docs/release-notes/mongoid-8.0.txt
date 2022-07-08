@@ -24,6 +24,17 @@ Support for MongoDB 3.4 and Earlier Servers Dropped
 Mongoid 8 requires MongoDB 3.6 or newer. Earlier server versions are not
 supported.
 
+Support for Ruby 2.5 Dropped
+----------------------------
+
+Mongoid 8 requires Ruby 2.6 or newer. Earlier Ruby versions are not supported.
+
+
+Support for Rails 5.1 Dropped
+-----------------------------
+
+Mongoid 8 requires Rails 5.2 or newer. Earlier Rails versions are not supported.
+
 
 Default Option Values Changed
 -----------------------------
