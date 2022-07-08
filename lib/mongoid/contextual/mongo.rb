@@ -269,8 +269,11 @@ module Mongoid
           if limit_or_opts.try(:key?, :id_sort)
             Mongoid::Warnings.warn_id_sort_deprecated
           end
-          sort = view.sort || { _id: 1 }
-          if raw_docs = view.sort(sort).limit(limit || 1).to_a
+          sorted_view = view
+          if sort = view.sort || ({ _id: 1 } unless limit_or_opts.try(:fetch, :id_sort) == :none)
+            sorted_view = view.sort(sort)
+          end
+          if raw_docs = sorted_view.limit(limit || 1).to_a
             process_raw_docs(raw_docs, limit)
           end
         end
@@ -742,8 +745,9 @@ module Mongoid
         Mongoid::Warnings.warn_id_sort_deprecated if opts.try(:key?, :id_sort)
 
         begin
-          sort = criteria.options[:sort] || { _id: 1 }
-          @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
+          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts.try(:fetch, :id_sort) == :none )
+            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
+          end
           yield
         ensure
           apply_option(:sort)

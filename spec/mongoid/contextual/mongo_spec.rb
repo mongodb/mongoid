@@ -2006,9 +2006,9 @@ describe Mongoid::Contextual::Mongo do
 
           context 'when calling #last' do
 
-            it 'applies a sort on _id' do
+            it 'doesn\'t apply a sort on _id' do
               expect(context.send(method, opts)).to eq(depeche_mode)
-              expect(context.last(opts)).to eq(rolling_stones)
+              expect(context.last(opts)).to eq(depeche_mode)
             end
           end
         end
@@ -2036,19 +2036,19 @@ describe Mongoid::Contextual::Mongo do
           end
         end
 
-        context 'with option { sort: :none }' do
+        context 'with option { id_sort: :none }' do
 
           let(:opts) do
             { id_sort: :none }
           end
 
-          it 'does not use the option' do
+          it 'uses the preexisting sort' do
             expect(context.send(method, opts)).to eq(rolling_stones)
           end
 
           context 'when calling #last' do
 
-            it 'does not use the option' do
+            it 'uses the preexisting sort' do
               expect(context.send(method, opts)).to eq(rolling_stones)
               expect(context.last(opts)).to eq(depeche_mode)
             end
@@ -2285,7 +2285,7 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).twice.and_call_original
+                  expect(context).to receive(:view).exactly(3).times.and_call_original
                   expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
                 end
               end
@@ -2307,7 +2307,7 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).twice.and_call_original
+                  expect(context).to receive(:view).exactly(3).times.and_call_original
                   expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
                 end
               end
@@ -2440,13 +2440,13 @@ describe Mongoid::Contextual::Mongo do
           { id_sort: :none }
         end
 
-        it 'applies the sort on _id' do
-          expect(context.last(opts)).to eq(rolling_stones)
+        it 'doesn\'t apply the sort on _id' do
+          expect(context.last(opts)).to eq(depeche_mode)
         end
 
         context 'when calling #first' do
 
-          it 'applies a sort on _id' do
+          it 'doesn\'t apply the sort on _id' do
             pending "MONGOID-5416"
             expect(context.last(opts)).to eq(rolling_stones)
             expect(context.first(opts)).to eq(depeche_mode)
@@ -2478,19 +2478,19 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context 'with option { sort: :none }' do
+      context 'with option { id_sort: :none }' do
 
         let(:opts) do
           { id_sort: :none }
         end
 
-        it 'does not use the option' do
+        it 'uses the preexisting sort' do
           expect(context.last(opts)).to eq(depeche_mode)
         end
 
         context 'when calling #first' do
 
-          it 'does not use the option' do
+          it 'uses the preexisting sort' do
             expect(context.last(opts)).to eq(depeche_mode)
             expect(context.first(opts)).to eq(rolling_stones)
           end
@@ -2781,7 +2781,7 @@ describe Mongoid::Contextual::Mongo do
         let(:limit) { 1 }
 
         it "hits the database" do
-          expect(context).to receive(:view).twice.and_call_original
+          expect(context).to receive(:view).exactly(3).times.and_call_original
           docs
         end
 
