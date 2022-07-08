@@ -287,7 +287,7 @@ describe Mongoid::Validatable::PresenceValidator do
             it "does not save the association target" do
               child.persisted?.should be false
 
-              expect { child.reload }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              expect { child.reload }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class HomAccreditation with id\(s\)/)
             end
           end
         end

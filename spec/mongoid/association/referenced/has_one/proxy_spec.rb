@@ -133,7 +133,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
             it "detaches the previous relation" do
               expect {
                 game.reload
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Game with id\(s\)/)
             end
           end
         end

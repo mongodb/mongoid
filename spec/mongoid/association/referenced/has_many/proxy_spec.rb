@@ -2540,7 +2540,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           it "raises an error" do
             expect {
               person.posts.find(post.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
           end
         end
 
@@ -2555,7 +2555,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 person.posts.find(BSON::ObjectId.new)
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
             end
           end
 
@@ -2604,7 +2604,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 person.posts.find([ BSON::ObjectId.new ])
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
             end
           end
 
@@ -2668,7 +2668,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 movie.ratings.find(BSON::ObjectId.new)
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Rating with id\(s\)/)
             end
           end
 
@@ -2725,7 +2725,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 movie.ratings.find([ BSON::ObjectId.new ])
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Rating with id\(s\)/)
             end
           end
 

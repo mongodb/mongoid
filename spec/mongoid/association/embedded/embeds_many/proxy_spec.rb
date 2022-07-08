@@ -2360,7 +2360,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           it "raises an error" do
             expect {
               person.addresses.find(BSON::ObjectId.new)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Address with id\(s\)/)
           end
         end
 
@@ -2409,7 +2409,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           it "raises an error" do
             expect {
               person.addresses.find([ BSON::ObjectId.new ])
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Address with id\(s\)/)
           end
         end
 
