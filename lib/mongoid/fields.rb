@@ -636,10 +636,7 @@ module Mongoid
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
             else
-              # Keep this code consistent with Mongoid::Attributes#read_attribute
-              value = field.demongoize(raw)
-              attribute_will_change!(name) if value.resizable?
-              value
+              process_raw_attribute(name.to_s, raw, field)
             end
           end
         end

@@ -600,3 +600,26 @@ returns ``true``:
     b.name == "Depeche Mode"
   end
   # => #<Band _id: 62c58e383282a4cbe82bd74b, name: "Depeche Mode">
+
+
+Changes to the ``attributes_before_type_cast`` Hash
+---------------------------------------------------
+
+The ``attributes_before_type_cast`` hash has been changed to function more like
+ActiveRecord:
+
+  - On instantiation of a new model (without parameters), the
+    ``attributes_before_type_cast`` hash has the same contents as the
+    ``attributes`` hash. If parameters are passed to the initializer, those
+    values will be stored in the ``attributes_before_type_cast`` hash before
+    they are ``mongoized``.
+  - When assigning a value to the model, the ``mongoized`` value (i.e. when
+    assiging '1' to an Integer field, it is ``mongoized`` to 1) is stored in
+    the ``attributes`` hash, whereas the raw value (i.e. '1') is stored in the
+    ``attributes_before_type_cast`` hash.
+  - When saving, creating (i.e. using the ``create!`` method), or reloading the
+    model, the ``attributes_before_type_cast`` hash is reset to have the same
+    contents as the ``attributes`` hash.
+  - When reading a document from the database, the ``attributes_before_type_cast``
+    hash contains the attributes as they appear in the database, as opposed to
+    their ``demongoized`` form.
