@@ -398,6 +398,44 @@ module Mongoid
         @view = view.limit(value) and self
       end
 
+      # Take the given number of documents from the database.
+      #
+      # @example Take 10 documents
+      #   context.take(10)
+      #
+      # @param [ Integer | nil ] limit The number of documents to return or nil.
+      #
+      # @return [ Document | Array<Document> ] The list of documents, or one
+      #   document if no value was given.
+      def take(limit = nil)
+        if limit
+          limit(limit).to_a
+        else
+          # Do to_a first so that the Mongo#first method is not used and the
+          # result is not sorted.
+          limit(1).to_a.first
+        end
+      end
+
+      # Take one document from the database and raise an error if there are none.
+      #
+      # @example Take a document
+      #   context.take!
+      #
+      # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def take!
+        # Do to_a first so that the Mongo#first method is not used and the
+        # result is not sorted.
+        if fst = limit(1).to_a.first
+          fst
+        else
+          raise Errors::DocumentNotFound.new(klass, nil, nil)
+        end
+      end
+
       # Initiate a map/reduce operation from the context.
       #
       # @example Initiate a map/reduce.

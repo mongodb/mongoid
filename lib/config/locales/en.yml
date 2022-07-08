@@ -404,6 +404,13 @@ en:
             \_\_\_\_\_\_default:\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
+        no_documents_found:
+          message: "Could not find a document of class %{klass}."
+          summary: "Mongoid attempted to find a document of the class %{klass}
+            but none exist."
+          resolution: "Create a document of class %{klass} or use a finder
+            method that returns nil when no documents are found instead of
+            raising an exception."
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."

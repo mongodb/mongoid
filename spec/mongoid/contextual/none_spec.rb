@@ -71,6 +71,24 @@ describe Mongoid::Contextual::None do
     end
   end
 
+  describe "#take" do
+    it "returns nil" do
+      expect(context.take).to be_nil
+    end
+
+    it "returns nil with params" do
+      expect(context.take(1)).to eq([])
+    end
+  end
+
+  describe "#take!" do
+    it "raises an error" do
+      expect do
+        context.take!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
   describe "#length" do
     it "returns zero" do
       expect(context.length).to eq(0)

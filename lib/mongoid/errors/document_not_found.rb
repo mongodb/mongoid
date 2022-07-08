@@ -23,7 +23,7 @@ module Mongoid
       # @param [ Array ] unmatched The unmatched ids, if appropriate
       def initialize(klass, params, unmatched = nil)
         if !unmatched && !params.is_a?(Hash)
-          unmatched = Array(params)
+          unmatched = Array(params) if params
         end
 
         @klass, @params = klass, params
@@ -93,10 +93,27 @@ module Mongoid
       #   error.problem
       #
       # @return [ String ] The problem.
-      def message_key(params)
-        case params
-          when Hash then "document_with_attributes_not_found"
-          else "document_not_found"
+      def message_key(params, unmatched)
+        if !params && !unmatched
+          "no_documents_found"
+        elsif Hash === params
+          "document_with_attributes_not_found"
+        elsif Hash === unmatched && unmatched.size >= 2
+          "document_with_shard_key_not_found"
+        else
+          "document_not_found"
+        end
+      end
+
+      # Get the shard key from the unmatched hash.
+      #
+      # @return [ String ] the shard key and value.
+      def shard_key(unmatched)
+        if Hash === unmatched
+          h = unmatched.dup
+          h.delete("_id")
+          h.delete(:_id)
+          h.map{|k,v| "#{k}: #{v}" }.join(", ")
         end
       end
     end
