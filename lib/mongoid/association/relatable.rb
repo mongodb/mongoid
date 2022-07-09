@@ -69,7 +69,7 @@ module Mongoid
       #
       # @param [ Symbol ] callback_type The type of callback type.
       #
-      # @return [ Array<Proc, Symbol> ] A list of the callbacks, either method
+      # @return [ Array<Proc | Symbol> ] A list of the callbacks, either method
       #   names or Procs.
       def get_callbacks(callback_type)
         Array(options[callback_type])

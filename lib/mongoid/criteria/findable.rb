@@ -14,7 +14,7 @@ module Mongoid
       #
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #
-      # @return [ Document, Array<Document> ] The document(s).
+      # @return [ Document | Array<Document> ] The document(s).
       def execute_or_raise(ids, multi)
         result = multiple_from_db(ids)
         check_for_missing_documents!(result, ids)
@@ -31,7 +31,7 @@ module Mongoid
       #
       # @param [ Array<BSON::ObjectId> ] args The ids to search for.
       #
-      # @return [ Array<Document>, Document ] The matching document(s).
+      # @return [ Array<Document> | Document ] The matching document(s).
       def find(*args)
         ids = args.__find_args__
         raise_invalid if ids.any?(&:nil?)

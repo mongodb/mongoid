@@ -48,7 +48,7 @@ module Mongoid
         #
         # @param [ Object ] object The object to demongoize.
         #
-        # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
+        # @return [ BigDecimal | nil ] A BigDecimal derived from the object or nil.
         def demongoize(object)
           unless object.nil?
             if object.is_a?(BSON::Decimal128)

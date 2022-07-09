@@ -135,7 +135,7 @@ module Mongoid
           #
           # @param [ Document ] document The document to be deleted.
           #
-          # @return [ Document, nil ] The deleted document or nil if nothing deleted.
+          # @return [ Document | nil ] The deleted document or nil if nothing deleted.
           def delete(document)
             execute_callbacks_around(:remove, document) do
               doc = _target.delete_one(document)
@@ -176,7 +176,7 @@ module Mongoid
           #     doc.state == "GA"
           #   end
           #
-          # @return [ Many, Enumerator ] The association or an enumerator if no
+          # @return [ Many | Enumerator ] The association or an enumerator if no
           #   block was provided.
           def delete_if
             if block_given?
@@ -210,7 +210,7 @@ module Mongoid
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
-          # @return [ true, false ] True is persisted documents exist, false if not.
+          # @return [ true | false ] True is persisted documents exist, false if not.
           def exists?
             count > 0
           end
@@ -287,7 +287,7 @@ module Mongoid
           # @param [ Integer ] count The number of documents to pop, or 1 if not
           #   provided.
           #
-          # @return [ Document, Array<Document> ] The popped document(s).
+          # @return [ Document | Array<Document> ] The popped document(s).
           def pop(count = nil)
             if count
               if docs = _target[_target.size - count, _target.size]
@@ -312,7 +312,7 @@ module Mongoid
           # @param [ Integer ] count The number of documents to shift, or 1 if not
           #   provided.
           #
-          # @return [ Document, Array<Document> ] The shifted document(s).
+          # @return [ Document | Array<Document> ] The shifted document(s).
           def shift(count = nil)
             if count
               if _target.size > 0 && docs = _target[0, count]
@@ -446,7 +446,7 @@ module Mongoid
           # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the association is persistable.
+          # @return [ true | false ] If the association is persistable.
           def persistable?
             _base.persisted? && !_binding?
           end

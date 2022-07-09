@@ -149,7 +149,7 @@ module Mongoid
       #
       # @param [ Object ] value The value to filter.
       #
-      # @return [ Object, Regexp ] The value, filtered or not.
+      # @return [ Object | Regexp ] The value, filtered or not.
       def filter(value)
         !case_sensitive? && value ? /\A#{Regexp.escape(value.to_s)}\z/i : value
       end

@@ -101,7 +101,7 @@ module Mongoid
         #
         # @note Only relevant for polymorphic associations.
         #
-        # @return [ String, nil ] The type field.
+        # @return [ String | nil ] The type field.
         def type
           @type ||= "#{as}_type" if polymorphic?
         end

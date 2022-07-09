@@ -274,7 +274,7 @@ module Mongoid
       #
       # @param [ Hash ] attributes The new attributes for the document.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update(attributes = nil)
         update_documents(attributes, [ first ])
       end
@@ -286,7 +286,7 @@ module Mongoid
       #
       # @param [ Hash ] attributes The new attributes for each document.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update_all(attributes = nil)
         update_documents(attributes, entries)
       end

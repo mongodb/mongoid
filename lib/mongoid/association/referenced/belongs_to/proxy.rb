@@ -48,7 +48,7 @@ module Mongoid
           #
           # @param [ Document | Array<Document> ] replacement The replacement.
           #
-          # @return [ self, nil ] The association or nil.
+          # @return [ self | nil ] The association or nil.
           def substitute(replacement)
             unbind_one
             if replacement

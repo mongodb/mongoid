@@ -56,7 +56,7 @@ module Mongoid
         # @param [ Class ] klass The class we're trying to convert for.
         # @param [ String ] id The id, usually coming from the form.
         #
-        # @return [ BSON::ObjectId, String, Object ] The converted id.
+        # @return [ BSON::ObjectId | String | Object ] The converted id.
         def convert_id(klass, id)
           klass.using_object_ids? ? BSON::ObjectId.mongoize(id) : id
         end

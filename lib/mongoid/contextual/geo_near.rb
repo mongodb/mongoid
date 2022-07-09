@@ -16,7 +16,7 @@ module Mongoid
       # @example Get the average distance.
       #   geo_near.average_distance
       #
-      # @return [ Float, nil ] The average distance.
+      # @return [ Float | nil ] The average distance.
       def average_distance
         average = stats["avgDistance"]
         (average.nil? || average.nan?) ? nil : average
@@ -100,7 +100,7 @@ module Mongoid
       #
       # @param [ Integer | Float ] value The maximum distance.
       #
-      # @return [ GeoNear, Float ] The GeoNear command or the value.
+      # @return [ GeoNear | Float ] The GeoNear command or the value.
       def max_distance(value = nil)
         if value
           command[:maxDistance] = value
@@ -211,7 +211,7 @@ module Mongoid
       # @example Get the documents.
       #   geo_near.documents
       #
-      # @return [ Array, Cursor ] The documents.
+      # @return [ Array | Cursor ] The documents.
       def documents
         results["results"].map do |attributes|
           doc = Factory.from_db(criteria.klass, attributes["obj"], criteria)

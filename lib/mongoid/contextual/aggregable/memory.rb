@@ -46,7 +46,7 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to max.
         #
-        # @return [ Float, Document ] The max value or document with the max
+        # @return [ Float | Document ] The max value or document with the max
         #   value.
         def max(field = nil)
           block_given? ? super() : aggregate_by(field, :max_by)
@@ -66,7 +66,7 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to min.
         #
-        # @return [ Float, Document ] The min value or document with the min
+        # @return [ Float | Document ] The min value or document with the min
         #   value.
         def min(field = nil)
           block_given? ? super() : aggregate_by(field, :min_by)
