@@ -65,7 +65,7 @@ en:
             and the following ids were not found: %{missing}."
           resolution: "Search for an id that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error when
+            which will cause nil to be returned instead of raising this error when
             searching for a single id, or only the matched documents when searching
             for multiples."
         document_with_attributes_not_found:
@@ -75,7 +75,7 @@ en:
             will be raised."
           resolution: "Search for attributes that are in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error."
+            which will cause nil to be returned instead of raising this error."
         document_with_shard_key_not_found:
           message: "Document not found for class %{klass} with id %{missing} and
             shard key %{shard_key}."
@@ -85,7 +85,7 @@ en:
             shard_key: %{shard_key} and it was not found."
           resolution: "Search for an id/shard key that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error."
+            which will cause nil to be returned instead of raising this error."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
