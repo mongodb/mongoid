@@ -27,7 +27,7 @@ module Mongoid
     # @param [ Document | Hash ] document The document to extract from.
     # @param [ String ] key The key path to extract.
     #
-    # @return [ Array<Object | Array, true | false> ]
+    # @return [ Array<[ Object | Array ], [ true | false ]> ]
     #   A two-element array. The first element is the value retrieved, or an
     #   array of values. The second element is a boolean flag indicating
     #   whether an array was expanded at any point during the key traversal
