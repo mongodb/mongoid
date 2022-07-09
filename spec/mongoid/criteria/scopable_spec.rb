@@ -413,7 +413,7 @@ describe Mongoid::Criteria::Scopable do
     end
 
     it "returns the scoping options" do
-      expect(criteria.scoping_options).to eq([ true | false ])
+      expect(criteria.scoping_options).to eq([ true, false ])
     end
   end
 
