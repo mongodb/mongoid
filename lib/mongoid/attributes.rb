@@ -27,7 +27,7 @@ module Mongoid
     #
     # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] True if present, false if not.
+    # @return [ true | false ] True if present, false if not.
     def attribute_present?(name)
       attribute = read_raw_attribute(name)
       !attribute.blank? || attribute == false
@@ -52,7 +52,7 @@ module Mongoid
     #
     # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] If the key is present in the attributes.
+    # @return [ true | false ] If the key is present in the attributes.
     def has_attribute?(name)
       attributes.key?(name.to_s)
     end
@@ -65,7 +65,7 @@ module Mongoid
     #
     # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] If the key is present in the
+    # @return [ true | false ] If the key is present in the
     #   attributes_before_type_cast.
     def has_attribute_before_type_cast?(name)
       attributes_before_type_cast.key?(name.to_s)
@@ -238,7 +238,7 @@ module Mongoid
     #
     # @param [ String ] name The name of the attribute.
     #
-    # @return [ true, false ] If the attribute is missing.
+    # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
       !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
     end
@@ -262,7 +262,7 @@ module Mongoid
     # @example Is the string in dot syntax.
     #   model.hash_dot_syntax?
     #
-    # @return [ true, false ] If the string contains a "."
+    # @return [ true | false ] If the string contains a "."
     def hash_dot_syntax?(string)
       string.include?(".")
     end

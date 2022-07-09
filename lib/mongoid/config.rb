@@ -131,7 +131,7 @@ module Mongoid
     # @example Is Mongoid configured?
     #   config.configured?
     #
-    # @return [ true, false ] If Mongoid is configured.
+    # @return [ true | false ] If Mongoid is configured.
     def configured?
       clients.key?(:default)
     end
@@ -309,7 +309,7 @@ module Mongoid
     # @example Is the application using passenger?
     #   config.running_with_passenger?
     #
-    # @return [ true, false ] If the app is deployed on Passenger.
+    # @return [ true | false ] If the app is deployed on Passenger.
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end

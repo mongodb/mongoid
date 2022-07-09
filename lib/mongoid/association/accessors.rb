@@ -225,7 +225,7 @@ module Mongoid
       # @example Is autobuild disabled?
       #   document.without_autobuild?
       #
-      # @return [ true, false ] If autobuild is disabled.
+      # @return [ true | false ] If autobuild is disabled.
       def without_autobuild?
         Threaded.executing?(:without_autobuild)
       end

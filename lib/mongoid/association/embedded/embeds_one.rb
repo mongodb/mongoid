@@ -66,7 +66,7 @@ module Mongoid
         # @example Get the validation default.
         #   Proxy.validation_default
         #
-        # @return [ true, false ] The validation default.
+        # @return [ true | false ] The validation default.
         def validation_default; true; end
 
         # Does this association type store the foreign key?
@@ -88,7 +88,7 @@ module Mongoid
 
         # Is this association polymorphic?
         #
-        # @return [ true, false ] Whether this association is polymorphic.
+        # @return [ true | false ] Whether this association is polymorphic.
         def polymorphic?
           @polymorphic ||= !!@options[:as]
         end

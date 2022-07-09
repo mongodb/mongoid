@@ -28,7 +28,7 @@ module Mongoid
     #
     # @param [ Document | Object ] other The other object to compare with.
     #
-    # @return [ true, false ] True if the ids are equal, false if not.
+    # @return [ true | false ] True if the ids are equal, false if not.
     def ==(other)
       self.class == other.class &&
           attributes["_id"] == other.attributes["_id"]
@@ -41,7 +41,7 @@ module Mongoid
     #
     # @param [ Document | Object ] other The other object to compare with.
     #
-    # @return [ true, false ] True if the classes are equal, false if not.
+    # @return [ true | false ] True if the classes are equal, false if not.
     def ===(other)
       if Mongoid.legacy_triple_equals
         super
@@ -57,7 +57,7 @@ module Mongoid
     #
     # @param [ Document | Object ] other The object to check against.
     #
-    # @return [ true, false ] True if equal, false if not.
+    # @return [ true | false ] True if equal, false if not.
     def eql?(other)
       self == (other)
     end
@@ -70,7 +70,7 @@ module Mongoid
       #
       # @param [ Document | Object ] other The other object to compare with.
       #
-      # @return [ true, false ] True if the classes are equal, false if not.
+      # @return [ true | false ] True if the classes are equal, false if not.
       def ===(other)
         if Mongoid.legacy_triple_equals
           other.is_a?(self)

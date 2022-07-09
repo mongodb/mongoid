@@ -74,7 +74,7 @@ module Mongoid
           # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the association is persistable.
+          # @return [ true | false ] If the association is persistable.
           def persistable?
             _target.persisted? && !_binding? && !_building?
           end

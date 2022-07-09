@@ -42,7 +42,7 @@ module Mongoid
       # @example Is the context cached?
       #   context.cached?
       #
-      # @return [ true, false ] If the context is cached.
+      # @return [ true | false ] If the context is cached.
       def cached?
         !!@cache
       end
@@ -169,7 +169,7 @@ module Mongoid
       #   b-tree indexes, unless a count is already cached then that is
       #   used to determine the value.
       #
-      # @return [ true, false ] If the count is more than zero.
+      # @return [ true | false ] If the count is more than zero.
       def exists?
         return !documents.empty? if cached? && cache_loaded?
         return @count > 0 if instance_variable_defined?(:@count)
@@ -200,7 +200,7 @@ module Mongoid
       #
       # @option options [ :before, :after ] :return_document Return the updated document
       #   from before or after update.
-      # @option options [ true, false ] :upsert Create the document if it doesn't exist.
+      # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
       def find_one_and_update(update, options = {})
@@ -220,7 +220,7 @@ module Mongoid
       #
       # @option options [ :before, :after ] :return_document Return the updated document
       #   from before or after update.
-      # @option options [ true, false ] :upsert Create the document if it doesn't exist.
+      # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
       def find_one_and_replace(replacement, options = {})
@@ -653,7 +653,7 @@ module Mongoid
       # @param [ Hash ] attributes The updates.
       # @param [ Symbol ] method The method to use.
       #
-      # @return [ true, false ] If the update succeeded.
+      # @return [ true | false ] If the update succeeded.
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
@@ -724,7 +724,7 @@ module Mongoid
       # @example Is the context cacheable?
       #   context.cacheable?
       #
-      # @return [ true, false ] If caching, and the cache isn't loaded.
+      # @return [ true | false ] If caching, and the cache isn't loaded.
       def cacheable?
         cached? && !cache_loaded?
       end
@@ -737,7 +737,7 @@ module Mongoid
       # @example Is the cache loaded?
       #   context.cache_loaded?
       #
-      # @return [ true, false ] If the cache is loaded.
+      # @return [ true | false ] If the cache is loaded.
       def cache_loaded?
         !!@cache_loaded
       end

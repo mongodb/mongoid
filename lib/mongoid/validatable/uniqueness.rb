@@ -74,7 +74,7 @@ module Mongoid
       # @example Is the validation case sensitive?
       #   validator.case_sensitive?
       #
-      # @return [ true, false ] If the validation is case sensitive.
+      # @return [ true | false ] If the validation is case sensitive.
       def case_sensitive?
         !(options[:case_sensitive] == false)
       end
@@ -182,7 +182,7 @@ module Mongoid
       #
       # @param [ Document ] document The embedded document.
       #
-      # @return [ true, false ] If the validation should be skipped.
+      # @return [ true | false ] If the validation should be skipped.
       def skip_validation?(document)
         !document._parent || document.embedded_one?
       end
@@ -196,7 +196,7 @@ module Mongoid
       #
       # @param [ Document ] document The embedded document.
       #
-      # @return [ true, false ] If the scope reference has changed.
+      # @return [ true | false ] If the scope reference has changed.
       def scope_value_changed?(document)
         Array.wrap(options[:scope]).any? do |item|
           document.send("attribute_changed?", item.to_s)
@@ -277,7 +277,7 @@ module Mongoid
       # @param [ Document ] document The document getting validated.
       # @param [ Symbol ] attribute The attribute to validate.
       #
-      # @return [ true, false ] If we need to validate.
+      # @return [ true | false ] If we need to validate.
       def validation_required?(document, attribute)
         document.new_record? ||
           document.send("attribute_changed?", attribute.to_s) ||
@@ -294,7 +294,7 @@ module Mongoid
       # @param [ Document ] document The document getting validated.
       # @param [ Symbol ] attribute The attribute to validate.
       #
-      # @return [ true, false ] If the attribute is localized.
+      # @return [ true | false ] If the attribute is localized.
       def localized?(document, attribute)
         document.fields[document.database_field_name(attribute)].try(:localized?)
       end

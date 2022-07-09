@@ -17,7 +17,7 @@ module Mongoid
       # @example Is the association empty??
       #   person.addresses.blank?
       #
-      # @return [ true, false ] If the association is empty or not.
+      # @return [ true | false ] If the association is empty or not.
       def blank?
         !any?
       end
@@ -133,7 +133,7 @@ module Mongoid
       # @param [ Symbol ] name The method name.
       # @param [ true | false ] include_private Whether to include private methods.
       #
-      # @return [ true, false ] If the proxy responds to the method.
+      # @return [ true | false ] If the proxy responds to the method.
       def respond_to?(name, include_private = false)
         [].respond_to?(name, include_private) ||
           klass.respond_to?(name, include_private) || super

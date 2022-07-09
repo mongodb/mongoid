@@ -150,7 +150,7 @@ module Mongoid
     #
     # @param [ Hash ] options The options.
     #
-    # @option options [ true, false ] :compact (Deprecated) Whether to include fields
+    # @option options [ true | false ] :compact (Deprecated) Whether to include fields
     #   with nil values in the json document.
     #
     # @return [ Hash ] The document as json.

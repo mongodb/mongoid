@@ -14,7 +14,7 @@ module Mongoid
       #
       # @param [ Hash ] options Options to pass to the save.
       #
-      # @return [ true, false ] True is success, false if not.
+      # @return [ true | false ] True is success, false if not.
       def save(options = {})
         if new_record?
           !insert(options).new_record?
@@ -34,7 +34,7 @@ module Mongoid
       # @raise [ Errors::Validations ] If validation failed.
       # @raise [ Errors::Callback ] If a callback returns false.
       #
-      # @return [ true, false ] True if validation passed.
+      # @return [ true | false ] True if validation passed.
       def save!(options = {})
         unless save(options)
           fail_due_to_validation! unless errors.empty?

@@ -200,7 +200,7 @@ module Mongoid
       # @example Set the base association.
       #   binding.set_base_association
       #
-      # @return [ true, false ] If the association changed.
+      # @return [ true | false ] If the association changed.
       def set_base_association
         inverse_association = _association.inverse_association(_target)
         if inverse_association != _association && !inverse_association.nil?

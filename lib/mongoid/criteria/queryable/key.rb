@@ -82,7 +82,7 @@ module Mongoid
         #
         # @param [ Object ] other The object to compare to.
         #
-        # @return [ true, false ] If the objects are equal.
+        # @return [ true | false ] If the objects are equal.
         def ==(other)
           return false unless other.is_a?(Key)
           name == other.name && operator == other.operator && expanded == other.expanded

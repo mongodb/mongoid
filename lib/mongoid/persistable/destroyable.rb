@@ -14,7 +14,7 @@ module Mongoid
       #
       # @param [ Hash ] options Options to pass to destroy.
       #
-      # @return [ true, false ] True if successful, false if not.
+      # @return [ true | false ] True if successful, false if not.
       def destroy(options = nil)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         self.flagged_for_destroy = true

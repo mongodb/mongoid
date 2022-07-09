@@ -60,7 +60,7 @@ module Mongoid
       # @example Is the query cache enabled?
       #   QueryCache.enabled?
       #
-      # @return [ true, false ] If the cache is enabled.
+      # @return [ true | false ] If the cache is enabled.
       def enabled?
         if defined?(Mongo::QueryCache)
           Mongo::QueryCache.enabled?

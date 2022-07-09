@@ -88,7 +88,7 @@ module Mongoid
       #
       # @param [ Document ] doc The document to be bound.
       #
-      # @return [ true, false ] Whether the document can be bound.
+      # @return [ true | false ] Whether the document can be bound.
       def bindable?(doc); false; end
 
       # Get the inverse names.
@@ -258,7 +258,7 @@ module Mongoid
 
       # Whether the dependent method is destructive.
       #
-      # @return [ true, false ] If the dependent method is destructive.
+      # @return [ true | false ] If the dependent method is destructive.
       def destructive?
         @destructive ||= !!(dependent && (dependent == :delete_all || dependent == :destroy))
       end
@@ -289,7 +289,7 @@ module Mongoid
 
       # Whether the associated object(s) should be validated.
       #
-      # @return [ true, false ] If the associated object(s)
+      # @return [ true | false ] If the associated object(s)
       #   should be validated.
       def validate?
         @validate ||= if @options[:validate].nil?

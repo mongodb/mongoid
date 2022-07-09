@@ -25,7 +25,7 @@ module Mongoid
       #
       # @param [ Array ] other The other array.
       #
-      # @return [ true, false ] If the objects are equal.
+      # @return [ true | false ] If the objects are equal.
       def ==(other)
         return false unless other.respond_to?(:entries)
         entries == other.entries
@@ -106,7 +106,7 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
-      # @return [ true, false ] If the count is more than zero.
+      # @return [ true | false ] If the count is more than zero.
       def exists?
         count > 0
       end

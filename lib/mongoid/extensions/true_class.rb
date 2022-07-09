@@ -21,7 +21,7 @@ module Mongoid
       #
       # @param [ Class ] other The class to check.
       #
-      # @return [ true, false ] If the other is a boolean.
+      # @return [ true | false ] If the other is a boolean.
       def is_a?(other)
         if other == Mongoid::Boolean || other.class == Mongoid::Boolean
           return true

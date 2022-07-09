@@ -40,7 +40,7 @@ module Mongoid
       #
       # @param [ Array ] other The other array.
       #
-      # @return [ true, false ] If the objects are equal.
+      # @return [ true | false ] If the objects are equal.
       def ==(other)
         other.is_a?(None)
       end

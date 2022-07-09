@@ -529,7 +529,7 @@ module Mongoid
         # @example Is the selectable negating?
         #   selectable.negating?
         #
-        # @return [ true, false ] If the selectable is negating.
+        # @return [ true | false ] If the selectable is negating.
         def negating?
           !!negating
         end

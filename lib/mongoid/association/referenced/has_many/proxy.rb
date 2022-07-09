@@ -168,7 +168,7 @@ module Mongoid
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
-          # @return [ true, false ] True is persisted documents exist, false if not.
+          # @return [ true | false ] True is persisted documents exist, false if not.
           def exists?
             criteria.exists?
           end
@@ -343,7 +343,7 @@ module Mongoid
           #
           # @param [ Document ] document The document to possibly append to the target.
           #
-          # @return [ true, false ] Whether the document is already related to the base and the
+          # @return [ true | false ] Whether the document is already related to the base and the
           #   association is persisted.
           def already_related?(document)
             document.persisted? &&
@@ -391,7 +391,7 @@ module Mongoid
           #
           # @param [ Document ] document The document to cascade on.
           #
-          # @return [ true, false ] If the association is destructive.
+          # @return [ true | false ] If the association is destructive.
           def cascade!(document)
             if persistable?
               case _association.dependent
@@ -450,7 +450,7 @@ module Mongoid
           # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the association is persistable.
+          # @return [ true | false ] If the association is persistable.
           def persistable?
             !_binding? && (_creating? || _base.persisted? && !_building?)
           end

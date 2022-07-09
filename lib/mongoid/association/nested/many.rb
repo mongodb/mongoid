@@ -65,7 +65,7 @@ module Mongoid
         #
         # @param [ Hash ] attributes The attributes to pull the flag from.
         #
-        # @return [ true, false ] If the association can potentially be deleted.
+        # @return [ true | false ] If the association can potentially be deleted.
         def destroyable?(attributes)
           destroy = attributes.delete(:_destroy)
           Nested::DESTROY_FLAGS.include?(destroy) && allow_destroy?
@@ -79,7 +79,7 @@ module Mongoid
         #
         # @param [ Hash ] attributes The attributes being set.
         #
-        # @return [ true, false ] If the attributes exceed the limit.
+        # @return [ true | false ] If the attributes exceed the limit.
         def over_limit?(attributes)
           limit = options[:limit]
           limit ? attributes.size > limit : false

@@ -36,7 +36,7 @@ module Mongoid
       #
       # @param [ Hash ] options The options hash.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ true | false ] If the operation succeeded.
       def prepare_upsert(options = {})
         return false if performing_validations?(options) && invalid?(:upsert)
         result = run_callbacks(:upsert) do

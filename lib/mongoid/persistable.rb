@@ -83,7 +83,7 @@ module Mongoid
     #   declared atomic operations) of the atomically block wrapping this one
     #   for the same document, if one exists.
     #
-    # @return [ true, false ] If the operation succeeded.
+    # @return [ true | false ] If the operation succeeded.
     def atomically(join_context: nil)
       join_context = Mongoid.join_contexts if join_context.nil?
       call_depth = @atomic_depth ||= 0
@@ -146,7 +146,7 @@ module Mongoid
     # @example Are we executing atomically?
     #   document.executing_atomically?
     #
-    # @return [ true, false ] If we are current executing atomically.
+    # @return [ true | false ] If we are current executing atomically.
     def executing_atomically?
       !@atomic_updates_to_execute_stack.nil?
     end

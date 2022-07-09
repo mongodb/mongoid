@@ -282,7 +282,7 @@ module Mongoid
           #
           # @param [ Document ] doc The document.
           #
-          # @return [ true, false ] If the document can be persisted.
+          # @return [ true | false ] If the document can be persisted.
           def child_persistable?(doc)
             (persistable? || _creating?) &&
                 !(doc.persisted? && _association.forced_nil_inverse?)

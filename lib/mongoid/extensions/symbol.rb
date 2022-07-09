@@ -9,7 +9,7 @@ module Mongoid
       # @example Is the string an id value?
       #   :_id.mongoid_id?
       #
-      # @return [ true, false ] If the symbol is :id or :_id.
+      # @return [ true | false ] If the symbol is :id or :_id.
       def mongoid_id?
         to_s.mongoid_id?
       end
