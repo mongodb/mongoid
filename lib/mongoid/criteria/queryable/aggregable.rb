@@ -20,7 +20,7 @@ module Mongoid
         # @example Is the aggregable aggregating?
         #   aggregable.aggregating?
         #
-        # @return [ true, false ] If the aggregable is aggregating.
+        # @return [ true | false ] If the aggregable is aggregating.
         def aggregating?
           !!@aggregating
         end

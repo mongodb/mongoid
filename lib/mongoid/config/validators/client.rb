@@ -86,7 +86,7 @@ module Mongoid
         #
         # @param [ Hash ] config The configuration options.
         #
-        # @return [ true, false ] If no database or uri is defined.
+        # @return [ true | false ] If no database or uri is defined.
         def no_database_or_uri?(config)
           !config.has_key?(:database) && !config.has_key?(:uri)
         end
@@ -101,7 +101,7 @@ module Mongoid
         #
         # @param [ Hash ] config The configuration options.
         #
-        # @return [ true, false ] If no hosts or uri is defined.
+        # @return [ true | false ] If no hosts or uri is defined.
         def no_hosts_or_uri?(config)
           !config.has_key?(:hosts) && !config.has_key?(:uri)
         end
@@ -116,7 +116,7 @@ module Mongoid
         #
         # @param [ Hash ] config The configuration options.
         #
-        # @return [ true, false ] If both standard and uri are defined.
+        # @return [ true | false ] If both standard and uri are defined.
         def both_uri_and_standard?(config)
           config.has_key?(:uri) && config.keys.any? do |key|
             STANDARD.include?(key.to_sym)

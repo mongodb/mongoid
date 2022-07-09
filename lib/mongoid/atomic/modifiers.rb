@@ -153,7 +153,7 @@ module Mongoid
       #
       # @param [ String ] field The field.
       #
-      # @return [ true, false ] If this field is a conflict.
+      # @return [ true | false ] If this field is a conflict.
       def set_conflict?(field)
         name = field.split(".", 2)[0]
         pull_fields.has_key?(name) || push_fields.has_key?(name)
@@ -166,7 +166,7 @@ module Mongoid
       #
       # @param [ String ] field The field.
       #
-      # @return [ true, false ] If this field is a conflict.
+      # @return [ true | false ] If this field is a conflict.
       def push_conflict?(field)
         name = field.split(".", 2)[0]
         set_fields.has_key?(name) || pull_fields.has_key?(name) ||

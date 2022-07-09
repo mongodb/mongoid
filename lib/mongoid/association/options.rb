@@ -28,21 +28,21 @@ module Mongoid
 
       # Whether to index the primary or foreign key field.
       #
-      # @return [ true, false ]
+      # @return [ true | false ]
       def indexed?
         @indexed ||= !!@options[:index]
       end
 
       # Whether the association is autobuilding.
       #
-      # @return [ true, false ]
+      # @return [ true | false ]
       def autobuilding?
         !!@options[:autobuild]
       end
 
       # Is the association cyclic.
       #
-      # @return [ true, false ] Whether the association is cyclic.
+      # @return [ true | false ] Whether the association is cyclic.
       def cyclic?
         !!@options[:cyclic]
       end
@@ -65,7 +65,7 @@ module Mongoid
       # Options to save any loaded members and destroy members that are marked for destruction
       # when the parent object is saved.
       #
-      # @return [ true, false ] The autosave option.
+      # @return [ true | false ] The autosave option.
       def autosave
         !!@options[:autosave]
       end
@@ -73,19 +73,19 @@ module Mongoid
 
       # Whether the association is counter-cached.
       #
-      # @return [ true, false ]
+      # @return [ true | false ]
       def counter_cached?
         !!@options[:counter_cache]
       end
 
       # Whether this association is polymorphic.
       #
-      # @return [ true, false ] Whether the association is polymorphic.
+      # @return [ true | false ] Whether the association is polymorphic.
       def polymorphic?; false; end
 
       # Whether the association has callbacks cascaded down from the parent.
       #
-      # @return [ true, false ] Whether callbacks are cascaded.
+      # @return [ true | false ] Whether callbacks are cascaded.
       def cascading_callbacks?
         !!@options[:cascade_callbacks]
       end

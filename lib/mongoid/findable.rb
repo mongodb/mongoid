@@ -75,7 +75,7 @@ module Mongoid
     # @example Are there no saved documents for this model?
     #   Person.empty?
     #
-    # @return [ true, false ] If the collection is empty.
+    # @return [ true | false ] If the collection is empty.
     def empty?
       count == 0
     end
@@ -86,7 +86,7 @@ module Mongoid
     # @example Do any documents exist for the conditions?
     #   Person.exists?
     #
-    # @return [ true, false ] If any documents exist for the conditions.
+    # @return [ true | false ] If any documents exist for the conditions.
     def exists?
       with_default_scope.exists?
     end
@@ -160,7 +160,7 @@ module Mongoid
     # @raise [ Errors::DocumentNotFound ] If no document found
     # and Mongoid.raise_not_found_error is true.
     #
-    # @return [ Document, nil ] A matching document.
+    # @return [ Document | nil ] A matching document.
     def find_by(attrs = {})
       result = where(attrs).find_first
       if result.nil? && Mongoid.raise_not_found_error

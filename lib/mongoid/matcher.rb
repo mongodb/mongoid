@@ -24,17 +24,14 @@ module Mongoid
     #   an array of values of the `bar` field in each of the hashes in the
     #   `foo` array.
     #
-    # The return value is a two-element array. The first element is the value
-    # retrieved, or an array of values. The second element is a boolean flag
-    # indicating whether an array was expanded at any point during the key
-    # traversal (because the respective document field was an array).
-    #
     # @param [ Document | Hash ] document The document to extract from.
     # @param [ String ] key The key path to extract.
     #
-    # @return [ Array<true | false, Object | Array, true | false> ]
-    #   Whether the value existed in the document, the extracted value
-    #   and the array expansion flag.
+    # @return [ Array<Object | Array, true | false> ]
+    #   A two-element array. The first element is the value retrieved, or an
+    #   array of values. The second element is a boolean flag indicating
+    #   whether an array was expanded at any point during the key traversal
+    #   (because the respective document field was an array).
     module_function def extract_attribute(document, key)
       if document.respond_to?(:as_attributes, true)
         # If a document has hash fields, as_attributes would keep those fields

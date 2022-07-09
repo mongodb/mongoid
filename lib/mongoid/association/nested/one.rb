@@ -62,7 +62,7 @@ module Mongoid
         # @example Is the id acceptable?
         #   one.acceptable_id?
         #
-        # @return [ true, false ] If the id part of the logic will allow an update.
+        # @return [ true | false ] If the id part of the logic will allow an update.
         def acceptable_id?
           id = association.klass.extract_id_field(attributes)
           id = convert_id(existing.class, id)

@@ -203,7 +203,7 @@ module Mongoid
     # @example Check if the document is a subclass
     #   Square.new.hereditary?
     #
-    # @return [ true, false ] True if hereditary, false if not.
+    # @return [ true | false ] True if hereditary, false if not.
     def hereditary?
       self.class.hereditary?
     end
@@ -283,7 +283,7 @@ module Mongoid
     # @example Is the document the root?
     #   document._root?
     #
-    # @return [ true, false ] If the document is the root.
+    # @return [ true | false ] If the document is the root.
     def _root?
       _parent ? false : true
     end
@@ -295,7 +295,7 @@ module Mongoid
       # @example Check if the document is a subclass.
       #   Square.hereditary?
       #
-      # @return [ true, false ] True if hereditary, false if not.
+      # @return [ true | false ] True if hereditary, false if not.
       def hereditary?
         !!(Mongoid::Document > superclass)
       end

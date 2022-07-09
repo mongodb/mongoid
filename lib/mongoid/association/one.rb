@@ -12,7 +12,7 @@ module Mongoid
       # @example Clear the relation.
       #   relation.clear
       #
-      # @return [ true, false ] If the delete succeeded.
+      # @return [ true | false ] If the delete succeeded.
       def clear
         _target.delete
       end
@@ -34,7 +34,7 @@ module Mongoid
       #
       # @param [ Symbol ] name The method name.
       #
-      # @return [ true, false ] If the proxy responds to the method.
+      # @return [ true | false ] If the proxy responds to the method.
       def respond_to?(name, include_private = false)
         _target.respond_to?(name, include_private) || super
       end

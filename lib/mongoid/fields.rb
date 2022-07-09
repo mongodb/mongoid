@@ -229,7 +229,7 @@ module Mongoid
     # @param [ Field ] field The field.
     # @param [ Object ] value The current value.
     #
-    # @return [ true, false ] If we set the field lazily.
+    # @return [ true | false ] If we set the field lazily.
     def lazy_settable?(field, value)
       !frozen? && value.nil? && field.lazy?
     end
@@ -241,7 +241,7 @@ module Mongoid
     # @example Is the document using object ids?
     #   model.using_object_ids?
     #
-    # @return [ true, false ] Using object ids.
+    # @return [ true | false ] Using object ids.
     def using_object_ids?
       self.class.using_object_ids?
     end
@@ -252,7 +252,7 @@ module Mongoid
     #
     # @param [ String ] name The field name.
     #
-    # @return [ true, false ] If this field is dotted or dollared.
+    # @return [ true | false ] If this field is dotted or dollared.
     def dot_dollar_field?(name)
       n = aliased_fields[name] || name
       fields.key?(n) && (n.include?('.') || n.start_with?('$'))
@@ -507,7 +507,7 @@ module Mongoid
       # @example Does this class use object ids?
       #   person.using_object_ids?
       #
-      # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
+      # @return [ true | false ] If the class uses BSON::ObjectIds for the id.
       def using_object_ids?
         fields["_id"].object_id_field?
       end

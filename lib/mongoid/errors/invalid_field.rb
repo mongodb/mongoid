@@ -42,7 +42,7 @@ module Mongoid
       # @param [ Class ] klass The document class.
       # @param [ Symbol ] name The method name.
       #
-      # @return [ Class, Module ] The originating class or module.
+      # @return [ Class | Module ] The originating class or module.
       def origin(klass, name)
         klass.instance_method(name).owner
       end
@@ -55,7 +55,7 @@ module Mongoid
       # @param [ Class ] klass The document class.
       # @param [ Symbol ] name The method name.
       #
-      # @return [ Array<String, Integer> ] The location of the method.
+      # @return [ Array<String | Integer> ] The location of the method.
       def location(klass, name)
         @location ||=
           (klass.instance_method(name).source_location || [ "Unknown", 0 ])

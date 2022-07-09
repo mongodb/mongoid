@@ -15,7 +15,7 @@ module Mongoid
     #
     # @param [ Hash ] selector The MongoDB selector.
     #
-    # @return [ true, false ] True if matches, false if not.
+    # @return [ true | false ] True if matches, false if not.
     def _matches?(selector)
       Matcher::Expression.matches?(self, selector)
     end

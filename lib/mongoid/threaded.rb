@@ -255,7 +255,7 @@ module Mongoid
     #
     # @param [ Document ] document The document to check.
     #
-    # @return [ true, false ] If the document is autosaved.
+    # @return [ true | false ] If the document is autosaved.
     def autosaved?(document)
       autosaves_for(document.class).include?(document._id)
     end
@@ -267,7 +267,7 @@ module Mongoid
     #
     # @param [ Document ] document The document to check.
     #
-    # @return [ true, false ] If the document is validated.
+    # @return [ true | false ] If the document is validated.
     def validated?(document)
       validations_for(document.class).include?(document._id)
     end
@@ -330,7 +330,7 @@ module Mongoid
     # @example Get the session for this thread.
     #   Threaded.get_session
     #
-    # @return [ Mongo::Session, nil ] The session cached on this thread or nil.
+    # @return [ Mongo::Session | nil ] The session cached on this thread or nil.
     def get_session
       Thread.current[:session]
     end

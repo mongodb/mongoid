@@ -81,7 +81,7 @@ module Mongoid
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Object ] value The value to serialize.
         #
-        # @return [ Array<String, String> ] The store name and store value.
+        # @return [ Array<String | String> ] The store name and store value.
         def store_creds(name, serializer, value)
           store_name = localized_key(name, serializer)
           if Range === value
@@ -232,7 +232,7 @@ module Mongoid
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Range ] value The Range to serialize.
         #
-        # @return [ Array<String, Hash> ] The store name and serialized Range.
+        # @return [ Array<String | Hash> ] The store name and serialized Range.
         def evolve_range(key, serializer, value)
           v = value.__evolve_range__(serializer: serializer)
           assocs = []
@@ -277,7 +277,7 @@ module Mongoid
         #
         # @param [ String ] key The key to check.
         #
-        # @return [ true, false ] If the key is for a multi-select.
+        # @return [ true | false ] If the key is for a multi-select.
         def multi_selection?(key)
           %w($and $or $nor).include?(key)
         end

@@ -41,7 +41,7 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute or a dot notation path.
       #
-      # @return [ true, false ] Whether the attribute is allowed by projection.
+      # @return [ true | false ] Whether the attribute is allowed by projection.
       #
       # @api private
       def attribute_or_path_allowed?(name)

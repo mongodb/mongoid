@@ -56,7 +56,7 @@ module Mongoid
     # @example Check if frozen
     #   document.frozen?
     #
-    # @return [ true, false ] True if frozen, else false.
+    # @return [ true | false ] True if frozen, else false.
     def frozen?
       attributes.frozen?
     end

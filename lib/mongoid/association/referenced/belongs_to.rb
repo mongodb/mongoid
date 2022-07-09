@@ -97,7 +97,7 @@ module Mongoid
 
         # Is this association polymorphic?
         #
-        # @return [ true, false ] Whether this association is polymorphic.
+        # @return [ true | false ] Whether this association is polymorphic.
         def polymorphic?
           @polymorphic ||= !!@options[:polymorphic]
         end

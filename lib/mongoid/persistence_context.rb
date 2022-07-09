@@ -118,7 +118,7 @@ module Mongoid
     #
     # @param [ Object ] other The object to be compared with this one.
     #
-    # @return [ true, false ] Whether the two persistence contexts are equal.
+    # @return [ true | false ] Whether the two persistence contexts are equal.
     def ==(other)
       return false unless other.is_a?(PersistenceContext)
       options == other.options

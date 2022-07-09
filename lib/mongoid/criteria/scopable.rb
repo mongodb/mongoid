@@ -83,7 +83,7 @@ module Mongoid
       # @example Is the default scope applied?
       #   criteria.scoped?
       #
-      # @return [ true, false ] If the default scope is applied.
+      # @return [ true | false ] If the default scope is applied.
       def scoped?
         !!(defined?(@scoped) ? @scoped : nil)
       end
@@ -108,7 +108,7 @@ module Mongoid
       # @example Is the criteria unscoped?
       #   criteria.unscoped?
       #
-      # @return [ true, false ] If the criteria is force unscoped.
+      # @return [ true | false ] If the criteria is force unscoped.
       def unscoped?
         !!(defined?(@unscoped) ? @unscoped : nil)
       end

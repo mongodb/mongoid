@@ -196,7 +196,7 @@ module Mongoid
         # @example Can inserts be performed?
         #   batchable.insertable?
         #
-        # @return [ true, false ] If inserts can be performed.
+        # @return [ true | false ] If inserts can be performed.
         def insertable?
           persistable? && !_assigning? && inserts_valid
         end
@@ -208,7 +208,7 @@ module Mongoid
         # @example Are the inserts currently valid.
         #   batchable.inserts_valid
         #
-        # @return [ true, false ] If inserts are currently valid.
+        # @return [ true | false ] If inserts are currently valid.
         def inserts_valid
           @inserts_valid
         end
@@ -222,7 +222,7 @@ module Mongoid
         #
         # @param [ true | false ] value The flag.
         #
-        # @return [ true, false ] The flag.
+        # @return [ true | false ] The flag.
         def inserts_valid=(value)
           @inserts_valid = value
         end

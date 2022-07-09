@@ -23,7 +23,7 @@ module Mongoid
     # @example Apply the default scoping.
     #   document.apply_default_scoping
     #
-    # @return [ true, false ] If default scoping was applied.
+    # @return [ true | false ] If default scoping was applied.
     def apply_default_scoping
       if default_scoping
         default_scoping.call.selector.each do |field, value|
@@ -90,7 +90,7 @@ module Mongoid
       # @example Can the default scope be applied?
       #   Band.default_scopable?
       #
-      # @return [ true, false ] If the default scope can be applied.
+      # @return [ true | false ] If the default scope can be applied.
       def default_scopable?
         default_scoping? && !Threaded.without_default_scope?(self)
       end
@@ -170,7 +170,7 @@ module Mongoid
       #
       # @note This will force the default scope to be removed.
       #
-      # @return [ Criteria, Object ] The unscoped criteria or result of the
+      # @return [ Criteria | Object ] The unscoped criteria or result of the
       #   block.
       def unscoped
         if block_given?

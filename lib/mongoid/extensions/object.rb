@@ -93,7 +93,7 @@ module Mongoid
       # @param [ String | Symbol ] name The method name.
       # @param [ Array ] args The arguments.
       #
-      # @return [ Object, nil ] The result of the method call or nil if the
+      # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist.
       def do_or_do_not(name, *args)
         send(name, *args) if name && respond_to?(name)
@@ -106,7 +106,7 @@ module Mongoid
       #
       # @param [ String ] name The name of the variable.
       #
-      # @return [ Object, false ] The value or false.
+      # @return [ Object | false ] The value or false.
       def ivar(name)
         var_name = "@_#{name}"
         if instance_variable_defined?(var_name)
@@ -154,7 +154,7 @@ module Mongoid
       #
       # @param [ String ] name The name of the variable.
       #
-      # @return [ true, false ] If the variable was defined.
+      # @return [ true | false ] If the variable was defined.
       def remove_ivar(name)
         if instance_variable_defined?("@_#{name}")
           return remove_instance_variable("@_#{name}")
@@ -192,7 +192,7 @@ module Mongoid
       # @param [ String | Symbol ] name The method name.
       # @param [ Array ] args The arguments.
       #
-      # @return [ Object, nil ] The result of the method call or nil if the
+      # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist. Nil if the object is frozen.
       def you_must(name, *args)
         frozen? ? nil : do_or_do_not(name, *args)
