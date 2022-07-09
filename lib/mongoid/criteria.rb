@@ -351,7 +351,7 @@ module Mongoid
     #   crtiteria.respond_to?(:each)
     #
     # @param [ Symbol ] name The name of the class method on the +Document+.
-    # @param [ true, false ] include_private Whether to include privates.
+    # @param [ true | false ] include_private Whether to include privates.
     #
     # @return [ true, false ] If the criteria responds to the method.
     def respond_to?(name, include_private = false)
@@ -404,7 +404,7 @@ module Mongoid
     # @example Add a javascript selection.
     #   criteria.where("this.name == 'syd'")
     #
-    # @param [ String, Hash ] expression The javascript or standard selection.
+    # @param [ String | Hash ] expression The javascript or standard selection.
     #
     # @raise [ UnsupportedJavascript ] If provided a string and the criteria
     #   is embedded.

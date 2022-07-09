@@ -137,7 +137,7 @@ module Mongoid
     # @example Get the association names.
     #   document.relation_names(:include => [ :addresses ])
     #
-    # @param [ Hash, Symbol, Array<Symbol> ] inclusions The inclusions.
+    # @param [ Hash | Symbol | Array<Symbol> ] inclusions The inclusions.
     #
     # @return [ Array<Symbol> ] The names of the included associations.
     def relation_names(inclusions)
@@ -150,7 +150,7 @@ module Mongoid
     # @example Get the association options.
     #   document.relation_names(:include => [ :addresses ])
     #
-    # @param [ Hash, Symbol, Array<Symbol> ] inclusions The inclusions.
+    # @param [ Hash | Symbol | Array<Symbol> ] inclusions The inclusions.
     # @param [ Hash ] options The options.
     # @param [ Symbol ] name The name of the association.
     #

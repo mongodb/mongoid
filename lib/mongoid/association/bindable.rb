@@ -15,7 +15,7 @@ module Mongoid
       #   Binding.new(base, target, association)
       #
       # @param [ Document ] base The base of the binding.
-      # @param [ Document, Array<Document> ] target The target of the binding.
+      # @param [ Document | Array<Document> ] target The target of the binding.
       # @param [ Association ] association The association metadata.
       def initialize(base, target, association)
         @_base, @_target, @_association = base, target, association

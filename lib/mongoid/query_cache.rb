@@ -46,7 +46,7 @@ module Mongoid
       # @example Set if the cache is enabled.
       #   QueryCache.enabled = true
       #
-      # @param [ true, false ] value The enabled value.
+      # @param [ true | false ] value The enabled value.
       def enabled=(value)
         if defined?(Mongo::QueryCache)
           Mongo::QueryCache.enabled = value

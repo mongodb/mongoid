@@ -13,7 +13,7 @@ module Mongoid
         # @example Merge in another selector.
         #   selector.merge!(name: "test")
         #
-        # @param [ Hash, Selector ] other The object to merge in.
+        # @param [ Hash | Selector ] other The object to merge in.
         #
         # @return [ Selector ] The selector.
         def merge!(other)

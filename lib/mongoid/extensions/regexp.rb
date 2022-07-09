@@ -12,7 +12,7 @@ module Mongoid
         # @example Mongoize the object.
         #   Regexp.mongoize(/\A[abc]/)
         #
-        # @param [ Regexp, String ] object The object to mongoize.
+        # @param [ Regexp | String ] object The object to mongoize.
         #
         # @return [ Regexp ] The object mongoized.
         def mongoize(object)

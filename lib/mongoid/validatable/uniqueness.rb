@@ -86,7 +86,7 @@ module Mongoid
       # @example Create the criteria.
       #   validator.create_criteria(User, user, :name, "syd")
       #
-      # @param [ Class, Proxy ] base The base to execute the criteria from.
+      # @param [ Class | Proxy ] base The base to execute the criteria from.
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The name of the attribute.
       # @param [ Object ] value The value of the object.

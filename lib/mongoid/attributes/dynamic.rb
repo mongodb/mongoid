@@ -13,7 +13,7 @@ module Mongoid
       #   person.respond_to?(:title)
       #
       # @param [ Array ] name The name of the method.
-      # @param [ true, false ] include_private
+      # @param [ true | false ] include_private
       #
       # @return [ true, false ] True if it does, false if not.
       def respond_to?(name, include_private = false)

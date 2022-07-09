@@ -23,7 +23,7 @@ module Mongoid
             # @example Evolve the object to a regex.
             #   Regexp.evolve("\A[123]")
             #
-            # @param [ Regexp, String ] object The object to evolve.
+            # @param [ Regexp | String ] object The object to evolve.
             #
             # @return [ Regexp ] The evolved regex.
             def evolve(object)
@@ -50,7 +50,7 @@ module Mongoid
               # @example Evolve the object to a regex.
               #   BSON::Regexp::Raw.evolve("\\A[123]")
               #
-              # @param [ BSON::Regexp::Raw, String ] object The object to evolve.
+              # @param [ BSON::Regexp::Raw | String ] object The object to evolve.
               #
               # @return [ BSON::Regexp::Raw ] The evolved raw regex.
               def evolve(object)

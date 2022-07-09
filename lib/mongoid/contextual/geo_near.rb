@@ -46,7 +46,7 @@ module Mongoid
       # @example Provide the distance multiplier.
       #   geo_near.distance_multiplier(13113.1)
       #
-      # @param [ Integer, Float ] value The distance multiplier.
+      # @param [ Integer | Float ] value The distance multiplier.
       #
       # @return [ GeoNear ] The GeoNear wrapper.
       def distance_multiplier(value)
@@ -98,7 +98,7 @@ module Mongoid
       # @example Get the max distance.
       #   geo_near.max_distance
       #
-      # @param [ Integer, Float ] value The maximum distance.
+      # @param [ Integer | Float ] value The maximum distance.
       #
       # @return [ GeoNear, Float ] The GeoNear command or the value.
       def max_distance(value = nil)
@@ -115,7 +115,7 @@ module Mongoid
       # @example Set the min distance.
       #   geo_near.min_distance(0.5)
       #
-      # @param [ Integer, Float ] value The minimum distance.
+      # @param [ Integer | Float ] value The minimum distance.
       #
       # @return [ GeoNear ] The GeoNear command.
       def min_distance(value)
@@ -139,7 +139,7 @@ module Mongoid
       # @example Set the unique flag.
       #   geo_near.unique(false)
       #
-      # @param [ true, false ] value Whether to return unique documents.
+      # @param [ true | false ] value Whether to return unique documents.
       #
       # @return [ GeoNear ] The command.
       def unique(value = true)

@@ -26,7 +26,7 @@ module Mongoid
     # @example Compare for equality.
     #   document == other
     #
-    # @param [ Document, Object ] other The other object to compare with.
+    # @param [ Document | Object ] other The other object to compare with.
     #
     # @return [ true, false ] True if the ids are equal, false if not.
     def ==(other)
@@ -39,7 +39,7 @@ module Mongoid
     # @example Compare the classes.
     #   document === other
     #
-    # @param [ Document, Object ] other The other object to compare with.
+    # @param [ Document | Object ] other The other object to compare with.
     #
     # @return [ true, false ] True if the classes are equal, false if not.
     def ===(other)
@@ -55,7 +55,7 @@ module Mongoid
     # @example Perform equality checking.
     #   document.eql?(other)
     #
-    # @param [ Document, Object ] other The object to check against.
+    # @param [ Document | Object ] other The object to check against.
     #
     # @return [ true, false ] True if equal, false if not.
     def eql?(other)
@@ -68,7 +68,7 @@ module Mongoid
       # @example Compare the classes.
       #   document === other
       #
-      # @param [ Document, Object ] other The other object to compare with.
+      # @param [ Document | Object ] other The other object to compare with.
       #
       # @return [ true, false ] True if the classes are equal, false if not.
       def ===(other)

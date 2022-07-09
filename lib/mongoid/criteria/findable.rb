@@ -10,7 +10,7 @@ module Mongoid
       #   criteria.execute_or_raise(id)
       #
       # @param [ Object ] ids The arguments passed.
-      # @param [ true, false ] multi Whether there arguments were a list.
+      # @param [ true | false ] multi Whether there arguments were a list.
       #
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #

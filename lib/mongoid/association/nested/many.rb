@@ -165,7 +165,7 @@ module Mongoid
         #   builder.update_nested_relation(parent, id, attrs)
         #
         # @param [ Document ] parent The parent document.
-        # @param [ String, BSON::ObjectId ] id of the related document.
+        # @param [ String | BSON::ObjectId ] id of the related document.
         # @param [ Hash ] attrs The single document attributes to process.
         def update_nested_relation(parent, id, attrs)
           first = existing.first

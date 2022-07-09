@@ -124,7 +124,7 @@ module Mongoid
         #   key.__expr_part__(50)
         #
         # @param [ Object ] object The value to be included.
-        # @param [ true, false ] negating If the selection should be negated.
+        # @param [ true | false ] negating If the selection should be negated.
         #
         # @return [ Hash ] The raw MongoDB selector.
         def __expr_part__(object, negating = false)

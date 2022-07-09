@@ -18,7 +18,7 @@ module Mongoid
           #   Association::BelongsTo::Proxy.new(game, person, association)
           #
           # @param [ Document ] base The document this association hangs off of.
-          # @param [ Document, Array<Document> ] target The target (parent) of the
+          # @param [ Document | Array<Document> ] target The target (parent) of the
           #   association.
           # @param [ Association ] association The association object.
           def initialize(base, target, association)
@@ -46,7 +46,7 @@ module Mongoid
           # @example Substitute the association.
           #   name.substitute(new_name)
           #
-          # @param [ Document, Array<Document> ] replacement The replacement.
+          # @param [ Document | Array<Document> ] replacement The replacement.
           #
           # @return [ self, nil ] The association or nil.
           def substitute(replacement)
@@ -77,7 +77,7 @@ module Mongoid
           # @example Normalize the substitute.
           #   proxy.normalize(id)
           #
-          # @param [ Document, Object ] replacement The replacement object.
+          # @param [ Document | Object ] replacement The replacement object.
           #
           # @return [ Document ] The document.
           def normalize(replacement)

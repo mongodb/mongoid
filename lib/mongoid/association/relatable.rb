@@ -248,7 +248,7 @@ module Mongoid
       # Create an association proxy object using the owner and target.
       #
       # @param [ Document ] owner The document this association hangs off of.
-      # @param [ Document, Array<Document> ] target The target (parent) of the
+      # @param [ Document | Array<Document> ] target The target (parent) of the
       #   association.
       #
       # @return [ Proxy ]

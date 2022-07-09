@@ -48,7 +48,7 @@ module Mongoid
       #   proxy.init(person, name, association)
       #
       # @param [ Document ] base The base document on the proxy.
-      # @param [ Document, Array<Document> ] target The target of the proxy.
+      # @param [ Document | Array<Document> ] target The target of the proxy.
       # @param [ Association ] association The association metadata.
       def init(base, target, association)
         @_base, @_target, @_association = base, target, association

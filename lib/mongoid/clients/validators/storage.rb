@@ -17,7 +17,7 @@ module Mongoid
         #   Storage.validate(:collection_name)
         #
         # @param [ Class ] klass The model class.
-        # @param [ Hash, String, Symbol ] options The provided options.
+        # @param [ Hash | String | Symbol ] options The provided options.
         def validate(klass, options)
           valid_keys?(options) or raise Errors::InvalidStorageOptions.new(klass, options)
           valid_parent?(klass) or raise Errors::InvalidStorageParent.new(klass)

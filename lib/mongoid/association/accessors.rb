@@ -16,7 +16,7 @@ module Mongoid
       #   person.__build__(:addresses, { :_id => 1 }, association)
       #
       # @param [ String | Symbol ] name The name of the association.
-      # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
+      # @param [ Hash | BSON::ObjectId ] object The id or attributes to use.
       # @param [ Association ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
       #   If selected_fields is specified, fields not listed in it will not be
@@ -33,7 +33,7 @@ module Mongoid
       # @example Create the association.
       #   person.create_relation(document, association)
       #
-      # @param [ Document, Array<Document> ] object The association target.
+      # @param [ Document | Array<Document> ] object The association target.
       # @param [ Association ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
       #   If selected_fields is specified, fields not listed in it will not be
@@ -101,7 +101,7 @@ module Mongoid
       # @param [ Symbol ] name The name of the association.
       # @param [ Association ] association The association metadata.
       # @param [ Object ] object The object used to build the association.
-      # @param [ true, false ] reload If the association is to be reloaded.
+      # @param [ true | false ] reload If the association is to be reloaded.
       #
       # @return [ Proxy ] The association.
       def get_relation(name, association, object, reload = false)

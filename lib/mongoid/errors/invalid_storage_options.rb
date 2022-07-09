@@ -12,7 +12,7 @@ module Mongoid
       #   InvalidStorageOptions.new(Person, invalid_option: 'name')
       #
       # @param [ Class ] klass The model class.
-      # @param [ Hash, String, Symbol ] options The provided options.
+      # @param [ Hash | String | Symbol ] options The provided options.
       def initialize(klass, options)
         super(
           compose_message(

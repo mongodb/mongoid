@@ -132,7 +132,7 @@ module Mongoid
         # @example Create multiple new documents.
         #   Person.create({ title: "Mr" }, { title: "Mrs" })
         #
-        # @param [ Hash, Array ] attributes The attributes to create with, or an
+        # @param [ Hash | Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
         #
         # @return [ Document, Array<Document> ] The newly created document(s).
@@ -159,7 +159,7 @@ module Mongoid
         # @example Create multiple new documents.
         #   Person.create!({ title: "Mr" }, { title: "Mrs" })
         #
-        # @param [ Hash, Array ] attributes The attributes to create with, or an
+        # @param [ Hash | Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
         #
         # @return [ Document, Array<Document> ] The newly created document(s).

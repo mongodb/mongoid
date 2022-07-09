@@ -14,7 +14,7 @@ module Mongoid
           #   :field.__expr_part__(value)
           #
           # @param [ Object ] value The value of the criteria.
-          # @param [ true, false ] negating If the selection should be negated.
+          # @param [ true | false ] negating If the selection should be negated.
           #
           # @return [ Hash ] The selection.
           def __expr_part__(value, negating = false)

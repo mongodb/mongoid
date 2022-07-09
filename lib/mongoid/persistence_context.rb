@@ -184,7 +184,7 @@ module Mongoid
       #  PersistenceContext.set(model)
       #
       # @param [ Object ] object The class or model instance.
-      # @param [ Hash, Mongoid::PersistenceContext ] options_or_context The persistence
+      # @param [ Hash | Mongoid::PersistenceContext ] options_or_context The persistence
       #   options or a persistence context object.
       #
       # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
@@ -221,7 +221,7 @@ module Mongoid
       # @example Clear the persistence context for a class or model instance.
       #  PersistenceContext.clear(model)
       #
-      # @param [ Class, Object ] object The class or model instance.
+      # @param [ Class | Object ] object The class or model instance.
       # @param [ Mongo::Cluster ] cluster The original cluster before this context was used.
       # @param [ Mongoid::PersistenceContext ] original_context The original persistence
       #   context that was set before this context was used.

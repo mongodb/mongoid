@@ -161,7 +161,7 @@ module Mongoid
       #
       # @note Ruby's instance_exec was just too slow.
       #
-      # @param [ Class, Module ] object The class or module the field is
+      # @param [ Class | Module ] object The class or module the field is
       #   defined on.
       def define_default_method(object)
         object.__send__(:define_method, default_name, default_val)

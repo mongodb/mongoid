@@ -25,7 +25,7 @@ module Mongoid
           # @example Concat with other documents.
           #   person.posts.concat([ post_one, post_two ])
           #
-          # @param [ Document, Array<Document> ] args Any number of documents.
+          # @param [ Document | Array<Document> ] args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
           def <<(*args)
@@ -196,7 +196,7 @@ module Mongoid
           # @note This will keep matching documents in memory for iteration
           #   later.
           #
-          # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] args The ids.
+          # @param [ BSON::ObjectId | Array<BSON::ObjectId> ] args The ids.
           # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
@@ -328,7 +328,7 @@ module Mongoid
           #   relation.with_add_callbacks(document, false)
           #
           # @param [ Document ] document The document to append to the target.
-          # @param [ true, false ] already_related Whether the document is already related
+          # @param [ true | false ] already_related Whether the document is already related
           #   to the target.
           def with_add_callbacks(document, already_related)
             execute_callback :before_add, document unless already_related

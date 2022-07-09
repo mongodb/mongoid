@@ -131,7 +131,7 @@ module Mongoid
       #   relation.respond_to?(:name)
       #
       # @param [ Symbol ] name The method name.
-      # @param [ true, false ] include_private Whether to include private methods.
+      # @param [ true | false ] include_private Whether to include private methods.
       #
       # @return [ true, false ] If the proxy responds to the method.
       def respond_to?(name, include_private = false)

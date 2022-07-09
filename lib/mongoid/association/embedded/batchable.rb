@@ -220,7 +220,7 @@ module Mongoid
         # @example Set the flag.
         #   batchable.inserts_valid = true
         #
-        # @param [ true, false ] value The flag.
+        # @param [ true | false ] value The flag.
         #
         # @return [ true, false ] The flag.
         def inserts_valid=(value)
@@ -235,7 +235,7 @@ module Mongoid
         # @example Normalize the docs.
         #   batchable.normalize_docs(docs)
         #
-        # @param [ Array<Hash, Document> ] docs The docs to normalize.
+        # @param [ Array<Hash | Document> ] docs The docs to normalize.
         #
         # @return [ Array<Document> ] The docs.
         def normalize_docs(docs)

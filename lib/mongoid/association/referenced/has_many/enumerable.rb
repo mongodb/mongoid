@@ -263,7 +263,7 @@ module Mongoid
           # @example Initialize the enumerable with an array.
           #   Enumerable.new([ post ])
           #
-          # @param [ Criteria, Array<Document> ] target The wrapped object.
+          # @param [ Criteria | Array<Document> ] target The wrapped object.
           def initialize(target, base = nil, association = nil)
             @_base = base
             @_association = association
@@ -410,7 +410,7 @@ module Mongoid
           #   enumerable.respond_to?(:sum)
           #
           # @param [ String | Symbol ] name The name of the method.
-          # @param [ true, false ] include_private Whether to include private
+          # @param [ true | false ] include_private Whether to include private
           #   methods.
           #
           # @return [ true, false ] Whether the enumerable responds.

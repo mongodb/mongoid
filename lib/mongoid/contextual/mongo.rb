@@ -460,7 +460,7 @@ module Mongoid
       # @note This method will return the raw db values - it performs no custom
       #   serialization.
       #
-      # @param [ String | Symbol, Array ] fields Fields to pluck.
+      # @param [ String | Symbol | Array ] fields Fields to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
       def pluck(*fields)

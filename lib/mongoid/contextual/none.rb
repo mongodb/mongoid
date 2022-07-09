@@ -88,7 +88,7 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String | Symbol, Array ] args Field or fields to pluck.
+      # @param [ String | Symbol | Array ] args Field or fields to pluck.
       #
       # @return [ Array ] An empty Array.
       def pluck(*args)

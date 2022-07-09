@@ -74,7 +74,7 @@ module Mongoid
       #     default_scope ->{ where(active: true) }
       #   end
       #
-      # @param [ Proc, Criteria ] value The default scope.
+      # @param [ Proc | Criteria ] value The default scope.
       #
       # @raise [ Errors::InvalidScope ] If the scope is not a proc or criteria.
       #
@@ -309,7 +309,7 @@ module Mongoid
       # @example Process the default scope.
       #   Model.process_default_scope(value)
       #
-      # @param [ Criteria, Proc ] value The default scope value.
+      # @param [ Criteria | Proc ] value The default scope value.
       def process_default_scope(value)
         if existing = default_scoping
           ->{ existing.call.merge(value.to_proc.call) }

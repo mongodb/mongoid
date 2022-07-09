@@ -79,7 +79,7 @@ module Mongoid
     #     document.set name: "Tool"
     #   end
     #
-    # @param [ true, false ] join_context Join the context (i.e. merge
+    # @param [ true | false ] join_context Join the context (i.e. merge
     #   declared atomic operations) of the atomically block wrapping this one
     #   for the same document, if one exists.
     #
