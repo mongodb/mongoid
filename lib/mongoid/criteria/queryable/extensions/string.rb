@@ -84,7 +84,7 @@ module Mongoid
             # @example Get the value as an expression.
             #   String.__expr_part__("field", value)
             #
-            # @param [ String, Symbol ] key The field key.
+            # @param [ String | Symbol ] key The field key.
             # @param [ Object ] value The value of the criteria.
             # @param [ true, false ] negating If the selection should be negated.
             #

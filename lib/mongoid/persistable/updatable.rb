@@ -13,7 +13,7 @@ module Mongoid
       # @example Update the attribute.
       #   person.update_attribute(:title, "Sir")
       #
-      # @param [ Symbol, String ] name The name of the attribute.
+      # @param [ Symbol | String ] name The name of the attribute.
       # @param [ Object ] value The new value of the attribute.a
       #
       # @raise [ Errors::ReadonlyAttribute ] If the field cannot be changed due

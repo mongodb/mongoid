@@ -11,7 +11,7 @@ module Mongoid
       # @example Create the new error.
       #   NoClientHosts.new(:default, {}})
       #
-      # @param [ Symbol, String ] name The db config key.
+      # @param [ Symbol | String ] name The db config key.
       # @param [ Hash ] config The hash configuration options.
       def initialize(name, config)
         super(

@@ -50,7 +50,7 @@ module Mongoid
       # @example Get the distinct values in null context.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] _field The name of the field.
+      # @param [ String | Symbol ] _field The name of the field.
       #
       # @return [ Array ] An empty Array.
       def distinct(_field)
@@ -88,7 +88,7 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String, Symbol, Array ] args Field or fields to pluck.
+      # @param [ String | Symbol, Array ] args Field or fields to pluck.
       #
       # @return [ Array ] An empty Array.
       def pluck(*args)
@@ -100,7 +100,7 @@ module Mongoid
       # @example Get the values for null context.
       #   context.tally(:name)
       #
-      # @param [ String, Symbol ] arg Field to tally.
+      # @param [ String | Symbol ] arg Field to tally.
       #
       # @return [ Hash ] An empty Hash.
       def tally(arg)

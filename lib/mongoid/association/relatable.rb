@@ -189,7 +189,7 @@ module Mongoid
       # The foreign key field if this association stores a foreign key.
       # Otherwise, the primary key.
       #
-      # @return [ Symbol, String ] The primary key.
+      # @return [ Symbol | String ] The primary key.
       def key
         stores_foreign_key? ? foreign_key : primary_key
       end

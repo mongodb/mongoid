@@ -114,7 +114,7 @@ module Mongoid
       # @example Call through method_missing.
       #   document.method_missing(:test)
       #
-      # @param [ String, Symbol ] name The name of the method.
+      # @param [ String | Symbol ] name The name of the method.
       # @param [ Array ] args The arguments to the method.
       #
       # @return [ Object ] The result of the method call.

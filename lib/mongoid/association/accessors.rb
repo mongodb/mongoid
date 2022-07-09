@@ -15,7 +15,7 @@ module Mongoid
       # @example Build the association.
       #   person.__build__(:addresses, { :_id => 1 }, association)
       #
-      # @param [ String, Symbol ] name The name of the association.
+      # @param [ String | Symbol ] name The name of the association.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
       # @param [ Association ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
@@ -80,7 +80,7 @@ module Mongoid
       # @example Set the proxy on the document.
       #   person.set(:addresses, addresses)
       #
-      # @param [ String, Symbol ] name The name of the association.
+      # @param [ String | Symbol ] name The name of the association.
       # @param [ Proxy ] relation The association to set.
       #
       # @return [ Proxy ] The association.

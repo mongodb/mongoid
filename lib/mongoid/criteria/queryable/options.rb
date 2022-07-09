@@ -54,7 +54,7 @@ module Mongoid
         # @example Store a value in the options.
         #   options.store(:key, "testing")
         #
-        # @param [ String, Symbol ] key The name of the attribute.
+        # @param [ String | Symbol ] key The name of the attribute.
         # @param [ Object ] value The value to add.
         #
         # @return [ Object ] The stored object.

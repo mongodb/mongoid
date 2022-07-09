@@ -736,7 +736,7 @@ module Mongoid
         #   conditions in a query. Mongoid will build such a query but the
         #   server will return an error when trying to execute it.
         #
-        # @param [ String, Symbol ] terms A string of terms that MongoDB parses
+        # @param [ String | Symbol ] terms A string of terms that MongoDB parses
         #   and uses to query the text index.
         # @param [ Hash ] opts Text search options. See MongoDB documentation
         #   for options.

@@ -409,7 +409,7 @@ module Mongoid
           # @example Does the enumerable respond to the method?
           #   enumerable.respond_to?(:sum)
           #
-          # @param [ String, Symbol ] name The name of the method.
+          # @param [ String | Symbol ] name The name of the method.
           # @param [ true, false ] include_private Whether to include private
           #   methods.
           #

@@ -7,7 +7,7 @@ module Mongoid
 
       # Returns the name of the parent to a polymorphic child.
       #
-      # @return [ String, Symbol ] The name.
+      # @return [ String | Symbol ] The name.
       def as
         @options[:as]
       end
@@ -57,7 +57,7 @@ module Mongoid
       # Mongoid assumes that the field used to hold the primary key of the association is id.
       # You can override this and explicitly specify the primary key with the :primary_key option.
       #
-      # @return [ Symbol, String ] The primary key.
+      # @return [ Symbol | String ] The primary key.
       def primary_key
         @primary_key ||= @options[:primary_key] ? @options[:primary_key].to_s : Relatable::PRIMARY_KEY_DEFAULT
       end

@@ -13,7 +13,7 @@ module Mongoid
       # @example Find association metadata by name.
       #   person.reflect_on_association(:addresses)
       #
-      # @param [ String, Symbol ] name The name of the association to find.
+      # @param [ String | Symbol ] name The name of the association to find.
       #
       # @return [ Association ] The matching association metadata.
       def reflect_on_association(name)
@@ -39,7 +39,7 @@ module Mongoid
         # @example Find association metadata by name.
         #   Person.reflect_on_association(:addresses)
         #
-        # @param [ String, Symbol ] name The name of the association to find.
+        # @param [ String | Symbol ] name The name of the association to find.
         #
         # @return [ Association ] The matching association metadata.
         def reflect_on_association(name)

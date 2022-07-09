@@ -119,7 +119,7 @@ module Mongoid
       # @example Get the distinct values.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] field The name of the field.
+      # @param [ String | Symbol ] field The name of the field.
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
@@ -460,7 +460,7 @@ module Mongoid
       # @note This method will return the raw db values - it performs no custom
       #   serialization.
       #
-      # @param [ String, Symbol, Array ] fields Fields to pluck.
+      # @param [ String | Symbol, Array ] fields Fields to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
       def pluck(*fields)
@@ -629,7 +629,7 @@ module Mongoid
 
       # yield the block given or return the cached value
       #
-      # @param [ String, Symbol ] key The instance variable name
+      # @param [ String | Symbol ] key The instance variable name
       #
       # @return the result of the block
       def try_cache(key, &block)

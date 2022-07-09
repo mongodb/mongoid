@@ -104,7 +104,7 @@ module Mongoid
         # @example Instantiate a key for sorting.
         #   Key.new(:field, :__override__, 1)
         #
-        # @param [ String, Symbol ] name The field name.
+        # @param [ String | Symbol ] name The field name.
         # @param [ Symbol ] strategy The name of the merge strategy.
         # @param [ String | Integer ] operator The MongoDB operator,
         #   or sort direction (1 or -1).

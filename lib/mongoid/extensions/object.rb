@@ -90,7 +90,7 @@ module Mongoid
       # @example Do or do not.
       #   object.do_or_do_not(:use, "The Force")
       #
-      # @param [ String, Symbol ] name The method name.
+      # @param [ String | Symbol ] name The method name.
       # @param [ Array ] args The arguments.
       #
       # @return [ Object, nil ] The result of the method call or nil if the
@@ -189,7 +189,7 @@ module Mongoid
       # @example You must perform this execution.
       #   object.you_must(:use, "The Force")
       #
-      # @param [ String, Symbol ] name The method name.
+      # @param [ String | Symbol ] name The method name.
       # @param [ Array ] args The arguments.
       #
       # @return [ Object, nil ] The result of the method call or nil if the

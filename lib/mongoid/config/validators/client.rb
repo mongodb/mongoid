@@ -37,7 +37,7 @@ module Mongoid
         # @example Validate the client has database.
         #   validator.validate_client_database(:default, {})
         #
-        # @param [ String, Symbol ] name The config key.
+        # @param [ String | Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
         def validate_client_database(name, config)
           if no_database_or_uri?(config)
@@ -52,7 +52,7 @@ module Mongoid
         # @example Validate the client has hosts.
         #   validator.validate_client_hosts(:default, {})
         #
-        # @param [ String, Symbol ] name The config key.
+        # @param [ String | Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
         def validate_client_hosts(name, config)
           if no_hosts_or_uri?(config)
@@ -68,7 +68,7 @@ module Mongoid
         # @example Validate the uri and options.
         #   validator.validate_client_uri(:default, {})
         #
-        # @param [ String, Symbol ] name The config key.
+        # @param [ String | Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
         def validate_client_uri(name, config)
           if both_uri_and_standard?(config)

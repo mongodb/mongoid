@@ -410,7 +410,7 @@ module Mongoid
           #
           # If the method exists on the array, use the default proxy behavior.
           #
-          # @param [ Symbol, String ] name The name of the method.
+          # @param [ Symbol | String ] name The name of the method.
           # @param [ Array ] args The method args
           # @param [ Proc ] block Optional block to pass.
           #

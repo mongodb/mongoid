@@ -102,7 +102,7 @@ module Mongoid
     # @example Remove a flagged change.
     #   model.remove_change(:field)
     #
-    # @param [ Symbol, String ] name The name of the field.
+    # @param [ Symbol | String ] name The name of the field.
     def remove_change(name)
       changed_attributes.delete(name.to_s)
     end

@@ -20,7 +20,7 @@ module Mongoid
         #   #   "avg" => 750.0
         #   # }
         #
-        # @param [ String, Symbol ] field The field name.
+        # @param [ String | Symbol ] field The field name.
         #
         # @return [ Hash ] A Hash containing the aggregate values.
         #   If no documents are found, then returned Hash will have
@@ -115,7 +115,7 @@ module Mongoid
         # @example Get the pipeline.
         #   aggregable.pipeline(:likes)
         #
-        # @param [ String, Symbol ] field The name of the field.
+        # @param [ String | Symbol ] field The name of the field.
         #
         # @return [ Array ] The array of pipeline operators.
         def pipeline(field)

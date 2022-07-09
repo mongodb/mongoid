@@ -117,7 +117,7 @@ module Mongoid
       # Default behavior of method missing should be to delegate all calls
       # to the target of the proxy. This can be overridden in special cases.
       #
-      # @param [ String, Symbol ] name The name of the method.
+      # @param [ String | Symbol ] name The name of the method.
       # @param [ Array ] args The arguments passed to the method.
       #
       ruby2_keywords def method_missing(name, *args, &block)

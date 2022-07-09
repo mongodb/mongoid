@@ -13,7 +13,7 @@ module Mongoid
       # @example Unset the values.
       #   document.unset(:first_name, :last_name, :middle)
       #
-      # @param [ Array<String, Symbol> ] fields The names of the fields to
+      # @param [ Array<String | Symbol> ] fields The names of the fields to
       #   unset.
       #
       # @return [ Document ] The document.

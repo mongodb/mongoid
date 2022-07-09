@@ -214,7 +214,7 @@ module Mongoid
     # @example Get the database field name.
     #   model.database_field_name(:authorization)
     #
-    # @param [ String, Symbol ] name The name to get.
+    # @param [ String | Symbol ] name The name to get.
     #
     # @return [ String ] The name of the field as it's stored in the db.
     def database_field_name(name)
@@ -396,7 +396,7 @@ module Mongoid
       # If the belongs_to association is the last part of the name, we will
       # pass back the _id field.
       #
-      # @param [ String, Symbol ] name The name to get.
+      # @param [ String | Symbol ] name The name to get.
       # @param [ Hash ] relations The associations.
       # @param [ Hash ] alaiased_fields The aliased fields.
       # @param [ Hash ] alaiased_associations The aliased associations.
@@ -455,7 +455,7 @@ module Mongoid
       # Get the name of the provided field as it is stored in the database.
       # Used in determining if the field is aliased or not.
       #
-      # @param [ String, Symbol ] name The name to get.
+      # @param [ String | Symbol ] name The name to get.
       #
       # @return [ String ] The name of the field as it's stored in the db.
       def database_field_name(name)

@@ -240,7 +240,7 @@ module Mongoid
       # @example Warn or raise error if name exists.
       #   Model.valid_scope_name?("test")
       #
-      # @param [ String, Symbol ] name The name of the scope.
+      # @param [ String | Symbol ] name The name of the scope.
       #
       # @raise [ Errors::ScopeOverwrite ] If the name exists and configured to
       #   raise the error.

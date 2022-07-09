@@ -9,7 +9,7 @@ module Mongoid
         # Get all the aggregate values for the provided field.
         # Provided for interface consistency with Aggregable::Mongo.
         #
-        # @param [ String, Symbol ] field The field name.
+        # @param [ String | Symbol ] field The field name.
         #
         # @return [ Hash ] A Hash containing the aggregate values.
         #   If no documents are present, then returned Hash will have

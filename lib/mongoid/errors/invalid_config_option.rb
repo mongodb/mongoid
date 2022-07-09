@@ -12,7 +12,7 @@ module Mongoid
       # @example Create the new error.
       #   InvalidConfigOption.new(:name, [ :option ])
       #
-      # @param [ Symbol, String ] name The attempted config option name.
+      # @param [ Symbol | String ] name The attempted config option name.
       def initialize(name)
         super(
           compose_message(
