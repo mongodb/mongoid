@@ -198,7 +198,7 @@ module Mongoid
       # @param [ Hash ] update The updates.
       # @param [ Hash ] options The command options.
       #
-      # @option options [ :before, :after ] :return_document Return the updated document
+      # @option options [ :before | :after ] :return_document Return the updated document
       #   from before or after update.
       # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
@@ -218,7 +218,7 @@ module Mongoid
       # @param [ Hash ] replacement The replacement.
       # @param [ Hash ] options The command options.
       #
-      # @option options [ :before, :after ] :return_document Return the updated document
+      # @option options [ :before | :after ] :return_document Return the updated document
       #   from before or after update.
       # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
@@ -884,7 +884,7 @@ module Mongoid
       #
       # @param [ String ] field_name The name of the field to demongoize.
       # @param [ Object ] value The value to demongoize.
-      # @param [ Boolean ] is_translation The field we are retrieving is an
+      # @param [ true | false ] is_translation The field we are retrieving is an
       #   _translations field.
       #
       # @return [ Object ] The demongoized value.
@@ -898,7 +898,7 @@ module Mongoid
       #
       # @param [ Field ] field The field to use to demongoize.
       # @param [ Object ] value The value to demongoize.
-      # @param [ Boolean ] is_translation The field we are retrieving is an
+      # @param [ true | false ] is_translation The field we are retrieving is an
       #   _translations field.
       #
       # @return [ Object ] The demongoized value.
