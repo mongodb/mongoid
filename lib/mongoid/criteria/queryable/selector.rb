@@ -232,7 +232,7 @@ module Mongoid
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Range ] value The Range to serialize.
         #
-        # @return [ Array<String | Hash> ] The store name and serialized Range.
+        # @return [ Array<String, Hash> ] The store name and serialized Range.
         def evolve_range(key, serializer, value)
           v = value.__evolve_range__(serializer: serializer)
           assocs = []
