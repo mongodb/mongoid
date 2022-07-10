@@ -1009,7 +1009,7 @@ setter methods for fields of your custom type.
 .. note::
 
   The ``mongoize`` method should return ``nil`` on values that are uncastable to
-  your custom type. See the secion on :ref:`Uncastable Values <uncastable-values>`
+  your custom type. See the section on :ref:`Uncastable Values <uncastable-values>`
   for more details.
 
 The class method ``demongoize`` does the inverse of ``mongoize``. It takes the raw object
