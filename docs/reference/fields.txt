@@ -994,6 +994,64 @@ when transforming objects for use in Mongoid query criteria.
    Venue.where(location: point) # This uses Point.evolve
 
 
+.. _phantom-custom-field-types:
+
+Phantom Custom Field Types
+``````````````````````````
+
+The custom field type may perform conversions from user-visible attribute
+values to the values stored in the database when the user-visible attribute
+value type is different from the declared field type. For example, this
+can be used to implement a mapping from one enumeration to another, to
+have more descriptive values in the application and more compact values stored
+in the database:
+
+.. code-block:: ruby
+
+  class ColorMapping
+    
+    MAPPING = {
+      'black' => 0,
+      'white' => 1,
+    }.freeze
+    
+    INVERSE_MAPPING = MAPPING.invert.freeze
+
+    class << self
+
+      # Takes application-scope value and converts it to how it would be
+      # stored in the database. Converts invalid values to nil.
+      def mongoize(object)
+        MAPPING[object]
+      end
+
+      # Get the value as it was stored in the database, and convert to
+      # application-scope value. Converts invalid values to nil.
+      def demongoize(object)
+        INVERSE_MAPPING[object]
+      end
+
+      # Converts the object that was supplied to a criteria and converts it
+      # into a query-friendly form. Returns invalid values as is.
+      def evolve(object)
+        MAPPING.fetch(object, object)
+      end
+    end
+  end
+
+  class Profile
+    include Mongoid::Document
+    field :color, type: ColorMapping
+  end
+  
+  profile = Profile.new(color: 'white')
+  profile.color
+  # => "white"
+  
+  # Writes 0 to color field
+  profile.save!
+
+
 .. _custom-field-options:
 
 Custom Field Options
