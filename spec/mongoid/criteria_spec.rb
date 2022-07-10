@@ -1939,7 +1939,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a array with nil values" do
+          it "returns an array with nil values" do
             expect(plucked).to eq([nil, nil, nil])
           end
         end
@@ -1952,7 +1952,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a nil arrays" do
+          it "returns an array of arrays with nil values" do
             expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
           end
         end

@@ -472,7 +472,7 @@ describe Mongoid::Findable do
         Band.pluck(:follows)
       end
 
-      it "returns a array with nil values" do
+      it "returns an array with nil values" do
         expect(plucked).to eq([nil, nil, nil])
       end
     end
