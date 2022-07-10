@@ -34,7 +34,6 @@ module Mongoid
           #
           # @example Nullify the association.
           #   person.game.nullify
-          #
           def nullify
             unbind_one
             _target.save

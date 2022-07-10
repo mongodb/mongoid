@@ -181,7 +181,6 @@ module Mongoid
     # @raise [ Errors::DocumentNotFound ] If no document found.
     #
     # @return [ Document ] A matching document.
-    #
     def find_by!(attrs = {})
       result = where(attrs).find_first
       raise(Errors::DocumentNotFound.new(self, attrs)) unless result

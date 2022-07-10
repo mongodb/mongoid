@@ -19,7 +19,6 @@ module Mongoid
       #   end
       #
       # @param [ Array ] args The arguments to pass to the validator.
-      #
       def validates_associated(*args)
         validates_with(AssociatedValidator, _merge_attributes(args))
       end
@@ -37,7 +36,6 @@ module Mongoid
       #   end
       #
       # @param [ Array ] args The arguments to pass to the validator.
-      #
       def validates_uniqueness_of(*args)
         validates_with(UniquenessValidator, _merge_attributes(args))
       end

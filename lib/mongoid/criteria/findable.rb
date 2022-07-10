@@ -31,7 +31,7 @@ module Mongoid
       #
       # @param [ Array<BSON::ObjectId> ] args The ids to search for.
       #
-      # @return [ Array<Document> | Document ] The matching document(s).
+      # @return [ Document | Array<Document> ] The matching document(s).
       def find(*args)
         ids = args.__find_args__
         raise_invalid if ids.any?(&:nil?)

@@ -147,7 +147,7 @@ module Mongoid
     # @example Apply all the non-proc defaults.
     #   model.apply_pre_processed_defaults
     #
-    # @return [ Array<String ] The names of the non-proc defaults.
+    # @return [ Array<String> ] The names of the non-proc defaults.
     def apply_pre_processed_defaults
       pre_processed_defaults.each do |name|
         apply_default(name)
@@ -159,7 +159,7 @@ module Mongoid
     # @example Apply all the proc defaults.
     #   model.apply_post_processed_defaults
     #
-    # @return [ Array<String ] The names of the proc defaults.
+    # @return [ Array<String> ] The names of the proc defaults.
     def apply_post_processed_defaults
       pending_callbacks.delete(:apply_post_processed_defaults)
       post_processed_defaults.each do |name|

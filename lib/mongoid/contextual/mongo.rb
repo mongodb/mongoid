@@ -461,9 +461,9 @@ module Mongoid
       # @note This method will return the raw db values - it performs no custom
       #   serialization.
       #
-      # @param [ String | Symbol | Array ] fields Fields to pluck.
+      # @param [ String | Symbol ] *fields Field(s) to pluck.
       #
-      # @return [ Array<Object | Array> ] The plucked values.
+      # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
         # Multiple fields can map to the same field name. For example, plucking
         # a field and its _translations field map to the same field in the database.
@@ -768,7 +768,7 @@ module Mongoid
       # @example Get the documents for iteration.
       #   context.documents_for_iteration
       #
-      # @return [ Array<Document>, Mongo::Collection::View ] The docs to iterate.
+      # @return [ Array<Document> | Mongo::Collection::View ] The docs to iterate.
       def documents_for_iteration
         return documents if cached? && !documents.empty?
         return view unless eager_loadable?

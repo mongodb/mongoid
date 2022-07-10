@@ -5,7 +5,6 @@ module Mongoid
 
     # This error is raised when trying to set an attribute with an invalid value.
     # For example when try to set an Array value to a Hash attribute.
-    #
     class InvalidValue < MongoidError
       def initialize(field_class, value_class)
         super(

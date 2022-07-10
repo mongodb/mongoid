@@ -5,7 +5,6 @@ module Mongoid
 
     # Used for converting foreign key values to the correct type based on the
     # types of ids that the document stores.
-    #
     module Constrainable
 
       # Convert the supplied object to the appropriate type to set as the

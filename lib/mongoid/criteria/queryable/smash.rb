@@ -97,7 +97,7 @@ module Mongoid
         #
         # @param [ Symbol | String ] key The key provided to the selection.
         #
-        # @return [ Array<String | Object> ] The name of the db field and
+        # @return [ Array<String, Object> ] The name of the db field and
         #   serializer.
         def storage_pair(key)
           field = key.to_s

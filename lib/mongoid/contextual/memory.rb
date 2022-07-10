@@ -228,7 +228,7 @@ module Mongoid
       #
       # @param [ String | Symbol ] *fields Field(s) to pluck.
       #
-      # @return [ Array ] The array of plucked values.
+      # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
         documents.pluck(*fields)
       end
