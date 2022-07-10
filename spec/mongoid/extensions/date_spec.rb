@@ -87,7 +87,6 @@ describe Mongoid::Extensions::Date do
     end
 
     let(:mongoized) do
-      byebug
       Date.mongoize(date)
     end
 
