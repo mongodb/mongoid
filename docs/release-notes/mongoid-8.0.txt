@@ -80,12 +80,6 @@ functionality:
 |              | ``to_sym`` is          |                        |                   |
 |              | assigned: ``[]``       |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
-| Array/Set    | When a value that is   | return ``[ 1, 2, 3 ]`` | return ``nil``    |
-|              | not an array or set is | return ``[[ :x, 1 ]]`` | return ``nil``    |
-|              | assigned, but does     |                        |                   |
-|              | respond to ``to_a``:   |                        |                   |
-|              | ``1..3``, ``{ x: 1 }`` |                        |                   |
-+--------------+------------------------+------------------------+-------------------+
 | Array/Set    | When a value that is   | raise ``InvalidValue`` | return ``nil``    |
 |              | not an array or set is | error                  |                   |
 |              | assigned, and does NOT |                        |                   |
