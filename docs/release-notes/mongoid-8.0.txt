@@ -315,6 +315,31 @@ Mongoid 7 behavior:
   end
 
 
+Configuration DSL No Longer Requires an Argument to its Block
+-------------------------------------------------------------
+
+In Mongoid 8.0, it is now possible to use ``Mongoid.configure`` without
+providing an argument to its block:
+
+.. code-block:: ruby
+
+  Mongoid.configure do
+    connect_to("mongoid_test")
+
+    # Use config method when assigning variables
+    config.preload_models = true
+
+Note that ``configure`` will continue to support a block argument.
+The following is equivalent to the above:
+
+.. code-block:: ruby
+
+  Mongoid.configure do |config|
+    config.connect_to("mongoid_test")
+
+    config.preload_models = true
+
+
 ``#pluck`` on Embedded Criteria Returns ``nil`` Values
 ------------------------------------------------------
 
