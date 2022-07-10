@@ -463,7 +463,7 @@ module Mongoid
       #
       # @param [ String | Symbol | Array ] fields Fields to pluck.
       #
-      # @return [ Array<Object, Array> ] The plucked values.
+      # @return [ Array<Object | Array> ] The plucked values.
       def pluck(*fields)
         # Multiple fields can map to the same field name. For example, plucking
         # a field and its _translations field map to the same field in the database.
