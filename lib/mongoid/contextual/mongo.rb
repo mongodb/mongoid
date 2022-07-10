@@ -377,7 +377,8 @@ module Mongoid
         end
       end
 
-      # Get's the number of documents matching the query selector.
+      # Returns the number of documents in the database matching
+      # the query selector.
       #
       # @example Get the length.
       #   context.length
@@ -832,7 +833,6 @@ module Mongoid
       def extract_value(attrs, field_name)
         i = 1
         num_meths = field_name.count('.') + 1
-        k = klass
         curr = attrs.dup
 
         klass.traverse_association_tree(field_name) do |meth, obj, is_field|
@@ -870,10 +870,6 @@ module Mongoid
             fetch_and_demongoize(curr, meth, field)
           end
 
-          # If it's a relation, update the current klass with the relation klass.
-          if !is_field && !obj.nil?
-            k = obj.klass
-          end
           i += 1
         end
         curr
@@ -910,7 +906,7 @@ module Mongoid
           # again, we already have the translation. If it's an _translations
           # field, don't demongoize, we want the full hash not just a
           # specific translation.
-          # If it is a hash, and it's not a transaltions field, we need to
+          # If it is a hash, and it's not a translations field, we need to
           # demongoize to get the correct translation.
           if field.localized? && (!value.is_a?(Hash) || is_translation)
             value.class.demongoize(value)

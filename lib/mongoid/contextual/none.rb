@@ -88,10 +88,10 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String | Symbol | Array ] args Field or fields to pluck.
+      # @param [ String | Symbol ] *_fields Field(s) to pluck.
       #
       # @return [ Array ] An empty Array.
-      def pluck(*args)
+      def pluck(*_fields)
         []
       end
 
@@ -100,10 +100,10 @@ module Mongoid
       # @example Get the values for null context.
       #   context.tally(:name)
       #
-      # @param [ String | Symbol ] arg Field to tally.
+      # @param [ String | Symbol ] _field Field to tally.
       #
       # @return [ Hash ] An empty Hash.
-      def tally(arg)
+      def tally(_field)
         {}
       end
 

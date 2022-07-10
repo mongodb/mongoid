@@ -215,7 +215,7 @@ module Mongoid
       #
       # @param [ Integer ] value The number of documents to return.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def limit(value)
         self.limiting = value
         self
@@ -233,6 +233,14 @@ module Mongoid
         documents.pluck(*fields)
       end
 
+      # Tally the field values in memory.
+      #
+      # @example Get the counts of values in memory.
+      #   context.tally(:name)
+      #
+      # @param [ String | Symbol ] field Field to tally.
+      #
+      # @return [ Hash ] The hash of counts.
       def tally(field)
         return documents.each_with_object({}) do |d, acc|
           v = retrieve_value_at_path(d, field)
@@ -248,7 +256,7 @@ module Mongoid
       #
       # @param [ Integer ] value The number of documents to skip.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def skip(value)
         self.skipping = value
         self
@@ -262,7 +270,7 @@ module Mongoid
       # @param [ Hash ] values The sorting values as field/direction(1/-1)
       #   pairs.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def sort(values)
         in_place_sort(values) and self
       end
