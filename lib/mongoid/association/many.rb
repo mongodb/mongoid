@@ -28,7 +28,6 @@ module Mongoid
       # @example Create and save the new document.
       #   person.posts.create(:text => "Testing")
       #
-      #
       # @param [ Hash ] attributes The attributes to create with.
       # @param [ Class ] type The optional type of document to create.
       #
