@@ -67,15 +67,9 @@ module Mongoid
   #
   # @return [ Config ] The configuration object.
   def configure(&block)
-    if block_given?
-      if block.arity == 0
-        Config.instance_exec(&block)
-      else
-        yield(Config)
-      end
-    else
-      Config
-    end
+    return Config unless block_given?
+
+    block.arity == 0 ? Config.instance_exec(&block) : yield(Config)
   end
 
   # Convenience method for getting the default client.
