@@ -208,8 +208,8 @@ schema in each remains the same.
 .. code-block:: ruby
 
   class BandsController < ApplicationController
-    before_filter :switch_database
-    after_filter :reset_database
+    before_action :switch_database
+    after_action :reset_database
 
     private
 
