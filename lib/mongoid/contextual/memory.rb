@@ -108,7 +108,7 @@ module Mongoid
       #
       # @return [ true, false ] If the count is more than zero.
       def exists?
-        count > 0
+        any?
       end
 
       # Get the first document in the database for the criteria's selector.
