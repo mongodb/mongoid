@@ -221,7 +221,7 @@ module Mongoid
         def mongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
-            object.dup.transform_values!(&:mongoize)
+            object.transform_values(&:mongoize)
           end
         end
 
@@ -229,15 +229,11 @@ module Mongoid
         #
         # @param [ Object ] object The object from Mongo.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
-        # @return [ Hash ] The object as a hash.
+        # @return [ Hash | nil ] The object as a hash or nil.
         def demongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
-            object
-          else
-            raise Errors::InvalidValue.new(self, object)
+            object.transform_values { |obj| obj.class.demongoize(obj) }
           end
         end
 

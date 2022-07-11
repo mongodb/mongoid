@@ -35,36 +35,21 @@ describe "mongoize/demongoize methods" do
 
       context "when passing an invalid value" do
         context "to demongoize" do
-          it "raises an error" do
-            expect do
-              klass.demongoize(invalid_value)
-            end.to raise_error(Mongoid::Errors::InvalidValue)
+          it "returns nil" do
+            expect(klass.demongoize(invalid_value)).to be_nil
           end
         end
-      end
 
-      context "when retrieving an invalid value from the db" do
+        context "when retrieving an invalid value from the db" do
 
-        before do
-          Catalog.collection.insert_one(field_name => invalid_value)
-        end
-        let(:catalog) { Catalog.first }
+          before do
+            Catalog.collection.insert_one(field_name => invalid_value)
+          end
 
-        context "when validate_db_attribute_types is false" do
-          config_override :validate_db_attribute_types, false
+          let(:catalog) { Catalog.first }
 
           it "returns nil" do
             catalog.send(field_name).should be_nil
-          end
-        end
-
-        context "when validate_db_attribute_types is true" do
-          config_override :validate_db_attribute_types, true
-
-          it "raises an error" do
-            expect do
-              catalog.send(field_name)
-            end.to raise_error(Mongoid::Errors::InvalidDBValue)
           end
         end
       end

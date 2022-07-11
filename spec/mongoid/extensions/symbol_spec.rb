@@ -4,23 +4,6 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Symbol do
 
-  describe ".demongoize" do
-
-    context "when the object is not a symbol" do
-
-      it "returns the symbol" do
-        expect(Symbol.demongoize("test")).to eq(:test)
-      end
-    end
-
-    context "when the object is nil" do
-
-      it "returns nil" do
-        expect(Symbol.demongoize(nil)).to be_nil
-      end
-    end
-  end
-
   describe "#mongoid_id?" do
 
     context "when the string is id" do
@@ -52,19 +35,29 @@ describe Mongoid::Extensions::Symbol do
     end
   end
 
-  describe ".mongoize" do
+  [ :mongoize, :demongoize ].each do |method|
 
-    context "when the object is not a symbol" do
+    describe ".mongoize" do
 
-      it "returns the symbol" do
-        expect(Symbol.mongoize("test")).to eq(:test)
+      context "when the object is not a symbol" do
+
+        it "returns the symbol" do
+          expect(Symbol.send(method, "test")).to eq(:test)
+        end
       end
-    end
 
-    context "when the object is nil" do
+      context "when the object is nil" do
 
-      it "returns nil" do
-        expect(Symbol.mongoize(nil)).to be_nil
+        it "returns nil" do
+          expect(Symbol.send(method, nil)).to be_nil
+        end
+      end
+
+      context "when the object is uncastable" do
+
+        it "returns nil" do
+          expect(Symbol.send(method, [])).to be_nil
+        end
       end
     end
   end

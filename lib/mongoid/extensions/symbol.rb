@@ -26,7 +26,6 @@ module Mongoid
         #
         # @return [ Symbol | nil ] The object mongoized or nil.
         def mongoize(object)
-          return if object.nil?
           object.try(:to_sym)
         end
         alias :demongoize :mongoize

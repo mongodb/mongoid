@@ -45,9 +45,7 @@ module Mongoid
         #
         # @param [ Time ] object The time from Mongo.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
-        # @return [ Time ] The object as a time.
+        # @return [ Time | nil ] The object as a time.
         def demongoize(object)
           return nil if object.blank?
           if object.acts_like?(:time)
@@ -58,8 +56,6 @@ module Mongoid
             object
           elsif object.acts_like?(:date)
             ::Date.demongoize(object).to_time
-          else
-            raise Errors::InvalidValue.new(self, object)
           end
         end
 

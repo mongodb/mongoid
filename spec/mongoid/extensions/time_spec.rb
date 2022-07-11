@@ -146,6 +146,13 @@ describe Mongoid::Extensions::Time do
         expect(Time.demongoize(nil)).to be_nil
       end
     end
+
+    context "when time is uncastable" do
+
+      it "returns nil" do
+        expect(Time.demongoize("bogus")).to be_nil
+      end
+    end
   end
 
   describe ".mongoize" do

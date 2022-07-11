@@ -157,17 +157,14 @@ module Mongoid
         #
         # @param [ Object ] object The object to demongoize.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
-        # @return [ Array ] The object.
+        # @return [ Array | nil ] The object or nil.
         #
         # @api private
         def demongoize(object)
           return if object.nil?
-          if object.is_a?(::Array)
-            object
-          else
-            raise Errors::InvalidValue.new(self, object)
+          case object
+          when ::Array, ::Set
+            object.map { |obj| obj.class.demongoize(obj) }
           end
         end
 

@@ -55,10 +55,6 @@ module Mongoid
             unless hash.blank?
               ::Range.new(hash["min"], hash["max"], hash["exclude_end"])
             end
-          end.tap do |res|
-            if res.nil?
-              raise Errors::InvalidValue.new(self, object) unless res
-            end
           end
         rescue ArgumentError # can be removed when Ruby version >= 2.7
           nil

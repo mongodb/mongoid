@@ -41,20 +41,15 @@ module Mongoid
         #
         # @param [ Object ] object The object to demongoize.
         #
-        # @raise [ Errors::InvalidValue ] if the value is uncastable.
-        #
-        # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
+        # @return [ BigDecimal | nil ] A BigDecimal derived from the object or nil.
         def demongoize(object)
-          return if object.nil?
-          return if object.is_a?(String) && object.blank?
+          return if object.blank?
           if object.is_a?(BSON::Decimal128)
             object.to_big_decimal
           elsif object.numeric?
             BigDecimal(object.to_s)
-          elsif object.respond_to?(:to_d)
+          elsif object.numeric?
             object.to_d
-          else
-            raise Errors::InvalidValue.new(self, object)
           end
         end
 

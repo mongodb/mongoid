@@ -60,6 +60,29 @@ describe Mongoid::Extensions::Date do
     it "converts to a date" do
       expect(Date.demongoize(time)).to be_a(Date)
     end
+
+    context "when demongoizing nil" do
+
+      it "returns nil" do
+        expect(Date.demongoize(nil)).to be_nil
+      end
+    end
+
+    context "when demongoizing a bogus value" do
+
+      it "returns nil" do
+        expect(Date.demongoize("bogus")).to be_nil
+      end
+    end
+
+    context "when demongoizing a castable value" do
+
+      let(:date) { "2022-07-11 14:03:42 -0400" }
+
+      it "returns a date" do
+        expect(Date.demongoize(date)).to eq(date.to_date)
+      end
+    end
   end
 
   describe "#mongoize" do

@@ -67,8 +67,8 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "raises an error" do
-          expect(demongoized).to eq(1.to_d)
+        it "returns nil" do
+          expect(demongoized).to be_nil
         end
       end
 
@@ -89,10 +89,8 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
-          expect do
-            demongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(demongoized).to be_nil
         end
       end
 
@@ -102,10 +100,8 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
-          expect do
-            demongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(demongoized).to be_nil
         end
       end
 
@@ -515,8 +511,8 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "raises an error" do
-          expect(demongoized).to eq(1.to_d)
+        it "returns nil" do
+          expect(demongoized).to be_nil
         end
       end
 
@@ -615,10 +611,8 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
-          expect do
-            demongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(demongoized).to be_nil
         end
       end
 
@@ -628,10 +622,8 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
-          expect do
-            demongoized
-          end.to raise_error(Mongoid::Errors::InvalidValue)
+        it "returns nil" do
+          expect(demongoized).to be_nil
         end
       end
     end
