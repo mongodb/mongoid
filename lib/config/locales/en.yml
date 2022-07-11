@@ -238,7 +238,7 @@ en:
             \_\_language_override\n
             \_\_default_language\n
             \_\_collation\n
-            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack', 'text', 'hashed'\n\n
+            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack (deprecated)', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
