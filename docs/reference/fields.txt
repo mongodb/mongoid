@@ -829,12 +829,20 @@ with systems that use the ``id`` field to store value different from ``_id``.
 
 .. _uncastable-values:
 
-Assigning Uncastable Values
----------------------------
+Uncastable Values
+-----------------
 
-In Mongoid 8, Mongoid has standardized the treatment of the assignment of
-"uncastable" values. A value is considered "uncastable" when it cannot be
-coerced to the type of the field. For example:
+In Mongoid 8, Mongoid has standardized the treatment of the assignment and
+reading of "uncastable" values. A value is considered "uncastable" when it
+cannot be coerced to the type of its field. For example, an array would be an
+"uncastable" value to an Integer field.
+
+
+Assigning Uncastable Values
+```````````````````````````
+
+The assignment of uncastable values has been standardized to assign ``nil`` by
+default. Consider the following example:
 
 .. code::
 
@@ -1051,12 +1059,12 @@ in the database:
 .. code-block:: ruby
 
   class ColorMapping
-    
+
     MAPPING = {
       'black' => 0,
       'white' => 1,
     }.freeze
-    
+
     INVERSE_MAPPING = MAPPING.invert.freeze
 
     class << self
@@ -1085,11 +1093,11 @@ in the database:
     include Mongoid::Document
     field :color, type: ColorMapping
   end
-  
+
   profile = Profile.new(color: 'white')
   profile.color
   # => "white"
-  
+
   # Writes 0 to color field
   profile.save!
 

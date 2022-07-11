@@ -60,13 +60,14 @@ the description and effects of each of these options.
 Storing Uncastable Value
 ------------------------
 
-In Mongoid 8, Mongoid standardizes the storing of "uncastable values." On
-attempting to write an uncastable value, a ``nil`` is written instead. See the
-secion on :ref:`Uncastable Values <uncastable-values>` for more details.
+In Mongoid 8, Mongoid standardizes the storing and reading of "uncastable
+values." On attempting to read or write an uncastable value, a ``nil`` is
+returned or written instead. See the section on
+:ref:`Uncastable Values <uncastable-values>` for more details.
 
-Some ``mongoize`` methods were also changed to perform consistently with rails
-and the other mongoize methods. The following is a table of the changes in
-functionality:
+Some ``mongoize`` and ``demongoize`` methods were also changed to perform
+consistently with rails and the other ``mongoize`` and ``demongoize`` methods.
+The following is a table of the changes in functionality:
 
 +--------------+------------------------+------------------------+-------------------+
 | Field Type   | Situation              | Previous Functionality | New Functionality |
