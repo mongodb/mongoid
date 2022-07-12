@@ -909,6 +909,13 @@ stored in the ``attributes_before_type_cast`` hash with their field names.
   user.attributes_before_type_cast["name"]
   # => ["Mike", "Trout"]
 
+.. note::
+
+  The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
+  changed to prevent bugs when modifying and saving those objects. See
+  https://jira.mongodb.org/browse/MONGOID-2951 for a longer discussion on these
+  bugs.
+
 
 .. _customizing-field-behavior:
 
