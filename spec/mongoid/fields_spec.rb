@@ -584,8 +584,8 @@ describe Mongoid::Fields do
     context "when the attribute has been assigned" do
 
       it "returns the attribute before type cast" do
-        person.age = "old"
-        expect(person.age_before_type_cast).to eq("old")
+        person.age = "42"
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
 
@@ -1156,7 +1156,7 @@ describe Mongoid::Fields do
       end
 
       it "uses the alias to write the attribute" do
-        (person.alias = expect(true)).to be true
+        expect(person.alias = true).to be true
       end
 
       it "uses the alias to read the attribute" do
@@ -1168,7 +1168,7 @@ describe Mongoid::Fields do
       end
 
       it "uses the name to write the attribute" do
-        (person.aliased = expect(true)).to be true
+        expect(person.aliased = true).to be true
       end
 
       it "uses the name to read the attribute" do

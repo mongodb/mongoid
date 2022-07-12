@@ -827,6 +827,42 @@ Mongoid also defines the ``id`` field aliased to ``_id``. The ``id``
 alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
 
+.. _uncastable-values:
+
+Assigning Uncastable Values
+---------------------------
+
+In Mongoid 8, Mongoid has standardized the treatment of the assignment of
+"uncastable" values. A value is considered "uncastable" when it cannot be
+coerced to the type of the field. For example:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+  User.new(name: [ "hello" ])
+
+Assigning an array to a field of type Integer doesn't work since an array can't
+be coerced to an Integer. The assignment of uncastable values to a field will
+cause a ``nil`` to be written:
+
+.. code::
+
+  user = User.new(name: [ "hello" ])
+  # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
+
+Note that the original uncastable values will be stored in the
+``attributes_before_type_cast`` hash with their field names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["hello"]
+
 
 .. _customizing-field-behavior:
 
@@ -977,6 +1013,12 @@ setter methods for fields of your custom type.
    point = Point.new(12, 24)
    venue = Venue.new(location: point) # This uses the Point#mongoize instance method.
    venue = Venue.new(location: [ 12, 24 ]) # This uses the Point.mongoize class method.
+
+.. note::
+
+  The ``mongoize`` method should return ``nil`` on values that are uncastable to
+  your custom type. See the section on :ref:`Uncastable Values <uncastable-values>`
+  for more details.
 
 The class method ``demongoize`` does the inverse of ``mongoize``. It takes the raw object
 from the MongoDB Ruby driver and converts it to an instance of your custom type.

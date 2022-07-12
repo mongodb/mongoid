@@ -56,9 +56,8 @@ describe BSON::Binary do
 
       let(:value) { true }
 
-      # TODO: MONGOID-5222 test with feature flag on and off
       it "returns nil" do
-        expect(mongoized).to eq(nil)
+        expect(mongoized).to be_nil
       end
     end
   end

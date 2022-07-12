@@ -57,6 +57,34 @@ changed in Mongoid 8.0:
 Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.
 
+Storing Uncastable Value
+------------------------
+
+In Mongoid 8, Mongoid standardizes the storing of "uncastable values." On
+attempting to write an uncastable value, a ``nil`` is written instead. See the
+secion on :ref:`Uncastable Values <uncastable-values>` for more details.
+
+Some ``mongoize`` methods were also changed to perform consistently with rails
+and the other mongoize methods. The following is a table of the changes in
+functionality:
+
++--------------+------------------------+------------------------+-------------------+
+| Field Type   | Situation              | Previous Functionality | New Functionality |
++==============+========================+========================+===================+
+| Boolean      | When a non-boolean     | return ``false``       | return ``nil``    |
+|              | string is assigned:    |                        |                   |
+|              | "bogus value"          |                        |                   |
++--------------+------------------------+------------------------+-------------------+
+| Array/Set    | When a value that is   | raise ``InvalidValue`` | return ``nil``    |
+|              | not an array or set is | error                  |                   |
+|              | assigned, and does NOT |                        |                   |
+|              | respond to ``to_a``: 1 |                        |                   |
++--------------+------------------------+------------------------+-------------------+
+| All Other    | When an uncastable     | undefined behavior,    | return ``nil``    |
+| Types        | value is assigned      | occasionally raises    |                   |
+|              |                        | ``NoMethodError``      |                   |
++--------------+------------------------+------------------------+-------------------+
+
 
 Order of Callback Invocation
 ----------------------------

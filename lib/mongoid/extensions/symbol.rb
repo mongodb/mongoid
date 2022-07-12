@@ -36,8 +36,9 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Symbol ] The object mongoized.
+        # @return [ Symbol | nil ] The object mongoized or nil.
         def mongoize(object)
+          return if object.nil?
           demongoize(object)
         end
       end
