@@ -13,10 +13,23 @@ Aggregation Pipeline
    :class: singlecol
 
 
-Mongoid exposes MongoDB's `aggregation pipeline
-<https://mongodb.com/docs/manual/core/aggregation-pipeline/>`_ for queries
-involving multiple referenced associations at the same time. Given the
-following model definitions with referenced associations:
+Mongoid exposes `MongoDB's aggregation pipeline
+<https://www.mongodb.com/docs/manual/core/aggregation-pipeline/>`_,
+which is used to construct flows of operations that process and return results.
+The aggregation pipeline is a superset of the deprecated
+:ref:`map/reduce framework <map-reduce>` functionality.
+
+
+Basic Usage
+===========
+
+.. _aggregation-pipeline-example-multiple-collections:
+
+Querying Across Multiple Collections
+````````````````````````````````````
+
+The aggregation pipeline may be used for queries involving multiple
+referenced associations at the same time:
 
 .. code-block:: ruby
 
@@ -45,22 +58,22 @@ could do the following:
 .. code-block:: ruby
 
   band_ids = Band.collection.aggregate([
-    {'$lookup' => {
+    { '$lookup' => {
       from: 'tours',
       localField: '_id',
       foreignField: 'band_id',
       as: 'tours',
-    }},
-    {'$lookup' => {
+    } },
+    { '$lookup' => {
       from: 'awards',
       localField: '_id',
       foreignField: 'band_id',
       as: 'awards',
-    }},
-    {'$match' => {
+    } },
+    { '$match' => {
       'tours.year' => {'$gte' => 2000},
       'awards._id' => {'$exists' => true},
-    }},
+    } },
     {'$project' => {_id: 1}},
   ])
   bands = Band.find(band_ids)
@@ -77,7 +90,7 @@ having to send the list of document ids to Mongoid in the second query
 .. _aggregation-pipeline-builder-dsl:
 
 Builder DSL
------------
+===========
 
 Mongoid provides limited support for constructing the aggregation pipeline
 itself using a high-level DSL. The following aggregation pipeline operators
@@ -113,7 +126,7 @@ For example, given the following models:
     field :name, type: String
   end
 
-We could find out which states a participant visited:
+We can find out which states a participant visited:
 
 .. code-block:: ruby
 

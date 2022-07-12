@@ -37,6 +37,10 @@ specified Mongoid versions.
      - |checkmark|
      -
 
+   * - 7.5
+     - |checkmark|
+     -
+
    * - 7.4
      - |checkmark|
      -
@@ -91,12 +95,24 @@ is deprecated.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     -
+     -
+     -
+     -
+     -
      - |checkmark|
-     -
-     -
-     -
-     -
+
+   * - 7.5
      - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     -
+     -
+     -
+     - D
+     -
 
    * - 7.4
      - |checkmark|
@@ -335,7 +351,14 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
+     -
+
+   * - 7.5
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
+     - D
 
    * - 7.4
      - |checkmark|

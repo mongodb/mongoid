@@ -12,6 +12,7 @@ Working With Data
   reference/crud
   reference/queries
   reference/text-search
+  reference/aggregation
   reference/map-reduce
   reference/persistence-configuration
   reference/nested-attributes

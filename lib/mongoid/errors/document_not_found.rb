@@ -24,7 +24,7 @@ module Mongoid
       #   there is a shard key this will be a hash.
       def initialize(klass, params, unmatched = nil)
         if !unmatched && !params.is_a?(Hash)
-          unmatched = Array(params)
+          unmatched = Array(params) if params
         end
 
         @klass, @params = klass, params
@@ -98,7 +98,9 @@ module Mongoid
       #
       # @return [ String ] The problem.
       def message_key(params, unmatched)
-        if Hash === params
+        if !params && !unmatched
+          "no_documents_found"
+        elsif Hash === params
           "document_with_attributes_not_found"
         elsif Hash === unmatched && unmatched.size >= 2
           "document_with_shard_key_not_found"

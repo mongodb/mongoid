@@ -575,6 +575,16 @@ Since ``ne`` does not support merge strategies, the ``union`` strategy was
 ignored and reset and when ``in`` was invoked the second time there was no
 strategy active.
 
+.. warning::
+
+  Merge strategies currently assume the previous condition(s) have been added
+  to the top level of the query, however this is not always the case
+  (conditions may be nested under an ``$and`` clause). Using merge strategies
+  with complex criteria may cause incorrect queries to be constructed.
+  This misbehavior is `intended to be fixed in the future
+  <https://jira.mongodb.org/browse/MONGOID-5350>`_.
+
+
 Supported Operator Methods
 --------------------------
 
@@ -1379,6 +1389,53 @@ Mongoid also has some helpful methods on criteria.
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.pluck('managers.n')
+
+   * - ``Criteria#take``
+
+       *Get a list of n documents from the database or just one if no parameter
+       is provided.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take
+          Band.take(5)
+
+   * - ``Criteria#take!``
+
+       *Get a document from the database or raise an error if none exist.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take!
+
+   * - ``Criteria#tally``
+
+       *Get a mapping of values to counts for the provided field.*
+
+       *This method accepts the dot notation, thus permitting referencing
+       fields in embedded associations.*
+
+       *This method respects :ref:`field aliases <field-aliases>`,
+       including those defined in embedded documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.tally(:name)
+
+          Band.all.tally('cities.name')
+
+          # Using the earlier definition of Manager,
+          # expands out to "managers.name" in the query:
+          Band.all.tally('managers.n')
 
 
 Eager Loading

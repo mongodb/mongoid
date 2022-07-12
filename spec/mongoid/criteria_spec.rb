@@ -837,8 +837,8 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when given a Proc" do
-      it "behaves as Enumerable" do
+    context "when given a Proc without a block" do
+      it "raises an error" do
         lambda do
           criteria.find(-> {"default"})
         # Proc is not serializable to a BSON type
@@ -1000,7 +1000,7 @@ describe Mongoid::Criteria do
         it "deletes the document from the database" do
           expect {
             depeche.reload
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
         end
       end
     end
@@ -1939,7 +1939,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a array with nil values" do
+          it "returns an array with nil values" do
             expect(plucked).to eq([nil, nil, nil])
           end
         end
@@ -1952,7 +1952,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a nil arrays" do
+          it "returns an array of arrays with nil values" do
             expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
           end
         end
@@ -2225,7 +2225,7 @@ describe Mongoid::Criteria do
         config_override :legacy_pluck_distinct, false
 
         it "demongoizes the field" do
-          expect(plucked.first).to eq(BigDecimal("1E2"))
+          expect(plucked).to eq([ BigDecimal("1E2") ])
         end
       end
     end
@@ -2250,7 +2250,7 @@ describe Mongoid::Criteria do
         config_override :legacy_pluck_distinct, false
 
         it "demongoizes the field" do
-          expect(plucked.first).to eq([BigDecimal("1E2")])
+          expect(plucked.first).to eq([ BigDecimal("1E2") ])
         end
       end
     end
@@ -2275,6 +2275,25 @@ describe Mongoid::Criteria do
         it "returns nil" do
           expect(plucked.first).to eq(nil)
         end
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      before do
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
+
+      let(:plucked) do
+        Person.pluck("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(plucked).to eq([
+          [ [ 1, 2 ] ], [ [ 1, 2 ] ], [ [ 1, 3 ] ]
+        ])
       end
     end
   end

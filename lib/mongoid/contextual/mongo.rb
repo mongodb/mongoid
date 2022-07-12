@@ -377,7 +377,8 @@ module Mongoid
         end
       end
 
-      # Get's the number of documents matching the query selector.
+      # Returns the number of documents in the database matching
+      # the query selector.
       #
       # @example Get the length.
       #   context.length
@@ -398,6 +399,44 @@ module Mongoid
       # @return [ Mongo ] The context.
       def limit(value)
         @view = view.limit(value) and self
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take 10 documents
+      #   context.take(10)
+      #
+      # @param [ Integer | nil ] limit The number of documents to return or nil.
+      #
+      # @return [ Document | Array<Document> ] The list of documents, or one
+      #   document if no value was given.
+      def take(limit = nil)
+        if limit
+          limit(limit).to_a
+        else
+          # Do to_a first so that the Mongo#first method is not used and the
+          # result is not sorted.
+          limit(1).to_a.first
+        end
+      end
+
+      # Take one document from the database and raise an error if there are none.
+      #
+      # @example Take a document
+      #   context.take!
+      #
+      # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def take!
+        # Do to_a first so that the Mongo#first method is not used and the
+        # result is not sorted.
+        if fst = limit(1).to_a.first
+          fst
+        else
+          raise Errors::DocumentNotFound.new(klass, nil, nil)
+        end
       end
 
       # Initiate a map/reduce operation from the context.
@@ -451,6 +490,75 @@ module Mongoid
             end
           end
           plucked << (values.size == 1 ? values.first : values)
+        end
+      end
+
+      # Get a hash of counts for the values of a single field. For example,
+      # if the following documents were in the database:
+      #
+      #   { _id: 1, age: 21 }
+      #   { _id: 2, age: 21 }
+      #   { _id: 3, age: 22 }
+      #
+      #   Model.tally("age")
+      #
+      # would yield the following result:
+      #
+      #   { 21 => 2, 22 => 1 }
+      #
+      # When tallying a field inside an array or embeds_many association:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 2, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 3, array: [ { x: 1 }, { x: 3 } ] }
+      #
+      #   Model.tally("array.x")
+      #
+      # The keys of the resulting hash are arrays:
+      #
+      #   { [ 1, 2 ] => 2, [ 1, 3 ] => 1 }
+      #
+      # Note that if tallying an element in an array of hashes, and the key
+      # doesn't exist in some of the hashes, tally will not include those
+      # nil keys in the resulting hash:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 }, { y: 3 } ] }
+      #
+      #   Model.tally("array.x")
+      #   # => { [ 1, 2 ] => 1 }
+      #
+      # @param [ String | Symbol ] field The field name.
+      #
+      # @return [ Hash ] The hash of counts.
+      def tally(field)
+        name = klass.cleanse_localized_field_names(field)
+
+        fld = klass.traverse_association_tree(name)
+        pipeline = [ { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } } ]
+        pipeline.unshift("$match" => view.filter) unless view.filter.blank?
+
+        collection.aggregate(pipeline).reduce({}) do |tallies, doc|
+          is_translation = "#{name}_translations" == field.to_s
+          val = doc["_id"]
+
+          key = if val.is_a?(Array)
+            val.map do |v|
+              demongoize_with_field(fld, v, is_translation)
+            end
+          else
+            demongoize_with_field(fld, val, is_translation)
+          end
+
+          # The only time where a key will already exist in the tallies hash
+          # is when the values are stored differently in the database, but
+          # demongoize to the same value. A good example of when this happens
+          # is when using localized fields. While the server query won't group
+          # together hashes that have other values in different languages, the
+          # demongoized value is just the translation in the current locale,
+          # which can be the same across multiple of those unequal hashes.
+          tallies[key] ||= 0
+          tallies[key] += doc["counts"]
+          tallies
         end
       end
 
@@ -695,6 +803,26 @@ module Mongoid
         collection.write_concern.nil? || collection.write_concern.acknowledged?
       end
 
+      # Fetch the element from the given hash and demongoize it using the
+      # given field. If the obj is an array, map over it and call this method
+      # on all of its elements.
+      #
+      # @param [ Hash | Array<Hash> ] obj The hash or array of hashes to fetch from.
+      # @param [ String ] meth The key to fetch from the hash.
+      # @param [ Field ] field The field to use for demongoization.
+      #
+      # @return [ Object ] The demongoized value.
+      #
+      # @api private
+      def fetch_and_demongoize(obj, meth, field)
+        if obj.is_a?(Array)
+          obj.map { |doc| fetch_and_demongoize(doc, meth, field) }
+        else
+          res = obj.try(:fetch, meth, nil)
+          field ? field.demongoize(res) : res.class.demongoize(res)
+        end
+      end
+
       # Extracts the value for the given field name from the given attribute
       # hash.
       #
@@ -703,21 +831,12 @@ module Mongoid
       #
       # @param [ Object ] The value for the given field name
       def extract_value(attrs, field_name)
-        def fetch_and_demongoize(d, meth, klass)
-          res = d.try(:fetch, meth, nil)
-          if field = klass.fields[meth]
-            field.demongoize(res)
-          else
-            res.class.demongoize(res)
-          end
-        end
-
         i = 1
         num_meths = field_name.count('.') + 1
-        k = klass
         curr = attrs.dup
 
         klass.traverse_association_tree(field_name) do |meth, obj, is_field|
+          field = obj if is_field
           is_translation = false
           # If no association or field was found, check if the meth is an
           # _translations field.
@@ -737,24 +856,20 @@ module Mongoid
           #    value so the full hash is returned.
           # 4. Otherwise, fetch and demongoize the value for the key meth.
           curr = if curr.is_a? Array
-            res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
+            res = fetch_and_demongoize(curr, meth, field)
             res.empty? ? nil : res
-          elsif !is_translation && k.fields[meth]&.localized?
+          elsif !is_translation && field&.localized?
             if i < num_meths
               curr.try(:fetch, meth, nil)
             else
-              fetch_and_demongoize(curr, meth, k)
+              fetch_and_demongoize(curr, meth, field)
             end
           elsif is_translation
             curr.try(:fetch, meth, nil)
           else
-            fetch_and_demongoize(curr, meth, k)
+            fetch_and_demongoize(curr, meth, field)
           end
 
-          # If it's a relation, update the current klass with the relation klass.
-          if !is_field && !obj.nil?
-            k = obj.klass
-          end
           i += 1
         end
         curr
@@ -771,12 +886,28 @@ module Mongoid
       # @return [ Object ] The demongoized value.
       def recursive_demongoize(field_name, value, is_translation)
         field = klass.traverse_association_tree(field_name)
+        demongoize_with_field(field, value, is_translation)
+      end
 
+      # Demongoize the value for the given field. If the field is nil or the
+      # field is a translations field, the value is demongoized using its class.
+      #
+      # @param [ Field ] field The field to use to demongoize.
+      # @param [ Object ] value The value to demongoize.
+      # @param [ Boolean ] is_translation The field we are retrieving is an
+      #   _translations field.
+      #
+      # @return [ Object ] The demongoized value.
+      #
+      # @api private
+      def demongoize_with_field(field, value, is_translation)
         if field
           # If it's a localized field that's not a hash, don't demongoize
           # again, we already have the translation. If it's an _translations
           # field, don't demongoize, we want the full hash not just a
           # specific translation.
+          # If it is a hash, and it's not a translations field, we need to
+          # demongoize to get the correct translation.
           if field.localized? && (!value.is_a?(Hash) || is_translation)
             value.class.demongoize(value)
           else

@@ -50,7 +50,7 @@ module Mongoid
       # @example Get the distinct values in null context.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] _field The name of the field.
+      # @param [ String | Symbol ] _field The name of the field.
       #
       # @return [ Array ] An empty Array.
       def distinct(_field)
@@ -88,11 +88,23 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String, Symbol, Array ] args Field or fields to pluck.
+      # @param [ String | Symbol ] *_fields Field or fields to pluck.
       #
       # @return [ Array ] An empty Array.
-      def pluck(*args)
+      def pluck(*_fields)
         []
+      end
+
+      # Tally the field values in null context.
+      #
+      # @example Get the values for null context.
+      #   context.tally(:name)
+      #
+      # @param [ String | Symbol ] _field Field to tally.
+      #
+      # @return [ Hash ] An empty Hash.
+      def tally(_field)
+        {}
       end
 
       # Create the new null context.
@@ -112,6 +124,28 @@ module Mongoid
       #
       # @return [ nil ] Always nil.
       def last; nil; end
+
+      # Returns nil or empty array.
+      #
+      # @example Take a document in null context.
+      #   context.take
+      #
+      # @param [ Integer | nil ] limit The number of documents to take or nil.
+      #
+      # @return [ [] | nil ] Empty array or nil.
+      def take(limit = nil)
+        limit ? [] : nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Take a document in null context.
+      #   context.take!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def take!
+        raise Errors::DocumentNotFound.new(klass, nil, nil)
+      end
 
       # Always returns zero.
       #

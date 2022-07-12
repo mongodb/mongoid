@@ -41,9 +41,12 @@ module Mongoid
       :pluck,
       :read,
       :sum,
+      :take,
+      :take!,
+      :tally,
       :text_search,
       :update,
-      :update_all
+      :update_all,
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.
@@ -118,6 +121,13 @@ module Mongoid
     # strings will be transparently converted to +BSON::ObjectId+ instances
     # during query construction.
     #
+    # If this method is given a block, it delegates to +Enumerable#find+ and
+    # returns the first document of those found by the current Crieria object
+    # for which the block returns a truthy value. If both a block and ids are
+    # given, the block is ignored and the documents for the given ids are
+    # returned. If a block and a Proc are given, the method delegates to
+    # +Enumerable#find+ and uses the proc as the default.
+    #
     # The +find+ method takes into account the default scope defined on the
     # model class, if any.
     #
@@ -128,8 +138,13 @@ module Mongoid
     #
     # @raise Errors::DocumentNotFound If not all documents are found and
     #   the +raise_not_found_error+ Mongoid configuration option is truthy.
-    def find(*args)
-      with_default_scope.find(*args)
+    def find(*args, &block)
+      empty_or_proc = args.empty? || (args.length == 1 && args.first.is_a?(Proc))
+      if block_given? && empty_or_proc
+        with_default_scope.find(*args, &block)
+      else
+        with_default_scope.find(*args)
+      end
     end
 
     # Find the first +Document+ given the conditions.

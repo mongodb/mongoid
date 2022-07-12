@@ -213,9 +213,8 @@ operations with examples.
        ``belongs_to`` *associations of the document with the option set.
        This operation skips validations and callbacks.*
 
-       *Attempting to touch a destroyed document will raise* ``FrozenError``
-       * (as of Ruby 2.5,* ``RuntimeError`` *on previous Ruby versions),
-       same as if attempting to update an attribute on a destroyed
+       *Attempting to touch a destroyed document will raise* ``FrozenError``,
+       *same as if attempting to update an attribute on a destroyed
        document.*
      -
         .. code-block:: ruby

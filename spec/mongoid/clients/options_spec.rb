@@ -413,6 +413,7 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         context 'when the options create a new cluster' do
+          retry_test
           # This test fails on sharded topologies in Evergreen but not locally
           require_topology :single, :replica_set
 

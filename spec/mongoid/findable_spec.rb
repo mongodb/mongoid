@@ -85,7 +85,7 @@ describe Mongoid::Findable do
           it "raises an error" do
             expect {
               person.messages.find_by(body: 'bar')
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class Message with attributes/)
           end
         end
 
@@ -144,7 +144,7 @@ describe Mongoid::Findable do
         it "raises an error" do
           expect {
             Person.find_by(ssn: "333-22-1111")
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class Person with attributes/)
         end
       end
 
@@ -213,7 +213,7 @@ describe Mongoid::Findable do
       it "raises an error" do
         expect {
           Person.find_by!(ssn: "333-22-1111")
-        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class Person with attributes/)
       end
     end
   end
@@ -472,7 +472,7 @@ describe Mongoid::Findable do
         Band.pluck(:follows)
       end
 
-      it "returns a array with nil values" do
+      it "returns an array with nil values" do
         expect(plucked).to eq([nil, nil, nil])
       end
     end
