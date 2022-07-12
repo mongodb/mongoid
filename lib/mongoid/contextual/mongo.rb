@@ -362,8 +362,8 @@ module Mongoid
           return limit ? documents.last(limit) : documents.last
         end
         res = try_numbered_cache(:last, limit) do
-          with_inverse_sorting do
-            if raw_docs = view.limit(limit || 1).to_a
+          with_inverse_sorting do |sort|
+            if raw_docs = view.sort(sort).limit(limit || 1).to_a
               process_raw_docs(raw_docs, limit)
             end
           end
@@ -728,10 +728,8 @@ module Mongoid
       #   context.with_inverse_sorting
       def with_inverse_sorting
         begin
-          if sort = criteria.options[:sort] || { _id: 1 }
-            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
-          end
-          yield
+          sort = criteria.options[:sort] || { _id: 1 }
+          yield(Hash[sort.map{|k, v| [k, -1*v]}])
         ensure
           apply_option(:sort)
         end
