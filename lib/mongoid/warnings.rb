@@ -9,7 +9,7 @@ module Mongoid
   module Warnings
 
     class << self
-      def add_warning(id, message)
+      def warning(id, message)
         singleton_class.class_eval do
           define_method("warn_#{id}") do
             unless instance_variable_get("@#{id}")
