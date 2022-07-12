@@ -20,8 +20,6 @@ module Mongoid
         end
       end
     end
-
-    warning :id_sort_deprecated, 'The :id_sort option has been deprecated. Use Mongo#take to get a document without a sort on _id.'
   end
 end
 

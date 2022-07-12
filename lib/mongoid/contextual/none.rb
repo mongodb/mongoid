@@ -122,14 +122,11 @@ module Mongoid
       # @example Get the first document in null context.
       #   context.first
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ nil ] Always nil.
-      def first(limit_or_opts = nil)
-        if !limit_or_opts.nil? && !limit_or_opts.is_a?(Hash)
-          []
-        end
+      def first(limit = nil)
+        [] unless limit.nil?
       end
 
       # Always returns nil.
@@ -137,14 +134,11 @@ module Mongoid
       # @example Get the last document in null context.
       #   context.last
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ nil ] Always nil.
-      def last(limit_or_opts = nil)
-        if !limit_or_opts.nil? && !limit_or_opts.is_a?(Hash)
-          []
-        end
+      def last(limit = nil)
+        [] unless limit.nil?
       end
 
       # Returns nil or empty array.

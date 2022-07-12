@@ -1994,24 +1994,6 @@ describe Mongoid::Contextual::Mongo do
             expect(context.last).to eq(rolling_stones)
           end
         end
-
-        context 'with option { id_sort: :none }' do
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'applies the sort on _id' do
-            expect(context.send(method, opts)).to eq(depeche_mode)
-          end
-
-          context 'when calling #last' do
-
-            it 'doesn\'t apply a sort on _id' do
-              expect(context.send(method, opts)).to eq(depeche_mode)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
-          end
-        end
       end
 
       context 'when the criteria has a sort' do
@@ -2033,25 +2015,6 @@ describe Mongoid::Contextual::Mongo do
           it 'applies the criteria sort' do
             expect(context.send(method)).to eq(rolling_stones)
             expect(context.last).to eq(depeche_mode)
-          end
-        end
-
-        context 'with option { id_sort: :none }' do
-
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'uses the preexisting sort' do
-            expect(context.send(method, opts)).to eq(rolling_stones)
-          end
-
-          context 'when calling #last' do
-
-            it 'uses the preexisting sort' do
-              expect(context.send(method, opts)).to eq(rolling_stones)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
           end
         end
       end
@@ -2285,7 +2248,7 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).exactly(3).times.and_call_original
+                  expect(context).to receive(:view).twice.and_call_original
                   expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
                 end
               end
@@ -2307,7 +2270,7 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).exactly(3).times.and_call_original
+                  expect(context).to receive(:view).twice.and_call_original
                   expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
                 end
               end
@@ -2434,25 +2397,6 @@ describe Mongoid::Contextual::Mongo do
           expect(context.first).to eq(depeche_mode)
         end
       end
-
-      context 'with option { id_sort: :none }' do
-        let(:opts) do
-          { id_sort: :none }
-        end
-
-        it 'doesn\'t apply the sort on _id' do
-          expect(context.last(opts)).to eq(depeche_mode)
-        end
-
-        context 'when calling #first' do
-
-          it 'doesn\'t apply the sort on _id' do
-            pending "MONGOID-5416"
-            expect(context.last(opts)).to eq(rolling_stones)
-            expect(context.first(opts)).to eq(depeche_mode)
-          end
-        end
-      end
     end
 
     context 'when the criteria has a sort' do
@@ -2475,25 +2419,6 @@ describe Mongoid::Contextual::Mongo do
         it 'applies the criteria sort' do
           expect(context.last).to eq(depeche_mode)
           expect(context.first).to eq(rolling_stones)
-        end
-      end
-
-      context 'with option { id_sort: :none }' do
-
-        let(:opts) do
-          { id_sort: :none }
-        end
-
-        it 'uses the preexisting sort' do
-          expect(context.last(opts)).to eq(depeche_mode)
-        end
-
-        context 'when calling #first' do
-
-          it 'uses the preexisting sort' do
-            expect(context.last(opts)).to eq(depeche_mode)
-            expect(context.first(opts)).to eq(rolling_stones)
-          end
         end
       end
     end
@@ -2781,7 +2706,7 @@ describe Mongoid::Contextual::Mongo do
         let(:limit) { 1 }
 
         it "hits the database" do
-          expect(context).to receive(:view).exactly(3).times.and_call_original
+          expect(context).to receive(:view).twice.and_call_original
           docs
         end
 

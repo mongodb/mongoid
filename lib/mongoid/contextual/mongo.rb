@@ -250,30 +250,19 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
-      #
-      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
-      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The first document.
-      def first(limit_or_opts = nil)
-        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
+      def first(limit = nil)
         if cached? && cache_loaded?
           return limit ? documents.first(limit) : documents.first
         end
         try_numbered_cache(:first, limit) do
-          if limit_or_opts.try(:key?, :id_sort)
-            Mongoid::Warnings.warn_id_sort_deprecated
-          end
-          sorted_view = view
-          if sort = view.sort || ({ _id: 1 } unless limit_or_opts.try(:fetch, :id_sort) == :none)
-            sorted_view = view.sort(sort)
-          end
-          if raw_docs = sorted_view.limit(limit || 1).to_a
+          sort = view.sort || { _id: 1 }
+          if raw_docs = view.sort(sort).limit(limit || 1).to_a
             process_raw_docs(raw_docs, limit)
           end
         end
@@ -362,23 +351,18 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
-      # @param [ Integer | Hash ] limit_or_opts The number of documents to
-      #   return, or a hash of options.
-      #
-      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
-      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The last document.
-      def last(limit_or_opts = nil)
-        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
+      def last(limit = nil)
         if cached? && cache_loaded?
           return limit ? documents.last(limit) : documents.last
         end
         res = try_numbered_cache(:last, limit) do
-          with_inverse_sorting(limit_or_opts) do
+          with_inverse_sorting do
             if raw_docs = view.limit(limit || 1).to_a
               process_raw_docs(raw_docs, limit)
             end
@@ -742,11 +726,9 @@ module Mongoid
       #
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
-      def with_inverse_sorting(opts = {})
-        Mongoid::Warnings.warn_id_sort_deprecated if opts.try(:key?, :id_sort)
-
+      def with_inverse_sorting
         begin
-          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts.try(:fetch, :id_sort) == :none )
+          if sort = criteria.options[:sort] || { _id: 1 }
             @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
           end
           yield

@@ -28,7 +28,7 @@ module Mongoid
           private
 
           def execute_query(object, type)
-            query_criteria(object, type).limit(1).first(id_sort: :none)
+            query_criteria(object, type).take
           end
 
           def query_criteria(object, type)

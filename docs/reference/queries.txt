@@ -1301,9 +1301,10 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#first|last``
 
-       *Finds a single document given the provided criteria. This automatically adds a sort on _id.
-       Opt out of adding the id sort with the {id_sort: :none} option. This option is deprecated -
-       please call ``take`` instead. Get a list of documents by passing in a limit argument.*
+       *Finds a single document given the provided criteria. Get a list of
+       documents by passing in a limit argument. This method automatically adds
+       a sort on _id. This can cause performance issues, so if the sort is
+       undesirable, Criteria#take can be used instead.*
 
      -
         .. code-block:: ruby

@@ -668,3 +668,10 @@ Deprecated the ``geoHaystack``, ``geoSearch`` Options
 -----------------------------------------------------
 
 The ``geoHaystack`` and ``geoSearch`` options on indexes have been deprecated.
+
+
+Support Dropped for the ``:id_sort`` Option on ``#first/last``
+--------------------------------------------------------------
+
+Support for the ``:id_sort`` option on the ``#first`` and ``#last`` options has
+been dropped. These methods now only except a limit as a positional argument.
