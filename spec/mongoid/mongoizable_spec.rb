@@ -67,14 +67,27 @@ describe "mongoize/demongoize methods" do
     end
 
     context "when assigning an invalid value to a field" do
-      let(:catalog) { Catalog.create!(field_name => invalid_value) }
+      let!(:catalog) { Catalog.create!(field_name => invalid_value) }
+      let(:from_db) { Catalog.find(catalog._id) }
 
       it "returns the inputted value" do
         catalog.attributes[field_name].should be_nil
       end
 
       it "persists the inputted value" do
-        Catalog.find(catalog._id).attributes[field_name].should be_nil
+        from_db.attributes[field_name].should be_nil
+      end
+    end
+
+    context "when reading an invalid value from the db" do
+      before do
+        Catalog.collection.insert_one(field_name => invalid_value)
+      end
+
+      let(:from_db) { Catalog.first }
+
+      it "reads the inputted value" do
+        from_db.send(field_name).should eq(demongoized_value)
       end
     end
   end
@@ -83,8 +96,10 @@ describe "mongoize/demongoize methods" do
     let(:invalid_value) { 1 }
     let(:klass) { Array }
     let(:field_name) { :array_field }
+    let(:mongoized_value) { nil }
+    let(:demongoized_value) { 1 }
 
-    include_examples "handles uncastable values"
+    include_examples "pushes through uncastable values"
   end
 
   describe BigDecimal do
@@ -146,6 +161,7 @@ describe "mongoize/demongoize methods" do
   describe BSON::ObjectId do
     let(:invalid_value) { "invalid value" }
     let(:mongoized_value) { invalid_value }
+    let(:demongoized_value) { mongoized_value }
     let(:klass) { described_class }
     let(:field_name) { :object_id_field }
 
@@ -187,6 +203,7 @@ describe "mongoize/demongoize methods" do
   describe String do
     let(:invalid_value) { 1 }
     let(:mongoized_value) { "1" }
+    let(:demongoized_value) { mongoized_value }
     let(:klass) { described_class }
     let(:field_name) { :string_field }
 
@@ -196,6 +213,7 @@ describe "mongoize/demongoize methods" do
   describe Mongoid::StringifiedSymbol do
     let(:invalid_value) { [] }
     let(:mongoized_value) { "[]" }
+    let(:demongoized_value) { :[] }
     let(:klass) { described_class }
     let(:field_name) { :stringified_symbol_field }
 
