@@ -182,9 +182,15 @@ module Mongoid
     # @example Find the first document.
     #   Person.first
     #
+    # @param [ Integer | Hash ] limit_or_opts The number of documents to
+    #   return, or a hash of options.
+    #
+    # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
+    #   Don't apply a sort on _id if no other sort is defined on the criteria.
+    #
     # @return [ Document ] The first matching document.
-    def first
-      with_default_scope.first
+    def first(limit_or_opts = nil)
+      with_default_scope.first(limit_or_opts)
     end
     alias :one :first
 
@@ -193,9 +199,15 @@ module Mongoid
     # @example Find the last document.
     #   Person.last
     #
+    # @param [ Integer | Hash ] limit_or_opts The number of documents to
+    #   return, or a hash of options.
+    #
+    # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
+    #   Don't apply a sort on _id if no other sort is defined on the criteria.
+    #
     # @return [ Document ] The last matching document.
-    def last
-      with_default_scope.last
+    def last(limit_or_opts = nil)
+      with_default_scope.last(limit_or_opts)
     end
   end
 end

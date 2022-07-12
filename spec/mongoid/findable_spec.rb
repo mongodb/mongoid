@@ -229,6 +229,36 @@ describe Mongoid::Findable do
       it "returns the first matching document" do
         expect(Person.send(method)).to eq(person)
       end
+
+      it "doen't raise when passing options" do
+        expect do
+          Person.first(id_sort: :none)
+        end.to_not raise_error
+      end
+
+      it "passes the limit through" do
+        Person.first(1).length.should == 1
+      end
+    end
+  end
+
+  describe "#last" do
+    let!(:person) do
+      Person.create!
+    end
+
+    it "returns the first matching document" do
+      expect(Person.last).to eq(person)
+    end
+
+    it "doen't raise when passing options" do
+      expect do
+        Person.last(id_sort: :none)
+      end.to_not raise_error
+    end
+
+    it "passes the limit through" do
+      Person.last(1).length.should == 1
     end
   end
 
