@@ -27,8 +27,8 @@ module Mongoid
         # @return [ Set ] The set.
         def demongoize(object)
           case object
-          when ::Set then object.dup.map! { |obj| obj.class.demongoize(obj) }
-          when ::Array then ::Set.new(object).map! { |obj| obj.class.demongoize(obj) }
+          when ::Set then object
+          when ::Array then ::Set.new(object)
           end
         end
 

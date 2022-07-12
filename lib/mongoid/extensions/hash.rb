@@ -228,21 +228,6 @@ module Mongoid
           end
         end
 
-        # Convert the object from its mongo friendly ruby type to this type.
-        #
-        # @param [ Object ] object The object from Mongo.
-        #
-        # @return [ Hash | nil ] The object as a hash or nil.
-        def demongoize(object)
-          return if object.nil?
-          if object.is_a?(Hash)
-            # Need to use transform_values! which maintains the BSON::Document
-            # instead of transform_values which always returns a hash. To do this,
-            # we first need to dup the hash.
-            object.dup.transform_values! { |obj| obj.class.demongoize(obj) }
-          end
-        end
-
         # Can the size of this object change?
         #
         # @example Is the hash resizable?
