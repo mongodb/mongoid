@@ -860,7 +860,7 @@ cause a ``nil`` to be written:
 
 .. code::
 
-  user = User.new(name: [ "hello" ])
+  user = User.new(name: [ "Mike", "Trout" ])
   # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
 
 Note that the original uncastable values will be stored in the
@@ -869,7 +869,45 @@ Note that the original uncastable values will be stored in the
 .. code::
 
   user.attributes_before_type_cast["name"]
-  # => ["hello"]
+  # => ["Mike", "Trout"]
+
+
+Reading Uncastable Values
+`````````````````````````
+
+When documents in the databae contain values of different types than their
+represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
+it will assign ``nil``. Consider the following model and document in the
+database:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+.. code::
+
+  { _id: ..., name: [ "Mike", "Trout" ] }
+
+Reading this document from the database will result in a ``nil`` being written
+to the model's name field:
+
+.. code::
+
+  User.first.name
+  # => nil
+
+Reading an array to a field of type Integer doesn't work since an array can't
+be coerced to an Integer. Note that the original uncastable values will be
+stored in the ``attributes_before_type_cast`` hash with their field names.
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
 
 
 .. _customizing-field-behavior:
