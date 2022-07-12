@@ -221,7 +221,10 @@ module Mongoid
         def mongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
-            object.transform_values(&:mongoize)
+            # Need to use transform_values! which maintains the BSON::Document
+            # instead of transform_values which always returns a hash. To do this,
+            # we first need to dup the hash.
+            object.dup.transform_values!(&:mongoize)
           end
         end
 
@@ -233,7 +236,10 @@ module Mongoid
         def demongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
-            object.transform_values { |obj| obj.class.demongoize(obj) }
+            # Need to use transform_values! which maintains the BSON::Document
+            # instead of transform_values which always returns a hash. To do this,
+            # we first need to dup the hash.
+            object.dup.transform_values! { |obj| obj.class.demongoize(obj) }
           end
         end
 
