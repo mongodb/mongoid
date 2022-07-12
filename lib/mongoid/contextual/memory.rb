@@ -121,7 +121,7 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       def first(limit_or_opts = nil)
-        if !limit_or_opts || limit_or_opts.is_a?(Hash)
+        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
           eager_load([documents.first]).first
         else
           eager_load(documents.first(limit_or_opts))
