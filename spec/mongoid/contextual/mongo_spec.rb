@@ -1994,27 +1994,6 @@ describe Mongoid::Contextual::Mongo do
             expect(context.last).to eq(rolling_stones)
           end
         end
-<<<<<<< HEAD
-
-        context 'with option { id_sort: :none }' do
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'applies the sort on _id' do
-            expect(context.send(method, opts)).to eq(depeche_mode)
-          end
-
-          context 'when calling #last' do
-
-            it 'doesn\'t apply a sort on _id' do
-              expect(context.send(method, opts)).to eq(depeche_mode)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
-          end
-        end
-=======
->>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
       end
 
       context 'when the criteria has a sort' do
@@ -2038,28 +2017,6 @@ describe Mongoid::Contextual::Mongo do
             expect(context.last).to eq(depeche_mode)
           end
         end
-<<<<<<< HEAD
-
-        context 'with option { id_sort: :none }' do
-
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'uses the preexisting sort' do
-            expect(context.send(method, opts)).to eq(rolling_stones)
-          end
-
-          context 'when calling #last' do
-
-            it 'uses the preexisting sort' do
-              expect(context.send(method, opts)).to eq(rolling_stones)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
-          end
-        end
-=======
->>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
       end
 
       context "when using .sort" do
@@ -2440,28 +2397,6 @@ describe Mongoid::Contextual::Mongo do
           expect(context.first).to eq(depeche_mode)
         end
       end
-<<<<<<< HEAD
-
-      context 'with option { id_sort: :none }' do
-        let(:opts) do
-          { id_sort: :none }
-        end
-
-        it 'doesn\'t apply the sort on _id' do
-          expect(context.last(opts)).to eq(depeche_mode)
-        end
-
-        context 'when calling #first' do
-
-          it 'doesn\'t apply the sort on _id' do
-            pending "MONGOID-5416"
-            expect(context.last(opts)).to eq(rolling_stones)
-            expect(context.first(opts)).to eq(depeche_mode)
-          end
-        end
-      end
-=======
->>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
     end
 
     context 'when the criteria has a sort' do
@@ -2486,28 +2421,6 @@ describe Mongoid::Contextual::Mongo do
           expect(context.first).to eq(rolling_stones)
         end
       end
-<<<<<<< HEAD
-
-      context 'with option { id_sort: :none }' do
-
-        let(:opts) do
-          { id_sort: :none }
-        end
-
-        it 'uses the preexisting sort' do
-          expect(context.last(opts)).to eq(depeche_mode)
-        end
-
-        context 'when calling #first' do
-
-          it 'uses the preexisting sort' do
-            expect(context.last(opts)).to eq(depeche_mode)
-            expect(context.first(opts)).to eq(rolling_stones)
-          end
-        end
-      end
-=======
->>>>>>> b7eb6815f (MONGOID-4998 remove last references to id_sort)
     end
 
     context "when using .sort" do
