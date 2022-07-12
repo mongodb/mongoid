@@ -74,5 +74,37 @@ describe Mongoid::Extensions::Set do
         end
       end
     end
+
+    context "when the mongoizer creates duplicate elements" do
+      let(:mongoized) do
+        Set.mongoize(input)
+      end
+
+      before do
+        expect(BigDecimal).to receive(:mongoize).exactly(4).times.and_wrap_original do |m, *args|
+          1
+        end
+      end
+
+      context "when the input is a set" do
+        let(:input) do
+          [ 1, 2, 3, 4 ].map(&:to_d).to_set
+        end
+
+        it "removes duplicates" do
+          expect(mongoized).to eq([ 1 ])
+        end
+      end
+
+      context "when the input is an array" do
+        let(:input) do
+          [ 1, 2, 3, 4 ].map(&:to_d)
+        end
+
+        it "removes duplicates" do
+          expect(mongoized).to eq([ 1 ])
+        end
+      end
+    end
   end
 end

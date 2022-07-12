@@ -149,7 +149,7 @@ module Mongoid
           return if object.nil?
           case object
           when ::Array, ::Set
-            evolve(object).collect{ |obj| obj.class.mongoize(obj) }
+            object.map(&:mongoize)
           end
         end
 
