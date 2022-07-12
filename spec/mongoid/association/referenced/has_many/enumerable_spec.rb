@@ -1264,6 +1264,33 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
     end
 
+    context 'when including a limit' do
+
+      let(:person) do
+        Person.create!
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create!(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create!(title: "Two")
+      end
+
+      it 'returns the matching document' do
+        expect(enumerable.first(1)).to eq([first_post])
+      end
+    end
+
     context 'when the id_sort option is not provided' do
 
       let(:person) do
@@ -1704,6 +1731,33 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         it "returns nil" do
           expect(last).to be_nil
         end
+      end
+    end
+
+    context 'when including a limit' do
+
+      let(:person) do
+        Person.create!
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create!(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create!(title: "Two")
+      end
+
+      it 'returns the matching document' do
+        expect(enumerable.last(1)).to eq([second_post])
       end
     end
 
