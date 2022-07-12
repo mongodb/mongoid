@@ -80,6 +80,11 @@ The following is a table of the changes in functionality:
 |              | not an array or hash   | error                  |                   |
 |              | is assigned            |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
+| Set          | When a value that is   | raise ``NoMethodError``| return ``nil``    |
+|              | not a set is assigned: | Exception: undefined   |                   |
+|              | 1                      | method ``to_a`` for    |                   |
+|              |                        | 1:Integer              |                   |
++--------------+------------------------+------------------------+-------------------+
 | Regexp       | When persisting and    | returns a              | returns a         |
 |              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``        |
 |              | the database           |                        |                   |
