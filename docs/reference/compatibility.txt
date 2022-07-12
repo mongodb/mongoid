@@ -30,10 +30,14 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.17-2.10
+     - Driver 2.18-2.10
      - Driver 2.9-2.7
 
    * - 8.0
+     - |checkmark|
+     -
+
+   * - 7.5
      - |checkmark|
      -
 
@@ -91,11 +95,23 @@ is deprecated.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     -
+     -
+     -
+     -
+     -
      - |checkmark|
+
+   * - 7.5
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
      -
      -
      -
-     -
+     - D
      - |checkmark|
 
    * - 7.4
@@ -335,7 +351,14 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
+     -
+
+   * - 7.5
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
+     - D
 
    * - 7.4
      - |checkmark|

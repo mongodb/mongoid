@@ -82,6 +82,7 @@ module Mongoid
     #   document.post_persist
     def post_persist
       reset_persisted_descendants
+      reset_attributes_before_type_cast
       move_changes
     end
 
@@ -246,6 +247,10 @@ module Mongoid
       else
         __send__("#{attr}=", nil)
       end
+    end
+
+    def reset_attributes_before_type_cast
+      @attributes_before_type_cast = @attributes.dup
     end
 
     module ClassMethods

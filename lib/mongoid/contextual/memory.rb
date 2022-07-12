@@ -74,7 +74,7 @@ module Mongoid
       # @example Get the distinct values.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] field The name of the field.
+      # @param [ String | Symbol ] field The name of the field.
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
@@ -108,7 +108,7 @@ module Mongoid
       #
       # @return [ true, false ] If the count is more than zero.
       def exists?
-        count > 0
+        any?
       end
 
       # Get the first document in the database for the criteria's selector.
@@ -116,9 +116,16 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
+      #
       # @return [ Document ] The first document.
-      def first(*args)
-        eager_load([documents.first]).first
+      def first(limit_or_opts = nil)
+        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
+          eager_load([documents.first]).first
+        else
+          eager_load(documents.first(limit_or_opts))
+        end
       end
       alias :one :first
       alias :find_first :first
@@ -159,9 +166,52 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
+      #
+      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
+      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      #
       # @return [ Document ] The last document.
-      def last
-        eager_load([documents.last]).first
+      def last(limit_or_opts = nil)
+        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
+          eager_load([documents.last]).first
+        else
+          eager_load(documents.last(limit_or_opts))
+        end
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @param [ Integer | nil ] limit The number of documents to take or nil.
+      #
+      # @return [ Document ] The document.
+      def take(limit = nil)
+        if limit
+          eager_load(documents.take(limit))
+        else
+          eager_load([documents.first]).first
+        end
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def take!
+        if documents.empty?
+          raise Errors::DocumentNotFound.new(klass, nil, nil)
+        else
+          eager_load([documents.first]).first
+        end
       end
 
       # Get the length of matching documents in the context.
@@ -200,21 +250,6 @@ module Mongoid
         documents.pluck(*fields)
       end
 
-      # Pick the field value(s) from the first result in memory.
-      #
-      # @example Get the first value in memory.
-      #   context.pick(:name)
-      #
-      # @param [ String, Symbol ] *fields Field(s) to pick from
-      #   the first result in memory.
-      #
-      # @return [ Object, Array ] The picked value.
-      #   If the *fields arg contains multiple values,
-      #   an array will be returned with one value per field.
-      def pick(*fields)
-        documents.pick(*fields)
-      end
-
       # Iterate through plucked field values in memory.
       #
       # @example Iterate through the values for null context.
@@ -231,12 +266,27 @@ module Mongoid
         block_given? ? self : enum
       end
 
+      # Pick the field value(s) from the first result in memory.
+      #
+      # @example Get the first value in memory.
+      #   context.pick(:name)
+      #
+      # @param [ String, Symbol ] *fields Field(s) to pick from
+      #   the first result in memory.
+      #
+      # @return [ Object, Array ] The picked value.
+      #   If the *fields arg contains multiple values,
+      #   an array will be returned with one value per field.
+      def pick(*fields)
+        documents.pick(*fields)
+      end
+
       # Tally the field values in memory.
       #
       # @example Get the counts of values in memory.
       #   context.tally(:name)
       #
-      # @param [ String, Symbol ] field Field to tally.
+      # @param [ String | Symbol ] field Field to tally.
       #
       # @return [ Hash ] The hash of counts.
       def tally(field)

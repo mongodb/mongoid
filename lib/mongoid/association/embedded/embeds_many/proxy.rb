@@ -212,7 +212,7 @@ module Mongoid
           #
           # @return [ true, false ] True is persisted documents exist, false if not.
           def exists?
-            count > 0
+            _target.any? { |doc| doc.persisted? }
           end
 
           # Finds a document in this association through several different

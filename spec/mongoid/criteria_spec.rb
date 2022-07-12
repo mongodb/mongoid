@@ -837,8 +837,8 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when given a Proc" do
-      it "behaves as Enumerable" do
+    context "when given a Proc without a block" do
+      it "raises an error" do
         lambda do
           criteria.find(-> {"default"})
         # Proc is not serializable to a BSON type
@@ -1000,7 +1000,7 @@ describe Mongoid::Criteria do
         it "deletes the document from the database" do
           expect {
             depeche.reload
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
         end
       end
     end
@@ -1939,7 +1939,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a array with nil values" do
+          it "returns an array with nil values" do
             expect(plucked).to eq([nil, nil, nil])
           end
         end
@@ -1952,7 +1952,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a nil arrays" do
+          it "returns an array of arrays with nil values" do
             expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
           end
         end

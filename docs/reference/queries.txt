@@ -1301,8 +1301,9 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#first|last``
 
-       *Finds a single document given the provided criteria. This automatically adds a sort on id.
-       Opt out of adding the id sort with the {id_sort: :none} option.*
+       *Finds a single document given the provided criteria. This automatically adds a sort on _id.
+       Opt out of adding the id sort with the {id_sort: :none} option. This option is deprecated -
+       please call ``take`` instead. Get a list of documents by passing in a limit argument.*
 
      -
         .. code-block:: ruby
@@ -1310,6 +1311,7 @@ Mongoid also has some helpful methods on criteria.
           Band.first
           Band.where(:members.with_size => 3).first
           Band.where(:members.with_size => 3).last
+          Band.first(2)
 
    * - ``Criteria#first_or_create``
 
@@ -1443,6 +1445,32 @@ Mongoid also has some helpful methods on criteria.
 
          Band.all.pick(:name, 'address.city')
            #=> ["The Rolling Stones", "London"]
+
+   * - ``Criteria#take``
+
+       *Get a list of n documents from the database or just one if no parameter
+       is provided.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take
+          Band.take(5)
+
+   * - ``Criteria#take!``
+
+       *Get a document from the database or raise an error if none exist.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take!
 
    * - ``Criteria#tally``
 

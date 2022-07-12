@@ -128,11 +128,57 @@ describe Mongoid::Contextual::None do
     it "returns nil" do
       expect(context.first).to be_nil
     end
+
+    it "doen't raise when passing options" do
+      expect do
+        context.first(id_sort: :none)
+      end.to_not raise_error
+    end
+
+    it "returns nil when passing a hash" do
+      expect(context.first(id_sort: :none)).to be_nil
+    end
+
+    it "returns [] when passing a limit" do
+      expect(context.first(1)).to eq([])
+    end
   end
 
   describe "#last" do
     it "returns nil" do
       expect(context.last).to be_nil
+    end
+
+    it "doen't raise when passing options" do
+      expect do
+        context.last(id_sort: :none)
+      end.to_not raise_error
+    end
+
+    it "returns nil when passing a hash" do
+      expect(context.last(id_sort: :none)).to be_nil
+    end
+
+    it "returns [] when passing a limit" do
+      expect(context.last(1)).to eq([])
+    end
+  end
+
+  describe "#take" do
+    it "returns nil" do
+      expect(context.take).to be_nil
+    end
+
+    it "returns nil with params" do
+      expect(context.take(1)).to eq([])
+    end
+  end
+
+  describe "#take!" do
+    it "raises an error" do
+      expect do
+        context.take!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
     end
   end
 

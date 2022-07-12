@@ -50,7 +50,7 @@ module Mongoid
       # @example Get the distinct values in null context.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] _field The name of the field.
+      # @param [ String | Symbol ] _field The name of the field.
       #
       # @return [ Array ] An empty Array.
       def distinct(_field)
@@ -88,7 +88,7 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String, Symbol ] *_fields Field(s) to pluck.
+      # @param [ String | Symbol ] *_fields Field(s) to pluck.
       #
       # @return [ Array ] An empty Array.
       def pluck(*_fields)
@@ -128,7 +128,7 @@ module Mongoid
       # @example Get the values for null context.
       #   context.tally(:name)
       #
-      # @param [ String, Symbol ] _field Field to tally.
+      # @param [ String | Symbol ] _field Field to tally.
       #
       # @return [ Hash ] An empty Hash.
       def tally(_field)
@@ -147,11 +147,55 @@ module Mongoid
 
       # Always returns nil.
       #
+      # @example Get the first document in null context.
+      #   context.first
+      #
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
+      #
+      # @return [ nil ] Always nil.
+      def first(limit_or_opts = nil)
+        if !limit_or_opts.nil? && !limit_or_opts.is_a?(Hash)
+          []
+        end
+      end
+
+      # Always returns nil.
+      #
       # @example Get the last document in null context.
       #   context.last
       #
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
+      #
       # @return [ nil ] Always nil.
-      def last; nil; end
+      def last(limit_or_opts = nil)
+        if !limit_or_opts.nil? && !limit_or_opts.is_a?(Hash)
+          []
+        end
+      end
+
+      # Returns nil or empty array.
+      #
+      # @example Take a document in null context.
+      #   context.take
+      #
+      # @param [ Integer | nil ] limit The number of documents to take or nil.
+      #
+      # @return [ [] | nil ] Empty array or nil.
+      def take(limit = nil)
+        limit ? [] : nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Take a document in null context.
+      #   context.take!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def take!
+        raise Errors::DocumentNotFound.new(klass, nil, nil)
+      end
 
       # Always returns zero.
       #
