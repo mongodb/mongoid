@@ -2610,7 +2610,6 @@ describe Mongoid::Contextual::Mongo do
           end
 
           let(:docs) do
-            byebug
             context.last(limit)
           end
 
