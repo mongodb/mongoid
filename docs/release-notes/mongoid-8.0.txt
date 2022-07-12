@@ -94,6 +94,13 @@ The following is a table of the changes in functionality:
 |              |                        | ``NoMethodError``      |                   |
 +--------------+------------------------+------------------------+-------------------+
 
+.. note::
+
+  The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
+  changed to prevent bugs when modifying and saving those objects. See
+  https://jira.mongodb.org/browse/MONGOID-2951 for a longer discussion on these
+  bugs.
+
 
 Order of Callback Invocation
 ----------------------------
