@@ -76,10 +76,9 @@ The following is a table of the changes in functionality:
 |              | string is assigned:    |                        |                   |
 |              | "bogus value"          |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
-| Array/Set    | When a value that is   | raise ``InvalidValue`` | return ``nil``    |
-|              | not an array or set is | error                  |                   |
-|              | assigned, and does NOT |                        |                   |
-|              | respond to ``to_a``: 1 |                        |                   |
+| Array/Hash   | When a value that is   | raise ``InvalidValue`` | return ``nil``    |
+|              | not an array or hash   | error                  |                   |
+|              | is assigned            |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
 | Regexp       | When persisting and    | returns a              | returns a         |
 |              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``        |
