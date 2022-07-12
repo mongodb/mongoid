@@ -146,8 +146,10 @@ describe "mongoize/demongoize methods" do
     let(:invalid_value) { 1 }
     let(:klass) { described_class }
     let(:field_name) { :hash_field }
+    let(:mongoized_value) { nil }
+    let(:demongoized_value) { 1 }
 
-    include_examples "handles uncastable values"
+    include_examples "pushes through uncastable values"
   end
 
   describe Integer do

@@ -306,8 +306,8 @@ describe Mongoid::Extensions::Hash do
         Hash.demongoize(1)
       end
 
-      it "returns nil" do
-        expect(demongoized).to be_nil
+      it "returns the object" do
+        expect(demongoized).to eq(1)
       end
     end
   end
