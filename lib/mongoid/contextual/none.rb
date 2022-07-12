@@ -142,7 +142,7 @@ module Mongoid
       #
       # @return [ nil ] Always nil.
       def last(limit_or_opts = nil)
-        if limit_or_opts && !limit_or_opts.is_a?(Hash)
+        if !limit_or_opts.nil? && !limit_or_opts.is_a?(Hash)
           []
         end
       end

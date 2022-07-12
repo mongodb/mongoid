@@ -174,7 +174,7 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       def last(limit_or_opts = nil)
-        if !limit_or_opts || limit_or_opts.is_a?(Hash)
+        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
           eager_load([documents.last]).first
         else
           eager_load(documents.last(limit_or_opts))
