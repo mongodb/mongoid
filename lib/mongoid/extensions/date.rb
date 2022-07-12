@@ -45,7 +45,7 @@ module Mongoid
           elsif object.respond_to?(:to_date)
             object.to_date
           end
-        rescue ::Date::Error
+        rescue ArgumentError
           nil
         end
 
