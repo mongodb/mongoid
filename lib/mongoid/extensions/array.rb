@@ -153,21 +153,6 @@ module Mongoid
           end
         end
 
-        # Convert the object from its mongo friendly ruby type to this type.
-        #
-        # @param [ Object ] object The object to demongoize.
-        #
-        # @return [ Array | nil ] The object or nil.
-        #
-        # @api private
-        def demongoize(object)
-          return if object.nil?
-          case object
-          when ::Array, ::Set
-            object.map { |obj| obj.class.demongoize(obj) }
-          end
-        end
-
         # Returns whether the object's size can be changed.
         #
         # @example Is the object resizable?
