@@ -57,8 +57,8 @@ changed in Mongoid 8.0:
 Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.
 
-Storing Uncastable Value
-------------------------
+Storing Uncastable Values
+-------------------------
 
 In Mongoid 8, Mongoid standardizes the storing and reading of "uncastable
 values." On attempting to read or write an uncastable value, a ``nil`` is
@@ -80,6 +80,10 @@ The following is a table of the changes in functionality:
 |              | not an array or set is | error                  |                   |
 |              | assigned, and does NOT |                        |                   |
 |              | respond to ``to_a``: 1 |                        |                   |
++--------------+------------------------+------------------------+-------------------+
+| Regexp       | When persisting and    | returns a              | returns a         |
+|              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``        |
+|              | the database           |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
 | All Other    | When an uncastable     | undefined behavior,    | return ``nil``    |
 | Types        | value is assigned      | occasionally raises    |                   |
