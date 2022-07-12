@@ -16,7 +16,7 @@ module Mongoid
     #   end
     #
     # It is also possible to limit the uniqueness constraint to a set of
-    # records matching certain conditions:
+    # documents matching certain conditions:
     #   class Person
     #     include Mongoid::Document
     #     field :title
@@ -242,6 +242,7 @@ module Mongoid
         relation = document._parent.send(document.association_name)
         criteria = create_criteria(relation, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
+        criteria = criteria.limit(2)
         add_error(document, attribute, value) if criteria.count > 1
       end
 

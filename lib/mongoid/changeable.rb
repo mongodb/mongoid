@@ -62,7 +62,7 @@ module Mongoid
 
     # Call this method after save, so the changes can be properly switched.
     #
-    # This will unset the memoized children array, set new record to
+    # This will unset the memoized children array, set new record flag to
     # false, set the document as validated, and move the dirty changes.
     #
     # @example Move the changes to previous.
@@ -82,6 +82,7 @@ module Mongoid
     #   document.post_persist
     def post_persist
       reset_persisted_descendants
+      reset_attributes_before_type_cast
       move_changes
     end
 
@@ -246,6 +247,10 @@ module Mongoid
       else
         __send__("#{attr}=", nil)
       end
+    end
+
+    def reset_attributes_before_type_cast
+      @attributes_before_type_cast = @attributes.dup
     end
 
     module ClassMethods

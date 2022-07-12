@@ -74,7 +74,7 @@ module Mongoid
       # @example Get the distinct values.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] field The name of the field.
+      # @param [ String | Symbol ] field The name of the field.
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
@@ -108,7 +108,7 @@ module Mongoid
       #
       # @return [ true, false ] If the count is more than zero.
       def exists?
-        count > 0
+        any?
       end
 
       # Get the first document in the database for the criteria's selector.
@@ -116,9 +116,16 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
+      #
       # @return [ Document ] The first document.
-      def first(*args)
-        eager_load([documents.first]).first
+      def first(limit_or_opts = nil)
+        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
+          eager_load([documents.first]).first
+        else
+          eager_load(documents.first(limit_or_opts))
+        end
       end
       alias :one :first
       alias :find_first :first
@@ -159,9 +166,52 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
+      # @param [ Integer | Hash ] limit_or_opts The number of documents to
+      #   return, or a hash of options.
+      #
+      # @option limit_or_opts [ :none ] :id_sort This option is deprecated.
+      #   Don't apply a sort on _id if no other sort is defined on the criteria.
+      #
       # @return [ Document ] The last document.
-      def last
-        eager_load([documents.last]).first
+      def last(limit_or_opts = nil)
+        if limit_or_opts.nil? || limit_or_opts.is_a?(Hash)
+          eager_load([documents.last]).first
+        else
+          eager_load(documents.last(limit_or_opts))
+        end
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @param [ Integer | nil ] limit The number of documents to take or nil.
+      #
+      # @return [ Document ] The document.
+      def take(limit = nil)
+        if limit
+          eager_load(documents.take(limit))
+        else
+          eager_load([documents.first]).first
+        end
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def take!
+        if documents.empty?
+          raise Errors::DocumentNotFound.new(klass, nil, nil)
+        else
+          eager_load([documents.first]).first
+        end
       end
 
       # Get the length of matching documents in the context.
@@ -182,21 +232,38 @@ module Mongoid
       #
       # @param [ Integer ] value The number of documents to return.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def limit(value)
         self.limiting = value
         self
       end
 
+      # Pluck the field values in memory.
+      #
+      # @example Get the values in memory.
+      #   context.pluck(:name)
+      #
+      # @param [ String | Symbol ] *fields Field(s) to pluck.
+      #
+      # @return [ Array ] The array of plucked values.
       def pluck(*fields)
-        fields = Array.wrap(fields)
-        documents.map do |doc|
-          if fields.size == 1
-            doc[fields.first]
-          else
-            fields.map { |n| doc[n] }.compact
-          end
-        end.compact
+        documents.pluck(*fields)
+      end
+
+      # Tally the field values in memory.
+      #
+      # @example Get the counts of values in memory.
+      #   context.tally(:name)
+      #
+      # @param [ String | Symbol ] field Field to tally.
+      #
+      # @return [ Hash ] The hash of counts.
+      def tally(field)
+        return documents.each_with_object({}) do |d, acc|
+          v = retrieve_value_at_path(d, field)
+          acc[v] ||= 0
+          acc[v] += 1
+        end
       end
 
       # Skips the provided number of documents.
@@ -206,7 +273,7 @@ module Mongoid
       #
       # @param [ Integer ] value The number of documents to skip.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def skip(value)
         self.skipping = value
         self
@@ -220,7 +287,7 @@ module Mongoid
       # @param [ Hash ] values The sorting values as field/direction(1/-1)
       #   pairs.
       #
-      # @return [ Mongo ] The context.
+      # @return [ Memory ] The context.
       def sort(values)
         in_place_sort(values) and self
       end
@@ -413,6 +480,62 @@ module Mongoid
 
       def _session
         @criteria.send(:_session)
+      end
+
+      # Retrieve the value for the current document at the given field path.
+      #
+      # For example, if I have the following models:
+      #
+      #   User has_many Accounts
+      #   address is a hash on Account
+      #
+      #   u = User.new(accounts: [ Account.new(address: { street: "W 50th" }) ])
+      #   retrieve_value_at_path(u, "user.accounts.address.street")
+      #   # => [ "W 50th" ]
+      #
+      # Note that the result is in an array since accounts is an array. If it
+      # was nested in two arrays the result would be in a 2D array.
+      #
+      # @param [ Object ] document The object to traverse the field path.
+      # @param [ String ] field_path The dotted string that represents the path
+      #   to the value.
+      #
+      # @return [ Object | nil ] The value at the given field path or nil if it
+      #   doesn't exist.
+      def retrieve_value_at_path(document, field_path)
+        return if field_path.blank? || !document
+        segment, remaining = field_path.to_s.split('.', 2)
+
+        curr = if document.is_a?(Document)
+          # Retrieves field for segment to check localization. Only does one
+          # iteration since there's no dots
+          res = if remaining
+            field = document.class.traverse_association_tree(segment)
+            # If this is a localized field, and there are remaining, get the
+            # _translations hash so that we can get the specified translation in
+            # the remaining
+            if field&.localized?
+              document.send("#{segment}_translations")
+            end
+          end
+          res.nil? ? document.send(segment) : res
+        elsif document.is_a?(Hash)
+          # TODO: Remove the indifferent access when implementing MONGOID-5410.
+          document.key?(segment.to_s) ?
+            document[segment.to_s] :
+            document[segment.to_sym]
+        else
+          nil
+        end
+
+        return curr unless remaining
+
+        if curr.is_a?(Array)
+          # compact is used for consistency with server behavior.
+          curr.map { |d| retrieve_value_at_path(d, remaining) }.compact
+        else
+          retrieve_value_at_path(curr, remaining)
+        end
       end
     end
   end

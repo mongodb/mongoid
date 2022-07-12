@@ -12,19 +12,19 @@ describe Mongoid::Errors::NoEnvironment do
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "Could not load the configuration since no environment was defined."
+        "Mongoid could not determine the environment"
       )
     end
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Mongoid attempted to find the appropriate environment but no Rails.env"
+        "it was not specified in any of the following locations"
       )
     end
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "Make sure some environment is set from the mentioned options"
+        "Please ensure an environment is set"
       )
     end
   end

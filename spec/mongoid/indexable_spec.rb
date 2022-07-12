@@ -191,7 +191,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when using a custom discriminator_key" do 
+    context "when using a custom discriminator_key" do
       context "when indexes have not been added" do
         let(:klass) do
           Class.new do
@@ -202,15 +202,15 @@ describe Mongoid::Indexable do
             end
           end
         end
-  
+
         before do
           klass.add_indexes
         end
-  
+
         let(:spec) do
           klass.index_specification(dkey: 1)
         end
-  
+
         it "adds the _type index" do
           expect(spec.options).to eq(unique: false, background: true)
         end

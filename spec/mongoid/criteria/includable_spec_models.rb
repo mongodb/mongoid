@@ -41,3 +41,14 @@ end
 class IncAuthor
   include Mongoid::Document
 end
+
+class IncPost
+  include Mongoid::Document
+  belongs_to :person, class_name: "IncPerson"
+end
+
+class IncPerson
+  include Mongoid::Document
+  has_many :posts, class_name: "IncPost"
+  field :name
+end

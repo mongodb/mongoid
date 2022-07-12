@@ -2516,7 +2516,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           it "raises an error" do
             expect {
               preference
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Preference with id\(s\)/)
           end
         end
 
@@ -2531,7 +2531,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
             it "raises an error" do
               expect {
                 person.preferences.find(BSON::ObjectId.new)
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Preference with id\(s\)/)
             end
           end
 
@@ -2580,7 +2580,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           it "raises an error" do
             expect {
               preferences
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Preference with id\(s\)/)
           end
         end
 
@@ -2595,7 +2595,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
             it "raises an error" do
               expect {
                 person.preferences.find([ BSON::ObjectId.new ])
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Preference with id\(s\)/)
             end
           end
 
