@@ -852,8 +852,16 @@ cause a ``nil`` to be written:
 
 .. code::
 
-  User.new(name: [ "hello" ])
+  user = User.new(name: [ "hello" ])
   # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
+
+Note that the original uncastable values will be stored in the
+``attributes_before_type_cast`` hash with their field names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["hello"]
 
 
 .. _customizing-field-behavior:
