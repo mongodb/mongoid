@@ -99,8 +99,7 @@ module Mongoid
             end
 
             if value == "geoHaystack"
-              # TODO: Move this to Mongoid::Warnings as part of MONGOID-5419.
-              Mongoid.logger.warn("The geoHaystack type is deprecated.")
+              Mongoid::Warnings.warn_geo_haystack_deprecated
             end
           end
         end
