@@ -43,10 +43,12 @@ module Mongoid
           if object.acts_like?(:time) || object.acts_like?(:date)
             ::Date.new(object.year, object.month, object.day)
           elsif object.respond_to?(:to_date)
-            object.to_date
+            begin
+              object.to_date
+            rescue ArgumentError
+              nil
+            end
           end
-        rescue ArgumentError
-          nil
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
