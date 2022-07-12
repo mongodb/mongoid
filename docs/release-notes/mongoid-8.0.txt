@@ -634,3 +634,9 @@ ActiveRecord:
   - When reading a document from the database, the ``attributes_before_type_cast``
     hash contains the attributes as they appear in the database, as opposed to
     their ``demongoized`` form.
+
+
+Deprecated the ``geoHaystack``, ``geoSearch`` Options
+-----------------------------------------------------
+
+The ``geoHaystack`` and ``geoSearch`` options on indexes have been deprecated.
