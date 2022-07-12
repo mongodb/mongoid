@@ -722,7 +722,7 @@ module Mongoid
       #
       # @api private
       def inverse_sorting
-        sort = criteria.options[:sort] || { _id: 1 }
+        sort = view.sort || { _id: 1 }
         Hash[sort.map{|k, v| [k, -1*v]}]
       end
 
