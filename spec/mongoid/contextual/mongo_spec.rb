@@ -2248,7 +2248,7 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).exactly(3).times.and_call_original
+                  expect(context).to receive(:view).twice.and_call_original
                   expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
                 end
               end
@@ -2270,7 +2270,7 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).exactly(3).times.and_call_original
+                  expect(context).to receive(:view).twice.and_call_original
                   expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
                 end
               end
@@ -2706,7 +2706,7 @@ describe Mongoid::Contextual::Mongo do
         let(:limit) { 1 }
 
         it "hits the database" do
-          expect(context).to receive(:view).exactly(3).times.and_call_original
+          expect(context).to receive(:view).twice.and_call_original
           docs
         end
 
