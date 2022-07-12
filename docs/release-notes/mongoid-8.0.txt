@@ -81,10 +81,6 @@ The following is a table of the changes in functionality:
 |              | assigned, and does NOT |                        |                   |
 |              | respond to ``to_a``: 1 |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
-| Array/Set    | When reading a value   | return the value       | return ``nil``    |
-|              | that is not an array   |                        |                   |
-|              | from the database      |                        |                   |
-+--------------+------------------------+------------------------+-------------------+
 | Regexp       | When persisting and    | returns a              | returns a         |
 |              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``        |
 |              | the database           |                        |                   |
