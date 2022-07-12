@@ -75,11 +75,6 @@ functionality:
 |              | string is assigned:    |                        |                   |
 |              | "bogus value"          |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
-| Symbol       | When a value that does | return ``nil``         | return ``nil``    |
-|              | not respond to         |                        |                   |
-|              | ``to_sym`` is          |                        |                   |
-|              | assigned: ``[]``       |                        |                   |
-+--------------+------------------------+------------------------+-------------------+
 | Array/Set    | When a value that is   | raise ``InvalidValue`` | return ``nil``    |
 |              | not an array or set is | error                  |                   |
 |              | assigned, and does NOT |                        |                   |
