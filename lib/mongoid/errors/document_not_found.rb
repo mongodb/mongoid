@@ -29,7 +29,7 @@ module Mongoid
         @klass, @params = klass, params
         super(
           compose_message(
-            message_key(params),
+            message_key(params, unmatched),
             {
               klass: klass.name,
               searched: searched(params),
