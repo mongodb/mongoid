@@ -193,7 +193,7 @@ Mongoid 8.
 Deprecate ``:id_sort`` Option and Support ``limit`` on ``#first/last``
 ----------------------------------------------------------------------
 
-Mongoid 7.5 deprecates support for the ``:id_sort`` keyword argument for the
+Mongoid 7.5 deprecates the ``:id_sort`` keyword argument for the
 ``Criteria#first`` and ``Criteria#last`` methods. These methods have added
 support for adding a limit as a positional argument:
 
