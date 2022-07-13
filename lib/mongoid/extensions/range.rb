@@ -50,14 +50,17 @@ module Mongoid
         def demongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
-            hash = object.stringify_keys
-            hash.slice!('min', 'max', 'exclude_end')
+            hash = object.slice('min', 'max', 'exclude_end')
             unless hash.blank?
-              ::Range.new(hash["min"], hash["max"], hash["exclude_end"])
+              begin
+                ::Range.new(hash["min"] || hash[:min],
+                            hash["max"] || hash[:max],
+                            hash["exclude_end"] || hash[:exclude_end])
+              rescue ArgumentError # can be removed when Ruby version >= 2.7
+                nil
+              end
             end
           end
-        rescue ArgumentError # can be removed when Ruby version >= 2.7
-          nil
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
