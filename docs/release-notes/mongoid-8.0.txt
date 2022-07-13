@@ -85,7 +85,7 @@ The following is a table of the changes in functionality:
 |              | 1                      | method ``to_a`` for    |                   |
 |              |                        | 1:Integer              |                   |
 +--------------+------------------------+------------------------+-------------------+
-| Regexp       | When persisting and    | returns a              | return a          |
+| Regexp       | When persisting and    | return a               | return a          |
 |              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``        |
 |              | the database           |                        |                   |
 +--------------+------------------------+------------------------+-------------------+
@@ -107,7 +107,7 @@ The following is a table of the changes in functionality:
 |              |                        | for :bogus:Symbol      |                   |
 +--------------+------------------------+------------------------+-------------------+
 | All Other    | When an uncastable     | undefined behavior,    | return ``nil``    |
-| Types        | value is assigned      | occasionally raises    |                   |
+| Types        | value is assigned      | occasionally raise     |                   |
 |              |                        | ``NoMethodError``      |                   |
 +--------------+------------------------+------------------------+-------------------+
 
