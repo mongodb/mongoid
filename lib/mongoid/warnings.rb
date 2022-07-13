@@ -20,6 +20,9 @@ module Mongoid
         end
       end
     end
+
+    warning :geo_haystack_deprecated, 'The geoHaystack type is deprecated.'
+    warning :as_json_compact_deprecated, '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
+    warning :symbol_type_deprecated, 'The BSON Symbol type is deprecated by MongoDB. Please use String or StringifiedSymbol field types instead of the Symbol field type'
   end
 end
-

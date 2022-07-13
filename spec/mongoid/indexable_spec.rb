@@ -423,6 +423,18 @@ describe Mongoid::Indexable do
       end
     end
 
+    context "when providing a geo haystack index with a bucket_size" do
+
+      let(:message) do
+        'The geoHaystack type is deprecated.'
+      end
+
+      it "logs a deprecation warning" do
+        expect(Mongoid::Warnings).to receive(:warn_geo_haystack_deprecated)
+        klass.index({ location: "geoHaystack" }, { min: -200, max: 200, bucket_size: 0.5 })
+      end
+    end
+
     context "when providing a Spherical Geospatial index" do
 
       before do

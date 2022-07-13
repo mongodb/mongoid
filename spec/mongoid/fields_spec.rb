@@ -443,25 +443,25 @@ describe Mongoid::Fields do
     context "when the Symbol type is used" do
 
       before do
-        Mongoid::Fields::Validators::Macro.class_eval do
-          @field_type_is_symbol_warned = false
+        Mongoid::Warnings.class_eval do
+          @symbol_type_deprecated = false
         end
       end
 
       after do
-        Band.fields.delete("should_warn")
+        Label.fields.delete("should_warn")
       end
 
       it "warns that the BSON symbol type is deprecated" do
         expect(Mongoid.logger).to receive(:warn)
 
-        Band.field :should_warn, type: Symbol
+        Label.field :should_warn, type: Symbol
       end
 
       it "warns on first use of Symbol type only" do
         expect(Mongoid.logger).to receive(:warn).once
 
-        Band.field :should_warn, type: Symbol
+        Label.field :should_warn, type: Symbol
       end
 
       context 'when using Symbol field type in multiple classes' do
@@ -472,7 +472,7 @@ describe Mongoid::Fields do
         it "warns on first use of Symbol type only" do
           expect(Mongoid.logger).to receive(:warn).once
 
-          Band.field :should_warn, type: Symbol
+          Label.field :should_warn, type: Symbol
           Truck.field :should_warn, type: Symbol
         end
       end
@@ -482,7 +482,7 @@ describe Mongoid::Fields do
 
       it "raises an error" do
         expect {
-          Band.field :unacceptable, bad: true
+          Label.field :unacceptable, bad: true
         }.to raise_error(Mongoid::Errors::InvalidFieldOption)
       end
     end
