@@ -85,9 +85,26 @@ The following is a table of the changes in functionality:
 |              | 1                      | method ``to_a`` for    |                   |
 |              |                        | 1:Integer              |                   |
 +--------------+------------------------+------------------------+-------------------+
-| Regexp       | When persisting and    | returns a              | returns a         |
+| Regexp       | When persisting and    | returns a              | return a          |
 |              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``        |
 |              | the database           |                        |                   |
++--------------+------------------------+------------------------+-------------------+
+| Time/DateTime| When assigning a       | raise ``NoMethodError``| return ``nil``    |
+|              | bogus value: ``:bogus``| Exception: undefined   |                   |
+|              |                        | method ``to_i``        |                   |
+|              |                        | for :bogus:Symbol      |                   |
++--------------+------------------------+------------------------+-------------------+
+| Time/DateTime| When demongoizing a    | raise ``NoMethodError``| "bogus":          |
+|              | non-Time value:        | Exception: undefined   | return ``nil``    |
+|              | "bogus",               | method ``getlocal``    |                   |
+|              | ``Date.today``         | for "bogus":String     | ``Date.today``:   |
+|              |                        |                        | return a          |
+|              |                        |                        | ``Time/DateTime`` |
++--------------+------------------------+------------------------+-------------------+
+| Date         | When assigning or      | raise ``NoMethodError``| return ``nil``    |
+|              | demongoizing a bogus   | Exception: undefined   |                   |
+|              | value: :bogus          | method ``year``        |                   |
+|              |                        | for :bogus:Symbol      |                   |
 +--------------+------------------------+------------------------+-------------------+
 | All Other    | When an uncastable     | undefined behavior,    | return ``nil``    |
 | Types        | value is assigned      | occasionally raises    |                   |

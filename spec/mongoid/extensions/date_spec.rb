@@ -54,10 +54,12 @@ describe Mongoid::Extensions::Date do
     end
 
     it "keeps the date" do
-      expect(Date.demongoize(time)).to eq(expected)
+      expect(Date.demongoize(expected)).to eq(expected)
+      expect(Date.demongoize(expected)).to be_a(Date)
     end
 
     it "converts to a date" do
+      expect(Date.demongoize(time)).to eq(expected)
       expect(Date.demongoize(time)).to be_a(Date)
     end
 
@@ -80,6 +82,7 @@ describe Mongoid::Extensions::Date do
       let(:date) { "2022-07-11 14:03:42 -0400" }
 
       it "returns a date" do
+        pending "MONGOID-5315"
         expect(Date.demongoize(date)).to eq(date.to_date)
       end
     end
@@ -109,12 +112,39 @@ describe Mongoid::Extensions::Date do
       Time.utc(2010, 1, 1, 0, 0, 0, 0)
     end
 
-    let(:mongoized) do
-      Date.mongoize(date)
+    let(:datetime) do
+      time.to_datetime
     end
 
-    it "returns the date as a time" do
-      expect(mongoized).to eq(time)
+    context "when the value is a date" do
+
+      it "converts to a date" do
+        expect(Date.mongoize(date)).to eq(date)
+        expect(Date.mongoize(date)).to be_a(Time)
+      end
+    end
+
+    context "when the value is a time" do
+
+      it "keeps the time" do
+        expect(Date.mongoize(time)).to eq(date)
+        expect(Date.mongoize(time)).to be_a(Time)
+      end
+    end
+
+    context "when the value is a datetime" do
+
+      it "converts to a time" do
+        expect(Date.mongoize(datetime)).to eq(date)
+        expect(Date.mongoize(datetime)).to be_a(Time)
+      end
+    end
+
+    context "when the value is uncastable" do
+
+      it "returns nil" do
+        expect(Date.mongoize("bogus")).to be_nil
+      end
     end
   end
 end

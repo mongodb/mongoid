@@ -50,16 +50,14 @@ module Mongoid
           return nil if object.blank?
           if object.acts_like?(:time)
             object = object.getlocal unless Mongoid::Config.use_utc?
-            if Mongoid::Config.use_activesupport_time_zone?
-              object = object.in_time_zone(Mongoid.time_zone)
-            end
-            object
           elsif object.acts_like?(:date)
-            time = ::Date.demongoize(object).to_time
-            if Mongoid::Config.use_activesupport_time_zone?
-              time = time.in_time_zone(Mongoid.time_zone)
-            end
-            time
+            object = ::Date.demongoize(object).to_time
+          end
+
+          if Mongoid::Config.use_activesupport_time_zone?
+            object.in_time_zone(Mongoid.time_zone)
+          else
+            object
           end
         end
 
