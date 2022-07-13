@@ -892,16 +892,18 @@ database:
 
   { _id: ..., name: [ "Mike", "Trout" ] }
 
-Reading this document from the database will result in the model's name field containing ``nil``:
+Reading this document from the database will result in the model's name field
+containing ``nil``:
 
 .. code::
 
   User.first.name
   # => nil
 
-The database value of type array cannot be stored in the attribute, since the array can't
-be coerced to an Integer. Note that the original uncastable values will be
-stored in the ``attributes_before_type_cast`` hash with their field names:
+The database value of type array cannot be stored in the attribute, since the
+array can't be coerced to an Integer. Note that the original uncastable values
+will be stored in the ``attributes_before_type_cast`` hash with their field
+names:
 
 .. code::
 
@@ -911,9 +913,9 @@ stored in the ``attributes_before_type_cast`` hash with their field names:
 .. note::
 
   The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
-  been changed to permit automatic persistence of mutated container attributes. See
-  `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_ for a longer discussion of this
-  topic.
+  been changed to permit automatic persistence of mutated container attributes.
+  See `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_ for a
+  longer discussion of this topic.
 
 
 .. _customizing-field-behavior:
