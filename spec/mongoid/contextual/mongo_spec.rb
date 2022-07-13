@@ -1494,7 +1494,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "does not hit the database" do
-            expect(context).to receive(:view).never
+            expect_any_instance_of(Mongo::Collection::View).to receive(:first).never
             expect(context).to be_exists
           end
         end

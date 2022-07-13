@@ -2,6 +2,7 @@
 
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
+require "mongoid/contextual/cacheable"
 require "mongoid/contextual/command"
 require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
@@ -16,6 +17,7 @@ module Mongoid
       include Atomic
       include Association::EagerLoadable
       include Queryable
+      include Cacheable
 
       Mongoid.deprecate(self, :geo_near)
 
@@ -37,16 +39,6 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
-      # Is the context cached?
-      #
-      # @example Is the context cached?
-      #   context.cached?
-      #
-      # @return [ true, false ] If the context is cached.
-      def cached?
-        !!@cache
-      end
-
       # Get the number of documents matching the query.
       #
       # @example Get the number of matching documents.
@@ -66,7 +58,12 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        try_cache(:count) { view.count_documents(options) }
+        cache_options = options.merge(
+          method: :count,
+          sort: nil,
+          projection: nil,
+        )
+        try_cache(cache_options) { view.count_documents(options) }
       end
 
       # Get the estimated number of documents matching the query.
@@ -172,10 +169,16 @@ module Mongoid
       # @return [ true, false ] If the count is more than zero.
       def exists?
         return !documents.empty? if cached? && cache_loaded?
-        return @count > 0 if instance_variable_defined?(:@count)
+        count_options = { method: :count, sort: nil, projection: nil }
+        return get_from_cache(count_options) > 0 if operation_cached?(count_options)
 
-        try_cache(:exists) do
-          !!(view.projection(_id: 1).limit(1).first)
+        options = {
+          projection: { _id: 1 },
+          limit: 1,
+          method: :exists
+        }
+        try_cache(options) do
+          !!(view.projection(options[:projection]).limit(options[:limit]).first)
         end
       end
 
@@ -618,49 +621,6 @@ module Mongoid
         update_documents(attributes, :update_many, opts)
       end
 
-      private
-
-      # yield the block given or return the cached value
-      #
-      # @param [ String, Symbol ] key The instance variable name
-      #
-      # @return the result of the block
-      def try_cache(key, &block)
-        unless cached?
-          yield
-        else
-          unless ret = instance_variable_get("@#{key}")
-            instance_variable_set("@#{key}", ret = yield)
-          end
-          ret
-        end
-      end
-
-      # yield the block given or return the cached value
-      #
-      # @param [ String, Symbol ] key The instance variable name
-      # @param [ Integer | nil ] n The number of documents requested or nil
-      #   if none is requested.
-      #
-      # @return [ Object ] The result of the block.
-      def try_numbered_cache(key, n, &block)
-        unless cached?
-          yield if block_given?
-        else
-          len = n || 1
-          ret = instance_variable_get("@#{key}")
-          if !ret || ret.length < len
-            instance_variable_set("@#{key}", ret = Array.wrap(yield))
-          elsif !n
-            ret.is_a?(Array) ? ret.first : ret
-          elsif ret.length > len
-            ret.first(n)
-          else
-            ret
-          end
-        end
-      end
-
       # Update the documents for the provided method.
       #
       # @api private
@@ -724,31 +684,6 @@ module Mongoid
       def inverse_sorting
         sort = view.sort || { _id: 1 }
         Hash[sort.map{|k, v| [k, -1*v]}]
-      end
-
-      # Is the cache able to be added to?
-      #
-      # @api private
-      #
-      # @example Is the context cacheable?
-      #   context.cacheable?
-      #
-      # @return [ true, false ] If caching, and the cache isn't loaded.
-      def cacheable?
-        cached? && !cache_loaded?
-      end
-
-      # Is the cache fully loaded? Will be true if caching after one full
-      # iteration.
-      #
-      # @api private
-      #
-      # @example Is the cache loaded?
-      #   context.cache_loaded?
-      #
-      # @return [ true, false ] If the cache is loaded.
-      def cache_loaded?
-        !!@cache_loaded
       end
 
       # Get the documents for cached queries.
