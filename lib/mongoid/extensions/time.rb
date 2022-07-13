@@ -55,7 +55,11 @@ module Mongoid
             end
             object
           elsif object.acts_like?(:date)
-            ::Date.demongoize(object).to_time
+            time = ::Date.demongoize(object).to_time
+            if Mongoid::Config.use_activesupport_time_zone?
+              time = time.in_time_zone(Mongoid.time_zone)
+            end
+            time
           end
         end
 
