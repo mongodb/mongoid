@@ -10,7 +10,7 @@ describe Mongoid::Warnings do
 
       let(:id) { :geo_haystack_deprecated }
       let(:message) do
-        'The geoHaystack option is deprecated.'
+        'The geoHaystack type is deprecated.'
       end
 
       before do
