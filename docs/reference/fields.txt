@@ -877,7 +877,7 @@ Reading Uncastable Values
 
 When documents in the databae contain values of different types than their
 represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
-it will assign ``nil``. Consider the following model and document in the
+it will replace the value with ``nil``. Consider the following model and document in the
 database:
 
 .. code::
@@ -892,17 +892,16 @@ database:
 
   { _id: ..., name: [ "Mike", "Trout" ] }
 
-Reading this document from the database will result in a ``nil`` being written
-to the model's name field:
+Reading this document from the database will result in the model's name field containing ``nil``:
 
 .. code::
 
   User.first.name
   # => nil
 
-Reading an array to a field of type Integer doesn't work since an array can't
+The database value of type array cannot be stored in the attribute, since the array can't
 be coerced to an Integer. Note that the original uncastable values will be
-stored in the ``attributes_before_type_cast`` hash with their field names.
+stored in the ``attributes_before_type_cast`` hash with their field names:
 
 .. code::
 
@@ -912,9 +911,9 @@ stored in the ``attributes_before_type_cast`` hash with their field names.
 .. note::
 
   The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
-  changed to prevent bugs when modifying and saving those objects. See
-  https://jira.mongodb.org/browse/MONGOID-2951 for a longer discussion on these
-  bugs.
+  been changed to permit automatic persistence of mutated container attributes. See
+  `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_ for a longer discussion of this
+  topic.
 
 
 .. _customizing-field-behavior:
