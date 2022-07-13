@@ -224,6 +224,7 @@ module Mongoid
         process_attributes(attrs) do
           yield(self) if block_given?
         end
+        @attributes_before_type_cast = @attributes.merge(attributes_before_type_cast)
 
         if execute_callbacks
           apply_post_processed_defaults
@@ -318,6 +319,10 @@ module Mongoid
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
+        # TODO: remove the to_h when the legacy_attributes flag is removed.
+        # The to_h ensures that we don't accidentally make attributes_before_type_cast
+        # a BSON::Document.
+        doc.instance_variable_set(:@attributes_before_type_cast, attributes&.to_h.dup)
 
         if execute_callbacks
           doc.apply_defaults

@@ -813,6 +813,435 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#tally" do
+    let(:fans1) { [ Fanatic.new(age:1), Fanatic.new(age:2) ] }
+    let(:fans2) { [ Fanatic.new(age:1), Fanatic.new(age:2) ] }
+    let(:fans3) { [ Fanatic.new(age:1), Fanatic.new(age:3) ] }
+
+    let(:genres1) { [ { x: 1, y: { z: 1 } }, { x: 2, y: { z: 2 } }, { y: 3 } ]}
+    let(:genres2) { [ { x: 1, y: { z: 1 } }, { x: 2, y: { z: 2 } }, { y: 4 } ]}
+    let(:genres3) { [ { x: 1, y: { z: 1 } }, { x: 3, y: { z: 3 } }, { y: 5 } ]}
+
+    let(:label1) {  Label.new(name: "Atlantic") }
+    let(:label2) {  Label.new(name: "Atlantic") }
+    let(:label3) {  Label.new(name: "Columbia") }
+
+    before do
+      Band.create!(origin: "tally", name: "Depeche Mode", years: 30, sales: "1E2", label: label1, genres: genres1)
+      Band.create!(origin: "tally", name: "New Order", years: 30, sales: "2E3", label: label2, genres: genres2)
+      Band.create!(origin: "tally", name: "10,000 Maniacs", years: 30, sales: "1E2", label: label3, genres: genres3)
+      Band.create!(origin: "tally2", fanatics: fans1, genres: [1, 2])
+      Band.create!(origin: "tally2", fanatics: fans2, genres: [1, 2])
+      Band.create!(origin: "tally2", fanatics: fans3, genres: [1, 3])
+    end
+
+    let(:criteria) { Band.where(origin: "tally") }
+
+    context "when tallying a string" do
+      let(:tally) do
+        criteria.tally(:name)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq("Depeche Mode" => 1, "New Order" => 1, "10,000 Maniacs" => 1)
+      end
+    end
+
+    context "using an aliased field" do
+      let(:tally) do
+        criteria.tally(:years)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(30 => 3)
+      end
+    end
+
+    context "when tallying a demongoizable field" do
+      let(:tally) do
+        criteria.tally(:sales)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(BigDecimal("1E2") => 2, BigDecimal("2E3") => 1)
+      end
+    end
+
+    context "when tallying a localized field" do
+      before do
+        I18n.locale = :en
+        d1 = Dictionary.create!(description: 'en1')
+        d2 = Dictionary.create!(description: 'en1')
+        d3 = Dictionary.create!(description: 'en1')
+        d4 = Dictionary.create!(description: 'en2')
+        I18n.locale = :de
+        d1.description = 'de1'
+        d2.description = 'de1'
+        d3.description = 'de2'
+        d4.description = 'de3'
+        d1.save!
+        d2.save!
+        d3.save!
+        d4.save!
+
+        I18n.locale = :en
+      end
+
+      context "when getting the demongoized field" do
+        let(:tallied) do
+          Dictionary.tally(:description)
+        end
+
+        it "returns the translation for the current locale" do
+          expect(tallied).to eq("en1" => 3, "en2" => 1)
+        end
+      end
+
+      context "when getting a specific locale" do
+        let(:tallied) do
+          Dictionary.tally("description.de")
+        end
+
+        it "returns the translation for the the specific locale" do
+          expect(tallied).to eq("de1" => 2, "de2" => 1, "de3" => 1)
+        end
+      end
+
+      context "when getting the full hash" do
+        let(:tallied) do
+          Dictionary.tally("description_translations")
+        end
+
+        it "returns the correct hash" do
+          expect(tallied).to eq(
+            {"de" => "de1", "en" => "en1" } => 2,
+            {"de" => "de2", "en" => "en1" } => 1,
+            {"de" => "de3", "en" => "en2" } => 1
+          )
+        end
+      end
+    end
+
+    context "when tallying an embedded localized field" do
+
+      before do
+        I18n.locale = :en
+        address1a = Address.new(name: "en1")
+        address1b = Address.new(name: "en2")
+        address2a = Address.new(name: "en1")
+        address2b = Address.new(name: "en3")
+        I18n.locale = :de
+        address1a.name = "de1"
+        address1b.name = "de2"
+        address2a.name = "de1"
+        address2b.name = "de3"
+        Person.create!(addresses: [ address1a, address1b ])
+        Person.create!(addresses: [ address2a, address2b ])
+
+        I18n.locale = :en
+      end
+
+      context "when getting the demongoized field" do
+        let(:tallied) do
+          Person.tally("addresses.name")
+        end
+
+        it "returns the translation for the current locale" do
+          expect(tallied).to eq(
+            [ "en1", "en2" ] => 1,
+            [ "en1", "en3" ] => 1,
+          )
+        end
+      end
+
+      context "when getting a specific locale" do
+        let(:tallied) do
+          Person.tally("addresses.name.de")
+        end
+
+        it "returns the translation for the the specific locale" do
+          expect(tallied).to eq(
+            [ "de1", "de2" ] => 1,
+            [ "de1", "de3" ] => 1,
+          )
+        end
+      end
+
+      context "when getting the full hash" do
+        let(:tallied) do
+          Person.tally("addresses.name_translations")
+        end
+
+        it "returns the correct hash" do
+          expect(tallied).to eq(
+            [{ "de" => "de1", "en" => "en1" }, { "de" => "de2", "en" => "en2" }] => 1,
+            [{ "de" => "de1", "en" => "en1" }, { "de" => "de3", "en" => "en3" }] => 1,
+          )
+        end
+      end
+
+    end
+
+    context "when tallying an embedded field" do
+      let(:tally) do
+        criteria.tally("label.name")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq("Atlantic" => 2, "Columbia" => 1)
+      end
+    end
+
+    context "when tallying an element in an embeds_many field" do
+      let(:criteria) { Band.where(origin: "tally2") }
+
+      let(:tally) do
+        criteria.tally("fanatics.age")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying an embeds_many field" do
+      let(:criteria) { Band.where(origin: "tally2") }
+
+      let(:tally) do
+        criteria.tally("fanatics")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          fans1.map(&:attributes) => 1,
+          fans2.map(&:attributes) => 1,
+          fans3.map(&:attributes) => 1,
+        )
+      end
+    end
+
+    context "when tallying a field of type array" do
+      let(:criteria) { Band.where(origin: "tally2") }
+
+      let(:tally) do
+        criteria.tally("genres")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying an element from an array of hashes" do
+      let(:criteria) { Band.where(origin: "tally") }
+
+      let(:tally) do
+        criteria.tally("genres.x")
+      end
+
+      it "returns the correct hash without the nil keys" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying an element from an array of hashes; with duplicate" do
+
+      before do
+        Band.create!(origin: "tally", genres: [ { x: 1 }, {x: 1} ] )
+      end
+
+      let(:criteria) { Band.where(origin: "tally") }
+
+      let(:tally) do
+        criteria.tally("genres.x")
+      end
+
+      it "returns the correct hash without the nil keys" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1,
+          [1, 1] => 1,
+        )
+      end
+    end
+
+    context "when tallying an aliased field of type array" do
+
+      before do
+        Person.create!(array: [ 1, 2 ])
+        Person.create!(array: [ 1, 3 ])
+      end
+
+      let(:tally) do
+        Person.tally("array")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 1,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when going multiple levels deep in arrays" do
+      let(:criteria) { Band.where(origin: "tally") }
+
+      let(:tally) do
+        criteria.tally("genres.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when going multiple levels deep in an array" do
+      let(:criteria) { Band.where(origin: "tally") }
+
+      let(:tally) do
+        criteria.tally("genres.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      before do
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
+
+      let(:tally) do
+        Person.tally("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [ [ 1, 2 ] ] => 2,
+          [ [ 1, 3 ] ] => 1
+        )
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      before do
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
+
+      let(:tally) do
+        Person.tally("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [ [ 1, 2 ], [ 1, 2 ] ] => 2,
+          [ [ 1, 3 ], [ 1, 3 ] ] => 1
+        )
+      end
+    end
+
+    context "when some keys are missing" do
+      before do
+        3.times { Band.create!(origin: "tally") }
+      end
+
+      let(:tally) do
+        criteria.tally(:name)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          "Depeche Mode" => 1,
+          "New Order" => 1,
+          "10,000 Maniacs" => 1,
+          nil => 3
+        )
+      end
+    end
+
+    context "when the first element is an embeds_one" do
+      before do
+        Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 2) ]))
+        Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 2) ]))
+        Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 3) ]))
+      end
+
+      let(:tally) do
+        Person.tally("name.translations.language")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying demongoizable values from typeless fields" do
+
+      let!(:person1) { Person.create!(ssn: /hello/) }
+      let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
+      let(:tally) { Person.tally("ssn") }
+
+      context "< BSON 5" do
+        max_bson_version '4.99.99'
+
+        it "stores the correct types in the database" do
+          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
+          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+        end
+
+        it "tallies the correct type" do
+          tally.keys.map(&:class).sort do |a,b|
+            a.to_s <=> b.to_s
+          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+        end
+      end
+
+      context ">= BSON 5" do
+        min_bson_version "5.0"
+
+        it "stores the correct types in the database" do
+          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
+          Person.find(person2.id).ssn.should be_a BigDeimal
+        end
+
+        it "tallies the correct type" do
+          tally.keys.map(&:class).sort do |a,b|
+            a.to_s <=> b.to_s
+          end.should == [BigDecimal, BSON::Regexp::Raw]
+        end
+      end
+    end
+  end
+
   describe "#each" do
 
     before do
@@ -1424,7 +1853,7 @@ describe Mongoid::Contextual::Mongo do
       it "deletes the document from the database" do
         expect {
           depeche.reload
-        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
       end
 
       context 'when a collation is specified on the criteria' do
@@ -1449,7 +1878,7 @@ describe Mongoid::Contextual::Mongo do
         it "deletes the document from the database" do
           expect {
             depeche.reload
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
         end
       end
     end
@@ -1484,6 +1913,10 @@ describe Mongoid::Contextual::Mongo do
 
       let!(:new_order) do
         Band.create!(name: "New Order")
+      end
+
+      let!(:rolling_stones) do
+        Band.create!(name: "The Rolling Stones")
       end
 
       context "when the context is not cached" do
@@ -1526,14 +1959,14 @@ describe Mongoid::Contextual::Mongo do
         context "when there is sort on the context" do
 
           it "follows the main sort" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
           end
         end
 
         context "when subsequently calling #last" do
 
           it "returns the correct document" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
             expect(context.last).to eq(depeche_mode)
           end
         end
@@ -1558,26 +1991,7 @@ describe Mongoid::Contextual::Mongo do
 
           it 'returns the last document, sorted by _id' do
             expect(context.send(method)).to eq(depeche_mode)
-            expect(context.last).to eq(new_order)
-          end
-        end
-
-        context 'with option { sort: :none }' do
-
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'does not apply the sort on _id' do
-            expect(context.send(method, opts)).to eq(depeche_mode)
-          end
-
-          context 'when calling #last' do
-
-            it 'does not apply a sort on _id' do
-              expect(context.send(method, opts)).to eq(depeche_mode)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
+            expect(context.last).to eq(rolling_stones)
           end
         end
       end
@@ -1592,35 +2006,15 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-
         it 'applies the criteria sort' do
-          expect(context.send(method)).to eq(new_order)
+          expect(context.send(method)).to eq(rolling_stones)
         end
 
         context 'when calling #last' do
 
           it 'applies the criteria sort' do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
             expect(context.last).to eq(depeche_mode)
-          end
-        end
-
-        context 'with option { sort: :none }' do
-
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'applies the criteria sort' do
-            expect(context.send(method, opts)).to eq(new_order)
-          end
-
-          context 'when calling #last' do
-
-            it 'applies the criteria sort' do
-              expect(context.send(method, opts)).to eq(new_order)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
           end
         end
       end
@@ -1638,14 +2032,14 @@ describe Mongoid::Contextual::Mongo do
         context "when there is sort on the context" do
 
           it "follows the main sort" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
           end
         end
 
         context "when subsequently calling #last" do
 
           it "returns the correct document" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
             expect(context.last).to eq(depeche_mode)
           end
         end
@@ -1683,6 +2077,640 @@ describe Mongoid::Contextual::Mongo do
             expect(context).to receive(:view).never
             expect(context.send(method)).to eq(depeche_mode)
           end
+        end
+      end
+
+      context "when including a limit" do
+
+        context "when the context is not cached" do
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          context "when the limit is 1" do
+            let(:criteria) do
+              Band.criteria
+            end
+
+            let(:docs) do
+              context.send(method, 1)
+            end
+
+            it "returns an array of documents" do
+              expect(docs).to eq([ depeche_mode ])
+            end
+          end
+
+          context "when the limit is >1" do
+            let(:criteria) do
+              Band.criteria
+            end
+
+            let(:docs) do
+              context.send(method, 2)
+            end
+
+            it "returns the number of documents in order" do
+              expect(docs).to eq([ depeche_mode, new_order ])
+            end
+          end
+
+          context 'when the criteria has a collation' do
+            min_server_version '3.4'
+
+            let(:criteria) do
+              Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+            end
+
+            it "returns the first matching document" do
+              expect(context.send(method, 1)).to eq([ depeche_mode ])
+            end
+          end
+        end
+
+        context "when the context is cached" do
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          context "when the whole context is loaded" do
+
+            before do
+              context.to_a
+            end
+
+            context "when all of the documents are cached" do
+
+              let(:criteria) do
+                Band.all.cache
+              end
+
+              context "when requesting all of the documents" do
+
+                let(:docs) do
+                  context.send(method, 3)
+                end
+
+                it "returns all of the documents without touching the database" do
+                  expect(context).to receive(:view).never
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
+              end
+
+              context "when requesting fewer than all of the documents" do
+
+                let(:docs) do
+                  context.send(method, 2)
+                end
+
+                it "returns all of the documents without touching the database" do
+                  expect(context).to receive(:view).never
+                  expect(docs).to eq([ depeche_mode, new_order ])
+                end
+              end
+            end
+
+            context "when only one document is cached" do
+
+              let(:criteria) do
+                Band.where(name: "Depeche Mode").cache
+              end
+
+              context "when requesting one document" do
+
+                let(:docs) do
+                  context.send(method, 1)
+                end
+
+                it "returns one document without touching the database" do
+                  expect(context).to receive(:view).never
+                  expect(docs).to eq([ depeche_mode ])
+                end
+              end
+            end
+          end
+
+          context "when the first method was called before" do
+
+            let(:context) do
+              described_class.new(criteria)
+            end
+
+            let(:criteria) do
+              Band.all.cache
+            end
+
+            before do
+              context.first(before_limit)
+            end
+
+            let(:docs) do
+              context.send(method, limit)
+            end
+
+            context "when getting all of the documents before" do
+              let(:before_limit) { 3 }
+
+              context "when getting all of the documents" do
+                let(:limit) { 3 }
+
+                it "returns all documents without touching the database" do
+                  expect(context).to receive(:view).never
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
+              end
+
+              context "when getting fewer documents" do
+                let(:limit) { 2 }
+
+                it "returns the correct documents without touching the database" do
+                  expect(context).to receive(:view).never
+                  expect(docs).to eq([ depeche_mode, new_order ])
+                end
+              end
+            end
+
+            context "when getting fewer documents before" do
+              let(:before_limit) { 2 }
+
+              context "when getting the same number of documents" do
+                let(:limit) { 2 }
+
+                it "returns the correct documents without touching the database" do
+                  expect(context).to receive(:view).never
+                  expect(docs).to eq([ depeche_mode, new_order ])
+                end
+              end
+
+              context "when getting more documents" do
+                let(:limit) { 3 }
+
+                it "returns the correct documents and touches the database" do
+                  expect(context).to receive(:view).twice.and_call_original
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
+              end
+            end
+
+            context "when getting one document before" do
+              let(:before_limit) { 1 }
+
+              context "when getting one document" do
+                let(:limit) { 1 }
+
+                it "returns the correct documents without touching the database" do
+                  expect(context).to receive(:view).never
+                  expect(docs).to eq([ depeche_mode ])
+                end
+              end
+
+              context "when getting more than one document" do
+                let(:limit) { 3 }
+
+                it "returns the correct documents and touches the database" do
+                  expect(context).to receive(:view).twice.and_call_original
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
+              end
+            end
+          end
+        end
+      end
+
+      context "when calling #first then #last" do
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let(:criteria) do
+          Band.all.cache
+        end
+
+        before do
+          context.first(before_limit)
+        end
+
+        let(:docs) do
+          context.last(limit)
+        end
+
+        context "when getting one from the beginning and one from the end" do
+          let(:before_limit) { 2 }
+          let(:limit) { 1 }
+
+          it "gets the correct document" do
+            expect(docs).to eq([rolling_stones])
+          end
+        end
+      end
+    end
+  end
+
+  describe "#last" do
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    context "when the context is not cached" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the last matching document" do
+        expect(context.last).to eq(depeche_mode)
+      end
+
+      context 'when the criteria has a collation' do
+        min_server_version '3.4'
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        it "returns the last matching document" do
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+    end
+
+    context "when using .desc" do
+
+      let(:criteria) do
+        Band.desc(:name)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when there is sort on the context" do
+
+        it "follows the main sort" do
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+
+      context "when subsequently calling #first" do
+
+        it "returns the correct document" do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
+    end
+
+    context 'when the criteria has no sort' do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it 'applies a sort on _id' do
+        expect(context.last).to eq(rolling_stones)
+      end
+
+      context 'when calling #first' do
+
+        it 'returns the first document, sorted by _id' do
+          expect(context.last).to eq(rolling_stones)
+          expect(context.first).to eq(depeche_mode)
+        end
+      end
+    end
+
+    context 'when the criteria has a sort' do
+
+      let(:criteria) do
+        Band.desc(:name)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+
+      it 'applies the criteria sort' do
+        expect(context.last).to eq(depeche_mode)
+      end
+
+      context 'when calling #first' do
+
+        it 'applies the criteria sort' do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
+    end
+
+    context "when using .sort" do
+
+      let(:criteria) do
+        Band.all.sort(:name => -1).criteria
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when there is sort on the context" do
+
+        it "follows the main sort" do
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+
+      context "when subsequently calling #first" do
+
+        it "returns the correct document" do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
+    end
+
+    context "when the context is cached" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode").cache
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when the cache is loaded" do
+
+        before do
+          context.to_a
+        end
+
+        it "returns the last document without touching the database" do
+          expect(context).to receive(:view).never
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+
+      context "when last method was called before" do
+
+        before do
+          context.last
+        end
+
+        it "returns the last document without touching the database" do
+          expect(context).to receive(:view).never
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+    end
+
+    context "when including a limit" do
+
+      context "when the context is not cached" do
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when the limit is 1" do
+          let(:criteria) do
+            Band.criteria
+          end
+
+          let(:docs) do
+            context.last(1)
+          end
+
+          it "returns an array of documents" do
+            expect(docs).to eq([ rolling_stones ])
+          end
+        end
+
+        context "when the limit is >1" do
+          let(:criteria) do
+            Band.criteria
+          end
+
+          let(:docs) do
+            context.last(2)
+          end
+
+          it "returns the number of documents in order" do
+            expect(docs).to eq([ new_order, rolling_stones ])
+          end
+        end
+
+        context 'when the criteria has a collation' do
+          min_server_version '3.4'
+
+          let(:criteria) do
+            Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+          end
+
+          it "returns the first matching document" do
+            expect(context.last(1)).to eq([ depeche_mode ])
+          end
+        end
+      end
+
+      context "when the context is cached" do
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when the whole context is loaded" do
+
+          before do
+            context.to_a
+          end
+
+          context "when all of the documents are cached" do
+
+            let(:criteria) do
+              Band.all.cache
+            end
+
+            context "when requesting all of the documents" do
+
+              let(:docs) do
+                context.last(3)
+              end
+
+              it "returns all of the documents without touching the database" do
+                expect(context).to receive(:view).never
+                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+              end
+            end
+
+            context "when requesting fewer than all of the documents" do
+
+              let(:docs) do
+                context.last(2)
+              end
+
+              it "returns all of the documents without touching the database" do
+                expect(context).to receive(:view).never
+                expect(docs).to eq([ new_order, rolling_stones ])
+              end
+            end
+          end
+
+          context "when only one document is cached" do
+
+            let(:criteria) do
+              Band.where(name: "Depeche Mode").cache
+            end
+
+            context "when requesting one document" do
+
+              let(:docs) do
+                context.last(1)
+              end
+
+              it "returns one document without touching the database" do
+                expect(context).to receive(:view).never
+                expect(docs).to eq([ depeche_mode ])
+              end
+            end
+          end
+        end
+
+        context "when the last method was called before" do
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          let(:criteria) do
+            Band.all.cache
+          end
+
+          before do
+            context.last(before_limit)
+          end
+
+          let(:docs) do
+            context.last(limit)
+          end
+
+          context "when getting all of the documents before" do
+            let(:before_limit) { 3 }
+
+            context "when getting all of the documents" do
+              let(:limit) { 3 }
+
+              it "returns all documents without touching the database" do
+                expect(context).to receive(:view).never
+                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+              end
+            end
+
+            context "when getting fewer documents" do
+              let(:limit) { 2 }
+
+              it "returns the correct documents without touching the database" do
+                expect(context).to receive(:view).never
+                expect(docs).to eq([ new_order, rolling_stones ])
+              end
+            end
+          end
+
+          context "when getting fewer documents before" do
+            let(:before_limit) { 2 }
+
+            context "when getting the same number of documents" do
+              let(:limit) { 2 }
+
+              it "returns the correct documents without touching the database" do
+                expect(context).to receive(:view).never
+                expect(docs).to eq([ new_order, rolling_stones ])
+              end
+            end
+
+            context "when getting more documents" do
+              let(:limit) { 3 }
+
+              it "returns the correct documents and touches the database" do
+                expect(context).to receive(:view).twice.and_call_original
+                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+              end
+            end
+          end
+
+          context "when getting one document before" do
+            let(:before_limit) { 1 }
+
+            context "when getting one document" do
+              let(:limit) { 1 }
+
+              it "returns the correct documents without touching the database" do
+                expect(context).to receive(:view).never
+                expect(docs).to eq([ rolling_stones ])
+              end
+            end
+
+            context "when getting more than one document" do
+              let(:limit) { 3 }
+
+              it "returns the correct documents and touches the database" do
+                expect(context).to receive(:view).twice.and_call_original
+                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+              end
+            end
+          end
+        end
+      end
+    end
+
+    context "when calling #last then #first" do
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:criteria) do
+        Band.all.cache
+      end
+
+      before do
+        context.last(before_limit)
+      end
+
+      let(:docs) do
+        context.first(limit)
+      end
+
+      context "when getting one from the beginning and one from the end" do
+        let(:before_limit) { 2 }
+        let(:limit) { 1 }
+
+        it "hits the database" do
+          expect(context).to receive(:view).twice.and_call_original
+          docs
+        end
+
+        it "gets the correct document" do
+          expect(docs).to eq([ depeche_mode ])
         end
       end
     end
@@ -1836,6 +2864,80 @@ describe Mongoid::Contextual::Mongo do
 
     it "limits the results" do
       expect(context.limit(1).entries).to eq([ depeche_mode ])
+    end
+  end
+
+  describe "#take" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "takes the correct number results" do
+      expect(context.take(2)).to eq([ depeche_mode, new_order ])
+    end
+
+    it "returns an array when passing 1" do
+      expect(context.take(1)).to eq([ depeche_mode ])
+    end
+
+    it "does not return an array when not passing an argument" do
+      expect(context.take).to eq(depeche_mode)
+    end
+
+    it "returns all the documents taking more than whats in the db" do
+      expect(context.take(5)).to eq([ depeche_mode, new_order, rolling_stones ])
+    end
+  end
+
+  describe "#take!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "takes the first document" do
+      expect(context.take!).to eq(depeche_mode)
+    end
+
+    context "when there are no documents" do
+      it "raises an error" do
+        expect do
+          Person.take!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Person./)
+      end
     end
   end
 

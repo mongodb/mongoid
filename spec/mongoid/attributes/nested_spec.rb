@@ -1356,7 +1356,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.addresses_attributes =
                     { "foo" => { "id" => "test", "street" => "Test" } }
-                }.to raise_error(Mongoid::Errors::DocumentNotFound)
+                }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Address with id\(s\)/)
               end
             end
           end
@@ -3015,7 +3015,7 @@ describe Mongoid::Attributes::Nested do
                       { "0" =>
                         { "id" => BSON::ObjectId.new.to_s, "title" => "Rogue" }
                       }
-                  }.to raise_error(Mongoid::Errors::DocumentNotFound)
+                  }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
                 end
               end
             end
@@ -3049,7 +3049,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.posts_attributes =
                     { "foo" => { "id" => "test", "title" => "Test" } }
-                }.to raise_error(Mongoid::Errors::DocumentNotFound)
+                }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
               end
             end
           end
@@ -3766,7 +3766,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.preferences_attributes =
                     { "foo" => { "id" => "test", "name" => "Test" } }
-                }.to raise_error(Mongoid::Errors::DocumentNotFound)
+                }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Preference with id\(s\)/)
               end
             end
           end

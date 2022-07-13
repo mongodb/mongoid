@@ -50,20 +50,21 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Time ] The object mongoized.
+        # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
-          unless object.blank?
-            begin
-              if object.is_a?(String)
-                # https://jira.mongodb.org/browse/MONGOID-4460
-                time = ::Time.parse(object)
-              else
-                time = object.__mongoize_time__
-              end
-              ::Time.utc(time.year, time.month, time.day)
-            rescue ArgumentError
-              nil
+          return if object.blank?
+          begin
+            if object.is_a?(String)
+              # https://jira.mongodb.org/browse/MONGOID-4460
+              time = ::Time.parse(object)
+            else
+              time = object.__mongoize_time__
             end
+          rescue ArgumentError
+            nil
+          end
+          if time.acts_like?(:time)
+            ::Time.utc(time.year, time.month, time.day)
           end
         end
       end

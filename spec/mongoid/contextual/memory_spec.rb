@@ -624,6 +624,14 @@ describe Mongoid::Contextual::Memory do
         expect(context.send(method)).to eq(hobrecht)
       end
 
+      it "returns a list when passing a limit" do
+        expect(context.send(method, 2)).to eq([ hobrecht, friedel ])
+      end
+
+      it "returns a list when passing 1" do
+        expect(context.send(method, 1)).to eq([ hobrecht ])
+      end
+
       context 'when there is a collation on the criteria' do
 
         let(:criteria) do
@@ -637,6 +645,108 @@ describe Mongoid::Contextual::Memory do
             context.send(method)
           }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
         end
+      end
+    end
+  end
+
+  describe "#take" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "returns the first matching document" do
+      expect(context.take).to eq(hobrecht)
+    end
+
+    it "returns an array when passing a limit" do
+      expect(context.take(2)).to eq([ hobrecht, friedel ])
+    end
+
+    it "returns an array when passing a limit as 1" do
+      expect(context.take(1)).to eq([ hobrecht ])
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.take
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
+  end
+
+  describe "#take!" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "returns the first matching document" do
+      expect(context.take!).to eq(hobrecht)
+    end
+
+    context "when the criteria is empty" do
+      let(:criteria) do
+        Address.where(street: "bogus").tap do |crit|
+          crit.documents = []
+        end
+      end
+
+      it "raise an error" do
+        expect do
+          context.take!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Address./)
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.take
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
       end
     end
   end
@@ -764,6 +874,14 @@ describe Mongoid::Contextual::Memory do
 
     it "returns the last matching document" do
       expect(context.last).to eq(friedel)
+    end
+
+    it "returns a list when a limit is passed" do
+      expect(context.last(2)).to eq([ hobrecht, friedel ])
+    end
+
+    it "returns a list when the limit is 1" do
+      expect(context.last(1)).to eq([ friedel ])
     end
 
     context 'when there is a collation on the criteria' do
@@ -948,6 +1066,27 @@ describe Mongoid::Contextual::Memory do
       end
     end
 
+    context "when plucking a mix of empty and non-empty values" do
+
+      let(:empty_doc) do
+        Address.new(street: nil)
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel, empty_doc ]
+        end
+      end
+
+      let!(:plucked) do
+        context.pluck(:street)
+      end
+
+      it "returns the values" do
+        expect(plucked).to eq([ "hobrecht", "friedel", nil ])
+      end
+    end
+
     context "when plucking a field that doesnt exist" do
 
       context "when pluck one field" do
@@ -957,7 +1096,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns a empty array" do
-          expect(plucked).to eq([])
+          expect(plucked).to eq([nil, nil])
         end
       end
 
@@ -968,7 +1107,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns a empty array" do
-          expect(plucked).to eq([[], []])
+          expect(plucked).to eq([[nil, nil], [nil, nil]])
         end
       end
     end
@@ -985,6 +1124,458 @@ describe Mongoid::Contextual::Memory do
         expect {
           context.pluck(:foo, :bar)
         }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
+  end
+
+  describe "#tally" do
+    let(:fans1) { [ Fanatic.new(age:1), Fanatic.new(age:2) ] }
+    let(:fans2) { [ Fanatic.new(age:1), Fanatic.new(age:2) ] }
+    let(:fans3) { [ Fanatic.new(age:1), Fanatic.new(age:3) ] }
+
+    let(:genres1) { [ { x: 1, y: { z: 1 } }, { x: 2, y: { z: 2 } }, { y: 3 } ]}
+    let(:genres2) { [ { x: 1, y: { z: 1 } }, { x: 2, y: { z: 2 } }, { y: 4 } ]}
+    let(:genres3) { [ { x: 1, y: { z: 1 } }, { x: 3, y: { z: 3 } }, { y: 5 } ]}
+
+    let(:label1) {  Label.new(name: "Atlantic") }
+    let(:label2) {  Label.new(name: "Atlantic") }
+    let(:label3) {  Label.new(name: "Columbia") }
+
+
+    let(:band1) { Band.new(origin: "tally", name: "Depeche Mode", years: 30, sales: "1E2", label: label1, genres: genres1) }
+    let(:band2) { Band.new(origin: "tally", name: "New Order", years: 30, sales: "2E3", label: label2, genres: genres2) }
+    let(:band3) { Band.new(origin: "tally", name: "10,000 Maniacs", years: 30, sales: "1E2", label: label3, genres: genres3) }
+    let(:band4) { Band.new(origin: "tally2", fanatics: fans1, genres: [1, 2]) }
+    let(:band5) { Band.new(origin: "tally2", fanatics: fans2, genres: [1, 2]) }
+    let(:band6) { Band.new(origin: "tally2", fanatics: fans3, genres: [1, 3]) }
+
+    let(:criteria) do
+      Band.where(origin: "tally").all.tap do |crit|
+        crit.documents = [ band1, band2, band3 ]
+      end
+    end
+
+    let(:criteria2) do
+      Band.where(origin: "tally2").tap do |crit|
+        crit.documents = [ band4, band5, band6 ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    let(:context2) do
+      described_class.new(criteria2)
+    end
+
+    context "when tallying a string" do
+      let(:tally) do
+        context.tally(:name)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq("Depeche Mode" => 1, "New Order" => 1, "10,000 Maniacs" => 1)
+      end
+    end
+
+    context "using an aliased field" do
+      let(:tally) do
+        context.tally(:years)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(30 => 3)
+      end
+    end
+
+    context "when tallying a demongoizable field" do
+      let(:tally) do
+        context.tally(:sales)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(BigDecimal("1E2") => 2, BigDecimal("2E3") => 1)
+      end
+    end
+
+    context "when tallying a localized field" do
+      let(:d1) { Dictionary.new(description: 'en1') }
+      let(:d2) { Dictionary.new(description: 'en1') }
+      let(:d3) { Dictionary.new(description: 'en1') }
+      let(:d4) { Dictionary.new(description: 'en2') }
+
+      before do
+        I18n.locale = :en
+        d1
+        d2
+        d3
+        d4
+        I18n.locale = :de
+        d1.description = 'de1'
+        d2.description = 'de1'
+        d3.description = 'de2'
+        d4.description = 'de3'
+        I18n.locale = :en
+      end
+
+      let(:criteria) do
+        Dictionary.all.tap do |crit|
+          crit.documents = [ d1, d2, d3, d4 ]
+        end
+      end
+
+      context "when getting the demongoized field" do
+        let(:tallied) do
+          context.tally(:description)
+        end
+
+        it "returns the translation for the current locale" do
+          expect(tallied).to eq("en1" => 3, "en2" => 1)
+        end
+      end
+
+      context "when getting a specific locale" do
+        let(:tallied) do
+          context.tally("description.de")
+        end
+
+        it "returns the translation for the the specific locale" do
+          expect(tallied).to eq("de1" => 2, "de2" => 1, "de3" => 1)
+        end
+      end
+
+      context "when getting the full hash" do
+        let(:tallied) do
+          context.tally("description_translations")
+        end
+
+        it "returns the correct hash" do
+          expect(tallied).to eq(
+            {"de" => "de1", "en" => "en1" } => 2,
+            {"de" => "de2", "en" => "en1" } => 1,
+            {"de" => "de3", "en" => "en2" } => 1
+          )
+        end
+      end
+    end
+
+    context "when tallying an embedded localized field" do
+
+      let(:person1) { Person.create!(addresses: [ address1a, address1b ]) }
+      let(:person2) { Person.create!(addresses: [ address2a, address2b ]) }
+
+      let(:address1a) { Address.new(name: "en1") }
+      let(:address1b) { Address.new(name: "en2") }
+      let(:address2a) { Address.new(name: "en1") }
+      let(:address2b) { Address.new(name: "en3") }
+
+      before do
+        I18n.locale = :en
+        address1a
+        address1b
+        address2a
+        address2b
+        I18n.locale = :de
+        address1a.name = "de1"
+        address1b.name = "de2"
+        address2a.name = "de1"
+        address2b.name = "de3"
+        person1
+        person2
+
+        I18n.locale = :en
+      end
+
+      let(:criteria) do
+        Person.all.tap do |crit|
+          crit.documents = [ person1, person2 ]
+        end
+      end
+
+      context "when getting the demongoized field" do
+        let(:tallied) do
+          context.tally("addresses.name")
+        end
+
+        it "returns the translation for the current locale" do
+          expect(tallied).to eq(
+            [ "en1", "en2" ] => 1,
+            [ "en1", "en3" ] => 1,
+          )
+        end
+      end
+
+      context "when getting a specific locale" do
+        let(:tallied) do
+          context.tally("addresses.name.de")
+        end
+
+        it "returns the translation for the the specific locale" do
+          expect(tallied).to eq(
+            [ "de1", "de2" ] => 1,
+            [ "de1", "de3" ] => 1,
+          )
+        end
+      end
+
+      context "when getting the full hash" do
+        let(:tallied) do
+          context.tally("addresses.name_translations")
+        end
+
+        it "returns the correct hash" do
+          expect(tallied).to eq(
+            [{ "de" => "de1", "en" => "en1" }, { "de" => "de2", "en" => "en2" }] => 1,
+            [{ "de" => "de1", "en" => "en1" }, { "de" => "de3", "en" => "en3" }] => 1,
+          )
+        end
+      end
+    end
+
+    context "when tallying an embedded field" do
+      let(:tally) do
+        context.tally("label.name")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq("Atlantic" => 2, "Columbia" => 1)
+      end
+    end
+
+    context "when tallying an element in an embeds_many field" do
+
+      let(:tally) do
+        context2.tally("fanatics.age")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying an embeds_many field" do
+
+      let(:tally) do
+        context2.tally("fanatics")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          fans1 => 1,
+          fans2 => 1,
+          fans3 => 1,
+        )
+      end
+    end
+
+    context "when tallying a field of type array" do
+
+      let(:tally) do
+        context2.tally("genres")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying an element from an array of hashes" do
+
+      let(:tally) do
+        context.tally("genres.x")
+      end
+
+      it "returns the correct hash without the nil keys" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying an element from an array of hashes; with duplicate" do
+
+      let(:band4) { Band.new(origin: "tally", genres: [ { x: 1 }, {x: 1} ] ) }
+
+      let(:criteria) do
+        Band.where(origin: "tally").all.tap do |crit|
+          crit.documents = [ band1, band2, band3, band4 ]
+        end
+      end
+
+      let(:tally) do
+        context.tally("genres.x")
+      end
+
+      it "returns the correct hash without the nil keys" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1,
+          [1, 1] => 1,
+        )
+      end
+    end
+
+    context "when tallying an aliased field of type array" do
+
+      let(:person1) { Person.new(array: [ 1, 2 ]) }
+      let(:person2) { Person.new(array: [ 1, 3 ]) }
+
+      let(:criteria) do
+        Person.all.tap do |crit|
+          crit.documents = [ person1, person2 ]
+        end
+      end
+
+      let(:tally) do
+        context.tally("array")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 1,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when going multiple levels deep in arrays" do
+
+      let(:tally) do
+        context.tally("genres.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when going multiple levels deep in an array" do
+
+      let(:tally) do
+        context.tally("genres.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      let(:person1) { Person.new(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ]) }
+      let(:person2) { Person.new(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ]) }
+      let(:person3) { Person.new(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ]) }
+
+      let(:criteria) do
+        Person.all.tap do |crit|
+          crit.documents = [ person1, person2, person3 ]
+        end
+      end
+
+      let(:tally) do
+        context.tally("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [ [ 1, 2 ] ] => 2,
+          [ [ 1, 3 ] ] => 1
+        )
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      let(:person1) do
+        Person.new(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+      end
+
+      let(:person2) do
+        Person.new(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+      end
+
+      let(:person3) do
+        Person.new(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))),
+                                    Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
+
+      let(:criteria) do
+        Person.all.tap do |crit|
+          crit.documents = [ person1, person2, person3 ]
+        end
+      end
+
+      let(:tally) do
+        context.tally("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [ [ 1, 2 ], [ 1, 2 ] ] => 2,
+          [ [ 1, 3 ], [ 1, 3 ] ] => 1
+        )
+      end
+    end
+
+    context "when some keys are missing" do
+
+      let(:criteria) do
+        Band.where(origin: "tally").all.tap do |crit|
+          crit.documents = [ band1, band2, band3 ]
+          3.times{ crit.documents << Band.new(origin: "tally") }
+        end
+      end
+
+      let(:tally) do
+        context.tally(:name)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          "Depeche Mode" => 1,
+          "New Order" => 1,
+          "10,000 Maniacs" => 1,
+          nil => 3
+        )
+      end
+    end
+
+    context "when the first element is an embeds_one" do
+      let(:person1) { Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 2) ])) }
+      let(:person2) { Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 2) ])) }
+      let(:person3) { Person.create!(name: Name.new(translations: [ Translation.new(language: 1), Translation.new(language: 3) ])) }
+
+      let(:criteria) do
+        Person.all.tap do |crit|
+          crit.documents = [ person1, person2, person3 ]
+        end
+      end
+
+      let(:tally) do
+        context.tally("name.translations.language")
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(
+          [1, 2] => 2,
+          [1, 3] => 1
+        )
       end
     end
   end

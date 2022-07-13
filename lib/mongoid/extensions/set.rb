@@ -10,7 +10,7 @@ module Mongoid
       # @example Mongoize the object.
       #   set.mongoize
       #
-      # @return [ Array ] The object mongoized.
+      # @return [ Array | nil ] The object mongoized or nil.
       def mongoize
         ::Set.mongoize(self)
       end
@@ -37,9 +37,13 @@ module Mongoid
         #
         # @param [ Set ] object The object to mongoize.
         #
-        # @return [ Array ] The object mongoized.
+        # @return [ Array | nil ] The object mongoized or nil.
         def mongoize(object)
-          object.to_a
+          return if object.nil?
+          case object
+          when ::Set then ::Array.mongoize(object.to_a).uniq
+          when ::Array then ::Array.mongoize(object).uniq
+          end
         end
       end
     end

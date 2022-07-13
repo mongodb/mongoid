@@ -20,7 +20,7 @@ module Mongoid
       # @example Mongoize the object.
       #   range.mongoize
       #
-      # @return [ Hash ] The object mongoized.
+      # @return [ Hash | nil ] The object mongoized or nil.
       def mongoize
         ::Range.mongoize(self)
       end
@@ -59,15 +59,14 @@ module Mongoid
         # @example Mongoize the object.
         #   Range.mongoize(1..3)
         #
-        # @param [ Range ] object The object to mongoize.
+        # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Hash ] The object mongoized.
+        # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
+          return if object.nil?
           case object
-          when NilClass then nil
-          when String then object
           when Hash then __mongoize_hash__(object)
-          else __mongoize_range__(object)
+          when Range then __mongoize_range__(object)
           end
         end
 
@@ -78,7 +77,7 @@ module Mongoid
           hash.slice!('min', 'max', 'exclude_end')
           hash.compact!
           hash.transform_values!(&:mongoize)
-          hash
+          hash.blank? ? nil : hash
         end
 
         def __mongoize_range__(object)

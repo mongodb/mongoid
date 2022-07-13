@@ -61,6 +61,39 @@ describe Mongoid::Extensions::Regexp do
         expect(value).to be_nil
       end
     end
+
+    context "when providing a BSON::Regexp::Raw" do
+
+      let(:value) do
+        Regexp.mongoize(BSON::Regexp::Raw.new("hello"))
+      end
+
+      it "returns a Regexp" do
+        expect(value).to eq(/hello/)
+      end
+    end
+
+    context "when providing an invalid regexp" do
+
+      let(:value) do
+        Regexp.mongoize("[")
+      end
+
+      it "returns nil" do
+        expect(value).to be_nil
+      end
+    end
+
+    context "when providing an invalid Regexp to a BSON::Regexp::Raw" do
+
+      let(:value) do
+        Regexp.mongoize(BSON::Regexp::Raw.new("["))
+      end
+
+      it "returns nil" do
+        expect(value).to be_nil
+      end
+    end
   end
 
   describe "#mongoize" do

@@ -31,5 +31,80 @@ describe Mongoid::Extensions::Set do
     it "returns an array" do
       expect(set.mongoize).to eq([ "test" ])
     end
+
+    context "when there are mongoizable values in the container" do
+      let(:date) do
+        Date.new(2012, 1, 1)
+      end
+
+      let(:mongoized) do
+        Set.mongoize(input)
+      end
+
+      context "when the input is an array" do
+
+        let(:input) do
+          [ date ]
+        end
+
+        it "mongoizes to a set" do
+          expect(mongoized).to be_a(Array)
+        end
+
+        it "mongoizes each element in the array" do
+          expect(mongoized.first).to be_a(Time)
+        end
+
+        it "converts the elements properly" do
+          expect(mongoized.first).to eq(Time.utc(2012, 1, 1, 0, 0, 0))
+        end
+      end
+
+      context "when the input is a set" do
+        let(:input) do
+          [ date ].to_set
+        end
+
+        it "mongoizes to a set" do
+          expect(mongoized).to be_a(Array)
+        end
+
+        it "converts the elements properly" do
+          expect(mongoized.first).to eq(Time.utc(2012, 1, 1, 0, 0, 0))
+        end
+      end
+    end
+
+    context "when the mongoizer creates duplicate elements" do
+      let(:mongoized) do
+        Set.mongoize(input)
+      end
+
+      before do
+        expect(BigDecimal).to receive(:mongoize).exactly(4).times.and_wrap_original do |m, *args|
+          1
+        end
+      end
+
+      context "when the input is a set" do
+        let(:input) do
+          [ 1, 2, 3, 4 ].map(&:to_d).to_set
+        end
+
+        it "removes duplicates" do
+          expect(mongoized).to eq([ 1 ])
+        end
+      end
+
+      context "when the input is an array" do
+        let(:input) do
+          [ 1, 2, 3, 4 ].map(&:to_d)
+        end
+
+        it "removes duplicates" do
+          expect(mongoized).to eq([ 1 ])
+        end
+      end
+    end
   end
 end

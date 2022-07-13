@@ -20,7 +20,7 @@ module Mongoid
       # @example Mongoize the object.
       #   time.mongoize
       #
-      # @return [ Time ] The object mongoized.
+      # @return [ Time | nil ] The object mongoized or nil.
       def mongoize
         ::Time.mongoize(self)
       end
@@ -63,11 +63,16 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Time ] The object mongoized.
+        # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
-          return nil if object.blank?
+          return if object.blank?
           begin
             time = object.__mongoize_time__
+          rescue ArgumentError
+            return
+          end
+
+          if time.acts_like?(:time)
             if object.respond_to?(:sec_fraction)
               ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
             elsif time.respond_to?(:subsec)
@@ -75,8 +80,6 @@ module Mongoid
             else
               ::Time.at(time.to_i, time.usec).utc
             end
-          rescue ArgumentError
-            nil
           end
         end
       end

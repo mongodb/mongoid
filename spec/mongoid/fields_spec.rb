@@ -555,8 +555,144 @@ describe Mongoid::Fields do
     context "when the attribute has been assigned" do
 
       it "returns the attribute before type cast" do
-        person.age = "old"
-        expect(person.age_before_type_cast).to eq("old")
+        person.age = "42"
+        expect(person.age_before_type_cast).to eq("42")
+      end
+    end
+
+    context "when reloading" do
+
+      let(:product) do
+        Product.create!(price: '1')
+      end
+
+      before do
+        product.reload
+      end
+
+      it "resets the attributes_before_type_cast to the attributes hash" do
+        expect(product.attributes_before_type_cast).to eq(product.attributes)
+      end
+
+      it "the *_before_type_cast method returns the demongoized value" do
+        expect(product.price_before_type_cast).to eq(1)
+      end
+    end
+
+    context "when reloading and writing a demongoizable value" do
+
+      let(:product) do
+        Product.create!.tap do |product|
+          Product.collection.update_one({ _id: product.id }, { :$set => { price: '1' }})
+        end
+      end
+
+      before do
+        product.reload
+      end
+
+      it "resets the attributes_before_type_cast to the attributes hash" do
+        expect(product.attributes_before_type_cast).to eq(product.attributes)
+      end
+
+      it "the *_before_type_cast method returns the mongoized value" do
+        expect(product.price_before_type_cast).to eq('1')
+      end
+    end
+
+    context "when reading from the db" do
+
+      let(:product) do
+        Product.create!(price: '1')
+      end
+
+      let(:from_db) do
+        Product.find(product.id)
+      end
+
+      it "resets the attributes_before_type_cast to the attributes hash" do
+        expect(from_db.attributes_before_type_cast).to eq(from_db.attributes)
+      end
+
+      it "the *_before_type_cast method returns the demongoized value" do
+        expect(from_db.price_before_type_cast).to eq(1)
+      end
+    end
+
+    context "when reading from the db after writing a demongoizable value" do
+
+      let(:product) do
+        Product.create!.tap do |product|
+          Product.collection.update_one({ _id: product.id }, { :$set => { price: '1' }})
+        end
+      end
+
+      let(:from_db) do
+        Product.find(product.id)
+      end
+
+      it "resets the attributes_before_type_cast to the attributes hash" do
+        expect(from_db.attributes_before_type_cast).to eq(from_db.attributes)
+      end
+
+      it "the *_before_type_cast method returns the mongoized value" do
+        expect(from_db.price_before_type_cast).to eq('1')
+      end
+    end
+
+    context "when making a new model" do
+
+      context "when using new with no options" do
+        let(:product) { Product.new }
+
+        it "sets the attributes_before_type_cast to the attributes hash" do
+          expect(product.attributes_before_type_cast).to eq(product.attributes)
+        end
+      end
+
+      context "when using new with options" do
+        let(:product) { Product.new(price: '1') }
+
+        let(:abtc) do
+          product.attributes.merge('price' => '1')
+        end
+
+        it "has the attributes before type cast" do
+          expect(product.attributes_before_type_cast).to eq(abtc)
+        end
+      end
+
+      context "when persisting the model" do
+        let(:product) { Product.new(price: '1') }
+
+        let(:abtc) do
+          product.attributes.merge('price' => '1')
+        end
+
+        before do
+          expect(product.attributes_before_type_cast).to eq(abtc)
+          product.save!
+        end
+
+        it "resets the attributes_before_type_cast to the attributes" do
+          expect(product.attributes_before_type_cast).to eq(product.attributes)
+        end
+      end
+
+      context "when using create! without options" do
+        let(:product) { Product.create! }
+
+        it "resets the attributes_before_type_cast to the attributes" do
+          expect(product.attributes_before_type_cast).to eq(product.attributes)
+        end
+      end
+
+      context "when using create! with options" do
+        let(:product) { Product.create!(price: '1') }
+
+        it "resets the attributes_before_type_cast to the attributes" do
+          expect(product.attributes_before_type_cast).to eq(product.attributes)
+        end
       end
     end
   end
@@ -710,6 +846,22 @@ describe Mongoid::Fields do
             { "de" => "Cheaper drinks", "en" => "Cheap drinks" }
           )
         end
+      end
+    end
+
+    context "when the field needs to be mongoized" do
+
+      before do
+        product.price = "1"
+        product.save!
+      end
+
+      it "mongoizes the value" do
+        expect(product.price).to eq(1)
+      end
+
+      it "stores the value in the mongoized form" do
+        expect(product.attributes_before_type_cast["price"]).to eq(1)
       end
     end
   end
@@ -975,7 +1127,7 @@ describe Mongoid::Fields do
       end
 
       it "uses the alias to write the attribute" do
-        (person.alias = expect(true)).to be true
+        expect(person.alias = true).to be true
       end
 
       it "uses the alias to read the attribute" do
@@ -987,7 +1139,7 @@ describe Mongoid::Fields do
       end
 
       it "uses the name to write the attribute" do
-        (person.aliased = expect(true)).to be true
+        expect(person.aliased = true).to be true
       end
 
       it "uses the name to read the attribute" do

@@ -132,6 +132,30 @@ describe Mongoid::Errors::DocumentNotFound do
         )
       end
     end
+
+    context "when not providing params or unmatched" do
+      let(:error) do
+        described_class.new(Person, nil, nil)
+      end
+
+      it "contains the problem in the message" do
+        expect(error.message).to include(
+          "Could not find a document of class Person."
+        )
+      end
+
+      it "contains the summary in the message" do
+        expect(error.message).to include(
+          "Mongoid attempted to find a document of the class Person but none exist."
+        )
+      end
+
+      it "contains the resolution in the message" do
+        expect(error.message).to include(
+          "Create a document of class Person or use a finder method that returns nil when no documents are found instead of raising an exception."
+        )
+      end
+    end
   end
 
   describe "#params" do

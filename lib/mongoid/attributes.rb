@@ -86,12 +86,25 @@ module Mongoid
     def read_attribute(name)
       field = fields[name.to_s]
       raw = read_raw_attribute(name)
-      # Keep this code consistent with Mongoid::Fields.create_field_getter
-      value = field ? field.demongoize(raw) : raw
-      attribute_will_change!(name.to_s) if value.resizable?
-      value
+      process_raw_attribute(name.to_s, raw, field)
     end
     alias :[] :read_attribute
+
+
+    # Process the raw attribute values just read from the documents attributes.
+    #
+    # @param [ String ] name The name of the attribute to get.
+    # @param [ Object ] raw The raw attribute value.
+    # @param [ Field | nil ] field The field to use for demongoization or nil.
+    #
+    # @return [ Object ] The value of the attribute.
+    #
+    # @api private
+    def process_raw_attribute(name, raw, field)
+      value = field ? field.demongoize(raw) : raw
+      attribute_will_change!(name) if value.resizable?
+      value
+    end
 
     # Read a value from the attributes before type cast. If the value has not
     # yet been assigned then this will return the attribute's existing value
@@ -157,7 +170,6 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
-          validate_attribute_value(field_name, value)
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
@@ -339,30 +351,6 @@ module Mongoid
     end
 
     private
-
-    # Validates an attribute value as being assignable to the specified field.
-    #
-    # For now, only Hash and Array fields are validated, and the value is
-    # being checked to be of an appropriate type (i.e. either Hash or Array,
-    # respectively, or nil).
-    #
-    # This method takes the name of the field as stored in the document
-    # in the database, not (necessarily) the Ruby method name used to read/write
-    # the said field.
-    #
-    # @param [ String, Symbol ] field_name The name of the field.
-    # @param [ Object ] value The value to be validated.
-    def validate_attribute_value(field_name, value)
-      return if value.nil?
-      field = fields[field_name]
-      return unless field
-      validatable_types = [ Hash, Array ]
-      if validatable_types.include?(field.type)
-        unless value.is_a?(field.type)
-          raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
-        end
-      end
-    end
 
     def lookup_attribute_presence(name, value)
       if localized_fields.has_key?(name) && value
