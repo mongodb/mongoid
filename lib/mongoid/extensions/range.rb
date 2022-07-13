@@ -50,7 +50,7 @@ module Mongoid
         def demongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
-            hash = object.slice('min', 'max', 'exclude_end')
+            hash = object.slice('min', 'max', 'exclude_end', :min, :max, :exclude_end)
             unless hash.blank?
               begin
                 ::Range.new(hash["min"] || hash[:min],
