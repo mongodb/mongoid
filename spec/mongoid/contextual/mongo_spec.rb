@@ -2392,7 +2392,6 @@ describe Mongoid::Contextual::Mongo do
       context 'when calling #first' do
 
         it 'returns the first document, sorted by _id' do
-          pending "MONGOID-5416"
           expect(context.last).to eq(rolling_stones)
           expect(context.first).to eq(depeche_mode)
         end
@@ -2711,7 +2710,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "gets the correct document" do
-          pending "MONGOID-5416"
           expect(docs).to eq([ depeche_mode ])
         end
       end

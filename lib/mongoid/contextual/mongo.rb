@@ -362,10 +362,8 @@ module Mongoid
           return limit ? documents.last(limit) : documents.last
         end
         res = try_numbered_cache(:last, limit) do
-          with_inverse_sorting do
-            if raw_docs = view.limit(limit || 1).to_a
-              process_raw_docs(raw_docs, limit)
-            end
+          if raw_docs = view.sort(inverse_sorting).limit(limit || 1).to_a
+            process_raw_docs(raw_docs, limit)
           end
         end
         res.is_a?(Array) ? res.reverse : res
@@ -723,18 +721,9 @@ module Mongoid
       # Map the inverse sort symbols to the correct MongoDB values.
       #
       # @api private
-      #
-      # @example Apply the inverse sorting params to the given block
-      #   context.with_inverse_sorting
-      def with_inverse_sorting
-        begin
-          if sort = criteria.options[:sort] || { _id: 1 }
-            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
-          end
-          yield
-        ensure
-          apply_option(:sort)
-        end
+      def inverse_sorting
+        sort = view.sort || { _id: 1 }
+        Hash[sort.map{|k, v| [k, -1*v]}]
       end
 
       # Is the cache able to be added to?
