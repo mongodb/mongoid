@@ -875,7 +875,7 @@ Note that the original uncastable values will be stored in the
 Reading Uncastable Values
 `````````````````````````
 
-When documents in the databae contain values of different types than their
+When documents in the database contain values of different types than their
 represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
 it will replace the value with ``nil``. Consider the following model and document in the
 database:
