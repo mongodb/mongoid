@@ -426,7 +426,7 @@ describe Mongoid::Indexable do
     context "when providing a geo haystack index with a bucket_size" do
 
       let(:message) do
-        'The geoHaystack option is deprecated.'
+        'The geoHaystack type is deprecated.'
       end
 
       it "logs a deprecation warning" do
