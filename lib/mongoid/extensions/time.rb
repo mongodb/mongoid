@@ -47,17 +47,19 @@ module Mongoid
         #
         # @return [ Time | nil ] The object as a time.
         def demongoize(object)
-          return nil if object.blank?
-          if object.acts_like?(:time)
-            object = object.getlocal unless Mongoid::Config.use_utc?
+          return if object.blank?
+          time = if object.acts_like?(:time)
+            Mongoid::Config.use_utc? ? object : object.getlocal
           elsif object.acts_like?(:date)
-            object = ::Date.demongoize(object).to_time
+            ::Date.demongoize(object).to_time
           end
 
+          return unless time
+
           if Mongoid::Config.use_activesupport_time_zone?
-            object.in_time_zone(Mongoid.time_zone)
+            time.in_time_zone(Mongoid.time_zone)
           else
-            object
+            time
           end
         end
 
