@@ -97,7 +97,7 @@ describe "mongoize/demongoize/evolve methods" do
     context "when passing an uncastable value to evolve" do
 
       it "pushes the value through" do
-        expect(klass.evolve(invalid_value)).to eq(invalid_value)
+        expect(klass.evolve(invalid_value)).to eq(mongoized_value)
       end
     end
   end
@@ -112,12 +112,13 @@ describe "mongoize/demongoize/evolve methods" do
     include_examples "handles undemongoizable values"
   end
 
+  let(:mongoized_value) { invalid_value }
+  let(:demongoized_value) { invalid_value }
+
   describe Array do
     let(:invalid_value) { 1 }
     let(:klass) { Array }
     let(:field_name) { :array_field }
-    let(:mongoized_value) { nil }
-    let(:demongoized_value) { 1 }
 
     include_examples "handles unmongoizable values"
     include_examples "pushes through undemongoizable values"
@@ -125,11 +126,12 @@ describe "mongoize/demongoize/evolve methods" do
   end
 
   describe BigDecimal do
-    let(:invalid_value) { [] }
+    let(:invalid_value) { "bogus" }
     let(:klass) { described_class }
     let(:field_name) { :big_decimal_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Mongoid::Boolean do
@@ -138,6 +140,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :boolean_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Date do
@@ -146,6 +149,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :date_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe DateTime do
@@ -154,6 +158,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :date_time_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Float do
@@ -162,17 +167,17 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :float_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Hash do
     let(:invalid_value) { 1 }
     let(:klass) { described_class }
     let(:field_name) { :hash_field }
-    let(:demongoized_value) { 1 }
 
     include_examples "handles unmongoizable values"
     include_examples "pushes through undemongoizable values"
-    # include_examples "pushes through unevolvable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Integer do
@@ -181,16 +186,16 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :integer_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe BSON::ObjectId do
     let(:invalid_value) { "invalid value" }
-    let(:mongoized_value) { invalid_value }
-    let(:demongoized_value) { mongoized_value }
     let(:klass) { described_class }
     let(:field_name) { :object_id_field }
 
     include_examples "pushes through uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe BSON::Binary do
@@ -199,6 +204,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :binary_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Range do
@@ -207,6 +213,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :range_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Regexp do
@@ -215,6 +222,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :regexp_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Set do
@@ -223,6 +231,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :set_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe String do
@@ -233,6 +242,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :string_field }
 
     include_examples "pushes through uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Mongoid::StringifiedSymbol do
@@ -243,14 +253,16 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :stringified_symbol_field }
 
     include_examples "pushes through uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Symbol do
-    let(:invalid_value) { [] }
+    let(:invalid_value) { Time.new }
     let(:klass) { described_class }
     let(:field_name) { :symbol_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe Time do
@@ -259,6 +271,7 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :time_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 
   describe ActiveSupport::TimeWithZone do
@@ -267,5 +280,6 @@ describe "mongoize/demongoize/evolve methods" do
     let(:field_name) { :time_with_zone_field }
 
     include_examples "handles uncastable values"
+    include_examples "pushes through unevolvable values"
   end
 end
