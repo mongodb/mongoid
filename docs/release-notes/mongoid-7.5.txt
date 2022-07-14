@@ -188,3 +188,37 @@ calling ``#first`` or ``#last`` with the ``{ id_sort: :none }`` option. This
 option has been deprecated in Mongoid 7.5 and it is recommended to use ``#take``
 instead going forward. Support for the ``:id_sort`` option will be dropped in
 Mongoid 8.
+
+
+Deprecate ``:id_sort`` Option and Support ``limit`` on ``#first/last``
+----------------------------------------------------------------------
+
+Mongoid 7.5 deprecates the ``:id_sort`` keyword argument for the
+``Criteria#first`` and ``Criteria#last`` methods. Please use ``Criteria#take``
+to retrieve documents without sorting by id.
+
+The ``first`` and ``last`` methods now take the number of documents to return
+as a positional argument, mirroring the functionality of Ruby's ``Enumerable``
+method and ActiveRecord's ``first`` and ``last`` methods. Both invocations
+(with limit as a positional arguments and with the ``:id_sort`` option) remain
+supported in Mongoid 7.x, but the ``:id_sort`` invocation will be removed in
+Mongoid 8.
+
+.. code:: ruby
+
+  Band.first
+  # => #<Band _id: 62c835813282a4470c07d530, >
+  Band.first(2)
+  # => [ #<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, > ]
+  Band.last
+  # => #<Band _id: 62c835823282a4470c07d531, >
+  Band.last(2)
+  # => [#<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, >]
+
+When providing a limit, ``#first/last`` will return a list of documents, and
+when not providing a limit (or providing ``nil``), a single document will be
+returned.
+
+Note that the ``#first/last`` methods apply a sort on ``_id``, which can
+cause performance issues. To get a document without sorting first, use the
+``Critera#take`` method.

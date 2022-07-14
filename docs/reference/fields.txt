@@ -827,6 +827,96 @@ Mongoid also defines the ``id`` field aliased to ``_id``. The ``id``
 alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
 
+.. _uncastable-values:
+
+Uncastable Values
+-----------------
+
+In Mongoid 8, Mongoid has standardized the treatment of the assignment and
+reading of "uncastable" values. A value is considered "uncastable" when it
+cannot be coerced to the type of its field. For example, an array would be an
+"uncastable" value to an Integer field.
+
+
+Assigning Uncastable Values
+```````````````````````````
+
+The assignment of uncastable values has been standardized to assign ``nil`` by
+default. Consider the following example:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+  User.new(name: [ "hello" ])
+
+Assigning an array to a field of type Integer doesn't work since an array can't
+be coerced to an Integer. The assignment of uncastable values to a field will
+cause a ``nil`` to be written:
+
+.. code::
+
+  user = User.new(name: [ "Mike", "Trout" ])
+  # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
+
+Note that the original uncastable values will be stored in the
+``attributes_before_type_cast`` hash with their field names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
+
+
+Reading Uncastable Values
+`````````````````````````
+
+When documents in the database contain values of different types than their
+represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
+it will replace the value with ``nil``. Consider the following model and document in the
+database:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+.. code::
+
+  { _id: ..., name: [ "Mike", "Trout" ] }
+
+Reading this document from the database will result in the model's name field
+containing ``nil``:
+
+.. code::
+
+  User.first.name
+  # => nil
+
+The database value of type array cannot be stored in the attribute, since the
+array can't be coerced to an Integer. Note that the original uncastable values
+will be stored in the ``attributes_before_type_cast`` hash with their field
+names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
+
+.. note::
+
+  The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
+  been changed to permit automatic persistence of mutated container attributes.
+  See `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_ for a
+  longer discussion of this topic.
+
 
 .. _customizing-field-behavior:
 
@@ -978,6 +1068,12 @@ setter methods for fields of your custom type.
    venue = Venue.new(location: point) # This uses the Point#mongoize instance method.
    venue = Venue.new(location: [ 12, 24 ]) # This uses the Point.mongoize class method.
 
+.. note::
+
+  The ``mongoize`` method should return ``nil`` on values that are uncastable to
+  your custom type. See the section on :ref:`Uncastable Values <uncastable-values>`
+  for more details.
+
 The class method ``demongoize`` does the inverse of ``mongoize``. It takes the raw object
 from the MongoDB Ruby driver and converts it to an instance of your custom type.
 In this case, the database driver returns an ``Array`` and we instantiate a ``Point`` from it.
@@ -992,6 +1088,64 @@ when transforming objects for use in Mongoid query criteria.
 
    point = Point.new(12, 24)
    Venue.where(location: point) # This uses Point.evolve
+
+
+.. _phantom-custom-field-types:
+
+Phantom Custom Field Types
+``````````````````````````
+
+The custom field type may perform conversions from user-visible attribute
+values to the values stored in the database when the user-visible attribute
+value type is different from the declared field type. For example, this
+can be used to implement a mapping from one enumeration to another, to
+have more descriptive values in the application and more compact values stored
+in the database:
+
+.. code-block:: ruby
+
+  class ColorMapping
+
+    MAPPING = {
+      'black' => 0,
+      'white' => 1,
+    }.freeze
+
+    INVERSE_MAPPING = MAPPING.invert.freeze
+
+    class << self
+
+      # Takes application-scope value and converts it to how it would be
+      # stored in the database. Converts invalid values to nil.
+      def mongoize(object)
+        MAPPING[object]
+      end
+
+      # Get the value as it was stored in the database, and convert to
+      # application-scope value. Converts invalid values to nil.
+      def demongoize(object)
+        INVERSE_MAPPING[object]
+      end
+
+      # Converts the object that was supplied to a criteria and converts it
+      # into a query-friendly form. Returns invalid values as is.
+      def evolve(object)
+        MAPPING.fetch(object, object)
+      end
+    end
+  end
+
+  class Profile
+    include Mongoid::Document
+    field :color, type: ColorMapping
+  end
+
+  profile = Profile.new(color: 'white')
+  profile.color
+  # => "white"
+
+  # Writes 0 to color field
+  profile.save!
 
 
 .. _custom-field-options:

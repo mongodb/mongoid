@@ -29,7 +29,7 @@ module Mongoid
         #
         # @return [ Float ] The average.
         def avg(field)
-          count > 0 ? sum(field).to_f / count.to_f : nil
+          any? ? sum(field).to_f / count.to_f : nil
         end
 
         # Get the max value of the provided field. If provided a block, will
@@ -88,7 +88,7 @@ module Mongoid
           if block_given?
             super()
           else
-            count > 0 ? super(0) { |doc| doc.public_send(field) } : 0
+            any? ? super(0) { |doc| doc.public_send(field) } : 0
           end
         end
 
@@ -106,7 +106,7 @@ module Mongoid
         #
         # @return [ Integer ] The aggregate.
         def aggregate_by(field, method)
-          count > 0 ? send(method) { |doc| doc.public_send(field) }.public_send(field) : nil
+          any? ? send(method) { |doc| doc.public_send(field) }.public_send(field) : nil
         end
       end
     end

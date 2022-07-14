@@ -69,11 +69,19 @@ describe Mongoid::Contextual::None do
     it "returns nil" do
       expect(context.first).to be_nil
     end
+
+    it "returns [] when passing a limit" do
+      expect(context.first(1)).to eq([])
+    end
   end
 
   describe "#last" do
     it "returns nil" do
       expect(context.last).to be_nil
+    end
+
+    it "returns [] when passing a limit" do
+      expect(context.last(1)).to eq([])
     end
   end
 

@@ -97,6 +97,10 @@ module Mongoid
             unless VALID_TYPES.include?(value)
               raise Errors::InvalidIndex.new(klass, spec, options)
             end
+
+            if value == "geoHaystack"
+              Mongoid::Warnings.warn_geo_haystack_deprecated
+            end
           end
         end
       end

@@ -250,28 +250,20 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
-      # @param [ Hash ] opts The options for the query returning the first document.
-      #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The first document.
-      def first(opts = {})
-        return documents.first if cached? && cache_loaded?
-        try_cache(:first) do
-          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
-            if raw_doc = view.sort(sort).limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
-          else
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
+      def first(limit = nil)
+        if cached? && cache_loaded?
+          return limit ? documents.first(limit) : documents.first
+        end
+        try_numbered_cache(:first, limit) do
+          sort = view.sort || { _id: 1 }
+          if raw_docs = view.sort(sort).limit(limit || 1).to_a
+            process_raw_docs(raw_docs, limit)
           end
         end
       end
@@ -359,22 +351,22 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
-      # @param [ Hash ] opts The options for the query returning the first document.
+      # @param [ Integer ] limit The number of documents to return.
       #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
-      def last(opts = {})
-        try_cache(:last) do
-          with_inverse_sorting(opts) do
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
+      # @return [ Document ] The last document.
+      def last(limit = nil)
+        if cached? && cache_loaded?
+          return limit ? documents.last(limit) : documents.last
+        end
+        res = try_numbered_cache(:last, limit) do
+          if raw_docs = view.sort(inverse_sorting).limit(limit || 1).to_a
+            process_raw_docs(raw_docs, limit)
           end
         end
+        res.is_a?(Array) ? res.reverse : res
       end
 
       # Returns the number of documents in the database matching
@@ -644,6 +636,31 @@ module Mongoid
         end
       end
 
+      # yield the block given or return the cached value
+      #
+      # @param [ String, Symbol ] key The instance variable name
+      # @param [ Integer | nil ] n The number of documents requested or nil
+      #   if none is requested.
+      #
+      # @return [ Object ] The result of the block.
+      def try_numbered_cache(key, n, &block)
+        unless cached?
+          yield if block_given?
+        else
+          len = n || 1
+          ret = instance_variable_get("@#{key}")
+          if !ret || ret.length < len
+            instance_variable_set("@#{key}", ret = Array.wrap(yield))
+          elsif !n
+            ret.is_a?(Array) ? ret.first : ret
+          elsif ret.length > len
+            ret.first(n)
+          else
+            ret
+          end
+        end
+      end
+
       # Update the documents for the provided method.
       #
       # @api private
@@ -704,18 +721,9 @@ module Mongoid
       # Map the inverse sort symbols to the correct MongoDB values.
       #
       # @api private
-      #
-      # @example Apply the inverse sorting params to the given block
-      #   context.with_inverse_sorting
-      def with_inverse_sorting(opts = {})
-        begin
-          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
-            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
-          end
-          yield
-        ensure
-          apply_option(:sort)
-        end
+      def inverse_sorting
+        sort = view.sort || { _id: 1 }
+        Hash[sort.map{|k, v| [k, -1*v]}]
       end
 
       # Is the cache able to be added to?
@@ -916,6 +924,18 @@ module Mongoid
         else
           value.class.demongoize(value)
         end
+      end
+
+      # Process the raw documents retrieved for #first/#last.
+      #
+      # @return [ Array<Document> | Document ] The list of documents or a
+      #   single document.
+      def process_raw_docs(raw_docs, limit)
+        docs = raw_docs.map do |d|
+          Factory.from_db(klass, d, criteria)
+        end
+        docs = eager_load(docs)
+        limit ? docs : docs.first
       end
     end
   end

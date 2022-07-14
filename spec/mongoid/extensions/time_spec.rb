@@ -59,8 +59,18 @@ describe Mongoid::Extensions::Time do
           Time.zone = nil
         end
 
-        it "returns an ActiveSupport::TimeWithZone" do
-          expect(Time.demongoize(time).class).to eq(ActiveSupport::TimeWithZone)
+        context "when demongoizing a Time" do
+
+          it "returns an ActiveSupport::TimeWithZone" do
+            expect(Time.demongoize(time).class).to eq(ActiveSupport::TimeWithZone)
+          end
+        end
+
+        context "when demongoizing a Date" do
+
+          it "returns an ActiveSupport::TimeWithZone" do
+            expect(Time.demongoize(Date.today).class).to eq(ActiveSupport::TimeWithZone)
+          end
         end
 
         context "when the local time is not observing daylight saving" do
@@ -146,6 +156,13 @@ describe Mongoid::Extensions::Time do
         expect(Time.demongoize(nil)).to be_nil
       end
     end
+
+    context "when the value is uncastable" do
+
+      it "returns nil" do
+        expect(Time.demongoize("bogus")).to be_nil
+      end
+    end
   end
 
   describe ".mongoize" do
@@ -163,8 +180,12 @@ describe Mongoid::Extensions::Time do
 
     context "when string is empty" do
 
+      let(:mongoized) do
+        Time.mongoize("")
+      end
+
       it "returns nil" do
-        expect(Time.mongoize("")).to be_nil
+        expect(mongoized).to be_nil
       end
     end
 
@@ -189,8 +210,12 @@ describe Mongoid::Extensions::Time do
 
       context "when the string is an invalid time" do
 
-        it "converts the time to nil" do
-          expect(Time.mongoize("time")).to eq(nil)
+        let(:mongoized) do
+          Time.mongoize("time")
+        end
+
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 

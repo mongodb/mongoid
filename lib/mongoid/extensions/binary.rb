@@ -10,7 +10,7 @@ module Mongoid
       # @example Mongoize the object.
       #   object.mongoize
       #
-      # @return [ Object ] The object.
+      # @return [ BSON::Binary | nil ] The object.
       def mongoize
         BSON::Binary.mongoize(self)
       end
@@ -24,21 +24,15 @@ module Mongoid
         #
         # @param [ Object ] object The object to Mongoize
         #
-        # @return [ String | Symbol | BSON::Binary | nil ] A String or Binary
-        #   representing the object or nil.
+        # @return [ BSON::Binary | nil ] A Binary representing the object or nil.
         def mongoize(object)
           return if object.nil?
-
           case object
-          when BSON::Binary
-            object
-          when String, Symbol
-            BSON::Binary.new(object.to_s)
-          else
-            # TODO: MONGOID-5222 raise on the setting of feature flag.
-            nil
+          when BSON::Binary then object
+          when String, Symbol then BSON::Binary.new(object.to_s)
           end
         end
+        alias :demongoize :mongoize
       end
     end
   end

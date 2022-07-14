@@ -114,12 +114,7 @@ module Mongoid
             end
 
             if option == :type && options[option] == Symbol
-              @field_type_is_symbol_warned ||= begin
-                Mongoid::Deprecation.warn(<<~MSG.squish.freeze)
-                  The BSON Symbol type is deprecated by MongoDB. Please use String or StringifiedSymbol field types instead of the Symbol field type
-                MSG
-                true
-              end
+              Mongoid::Warnings.warn_symbol_type_deprecated
             end
           end
         end

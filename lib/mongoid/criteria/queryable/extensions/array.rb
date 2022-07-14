@@ -133,7 +133,8 @@ module Mongoid
             #
             # @return [ Object ] The evolved object.
             def evolve(object)
-              if object.is_a?(::Array)
+              case object
+              when ::Array, ::Set
                 object.map { |obj| obj.class.evolve(obj) }
               else
                 object

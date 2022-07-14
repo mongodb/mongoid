@@ -3534,7 +3534,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
     describe "replacing the entire embedded list" do
 
-      context "when an embeds many relationship contains a nil as the first item" do
+      context "when an embeds many relationship contains nil as the first item" do
 
         let(:person) do
           Person.create!
@@ -3555,7 +3555,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when an embeds many relationship contains a nil in the middle of the list" do
+      context "when an embeds many relationship contains nil in the middle of the list" do
 
         let(:person) do
           Person.create!
@@ -3576,7 +3576,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when an embeds many relationship contains a nil at the end of the list" do
+      context "when an embeds many relationship contains nil at the end of the list" do
 
         let(:person) do
           Person.create!
@@ -3600,7 +3600,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
     describe "appending to the embedded list" do
 
-      context "when appending a nil to the first position in an embedded list" do
+      context "when appending nil to the first position in an embedded list" do
 
         let(:person) do
           Person.create! phone_numbers: []
@@ -3619,7 +3619,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when appending a nil into the middle of an embedded list" do
+      context "when appending nil into the middle of an embedded list" do
 
         let(:person) do
           Person.create! phone_numbers: []
@@ -3638,7 +3638,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when appending a nil to the end of an embedded list" do
+      context "when appending nil to the end of an embedded list" do
 
         let(:person) do
           Person.create! phone_numbers: []

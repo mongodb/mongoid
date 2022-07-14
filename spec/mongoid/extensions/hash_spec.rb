@@ -290,6 +290,26 @@ describe Mongoid::Extensions::Hash do
     it "returns the hash" do
       expect(Hash.demongoize(hash)).to eq(hash)
     end
+
+    context "when object is nil" do
+      let(:demongoized) do
+        Hash.demongoize(nil)
+      end
+
+      it "returns nil" do
+        expect(demongoized).to be_nil
+      end
+    end
+
+    context "when the object is uncastable" do
+      let(:demongoized) do
+        Hash.demongoize(1)
+      end
+
+      it "returns the object" do
+        expect(demongoized).to eq(1)
+      end
+    end
   end
 
   describe ".mongoize" do
@@ -320,6 +340,16 @@ describe Mongoid::Extensions::Hash do
     context "when object is nil" do
       let(:mongoized) do
         Hash.mongoize(nil)
+      end
+
+      it "returns nil" do
+        expect(mongoized).to be_nil
+      end
+    end
+
+    context "when the object is uncastable" do
+      let(:mongoized) do
+        Hash.mongoize(1)
       end
 
       it "returns nil" do

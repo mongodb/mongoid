@@ -145,6 +145,22 @@ describe Mongoid::Extensions::Range do
         end
       end
     end
+
+    context "when the range doesn't have any correct keys" do
+      let(:hash) { { "min^" => "a", "max^" => "z", "exclude_end^" => true } }
+
+      it "returns nil" do
+        is_expected.to be nil
+      end
+    end
+
+    context "when the range has symbol keys" do
+      let(:hash) { { min: 1, max: 3 } }
+
+      it "returns an ascending range" do
+        is_expected.to eq(1..3)
+      end
+    end
   end
 
   shared_examples_for 'mongoize range' do
@@ -267,6 +283,34 @@ describe Mongoid::Extensions::Range do
       end
     end
 
+    context "given nil" do
+      let(:range) { nil }
+
+      it "returns nil" do
+        is_expected.to be_nil
+      end
+    end
+
+    context "given a hash" do
+      let(:range) { { 'min' => 1, 'max' => 5, 'exclude_end' => true } }
+
+      it "returns the hash" do
+        is_expected.to eq(range)
+      end
+    end
+
+    context "given a hash missing fields" do
+      let(:range) { { 'min' => 1 } }
+
+      it "returns the hash" do
+        is_expected.to eq(range)
+      end
+    end
+  end
+
+  describe "#mongoize" do
+    subject { range.mongoize }
+
     context 'given a String' do
       let(:range) { '3' }
 
@@ -275,23 +319,35 @@ describe Mongoid::Extensions::Range do
       end
     end
 
-    context "given nil" do
-      let(:range) { nil }
-
-      it "returns nil" do
-        is_expected.to be_nil
-      end
-    end
-  end
-
-  describe "#mongoize" do
-    subject { range.mongoize }
-
     it_behaves_like 'mongoize range'
   end
 
   describe ".mongoize" do
     subject { Range.mongoize(range) }
+
+    context 'given a String' do
+      let(:range) { '3' }
+
+      it "returns nil" do
+        is_expected.to be_nil
+      end
+    end
+
+    context "given a hash with wrong fields" do
+      let(:range) { { 'min' => 1, 'max' => 5, 'exclude_end^' => true} }
+
+      it "removes the bogus fields" do
+        is_expected.to eq({ 'min' => 1, 'max' => 5 })
+      end
+    end
+
+    context "given a hash with no correct fields" do
+      let(:range) { { 'min^' => 1, 'max^' => 5, 'exclude_end^' => true} }
+
+      it "returns nil" do
+        is_expected.to be_nil
+      end
+    end
 
     it_behaves_like 'mongoize range'
   end

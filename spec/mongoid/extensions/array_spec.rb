@@ -488,12 +488,12 @@ describe Mongoid::Extensions::Array do
       Date.new(2012, 1, 1)
     end
 
-    let(:array) do
+    let(:input) do
       [ date ]
     end
 
     let(:mongoized) do
-      Array.mongoize(array)
+      Array.mongoize(input)
     end
 
     it "mongoizes each element in the array" do
@@ -502,6 +502,20 @@ describe Mongoid::Extensions::Array do
 
     it "converts the elements properly" do
       expect(mongoized.first).to eq(Time.utc(2012, 1, 1, 0, 0, 0))
+    end
+
+    context "when passing in a set" do
+      let(:input) do
+        [ date ].to_set
+      end
+
+      it "mongoizes to an array" do
+        expect(mongoized).to be_a(Array)
+      end
+
+      it "converts the elements properly" do
+        expect(mongoized.first).to eq(Time.utc(2012, 1, 1, 0, 0, 0))
+      end
     end
   end
 

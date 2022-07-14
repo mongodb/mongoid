@@ -79,8 +79,12 @@ describe Mongoid::Extensions::DateTime do
 
     context "when the string is an invalid time" do
 
+      let(:mongoized) do
+        DateTime.mongoize("time")
+      end
+
       it "returns nil" do
-        expect(DateTime.mongoize("time")).to eq(nil)
+        expect(mongoized).to be_nil
       end
     end
   end

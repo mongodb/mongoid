@@ -108,7 +108,7 @@ module Mongoid
       #
       # @return [ true | false ] If the count is more than zero.
       def exists?
-        count > 0
+        any?
       end
 
       # Get the first document in the database for the criteria's selector.
@@ -116,9 +116,15 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
+      # @param [ Integer ] limit The number of documents to return.
+      #
       # @return [ Document ] The first document.
-      def first(*args)
-        eager_load([documents.first]).first
+      def first(limit = nil)
+        if limit
+          eager_load(documents.first(limit))
+        else
+          eager_load([documents.first]).first
+        end
       end
       alias :one :first
       alias :find_first :first
@@ -159,9 +165,15 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
+      # @param [ Integer ] limit The number of documents to return.
+      #
       # @return [ Document ] The last document.
-      def last
-        eager_load([documents.last]).first
+      def last(limit = nil)
+        if limit
+          eager_load(documents.last(limit))
+        else
+          eager_load([documents.last]).first
+        end
       end
 
       # Take the given number of documents from the database.

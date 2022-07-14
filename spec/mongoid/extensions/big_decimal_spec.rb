@@ -67,7 +67,7 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -89,7 +89,7 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -100,7 +100,7 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -195,6 +195,7 @@ describe Mongoid::Extensions::BigDecimal do
       let(:mongoized) do
         BigDecimal.mongoize(value)
       end
+
       context "when the value is a BigDecimal" do
 
         let(:value) do
@@ -424,6 +425,16 @@ describe Mongoid::Extensions::BigDecimal do
           expect(mongoized).to eq("-Infinity")
         end
       end
+
+      context "when the value is a decimal128" do
+        let(:value) do
+          BSON::Decimal128.new("42")
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq("42")
+        end
+      end
     end
 
     describe "#mongoize" do
@@ -457,7 +468,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "raises an error" do
-          expect(demongoized).to be_nil
+          expect(demongoized).to eq(nil)
         end
       end
 
@@ -500,7 +511,7 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -600,7 +611,7 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -611,7 +622,7 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -662,8 +673,8 @@ describe Mongoid::Extensions::BigDecimal do
           ""
         end
 
-        it "returns an empty String" do
-          expect(mongoized).to eq(value)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -695,8 +706,8 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "returns the non-numeric String" do
-          expect(mongoized).to eq(value)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -717,8 +728,8 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "returns true" do
-          expect(mongoized).to eq(value)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -728,8 +739,8 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "returns false" do
-          expect(mongoized).to eq(value)
+        it "returns nil" do
+          expect(mongoized).to be_nil
         end
       end
 
@@ -851,6 +862,16 @@ describe Mongoid::Extensions::BigDecimal do
 
         it "returns a BSON::Decimal128 representation of negative Infinity" do
           expect(mongoized).to eq(BSON::Decimal128.new("-Infinity"))
+        end
+      end
+
+      context "when the value is a decimal128" do
+        let(:value) do
+          BSON::Decimal128.new("42")
+        end
+
+        it "returns a String" do
+          expect(mongoized).to eq(value)
         end
       end
     end

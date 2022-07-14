@@ -191,7 +191,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when using a custom discriminator_key" do 
+    context "when using a custom discriminator_key" do
       context "when indexes have not been added" do
         let(:klass) do
           Class.new do
@@ -202,15 +202,15 @@ describe Mongoid::Indexable do
             end
           end
         end
-  
+
         before do
           klass.add_indexes
         end
-  
+
         let(:spec) do
           klass.index_specification(dkey: 1)
         end
-  
+
         it "adds the _type index" do
           expect(spec.options).to eq(unique: false, background: true)
         end
@@ -420,6 +420,18 @@ describe Mongoid::Indexable do
 
       it "sets the geo haystack index with the bucket_size option" do
         expect(options).to eq({ min: -200, max: 200, bucket_size: 0.5 })
+      end
+    end
+
+    context "when providing a geo haystack index with a bucket_size" do
+
+      let(:message) do
+        'The geoHaystack type is deprecated.'
+      end
+
+      it "logs a deprecation warning" do
+        expect(Mongoid::Warnings).to receive(:warn_geo_haystack_deprecated)
+        klass.index({ location: "geoHaystack" }, { min: -200, max: 200, bucket_size: 0.5 })
       end
     end
 

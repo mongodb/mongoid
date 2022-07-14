@@ -87,7 +87,7 @@ module Mongoid
       # @example Mongoize the object.
       #   object.mongoize
       #
-      # @return [ Array ] The object.
+      # @return [ Array | nil ] The object or nil.
       def mongoize
         ::Array.mongoize(self)
       end
@@ -144,12 +144,12 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Array ] The object mongoized.
+        # @return [ Array | nil ] The object mongoized or nil.
         def mongoize(object)
-          if object.is_a?(::Array)
-            evolve(object).collect{ |obj| obj.class.mongoize(obj) }
-          else
-            evolve(object)
+          return if object.nil?
+          case object
+          when ::Array, ::Set
+            object.map(&:mongoize)
           end
         end
 
