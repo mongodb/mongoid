@@ -43,7 +43,7 @@ module Mongoid
             # @return [ Time ] The evolved date time.
             def evolve(object)
               res = begin
-                object.try(:__evolve_date__)
+                object.try(:__evolve_time__)
               rescue ArgumentError
                 nil
               end
