@@ -39,7 +39,15 @@ module Mongoid
         #
         # @return [ Date | nil ] The object as a date or nil.
         def demongoize(object)
-          return nil if object.nil?
+          return if object.nil?
+          if object.is_a?(String)
+            object = begin
+              object.__mongoize_time__
+            rescue ArgumentError
+              nil
+            end
+          end
+
           if object.acts_like?(:time) || object.acts_like?(:date)
             ::Date.new(object.year, object.month, object.day)
           end

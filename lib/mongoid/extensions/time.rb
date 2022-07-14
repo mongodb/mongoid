@@ -52,9 +52,15 @@ module Mongoid
             Mongoid::Config.use_utc? ? object : object.getlocal
           elsif object.acts_like?(:date)
             ::Date.demongoize(object).to_time
+          elsif object.is_a?(String)
+            begin
+              object.__mongoize_time__
+            rescue ArgumentError
+              nil
+            end
           end
 
-          return unless time
+          return if time.nil?
 
           if Mongoid::Config.use_activesupport_time_zone?
             time.in_time_zone(Mongoid.time_zone)
