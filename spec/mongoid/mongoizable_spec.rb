@@ -4,27 +4,54 @@ require "spec_helper"
 
 # This file is for testing the functionality of uncastable values for all
 # mongoizable classes.
-describe "Mongoize methods" do
+describe "mongoize/demongoize methods" do
 
   shared_examples "handles uncastable values" do
 
-    context "when passing an invalid value" do
-      context "to mongoize" do
-        it "returns nil" do
-          expect(klass.mongoize(invalid_value)).to be_nil
+    describe ".mongoize" do
+
+      context "when passing an invalid value" do
+        context "to mongoize" do
+          it "returns nil" do
+            expect(klass.mongoize(invalid_value)).to be_nil
+          end
+        end
+
+        context "when assigning an invalid value to a field" do
+          let(:catalog) { Catalog.create!(field_name => invalid_value) }
+
+          it "returns nil" do
+            catalog.attributes[field_name].should be_nil
+          end
+
+          it "persists nil" do
+            Catalog.find(catalog._id).attributes[field_name].should be_nil
+          end
         end
       end
     end
 
-    context "when assigning an invalid value to a field" do
-      let(:catalog) { Catalog.create!(field_name => invalid_value) }
+    describe ".demongoize" do
 
-      it "returns nil" do
-        catalog.attributes[field_name].should be_nil
-      end
+      context "when passing an invalid value" do
+        context "to demongoize" do
+          it "returns nil" do
+            expect(klass.demongoize(invalid_value)).to be_nil
+          end
+        end
 
-      it "persists nil" do
-        Catalog.find(catalog._id).attributes[field_name].should be_nil
+        context "when retrieving an invalid value from the db" do
+
+          before do
+            Catalog.collection.insert_one(field_name => invalid_value)
+          end
+
+          let(:catalog) { Catalog.first }
+
+          it "returns nil" do
+            catalog.send(field_name).should be_nil
+          end
+        end
       end
     end
   end
@@ -40,14 +67,27 @@ describe "Mongoize methods" do
     end
 
     context "when assigning an invalid value to a field" do
-      let(:catalog) { Catalog.create!(field_name => invalid_value) }
+      let!(:catalog) { Catalog.create!(field_name => invalid_value) }
+      let(:from_db) { Catalog.find(catalog._id) }
 
       it "returns the inputted value" do
         catalog.attributes[field_name].should be_nil
       end
 
       it "persists the inputted value" do
-        Catalog.find(catalog._id).attributes[field_name].should be_nil
+        from_db.attributes[field_name].should be_nil
+      end
+    end
+
+    context "when reading an invalid value from the db" do
+      before do
+        Catalog.collection.insert_one(field_name => invalid_value)
+      end
+
+      let(:from_db) { Catalog.first }
+
+      it "reads the inputted value" do
+        from_db.send(field_name).should eq(demongoized_value)
       end
     end
   end
@@ -56,8 +96,10 @@ describe "Mongoize methods" do
     let(:invalid_value) { 1 }
     let(:klass) { Array }
     let(:field_name) { :array_field }
+    let(:mongoized_value) { nil }
+    let(:demongoized_value) { 1 }
 
-    include_examples "handles uncastable values"
+    include_examples "pushes through uncastable values"
   end
 
   describe BigDecimal do
@@ -104,8 +146,10 @@ describe "Mongoize methods" do
     let(:invalid_value) { 1 }
     let(:klass) { described_class }
     let(:field_name) { :hash_field }
+    let(:mongoized_value) { nil }
+    let(:demongoized_value) { 1 }
 
-    include_examples "handles uncastable values"
+    include_examples "pushes through uncastable values"
   end
 
   describe Integer do
@@ -116,10 +160,10 @@ describe "Mongoize methods" do
     include_examples "handles uncastable values"
   end
 
-
   describe BSON::ObjectId do
     let(:invalid_value) { "invalid value" }
     let(:mongoized_value) { invalid_value }
+    let(:demongoized_value) { mongoized_value }
     let(:klass) { described_class }
     let(:field_name) { :object_id_field }
 
@@ -161,6 +205,7 @@ describe "Mongoize methods" do
   describe String do
     let(:invalid_value) { 1 }
     let(:mongoized_value) { "1" }
+    let(:demongoized_value) { mongoized_value }
     let(:klass) { described_class }
     let(:field_name) { :string_field }
 
@@ -170,6 +215,7 @@ describe "Mongoize methods" do
   describe Mongoid::StringifiedSymbol do
     let(:invalid_value) { [] }
     let(:mongoized_value) { "[]" }
+    let(:demongoized_value) { :[] }
     let(:klass) { described_class }
     let(:field_name) { :stringified_symbol_field }
 

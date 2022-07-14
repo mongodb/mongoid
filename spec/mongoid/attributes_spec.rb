@@ -2696,4 +2696,19 @@ describe Mongoid::Attributes do
       church.location.should == { "x" => 1, "y" => 2 }
     end
   end
+
+  context "when modifiying a set referenced with the [] notation" do
+    let(:catalog) { Catalog.create!(set_field: [ 1 ].to_set) }
+
+    before do
+      catalog[:set_field] << 2
+      catalog.save!
+      catalog.reload
+    end
+
+    it "persists the updated hash" do
+      pending "MONGOID-2951"
+      catalog.set_field.should == Set.new([ 1, 2 ])
+    end
+  end
 end

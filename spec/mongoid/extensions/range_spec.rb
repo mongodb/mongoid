@@ -145,6 +145,22 @@ describe Mongoid::Extensions::Range do
         end
       end
     end
+
+    context "when the range doesn't have any correct keys" do
+      let(:hash) { { "min^" => "a", "max^" => "z", "exclude_end^" => true } }
+
+      it "returns nil" do
+        is_expected.to be nil
+      end
+    end
+
+    context "when the range has symbol keys" do
+      let(:hash) { { min: 1, max: 3 } }
+
+      it "returns an ascending range" do
+        is_expected.to eq(1..3)
+      end
+    end
   end
 
   shared_examples_for 'mongoize range' do

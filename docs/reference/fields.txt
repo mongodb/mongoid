@@ -829,12 +829,20 @@ with systems that use the ``id`` field to store value different from ``_id``.
 
 .. _uncastable-values:
 
-Assigning Uncastable Values
----------------------------
+Uncastable Values
+-----------------
 
-In Mongoid 8, Mongoid has standardized the treatment of the assignment of
-"uncastable" values. A value is considered "uncastable" when it cannot be
-coerced to the type of the field. For example:
+In Mongoid 8, Mongoid has standardized the treatment of the assignment and
+reading of "uncastable" values. A value is considered "uncastable" when it
+cannot be coerced to the type of its field. For example, an array would be an
+"uncastable" value to an Integer field.
+
+
+Assigning Uncastable Values
+```````````````````````````
+
+The assignment of uncastable values has been standardized to assign ``nil`` by
+default. Consider the following example:
 
 .. code::
 
@@ -852,7 +860,7 @@ cause a ``nil`` to be written:
 
 .. code::
 
-  user = User.new(name: [ "hello" ])
+  user = User.new(name: [ "Mike", "Trout" ])
   # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
 
 Note that the original uncastable values will be stored in the
@@ -861,7 +869,53 @@ Note that the original uncastable values will be stored in the
 .. code::
 
   user.attributes_before_type_cast["name"]
-  # => ["hello"]
+  # => ["Mike", "Trout"]
+
+
+Reading Uncastable Values
+`````````````````````````
+
+When documents in the database contain values of different types than their
+represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
+it will replace the value with ``nil``. Consider the following model and document in the
+database:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+.. code::
+
+  { _id: ..., name: [ "Mike", "Trout" ] }
+
+Reading this document from the database will result in the model's name field
+containing ``nil``:
+
+.. code::
+
+  User.first.name
+  # => nil
+
+The database value of type array cannot be stored in the attribute, since the
+array can't be coerced to an Integer. Note that the original uncastable values
+will be stored in the ``attributes_before_type_cast`` hash with their field
+names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
+
+.. note::
+
+  The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
+  been changed to permit automatic persistence of mutated container attributes.
+  See `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_ for a
+  longer discussion of this topic.
 
 
 .. _customizing-field-behavior:
@@ -1051,12 +1105,12 @@ in the database:
 .. code-block:: ruby
 
   class ColorMapping
-    
+
     MAPPING = {
       'black' => 0,
       'white' => 1,
     }.freeze
-    
+
     INVERSE_MAPPING = MAPPING.invert.freeze
 
     class << self
@@ -1085,11 +1139,11 @@ in the database:
     include Mongoid::Document
     field :color, type: ColorMapping
   end
-  
+
   profile = Profile.new(color: 'white')
   profile.color
   # => "white"
-  
+
   # Writes 0 to color field
   profile.save!
 

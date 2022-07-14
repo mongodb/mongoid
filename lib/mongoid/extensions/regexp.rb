@@ -25,6 +25,7 @@ module Mongoid
         rescue RegexpError
           nil
         end
+        alias :demongoize :mongoize
       end
     end
   end
