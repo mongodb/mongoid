@@ -57,17 +57,18 @@ changed in Mongoid 8.0:
 Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.
 
-Storing Uncastable Values
--------------------------
+Storing/Retrieving/Evolving Uncastable Values
+---------------------------------------------
 
-In Mongoid 8, Mongoid standardizes the storing and reading of "uncastable
-values." On attempting to read or write an uncastable value, a ``nil`` is
-returned or written instead. See the section on
+In Mongoid 8, Mongoid standardizes the storing, retrieving and evolving of
+"uncastable values." On attempting to read or write an uncastable value, a
+``nil`` is returned or written instead. When attempting to evolve an
+uncastable value, the inputted value is returned. See the section on
 :ref:`Uncastable Values <uncastable-values>` for more details.
 
-Some ``mongoize`` and ``demongoize`` methods were also changed to perform
-consistently with rails and the other ``mongoize`` and ``demongoize`` methods.
-The following is a table of the changes in functionality:
+Some ``mongoize``, ``demongoize`` and ``evolve`` methods were also changed to
+perform consistently with rails and the other ``mongoize``, ``demongoize`` and
+``evolve`` methods. The following is a table of the changes in functionality:
 
 +--------------+------------------------+------------------------+-----------------------+
 | Field Type   | Situation              | Previous Functionality | New Functionality     |
@@ -112,8 +113,12 @@ The following is a table of the changes in functionality:
 |              | -0400"                 | for "2022-07-14        |                       |
 |              |                        | 14:45:51 -0400":String |                       |
 +--------------+------------------------+------------------------+-----------------------+
-| All Other    | When an uncastable     | undefined behavior,    | return ``nil``        |
-| Types        | value is assigned      | occasionally raise     |                       |
+| All Types    | When an uncastable     | undefined behavior,    | return ``nil``        |
+|              | value is assigned or   | occasionally raise     |                       |
+|              | demongoized            | ``NoMethodError``      |                       |
++--------------+------------------------+------------------------+-----------------------+
+| All Types    | When an uncastable     | undefined behavior,    | return inputted value |
+|              | value is evolved       | occasionally raise     |                       |
 |              |                        | ``NoMethodError``      |                       |
 +--------------+------------------------+------------------------+-----------------------+
 
