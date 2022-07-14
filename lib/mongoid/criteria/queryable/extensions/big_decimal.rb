@@ -23,7 +23,28 @@ module Mongoid
             #   or the inputted object if it is uncastable.
             def evolve(object)
               __evolve__(object) do |obj|
-                mongoize(obj)
+                return if obj.nil?
+                case obj
+                when ::BigDecimal
+                  if Mongoid.map_big_decimal_to_decimal128
+                    BSON::Decimal128.new(obj)
+                  else
+                    obj.to_s
+                  end
+                # Always return on string for backwards compatibility with querying
+                # string-backed BigDecimal fields.
+                when BSON::Decimal128, String then obj
+                else
+                  if obj.numeric?
+                    if Mongoid.map_big_decimal_to_decimal128
+                      BSON::Decimal128.new(object.to_s)
+                    else
+                      obj.to_s
+                    end
+                  else
+                    obj
+                  end
+                end
               end
             end
           end
