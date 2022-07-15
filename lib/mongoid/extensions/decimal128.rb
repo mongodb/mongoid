@@ -14,6 +14,16 @@ module Mongoid
         self
       end
 
+      # Is the BSON::Decimal128 a number?
+      #
+      # @example Is the object a number?.
+      #   object.numeric?
+      #
+      # @return [ true ] Always true.
+      def numeric?
+        true
+      end
+
       module ClassMethods
 
         # Evolve the object into a mongo-friendly value to query with.
