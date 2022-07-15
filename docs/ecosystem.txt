@@ -84,8 +84,8 @@ Integration Libraries
   A Rails-compatible session store for Mongoid.
 
 
-Corporate Users
-===============
+Companies
+=========
 
 These companies are proudly powered by MongoDB and Mongoid:
 
