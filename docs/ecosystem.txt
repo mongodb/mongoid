@@ -82,3 +82,13 @@ Integration Libraries
 - `Mongo Session Store <https://github.com/mongoid/mongo_session_store>`_
 
   A Rails-compatible session store for Mongoid.
+
+
+Corporate Users
+===============
+
+These companies are proudly powered by MongoDB and Mongoid:
+
+- `TableCheck <https://www.tablecheck.com/en/join/>`_
+
+  Restaurant reservation booking and guest management platform used by top hospitality brands worldwide.
