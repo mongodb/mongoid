@@ -125,6 +125,10 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
+    # When this flag is set to false, the view options will be correctly
+    # propagated to readable methods.
+    option :broken_view_options, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

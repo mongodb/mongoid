@@ -349,6 +349,28 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the broken_view_options option in the config' do
+    let(:option) { :broken_view_options }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+
+    context "when broken_view_options default assigned" do
+
+      it "is assigned in the Mongo flag" do
+        expect(Mongo.broken_view_options).to be false
+      end
+    end
+
+    context "when assigning to the broken_view_options" do
+      config_override :broken_view_options, true
+
+      it "also assigns to the Mongo flag" do
+        expect(Mongo.broken_view_options).to be true
+      end
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do

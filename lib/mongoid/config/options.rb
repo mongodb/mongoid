@@ -36,8 +36,16 @@ module Mongoid
             end
           end
 
-          define_method("#{name}=") do |value|
-            settings[name] = value
+          if name.to_sym == :broken_view_options
+            Mongo.send("#{name}=", options[:default])
+            define_method("#{name}=") do |value|
+              Mongo.send("#{name}=", value)
+              settings[name] = value
+            end
+          else
+            define_method("#{name}=") do |value|
+              settings[name] = value
+            end
           end
 
           define_method("#{name}?") do
