@@ -67,6 +67,8 @@ module Mongoid
         Mongo::QueryCache.uncached(&block)
       end
     end
+
+    Middleware = Mongo::QueryCache::Middleware
   end
 end
 
