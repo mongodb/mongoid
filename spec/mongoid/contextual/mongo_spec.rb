@@ -2959,7 +2959,9 @@ describe Mongoid::Contextual::Mongo do
     context "when passed the symbol field name" do
 
       it "performs mapping" do
-        expect(context.map(:name)).to eq ["Depeche Mode", "New Order"]
+        expect do
+          context.map(:name)
+        end.to raise_error(ArgumentError, /wrong number of arguments \(given 1, expected 0\)/)
       end
     end
 
