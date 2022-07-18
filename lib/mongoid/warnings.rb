@@ -24,5 +24,6 @@ module Mongoid
     warning :geo_haystack_deprecated, 'The geoHaystack type is deprecated.'
     warning :as_json_compact_deprecated, '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
     warning :symbol_type_deprecated, 'The BSON Symbol type is deprecated by MongoDB. Please use String or StringifiedSymbol field types instead of the Symbol field type'
+    warning :criteria_cache_deprecated, 'The criteria cache has been deprecated and will be removed in Mongoid 8. Please enable the Mongoid QueryCache to have caching functionality.'
   end
 end

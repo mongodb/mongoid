@@ -44,6 +44,7 @@ module Mongoid
       #
       # @return [ true, false ] If the context is cached.
       def cached?
+        Mongoid::Warnings.warn_criteria_cache_deprecated
         !!@cache
       end
 
