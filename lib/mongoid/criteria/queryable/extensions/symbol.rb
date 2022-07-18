@@ -59,7 +59,9 @@ module Mongoid
             #
             # @return [ Symbol ] The value as a symbol.
             def evolve(object)
-              __evolve__(object) { |obj| obj.to_sym }
+              __evolve__(object) do |obj|
+                obj.try(:to_sym)
+              end
             end
           end
         end

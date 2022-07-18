@@ -12,24 +12,37 @@ module Mongoid
         module BigDecimal
           module ClassMethods
 
-            # Evolves the big decimal into a MongoDB friendly value - in this case
-            # a string.
+            # Evolves the big decimal into a MongoDB friendly value.
             #
             # @example Evolve the big decimal
             #   BigDecimal.evolve(decimal)
             #
             # @param [ BigDecimal ] object The object to convert.
             #
-            # @return [ String ] The big decimal as a string.
+            # @return [ Object ] The big decimal as a string, a Decimal128,
+            #   or the inputted object if it is uncastable.
             def evolve(object)
               __evolve__(object) do |obj|
-                if obj
-                  if obj.is_a?(::BigDecimal) && Mongoid.map_big_decimal_to_decimal128
+                return if obj.nil?
+                case obj
+                when ::BigDecimal
+                  if Mongoid.map_big_decimal_to_decimal128
                     BSON::Decimal128.new(obj)
-                  elsif obj.is_a?(BSON::Decimal128)
-                    obj
                   else
                     obj.to_s
+                  end
+                # Always return on string for backwards compatibility with querying
+                # string-backed BigDecimal fields.
+                when BSON::Decimal128, String then obj
+                else
+                  if obj.numeric?
+                    if Mongoid.map_big_decimal_to_decimal128
+                      BSON::Decimal128.new(object.to_s)
+                    else
+                      obj.to_s
+                    end
+                  else
+                    obj
                   end
                 end
               end

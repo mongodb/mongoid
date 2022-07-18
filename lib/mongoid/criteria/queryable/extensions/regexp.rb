@@ -28,7 +28,7 @@ module Mongoid
             # @return [ Regexp ] The evolved regex.
             def evolve(object)
               __evolve__(object) do |obj|
-                ::Regexp.new(obj)
+                mongoize(obj)
               end
             end
           end

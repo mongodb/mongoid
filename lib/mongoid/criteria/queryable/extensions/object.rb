@@ -167,7 +167,8 @@ module Mongoid
               when ::Range
                 object.__evolve_range__
               else
-                yield(object)
+                res = yield(object)
+                res.nil? ? object : res
               end
             end
           end

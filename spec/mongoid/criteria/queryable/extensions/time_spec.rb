@@ -343,6 +343,17 @@ describe Time do
       end
     end
 
+    context "when provided an invalid string" do
+
+      let(:evolved) do
+        described_class.evolve("bogus")
+      end
+
+      it "returns that string" do
+        expect(evolved).to eq("bogus")
+      end
+    end
+
     context "when provided nil" do
 
       it "returns nil" do
