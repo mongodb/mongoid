@@ -13,7 +13,8 @@ module Mongoid
         class_attribute :embedded_relations
         class_attribute :relations
 
-        # A hash that maps aliases to their associations. This is used when
+        # A hash that maps aliases to their associations. This hash maps the
+        # associations "in database name" to its "in code" name. This is used when
         # associations specify the `store_as` option, or on a referenced association.
         # On a referenced association, this is used to map the foreign key to
         # the association's name. For example, if we had the following

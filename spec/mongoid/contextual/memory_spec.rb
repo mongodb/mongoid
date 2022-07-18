@@ -581,15 +581,15 @@ describe Mongoid::Contextual::Memory do
           end
 
           let(:distinct) do
-            context.distinct("passport.name").first
+            context.distinct("pass.name").first
           end
 
           let(:distinct_translations) do
-            context.distinct("passport.name_translations").first
+            context.distinct("pass.name_translations").first
           end
 
           let(:distinct_translations_field) do
-            context.distinct("passport.name_translations.en").first
+            context.distinct("pass.name_translations.en").first
           end
 
           it "returns the translation for the current locale" do

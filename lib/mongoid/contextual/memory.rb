@@ -529,7 +529,8 @@ module Mongoid
               document.send("#{segment}_translations")
             end
           end
-          res.nil? ? document.try(segment) : res
+          meth = klass.aliased_associations[segment] || segment
+          res.nil? ? document.try(meth) : res
         elsif document.is_a?(Hash)
           # TODO: Remove the indifferent access when implementing MONGOID-5410.
           document.key?(segment.to_s) ?
