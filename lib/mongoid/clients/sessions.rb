@@ -43,13 +43,7 @@ module Mongoid
         Threaded.set_session(session)
         yield(session)
       rescue Mongo::Error::InvalidSession => ex
-        if
-          # Driver 2.13.0+
-          defined?(Mongo::Error::SessionsNotSupported) &&
-            Mongo::Error::SessionsNotSupported === ex ||
-          # Legacy drivers
-          ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
-        then
+        if Mongo::Error::SessionsNotSupported === ex
           raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
         end
         raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
@@ -100,13 +94,7 @@ module Mongoid
           Threaded.set_session(session)
           yield(session)
         rescue Mongo::Error::InvalidSession => ex
-          if
-            # Driver 2.13.0+
-            defined?(Mongo::Error::SessionsNotSupported) &&
-              Mongo::Error::SessionsNotSupported === ex ||
-            # Legacy drivers
-            ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
-          then
+          if Mongo::Error::SessionsNotSupported === ex
             raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
           end
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)

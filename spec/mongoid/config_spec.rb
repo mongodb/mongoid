@@ -563,9 +563,6 @@ describe Mongoid::Config do
 
       let(:client) { Mongoid.default_client }
 
-      # Wrapping libraries are only recognized by driver 2.13.0+.
-      min_driver_version '2.13'
-
       it 'passes uuid to driver' do
         Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
           auto_encryption_options: {
