@@ -53,15 +53,15 @@ sets:
     values:
       - 233
       - '-974.332'
-      - ~
+      - ~ # ignored
       - 532.45642
       - '-5675'
       - 348.434
-      - 'Foobar'
+      - 'Foobar' # ignored
       - -3394
       - -493
-      - ''
-      - '0 1 2 3'
+      - '' # ignored
+      - '0 1 2 3' # ignored
       - !ruby/object:BigDecimal 18:0.53245642e3
       - -5675
       - '0.434'
@@ -69,7 +69,7 @@ sets:
       - 0.434
       - 7455.96
       - -0.0544
-      - '   '
+      - '   ' # ignored
     expected:
       integer:
         avg: -7484.7857
