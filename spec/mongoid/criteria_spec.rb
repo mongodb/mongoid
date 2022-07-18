@@ -495,17 +495,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#cache" do
-
-    let(:criteria) do
-      Band.where(name: "Depeche Mode")
-    end
-
-    it "sets the cache option to be false" do
-      expect(criteria.cache).to_not be_cached
-    end
-  end
-
   describe "#context" do
 
     context "when the model is embedded" do

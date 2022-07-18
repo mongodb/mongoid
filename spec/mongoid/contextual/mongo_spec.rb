@@ -44,39 +44,6 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  describe "#cached?" do
-
-    context "when the criteria is cached" do
-
-      let(:criteria) do
-        Band.all.cache
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "always returns false" do
-        expect(context).to_not be_cached
-      end
-    end
-
-    context "when the criteria is not cached" do
-
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns false" do
-        expect(context).to_not be_cached
-      end
-    end
-  end
-
   describe "#count" do
 
     let!(:depeche) do
@@ -2187,14 +2154,15 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when calling #first then #last" do
+      context "when calling #first then #last and the query cache is enabled" do
+        query_cache_enabled
 
         let(:context) do
           described_class.new(criteria)
         end
 
         let(:criteria) do
-          Band.all.cache
+          Band.all
         end
 
         before do
@@ -2209,8 +2177,10 @@ describe Mongoid::Contextual::Mongo do
           let(:before_limit) { 2 }
           let(:limit) { 1 }
 
-          it "gets the correct document" do
-            expect(docs).to eq([rolling_stones])
+          it "gets the correct document and hits the database" do
+            expect_query(1) do
+              expect(docs).to eq([rolling_stones])
+            end
           end
         end
       end
@@ -2530,14 +2500,15 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when calling #last then #first" do
+    context "when calling #last then #first and the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
         described_class.new(criteria)
       end
 
       let(:criteria) do
-        Band.all.cache
+        Band.all
       end
 
       before do
@@ -2553,8 +2524,9 @@ describe Mongoid::Contextual::Mongo do
         let(:limit) { 1 }
 
         it "hits the database" do
-          expect(context).to receive(:view).twice.and_call_original
-          docs
+          expect_query(1) do
+            docs
+          end
         end
 
         it "gets the correct document" do
