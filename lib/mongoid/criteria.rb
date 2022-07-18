@@ -121,6 +121,8 @@ module Mongoid
     #   criteria.cache
     #
     # @return [ Criteria ] The cloned criteria.
+    #
+    # @deprecated
     def cache
       Mongoid::Warnings.warn_criteria_cache_deprecated
       clone
@@ -132,6 +134,8 @@ module Mongoid
     #   criteria.cached?
     #
     # @return [ true, false ] If the criteria is flagged as cached.
+    #
+    # @deprecated
     def cached?
       Mongoid::Warnings.warn_criteria_cache_deprecated
       false
