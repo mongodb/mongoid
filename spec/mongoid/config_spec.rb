@@ -233,6 +233,12 @@ describe Mongoid::Config do
       end
     end
 
+    around do |ex|
+      temp = Mongoid.send(option)
+      ex.run
+      Mongoid.send("#{option}=", temp)
+    end
+
     context 'when the value is false' do
 
       let(:conf) do
@@ -353,14 +359,14 @@ describe Mongoid::Config do
     let(:option) { :broken_view_options }
     let(:default) { false }
 
-    it_behaves_like "a config option"
-
     context "when broken_view_options default assigned" do
 
       it "is assigned in the Mongo flag" do
         expect(Mongo.broken_view_options).to be false
       end
     end
+
+    it_behaves_like "a config option"
 
     context "when assigning to the broken_view_options" do
       config_override :broken_view_options, true
