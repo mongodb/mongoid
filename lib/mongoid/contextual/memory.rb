@@ -242,7 +242,19 @@ module Mongoid
       #
       # @return [ Array ] The array of plucked values.
       def pluck(*fields)
-        documents.pluck(*fields)
+        if Mongoid.legacy_pluck_distinct
+          documents.pluck(*fields)
+        else
+          documents.map do |d|
+            if fields.length == 1
+              retrieve_value_at_path(d, fields.first)
+            else
+              fields.map do |field|
+                retrieve_value_at_path(d, field)
+              end
+            end
+          end
+        end
       end
 
       # Tally the field values in memory.
@@ -513,7 +525,7 @@ module Mongoid
               document.send("#{segment}_translations")
             end
           end
-          res.nil? ? document.send(segment) : res
+          res.nil? ? document.try(segment) : res
         elsif document.is_a?(Hash)
           # TODO: Remove the indifferent access when implementing MONGOID-5410.
           document.key?(segment.to_s) ?
