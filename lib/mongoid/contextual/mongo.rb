@@ -304,29 +304,6 @@ module Mongoid
         GeoNear.new(collection, criteria, coordinates)
       end
 
-      # Invoke the block for each element of Contextual. Create a new array
-      # containing the values returned by the block.
-      #
-      # If the symbol field name is passed instead of the block, additional
-      # optimizations would be used.
-      #
-      # @example Map by some field.
-      #   context.map(:field1)
-      #
-      # @example Map with block.
-      #   context.map(&:field1)
-      #
-      # @param [ Symbol ] field The field name.
-      #
-      # @return [ Array ] The result of mapping.
-      def map(field = nil, &block)
-        if block_given?
-          super(&block)
-        else
-          criteria.pluck(field)
-        end
-      end
-
       # Create the new Mongo context. This delegates operations to the
       # underlying driver.
       #
