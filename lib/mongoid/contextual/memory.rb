@@ -78,7 +78,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        documents.map{ |doc| doc.send(field) }.uniq
+        if Mongoid.legacy_pluck_distinct
+          documents.map{ |doc| doc.send(field) }.uniq
+        else
+          pluck(field).uniq
+        end
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -239,14 +243,35 @@ module Mongoid
       end
 
       def pluck(*fields)
-        fields = Array.wrap(fields)
-        documents.map do |doc|
-          if fields.size == 1
-            doc[fields.first]
-          else
-            fields.map { |n| doc[n] }.compact
+        if Mongoid.legacy_pluck_distinct
+          documents.pluck(*fields)
+        else
+          documents.map do |d|
+            if fields.length == 1
+              retrieve_value_at_path(d, fields.first)
+            else
+              fields.map do |field|
+                retrieve_value_at_path(d, field)
+              end
+            end
           end
-        end.compact
+        end
+      end
+
+      # Tally the field values in memory.
+      #
+      # @example Get the counts of values in memory.
+      #   context.tally(:name)
+      #
+      # @param [ String | Symbol ] field Field to tally.
+      #
+      # @return [ Hash ] The hash of counts.
+      def tally(field)
+        return documents.each_with_object({}) do |d, acc|
+          v = retrieve_value_at_path(d, field)
+          acc[v] ||= 0
+          acc[v] += 1
+        end
       end
 
       # Skips the provided number of documents.
@@ -463,6 +488,63 @@ module Mongoid
 
       def _session
         @criteria.send(:_session)
+      end
+
+      # Retrieve the value for the current document at the given field path.
+      #
+      # For example, if I have the following models:
+      #
+      #   User has_many Accounts
+      #   address is a hash on Account
+      #
+      #   u = User.new(accounts: [ Account.new(address: { street: "W 50th" }) ])
+      #   retrieve_value_at_path(u, "user.accounts.address.street")
+      #   # => [ "W 50th" ]
+      #
+      # Note that the result is in an array since accounts is an array. If it
+      # was nested in two arrays the result would be in a 2D array.
+      #
+      # @param [ Object ] document The object to traverse the field path.
+      # @param [ String ] field_path The dotted string that represents the path
+      #   to the value.
+      #
+      # @return [ Object | nil ] The value at the given field path or nil if it
+      #   doesn't exist.
+      def retrieve_value_at_path(document, field_path)
+        return if field_path.blank? || !document
+        segment, remaining = field_path.to_s.split('.', 2)
+
+        curr = if document.is_a?(Document)
+          # Retrieves field for segment to check localization. Only does one
+          # iteration since there's no dots
+          res = if remaining
+            field = document.class.traverse_association_tree(segment)
+            # If this is a localized field, and there are remaining, get the
+            # _translations hash so that we can get the specified translation in
+            # the remaining
+            if field&.localized?
+              document.send("#{segment}_translations")
+            end
+          end
+          meth = klass.aliased_associations[segment] || segment
+          res.nil? ? document.try(meth) : res
+        elsif document.is_a?(Hash)
+          # TODO: Remove the indifferent access when implementing MONGOID-5410.
+          document.key?(segment.to_s) ?
+            document[segment.to_s] :
+            document[segment.to_sym]
+        else
+          nil
+        end
+
+        return curr unless remaining
+
+        if curr.is_a?(Array)
+          # compact is used for consistency with server behavior.
+          curr.map { |d| retrieve_value_at_path(d, remaining) }.compact
+        else
+          retrieve_value_at_path(curr, remaining)
+        end
       end
     end
   end
