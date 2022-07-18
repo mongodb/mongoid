@@ -500,6 +500,10 @@ describe Mongoid::Contextual::Memory do
           d.save!
         end
 
+        after do
+          I18n.locale = :en
+        end
+
         let(:criteria) do
           Dictionary.all.tap do |crit|
             crit.documents = [ Dictionary.first ]
@@ -551,6 +555,10 @@ describe Mongoid::Contextual::Memory do
             I18n.fallbacks = prev_fallbacks
           end
 
+          after do
+            I18n.locale = :en
+          end
+
           let(:distinct) do
             context.distinct(:description).first
           end
@@ -572,6 +580,10 @@ describe Mongoid::Contextual::Memory do
             p.name = "Nissim"
 
             Person.create!(passport: p, employer_id: 12345)
+          end
+
+          after do
+            I18n.locale = :en
           end
 
           let(:criteria) do
@@ -1595,6 +1607,10 @@ describe Mongoid::Contextual::Memory do
             I18n.fallbacks = prev_fallbacks
           end
 
+          after do
+            I18n.locale = :en
+          end
+
           let(:plucked) do
             context.pluck(:description).first
           end
@@ -1616,6 +1632,10 @@ describe Mongoid::Contextual::Memory do
             p.name = "Nissim"
 
             Person.create!(passport: p, employer_id: 12345)
+          end
+
+          after do
+            I18n.locale = :en
           end
 
           let(:plucked) do
