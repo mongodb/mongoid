@@ -322,11 +322,14 @@ module Mongoid
       # @example Map with block.
       #   context.map(&:field1)
       #
+      # @example Map by some field.
+      #   context.map(:field1)
+      #
       # @param [ Symbol ] field The field name.
       #
       # @return [ Array ] The result of mapping.
       def map(field = nil, &block)
-        if field
+        if !field.nil?
           Mongoid::Warnings.warn_map_field_deprecated
         end
 
