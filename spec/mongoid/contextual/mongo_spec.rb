@@ -2961,7 +2961,7 @@ describe Mongoid::Contextual::Mongo do
       it "performs mapping" do
         expect do
           context.map(:name)
-        end.to raise_error(ArgumentError, /wrong number of arguments \(given 1, expected 0\)/)
+        end.to raise_error(ArgumentError)
       end
     end
 
