@@ -301,7 +301,7 @@ describe Mongoid::Extensions::Time do
               Time.now.utc_offset
             end
 
-            let(:expected_time) { Time.parse("2010-11-19 05:00:00 +0000").in_time_zone }
+            let(:expected_time) { Time.parse("2010-11-19 00:00:00 +0000") - Time.parse(string).utc_offset }
 
             it 'test operates in multiple time zones' do
               expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
@@ -458,7 +458,7 @@ describe Mongoid::Extensions::Time do
               Time.now.utc_offset
             end
 
-            let(:expected_time) { Time.parse("2010-11-19 05:00:00 +0000").in_time_zone }
+            let(:expected_time) { Time.parse("2010-11-19 00:00:00 +0000") - Time.parse(string).utc_offset }
 
             it 'test operates in multiple time zones' do
               expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
@@ -639,7 +639,7 @@ describe Mongoid::Extensions::Time do
               Time.now.utc_offset
             end
 
-            let(:expected_time) { Time.parse("2010-11-19 05:00:00 +0000").in_time_zone }
+            let(:expected_time) { Time.parse("2010-11-19 00:00:00 +0000") - Time.parse(string).utc_offset }
 
             it 'test operates in multiple time zones' do
               expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
@@ -792,7 +792,7 @@ describe Mongoid::Extensions::Time do
               Time.now.utc_offset
             end
 
-            let(:expected_time) { Time.parse("2010-11-19 05:00:00 +0000").in_time_zone }
+            let(:expected_time) { Time.parse("2010-11-19 00:00:00 +0000") - Time.parse(string).utc_offset }
 
             it 'test operates in multiple time zones' do
               expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
