@@ -37,19 +37,6 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
-      # Is the context cached?
-      #
-      # @example Is the context cached?
-      #   context.cached?
-      #
-      # @return [ false ] Always return false.
-      #
-      # @deprecated
-      def cached?
-        Mongoid::Warnings.warn_criteria_cache_deprecated
-        false
-      end
-
       # Get the number of documents matching the query.
       #
       # @example Get the number of matching documents.
