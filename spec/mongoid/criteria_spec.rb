@@ -3183,6 +3183,10 @@ describe Mongoid::Criteria do
           I18n.fallbacks = prev_fallbacks
         end
 
+        after do
+          I18n.locale = :en
+        end
+
         let(:plucked) do
           Dictionary.all.pluck(:description).first
         end
@@ -3216,6 +3220,10 @@ describe Mongoid::Criteria do
           p.name = "Nissim"
 
           Person.create!(passport: p, employer_id: 12345)
+        end
+
+        after do
+          I18n.locale = :en
         end
 
         let(:plucked) do
