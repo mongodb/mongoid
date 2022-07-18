@@ -78,7 +78,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        documents.map{ |doc| doc.send(field) }.uniq
+        if Mongoid.legacy_pluck_distinct
+          documents.map{ |doc| doc.send(field) }.uniq
+        else
+          pluck(field).uniq
+        end
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
