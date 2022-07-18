@@ -1678,12 +1678,9 @@ describe Mongoid::Contextual::Memory do
           Band.where(name: maniacs.name).pluck(:sales)
         end
 
-        with_config_values :map_big_decimal_to_decimal128, true, false do
-
-          it "demongoizes the field" do
-            expect(plucked.first).to be_a(BigDecimal)
-            expect(plucked.first).to eq(BigDecimal("1E2"))
-          end
+        it "demongoizes the field" do
+          expect(plucked.first).to be_a(BigDecimal)
+          expect(plucked.first).to eq(BigDecimal("1E2"))
         end
       end
 
