@@ -6,16 +6,6 @@ module Mongoid
   module QueryCache
 
     class << self
-      # Get the cached queries.
-      #
-      # @example Get the cached queries from the current thread.
-      #   QueryCache.cache_table
-      #
-      # @return [ Hash ] The hash of cached queries.
-      # @api private
-      def cache_table
-        raise NotImplementedError, "Mongoid does not expose driver's query cache table"
-      end
 
       # Clear the query cache.
       #
