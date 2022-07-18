@@ -319,11 +319,11 @@ module Mongoid
       # If the symbol field name is passed instead of the block, additional
       # optimizations would be used.
       #
-      # @example Map with block.
-      #   context.map(&:field1)
-      #
       # @example Map by some field.
       #   context.map(:field1)
+      #
+      # @example Map with block.
+      #   context.map(&:field1)
       #
       # @param [ Symbol ] field The field name.
       #
