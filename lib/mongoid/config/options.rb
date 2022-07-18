@@ -30,13 +30,13 @@ module Mongoid
 
         class_eval do
           # log_level accessor is defined specially below
-          unless name.to_sym == :log_level
+          unless name == :log_level
             define_method(name) do
               settings[name]
             end
           end
 
-          if name.to_sym == :broken_view_options
+          if name == :broken_view_options
             Mongo.send("#{name}=", options[:default])
             define_method("#{name}=") do |value|
               Mongo.send("#{name}=", value)
