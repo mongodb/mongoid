@@ -122,6 +122,7 @@ module Mongoid
     #
     # @return [ Criteria ] The cloned criteria.
     def cache
+      Mongoid::Warnings.warn_criteria_cache_deprecated
       crit = clone
       crit.options.merge!(cache: true)
       crit
@@ -134,6 +135,7 @@ module Mongoid
     #
     # @return [ true, false ] If the criteria is flagged as cached.
     def cached?
+      Mongoid::Warnings.warn_criteria_cache_deprecated
       options[:cache] == true
     end
 

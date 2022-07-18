@@ -22,6 +22,7 @@ module Mongoid
     end
 
     warning :id_sort_deprecated, 'The :id_sort option has been deprecated. Use Mongo#take to get a document without a sort on _id.'
+    warning :criteria_cache_deprecated, 'The criteria cache has been deprecated and will be removed in Mongoid 8. Please enable the Mongoid QueryCache to have caching functionality.'
   end
 end
 
