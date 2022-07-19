@@ -53,7 +53,7 @@ test_nil:
           - <%= address %>
         <% end %>
   driver_options:
-    broken_view_options: <% nil %>
+    broken_view_options:
     validate_update_replace: false
 
 test_with_max_staleness:
