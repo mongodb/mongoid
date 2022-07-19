@@ -437,6 +437,26 @@ for details on driver options.
       # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
       # indexes in the background by default. (default: false)
       background_indexing: false
+    # Configure driver-specific options. (optional)
+    driver_options:
+      # When this flag is turned off, inline options will be correctly
+      # propagated to Mongoid and Driver finder methods. When this flag is turned
+      # on those options will be ignored. For example, with this flag turned
+      # off, Band.all.limit(1).count will take the limit into account, while
+      # when this flag is turned on, that limit is ignored. The affected driver
+      # methods are: aggregate, count, count_documents, distinct, and
+      # estimated_document_count. The corresponding Mongoid methods are also
+      # affected. (default: false, driver version: 2.18.0+)
+      #broken_view_options: false
+
+      # Validates that there are no atomic operators (those that start with $)
+      # in the root of a replacement document, and that there are only atomic
+      # operators at the root of an update document. If this feature flag is on,
+      # an error will be raised on an invalid update or replacement document,
+      # if not, a warning will be output to the logs. This flag does not affect
+      # Mongoid as of 8.0, but will affect calls to driver update/replace
+      # methods. (default: false, driver version: 2.18.0+)
+      #validate_update_replace: false
 
 ERb Preprocessing
 =================

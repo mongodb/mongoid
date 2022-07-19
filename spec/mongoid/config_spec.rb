@@ -469,6 +469,25 @@ describe Mongoid::Config do
       end
     end
 
+    context "when provided an environment with driver options" do
+
+      before do
+        described_class.load!(file, :test)
+      end
+
+      after do
+        described_class.reset
+      end
+
+      it "sets the Mongo.broken_view_options option" do
+        expect(Mongo.broken_view_options).to eq(false)
+      end
+
+      it "sets the Mongo.validate_update_replace option" do
+        expect(Mongo.validate_update_replace).to eq(false)
+      end
+    end
+
     context "when the rack environment is set" do
 
       before do
