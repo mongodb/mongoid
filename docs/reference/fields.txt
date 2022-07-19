@@ -1068,18 +1068,18 @@ setter methods for fields of your custom type.
    venue = Venue.new(location: point) # This uses the Point#mongoize instance method.
    venue = Venue.new(location: [ 12, 24 ]) # This uses the Point.mongoize class method.
 
-.. note::
-
-  The ``mongoize`` method should return ``nil`` on values that are uncastable to
-  your custom type. See the section on :ref:`Uncastable Values <uncastable-values>`
-  for more details.
-
 The class method ``demongoize`` does the inverse of ``mongoize``. It takes the raw object
 from the MongoDB Ruby driver and converts it to an instance of your custom type.
 In this case, the database driver returns an ``Array`` and we instantiate a ``Point`` from it.
 The ``demongoize`` method is used when calling the getters of fields for your custom type.
 Note that in the example above, since ``demongoize`` calls ``Point.new``, a new instance of
 ``Point`` will be generated on each call to the getter.
+
+.. note::
+
+  The ``mongoize`` and ``demongoize`` methods should return ``nil`` on values
+  that are uncastable to your custom type. See the section on :ref:`Uncastable
+  Values <uncastable-values>` for more details.
 
 Lastly, the class method ``evolve`` is similar to ``mongoize``, however it is used
 when transforming objects for use in Mongoid query criteria.

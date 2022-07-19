@@ -45,7 +45,12 @@ module Mongoid
             #
             # @return [ Time ] The evolved date.
             def evolve(object)
-              object.__evolve_date__
+              res = begin
+                object.try(:__evolve_date__)
+              rescue ArgumentError
+                nil
+              end
+              res.nil? ? object : res
             end
           end
         end

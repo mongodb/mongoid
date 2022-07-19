@@ -2063,31 +2063,19 @@ document inserts, updates, and deletion.
 Query Cache
 ===========
 
-Mongoid and the underlying Ruby MongoDB driver provide query caching
-functionality. When enabled, the query cache saves the results of
-previously executed find and aggregation queries and reuses them in
-the future instead of performing the queries again, thus increasing
-application performance and reducing database load.
+The Ruby MongoDB driver provide query caching functionality. When enabled, the
+query cache saves the results of previously executed find and aggregation
+queries and reuses them in the future instead of performing the queries again,
+thus increasing application performance and reducing database load.
 
 The query cache has historically been provided by Mongoid but as of driver
 version 2.14.0, the query cache implementation has been moved into the driver.
 When Mongoid is used with driver version 2.14.0 or later, Mongoid delegates
-all work to the driver's query cache implementation. When Mongoid is used
-with driver versions 2.13.x and earlier, Mongoid utilizes its own, legacy,
-query cache implementation.
+all work to the driver's query cache implementation.
 
 Please review the `driver query cache documentation
 <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_
 for details about the driver's query cache behavior.
-
-.. warning::
-
-  The legacy query cache implementation that Mongoid uses when it detects
-  driver version 2.13.x and earlier has a number of limitations and
-  known issues, some of which are severe. If you wish to use the query cache,
-  it is strongly recommended to use driver 2.14.0 or later. The limitations
-  of the legacy Mongoid query cache are :ref:`described below
-  <legacy-query-cache-limitations>`.
 
 The rest of this section assumes that driver 2.14.0 or later is being used and
 Mongoid delegates to the driver's query cache.
@@ -2207,22 +2195,3 @@ To use the cached results, call ``all.to_a.first`` on the model class.
 
 .. _legacy-query-cache-limitations:
 
-Legacy Query Cache Limitations
-------------------------------
-
-When Mongoid uses its legacy query cache due to driver version being older
-than 2.14.0, the following limitations apply:
-
-* The query cache does not cache query results that exceed the batch size.
-  The default batch size is 1000 documents (refer to :ref:`batch_size <batch-size>`.)
-
-* The query cache does not take into account read preference or read concern
-  when deciding whether to return cached results. When performing the same
-  query with a different read preference or read concern with the query cache
-  enabled, incorrect results may be returned.
-
-* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
-  do not invalidate the query cache. Cached results may be stale after performing
-  any of these operations.
-
-* Aggregation results are not cached.

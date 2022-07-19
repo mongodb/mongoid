@@ -66,7 +66,7 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        try_cache(:count) { view.count_documents(options) }
+        view.count_documents(options)
       end
 
       # Get the estimated number of documents matching the query.
@@ -85,7 +85,7 @@ module Mongoid
         unless self.criteria.selector.empty?
           raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
         end
-        try_cache(:estimated_count) { view.estimated_document_count(options) }
+        view.estimated_document_count(options)
       end
 
       # Delete all documents in the database that match the selector.
@@ -153,7 +153,6 @@ module Mongoid
           documents_for_iteration.each do |doc|
             yield_document(doc, &block)
           end
-          @cache_loaded = true
           self
         else
           to_enum
@@ -166,17 +165,11 @@ module Mongoid
       #   context.exists?
       #
       # @note We don't use count here since Mongo does not use counted
-      #   b-tree indexes, unless a count is already cached then that is
-      #   used to determine the value.
+      #   b-tree indexes.
       #
       # @return [ true | false ] If the count is more than zero.
       def exists?
-        return !documents.empty? if cached? && cache_loaded?
-        return @count > 0 if instance_variable_defined?(:@count)
-
-        try_cache(:exists) do
-          !!(view.projection(_id: 1).limit(1).first)
-        end
+        !!(view.projection(_id: 1).limit(1).first)
       end
 
       # Run an explain on the criteria.
@@ -257,14 +250,9 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       def first(limit = nil)
-        if cached? && cache_loaded?
-          return limit ? documents.first(limit) : documents.first
-        end
-        try_numbered_cache(:first, limit) do
-          sort = view.sort || { _id: 1 }
-          if raw_docs = view.sort(sort).limit(limit || 1).to_a
-            process_raw_docs(raw_docs, limit)
-          end
+        sort = view.sort || { _id: 1 }
+        if raw_docs = view.sort(sort).limit(limit || 1).to_a
+          process_raw_docs(raw_docs, limit)
         end
       end
       alias :one :first
@@ -273,7 +261,6 @@ module Mongoid
       #
       # @api private
       def find_first
-        return documents.first if cached? && cache_loaded?
         if raw_doc = view.first
           doc = Factory.from_db(klass, raw_doc, criteria)
           eager_load([doc]).first
@@ -303,29 +290,6 @@ module Mongoid
         GeoNear.new(collection, criteria, coordinates)
       end
 
-      # Invoke the block for each element of Contextual. Create a new array
-      # containing the values returned by the block.
-      #
-      # If the symbol field name is passed instead of the block, additional
-      # optimizations would be used.
-      #
-      # @example Map by some field.
-      #   context.map(:field1)
-      #
-      # @example Map with block.
-      #   context.map(&:field1)
-      #
-      # @param [ Symbol ] field The field name.
-      #
-      # @return [ Array ] The result of mapping.
-      def map(field = nil, &block)
-        if block_given?
-          super(&block)
-        else
-          criteria.pluck(field)
-        end
-      end
-
       # Create the new Mongo context. This delegates operations to the
       # underlying driver.
       #
@@ -334,7 +298,7 @@ module Mongoid
       #
       # @param [ Criteria ] criteria The criteria.
       def initialize(criteria)
-        @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
+        @criteria, @klass = criteria, criteria.klass
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
         @view = collection.find(criteria.selector, session: _session)
@@ -358,15 +322,8 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       def last(limit = nil)
-        if cached? && cache_loaded?
-          return limit ? documents.last(limit) : documents.last
-        end
-        res = try_numbered_cache(:last, limit) do
-          if raw_docs = view.sort(inverse_sorting).limit(limit || 1).to_a
-            process_raw_docs(raw_docs, limit)
-          end
-        end
-        res.is_a?(Array) ? res.reverse : res
+        raw_docs = view.sort(inverse_sorting).limit(limit || 1).to_a.reverse
+        process_raw_docs(raw_docs, limit)
       end
 
       # Returns the number of documents in the database matching
@@ -638,7 +595,7 @@ module Mongoid
 
       # yield the block given or return the cached value
       #
-      # @param [ String, Symbol ] key The instance variable name
+      # @param [ String | Symbol ] key The instance variable name
       # @param [ Integer | nil ] n The number of documents requested or nil
       #   if none is requested.
       #
@@ -778,7 +735,6 @@ module Mongoid
       #
       # @return [ Array<Document> | Mongo::Collection::View ] The docs to iterate.
       def documents_for_iteration
-        return documents if cached? && !documents.empty?
         return view unless eager_loadable?
         docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
         eager_load(docs)
@@ -798,7 +754,6 @@ module Mongoid
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
         yield(doc)
-        documents.push(doc) if cacheable?
       end
 
       private

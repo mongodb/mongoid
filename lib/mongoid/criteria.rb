@@ -430,7 +430,6 @@ module Mongoid
       super
     end
 
-
     # Get a version of this criteria without the options.
     #
     # @example Get the criteria without options.

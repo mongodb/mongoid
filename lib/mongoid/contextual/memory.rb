@@ -78,7 +78,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        documents.map{ |doc| doc.send(field) }.uniq
+        if Mongoid.legacy_pluck_distinct
+          documents.map{ |doc| doc.send(field) }.uniq
+        else
+          pluck(field).uniq
+        end
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -242,7 +246,19 @@ module Mongoid
       #
       # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
-        documents.pluck(*fields)
+        if Mongoid.legacy_pluck_distinct
+          documents.pluck(*fields)
+        else
+          documents.map do |d|
+            if fields.length == 1
+              retrieve_value_at_path(d, fields.first)
+            else
+              fields.map do |field|
+                retrieve_value_at_path(d, field)
+              end
+            end
+          end
+        end
       end
 
       # Tally the field values in memory.
@@ -513,7 +529,8 @@ module Mongoid
               document.send("#{segment}_translations")
             end
           end
-          res.nil? ? document.send(segment) : res
+          meth = klass.aliased_associations[segment] || segment
+          res.nil? ? document.try(meth) : res
         elsif document.is_a?(Hash)
           # TODO: Remove the indifferent access when implementing MONGOID-5410.
           document.key?(segment.to_s) ?

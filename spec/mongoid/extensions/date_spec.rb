@@ -77,12 +77,11 @@ describe Mongoid::Extensions::Date do
       end
     end
 
-    context "when demongoizing a castable value" do
+    context "when demongoizing a string" do
 
       let(:date) { "2022-07-11 14:03:42 -0400" }
 
       it "returns a date" do
-        pending "MONGOID-5315"
         expect(Date.demongoize(date)).to eq(date.to_date)
       end
     end

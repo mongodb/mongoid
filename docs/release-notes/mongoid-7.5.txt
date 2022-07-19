@@ -17,6 +17,13 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+``Array#update_values`` and ``Hash#update_values`` deprecated
+-------------------------------------------------------------
+
+The ``Array#update_values`` and ``Hash#update_values`` methods are deprecated in
+Mongoid 7.5. It is recommended to use ActiveSupport's ``transform_values!``
+method instead.
+
 
 Ruby 2.5 Deprecated
 -------------------
@@ -222,3 +229,13 @@ returned.
 Note that the ``#first/last`` methods apply a sort on ``_id``, which can
 cause performance issues. To get a document without sorting first, use the
 ``Critera#take`` method.
+
+
+``Mongoid::Criteria`` cache deprecated
+--------------------------------------
+
+The ability to cache individual criteria objects has been deprecated in Mongoid
+7.5 and will be dropped in Mongoid 8.
+
+In order to get caching functionality, enable the Mongoid QueryCache. See the
+section on :ref:`QueryCache <query-cache>` for more details.

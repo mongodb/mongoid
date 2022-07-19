@@ -47,5 +47,13 @@ module Mongoid
         Mongoid::Config.send(:clients=, old_config)
       end
     end
+
+    def query_cache_enabled
+      around do |example|
+        Mongoid::QueryCache.cache do
+          example.run
+        end
+      end
+    end
   end
 end

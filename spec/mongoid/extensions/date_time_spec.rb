@@ -73,6 +73,15 @@ describe Mongoid::Extensions::DateTime do
         end
       end
     end
+
+    context "when demongoizing a string" do
+
+      let(:date) { "2022-07-11 14:03:42 -0400" }
+
+      it "returns a date" do
+        expect(DateTime.demongoize(date)).to eq(date.to_datetime)
+      end
+    end
   end
 
   describe ".mongoize" do

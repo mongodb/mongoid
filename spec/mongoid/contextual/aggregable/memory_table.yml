@@ -1,0 +1,88 @@
+sets:
+  integers:
+    values:
+      - 324
+      - 4553
+      - -74
+      - 634
+      - 0
+      - 3484
+      - -3394
+      - 493
+    expected:
+      integer:
+        avg: 752.5
+        sum: 6020
+        min: -3394
+        max: 4553
+      float:
+        avg: 752.5
+        sum: 6020.0
+        min: -3394.0
+        max: 4553.0
+      big_decimal:
+        avg: !ruby/object:BigDecimal 36:0.7525e3
+        sum: !ruby/object:BigDecimal 18:0.602e4
+        min: !ruby/object:BigDecimal 18:-0.3394e4
+        max: !ruby/object:BigDecimal 18:0.4553e4
+
+  floats:
+    values:
+      - 233.132425
+      - -974.332
+      - 532.53323
+      - 0
+    expected:
+      integer:
+        avg: -52.25
+        sum: -209
+        min: -974
+        max: 532
+      float:
+        avg: -52.16658625
+        sum: -208.666345
+        min: -974.332
+        max: 532.53323
+      big_decimal:
+        avg: !ruby/object:BigDecimal 45:-0.5216658625e2
+        sum: !ruby/object:BigDecimal 27:-0.208666345e3
+        min: !ruby/object:BigDecimal 18:-0.974332e3
+        max: !ruby/object:BigDecimal 18:0.53253323e3
+
+  mixed:
+    values:
+      - 233
+      - '-974.332'
+      - ~ # ignored
+      - 532.45642
+      - '-5675'
+      - 348.434
+      - 'Foobar' # ignored
+      - -3394
+      - -493
+      - '' # ignored
+      - '0 1 2 3' # ignored
+      - !ruby/object:BigDecimal 18:0.53245642e3
+      - -5675
+      - '0.434'
+      - !ruby/object:BigDecimal 18:-0.97676e5
+      - 0.434
+      - 7455.96
+      - -0.0544
+      - '   ' # ignored
+    expected:
+      integer:
+        avg: -7484.7857
+        sum: -104787
+        min: -97676
+        max: 7455
+      float:
+        avg: -7484.5865
+        sum: -104784.2116
+        min: -97676.0
+        max: 7455.96
+      big_decimal:
+        avg: !ruby/object:BigDecimal 27:-0.7484586540e4
+        sum: !ruby/object:BigDecimal 27:-0.1047842116e6
+        min: !ruby/object:BigDecimal 18:-0.97676e5
+        max: !ruby/object:BigDecimal 18:0.745596e4
