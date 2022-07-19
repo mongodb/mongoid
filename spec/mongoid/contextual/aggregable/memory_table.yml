@@ -25,6 +25,11 @@ sets:
         sum: !ruby/object:BigDecimal 18:0.602e4
         min: !ruby/object:BigDecimal 18:-0.3394e4
         max: !ruby/object:BigDecimal 18:0.4553e4
+      object:
+        avg: 752.5
+        sum: 6020
+        min: -3394
+        max: 4553
 
   floats:
     values:
@@ -48,6 +53,11 @@ sets:
         sum: !ruby/object:BigDecimal 27:-0.208666345e3
         min: !ruby/object:BigDecimal 18:-0.974332e3
         max: !ruby/object:BigDecimal 18:0.53253323e3
+      object:
+        avg: -52.16658625
+        sum: -208.666345
+        min: -974.332
+        max: 532.53323
 
   mixed:
     values:
@@ -86,3 +96,8 @@ sets:
         sum: !ruby/object:BigDecimal 27:-0.1047842116e6
         min: !ruby/object:BigDecimal 18:-0.97676e5
         max: !ruby/object:BigDecimal 18:0.745596e4
+      object:
+        avg: !ruby/object:BigDecimal 27:-0.7484586540e4
+        sum: !ruby/object:BigDecimal 27:-0.1047842116e6
+        min: !ruby/object:BigDecimal 18:-0.97676e5
+        max: 7455.96

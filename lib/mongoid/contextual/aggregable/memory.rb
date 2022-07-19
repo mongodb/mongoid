@@ -29,7 +29,7 @@ module Mongoid
         #
         # @return [ Numeric ] The average.
         def avg(field)
-          total = count { |doc| !doc.send(field).nil? }
+          total = count { |doc| doc.send(field).numeric? }
           return nil unless total > 0
 
           total = total.to_f if total.is_a?(Integer)
@@ -114,7 +114,36 @@ module Mongoid
         def aggregate_by(field, method)
           return nil unless any?
 
-          map { |doc| doc.public_send(field) }.compact.public_send(method)
+          map { |doc| __coerce_numeric(doc.public_send(field)) }.compact.public_send(method)
+        end
+
+        # Returns the given value if it is numeric, otherwise returns
+        # a given default value. Strings will be coerced to either
+        # Float or Integer depending on format.
+        #
+        # @api private
+        #
+        # @param [ Object ] value The value to return if numeric.
+        #
+        # @return [ Numeric | nil ] The coerced value or nil if the
+        #   original value was not numeric.
+        def __coerce_numeric(value)
+          if value.numeric?
+            case value
+            when BSON::Decimal128
+              value.to_big_decimal
+            when String
+              if value =~ /\A-?\d+\z/
+                Integer(value)
+              else
+                Float(value)
+              end
+            else
+              value
+            end
+          else
+            nil
+          end
         end
       end
     end

@@ -387,6 +387,54 @@ Mongoid 7 behavior:
   end
 
 
+``max``, ``min``, ``avg``, ``sum`` Aggregations On Embedded Documents
+---------------------------------------------------------------------
+
+Mongoid 8.0 converts fields of embedded documents that are being numerically
+aggregated (that is, aggregated using the ``max``, ``min``, ``avg`` and ``sum``
+methods) to numbers, if possible, prior to performing the aggregation.
+Any values which are not numeric are ignored.
+
+This conversion permits numeric aggregations over ``BigDecimal`` values stored
+in the database as strings.
+
+Mongoid 8.0 behavior:
+
+.. code-block:: ruby
+
+  class Cat
+    include Mongoid::Document
+
+    field :age, type: Integer
+
+    embeds_many :kittens
+  end
+
+  class Kitten
+    include Mongoid::Document
+
+    embedded_in :cat
+
+    field :age, type: Integer
+  end
+
+  Cat.create!(age: 12)
+  Cat.create!(age: '11')
+  Cat.create!(age: 'hello')
+
+  Cat.sum(:age)
+  # => 23
+
+  cat = Cat.create!
+
+  cat.kittens.create!(age: 12)
+  cat.kittens.create!(age: '11')
+  cat.kittens.create!(age: 'hello')
+
+  cat.kittens.sum(:age)
+  # => 23
+
+
 ``#pluck`` on Embedded Criteria Returns ``nil`` Values
 ------------------------------------------------------
 

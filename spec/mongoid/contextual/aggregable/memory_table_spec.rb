@@ -31,7 +31,8 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
       { integer: :views,
         float: :rating,
-        big_decimal: :sales }.each do |type, field|
+        big_decimal: :sales,
+        object: :mojo }.each do |type, field|
 
         %i[sum avg min max].each do |method|
           context "#{type.to_s.camelize} field :#{method}" do

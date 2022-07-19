@@ -138,8 +138,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
       let!(:bands) do
         [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+          Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
           Band.create!(name: "Spirit of the Beehive", mojo: 10),
-          Band.create!(name: "Justin Bieber", mojo: nil) ]
+          Band.create!(name: "Burning Spear", mojo: '7.3'),
+          Band.create!(name: "Justin Bieber", mojo: nil),
+          Band.create!(name: "Alex G", mojo: "string") ]
       end
 
       let(:criteria) do
@@ -153,18 +156,21 @@ describe Mongoid::Contextual::Aggregable::Memory do
       end
 
       it "coerces types to calculate avg" do
-        expect(avg).to eq(8.85)
+        expect(avg).to eq(9.0)
       end
 
       it "database only averages Numeric types" do
-        expect(Band.all.avg(:mojo)).to be_within(0.000001).of(8.85)
+        expect(Band.all.avg(:mojo).to_big_decimal).to be_within(0.000001).of(9.566666)
       end
     end
 
     context "when there no numeric values" do
 
       let!(:bands) do
-        [ Band.create!(name: "Justin Bieber", mojo: nil) ]
+        [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+          Band.create!(name: "Justin Bieber", mojo: nil),
+          Band.create!(name: "The Beatles", mojo: Date.yesterday),
+          Band.create!(name: "Alex G", mojo: "string") ]
       end
 
       let(:criteria) do
@@ -232,8 +238,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
         let!(:bands) do
           [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+            Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
             Band.create!(name: "Spirit of the Beehive", mojo: 10),
-            Band.create!(name: "Justin Bieber", mojo: nil) ]
+            Band.create!(name: "Burning Spear", mojo: '7.3'),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "Alex G", mojo: "string") ]
         end
 
         let(:criteria) do
@@ -247,15 +256,18 @@ describe Mongoid::Contextual::Aggregable::Memory do
         end
 
         it "coerces types to calculate max" do
-          expect(max).to eq 10
-          expect(max).to be_a Integer
+          expect(max).to eq 11
+          expect(max).to be_a BigDecimal
         end
       end
 
       context "when there no numeric values" do
 
         let!(:bands) do
-          [ Band.create!(name: "Justin Bieber", mojo: nil) ]
+          [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
         end
 
         let(:criteria) do
@@ -333,8 +345,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
         let!(:bands) do
           [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+            Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
             Band.create!(name: "Spirit of the Beehive", mojo: 10),
-            Band.create!(name: "Justin Bieber", mojo: nil) ]
+            Band.create!(name: "Burning Spear", mojo: '7.3'),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "Alex G", mojo: "string") ]
         end
 
         let(:criteria) do
@@ -348,7 +363,7 @@ describe Mongoid::Contextual::Aggregable::Memory do
         end
 
         it "coerces types to calculate min" do
-          expect(min).to eq 7.7
+          expect(min).to eq 7.3
           expect(min).to be_a Float
         end
       end
@@ -356,7 +371,10 @@ describe Mongoid::Contextual::Aggregable::Memory do
       context "when there no numeric values" do
 
         let!(:bands) do
-          [ Band.create!(name: "Justin Bieber", mojo: nil) ]
+          [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
         end
 
         let(:criteria) do
@@ -509,8 +527,13 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
         let!(:bands) do
           [ Band.create!(name: "The Flaming Lips", mojo: 7.7),
+            Band.create!(name: "Spinal Tap", mojo: BigDecimal('11')),
             Band.create!(name: "Spirit of the Beehive", mojo: 10),
-            Band.create!(name: "Justin Bieber", mojo: nil) ]
+            Band.create!(name: "Burning Spear", mojo: '7.3'),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
         end
 
         let(:criteria) do
@@ -524,19 +547,22 @@ describe Mongoid::Contextual::Aggregable::Memory do
         end
 
         it "coerces types to calculate sum" do
-          expect(sum).to eq 17.7
-          expect(sum).to be_a Float
+          expect(sum).to eq 36
+          expect(sum).to be_a BigDecimal
         end
 
         it "database only sums Float and Integer types" do
-          expect(Band.all.sum(:mojo)).to be_within(Float::EPSILON).of(17.7)
+          expect(Band.all.sum(:mojo).to_big_decimal).to be_within(Float::EPSILON).of(28.7)
         end
       end
 
       context "when there no numeric values" do
 
         let!(:bands) do
-          [ Band.create!(name: "Justin Bieber", mojo: nil) ]
+          [ Band.create!(name: "Sheena Easton", mojo: 9..5),
+            Band.create!(name: "Justin Bieber", mojo: nil),
+            Band.create!(name: "The Beatles", mojo: Date.yesterday),
+            Band.create!(name: "Alex G", mojo: "string") ]
         end
 
         let(:criteria) do
