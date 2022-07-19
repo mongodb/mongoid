@@ -2762,8 +2762,20 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        it "returns the number of documents that match" do
-          expect(context.send(method)).to eq(2)
+        context "when broken_view_options is true" do
+          config_override :broken_view_options, true
+
+          it "returns the number of documents that match" do
+            expect(context.send(method)).to eq(2)
+          end
+        end
+
+        context "when broken_view_options is false" do
+          config_override :broken_view_options, false
+
+          it "returns the number of documents that match" do
+            expect(context.send(method)).to eq(1)
+          end
         end
 
         context "when calling more than once" do
@@ -2790,8 +2802,20 @@ describe Mongoid::Contextual::Mongo do
               context.entries
             end
 
-            it "resets the length on each full iteration" do
-              expect(context.size).to eq(2)
+            context "when broken_view_options is true" do
+              config_override :broken_view_options, true
+
+              it "resets the length on each full iteration" do
+                expect(context.size).to eq(2)
+              end
+            end
+
+            context "when broken_view_options is false" do
+              config_override :broken_view_options, false
+
+              it "resets the length on each full iteration" do
+                expect(context.size).to eq(1)
+              end
             end
           end
         end
