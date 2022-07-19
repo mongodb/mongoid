@@ -324,7 +324,7 @@ module Mongoid
       #
       # @return [ Integer ] The number of documents.
       def length
-        @length ||= self.count
+        self.count
       end
       alias :size :length
 
