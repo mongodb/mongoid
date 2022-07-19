@@ -694,7 +694,6 @@ The ``pick`` method accepts the dot notation and field aliases. It also
 allows for picking localized fields.
 
 
-
 ``find`` delegates to ``Enumerable#find`` when given a block
 ------------------------------------------------------------
 
