@@ -687,8 +687,12 @@ Calling ``pick`` on the age field yields the following:
   User.pick(:age)
   # => 21
 
+This method does not apply a sort to the documents, so it will not necessarily
+return the values from the first document.
+
 The ``pick`` method accepts the dot notation and field aliases. It also
 allows for picking localized fields.
+
 
 
 ``find`` delegates to ``Enumerable#find`` when given a block

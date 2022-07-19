@@ -1376,6 +1376,9 @@ Mongoid also has some helpful methods on criteria.
        *Get the values from one document for the provided fields.
        Returns nil for unset fields and for non-existent fields.*
 
+       *This method does not apply a sort to the documents, so it
+       will not necessarily return the values from the first document.*
+
        *This method accepts the dot notation, thus permitting referencing
        fields in embedded associations.*
 
