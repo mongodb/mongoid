@@ -375,6 +375,17 @@ describe Mongoid::Config do
         expect(Mongo.broken_view_options).to be true
       end
     end
+
+    context "when assiging through options=" do
+
+      before do
+        Mongoid.options = { broken_view_options: true }
+      end
+
+      it "also assigns the Mongo flag" do
+        expect(Mongo.broken_view_options).to be true
+      end
+    end
   end
 
   describe "#load!" do
