@@ -2586,10 +2586,17 @@ describe Mongoid::Contextual::Mongo do
           expect(context.send(method)).to eq(2)
         end
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(2)
-            2.times { expect(context.send(method)).to eq(2) }
+        context "when calling more than once with different limits" do
+          around do |ex|
+            temp = Mongo.broken_view_options
+            Mongo.broken_view_options = false
+            ex.run
+            Mongo.broken_view_options = temp
+          end
+
+          it "does not cache the value" do
+            expect(context.limit(1).send(method)).to eq(1)
+            expect(context.limit(2).send(method)).to eq(2)
           end
         end
 
@@ -2631,10 +2638,17 @@ describe Mongoid::Contextual::Mongo do
           expect(context.send(method)).to eq(1)
         end
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(1)
-            2.times { expect(context.send(method)).to eq(1) }
+        context "when calling more than once with different skips" do
+          around do |ex|
+            temp = Mongo.broken_view_options
+            Mongo.broken_view_options = false
+            ex.run
+            Mongo.broken_view_options = temp
+          end
+
+          it "does not cache the value" do
+            expect(context.skip(0).send(method)).to eq(1)
+            expect(context.skip(1).send(method)).to eq(0)
           end
         end
 
