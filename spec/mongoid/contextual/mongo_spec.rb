@@ -2587,12 +2587,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context "when calling more than once with different limits" do
-          around do |ex|
-            temp = Mongo.broken_view_options
-            Mongo.broken_view_options = false
-            ex.run
-            Mongo.broken_view_options = temp
-          end
+          driver_config_override :broken_view_options, false
 
           it "does not cache the value" do
             expect(context.limit(1).send(method)).to eq(1)
@@ -2639,12 +2634,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context "when calling more than once with different skips" do
-          around do |ex|
-            temp = Mongo.broken_view_options
-            Mongo.broken_view_options = false
-            ex.run
-            Mongo.broken_view_options = temp
-          end
+          driver_config_override :broken_view_options, false
 
           it "does not cache the value" do
             expect(context.skip(0).send(method)).to eq(1)
