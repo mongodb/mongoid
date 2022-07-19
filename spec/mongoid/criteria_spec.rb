@@ -383,10 +383,11 @@ describe Mongoid::Criteria do
       Person.create!
     end
 
-    context "when no eager loading is involved" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.all.cache
+        Person.all
       end
 
       before do
@@ -394,17 +395,19 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
 
     context "when the criteria is eager loading" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.includes(:posts).cache
+        Person.includes(:posts)
       end
 
       before do
@@ -412,9 +415,10 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
@@ -488,17 +492,6 @@ describe Mongoid::Criteria do
       it 'does not convert the option keys to string from symbols' do
         expect(clone.options[:read][:mode]).to eq(:secondary)
       end
-    end
-  end
-
-  describe "#cache" do
-
-    let(:criteria) do
-      Band.where(name: "Depeche Mode")
-    end
-
-    it "sets the cache option to true" do
-      expect(criteria.cache).to be_cached
     end
   end
 

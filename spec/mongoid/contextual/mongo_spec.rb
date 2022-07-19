@@ -44,39 +44,6 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  describe "#cached?" do
-
-    context "when the criteria is cached" do
-
-      let(:criteria) do
-        Band.all.cache
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns true" do
-        expect(context).to be_cached
-      end
-    end
-
-    context "when the criteria is not cached" do
-
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns false" do
-        expect(context).to_not be_cached
-      end
-    end
-  end
-
   describe "#count" do
 
     let!(:depeche) do
@@ -102,15 +69,17 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
-        described_class.new(criteria.cache)
+        described_class.new(criteria)
       end
 
-      it "returns the count cached value after first call" do
-        expect(context.view).to receive(:count_documents).once.and_return(1)
-        2.times { expect(context.count).to eq(1) }
+      it "only executes the count query once" do
+        expect_query(1) do
+          2.times { expect(context.count).to eq(1) }
+        end
       end
     end
 
@@ -217,16 +186,18 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
-        described_class.new(criteria.cache)
+        described_class.new(criteria)
       end
 
-      it "returns the count cached value after first call" do
-        expect(context.view).to receive(:estimated_document_count).once.and_return(1)
-        2.times do
-          context.estimated_count
+      it "the results are not cached" do
+        expect_query(2) do
+          2.times do
+            context.estimated_count
+          end
         end
       end
     end
@@ -1450,51 +1421,15 @@ describe Mongoid::Contextual::Mongo do
         described_class.new(criteria)
       end
 
-      context "when exists? already called" do
+      context "when exists? already called and query cache is enabled" do
+        query_cache_enabled
 
         before do
           context.exists?
         end
 
-        it "hits the database again" do
-          expect(context).to receive(:view).once.and_call_original
-          expect(context).to be_exists
-        end
-      end
-    end
-
-    context "when caching is enabled" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode").cache
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      context "when the cache is loaded" do
-
-        before do
-          context.to_a
-        end
-
-        it "does not hit the database" do
-          expect(context).to receive(:view).never
-          expect(context).to be_exists
-        end
-      end
-
-      context "when the cache is not loaded" do
-
-        context "when a count has been executed" do
-
-          before do
-            context.count
-          end
-
-          it "does not hit the database" do
-            expect(context).to receive(:view).never
+        it "does not hit the database again" do
+          expect_no_queries do
             expect(context).to be_exists
           end
         end
@@ -2045,26 +1980,15 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the context is cached" do
+      context "when the query cache is enabled" do
+        query_cache_enabled
 
         let(:criteria) do
-          Band.where(name: "Depeche Mode").cache
+          Band.where(name: "Depeche Mode")
         end
 
         let(:context) do
           described_class.new(criteria)
-        end
-
-        context "when the cache is loaded" do
-
-          before do
-            context.to_a
-          end
-
-          it "returns the first document without touching the database" do
-            expect(context).to receive(:view).never
-            expect(context.send(method)).to eq(depeche_mode)
-          end
         end
 
         context "when first method was called before" do
@@ -2074,8 +1998,9 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first document without touching the database" do
-            expect(context).to receive(:view).never
-            expect(context.send(method)).to eq(depeche_mode)
+            expect_no_queries do
+              expect(context.send(method)).to eq(depeche_mode)
+            end
           end
         end
       end
@@ -2129,77 +2054,21 @@ describe Mongoid::Contextual::Mongo do
           end
         end
 
-        context "when the context is cached" do
+        context "when the query cache is enabled" do
 
           let(:context) do
             described_class.new(criteria)
           end
 
-          context "when the whole context is loaded" do
-
-            before do
-              context.to_a
-            end
-
-            context "when all of the documents are cached" do
-
-              let(:criteria) do
-                Band.all.cache
-              end
-
-              context "when requesting all of the documents" do
-
-                let(:docs) do
-                  context.send(method, 3)
-                end
-
-                it "returns all of the documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
-                end
-              end
-
-              context "when requesting fewer than all of the documents" do
-
-                let(:docs) do
-                  context.send(method, 2)
-                end
-
-                it "returns all of the documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order ])
-                end
-              end
-            end
-
-            context "when only one document is cached" do
-
-              let(:criteria) do
-                Band.where(name: "Depeche Mode").cache
-              end
-
-              context "when requesting one document" do
-
-                let(:docs) do
-                  context.send(method, 1)
-                end
-
-                it "returns one document without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode ])
-                end
-              end
-            end
-          end
-
-          context "when the first method was called before" do
+          context "when calling first beforehand" do
+            query_cache_enabled
 
             let(:context) do
               described_class.new(criteria)
             end
 
             let(:criteria) do
-              Band.all.cache
+              Band.all
             end
 
             before do
@@ -2217,8 +2086,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns all documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
                 end
               end
 
@@ -2226,8 +2096,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 2 }
 
                 it "returns the correct documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order ])
+                  end
                 end
               end
             end
@@ -2239,8 +2110,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 2 }
 
                 it "returns the correct documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order ])
+                  end
                 end
               end
 
@@ -2248,8 +2120,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).twice.and_call_original
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  expect_query(1) do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
                 end
               end
             end
@@ -2261,8 +2134,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 1 }
 
                 it "returns the correct documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode ])
+                  end
                 end
               end
 
@@ -2270,8 +2144,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).twice.and_call_original
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  expect_query(1) do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
                 end
               end
             end
@@ -2279,14 +2154,15 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when calling #first then #last" do
+      context "when calling #first then #last and the query cache is enabled" do
+        query_cache_enabled
 
         let(:context) do
           described_class.new(criteria)
         end
 
         let(:criteria) do
-          Band.all.cache
+          Band.all
         end
 
         before do
@@ -2301,8 +2177,10 @@ describe Mongoid::Contextual::Mongo do
           let(:before_limit) { 2 }
           let(:limit) { 1 }
 
-          it "gets the correct document" do
-            expect(docs).to eq([rolling_stones])
+          it "gets the correct document and hits the database" do
+            expect_query(1) do
+              expect(docs).to eq([rolling_stones])
+            end
           end
         end
       end
@@ -2448,26 +2326,15 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when the context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:criteria) do
-        Band.where(name: "Depeche Mode").cache
+        Band.where(name: "Depeche Mode")
       end
 
       let(:context) do
         described_class.new(criteria)
-      end
-
-      context "when the cache is loaded" do
-
-        before do
-          context.to_a
-        end
-
-        it "returns the last document without touching the database" do
-          expect(context).to receive(:view).never
-          expect(context.last).to eq(depeche_mode)
-        end
       end
 
       context "when last method was called before" do
@@ -2477,8 +2344,9 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "returns the last document without touching the database" do
-          expect(context).to receive(:view).never
-          expect(context.last).to eq(depeche_mode)
+          expect_no_queries do
+            expect(context.last).to eq(depeche_mode)
+          end
         end
       end
     end
@@ -2538,71 +2406,15 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        context "when the whole context is loaded" do
-
-          before do
-            context.to_a
-          end
-
-          context "when all of the documents are cached" do
-
-            let(:criteria) do
-              Band.all.cache
-            end
-
-            context "when requesting all of the documents" do
-
-              let(:docs) do
-                context.last(3)
-              end
-
-              it "returns all of the documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
-              end
-            end
-
-            context "when requesting fewer than all of the documents" do
-
-              let(:docs) do
-                context.last(2)
-              end
-
-              it "returns all of the documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ new_order, rolling_stones ])
-              end
-            end
-          end
-
-          context "when only one document is cached" do
-
-            let(:criteria) do
-              Band.where(name: "Depeche Mode").cache
-            end
-
-            context "when requesting one document" do
-
-              let(:docs) do
-                context.last(1)
-              end
-
-              it "returns one document without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ depeche_mode ])
-              end
-            end
-          end
-        end
-
-        context "when the last method was called before" do
+        context "when query cache is enabled" do
+          query_cache_enabled
 
           let(:context) do
             described_class.new(criteria)
           end
 
           let(:criteria) do
-            Band.all.cache
+            Band.all
           end
 
           before do
@@ -2619,18 +2431,20 @@ describe Mongoid::Contextual::Mongo do
             context "when getting all of the documents" do
               let(:limit) { 3 }
 
-              it "returns all documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+              it "returns all documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
               end
             end
 
             context "when getting fewer documents" do
               let(:limit) { 2 }
 
-              it "returns the correct documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ new_order, rolling_stones ])
+              it "returns the correct documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ new_order, rolling_stones ])
+                end
               end
             end
           end
@@ -2641,9 +2455,10 @@ describe Mongoid::Contextual::Mongo do
             context "when getting the same number of documents" do
               let(:limit) { 2 }
 
-              it "returns the correct documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ new_order, rolling_stones ])
+              it "returns the correct documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ new_order, rolling_stones ])
+                end
               end
             end
 
@@ -2651,8 +2466,9 @@ describe Mongoid::Contextual::Mongo do
               let(:limit) { 3 }
 
               it "returns the correct documents and touches the database" do
-                expect(context).to receive(:view).twice.and_call_original
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                expect_query(1) do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
               end
             end
           end
@@ -2664,8 +2480,9 @@ describe Mongoid::Contextual::Mongo do
               let(:limit) { 1 }
 
               it "returns the correct documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ rolling_stones ])
+                expect_no_queries do
+                  expect(docs).to eq([ rolling_stones ])
+                end
               end
             end
 
@@ -2673,8 +2490,9 @@ describe Mongoid::Contextual::Mongo do
               let(:limit) { 3 }
 
               it "returns the correct documents and touches the database" do
-                expect(context).to receive(:view).twice.and_call_original
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                expect_query(1) do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
               end
             end
           end
@@ -2682,14 +2500,15 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when calling #last then #first" do
+    context "when calling #last then #first and the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
         described_class.new(criteria)
       end
 
       let(:criteria) do
-        Band.all.cache
+        Band.all
       end
 
       before do
@@ -2705,8 +2524,9 @@ describe Mongoid::Contextual::Mongo do
         let(:limit) { 1 }
 
         it "hits the database" do
-          expect(context).to receive(:view).twice.and_call_original
-          docs
+          expect_query(1) do
+            docs
+          end
         end
 
         it "gets the correct document" do

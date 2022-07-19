@@ -719,3 +719,12 @@ Support Dropped for the ``:id_sort`` Option on ``#first/last``
 
 Support for the ``:id_sort`` option on the ``#first`` and ``#last`` options has
 been dropped. These methods now only except a limit as a positional argument.
+
+
+Support Dropped for Mongoid::Criteria cache
+-------------------------------------------
+
+Support for individually caching criteria objects has been dropped in Mongoid 8.
+
+In order to get caching functionality, enable the Mongoid QueryCache. See the
+section on :ref:`QueryCache <query-cache>` for more details.

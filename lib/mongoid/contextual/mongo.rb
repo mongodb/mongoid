@@ -37,17 +37,6 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
-      # Is the context cached?
-      #
-      # @example Is the context cached?
-      #   context.cached?
-      #
-      # @return [ true, false ] If the context is cached.
-      def cached?
-        Mongoid::Warnings.warn_criteria_cache_deprecated
-        !!@cache
-      end
-
       # Get the number of documents matching the query.
       #
       # @example Get the number of matching documents.
@@ -67,7 +56,7 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        try_cache(:count) { view.count_documents(options) }
+        view.count_documents(options)
       end
 
       # Get the estimated number of documents matching the query.
@@ -86,7 +75,7 @@ module Mongoid
         unless self.criteria.selector.empty?
           raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
         end
-        try_cache(:estimated_count) { view.estimated_document_count(options) }
+        view.estimated_document_count(options)
       end
 
       # Delete all documents in the database that match the selector.
@@ -154,7 +143,6 @@ module Mongoid
           documents_for_iteration.each do |doc|
             yield_document(doc, &block)
           end
-          @cache_loaded = true
           self
         else
           to_enum
@@ -167,17 +155,11 @@ module Mongoid
       #   context.exists?
       #
       # @note We don't use count here since Mongo does not use counted
-      #   b-tree indexes, unless a count is already cached then that is
-      #   used to determine the value.
+      #   b-tree indexes.
       #
       # @return [ true, false ] If the count is more than zero.
       def exists?
-        return !documents.empty? if cached? && cache_loaded?
-        return @count > 0 if instance_variable_defined?(:@count)
-
-        try_cache(:exists) do
-          !!(view.projection(_id: 1).limit(1).first)
-        end
+        !!(view.projection(_id: 1).limit(1).first)
       end
 
       # Run an explain on the criteria.
@@ -258,14 +240,9 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       def first(limit = nil)
-        if cached? && cache_loaded?
-          return limit ? documents.first(limit) : documents.first
-        end
-        try_numbered_cache(:first, limit) do
-          sort = view.sort || { _id: 1 }
-          if raw_docs = view.sort(sort).limit(limit || 1).to_a
-            process_raw_docs(raw_docs, limit)
-          end
+        sort = view.sort || { _id: 1 }
+        if raw_docs = view.sort(sort).limit(limit || 1).to_a
+          process_raw_docs(raw_docs, limit)
         end
       end
       alias :one :first
@@ -274,7 +251,6 @@ module Mongoid
       #
       # @api private
       def find_first
-        return documents.first if cached? && cache_loaded?
         if raw_doc = view.first
           doc = Factory.from_db(klass, raw_doc, criteria)
           eager_load([doc]).first
@@ -312,7 +288,7 @@ module Mongoid
       #
       # @param [ Criteria ] criteria The criteria.
       def initialize(criteria)
-        @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
+        @criteria, @klass = criteria, criteria.klass
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
         @view = collection.find(criteria.selector, session: _session)
@@ -336,15 +312,8 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       def last(limit = nil)
-        if cached? && cache_loaded?
-          return limit ? documents.last(limit) : documents.last
-        end
-        res = try_numbered_cache(:last, limit) do
-          if raw_docs = view.sort(inverse_sorting).limit(limit || 1).to_a
-            process_raw_docs(raw_docs, limit)
-          end
-        end
-        res.is_a?(Array) ? res.reverse : res
+        raw_docs = view.sort(inverse_sorting).limit(limit || 1).to_a.reverse
+        process_raw_docs(raw_docs, limit)
       end
 
       # Returns the number of documents in the database matching
@@ -598,47 +567,6 @@ module Mongoid
 
       private
 
-      # yield the block given or return the cached value
-      #
-      # @param [ String, Symbol ] key The instance variable name
-      #
-      # @return the result of the block
-      def try_cache(key, &block)
-        unless cached?
-          yield
-        else
-          unless ret = instance_variable_get("@#{key}")
-            instance_variable_set("@#{key}", ret = yield)
-          end
-          ret
-        end
-      end
-
-      # yield the block given or return the cached value
-      #
-      # @param [ String, Symbol ] key The instance variable name
-      # @param [ Integer | nil ] n The number of documents requested or nil
-      #   if none is requested.
-      #
-      # @return [ Object ] The result of the block.
-      def try_numbered_cache(key, n, &block)
-        unless cached?
-          yield if block_given?
-        else
-          len = n || 1
-          ret = instance_variable_get("@#{key}")
-          if !ret || ret.length < len
-            instance_variable_set("@#{key}", ret = Array.wrap(yield))
-          elsif !n
-            ret.is_a?(Array) ? ret.first : ret
-          elsif ret.length > len
-            ret.first(n)
-          else
-            ret
-          end
-        end
-      end
-
       # Update the documents for the provided method.
       #
       # @api private
@@ -704,43 +632,6 @@ module Mongoid
         Hash[sort.map{|k, v| [k, -1*v]}]
       end
 
-      # Is the cache able to be added to?
-      #
-      # @api private
-      #
-      # @example Is the context cacheable?
-      #   context.cacheable?
-      #
-      # @return [ true, false ] If caching, and the cache isn't loaded.
-      def cacheable?
-        cached? && !cache_loaded?
-      end
-
-      # Is the cache fully loaded? Will be true if caching after one full
-      # iteration.
-      #
-      # @api private
-      #
-      # @example Is the cache loaded?
-      #   context.cache_loaded?
-      #
-      # @return [ true, false ] If the cache is loaded.
-      def cache_loaded?
-        !!@cache_loaded
-      end
-
-      # Get the documents for cached queries.
-      #
-      # @api private
-      #
-      # @example Get the cached documents.
-      #   context.documents
-      #
-      # @return [ Array<Document> ] The documents.
-      def documents
-        @documents ||= []
-      end
-
       # Get the documents the context should iterate. This follows 3 rules:
       #
       # 1. If the query is cached, and we already have documents loaded, use
@@ -756,7 +647,6 @@ module Mongoid
       #
       # @return [ Array<Document>, Mongo::Collection::View ] The docs to iterate.
       def documents_for_iteration
-        return documents if cached? && !documents.empty?
         return view unless eager_loadable?
         docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
         eager_load(docs)
@@ -776,7 +666,6 @@ module Mongoid
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
         yield(doc)
-        documents.push(doc) if cacheable?
       end
 
       private
