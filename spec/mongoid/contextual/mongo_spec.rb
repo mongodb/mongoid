@@ -584,6 +584,10 @@ describe Mongoid::Contextual::Mongo do
         d.save!
       end
 
+      after do
+        I18n.locale = :en
+      end
+
       let(:criteria) do
         Dictionary.criteria
       end
@@ -684,6 +688,10 @@ describe Mongoid::Contextual::Mongo do
           I18n.fallbacks = prev_fallbacks
         end
 
+        after do
+          I18n.locale = :en
+        end
+
         let(:distinct) do
           context.distinct(:description).first
         end
@@ -717,6 +725,10 @@ describe Mongoid::Contextual::Mongo do
           p.name = "Nissim"
 
           Person.create!(passport: p, employer_id: 12345)
+        end
+
+        after do
+          I18n.locale = :en
         end
 
         let(:criteria) do
@@ -2590,7 +2602,8 @@ describe Mongoid::Contextual::Mongo do
 
     context "when passed the symbol field name" do
 
-      it "performs mapping" do
+      it "performs mapping and warns" do
+        expect(Mongoid::Warnings).to receive(:warn_map_field_deprecated)
         expect(context.map(:name)).to eq ["Depeche Mode", "New Order"]
       end
     end

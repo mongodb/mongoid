@@ -23,6 +23,10 @@ describe 'i18n fallbacks' do
       I18n.fallbacks[:de] = [ :en ]
     end
 
+    after do
+      I18n.locale = :en
+    end
+
     context 'when translation is present in active locale' do
       it 'uses active locale' do
         product = Product.new
@@ -36,6 +40,9 @@ describe 'i18n fallbacks' do
     end
 
     context 'when translation is missing in active locale and present in fallback locale' do
+      after do
+        I18n.locale = :en
+      end
 
       it 'falls back on default locale' do
         product = Product.new
@@ -57,6 +64,10 @@ describe 'i18n fallbacks' do
           end
         end
 
+        after do
+          I18n.locale = :en
+        end
+
         it 'returns nil' do
           product = Product.new
           I18n.locale = :en
@@ -75,6 +86,10 @@ describe 'i18n fallbacks' do
           end
         end
 
+        after do
+          I18n.locale = :en
+        end
+
         it 'falls back on default locale' do
           product = Product.new
           I18n.locale = :en
@@ -82,7 +97,6 @@ describe 'i18n fallbacks' do
           I18n.locale = :ru
           product.description.should == 'Marvelous!'
         end
-
       end
     end
   end

@@ -329,6 +329,10 @@ module Mongoid
       #
       # @return [ Array ] The result of mapping.
       def map(field = nil, &block)
+        if !field.nil?
+          Mongoid::Warnings.warn_map_field_deprecated
+        end
+
         if block_given?
           super(&block)
         else
