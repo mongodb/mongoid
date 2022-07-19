@@ -1373,7 +1373,7 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#pick``
 
-       *Get the values from one documenet for the provided fields.
+       *Get the values from one document for the provided fields.
        Returns nil for unset fields and for non-existent fields.*
 
        *This method accepts the dot notation, thus permitting referencing
