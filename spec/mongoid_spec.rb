@@ -14,12 +14,7 @@ describe Mongoid do
     end
 
     context "when a block is given" do
-
-      after do
-        Mongoid.configure do |config|
-          config.preload_models = false
-        end
-      end
+      config_override :preload_models, false
 
       context "with arity 0" do
 
