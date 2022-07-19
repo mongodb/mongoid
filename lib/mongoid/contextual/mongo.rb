@@ -397,9 +397,6 @@ module Mongoid
       # @example Pluck a field.
       #   context.pluck(:_id)
       #
-      # @note This method will return the raw db values - it performs no custom
-      #   serialization.
-      #
       # @param [ String, Symbol, Array ] fields Fields to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
@@ -430,6 +427,18 @@ module Mongoid
           end
           plucked << (values.size == 1 ? values.first : values)
         end
+      end
+
+      # Pick the single field values from the database.
+      #
+      # @example Pick a field.
+      #   context.pick(:_id)
+      #
+      # @param [ String, Symbol, Array ] fields Fields to pick.
+      #
+      # @return [ Object, Array<Object> ] The picked values.
+      def pick(*fields)
+        limit(1).pluck(*fields).first
       end
 
       # Get a hash of counts for the values of a single field. For example,

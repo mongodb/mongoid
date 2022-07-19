@@ -249,13 +249,33 @@ module Mongoid
         if Mongoid.legacy_pluck_distinct
           documents.pluck(*fields)
         else
-          documents.map do |d|
+          documents.map do |doc|
             if fields.length == 1
-              retrieve_value_at_path(d, fields.first)
+              retrieve_value_at_path(doc, fields.first)
             else
               fields.map do |field|
-                retrieve_value_at_path(d, field)
+                retrieve_value_at_path(doc, field)
               end
+            end
+          end
+        end
+      end
+
+      # Pick the field values in memory.
+      #
+      # @example Get the values in memory.
+      #   context.pick(:name)
+      #
+      # @param [ String | Symbol ] *fields Field(s) to pick.
+      #
+      # @return [ Object, Array<Object> ] The picked values.
+      def pick(*fields)
+        if doc = documents.first
+          if fields.length == 1
+            retrieve_value_at_path(doc, fields.first)
+          else
+            fields.map do |field|
+              retrieve_value_at_path(doc, field)
             end
           end
         end

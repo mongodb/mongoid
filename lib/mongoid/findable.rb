@@ -38,6 +38,7 @@ module Mongoid
       :max,
       :min,
       :none,
+      :pick,
       :pluck,
       :read,
       :sum,
