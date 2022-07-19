@@ -54,8 +54,52 @@ describe Mongoid::Contextual::None do
   end
 
   describe "#pluck" do
-    it "returns an empty array" do
-      expect(context.pluck(:id)).to eq([])
+
+    context "when plucking one field" do
+      it "returns an empty array" do
+        expect(context.pluck(:id)).to eq([])
+      end
+    end
+
+    context "when plucking multiple fields" do
+      it "returns an empty array" do
+        expect(context.pluck(:id, :foo)).to eq([])
+      end
+    end
+  end
+
+  describe "#pluck_each" do
+
+    context "when block given" do
+
+      let!(:plucked_values) { [] }
+
+      let!(:plucked) do
+        context.pluck_each(:street) { |value| plucked_values << value }
+      end
+
+      it "returns the context" do
+        expect(plucked).to eq context
+      end
+
+      it "yields no values to the block" do
+        expect(plucked_values).to eq([])
+      end
+    end
+
+    context "when block not given" do
+
+      let!(:plucked) do
+        context.pluck_each(:street)
+      end
+
+      it "returns an Enumerator" do
+        expect(plucked).to be_an Enumerator
+      end
+
+      it "does not yield any values" do
+        expect(plucked.map { |value| value }).to eq([])
+      end
     end
   end
 
