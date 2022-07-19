@@ -561,8 +561,9 @@ module Mongoid
       # Pluck the field values from the given document.
       #
       # @param [ Document ] doc The document to pluck from.
-      #
       # @param [ String | Symbol ] *fields Field(s) to pluck.
+      #
+      # @return [ Object, Array<Object> ] The plucked values.
       def pluck_from_doc(doc, *fields)
         if fields.length == 1
           retrieve_value_at_path(doc, fields.first)
