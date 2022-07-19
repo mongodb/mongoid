@@ -95,7 +95,10 @@ module Mongoid
           Mongo.send(name)
         end
 
+        # This causes the driver option to be set to Mongoid's default
+        # when Mongoid is loaded.
         Mongo.send("#{name}=", options[:default])
+
         define_method("#{name}=") do |value|
           Mongo.send("#{name}=", value)
           settings[name] = value

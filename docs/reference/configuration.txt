@@ -349,6 +349,9 @@ for details on driver options.
       # on those options will be ignored. For example, with this flag turned
       # off, Band.all.limit(1).count will take the limit into account, while
       # when this flag is turned on, that limit is ignored. (default: false)
+      #
+      # Note that when Mongoid is loaded, it will set the driver's option
+      # value to Mongoid's default value.
       #broken_view_options: false
 
       # Time objects in Ruby have nanosecond precision, whereas MongoDB server
