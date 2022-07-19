@@ -658,6 +658,42 @@ The ``tally`` method accepts the dot notation and field aliases. It also
 allows for tallying localized fields.
 
 
+Implemented ``.pick`` method on ``Mongoid#Criteria``
+-----------------------------------------------------
+
+Mongoid 8 implements the ``.pick`` method on ``Mongoid#Criteria``. ``pick``
+takes one or more field names as a parameter and returns the values for those
+fields from one document. Consider the following model:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+    field :age
+  end
+
+and the following documents in the database:
+
+.. code::
+
+  { _id: 1, age: 21 }
+  { _id: 2, age: 21 }
+  { _id: 3, age: 22 }
+
+Calling ``pick`` on the age field yields the following:
+
+.. code::
+
+  User.pick(:age)
+  # => 21
+
+This method does not apply a sort to the documents, so it will not necessarily
+return the values from the first document.
+
+The ``pick`` method accepts the dot notation and field aliases. It also
+allows for picking localized fields.
+
+
 ``find`` delegates to ``Enumerable#find`` when given a block
 ------------------------------------------------------------
 
