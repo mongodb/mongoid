@@ -378,12 +378,31 @@ describe Mongoid::Config do
 
     context "when assiging through options=" do
 
-      before do
+      around do |ex|
+        expect(Mongoid.broken_view_options).to be false
+        temp = Mongo.broken_view_options
         Mongoid.options = { broken_view_options: true }
+        ex.run
+        Mongo.broken_view_options = temp
       end
 
       it "also assigns the Mongo flag" do
         expect(Mongo.broken_view_options).to be true
+      end
+    end
+
+    context "when modifying the mongo flag" do
+
+      around do |ex|
+        expect(Mongoid.broken_view_options).to be false
+        temp = Mongo.broken_view_options
+        Mongo.broken_view_options = true
+        ex.run
+        Mongo.broken_view_options = temp
+      end
+
+      it "modifies the Mongoid flag" do
+        expect(Mongoid.broken_view_options).to be true
       end
     end
   end

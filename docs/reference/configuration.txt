@@ -340,6 +340,17 @@ for details on driver options.
       # (default: false)
       #broken_updates: true
 
+      # This option delegates to Mongo's broken_view_options flag. Modifying
+      # Mongo.broken_view_options, will also modify Mongoid.broken_view_options,
+      # however, it will not modify Mongoid::Config.settings.
+      #
+      # When this flag is turned off, inline options will be correctly
+      # propagated to Mongoid finder methods. When this flag is turned
+      # on those options will be ignored. For example, with this flag turned
+      # off, Band.all.limit(1).count will take the limit into account, while
+      # when this flag is turned on, that limit is ignored. (default: false)
+      #broken_view_options: false
+
       # Time objects in Ruby have nanosecond precision, whereas MongoDB server
       # can only store times with millisecond precision. Set this option to
       # true to truncate times to millisecond precision when performing

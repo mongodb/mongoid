@@ -26,6 +26,10 @@ module Mongoid
       #
       # @option options [ Object ] :default The default value.
       def option(name, options = {})
+        if name == :broken_view_options
+          return delegate_option_to_mongo(name, options)
+        end
+
         defaults[name] = settings[name] = options[:default]
 
         class_eval do
@@ -36,16 +40,8 @@ module Mongoid
             end
           end
 
-          if name == :broken_view_options
-            Mongo.send("#{name}=", options[:default])
-            define_method("#{name}=") do |value|
-              Mongo.send("#{name}=", value)
-              settings[name] = value
-            end
-          else
-            define_method("#{name}=") do |value|
-              settings[name] = value
-            end
+          define_method("#{name}=") do |value|
+            settings[name] = value
           end
 
           define_method("#{name}?") do
@@ -87,6 +83,26 @@ module Mongoid
             level = "Logger::#{level}".constantize
           end
           level
+        end
+      end
+
+      private
+
+      def delegate_option_to_mongo(name, options = {})
+        defaults[name] = settings[name] = options[:default]
+
+        define_method(name) do
+          Mongo.send(name)
+        end
+
+        Mongo.send("#{name}=", options[:default])
+        define_method("#{name}=") do |value|
+          Mongo.send("#{name}=", value)
+          settings[name] = value
+        end
+
+        define_method("#{name}?") do
+          !!send(name)
         end
       end
     end
