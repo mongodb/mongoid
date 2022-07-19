@@ -483,7 +483,7 @@ describe Mongoid::Config do
         expect(Mongo.broken_view_options).to eq(false)
       end
 
-      it "does not override the Mongo.validate_update_replace option" do
+      it "does not override the unset Mongo.validate_update_replace option" do
         expect(Mongo.validate_update_replace).to eq(false)
       end
     end
