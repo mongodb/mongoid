@@ -1014,7 +1014,9 @@ module Mongoid
 
       def retrieve_nth_with_limit(n, limit)
         sort = view.sort || { _id: 1 }
-        if raw_docs = view.sort(sort).skip(n).limit(limit || 1).to_a
+        v = view.sort(sort).limit(limit || 1)
+        v = v.skip(n) if n > 0
+        if raw_docs = v.to_a
           process_raw_docs(raw_docs, limit)
         end
       end
@@ -1024,7 +1026,9 @@ module Mongoid
       end
 
       def retrieve_nth_to_last_with_limit(n, limit)
-        raw_docs = view.sort(inverse_sorting).skip(n).limit(limit || 1).to_a.reverse
+        v = view.sort(inverse_sorting).skip(n).limit(limit || 1)
+        v = v.skip(n) if n > 0
+        raw_docs = v.to_a.reverse
         process_raw_docs(raw_docs, limit)
       end
     end
