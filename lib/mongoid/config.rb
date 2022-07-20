@@ -223,6 +223,7 @@ module Mongoid
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
       self.clients = configuration[:clients]
+      Mongo.options = configuration[:driver_options] || {}
       set_log_levels
     end
 

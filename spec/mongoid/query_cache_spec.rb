@@ -34,66 +34,6 @@ describe Mongoid::QueryCache do
 
   describe '#cache' do
     context 'with driver query cache' do
-      min_driver_version '2.14'
-
-      it 'does not log a deprecation warning' do
-        reset_legacy_qc_warning
-
-        expect_any_instance_of(Logger).to_not receive(:warn).with(
-          described_class::LEGACY_WARNING
-        )
-        described_class.cache { }
-      end
-
-      context 'when query cache is not enabled' do
-        before do
-          Mongoid::QueryCache.enabled = false
-        end
-
-        it 'turns on the query cache within the block' do
-          expect(Mongoid::QueryCache.enabled?).to be false
-
-          Mongoid::QueryCache.cache do
-            expect(Mongoid::QueryCache.enabled?).to be true
-          end
-
-          expect(Mongoid::QueryCache.enabled?).to be false
-        end
-      end
-
-      context 'when query cache is enabled' do
-        before do
-          Mongoid::QueryCache.enabled = true
-        end
-
-        it 'keeps the query cache enabled within the block' do
-          expect(Mongoid::QueryCache.enabled?).to be true
-
-          Mongoid::QueryCache.cache do
-            expect(Mongoid::QueryCache.enabled?).to be true
-          end
-
-          expect(Mongoid::QueryCache.enabled?).to be true
-        end
-      end
-
-      context 'nested inside #uncached' do
-        it 'turns on the query cache in the block' do
-          Mongoid::QueryCache.uncached do
-            expect(Mongoid::QueryCache.enabled?).to be false
-
-            Mongoid::QueryCache.cache do
-              expect(Mongoid::QueryCache.enabled?).to be true
-            end
-
-            expect(Mongoid::QueryCache.enabled?).to be false
-          end
-        end
-      end
-    end
-
-    context 'with mongoid query cache' do
-      max_driver_version '2.13'
 
       context 'when query cache is not enabled' do
         before do
@@ -145,64 +85,6 @@ describe Mongoid::QueryCache do
 
   describe '#uncached' do
     context 'with driver query cache' do
-      min_driver_version '2.14'
-
-      context 'when query cache is not enabled' do
-        before do
-          Mongoid::QueryCache.enabled = false
-        end
-
-        it 'keeps the query cache turned off within the block' do
-          expect(Mongoid::QueryCache.enabled?).to be false
-
-          Mongoid::QueryCache.uncached do
-            expect(Mongoid::QueryCache.enabled?).to be false
-          end
-
-          expect(Mongoid::QueryCache.enabled?).to be false
-        end
-      end
-
-      context 'when query cache is enabled' do
-        before do
-          Mongoid::QueryCache.enabled = true
-        end
-
-        it 'turns off the query cache within the block' do
-          expect(Mongoid::QueryCache.enabled?).to be true
-
-          Mongoid::QueryCache.uncached do
-            expect(Mongoid::QueryCache.enabled?).to be false
-          end
-
-          expect(Mongoid::QueryCache.enabled?).to be true
-        end
-      end
-
-      context 'nested inside #cache' do
-        it 'turns on the query cache in the block' do
-          Mongoid::QueryCache.cache do
-            expect(Mongoid::QueryCache.enabled?).to be true
-
-            Mongoid::QueryCache.uncached do
-              expect(Mongoid::QueryCache.enabled?).to be false
-            end
-
-            expect(Mongoid::QueryCache.enabled?).to be true
-          end
-        end
-      end
-    end
-
-    context 'with mongoid query cache' do
-      max_driver_version '2.13'
-
-      it 'logs a deprecation warning' do
-        reset_legacy_qc_warning
-
-        expect_any_instance_of(Logger).to receive(:warn).with(described_class::LEGACY_WARNING)
-        described_class.cache { }
-      end
 
       context 'when query cache is not enabled' do
         before do
@@ -328,7 +210,6 @@ describe Mongoid::QueryCache do
   end
 
   context 'when driver query cache exists' do
-    min_driver_version '2.14'
 
     before do
       Band.all.to_a
@@ -421,14 +302,6 @@ describe Mongoid::QueryCache do
           Band.all.to_a
         end
       end
-    end
-  end
-
-  context 'when drivers query cache does not exist' do
-    max_driver_version '2.13'
-
-    it 'does not recognize the driver query cache' do
-      expect(defined?(Mongo::QueryCache)).to be_nil
     end
   end
 
@@ -662,28 +535,12 @@ describe Mongoid::QueryCache do
         end
 
         context "when the next query has a limit" do
-          # Server versions older than 3.2 also perform a killCursors operation,
-          # which causes this test to fail.
-          min_server_version '3.2'
 
           context 'with driver query cache' do
-            min_driver_version '2.14'
 
             # The driver query cache re-uses results with a larger limit
             it 'does not query again' do
               expect_no_queries do
-                result = game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
-                expect(result.length).to eq(2)
-                expect(result.map { |r| r['value'] }).to eq([6, 7])
-              end
-            end
-          end
-
-          context 'with mongoid query cache' do
-            max_driver_version '2.13'
-
-            it 'queries again' do
-              expect_query(1) do
                 result = game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
                 expect(result.length).to eq(2)
                 expect(result.map { |r| r['value'] }).to eq([6, 7])
@@ -970,21 +827,10 @@ describe Mongoid::QueryCache do
     end
 
     context 'with driver query cache' do
-      min_driver_version '2.14'
 
       # The driver query cache caches multi-batch cursors
       it 'does cache the result' do
         expect_no_queries do
-          expect(Band.all.map(&:id).size).to eq(10)
-        end
-      end
-    end
-
-    context 'with mongoid query cache' do
-      max_driver_version '2.13'
-
-      it 'does not cache the result' do
-        expect_query(1) do
           expect(Band.all.map(&:id).size).to eq(10)
         end
       end

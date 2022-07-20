@@ -95,6 +95,18 @@ module Mongoid
         []
       end
 
+      # Pick the field values in null context.
+      #
+      # @example Get the value for null context.
+      #   context.pick(:name)
+      #
+      # @param [ String | Symbol ] *_fields Field or fields to pick.
+      #
+      # @return [ nil ] Always reeturn nil.
+      def pick(*_fields)
+        nil
+      end
+
       # Tally the field values in null context.
       #
       # @example Get the values for null context.
@@ -119,11 +131,27 @@ module Mongoid
 
       # Always returns nil.
       #
+      # @example Get the first document in null context.
+      #   context.first
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ nil ] Always nil.
+      def first(limit = nil)
+        [] unless limit.nil?
+      end
+
+      # Always returns nil.
+      #
       # @example Get the last document in null context.
       #   context.last
       #
+      # @param [ Integer ] limit The number of documents to return.
+      #
       # @return [ nil ] Always nil.
-      def last; nil; end
+      def last(limit = nil)
+        [] unless limit.nil?
+      end
 
       # Returns nil or empty array.
       #

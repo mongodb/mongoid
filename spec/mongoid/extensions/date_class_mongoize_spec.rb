@@ -98,19 +98,23 @@ describe Mongoid::Extensions::Date do
 
       context "when the string is empty" do
 
-        let(:evolved) do
+        let(:mongoized) do
           Date.mongoize("")
         end
 
         it "returns nil" do
-          expect(evolved).to be_nil
+          expect(mongoized).to be_nil
         end
       end
 
       context "when the string is an invalid time" do
 
+        let(:mongoized) do
+          Date.mongoize("time")
+        end
+
         it "returns nil" do
-          expect(Date.mongoize("time")).to eq(nil)
+          expect(mongoized).to be_nil
         end
       end
     end

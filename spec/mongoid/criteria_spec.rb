@@ -383,10 +383,11 @@ describe Mongoid::Criteria do
       Person.create!
     end
 
-    context "when no eager loading is involved" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.all.cache
+        Person.all
       end
 
       before do
@@ -394,17 +395,19 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
 
     context "when the criteria is eager loading" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.includes(:posts).cache
+        Person.includes(:posts)
       end
 
       before do
@@ -412,9 +415,10 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
@@ -488,17 +492,6 @@ describe Mongoid::Criteria do
       it 'does not convert the option keys to string from symbols' do
         expect(clone.options[:read][:mode]).to eq(:secondary)
       end
-    end
-  end
-
-  describe "#cache" do
-
-    let(:criteria) do
-      Band.where(name: "Depeche Mode")
-    end
-
-    it "sets the cache option to true" do
-      expect(criteria.cache).to be_cached
     end
   end
 
@@ -1939,7 +1932,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a array with nil values" do
+          it "returns an array with nil values" do
             expect(plucked).to eq([nil, nil, nil])
           end
         end
@@ -1952,7 +1945,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a nil arrays" do
+          it "returns an array of arrays with nil values" do
             expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
           end
         end
@@ -2297,6 +2290,47 @@ describe Mongoid::Criteria do
         expect(plucked).to eq([
           [ [ 1, 2 ] ], [ [ 1, 2 ] ], [ [ 1, 3 ] ]
         ])
+      end
+    end
+  end
+
+  describe "#pick" do
+
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 3)
+    end
+
+    context "when picking a field" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name)
+      end
+
+      it "returns one element" do
+        expect(picked).to eq("Depeche Mode")
+      end
+    end
+
+    context "when picking multiple fields" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name, :likes)
+      end
+
+      it "returns an array" do
+        expect(picked).to eq([ "Depeche Mode", 3 ])
       end
     end
   end

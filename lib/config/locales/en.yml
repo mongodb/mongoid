@@ -65,7 +65,7 @@ en:
             and the following ids were not found: %{missing}."
           resolution: "Search for an id that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error when
+            which will cause nil to be returned instead of raising this error when
             searching for a single id, or only the matched documents when searching
             for multiples."
         document_with_attributes_not_found:
@@ -75,7 +75,7 @@ en:
             will be raised."
           resolution: "Search for attributes that are in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error."
+            which will cause nil to be returned instead of raising this error."
         document_with_shard_key_not_found:
           message: "Document not found for class %{klass} with id %{missing} and
             shard key %{shard_key}."
@@ -85,7 +85,7 @@ en:
             shard_key: %{shard_key} and it was not found."
           resolution: "Search for an id/shard key that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error."
+            which will cause nil to be returned instead of raising this error."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
@@ -238,7 +238,7 @@ en:
             \_\_language_override\n
             \_\_default_language\n
             \_\_collation\n
-            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack', 'text', 'hashed'\n\n
+            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack (deprecated)', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
@@ -372,10 +372,6 @@ en:
             from the child side which association to go in."
           resolution: "Set the values from the parent, or redefine the association
             with only a single definition in the parent."
-        invalid_value:
-          message: "Value of type %{value_class} cannot be written to a field of type %{field_class}"
-          summary: "Tried to set a value of type %{value_class} to a field of type %{field_class}"
-          resolution: "Verify if the value to be set correspond to field definition"
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
             document via a non-embedded association is not allowed since the
@@ -432,19 +428,18 @@ en:
           summary: "Mongoid attempted to find a document of the class %{klass}
             but none exist."
           resolution: "Create a document of class %{klass} or use a finder
-            method that returns nil when no documents are found instead of
-            raising an exception."
+            method that does not raise an exception when no documents are
+            found."
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."
-          summary: "Mongoid attempted to find the appropriate environment
-            but no Rails.env, Sinatra::Base.environment, RACK_ENV, or
-            MONGOID_ENV could be found."
-          resolution: "Make sure some environment is set from the mentioned
-            options. Mongoid cannot load configuration from the yaml without
-            knowing which environment it is in, and we have considered
-            defaulting to development an undesirable side effect of this not
-            being defined."
+          summary: "Mongoid could not determine the environment to use because
+            it was not specified in any of the following locations:
+            Rails.env, Sinatra::Base.environment,
+            ENV[\"RACK_ENV\"], ENV[\"MONGOID_ENV\"]. Without knowing the
+            environment, Mongoid cannot load its configuration."
+          resolution: "Please ensure an environment is set in one of the
+            listed locations. The environment must be explicitly set."
         no_map_reduce_output:
           message: "No output location was specified for the map/reduce
             operation."

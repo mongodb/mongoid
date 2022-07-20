@@ -379,19 +379,77 @@ describe Mongoid::Contextual::Memory do
 
   describe "#distinct" do
 
-    let(:hobrecht) do
-      Address.new(street: "hobrecht")
+    context "when legacy_pluck_distinct is true" do
+      config_override :legacy_pluck_distinct, true
+
+      let(:hobrecht) do
+        Address.new(street: "hobrecht")
+      end
+
+      let(:friedel) do
+        Address.new(street: "friedel")
+      end
+
+      context "when limiting the result set" do
+
+        let(:criteria) do
+          Address.where(street: "hobrecht").tap do |crit|
+            crit.documents = [ hobrecht, hobrecht, friedel ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns the distinct field values" do
+          expect(context.distinct(:street)).to eq([ "hobrecht" ])
+        end
+      end
+
+      context "when not limiting the result set" do
+
+        let(:criteria) do
+          Address.all.tap do |crit|
+            crit.documents = [ hobrecht, friedel, friedel ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns the distinct field values" do
+          expect(context.distinct(:street)).to eq([ "hobrecht", "friedel" ])
+        end
+      end
+
+      context 'when there is a collation on the criteria' do
+
+        let(:criteria) do
+          Address.where(street: "hobrecht").tap do |crit|
+            crit.documents = [ hobrecht, hobrecht, friedel ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context.distinct(:street)
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
+      end
     end
 
-    let(:friedel) do
-      Address.new(street: "friedel")
-    end
+    context "when legacy_pluck_distinct is false" do
+      config_override :legacy_pluck_distinct, false
 
-    context "when limiting the result set" do
+      let(:depeche) { Band.create!(name: "Depeche Mode", years: 30, sales: "1E2") }
+      let(:new_order) { Band.create!(name: "New Order", years: 25, sales: "2E3") }
+      let(:maniacs) { Band.create!(name: "10,000 Maniacs", years: 20, sales: "1E2") }
 
       let(:criteria) do
-        Address.where(street: "hobrecht").tap do |crit|
-          crit.documents = [ hobrecht, hobrecht, friedel ]
+        Band.all.tap do |crit|
+          crit.documents = [ depeche, new_order, maniacs ]
         end
       end
 
@@ -399,40 +457,180 @@ describe Mongoid::Contextual::Memory do
         described_class.new(criteria)
       end
 
-      it "returns the distinct field values" do
-        expect(context.distinct(:street)).to eq([ "hobrecht" ])
-      end
-    end
+      context "when limiting the result set" do
 
-    context "when not limiting the result set" do
+        let(:criteria) do
+          Band.where(name: "Depeche Mode").tap do |crit|
+            crit.documents = [ depeche ]
+          end
+        end
 
-      let(:criteria) do
-        Address.all.tap do |crit|
-          crit.documents = [ hobrecht, friedel, friedel ]
+        it "returns the distinct matching fields" do
+          expect(context.distinct(:name)).to eq([ "Depeche Mode" ])
         end
       end
 
-      let(:context) do
-        described_class.new(criteria)
+      context "when not limiting the result set" do
+
+        it "returns the distinct field values" do
+          expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
+        end
       end
 
-      it "returns the distinct field values" do
-        expect(context.distinct(:street)).to eq([ "hobrecht", "friedel" ])
-      end
-    end
+      context "when providing an aliased field" do
 
-    context 'when there is a collation on the criteria' do
-
-      let(:criteria) do
-        Address.where(street: "hobrecht").tap do |crit|
-          crit.documents = [ hobrecht, hobrecht, friedel ]
-        end.collation(locale: 'en_US', strength: 2)
+        it "returns the distinct field values" do
+          expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
+        end
       end
 
-      it "raises an exception" do
-        expect {
-          context.distinct(:street)
-        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      context "when providing a demongoizable field" do
+
+        it "returns the non-demongoized distinct field values" do
+          expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
+        end
+      end
+
+      context "when getting a localized field" do
+        before do
+          I18n.locale = :en
+          d = Dictionary.create!(description: 'english-text')
+          I18n.locale = :de
+          d.description = 'deutsch-text'
+          d.save!
+        end
+
+        after do
+          I18n.locale = :en
+        end
+
+        let(:criteria) do
+          Dictionary.all.tap do |crit|
+            crit.documents = [ Dictionary.first ]
+          end
+        end
+
+        context "when getting the field without _translations" do
+          it "gets the demongoized localized field" do
+            expect(context.distinct(:description)).to eq([ 'deutsch-text' ])
+          end
+        end
+
+        context "when getting the field with _translations" do
+
+          it "gets the full hash" do
+            expect(context.distinct(:description_translations)).to eq([ { "de" => "deutsch-text", "en" => "english-text" } ])
+          end
+        end
+
+        context 'when plucking a specific locale' do
+
+          let(:distinct) do
+            context.distinct(:'description.de')
+          end
+
+          it 'returns the specific translation' do
+            expect(distinct).to eq([ "deutsch-text" ])
+          end
+        end
+
+        context 'when plucking a specific locale from _translations field' do
+
+          let(:distinct) do
+            context.distinct(:'description_translations.de')
+          end
+
+          it 'returns the specific translations' do
+            expect(distinct).to eq(['deutsch-text'])
+          end
+        end
+
+        context 'when fallbacks are enabled with a locale list' do
+          require_fallbacks
+
+          around(:all) do |example|
+            prev_fallbacks = I18n.fallbacks.dup
+            I18n.fallbacks[:he] = [ :en ]
+            example.run
+            I18n.fallbacks = prev_fallbacks
+          end
+
+          after do
+            I18n.locale = :en
+          end
+
+          let(:distinct) do
+            context.distinct(:description).first
+          end
+
+          it "correctly uses the fallback" do
+            I18n.locale = :en
+            d = Dictionary.create!(description: 'english-text')
+            I18n.locale = :he
+            distinct.should == "english-text"
+          end
+        end
+
+        context "when the localized field is embedded" do
+          let(:person) do
+            p = Passport.new
+            I18n.locale = :en
+            p.name = "Neil"
+            I18n.locale = :he
+            p.name = "Nissim"
+
+            Person.create!(passport: p, employer_id: 12345)
+          end
+
+          after do
+            I18n.locale = :en
+          end
+
+          let(:criteria) do
+            Person.where(employer_id: 12345).tap do |crit|
+              crit.documents = [ person ]
+            end
+          end
+
+          let(:distinct) do
+            context.distinct("pass.name").first
+          end
+
+          let(:distinct_translations) do
+            context.distinct("pass.name_translations").first
+          end
+
+          let(:distinct_translations_field) do
+            context.distinct("pass.name_translations.en").first
+          end
+
+          it "returns the translation for the current locale" do
+            expect(distinct).to eq("Nissim")
+          end
+
+          it "returns the full _translation hash" do
+            expect(distinct_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the translation for the requested locale" do
+            expect(distinct_translations_field).to eq("Neil")
+          end
+        end
+      end
+
+      context "when getting an embedded field" do
+
+        let(:label) { Label.new(sales: "1E2") }
+        let!(:band) { Band.create!(label: label) }
+        let(:criteria) do
+          Band.where(_id: band.id).tap do |crit|
+            crit.documents = [ band ]
+          end
+        end
+
+        it "returns the distinct matching fields" do
+          expect(context.distinct("label.sales")).to eq([ BigDecimal("1E2") ])
+        end
       end
     end
   end
@@ -622,6 +820,14 @@ describe Mongoid::Contextual::Memory do
 
       it "returns the first matching document" do
         expect(context.send(method)).to eq(hobrecht)
+      end
+
+      it "returns a list when passing a limit" do
+        expect(context.send(method, 2)).to eq([ hobrecht, friedel ])
+      end
+
+      it "returns a list when passing 1" do
+        expect(context.send(method, 1)).to eq([ hobrecht ])
       end
 
       context 'when there is a collation on the criteria' do
@@ -868,6 +1074,14 @@ describe Mongoid::Contextual::Memory do
       expect(context.last).to eq(friedel)
     end
 
+    it "returns a list when a limit is passed" do
+      expect(context.last(2)).to eq([ hobrecht, friedel ])
+    end
+
+    it "returns a list when the limit is 1" do
+      expect(context.last(1)).to eq([ friedel ])
+    end
+
     context 'when there is a collation on the criteria' do
 
       let(:criteria) do
@@ -1021,17 +1235,529 @@ describe Mongoid::Contextual::Memory do
 
   describe "#pluck" do
 
-    let(:hobrecht) do
-      Address.new(street: "hobrecht")
+    let(:context) do
+      described_class.new(criteria)
     end
 
-    let(:friedel) do
-      Address.new(street: "friedel")
+    context "when legacy_pluck_distinct is true" do
+      config_override :legacy_pluck_distinct, true
+
+      let(:hobrecht) do
+        Address.new(street: "hobrecht")
+      end
+
+      let(:friedel) do
+        Address.new(street: "friedel")
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end
+      end
+
+      context "when plucking" do
+
+        let!(:plucked) do
+          context.pluck(:street)
+        end
+
+        it "returns the values" do
+          expect(plucked).to eq([ "hobrecht", "friedel" ])
+        end
+      end
+
+      context "when plucking a mix of empty and non-empty values" do
+
+        let(:empty_doc) do
+          Address.new(street: nil)
+        end
+
+        let(:criteria) do
+          Address.all.tap do |crit|
+            crit.documents = [ hobrecht, friedel, empty_doc ]
+          end
+        end
+
+        let!(:plucked) do
+          context.pluck(:street)
+        end
+
+        it "returns the values" do
+          expect(plucked).to eq([ "hobrecht", "friedel", nil ])
+        end
+      end
+
+      context "when plucking a field that doesnt exist" do
+
+        context "when pluck one field" do
+
+          let(:plucked) do
+            context.pluck(:foo)
+          end
+
+          it "returns a empty array" do
+            expect(plucked).to eq([nil, nil])
+          end
+        end
+
+        context "when pluck multiple fields" do
+
+          let(:plucked) do
+            context.pluck(:foo, :bar)
+          end
+
+          it "returns a empty array" do
+            expect(plucked).to eq([[nil, nil], [nil, nil]])
+          end
+        end
+      end
+
+      context 'when there is a collation on the criteria' do
+
+        let(:criteria) do
+          Address.all.tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context.pluck(:foo, :bar)
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
+      end
+    end
+
+    context "when legacy_pluck_distinct is false" do
+      config_override :legacy_pluck_distinct, false
+
+      let!(:depeche) do
+        Band.create!(name: "Depeche Mode", likes: 3)
+      end
+
+      let!(:tool) do
+        Band.create!(name: "Tool", likes: 3)
+      end
+
+      let!(:photek) do
+        Band.create!(name: "Photek", likes: 1)
+      end
+
+      let!(:maniacs) do
+        Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
+      end
+
+      let(:criteria) do
+        Band.all.tap do |crit|
+          crit.documents = [ depeche, tool, photek, maniacs ]
+        end
+      end
+
+      context "when the field is aliased" do
+
+        let!(:expensive) do
+          Product.create!(price: 100000)
+        end
+
+        let!(:cheap) do
+          Product.create!(price: 1)
+        end
+
+        let(:criteria) do
+          Product.all.tap do |crit|
+            crit.documents = [ expensive, cheap ]
+          end
+        end
+
+        context "when using alias_attribute" do
+
+          let(:plucked) do
+            context.pluck(:price)
+          end
+
+          it "uses the aliases" do
+            expect(plucked).to eq([ 100000, 1 ])
+          end
+        end
+      end
+
+      context "when the criteria matches" do
+
+        context "when there are no duplicate values" do
+
+          let!(:plucked) do
+            context.pluck(:name)
+          end
+
+          it "returns the values" do
+            expect(plucked).to contain_exactly("10,000 Maniacs", "Depeche Mode", "Tool", "Photek")
+          end
+
+          context "when subsequently executing the criteria without a pluck" do
+
+            it "does not limit the fields" do
+              expect(context.first.likes).to eq(3)
+            end
+          end
+
+          context 'when the field is a subdocument' do
+
+            context 'when a top-level field and a subdocument field are plucked' do
+              let(:criteria) do
+                Band.where(name: 'FKA Twigs').tap do |crit|
+                  crit.documents = [
+                    Band.create!(name: 'FKA Twigs'),
+                    Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+                  ]
+                end
+              end
+
+              let(:embedded_pluck) do
+                context.pluck(:name, 'records.name')
+              end
+
+              let(:expected) do
+                [
+                  ["FKA Twigs", []],
+                  ['FKA Twigs', ["LP1"]]
+                ]
+              end
+
+              it 'returns the list of top-level field and subdocument values' do
+                expect(embedded_pluck).to eq(expected)
+              end
+            end
+
+            context 'when only a subdocument field is plucked' do
+
+              let(:criteria) do
+                Band.where(name: 'FKA Twigs').tap do |crit|
+                  crit.documents = [
+                    Band.create!(name: 'FKA Twigs'),
+                    Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+                  ]
+                end
+              end
+
+              let(:embedded_pluck) do
+                context.pluck('records.name')
+              end
+
+              let(:expected) do
+                [
+                  [],
+                  ["LP1"]
+                ]
+              end
+
+              it 'returns the list of subdocument values' do
+                expect(embedded_pluck).to eq(expected)
+              end
+            end
+          end
+        end
+
+        context "when plucking multi-fields" do
+
+          let(:plucked) do
+            context.pluck(:name, :likes)
+          end
+
+          it "returns the values" do
+            expect(plucked).to contain_exactly(["10,000 Maniacs", 1], ["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
+          end
+        end
+
+        context "when there are duplicate values" do
+
+          let(:plucked) do
+            context.pluck(:likes)
+          end
+
+          it "returns the duplicates" do
+            expect(plucked).to contain_exactly(1, 3, 3, 1)
+          end
+        end
+      end
+
+      context "when plucking an aliased field" do
+
+        let(:plucked) do
+          context.pluck(:id)
+        end
+
+        it "returns the field values" do
+          expect(plucked).to eq([ depeche.id, tool.id, photek.id, maniacs.id ])
+        end
+      end
+
+      context "when plucking existent and non-existent fields" do
+
+        let(:plucked) do
+          context.pluck(:id, :fooz)
+        end
+
+        it "returns nil for the field that doesnt exist" do
+          expect(plucked).to eq([[depeche.id, nil], [tool.id, nil], [photek.id, nil], [maniacs.id, nil] ])
+        end
+      end
+
+      context "when plucking a field that doesnt exist" do
+
+        context "when pluck one field" do
+
+          let(:plucked) do
+            context.pluck(:foo)
+          end
+
+          it "returns an array with nil values" do
+            expect(plucked).to eq([nil, nil, nil, nil])
+          end
+        end
+
+        context "when pluck multiple fields" do
+
+          let(:plucked) do
+            context.pluck(:foo, :bar)
+          end
+
+          it "returns an array of arrays with nil values" do
+            expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil], [nil, nil]])
+          end
+        end
+      end
+
+      context 'when plucking a localized field' do
+
+        before do
+          I18n.locale = :en
+          d = Dictionary.create!(description: 'english-text')
+          I18n.locale = :de
+          d.description = 'deutsch-text'
+          d.save!
+        end
+
+        after do
+          I18n.locale = :en
+        end
+
+        let(:criteria) do
+          Dictionary.all.tap do |crit|
+            crit.documents = [ Dictionary.first ]
+          end
+        end
+
+        context 'when plucking the entire field' do
+
+          let(:plucked) do
+            context.pluck(:description)
+          end
+
+          let(:plucked_translations) do
+            context.pluck(:description_translations)
+          end
+
+          let(:plucked_translations_both) do
+            context.pluck(:description_translations, :description)
+          end
+
+          it 'returns the demongoized translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+
+          it 'returns the full translations hash to _translations' do
+            expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+
+          it 'returns both' do
+            expect(plucked_translations_both.first).to eq([{"de"=>"deutsch-text", "en"=>"english-text"}, "deutsch-text"])
+          end
+        end
+
+        context 'when plucking a specific locale' do
+
+          let(:plucked) do
+            context.pluck(:'description.de')
+          end
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+
+        context 'when plucking a specific locale from _translations field' do
+
+          let(:plucked) do
+            context.pluck(:'description_translations.de')
+          end
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+
+        context 'when fallbacks are enabled with a locale list' do
+          require_fallbacks
+
+          around(:all) do |example|
+            prev_fallbacks = I18n.fallbacks.dup
+            I18n.fallbacks[:he] = [ :en ]
+            example.run
+            I18n.fallbacks = prev_fallbacks
+          end
+
+          after do
+            I18n.locale = :en
+          end
+
+          let(:plucked) do
+            context.pluck(:description).first
+          end
+
+          it "correctly uses the fallback" do
+            I18n.locale = :en
+            d = Dictionary.create!(description: 'english-text')
+            I18n.locale = :he
+            plucked.should == "english-text"
+          end
+        end
+
+        context "when the localized field is embedded" do
+          before do
+            p = Passport.new
+            I18n.locale = :en
+            p.name = "Neil"
+            I18n.locale = :he
+            p.name = "Nissim"
+
+            Person.create!(passport: p, employer_id: 12345)
+          end
+
+          after do
+            I18n.locale = :en
+          end
+
+          let(:plucked) do
+            Person.where(employer_id: 12345).pluck("pass.name").first
+          end
+
+          let(:plucked_translations) do
+            Person.where(employer_id: 12345).pluck("pass.name_translations").first
+          end
+
+          let(:plucked_translations_field) do
+            Person.where(employer_id: 12345).pluck("pass.name_translations.en").first
+          end
+
+          it "returns the translation for the current locale" do
+            expect(plucked).to eq("Nissim")
+          end
+
+          it "returns the full _translation hash" do
+            expect(plucked_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the translation for the requested locale" do
+            expect(plucked_translations_field).to eq("Neil")
+          end
+        end
+      end
+
+      context 'when plucking a field to be demongoized' do
+
+        let(:plucked) do
+          Band.where(name: maniacs.name).pluck(:sales)
+        end
+
+        with_config_values :map_big_decimal_to_decimal128, true, false do
+
+          it "demongoizes the field" do
+            expect(plucked.first).to be_a(BigDecimal)
+            expect(plucked.first).to eq(BigDecimal("1E2"))
+          end
+        end
+      end
+
+      context "when plucking an embedded field" do
+        let(:label) { Label.new(sales: "1E2") }
+        let!(:band) { Band.create!(label: label) }
+
+        let(:plucked) do
+          Band.where(_id: band.id).tap do |crit|
+            crit.documents = [ band ]
+          end.pluck("label.sales")
+        end
+
+        it "demongoizes the field" do
+          expect(plucked).to eq([ BigDecimal("1E2") ])
+        end
+      end
+
+      context "when plucking an embeds_many field" do
+        let(:label) { Label.new(sales: "1E2") }
+        let!(:band) { Band.create!(labels: [label]) }
+
+        let(:plucked) { Band.where(_id: band.id).pluck("labels.sales") }
+
+        it "demongoizes the field" do
+          expect(plucked.first).to eq([ BigDecimal("1E2") ])
+        end
+      end
+
+      context "when plucking a nonexistent embedded field" do
+        let(:label) { Label.new(sales: "1E2") }
+        let!(:band) { Band.create!(label: label) }
+
+        let(:plucked) do
+          Band.where(_id: band.id).tap do |crit|
+            crit.documents = [ band ]
+          end.pluck("label.qwerty")
+        end
+
+        it "returns nil" do
+          expect(plucked.first).to eq(nil)
+        end
+      end
+
+      context "when tallying deeply nested arrays/embedded associations" do
+
+        let(:criteria) do
+          Person.all.tap do |crit|
+            crit.documents = [
+              Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ]),
+              Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ]),
+              Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ]),
+            ]
+          end
+        end
+
+        let(:plucked) do
+          context.pluck("addresses.code.deepest.array.y.z")
+        end
+
+        it "returns the correct hash" do
+          expect(plucked).to eq([
+            [ [ 1, 2 ] ], [ [ 1, 2 ] ], [ [ 1, 3 ] ]
+          ])
+        end
+      end
+    end
+  end
+
+  describe "#pick" do
+
+    let(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let(:tool) do
+      Band.create!(name: "Tool", likes: 3)
     end
 
     let(:criteria) do
-      Address.all.tap do |crit|
-        crit.documents = [ hobrecht, friedel ]
+      Band.all.tap do |crit|
+        crit.documents = [ depeche, tool ]
       end
     end
 
@@ -1039,75 +1765,42 @@ describe Mongoid::Contextual::Memory do
       described_class.new(criteria)
     end
 
-    context "when plucking" do
+    context "when picking a field" do
 
-      let!(:plucked) do
-        context.pluck(:street)
+      let(:picked) do
+        context.pick(:name)
       end
 
-      it "returns the values" do
-        expect(plucked).to eq([ "hobrecht", "friedel" ])
+      it "returns one element" do
+        expect(picked).to eq("Depeche Mode")
       end
     end
 
-    context "when plucking a mix of empty and non-empty values" do
+    context "when picking multiple fields" do
 
-      let(:empty_doc) do
-        Address.new(street: nil)
+      let(:picked) do
+        context.pick(:name, :likes)
       end
+
+      it "returns an array" do
+        expect(picked).to eq([ "Depeche Mode", 3 ])
+      end
+    end
+
+    context "when no documents to pick" do
 
       let(:criteria) do
-        Address.all.tap do |crit|
-          crit.documents = [ hobrecht, friedel, empty_doc ]
+        Band.all.tap do |crit|
+          crit.documents = []
         end
       end
 
-      let!(:plucked) do
-        context.pluck(:street)
+      let(:picked) do
+        context.pick(:name)
       end
 
-      it "returns the values" do
-        expect(plucked).to eq([ "hobrecht", "friedel", nil ])
-      end
-    end
-
-    context "when plucking a field that doesnt exist" do
-
-      context "when pluck one field" do
-
-        let(:plucked) do
-          context.pluck(:foo)
-        end
-
-        it "returns a empty array" do
-          expect(plucked).to eq([nil, nil])
-        end
-      end
-
-      context "when pluck multiple fields" do
-
-        let(:plucked) do
-          context.pluck(:foo, :bar)
-        end
-
-        it "returns a empty array" do
-          expect(plucked).to eq([[nil, nil], [nil, nil]])
-        end
-      end
-    end
-
-    context 'when there is a collation on the criteria' do
-
-      let(:criteria) do
-        Address.all.tap do |crit|
-          crit.documents = [ hobrecht, friedel ]
-        end.collation(locale: 'en_US', strength: 2)
-      end
-
-      it "raises an exception" do
-        expect {
-          context.pluck(:foo, :bar)
-        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      it "returns nil" do
+        expect(picked).to be_nil
       end
     end
   end

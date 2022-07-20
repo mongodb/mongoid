@@ -229,6 +229,24 @@ describe Mongoid::Findable do
       it "returns the first matching document" do
         expect(Person.send(method)).to eq(person)
       end
+
+      it "passes the limit through" do
+        expect(Person.last(1)).to eq([ person ])
+      end
+    end
+  end
+
+  describe "#last" do
+    let!(:person) do
+      Person.create!
+    end
+
+    it "returns the first matching document" do
+      expect(Person.last).to eq(person)
+    end
+
+    it "passes the limit through" do
+      expect(Person.last(1)).to eq([ person ])
     end
   end
 
@@ -472,7 +490,7 @@ describe Mongoid::Findable do
         Band.pluck(:follows)
       end
 
-      it "returns a array with nil values" do
+      it "returns an array with nil values" do
         expect(plucked).to eq([nil, nil, nil])
       end
     end

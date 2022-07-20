@@ -12,13 +12,20 @@ module Mongoid
         # @example Mongoize the object.
         #   Regexp.mongoize(/\A[abc]/)
         #
-        # @param [ Regexp, String ] object The object to mongoize.
+        # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Regexp ] The object mongoized.
+        # @return [ Regexp | nil ] The object mongoized or nil.
         def mongoize(object)
-          return nil if object.nil?
-          ::Regexp.new(object)
+          return if object.nil?
+          case object
+          when String then ::Regexp.new(object)
+          when ::Regexp then object
+          when BSON::Regexp::Raw then object.compile
+          end
+        rescue RegexpError
+          nil
         end
+        alias :demongoize :mongoize
       end
     end
   end

@@ -33,6 +33,13 @@ describe Array do
         expect(described_class.evolve("testing")).to eq("testing")
       end
     end
+
+    context "when providing a set" do
+
+      it "returns an array" do
+        expect(described_class.evolve([ 1, 2, 3 ].to_set)).to eq([ 1, 2, 3 ])
+      end
+    end
   end
 
   describe "#__add__" do

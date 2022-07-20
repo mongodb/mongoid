@@ -78,7 +78,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        documents.map{ |doc| doc.send(field) }.uniq
+        if Mongoid.legacy_pluck_distinct
+          documents.map{ |doc| doc.send(field) }.uniq
+        else
+          pluck(field).uniq
+        end
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -108,7 +112,7 @@ module Mongoid
       #
       # @return [ true, false ] If the count is more than zero.
       def exists?
-        count > 0
+        any?
       end
 
       # Get the first document in the database for the criteria's selector.
@@ -116,9 +120,15 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
+      # @param [ Integer ] limit The number of documents to return.
+      #
       # @return [ Document ] The first document.
-      def first(*args)
-        eager_load([documents.first]).first
+      def first(limit = nil)
+        if limit
+          eager_load(documents.first(limit))
+        else
+          eager_load([documents.first]).first
+        end
       end
       alias :one :first
       alias :find_first :first
@@ -159,9 +169,15 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
+      # @param [ Integer ] limit The number of documents to return.
+      #
       # @return [ Document ] The last document.
-      def last
-        eager_load([documents.last]).first
+      def last(limit = nil)
+        if limit
+          eager_load(documents.last(limit))
+        else
+          eager_load([documents.last]).first
+        end
       end
 
       # Take the given number of documents from the database.
@@ -230,7 +246,27 @@ module Mongoid
       #
       # @return [ Array ] The array of plucked values.
       def pluck(*fields)
-        documents.pluck(*fields)
+        if Mongoid.legacy_pluck_distinct
+          documents.pluck(*fields)
+        else
+          documents.map do |doc|
+            pluck_from_doc(doc, *fields)
+          end
+        end
+      end
+
+      # Pick the field values in memory.
+      #
+      # @example Get the values in memory.
+      #   context.pick(:name)
+      #
+      # @param [ String | Symbol ] *fields Field(s) to pick.
+      #
+      # @return [ Object, Array<Object> ] The picked values.
+      def pick(*fields)
+        if doc = documents.first
+          pluck_from_doc(doc, *fields)
+        end
       end
 
       # Tally the field values in memory.
@@ -501,7 +537,8 @@ module Mongoid
               document.send("#{segment}_translations")
             end
           end
-          res.nil? ? document.send(segment) : res
+          meth = klass.aliased_associations[segment] || segment
+          res.nil? ? document.try(meth) : res
         elsif document.is_a?(Hash)
           # TODO: Remove the indifferent access when implementing MONGOID-5410.
           document.key?(segment.to_s) ?
@@ -518,6 +555,22 @@ module Mongoid
           curr.map { |d| retrieve_value_at_path(d, remaining) }.compact
         else
           retrieve_value_at_path(curr, remaining)
+        end
+      end
+
+      # Pluck the field values from the given document.
+      #
+      # @param [ Document ] doc The document to pluck from.
+      # @param [ String | Symbol ] *fields Field(s) to pluck.
+      #
+      # @return [ Object, Array<Object> ] The plucked values.
+      def pluck_from_doc(doc, *fields)
+        if fields.length == 1
+          retrieve_value_at_path(doc, fields.first)
+        else
+          fields.map do |field|
+            retrieve_value_at_path(doc, field)
+          end
         end
       end
     end

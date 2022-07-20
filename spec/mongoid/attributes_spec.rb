@@ -1078,8 +1078,8 @@ describe Mongoid::Attributes do
     context "after the attribute has been assigned" do
 
       it "returns the default value" do
-        person.age = "old"
-        expect(person.age_before_type_cast).to eq("old")
+        person.age = "42"
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
 
@@ -1274,7 +1274,7 @@ describe Mongoid::Attributes do
     context "after the attribute has been assigned" do
 
       it "returns true" do
-        person.age = 'old'
+        person.age = '42'
         expect(person.has_attribute_before_type_cast?(:age)).to be true
       end
     end
@@ -1529,12 +1529,13 @@ describe Mongoid::Attributes do
     end
 
     context "when setting an attribute that needs type casting" do
+
       let(:person) do
-        Person.new(age: "old")
+        Person.new(age: "42")
       end
 
       it "should store the attribute before type cast" do
-        expect(person.age_before_type_cast).to eq("old")
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
 
@@ -1582,16 +1583,14 @@ describe Mongoid::Attributes do
     context "when attribute is a Hash" do
       let(:person) { Person.new map: { somekey: "somevalue" } }
 
-      it "raises an error when trying to set a value of invalid type - array" do
-        expect do
-          person.map = []
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Array cannot be written to a field of type Hash/)
+      it "writes nil when trying to set a value of invalid type - array" do
+        person.map = []
+        expect(person.map).to be_nil
       end
 
-      it "raises an error when trying to set a value of invalid type - boolean" do
-        expect do
-          person.map = false
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Hash/)
+      it "writes nil when trying to set a value of invalid type - boolean" do
+        person.map = false
+        expect(person.map).to be_nil
       end
 
       it "can set a Hash value" do
@@ -1606,16 +1605,14 @@ describe Mongoid::Attributes do
         expect(person.aliases).to eq([ :alias_1 ])
       end
 
-      it "raises an error when trying to set a value of invalid type - hash" do
-        expect do
-          person.aliases = {}
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Hash cannot be written to a field of type Array/)
+      it "writes nil when trying to set a value of invalid type - hash" do
+        person.aliases = {}
+        expect(person.aliases).to be_nil
       end
 
-      it "raises an error when trying to set a value of invalid type - boolean" do
-        expect do
-          person.aliases = false
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Array/)
+      it "writes nil when trying to set a value of invalid type - boolean" do
+        person.aliases = false
+        expect(person.aliases).to be_nil
       end
     end
 
@@ -2074,8 +2071,8 @@ describe Mongoid::Attributes do
       end
 
       it "aliases *_before_type_cast" do
-        product.cost = "expensive"
-        expect(product.cost_before_type_cast).to eq("expensive")
+        product.cost = "42"
+        expect(product.cost_before_type_cast).to eq("42")
       end
     end
 
@@ -2697,6 +2694,21 @@ describe Mongoid::Attributes do
 
     it "persists the updated hash" do
       church.location.should == { "x" => 1, "y" => 2 }
+    end
+  end
+
+  context "when modifiying a set referenced with the [] notation" do
+    let(:catalog) { Catalog.create!(set_field: [ 1 ].to_set) }
+
+    before do
+      catalog[:set_field] << 2
+      catalog.save!
+      catalog.reload
+    end
+
+    it "persists the updated hash" do
+      pending "MONGOID-2951"
+      catalog.set_field.should == Set.new([ 1, 2 ])
     end
   end
 end

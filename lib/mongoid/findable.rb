@@ -38,6 +38,7 @@ module Mongoid
       :max,
       :min,
       :none,
+      :pick,
       :pluck,
       :read,
       :sum,
@@ -194,9 +195,11 @@ module Mongoid
     # @example Find the first document.
     #   Person.first
     #
+    # @param [ Integer ] limit The number of documents to return.
+    #
     # @return [ Document ] The first matching document.
-    def first
-      with_default_scope.first
+    def first(limit = nil)
+      with_default_scope.first(limit)
     end
     alias :one :first
 
@@ -205,9 +208,11 @@ module Mongoid
     # @example Find the last document.
     #   Person.last
     #
+    # @param [ Integer ] limit The number of documents to return.
+    #
     # @return [ Document ] The last matching document.
-    def last
-      with_default_scope.last
+    def last(limit = nil)
+      with_default_scope.last(limit)
     end
   end
 end

@@ -44,39 +44,6 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  describe "#cached?" do
-
-    context "when the criteria is cached" do
-
-      let(:criteria) do
-        Band.all.cache
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns true" do
-        expect(context).to be_cached
-      end
-    end
-
-    context "when the criteria is not cached" do
-
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns false" do
-        expect(context).to_not be_cached
-      end
-    end
-  end
-
   describe "#count" do
 
     let!(:depeche) do
@@ -102,15 +69,17 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
-        described_class.new(criteria.cache)
+        described_class.new(criteria)
       end
 
-      it "returns the count cached value after first call" do
-        expect(context.view).to receive(:count_documents).once.and_return(1)
-        2.times { expect(context.count).to eq(1) }
+      it "only executes the count query once" do
+        expect_query(1) do
+          2.times { expect(context.count).to eq(1) }
+        end
       end
     end
 
@@ -217,16 +186,18 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
-        described_class.new(criteria.cache)
+        described_class.new(criteria)
       end
 
-      it "returns the count cached value after first call" do
-        expect(context.view).to receive(:estimated_document_count).once.and_return(1)
-        2.times do
-          context.estimated_count
+      it "the results are not cached" do
+        expect_query(2) do
+          2.times do
+            context.estimated_count
+          end
         end
       end
     end
@@ -1450,51 +1421,15 @@ describe Mongoid::Contextual::Mongo do
         described_class.new(criteria)
       end
 
-      context "when exists? already called" do
+      context "when exists? already called and query cache is enabled" do
+        query_cache_enabled
 
         before do
           context.exists?
         end
 
-        it "hits the database again" do
-          expect(context).to receive(:view).once.and_call_original
-          expect(context).to be_exists
-        end
-      end
-    end
-
-    context "when caching is enabled" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode").cache
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      context "when the cache is loaded" do
-
-        before do
-          context.to_a
-        end
-
-        it "does not hit the database" do
-          expect(context).to receive(:view).never
-          expect(context).to be_exists
-        end
-      end
-
-      context "when the cache is not loaded" do
-
-        context "when a count has been executed" do
-
-          before do
-            context.count
-          end
-
-          it "does not hit the database" do
-            expect(context).to receive(:view).never
+        it "does not hit the database again" do
+          expect_no_queries do
             expect(context).to be_exists
           end
         end
@@ -1915,6 +1850,10 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
+      let!(:rolling_stones) do
+        Band.create!(name: "The Rolling Stones")
+      end
+
       context "when the context is not cached" do
 
         let(:criteria) do
@@ -1955,14 +1894,14 @@ describe Mongoid::Contextual::Mongo do
         context "when there is sort on the context" do
 
           it "follows the main sort" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
           end
         end
 
         context "when subsequently calling #last" do
 
           it "returns the correct document" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
             expect(context.last).to eq(depeche_mode)
           end
         end
@@ -1987,26 +1926,7 @@ describe Mongoid::Contextual::Mongo do
 
           it 'returns the last document, sorted by _id' do
             expect(context.send(method)).to eq(depeche_mode)
-            expect(context.last).to eq(new_order)
-          end
-        end
-
-        context 'with option { sort: :none }' do
-
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'does not apply the sort on _id' do
-            expect(context.send(method, opts)).to eq(depeche_mode)
-          end
-
-          context 'when calling #last' do
-
-            it 'does not apply a sort on _id' do
-              expect(context.send(method, opts)).to eq(depeche_mode)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
+            expect(context.last).to eq(rolling_stones)
           end
         end
       end
@@ -2021,35 +1941,15 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-
         it 'applies the criteria sort' do
-          expect(context.send(method)).to eq(new_order)
+          expect(context.send(method)).to eq(rolling_stones)
         end
 
         context 'when calling #last' do
 
           it 'applies the criteria sort' do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
             expect(context.last).to eq(depeche_mode)
-          end
-        end
-
-        context 'with option { sort: :none }' do
-
-          let(:opts) do
-            { id_sort: :none }
-          end
-
-          it 'applies the criteria sort' do
-            expect(context.send(method, opts)).to eq(new_order)
-          end
-
-          context 'when calling #last' do
-
-            it 'applies the criteria sort' do
-              expect(context.send(method, opts)).to eq(new_order)
-              expect(context.last(opts)).to eq(depeche_mode)
-            end
           end
         end
       end
@@ -2067,39 +1967,28 @@ describe Mongoid::Contextual::Mongo do
         context "when there is sort on the context" do
 
           it "follows the main sort" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
           end
         end
 
         context "when subsequently calling #last" do
 
           it "returns the correct document" do
-            expect(context.send(method)).to eq(new_order)
+            expect(context.send(method)).to eq(rolling_stones)
             expect(context.last).to eq(depeche_mode)
           end
         end
       end
 
-      context "when the context is cached" do
+      context "when the query cache is enabled" do
+        query_cache_enabled
 
         let(:criteria) do
-          Band.where(name: "Depeche Mode").cache
+          Band.where(name: "Depeche Mode")
         end
 
         let(:context) do
           described_class.new(criteria)
-        end
-
-        context "when the cache is loaded" do
-
-          before do
-            context.to_a
-          end
-
-          it "returns the first document without touching the database" do
-            expect(context).to receive(:view).never
-            expect(context.send(method)).to eq(depeche_mode)
-          end
         end
 
         context "when first method was called before" do
@@ -2109,9 +1998,539 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first document without touching the database" do
-            expect(context).to receive(:view).never
-            expect(context.send(method)).to eq(depeche_mode)
+            expect_no_queries do
+              expect(context.send(method)).to eq(depeche_mode)
+            end
           end
+        end
+      end
+
+      context "when including a limit" do
+
+        context "when the context is not cached" do
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          context "when the limit is 1" do
+            let(:criteria) do
+              Band.criteria
+            end
+
+            let(:docs) do
+              context.send(method, 1)
+            end
+
+            it "returns an array of documents" do
+              expect(docs).to eq([ depeche_mode ])
+            end
+          end
+
+          context "when the limit is >1" do
+            let(:criteria) do
+              Band.criteria
+            end
+
+            let(:docs) do
+              context.send(method, 2)
+            end
+
+            it "returns the number of documents in order" do
+              expect(docs).to eq([ depeche_mode, new_order ])
+            end
+          end
+
+          context 'when the criteria has a collation' do
+            min_server_version '3.4'
+
+            let(:criteria) do
+              Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+            end
+
+            it "returns the first matching document" do
+              expect(context.send(method, 1)).to eq([ depeche_mode ])
+            end
+          end
+        end
+
+        context "when the query cache is enabled" do
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          context "when calling first beforehand" do
+            query_cache_enabled
+
+            let(:context) do
+              described_class.new(criteria)
+            end
+
+            let(:criteria) do
+              Band.all
+            end
+
+            before do
+              context.first(before_limit)
+            end
+
+            let(:docs) do
+              context.send(method, limit)
+            end
+
+            context "when getting all of the documents before" do
+              let(:before_limit) { 3 }
+
+              context "when getting all of the documents" do
+                let(:limit) { 3 }
+
+                it "returns all documents without touching the database" do
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
+                end
+              end
+
+              context "when getting fewer documents" do
+                let(:limit) { 2 }
+
+                it "returns the correct documents without touching the database" do
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order ])
+                  end
+                end
+              end
+            end
+
+            context "when getting fewer documents before" do
+              let(:before_limit) { 2 }
+
+              context "when getting the same number of documents" do
+                let(:limit) { 2 }
+
+                it "returns the correct documents without touching the database" do
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order ])
+                  end
+                end
+              end
+
+              context "when getting more documents" do
+                let(:limit) { 3 }
+
+                it "returns the correct documents and touches the database" do
+                  expect_query(1) do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
+                end
+              end
+            end
+
+            context "when getting one document before" do
+              let(:before_limit) { 1 }
+
+              context "when getting one document" do
+                let(:limit) { 1 }
+
+                it "returns the correct documents without touching the database" do
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode ])
+                  end
+                end
+              end
+
+              context "when getting more than one document" do
+                let(:limit) { 3 }
+
+                it "returns the correct documents and touches the database" do
+                  expect_query(1) do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+
+      context "when calling #first then #last and the query cache is enabled" do
+        query_cache_enabled
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let(:criteria) do
+          Band.all
+        end
+
+        before do
+          context.first(before_limit)
+        end
+
+        let(:docs) do
+          context.last(limit)
+        end
+
+        context "when getting one from the beginning and one from the end" do
+          let(:before_limit) { 2 }
+          let(:limit) { 1 }
+
+          it "gets the correct document and hits the database" do
+            expect_query(1) do
+              expect(docs).to eq([rolling_stones])
+            end
+          end
+        end
+      end
+    end
+  end
+
+  describe "#last" do
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    context "when the context is not cached" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the last matching document" do
+        expect(context.last).to eq(depeche_mode)
+      end
+
+      context 'when the criteria has a collation' do
+        min_server_version '3.4'
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        it "returns the last matching document" do
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+    end
+
+    context "when using .desc" do
+
+      let(:criteria) do
+        Band.desc(:name)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when there is sort on the context" do
+
+        it "follows the main sort" do
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+
+      context "when subsequently calling #first" do
+
+        it "returns the correct document" do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
+    end
+
+    context 'when the criteria has no sort' do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it 'applies a sort on _id' do
+        expect(context.last).to eq(rolling_stones)
+      end
+
+      context 'when calling #first' do
+
+        it 'returns the first document, sorted by _id' do
+          expect(context.last).to eq(rolling_stones)
+          expect(context.first).to eq(depeche_mode)
+        end
+      end
+    end
+
+    context 'when the criteria has a sort' do
+
+      let(:criteria) do
+        Band.desc(:name)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+
+      it 'applies the criteria sort' do
+        expect(context.last).to eq(depeche_mode)
+      end
+
+      context 'when calling #first' do
+
+        it 'applies the criteria sort' do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
+    end
+
+    context "when using .sort" do
+
+      let(:criteria) do
+        Band.all.sort(:name => -1).criteria
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when there is sort on the context" do
+
+        it "follows the main sort" do
+          expect(context.last).to eq(depeche_mode)
+        end
+      end
+
+      context "when subsequently calling #first" do
+
+        it "returns the correct document" do
+          expect(context.last).to eq(depeche_mode)
+          expect(context.first).to eq(rolling_stones)
+        end
+      end
+    end
+
+    context "when the query cache is enabled" do
+      query_cache_enabled
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when last method was called before" do
+
+        before do
+          context.last
+        end
+
+        it "returns the last document without touching the database" do
+          expect_no_queries do
+            expect(context.last).to eq(depeche_mode)
+          end
+        end
+      end
+    end
+
+    context "when including a limit" do
+
+      context "when the context is not cached" do
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when the limit is 1" do
+          let(:criteria) do
+            Band.criteria
+          end
+
+          let(:docs) do
+            context.last(1)
+          end
+
+          it "returns an array of documents" do
+            expect(docs).to eq([ rolling_stones ])
+          end
+        end
+
+        context "when the limit is >1" do
+          let(:criteria) do
+            Band.criteria
+          end
+
+          let(:docs) do
+            context.last(2)
+          end
+
+          it "returns the number of documents in order" do
+            expect(docs).to eq([ new_order, rolling_stones ])
+          end
+        end
+
+        context 'when the criteria has a collation' do
+          min_server_version '3.4'
+
+          let(:criteria) do
+            Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+          end
+
+          it "returns the first matching document" do
+            expect(context.last(1)).to eq([ depeche_mode ])
+          end
+        end
+      end
+
+      context "when the context is cached" do
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when query cache is enabled" do
+          query_cache_enabled
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          let(:criteria) do
+            Band.all
+          end
+
+          before do
+            context.last(before_limit)
+          end
+
+          let(:docs) do
+            context.last(limit)
+          end
+
+          context "when getting all of the documents before" do
+            let(:before_limit) { 3 }
+
+            context "when getting all of the documents" do
+              let(:limit) { 3 }
+
+              it "returns all documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
+              end
+            end
+
+            context "when getting fewer documents" do
+              let(:limit) { 2 }
+
+              it "returns the correct documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ new_order, rolling_stones ])
+                end
+              end
+            end
+          end
+
+          context "when getting fewer documents before" do
+            let(:before_limit) { 2 }
+
+            context "when getting the same number of documents" do
+              let(:limit) { 2 }
+
+              it "returns the correct documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ new_order, rolling_stones ])
+                end
+              end
+            end
+
+            context "when getting more documents" do
+              let(:limit) { 3 }
+
+              it "returns the correct documents and touches the database" do
+                expect_query(1) do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
+              end
+            end
+          end
+
+          context "when getting one document before" do
+            let(:before_limit) { 1 }
+
+            context "when getting one document" do
+              let(:limit) { 1 }
+
+              it "returns the correct documents without touching the database" do
+                expect_no_queries do
+                  expect(docs).to eq([ rolling_stones ])
+                end
+              end
+            end
+
+            context "when getting more than one document" do
+              let(:limit) { 3 }
+
+              it "returns the correct documents and touches the database" do
+                expect_query(1) do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    context "when calling #last then #first and the query cache is enabled" do
+      query_cache_enabled
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      before do
+        context.last(before_limit)
+      end
+
+      let(:docs) do
+        context.first(limit)
+      end
+
+      context "when getting one from the beginning and one from the end" do
+        let(:before_limit) { 2 }
+        let(:limit) { 1 }
+
+        it "hits the database" do
+          expect_query(1) do
+            docs
+          end
+        end
+
+        it "gets the correct document" do
+          expect(docs).to eq([ depeche_mode ])
         end
       end
     end
@@ -2163,37 +2582,28 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        it "returns the number of documents that match" do
-          expect(context.send(method)).to eq(2)
-        end
+        context "when broken_view_options is false" do
+          driver_config_override :broken_view_options, false
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(2)
-            2.times { expect(context.send(method)).to eq(2) }
+          it "returns the number of documents that match" do
+            expect(context.send(method)).to eq(1)
           end
         end
 
-        context "when the results have been iterated over" do
+        context "when broken_view_options is true" do
+          driver_config_override :broken_view_options, true
 
-          before do
-            context.entries
-          end
-
-          it "returns the cached value for all calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(2)
+          it "returns the number of documents that match" do
             expect(context.send(method)).to eq(2)
           end
+        end
 
-          context "when the results have been iterated over multiple times" do
+        context "when calling more than once with different limits" do
+          driver_config_override :broken_view_options, false
 
-            before do
-              context.entries
-            end
-
-            it "resets the length on each full iteration" do
-              expect(context.size).to eq(2)
-            end
+          it "does not cache the value" do
+            expect(context.limit(1).send(method)).to eq(1)
+            expect(context.limit(2).send(method)).to eq(2)
           end
         end
       end
@@ -2212,10 +2622,12 @@ describe Mongoid::Contextual::Mongo do
           expect(context.send(method)).to eq(1)
         end
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(1)
-            2.times { expect(context.send(method)).to eq(1) }
+        context "when calling more than once with different skips" do
+          driver_config_override :broken_view_options, false
+
+          it "does not cache the value" do
+            expect(context.skip(0).send(method)).to eq(1)
+            expect(context.skip(1).send(method)).to eq(0)
           end
         end
 
@@ -2359,8 +2771,10 @@ describe Mongoid::Contextual::Mongo do
 
     context "when passed the symbol field name" do
 
-      it "performs mapping" do
-        expect(context.map(:name)).to eq ["Depeche Mode", "New Order"]
+      it "raises an error" do
+        expect do
+          context.map(:name)
+        end.to raise_error(ArgumentError)
       end
     end
 

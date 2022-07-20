@@ -112,31 +112,6 @@ module Mongoid
       entries.as_json(options)
     end
 
-    # Tells the criteria that the cursor that gets returned needs to be
-    # cached. This is so multiple iterations don't hit the database multiple
-    # times, however this is not advisable when working with large data sets
-    # as the entire results will get stored in memory.
-    #
-    # @example Flag the criteria as cached.
-    #   criteria.cache
-    #
-    # @return [ Criteria ] The cloned criteria.
-    def cache
-      crit = clone
-      crit.options.merge!(cache: true)
-      crit
-    end
-
-    # Will return true if the cache option has been set.
-    #
-    # @example Is the criteria cached?
-    #   criteria.cached?
-    #
-    # @return [ true, false ] If the criteria is flagged as cached.
-    def cached?
-      options[:cache] == true
-    end
-
     # Get the documents from the embedded criteria.
     #
     # @example Get the documents.

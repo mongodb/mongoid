@@ -37,16 +37,6 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
-      # Is the context cached?
-      #
-      # @example Is the context cached?
-      #   context.cached?
-      #
-      # @return [ true, false ] If the context is cached.
-      def cached?
-        !!@cache
-      end
-
       # Get the number of documents matching the query.
       #
       # @example Get the number of matching documents.
@@ -66,7 +56,7 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        try_cache(:count) { view.count_documents(options) }
+        view.count_documents(options)
       end
 
       # Get the estimated number of documents matching the query.
@@ -85,7 +75,7 @@ module Mongoid
         unless self.criteria.selector.empty?
           raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
         end
-        try_cache(:estimated_count) { view.estimated_document_count(options) }
+        view.estimated_document_count(options)
       end
 
       # Delete all documents in the database that match the selector.
@@ -153,7 +143,6 @@ module Mongoid
           documents_for_iteration.each do |doc|
             yield_document(doc, &block)
           end
-          @cache_loaded = true
           self
         else
           to_enum
@@ -166,17 +155,11 @@ module Mongoid
       #   context.exists?
       #
       # @note We don't use count here since Mongo does not use counted
-      #   b-tree indexes, unless a count is already cached then that is
-      #   used to determine the value.
+      #   b-tree indexes.
       #
       # @return [ true, false ] If the count is more than zero.
       def exists?
-        return !documents.empty? if cached? && cache_loaded?
-        return @count > 0 if instance_variable_defined?(:@count)
-
-        try_cache(:exists) do
-          !!(view.projection(_id: 1).limit(1).first)
-        end
+        !!(view.projection(_id: 1).limit(1).first)
       end
 
       # Run an explain on the criteria.
@@ -250,29 +233,16 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
-      # @param [ Hash ] opts The options for the query returning the first document.
-      #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
+      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The first document.
-      def first(opts = {})
-        return documents.first if cached? && cache_loaded?
-        try_cache(:first) do
-          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
-            if raw_doc = view.sort(sort).limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
-          else
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
-          end
+      def first(limit = nil)
+        sort = view.sort || { _id: 1 }
+        if raw_docs = view.sort(sort).limit(limit || 1).to_a
+          process_raw_docs(raw_docs, limit)
         end
       end
       alias :one :first
@@ -281,7 +251,6 @@ module Mongoid
       #
       # @api private
       def find_first
-        return documents.first if cached? && cache_loaded?
         if raw_doc = view.first
           doc = Factory.from_db(klass, raw_doc, criteria)
           eager_load([doc]).first
@@ -311,29 +280,6 @@ module Mongoid
         GeoNear.new(collection, criteria, coordinates)
       end
 
-      # Invoke the block for each element of Contextual. Create a new array
-      # containing the values returned by the block.
-      #
-      # If the symbol field name is passed instead of the block, additional
-      # optimizations would be used.
-      #
-      # @example Map by some field.
-      #   context.map(:field1)
-      #
-      # @example Map with block.
-      #   context.map(&:field1)
-      #
-      # @param [ Symbol ] field The field name.
-      #
-      # @return [ Array ] The result of mapping.
-      def map(field = nil, &block)
-        if block_given?
-          super(&block)
-        else
-          criteria.pluck(field)
-        end
-      end
-
       # Create the new Mongo context. This delegates operations to the
       # underlying driver.
       #
@@ -342,7 +288,7 @@ module Mongoid
       #
       # @param [ Criteria ] criteria The criteria.
       def initialize(criteria)
-        @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
+        @criteria, @klass = criteria, criteria.klass
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
         @view = collection.find(criteria.selector, session: _session)
@@ -359,22 +305,15 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
       #
-      # @param [ Hash ] opts The options for the query returning the first document.
+      # @param [ Integer ] limit The number of documents to return.
       #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
-      def last(opts = {})
-        try_cache(:last) do
-          with_inverse_sorting(opts) do
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
-          end
-        end
+      # @return [ Document ] The last document.
+      def last(limit = nil)
+        raw_docs = view.sort(inverse_sorting).limit(limit || 1).to_a.reverse
+        process_raw_docs(raw_docs, limit)
       end
 
       # Returns the number of documents in the database matching
@@ -385,7 +324,7 @@ module Mongoid
       #
       # @return [ Integer ] The number of documents.
       def length
-        @length ||= self.count
+        self.count
       end
       alias :size :length
 
@@ -458,9 +397,6 @@ module Mongoid
       # @example Pluck a field.
       #   context.pluck(:_id)
       #
-      # @note This method will return the raw db values - it performs no custom
-      #   serialization.
-      #
       # @param [ String, Symbol, Array ] fields Fields to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
@@ -491,6 +427,18 @@ module Mongoid
           end
           plucked << (values.size == 1 ? values.first : values)
         end
+      end
+
+      # Pick the single field values from the database.
+      #
+      # @example Pick a field.
+      #   context.pick(:_id)
+      #
+      # @param [ String, Symbol, Array ] fields Fields to pick.
+      #
+      # @return [ Object, Array<Object> ] The picked values.
+      def pick(*fields)
+        limit(1).pluck(*fields).first
       end
 
       # Get a hash of counts for the values of a single field. For example,
@@ -628,22 +576,6 @@ module Mongoid
 
       private
 
-      # yield the block given or return the cached value
-      #
-      # @param [ String, Symbol ] key The instance variable name
-      #
-      # @return the result of the block
-      def try_cache(key, &block)
-        unless cached?
-          yield
-        else
-          unless ret = instance_variable_get("@#{key}")
-            instance_variable_set("@#{key}", ret = yield)
-          end
-          ret
-        end
-      end
-
       # Update the documents for the provided method.
       #
       # @api private
@@ -704,55 +636,9 @@ module Mongoid
       # Map the inverse sort symbols to the correct MongoDB values.
       #
       # @api private
-      #
-      # @example Apply the inverse sorting params to the given block
-      #   context.with_inverse_sorting
-      def with_inverse_sorting(opts = {})
-        begin
-          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
-            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
-          end
-          yield
-        ensure
-          apply_option(:sort)
-        end
-      end
-
-      # Is the cache able to be added to?
-      #
-      # @api private
-      #
-      # @example Is the context cacheable?
-      #   context.cacheable?
-      #
-      # @return [ true, false ] If caching, and the cache isn't loaded.
-      def cacheable?
-        cached? && !cache_loaded?
-      end
-
-      # Is the cache fully loaded? Will be true if caching after one full
-      # iteration.
-      #
-      # @api private
-      #
-      # @example Is the cache loaded?
-      #   context.cache_loaded?
-      #
-      # @return [ true, false ] If the cache is loaded.
-      def cache_loaded?
-        !!@cache_loaded
-      end
-
-      # Get the documents for cached queries.
-      #
-      # @api private
-      #
-      # @example Get the cached documents.
-      #   context.documents
-      #
-      # @return [ Array<Document> ] The documents.
-      def documents
-        @documents ||= []
+      def inverse_sorting
+        sort = view.sort || { _id: 1 }
+        Hash[sort.map{|k, v| [k, -1*v]}]
       end
 
       # Get the documents the context should iterate. This follows 3 rules:
@@ -770,7 +656,6 @@ module Mongoid
       #
       # @return [ Array<Document>, Mongo::Collection::View ] The docs to iterate.
       def documents_for_iteration
-        return documents if cached? && !documents.empty?
         return view unless eager_loadable?
         docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
         eager_load(docs)
@@ -790,7 +675,6 @@ module Mongoid
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
         yield(doc)
-        documents.push(doc) if cacheable?
       end
 
       private
@@ -916,6 +800,18 @@ module Mongoid
         else
           value.class.demongoize(value)
         end
+      end
+
+      # Process the raw documents retrieved for #first/#last.
+      #
+      # @return [ Array<Document> | Document ] The list of documents or a
+      #   single document.
+      def process_raw_docs(raw_docs, limit)
+        docs = raw_docs.map do |d|
+          Factory.from_db(klass, d, criteria)
+        end
+        docs = eager_load(docs)
+        limit ? docs : docs.first
       end
     end
   end
