@@ -3732,6 +3732,61 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#last!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the last document" do
+        expect(context.last!).to eq(death_cab)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the last document" do
+        expect(context.sort(name: 1).last!).to eq(rolling_stones)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.last!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
   describe "#second" do
 
     let!(:depeche_mode) do
@@ -4167,6 +4222,222 @@ describe Mongoid::Contextual::Mongo do
       it "raises an error" do
         expect do
           context.fifth!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#second_to_last" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.second_to_last).to eq(rolling_stones)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.sort(name: 1).second_to_last).to eq(new_order)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.second_to_last).to be_nil
+      end
+    end
+  end
+
+  describe "#second_to_last!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.second_to_last!).to eq(rolling_stones)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.sort(name: 1).second_to_last!).to eq(new_order)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.second_to_last!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#third_to_last" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.third_to_last).to eq(new_order)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.sort(name: 1).third_to_last).to eq(depeche_mode)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.third_to_last).to be_nil
+      end
+    end
+  end
+
+  describe "#third_to_last!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.third_to_last!).to eq(new_order)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.sort(name: 1).third_to_last!).to eq(depeche_mode)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.third_to_last!
         end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
       end
     end
