@@ -60,10 +60,10 @@ the description and effects of each of these options.
 Storing/Retrieving/Evolving Uncastable Values
 ---------------------------------------------
 
-In Mongoid 8, Mongoid standardizes the storing, retrieving and evolving of
-"uncastable values." On attempting to read or write an uncastable value, a
-``nil`` is returned or written instead. When attempting to evolve an
-uncastable value, the inputted value is returned. See the section on
+**Breaking change:** In Mongoid 8, Mongoid standardizes the storing, retrieving
+and evolving of "uncastable values." On attempting to read or write an
+uncastable value, a ``nil`` is returned or written instead. When attempting to
+evolve an uncastable value, the inputted value is returned. See the section on
 :ref:`Uncastable Values <uncastable-values>` for more details.
 
 Some ``mongoize``, ``demongoize`` and ``evolve`` methods were also changed to
@@ -327,6 +327,7 @@ Mongoid 7 output:
 Notice that in 7 ``attribute_was(:age)`` returns the old attribute value,
 while in 8.0 ``attribute_was(:age)`` returns the new value.
 
+
 ``*_previously_was``, ``previously_new_record?``, and ``previously_persisted?`` helpers
 ---------------------------------------------------------------------------------------
 
@@ -359,9 +360,9 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
 Unknown Field Type Symbols/Strings Prohibited
 ---------------------------------------------
 
-Mongoid 8 prohibits using symbols and strings as field types when these symbols
-and strings do not map to a known type. Previously such usage would create a
-field of type ``Object``.
+**Breaking change:** Mongoid 8 prohibits using symbols and strings as field
+types when these symbols and strings do not map to a known type. Previously
+such usage would create a field of type ``Object``.
 
 Mongoid 8 behavior:
 
@@ -589,9 +590,9 @@ Mongoid 8 correctly updates the number of elements without requiring a reload.
 Repaired Storing Strings in BSON::Binary fields
 -----------------------------------------------
 
-In Mongoid 8, storing a String in a field of type ``BSON::Binary`` will be
-stored in and returned from the database as a ``BSON::Binary``. Prior to Mongoid 8
-it was stored and returned as a String.
+**Breaking change:** In Mongoid 8, storing a String in a field of type
+``BSON::Binary`` will be stored in and returned from the database as a
+``BSON::Binary``. Prior to Mongoid 8 it was stored and returned as a String:
 
 .. code::
 
