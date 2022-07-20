@@ -2294,6 +2294,47 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#pick" do
+
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 3)
+    end
+
+    context "when picking a field" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name)
+      end
+
+      it "returns one element" do
+        expect(picked).to eq("Depeche Mode")
+      end
+    end
+
+    context "when picking multiple fields" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name, :likes)
+      end
+
+      it "returns an array" do
+        expect(picked).to eq([ "Depeche Mode", 3 ])
+      end
+    end
+  end
+
   describe "#respond_to?" do
 
     let(:criteria) do

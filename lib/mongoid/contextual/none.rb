@@ -95,6 +95,18 @@ module Mongoid
         []
       end
 
+      # Pick the field values in null context.
+      #
+      # @example Get the value for null context.
+      #   context.pick(:name)
+      #
+      # @param [ String | Symbol ] *_fields Field or fields to pick.
+      #
+      # @return [ nil ] Always reeturn nil.
+      def pick(*_fields)
+        nil
+      end
+
       # Tally the field values in null context.
       #
       # @example Get the values for null context.

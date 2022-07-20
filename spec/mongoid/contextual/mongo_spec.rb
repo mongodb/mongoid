@@ -2582,37 +2582,28 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        it "returns the number of documents that match" do
-          expect(context.send(method)).to eq(2)
-        end
+        context "when broken_view_options is false" do
+          driver_config_override :broken_view_options, false
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(2)
-            2.times { expect(context.send(method)).to eq(2) }
+          it "returns the number of documents that match" do
+            expect(context.send(method)).to eq(1)
           end
         end
 
-        context "when the results have been iterated over" do
+        context "when broken_view_options is true" do
+          driver_config_override :broken_view_options, true
 
-          before do
-            context.entries
-          end
-
-          it "returns the cached value for all calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(2)
+          it "returns the number of documents that match" do
             expect(context.send(method)).to eq(2)
           end
+        end
 
-          context "when the results have been iterated over multiple times" do
+        context "when calling more than once with different limits" do
+          driver_config_override :broken_view_options, false
 
-            before do
-              context.entries
-            end
-
-            it "resets the length on each full iteration" do
-              expect(context.size).to eq(2)
-            end
+          it "does not cache the value" do
+            expect(context.limit(1).send(method)).to eq(1)
+            expect(context.limit(2).send(method)).to eq(2)
           end
         end
       end
@@ -2631,10 +2622,12 @@ describe Mongoid::Contextual::Mongo do
           expect(context.send(method)).to eq(1)
         end
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(1)
-            2.times { expect(context.send(method)).to eq(1) }
+        context "when calling more than once with different skips" do
+          driver_config_override :broken_view_options, false
+
+          it "does not cache the value" do
+            expect(context.skip(0).send(method)).to eq(1)
+            expect(context.skip(1).send(method)).to eq(0)
           end
         end
 

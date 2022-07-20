@@ -114,6 +114,25 @@ describe Mongoid::Extensions::String do
         it_behaves_like 'maintains precision when mongoized'
       end
 
+      context "when the string is a valid time without time" do
+
+        let(:string) do
+          "2010-11-19"
+        end
+
+        let(:mongoized) do
+          string.__mongoize_time__
+        end
+
+        let(:expected_time) { Time.parse("2010-11-18 15:00:00 +0000").in_time_zone }
+
+        it "converts to the AS time zone" do
+          expect(mongoized.zone).to eq("JST")
+        end
+
+        it_behaves_like 'mongoizes to AS::TimeWithZone'
+      end
+
       context "when the string is an invalid time" do
 
         let(:string) do
@@ -169,6 +188,29 @@ describe Mongoid::Extensions::String do
 
         it_behaves_like 'mongoizes to Time'
         it_behaves_like 'maintains precision when mongoized'
+      end
+
+      context "when the string is a valid time without time" do
+
+        let(:string) do
+          "2010-11-19"
+        end
+
+        let(:mongoized) do
+          string.__mongoize_time__
+        end
+
+        let(:utc_offset) do
+          Time.now.utc_offset
+        end
+
+        let(:expected_time) { Time.parse("2010-11-19 00:00:00 +0000") - Time.parse(string).utc_offset }
+
+        it 'test operates in multiple time zones' do
+          expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
+        end
+
+        it_behaves_like 'mongoizes to Time'
       end
 
       context "when the string is an invalid time" do

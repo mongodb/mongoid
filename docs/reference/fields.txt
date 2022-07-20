@@ -269,6 +269,12 @@ assignment to a ``Time`` field:
 In the above example, the value was interpreted as the beginning of today in
 local time, because the application was not configured to use UTC times.
 
+.. note::
+
+  When the database contains a string value for a ``Time`` field, Mongoid
+  parses the string value using ``Time.parse`` which considers values without
+  time zones to be in local time.
+
 
 .. _field-type-date:
 
@@ -294,6 +300,13 @@ especially if an application operates with times in different time zones it is
 recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
+
+.. note::
+
+  When the database contains a string value for a ``Date`` field, Mongoid
+  parses the string value using ``Time.parse``, discards the time portion of
+  the resulting ``Time`` object and uses the date portion. ``Time.parse``
+  considers values without time zones to be in local time.
 
 
 .. _field-type-date-time:
@@ -363,6 +376,12 @@ If a time zone is specified, it is respected:
     ticket.opened_at = 'Mar 4, 2018 10:00:00 +01:00'
     ticket.opened_at
     # => Sun, 04 Mar 2018 09:00:00 +0000
+
+.. note::
+
+  When the database contains a string value for a ``DateTime`` field, Mongoid
+  parses the string value using ``Time.parse`` which considers values without
+  time zones to be in local time.
 
 
 .. _field-type-regexp:

@@ -1371,6 +1371,32 @@ Mongoid also has some helpful methods on criteria.
           Band.length
           Band.where(name: "FKA Twigs").size
 
+   * - ``Criteria#pick``
+
+       *Get the values from one document for the provided fields.
+       Returns nil for unset fields and for non-existent fields.*
+
+       *This method does not apply a sort to the documents, so it
+       will not necessarily return the values from the first document.*
+
+       *This method accepts the dot notation, thus permitting referencing
+       fields in embedded associations.*
+
+       *This method respects :ref:`field aliases <field-aliases>`,
+       including those defined in embedded documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.pick(:name)
+
+          Band.all.pick('cities.name')
+
+          # Using the earlier definition of Manager,
+          # expands out to "managers.name" in the query:
+          Band.all.pick('managers.n')
+
+
    * - ``Criteria#pluck``
 
        *Get all the values for the provided field.

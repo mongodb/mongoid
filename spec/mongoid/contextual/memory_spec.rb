@@ -1344,7 +1344,7 @@ describe Mongoid::Contextual::Memory do
         Band.create!(name: "Photek", likes: 1)
       end
 
-      let(:maniacs) do
+      let!(:maniacs) do
         Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
       end
 
@@ -1685,7 +1685,7 @@ describe Mongoid::Contextual::Memory do
 
         let(:plucked) do
           Band.where(_id: band.id).tap do |crit|
-            crit.documents = [band]
+            crit.documents = [ band ]
           end.pluck("label.sales")
         end
 
@@ -1711,7 +1711,7 @@ describe Mongoid::Contextual::Memory do
 
         let(:plucked) do
           Band.where(_id: band.id).tap do |crit|
-            crit.documents = band
+            crit.documents = [ band ]
           end.pluck("label.qwerty")
         end
 
@@ -1741,6 +1741,66 @@ describe Mongoid::Contextual::Memory do
             [ [ 1, 2 ] ], [ [ 1, 2 ] ], [ [ 1, 3 ] ]
           ])
         end
+      end
+    end
+  end
+
+  describe "#pick" do
+
+    let(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let(:tool) do
+      Band.create!(name: "Tool", likes: 3)
+    end
+
+    let(:criteria) do
+      Band.all.tap do |crit|
+        crit.documents = [ depeche, tool ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when picking a field" do
+
+      let(:picked) do
+        context.pick(:name)
+      end
+
+      it "returns one element" do
+        expect(picked).to eq("Depeche Mode")
+      end
+    end
+
+    context "when picking multiple fields" do
+
+      let(:picked) do
+        context.pick(:name, :likes)
+      end
+
+      it "returns an array" do
+        expect(picked).to eq([ "Depeche Mode", 3 ])
+      end
+    end
+
+    context "when no documents to pick" do
+
+      let(:criteria) do
+        Band.all.tap do |crit|
+          crit.documents = []
+        end
+      end
+
+      let(:picked) do
+        context.pick(:name)
+      end
+
+      it "returns nil" do
+        expect(picked).to be_nil
       end
     end
   end

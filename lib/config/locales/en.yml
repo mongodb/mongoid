@@ -428,8 +428,8 @@ en:
           summary: "Mongoid attempted to find a document of the class %{klass}
             but none exist."
           resolution: "Create a document of class %{klass} or use a finder
-            method that returns nil when no documents are found instead of
-            raising an exception."
+            method that does not raise an exception when no documents are
+            found."
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."
