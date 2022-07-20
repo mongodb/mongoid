@@ -1,0 +1,44 @@
+***********
+Mongoid 8.1
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 8.1.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Added ``Mongoid::Criteria`` finder methods
+------------------------------------------
+
+Mongoid 8.1 implements several finder methods on ``Mongoid::Criteria``:
+
+- ``first!``
+- ``last!``
+- ``second/second!``
+- ``third/third!``
+- ``fourth/fourth!``
+- ``fifth/fifth!``
+- ``second_to_last/second_to_last!``
+- ``third_to_last/third_to_last!``
+
+When no documents are found, methods without a bang (!) return nil, and methods
+with a bang (!) raise an error:
+
+.. code:: ruby
+
+  Band.none.first
+  # => nil
+
+  Band.none.first!
+  # => raise Mongoid::Errors::DocumentNotFound
