@@ -2582,7 +2582,7 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        context "when calling more than once with different limits" do
+        context "when broken_view_options is false" do
           driver_config_override :broken_view_options, false
 
           it "returns the number of documents that match" do
