@@ -59,6 +59,20 @@ Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.
 
 
+``Decimal128``-backed ``BigDecimal`` Fields
+-------------------------------------------
+
+Mongoid 8 introduces the ``map_big_decimal_to_decimal128`` feature flag, which
+allows values assigned to a field of type ``BigDecimal`` to be stored as type
+``String`` in the database for compatibility with Mongoid 7 and earlier. In
+Mongoid 8 by default (with this feature flag turned on), values assigned to
+fields of type ``BigDecimal`` are stored in the database as type
+``BSON::Decimal128``. In Mongoid 7 and earlier, and in Mongoid 8 with this
+feature flag turned off, values assigned to fields of type ``BigDecimal`` are
+stored as Strings. See the section on :ref:`BigDecimal Fields <bigdecimal-fields>`
+for more details.
+
+
 Storing/Retrieving/Evolving Uncastable Values
 ---------------------------------------------
 
@@ -130,6 +144,29 @@ perform consistently with rails and the other ``mongoize``, ``demongoize`` and
   changed to prevent bugs when modifying and saving those objects. See
   https://jira.mongodb.org/browse/MONGOID-2951 for a longer discussion on these
   bugs.
+
+
+Changes to the ``attributes_before_type_cast`` Hash
+---------------------------------------------------
+
+The ``attributes_before_type_cast`` hash has been changed to function more like
+ActiveRecord:
+
+  - On instantiation of a new model (without parameters), the
+    ``attributes_before_type_cast`` hash has the same contents as the
+    ``attributes`` hash. If parameters are passed to the initializer, those
+    values will be stored in the ``attributes_before_type_cast`` hash before
+    they are ``mongoized``.
+  - When assigning a value to the model, the ``mongoized`` value (i.e. when
+    assiging '1' to an Integer field, it is ``mongoized`` to 1) is stored in
+    the ``attributes`` hash, whereas the raw value (i.e. '1') is stored in the
+    ``attributes_before_type_cast`` hash.
+  - When saving, creating (i.e. using the ``create!`` method), or reloading the
+    model, the ``attributes_before_type_cast`` hash is reset to have the same
+    contents as the ``attributes`` hash.
+  - When reading a document from the database, the ``attributes_before_type_cast``
+    hash contains the attributes as they appear in the database, as opposed to
+    their ``demongoized`` form.
 
 
 Order of Callback Invocation
@@ -231,61 +268,6 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
 +---------------------------------------+---------------------------------------+
 | Parent :after_save                    | Parent :after_save                    |
 +---------------------------------------+---------------------------------------+
-
-
-``any_of`` Adds Multiple Arguments As Top-Level Conditions
-----------------------------------------------------------
-
-**Breaking change:** When ``any_of`` is invoked with multiple conditions, the
-conditions are now added to the top level of the criteria, same as when
-``any_of`` is invoked with a single condition. Previously when multiple
-conditions were provided, and the criteria already had an ``$or`` operator,
-the new conditions would be added to the existing ``$or`` as an additional
-branch.
-
-Mongoid 8.0 behavior:
-
-.. code-block:: ruby
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
-    any_of({members: 2}, {last_tour: 1995})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}],
-  #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-Mongoid 7 behavior:
-
-.. code-block:: ruby
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
-    any_of({members: 2}, {last_tour: 1995})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990},
-  #     {"members"=>2}, {"last_tour"=>1995}]}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
 
 
 ``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
@@ -390,6 +372,61 @@ Mongoid 7 behavior:
   end
 
 
+``any_of`` Adds Multiple Arguments As Top-Level Conditions
+----------------------------------------------------------
+
+**Breaking change:** When ``any_of`` is invoked with multiple conditions, the
+conditions are now added to the top level of the criteria, same as when
+``any_of`` is invoked with a single condition. Previously when multiple
+conditions were provided, and the criteria already had an ``$or`` operator,
+the new conditions would be added to the existing ``$or`` as an additional
+branch.
+
+Mongoid 8.0 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}],
+  #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Mongoid 7 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990},
+  #     {"members"=>2}, {"last_tour"=>1995}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+
 ``#pluck`` on Embedded Criteria Returns ``nil`` Values
 ------------------------------------------------------
 
@@ -445,29 +482,6 @@ For clarity, the following behavior is unchanged from Mongoid 7 to Mongoid 8.0:
     #=> ['Elm Street', nil]
 
 
-Removed ``:drop_dups`` Option from Indexes
-------------------------------------------
-
-The ``:drop_dups`` option has been removed from the ``index`` macro. This option
-was specific to MongoDB server 2.6 and earlier, which Mongoid no longer supports.
-
-
-Removed ``Document#to_a`` Method
---------------------------------
-
-The previously deprecated ``Document#to_a`` method has been removed in
-Mongoid 8.
-
-
-Removed ``Mongoid::Errors::EagerLoad`` Exception Class
-------------------------------------------------------
-
-The previously deprecated ``Mongoid::Errors::EagerLoad`` exception class
-has been removed in Mongoid 8. It has not been used by Mongoid since
-version 7.1.1 when eager loading for polymorphic ``belongs_to`` associations
-was implemented.
-
-
 Replaced ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
 ----------------------------------------------------------------
 
@@ -476,22 +490,100 @@ removed in Mongoid 8. It has been replaced one-for-one with ``#geo_spatial``
 which was added in Mongoid 7.2.0.
 
 
-Removed Deprecated Constants
-----------------------------
+Implemented ``.tally`` method on ``Mongoid#Criteria``
+-----------------------------------------------------
 
-Mongoid 8 removes the following deprecated constants that are not expected
-to have been used outside of Mongoid:
+Mongoid 8 implements the ``.tally`` method on ``Mongoid#Criteria``. ``tally``
+takes a field name as a parameter and returns a mapping from values to their
+counts. For example, take the following model:
 
-- ``Mongoid::Extensions::Date::EPOCH``
-- ``Mongoid::Extensions::Time::EPOCH``
-- ``Mongoid::Factory::TYPE``
+.. code::
+
+  class User
+    include Mongoid::Document
+    field :age
+  end
+
+and the following documents in the database:
+
+.. code::
+
+  { _id: 1, age: 21 }
+  { _id: 2, age: 21 }
+  { _id: 3, age: 22 }
+
+Calling ``tally`` on the age field yields the following:
+
+.. code::
+
+  User.tally("age")
+  # => { 21 => 2, 22 => 1 }
+
+The ``tally`` method accepts the dot notation and field aliases. It also
+allows for tallying localized fields.
 
 
-Removed ``Array#update_values`` and ``Hash#update_values`` methods
-------------------------------------------------------------------
+Implemented ``.pick`` method on ``Mongoid#Criteria``
+-----------------------------------------------------
 
-The previously deprecated ``Array#update_values`` and ``Hash#update_values``
-methods have been removed in Mongoid 8.
+Mongoid 8 implements the ``.pick`` method on ``Mongoid#Criteria``. ``pick``
+takes one or more field names as a parameter and returns the values for those
+fields from one document. Consider the following model:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+    field :age
+  end
+
+and the following documents in the database:
+
+.. code::
+
+  { _id: 1, age: 21 }
+  { _id: 2, age: 21 }
+  { _id: 3, age: 22 }
+
+Calling ``pick`` on the age field yields the following:
+
+.. code::
+
+  User.pick(:age)
+  # => 21
+
+This method does not apply a sort to the documents, so it will not necessarily
+return the values from the first document.
+
+The ``pick`` method accepts the dot notation and field aliases. It also
+allows for picking localized fields.
+
+
+``find`` delegates to ``Enumerable#find`` when given a block
+------------------------------------------------------------
+
+When given a block, without ``_id`` arguments, ``find`` delegates to
+``Enumerable#find``. Consider the following model:
+
+.. code::
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+  end
+
+  Band.create!(name: "Depeche Mode")
+  Band.create!(name: "The Rolling Stones")
+
+Calling ``find`` with a block returns the first document for which the block
+returns ``true``:
+
+.. code::
+
+  Band.find do |b|
+    b.name == "Depeche Mode"
+  end
+  # => #<Band _id: 62c58e383282a4cbe82bd74b, name: "Depeche Mode">
 
 
 No Longer Persisting Documents with Invalid ``belongs_to`` Associations
@@ -614,137 +706,45 @@ Repaired Storing Strings in BSON::Binary fields
   # => Mongoid 8: <BSON::Binary:0x2600 type=generic data=0x6461746121...>
 
 
-``Decimal128``-backed ``BigDecimal`` fields
--------------------------------------------
+Removed ``Document#to_a`` Method
+--------------------------------
 
-Mongoid 8 introduces the ``map_big_decimal_to_decimal128`` feature flag, which
-allows values assigned to a field of type ``BigDecimal`` to be stored as type
-``String`` in the database for compatibility with Mongoid 7 and earlier. In
-Mongoid 8 by default (with this feature flag turned on), values assigned to
-fields of type ``BigDecimal`` are stored in the database as type
-``BSON::Decimal128``. In Mongoid 7 and earlier, and in Mongoid 8 with this
-feature flag turned off, values assigned to fields of type ``BigDecimal`` are
-stored as Strings. See the section on :ref:`BigDecimal Fields <bigdecimal-fields>`
-for more details.
+The previously deprecated ``Document#to_a`` method has been removed in
+Mongoid 8.
 
 
-Implemented ``.tally`` method on ``Mongoid#Criteria``
------------------------------------------------------
+Removed ``:drop_dups`` Option from Indexes
+------------------------------------------
 
-Mongoid 8 implements the ``.tally`` method on ``Mongoid#Criteria``. ``tally``
-takes a field name as a parameter and returns a mapping from values to their
-counts. For example, take the following model:
-
-.. code::
-
-  class User
-    include Mongoid::Document
-    field :age
-  end
-
-and the following documents in the database:
-
-.. code::
-
-  { _id: 1, age: 21 }
-  { _id: 2, age: 21 }
-  { _id: 3, age: 22 }
-
-Calling ``tally`` on the age field yields the following:
-
-.. code::
-
-  User.tally("age")
-  # => { 21 => 2, 22 => 1 }
-
-The ``tally`` method accepts the dot notation and field aliases. It also
-allows for tallying localized fields.
+The ``:drop_dups`` option has been removed from the ``index`` macro. This option
+was specific to MongoDB server 2.6 and earlier, which Mongoid no longer supports.
 
 
-Implemented ``.pick`` method on ``Mongoid#Criteria``
------------------------------------------------------
+Removed ``Mongoid::Errors::EagerLoad`` Exception Class
+------------------------------------------------------
 
-Mongoid 8 implements the ``.pick`` method on ``Mongoid#Criteria``. ``pick``
-takes one or more field names as a parameter and returns the values for those
-fields from one document. Consider the following model:
-
-.. code::
-
-  class User
-    include Mongoid::Document
-    field :age
-  end
-
-and the following documents in the database:
-
-.. code::
-
-  { _id: 1, age: 21 }
-  { _id: 2, age: 21 }
-  { _id: 3, age: 22 }
-
-Calling ``pick`` on the age field yields the following:
-
-.. code::
-
-  User.pick(:age)
-  # => 21
-
-This method does not apply a sort to the documents, so it will not necessarily
-return the values from the first document.
-
-The ``pick`` method accepts the dot notation and field aliases. It also
-allows for picking localized fields.
+The previously deprecated ``Mongoid::Errors::EagerLoad`` exception class
+has been removed in Mongoid 8. It has not been used by Mongoid since
+version 7.1.1 when eager loading for polymorphic ``belongs_to`` associations
+was implemented.
 
 
-``find`` delegates to ``Enumerable#find`` when given a block
-------------------------------------------------------------
+Removed Deprecated Constants
+----------------------------
 
-When given a block, without ``_id`` arguments, ``find`` delegates to
-``Enumerable#find``. Consider the following model:
+Mongoid 8 removes the following deprecated constants that are not expected
+to have been used outside of Mongoid:
 
-.. code::
-
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-  end
-
-  Band.create!(name: "Depeche Mode")
-  Band.create!(name: "The Rolling Stones")
-
-Calling ``find`` with a block returns the first document for which the block
-returns ``true``:
-
-.. code::
-
-  Band.find do |b|
-    b.name == "Depeche Mode"
-  end
-  # => #<Band _id: 62c58e383282a4cbe82bd74b, name: "Depeche Mode">
+- ``Mongoid::Extensions::Date::EPOCH``
+- ``Mongoid::Extensions::Time::EPOCH``
+- ``Mongoid::Factory::TYPE``
 
 
-Changes to the ``attributes_before_type_cast`` Hash
----------------------------------------------------
+Removed ``Array#update_values`` and ``Hash#update_values`` methods
+------------------------------------------------------------------
 
-The ``attributes_before_type_cast`` hash has been changed to function more like
-ActiveRecord:
-
-  - On instantiation of a new model (without parameters), the
-    ``attributes_before_type_cast`` hash has the same contents as the
-    ``attributes`` hash. If parameters are passed to the initializer, those
-    values will be stored in the ``attributes_before_type_cast`` hash before
-    they are ``mongoized``.
-  - When assigning a value to the model, the ``mongoized`` value (i.e. when
-    assiging '1' to an Integer field, it is ``mongoized`` to 1) is stored in
-    the ``attributes`` hash, whereas the raw value (i.e. '1') is stored in the
-    ``attributes_before_type_cast`` hash.
-  - When saving, creating (i.e. using the ``create!`` method), or reloading the
-    model, the ``attributes_before_type_cast`` hash is reset to have the same
-    contents as the ``attributes`` hash.
-  - When reading a document from the database, the ``attributes_before_type_cast``
-    hash contains the attributes as they appear in the database, as opposed to
-    their ``demongoized`` form.
+The previously deprecated ``Array#update_values`` and ``Hash#update_values``
+methods have been removed in Mongoid 8.
 
 
 Deprecated the ``geoHaystack``, ``geoSearch`` Options
@@ -753,17 +753,17 @@ Deprecated the ``geoHaystack``, ``geoSearch`` Options
 The ``geoHaystack`` and ``geoSearch`` options on indexes have been deprecated.
 
 
-Support Dropped for the ``:id_sort`` Option on ``#first/last``
---------------------------------------------------------------
+``:id_sort`` Option on ``#first/last`` Removed
+----------------------------------------------
 
 Support for the ``:id_sort`` option on the ``#first`` and ``#last`` options has
 been dropped. These methods now only except a limit as a positional argument.
 
 
-Support Dropped for Mongoid::Criteria Cache
--------------------------------------------
+Mongoid::Criteria Cache Removed
+-------------------------------
 
 Support for individually caching criteria objects has been dropped in Mongoid 8.
 
-In order to get caching functionality, enable the Mongoid QueryCache. See the
-section on :ref:`QueryCache <query-cache>` for more details.
+In order to get caching functionality, enable the Mongoid Query Cache. See the
+section on :ref:`Query Cache <query-cache>` for more details.
