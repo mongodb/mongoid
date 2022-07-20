@@ -10,6 +10,7 @@ Release Notes
   :titlesonly:
 
   release-notes/mongoid-8.0
+  release-notes/mongoid-7.5
   release-notes/mongoid-7.4
   release-notes/mongoid-7.3
   release-notes/mongoid-7.2
