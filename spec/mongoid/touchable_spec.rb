@@ -701,4 +701,102 @@ describe Mongoid::Touchable do
       end
     end
   end
+
+  describe "when saving a document" do
+
+    let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+    let(:update_time) do
+      Timecop.freeze(Time.at(Time.now.to_i) + 2)
+    end
+
+    after do
+      Timecop.return
+    end
+
+    let(:doc) { Dokument.new }
+
+    context "when saving a new document" do
+
+      context "when not passing a touch option" do
+
+        before do
+          doc.save!
+        end
+
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(start_time)
+        end
+      end
+
+      context "when passing touch: true" do
+
+        before do
+          doc.save!(touch: true)
+        end
+
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(start_time)
+        end
+      end
+
+      context "when passing touch: false" do
+
+        before do
+          doc.save!(touch: false)
+        end
+
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(start_time)
+        end
+      end
+    end
+
+    context "when updating a document" do
+      before do
+        doc.save!
+        doc.title = "title"
+        update_time
+      end
+
+      context "when not passing a touch option" do
+
+        before do
+          doc.save!
+        end
+
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(update_time)
+        end
+      end
+
+      context "when passing touch: true" do
+
+        before do
+          doc.save!(touch: true)
+        end
+
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(update_time)
+        end
+      end
+
+      context "when passing touch: false" do
+
+        before do
+          doc.save!(touch: false)
+        end
+
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(start_time)
+        end
+      end
+    end
+  end
 end

@@ -101,6 +101,7 @@ module Mongoid
             run_callbacks(:persist_parent, with_children: false) do
               _mongoid_run_child_callbacks(:save) do
                 _mongoid_run_child_callbacks(:update) do
+                  try(:set_updated_at) if options.fetch(:touch, true)
                   result = yield(self)
                   self.previously_new_record = false
                   post_process_persist(result, options)

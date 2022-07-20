@@ -14,7 +14,6 @@ module Mongoid
 
         field :updated_at, type: Time
         set_callback :create, :before, :set_updated_at
-        set_callback :update, :before, :set_updated_at
       end
 
       # Update the updated_at field on the Document to the current time.
