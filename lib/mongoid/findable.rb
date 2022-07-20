@@ -132,8 +132,10 @@ module Mongoid
     # The +find+ method takes into account the default scope defined on the
     # model class, if any.
     #
-    # @param [ Object | Array<Object> ] args The _id values to find or an
-    #   array thereof.
+    # @note Each argument can be an individual id, an array of ids or
+    #   a nested array. Each array will be flattened.
+    #
+    # @param [ Object | Array<Object> ] *args The _id value(s) to find.
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
     #

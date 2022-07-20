@@ -23,13 +23,16 @@ module Mongoid
 
       # Find the matchind document(s) in the criteria for the provided ids.
       #
+      # @note Each argument can be an individual id, an array of ids or
+      #   a nested array. Each array will be flattened.
+      #
       # @example Find by an id.
       #   criteria.find(BSON::ObjectId.new)
       #
       # @example Find by multiple ids.
       #   criteria.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
       #
-      # @param [ Array<BSON::ObjectId> ] args The ids to search for.
+      # @param [ Object | Array<Object> ] *args The ids to search for.
       #
       # @return [ Document | Array<Document> ] The matching document(s).
       def find(*args)

@@ -73,6 +73,9 @@ module Mongoid
     # treated by Mongoid - the decision between delegating to +Findable+ vs
     # +Enumerable+ is made solely based on whether +find+ is passed a block.
     #
+    # @note Each argument can be an individual id, an array of ids or
+    #   a nested array. Each array will be flattened.
+    #
     # @example Finds a document by its _id, invokes Findable#find.
     #   critera.find("1234")
     #
@@ -84,6 +87,9 @@ module Mongoid
     #
     # @example Tries to find a document whose _id is the stringification of the provided Proc, typically failing.
     #   enumerator = criteria.find(-> { "Default Band" })
+    #
+    # @param [ Object | Array<Object> ] *args The ids.
+    # @param [ Proc ] block Optional block to pass.
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
     #

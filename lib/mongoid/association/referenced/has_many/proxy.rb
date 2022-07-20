@@ -184,6 +184,9 @@ module Mongoid
           # of those found by the current Criteria object for which the block
           # returns a truthy value.
           #
+          # @note Each argument can be an individual id, an array of ids or
+          #   a nested array. Each array will be flattened.
+          #
           # @example Find by an id.
           #   person.posts.find(BSON::ObjectId.new)
           #
@@ -196,7 +199,7 @@ module Mongoid
           # @note This will keep matching documents in memory for iteration
           #   later.
           #
-          # @param [ BSON::ObjectId | Array<BSON::ObjectId> ] args The ids.
+          # @param [ Object | Array<Object> ] *args The ids.
           # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
