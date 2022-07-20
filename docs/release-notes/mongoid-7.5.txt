@@ -197,6 +197,23 @@ The following functions are affected by this change:
    operator.
 
 
+``pluck`` Usage of ``map`` Deprecated
+-------------------------------------
+
+Mongoid 7.5 deprecates the usage of ``map`` as pluck, as in the following
+example:
+
+.. code-block:: ruby
+
+  Band.all.map(:name)
+  
+  # Equivalent to:
+  Band.pluck(:name)
+
+This usage will no longer be supported in Mongoid 8, which will not accept
+arguments to ``map``.
+
+
 ``Mongoid::Criteria`` cache deprecated
 --------------------------------------
 
