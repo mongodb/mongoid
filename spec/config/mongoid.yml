@@ -40,6 +40,22 @@ test:
     app_name: 'testing'
     background_indexing: false
     join_contexts: false
+  driver_options:
+    broken_view_options: false
+    # Don't set validate_update_replace here, as it is used to check if the
+    # default driver options are kept in Mongoid.
+test_nil:
+  clients:
+    default:
+      database: mongoid_test
+      hosts:
+        <% SpecConfig.instance.addresses.each do |address| %>
+          - <%= address %>
+        <% end %>
+  driver_options:
+    broken_view_options:
+    validate_update_replace: false
+
 test_with_max_staleness:
   clients:
     default:
