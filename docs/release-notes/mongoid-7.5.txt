@@ -17,39 +17,127 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
-``Array#update_values`` and ``Hash#update_values`` deprecated
--------------------------------------------------------------
 
-The ``Array#update_values`` and ``Hash#update_values`` methods are deprecated in
-Mongoid 7.5. It is recommended to use ActiveSupport's ``transform_values!``
-method instead.
+Ruby, JRuby and Rails Version Support
+-------------------------------------
 
-
-Ruby 2.5 Deprecated
--------------------
-
-Mongoid 7.5 deprecates support for Ruby 2.5.
-Mongoid 8 will require Ruby 2.6 or newer.
+Mongoid 7.5 deprecates support for Ruby 2.5, JRuby 9.2 and Rails 5.1.
+Mongoid 8 will requir Ruby 2.6 or newer, JRuby 9.3 or newer and Rails 5.2 or
+newer.
 
 
-JRuby 9.2 Deprecated
---------------------
+Implemented ``Criteria#take/take!`` Method
+------------------------------------------
 
-Mongoid 7.5 deprecates support for JRuby 9.2.
-Mongoid 8 will require JRuby 9.3 or newer.
+Mongoid 7.5 introduces the ``#take`` method which returns a document
+or a set of documents from the database without ordering by ``_id``:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+  end
+
+  Band.create!
+  Band.create!
+
+  Band.take
+  # => #<Band _id: 62c835813282a4470c07d530, >
+  Band.take(2)
+  # => [ #<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, > ]
+
+If a parameter is given to ``#take``, an array of documents is returned. If no parameter is
+given, a singular document is returned.
+
+The ``#take!`` method functions the same as calling ``#take`` without arguments,
+but raises an DocumentNotFound error instead of returning nil if no documents
+are found.
+
+.. code:: ruby
+
+  Band.take!
+  # => #<Band _id: 62c835813282a4470c07d530, >
+
+Note that the ``#take/take!`` methods do not apply a sort to the view before
+retrieving the documents from the database, and therefore they may return different
+results than the ``#first`` and ``#last`` methods. ``#take`` is equivalent to
+calling ``#first`` or ``#last`` with the ``{ id_sort: :none }`` option. This
+option has been deprecated in Mongoid 7.5 and it is recommended to use ``#take``
+instead going forward. Support for the ``:id_sort`` option will be dropped in
+Mongoid 8.
 
 
-Rails 5.1 Deprecated
---------------------
+Force the ``attributes`` Method to Always Return a ``Hash``
+-----------------------------------------------------------
 
-Mongoid 7.5 deprecates support for Rails 5.1.
-Mongoid 8 will require Rails 5.2 or newer.
+Mongoid 7.5 with the ``Mongoid.legacy_attributes`` option set to ``false``
+will always return a ``Hash`` when calling the ``attributes`` method.
+For example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    field :name
+  end
+
+  band = Band.create!(name: "The Rolling Stones")
+  p band.attributes.class
+  # => Hash
+
+  band = Band.first
+  p band.attributes.class
+  # => Hash
+
+In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.legacy_attributes``
+option set to ``true``, the ``attributes`` method on a document will return a
+``BSON::Document`` when retrieving that document from the database, but will
+return a ``Hash`` when instantiating a new document:
+
+.. code-block:: ruby
+
+  band = Band.create!(name: "The Rolling Stones")
+  p band.attributes.class
+  # => Hash
+
+  band = Band.first
+  p band.attributes.class
+  # => BSON::Document
 
 
-``Document#to_a`` deprecated
-----------------------------
+Deprecate ``:id_sort`` Option and Support ``limit`` on ``#first/last``
+----------------------------------------------------------------------
 
-The ``Document#to_a`` method is deprecated in Mongoid 7.5.
+Mongoid 7.5 deprecates the ``:id_sort`` keyword argument for the
+``Criteria#first`` and ``Criteria#last`` methods. Please use ``Criteria#take``
+to retrieve documents without sorting by id.
+
+The ``first`` and ``last`` methods now take the number of documents to return
+as a positional argument, mirroring the functionality of Ruby's ``Enumerable``
+method and ActiveRecord's ``first`` and ``last`` methods. Both invocations
+(with limit as a positional arguments and with the ``:id_sort`` option) remain
+supported in Mongoid 7.x, but the ``:id_sort`` invocation will be removed in
+Mongoid 8.
+
+.. code:: ruby
+
+  Band.first
+  # => #<Band _id: 62c835813282a4470c07d530, >
+  Band.first(2)
+  # => [ #<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, > ]
+  Band.last
+  # => #<Band _id: 62c835823282a4470c07d531, >
+  Band.last(2)
+  # => [#<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, >]
+
+When providing a limit, ``#first/last`` will return a list of documents, and
+when not providing a limit (or providing ``nil``), a single document will be
+returned.
+
+Note that the ``#first/last`` methods apply a sort on ``_id``, which can
+cause performance issues. To get a document without sorting first, use the
+``Critera#take`` method.
 
 
 Combine Chained Operators Using ``and`` Instead of ``override``
@@ -109,128 +197,6 @@ The following functions are affected by this change:
    operator.
 
 
-``update_one`` Warnings in ``upsert``
--------------------------------------
-
-Mongoid 7.5 fixes incorrect usage of the driver's ``update_one`` method from
-Mongoid's ``upsert`` method. Mongoid's ``upsert`` actually performs a
-replacing upsert, and Mongoid 7.5 correctly calls ``replace_one``.
-
-
-Force the ``attributes`` Method to Always Return a ``Hash``
------------------------------------------------------------
-
-Mongoid 7.5 with the ``Mongoid.legacy_attributes`` option set to ``false``
-will always return a ``Hash`` when calling the ``attributes`` method.
-For example:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-
-    field :name
-  end
-
-  band = Band.create!(name: "The Rolling Stones")
-  p band.attributes.class
-  # => Hash
-
-  band = Band.first
-  p band.attributes.class
-  # => Hash
-
-In Mongoid 7.4 and earlier, and in 7.5 with the ``Mongoid.legacy_attributes``
-option set to ``true``, the ``attributes`` method on a document will return a
-``BSON::Document`` when retrieving that document from the database, but will
-return a ``Hash`` when instantiating a new document:
-
-.. code-block:: ruby
-
-  band = Band.create!(name: "The Rolling Stones")
-  p band.attributes.class
-  # => Hash
-
-  band = Band.first
-  p band.attributes.class
-  # => BSON::Document
-
-
-Implemented ``Criteria#take/take!`` Method
-------------------------------------------
-
-Mongoid 7.5 introduces the ``#take`` method which returns a document
-or a set of documents from the database without ordering by ``_id``:
-
-.. code:: ruby
-
-  class Band
-    include Mongoid::Document
-  end
-
-  Band.create!
-  Band.create!
-
-  Band.take
-  # => #<Band _id: 62c835813282a4470c07d530, >
-  Band.take(2)
-  # => [ #<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, > ]
-
-If a parameter is given to ``#take``, an array of documents is returned. If no parameter is
-given, a singular document is returned.
-
-The ``#take!`` method functions the same as calling ``#take`` without arguments,
-but raises an DocumentNotFound error instead of returning nil if no documents
-are found.
-
-.. code:: ruby
-
-  Band.take!
-  # => #<Band _id: 62c835813282a4470c07d530, >
-
-Note that the ``#take/take!`` methods do not apply a sort to the view before
-retrieving the documents from the database, and therefore they may return different
-results than the ``#first`` and ``#last`` methods. ``#take`` is equivalent to
-calling ``#first`` or ``#last`` with the ``{ id_sort: :none }`` option. This
-option has been deprecated in Mongoid 7.5 and it is recommended to use ``#take``
-instead going forward. Support for the ``:id_sort`` option will be dropped in
-Mongoid 8.
-
-
-Deprecate ``:id_sort`` Option and Support ``limit`` on ``#first/last``
-----------------------------------------------------------------------
-
-Mongoid 7.5 deprecates the ``:id_sort`` keyword argument for the
-``Criteria#first`` and ``Criteria#last`` methods. Please use ``Criteria#take``
-to retrieve documents without sorting by id.
-
-The ``first`` and ``last`` methods now take the number of documents to return
-as a positional argument, mirroring the functionality of Ruby's ``Enumerable``
-method and ActiveRecord's ``first`` and ``last`` methods. Both invocations
-(with limit as a positional arguments and with the ``:id_sort`` option) remain
-supported in Mongoid 7.x, but the ``:id_sort`` invocation will be removed in
-Mongoid 8.
-
-.. code:: ruby
-
-  Band.first
-  # => #<Band _id: 62c835813282a4470c07d530, >
-  Band.first(2)
-  # => [ #<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, > ]
-  Band.last
-  # => #<Band _id: 62c835823282a4470c07d531, >
-  Band.last(2)
-  # => [#<Band _id: 62c835813282a4470c07d530, >, #<Band _id: 62c835823282a4470c07d531, >]
-
-When providing a limit, ``#first/last`` will return a list of documents, and
-when not providing a limit (or providing ``nil``), a single document will be
-returned.
-
-Note that the ``#first/last`` methods apply a sort on ``_id``, which can
-cause performance issues. To get a document without sorting first, use the
-``Critera#take`` method.
-
-
 ``Mongoid::Criteria`` cache deprecated
 --------------------------------------
 
@@ -239,3 +205,25 @@ The ability to cache individual criteria objects has been deprecated in Mongoid
 
 In order to get caching functionality, enable the Mongoid QueryCache. See the
 section on :ref:`QueryCache <query-cache>` for more details.
+
+
+``Array#update_values`` and ``Hash#update_values`` deprecated
+-------------------------------------------------------------
+
+The ``Array#update_values`` and ``Hash#update_values`` methods are deprecated in
+Mongoid 7.5. It is recommended to use ActiveSupport's ``transform_values!``
+method instead.
+
+
+``Document#to_a`` deprecated
+----------------------------
+
+The ``Document#to_a`` method is deprecated in Mongoid 7.5.
+
+
+``update_one`` Warnings in ``upsert``
+-------------------------------------
+
+Mongoid 7.5 fixes incorrect usage of the driver's ``update_one`` method from
+Mongoid's ``upsert`` method. Mongoid's ``upsert`` actually performs a
+replacing upsert, and Mongoid 7.5 correctly calls ``replace_one``.
