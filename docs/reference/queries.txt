@@ -1253,7 +1253,7 @@ Mongoid also has some helpful methods on criteria.
 
        *Get the fifth document for the given criteria.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1265,7 +1265,7 @@ Mongoid also has some helpful methods on criteria.
        *Get the fifth document for the given criteria, or raise an error if
        none exist.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1337,6 +1337,20 @@ Mongoid also has some helpful methods on criteria.
           Band.where(:members.with_size => 3).last
           Band.first(2)
 
+   * - ``Criteria#first!|last!``
+
+       *Finds a single document given the provided criteria, or raises an error
+       if none are found. This method automatically adds a sort on _id if no
+       sort is given. This can cause performance issues, so if the sort is
+       undesirable, Criteria#take! can be used instead.*
+
+     -
+        .. code-block:: ruby
+
+          Band.first!
+          Band.where(:members.with_size => 3).first!
+          Band.where(:members.with_size => 3).last!
+
    * - ``Criteria#first_or_create``
 
        *Find the first document by the provided attributes, and if not found
@@ -1388,7 +1402,7 @@ Mongoid also has some helpful methods on criteria.
 
        *Get the fourth document for the given criteria.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1400,7 +1414,7 @@ Mongoid also has some helpful methods on criteria.
        *Get the fourth document for the given criteria, or raise an error if
        none exist.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1469,7 +1483,7 @@ Mongoid also has some helpful methods on criteria.
 
        *Get the second document for the given criteria.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1481,7 +1495,7 @@ Mongoid also has some helpful methods on criteria.
        *Get the second document for the given criteria, or raise an error if
        none exist.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1492,7 +1506,7 @@ Mongoid also has some helpful methods on criteria.
 
        *Get the second to last document for the given criteria.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1504,7 +1518,7 @@ Mongoid also has some helpful methods on criteria.
        *Get the second to last document for the given criteria, or raise an
        error if none exist.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1562,7 +1576,7 @@ Mongoid also has some helpful methods on criteria.
 
        *Get the third document for the given criteria.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1574,7 +1588,7 @@ Mongoid also has some helpful methods on criteria.
        *Get the third document for the given criteria, or raise an error if
        none exist.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1585,7 +1599,7 @@ Mongoid also has some helpful methods on criteria.
 
        *Get the third to last document for the given criteria.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
@@ -1597,7 +1611,7 @@ Mongoid also has some helpful methods on criteria.
        *Get the third to last document for the given criteria, or raise an
        error if none exist.*
 
-       *This method automatically adds a sort on _id.*
+       *This method automatically adds a sort on _id if no sort is given.*
 
      -
         .. code-block:: ruby
