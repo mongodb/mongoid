@@ -37,16 +37,6 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
-      # Is the context cached?
-      #
-      # @example Is the context cached?
-      #   context.cached?
-      #
-      # @return [ true | false ] If the context is cached.
-      def cached?
-        !!@cache
-      end
-
       # Get the number of documents matching the query.
       #
       # @example Get the number of matching documents.
@@ -586,47 +576,6 @@ module Mongoid
 
       private
 
-      # yield the block given or return the cached value
-      #
-      # @param [ String | Symbol ] key The instance variable name
-      #
-      # @return the result of the block
-      def try_cache(key, &block)
-        unless cached?
-          yield
-        else
-          unless ret = instance_variable_get("@#{key}")
-            instance_variable_set("@#{key}", ret = yield)
-          end
-          ret
-        end
-      end
-
-      # yield the block given or return the cached value
-      #
-      # @param [ String | Symbol ] key The instance variable name
-      # @param [ Integer | nil ] n The number of documents requested or nil
-      #   if none is requested.
-      #
-      # @return [ Object ] The result of the block.
-      def try_numbered_cache(key, n, &block)
-        unless cached?
-          yield if block_given?
-        else
-          len = n || 1
-          ret = instance_variable_get("@#{key}")
-          if !ret || ret.length < len
-            instance_variable_set("@#{key}", ret = Array.wrap(yield))
-          elsif !n
-            ret.is_a?(Array) ? ret.first : ret
-          elsif ret.length > len
-            ret.first(n)
-          else
-            ret
-          end
-        end
-      end
-
       # Update the documents for the provided method.
       #
       # @api private
@@ -690,43 +639,6 @@ module Mongoid
       def inverse_sorting
         sort = view.sort || { _id: 1 }
         Hash[sort.map{|k, v| [k, -1*v]}]
-      end
-
-      # Is the cache able to be added to?
-      #
-      # @api private
-      #
-      # @example Is the context cacheable?
-      #   context.cacheable?
-      #
-      # @return [ true | false ] If caching, and the cache isn't loaded.
-      def cacheable?
-        cached? && !cache_loaded?
-      end
-
-      # Is the cache fully loaded? Will be true if caching after one full
-      # iteration.
-      #
-      # @api private
-      #
-      # @example Is the cache loaded?
-      #   context.cache_loaded?
-      #
-      # @return [ true | false ] If the cache is loaded.
-      def cache_loaded?
-        !!@cache_loaded
-      end
-
-      # Get the documents for cached queries.
-      #
-      # @api private
-      #
-      # @example Get the cached documents.
-      #   context.documents
-      #
-      # @return [ Array<Document> ] The documents.
-      def documents
-        @documents ||= []
       end
 
       # Get the documents the context should iterate. This follows 3 rules:
