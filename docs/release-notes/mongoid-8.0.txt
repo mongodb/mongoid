@@ -24,6 +24,7 @@ Support for MongoDB 3.4 and Earlier Servers Dropped
 Mongoid 8 requires MongoDB 3.6 or newer. Earlier server versions are not
 supported.
 
+
 Support for Ruby 2.5 Dropped
 ----------------------------
 
@@ -56,6 +57,7 @@ changed in Mongoid 8.0:
 
 Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.
+
 
 Storing/Retrieving/Evolving Uncastable Values
 ---------------------------------------------
