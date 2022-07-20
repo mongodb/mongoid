@@ -157,9 +157,9 @@ module Mongoid
       #
       # @param [ Hash ] options The options to pass.
       #
-      # @option options [ Symbol | Array<Symbol> ] :include Which association(s) to include.
-      # @option options [ Symbol | Array<Symbol> ] :only Limit the field(s) to only these.
-      # @option options [ Symbol | Array<Symbol> ] :except Do not include these field(s).
+      # @option options [ Symbol | String | Array<Symbol | String> ] :except Do not include these field(s).
+      # @option options [ Symbol | String | Array<Symbol | String> ] :include Which association(s) to include.
+      # @option options [ Symbol | String | Array<Symbol | String> ] :only Limit the field(s) to only these.
       #
       # @return [ Hash ] The documents, ready to be serialized.
       def serializable_hash(options = {})
