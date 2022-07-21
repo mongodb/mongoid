@@ -165,6 +165,12 @@ Type Declarations
     #   as the optional last arg.
     def say_hello(*args)
 
+- **Splat Args:** Specify type unions with square brackets ``[ ]``.
+
+  .. code-block:: ruby
+
+    # @param [ [ String | Symbol ]... ] *fields A splat of mixed Symbols and Strings.
+
 - **Keyword Arguments:** Following YARD conventions, use ``@param`` for keyword arguments,
   and specify keyword argument names as symbols.
 
