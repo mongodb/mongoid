@@ -289,9 +289,9 @@ module Mongoid
       # @return [ Method ] The defined method.
       def define_scope_method(name)
         singleton_class.class_eval do
-          define_method(name) do |*args|
+          define_method(name) do |*args, **kargs|
             scoping = _declared_scopes[name]
-            scope = instance_exec(*args, &scoping[:scope])
+            scope = instance_exec(*args, **kargs, &scoping[:scope])
             extension = scoping[:extension]
             to_merge = scope || queryable
             criteria = to_merge.empty_and_chainable? ? to_merge : with_default_scope.merge(to_merge)
