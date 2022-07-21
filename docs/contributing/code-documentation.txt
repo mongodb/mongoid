@@ -28,8 +28,8 @@ Formatting
 
   .. code-block:: ruby
 
-    # This is the description of the method. When doing a line wrap in the
-    # description, you do not need to indent the wrapped line.
+    # This is the description of the method. Line wraps in the description
+    # should not be indented.
     #
     # @return [ Symbol ] For macro functions, wraps must be double-space
     #   indented on the second, third, etc. lines.
