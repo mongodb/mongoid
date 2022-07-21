@@ -487,8 +487,13 @@ describe Mongoid::Scopable do
               Band.where(name: name, deleted: deleted)
             })
           end
-          it "returns a chainable empty scope" do
-            expect(Band.named_by("Emily", deleted: true)).to be_a(Mongoid::Criteria)
+
+          let(:scope) do
+            Band.named_by("Emily", deleted: true)
+          end
+
+          it "sets the conditions from keyword arguments" do
+            scope.selector.should == {'name' => 'Emily', 'deleted' => true}
           end
         end
 
