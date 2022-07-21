@@ -24,7 +24,7 @@ module Mongoid
       # @example Is the field localized?
       #   field.localized?
       #
-      # @return [ true, false ] If the field is localized.
+      # @return [ true | false ] If the field is localized.
       def localized?
         true
       end
@@ -50,7 +50,7 @@ module Mongoid
       # @example Should fallbacks be used.
       #   field.fallbacks?
       #
-      # @return [ true, false ] If fallbacks should be used.
+      # @return [ true | false ] If fallbacks should be used.
       def fallbacks?
         return true if options[:fallbacks].nil?
         !!options[:fallbacks]

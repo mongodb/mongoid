@@ -33,10 +33,14 @@ module Mongoid
     #
     # @param [ Hash ] options The options to pass.
     #
-    # @option options [ Symbol ] :include What associations to include.
-    # @option options [ Symbol ] :only Limit the fields to only these.
-    # @option options [ Symbol ] :except Dont include these fields.
-    # @option options [ Symbol ] :methods What methods to include.
+    # @option options [ Symbol | String | Array<Symbol | String> ] :except
+    #   Do not include these field(s).
+    # @option options [ Symbol | String | Array<Symbol | String> ] :include
+    #   Which association(s) to include.
+    # @option options [ Symbol | String | Array<Symbol | String> ] :only
+    #   Limit the field(s) to only these.
+    # @option options [ Symbol | String | Array<Symbol | String> ] :methods
+    #   What methods to include.
     #
     # @return [ Hash ] The document, ready to be serialized.
     def serializable_hash(options = nil)
@@ -137,7 +141,7 @@ module Mongoid
     # @example Get the association names.
     #   document.relation_names(:include => [ :addresses ])
     #
-    # @param [ Hash, Symbol, Array<Symbol> ] inclusions The inclusions.
+    # @param [ Hash | Symbol | Array<Symbol> ] inclusions The inclusions.
     #
     # @return [ Array<Symbol> ] The names of the included associations.
     def relation_names(inclusions)
@@ -150,7 +154,7 @@ module Mongoid
     # @example Get the association options.
     #   document.relation_names(:include => [ :addresses ])
     #
-    # @param [ Hash, Symbol, Array<Symbol> ] inclusions The inclusions.
+    # @param [ Hash | Symbol | Array<Symbol> ] inclusions The inclusions.
     # @param [ Hash ] options The options.
     # @param [ Symbol ] name The name of the association.
     #

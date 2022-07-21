@@ -19,8 +19,8 @@ module Mongoid
       #   DocumentNotFound.new(Person, :ssn => "1234", :name => "Helen")
       #
       # @param [ Class ] klass The model class.
-      # @param [ Hash, Array, Object ] params The attributes or ids.
-      # @param [ Array, Hash ] unmatched The unmatched ids, if appropriate. If
+      # @param [ Hash | Array | Object ] params The attributes or ids.
+      # @param [ Array | Hash ] unmatched The unmatched ids, if appropriate. If
       #   there is a shard key this will be a hash.
       def initialize(klass, params, unmatched = nil)
         if !unmatched && !params.is_a?(Hash)
@@ -50,7 +50,7 @@ module Mongoid
       # @example Get the missing string.
       #   error.missing(1)
       #
-      # @param [ Object, Array ] unmatched The ids that did not match.
+      # @param [ Object | Array ] unmatched The ids that did not match.
       #
       # @return [ String ] The missing string.
       def missing(unmatched)
@@ -68,7 +68,7 @@ module Mongoid
       # @example Get the searched string.
       #   error.searched(1)
       #
-      # @param [ Object, Array ] params The ids that were searched for.
+      # @param [ Object | Array ] params The ids that were searched for.
       #
       # @return [ String ] The searched string.
       def searched(params)
@@ -84,7 +84,7 @@ module Mongoid
       # @example Get the total.
       #   error.total([ 1, 2, 3 ])
       #
-      # @param [ Object, Array ] params What was searched for.
+      # @param [ Object | Array ] params What was searched for.
       #
       # @return [ Integer ] The total number.
       def total(params)

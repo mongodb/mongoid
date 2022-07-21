@@ -56,7 +56,7 @@ module Mongoid
     # @example Is the document embedded?
     #   address.embedded?
     #
-    # @return [ true, false ] True if the document has a parent document.
+    # @return [ true | false ] True if the document has a parent document.
     def embedded?
       @embedded ||= (cyclic ? _parent.present? : self.class.embedded?)
     end
@@ -66,7 +66,7 @@ module Mongoid
     # @example Is the document in an embeds many?
     #   address.embedded_many?
     #
-    # @return [ true, false ] True if in an embeds many.
+    # @return [ true | false ] True if in an embeds many.
     def embedded_many?
       _association && _association.is_a?(Association::Embedded::EmbedsMany)
     end
@@ -76,7 +76,7 @@ module Mongoid
     # @example Is the document in an embeds one?
     #   address.embedded_one?
     #
-    # @return [ true, false ] True if in an embeds one.
+    # @return [ true | false ] True if in an embeds one.
     def embedded_one?
       _association && _association.is_a?(Association::Embedded::EmbedsOne)
     end
@@ -100,7 +100,7 @@ module Mongoid
     # @example Is the document in a references many?
     #   post.referenced_many?
     #
-    # @return [ true, false ] True if in a references many.
+    # @return [ true | false ] True if in a references many.
     def referenced_many?
       _association && _association.is_a?(Association::Referenced::HasMany)
     end
@@ -110,7 +110,7 @@ module Mongoid
     # @example Is the document in a references one?
     #   address.referenced_one?
     #
-    # @return [ true, false ] True if in a references one.
+    # @return [ true | false ] True if in a references one.
     def referenced_one?
       _association && _association.is_a?(Association::Referenced::HasOne)
     end

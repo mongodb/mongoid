@@ -37,7 +37,7 @@ module Mongoid
       # @example Is the current thread in assigning mode?
       #   proxy._assigning?
       #
-      # @return [ true, false ] If the thread is assigning.
+      # @return [ true | false ] If the thread is assigning.
       def _assigning?
         Threaded.executing?(ASSIGN)
       end
@@ -62,7 +62,7 @@ module Mongoid
       # @example Is the current thread in binding mode?
       #   proxy.binding?
       #
-      # @return [ true, false ] If the thread is binding.
+      # @return [ true | false ] If the thread is binding.
       def _binding?
         Threaded.executing?(BIND)
       end
@@ -87,7 +87,7 @@ module Mongoid
       # @example Is the current thread in building mode?
       #   proxy._building?
       #
-      # @return [ true, false ] If the thread is building.
+      # @return [ true | false ] If the thread is building.
       def _building?
         Threaded.executing?(BUILD)
       end
@@ -97,7 +97,7 @@ module Mongoid
       # @example Is the current thread in creating mode?
       #   proxy.creating?
       #
-      # @return [ true, false ] If the thread is creating.
+      # @return [ true | false ] If the thread is creating.
       def _creating?
         Threaded.executing?(CREATE)
       end
@@ -122,7 +122,7 @@ module Mongoid
       # @example Is the current thread in loading mode?
       #   proxy._loading?
       #
-      # @return [ true, false ] If the thread is loading.
+      # @return [ true | false ] If the thread is loading.
       def _loading?
         Threaded.executing?(LOAD)
       end

@@ -43,7 +43,7 @@ module Mongoid
       # @example Is the field a foreign key?
       #   field.foreign_key?
       #
-      # @return [ true, false ] If the field is a foreign key.
+      # @return [ true | false ] If the field is a foreign key.
       def foreign_key?
         true
       end
@@ -75,7 +75,7 @@ module Mongoid
       # @example Is the field lazy?
       #   field.lazy?
       #
-      # @return [ true, false ] If the field is lazy.
+      # @return [ true | false ] If the field is lazy.
       def lazy?
         type.resizable?
       end
@@ -101,7 +101,7 @@ module Mongoid
       # @example Is the field a BSON::ObjectId?
       #   field.object_id_field?
       #
-      # @return [ true, false ] If the field is a BSON::ObjectId.
+      # @return [ true | false ] If the field is a BSON::ObjectId.
       def object_id_field?
         @object_id_field ||=
             association.polymorphic? ? true : association.klass.using_object_ids?
@@ -112,7 +112,7 @@ module Mongoid
       # @example Is the field resizable?
       #   field.resizable?
       #
-      # @return [ true, false ] If the field is resizable.
+      # @return [ true | false ] If the field is resizable.
       def resizable?
         type.resizable?
       end

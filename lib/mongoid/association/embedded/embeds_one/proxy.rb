@@ -45,7 +45,7 @@ module Mongoid
           #
           # @param [ Document ] replacement A document to replace the target.
           #
-          # @return [ Document, nil ] The association or nil.
+          # @return [ Document | nil ] The association or nil.
           def substitute(replacement)
             if replacement != self
               if _assigning?
@@ -112,7 +112,7 @@ module Mongoid
           # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the association is persistable.
+          # @return [ true | false ] If the association is persistable.
           def persistable?
             _base.persisted? && !_binding? && !_building? && !_assigning?
           end

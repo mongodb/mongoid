@@ -40,7 +40,7 @@ module Mongoid
       #
       # @param [ Array ] other The other array.
       #
-      # @return [ true, false ] If the objects are equal.
+      # @return [ true | false ] If the objects are equal.
       def ==(other)
         other.is_a?(None)
       end
@@ -88,7 +88,7 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String | Symbol ] *_fields Field or fields to pluck.
+      # @param [ String | Symbol ] *_fields Field(s) to pluck.
       #
       # @return [ Array ] An empty Array.
       def pluck(*_fields)
