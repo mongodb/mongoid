@@ -20,7 +20,7 @@ module Mongoid
         # @example Is the aggregable aggregating?
         #   aggregable.aggregating?
         #
-        # @return [ true, false ] If the aggregable is aggregating.
+        # @return [ true | false ] If the aggregable is aggregating.
         def aggregating?
           !!@aggregating
         end
@@ -69,7 +69,7 @@ module Mongoid
         # @example Add an unwind to the pipeline.
         #   aggregable.unwind(:field)
         #
-        # @param [ String, Symbol ] field The name of the field to unwind.
+        # @param [ String | Symbol ] field The name of the field to unwind.
         #
         # @return [ Aggregable ] The aggregable.
         def unwind(field)

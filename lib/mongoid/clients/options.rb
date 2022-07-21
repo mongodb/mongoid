@@ -12,7 +12,7 @@ module Mongoid
       #     m.save
       #   end
       #
-      # @param [ Hash, Mongoid::PersistenceContext ] options_or_context
+      # @param [ Hash | Mongoid::PersistenceContext ] options_or_context
       #   The storage options or a persistence context.
       #
       # @option options [ String | Symbol ] :collection The collection name.

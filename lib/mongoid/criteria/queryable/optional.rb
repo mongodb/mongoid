@@ -163,7 +163,7 @@ module Mongoid
         # @example Add sorting options via a string.
         #   optional.order_by("name ASC, dob DESC")
         #
-        # @param [ Array, Hash, String ] spec The sorting specification.
+        # @param [ Array | Hash | String ] spec The sorting specification.
         #
         # @return [ Optional ] The cloned optional.
         def order_by(*spec)
@@ -184,7 +184,7 @@ module Mongoid
         # @example Replace the ordering.
         #   optional.reorder(name: :asc)
         #
-        # @param [ Array, Hash, String ] spec The sorting specification.
+        # @param [ Array | Hash | String ] spec The sorting specification.
         #
         # @return [ Optional ] The cloned optional.
         def reorder(*spec)

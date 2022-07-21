@@ -12,7 +12,7 @@ module Mongoid
       #   InvalidRelationOption.new(Person, invalid_option: 'make_me_a_sandwich')
       #
       # @param [ Class ] klass The model class.
-      # @param [ String, Symbol ] name The association name.
+      # @param [ String | Symbol ] name The association name.
       # @param [ Symbol ] option The invalid option.
       # @param [ Array<Symbol> ] valid_options The valid option.
       def initialize(klass, name, option, valid_options)

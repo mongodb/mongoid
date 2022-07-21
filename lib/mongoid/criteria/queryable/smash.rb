@@ -95,7 +95,7 @@ module Mongoid
         # @example Get the name and serializer.
         #   smash.storage_pair("id")
         #
-        # @param [ Symbol, String ] key The key provided to the selection.
+        # @param [ Symbol | String ] key The key provided to the selection.
         #
         # @return [ Array<String, Object> ] The name of the db field and
         #   serializer.

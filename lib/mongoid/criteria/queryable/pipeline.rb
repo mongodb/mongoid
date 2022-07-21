@@ -67,7 +67,7 @@ module Mongoid
         #   pipeline.unwind(:field)
         #   pipeline.unwind(document)
         #
-        # @param [ String, Symbol, Hash ] field_or_doc A field name or a
+        # @param [ String | Symbol | Hash ] field_or_doc A field name or a
         #   document.
         #
         # @return [ Pipeline ] The pipeline.

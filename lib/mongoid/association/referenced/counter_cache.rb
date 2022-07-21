@@ -13,7 +13,7 @@ module Mongoid
         # @example Reset the given counter cache
         #   post.reset_counters(:comments)
         #
-        # @param [ Symbol, Array ] counters One or more counter caches to reset
+        # @param [ Symbol | Array ] counters One or more counter caches to reset
         def reset_counters(*counters)
           self.class.with(persistence_context) do |_class|
             _class.reset_counters(self, *counters)
@@ -30,7 +30,7 @@ module Mongoid
           #   Post.reset_counters('50e0edd97c71c17ea9000001', :comments)
           #
           # @param [ String ] id The id of the object that will be reset.
-          # @param [ Symbol, Array ] counters One or more counter caches to reset
+          # @param [ Symbol | Array ] counters One or more counter caches to reset
           def reset_counters(id, *counters)
             document = id.is_a?(Document) ? id : find(id)
             counters.each do |name|

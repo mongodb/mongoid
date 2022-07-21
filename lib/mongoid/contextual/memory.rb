@@ -25,7 +25,7 @@ module Mongoid
       #
       # @param [ Array ] other The other array.
       #
-      # @return [ true, false ] If the objects are equal.
+      # @return [ true | false ] If the objects are equal.
       def ==(other)
         return false unless other.respond_to?(:entries)
         entries == other.entries
@@ -110,7 +110,7 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
-      # @return [ true, false ] If the count is more than zero.
+      # @return [ true | false ] If the count is more than zero.
       def exists?
         any?
       end
@@ -244,7 +244,7 @@ module Mongoid
       #
       # @param [ String | Symbol ] *fields Field(s) to pluck.
       #
-      # @return [ Array ] The array of plucked values.
+      # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
         if Mongoid.legacy_pluck_distinct
           documents.pluck(*fields)
@@ -318,7 +318,7 @@ module Mongoid
       #
       # @param [ Hash ] attributes The new attributes for the document.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update(attributes = nil)
         update_documents(attributes, [ first ])
       end
@@ -330,7 +330,7 @@ module Mongoid
       #
       # @param [ Hash ] attributes The new attributes for each document.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update_all(attributes = nil)
         update_documents(attributes, entries)
       end

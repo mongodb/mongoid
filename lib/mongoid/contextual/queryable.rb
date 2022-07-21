@@ -14,7 +14,7 @@ module Mongoid
       # @example Is the context empty?
       #   context.blank?
       #
-      # @return [ true, false ] If the context is empty.
+      # @return [ true | false ] If the context is empty.
       def blank?
         !exists?
       end

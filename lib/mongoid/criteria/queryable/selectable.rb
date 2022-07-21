@@ -529,7 +529,7 @@ module Mongoid
         # @example Is the selectable negating?
         #   selectable.negating?
         #
-        # @return [ true, false ] If the selectable is negating.
+        # @return [ true | false ] If the selectable is negating.
         def negating?
           !!negating
         end
@@ -736,7 +736,7 @@ module Mongoid
         #   conditions in a query. Mongoid will build such a query but the
         #   server will return an error when trying to execute it.
         #
-        # @param [ String, Symbol ] terms A string of terms that MongoDB parses
+        # @param [ String | Symbol ] terms A string of terms that MongoDB parses
         #   and uses to query the text index.
         # @param [ Hash ] opts Text search options. See MongoDB documentation
         #   for options.
@@ -774,7 +774,7 @@ module Mongoid
         # @example Add a javascript selection.
         #   selectable.where("this.name == 'syd'")
         #
-        # @param [ String, Hash ] criterion The javascript or standard selection.
+        # @param [ String | Hash ] criterion The javascript or standard selection.
         #
         # @return [ Selectable ] The cloned selectable.
         def where(*criteria)

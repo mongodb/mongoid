@@ -27,7 +27,7 @@ module Mongoid
       #
       # @param [ Specification ] other The spec to compare against.
       #
-      # @return [ true, false ] If the specs are equal.
+      # @return [ true | false ] If the specs are equal.
       def ==(other)
         fields == other.fields && key == other.key
       end

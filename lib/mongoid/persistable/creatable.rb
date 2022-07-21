@@ -132,10 +132,10 @@ module Mongoid
         # @example Create multiple new documents.
         #   Person.create({ title: "Mr" }, { title: "Mrs" })
         #
-        # @param [ Hash, Array ] attributes The attributes to create with, or an
+        # @param [ Hash | Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
         #
-        # @return [ Document, Array<Document> ] The newly created document(s).
+        # @return [ Document | Array<Document> ] The newly created document(s).
         def create(attributes = nil, &block)
           _creating do
             if attributes.is_a?(::Array)
@@ -159,10 +159,10 @@ module Mongoid
         # @example Create multiple new documents.
         #   Person.create!({ title: "Mr" }, { title: "Mrs" })
         #
-        # @param [ Hash, Array ] attributes The attributes to create with, or an
+        # @param [ Hash | Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
         #
-        # @return [ Document, Array<Document> ] The newly created document(s).
+        # @return [ Document | Array<Document> ] The newly created document(s).
         def create!(attributes = nil, &block)
           _creating do
             if attributes.is_a?(::Array)

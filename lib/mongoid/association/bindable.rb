@@ -15,7 +15,7 @@ module Mongoid
       #   Binding.new(base, target, association)
       #
       # @param [ Document ] base The base of the binding.
-      # @param [ Document, Array<Document> ] target The target of the binding.
+      # @param [ Document | Array<Document> ] target The target of the binding.
       # @param [ Association ] association The association metadata.
       def initialize(base, target, association)
         @_base, @_target, @_association = base, target, association
@@ -200,7 +200,7 @@ module Mongoid
       # @example Set the base association.
       #   binding.set_base_association
       #
-      # @return [ true, false ] If the association changed.
+      # @return [ true | false ] If the association changed.
       def set_base_association
         inverse_association = _association.inverse_association(_target)
         if inverse_association != _association && !inverse_association.nil?

@@ -16,7 +16,7 @@ module Mongoid
             # @example Evolve the set.
             #   Set.evolve(set)
             #
-            # @param [ Set, Object ] object The object to evolve.
+            # @param [ Set | Object ] object The object to evolve.
             #
             # @return [ Array ] The evolved set.
             def evolve(object)
