@@ -1173,7 +1173,7 @@ describe Mongoid::Scopable do
       end
     end
 
-    context 'when nesting unsoped under with_scope' do
+    context 'when nesting unscoped under with_scope' do
       let(:c1) { Band.where(active: true) }
 
       it 'restores previous scope' do
