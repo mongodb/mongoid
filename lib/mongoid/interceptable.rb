@@ -134,7 +134,7 @@ module Mongoid
     # Run the callbacks for embedded documents.
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array<Document> ] children Children to exeute callbacks on. If
+    # @param [ Array<Document> ] children Children to execute callbacks on. If
     #   nil, callbacks will be executed on all cascadable children of
     #   the document.
     #

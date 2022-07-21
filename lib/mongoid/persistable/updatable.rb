@@ -166,12 +166,17 @@ module Mongoid
         end
       end
 
-      # If there is a touch option and it is false, call the timeless method so
-      # that the updated_at attribute is not updated. Call the timeless method
-      # on all of the cascadable children as well. Note that timeless is
-      # cleared in the before_update callback.
+      # If there is a touch option and it is false, this method will call the
+      # timeless method so that the updated_at attribute is not updated. It
+      # will call the timeless method on all of the cascadable children as
+      # well. Note that timeless is cleared in the before_update callback.
       #
       # @param [ Hash ] options The options.
+      # @param [ Array<Document> ] children The children that the :update
+      #   callbacks will be executed on.
+      #
+      # @option options [ true | false ] :touch Whether or not the updated_at
+      #   attribute will be updated with the current time.
       def process_touch_option(options, children)
         unless options.fetch(:touch, true)
           timeless
