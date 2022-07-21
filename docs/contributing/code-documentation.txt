@@ -23,11 +23,15 @@ for code documentation. Please note the conventions outlined in this document.
 Formatting
 ----------
 
-- **Line Wrapping:** Use double-space indent when wrapping lines.
+- **Line Wrapping:** Use double-space indent when wrapping lines of macros
+  such as ``@param`` and ``@return``. Do not indent line wraps in the description.
 
   .. code-block:: ruby
 
-    # @return [ Symbol ] This sentence is so long that it must be double-space
+    # This is the description of the method. When doing a line wrap in the
+    # description, you do not need to indent the wrapped line.
+    #
+    # @return [ Symbol ] For macro functions, wraps must be double-space
     #   indented on the second, third, etc. lines.
 
 - **Whitespace:** Do not use leading/trailing empty comment lines,
