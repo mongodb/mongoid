@@ -716,6 +716,26 @@ describe Mongoid::Touchable do
 
     context "when only using the root document" do
 
+      shared_examples "timeless is cleared" do
+        it "clears the timeless option" do
+          expect(doc.timeless?).to be false
+        end
+      end
+
+      shared_examples "touches the document" do
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(start_time)
+        end
+      end
+
+      shared_examples "updates the document" do
+        it "updates the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(update_time)
+        end
+      end
+
       let(:doc) { Dokument.new }
 
       context "when saving a new document" do
@@ -726,10 +746,8 @@ describe Mongoid::Touchable do
             doc.save!
           end
 
-          it "touches the document" do
-            expect(doc.created_at).to eq(start_time)
-            expect(doc.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: true" do
@@ -738,10 +756,8 @@ describe Mongoid::Touchable do
             doc.save!(touch: true)
           end
 
-          it "touches the document" do
-            expect(doc.created_at).to eq(start_time)
-            expect(doc.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: false" do
@@ -750,10 +766,8 @@ describe Mongoid::Touchable do
             doc.save!(touch: false)
           end
 
-          it "touches the document" do
-            expect(doc.created_at).to eq(start_time)
-            expect(doc.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
         end
       end
 
@@ -770,10 +784,8 @@ describe Mongoid::Touchable do
             doc.save!
           end
 
-          it "touches the document" do
-            expect(doc.created_at).to eq(start_time)
-            expect(doc.updated_at).to eq(update_time)
-          end
+          include_examples "updates the document"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: true" do
@@ -782,10 +794,8 @@ describe Mongoid::Touchable do
             doc.save!(touch: true)
           end
 
-          it "touches the document" do
-            expect(doc.created_at).to eq(start_time)
-            expect(doc.updated_at).to eq(update_time)
-          end
+          include_examples "updates the document"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: false" do
@@ -794,15 +804,48 @@ describe Mongoid::Touchable do
             doc.save!(touch: false)
           end
 
-          it "touches the document" do
-            expect(doc.created_at).to eq(start_time)
-            expect(doc.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
         end
       end
     end
 
     context "when saving embedded associations with cascadable callbacks" do
+
+      shared_examples "timeless is cleared" do
+        it "clears the timeless option" do
+          expect(book.timeless?).to be false
+          expect(book.covers.first.timeless?).to be false
+        end
+      end
+
+      shared_examples "touches the document" do
+        it "touches the document" do
+          expect(book.created_at).to eq(start_time)
+          expect(book.updated_at).to eq(start_time)
+        end
+      end
+
+      shared_examples "updates the document" do
+        it "updates the document" do
+          expect(book.created_at).to eq(start_time)
+          expect(book.updated_at).to eq(update_time)
+        end
+      end
+
+      shared_examples "touches the children" do
+        it "touches the children" do
+          expect(book.covers.first.created_at).to eq(start_time)
+          expect(book.covers.first.updated_at).to eq(start_time)
+        end
+      end
+
+      shared_examples "updates the children" do
+        it "updates the children" do
+          expect(book.covers.first.created_at).to eq(start_time)
+          expect(book.covers.first.updated_at).to eq(update_time)
+        end
+      end
 
       let(:book) do
         Book.new(covers: [ cover ])
@@ -820,15 +863,9 @@ describe Mongoid::Touchable do
             book.save!
           end
 
-          it "touches the document" do
-            expect(book.created_at).to eq(start_time)
-            expect(book.updated_at).to eq(start_time)
-          end
-
-          it "touches the children" do
-            expect(book.covers.first.created_at).to eq(start_time)
-            expect(book.covers.first.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: true" do
@@ -837,15 +874,9 @@ describe Mongoid::Touchable do
             book.save!(touch: true)
           end
 
-          it "touches the document" do
-            expect(book.created_at).to eq(start_time)
-            expect(book.updated_at).to eq(start_time)
-          end
-
-          it "touches the children" do
-            expect(book.covers.first.created_at).to eq(start_time)
-            expect(book.covers.first.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: false" do
@@ -854,15 +885,9 @@ describe Mongoid::Touchable do
             book.save!(touch: false)
           end
 
-          it "touches the document" do
-            expect(book.created_at).to eq(start_time)
-            expect(book.updated_at).to eq(start_time)
-          end
-
-          it "touches the children" do
-            expect(book.covers.first.created_at).to eq(start_time)
-            expect(book.covers.first.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
         end
       end
 
@@ -880,15 +905,9 @@ describe Mongoid::Touchable do
             book.save!
           end
 
-          it "touches the document" do
-            expect(book.created_at).to eq(start_time)
-            expect(book.updated_at).to eq(update_time)
-          end
-
-          it "touches the children" do
-            expect(book.covers.first.created_at).to eq(start_time)
-            expect(book.covers.first.updated_at).to eq(update_time)
-          end
+          include_examples "updates the document"
+          include_examples "updates the children"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: true" do
@@ -897,15 +916,9 @@ describe Mongoid::Touchable do
             book.save!(touch: true)
           end
 
-          it "touches the document" do
-            expect(book.created_at).to eq(start_time)
-            expect(book.updated_at).to eq(update_time)
-          end
-
-          it "touches the children" do
-            expect(book.covers.first.created_at).to eq(start_time)
-            expect(book.covers.first.updated_at).to eq(update_time)
-          end
+          include_examples "updates the document"
+          include_examples "updates the children"
+          include_examples "timeless is cleared"
         end
 
         context "when passing touch: false" do
@@ -914,15 +927,9 @@ describe Mongoid::Touchable do
             book.save!(touch: false)
           end
 
-          it "does not touch the document" do
-            expect(book.created_at).to eq(start_time)
-            expect(book.updated_at).to eq(start_time)
-          end
-
-          it "does not touch the children" do
-            expect(book.covers.first.created_at).to eq(start_time)
-            expect(book.covers.first.updated_at).to eq(start_time)
-          end
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
         end
       end
     end
