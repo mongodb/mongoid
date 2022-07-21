@@ -42,3 +42,18 @@ with a bang (!) raise an error:
 
   Band.none.first!
   # => raise Mongoid::Errors::DocumentNotFound
+
+
+Added ``:touch`` option to ``#save``
+------------------------------------
+
+Support for the ``:touch`` option has been added to the ``#save`` and ``#save!``
+methods. When this option is false, the ``updated_at`` field on the saved
+document and all of it's embedded documents will not be updated with the
+current time. When this option is true or unset, the ``updated_at`` field will
+be updated with the current time.
+
+If the document being saved is a new document (i.e. it has not yet been
+persisted to the database), then the ``:touch`` option will be ignored, and the
+``updated_at`` (and ``created_at``) fields will be updated with the current
+time.
