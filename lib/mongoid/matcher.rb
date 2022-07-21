@@ -24,14 +24,22 @@ module Mongoid
     #   an array of values of the `bar` field in each of the hashes in the
     #   `foo` array.
     #
+    # This method can return an individual field value in some document
+    # or an array of values from multiple documents. The array can be returned
+    # because a field value in the specified path is an array of primitive
+    # values (e.g. integers) or because a field value in the specified path
+    # is an array of documents (e.g. a one-to-many embedded association),
+    # in which case the leaf value may be a scalar for each individual document.
+    # If the leaf value is an array and a one-to-many association was traversed,
+    # the return value will be an array of arrays. Note that an individual
+    # field value can also be an array and this case is indistinguishable
+    # from and behaves identically to association traversal for the purposes
+    # of, for example, subsequent array element retrieval.
+    #
     # @param [ Document | Hash ] document The document to extract from.
     # @param [ String ] key The key path to extract.
     #
-    # @return [ Array<[ Object | Array ], [ true | false ]> ]
-    #   A two-element array. The first element is the value retrieved, or an
-    #   array of values. The second element is a boolean flag indicating
-    #   whether an array was expanded at any point during the key traversal
-    #   (because the respective document field was an array).
+    # @return [ Object | Array ] Field value or values.
     module_function def extract_attribute(document, key)
       if document.respond_to?(:as_attributes, true)
         # If a document has hash fields, as_attributes would keep those fields
