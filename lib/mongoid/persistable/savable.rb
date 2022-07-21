@@ -15,7 +15,8 @@ module Mongoid
       # @param [ Hash ] options Options to pass to the save.
       #
       # @option options [ true | false ] :touch Whether or not the updated_at
-      #   attribute will be updated with the current time. This option is
+      #   attribute will be updated with the current time. When this option is
+      #   false, none of the embedded documents will be touched. This option is
       #   ignored when saving a new document, and the created_at and updated_at
       #   will be set to the current time.
       #
@@ -37,7 +38,8 @@ module Mongoid
       # @param [ Hash ] options Options to pass to the save.
       #
       # @option options [ true | false ] :touch Whether or not the updated_at
-      #   attribute will be updated with the current time. This option is
+      #   attribute will be updated with the current time. When this option is
+      #   false, none of the embedded documents will be touched.This option is
       #   ignored when saving a new document, and the created_at and updated_at
       #   will be set to the current time.
       #

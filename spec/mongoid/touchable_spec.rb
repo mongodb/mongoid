@@ -89,7 +89,7 @@ describe Mongoid::Touchable do
         end
       end
 
-      shared_examples 'updates the parent when :touch is not set' do
+      shared_examples 'updates the parent when :touch is false' do
         it 'does not update updated_at on parent' do
           entrance
           update_time
@@ -130,7 +130,7 @@ describe Mongoid::Touchable do
 
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
-        include_examples 'updates the parent when :touch is not set'
+        include_examples 'updates the parent when :touch is false'
 
         context 'when also updating an additional field' do
           it 'persists the update to the additional field' do
@@ -714,87 +714,215 @@ describe Mongoid::Touchable do
       Timecop.return
     end
 
-    let(:doc) { Dokument.new }
+    context "when only using the root document" do
 
-    context "when saving a new document" do
+      let(:doc) { Dokument.new }
 
-      context "when not passing a touch option" do
+      context "when saving a new document" do
 
+        context "when not passing a touch option" do
+
+          before do
+            doc.save!
+          end
+
+          it "touches the document" do
+            expect(doc.created_at).to eq(start_time)
+            expect(doc.updated_at).to eq(start_time)
+          end
+        end
+
+        context "when passing touch: true" do
+
+          before do
+            doc.save!(touch: true)
+          end
+
+          it "touches the document" do
+            expect(doc.created_at).to eq(start_time)
+            expect(doc.updated_at).to eq(start_time)
+          end
+        end
+
+        context "when passing touch: false" do
+
+          before do
+            doc.save!(touch: false)
+          end
+
+          it "touches the document" do
+            expect(doc.created_at).to eq(start_time)
+            expect(doc.updated_at).to eq(start_time)
+          end
+        end
+      end
+
+      context "when updating a document" do
         before do
           doc.save!
+          doc.title = "title"
+          update_time
         end
 
-        it "touches the document" do
-          expect(doc.created_at).to eq(start_time)
-          expect(doc.updated_at).to eq(start_time)
-        end
-      end
+        context "when not passing a touch option" do
 
-      context "when passing touch: true" do
+          before do
+            doc.save!
+          end
 
-        before do
-          doc.save!(touch: true)
-        end
-
-        it "touches the document" do
-          expect(doc.created_at).to eq(start_time)
-          expect(doc.updated_at).to eq(start_time)
-        end
-      end
-
-      context "when passing touch: false" do
-
-        before do
-          doc.save!(touch: false)
+          it "touches the document" do
+            expect(doc.created_at).to eq(start_time)
+            expect(doc.updated_at).to eq(update_time)
+          end
         end
 
-        it "touches the document" do
-          expect(doc.created_at).to eq(start_time)
-          expect(doc.updated_at).to eq(start_time)
+        context "when passing touch: true" do
+
+          before do
+            doc.save!(touch: true)
+          end
+
+          it "touches the document" do
+            expect(doc.created_at).to eq(start_time)
+            expect(doc.updated_at).to eq(update_time)
+          end
+        end
+
+        context "when passing touch: false" do
+
+          before do
+            doc.save!(touch: false)
+          end
+
+          it "touches the document" do
+            expect(doc.created_at).to eq(start_time)
+            expect(doc.updated_at).to eq(start_time)
+          end
         end
       end
     end
 
-    context "when updating a document" do
-      before do
-        doc.save!
-        doc.title = "title"
-        update_time
+    context "when saving embedded associations with cascadable callbacks" do
+
+      let(:book) do
+        Book.new(covers: [ cover ])
       end
 
-      context "when not passing a touch option" do
+      let(:cover) do
+        Cover.new
+      end
 
-        before do
-          doc.save!
+      context "when saving a new document" do
+
+        context "when not passing a touch option" do
+
+          before do
+            book.save!
+          end
+
+          it "touches the document" do
+            expect(book.created_at).to eq(start_time)
+            expect(book.updated_at).to eq(start_time)
+          end
+
+          it "touches the children" do
+            expect(book.covers.first.created_at).to eq(start_time)
+            expect(book.covers.first.updated_at).to eq(start_time)
+          end
         end
 
-        it "touches the document" do
-          expect(doc.created_at).to eq(start_time)
-          expect(doc.updated_at).to eq(update_time)
+        context "when passing touch: true" do
+
+          before do
+            book.save!(touch: true)
+          end
+
+          it "touches the document" do
+            expect(book.created_at).to eq(start_time)
+            expect(book.updated_at).to eq(start_time)
+          end
+
+          it "touches the children" do
+            expect(book.covers.first.created_at).to eq(start_time)
+            expect(book.covers.first.updated_at).to eq(start_time)
+          end
+        end
+
+        context "when passing touch: false" do
+
+          before do
+            book.save!(touch: false)
+          end
+
+          it "touches the document" do
+            expect(book.created_at).to eq(start_time)
+            expect(book.updated_at).to eq(start_time)
+          end
+
+          it "touches the children" do
+            expect(book.covers.first.created_at).to eq(start_time)
+            expect(book.covers.first.updated_at).to eq(start_time)
+          end
         end
       end
 
-      context "when passing touch: true" do
-
+      context "when updating a document" do
         before do
-          doc.save!(touch: true)
+          book.save!
+          book.title = "title"
+          book.covers.first.title = "title"
+          update_time
         end
 
-        it "touches the document" do
-          expect(doc.created_at).to eq(start_time)
-          expect(doc.updated_at).to eq(update_time)
+        context "when not passing a touch option" do
+
+          before do
+            book.save!
+          end
+
+          it "touches the document" do
+            expect(book.created_at).to eq(start_time)
+            expect(book.updated_at).to eq(update_time)
+          end
+
+          it "touches the children" do
+            expect(book.covers.first.created_at).to eq(start_time)
+            expect(book.covers.first.updated_at).to eq(update_time)
+          end
         end
-      end
 
-      context "when passing touch: false" do
+        context "when passing touch: true" do
 
-        before do
-          doc.save!(touch: false)
+          before do
+            book.save!(touch: true)
+          end
+
+          it "touches the document" do
+            expect(book.created_at).to eq(start_time)
+            expect(book.updated_at).to eq(update_time)
+          end
+
+          it "touches the children" do
+            expect(book.covers.first.created_at).to eq(start_time)
+            expect(book.covers.first.updated_at).to eq(update_time)
+          end
         end
 
-        it "touches the document" do
-          expect(doc.created_at).to eq(start_time)
-          expect(doc.updated_at).to eq(start_time)
+        context "when passing touch: false" do
+
+          before do
+            book.save!(touch: false)
+          end
+
+          it "does not touch the document" do
+            expect(book.created_at).to eq(start_time)
+            expect(book.updated_at).to eq(start_time)
+          end
+
+          it "does not touch the children" do
+            expect(book.covers.first.created_at).to eq(start_time)
+            expect(book.covers.first.updated_at).to eq(start_time)
+          end
         end
       end
     end
