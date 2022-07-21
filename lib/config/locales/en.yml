@@ -238,6 +238,7 @@ en:
             \_\_language_override\n
             \_\_default_language\n
             \_\_collation\n
+            \_\_wildcard_projection: { 'path.to.field.a': 1, 'path.to.field.b': 0 }\n
             Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack (deprecated)', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
