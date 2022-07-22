@@ -145,6 +145,11 @@ operations with examples.
        the save.*
 
        *Pass* ``validate: false`` *option to bypass validations.*
+
+       *Pass* ``touch: false`` *option to ignore the updates to the updated_at
+       field. If the document being save has not been previously persisted,
+       this option is ignored and the created_at and updated_at fields will be
+       updated with the current time.*
      -
         .. code-block:: ruby
 
@@ -154,6 +159,7 @@ operations with examples.
           )
           person.save
           person.save(validate: false)
+          person.save(touch: false)
 
           person.first_name = "Christian Johan"
           person.save

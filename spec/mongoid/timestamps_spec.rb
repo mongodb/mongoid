@@ -127,7 +127,7 @@ describe Mongoid::Timestamps do
   end
 
   # This section of tests describes the behavior of the updated_at field for
-  # different updates on associations, as outlined in PR #5219.
+  # different updates on referenced associations, as outlined in PR #5219.
   describe "updated_at attribute" do
     let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 

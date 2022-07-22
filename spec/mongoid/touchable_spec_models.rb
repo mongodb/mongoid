@@ -6,6 +6,8 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      field :title, type: String
+
       embeds_many :entrances, class_name: "TouchableSpec::Embedded::Entrance"
       embeds_many :floors, class_name: "TouchableSpec::Embedded::Floor"
     end
@@ -14,7 +16,7 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :building, class_name: "TouchableSpec::Embedded::Building"
+      embedded_in :building, touch: false, class_name: "TouchableSpec::Embedded::Building"
 
       field :last_used_at, type: Time
     end

@@ -89,7 +89,7 @@ describe Mongoid::Touchable do
         end
       end
 
-      shared_examples 'updates the parent when :touch is not set' do
+      shared_examples 'updates the parent when :touch is false' do
         it 'does not update updated_at on parent' do
           entrance
           update_time
@@ -130,7 +130,7 @@ describe Mongoid::Touchable do
 
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
-        include_examples 'updates the parent when :touch is not set'
+        include_examples 'updates the parent when :touch is false'
 
         context 'when also updating an additional field' do
           it 'persists the update to the additional field' do
@@ -697,6 +697,239 @@ describe Mongoid::Touchable do
           end
 
           include_examples "does not update the parent"
+        end
+      end
+    end
+  end
+
+  describe "when saving a document" do
+
+    let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+    let(:update_time) do
+      Timecop.freeze(Time.at(Time.now.to_i) + 2)
+    end
+
+    after do
+      Timecop.return
+    end
+
+    context "when only using the root document" do
+
+      shared_examples "timeless is cleared" do
+        it "clears the timeless option" do
+          expect(doc.timeless?).to be false
+        end
+      end
+
+      shared_examples "touches the document" do
+        it "touches the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(start_time)
+        end
+      end
+
+      shared_examples "updates the document" do
+        it "updates the document" do
+          expect(doc.created_at).to eq(start_time)
+          expect(doc.updated_at).to eq(update_time)
+        end
+      end
+
+      let(:doc) { Dokument.new }
+
+      context "when saving a new document" do
+
+        context "when not passing a touch option" do
+
+          before do
+            doc.save!
+          end
+
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: true" do
+
+          before do
+            doc.save!(touch: true)
+          end
+
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: false" do
+
+          before do
+            doc.save!(touch: false)
+          end
+
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
+        end
+      end
+
+      context "when updating a document" do
+        before do
+          doc.save!
+          doc.title = "title"
+          update_time
+        end
+
+        context "when not passing a touch option" do
+
+          before do
+            doc.save!
+          end
+
+          include_examples "updates the document"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: true" do
+
+          before do
+            doc.save!(touch: true)
+          end
+
+          include_examples "updates the document"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: false" do
+
+          before do
+            doc.save!(touch: false)
+          end
+
+          include_examples "touches the document"
+          include_examples "timeless is cleared"
+        end
+      end
+    end
+
+    context "when saving embedded associations with cascadable callbacks" do
+
+      shared_examples "timeless is cleared" do
+        it "clears the timeless option" do
+          expect(book.timeless?).to be false
+          expect(book.covers.first.timeless?).to be false
+        end
+      end
+
+      shared_examples "touches the document" do
+        it "touches the document" do
+          expect(book.created_at).to eq(start_time)
+          expect(book.updated_at).to eq(start_time)
+        end
+      end
+
+      shared_examples "updates the document" do
+        it "updates the document" do
+          expect(book.created_at).to eq(start_time)
+          expect(book.updated_at).to eq(update_time)
+        end
+      end
+
+      shared_examples "touches the children" do
+        it "touches the children" do
+          expect(book.covers.first.created_at).to eq(start_time)
+          expect(book.covers.first.updated_at).to eq(start_time)
+        end
+      end
+
+      shared_examples "updates the children" do
+        it "updates the children" do
+          expect(book.covers.first.created_at).to eq(start_time)
+          expect(book.covers.first.updated_at).to eq(update_time)
+        end
+      end
+
+      let(:book) do
+        Book.new(covers: [ cover ])
+      end
+
+      let(:cover) do
+        Cover.new
+      end
+
+      context "when saving a new document" do
+
+        context "when not passing a touch option" do
+
+          before do
+            book.save!
+          end
+
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: true" do
+
+          before do
+            book.save!(touch: true)
+          end
+
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: false" do
+
+          before do
+            book.save!(touch: false)
+          end
+
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
+        end
+      end
+
+      context "when updating a document" do
+        before do
+          book.save!
+          book.title = "title"
+          book.covers.first.title = "title"
+          update_time
+        end
+
+        context "when not passing a touch option" do
+
+          before do
+            book.save!
+          end
+
+          include_examples "updates the document"
+          include_examples "updates the children"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: true" do
+
+          before do
+            book.save!(touch: true)
+          end
+
+          include_examples "updates the document"
+          include_examples "updates the children"
+          include_examples "timeless is cleared"
+        end
+
+        context "when passing touch: false" do
+
+          before do
+            book.save!(touch: false)
+          end
+
+          include_examples "touches the document"
+          include_examples "touches the children"
+          include_examples "timeless is cleared"
         end
       end
     end

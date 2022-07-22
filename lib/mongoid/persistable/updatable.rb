@@ -91,16 +91,21 @@ module Mongoid
       #
       # @param [ Hash ] options The options.
       #
+      # @option options [ true | false ] :touch Whether or not the updated_at
+      #   attribute will be updated with the current time.
+      #
       # @return [ true | false ] The result of the update.
       def prepare_update(options = {})
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys
+        update_children = cascadable_children(:update)
+        process_touch_option(options, update_children)
         run_callbacks(:save, with_children: false) do
           run_callbacks(:update, with_children: false) do
             run_callbacks(:persist_parent, with_children: false) do
               _mongoid_run_child_callbacks(:save) do
-                _mongoid_run_child_callbacks(:update) do
+                _mongoid_run_child_callbacks(:update, children: update_children) do
                   result = yield(self)
                   self.previously_new_record = false
                   post_process_persist(result, options)
@@ -158,6 +163,24 @@ module Mongoid
               end
             end
           end
+        end
+      end
+
+      # If there is a touch option and it is false, this method will call the
+      # timeless method so that the updated_at attribute is not updated. It
+      # will call the timeless method on all of the cascadable children as
+      # well. Note that timeless is cleared in the before_update callback.
+      #
+      # @param [ Hash ] options The options.
+      # @param [ Array<Document> ] children The children that the :update
+      #   callbacks will be executed on.
+      #
+      # @option options [ true | false ] :touch Whether or not the updated_at
+      #   attribute will be updated with the current time.
+      def process_touch_option(options, children)
+        unless options.fetch(:touch, true)
+          timeless
+          children.each(&:timeless)
         end
       end
     end
