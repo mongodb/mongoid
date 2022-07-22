@@ -90,6 +90,14 @@ describe Mongoid::Contextual::None do
     end
   end
 
+  describe "#first!" do
+    it "raises an error" do
+      expect do
+        context.first!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
   describe "#last" do
     it "returns nil" do
       expect(context.last).to be_nil
@@ -97,6 +105,14 @@ describe Mongoid::Contextual::None do
 
     it "returns [] when passing a limit" do
       expect(context.last(1)).to eq([])
+    end
+  end
+
+  describe "#last!" do
+    it "raises an error" do
+      expect do
+        context.last!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
     end
   end
 
@@ -115,6 +131,28 @@ describe Mongoid::Contextual::None do
       expect do
         context.take!
       end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  [ :second,
+    :third,
+    :fourth,
+    :fifth,
+    :second_to_last,
+    :third_to_last
+  ].each do |meth|
+    describe "##{meth}" do
+      it "returns nil" do
+        expect(context.send(meth)).to be_nil
+      end
+    end
+
+    describe "##{meth}!" do
+      it "raises an error" do
+        expect do
+          context.send("#{meth}!")
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
     end
   end
 

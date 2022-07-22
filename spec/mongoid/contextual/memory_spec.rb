@@ -4,6 +4,36 @@ require "spec_helper"
 
 describe Mongoid::Contextual::Memory do
 
+  shared_examples "raises an error when no documents" do
+    context "when there are no matching documents" do
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = []
+        end
+      end
+
+      it "returns nil" do
+        expect do
+          context.send(method)
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Address./)
+      end
+    end
+  end
+
+  shared_examples "returns nil when no documents" do
+    context "when there are no matching documents" do
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = []
+        end
+      end
+
+      it "returns nil" do
+        expect(context.send(method)).to be_nil
+      end
+    end
+  end
+
   [ :blank?, :empty? ].each do |method|
 
     describe "##{method}" do
@@ -800,6 +830,8 @@ describe Mongoid::Contextual::Memory do
 
     describe "##{method}" do
 
+      let(:method) { method }
+
       let(:hobrecht) do
         Address.new(street: "hobrecht")
       end
@@ -830,6 +862,8 @@ describe Mongoid::Contextual::Memory do
         expect(context.send(method, 1)).to eq([ hobrecht ])
       end
 
+      include_examples "returns nil when no documents"
+
       context 'when there is a collation on the criteria' do
 
         let(:criteria) do
@@ -847,7 +881,38 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
+  describe "#first!" do
+
+    let(:method) { :first! }
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "returns the first matching document" do
+      expect(context.first!).to eq(hobrecht)
+    end
+
+    include_examples "raises an error when no documents"
+  end
+
   describe "#take" do
+
+    let(:method) { :take }
 
     let(:hobrecht) do
       Address.new(street: "hobrecht")
@@ -879,6 +944,8 @@ describe Mongoid::Contextual::Memory do
       expect(context.take(1)).to eq([ hobrecht ])
     end
 
+    include_examples "returns nil when no documents"
+
     context 'when there is a collation on the criteria' do
 
       let(:criteria) do
@@ -896,6 +963,8 @@ describe Mongoid::Contextual::Memory do
   end
 
   describe "#take!" do
+
+    let(:method) { :take! }
 
     let(:hobrecht) do
       Address.new(street: "hobrecht")
@@ -919,19 +988,7 @@ describe Mongoid::Contextual::Memory do
       expect(context.take!).to eq(hobrecht)
     end
 
-    context "when the criteria is empty" do
-      let(:criteria) do
-        Address.where(street: "bogus").tap do |crit|
-          crit.documents = []
-        end
-      end
-
-      it "raise an error" do
-        expect do
-          context.take!
-        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Address./)
-      end
-    end
+    include_examples "raises an error when no documents"
 
     context 'when there is a collation on the criteria' do
 
@@ -1052,6 +1109,8 @@ describe Mongoid::Contextual::Memory do
 
   describe "#last" do
 
+    let(:method) { :last }
+
     let(:hobrecht) do
       Address.new(street: "hobrecht")
     end
@@ -1082,6 +1141,8 @@ describe Mongoid::Contextual::Memory do
       expect(context.last(1)).to eq([ friedel ])
     end
 
+    include_examples "returns nil when no documents"
+
     context 'when there is a collation on the criteria' do
 
       let(:criteria) do
@@ -1095,6 +1156,102 @@ describe Mongoid::Contextual::Memory do
           context.last
         }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
       end
+    end
+  end
+
+  describe "#last!" do
+    let(:method) { :last! }
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "returns the last matching document" do
+      expect(context.last!).to eq(friedel)
+    end
+
+    include_examples "raises an error when no documents"
+  end
+
+  [ :second,
+    :third,
+    :fourth,
+    :fifth,
+    :second_to_last,
+    :third_to_last
+  ].each do |meth|
+    describe "##{meth}" do
+      let(:method) { meth }
+
+      let(:addresses) do
+        [
+          Address.new,
+          Address.new,
+          Address.new,
+          Address.new,
+          Address.new,
+        ]
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = addresses
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the matching document" do
+        expect(context.send(method)).to eq(addresses.send(method))
+      end
+
+      include_examples "returns nil when no documents"
+    end
+
+    describe "##{meth}!" do
+      let(:method) { "#{meth}!" }
+
+      let(:addresses) do
+        [
+          Address.new,
+          Address.new,
+          Address.new,
+          Address.new,
+          Address.new,
+        ]
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = addresses
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the matching document" do
+        expect(context.send(method)).to eq(addresses.send(meth))
+      end
+
+      include_examples "raises an error when no documents"
     end
   end
 

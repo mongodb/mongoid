@@ -1249,6 +1249,29 @@ Mongoid also has some helpful methods on criteria.
           Band.exists?
           Band.where(name: "Photek").exists?
 
+   * - ``Criteria#fifth``
+
+       *Get the fifth document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fifth
+
+   * - ``Criteria#fifth!``
+
+       *Get the fifth document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fifth!
+
    * - ``Criteria#find_by``
 
        *Find a document by the provided attributes. If not found,
@@ -1314,6 +1337,20 @@ Mongoid also has some helpful methods on criteria.
           Band.where(:members.with_size => 3).last
           Band.first(2)
 
+   * - ``Criteria#first!|last!``
+
+       *Finds a single document given the provided criteria, or raises an error
+       if none are found. This method automatically adds a sort on _id if no
+       sort is given. This can cause performance issues, so if the sort is
+       undesirable, Criteria#take! can be used instead.*
+
+     -
+        .. code-block:: ruby
+
+          Band.first!
+          Band.where(:members.with_size => 3).first!
+          Band.where(:members.with_size => 3).last!
+
    * - ``Criteria#first_or_create``
 
        *Find the first document by the provided attributes, and if not found
@@ -1360,6 +1397,29 @@ Mongoid also has some helpful methods on criteria.
 
           # MongoDB 4.2 and lower
           Band.for_js("this.name = param", param: "Tool")
+
+   * - ``Criteria#fourth``
+
+       *Get the fourth document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fourth
+
+   * - ``Criteria#fourth!``
+
+       *Get the fourth document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fourth!
 
    * - ``Criteria#length|size``
 
@@ -1427,6 +1487,52 @@ Mongoid also has some helpful methods on criteria.
           Band.all.pluck(:name, :likes)
             #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
 
+   * - ``Criteria#second``
+
+       *Get the second document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second
+
+   * - ``Criteria#second!``
+
+       *Get the second document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second!
+
+   * - ``Criteria#second_to_last``
+
+       *Get the second to last document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second_to_last
+
+   * - ``Criteria#second_to_last!``
+
+       *Get the second to last document for the given criteria, or raise an
+       error if none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second_to_last!
+
    * - ``Criteria#take``
 
        *Get a list of n documents from the database or just one if no parameter
@@ -1473,6 +1579,52 @@ Mongoid also has some helpful methods on criteria.
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.tally('managers.n')
+
+   * - ``Criteria#third``
+
+       *Get the third document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third
+
+   * - ``Criteria#third!``
+
+       *Get the third document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third!
+
+   * - ``Criteria#third_to_last``
+
+       *Get the third to last document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third_to_last
+
+   * - ``Criteria#third_to_last!``
+
+       *Get the third to last document for the given criteria, or raise an
+       error if none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third_to_last!
 
 
 Eager Loading
