@@ -122,8 +122,6 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
 
-I18n.config.enforce_available_locales = false
-
 # The user must be created before any of the tests are loaded, until
 # https://jira.mongodb.org/browse/MONGOID-4827 is implemented.
 client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
@@ -159,6 +157,13 @@ RSpec.configure do |config|
     Mongoid.default_client.collections.each do |coll|
       coll.delete_many
     end
+  end
+
+  config.before(:each) do
+    I18n.locale = :en
+    I18n.default_locale = :en
+    I18n.fallbacks = []
+    I18n.enforce_available_locales = false
   end
 end
 
