@@ -578,12 +578,8 @@ describe Mongoid::Contextual::Memory do
         context 'when fallbacks are enabled with a locale list' do
           with_i18n_fallbacks
 
-          around(:all) do |example|
+          before do
             I18n.fallbacks[:he] = [ :en ]
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:distinct) do
@@ -1765,12 +1761,8 @@ describe Mongoid::Contextual::Memory do
         context 'when fallbacks are enabled with a locale list' do
           with_i18n_fallbacks
 
-          around(:all) do |example|
+          before do
             I18n.fallbacks[:he] = [ :en ]
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:plucked) do
