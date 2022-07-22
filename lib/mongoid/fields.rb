@@ -818,7 +818,7 @@ module Mongoid
       # @api private
       def retrieve_and_validate_type(name, type)
         type_mapping = TYPE_MAPPINGS[type]
-        result = type_mapping || unmapped_type(type)
+        result = type_mapping || unmapped_type(name, type)
         if !result.is_a?(Class)
           raise Errors::InvalidFieldType.new(self, name, type)
         else
@@ -838,16 +838,56 @@ module Mongoid
       # Returns the type of the field if the type was not in the TYPE_MAPPINGS
       # hash.
       #
+      # @param [ Symbol ] name The name of the field.
       # @param [ Symbol | Class ] type The type of the field.
       #
       # @return [ Class ] The type of the field.
       #
       # @api private
-      def unmapped_type(type)
+      def unmapped_type(name, type)
         if "Boolean" == type.to_s
           Mongoid::Boolean
+        elsif type.is_a?(Array)
+          array_type = retrieve_and_validate_type(name, type.first)
+          create_typed_array_class(array_type)
         else
           type || Object
+        end
+      end
+
+      # Create or retrieve the typed array class. If the class has not already
+      # been created, create a class called {Type}Array that inherits from
+      # Mongoid::TypedArray.
+      #
+      # @param [ Class ] type The type of the field.
+      #
+      # @return [ Class ] The typed array class.
+      #
+      # @api private
+      def create_typed_array_class(type)
+        const_string = "#{type}Array"
+        if Mongoid.const_defined?(const_string)
+          Mongoid.const_get(const_string)
+        else
+          array_class = Class.new(Mongoid::TypedArray) do
+
+            def initialize(*args, &block)
+              @type = self.class.const_get("Type")
+              super(@type, *args, &block)
+            end
+
+            class << self
+              def mongoize(object)
+                return if object.nil?
+                case object
+                when Array, Set
+                  object.map { |x| type.mongoize(x) }
+                end
+              end
+            end
+          end
+          array_class.const_set("Type", type)
+          Mongoid.const_set(const_string, array_class)
         end
       end
     end

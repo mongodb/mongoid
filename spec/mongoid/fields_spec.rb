@@ -394,7 +394,7 @@ describe Mongoid::Fields do
       context 'when using an unknown symbol' do
         it 'raises InvalidFieldType' do
           lambda do
-            klass.field(:test, type:  :bogus)
+            klass.field(:test, type: :bogus)
           end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value :bogus/)
         end
       end
@@ -402,7 +402,7 @@ describe Mongoid::Fields do
       context 'when using an unknown string' do
         it 'raises InvalidFieldType' do
           lambda do
-            klass.field(:test, type:  'bogus')
+            klass.field(:test, type: 'bogus')
           end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
         end
       end
@@ -481,6 +481,62 @@ describe Mongoid::Fields do
         expect {
           Label.field :unacceptable, bad: true
         }.to raise_error(Mongoid::Errors::InvalidFieldOption)
+      end
+    end
+
+    context "when declaring a typed array field" do
+      after do
+        Label.fields.delete('members')
+      end
+
+      before do
+        Label.field :members, type: Array(String)
+      end
+
+      let(:members) { Label.fields["members"] }
+
+      it "create the correct field" do
+        expect(members).to_not be_nil
+      end
+
+      it "creates the correct class" do
+        expect(Mongoid.const_defined?("StringArray")).to be true
+      end
+
+      it "gives the field the correct type" do
+        expect(members.type).to eq(Mongoid::StringArray)
+      end
+    end
+  end
+
+  describe "Mongoid::.*Array" do
+
+    after do
+      Label.fields.delete('members')
+    end
+
+    before do
+      Label.field :members, type: Array(String)
+    end
+
+    context "creates an array" do
+
+      context "when giving no args" do
+
+        let(:string_array) { Mongoid::StringArray.new }
+
+        it "is an empty array" do
+          expect(string_array).to eq([])
+        end
+      end
+
+      context "when giving args" do
+
+        let(:string_array) { Mongoid::StringArray.new([ 1, 2 ]) }
+
+        it "mongoizes the arguments" do
+          expect(string_array).to eq(["1", "2"])
+        end
       end
     end
   end
