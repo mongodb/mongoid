@@ -1756,6 +1756,7 @@ describe Mongoid::Contextual::Memory do
           end
 
           it "correctly uses the fallback" do
+            I18n.locale = :en
             Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             plucked.should == "english-text"

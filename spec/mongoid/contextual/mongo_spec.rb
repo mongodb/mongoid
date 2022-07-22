@@ -681,6 +681,7 @@ describe Mongoid::Contextual::Mongo do
           config_override :legacy_pluck_distinct, false
 
           it "correctly uses the fallback" do
+            I18n.locale = :en
             Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             distinct.should == "english-text"
