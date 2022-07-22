@@ -1243,11 +1243,11 @@ describe Mongoid::Contextual::Memory do
       config_override :legacy_pluck_distinct, true
 
       let(:hobrecht) do
-        Address.new(street: "hobrecht")
+        Address.new(street: "hobrecht", number: 213)
       end
 
       let(:friedel) do
-        Address.new(street: "friedel")
+        Address.new(street: "friedel", number: 11)
       end
 
       let(:criteria) do
@@ -1264,6 +1264,17 @@ describe Mongoid::Contextual::Memory do
 
         it "returns the values" do
           expect(plucked).to eq([ "hobrecht", "friedel" ])
+        end
+      end
+
+      context "when plucking multiple fields" do
+
+        let!(:plucked) do
+          context.pluck(:street, :number)
+        end
+
+        it "returns the values as an array" do
+          expect(plucked).to eq([ ["hobrecht", 213], ["friedel", 11] ])
         end
       end
 
@@ -1296,7 +1307,7 @@ describe Mongoid::Contextual::Memory do
             context.pluck(:foo)
           end
 
-          it "returns a empty array" do
+          it "returns an empty array" do
             expect(plucked).to eq([nil, nil])
           end
         end
@@ -1307,7 +1318,7 @@ describe Mongoid::Contextual::Memory do
             context.pluck(:foo, :bar)
           end
 
-          it "returns a empty array" do
+          it "returns an empty array" do
             expect(plucked).to eq([[nil, nil], [nil, nil]])
           end
         end
@@ -1720,7 +1731,7 @@ describe Mongoid::Contextual::Memory do
         end
       end
 
-      context "when tallying deeply nested arrays/embedded associations" do
+      context "when plucking deeply nested arrays/embedded associations" do
 
         let(:criteria) do
           Person.all.tap do |crit|

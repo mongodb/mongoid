@@ -1412,12 +1412,20 @@ Mongoid also has some helpful methods on criteria.
         .. code-block:: ruby
 
           Band.all.pluck(:name)
+            #=> ["Daft Punk", "Aphex Twin", "Ween"]
 
-          Band.all.pluck('cities.name')
+          Band.all.pluck('address.city')
+            #=> ["Paris", "Limerick", "New Hope"]
 
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.pluck('managers.n')
+            #=> [ ["Berry Gordy", "Tommy Mottola"], [], ["Quincy Jones"] ]
+
+          # Accepts multiple field arguments, in which case
+          # the result will be returned as an Array of Arrays.
+          Band.all.pluck(:name, :likes)
+            #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
 
    * - ``Criteria#take``
 

@@ -391,15 +391,22 @@ module Mongoid
         MapReduce.new(collection, criteria, map, reduce)
       end
 
-      # Pluck the single field values from the database. Will return duplicates
-      # if they exist and only works for top level fields.
+      # Pluck the field value(s) from the database. Returns one
+      # result for each document found in the database for
+      # the context. The results are normalized according to their
+      # Mongoid field types. Note that the results may include
+      # duplicates and nil values.
       #
       # @example Pluck a field.
       #   context.pluck(:_id)
       #
-      # @param [ String | Symbol ] *fields Field(s) to pluck.
+      # @param [ String | Symbol ] *fields Field(s) to pluck,
+      #   which may include nested fields using dot-notation.
       #
       # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
+      #   If the *fields arg contains a single value, each result
+      #   in the array will be a single value. Otherwise, each
+      #   result in the array will be an array of values.
       def pluck(*fields)
         # Multiple fields can map to the same field name. For example, plucking
         # a field and its _translations field map to the same field in the database.
