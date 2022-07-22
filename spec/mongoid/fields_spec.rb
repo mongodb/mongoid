@@ -21,10 +21,6 @@ describe Mongoid::Fields do
           product.description = "The best"
         end
 
-        after do
-          ::I18n.locale = :en
-        end
-
         let(:translations) do
           product.description_translations
         end
@@ -532,10 +528,6 @@ describe Mongoid::Fields do
           product.description = "The best"
         end
 
-        after do
-          ::I18n.locale = :en
-        end
-
         let(:description) do
           product.description
         end
@@ -551,10 +543,6 @@ describe Mongoid::Fields do
           product.description = "Cheap drinks"
           ::I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -840,10 +828,6 @@ describe Mongoid::Fields do
           product.description = "Cheaper drinks"
         end
 
-        after do
-          ::I18n.locale = :en
-        end
-
         let(:description) do
           product.attributes["description"]
         end
@@ -859,10 +843,6 @@ describe Mongoid::Fields do
           product.description = "Cheap drinks"
           ::I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do

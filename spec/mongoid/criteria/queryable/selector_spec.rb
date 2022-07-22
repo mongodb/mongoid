@@ -623,7 +623,6 @@ describe Mongoid::Criteria::Queryable::Selector do
 
           after(:all) do
             Object.send(:remove_const, :Field)
-            ::I18n.locale = :en
           end
 
           let(:selector) do

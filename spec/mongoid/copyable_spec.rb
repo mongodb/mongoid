@@ -172,10 +172,6 @@ describe Mongoid::Copyable do
           person.save!
         end
 
-        after do
-          I18n.locale = :en
-        end
-
         let!(:from_db) do
           Person.find(person.id)
         end
@@ -220,10 +216,6 @@ describe Mongoid::Copyable do
           I18n.locale = 'pt_BR'
           person.addresses.type(ShipmentAddress).each { |address| address.shipping_name = "Título" }
           person.save!
-        end
-
-        after do
-          I18n.locale = :en
         end
 
         let!(:from_db) do

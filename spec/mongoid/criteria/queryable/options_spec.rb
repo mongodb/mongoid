@@ -232,7 +232,6 @@ describe Mongoid::Criteria::Queryable::Options do
 
           after(:all) do
             Object.send(:remove_const, :Field)
-            ::I18n.locale = :en
           end
 
           let(:options) do

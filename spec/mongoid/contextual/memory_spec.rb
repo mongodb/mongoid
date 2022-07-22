@@ -523,15 +523,10 @@ describe Mongoid::Contextual::Memory do
 
       context "when getting a localized field" do
         before do
-          I18n.locale = :en
           d = Dictionary.create!(description: 'english-text')
           I18n.locale = :de
           d.description = 'deutsch-text'
           d.save!
-        end
-
-        after do
-          I18n.locale = :en
         end
 
         let(:criteria) do
@@ -588,7 +583,7 @@ describe Mongoid::Contextual::Memory do
 
           it "correctly uses the fallback" do
             I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
+            Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             distinct.should == "english-text"
           end
@@ -603,10 +598,6 @@ describe Mongoid::Contextual::Memory do
             p.name = "Nissim"
 
             Person.create!(passport: p, employer_id: 12345)
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:criteria) do
@@ -1692,15 +1683,10 @@ describe Mongoid::Contextual::Memory do
       context 'when plucking a localized field' do
 
         before do
-          I18n.locale = :en
           d = Dictionary.create!(description: 'english-text')
           I18n.locale = :de
           d.description = 'deutsch-text'
           d.save!
-        end
-
-        after do
-          I18n.locale = :en
         end
 
         let(:criteria) do
@@ -1770,8 +1756,7 @@ describe Mongoid::Contextual::Memory do
           end
 
           it "correctly uses the fallback" do
-            I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
+            Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             plucked.should == "english-text"
           end
@@ -1786,10 +1771,6 @@ describe Mongoid::Contextual::Memory do
             p.name = "Nissim"
 
             Person.create!(passport: p, employer_id: 12345)
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:plucked) do
@@ -2037,7 +2018,6 @@ describe Mongoid::Contextual::Memory do
       let(:d4) { Dictionary.new(description: 'en2') }
 
       before do
-        I18n.locale = :en
         d1
         d2
         d3
@@ -2102,7 +2082,6 @@ describe Mongoid::Contextual::Memory do
       let(:address2b) { Address.new(name: "en3") }
 
       before do
-        I18n.locale = :en
         address1a
         address1b
         address2a
@@ -2114,7 +2093,6 @@ describe Mongoid::Contextual::Memory do
         address2b.name = "de3"
         person1
         person2
-
         I18n.locale = :en
       end
 

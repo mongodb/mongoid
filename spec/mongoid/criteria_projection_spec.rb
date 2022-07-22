@@ -156,22 +156,16 @@ describe Mongoid::Criteria do
     context 'when the field is localized' do
 
       before do
-        I18n.locale = :en
         d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
         d.save!
       end
 
-      after do
-        I18n.locale = :en
-      end
-
       context 'when entire field is included' do
 
         let(:dictionary) do
           Dictionary.only(:description).first
-
         end
 
         it 'loads all translations' do

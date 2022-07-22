@@ -237,10 +237,6 @@ describe Mongoid::Fields::Localized do
           ::I18n.locale = :de
         end
 
-        after do
-          ::I18n.locale = :en
-        end
-
         context "when the value exists" do
 
           let(:value) do
@@ -372,10 +368,6 @@ describe Mongoid::Fields::Localized do
           ::I18n.locale = :de
         end
 
-        after do
-          ::I18n.locale = :en
-        end
-
         let(:value) do
           field.mongoize("This is a test")
         end
@@ -407,10 +399,6 @@ describe Mongoid::Fields::Localized do
 
         before do
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:value) do

@@ -562,7 +562,6 @@ describe Mongoid::Contextual::Mongo do
 
     context "when getting a localized field" do
       before do
-        I18n.locale = :en
         d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
@@ -682,8 +681,7 @@ describe Mongoid::Contextual::Mongo do
           config_override :legacy_pluck_distinct, false
 
           it "correctly uses the fallback" do
-            I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
+            Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             distinct.should == "english-text"
           end
@@ -837,7 +835,6 @@ describe Mongoid::Contextual::Mongo do
 
     context "when tallying a localized field" do
       before do
-        I18n.locale = :en
         d1 = Dictionary.create!(description: 'en1')
         d2 = Dictionary.create!(description: 'en1')
         d3 = Dictionary.create!(description: 'en1')
@@ -851,7 +848,6 @@ describe Mongoid::Contextual::Mongo do
         d2.save!
         d3.save!
         d4.save!
-
         I18n.locale = :en
       end
 
@@ -893,7 +889,6 @@ describe Mongoid::Contextual::Mongo do
     context "when tallying an embedded localized field" do
 
       before do
-        I18n.locale = :en
         address1a = Address.new(name: "en1")
         address1b = Address.new(name: "en2")
         address2a = Address.new(name: "en1")
@@ -905,7 +900,6 @@ describe Mongoid::Contextual::Mongo do
         address2b.name = "de3"
         Person.create!(addresses: [ address1a, address1b ])
         Person.create!(addresses: [ address2a, address2b ])
-
         I18n.locale = :en
       end
 
