@@ -870,6 +870,7 @@ module Mongoid
           Mongoid.const_get(const_string)
         else
           array_class = Class.new(Mongoid::TypedArray) do
+            attr_reader :type
 
             def initialize(*args, &block)
               @type = self.class.const_get("Type")
