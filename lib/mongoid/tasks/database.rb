@@ -36,7 +36,6 @@ module Mongoid
       #   Mongoid::Tasks::Database.undefined_indexes
       #
       # @return [ Array<Hash> ] The list of undefined indexes by model.
-      #
       def undefined_indexes(models = ::Mongoid.models)
         undefined_by_model = {}
 
@@ -90,7 +89,6 @@ module Mongoid
       #   Mongoid::Tasks::Database.remove_indexes
       #
       # @return [ Array<Class> ] The un-indexed models.
-      #
       def remove_indexes(models = ::Mongoid.models)
         models.each do |model|
           next if model.embedded?

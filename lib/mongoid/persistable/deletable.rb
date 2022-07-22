@@ -86,7 +86,7 @@ module Mongoid
       #
       # @param [ Hash ] options The delete options.
       #
-      # @return [ true, false ] If the parent should be notified.
+      # @return [ true | false ] If the parent should be notified.
       def notifying_parent?(options = {})
         !options.delete(:suppress)
       end

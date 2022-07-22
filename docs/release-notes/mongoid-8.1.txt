@@ -41,3 +41,29 @@ The following is equivalent to the above:
     config.connect_to("mongoid_test")
 
     config.preload_models = true
+
+
+Added ``Mongoid::Criteria`` finder methods
+------------------------------------------
+
+Mongoid 8.1 implements several finder methods on ``Mongoid::Criteria``:
+
+- ``first!``
+- ``last!``
+- ``second/second!``
+- ``third/third!``
+- ``fourth/fourth!``
+- ``fifth/fifth!``
+- ``second_to_last/second_to_last!``
+- ``third_to_last/third_to_last!``
+
+When no documents are found, methods without a bang (!) return nil, and methods
+with a bang (!) raise an error:
+
+.. code:: ruby
+
+  Band.none.first
+  # => nil
+
+  Band.none.first!
+  # => raise Mongoid::Errors::DocumentNotFound

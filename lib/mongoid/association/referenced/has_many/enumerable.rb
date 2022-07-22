@@ -28,7 +28,7 @@ module Mongoid
           #
           # @param [ Enumerable ] other The other enumerable.
           #
-          # @return [ true, false ] If the objects are equal.
+          # @return [ true | false ] If the objects are equal.
           def ==(other)
             return false unless other.respond_to?(:entries)
             entries == other.entries
@@ -42,7 +42,7 @@ module Mongoid
           #
           # @param [ Object ] other The object to check.
           #
-          # @return [ true, false ] If the objects are equal in a case.
+          # @return [ true | false ] If the objects are equal in a case.
           def ===(other)
             return false unless other.respond_to?(:entries)
             if Mongoid.legacy_triple_equals
@@ -192,7 +192,7 @@ module Mongoid
           # @example Is the enumerable empty?
           #   enumerable.empty?
           #
-          # @return [ true, false ] If the enumerable is empty.
+          # @return [ true | false ] If the enumerable is empty.
           def empty?
             if _loaded?
               in_memory.empty?
@@ -224,7 +224,7 @@ module Mongoid
           # @param [ Object ] condition The condition that documents
           #   must satisfy. See Enumerable documentation for details.
           #
-          # @return [ true, false ] If the association has any documents.
+          # @return [ true | false ] If the association has any documents.
           def any?(*args)
             return super if args.any? || block_given?
 
@@ -261,7 +261,7 @@ module Mongoid
           # @example Initialize the enumerable with an array.
           #   Enumerable.new([ post ])
           #
-          # @param [ Criteria, Array<Document> ] target The wrapped object.
+          # @param [ Criteria | Array<Document> ] target The wrapped object.
           def initialize(target, base = nil, association = nil)
             @_base = base
             @_association = association
@@ -283,7 +283,7 @@ module Mongoid
           #
           # @param [ Document ] doc The document to check.
           #
-          # @return [ true, false ] If the document is in the target.
+          # @return [ true | false ] If the document is in the target.
           def include?(doc)
             return super unless _unloaded
             _unloaded.where(_id: doc._id).exists? || _added.has_key?(doc._id)
@@ -352,7 +352,7 @@ module Mongoid
           # @example Is the enumerable _loaded?
           #   enumerable._loaded?
           #
-          # @return [ true, false ] If the enumerable has been _loaded.
+          # @return [ true | false ] If the enumerable has been _loaded.
           def _loaded?
             !!@executed
           end
@@ -405,11 +405,11 @@ module Mongoid
           # @example Does the enumerable respond to the method?
           #   enumerable.respond_to?(:sum)
           #
-          # @param [ String, Symbol ] name The name of the method.
-          # @param [ true, false ] include_private Whether to include private
+          # @param [ String | Symbol ] name The name of the method.
+          # @param [ true | false ] include_private Whether to include private
           #   methods.
           #
-          # @return [ true, false ] Whether the enumerable responds.
+          # @return [ true | false ] Whether the enumerable responds.
           def respond_to?(name, include_private = false)
             [].respond_to?(name, include_private) || super
           end

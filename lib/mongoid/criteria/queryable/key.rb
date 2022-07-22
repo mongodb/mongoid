@@ -82,7 +82,7 @@ module Mongoid
         #
         # @param [ Object ] other The object to compare to.
         #
-        # @return [ true, false ] If the objects are equal.
+        # @return [ true | false ] If the objects are equal.
         def ==(other)
           return false unless other.is_a?(Key)
           name == other.name && operator == other.operator && expanded == other.expanded
@@ -104,7 +104,7 @@ module Mongoid
         # @example Instantiate a key for sorting.
         #   Key.new(:field, :__override__, 1)
         #
-        # @param [ String, Symbol ] name The field name.
+        # @param [ String | Symbol ] name The field name.
         # @param [ Symbol ] strategy The name of the merge strategy.
         # @param [ String | Integer ] operator The MongoDB operator,
         #   or sort direction (1 or -1).
@@ -124,7 +124,7 @@ module Mongoid
         #   key.__expr_part__(50)
         #
         # @param [ Object ] object The value to be included.
-        # @param [ true, false ] negating If the selection should be negated.
+        # @param [ true | false ] negating If the selection should be negated.
         #
         # @return [ Hash ] The raw MongoDB selector.
         def __expr_part__(object, negating = false)

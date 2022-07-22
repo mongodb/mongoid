@@ -223,8 +223,11 @@ describe Mongoid::Indexable do
     let(:klass) do
       Class.new do
         include Mongoid::Document
-        field :a, as: :authentication_token
+
         store_in collection: :specs
+
+        field :a, as: :authentication_token
+        field :username
       end
     end
 
@@ -585,6 +588,25 @@ describe Mongoid::Indexable do
 
       it "sets the index with expire_after option" do
         expect(options).to eq(expire_after: 3600)
+      end
+    end
+
+    context "when using a wildcard index" do
+
+      before do
+        klass.index({ '$**': 1 }, wildcard_projection: { _id: 1, username: 0 })
+      end
+
+      let(:spec) do
+        klass.index_specification('$**': 1)
+      end
+
+      it "creates the index" do
+        expect(spec).to be_a(Mongoid::Indexable::Specification)
+      end
+
+      it "sets the index with correct options" do
+        expect(spec.options).to eq(wildcard_projection: { _id: 1, username: 0 })
       end
     end
 

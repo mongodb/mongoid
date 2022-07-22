@@ -12,7 +12,7 @@ module Mongoid
       # @example Evolve the string.
       #   "test".__evolve_object_id__
       #
-      # @return [ String, BSON::ObjectId ] The evolved string.
+      # @return [ String | BSON::ObjectId ] The evolved string.
       def __evolve_object_id__
         convert_to_object_id
       end
@@ -22,7 +22,7 @@ module Mongoid
       # @example Evolve the string.
       #   "test".__mongoize_object_id__
       #
-      # @return [ String, BSON::ObjectId, nil ] The mongoized string.
+      # @return [ String | BSON::ObjectId | nil ] The mongoized string.
       def __mongoize_object_id__
         convert_to_object_id unless blank?
       end
@@ -65,7 +65,7 @@ module Mongoid
       # @example Is the string an id value?
       #   "_id".mongoid_id?
       #
-      # @return [ true, false ] If the string is id or _id.
+      # @return [ true | false ] If the string is id or _id.
       def mongoid_id?
         self =~ /\A(|_)id\z/
       end
@@ -76,7 +76,7 @@ module Mongoid
       # @example Is the string a number.
       #   "1234.23".numeric?
       #
-      # @return [ true, false ] If the string is a number.
+      # @return [ true | false ] If the string is a number.
       def numeric?
         !!Float(self)
       rescue ArgumentError
@@ -98,7 +98,7 @@ module Mongoid
       # @example Is the string a setter method?
       #   "model=".writer?
       #
-      # @return [ true, false ] If the string contains "=".
+      # @return [ true | false ] If the string contains "=".
       def writer?
         include?("=")
       end
@@ -108,7 +108,7 @@ module Mongoid
       # @example Is the string a valid Ruby identifier for use as a method name
       #   "model=".valid_method_name?
       #
-      # @return [ true, false ] If the string contains a valid Ruby identifier.
+      # @return [ true | false ] If the string contains a valid Ruby identifier.
       def valid_method_name?
         /[@$"-]/ !~ self
       end
@@ -118,7 +118,7 @@ module Mongoid
       # @example Is the string a setter method?
       #   "price_before_type_cast".before_type_cast?
       #
-      # @return [ true, false ] If the string ends with "_before_type_cast"
+      # @return [ true | false ] If the string ends with "_before_type_cast"
       def before_type_cast?
         ends_with?("_before_type_cast")
       end
@@ -128,7 +128,7 @@ module Mongoid
       # @example Is the object unconvertable?
       #   object.unconvertable_to_bson?
       #
-      # @return [ true, false ] If the object is unconvertable.
+      # @return [ true | false ] If the object is unconvertable.
       def unconvertable_to_bson?
         @unconvertable_to_bson ||= false
       end
@@ -142,7 +142,7 @@ module Mongoid
       # @example Convert to the object id.
       #   string.convert_to_object_id
       #
-      # @return [ String, BSON::ObjectId ] The string or the id.
+      # @return [ String | BSON::ObjectId ] The string or the id.
       def convert_to_object_id
         BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
       end

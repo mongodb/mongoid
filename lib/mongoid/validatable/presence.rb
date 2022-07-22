@@ -56,7 +56,7 @@ module Mongoid
       # @param [ Symbol ] attr The attribute.
       # @param [ Object ] value The value.
       #
-      # @return [ true, false ] If the doc is missing.
+      # @return [ true | false ] If the doc is missing.
       def relation_or_fk_missing?(doc, attr, value)
         return true if value.blank? && doc.send(attr).blank?
         association = doc.relations[attr.to_s]
@@ -72,7 +72,7 @@ module Mongoid
       #
       # @param [ Object ] value The value.
       #
-      # @return [ true, false ] If the value is not present.
+      # @return [ true | false ] If the value is not present.
       def not_present?(value)
         value.blank? && value != false
       end

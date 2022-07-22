@@ -13,13 +13,13 @@ module Mongoid
       # @example Update the attribute.
       #   person.update_attribute(:title, "Sir")
       #
-      # @param [ Symbol, String ] name The name of the attribute.
+      # @param [ Symbol | String ] name The name of the attribute.
       # @param [ Object ] value The new value of the attribute.a
       #
       # @raise [ Errors::ReadonlyAttribute ] If the field cannot be changed due
       #   to being flagged as read-only.
       #
-      # @return [ true, false ] True if save was successful, false if not.
+      # @return [ true | false ] True if save was successful, false if not.
       def update_attribute(name, value)
         as_writable_attribute!(name, value) do |access|
           normalized = name.to_s
@@ -35,7 +35,7 @@ module Mongoid
       #
       # @param [ Hash ] attributes The attributes to update.
       #
-      # @return [ true, false ] True if validation passed, false if not.
+      # @return [ true | false ] True if validation passed, false if not.
       def update(attributes = {})
         assign_attributes(attributes)
         save
@@ -53,7 +53,7 @@ module Mongoid
       # @raise [ Errors::Validations ] If validation failed.
       # @raise [ Errors::Callbacks ] If a callback returns false.
       #
-      # @return [ true, false ] True if validation passed.
+      # @return [ true | false ] True if validation passed.
       def update!(attributes = {})
         result = update_attributes(attributes)
         unless result
@@ -91,7 +91,7 @@ module Mongoid
       #
       # @param [ Hash ] options The options.
       #
-      # @return [ true, false ] The result of the update.
+      # @return [ true | false ] The result of the update.
       def prepare_update(options = {})
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
@@ -119,9 +119,9 @@ module Mongoid
       #
       # @param [ Hash ] options Options to pass to update.
       #
-      # @option options [ true, false ] :validate Whether or not to validate.
+      # @option options [ true | false ] :validate Whether or not to validate.
       #
-      # @return [ true, false ] True if succeeded, false if not.
+      # @return [ true | false ] True if succeeded, false if not.
       def update_document(options = {})
         prepare_update(options) do
           updates, conflicts = init_atomic_updates

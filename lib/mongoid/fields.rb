@@ -147,7 +147,7 @@ module Mongoid
     # @example Apply all the non-proc defaults.
     #   model.apply_pre_processed_defaults
     #
-    # @return [ Array<String ] The names of the non-proc defaults.
+    # @return [ Array<String> ] The names of the non-proc defaults.
     def apply_pre_processed_defaults
       pre_processed_defaults.each do |name|
         apply_default(name)
@@ -159,7 +159,7 @@ module Mongoid
     # @example Apply all the proc defaults.
     #   model.apply_post_processed_defaults
     #
-    # @return [ Array<String ] The names of the proc defaults.
+    # @return [ Array<String> ] The names of the proc defaults.
     def apply_post_processed_defaults
       pending_callbacks.delete(:apply_post_processed_defaults)
       post_processed_defaults.each do |name|
@@ -214,7 +214,7 @@ module Mongoid
     # @example Get the database field name.
     #   model.database_field_name(:authorization)
     #
-    # @param [ String, Symbol ] name The name to get.
+    # @param [ String | Symbol ] name The name to get.
     #
     # @return [ String ] The name of the field as it's stored in the db.
     def database_field_name(name)
@@ -229,7 +229,7 @@ module Mongoid
     # @param [ Field ] field The field.
     # @param [ Object ] value The current value.
     #
-    # @return [ true, false ] If we set the field lazily.
+    # @return [ true | false ] If we set the field lazily.
     def lazy_settable?(field, value)
       !frozen? && value.nil? && field.lazy?
     end
@@ -241,7 +241,7 @@ module Mongoid
     # @example Is the document using object ids?
     #   model.using_object_ids?
     #
-    # @return [ true, false ] Using object ids.
+    # @return [ true | false ] Using object ids.
     def using_object_ids?
       self.class.using_object_ids?
     end
@@ -252,7 +252,7 @@ module Mongoid
     #
     # @param [ String ] name The field name.
     #
-    # @return [ true, false ] If this field is dotted or dollared.
+    # @return [ true | false ] If this field is dotted or dollared.
     def dot_dollar_field?(name)
       n = aliased_fields[name] || name
       fields.key?(n) && (n.include?('.') || n.start_with?('$'))
@@ -396,7 +396,7 @@ module Mongoid
       # If the belongs_to association is the last part of the name, we will
       # pass back the _id field.
       #
-      # @param [ String, Symbol ] name The name to get.
+      # @param [ String | Symbol ] name The name to get.
       # @param [ Hash ] relations The associations.
       # @param [ Hash ] alaiased_fields The aliased fields.
       # @param [ Hash ] alaiased_associations The aliased associations.
@@ -455,7 +455,7 @@ module Mongoid
       # Get the name of the provided field as it is stored in the database.
       # Used in determining if the field is aliased or not.
       #
-      # @param [ String, Symbol ] name The name to get.
+      # @param [ String | Symbol ] name The name to get.
       #
       # @return [ String ] The name of the field as it's stored in the db.
       def database_field_name(name)
@@ -507,7 +507,7 @@ module Mongoid
       # @example Does this class use object ids?
       #   person.using_object_ids?
       #
-      # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
+      # @return [ true | false ] If the class uses BSON::ObjectIds for the id.
       def using_object_ids?
         fields["_id"].object_id_field?
       end
