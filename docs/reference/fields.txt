@@ -269,6 +269,12 @@ assignment to a ``Time`` field:
 In the above example, the value was interpreted as the beginning of today in
 local time, because the application was not configured to use UTC times.
 
+.. note::
+
+  When the database contains a string value for a ``Time`` field, Mongoid
+  parses the string value using ``Time.parse`` which considers values without
+  time zones to be in local time.
+
 
 .. _field-type-date:
 
@@ -294,6 +300,13 @@ especially if an application operates with times in different time zones it is
 recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
+
+.. note::
+
+  When the database contains a string value for a ``Date`` field, Mongoid
+  parses the string value using ``Time.parse``, discards the time portion of
+  the resulting ``Time`` object and uses the date portion. ``Time.parse``
+  considers values without time zones to be in local time.
 
 
 .. _field-type-date-time:
@@ -363,6 +376,12 @@ If a time zone is specified, it is respected:
     ticket.opened_at = 'Mar 4, 2018 10:00:00 +01:00'
     ticket.opened_at
     # => Sun, 04 Mar 2018 09:00:00 +0000
+
+.. note::
+
+  When the database contains a string value for a ``DateTime`` field, Mongoid
+  parses the string value using ``Time.parse`` which considers values without
+  time zones to be in local time.
 
 
 .. _field-type-regexp:
@@ -827,6 +846,96 @@ Mongoid also defines the ``id`` field aliased to ``_id``. The ``id``
 alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
 
+.. _uncastable-values:
+
+Uncastable Values
+-----------------
+
+In Mongoid 8, Mongoid has standardized the treatment of the assignment and
+reading of "uncastable" values. A value is considered "uncastable" when it
+cannot be coerced to the type of its field. For example, an array would be an
+"uncastable" value to an Integer field.
+
+
+Assigning Uncastable Values
+```````````````````````````
+
+The assignment of uncastable values has been standardized to assign ``nil`` by
+default. Consider the following example:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+  User.new(name: [ "hello" ])
+
+Assigning an array to a field of type Integer doesn't work since an array can't
+be coerced to an Integer. The assignment of uncastable values to a field will
+cause a ``nil`` to be written:
+
+.. code::
+
+  user = User.new(name: [ "Mike", "Trout" ])
+  # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
+
+Note that the original uncastable values will be stored in the
+``attributes_before_type_cast`` hash with their field names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
+
+
+Reading Uncastable Values
+`````````````````````````
+
+When documents in the database contain values of different types than their
+represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
+it will replace the value with ``nil``. Consider the following model and document in the
+database:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+.. code::
+
+  { _id: ..., name: [ "Mike", "Trout" ] }
+
+Reading this document from the database will result in the model's name field
+containing ``nil``:
+
+.. code::
+
+  User.first.name
+  # => nil
+
+The database value of type array cannot be stored in the attribute, since the
+array can't be coerced to an Integer. Note that the original uncastable values
+will be stored in the ``attributes_before_type_cast`` hash with their field
+names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
+
+.. note::
+
+  The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
+  been changed to permit automatic persistence of mutated container attributes.
+  See `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_ for a
+  longer discussion of this topic.
+
 
 .. _customizing-field-behavior:
 
@@ -985,6 +1094,12 @@ The ``demongoize`` method is used when calling the getters of fields for your cu
 Note that in the example above, since ``demongoize`` calls ``Point.new``, a new instance of
 ``Point`` will be generated on each call to the getter.
 
+.. note::
+
+  The ``mongoize`` and ``demongoize`` methods should return ``nil`` on values
+  that are uncastable to your custom type. See the section on :ref:`Uncastable
+  Values <uncastable-values>` for more details.
+
 Lastly, the class method ``evolve`` is similar to ``mongoize``, however it is used
 when transforming objects for use in Mongoid query criteria.
 
@@ -1009,12 +1124,12 @@ in the database:
 .. code-block:: ruby
 
   class ColorMapping
-    
+
     MAPPING = {
       'black' => 0,
       'white' => 1,
     }.freeze
-    
+
     INVERSE_MAPPING = MAPPING.invert.freeze
 
     class << self
@@ -1043,11 +1158,11 @@ in the database:
     include Mongoid::Document
     field :color, type: ColorMapping
   end
-  
+
   profile = Profile.new(color: 'white')
   profile.color
   # => "white"
-  
+
   # Writes 0 to color field
   profile.save!
 

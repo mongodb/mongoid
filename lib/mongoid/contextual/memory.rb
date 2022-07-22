@@ -25,7 +25,7 @@ module Mongoid
       #
       # @param [ Array ] other The other array.
       #
-      # @return [ true, false ] If the objects are equal.
+      # @return [ true | false ] If the objects are equal.
       def ==(other)
         return false unless other.respond_to?(:entries)
         entries == other.entries
@@ -78,7 +78,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        documents.map{ |doc| doc.send(field) }.uniq
+        if Mongoid.legacy_pluck_distinct
+          documents.map{ |doc| doc.send(field) }.uniq
+        else
+          pluck(field).uniq
+        end
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -106,7 +110,7 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
-      # @return [ true, false ] If the count is more than zero.
+      # @return [ true | false ] If the count is more than zero.
       def exists?
         any?
       end
@@ -116,12 +120,32 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
+      # @param [ Integer ] limit The number of documents to return.
+      #
       # @return [ Document ] The first document.
-      def first(*args)
-        eager_load([documents.first]).first
+      def first(limit = nil)
+        if limit
+          eager_load(documents.first(limit))
+        else
+          eager_load([documents.first]).first
+        end
       end
       alias :one :first
       alias :find_first :first
+
+      # Get the first document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the first document.
+      #   context.first!
+      #
+      # @return [ Document ] The first document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def first!
+        first || raise_document_not_found_error
+      end
 
       # Create the new in memory context.
       #
@@ -159,42 +183,29 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
+      # @param [ Integer ] limit The number of documents to return.
+      #
       # @return [ Document ] The last document.
-      def last
-        eager_load([documents.last]).first
-      end
-
-      # Take the given number of documents from the database.
-      #
-      # @example Take a document.
-      #   context.take
-      #
-      # @param [ Integer | nil ] limit The number of documents to take or nil.
-      #
-      # @return [ Document ] The document.
-      def take(limit = nil)
+      def last(limit = nil)
         if limit
-          eager_load(documents.take(limit))
+          eager_load(documents.last(limit))
         else
-          eager_load([documents.first]).first
+          eager_load([documents.last]).first
         end
       end
 
-      # Take the given number of documents from the database.
+      # Get the last document in the database for the criteria's selector or
+      # raise an error if none is found.
       #
-      # @example Take a document.
-      #   context.take
+      # @example Get the last document.
+      #   context.last!
       #
-      # @return [ Document ] The document.
+      # @return [ Document ] The last document.
       #
       # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
-      def take!
-        if documents.empty?
-          raise Errors::DocumentNotFound.new(klass, nil, nil)
-        else
-          eager_load([documents.first]).first
-        end
+      def last!
+        last || raise_document_not_found_error
       end
 
       # Get the length of matching documents in the context.
@@ -228,9 +239,29 @@ module Mongoid
       #
       # @param [ String | Symbol ] *fields Field(s) to pluck.
       #
-      # @return [ Array ] The array of plucked values.
+      # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
-        documents.pluck(*fields)
+        if Mongoid.legacy_pluck_distinct
+          documents.pluck(*fields)
+        else
+          documents.map do |doc|
+            pluck_from_doc(doc, *fields)
+          end
+        end
+      end
+
+      # Pick the field values in memory.
+      #
+      # @example Get the values in memory.
+      #   context.pick(:name)
+      #
+      # @param [ String | Symbol ] *fields Field(s) to pick.
+      #
+      # @return [ Object, Array<Object> ] The picked values.
+      def pick(*fields)
+        if doc = documents.first
+          pluck_from_doc(doc, *fields)
+        end
       end
 
       # Tally the field values in memory.
@@ -247,6 +278,36 @@ module Mongoid
           acc[v] ||= 0
           acc[v] += 1
         end
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @param [ Integer | nil ] limit The number of documents to take or nil.
+      #
+      # @return [ Document ] The document.
+      def take(limit = nil)
+        if limit
+          eager_load(documents.take(limit))
+        else
+          eager_load([documents.first]).first
+        end
+      end
+
+      # Take the given number of documents from the database or raise an error
+      # if none are found.
+      #
+      # @example Take a document.
+      #   context.take
+      #
+      # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def take!
+        take || raise_document_not_found_error
       end
 
       # Skips the provided number of documents.
@@ -282,7 +343,7 @@ module Mongoid
       #
       # @param [ Hash ] attributes The new attributes for the document.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update(attributes = nil)
         update_documents(attributes, [ first ])
       end
@@ -294,9 +355,165 @@ module Mongoid
       #
       # @param [ Hash ] attributes The new attributes for each document.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update_all(attributes = nil)
         update_documents(attributes, entries)
+      end
+
+      # Get the second document in the database for the criteria's selector.
+      #
+      # @example Get the second document.
+      #   context.second
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document ] The second document.
+      def second
+        eager_load([documents.second]).first
+      end
+
+      # Get the second document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the second document.
+      #   context.second!
+      #
+      # @return [ Document ] The second document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def second!
+        second || raise_document_not_found_error
+      end
+
+      # Get the third document in the database for the criteria's selector.
+      #
+      # @example Get the third document.
+      #   context.third
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document ] The third document.
+      def third
+        eager_load([documents.third]).first
+      end
+
+      # Get the third document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the third document.
+      #   context.third!
+      #
+      # @return [ Document ] The third document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def third!
+        third || raise_document_not_found_error
+      end
+
+      # Get the fourth document in the database for the criteria's selector.
+      #
+      # @example Get the fourth document.
+      #   context.fourth
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document ] The fourth document.
+      def fourth
+        eager_load([documents.fourth]).first
+      end
+
+      # Get the fourth document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the fourth document.
+      #   context.fourth!
+      #
+      # @return [ Document ] The fourth document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def fourth!
+        fourth || raise_document_not_found_error
+      end
+
+      # Get the fifth document in the database for the criteria's selector.
+      #
+      # @example Get the fifth document.
+      #   context.fifth
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document ] The fifth document.
+      def fifth
+        eager_load([documents.fifth]).first
+      end
+
+      # Get the fifth document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the fifth document.
+      #   context.fifth!
+      #
+      # @return [ Document ] The fifth document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def fifth!
+        fifth || raise_document_not_found_error
+      end
+
+      # Get the second to last document in the database for the criteria's selector.
+      #
+      # @example Get the second to last document.
+      #   context.second_to_last
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document ] The second to last document.
+      def second_to_last
+        eager_load([documents.second_to_last]).first
+      end
+
+      # Get the second to last document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the second to last document.
+      #   context.second_to_last!
+      #
+      # @return [ Document ] The second to last document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def second_to_last!
+        second_to_last || raise_document_not_found_error
+      end
+
+      # Get the third to last document in the database for the criteria's selector.
+      #
+      # @example Get the third to last document.
+      #   context.third_to_last
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document ] The third to last document.
+      def third_to_last
+        eager_load([documents.third_to_last]).first
+      end
+
+      # Get the third to last document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the third to last document.
+      #   context.third_to_last!
+      #
+      # @return [ Document ] The third to last document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def third_to_last!
+        third_to_last || raise_document_not_found_error
       end
 
       private
@@ -501,7 +718,8 @@ module Mongoid
               document.send("#{segment}_translations")
             end
           end
-          res.nil? ? document.send(segment) : res
+          meth = klass.aliased_associations[segment] || segment
+          res.nil? ? document.try(meth) : res
         elsif document.is_a?(Hash)
           # TODO: Remove the indifferent access when implementing MONGOID-5410.
           document.key?(segment.to_s) ?
@@ -519,6 +737,26 @@ module Mongoid
         else
           retrieve_value_at_path(curr, remaining)
         end
+      end
+
+      # Pluck the field values from the given document.
+      #
+      # @param [ Document ] doc The document to pluck from.
+      # @param [ String | Symbol ] *fields Field(s) to pluck.
+      #
+      # @return [ Object, Array<Object> ] The plucked values.
+      def pluck_from_doc(doc, *fields)
+        if fields.length == 1
+          retrieve_value_at_path(doc, fields.first)
+        else
+          fields.map do |field|
+            retrieve_value_at_path(doc, field)
+          end
+        end
+      end
+
+      def raise_document_not_found_error
+        raise Errors::DocumentNotFound.new(klass, nil, nil)
       end
     end
   end

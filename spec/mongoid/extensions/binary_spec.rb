@@ -15,66 +15,53 @@ describe BSON::Binary do
     end
   end
 
-  describe ".mongoize" do
 
-    let(:binary) do
-      BSON::Binary.new("testing")
-    end
+  [ :mongoize, :demongoize].each do |method|
+    describe ".#{method}" do
 
-    let(:mongoized) do
-      BSON::Binary.mongoize(value)
-    end
-
-    context "when mongoizing a BSON::Binary" do
-
-      let(:value) { binary }
-
-      it "returns the binary" do
-        expect(mongoized).to eq(binary)
+      let(:binary) do
+        BSON::Binary.new("testing")
       end
-    end
 
-    context "when mongoizing a String" do
-
-      let(:value) { "testing" }
-
-      it "returns it as binary" do
-        expect(mongoized).to eq(binary)
+      let(:evaluated) do
+        BSON::Binary.send(method, value)
       end
-    end
 
-    context "when mongoizing nil" do
+      context "when mongoizing a BSON::Binary" do
 
-      let(:value) { nil }
+        let(:value) { binary }
 
-      it "returns nil" do
-        expect(mongoized).to eq(nil)
+        it "returns the binary" do
+          expect(evaluated).to eq(binary)
+        end
       end
-    end
 
-    context "when mongoizing an invalid type" do
+      context "when mongoizing a String" do
 
-      let(:value) { true }
+        let(:value) { "testing" }
 
-      # TODO: MONGOID-5222 test with feature flag on and off
-      it "returns nil" do
-        expect(mongoized).to eq(nil)
+        it "returns it as binary" do
+          expect(evaluated).to eq(binary)
+        end
       end
-    end
-  end
 
-  describe ".demongoize" do
+      context "when mongoizing nil" do
 
-    let(:binary) do
-      BSON::Binary.new("testing", :md5)
-    end
+        let(:value) { nil }
 
-    let(:demongoized) do
-      BSON::Binary.demongoize(binary)
-    end
+        it "returns nil" do
+          expect(evaluated).to eq(nil)
+        end
+      end
 
-    it "returns the binary" do
-      expect(demongoized).to eq(binary)
+      context "when mongoizing an invalid type" do
+
+        let(:value) { true }
+
+        it "returns nil" do
+          expect(evaluated).to be_nil
+        end
+      end
     end
   end
 

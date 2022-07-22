@@ -49,8 +49,7 @@ module Mongoid
         #
         # @return [ TimeWithZone ] The object as a date.
         def demongoize(object)
-          return nil if object.blank?
-          ::Time.demongoize(object).in_time_zone
+          ::Time.demongoize(object).try(:in_time_zone)
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

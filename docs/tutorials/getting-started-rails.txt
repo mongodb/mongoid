@@ -532,8 +532,9 @@ The migration tools are often specific to the data being migrated because,
 even though Mongoid supports a superset of ActiveRecord associations,
 the way that model references are stored in collections differs between
 Mongoid and ActiveRecord. With that said, MongoDB has
-`some resources <https://resources.mongodb.com/migrating-to-mongodb/rdbmstomongodbmigration>`_
-on migrating from an RDBMS to MongoDB.
+some resources on migrating from an RDBMS to MongoDB such as the
+`RDBMS to MongoDB Migration Guide <https://s3.amazonaws.com/info-mongodb-com/RDBMStoMongoDBMigration.pdf>`_ and
+`Modernization Guide <https://www.mongodb.com/modernize>`_.
 
 
 Rails API

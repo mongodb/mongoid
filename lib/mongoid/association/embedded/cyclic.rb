@@ -88,7 +88,7 @@ module Mongoid
           # @example Determine the child name.
           #   Role.cyclic_child_name
           #
-          # @param [ true, false ] many Is the a many association?
+          # @param [ true | false ] many Is the a many association?
           #
           # @return [ String ] "child_" plus the class name underscored in
           #   singular or plural form.

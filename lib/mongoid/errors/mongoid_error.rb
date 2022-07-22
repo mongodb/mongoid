@@ -53,7 +53,7 @@ module Mongoid
       # @example Create the problem.
       #   error.problem("error", {})
       #
-      # @param [ String, Symbol ] key The error key.
+      # @param [ String | Symbol ] key The error key.
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The problem.
@@ -66,7 +66,7 @@ module Mongoid
       # @example Create the summary.
       #   error.summary("error", {})
       #
-      # @param [ String, Symbol ] key The error key.
+      # @param [ String | Symbol ] key The error key.
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The summary.
@@ -79,7 +79,7 @@ module Mongoid
       # @example Create the resolution.
       #   error.resolution("error", {})
       #
-      # @param [ String, Symbol ] key The error key.
+      # @param [ String | Symbol ] key The error key.
       # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The resolution.

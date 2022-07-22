@@ -17,10 +17,10 @@ module Mongoid
             #
             # @param [ Object ] object The object to evolve.
             #
-            # @return [ true, false ] The boolean value.
+            # @return [ true | false ] The boolean value.
             def evolve(object)
               __evolve__(object) do |obj|
-                obj.to_s =~ (/\A(true|t|yes|y|on|1|1.0)\z/i) ? true : false
+                mongoize(obj)
               end
             end
           end

@@ -17,7 +17,7 @@ module Mongoid
       # @example Is the association empty??
       #   person.addresses.blank?
       #
-      # @return [ true, false ] If the association is empty or not.
+      # @return [ true | false ] If the association is empty or not.
       def blank?
         !any?
       end
@@ -27,7 +27,6 @@ module Mongoid
       #
       # @example Create and save the new document.
       #   person.posts.create(:text => "Testing")
-      #
       #
       # @param [ Hash ] attributes The attributes to create with.
       # @param [ Class ] type The optional type of document to create.
@@ -131,9 +130,9 @@ module Mongoid
       #   relation.respond_to?(:name)
       #
       # @param [ Symbol ] name The method name.
-      # @param [ true, false ] include_private Whether to include private methods.
+      # @param [ true | false ] include_private Whether to include private methods.
       #
-      # @return [ true, false ] If the proxy responds to the method.
+      # @return [ true | false ] If the proxy responds to the method.
       def respond_to?(name, include_private = false)
         [].respond_to?(name, include_private) ||
           klass.respond_to?(name, include_private) || super
@@ -158,9 +157,9 @@ module Mongoid
       #
       # @param [ Hash ] options The options to pass.
       #
-      # @option options [ Symbol ] :include What associations to include
-      # @option options [ Symbol ] :only Limit the fields to only these.
-      # @option options [ Symbol ] :except Dont include these fields.
+      # @option options [ Symbol | String | Array<Symbol | String> ] :except Do not include these field(s).
+      # @option options [ Symbol | String | Array<Symbol | String> ] :include Which association(s) to include.
+      # @option options [ Symbol | String | Array<Symbol | String> ] :only Limit the field(s) to only these.
       #
       # @return [ Hash ] The documents, ready to be serialized.
       def serializable_hash(options = {})

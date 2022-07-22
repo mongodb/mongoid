@@ -17,9 +17,9 @@ module Mongoid
       # @example Can we write the attribute?
       #   model.attribute_writable?(:title)
       #
-      # @param [ String, Symbol ] name The name of the field.
+      # @param [ String | Symbol ] name The name of the field.
       #
-      # @return [ true, false ] If the document is new, or if the field is not
+      # @return [ true | false ] If the document is new, or if the field is not
       #   readonly.
       def attribute_writable?(name)
         new_record? || (!readonly_attributes.include?(name) && _loaded?(name))

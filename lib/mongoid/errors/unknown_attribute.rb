@@ -13,7 +13,7 @@ module Mongoid
       #   UnknownAttribute.new(Person, "gender")
       #
       # @param [ Class ] klass The model class.
-      # @param [ String, Symbol ] name The name of the attribute.
+      # @param [ String | Symbol ] name The name of the attribute.
       def initialize(klass, name)
         super(
           compose_message("unknown_attribute", { klass: klass.name, name: name })

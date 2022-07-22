@@ -148,7 +148,7 @@ module Mongoid
       # @example Mongoize the object.
       #   object.mongoize
       #
-      # @return [ Hash ] The object.
+      # @return [ Hash | nil ] The object mongoized or nil.
       def mongoize
         ::Hash.mongoize(self)
       end
@@ -190,7 +190,7 @@ module Mongoid
       #
       # @param [ String ] operator The operator.
       # @param [ Class ] klass The model class.
-      # @param [ String, Symbol ] key The field key.
+      # @param [ String | Symbol ] key The field key.
       # @param [ Object ] value The value to mongoize.
       #
       # @return [ Object ] The mongoized value.
@@ -217,10 +217,15 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Hash ] The object mongoized.
+        # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
-          evolve(object.dup).transform_values!(&:mongoize)
+          if object.is_a?(Hash)
+            # Need to use transform_values! which maintains the BSON::Document
+            # instead of transform_values which always returns a hash. To do this,
+            # we first need to dup the hash.
+            object.dup.transform_values!(&:mongoize)
+          end
         end
 
         # Can the size of this object change?

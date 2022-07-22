@@ -20,7 +20,7 @@ module Mongoid
       # @example Mongoize the object.
       #   time.mongoize
       #
-      # @return [ Time ] The object mongoized.
+      # @return [ Time | nil ] The object mongoized or nil.
       def mongoize
         ::Time.mongoize(self)
       end
@@ -45,14 +45,28 @@ module Mongoid
         #
         # @param [ Time ] object The time from Mongo.
         #
-        # @return [ Time ] The object as a date.
+        # @return [ Time | nil ] The object as a time.
         def demongoize(object)
-          return nil if object.blank?
-          object = object.getlocal unless Mongoid::Config.use_utc?
-          if Mongoid::Config.use_activesupport_time_zone?
-            object = object.in_time_zone(Mongoid.time_zone)
+          return if object.blank?
+          time = if object.acts_like?(:time)
+            Mongoid::Config.use_utc? ? object : object.getlocal
+          elsif object.acts_like?(:date)
+            ::Date.demongoize(object).to_time
+          elsif object.is_a?(String)
+            begin
+              object.__mongoize_time__
+            rescue ArgumentError
+              nil
+            end
           end
-          object
+
+          return if time.nil?
+
+          if Mongoid::Config.use_activesupport_time_zone?
+            time.in_time_zone(Mongoid.time_zone)
+          else
+            time
+          end
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -63,11 +77,16 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Time ] The object mongoized.
+        # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
-          return nil if object.blank?
+          return if object.blank?
           begin
             time = object.__mongoize_time__
+          rescue ArgumentError
+            return
+          end
+
+          if time.acts_like?(:time)
             if object.respond_to?(:sec_fraction)
               ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
             elsif time.respond_to?(:subsec)
@@ -75,8 +94,6 @@ module Mongoid
             else
               ::Time.at(time.to_i, time.usec).utc
             end
-          rescue ArgumentError
-            nil
           end
         end
       end

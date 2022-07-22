@@ -54,8 +54,23 @@ describe Mongoid::Contextual::None do
   end
 
   describe "#pluck" do
+
+    context "when plucking one field" do
+      it "returns an empty array" do
+        expect(context.pluck(:id)).to eq([])
+      end
+    end
+
+    context "when plucking multiple fields" do
+      it "returns an empty array" do
+        expect(context.pluck(:id, :foo)).to eq([])
+      end
+    end
+  end
+
+  describe "#pick" do
     it "returns an empty array" do
-      expect(context.pluck(:id)).to eq([])
+      expect(context.pick(:id)).to eq(nil)
     end
   end
 
@@ -69,11 +84,35 @@ describe Mongoid::Contextual::None do
     it "returns nil" do
       expect(context.first).to be_nil
     end
+
+    it "returns [] when passing a limit" do
+      expect(context.first(1)).to eq([])
+    end
+  end
+
+  describe "#first!" do
+    it "raises an error" do
+      expect do
+        context.first!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
   end
 
   describe "#last" do
     it "returns nil" do
       expect(context.last).to be_nil
+    end
+
+    it "returns [] when passing a limit" do
+      expect(context.last(1)).to eq([])
+    end
+  end
+
+  describe "#last!" do
+    it "raises an error" do
+      expect do
+        context.last!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
     end
   end
 
@@ -92,6 +131,28 @@ describe Mongoid::Contextual::None do
       expect do
         context.take!
       end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  [ :second,
+    :third,
+    :fourth,
+    :fifth,
+    :second_to_last,
+    :third_to_last
+  ].each do |meth|
+    describe "##{meth}" do
+      it "returns nil" do
+        expect(context.send(meth)).to be_nil
+      end
+    end
+
+    describe "##{meth}!" do
+      it "raises an error" do
+        expect do
+          context.send("#{meth}!")
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
     end
   end
 

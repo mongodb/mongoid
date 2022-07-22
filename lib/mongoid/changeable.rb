@@ -21,7 +21,7 @@ module Mongoid
     # @example Has the document changed?
     #   model.changed?
     #
-    # @return [ true, false ] If the document is changed.
+    # @return [ true | false ] If the document is changed.
     def changed?
       changes.values.any? { |val| val } || children_changed?
     end
@@ -30,7 +30,7 @@ module Mongoid
     #
     # @note This intentionally only considers children and not descendants.
     #
-    # @return [ true, false ] If any children have changed.
+    # @return [ true | false ] If any children have changed.
     def children_changed?
       _children.any?(&:changed?)
     end
@@ -102,7 +102,7 @@ module Mongoid
     # @example Remove a flagged change.
     #   model.remove_change(:field)
     #
-    # @param [ Symbol, String ] name The name of the field.
+    # @param [ Symbol | String ] name The name of the field.
     def remove_change(name)
       changed_attributes.delete(name.to_s)
     end
@@ -162,7 +162,7 @@ module Mongoid
     #
     # @param [ String ] attr The name of the attribute.
     #
-    # @return [ true, false ] Whether the attribute has changed.
+    # @return [ true | false ] Whether the attribute has changed.
     def attribute_changed?(attr)
       attr = database_field_name(attr)
       return false unless changed_attributes.key?(attr)
@@ -176,7 +176,7 @@ module Mongoid
     #
     # @param [ String ] attr The name of the attribute.
     #
-    # @return [ true, false ] If the attribute differs.
+    # @return [ true | false ] If the attribute differs.
     def attribute_changed_from_default?(attr)
       field = fields[attr]
       return false unless field

@@ -37,9 +37,20 @@ module Mongoid
         #
         # @param [ Time ] object The time from Mongo.
         #
-        # @return [ Date ] The object as a date.
+        # @return [ Date | nil ] The object as a date or nil.
         def demongoize(object)
-          ::Date.new(object.year, object.month, object.day) if object
+          return if object.nil?
+          if object.is_a?(String)
+            object = begin
+              object.__mongoize_time__
+            rescue ArgumentError
+              nil
+            end
+          end
+
+          if object.acts_like?(:time) || object.acts_like?(:date)
+            ::Date.new(object.year, object.month, object.day)
+          end
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -50,20 +61,21 @@ module Mongoid
         #
         # @param [ Object ] object The object to mongoize.
         #
-        # @return [ Time ] The object mongoized.
+        # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
-          unless object.blank?
-            begin
-              if object.is_a?(String)
-                # https://jira.mongodb.org/browse/MONGOID-4460
-                time = ::Time.parse(object)
-              else
-                time = object.__mongoize_time__
-              end
-              ::Time.utc(time.year, time.month, time.day)
-            rescue ArgumentError
-              nil
+          return if object.blank?
+          begin
+            if object.is_a?(String)
+              # https://jira.mongodb.org/browse/MONGOID-4460
+              time = ::Time.parse(object)
+            else
+              time = object.__mongoize_time__
             end
+          rescue ArgumentError
+            nil
+          end
+          if time.acts_like?(:time)
+            ::Time.utc(time.year, time.month, time.day)
           end
         end
       end

@@ -62,7 +62,7 @@ module Mongoid
         # @example Is the id acceptable?
         #   one.acceptable_id?
         #
-        # @return [ true, false ] If the id part of the logic will allow an update.
+        # @return [ true | false ] If the id part of the logic will allow an update.
         def acceptable_id?
           id = association.klass.extract_id_field(attributes)
           id = convert_id(existing.class, id)
@@ -74,7 +74,7 @@ module Mongoid
         # @example Can the existing object be deleted?
         #   one.delete?
         #
-        # @return [ true, false ] If the association should be deleted.
+        # @return [ true | false ] If the association should be deleted.
         def delete?
           id = association.klass.extract_id_field(attributes)
           destroyable? && !id.nil?
@@ -85,7 +85,7 @@ module Mongoid
         # @example Is the object destroyable?
         #   one.destroyable?({ :_destroy => "1" })
         #
-        # @return [ true, false ] If the association can potentially be
+        # @return [ true | false ] If the association can potentially be
         #   destroyed.
         def destroyable?
           Nested::DESTROY_FLAGS.include?(destroy) && allow_destroy?
@@ -96,7 +96,7 @@ module Mongoid
         # @example Is the document to be replaced?
         #   one.replace?
         #
-        # @return [ true, false ] If the document should be replaced.
+        # @return [ true | false ] If the document should be replaced.
         def replace?
           !existing && !destroyable? && !attributes.blank?
         end
@@ -106,7 +106,7 @@ module Mongoid
         # @example Should the document be updated?
         #   one.update?
         #
-        # @return [ true, false ] If the object should have its attributes updated.
+        # @return [ true | false ] If the object should have its attributes updated.
         def update?
           existing && !destroyable? && acceptable_id?
         end

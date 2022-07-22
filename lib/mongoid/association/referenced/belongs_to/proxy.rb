@@ -18,7 +18,7 @@ module Mongoid
           #   Association::BelongsTo::Proxy.new(game, person, association)
           #
           # @param [ Document ] base The document this association hangs off of.
-          # @param [ Document, Array<Document> ] target The target (parent) of the
+          # @param [ Document | Array<Document> ] target The target (parent) of the
           #   association.
           # @param [ Association ] association The association object.
           def initialize(base, target, association)
@@ -34,7 +34,6 @@ module Mongoid
           #
           # @example Nullify the association.
           #   person.game.nullify
-          #
           def nullify
             unbind_one
             _target.save
@@ -46,9 +45,9 @@ module Mongoid
           # @example Substitute the association.
           #   name.substitute(new_name)
           #
-          # @param [ Document, Array<Document> ] replacement The replacement.
+          # @param [ Document | Array<Document> ] replacement The replacement.
           #
-          # @return [ self, nil ] The association or nil.
+          # @return [ self | nil ] The association or nil.
           def substitute(replacement)
             unbind_one
             if replacement
@@ -77,7 +76,7 @@ module Mongoid
           # @example Normalize the substitute.
           #   proxy.normalize(id)
           #
-          # @param [ Document, Object ] replacement The replacement object.
+          # @param [ Document | Object ] replacement The replacement object.
           #
           # @return [ Document ] The document.
           def normalize(replacement)
@@ -90,7 +89,7 @@ module Mongoid
           # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the association is persistable.
+          # @return [ true | false ] If the association is persistable.
           def persistable?
             _target.persisted? && !_binding? && !_building?
           end

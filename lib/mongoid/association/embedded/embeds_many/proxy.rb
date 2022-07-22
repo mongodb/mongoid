@@ -19,7 +19,7 @@ module Mongoid
           # @example Push a document.
           #   person.addresses.push(address)
           #
-          # @param [ Document, Array<Document> ] args Any number of documents.
+          # @param [ Document | Array<Document> ] args Any number of documents.
           def <<(*args)
             docs = args.flatten
             return concat(docs) if docs.size > 1
@@ -117,7 +117,7 @@ module Mongoid
           # @example Use #persisted? inside block to count persisted documents.
           #   person.addresses.count { |a| a.persisted? && a.country == "FR" }
           #
-          # @param [ Object, Array<Object> ] args Args to delegate to the target.
+          # @param [ Object | Array<Object> ] args Args to delegate to the target.
           #
           # @return [ Integer ] The total number of persisted embedded docs, as
           #   flagged by the #persisted? method.
@@ -135,7 +135,7 @@ module Mongoid
           #
           # @param [ Document ] document The document to be deleted.
           #
-          # @return [ Document, nil ] The deleted document or nil if nothing deleted.
+          # @return [ Document | nil ] The deleted document or nil if nothing deleted.
           def delete(document)
             execute_callbacks_around(:remove, document) do
               doc = _target.delete_one(document)
@@ -176,7 +176,7 @@ module Mongoid
           #     doc.state == "GA"
           #   end
           #
-          # @return [ Many, Enumerator ] The association or an enumerator if no
+          # @return [ Many | Enumerator ] The association or an enumerator if no
           #   block was provided.
           def delete_if
             if block_given?
@@ -210,7 +210,7 @@ module Mongoid
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
-          # @return [ true, false ] True is persisted documents exist, false if not.
+          # @return [ true | false ] True is persisted documents exist, false if not.
           def exists?
             _target.any? { |doc| doc.persisted? }
           end
@@ -287,7 +287,7 @@ module Mongoid
           # @param [ Integer ] count The number of documents to pop, or 1 if not
           #   provided.
           #
-          # @return [ Document, Array<Document> ] The popped document(s).
+          # @return [ Document | Array<Document> ] The popped document(s).
           def pop(count = nil)
             if count
               if docs = _target[_target.size - count, _target.size]
@@ -312,7 +312,7 @@ module Mongoid
           # @param [ Integer ] count The number of documents to shift, or 1 if not
           #   provided.
           #
-          # @return [ Document, Array<Document> ] The shifted document(s).
+          # @return [ Document | Array<Document> ] The shifted document(s).
           def shift(count = nil)
             if count
               if _target.size > 0 && docs = _target[0, count]
@@ -429,7 +429,7 @@ module Mongoid
           #
           # If the method exists on the array, use the default proxy behavior.
           #
-          # @param [ Symbol, String ] name The name of the method.
+          # @param [ Symbol | String ] name The name of the method.
           # @param [ Array ] args The method args
           # @param [ Proc ] block Optional block to pass.
           #
@@ -446,7 +446,7 @@ module Mongoid
           # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the association is persistable.
+          # @return [ true | false ] If the association is persistable.
           def persistable?
             _base.persisted? && !_binding?
           end
@@ -490,7 +490,7 @@ module Mongoid
           #   relation.remove_all({ :num => 1 }, true)
           #
           # @param [ Hash ] conditions Conditions to filter by.
-          # @param [ true, false ] method :delete or :destroy.
+          # @param [ true | false ] method :delete or :destroy.
           #
           # @return [ Integer ] The number of documents removed.
           def remove_all(conditions = {}, method = :delete)

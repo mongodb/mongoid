@@ -20,13 +20,9 @@ module Mongoid
       # @example Mongoize the object.
       #   object.mongoize
       #
-      # @return [ Object ] The object.
+      # @return [ String | BSON::Decimal128 | nil ] The object or nil.
       def mongoize
-        if Mongoid.map_big_decimal_to_decimal128
-          BSON::Decimal128.new(self)
-        else
-          to_s
-        end
+        ::BigDecimal.mongoize(self)
       end
 
       # Is the BigDecimal a number?
@@ -43,19 +39,17 @@ module Mongoid
 
         # Convert the object from its mongo friendly ruby type to this type.
         #
-        # @example Demongoize the object.
-        #   Object.demongoize(object)
-        #
         # @param [ Object ] object The object to demongoize.
         #
-        # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
+        # @return [ BigDecimal | nil ] A BigDecimal derived from the object or nil.
         def demongoize(object)
-          unless object.nil?
-            if object.is_a?(BSON::Decimal128)
-              object.to_big_decimal
-            elsif object.numeric?
-              BigDecimal(object.to_s)
-            end
+          return if object.blank?
+          if object.is_a?(BSON::Decimal128)
+            object.to_big_decimal
+          elsif object.numeric?
+            BigDecimal(object.to_s)
+          elsif object.numeric?
+            object.to_d
           end
         end
 
@@ -67,20 +61,20 @@ module Mongoid
         # @param [ Object ] object The object to Mongoize
         #
         # @return [ String | BSON::Decimal128 | nil ] A String or Decimal128
-        #   representing the object or nil.
+        #   representing the object or nil. String if Mongoid.map_big_decimal_to_decimal128
+        #   is false, BSON::Decimal128 otherwise.
         def mongoize(object)
-          unless object.nil?
+          return if object.blank?
+          if Mongoid.map_big_decimal_to_decimal128
             if object.is_a?(BSON::Decimal128)
               object
-            elsif Mongoid.map_big_decimal_to_decimal128
-              if object.is_a?(BigDecimal)
-                BSON::Decimal128.new(object)
-              elsif object.numeric?
-                BSON::Decimal128.new(object.to_s)
-              else
-                object.mongoize
-              end
+            elsif object.is_a?(BigDecimal)
+              BSON::Decimal128.new(object)
             elsif object.numeric?
+              BSON::Decimal128.new(object.to_s)
+            end
+          else
+            if object.is_a?(BSON::Decimal128) || object.numeric?
               object.to_s
             end
           end

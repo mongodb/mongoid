@@ -22,29 +22,44 @@ module Mongoid
       :each,
       :each_with_index,
       :extras,
+      :fifth,
+      :fifth!,
       :find_one_and_delete,
       :find_one_and_replace,
       :find_one_and_update,
       :find_or_create_by,
       :find_or_create_by!,
       :find_or_initialize_by,
+      :first!,
       :first_or_create,
       :first_or_create!,
       :first_or_initialize,
       :for_js,
+      :fourth,
+      :fourth!,
       :geo_near,
       :includes,
+      :last!,
       :map_reduce,
       :max,
       :min,
       :none,
+      :pick,
       :pluck,
       :read,
+      :second,
+      :second!,
+      :second_to_last,
+      :second_to_last!,
       :sum,
       :take,
       :take!,
       :tally,
       :text_search,
+      :third,
+      :third!,
+      :third_to_last,
+      :third_to_last!,
       :update,
       :update_all,
 
@@ -75,7 +90,7 @@ module Mongoid
     # @example Are there no saved documents for this model?
     #   Person.empty?
     #
-    # @return [ true, false ] If the collection is empty.
+    # @return [ true | false ] If the collection is empty.
     def empty?
       count == 0
     end
@@ -86,7 +101,7 @@ module Mongoid
     # @example Do any documents exist for the conditions?
     #   Person.exists?
     #
-    # @return [ true, false ] If any documents exist for the conditions.
+    # @return [ true | false ] If any documents exist for the conditions.
     def exists?
       with_default_scope.exists?
     end
@@ -131,8 +146,10 @@ module Mongoid
     # The +find+ method takes into account the default scope defined on the
     # model class, if any.
     #
-    # @param [ Object | Array<Object> ] args The _id values to find or an
-    #   array thereof.
+    # @note Each argument can be an individual id, an array of ids or
+    #   a nested array. Each array will be flattened.
+    #
+    # @param [ Object | Array<Object> ] *args The _id value(s) to find.
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
     #
@@ -160,7 +177,7 @@ module Mongoid
     # @raise [ Errors::DocumentNotFound ] If no document found
     # and Mongoid.raise_not_found_error is true.
     #
-    # @return [ Document, nil ] A matching document.
+    # @return [ Document | nil ] A matching document.
     def find_by(attrs = {})
       result = where(attrs).find_first
       if result.nil? && Mongoid.raise_not_found_error
@@ -181,7 +198,6 @@ module Mongoid
     # @raise [ Errors::DocumentNotFound ] If no document found.
     #
     # @return [ Document ] A matching document.
-    #
     def find_by!(attrs = {})
       result = where(attrs).find_first
       raise(Errors::DocumentNotFound.new(self, attrs)) unless result
@@ -194,9 +210,11 @@ module Mongoid
     # @example Find the first document.
     #   Person.first
     #
+    # @param [ Integer ] limit The number of documents to return.
+    #
     # @return [ Document ] The first matching document.
-    def first
-      with_default_scope.first
+    def first(limit = nil)
+      with_default_scope.first(limit)
     end
     alias :one :first
 
@@ -205,9 +223,11 @@ module Mongoid
     # @example Find the last document.
     #   Person.last
     #
+    # @param [ Integer ] limit The number of documents to return.
+    #
     # @return [ Document ] The last matching document.
-    def last
-      with_default_scope.last
+    def last(limit = nil)
+      with_default_scope.last(limit)
     end
   end
 end

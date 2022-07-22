@@ -238,7 +238,8 @@ en:
             \_\_language_override\n
             \_\_default_language\n
             \_\_collation\n
-            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack', 'text', 'hashed'\n\n
+            \_\_wildcard_projection: { 'path.to.field.a': 1, 'path.to.field.b': 0 }\n
+            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack (deprecated)', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
@@ -372,10 +373,6 @@ en:
             from the child side which association to go in."
           resolution: "Set the values from the parent, or redefine the association
             with only a single definition in the parent."
-        invalid_value:
-          message: "Value of type %{value_class} cannot be written to a field of type %{field_class}"
-          summary: "Tried to set a value of type %{value_class} to a field of type %{field_class}"
-          resolution: "Verify if the value to be set correspond to field definition"
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
             document via a non-embedded association is not allowed since the
@@ -432,8 +429,8 @@ en:
           summary: "Mongoid attempted to find a document of the class %{klass}
             but none exist."
           resolution: "Create a document of class %{klass} or use a finder
-            method that returns nil when no documents are found instead of
-            raising an exception."
+            method that does not raise an exception when no documents are
+            found."
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."
