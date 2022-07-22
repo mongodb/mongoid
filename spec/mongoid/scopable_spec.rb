@@ -481,27 +481,45 @@ describe Mongoid::Scopable do
 
       context "when a block is provided" do
 
-        before do
-          Band.scope(:active, ->{ Band.where(active: true) }) do
-            def add_origin
-              tap { |c| c.selector[:origin] = "Deutschland" }
+        context "when with optional and keyword arguments" do
+          before do
+            Band.scope(:named_by, ->(name, deleted: false) {
+              Band.where(name: name, deleted: deleted)
+            })
+          end
+
+          let(:scope) do
+            Band.named_by("Emily", deleted: true)
+          end
+
+          it "sets the conditions from keyword arguments" do
+            scope.selector.should == {'name' => 'Emily', 'deleted' => true}
+          end
+        end
+
+        context "when without arguments" do
+          before do
+            Band.scope(:active, ->{ Band.where(active: true) }) do
+              def add_origin
+                tap { |c| c.selector[:origin] = "Deutschland" }
+              end
             end
           end
-        end
 
-        after do
-          class << Band
-            undef_method :active
+          after do
+            class << Band
+              undef_method :active
+            end
+            Band._declared_scopes.clear
           end
-          Band._declared_scopes.clear
-        end
 
-        let(:scope) do
-          Band.active.add_origin
-        end
+          let(:scope) do
+            Band.active.add_origin
+          end
 
-        it "adds the extension to the scope" do
-          expect(scope.selector).to eq({ "active" => true, "origin" => "Deutschland" })
+          it "adds the extension to the scope" do
+            expect(scope.selector).to eq({ "active" => true, "origin" => "Deutschland" })
+          end
         end
       end
 
