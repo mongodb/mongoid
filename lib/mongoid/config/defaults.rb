@@ -26,32 +26,32 @@ module Mongoid
         case version.to_s
         when "7.3"
           # flags introduced in 7.4 - old functionality
-          Mongoid.broken_aggregables = true
-          Mongoid.broken_alias_handling = true
-          Mongoid.broken_and = true
-          Mongoid.broken_scoping = true
-          Mongoid.broken_updates = true
-          Mongoid.compare_time_by_ms = false
-          Mongoid.legacy_pluck_distinct = true
-          Mongoid.legacy_triple_equals = true
-          Mongoid.object_id_as_json_oid = true
+          self.broken_aggregables = true
+          self.broken_alias_handling = true
+          self.broken_and = true
+          self.broken_scoping = true
+          self.broken_updates = true
+          self.compare_time_by_ms = false
+          self.legacy_pluck_distinct = true
+          self.legacy_triple_equals = true
+          self.object_id_as_json_oid = true
 
           load_defaults "7.4"
         when "7.4"
           # flags introduced in 7.5 - old functionality
-          Mongoid.overwrite_chained_operators = true
+          self.overwrite_chained_operators = true
 
           load_defaults "7.5"
         when "7.5"
           # flags introduced in 8.0 - old functionality
-          Mongoid.legacy_attributes = true
-          Mongoid.map_big_decimal_to_decimal128 = false
+          self.legacy_attributes = true
+          self.map_big_decimal_to_decimal128 = false
         when "8.0"
           # All flag defaults currently reflect 8.0 behavior.
         when "8.1"
           # All flag defaults currently reflect 8.1 behavior.
         else
-          raise ArgumentError, "Unknown version: #{version.to_s}"
+          raise ArgumentError, "Unknown version: #{version}"
         end
       end
     end
