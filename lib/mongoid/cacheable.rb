@@ -18,7 +18,7 @@ module Mongoid
     # plural model name.
     #
     # If new_record?     - will append /new
-    # If not             - will append /id-updated_at.to_s(cache_timestamp_format)
+    # If not             - will append /id-updated_at.to_formatted_s(cache_timestamp_format)
     # Without updated_at - will append /id
     #
     # This is usually called insode a cache() block
@@ -31,7 +31,7 @@ module Mongoid
     # @since 2.4.0
     def cache_key
       return "#{model_key}/new" if new_record?
-      return "#{model_key}/#{_id}-#{updated_at.utc.to_s(cache_timestamp_format)}" if do_or_do_not(:updated_at)
+      return "#{model_key}/#{_id}-#{updated_at.utc.to_formatted_s(cache_timestamp_format)}" if do_or_do_not(:updated_at)
       "#{model_key}/#{_id}"
     end
   end

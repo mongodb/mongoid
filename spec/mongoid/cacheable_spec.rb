@@ -46,7 +46,7 @@ describe Mongoid::Cacheable do
         context "with the default cache_timestamp_format" do
 
           let!(:updated_at) do
-            document.updated_at.utc.to_s(:nsec)
+            document.updated_at.utc.to_formatted_s(:nsec)
           end
 
           it "has the id and updated_at key name" do
@@ -65,7 +65,7 @@ describe Mongoid::Cacheable do
           end
 
           let!(:updated_at) do
-            document.updated_at.utc.to_s(:number)
+            document.updated_at.utc.to_formatted_s(:number)
           end
 
           it "has the id and updated_at key name" do
@@ -104,7 +104,7 @@ describe Mongoid::Cacheable do
       end
 
       let!(:updated_at) do
-        agent.updated_at.utc.to_s(:nsec)
+        agent.updated_at.utc.to_formatted_s(:nsec)
       end
 
       it "has the id and updated_at key name" do
