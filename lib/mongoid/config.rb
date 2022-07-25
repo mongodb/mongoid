@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "mongoid/config/defaults"
 require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
@@ -11,6 +12,7 @@ module Mongoid
   module Config
     extend Forwardable
     extend Options
+    extend Defaults
     extend self
 
     def_delegators ::Mongoid, :logger, :logger=
