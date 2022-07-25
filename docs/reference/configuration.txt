@@ -458,6 +458,64 @@ for details on driver options.
       # methods. (default: false, driver version: 2.18.0+)
       #validate_update_replace: false
 
+
+.. _load-defaults:
+
+Version Based Defaults
+======================
+
+Mongoid supports setting the configuration options to the defaults for specific
+versions. This is useful for upgrading to a new Mongoid version. When upgrading
+your Mongoid version, the following should be set on ``Mongoid::Config``:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults <OLD VERSION>
+  end
+
+This way, when upgrading to a new version of Mongoid, your code will run with
+the configuration options from the previous version of Mongoid. Then,
+one-by-one, you can change the feature flags for the new version, and test that
+your code still acts as expected. Once all of the new feature flags have been
+accounted for, the call to ``load_defaults`` can be changed to take in the *new*
+version, and all of the changed feature flags can be removed. For example, say
+we're upgrading from 7.5 to 8.0. Between these two versions, only two feature
+flags were added: ``legacy_attributes`` and ``map_big_decimal_to_decimal128``.
+Before upgrading to Mongoid 8, the following line can be added:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults 7.5
+  end
+
+Now, after upgrading, those two feature flags will default to their 7.5
+functionality (``legacy_attributes: true, map_big_decimal_to_decimal128: false``).
+Now you can set these feature flags one-by-one and flip them to their 8.0
+behavior:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults 7.5
+    config.legacy_attributes = false
+    # config.map_big_decimal_to_decimal128 = true
+  end
+
+It is advised to do these one at a time, so I have left the second flag
+commented out. After verifying your code works as expected with the
+``legacy_attributes`` flag turned off, the ``map_big_decimal_to_decimal128``
+setting can be uncommented. Once that functionality is verified as well, both
+of those lines can be removed and the ``load_defaults`` replaced with:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults 8.0
+  end
+
+
 ERb Preprocessing
 =================
 
