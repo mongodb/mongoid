@@ -21,7 +21,7 @@ the complete list of issues fixed in each release, including bug fixes.
 Configuration DSL No Longer Requires an Argument to its Block
 -------------------------------------------------------------
 
-In Mongoid 8.1, it is now possible to use ``Mongoid.configure`` without
+It is now possible to use ``Mongoid.configure`` without
 providing an argument to its block:
 
 .. code-block:: ruby
