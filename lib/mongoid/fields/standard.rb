@@ -97,6 +97,16 @@ module Mongoid
         false
       end
 
+      # Is the localized field enforcing values to be present?
+      #
+      # @example Is the field localized?
+      #   field.present?
+      #
+      # @return [ true | false ] If the field enforces present.
+      def present?
+        false
+      end
+
       # Get the metadata for the field if its a foreign key.
       #
       # @example Get the metadata.
