@@ -103,7 +103,7 @@ module Mongoid
       #   field.present?
       #
       # @return [ true | false ] If the field enforces present.
-      def present?
+      def localize_present?
         false
       end
 
