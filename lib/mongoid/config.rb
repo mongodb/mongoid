@@ -127,6 +127,13 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
+    # Returns the Config singleton, for use in the configure DSL.
+    #
+    # @return [ self ] The Config singleton.
+    def config
+      self
+    end
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

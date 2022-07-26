@@ -18,6 +18,31 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Configuration DSL No Longer Requires an Argument to its Block
+-------------------------------------------------------------
+
+It is now possible to use ``Mongoid.configure`` without
+providing an argument to its block:
+
+.. code-block:: ruby
+
+  Mongoid.configure do
+    connect_to("mongoid_test")
+
+    # Use config method when assigning variables
+    config.preload_models = true
+
+Note that ``configure`` will continue to support a block argument.
+The following is equivalent to the above:
+
+.. code-block:: ruby
+
+  Mongoid.configure do |config|
+    config.connect_to("mongoid_test")
+
+    config.preload_models = true
+
+
 Added ``Mongoid::Criteria`` finder methods
 ------------------------------------------
 

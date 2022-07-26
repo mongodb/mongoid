@@ -13,22 +13,46 @@ describe Mongoid do
       end
     end
 
-    context "when a block is supplied" do
+    context "when a block is given" do
+      config_override :preload_models, false
 
-      before do
-        Mongoid.configure do |config|
-          config.preload_models = true
+      context "with arity 0" do
+
+        before do
+          Mongoid.configure do
+            config.preload_models = true
+          end
+        end
+
+        it "sets the values on the config instance" do
+          expect(Mongoid.preload_models).to be true
         end
       end
 
-      after do
-        Mongoid.configure do |config|
-          config.preload_models = false
+      context "with arity 1" do
+
+        before do
+          Mongoid.configure do |config|
+            config.preload_models = true
+          end
+        end
+
+        it "sets the values on the config instance" do
+          expect(Mongoid.preload_models).to be true
         end
       end
 
-      it "sets the values on the config instance" do
-        expect(Mongoid.preload_models).to be true
+      context "with arity 2" do
+
+        before do
+          Mongoid.configure do |config, _other|
+            config.preload_models = true
+          end
+        end
+
+        it "sets the values on the config instance" do
+          expect(Mongoid.preload_models).to be true
+        end
       end
     end
   end

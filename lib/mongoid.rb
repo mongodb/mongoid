@@ -58,9 +58,19 @@ module Mongoid
   #     }
   #   end
   #
+  # @example Using a block without an argument. Use `config` inside
+  #   the block to perform variable assignment.
+  #
+  #   Mongoid.configure do
+  #     connect_to("mongoid_test")
+  #
+  #     config.preload_models = true
+  #
   # @return [ Config ] The configuration object.
-  def configure
-    block_given? ? yield(Config) : Config
+  def configure(&block)
+    return Config unless block_given?
+
+    block.arity == 0 ? Config.instance_exec(&block) : yield(Config)
   end
 
   # Convenience method for getting the default client.
