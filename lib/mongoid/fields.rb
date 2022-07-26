@@ -815,7 +815,7 @@ module Mongoid
        # @api private
        def retrieve_and_validate_type(name, type)
         type_mapping = TYPE_MAPPINGS[type]
-        result = type_mapping || unmapped_type(name, type)
+        result = type_mapping || unmapped_type(type)
         if !result.is_a?(Class)
           raise Errors::InvalidFieldType.new(self, name, type)
         else
@@ -835,17 +835,16 @@ module Mongoid
       # Returns the type of the field if the type was not in the TYPE_MAPPINGS
       # hash.
       #
-      # @param [ Symbol ] name The name of the field.
       # @param [ Symbol | Class ] type The type of the field.
       #
       # @return [ Class ] The type of the field.
       #
       # @api private
-      def unmapped_type(options)
-        if "Boolean" == options[:type].to_s
+      def unmapped_type(type)
+        if "Boolean" == type.to_s
           Mongoid::Boolean
         else
-          options[:type] || Object
+          type || Object
         end
       end
     end
