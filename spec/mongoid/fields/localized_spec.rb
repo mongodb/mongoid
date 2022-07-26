@@ -525,4 +525,37 @@ describe Mongoid::Fields::Localized do
       end
     end
   end
+
+  describe "localize: :present" do
+
+    let(:field) do
+      described_class.new(:description, localize: :present, type: String)
+    end
+
+    context "when setting the localize to present" do
+
+      it "is localized?" do
+        expect(field.localized?).to be true
+      end
+
+      it "is localize_present?" do
+        expect(field.localize_present?).to be true
+      end
+    end
+
+    context "when localize is not localize_present" do
+
+      let(:field) do
+        described_class.new(:description, localize: true, type: String)
+      end
+
+      it "is localized?" do
+        expect(field.localized?).to be true
+      end
+
+      it "is not localize_present?" do
+        expect(field.localize_present?).to be false
+      end
+    end
+  end
 end
