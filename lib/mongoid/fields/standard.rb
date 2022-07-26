@@ -99,7 +99,7 @@ module Mongoid
 
       # Is the localized field enforcing values to be present?
       #
-      # @example Is the field localized?
+      # @example Is the localized field enforcing values to be present?
       #   field.localize_present?
       #
       # @return [ true | false ] If the field enforces present.
