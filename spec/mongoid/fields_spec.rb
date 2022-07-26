@@ -1989,6 +1989,7 @@ describe Mongoid::Fields do
     context "when assigning an empty string" do
 
       before do
+        ::I18n.locale = :en
         product.title = "hello"
         ::I18n.locale = :de
         product.title = "hello there!"
@@ -2011,6 +2012,7 @@ describe Mongoid::Fields do
     context "when assigning nil" do
 
       before do
+        ::I18n.locale = :en
         product.title = "hello"
         ::I18n.locale = :de
         product.title = "hello there!"
@@ -2033,6 +2035,7 @@ describe Mongoid::Fields do
     context "when assigning an empty array" do
 
       before do
+        ::I18n.locale = :en
         product.title = "hello"
         ::I18n.locale = :de
         product.title = "hello there!"
