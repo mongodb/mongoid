@@ -114,5 +114,5 @@ from the ``_translations`` hash:
      field :description, localize: :present
    end
 
-See the section on :ref:`Present Fields <present-fields>` for more details on
-how these are used.
+See the section on :ref:`Localize :present Field Option <present-fields>` for
+more details on how these are used.

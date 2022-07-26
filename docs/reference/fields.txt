@@ -1398,8 +1398,8 @@ You can get and set all the translations at once by using the corresponding ``_t
 
 .. _present-fields:
 
-Present Fields
---------------
+Localize ``:present`` Field Option
+----------------------------------
 
 Mongoid supports the ``:present`` option when creating a localized field:
 
