@@ -1,0 +1,12 @@
+.. _contributing:
+
+************
+Contributing
+************
+
+.. default-domain:: mongodb
+
+.. toctree::
+  :titlesonly:
+
+  contributing/code-documentation
