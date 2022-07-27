@@ -2694,6 +2694,20 @@ describe Mongoid::Attributes do
     end
   end
 
+  context "when modifiying an array referenced with the [] notation" do
+    let(:band) { Band.create!(genres: [ "Pop", "Rock" ]) }
+
+    before do
+      band[:genres].push("Jazz")
+      band.save!
+      band.reload
+    end
+
+    it "persists the updated hash" do
+      band.genres.should == [ "Pop", "Rock", "Jazz" ]
+    end
+  end
+
   context "when modifiying a typed array referenced with the [] notation" do
     let(:band) { Band.create!(mates: [ "John", "Paul", "George" ]) }
 
