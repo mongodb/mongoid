@@ -52,6 +52,93 @@ describe Mongoid::TypedArray do
         expect(typed_array).to eq([nil, nil])
       end
     end
+
+    context "when an empty typed array" do
+
+      let(:typed_array) { described_class.new(Integer) }
+
+      it "has class typed array" do
+        expect(typed_array).to be_a(described_class)
+      end
+
+      it "returns an empty array" do
+        expect(typed_array).to eq([])
+      end
+    end
+
+    context "when an empty typed array with a block" do
+
+      let(:typed_array) { described_class.new(Integer) { |i| i } }
+
+      it "has class typed array" do
+        expect(typed_array).to be_a(described_class)
+      end
+
+      it "returns an empty array" do
+        expect(typed_array).to eq([])
+      end
+    end
+
+    context "when a typed array with a block" do
+
+      let(:typed_array) { described_class.new(Integer, 3) { |i| "#{i * i}" } }
+
+      it "has class typed array" do
+        expect(typed_array).to be_a(described_class)
+      end
+
+      it "mongoizes and adds all of the correct elements" do
+        expect(typed_array).to eq([ 0, 1, 4 ])
+      end
+    end
+
+    context "when a length without a default" do
+
+      let(:typed_array) { described_class.new(Integer, 3) }
+
+      it "has class typed array" do
+        expect(typed_array).to be_a(described_class)
+      end
+
+      it "has all of the correct elements" do
+        expect(typed_array).to eq([ nil, nil, nil ])
+      end
+    end
+
+    context "when a length with a default" do
+
+      let(:typed_array) { described_class.new(Integer, 3, "1") }
+
+      it "has class typed array" do
+        expect(typed_array).to be_a(described_class)
+      end
+
+      it "mongoizes and adds all of the correct elements" do
+        expect(typed_array).to eq([ 1, 1, 1 ])
+      end
+    end
+
+    context "when an array with a default" do
+
+      let(:typed_array) { described_class.new(Integer, [ 3 ], 1) }
+
+      it "raises an error" do
+        expect do
+          typed_array
+        end.to raise_error(TypeError, /no implicit conversion of Array into Integer/)
+      end
+    end
+
+    context "when too many arguments" do
+
+      let(:typed_array) { described_class.new(Integer, 1, 1, 1) }
+
+      it "raises an error" do
+        expect do
+          typed_array
+        end.to raise_error(ArgumentError, /wrong number of arguments/)
+      end
+    end
   end
 
   shared_examples "maintains class" do

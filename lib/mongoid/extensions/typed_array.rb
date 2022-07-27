@@ -12,7 +12,16 @@ module Mongoid
     # @param [ Array ] array The array.
     def initialize(type, *args, &block)
       @element_klass = type
-      super(*args, &block).map! { |x| type.mongoize(x) }
+
+      if block_given?
+        super(*args, &block).map! { |x| type.mongoize(x) }
+      elsif args.length == 1 && args.first.is_a?(Array)
+        super(args.first.map { |x| type.mongoize(x) })
+      elsif args.length == 2
+        super(args.first, type.mongoize(args[1]))
+      else
+        super(*args, &block)
+      end
     end
 
     # Append an item to the Array. The item will be mongoized into the
