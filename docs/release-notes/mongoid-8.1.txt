@@ -372,3 +372,29 @@ example:
 
 See the section on :ref:`Hash Assignment on Embedded Associations <hash-assignment>`
 for more details
+
+
+Added Typed Array Fields
+------------------------
+
+Mongoid 8.1 adds a new field type: typed array fields. Typed array fields allow
+the user to enforce the type of the elements inside of the array. Take the
+following example:
+
+code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :members, type: Array(String)
+  end
+
+  band = Band.new(members: [ 1, 2, 3 ])
+  band.members
+  # => [ "1", "2", "3" ]
+  band.members.push(4)
+  # => [ "1", "2", "3", "4" ]
+  band.members.class
+  # => Mongoid::StringArray
+
+For more a longer explanation on how these fields work and how they can be used,
+see the section on :ref:`Typed Array Fields <typed-arrays>`.
