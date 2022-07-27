@@ -567,7 +567,7 @@ describe Mongoid::Fields do
         end
 
         it "has the correct type" do
-          expect(mongoized).to be_a(Mongoid::StringArray)
+          expect(mongoized).to be_a(Array)
         end
       end
 
@@ -579,7 +579,7 @@ describe Mongoid::Fields do
         end
 
         it "has the correct type" do
-          expect(mongoized).to be_a(Mongoid::StringArray)
+          expect(mongoized).to be_a(Array)
         end
       end
 
@@ -599,7 +599,7 @@ describe Mongoid::Fields do
         end
 
         it "has the correct type" do
-          expect(mongoized).to be_a(Mongoid::StringArray)
+          expect(mongoized).to be_a(Array)
         end
 
         it "doesn't mongoize the values again" do
@@ -617,7 +617,7 @@ describe Mongoid::Fields do
         end
 
         it "has the correct type" do
-          expect(mongoized).to be_a(Mongoid::StringArray)
+          expect(mongoized).to be_a(Array)
         end
       end
     end
@@ -710,7 +710,7 @@ describe Mongoid::Fields do
         end
 
         it "mongoizes to an array in the attributes hash" do
-          expect(band.attributes["mate_ids"]).to be_a(Mongoid::IntegerArray)
+          expect(band.attributes["mate_ids"]).to be_a(Array)
         end
       end
 
@@ -735,7 +735,36 @@ describe Mongoid::Fields do
         end
 
         it "mongoizes to an array in the attributes hash" do
-          expect(from_db.attributes["mate_ids"]).to be_a(Mongoid::IntegerArray)
+          expect(from_db.attributes["mate_ids"]).to be_a(Array)
+        end
+      end
+
+      context "when assiging a mongoizable typed array field" do
+        after do
+          Band.fields.delete("range_array")
+        end
+
+        before do
+          Band.field :range_array, type: Array(Range)
+        end
+
+        let!(:band) { Band.create!(range_array: [ 1..3 ]) }
+        let(:from_db) { Band.first }
+
+        it "mongoizes to a hash" do
+          expect(band.attributes["range_array"]).to eq([ { "min" => 1, "max" => 3 } ])
+        end
+
+        it "demongoizes to a range" do
+          expect(band.range_array).to eq([ 1..3 ])
+        end
+
+        it "is stored as a hash in the database" do
+          expect(from_db.attributes["range_array"]).to eq([ { "min" => 1, "max" => 3 } ])
+        end
+
+        it "demongoizes to a range from the database" do
+          expect(from_db.range_array).to eq([ 1..3 ])
         end
       end
     end

@@ -881,12 +881,19 @@ module Mongoid
               def mongoize(object)
                 return if object.nil?
                 case object
+                when Array, Set
+                  object.map { |obj| const_get("Type").mongoize(obj) }
+                end
+              end
+
+              def demongoize(object)
+                return if object.nil?
+                case object
                 when self then object
                 when Array, Set
                   new(object.to_a)
                 end
               end
-              alias :demongoize :mongoize
             end
           end
           array_class.const_set("Type", type)

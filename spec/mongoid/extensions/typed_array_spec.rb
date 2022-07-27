@@ -87,7 +87,7 @@ describe Mongoid::TypedArray do
         expect(typed_array).to be_a(described_class)
       end
 
-      it "mongoizes and adds all of the correct elements" do
+      it "demongoizes and adds all of the correct elements" do
         expect(typed_array).to eq([ 0, 1, 4 ])
       end
     end
@@ -113,7 +113,7 @@ describe Mongoid::TypedArray do
         expect(typed_array).to be_a(described_class)
       end
 
-      it "mongoizes and adds all of the correct elements" do
+      it "demongoizes and adds all of the correct elements" do
         expect(typed_array).to eq([ 1, 1, 1 ])
       end
     end
@@ -484,7 +484,7 @@ describe Mongoid::TypedArray do
 
       let(:pushed) { typed_array.fill(2) { |i| "#{i * i}" } }
 
-      it "returns and mongoizes the correct elements" do
+      it "returns and demongoizes the correct elements" do
         expect(pushed).to eq([ 1, 2, 4 ])
       end
 
@@ -810,53 +810,6 @@ describe Mongoid::TypedArray do
       it "raises an ArgumentError" do
         expect do
           typed_array.[]=(1,2,3,4)
-        end.to raise_error(ArgumentError, /wrong number of arguments/)
-      end
-    end
-  end
-
-  describe '.try_convert' do
-
-    let(:typed_array) { described_class.try_convert(Integer, arg) }
-
-    context "when passing an array" do
-      let(:arg) { [ 1, 2, 3 ] }
-
-      it "has the correct elements" do
-        expect(typed_array).to eq([ 1, 2, 3 ])
-      end
-
-      it "has the correct type" do
-        expect(typed_array).to be_a(described_class)
-      end
-    end
-
-    context "when passing assorted values" do
-      let(:arg) { [ 1, "2", "bogus" ] }
-
-      it "mongoizes the elements" do
-        expect(typed_array).to eq([ 1, 2, nil ])
-      end
-
-      it "has the correct type" do
-        expect(typed_array).to be_a(described_class)
-      end
-    end
-
-    context "when a bogus value" do
-      let(:arg) { "bogus" }
-
-      it "returns nil" do
-        expect(typed_array).to be_nil
-      end
-    end
-
-    context "when passing multiple values" do
-      let(:typed_array) { described_class.try_convert(Integer, 1, 2) }
-
-      it "returns nil" do
-        expect do
-          typed_array
         end.to raise_error(ArgumentError, /wrong number of arguments/)
       end
     end
