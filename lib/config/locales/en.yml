@@ -246,6 +246,13 @@ en:
           resolution: "Please provide a valid type value for the field.
             Refer to:
             https://www.mongodb.com/docs/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
+        invalid_field_type_array:
+          message: "Invalid typed array field type for field '%{field}' on model
+            '%{klass}'."
+          summary: "Model '%{klass}' defines a field '%{field}' with an invalid
+            typed value array value. Attempted to pass %{types} types, when only
+            one is permitted."
+          resolution: "Please only pass in one type for a typed array."
         invalid_global_executor_concurrency:
           message: "Invalid global_executor_concurrency option."
           summary: "You set global_executor_concurrency while async_query_executor
@@ -253,6 +260,7 @@ en:
             allowed only for the global thread pool executor."
           resolution: "Set global_executor_concurrency option to :global_thread_pool
             or remove global_executor_concurrency option."
+            https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments

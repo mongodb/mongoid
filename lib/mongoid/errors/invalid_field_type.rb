@@ -16,10 +16,17 @@ module Mongoid
       # @param [ String ] field The field on which the invalid type is used.
       # @param [ Symbol | String ] type The value of the field :type option.
       def initialize(klass, field, type)
-        super(
-          compose_message('invalid_field_type',
-            klass: klass, field: field, type_inspection: type.inspect)
-        )
+        if type.is_a?(Array) && type.length != 1
+          super(
+            compose_message('invalid_field_type_array',
+              klass: klass, field: field, types: type.length)
+          )
+        else
+          super(
+            compose_message('invalid_field_type',
+              klass: klass, field: field, type_inspection: type.inspect)
+          )
+        end
       end
     end
   end

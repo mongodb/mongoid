@@ -114,16 +114,16 @@ module Mongoid
             end
 
             if option == :type
-              validate_type(options[option])
+              validate_type(name, options[option])
             end
           end
         end
 
-        def validate_type(type)
+        def validate_type(name, type)
           if type == Symbol
             Mongoid::Warnings.warn_symbol_type_deprecated
           elsif type.is_a?(Array) && type.length != 1
-            # TODO: raise error
+            raise Errors::InvalidFieldType.new(self, name, type)
           end
         end
       end
