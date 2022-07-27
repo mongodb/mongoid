@@ -1429,7 +1429,7 @@ for the ``blank?`` method) from the ``_translations`` hash:
    # { "en" => "Marvelous!" }
 
 When the empty string is written for the ``:de`` locale, the ``"de"`` key is
-removed from the ``_translations`` hash instead of writing an empty string.
+removed from the ``_translations`` hash instead of writing the empty string.
 
 
 Fallbacks
