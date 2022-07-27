@@ -113,6 +113,25 @@ module Mongoid
       super(mongoize_with_array(arg))
     end
 
+    # Concat the given arrays with this array.
+    #
+    # @example Concat the array.
+    #   array.concat([1, 2, 3])
+    #
+    # @param [ Array... ] *args The arrays to concat.
+    #
+    # @return [ Array ] The resulting array.
+    def concat(*args)
+      as = args.map do |obj|
+        if obj.is_a?(Array)
+          obj.map { |x| element_klass.mongoize(x) }
+        else
+          obj
+        end
+      end
+      super(*as)
+    end
+
     # Set the element as the given index.
     #
     # @param [ Object ] *args The arguments.

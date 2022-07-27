@@ -555,6 +555,57 @@ describe Mongoid::TypedArray do
     end
   end
 
+  describe "#concat" do
+
+    let(:typed_array) { described_class.new(Integer, [ 1, 2 ]) }
+
+    context "when concatting one array" do
+
+      let!(:pushed) { typed_array.concat([ 3, "4", "bogus"]) }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, 2, 3, 4, nil ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when concatting multiple arrays" do
+
+      let!(:pushed) { typed_array.concat([ 3, "4", "bogus" ], [ 6, "7" ]) }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, 2, 3, 4, nil, 6, 7 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending one item of the wrong type" do
+
+      let(:pushed) { typed_array.concat("bogus") }
+
+      it "raises a type error" do
+        expect do
+          pushed
+        end.to raise_error(TypeError, /no implicit conversion of String into Array/)
+      end
+    end
+
+    context "when multiple items of the wrong type" do
+
+      let(:pushed) { typed_array.concat([1], "bogus") }
+
+      it "raises a type error" do
+        expect do
+          pushed
+        end.to raise_error(TypeError, /no implicit conversion of String into Array/)
+      end
+    end
+  end
+
   describe "#[]=" do
 
     let(:typed_array) { described_class.new(Integer, [ 1, 2, 3 ]) }
@@ -759,6 +810,53 @@ describe Mongoid::TypedArray do
       it "raises an ArgumentError" do
         expect do
           typed_array.[]=(1,2,3,4)
+        end.to raise_error(ArgumentError, /wrong number of arguments/)
+      end
+    end
+  end
+
+  describe '.try_convert' do
+
+    let(:typed_array) { described_class.try_convert(Integer, arg) }
+
+    context "when passing an array" do
+      let(:arg) { [ 1, 2, 3 ] }
+
+      it "has the correct elements" do
+        expect(typed_array).to eq([ 1, 2, 3 ])
+      end
+
+      it "has the correct type" do
+        expect(typed_array).to be_a(described_class)
+      end
+    end
+
+    context "when passing assorted values" do
+      let(:arg) { [ 1, "2", "bogus" ] }
+
+      it "mongoizes the elements" do
+        expect(typed_array).to eq([ 1, 2, nil ])
+      end
+
+      it "has the correct type" do
+        expect(typed_array).to be_a(described_class)
+      end
+    end
+
+    context "when a bogus value" do
+      let(:arg) { "bogus" }
+
+      it "returns nil" do
+        expect(typed_array).to be_nil
+      end
+    end
+
+    context "when passing multiple values" do
+      let(:typed_array) { described_class.try_convert(Integer, 1, 2) }
+
+      it "returns nil" do
+        expect do
+          typed_array
         end.to raise_error(ArgumentError, /wrong number of arguments/)
       end
     end

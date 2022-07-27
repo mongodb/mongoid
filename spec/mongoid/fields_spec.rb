@@ -513,29 +513,95 @@ describe Mongoid::Fields do
 
     after do
       Label.fields.delete('members')
+      Label.fields.delete('members_ids')
     end
 
     before do
       Label.field :members, type: Array(String)
+      Label.field :members_ids, type: Array(Integer)
     end
 
-    context "creates an array" do
+    describe "#initialize" do
 
-      context "when giving no args" do
+      context "creates an array" do
 
-        let(:string_array) { Mongoid::StringArray.new }
+        context "when giving no args" do
 
-        it "is an empty array" do
-          expect(string_array).to eq([])
+          let(:string_array) { Mongoid::StringArray.new }
+
+          it "is an empty array" do
+            expect(string_array).to eq([])
+          end
+        end
+
+        context "when giving args" do
+
+          let(:string_array) { Mongoid::StringArray.new([ 1, 2 ]) }
+
+          it "mongoizes the arguments" do
+            expect(string_array).to eq(["1", "2"])
+          end
+        end
+      end
+    end
+
+    describe ".mongoize" do
+
+      let(:mongoized) { Mongoid::StringArray.mongoize(arg) }
+
+      context "when passing in an array" do
+        let(:arg) { [ "1", 2 ] }
+
+        it "mongoizes the values" do
+          expect(mongoized).to eq([ "1", "2" ])
+        end
+
+        it "has the correct type" do
+          expect(mongoized).to be_a(Mongoid::StringArray)
         end
       end
 
-      context "when giving args" do
+      context "when passing in a set" do
+        let(:arg) { [ "1", 2 ].to_set }
 
-        let(:string_array) { Mongoid::StringArray.new([ 1, 2 ]) }
+        it "mongoizes the values" do
+          expect(mongoized).to eq([ "1", "2" ])
+        end
 
-        it "mongoizes the arguments" do
-          expect(string_array).to eq(["1", "2"])
+        it "has the correct type" do
+          expect(mongoized).to be_a(Mongoid::StringArray)
+        end
+      end
+
+      context "when passing in a bogus value" do
+        let(:arg) { "bogus" }
+
+        it "returns nil" do
+          expect(mongoized).to eq(nil)
+        end
+      end
+
+      context "when passing in a Mongoid::StringArray" do
+        let(:arg) { Mongoid::StringArray.new([ 1 ]) }
+
+        it "mongoizes and returns the values" do
+          expect(mongoized).to eq([ "1" ])
+        end
+
+        it "has the correct type" do
+          expect(mongoized).to be_a(Mongoid::StringArray)
+        end
+      end
+
+      context "when passing in a Mongoid::IntegerArray" do
+        let(:arg) { Mongoid::IntegerArray.new([ 1 ]) }
+
+        it "mongoizes and returns the values" do
+          expect(mongoized).to eq([ "1" ])
+        end
+
+        it "has the correct type" do
+          expect(mongoized).to be_a(Mongoid::StringArray)
         end
       end
     end

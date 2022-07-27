@@ -882,7 +882,7 @@ module Mongoid
                 return if object.nil?
                 case object
                 when Array, Set
-                  object.map { |x| type.mongoize(x) }
+                  new(object.to_a)
                 end
               end
             end
