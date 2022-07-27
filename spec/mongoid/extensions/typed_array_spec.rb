@@ -87,7 +87,7 @@ describe Mongoid::TypedArray do
         expect(typed_array).to be_a(described_class)
       end
 
-      it "demongoizes and adds all of the correct elements" do
+      it "mongoizes and adds all of the correct elements" do
         expect(typed_array).to eq([ 0, 1, 4 ])
       end
     end
@@ -113,7 +113,7 @@ describe Mongoid::TypedArray do
         expect(typed_array).to be_a(described_class)
       end
 
-      it "demongoizes and adds all of the correct elements" do
+      it "mongoizes and adds all of the correct elements" do
         expect(typed_array).to eq([ 1, 1, 1 ])
       end
     end
@@ -484,7 +484,7 @@ describe Mongoid::TypedArray do
 
       let(:pushed) { typed_array.fill(2) { |i| "#{i * i}" } }
 
-      it "returns and demongoizes the correct elements" do
+      it "returns and mongoizes the correct elements" do
         expect(pushed).to eq([ 1, 2, 4 ])
       end
 

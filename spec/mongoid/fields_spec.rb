@@ -755,16 +755,29 @@ describe Mongoid::Fields do
           expect(band.attributes["range_array"]).to eq([ { "min" => 1, "max" => 3 } ])
         end
 
-        it "demongoizes to a range" do
-          expect(band.range_array).to eq([ 1..3 ])
+        it "demongoizes to a hash" do
+          expect(band.range_array).to eq([ { "min" => 1, "max" => 3 } ])
         end
 
         it "is stored as a hash in the database" do
           expect(from_db.attributes["range_array"]).to eq([ { "min" => 1, "max" => 3 } ])
         end
 
-        it "demongoizes to a range from the database" do
-          expect(from_db.range_array).to eq([ 1..3 ])
+        it "demongoizes to a hash from the database" do
+          expect(from_db.range_array).to eq([ { "min" => 1, "max" => 3 } ])
+        end
+      end
+
+      context "when modifying a typed array" do
+        let(:band) { Band.new(mates: [ "1", "2" ]) }
+
+        before do
+          band.mates.push(3)
+          band.mates.push(4)
+        end
+
+        it "adds the element to the array" do
+          expect(band.mates).to eq([ "1", "2", "3", "4" ])
         end
       end
     end
