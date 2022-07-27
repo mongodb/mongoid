@@ -406,6 +406,22 @@ describe Mongoid::Fields do
           end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
         end
       end
+
+      context 'when using an unknown array type' do
+        it 'raises InvalidFieldType' do
+          lambda do
+            klass.field(:test, type: Array('bogus'))
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
+        end
+      end
+
+      context 'when using giving more than one type in the array' do
+        it 'raises InvalidFieldType' do
+          lambda do
+            klass.field(:test, type: [ String, Integer ])
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /Invalid typed array field type for field 'test'/)
+        end
+      end
     end
 
     context "when the options are valid" do
@@ -486,17 +502,17 @@ describe Mongoid::Fields do
 
     context "when declaring a typed array field" do
       after do
-        Label.fields.delete('members')
+        Label.fields.delete('mates')
       end
 
       before do
-        Label.field :members, type: Array(String)
+        Label.field :mates, type: Array(String)
       end
 
-      let(:members) { Label.fields["members"] }
+      let(:mates) { Label.fields["mates"] }
 
       it "create the correct field" do
-        expect(members).to_not be_nil
+        expect(mates).to_not be_nil
       end
 
       it "creates the correct class" do
@@ -504,21 +520,15 @@ describe Mongoid::Fields do
       end
 
       it "gives the field the correct type" do
-        expect(members.type).to eq(Mongoid::StringArray)
+        expect(mates.type).to eq(Mongoid::StringArray)
       end
     end
   end
 
   describe "Mongoid::.*Array" do
-
-    after do
-      Label.fields.delete('members')
-      Label.fields.delete('members_ids')
-    end
-
     before do
-      Label.field :members, type: Array(String)
-      Label.field :members_ids, type: Array(Integer)
+      # load band so the IntegerArray and StringArray classes are created.
+      Band
     end
 
     describe "#initialize" do
@@ -591,6 +601,12 @@ describe Mongoid::Fields do
         it "has the correct type" do
           expect(mongoized).to be_a(Mongoid::StringArray)
         end
+
+        it "doesn't mongoize the values again" do
+          arg
+          expect(String).to receive(:mongoize).never
+          mongoized
+        end
       end
 
       context "when passing in a Mongoid::IntegerArray" do
@@ -602,6 +618,124 @@ describe Mongoid::Fields do
 
         it "has the correct type" do
           expect(mongoized).to be_a(Mongoid::StringArray)
+        end
+      end
+    end
+
+    describe ".demongoize" do
+
+      let(:demongoized) { Mongoid::StringArray.demongoize(arg) }
+
+      context "when passing in an array" do
+        let(:arg) { [ "1", 2 ] }
+
+        it "mongoizes the values" do
+          expect(demongoized).to eq([ "1", "2" ])
+        end
+
+        it "has the correct type" do
+          expect(demongoized).to be_a(Mongoid::StringArray)
+        end
+      end
+
+      context "when passing in a set" do
+        let(:arg) { [ "1", 2 ].to_set }
+
+        it "mongoizes the values" do
+          expect(demongoized).to eq([ "1", "2" ])
+        end
+
+        it "has the correct type" do
+          expect(demongoized).to be_a(Mongoid::StringArray)
+        end
+      end
+
+      context "when passing in a bogus value" do
+        let(:arg) { "bogus" }
+
+        it "returns nil" do
+          expect(demongoized).to eq(nil)
+        end
+      end
+
+      context "when passing in a Mongoid::StringArray" do
+        let(:arg) { Mongoid::StringArray.new([ 1 ]) }
+
+        it "mongoizes and returns the values" do
+          expect(demongoized).to eq([ "1" ])
+        end
+
+        it "has the correct type" do
+          expect(demongoized).to be_a(Mongoid::StringArray)
+        end
+
+        it "doesn't call the constructor again" do
+          arg
+          expect(Mongoid::StringArray).to receive(:new).never
+          demongoized
+        end
+      end
+
+      context "when passing in a Mongoid::IntegerArray" do
+        let(:arg) { Mongoid::IntegerArray.new([ 1 ]) }
+
+        it "mongoizes and returns the values" do
+          expect(demongoized).to eq([ "1" ])
+        end
+
+        it "has the correct type" do
+          expect(demongoized).to be_a(Mongoid::StringArray)
+        end
+      end
+    end
+
+    describe "#getter/setter" do
+      let(:band) { Band.new }
+
+      context "when assigning an array" do
+        before do
+          band.mate_ids = [ 1, "2", "bogus" ]
+        end
+
+        it "is able to be retrieved with the getter" do
+          expect(band.mate_ids).to eq([1, 2, nil])
+        end
+
+        it "is demongoized to an IntegerArray" do
+          expect(band.mate_ids).to be_a(Mongoid::IntegerArray)
+        end
+
+        it "has the correct types in the attributes hash" do
+          expect(band.attributes["mate_ids"]).to eq([ 1, 2, nil ])
+        end
+
+        it "mongoizes to an array in the attributes hash" do
+          expect(band.attributes["mate_ids"]).to be_a(Mongoid::IntegerArray)
+        end
+      end
+
+      context "when persisting an array" do
+        before do
+          band.mate_ids = [ 1, "2", "bogus" ]
+          band.save!
+        end
+
+        let(:from_db) { band }
+
+        it "is able to be retrieved with the getter" do
+          expect(from_db.mate_ids).to eq([1, 2, nil])
+        end
+
+        it "is demongoized to an IntegerArray" do
+          expect(from_db.mate_ids).to be_a(Mongoid::IntegerArray)
+        end
+
+        it "has the correct types in the attributes hash" do
+          expect(from_db.attributes["mate_ids"]).to eq([ 1, 2, nil ])
+        end
+
+        it "mongoizes to an array in the attributes hash" do
+          expect(from_db.attributes["mate_ids"]).to be_a(Mongoid::IntegerArray)
         end
       end
     end

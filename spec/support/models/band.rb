@@ -23,6 +23,8 @@ class Band
   field :mojo, type: Object
   field :tags, type: Hash
   field :fans
+  field :mates, type: Array(String)
+  field :mate_ids, type: Array(Integer)
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false

@@ -2694,6 +2694,20 @@ describe Mongoid::Attributes do
     end
   end
 
+  context "when modifiying a typed array referenced with the [] notation" do
+    let(:band) { Band.create!(mates: [ "John", "Paul", "George" ]) }
+
+    before do
+      band[:mates].push("Ringo")
+      band.save!
+      band.reload
+    end
+
+    it "persists the updated hash" do
+      band.mates.should == [ "John", "Paul", "George", "Ringo" ]
+    end
+  end
+
   context "when modifiying a set referenced with the [] notation" do
     let(:catalog) { Catalog.create!(set_field: [ 1 ].to_set) }
 
