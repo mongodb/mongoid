@@ -2054,5 +2054,53 @@ describe Mongoid::Fields do
         expect(product.title_translations).to eq({ "en" => "hello" })
       end
     end
+
+    context "when assigning an empty string first" do
+
+      before do
+        ::I18n.locale = :en
+        product.title = ""
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({})
+      end
+    end
+
+    context "when assigning an empty string with only one translation" do
+
+      before do
+        ::I18n.locale = :en
+        product.title = "Hello"
+        product.title = ""
+        product.save!
+      end
+
+      let(:from_db) { Product.first }
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({})
+      end
+
+      it "round trips an empty hash" do
+        expect(from_db.title_translations).to eq({})
+      end
+    end
   end
 end

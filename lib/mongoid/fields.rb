@@ -802,18 +802,18 @@ module Mongoid
         Fields::Standard.new(name, opts)
       end
 
-       # Get the class for the given type.
-       #
-       # @param [ Symbol ] name The name of the field.
-       # @param [ Symbol | Class ] type The type of the field.
-       #
-       # @return [ Class ] The type of the field.
-       #
-       # @raises [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
-       #   type.
-       #
-       # @api private
-       def retrieve_and_validate_type(name, type)
+      # Get the class for the given type.
+      #
+      # @param [ Symbol ] name The name of the field.
+      # @param [ Symbol | Class ] type The type of the field.
+      #
+      # @return [ Class ] The type of the field.
+      #
+      # @raises [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
+      #   type.
+      #
+      # @api private
+      def retrieve_and_validate_type(name, type)
         type_mapping = TYPE_MAPPINGS[type]
         result = type_mapping || unmapped_type(type)
         if !result.is_a?(Class)

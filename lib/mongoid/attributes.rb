@@ -178,9 +178,9 @@ module Mongoid
           end
           if localized
             present = fields[field_name].try(:localize_present?)
-            loc_key, loc_val = typed_value.to_a.flatten
+            loc_key, loc_val = typed_value.first
             if present && loc_val.blank?
-              attributes[field_name].delete(loc_key)
+              attributes[field_name].delete(loc_key) unless attributes[field_name].nil?
             else
               attributes[field_name] ||= {}
               attributes[field_name].merge!(typed_value)
