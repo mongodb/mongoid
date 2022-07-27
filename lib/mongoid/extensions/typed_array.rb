@@ -31,10 +31,10 @@ module Mongoid
     # Push item(s) to the Array. The item will be mongoized into the
     # TypedArray's inner type.
     #
-    # @example Append the item.
+    # @example Push the item.
     #   array.push(item)
     #
-    # @param [ Object... ] *args The items to append.
+    # @param [ Object... ] *args The items to push.
     #
     # @return [ Array ] The resulting array.
     def push(*args)
@@ -45,7 +45,7 @@ module Mongoid
     # Prepend item(s) to the Array. The item will be mongoized into the
     # TypedArray's inner type.
     #
-    # @example Append the item.
+    # @example Prepend the item.
     #   array.unshift(item)
     #
     # @param [ Object... ] *args The items to prepend.
@@ -59,10 +59,10 @@ module Mongoid
     # Insert item(s) into the Array. The item will be mongoized into the
     # TypedArray's inner type.
     #
-    # @example Append the item.
+    # @example Insert an item.
     #   array.insert(1, item)
     #
-    # @param [ Object... ] *args The items to prepend.
+    # @param [ Object... ] *args The index and the items to insert.
     #
     # @return [ Array ] The resulting array.
     def insert(*args)
@@ -73,10 +73,13 @@ module Mongoid
     # Fill the Array with item(s). The item will be mongoized into the
     # TypedArray's inner type.
     #
-    # @example Append the item.
-    #   array.insert(1, item)
+    # @example Fill the array.
+    #   array.fill(1, 1..2)
+    #   array.fill(1, 1, 2)
+    #   array.fill { |i| i * i }
+    #   array.fill(1) { |i| i * i }
     #
-    # @param [ Object... ] *args The items to prepend.
+    # @param [ Object... ] *args The item to fill and the indeces to fill it into.
     #
     # @return [ Array ] The resulting array.
     def fill(*args)
@@ -87,6 +90,18 @@ module Mongoid
       else
         super(element_klass.mongoize(args.first), *args[1, args.length-1])
       end
+    end
+
+    # Replace the contents of this array with the new array.
+    #
+    # @example Replace the array.
+    #   array.replace([1, 2, 3])
+    #
+    # @param [ Array ] arg The array to replace.
+    #
+    # @return [ Array ] The resulting array.
+    def replace(arg)
+      super(mongoize_with_array(arg))
     end
 
     # Set the element as the given index.

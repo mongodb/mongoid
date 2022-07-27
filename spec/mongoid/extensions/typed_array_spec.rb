@@ -428,6 +428,46 @@ describe Mongoid::TypedArray do
     end
   end
 
+  describe "#replace" do
+
+    let(:typed_array) { described_class.new(Integer, [ 1, 2 ]) }
+
+
+    context "when sending multiple items" do
+
+      let!(:pushed) { typed_array.replace([ 1, "2", "bogus" ]) }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, 2, nil ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending one item" do
+
+      let(:pushed) { typed_array.replace(2) }
+
+      it "raises an error" do
+        expect do
+          pushed
+        end.to raise_error(TypeError, /no implicit conversion of Integer into Array/)
+      end
+    end
+
+    context "when multiple args" do
+
+      let(:pushed) { typed_array.replace([1], [2]) }
+
+      it "raises an error" do
+        expect do
+          pushed
+        end.to raise_error(ArgumentError, /wrong number of arguments/)
+      end
+    end
+  end
+
   describe "#[]=" do
 
     let(:typed_array) { described_class.new(Integer, [ 1, 2, 3 ]) }
@@ -623,7 +663,7 @@ describe Mongoid::TypedArray do
       it "raises an ArgumentError" do
         expect do
           typed_array.[]=(1)
-        end.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError, /wrong number of arguments/)
       end
     end
 
@@ -632,7 +672,7 @@ describe Mongoid::TypedArray do
       it "raises an ArgumentError" do
         expect do
           typed_array.[]=(1,2,3,4)
-        end.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError, /wrong number of arguments/)
       end
     end
   end
