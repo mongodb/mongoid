@@ -3,9 +3,12 @@
 module Mongoid
   class TypedArray < ::Array
 
+    # The enforced class of all of the elements in the array.
+    #
+    # @return [ Class ] The inner class of the array.
     attr_reader :element_klass
 
-    # Initialize a typed array. Set the element klass and mongoizes all of the
+    # Initialize a typed array. Sets the element klass and mongoizes all of the
     # elements in the given array.
     #
     # @param [ Class ] type The inner type of the array.
@@ -13,6 +16,21 @@ module Mongoid
     def initialize(type, *args, &block)
       @element_klass = type
 
+      # There are a few ways to instantiate an array:
+      #
+      # - Array.new(4) { |i| i * i } # => [ 0, 1, 4, 9 ]
+      #   In this case we can't mongoize the inputs since the values are
+      #   calculated inside Array's constructor. Instead we can map over the
+      #   results.
+      # - Array.new([ 1, 2, 3 ]) # => [ 1, 2, 3 ]
+      #   Map over and mongoize the input and pass it into the constructor.
+      # - Array(3, "value") # => [ "value", "value", "value" ]
+      #   Mongoize the default value and pass it into the constructor.
+      # - Else, we are either instantiating an empty array or raising an error.
+      #
+      # Now, we could just do what we do for case 1 for all cases, but this
+      # would be very inefficient in case 3, since we could be mapping over a
+      # large array instead of just mongoizing one value.
       if block_given?
         super(*args, &block).map! { |x| type.mongoize(x) }
       elsif args.length == 1 && args.first.is_a?(Array)
