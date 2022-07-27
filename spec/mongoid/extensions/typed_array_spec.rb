@@ -54,9 +54,22 @@ describe Mongoid::TypedArray do
     end
   end
 
+  shared_examples "maintains class" do
+    it "keeps the type of the array" do
+      expect(pushed).to be_a(described_class)
+      expect(typed_array).to be_a(described_class)
+    end
+  end
+
+  shared_examples "maintains original array" do
+    it "has the correct values" do
+      expect(typed_array).to eq(pushed)
+    end
+  end
+
   describe "#<<" do
 
-    let(:typed_array) { described_class.new(Integer, [1]) }
+    let(:typed_array) { described_class.new(Integer, [ 1 ]) }
 
     context "when the item is of the correct type" do
 
@@ -66,16 +79,351 @@ describe Mongoid::TypedArray do
         expect(pushed).to eq([ 1, 2 ])
       end
 
-      it "returns an array of the correct type" do
-        expect(pushed).to be_a(described_class)
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when the item is castable" do
+
+      let!(:pushed) { typed_array << "2" }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, 2 ])
       end
 
-      it "modifies the original array" do
-        expect(typed_array).to eq([ 1, 2 ])
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when the item is uncastable" do
+
+      let!(:pushed) { typed_array << "bogus" }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, nil ])
       end
 
-      it "keeps the type of the original array" do
-        expect(typed_array).to be_a(described_class)
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending no items" do
+
+      let(:pushed) { typed_array.<< }
+
+      it "raises an error" do
+        expect do
+          pushed
+        end.to raise_error(ArgumentError, /wrong number of arguments/)
+      end
+    end
+  end
+
+  [ :push, :append ].each do |method|
+    describe "##{method}" do
+
+      let(:typed_array) { described_class.new(Integer, [ 1 ]) }
+
+      context "when the item is of the correct type" do
+
+        let!(:pushed) { typed_array.send(method, 2) }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ 1, 2 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when the item is castable" do
+
+        let!(:pushed) { typed_array.send(method, "2") }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ 1, 2 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when the item is uncastable" do
+
+        let!(:pushed) { typed_array.send(method, "bogus") }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ 1, nil ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when sending multiple items" do
+
+        let!(:pushed) { typed_array.send(method, 2, "3", "bogus") }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ 1, 2, 3, nil ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when sending no items" do
+
+        let!(:pushed) { typed_array.send(method) }
+
+        it "returns the same elements" do
+          expect(pushed).to eq([ 1 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+    end
+  end
+
+  [ :unshift, :prepend ].each do |method|
+    describe "##{method}" do
+
+      let(:typed_array) { described_class.new(Integer, [ 1 ]) }
+
+      context "when the item is of the correct type" do
+
+        let!(:pushed) { typed_array.send(method, 2) }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ 2, 1 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when the item is castable" do
+
+        let!(:pushed) { typed_array.send(method, "2") }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ 2, 1 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when the item is uncastable" do
+
+        let!(:pushed) { typed_array.send(method, "bogus") }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ nil, 1 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when sending multiple items" do
+
+        let!(:pushed) { typed_array.send(method, 2, "3", "bogus") }
+
+        it "returns the correct elements" do
+          expect(pushed).to eq([ 2, 3, nil, 1 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+
+      context "when sending no items" do
+
+        let!(:pushed) { typed_array.send(method) }
+
+        it "returns the same elements" do
+          expect(pushed).to eq([ 1 ])
+        end
+
+        include_examples "maintains original array"
+        include_examples "maintains class"
+      end
+    end
+  end
+
+  describe "#insert" do
+
+    let(:typed_array) { described_class.new(Integer, [ 1, 2 ]) }
+
+    context "when the item is of the correct type" do
+
+      let!(:pushed) { typed_array.insert(1, 3) }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, 3, 2 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when the item is castable" do
+
+      let!(:pushed) { typed_array.insert(1, "3") }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, 3, 2 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when the item is uncastable" do
+
+      let!(:pushed) { typed_array.insert(1, "bogus") }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, nil, 2 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending multiple items" do
+
+      let!(:pushed) { typed_array.insert(1, "3", "bogus") }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 1, 3, nil, 2 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending one item" do
+
+      let(:pushed) { typed_array.insert(2) }
+
+      it "returns the same elements" do
+        expect(pushed).to eq([ 1, 2 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending one item of the wrong type" do
+
+      let(:pushed) { typed_array.insert("bogus") }
+
+      it "raises a type error" do
+        expect do
+          pushed
+        end.to raise_error(TypeError, /no implicit conversion of String into Integer/)
+      end
+    end
+  end
+
+  describe "#fill" do
+
+    let(:typed_array) { described_class.new(Integer, [ 1, 2, 3 ]) }
+
+    context "when passing one item of the correct type" do
+
+      let!(:pushed) { typed_array.fill(4) }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 4, 4, 4 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when passing on item that is castable" do
+
+      let!(:pushed) { typed_array.fill("4") }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 4, 4, 4 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when passing one item that is uncastable" do
+
+      let!(:pushed) { typed_array.fill("bogus") }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ nil, nil, nil ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending a range" do
+
+      let!(:pushed) { typed_array.fill("4", 0..1) }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 4, 4, 3 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending a start and end" do
+
+      let!(:pushed) { typed_array.fill("4", 0, 1) }
+
+      it "returns the correct elements" do
+        expect(pushed).to eq([ 4, 2, 3 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending a block" do
+
+      let(:pushed) { typed_array.fill(2) { |i| "#{i * i}" } }
+
+      it "returns and mongoizes the correct elements" do
+        expect(pushed).to eq([ 1, 2, 4 ])
+      end
+
+      include_examples "maintains original array"
+      include_examples "maintains class"
+    end
+
+    context "when sending an item of the wrong type with a block" do
+
+      let(:pushed) { typed_array.fill("bogus") { |i| i * i } }
+
+      it "raises a type error" do
+        expect do
+          pushed
+        end.to raise_error(TypeError, /no implicit conversion of String into Integer/)
+      end
+    end
+
+    context "when sending an item of the wrong type to other args" do
+
+      let(:pushed) { typed_array.fill(1, "bogus") }
+
+      it "raises a type error" do
+        expect do
+          pushed
+        end.to raise_error(TypeError, /no implicit conversion of String into Integer/)
       end
     end
   end

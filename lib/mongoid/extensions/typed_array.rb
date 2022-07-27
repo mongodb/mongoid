@@ -28,6 +28,67 @@ module Mongoid
       super(element_klass.mongoize(arg))
     end
 
+    # Push item(s) to the Array. The item will be mongoized into the
+    # TypedArray's inner type.
+    #
+    # @example Append the item.
+    #   array.push(item)
+    #
+    # @param [ Object... ] *args The items to append.
+    #
+    # @return [ Array ] The resulting array.
+    def push(*args)
+      super(*mongoize_with_array(args))
+    end
+    alias :append :push
+
+    # Prepend item(s) to the Array. The item will be mongoized into the
+    # TypedArray's inner type.
+    #
+    # @example Append the item.
+    #   array.unshift(item)
+    #
+    # @param [ Object... ] *args The items to prepend.
+    #
+    # @return [ Array ] The resulting array.
+    def unshift(*args)
+      super(*mongoize_with_array(args))
+    end
+    alias :prepend :unshift
+
+    # Insert item(s) into the Array. The item will be mongoized into the
+    # TypedArray's inner type.
+    #
+    # @example Append the item.
+    #   array.insert(1, item)
+    #
+    # @param [ Object... ] *args The items to prepend.
+    #
+    # @return [ Array ] The resulting array.
+    def insert(*args)
+      return super if args.length == 0
+      super(args.first, *mongoize_with_array(args[1, args.length-1]))
+    end
+
+    # Fill the Array with item(s). The item will be mongoized into the
+    # TypedArray's inner type.
+    #
+    # @example Append the item.
+    #   array.insert(1, item)
+    #
+    # @param [ Object... ] *args The items to prepend.
+    #
+    # @return [ Array ] The resulting array.
+    def fill(*args)
+      return super if args.length == 0
+
+      if block_given?
+        super.map! { |x| element_klass.mongoize(x) }
+      else
+        super(element_klass.mongoize(args.first), *args[1, args.length-1])
+      end
+    end
+
     # Set the element as the given index.
     #
     # @param [ Object ] *args The arguments.
