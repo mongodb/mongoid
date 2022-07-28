@@ -29,6 +29,16 @@ module Mongoid
         true
       end
 
+      # Is the localized field enforcing values to be present?
+      #
+      # @example Is the localized field enforcing values to be present?
+      #   field.localize_present?
+      #
+      # @return [ true | false ] If the field enforces present.
+      def localize_present?
+        options[:localize] == :present
+      end
+
       # Convert the provided string into a hash for the locale.
       #
       # @example Serialize the value.

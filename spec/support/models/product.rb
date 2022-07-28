@@ -10,6 +10,7 @@ class Product
   field :website, localize: true
   field :sku, as: :stock_keeping_unit
   field :tl, as: :tagline, localize: true
+  field :title, localize: :present
   alias_attribute :cost, :price
 
   validates :name, presence: true

@@ -1964,4 +1964,143 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  describe "localize: :present" do
+
+    let(:product) do
+      Product.new
+    end
+
+    context "when assigning a non blank value" do
+
+      before do
+        product.title = "hello"
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq("hello")
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning an empty string" do
+
+      before do
+        ::I18n.locale = :en
+        product.title = "hello"
+        ::I18n.locale = :de
+        product.title = "hello there!"
+        product.title = ""
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning nil" do
+
+      before do
+        ::I18n.locale = :en
+        product.title = "hello"
+        ::I18n.locale = :de
+        product.title = "hello there!"
+        product.title = nil
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning an empty array" do
+
+      before do
+        ::I18n.locale = :en
+        product.title = "hello"
+        ::I18n.locale = :de
+        product.title = "hello there!"
+        product.title = []
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning an empty string first" do
+
+      before do
+        ::I18n.locale = :en
+        product.title = ""
+      end
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({})
+      end
+    end
+
+    context "when assigning an empty string with only one translation" do
+
+      before do
+        ::I18n.locale = :en
+        product.title = "Hello"
+        product.title = ""
+        product.save!
+      end
+
+      let(:from_db) { Product.first }
+
+      after do
+        ::I18n.locale = :en
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({})
+      end
+
+      it "round trips an empty hash" do
+        expect(from_db.title_translations).to eq({})
+      end
+    end
+  end
 end

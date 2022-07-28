@@ -99,3 +99,20 @@ specific version:
 This is helpful for upgrading between versions. See the section on
 :ref:`Version Based Default Configuration <load-defaults>` for more details on
 how to use this feature to make upgrading between Mongoid versions easier.
+
+
+Added ``:present`` option to localized fields
+---------------------------------------------
+
+The ``:present`` option was added to localized fields for removing blank values
+from the ``_translations`` hash:
+
+.. code-block:: ruby
+
+   class Product
+     include Mongoid::Document
+     field :description, localize: :present
+   end
+
+See the section on :ref:`Localize :present Field Option <present-fields>` for
+more details on how these are used.

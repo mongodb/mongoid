@@ -1396,6 +1396,42 @@ You can get and set all the translations at once by using the corresponding ``_t
      { "en" => "Marvelous!", "de" => "Wunderbar!" }
 
 
+.. _present-fields:
+
+Localize ``:present`` Field Option
+----------------------------------
+
+Mongoid supports the ``:present`` option when creating a localized field:
+
+.. code-block:: ruby
+
+   class Product
+     include Mongoid::Document
+     field :description, localize: :present
+   end
+
+This option automatically removes ``blank`` values (i.e. those that return true
+for the ``blank?`` method) from the ``_translations`` hash:
+
+.. code-block:: ruby
+
+   I18n.default_locale = :en
+   product = Product.new
+   product.description = "Marvelous!"
+   I18n.locale = :de
+   product.description = "Fantastisch!"
+
+   product.description_translations
+   # { "en" => "Marvelous!", "de" => "Fantastisch!" }
+
+   product.description = ""
+   product.description_translations
+   # { "en" => "Marvelous!" }
+
+When the empty string is written for the ``:de`` locale, the ``"de"`` key is
+removed from the ``_translations`` hash instead of writing the empty string.
+
+
 Fallbacks
 ---------
 

@@ -177,8 +177,14 @@ module Mongoid
             attribute_will_change!(field_name)
           end
           if localized
-            attributes[field_name] ||= {}
-            attributes[field_name].merge!(typed_value)
+            present = fields[field_name].try(:localize_present?)
+            loc_key, loc_val = typed_value.first
+            if present && loc_val.blank?
+              attributes[field_name]&.delete(loc_key)
+            else
+              attributes[field_name] ||= {}
+              attributes[field_name].merge!(typed_value)
+            end
           else
             attributes[field_name] = typed_value
           end
