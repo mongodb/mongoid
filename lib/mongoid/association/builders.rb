@@ -27,7 +27,7 @@ module Mongoid
       # @example Parse the args.
       #   doc.parse_args(:name => "Joe")
       #
-      # @param [ Array ] args The arguments.
+      # @param [ Hash... ] *args The arguments.
       #
       # @return [ Array<Hash> ] The attributes and options.
       def parse_args(*args)

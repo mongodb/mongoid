@@ -79,7 +79,7 @@ module Mongoid
     # @example Run only the after save callbacks.
     #   model.run_after_callbacks(:save)
     #
-    # @param [ Array<Symbol> ] kinds The events that are occurring.
+    # @param [ Symbol... ] *kinds The events that are occurring.
     #
     # @return [ Object ] The result of the chain executing.
     def run_after_callbacks(*kinds)
@@ -96,7 +96,7 @@ module Mongoid
     # @example Run only the before save callbacks.
     #   model.run_before_callbacks(:save, :create)
     #
-    # @param [ Array<Symbol> ] kinds The events that are occurring.
+    # @param [ Symbol... ] *kinds The events that are occurring.
     #
     # @return [ Object ] The result of the chain executing.
     def run_before_callbacks(*kinds)

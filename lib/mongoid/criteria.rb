@@ -88,7 +88,7 @@ module Mongoid
     # @example Tries to find a document whose _id is the stringification of the provided Proc, typically failing.
     #   enumerator = criteria.find(-> { "Default Band" })
     #
-    # @param [ Object | Array<Object> ] *args The ids.
+    # @param [ Object... ] *args The id(s).
     # @param [ Proc ] block Optional block to pass.
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
@@ -284,7 +284,7 @@ module Mongoid
     # @example Limit the fields returned from the database.
     #   Band.only(:name)
     #
-    # @param [ Array<Symbol> ] args The names of the fields.
+    # @param [ [ Symbol | Array<Symbol> ]... ] *args The field name(s).
     #
     # @return [ Criteria ] The cloned criteria.
     def only(*args)
@@ -318,7 +318,7 @@ module Mongoid
     # @example Exclude fields returned from the database.
     #   Band.without(:name)
     #
-    # @param [ Array<Symbol> ] args The names of the fields.
+    # @param [ Symbol... ] *args The field name(s).
     #
     # @return [ Criteria ] The cloned criteria.
     def without(*args)
@@ -385,7 +385,8 @@ module Mongoid
     # @example Add a javascript selection.
     #   criteria.where("this.name == 'syd'")
     #
-    # @param [ String | Hash ] expression The javascript or standard selection.
+    # @param [ [ Hash | String ]... ] *args The standard selection
+    #   or javascript string.
     #
     # @raise [ UnsupportedJavascript ] If provided a string and the criteria
     #   is embedded.
@@ -495,7 +496,7 @@ module Mongoid
     #   criteria.method_missing(:name)
     #
     # @param [ Symbol ] name The method name.
-    # @param [ Array ] args The arguments.
+    # @param [ Object... ] *args The arguments.
     #
     # @return [ Object ] The result of the method call.
     ruby2_keywords def method_missing(name, *args, &block)
