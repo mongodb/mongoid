@@ -180,7 +180,7 @@ module Mongoid
             present = fields[field_name].try(:localize_present?)
             loc_key, loc_val = typed_value.first
             if present && loc_val.blank?
-              attributes[field_name].delete(loc_key) unless attributes[field_name].nil?
+              attributes[field_name]&.delete(loc_key)
             else
               attributes[field_name] ||= {}
               attributes[field_name].merge!(typed_value)
