@@ -22,9 +22,9 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
   end
 
   describe "Mongoid::.*Array" do
-    before do
-      # load band so the IntegerArray and StringArray classes are created.
-      Band
+    before(:all) do
+      described_class.create(Integer)
+      described_class.create(String)
     end
 
     describe "#initialize" do
