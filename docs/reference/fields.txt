@@ -28,17 +28,14 @@ Field type definitions determine how Mongoid behaves when constructing queries
 and retrieving/writing fields from/to the database. Specifically:
 
 1. When assigning values to fields at runtime, the values are converted to the
-specified type.
-
+   specified type.
 2. When persisting data to MongoDB, the data is sent in an appropriate
-type, permitting richer data manipulation within MongoDB or by other
-tools.
-
+   type, permitting richer data manipulation within MongoDB or by other
+   tools.
 3. When querying documents, query parameters are converted to the specified
-type before being sent to MongoDB.
-
+   type before being sent to MongoDB.
 4. When retrieving documents from the database, field values are converted
-to the specified type.
+   to the specified type.
 
 Changing the field definitions in a model class does not alter data already stored in
 MongoDB. To update type or contents of fields of existing documents,
