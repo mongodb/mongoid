@@ -199,7 +199,7 @@ module Mongoid
           # @note This will keep matching documents in memory for iteration
           #   later.
           #
-          # @param [ [ BSON::ObjectId | String ]... ] *args The ids.
+          # @param [ [ Object | Array<Object> ]... ] *args The ids.
           # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.

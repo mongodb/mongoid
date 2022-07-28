@@ -149,7 +149,7 @@ module Mongoid
     # @note Each argument can be an individual id, an array of ids or
     #   a nested array. Each array will be flattened.
     #
-    # @param [ Object... ] *args The id(s) to find.
+    # @param [ [ Object | Array<Object> ]... ] *args The id(s) to find.
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
     #

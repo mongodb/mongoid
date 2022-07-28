@@ -88,7 +88,7 @@ module Mongoid
     # @example Tries to find a document whose _id is the stringification of the provided Proc, typically failing.
     #   enumerator = criteria.find(-> { "Default Band" })
     #
-    # @param [ Object... ] *args The id(s).
+    # @param [ [ Object | Array<Object> ]... ] *args The id(s).
     # @param [ Proc ] block Optional block to pass.
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.

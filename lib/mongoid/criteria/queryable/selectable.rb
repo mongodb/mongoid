@@ -69,7 +69,7 @@ module Mongoid
         # @example Add the criterion.
         #   selectable.and({ field: value }, { other: value })
         #
-        # @param [ [ Hash | Criteria ]... ] *criteria
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects that all must
         #   match to return results.
         #
@@ -517,7 +517,7 @@ module Mongoid
         # @example Add the $nor selection.
         #   selectable.nor(field: 1, field: 2)
         #
-        # @param [ [ Hash | Criteria ]... ] *criteria Multiple key/value pair
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria Multiple key/value pair
         #   matches or Criteria objects.
         #
         # @return [ Selectable ] The new selectable.
