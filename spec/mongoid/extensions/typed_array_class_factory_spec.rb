@@ -6,12 +6,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
 
   describe '.create' do
     context "when creating a TypedArray class" do
-      after do
-        Mongoid.send(:remove_const, :IntegerArray)
-      end
-
       before do
-        expect(Mongoid.const_defined?("IntegerArray")).to be false
         described_class.create(Integer)
       end
 
