@@ -517,8 +517,8 @@ module Mongoid
         # @example Add the $nor selection.
         #   selectable.nor(field: 1, field: 2)
         #
-        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria Multiple key/value pair
-        #   matches or Criteria objects.
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        #   Multiple key/value pair matches or Criteria objects.
         #
         # @return [ Selectable ] The new selectable.
         def nor(*criteria)
