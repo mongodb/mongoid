@@ -280,4 +280,78 @@ describe 'embedded associations' do
       expect(user.orders.sum(:amount)).to eq(500)
     end
   end
+
+  context 'when modifying an embedded document & removing another embedded document' do
+    let(:user) do
+      EmmUser.create!(orders: [
+        EmmOrder.new(sku: 0, amount: 0),
+        EmmOrder.new(sku: 1, amount: 1),
+        EmmOrder.new(sku: 2, amount: 2),
+      ])
+    end
+
+    context 'when modifying first and removing second' do
+      it 'works correctly' do
+        user.orders[1].assign_attributes(amount: 10)
+        user.orders[0].destroy
+        user.save!
+        user.reload
+
+        user.orders.map do
+          |order| [order.sku, order.amount]
+        end.should == [[1, 10], [2, 2]]
+      end
+    end
+
+    context 'when removing first and modifying second' do
+      it 'works correctly' do
+        user.orders[0].destroy
+        user.orders[1].assign_attributes(amount: 20)
+        user.save!
+        user.reload
+
+        user.orders.map do
+          |order| [order.sku, order.amount]
+        end.should == [[1, 1], [2, 20]]
+      end
+    end
+  end
+
+  context 'when modifying a nested embedded document & removing another nested embedded document' do
+    let(:user) do
+      EmmUser.create!(orders: [
+        EmmOrder.new(sku: 0, surcharges: [EmmSurcharge.new(amount: 0)]),
+        EmmOrder.new(sku: 1, surcharges: [EmmSurcharge.new(amount: 1)]),
+        EmmOrder.new(sku: 2, surcharges: [EmmSurcharge.new(amount: 2)]),
+      ])
+    end
+
+    context 'when modifying first and removing second' do
+      it 'works correctly' do
+        pending 'MONGOID-5364'
+
+        user.orders[1].assign_attributes(surcharges: [amount: 10])
+        user.orders[0].destroy
+        user.save!
+        user.reload
+
+        user.orders.map do
+          |order| [order.sku, order.surcharges.first.amount]
+        end.should == [[1, 10], [2, 2]]
+      end
+    end
+
+    context 'when removing first and modifying second' do
+      it 'works correctly' do
+        user.orders[0].destroy
+        user.orders[1].assign_attributes(surcharges: [amount: 20])
+        user.save!
+        user.reload
+
+        user.orders.map do
+          |order| [order.sku, order.surcharges.first.amount]
+        end.should == [[1, 1], [2, 20]]
+      end
+    end
+  end
 end
