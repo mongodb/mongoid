@@ -61,25 +61,25 @@ The valid types for fields are as follows:
 
 - ``Array``
 - ``BSON::Binary``
-- ``BigDecimal``
+- :ref:`BigDecimal <field-type-big-decimal>`
 - ``Mongoid::Boolean``, which may be specified simply as ``Boolean`` in the
   scope of a class which included ``Mongoid::Document``.
-- ``Date``
-- ``DateTime``
+- :ref:`Date <field-type-date>`
+- :ref:`DateTime <field-type-date-time>`
 - ``Float``
-- ``Hash``
+- :ref:`Hash <field-type-hash>`
 - ``Integer``
-- ``Object`` (see :ref:`untyped fields <untyped-fields>`)
+- :ref:`Object <untyped-fields>`
 - ``BSON::ObjectId``
 - ``Range``
-- ``Regexp``
+- :ref:`Regexp <field-type-regexp>`
 - ``Set``
 - ``String``
-- ``Mongoid::StringifiedSymbol``, which may be specified simply as
-  ``StringifiedSymbol`` in the scope of a class which included
-  ``Mongoid::Document``.
-- ``Symbol``
-- ``Time``
+- :ref:`Mongoid::StringifiedSymbol <field-type-stringified-symbol>`,
+  which may be specified simply as ``StringifiedSymbol`` in the scope of a
+  class which included ``Mongoid::Document``.
+- :ref:`Symbol <field-type-stringified-symbol>`
+- :ref:`Time <field-type-time>`
 - ``ActiveSupport::TimeWithZone``
 
 Mongoid also recognizes the string ``"Boolean"`` as an alias for the
@@ -471,7 +471,7 @@ matches strings containing "hello" before a newline, besides strings ending in
 This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
 
-.. _bigdecimal-fields:
+.. _field-type-big-decimal:
 
 BigDecimal Fields
 -----------------
