@@ -12,6 +12,12 @@ Inheritance
    :depth: 2
    :class: singlecol
 
+
+.. _inheritance-overview:
+
+Overview
+========
+
 Mongoid supports inheritance in both top level and embedded documents. When
 a child document inherits from a parent document, the parent document's
 fields, associations, validations and scopes are copied to the child document.
