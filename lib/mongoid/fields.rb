@@ -849,48 +849,9 @@ module Mongoid
           Mongoid::Boolean
         elsif type.is_a?(Array)
           array_type = retrieve_and_validate_type(name, type.first)
-          create_typed_array_class(array_type)
+          Mongoid::Extensions::TypedArrayClassFactory.create(array_type)
         else
           type || Object
-        end
-      end
-
-      # Create or retrieve the typed array class. If the class has not already
-      # been created, create a class called {Type}Array that inherits from
-      # Mongoid::TypedArray.
-      #
-      # @param [ Class ] type The type of the field.
-      #
-      # @return [ Class ] The typed array class.
-      #
-      # @api private
-      def create_typed_array_class(type)
-        const_string = "#{type}Array"
-        if Mongoid.const_defined?(const_string)
-          Mongoid.const_get(const_string)
-        else
-          array_class = Class.new(Mongoid::TypedArray) do
-            attr_reader :type
-
-            def initialize(*args, &block)
-              @type = self.class.const_get("Type")
-              super(@type, *args, &block)
-            end
-
-            class << self
-              def mongoize(object)
-                return if object.nil?
-                case object
-                when self then object
-                when Array, Set
-                  new(object.to_a)
-                end
-              end
-              alias :demongoize :mongoize
-            end
-          end
-          array_class.const_set("Type", type)
-          Mongoid.const_set(const_string, array_class)
         end
       end
     end
