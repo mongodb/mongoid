@@ -14,9 +14,8 @@ module Mongoid
       #
       # @return [ Object ] The value for the current locale.
       def demongoize(object)
-        if object
-          type.demongoize(lookup(object))
-        end
+        return if object.nil?
+        type.demongoize(lookup(object))
       end
 
       # Is the field localized or not?
@@ -86,7 +85,10 @@ module Mongoid
         end
         return value unless value.nil?
         if fallbacks? && ::I18n.respond_to?(:fallbacks)
-          object[::I18n.fallbacks[locale].map(&:to_s).find{ |loc| object.has_key?(loc) }]
+          fallback_key = ::I18n.fallbacks[locale].find do |loc|
+            object.has_key?(loc.to_s) || object.has_key?(loc)
+          end
+          object[fallback_key.to_s] || object[fallback_key]
         end
       end
     end
