@@ -50,6 +50,8 @@ module Mongoid
           # All flag defaults currently reflect 8.0 behavior.
         when "8.1"
           # All flag defaults currently reflect 8.1 behavior.
+        when "9.0"
+          # All flag defaults currently reflect 9.0 behavior.
         else
           raise ArgumentError, "Unknown version: #{version}"
         end
