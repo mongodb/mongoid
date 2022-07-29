@@ -215,13 +215,13 @@ module Mongoid
           # completely depending on whether it is iterated to completion.
           #
           # This method can take a parameter and a block. The behavior with
-          # either the paramater or the block is delegated to the standard
+          # either the parameter or the block is delegated to the standard
           # library Enumerable module.
           #
           # Note that when Enumerable's any? method is invoked with both
           # a block and a pattern, it only uses the pattern.
           #
-          # @param [ Object ] condition The condition that documents
+          # @param [ Object... ] *args The condition that documents
           #   must satisfy. See Enumerable documentation for details.
           #
           # @return [ true | false ] If the association has any documents.

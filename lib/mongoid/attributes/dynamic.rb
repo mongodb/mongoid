@@ -115,7 +115,7 @@ module Mongoid
       #   document.method_missing(:test)
       #
       # @param [ String | Symbol ] name The name of the method.
-      # @param [ Array ] args The arguments to the method.
+      # @param [ Object... ] *args The arguments to the method.
       #
       # @return [ Object ] The result of the method call.
       def method_missing(name, *args)

@@ -88,7 +88,7 @@ module Mongoid
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String | Symbol ] *_fields Field(s) to pluck.
+      # @param [ [ String | Symbol ]... ] *_fields Field(s) to pluck.
       #
       # @return [ Array ] An empty Array.
       def pluck(*_fields)
@@ -100,9 +100,9 @@ module Mongoid
       # @example Get the value for null context.
       #   context.pick(:name)
       #
-      # @param [ String | Symbol ] *_fields Field or fields to pick.
+      # @param [ [ String | Symbol ]... ] *_fields Field(s) to pick.
       #
-      # @return [ nil ] Always reeturn nil.
+      # @return [ nil ] Always return nil.
       def pick(*_fields)
         nil
       end

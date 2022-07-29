@@ -61,7 +61,7 @@ module Mongoid
         #     attr_readonly :name, :genre
         #   end
         #
-        # @param [ Array<Symbol> ] names The names of the fields.
+        # @param [ Symbol... ] *names The names of the fields.
         def attr_readonly(*names)
           names.each do |name|
             readonly_attributes << database_field_name(name)

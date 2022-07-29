@@ -118,7 +118,7 @@ module Mongoid
       # to the target of the proxy. This can be overridden in special cases.
       #
       # @param [ String | Symbol ] name The name of the method.
-      # @param [ Array ] args The arguments passed to the method.
+      # @param [ Object... ] *args The arguments passed to the method.
       ruby2_keywords def method_missing(name, *args, &block)
         _target.send(name, *args, &block)
       end

@@ -19,7 +19,7 @@ module Mongoid
           # @example Push a document.
           #   person.addresses.push(address)
           #
-          # @param [ Document | Array<Document> ] args Any number of documents.
+          # @param [ Document... ] *args Any number of documents.
           def <<(*args)
             docs = args.flatten
             return concat(docs) if docs.size > 1
@@ -117,7 +117,7 @@ module Mongoid
           # @example Use #persisted? inside block to count persisted documents.
           #   person.addresses.count { |a| a.persisted? && a.country == "FR" }
           #
-          # @param [ Object | Array<Object> ] args Args to delegate to the target.
+          # @param [ Object... ] *args Args to delegate to the target.
           #
           # @return [ Integer ] The total number of persisted embedded docs, as
           #   flagged by the #persisted? method.
@@ -235,7 +235,7 @@ module Mongoid
           # @example Finds the first matching document using a block.
           #   person.addresses.find { |addr| addr.state == 'CA' }
           #
-          # @param [ Array<Object> ] args Various arguments.
+          # @param [ Object... ] *args Various arguments.
           # @param [ Proc ] block Optional block to pass.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
@@ -430,10 +430,10 @@ module Mongoid
           # If the method exists on the array, use the default proxy behavior.
           #
           # @param [ Symbol | String ] name The name of the method.
-          # @param [ Array ] args The method args
+          # @param [ Object... ] *args The method args.
           # @param [ Proc ] block Optional block to pass.
           #
-          # @return [ Criteria, Object ] A Criteria or return value from the target.
+          # @return [ Criteria | Object ] A Criteria or return value from the target.
           ruby2_keywords def method_missing(name, *args, &block)
             return super if _target.respond_to?(name)
             klass.send(:with_scope, criteria) do

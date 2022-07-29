@@ -321,7 +321,7 @@ module Mongoid
       # @example Pluck a field.
       #   context.pluck(:_id)
       #
-      # @param [ String | Symbol ] *fields Field(s) to pluck,
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pluck,
       #   which may include nested fields using dot-notation.
       #
       # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
@@ -362,7 +362,7 @@ module Mongoid
       # @example Pick a field.
       #   context.pick(:_id)
       #
-      # @param [ String | Symbol ] *fields Field(s) to pick.
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pick.
       #
       # @return [ Object | Array<Object> ] The picked values.
       def pick(*fields)
@@ -519,7 +519,7 @@ module Mongoid
       # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
       #   an update should apply.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update(attributes = nil, opts = {})
         update_documents(attributes, :update_one, opts)
       end
@@ -535,7 +535,7 @@ module Mongoid
       # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
       #   an update should apply.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update_all(attributes = nil, opts = {})
         update_documents(attributes, :update_many, opts)
       end

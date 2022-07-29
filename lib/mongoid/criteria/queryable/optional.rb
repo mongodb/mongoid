@@ -17,7 +17,7 @@ module Mongoid
         # @example Add ascending sorting.
         #   optional.ascending(:first_name, :last_name)
         #
-        # @param [ Array<Symbol> ] fields The fields to sort.
+        # @param [ Symbol... ] *fields The field(s) to sort.
         #
         # @return [ Optional ] The cloned optional.
         def ascending(*fields)
@@ -45,7 +45,7 @@ module Mongoid
         # @example Add descending sorting.
         #   optional.descending(:first_name, :last_name)
         #
-        # @param [ Array<Symbol> ] fields The fields to sort.
+        # @param [ Symbol... ] *fields The field(s) to sort.
         #
         # @return [ Optional ] The cloned optional.
         def descending(*fields)
@@ -123,7 +123,7 @@ module Mongoid
         # @example Limit the results to the provided fields.
         #   optional.only(:name, :dob)
         #
-        # @param [ Array<Symbol> ] args The fields to return.
+        # @param [ Symbol... ] *args The field(s) to return.
         #
         # @return [ Optional ] The cloned optional.
         def only(*args)
@@ -163,7 +163,7 @@ module Mongoid
         # @example Add sorting options via a string.
         #   optional.order_by("name ASC, dob DESC")
         #
-        # @param [ Array | Hash | String ] spec The sorting specification.
+        # @param [ [ Array | Hash | String ]... ] *spec The sorting specification.
         #
         # @return [ Optional ] The cloned optional.
         def order_by(*spec)
@@ -184,7 +184,7 @@ module Mongoid
         # @example Replace the ordering.
         #   optional.reorder(name: :asc)
         #
-        # @param [ Array | Hash | String ] spec The sorting specification.
+        # @param [ [ Array | Hash | String ]... ] *spec The sorting specification.
         #
         # @return [ Optional ] The cloned optional.
         def reorder(*spec)
@@ -245,7 +245,7 @@ module Mongoid
         # @example Limit the results to the fields not provided.
         #   optional.without(:name, :dob)
         #
-        # @param [ Array<Symbol> ] args The fields to ignore.
+        # @param [ Symbol... ] *args The field(s) to ignore.
         #
         # @return [ Optional ] The cloned optional.
         def without(*args)
@@ -331,7 +331,7 @@ module Mongoid
         # @example Store the option.
         #   optional.option({ skip: 10 })
         #
-        # @param [ Array ] args The options.
+        # @param [ Object... ] *args The options.
         #
         # @return [ Queryable ] The cloned queryable.
         def option(*args)
@@ -349,7 +349,7 @@ module Mongoid
         # @example Add multiple sort options.
         #   optional.sort_with_list(:name, :dob, 1)
         #
-        # @param [ Array<String> ] fields The field names.
+        # @param [ [ Symbol | String ]... ] *fields The field name(s).
         # @param [ Integer ] direction The sort direction.
         #
         # @return [ Optional ] The cloned optional.
