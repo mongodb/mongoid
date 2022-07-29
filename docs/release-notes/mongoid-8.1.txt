@@ -121,9 +121,15 @@ more details on how these are used.
 Support for Assignment of Nested ``ActionController::Parameters``
 -----------------------------------------------------------------
 
-Prior to Mongoid 8.0, attempting to instantiate or assign nested
-``ActionController::Parameters`` to a document would raise a
-``MethodMissing`` error. The following now works as expected.
+Mass assignment of nested ``ActionController::Parameters`` to a document now
+works as expected for the following cases:
+
+- Localized fields
+- Array and Hash fields, including deeply nested Arrays and Hashes
+- ``accepts_nested_attributes_for``
+
+As usual, you must ``permit`` parameters before doing so; any unpermitted
+parameters will be ignored.
 
 .. code-block:: ruby
 
@@ -138,16 +144,28 @@ Prior to Mongoid 8.0, attempting to instantiate or assign nested
   end
 
   params = ActionController::Parameters.new({
-    name: { 'en' => 'ACME Co.' },
+    name: { "en" => "ACME Co." },
     data: { key: [:value1, { key2: :value2 }] }
-    shops_attributes: { ... }
+    shops_attributes: [{ name: "Gadgets R Us" }]
   }).permit!
 
-  Company.new(params) #=> raises MethodMissing error prior to Mongoid 8.0
+  company = Company.new(params)
+  company.name_translations  #=> { "en" => "ACME Co." }
+  company.data               #=> { key: [:value1, { key2: :value2 }] }
+  company.shops.first.name   #=> "Gadgets R Us"
 
-If you are using the `Protected Attributes Continued gem
-<https://github.com/westonganger/protected_attributes_continued>`_
-to preserve legacy Rails 4 ``attr_accessible`` functionality, please note
-that it will only protect document root-level field assignment and will
-not protect ``accepts_nested_attributes_for`` nested assignment.
-Please use Strong Parameters (``permit!``, etc.) in this case.
+In prior Mongoid versions, given the above example, attempting to mass-assign
+nested ``ActionController::Parameters`` would raise a ``MethodMissing`` error.
+
+.. code-block:: ruby
+
+  Company.new(params) #=> raises MethodMissing error
+
+.. note::
+
+  If you are using the `Protected Attributes Continued gem
+  <https://github.com/westonganger/protected_attributes_continued>`_
+  to preserve legacy Rails 4 ``attr_accessible`` functionality, please note
+  that it will only protect document root-level field assignment and will
+  not protect ``accepts_nested_attributes_for`` nested assignment.
+  Please use Strong Parameters (``permit!``, etc.) in this case.
