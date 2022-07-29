@@ -335,6 +335,10 @@ describe Mongoid::Extensions::Hash do
       it "converts the elements properly" do
         expect(mongoized[:date]).to eq(Time.utc(2012, 1, 1, 0, 0, 0))
       end
+
+      it "mongoizes to a BSON::Document" do
+        expect(mongoized).to be_a(BSON::Document)
+      end
     end
 
     context "when object is nil" do
@@ -354,6 +358,20 @@ describe Mongoid::Extensions::Hash do
 
       it "returns nil" do
         expect(mongoized).to be_nil
+      end
+    end
+
+    describe "when mongoizing a BSON::Document" do
+      let(:mongoized) do
+        Hash.mongoize(BSON::Document.new({ x: 1, y: 2 }))
+      end
+
+      it "returns the same hash" do
+        expect(mongoized).to eq({ "x" => 1, "y" => 2 })
+      end
+
+      it "returns a BSON::Document" do
+        expect(mongoized).to be_a(BSON::Document)
       end
     end
   end
