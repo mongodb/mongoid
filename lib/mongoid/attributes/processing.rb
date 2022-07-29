@@ -149,7 +149,7 @@ module Mongoid
       # instead of #sanitize_for_mass_assignment. The former only resolves
       # Strong Parameters permitted attributes.
       def sanitize_nested_forbidden_attributes(attrs)
-        if attrs.is_a?(Array)
+        if attrs.is_a?(Array) || attrs.is_a?(Set)
           attrs.map(&method(:sanitize_forbidden_attributes))
         else
           sanitize_forbidden_attributes(attrs)
