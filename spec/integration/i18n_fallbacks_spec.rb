@@ -19,8 +19,13 @@ describe 'i18n fallbacks' do
 
   context 'when fallbacks are enabled with a locale list' do
     before do
+      prev_fallbacks = I18n.fallbacks.dup
+      prev_default = I18n.default_locale
       I18n.default_locale = :en
       I18n.fallbacks[:de] = [ :en ]
+      example.run
+      I18n.fallbacks = prev_fallbacks
+      I18n.default_locale = prev_default
     end
 
     context 'when translation is present in active locale' do
