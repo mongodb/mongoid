@@ -18,17 +18,22 @@ module Mongoid
         #
         # @api private
         def create(type)
-          const_string = "#{type}Array"
-          if Mongoid.const_defined?(const_string)
-            Mongoid.const_get(const_string)
-          else
-            array_class = typed_array_class(type)
-            array_class.const_set("Type", type)
-            Mongoid.const_set(const_string, array_class)
+          LOCK.synchronize do
+            const_string = "#{type}Array"
+            if Mongoid.const_defined?(const_string)
+              Mongoid.const_get(const_string)
+            else
+              array_class = typed_array_class(type)
+              array_class.const_set("Type", type)
+              Mongoid.const_set(const_string, array_class)
+            end
           end
         end
 
         private
+
+        # @api private
+        LOCK = Mutex.new
 
         # Create the typed array class.
         #
