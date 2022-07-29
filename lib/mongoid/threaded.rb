@@ -322,7 +322,7 @@ module Mongoid
     #
     # @param [ Mongo::Session ] session The session to save.
     def set_session(session)
-      Thread.current[:session] = session
+      Thread.current["[mongoid]:session"] = session
     end
 
     # Get the cached session for this thread.
@@ -332,7 +332,7 @@ module Mongoid
     #
     # @return [ Mongo::Session | nil ] The session cached on this thread or nil.
     def get_session
-      Thread.current[:session]
+      Thread.current["[mongoid]:session"]
     end
 
     # Clear the cached session for this thread.
@@ -344,7 +344,7 @@ module Mongoid
     def clear_session
       session = get_session
       session.end_session if session
-      Thread.current[:session] = nil
+      Thread.current["[mongoid]:session"] = nil
     end
   end
 end
