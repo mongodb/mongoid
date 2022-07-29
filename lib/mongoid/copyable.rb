@@ -10,7 +10,11 @@ module Mongoid
     # the exception of the document's id, and will reset all the
     # instance variables.
     #
-    # This clone also includes embedded documents.
+    # This clone also includes embedded documents. If there is an _id field in
+    # the embedded document, it will be maintained, unlike the root's _id.
+    #
+    # If cloning an embedded child, the embedded parent is not cloned and the
+    # embedded_in association is not set.
     #
     # @example Clone the document.
     #   document.clone
@@ -19,19 +23,42 @@ module Mongoid
     def clone
       # @note This next line is here to address #2704, even though having an
       # _id and id field in the document would cause problems with Mongoid
-      # elsewhere.
+      # elsewhere. Note this is only done on the root document as we want
+      # to maintain the same _id on the embedded documents.
       attrs = clone_document.except(*self.class.id_fields)
+      Copyable.clone_with_hash(self.class, attrs)
+    end
+    alias :dup :clone
+
+    private
+
+    # Create clone of a document of the given klass with the given attributes
+    # hash. This is used recursively so that embedded associations are cloned
+    # safely.
+    #
+    # @param klass [ Class ] The class of the document to create.
+    # @param attrs [ Hash ] The hash of the attributes.
+    #
+    # @return [ Document ] The new document.
+    def self.clone_with_hash(klass, attrs)
       dynamic_attrs = {}
-      _attribute_names = self.attribute_names
+      _attribute_names = klass.attribute_names
       attrs.reject! do |attr_name, value|
         unless _attribute_names.include?(attr_name)
           dynamic_attrs[attr_name] = value
           true
         end
       end
-      self.class.new(attrs).tap do |object|
+
+      Factory.build(klass, attrs).tap do |object|
         dynamic_attrs.each do |attr_name, value|
-          if object.respond_to?("#{attr_name}=")
+          assoc = object.embedded_relations[attr_name]
+          if assoc&.one? && Hash === value
+            object.send("#{attr_name}=", clone_with_hash(assoc.klass, value))
+          elsif assoc&.many? && Array === value
+            docs = value.map { |h| clone_with_hash(assoc.klass, h) }
+            object.send("#{attr_name}=", docs)
+          elsif object.respond_to?("#{attr_name}=")
             object.send("#{attr_name}=", value)
           else
             object.attributes[attr_name] = value
@@ -39,9 +66,6 @@ module Mongoid
         end
       end
     end
-    alias :dup :clone
-
-    private
 
     # Clone the document attributes
     #

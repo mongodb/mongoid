@@ -15,18 +15,53 @@ describe BSON::Binary do
     end
   end
 
-  describe ".demongoize" do
 
-    let(:binary) do
-      BSON::Binary.new("testing", :md5)
-    end
+  [ :mongoize, :demongoize].each do |method|
+    describe ".#{method}" do
 
-    let(:demongoized) do
-      BSON::Binary.demongoize(binary)
-    end
+      let(:binary) do
+        BSON::Binary.new("testing")
+      end
 
-    it "returns the binary" do
-      expect(demongoized).to eq(binary)
+      let(:evaluated) do
+        BSON::Binary.send(method, value)
+      end
+
+      context "when mongoizing a BSON::Binary" do
+
+        let(:value) { binary }
+
+        it "returns the binary" do
+          expect(evaluated).to eq(binary)
+        end
+      end
+
+      context "when mongoizing a String" do
+
+        let(:value) { "testing" }
+
+        it "returns it as binary" do
+          expect(evaluated).to eq(binary)
+        end
+      end
+
+      context "when mongoizing nil" do
+
+        let(:value) { nil }
+
+        it "returns nil" do
+          expect(evaluated).to eq(nil)
+        end
+      end
+
+      context "when mongoizing an invalid type" do
+
+        let(:value) { true }
+
+        it "returns nil" do
+          expect(evaluated).to be_nil
+        end
+      end
     end
   end
 

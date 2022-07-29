@@ -1237,7 +1237,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
     end
 
-    context 'when the id_sort option is none' do
+    context 'when including a limit' do
 
       let(:person) do
         Person.create!
@@ -1259,12 +1259,12 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         person.posts.create!(title: "Two")
       end
 
-      it 'does not use the sort on id' do
-        expect(enumerable.first(id_sort: :none)).to eq(first_post)
+      it 'returns the matching document' do
+        expect(enumerable.first(1)).to eq([first_post])
       end
     end
 
-    context 'when the id_sort option is not provided' do
+    context 'when no parameters are provided' do
 
       let(:person) do
         Person.create!
@@ -1707,7 +1707,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       end
     end
 
-    context 'when the id_sort option is none' do
+    context 'when including a limit' do
 
       let(:person) do
         Person.create!
@@ -1729,12 +1729,12 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
         person.posts.create!(title: "Two")
       end
 
-      it 'does not use the sort on id' do
-        expect(enumerable.last(id_sort: :none)).to eq(first_post)
+      it 'returns the matching document' do
+        expect(enumerable.last(1)).to eq([second_post])
       end
     end
 
-    context 'when the id_sort option is not provided' do
+    context 'when no parameters are provided' do
 
       let(:person) do
         Person.create!

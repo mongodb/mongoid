@@ -13,7 +13,7 @@ module Mongoid
         # @example Merge in another selector.
         #   selector.merge!(name: "test")
         #
-        # @param [ Hash, Selector ] other The object to merge in.
+        # @param [ Hash | Selector ] other The object to merge in.
         #
         # @return [ Selector ] The selector.
         def merge!(other)
@@ -43,7 +43,7 @@ module Mongoid
         # @example Store a value in the selector.
         #   selector.store(:key, "testing")
         #
-        # @param [ String, Symbol ] key The name of the attribute.
+        # @param [ String | Symbol ] key The name of the attribute.
         # @param [ Object ] value The value to add.
         #
         # @return [ Object ] The stored object.
@@ -277,7 +277,7 @@ module Mongoid
         #
         # @param [ String ] key The key to check.
         #
-        # @return [ true, false ] If the key is for a multi-select.
+        # @return [ true | false ] If the key is for a multi-select.
         def multi_selection?(key)
           %w($and $or $nor).include?(key)
         end

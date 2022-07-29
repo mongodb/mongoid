@@ -30,11 +30,11 @@ describe "Mongoid::Railties::ControllerRuntime" do
 
       clear_metric!
       instance.succeeded event_payload
-      expect(collector.runtime).to eq(42)
+      expect(collector.runtime).to eq(42000)
 
       clear_metric!
       instance.failed event_payload
-      expect(collector.runtime).to eq(42)
+      expect(collector.runtime).to eq(42000)
     end
 
     it "resets the metric and returns the value" do

@@ -80,8 +80,13 @@ development:
         # (default: 10)
         # connect_timeout: 10
 
-        # The timeout to wait to execute operations on a socket before raising an error.
-        # (default: 5)
+        # How long to wait for a response for each operation sent to the
+        # server. This timeout should be set to a value larger than the
+        # processing time for the longest operation that will be executed
+        # by the application. Note that this is a client-side timeout;
+        # the server may continue executing an operation after the client
+        # aborts it with the SocketTimeout exception.
+        # (default: nil, meaning no timeout)
         # socket_timeout: 5
 
         # The name of the replica set to connect to. Servers provided as seeds that do
@@ -119,9 +124,6 @@ development:
     # exceed 128 bytes. It is also used as the database name if the
     # database name is not explicitly defined. (default: nil)
     # app_name: MyApplicationName
-    
-    # Create indexes in background by default. (default: false)
-    # background_indexing: false
     
     # Mark belongs_to associations as required by default, so that saving a
     # model with a missing belongs_to association will trigger a validation
@@ -166,6 +168,10 @@ development:
     # further information. Most applications should not use this option.
     # (default: false)
     # use_utc: false
+
+    # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
+    # indexes in the background by default. (default: false)
+    # background_indexing: false
 
 test:
   clients:

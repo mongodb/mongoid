@@ -49,7 +49,7 @@ describe 'association :scope option' do
     it 'initially associates the documents in-memory' do
       expect(trainer1.animal).to eq animal2
       expect(trainer2.animal).to eq animal3
-      expect(animal1.trainer).to eq trainer1
+      expect(animal1.trainer).to be_nil
       expect(animal2.trainer).to eq trainer1
       expect(animal3.trainer).to eq trainer2
     end

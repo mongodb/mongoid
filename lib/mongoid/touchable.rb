@@ -19,10 +19,10 @@ module Mongoid
       #
       # @param [ Symbol ] field The name of an additional field to update.
       #
-      # @return [ true/false ] false if record is new_record otherwise true.
+      # @return [ true/false ] false if document is new_record otherwise true.
       def touch(field = nil)
         return false if _root.new_record?
-        current = Time.now
+        current = Time.configured.now
         field = database_field_name(field)
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
         write_attribute(field, current) if field
@@ -60,7 +60,6 @@ module Mongoid
 
         # Callbacks are invoked on the composition root first and on the
         # leaf-most embedded document last.
-        # TODO add tests, see MONGOID-5015.
         run_callbacks(:touch)
         true
       end

@@ -1,0 +1,118 @@
+***********
+Mongoid 8.1
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 8.1.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Configuration DSL No Longer Requires an Argument to its Block
+-------------------------------------------------------------
+
+It is now possible to use ``Mongoid.configure`` without
+providing an argument to its block:
+
+.. code-block:: ruby
+
+  Mongoid.configure do
+    connect_to("mongoid_test")
+
+    # Use config method when assigning variables
+    config.preload_models = true
+
+Note that ``configure`` will continue to support a block argument.
+The following is equivalent to the above:
+
+.. code-block:: ruby
+
+  Mongoid.configure do |config|
+    config.connect_to("mongoid_test")
+
+    config.preload_models = true
+
+
+Added ``Mongoid::Criteria`` finder methods
+------------------------------------------
+
+Mongoid 8.1 implements several finder methods on ``Mongoid::Criteria``:
+
+- ``first!``
+- ``last!``
+- ``second/second!``
+- ``third/third!``
+- ``fourth/fourth!``
+- ``fifth/fifth!``
+- ``second_to_last/second_to_last!``
+- ``third_to_last/third_to_last!``
+
+When no documents are found, methods without a bang (!) return nil, and methods
+with a bang (!) raise an error:
+
+.. code:: ruby
+
+  Band.none.first
+  # => nil
+
+  Band.none.first!
+  # => raise Mongoid::Errors::DocumentNotFound
+
+
+Added ``:touch`` option to ``#save``
+------------------------------------
+
+Support for the ``:touch`` option has been added to the ``#save`` and ``#save!``
+methods. When this option is false, the ``updated_at`` field on the saved
+document and all of it's embedded documents will not be updated with the
+current time. When this option is true or unset, the ``updated_at`` field will
+be updated with the current time.
+
+If the document being saved is a new document (i.e. it has not yet been
+persisted to the database), then the ``:touch`` option will be ignored, and the
+``updated_at`` (and ``created_at``) fields will be updated with the current
+time.
+
+
+Added Version Based Default Configuration
+-----------------------------------------
+
+Mongoid 8.1 has added the ability to set the default configurations for a
+specific version:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults 8.0
+  end
+
+This is helpful for upgrading between versions. See the section on
+:ref:`Version Based Default Configuration <load-defaults>` for more details on
+how to use this feature to make upgrading between Mongoid versions easier.
+
+
+Added ``:present`` option to localized fields
+---------------------------------------------
+
+The ``:present`` option was added to localized fields for removing blank values
+from the ``_translations`` hash:
+
+.. code-block:: ruby
+
+   class Product
+     include Mongoid::Document
+     field :description, localize: :present
+   end
+
+See the section on :ref:`Localize :present Field Option <present-fields>` for
+more details on how these are used.

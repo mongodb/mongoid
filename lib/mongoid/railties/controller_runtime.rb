@@ -62,7 +62,7 @@ module Mongoid
         def started _; end
 
         def _completed e
-          Collector.runtime += e.duration
+          Collector.runtime += e.duration * 1000
         end
         alias :succeeded :_completed
         alias :failed :_completed

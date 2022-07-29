@@ -21,7 +21,7 @@ module Mongoid
     # @example Has the document changed?
     #   model.changed?
     #
-    # @return [ true, false ] If the document is changed.
+    # @return [ true | false ] If the document is changed.
     def changed?
       changes.values.any? { |val| val } || children_changed?
     end
@@ -30,7 +30,7 @@ module Mongoid
     #
     # @note This intentionally only considers children and not descendants.
     #
-    # @return [ true, false ] If any children have changed.
+    # @return [ true | false ] If any children have changed.
     def children_changed?
       _children.any?(&:changed?)
     end
@@ -62,7 +62,7 @@ module Mongoid
 
     # Call this method after save, so the changes can be properly switched.
     #
-    # This will unset the memoized children array, set new record to
+    # This will unset the memoized children array, set new record flag to
     # false, set the document as validated, and move the dirty changes.
     #
     # @example Move the changes to previous.
@@ -82,6 +82,7 @@ module Mongoid
     #   document.post_persist
     def post_persist
       reset_persisted_descendants
+      reset_attributes_before_type_cast
       move_changes
     end
 
@@ -101,7 +102,7 @@ module Mongoid
     # @example Remove a flagged change.
     #   model.remove_change(:field)
     #
-    # @param [ Symbol, String ] name The name of the field.
+    # @param [ Symbol | String ] name The name of the field.
     def remove_change(name)
       changed_attributes.delete(name.to_s)
     end
@@ -161,7 +162,7 @@ module Mongoid
     #
     # @param [ String ] attr The name of the attribute.
     #
-    # @return [ true, false ] Whether the attribute has changed.
+    # @return [ true | false ] Whether the attribute has changed.
     def attribute_changed?(attr)
       attr = database_field_name(attr)
       return false unless changed_attributes.key?(attr)
@@ -175,7 +176,7 @@ module Mongoid
     #
     # @param [ String ] attr The name of the attribute.
     #
-    # @return [ true, false ] If the attribute differs.
+    # @return [ true | false ] If the attribute differs.
     def attribute_changed_from_default?(attr)
       field = fields[attr]
       return false unless field
@@ -246,6 +247,10 @@ module Mongoid
       else
         __send__("#{attr}=", nil)
       end
+    end
+
+    def reset_attributes_before_type_cast
+      @attributes_before_type_cast = @attributes.dup
     end
 
     module ClassMethods

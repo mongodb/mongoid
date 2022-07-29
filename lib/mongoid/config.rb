@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "mongoid/config/defaults"
 require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
@@ -11,6 +12,7 @@ module Mongoid
   module Config
     extend Forwardable
     extend Options
+    extend Defaults
     extend self
 
     def_delegators ::Mongoid, :logger, :logger=
@@ -23,7 +25,8 @@ module Mongoid
     # database name is not explicitly defined.
     option :app_name, default: nil
 
-    # Create indexes in background by default.
+    # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
+    # indexes in the background by default. (default: false)
     option :background_indexing, default: false
 
     # Mark belongs_to associations as required by default, so that saving a
@@ -114,13 +117,30 @@ module Mongoid
     # demongoize the values on returning them.
     option :legacy_pluck_distinct, default: false
 
+    # Combine chained operators, which use the same field and operator,
+    # using and's instead of overwriting them.
+    option :overwrite_chained_operators, default: false
+
+    # When this flag is true, the attributes method on a document will return
+    # a BSON::Document when that document is retrieved from the database, and
+    # a Hash otherwise. When this flag is false, the attributes method will
+    # always return a Hash.
+    option :legacy_attributes, default: false
+
+    # Returns the Config singleton, for use in the configure DSL.
+    #
+    # @return [ self ] The Config singleton.
+    def config
+      self
+    end
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
     # @example Is Mongoid configured?
     #   config.configured?
     #
-    # @return [ true, false ] If Mongoid is configured.
+    # @return [ true | false ] If Mongoid is configured.
     def configured?
       clients.key?(:default)
     end
@@ -161,7 +181,7 @@ module Mongoid
     #   Mongoid.load!("/path/to/mongoid.yml")
     #
     # @param [ String ] path The path to the file.
-    # @param [ String, Symbol ] environment The environment to load.
+    # @param [ String | Symbol ] environment The environment to load.
     def load!(path, environment = nil)
       settings = Environment.load_yaml(path, environment)
       if settings.present?
@@ -205,6 +225,7 @@ module Mongoid
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
       self.clients = configuration[:clients]
+      Mongo.options = configuration[:driver_options] || {}
       set_log_levels
     end
 
@@ -213,9 +234,9 @@ module Mongoid
     # @example Override the database globally.
     #   config.override_database(:optional)
     #
-    # @param [ String, Symbol ] name The name of the database.
+    # @param [ String | Symbol ] name The name of the database.
     #
-    # @return [ String, Symbol ] The global override.
+    # @return [ String | Symbol ] The global override.
     def override_database(name)
       Threaded.database_override = name
     end
@@ -225,9 +246,9 @@ module Mongoid
     # @example Override the client globally.
     #   config.override_client(:optional)
     #
-    # @param [ String, Symbol ] name The name of the client.
+    # @param [ String | Symbol ] name The name of the client.
     #
-    # @return [ String, Symbol ] The global override.
+    # @return [ String | Symbol ] The global override.
     def override_client(name)
       Threaded.client_override = name ? name.to_s : nil
     end
@@ -298,7 +319,7 @@ module Mongoid
     # @example Is the application using passenger?
     #   config.running_with_passenger?
     #
-    # @return [ true, false ] If the app is deployed on Passenger.
+    # @return [ true | false ] If the app is deployed on Passenger.
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end

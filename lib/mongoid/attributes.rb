@@ -25,9 +25,9 @@ module Mongoid
     # @example Is the attribute present?
     #   person.attribute_present?("title")
     #
-    # @param [ String, Symbol ] name The name of the attribute.
+    # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] True if present, false if not.
+    # @return [ true | false ] True if present, false if not.
     def attribute_present?(name)
       attribute = read_raw_attribute(name)
       !attribute.blank? || attribute == false
@@ -50,9 +50,9 @@ module Mongoid
     # @example Does the document have the attribute?
     #   model.has_attribute?(:name)
     #
-    # @param [ String, Symbol ] name The name of the attribute.
+    # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] If the key is present in the attributes.
+    # @return [ true | false ] If the key is present in the attributes.
     def has_attribute?(name)
       attributes.key?(name.to_s)
     end
@@ -63,9 +63,9 @@ module Mongoid
     # @example Does the document have the attribute before it was assigned?
     #   model.has_attribute_before_type_cast?(:name)
     #
-    # @param [ String, Symbol ] name The name of the attribute.
+    # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] If the key is present in the
+    # @return [ true | false ] If the key is present in the
     #   attributes_before_type_cast.
     def has_attribute_before_type_cast?(name)
       attributes_before_type_cast.key?(name.to_s)
@@ -80,15 +80,31 @@ module Mongoid
     # @example Read an attribute (alternate syntax.)
     #   person[:title]
     #
-    # @param [ String, Symbol ] name The name of the attribute to get.
+    # @param [ String | Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute.
     def read_attribute(name)
       field = fields[name.to_s]
       raw = read_raw_attribute(name)
-      field ? field.demongoize(raw) : raw
+      process_raw_attribute(name.to_s, raw, field)
     end
     alias :[] :read_attribute
+
+
+    # Process the raw attribute values just read from the documents attributes.
+    #
+    # @param [ String ] name The name of the attribute to get.
+    # @param [ Object ] raw The raw attribute value.
+    # @param [ Field | nil ] field The field to use for demongoization or nil.
+    #
+    # @return [ Object ] The value of the attribute.
+    #
+    # @api private
+    def process_raw_attribute(name, raw, field)
+      value = field ? field.demongoize(raw) : raw
+      attribute_will_change!(name) if value.resizable?
+      value
+    end
 
     # Read a value from the attributes before type cast. If the value has not
     # yet been assigned then this will return the attribute's existing value
@@ -97,7 +113,7 @@ module Mongoid
     # @example Read an attribute before type cast.
     #   person.read_attribute_before_type_cast(:price)
     #
-    # @param [ String, Symbol ] name The name of the attribute to get.
+    # @param [ String | Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute before type cast, if
     #   available. Otherwise, the value of the attribute.
@@ -116,11 +132,12 @@ module Mongoid
     # @example Remove the attribute.
     #   person.remove_attribute(:title)
     #
-    # @param [ String, Symbol ] name The name of the attribute to remove.
+    # @param [ String | Symbol ] name The name of the attribute to remove.
     #
     # @raise [ Errors::ReadonlyAttribute ] If the field cannot be removed due
     #   to being flagged as reaodnly.
     def remove_attribute(name)
+      validate_writable_field_name!(name.to_s)
       as_writable_attribute!(name) do |access|
         _assigning do
           attribute_will_change!(access)
@@ -140,9 +157,11 @@ module Mongoid
     # @example Write the attribute (alternate syntax.)
     #   person[:title] = "Mr."
     #
-    # @param [ String, Symbol ] name The name of the attribute to update.
+    # @param [ String | Symbol ] name The name of the attribute to update.
     # @param [ Object ] value The value to set for the attribute.
     def write_attribute(name, value)
+      validate_writable_field_name!(name.to_s)
+
       field_name = database_field_name(name)
 
       if attribute_missing?(field_name)
@@ -151,7 +170,6 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
-          validate_attribute_value(field_name, value)
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
@@ -159,8 +177,14 @@ module Mongoid
             attribute_will_change!(field_name)
           end
           if localized
-            attributes[field_name] ||= {}
-            attributes[field_name].merge!(typed_value)
+            present = fields[field_name].try(:localize_present?)
+            loc_key, loc_val = typed_value.first
+            if present && loc_val.blank?
+              attributes[field_name]&.delete(loc_key)
+            else
+              attributes[field_name] ||= {}
+              attributes[field_name].merge!(typed_value)
+            end
           else
             attributes[field_name] = typed_value
           end
@@ -219,7 +243,7 @@ module Mongoid
     #
     # @param [ String ] name The name of the attribute.
     #
-    # @return [ true, false ] If the attribute is missing.
+    # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
       !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
     end
@@ -243,7 +267,7 @@ module Mongoid
     # @example Is the string in dot syntax.
     #   model.hash_dot_syntax?
     #
-    # @return [ true, false ] If the string contains a "."
+    # @return [ true | false ] If the string contains a "."
     def hash_dot_syntax?(string)
       string.include?(".")
     end
@@ -253,7 +277,7 @@ module Mongoid
     # @example Get the value typecasted.
     #   person.typed_value_for(:title, :sir)
     #
-    # @param [ String, Symbol ] key The field name.
+    # @param [ String | Symbol ] key The field name.
     # @param [ Object ] value The uncast value.
     #
     # @return [ Object ] The cast value.
@@ -271,7 +295,11 @@ module Mongoid
       end
 
       if hash_dot_syntax?(normalized)
-        attributes.__nested__(normalized)
+        if fields.key?(normalized)
+          attributes[normalized]
+        else
+          attributes.__nested__(normalized)
+        end
       else
         attributes[normalized]
       end
@@ -329,30 +357,6 @@ module Mongoid
     end
 
     private
-
-    # Validates an attribute value as being assignable to the specified field.
-    #
-    # For now, only Hash and Array fields are validated, and the value is
-    # being checked to be of an appropriate type (i.e. either Hash or Array,
-    # respectively, or nil).
-    #
-    # This method takes the name of the field as stored in the document
-    # in the database, not (necessarily) the Ruby method name used to read/write
-    # the said field.
-    #
-    # @param [ String, Symbol ] field_name The name of the field.
-    # @param [ Object ] value The value to be validated.
-    def validate_attribute_value(field_name, value)
-      return if value.nil?
-      field = fields[field_name]
-      return unless field
-      validatable_types = [ Hash, Array ]
-      if validatable_types.include?(field.type)
-        unless value.is_a?(field.type)
-          raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
-        end
-      end
-    end
 
     def lookup_attribute_presence(name, value)
       if localized_fields.has_key?(name) && value

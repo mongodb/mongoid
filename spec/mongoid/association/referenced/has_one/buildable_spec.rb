@@ -91,7 +91,7 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
         expect(document).to eq(object)
       end
 
-      context 'when the object is already related to another object' do
+      context 'when the object is already associated with another object' do
 
         let(:original_person) do
           Person.new
@@ -105,7 +105,7 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
           association.build(Person.new, object)
         end
 
-        it 'clears the object of its previous relation' do
+        it 'clears the object of its previous association' do
           expect(original_person.account).to be_nil
         end
 

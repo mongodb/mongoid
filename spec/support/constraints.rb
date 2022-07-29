@@ -27,6 +27,30 @@ module Constraints
     Mongo::VERSION.split('.')[0...precision].map(&:to_i)
   end
 
+  def min_bson_version(version)
+    required_version = version.split('.').map(&:to_i)
+    actual_version = bson_version(required_version.length)
+    before(:all) do
+      if (actual_version <=> required_version) < 0
+        skip "bson-ruby version #{version} or higher is required"
+      end
+    end
+  end
+
+  def max_bson_version(version)
+    required_version = version.split('.').map(&:to_i)
+    actual_version = bson_version(required_version.length)
+    before(:all) do
+      if (actual_version <=> required_version) > 0
+        skip "bson-ruby version #{version} or lower is required"
+      end
+    end
+  end
+
+  def bson_version(precision)
+    BSON::VERSION.split('.')[0...precision].map(&:to_i)
+  end
+
   def min_rails_version(version)
     unless version =~ /\A\d+\.\d+\z/
       raise ArgumentError, "Version can only be major.minor: #{version}"

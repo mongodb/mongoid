@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './attributes/nested_spec_models'
 
 describe Mongoid::Attributes do
 
@@ -1077,8 +1078,8 @@ describe Mongoid::Attributes do
     context "after the attribute has been assigned" do
 
       it "returns the default value" do
-        person.age = "old"
-        expect(person.age_before_type_cast).to eq("old")
+        person.age = "42"
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
 
@@ -1265,15 +1266,15 @@ describe Mongoid::Attributes do
 
     context "before the attribute has been assigned" do
 
-      it "returns false" do
-        expect(person.has_attribute_before_type_cast?(:age)).to be false
+      it "returns true" do
+        expect(person.has_attribute_before_type_cast?(:age)).to be true
       end
     end
 
     context "after the attribute has been assigned" do
 
       it "returns true" do
-        person.age = 'old'
+        person.age = '42'
         expect(person.has_attribute_before_type_cast?(:age)).to be true
       end
     end
@@ -1528,12 +1529,13 @@ describe Mongoid::Attributes do
     end
 
     context "when setting an attribute that needs type casting" do
+
       let(:person) do
-        Person.new(age: "old")
+        Person.new(age: "42")
       end
 
       it "should store the attribute before type cast" do
-        expect(person.age_before_type_cast).to eq("old")
+        expect(person.age_before_type_cast).to eq("42")
       end
     end
 
@@ -1581,16 +1583,14 @@ describe Mongoid::Attributes do
     context "when attribute is a Hash" do
       let(:person) { Person.new map: { somekey: "somevalue" } }
 
-      it "raises an error when trying to set a value of invalid type - array" do
-        expect do
-          person.map = []
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Array cannot be written to a field of type Hash/)
+      it "writes nil when trying to set a value of invalid type - array" do
+        person.map = []
+        expect(person.map).to be_nil
       end
 
-      it "raises an error when trying to set a value of invalid type - boolean" do
-        expect do
-          person.map = false
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Hash/)
+      it "writes nil when trying to set a value of invalid type - boolean" do
+        person.map = false
+        expect(person.map).to be_nil
       end
 
       it "can set a Hash value" do
@@ -1605,16 +1605,14 @@ describe Mongoid::Attributes do
         expect(person.aliases).to eq([ :alias_1 ])
       end
 
-      it "raises an error when trying to set a value of invalid type - hash" do
-        expect do
-          person.aliases = {}
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Hash cannot be written to a field of type Array/)
+      it "writes nil when trying to set a value of invalid type - hash" do
+        person.aliases = {}
+        expect(person.aliases).to be_nil
       end
 
-      it "raises an error when trying to set a value of invalid type - boolean" do
-        expect do
-          person.aliases = false
-        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Array/)
+      it "writes nil when trying to set a value of invalid type - boolean" do
+        person.aliases = false
+        expect(person.aliases).to be_nil
       end
     end
 
@@ -1672,6 +1670,50 @@ describe Mongoid::Attributes do
         it "writes the value" do
           from_db.write_attribute(:undefined_field, 'x')
           from_db.read_attribute(:undefined_field).should == 'x'
+        end
+      end
+    end
+
+    context "when comparing the object_ids of the written value" do
+      config_override :legacy_attributes, false
+
+      before do
+        Person.create!
+      end
+
+      let(:person) do
+        Person.first
+      end
+
+      context "when the field is not resizable" do
+        let(:test) do
+          person.write_attribute(:test, "aliased field to test")
+        end
+
+        it "has the same object_id as the attributes hash value" do
+          expect(test.object_id).to eq(person.test.object_id)
+        end
+      end
+
+      context "when the field is resizable" do
+
+        let(:arrays) do
+          person.write_attribute(:arrays, [])
+        end
+
+        it "has the same object_id as the attributes hash value" do
+          expect(arrays.object_id).to eq(person.arrays.object_id)
+        end
+      end
+
+      context "when the field is a HABTM foreign key array" do
+
+        let(:preference_ids) do
+          person.write_attribute(:preference_ids, [])
+        end
+
+        it "has the same object_id as the attributes hash value" do
+          expect(preference_ids.object_id).to eq(person.preference_ids.object_id)
         end
       end
     end
@@ -1855,11 +1897,11 @@ describe Mongoid::Attributes do
           end
 
           it "has 3 new entries" do
-            expect(pet.vet_visits.count).to eq(3)
+            expect(pet.vet_visits.count).to eq 3
           end
 
           it "persists the changes" do
-            expect(pet.reload.vet_visits.count).to eq(3)
+            expect(pet.reload.vet_visits.count).to eq 3
           end
         end
 
@@ -2029,8 +2071,8 @@ describe Mongoid::Attributes do
       end
 
       it "aliases *_before_type_cast" do
-        product.cost = "expensive"
-        expect(product.cost_before_type_cast).to eq("expensive")
+        product.cost = "42"
+        expect(product.cost_before_type_cast).to eq("42")
       end
     end
 
@@ -2227,6 +2269,446 @@ describe Mongoid::Attributes do
 
     it "correctly sets the attribute" do
       expect(cat.name).to eq("Nissim")
+    end
+  end
+
+  describe "attributes after setting an association without reloading" do
+
+    context "on embeds_many" do
+
+      context "when not setting anything" do
+        let(:doc) { NestedBook.create! }
+
+        it "doesn't add attributes" do
+          expect(doc.attributes).to_not have_key("pages")
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when using nested attributes" do
+        let(:doc) { NestedBook.create! }
+
+        before do
+          doc.update_attributes({ pages_attributes: [ {} ] })
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when doing assignments" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [NestedPage.new]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when replacing assignments" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [NestedPage.new(number: 1)]
+          doc.pages = [NestedPage.new(number: 2)]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id, "number" => 2 }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when setting to nil" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [NestedPage.new(number: 1)]
+          doc.pages = nil
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes).to_not have_key("pages")
+        end
+
+        it "has the same attributes after reloading" do
+          expect({ "pages" => [] }.merge(doc.attributes)).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when setting to nil and back" do
+        let(:doc) { NestedBook.create! }
+        let(:page) { NestedPage.new }
+        before do
+          doc.pages = [page]
+          doc.pages = nil
+          doc.pages = [page]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when pushing" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages << NestedPage.new
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      [:shift, :pop].each do |meth|
+        context "when performing #{meth}" do
+          let(:doc) { NestedBook.create! }
+          before do
+            doc.pages << NestedPage.new
+            doc.pages << NestedPage.new
+            doc.pages << NestedPage.new
+
+            doc.pages.send(meth, 2)
+          end
+
+          it "updates the attributes" do
+            expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+          end
+
+          it "has the same attributes after reloading" do
+            expect(doc.attributes).to eq(doc.reload.attributes)
+          end
+        end
+      end
+
+      context "when concatting" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages << NestedPage.new
+          doc.pages.concat([NestedPage.new, NestedPage.new])
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"].count).to eq 3
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      [:build, :create].each do |meth|
+        context "when preforming #{meth}" do
+          let(:doc) { NestedBook.create! }
+          before do
+            doc.pages.send(meth)
+          end
+
+          it "updates the attributes" do
+            expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+          end
+
+          it "has the same attributes after reloading" do
+            doc.pages.first.save
+            expect(doc.attributes).to eq(doc.reload.attributes)
+          end
+        end
+      end
+
+      context "when clearing" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages << NestedPage.new
+          doc.pages << NestedPage.new
+          doc.pages << NestedPage.new
+
+          doc.pages.clear
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes).to_not have_key("pages")
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      [:delete_all, :destroy_all, :remove_all].each do |meth|
+        context "when performing: #{meth}" do
+          let(:doc) { NestedBook.create! }
+          before do
+            doc.pages << NestedPage.new
+            doc.pages << NestedPage.new
+            doc.pages << NestedPage.new
+
+            doc.pages.send(meth)
+          end
+
+          it "updates the attributes" do
+            expect(doc.attributes).to_not have_key("pages")
+          end
+
+          it "has the same attributes after reloading" do
+            expect({ "pages" => [] }.merge(doc.attributes)).to eq(doc.reload.attributes)
+          end
+        end
+      end
+
+      context "when deleting" do
+        let(:doc) { NestedBook.create! }
+        let(:page) { NestedPage.new }
+        before do
+          doc.pages << page
+          doc.pages << NestedPage.new
+          doc.pages << NestedPage.new
+
+          doc.pages.delete(page)
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"].count).to eq 2
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when doing delete_one" do
+        let(:doc) { NestedBook.create! }
+        let(:page) { NestedPage.new }
+        before do
+          doc.pages << page
+          doc.pages << NestedPage.new
+          doc.pages << NestedPage.new
+
+          doc.pages.send(:delete_one, page)
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"].count).to eq 2
+        end
+      end
+
+      context "when assigning an array of hashes" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [{}]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when assigning twice" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.pages = [{ number: 1 }]
+          doc.pages = [{}]
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["pages"]).to eq([{ "_id" => doc.pages.first.id }])
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+    end
+
+    context "on embeds_one" do
+
+      let(:attrs) { { "title" => "Title" } }
+
+      context "when using nested attributes" do
+        let(:doc) { NestedBook.create! }
+
+        before do
+          doc.update_attributes({ cover_attributes: attrs })
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when doing assignments" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = NestedCover.new(attrs)
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when replacing assignments" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = NestedCover.new("title" => "Title1")
+          doc.cover = NestedCover.new(attrs)
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when setting to nil" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = NestedCover.new(attrs)
+          doc.cover = nil
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes.key?("cover")).to be false
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when setting to nil and back" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = NestedCover.new(attrs)
+          doc.cover = nil
+          doc.cover = NestedCover.new(attrs)
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      [:build, :create].each do |meth|
+        context "when preforming #{meth}" do
+          let(:doc) { NestedBook.create! }
+          before do
+            doc.send("#{meth}_cover", attrs)
+          end
+
+          it "updates the attributes" do
+            expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+          end
+
+          it "has the same attributes after reloading" do
+            doc.cover.save
+            expect(doc.attributes).to eq(doc.reload.attributes)
+          end
+        end
+      end
+
+      context "when assigning a hash" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = attrs
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+
+      context "when assigning twice" do
+        let(:doc) { NestedBook.create! }
+        before do
+          doc.cover = { "title" => "1984" }
+          doc.cover = attrs
+        end
+
+        it "updates the attributes" do
+          expect(doc.attributes["cover"]).to eq(attrs.merge("_id" => doc.cover.id))
+        end
+
+        it "has the same attributes after reloading" do
+          expect(doc.attributes).to eq(doc.reload.attributes)
+        end
+      end
+    end
+  end
+
+  context "when modifiying a hash referenced with the [] notation" do
+    let(:church) { Church.create!(location: { x: 1 }) }
+
+    before do
+      church[:location].merge!(y: 2)
+      church.save!
+      church.reload
+    end
+
+    it "persists the updated hash" do
+      church.location.should == { "x" => 1, "y" => 2 }
+    end
+  end
+
+  context "when modifiying a set referenced with the [] notation" do
+    let(:catalog) { Catalog.create!(set_field: [ 1 ].to_set) }
+
+    before do
+      catalog[:set_field] << 2
+      catalog.save!
+      catalog.reload
+    end
+
+    it "persists the updated hash" do
+      pending "MONGOID-2951"
+      catalog.set_field.should == Set.new([ 1, 2 ])
     end
   end
 end

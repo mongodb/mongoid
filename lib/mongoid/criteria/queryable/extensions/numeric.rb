@@ -51,7 +51,7 @@ module Mongoid
             #
             # @return [ Object ] The converted number.
             def __numeric__(object)
-              object.to_s =~ /(\A[-+]?[0-9]+\z)|(\.0+\z)|(\.\z)/ ? object.to_i : Float(object)
+              object.to_s.match?(/\A[-+]?[0-9]*[0-9.]0*\z/) ? object.to_i : Float(object)
             end
 
             # Evolve the object to an integer.

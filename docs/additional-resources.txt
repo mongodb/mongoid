@@ -23,7 +23,7 @@ Screencasts
   <https://www.youtube.com/watch?v=L0RqU2MdqXU>`_
 
   An overview of Mongoid, by Ryan Bates including the basics
-  of setting up an app, querying for records, adding embedded
+  of setting up an app, querying for documents, adding embedded
   associations, overriding the id, and more.
 
 - `Ruby on Rails Web Services and Integration with MongoDB, Week 3: Mongoid

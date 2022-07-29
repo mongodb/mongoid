@@ -2093,5 +2093,27 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
     end
+
+    # This test confirms that MONGOID-5097 has been repaired.
+    context "when using exists on a field of type Time" do
+      let(:criteria) do
+        Dictionary.any_of({:published.exists => true}, published: nil)
+      end
+
+      it "doesn't raise an error" do
+        expect do
+          criteria
+        end.to_not raise_error
+      end
+
+      it "generates the correct selector" do
+        expect(criteria.selector).to eq({
+          "$or" => [ {
+            "published" => { "$exists" => true }
+          }, {
+            "published" => nil
+          } ] } )
+      end
+    end
   end
 end

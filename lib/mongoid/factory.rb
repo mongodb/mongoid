@@ -6,9 +6,6 @@ module Mongoid
   module Factory
     extend self
 
-    # @deprecated
-    TYPE = "_type".freeze
-
     # Builds a new +Document+ from the supplied attributes.
     #
     # This method either instantiates klass or a descendant of klass if the attributes include

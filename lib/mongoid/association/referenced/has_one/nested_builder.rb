@@ -60,7 +60,7 @@ module Mongoid
           # @example Is the id acceptable?
           #   one.acceptable_id?
           #
-          # @return [ true, false ] If the id part of the logic will allow an update.
+          # @return [ true | false ] If the id part of the logic will allow an update.
           def acceptable_id?
             id = convert_id(existing.class, attributes[:_id])
             existing._id == id || id.nil? || (existing._id != id && update_only?)
@@ -71,7 +71,7 @@ module Mongoid
           # @example Can the existing object be deleted?
           #   one.delete?
           #
-          # @return [ true, false ] If the association should be deleted.
+          # @return [ true | false ] If the association should be deleted.
           def delete?
             destroyable? && !attributes[:_id].nil?
           end
@@ -81,7 +81,7 @@ module Mongoid
           # @example Is the object destroyable?
           #   one.destroyable?({ :_destroy => "1" })
           #
-          # @return [ true, false ] If the association can potentially be
+          # @return [ true | false ] If the association can potentially be
           #   destroyed.
           def destroyable?
             [ 1, "1", true, "true" ].include?(destroy) && allow_destroy?
@@ -92,7 +92,7 @@ module Mongoid
           # @example Is the document to be replaced?
           #   one.replace?
           #
-          # @return [ true, false ] If the document should be replaced.
+          # @return [ true | false ] If the document should be replaced.
           def replace?
             !existing && !destroyable? && !attributes.blank?
           end
@@ -102,7 +102,7 @@ module Mongoid
           # @example Should the document be updated?
           #   one.update?
           #
-          # @return [ true, false ] If the object should have its attributes updated.
+          # @return [ true | false ] If the object should have its attributes updated.
           def update?
             existing && !destroyable? && acceptable_id?
           end

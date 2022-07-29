@@ -69,7 +69,7 @@ module Mongoid
       #
       # @param [ Symbol ] callback_type The type of callback type.
       #
-      # @return [ Array<Proc, Symbol> ] A list of the callbacks, either method
+      # @return [ Array<Proc | Symbol> ] A list of the callbacks, either method
       #   names or Procs.
       def get_callbacks(callback_type)
         Array(options[callback_type])
@@ -88,7 +88,7 @@ module Mongoid
       #
       # @param [ Document ] doc The document to be bound.
       #
-      # @return [ true, false ] Whether the document can be bound.
+      # @return [ true | false ] Whether the document can be bound.
       def bindable?(doc); false; end
 
       # Get the inverse names.
@@ -189,7 +189,7 @@ module Mongoid
       # The foreign key field if this association stores a foreign key.
       # Otherwise, the primary key.
       #
-      # @return [ Symbol, String ] The primary key.
+      # @return [ Symbol | String ] The primary key.
       def key
         stores_foreign_key? ? foreign_key : primary_key
       end
@@ -248,7 +248,7 @@ module Mongoid
       # Create an association proxy object using the owner and target.
       #
       # @param [ Document ] owner The document this association hangs off of.
-      # @param [ Document, Array<Document> ] target The target (parent) of the
+      # @param [ Document | Array<Document> ] target The target (parent) of the
       #   association.
       #
       # @return [ Proxy ]
@@ -258,7 +258,7 @@ module Mongoid
 
       # Whether the dependent method is destructive.
       #
-      # @return [ true, false ] If the dependent method is destructive.
+      # @return [ true | false ] If the dependent method is destructive.
       def destructive?
         @destructive ||= !!(dependent && (dependent == :delete_all || dependent == :destroy))
       end
@@ -289,7 +289,7 @@ module Mongoid
 
       # Whether the associated object(s) should be validated.
       #
-      # @return [ true, false ] If the associated object(s)
+      # @return [ true | false ] If the associated object(s)
       #   should be validated.
       def validate?
         @validate ||= if @options[:validate].nil?
@@ -304,6 +304,28 @@ module Mongoid
 
       def parent_inclusions
         @parent_inclusions ||= []
+      end
+
+      # Is this association an embeds_many or has_many association?
+      #
+      # @return [ true | false ] true if it is a *_many association, false if not.
+      def many?
+        [Referenced::HasMany, Embedded::EmbedsMany].any? { |a| self.is_a?(a) }
+      end
+
+      # Is this association an embeds_one or has_one association?
+      #
+      # @return [ true | false ] true if it is a *_one association, false if not.
+      def one?
+        [Referenced::HasOne, Embedded::EmbedsOne].any? { |a| self.is_a?(a) }
+      end
+
+      # Is this association an embedded_in or belongs_to association?
+      #
+      # @return [ true | false ] true if it is an embedded_in or belongs_to
+      #   association, false if not.
+      def in_to?
+        [Referenced::BelongsTo, Embedded::EmbeddedIn].any? { |a| self.is_a?(a) }
       end
 
       private
@@ -411,10 +433,15 @@ module Mongoid
       def namespace_hierarchy(mod)
         parent = Object
         hier = [parent]
-        mod.name.split('::').each do |part|
-          parent = parent.const_get(part)
-          hier << parent
+
+        # name is not present on anonymous modules
+        if mod.name
+          mod.name.split('::').each do |part|
+            parent = parent.const_get(part)
+            hier << parent
+          end
         end
+
         hier.reverse
       end
 

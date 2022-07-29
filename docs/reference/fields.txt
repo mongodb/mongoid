@@ -60,11 +60,12 @@ on a person by using the ``field`` macro.
      field :weight, type: Float
    end
 
-Below is a list of valid types for fields.
+The valid types for fields are as follows:
 
 - ``Array``
 - ``BigDecimal``
-- ``Boolean``
+- ``Mongoid::Boolean``, which may be specified simply as ``Boolean`` in the
+  scope of a class which included ``Mongoid::Document``.
 - ``Date``
 - ``DateTime``
 - ``Float``
@@ -76,13 +77,25 @@ Below is a list of valid types for fields.
 - ``Regexp``
 - ``Set``
 - ``String``
-- ``StringifiedSymbol``
+- ``Mongoid::StringifiedSymbol``, which may be specified simply as
+  ``StringifiedSymbol`` in the scope of a class which included
+  ``Mongoid::Document``.
 - ``Symbol``
 - ``Time``
-- ``TimeWithZone``
+- ``ActiveSupport::TimeWithZone``
+
+Mongoid also recognizes the string ``"Boolean"`` as an alias for the
+``Mongoid::Boolean`` class.
 
 To define custom field types, refer to :ref:`Custom Field Types <custom-field-types>` below.
 
+.. note::
+
+  Using the ``BSON::Int64`` and ``BSON::Int32`` types as field types is unsupported.
+  Saving these types to the database will work as expected, however, querying them
+  will return the native Ruby ``Integer`` type. Querying fields of type
+  ``BSON::Decimal128`` will return values of type ``BSON::Decimal128`` in
+  BSON <=4 and values of type ``BigDecimal`` in BSON 5+.
 
 .. _omitting-field-type-definition:
 
@@ -256,6 +269,12 @@ assignment to a ``Time`` field:
 In the above example, the value was interpreted as the beginning of today in
 local time, because the application was not configured to use UTC times.
 
+.. note::
+
+  When the database contains a string value for a ``Time`` field, Mongoid
+  parses the string value using ``Time.parse`` which considers values without
+  time zones to be in local time.
+
 
 .. _field-type-date:
 
@@ -281,6 +300,13 @@ especially if an application operates with times in different time zones it is
 recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
+
+.. note::
+
+  When the database contains a string value for a ``Date`` field, Mongoid
+  parses the string value using ``Time.parse``, discards the time portion of
+  the resulting ``Time`` object and uses the date portion. ``Time.parse``
+  considers values without time zones to be in local time.
 
 
 .. _field-type-date-time:
@@ -351,6 +377,12 @@ If a time zone is specified, it is respected:
     ticket.opened_at
     # => Sun, 04 Mar 2018 09:00:00 +0000
 
+.. note::
+
+  When the database contains a string value for a ``DateTime`` field, Mongoid
+  parses the string value using ``Time.parse`` which considers values without
+  time zones to be in local time.
+
 
 .. _field-type-regexp:
 
@@ -414,6 +446,8 @@ matches strings containing "hello" before a newline, besides strings ending in
 
 This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
+
+.. _bigdecimal-fields:
 
 BigDecimal Fields
 -----------------
@@ -517,6 +551,47 @@ you have three options:
    This query will find all values that are either a ``decimal128`` value or
    a string that match that value.
 
+
+Using Symbols Or Strings Instead Of Classes
+-------------------------------------------
+
+Mongoid permits using symbols or strings instead of classes to specify the
+type of fields, for example:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+
+    field :state, type: :integer
+    # Equivalent to:
+    field :state, type: "integer"
+    # Equivalent to:
+    field :state, type: Integer
+  end
+
+Only standard field types as listed below can be specified using symbols or
+strings in this manner. Mongoid recognizes the following expansions:
+
+- ``:array`` => ``Array``
+- ``:big_decimal`` => ``BigDecimal``
+- ``:binary`` => ``BSON::Binary``
+- ``:boolean`` => ``Mongoid::Boolean``
+- ``:date`` => ``Date``
+- ``:date_time`` => ``DateTime``
+- ``:float`` => ``Float``
+- ``:hash`` => ``Hash``
+- ``:integer`` => ``Integer``
+- ``:object_id`` => ``BSON::ObjectId``
+- ``:range`` => ``Range``
+- ``:regexp`` => ``Regexp``
+- ``:set`` => ``Set``
+- ``:string`` => ``String``
+- ``:stringified_symbol`` => ``StringifiedSymbol``
+- ``:symbol`` => ``Symbol``
+- ``:time`` => ``Time``
+
+
 .. _field-default-values:
 
 Specifying Field Default Values
@@ -575,13 +650,22 @@ being operated on:
   }
 
 When defining a default value as a ``Proc``, Mongoid will apply the default
-after all other attributes are set. To have the default be applied before
-the other attributes are set, use the ``pre_processed: true`` field option:
+after all other attributes are set and associations are initialized.
+To have the default be applied before the other attributes are set,
+use the ``pre_processed: true`` field option:
 
 .. code-block:: ruby
 
   field :fulfill_by, type: Time, default: ->{ Time.now + 3.days },
     pre_processed: true
+
+The ``pre_processed: true`` option is also necessary when specifying a custom
+default value via a ``Proc`` for the ``_id`` field, to ensure the ``_id``
+is set correctly via associations:
+
+.. code-block:: ruby
+
+  field :_id, type: String, default: -> { 'hello' }, pre_processed: true
 
 
 .. _storage-field-names:
@@ -762,6 +846,96 @@ Mongoid also defines the ``id`` field aliased to ``_id``. The ``id``
 alias can :ref:`be removed <unalias-id>` if desired (such as to integrate
 with systems that use the ``id`` field to store value different from ``_id``.
 
+.. _uncastable-values:
+
+Uncastable Values
+-----------------
+
+In Mongoid 8, Mongoid has standardized the treatment of the assignment and
+reading of "uncastable" values. A value is considered "uncastable" when it
+cannot be coerced to the type of its field. For example, an array would be an
+"uncastable" value to an Integer field.
+
+
+Assigning Uncastable Values
+```````````````````````````
+
+The assignment of uncastable values has been standardized to assign ``nil`` by
+default. Consider the following example:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+  User.new(name: [ "hello" ])
+
+Assigning an array to a field of type Integer doesn't work since an array can't
+be coerced to an Integer. The assignment of uncastable values to a field will
+cause a ``nil`` to be written:
+
+.. code::
+
+  user = User.new(name: [ "Mike", "Trout" ])
+  # => #<User _id: 62b222d43282a47bf73e3264, name: nil>
+
+Note that the original uncastable values will be stored in the
+``attributes_before_type_cast`` hash with their field names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
+
+
+Reading Uncastable Values
+`````````````````````````
+
+When documents in the database contain values of different types than their
+represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
+it will replace the value with ``nil``. Consider the following model and document in the
+database:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: Integer
+  end
+
+.. code::
+
+  { _id: ..., name: [ "Mike", "Trout" ] }
+
+Reading this document from the database will result in the model's name field
+containing ``nil``:
+
+.. code::
+
+  User.first.name
+  # => nil
+
+The database value of type array cannot be stored in the attribute, since the
+array can't be coerced to an Integer. Note that the original uncastable values
+will be stored in the ``attributes_before_type_cast`` hash with their field
+names:
+
+.. code::
+
+  user.attributes_before_type_cast["name"]
+  # => ["Mike", "Trout"]
+
+.. note::
+
+  The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
+  been changed to permit automatic persistence of mutated container attributes.
+  See `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_ for a
+  longer discussion of this topic.
+
 
 .. _customizing-field-behavior:
 
@@ -920,6 +1094,12 @@ The ``demongoize`` method is used when calling the getters of fields for your cu
 Note that in the example above, since ``demongoize`` calls ``Point.new``, a new instance of
 ``Point`` will be generated on each call to the getter.
 
+.. note::
+
+  The ``mongoize`` and ``demongoize`` methods should return ``nil`` on values
+  that are uncastable to your custom type. See the section on :ref:`Uncastable
+  Values <uncastable-values>` for more details.
+
 Lastly, the class method ``evolve`` is similar to ``mongoize``, however it is used
 when transforming objects for use in Mongoid query criteria.
 
@@ -927,6 +1107,64 @@ when transforming objects for use in Mongoid query criteria.
 
    point = Point.new(12, 24)
    Venue.where(location: point) # This uses Point.evolve
+
+
+.. _phantom-custom-field-types:
+
+Phantom Custom Field Types
+``````````````````````````
+
+The custom field type may perform conversions from user-visible attribute
+values to the values stored in the database when the user-visible attribute
+value type is different from the declared field type. For example, this
+can be used to implement a mapping from one enumeration to another, to
+have more descriptive values in the application and more compact values stored
+in the database:
+
+.. code-block:: ruby
+
+  class ColorMapping
+
+    MAPPING = {
+      'black' => 0,
+      'white' => 1,
+    }.freeze
+
+    INVERSE_MAPPING = MAPPING.invert.freeze
+
+    class << self
+
+      # Takes application-scope value and converts it to how it would be
+      # stored in the database. Converts invalid values to nil.
+      def mongoize(object)
+        MAPPING[object]
+      end
+
+      # Get the value as it was stored in the database, and convert to
+      # application-scope value. Converts invalid values to nil.
+      def demongoize(object)
+        INVERSE_MAPPING[object]
+      end
+
+      # Converts the object that was supplied to a criteria and converts it
+      # into a query-friendly form. Returns invalid values as is.
+      def evolve(object)
+        MAPPING.fetch(object, object)
+      end
+    end
+  end
+
+  class Profile
+    include Mongoid::Document
+    field :color, type: ColorMapping
+  end
+
+  profile = Profile.new(color: 'white')
+  profile.color
+  # => "white"
+
+  # Writes 0 to color field
+  profile.save!
 
 
 .. _custom-field-options:
@@ -1100,6 +1338,11 @@ Attributes can always be read using mass attribute access or ``read_attribute``
   bob.read_attribute(:age)
   # => 42
 
+.. note::
+
+  The values returned from the ``read_attribute`` method, and those stored in
+  the ``attributes`` hash, are the ``mongoized`` values.
+
 
 Special Characters in Field Names
 ---------------------------------
@@ -1151,6 +1394,42 @@ You can get and set all the translations at once by using the corresponding ``_t
    # { "en" => "Marvelous!", "de" => "Fantastisch!" }
    product.description_translations =
      { "en" => "Marvelous!", "de" => "Wunderbar!" }
+
+
+.. _present-fields:
+
+Localize ``:present`` Field Option
+----------------------------------
+
+Mongoid supports the ``:present`` option when creating a localized field:
+
+.. code-block:: ruby
+
+   class Product
+     include Mongoid::Document
+     field :description, localize: :present
+   end
+
+This option automatically removes ``blank`` values (i.e. those that return true
+for the ``blank?`` method) from the ``_translations`` hash:
+
+.. code-block:: ruby
+
+   I18n.default_locale = :en
+   product = Product.new
+   product.description = "Marvelous!"
+   I18n.locale = :de
+   product.description = "Fantastisch!"
+
+   product.description_translations
+   # { "en" => "Marvelous!", "de" => "Fantastisch!" }
+
+   product.description = ""
+   product.description_translations
+   # { "en" => "Marvelous!" }
+
+When the empty string is written for the ``:de`` locale, the ``"de"`` key is
+removed from the ``_translations`` hash instead of writing the empty string.
 
 
 Fallbacks
@@ -1209,6 +1488,7 @@ alter the criteria to match the current locale.
    Product.where(description: "Marvelous!")
    # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
 
+
 Indexing
 --------
 
@@ -1256,6 +1536,19 @@ a ``ReadonlyAttribute`` exception will be raised:
    band.update_attribute(:name, "Tool") # Raises the error.
    band.remove_attribute(:name) # Raises the error.
 
+Assignments to read-only attributes using their setters will be ignored:
+
+.. code-block:: ruby
+
+  b = Band.create!(name: "The Rolling Stones")
+  # => #<Band _id: 6287a3d5d1327a5292535383, name: "The Rolling Stones", origin: nil>
+  b.name = "The Smashing Pumpkins"
+  # => "The Smashing Pumpkins"
+  b.name
+  # => "The Rolling Stones"
+
+Calls to atomic persistence operators, like ``bit`` and ``inc``, will persist
+changes to readonly fields.
 
 Timestamp Fields
 ================
@@ -1338,8 +1631,47 @@ requiring the usage of the aggregation pipeline for both queries and updates,
 applications should avoid using dots in field names and starting field names
 with the dollar sign if possible.
 
-The Ruby driver `currently prohibits
-<https://jira.mongodb.org/browse/RUBY-2528>`_ inserting documents whose
-field names contain dots or begin with the dollar sign. However, if such
-documents are inserted using other software, Mongoid and the Ruby driver
-provide limited support for retrieving and operating on these documents.
+Mongoid, starting in version 8, now allows users to access fields that begin with
+dollar signs and that contain dots/periods. They can be accessed using the ``send``
+method as follows:
+
+.. code::
+
+    class User
+      include Mongoid::Document
+      field :"first.last", type: String
+      field :"$_amount", type: Integer
+    end
+
+    user = User.first
+    user.send(:"first.last")
+    # => Mike.Trout
+    user.send(:"$_amount")
+    # => 42650000
+
+It is also possible to use ``read_attribute`` to access these fields:
+
+.. code::
+
+    user.read_attribute("first.last")
+    # => Mike.Trout
+
+Due to `server limitations <https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/>`_,
+updating and replacing fields containing dots and dollars requires using special
+operators. For this reason, calling setters on these fields is prohibited and
+will raise an error:
+
+.. code::
+
+    class User
+      include Mongoid::Document
+      field :"first.last", type: String
+      field :"$_amount", type: Integer
+    end
+
+    user = User.new
+    user.send(:"first.last=", "Shohei.Ohtani")
+    # raises a InvalidDotDollarAssignment error
+    user.send(:"$_amount=", 8500000)
+    # raises a InvalidDotDollarAssignment error
+

@@ -28,15 +28,40 @@ Ruby Version Support
 As of version 7.4, Mongoid supports Ruby 2.5+.
 Support for Ruby 2.4 and earlier has been dropped.
 
-As of Mongoid 7.4, JRuby support is deprecated. Mongoid 8 will not support
-JRuby.
-
 
 Support for MongoDB 3.4 and Earlier Servers Deprecated
 ------------------------------------------------------
 
 Mongoid 7.4 deprecates support for MongoDB 3.4 and earlier.
 Mongoid 8 will require MongoDB 3.6 or newer.
+
+
+Feature Flags Summary
+---------------------
+
+To ensure a stable upgrade path from Mongoid 7.3, Mongoid 7.4
+introduces feature flags which are further explained in the
+sections below.
+
+To enable all new behavior in Mongoid 7.4, please use the following
+:ref:`configuration options <configuration-options>` in your mongoid.yml file.
+We recommend newly created apps to do this as well.
+
+.. code-block:: yaml
+
+  development:
+    ...
+    options:
+      # Enable all new behavior in Mongoid 7.4
+      legacy_triple_equals: false
+      object_id_as_json_oid: false
+      compare_time_by_ms: true
+      broken_aggregables: false
+      broken_updates: false
+      broken_and: false
+      broken_scoping: false
+      broken_alias_handling: false
+      legacy_pluck_distinct: false
 
 
 Change ``===`` Operator To Match Ruby Semantics
@@ -137,12 +162,12 @@ and matches the core Ruby behavior:
 
 .. note::
 
-  The value of ``Mongoid.legacy_triple_equals`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.legacy_triple_equals`` option will
+  change to ``false``.
 
 
-Return Hexadecimal ``_id`` Value from ``BSON::ObjectId#as_json``
-----------------------------------------------------------------
+Return String ``_id`` Value (Hexadecimal) from ``BSON::ObjectId#as_json``
+-------------------------------------------------------------------------
 
 Mongoid 7.4 permits configuring the ``BSON::ObjectId#as_json`` method
 to return the ``_id`` value as a hexadecimal string instead of the
@@ -179,6 +204,11 @@ The behavior of ``as_json`` is summarized in the following table:
      - ``{"$oid"=>"621ed7fda15d5d231594627c"}``
      - ``"621ed7fda15d5d231594627c"``
 
+.. note::
+
+  In Mongoid 8.0, the default value of the ``Mongoid.object_id_as_json_oid`` option will
+  change to ``false``.
+
 
 Scoped Associations
 -------------------
@@ -206,8 +236,12 @@ that are already loaded into memory vs queries on unloaded associations and
 top-level models.
 
 The ``Mongoid.compare_time_by_ms`` option is set to ``false`` by default
-in Mongoid 7.4 for backwards compatibility. In Mongoid 8 the default value
-will change to ``true``.
+in Mongoid 7.4 for backwards compatibility.
+
+.. note::
+
+  In Mongoid 8.0, the default value of the ``Mongoid.compare_time_by_ms`` option will
+  change to ``true``.
 
 
 ``count``, ``sum``, ``avg``, ``min``, ``max`` Ignore Sort If Not Limiting/Skipping
@@ -240,8 +274,8 @@ set to ``true`` (the default) returns ``nil`` in this case.
 
 .. note::
 
-  The value of ``Mongoid.broken_aggregables`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.broken_aggregables`` option will
+  change to ``false``.
 
 
 Correct Update Behavior When Replacing Association
@@ -269,8 +303,8 @@ we would expect it to be ``palette``.
 
 .. note::
 
-  The value of ``Mongoid.broken_update`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.broken_updates`` option will
+  change to ``false``
 
 
 Correct Logical ``and`` Query Generation
@@ -310,8 +344,8 @@ generated instead which omit the {"$in" => [2021]} condition:
 
 .. note::
 
-  The value of ``Mongoid.broken_and`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.broken_and`` option will
+  change to ``false``.
 
 
 Restore Parent Scope When Exiting ``with_scope`` Block
@@ -347,8 +381,8 @@ all scopes are cleared:
 
 .. note::
 
-  The value of ``Mongoid.broken_scoping`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.broken_scoping`` option will
+  change to ``false``.
 
 
 Changes to ``distinct`` and ``pluck``
@@ -399,8 +433,8 @@ Mongoid 7.3 and 7.4 with ``Mongoid.broken_alias_handling`` set to ``true`` behav
 
 .. note::
 
-  The value of ``Mongoid.broken_alias_handling`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.broken_alias_handling`` option will
+  change to ``false``.
 
 
 Demongoize Values Returned from ``pluck`` and ``distinct``
@@ -444,8 +478,9 @@ distinct methods will not be demongoized. For example:
 
 .. note::
 
-  The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.legacy_pluck_distinct`` option will
+  change to ``false``.
+
 
 Localized Fields with ``pluck`` and ``distinct``
 ````````````````````````````````````````````````
@@ -492,8 +527,8 @@ For example:
 
 .. note::
 
-  The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.legacy_pluck_distinct`` option will
+  change to ``false``.
 
 
 Embedded Fields with ``pluck``
@@ -535,6 +570,13 @@ inside a hash. For example:
 
 .. note::
 
-  The value of ``Mongoid.legacy_pluck_distinct`` option will change to ``false``
-  by default in Mongoid 8.0.
+  In Mongoid 8.0, the default value of the ``Mongoid.legacy_pluck_distinct`` option will
+  change to ``false``.
 
+
+``update_one`` Warnings in ``upsert``
+-------------------------------------
+
+Mongoid 7.4.1 fixes incorrect usage of the driver's ``update_one`` method from
+Mongoid's ``upsert`` method. Mongoid's ``upsert`` actually performs a
+replacing upsert, and Mongoid 7.4.1 and later correctly call ``replace_one``.

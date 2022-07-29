@@ -24,7 +24,7 @@ module Mongoid
       #   person.set_updated_at
       def set_updated_at
         if able_to_set_updated_at?
-          self.updated_at = Time.now.utc unless updated_at_changed?
+          self.updated_at = Time.configured.now unless updated_at_changed?
         end
 
         clear_timeless_option
@@ -35,7 +35,7 @@ module Mongoid
       # @example Can the timestamp be set?
       #   document.able_to_set_updated_at?
       #
-      # @return [ true, false ] If the timestamp can be set.
+      # @return [ true | false ] If the timestamp can be set.
       def able_to_set_updated_at?
         !frozen? && !timeless? && (new_record? || changed?)
       end

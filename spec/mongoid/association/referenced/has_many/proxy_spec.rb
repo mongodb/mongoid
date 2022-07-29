@@ -2239,10 +2239,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             Person.create!(username: 'durran')
           end
 
-          before do
-            person.posts.create!(title: "Testing")
-            person.posts.create!(title: "Test")
-          end
+          let!(:post1) { person.posts.create!(title: "Testing") }
+          let!(:post2) { person.posts.create!(title: "Test") }
 
           it "removes the correct posts" do
             person.posts.send(method, { title: "Testing" })
@@ -2257,6 +2255,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(person.posts.send(method, { title: "Testing" })).to eq(1)
+          end
+
+          it "sets the association locally" do
+            person.posts.send(method, { title: "Testing" })
+            expect(person.posts).to eq([post2])
           end
         end
 
@@ -2284,6 +2287,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           it "returns the number of documents deleted" do
             expect(person.posts.send(method)).to eq(2)
           end
+
+          it "sets the association locally" do
+            person.posts.send(method)
+            expect(person.posts).to eq([])
+          end
         end
       end
 
@@ -2295,10 +2303,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             Movie.create!(title: "Bladerunner")
           end
 
-          before do
-            movie.ratings.create!(value: 1)
-            movie.ratings.create!(value: 2)
-          end
+          let!(:rating1) { movie.ratings.create!(value: 1) }
+          let!(:rating2) { movie.ratings.create!(value: 2) }
 
           it "removes the correct ratings" do
             movie.ratings.send(method, { value: 1 })
@@ -2312,6 +2318,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(movie.ratings.send(method, { value: 1 })).to eq(1)
+          end
+
+          it "sets the association locally" do
+            movie.ratings.send(method, { value: 1 })
+            expect(movie.ratings).to eq([rating2])
           end
         end
 
@@ -2338,6 +2349,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
           it "returns the number of documents deleted" do
             expect(movie.ratings.send(method)).to eq(2)
+          end
+
+          it "sets the association locally" do
+            movie.ratings.send(method)
+            expect(movie.ratings).to eq([])
           end
         end
       end
@@ -2524,7 +2540,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           it "raises an error" do
             expect {
               person.posts.find(post.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
           end
         end
 
@@ -2539,7 +2555,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 person.posts.find(BSON::ObjectId.new)
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
             end
           end
 
@@ -2588,7 +2604,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 person.posts.find([ BSON::ObjectId.new ])
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
             end
           end
 
@@ -2652,7 +2668,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 movie.ratings.find(BSON::ObjectId.new)
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Rating with id\(s\)/)
             end
           end
 
@@ -2709,7 +2725,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             it "raises an error" do
               expect {
                 movie.ratings.find([ BSON::ObjectId.new ])
-              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Rating with id\(s\)/)
             end
           end
 
@@ -4112,6 +4128,34 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     it "the count field is updated" do
       expect(person2.posts_count).to eq 0
+    end
+  end
+
+  context "when there is a foreign key in the aliased associations" do
+    it "has the correct aliases" do
+      expect(Band.aliased_associations["artist_ids"]).to eq("artists")
+      expect(Artist.aliased_associations.key?("band_id")).to be false
+      expect(Artist.aliased_fields["band"]).to eq("band_id")
+    end
+  end
+
+  context "when executing concat on foreign key array from the db" do
+    config_override :legacy_attributes, false
+
+    before do
+      Agent.create!
+      Basic.create!
+    end
+
+    let!(:agent) { Agent.first }
+    let!(:basic) { Basic.first }
+
+    before do
+      agent.basic_ids.concat([basic.id])
+    end
+
+    it "works on the first attempt" do
+      expect(agent.basic_ids).to eq([basic.id])
     end
   end
 end

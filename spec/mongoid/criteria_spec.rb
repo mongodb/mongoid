@@ -383,10 +383,11 @@ describe Mongoid::Criteria do
       Person.create!
     end
 
-    context "when no eager loading is involved" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.all.cache
+        Person.all
       end
 
       before do
@@ -394,17 +395,19 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
 
     context "when the criteria is eager loading" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.includes(:posts).cache
+        Person.includes(:posts)
       end
 
       before do
@@ -412,9 +415,10 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
@@ -488,17 +492,6 @@ describe Mongoid::Criteria do
       it 'does not convert the option keys to string from symbols' do
         expect(clone.options[:read][:mode]).to eq(:secondary)
       end
-    end
-  end
-
-  describe "#cache" do
-
-    let(:criteria) do
-      Band.where(name: "Depeche Mode")
-    end
-
-    it "sets the cache option to true" do
-      expect(criteria.cache).to be_cached
     end
   end
 
@@ -837,8 +830,8 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when given a Proc" do
-      it "behaves as Enumerable" do
+    context "when given a Proc without a block" do
+      it "raises an error" do
         lambda do
           criteria.find(-> {"default"})
         # Proc is not serializable to a BSON type
@@ -1000,7 +993,7 @@ describe Mongoid::Criteria do
         it "deletes the document from the database" do
           expect {
             depeche.reload
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
         end
       end
     end
@@ -1939,7 +1932,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a array with nil values" do
+          it "returns an array with nil values" do
             expect(plucked).to eq([nil, nil, nil])
           end
         end
@@ -1952,7 +1945,7 @@ describe Mongoid::Criteria do
         end
 
         with_config_values :legacy_pluck_distinct, true, false do
-          it "returns a nil arrays" do
+          it "returns an array of arrays with nil values" do
             expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
           end
         end
@@ -2176,6 +2169,7 @@ describe Mongoid::Criteria do
 
         context 'when value is stored as decimal128' do
           config_override :map_big_decimal_to_decimal128, true
+          max_bson_version '4.99.99'
 
           it "does not demongoize the field" do
             expect(plucked.first).to be_a(BSON::Decimal128)
@@ -2216,6 +2210,7 @@ describe Mongoid::Criteria do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
         config_override :map_big_decimal_to_decimal128, true
+        max_bson_version '4.99.99'
 
         it "returns a hash with a non-demongoized field" do
           expect(plucked.first).to eq({ 'sales' => BSON::Decimal128.new('1E+2') })
@@ -2226,7 +2221,7 @@ describe Mongoid::Criteria do
         config_override :legacy_pluck_distinct, false
 
         it "demongoizes the field" do
-          expect(plucked.first).to eq(BigDecimal("1E2"))
+          expect(plucked).to eq([ BigDecimal("1E2") ])
         end
       end
     end
@@ -2240,6 +2235,7 @@ describe Mongoid::Criteria do
       context "when legacy_pluck_distinct is set" do
         config_override :legacy_pluck_distinct, true
         config_override :map_big_decimal_to_decimal128, true
+        max_bson_version '4.99.99'
 
         it "returns a hash with a non-demongoized field" do
           expect(plucked.first).to eq([{ 'sales' => BSON::Decimal128.new('1E+2') }])
@@ -2250,7 +2246,7 @@ describe Mongoid::Criteria do
         config_override :legacy_pluck_distinct, false
 
         it "demongoizes the field" do
-          expect(plucked.first).to eq([BigDecimal("1E2")])
+          expect(plucked.first).to eq([ BigDecimal("1E2") ])
         end
       end
     end
@@ -2275,6 +2271,66 @@ describe Mongoid::Criteria do
         it "returns nil" do
           expect(plucked.first).to eq(nil)
         end
+      end
+    end
+
+    context "when tallying deeply nested arrays/embedded associations" do
+
+      before do
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
+        Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 3 } } ]))) ])
+      end
+
+      let(:plucked) do
+        Person.pluck("addresses.code.deepest.array.y.z")
+      end
+
+      it "returns the correct hash" do
+        expect(plucked).to eq([
+          [ [ 1, 2 ] ], [ [ 1, 2 ] ], [ [ 1, 3 ] ]
+        ])
+      end
+    end
+  end
+
+  describe "#pick" do
+
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 3)
+    end
+
+    context "when picking a field" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name)
+      end
+
+      it "returns one element" do
+        expect(picked).to eq("Depeche Mode")
+      end
+    end
+
+    context "when picking multiple fields" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name, :likes)
+      end
+
+      it "returns an array" do
+        expect(picked).to eq([ "Depeche Mode", 3 ])
       end
     end
   end

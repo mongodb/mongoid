@@ -496,4 +496,18 @@ describe "Syncable Association" do
       expect(dog.reload.breed_ids).to eq([ breed.id ])
     end
   end
+
+  context "when setting one document on unpersisted HABTM association" do
+    let!(:dog) { Dog.create! }
+    let!(:breed) { Breed.new }
+
+    before do
+      breed.dogs = Dog.all
+      breed.save!
+    end
+
+    it "sets the foreign key on the other side" do
+      expect(dog.reload.breed_ids).to eq([breed._id])
+    end
+  end
 end

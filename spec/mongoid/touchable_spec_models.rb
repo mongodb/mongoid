@@ -6,15 +6,17 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embeds_many :entrances
-      embeds_many :floors
+      field :title, type: String
+
+      embeds_many :entrances, class_name: "TouchableSpec::Embedded::Entrance"
+      embeds_many :floors, class_name: "TouchableSpec::Embedded::Floor"
     end
 
     class Entrance
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :building
+      embedded_in :building, touch: false, class_name: "TouchableSpec::Embedded::Building"
 
       field :last_used_at, type: Time
     end
@@ -23,7 +25,9 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :building, touch: true
+      field :level, type: Integer
+
+      embedded_in :building, touch: true, class_name: "TouchableSpec::Embedded::Building"
     end
   end
 
@@ -32,22 +36,24 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      has_many :entrances, inverse_of: :building
-      has_many :floors, inverse_of: :building
+      has_many :entrances, inverse_of: :building, class_name: "TouchableSpec::Referenced::Entrance"
+      has_many :floors, inverse_of: :building, class_name: "TouchableSpec::Referenced::Floor"
     end
 
     class Entrance
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      belongs_to :building
+      belongs_to :building, touch: false, class_name: "TouchableSpec::Referenced::Building"
     end
 
     class Floor
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      belongs_to :building, touch: true
+      field :level, type: Integer
+
+      belongs_to :building, touch: true, class_name: "TouchableSpec::Referenced::Building"
     end
   end
 end

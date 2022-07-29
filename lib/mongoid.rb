@@ -24,6 +24,7 @@ require "mongoid/clients"
 require "mongoid/document"
 require "mongoid/tasks/database"
 require "mongoid/query_cache"
+require "mongoid/warnings"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
@@ -57,9 +58,19 @@ module Mongoid
   #     }
   #   end
   #
+  # @example Using a block without an argument. Use `config` inside
+  #   the block to perform variable assignment.
+  #
+  #   Mongoid.configure do
+  #     connect_to("mongoid_test")
+  #
+  #     config.preload_models = true
+  #
   # @return [ Config ] The configuration object.
-  def configure
-    block_given? ? yield(Config) : Config
+  def configure(&block)
+    return Config unless block_given?
+
+    block.arity == 0 ? Config.instance_exec(&block) : yield(Config)
   end
 
   # Convenience method for getting the default client.

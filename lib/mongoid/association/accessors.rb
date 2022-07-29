@@ -15,8 +15,8 @@ module Mongoid
       # @example Build the association.
       #   person.__build__(:addresses, { :_id => 1 }, association)
       #
-      # @param [ String, Symbol ] name The name of the association.
-      # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
+      # @param [ String | Symbol ] name The name of the association.
+      # @param [ Hash | BSON::ObjectId ] object The id or attributes to use.
       # @param [ Association ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
       #   If selected_fields is specified, fields not listed in it will not be
@@ -33,7 +33,7 @@ module Mongoid
       # @example Create the association.
       #   person.create_relation(document, association)
       #
-      # @param [ Document, Array<Document> ] object The association target.
+      # @param [ Document | Array<Document> ] object The association target.
       # @param [ Association ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
       #   If selected_fields is specified, fields not listed in it will not be
@@ -80,7 +80,7 @@ module Mongoid
       # @example Set the proxy on the document.
       #   person.set(:addresses, addresses)
       #
-      # @param [ String, Symbol ] name The name of the association.
+      # @param [ String | Symbol ] name The name of the association.
       # @param [ Proxy ] relation The association to set.
       #
       # @return [ Proxy ] The association.
@@ -101,7 +101,7 @@ module Mongoid
       # @param [ Symbol ] name The name of the association.
       # @param [ Association ] association The association metadata.
       # @param [ Object ] object The object used to build the association.
-      # @param [ true, false ] reload If the association is to be reloaded.
+      # @param [ true | false ] reload If the association is to be reloaded.
       #
       # @return [ Proxy ] The association.
       def get_relation(name, association, object, reload = false)
@@ -225,7 +225,7 @@ module Mongoid
       # @example Is autobuild disabled?
       #   document.without_autobuild?
       #
-      # @return [ true, false ] If autobuild is disabled.
+      # @return [ true | false ] If autobuild is disabled.
       def without_autobuild?
         Threaded.executing?(:without_autobuild)
       end
@@ -251,7 +251,7 @@ module Mongoid
       # @example Parse the args.
       #   doc.parse_args(:name => "Joe")
       #
-      # @param [ Array ] args The arguments.
+      # @param [ Hash... ] *args The arguments.
       #
       # @return [ Array<Hash> ] The attributes and options.
       def parse_args(*args)
@@ -319,7 +319,7 @@ module Mongoid
         ids_method = "#{association.name.to_s.singularize}_ids"
         association.inverse_class.tap do |klass|
           klass.re_define_method(ids_method) do
-            send(association.name).only(:_id).map(&:_id)
+            send(association.name).pluck(:_id)
           end
         end
       end

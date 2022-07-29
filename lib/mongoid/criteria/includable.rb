@@ -21,8 +21,8 @@ module Mongoid
       # @example Eager load the provided associations.
       #   Person.includes(:posts, :game)
       #
-      # @param [ Array<Symbol>, Array<Hash> ] relations The names of the associations to eager
-      #   load.
+      # @param [ [ Symbol | Hash ]... ] *relations The names of the association(s)
+      #   to eager load.
       #
       # @return [ Criteria ] The cloned criteria.
       def includes(*relations)
@@ -66,11 +66,12 @@ module Mongoid
 
       # Iterate through the list of relations and create the inclusions list.
       #
-      # @param [ Class, String, Symbol ] _parent_class The class from which the
+      # @param [ Class | String | Symbol ] _parent_class The class from which the
       #   association originates.
       # @param [ String ] parent The name of the association above this one in
       #   the inclusion tree, if it is a nested inclusion.
-      # @param relations_list The names of the associations to eager load.
+      # @param [ [ Symbol | Hash | Array<Symbol | Hash> ]... ] *relations_list
+      #   The names of the association(s) to eager load.
       def extract_includes_list(_parent_class, parent, *relations_list)
         relations_list.flatten.each do |relation_object|
           if relation_object.is_a?(Hash)

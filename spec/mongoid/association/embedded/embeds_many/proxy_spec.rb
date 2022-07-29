@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../embeds_many_models.rb'
 
 describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
@@ -2209,6 +2210,79 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           end
         end
       end
+
+      context "when modifying the document beforehand" do
+        let(:parent) { EmmParent.new }
+
+        before do
+
+          parent.blocks << EmmBlock.new(name: 'test', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[0].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "deletes the correct document in the database" do
+          expect(parent.reload.blocks.length).to eq(0)
+        end
+      end
+
+      context "when nil _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test2', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "deletes only the matching documents in the database" do
+          expect(parent.reload.blocks.length).to eq(1)
+        end
+      end
+
+      # Since without an _id field we must us a $pullAll with the attributes of
+      # the embedded document, if you modify it beforehand, the query will not
+      # be able to find the correct document to pull.
+      context "when modifying the document with nil _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test2', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[0].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "does not delete the correct documents" do
+          expect(parent.reload.blocks.length).to eq(2)
+        end
+      end
+
+      context "when documents with and without _id" do
+        let(:parent) { EmmParent.new }
+
+        before do
+          parent.blocks << EmmBlock.new(_id: nil, name: 'test', children: [size: 1, order: 1])
+          parent.blocks << EmmBlock.new(name: 'test', children: [size: 1, order: 1])
+          parent.save!
+
+          parent.blocks[1].children[0].assign_attributes(size: 2)
+
+          parent.blocks.destroy_all(:name => 'test')
+        end
+
+        it "does not delete the correct documents" do
+          expect(parent.reload.blocks.length).to eq(0)
+        end
+      end
     end
   end
 
@@ -2286,7 +2360,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           it "raises an error" do
             expect {
               person.addresses.find(BSON::ObjectId.new)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Address with id\(s\)/)
           end
         end
 
@@ -2335,7 +2409,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           it "raises an error" do
             expect {
               person.addresses.find([ BSON::ObjectId.new ])
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Address with id\(s\)/)
           end
         end
 
@@ -3460,7 +3534,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
     describe "replacing the entire embedded list" do
 
-      context "when an embeds many relationship contains a nil as the first item" do
+      context "when an embeds many relationship contains nil as the first item" do
 
         let(:person) do
           Person.create!
@@ -3481,7 +3555,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when an embeds many relationship contains a nil in the middle of the list" do
+      context "when an embeds many relationship contains nil in the middle of the list" do
 
         let(:person) do
           Person.create!
@@ -3502,7 +3576,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when an embeds many relationship contains a nil at the end of the list" do
+      context "when an embeds many relationship contains nil at the end of the list" do
 
         let(:person) do
           Person.create!
@@ -3526,7 +3600,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
     describe "appending to the embedded list" do
 
-      context "when appending a nil to the first position in an embedded list" do
+      context "when appending nil to the first position in an embedded list" do
 
         let(:person) do
           Person.create! phone_numbers: []
@@ -3545,7 +3619,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when appending a nil into the middle of an embedded list" do
+      context "when appending nil into the middle of an embedded list" do
 
         let(:person) do
           Person.create! phone_numbers: []
@@ -3564,7 +3638,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
       end
 
-      context "when appending a nil to the end of an embedded list" do
+      context "when appending nil to the end of an embedded list" do
 
         let(:person) do
           Person.create! phone_numbers: []
@@ -3956,6 +4030,28 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       it "does not add additional documents" do
         expect(addresses.count).to eq(1)
       end
+    end
+  end
+
+  context "when destroying a document with multiple nil _ids" do
+    let(:congress) { EmmCongress.create! }
+
+    before do
+      congress.legislators << EmmLegislator.new(_id: nil, a: 1)
+      congress.legislators << EmmLegislator.new(_id: nil, a: 2)
+
+      congress.legislators[0].destroy
+    end
+
+    it "deletes the correct document locally" do
+      pending "MONGOID-5394"
+      expect(congress.legislators.length).to eq(1)
+      expect(congress.legislators.first.a).to eq(1)
+    end
+
+    it "only deletes the one document" do
+      pending "MONGOID-5394"
+      expect(congress.reload.legislators.length).to eq(1)
     end
   end
 
@@ -4696,6 +4792,72 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       it "does not persist the empty list" do
         expect(reloaded_band).to_not have_key(:labels)
       end
+    end
+  end
+
+  context "when using assign_attributes with an already populated array" do
+    let(:post) { EmmPost.create! }
+
+    before do
+      post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'a'}],
+        user_tags: [{id: BSON::ObjectId.new, title: 'b'}])
+      post.save!
+      post.reload
+      post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'c'}],
+        user_tags: [])
+      post.save!
+      post.reload
+    end
+
+    it "has the correct embedded documents" do
+      expect(post.company_tags.length).to eq(1)
+      expect(post.company_tags.first.title).to eq("c")
+    end
+  end
+
+  context "when the parent fails validation" do
+    let(:school) { EmmSchool.new }
+    let(:student) { school.students.new }
+
+    before do
+      student.save
+    end
+
+    it "does not mark the parent as persisted" do
+      expect(school.persisted?).to be false
+    end
+
+    it "does not mark the child as persisted" do
+      expect(student.persisted?).to be false
+    end
+
+    it "does not persist the parent" do
+      expect(School.count).to eq(0)
+    end
+  end
+
+  context "when doing assign_attributes then assignment" do
+
+    let(:post) do
+      EmmPost.create!(
+        company_tags: [ EmmCompanyTag.new(title: "1"), EmmCompanyTag.new(title: "1") ],
+        user_tags: [ EmmUserTag.new(title: "1"), EmmUserTag.new(title: "1") ]
+      )
+    end
+
+    let(:from_db) { EmmPost.find(post.id) }
+
+    before do
+      post.assign_attributes(
+        company_tags: [ EmmCompanyTag.new(title: '3'), EmmCompanyTag.new(title: '4') ]
+      )
+      post.user_tags = [ EmmUserTag.new(title: '3'), EmmUserTag.new(title: '4') ]
+      post.save!
+    end
+
+    it "persists the associations correctly" do
+      expect(from_db.user_tags.size).to eq(2)
+      expect(from_db.company_tags.size).to eq(2)
     end
   end
 end

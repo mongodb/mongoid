@@ -52,6 +52,27 @@ module Mongoid
           self
         end
 
+        # Merge criteria with operators using the and operator.
+        #
+        # @param [ Hash ] criterion The criterion to add to the criteria.
+        # @param [ String ] operator The MongoDB operator.
+        #
+        # @return [ Criteria ] The resulting criteria.
+        def and_with_operator(criterion, operator)
+          crit = self
+          if criterion
+            criterion.each_pair do |field, value|
+              val = prepare(field, operator, value)
+              # The prepare method already takes the negation into account. We
+              # set negating to false here so that ``and`` doesn't also apply
+              # negation and we have a double negative.
+              crit.negating = false
+              crit = crit.and(field => val)
+            end
+          end
+          crit
+        end
+
         private
 
         # Adds the criterion to the existing selection.

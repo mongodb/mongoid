@@ -78,7 +78,7 @@ module Mongoid
 
         # Are ids only saved on this side of the association?
         #
-        # @return [ true, false ] Whether this association has a forced nil inverse.
+        # @return [ true | false ] Whether this association has a forced nil inverse.
         def forced_nil_inverse?
           @forced_nil_inverse ||= @options.key?(:inverse_of) && !@options[:inverse_of]
         end
@@ -119,6 +119,8 @@ module Mongoid
             @options[:inverse_foreign_key]
           elsif @options.key?(:inverse_of)
             inverse_of ? "#{inverse_of.to_s.singularize}#{FOREIGN_KEY_SUFFIX}" : nil
+          elsif inv = inverse_association&.foreign_key
+            inv
           else
             "#{inverse_class_name.demodulize.underscore}#{FOREIGN_KEY_SUFFIX}"
           end
@@ -129,7 +131,7 @@ module Mongoid
         #
         # @param [ Document ] doc The document to be bound.
         #
-        # @return [ true, false ] Whether the document can be bound.
+        # @return [ true | false ] Whether the document can be bound.
         def bindable?(doc)
           forced_nil_inverse? || (!!inverse && doc.fields.keys.include?(foreign_key))
         end
@@ -228,6 +230,7 @@ module Mongoid
         end
 
         def create_foreign_key_field!
+          inverse_class.aliased_associations[foreign_key] = name.to_s
           @owner_class.field(
               foreign_key,
               type: FOREIGN_KEY_FIELD_TYPE,

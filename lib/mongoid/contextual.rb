@@ -30,7 +30,7 @@ module Mongoid
     # @example Get the context.
     #   criteria.context
     #
-    # @return [ Memory, Mongo ] The context.
+    # @return [ Memory | Mongo ] The context.
     def context
       @context ||= create_context
     end
@@ -45,7 +45,7 @@ module Mongoid
     # @example Create the context.
     #   contextual.create_context
     #
-    # @return [ Mongo, Memory ] The context.
+    # @return [ Mongo | Memory ] The context.
     def create_context
       return None.new(self) if empty_and_chainable?
       embedded ? Memory.new(self) : Mongo.new(self)

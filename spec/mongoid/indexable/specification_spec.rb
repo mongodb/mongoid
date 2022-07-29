@@ -85,7 +85,7 @@ describe Mongoid::Indexable::Specification do
         Band,
         { name: 1, title: 1, years: -1 },
         background: true,
-        drop_dups: true
+        unique: true
       )
     end
 
@@ -98,7 +98,7 @@ describe Mongoid::Indexable::Specification do
     end
 
     it "normalizes the options" do
-      expect(spec.options).to eq(background: true, drop_dups: true)
+      expect(spec.options).to eq(background: true, unique: true)
     end
   end
 

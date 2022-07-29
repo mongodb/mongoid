@@ -33,6 +33,13 @@ describe Array do
         expect(described_class.evolve("testing")).to eq("testing")
       end
     end
+
+    context "when providing a set" do
+
+      it "returns an array" do
+        expect(described_class.evolve([ 1, 2, 3 ].to_set)).to eq([ 1, 2, 3 ])
+      end
+    end
   end
 
   describe "#__add__" do
@@ -501,25 +508,6 @@ describe Array do
           { field_one: 1, field_two: -1 }
         )
       end
-    end
-  end
-
-  describe "#update_values" do
-
-    let(:array) do
-      [ 1, 2, 3 ]
-    end
-
-    let(:updated) do
-      array.update_values(&:to_s)
-    end
-
-    it "replaces each of the values with the result of the block" do
-      expect(updated).to eq([ "1", "2", "3" ])
-    end
-
-    it "returns the same instance of the array" do
-      expect(updated).to equal(array)
     end
   end
 end

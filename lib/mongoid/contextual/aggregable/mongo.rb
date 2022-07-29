@@ -20,13 +20,13 @@ module Mongoid
         #   #   "avg" => 750.0
         #   # }
         #
-        # @param [ String, Symbol ] field The field name.
+        # @param [ String | Symbol ] field The field name.
         #
         # @return [ Hash ] A Hash containing the aggregate values.
         #   If no documents are found, then returned Hash will have
         #   count, sum of 0 and max, min, avg of nil.
         def aggregates(field)
-          result = collection.find.aggregate(pipeline(field), session: _session).to_a
+          result = collection.aggregate(pipeline(field), session: _session).to_a
           if result.empty?
             if Mongoid.broken_aggregables
               { "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil }
@@ -64,7 +64,7 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to max.
         #
-        # @return [ Float, Document ] The max value or document with the max
+        # @return [ Float | Document ] The max value or document with the max
         #   value.
         def max(field = nil)
           block_given? ? super() : aggregates(field)["max"]
@@ -84,7 +84,7 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to min.
         #
-        # @return [ Float, Document ] The min value or document with the min
+        # @return [ Float | Document ] The min value or document with the min
         #   value.
         def min(field = nil)
           block_given? ? super() : aggregates(field)["min"]
@@ -115,7 +115,7 @@ module Mongoid
         # @example Get the pipeline.
         #   aggregable.pipeline(:likes)
         #
-        # @param [ String, Symbol ] field The name of the field.
+        # @param [ String | Symbol ] field The name of the field.
         #
         # @return [ Array ] The array of pipeline operators.
         def pipeline(field)

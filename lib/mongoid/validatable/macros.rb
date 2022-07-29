@@ -18,8 +18,7 @@ module Mongoid
       #     validates_associated :name, :addresses
       #   end
       #
-      # @param [ Array ] args The arguments to pass to the validator.
-      #
+      # @param [ Object... ] *args The arguments to pass to the validator.
       def validates_associated(*args)
         validates_with(AssociatedValidator, _merge_attributes(args))
       end
@@ -36,8 +35,7 @@ module Mongoid
       #     validates_uniqueness_of :title
       #   end
       #
-      # @param [ Array ] args The arguments to pass to the validator.
-      #
+      # @param [ Object... ] *args The arguments to pass to the validator.
       def validates_uniqueness_of(*args)
         validates_with(UniquenessValidator, _merge_attributes(args))
       end
@@ -52,7 +50,7 @@ module Mongoid
       #     validates_format_of :title, with: /\A[a-z0-9 \-_]*\z/i
       #   end
       #
-      # @param [ Array ] args The names of the fields to validate.
+      # @param [ Object... ] *args The names of the field(s) to validate.
       def validates_format_of(*args)
         validates_with(FormatValidator, _merge_attributes(args))
       end
@@ -67,7 +65,7 @@ module Mongoid
       #     validates_length_of :title, minimum: 100
       #   end
       #
-      # @param [ Array ] args The names of the fields to validate.
+      # @param [ Object... ] *args The names of the field(s) to validate.
       def validates_length_of(*args)
         validates_with(LengthValidator, _merge_attributes(args))
       end
@@ -82,7 +80,7 @@ module Mongoid
       #     validates_presence_of :title
       #   end
       #
-      # @param [ Array ] args The names of the fields to validate.
+      # @param [ Object... ] *args The names of the field(s) to validate.
       def validates_presence_of(*args)
         validates_with(PresenceValidator, _merge_attributes(args))
       end

@@ -10,18 +10,21 @@ module Mongoid
       #   criteria.execute_or_raise(id)
       #
       # @param [ Object ] ids The arguments passed.
-      # @param [ true, false ] multi Whether there arguments were a list.
+      # @param [ true | false ] multi Whether there arguments were a list.
       #
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #
-      # @return [ Document, Array<Document> ] The document(s).
+      # @return [ Document | Array<Document> ] The document(s).
       def execute_or_raise(ids, multi)
         result = multiple_from_db(ids)
         check_for_missing_documents!(result, ids)
         multi ? result : result.first
       end
 
-      # Find the matchind document(s) in the criteria for the provided ids.
+      # Find the matching document(s) in the criteria for the provided id(s).
+      #
+      # @note Each argument can be an individual id, an array of ids or
+      #   a nested array. Each array will be flattened.
       #
       # @example Find by an id.
       #   criteria.find(BSON::ObjectId.new)
@@ -29,9 +32,9 @@ module Mongoid
       # @example Find by multiple ids.
       #   criteria.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
       #
-      # @param [ Array<BSON::ObjectId> ] args The ids to search for.
+      # @param [ [ Object | Array<Object> ]... ] *args The id(s) to find.
       #
-      # @return [ Array<Document>, Document ] The matching document(s).
+      # @return [ Document | Array<Document> ] The matching document(s).
       def find(*args)
         ids = args.__find_args__
         raise_invalid if ids.any?(&:nil?)

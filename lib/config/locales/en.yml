@@ -1,4 +1,8 @@
 en:
+  errors:
+    messages:
+      taken: "has already been taken"
+
   mongoid:
     errors:
       messages:
@@ -61,7 +65,7 @@ en:
             and the following ids were not found: %{missing}."
           resolution: "Search for an id that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error when
+            which will cause nil to be returned instead of raising this error when
             searching for a single id, or only the matched documents when searching
             for multiples."
         document_with_attributes_not_found:
@@ -71,15 +75,17 @@ en:
             will be raised."
           resolution: "Search for attributes that are in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
-            which will cause a nil to be returned instead of raising this error."
-        eager_load:
-          message: "Eager loading :%{name} is not supported since it is a
-            polymorphic belongs_to association."
-          summary: "Mongoid cannot currently determine the classes it needs to
-            eager load when the association is polymorphic. The parents reside in
-            different collections so a simple id lookup is not sufficient enough."
-          resolution: "Don't attempt to perform this action and have patience,
-            maybe this will be supported in the future."
+            which will cause nil to be returned instead of raising this error."
+        document_with_shard_key_not_found:
+          message: "Document not found for class %{klass} with id %{missing} and
+            shard key %{shard_key}."
+          summary: "When calling %{klass}.find with an id and a shard key, each
+            parameter must match a document in the database or this error will
+            be raised. The search was for the id: %{missing} with
+            shard_key: %{shard_key} and it was not found."
+          resolution: "Search for an id/shard key that is in the database or set
+            the Mongoid.raise_not_found_error configuration option to false,
+            which will cause nil to be returned instead of raising this error."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
@@ -126,6 +132,17 @@ en:
             allowed."
           resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
             ancestors."
+        invalid_dot_dollar_assignment:
+          message: "Cannot set the %{attr} attribute on the %{klass} class."
+          summary: "Calling the setters for fields that start with a dollar
+            sign ($) or contain a dot/period (.) is prohibited. See the
+            Mongoid documentation on Field Names with Dots/Periods (.) and
+            Dollar Signs ($) for more information."
+          resolution: "In order to set fields that start with a dollar
+            sign ($) or contain a dot/period (.), the aggregation pipeline can
+            be used. MongoDB provides specific operators for working with these
+            fields. Refer to the MongoDB documentation here:
+            https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/"
         invalid_elem_match_operator:
           message: "Invalid $elemMatch operator '%{operator}'."
           summary: "You misspelled an operator or are using an operator that
@@ -146,7 +163,7 @@ en:
           resolution: "Valid expression operators are: %{valid_operators}.
             Ensure you are using one of these operators."
         invalid_field:
-          message: "Defining a field named '%{name}' is not allowed."
+          message: "Defining a field named '%{field}' is not allowed."
           summary: "Defining this field would override the method '%{name}',
             which would cause issues with expectations around the original
             method and cause extremely hard to debug issues. The original
@@ -181,6 +198,13 @@ en:
             \_\_end\n\n
             Refer to:
             https://docs.mongodb.com/mongoid/current/reference/fields/#custom-field-options"
+        invalid_field_type:
+          message: "Invalid field type %{type_inspection} for field '%{field}' on model '%{klass}'."
+          summary: "Model '%{klass}' defines a field '%{field}' with an unknown type value
+            %{type_inspection}."
+          resolution: "Please provide a valid type value for the field.
+            Refer to:
+            https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
@@ -196,7 +220,6 @@ en:
             Valid options are:\n
             \_\_background: true|false\n
             \_\_database: 'database_name'\n
-            \_\_drop_dups: true|false\n
             \_\_name: 'index_name'\n
             \_\_sparse: true|false\n
             \_\_unique: true|false\n
@@ -215,7 +238,8 @@ en:
             \_\_language_override\n
             \_\_default_language\n
             \_\_collation\n
-            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack', 'text', 'hashed'\n\n
+            \_\_wildcard_projection: { 'path.to.field.a': 1, 'path.to.field.b': 0 }\n
+            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack (deprecated)', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
@@ -349,10 +373,6 @@ en:
             from the child side which association to go in."
           resolution: "Set the values from the parent, or redefine the association
             with only a single definition in the parent."
-        invalid_value:
-          message: "Value of type %{value_class} cannot be written to a field of type %{field_class}"
-          summary: "Tried to set a value of type %{value_class} to a field of type %{field_class}"
-          resolution: "Verify if the value to be set correspond to field definition"
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
             document via a non-embedded association is not allowed since the
@@ -404,17 +424,23 @@ en:
             \_\_\_\_\_\_default:\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
+        no_documents_found:
+          message: "Could not find a document of class %{klass}."
+          summary: "Mongoid attempted to find a document of the class %{klass}
+            but none exist."
+          resolution: "Create a document of class %{klass} or use a finder
+            method that does not raise an exception when no documents are
+            found."
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."
-          summary: "Mongoid attempted to find the appropriate environment
-            but no Rails.env, Sinatra::Base.environment, RACK_ENV, or
-            MONGOID_ENV could be found."
-          resolution: "Make sure some environment is set from the mentioned
-            options. Mongoid cannot load configuration from the yaml without
-            knowing which environment it is in, and we have considered
-            defaulting to development an undesirable side effect of this not
-            being defined."
+          summary: "Mongoid could not determine the environment to use because
+            it was not specified in any of the following locations:
+            Rails.env, Sinatra::Base.environment,
+            ENV[\"RACK_ENV\"], ENV[\"MONGOID_ENV\"]. Without knowing the
+            environment, Mongoid cannot load its configuration."
+          resolution: "Please ensure an environment is set in one of the
+            listed locations. The environment must be explicitly set."
         no_map_reduce_output:
           message: "No output location was specified for the map/reduce
             operation."
@@ -541,11 +567,9 @@ en:
             server versions 3.6 and higher."
           resolution: "Verify that all servers in your deployment are at least
             version 3.6 or don't attempt to use sessions with older server versions."
-        taken:
-          "is already taken"
         too_many_nested_attribute_records:
           message: "Accepting nested attributes for %{association} is limited
-            to %{limit} records."
+            to %{limit} documents."
           summary: "More documents were sent to be processed than the allowed
             limit."
           resolution: "The limit is set as an option to the macro, for example:

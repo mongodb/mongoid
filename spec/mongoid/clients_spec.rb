@@ -802,7 +802,7 @@ describe Mongoid::Clients do
         it "does not persist to the default database" do
           expect {
             Band.find(band.id)
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
         end
 
         let(:from_db) do
@@ -840,7 +840,7 @@ describe Mongoid::Clients do
         it "does not persist to the default database" do
           expect {
             Band.find(band.id)
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
         end
 
         let(:from_db) do

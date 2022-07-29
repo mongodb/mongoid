@@ -172,8 +172,6 @@ describe 'embeds_many associations' do
           # Mongoid uses the new value of `x` in the $pullAll query,
           # which doesn't match the document that is in the database,
           # resulting in the empty array assignment not taking effect.
-          pending 'MONGOID-5037'
-
           canvas.shapes.first.x = 1
           canvas.shapes = []
           canvas.save!
@@ -201,6 +199,21 @@ describe 'embeds_many associations' do
 
         include_examples 'persists correctly'
       end
+    end
+  end
+
+  context 'when an anonymous class defines an embeds_many association' do
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+        embeds_many :addresses
+      end
+    end
+
+    it 'loads the association correctly' do
+      expect { klass }.to_not raise_error
+      expect { klass.new.addresses }.to_not raise_error
+      expect(klass.new.addresses.build).to be_a Address
     end
   end
 end

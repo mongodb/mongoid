@@ -16,7 +16,7 @@ module Mongoid
     #   end
     #
     # It is also possible to limit the uniqueness constraint to a set of
-    # records matching certain conditions:
+    # documents matching certain conditions:
     #   class Person
     #     include Mongoid::Document
     #     field :title
@@ -74,7 +74,7 @@ module Mongoid
       # @example Is the validation case sensitive?
       #   validator.case_sensitive?
       #
-      # @return [ true, false ] If the validation is case sensitive.
+      # @return [ true | false ] If the validation is case sensitive.
       def case_sensitive?
         !(options[:case_sensitive] == false)
       end
@@ -86,7 +86,7 @@ module Mongoid
       # @example Create the criteria.
       #   validator.create_criteria(User, user, :name, "syd")
       #
-      # @param [ Class, Proxy ] base The base to execute the criteria from.
+      # @param [ Class | Proxy ] base The base to execute the criteria from.
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The name of the attribute.
       # @param [ Object ] value The value of the object.
@@ -149,7 +149,7 @@ module Mongoid
       #
       # @param [ Object ] value The value to filter.
       #
-      # @return [ Object, Regexp ] The value, filtered or not.
+      # @return [ Object | Regexp ] The value, filtered or not.
       def filter(value)
         !case_sensitive? && value ? /\A#{Regexp.escape(value.to_s)}\z/i : value
       end
@@ -182,7 +182,7 @@ module Mongoid
       #
       # @param [ Document ] document The embedded document.
       #
-      # @return [ true, false ] If the validation should be skipped.
+      # @return [ true | false ] If the validation should be skipped.
       def skip_validation?(document)
         !document._parent || document.embedded_one?
       end
@@ -196,7 +196,7 @@ module Mongoid
       #
       # @param [ Document ] document The embedded document.
       #
-      # @return [ true, false ] If the scope reference has changed.
+      # @return [ true | false ] If the scope reference has changed.
       def scope_value_changed?(document)
         Array.wrap(options[:scope]).any? do |item|
           document.send("attribute_changed?", item.to_s)
@@ -242,6 +242,7 @@ module Mongoid
         relation = document._parent.send(document.association_name)
         criteria = create_criteria(relation, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
+        criteria = criteria.limit(2)
         add_error(document, attribute, value) if criteria.count > 1
       end
 
@@ -277,7 +278,7 @@ module Mongoid
       # @param [ Document ] document The document getting validated.
       # @param [ Symbol ] attribute The attribute to validate.
       #
-      # @return [ true, false ] If we need to validate.
+      # @return [ true | false ] If we need to validate.
       def validation_required?(document, attribute)
         document.new_record? ||
           document.send("attribute_changed?", attribute.to_s) ||
@@ -294,7 +295,7 @@ module Mongoid
       # @param [ Document ] document The document getting validated.
       # @param [ Symbol ] attribute The attribute to validate.
       #
-      # @return [ true, false ] If the attribute is localized.
+      # @return [ true | false ] If the attribute is localized.
       def localized?(document, attribute)
         document.fields[document.database_field_name(attribute)].try(:localized?)
       end

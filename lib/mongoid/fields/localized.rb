@@ -24,9 +24,19 @@ module Mongoid
       # @example Is the field localized?
       #   field.localized?
       #
-      # @return [ true, false ] If the field is localized.
+      # @return [ true | false ] If the field is localized.
       def localized?
         true
+      end
+
+      # Is the localized field enforcing values to be present?
+      #
+      # @example Is the localized field enforcing values to be present?
+      #   field.localize_present?
+      #
+      # @return [ true | false ] If the field enforces present.
+      def localize_present?
+        options[:localize] == :present
       end
 
       # Convert the provided string into a hash for the locale.
@@ -50,7 +60,7 @@ module Mongoid
       # @example Should fallbacks be used.
       #   field.fallbacks?
       #
-      # @return [ true, false ] If fallbacks should be used.
+      # @return [ true | false ] If fallbacks should be used.
       def fallbacks?
         return true if options[:fallbacks].nil?
         !!options[:fallbacks]

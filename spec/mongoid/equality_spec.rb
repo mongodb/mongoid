@@ -85,8 +85,8 @@ describe Mongoid::Equality do
 
   describe ".===" do
 
-    context "when legacy_triple_equals is set" do
-      config_override :legacy_triple_equals, true
+    context "when legacy_triple_equals is not set" do
+      config_override :legacy_triple_equals, false
 
       context "when comparable is an instance of this document" do
 
@@ -128,8 +128,8 @@ describe Mongoid::Equality do
       end
     end
 
-    context "when legacy_triple_equals is not set" do
-      config_override :legacy_triple_equals, false
+    context "when legacy_triple_equals is set" do
+      config_override :legacy_triple_equals, true
 
       context "when comparable is an instance of this document" do
 
@@ -205,8 +205,8 @@ describe Mongoid::Equality do
 
         context "when the class is the same" do
 
-          it "returns false" do
-            expect(person === Person).to be false
+          it "returns true" do
+            expect(person === Person).to be true
           end
         end
 
@@ -219,8 +219,8 @@ describe Mongoid::Equality do
 
         context "when the class is a superclass" do
 
-          it "returns false" do
-            expect(Doctor.new === Person).to be false
+          it "returns true" do
+            expect(Doctor.new === Person).to be true
           end
         end
       end
@@ -256,8 +256,8 @@ describe Mongoid::Equality do
       context "when comparing to a class" do
         context "when the class is the same" do
 
-          it "returns true" do
-            expect(person === Person).to be true
+          it "returns false" do
+            expect(person === Person).to be false
           end
         end
 
@@ -270,8 +270,8 @@ describe Mongoid::Equality do
 
         context "when the class is a superclass" do
 
-          it "returns true" do
-            expect(Doctor.new === Person).to be true
+          it "returns false" do
+            expect(Doctor.new === Person).to be false
           end
         end
       end

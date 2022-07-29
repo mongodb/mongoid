@@ -18,7 +18,7 @@ module Mongoid
       # @return [ true ] True.
       def upsert(options = {})
         prepare_upsert(options) do
-          collection.find(atomic_selector).update_one(
+          collection.find(atomic_selector).replace_one(
               as_attributes, upsert: true, session: _session)
         end
       end
@@ -36,7 +36,7 @@ module Mongoid
       #
       # @param [ Hash ] options The options hash.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ true | false ] If the operation succeeded.
       def prepare_upsert(options = {})
         return false if performing_validations?(options) && invalid?(:upsert)
         result = run_callbacks(:upsert) do

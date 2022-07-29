@@ -204,7 +204,7 @@ describe Mongoid::Config do
 
         Mongoid.configure { |config| config.load_configuration(configuration) }
 
-        expect(Mongoid::Config.discriminator_key).to be("_type")
+        expect(Mongoid::Config.discriminator_key).to eq("_type")
       end
     end
 
@@ -215,11 +215,11 @@ describe Mongoid::Config do
 
         Mongoid.configure { |config| config.load_configuration(configuration) }
 
-        expect(Mongoid::Config.discriminator_key).to be("test")
+        expect(Mongoid::Config.discriminator_key).to eq("test")
       end
 
       it 'is set globally' do
-        expect(Mongoid.discriminator_key).to be("test")
+        expect(Mongoid.discriminator_key).to eq("test")
       end
     end
   end
@@ -260,7 +260,7 @@ describe Mongoid::Config do
       let(:conf) { CONFIG }
 
       it "it is set to its default" do
-        expect(Mongoid.send(option)).to be(default)
+        expect(Mongoid.send(option)).to eq(default)
       end
     end
   end
@@ -335,6 +335,19 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the overwrite_chained_operators option in the config' do
+    let(:option) { :overwrite_chained_operators }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the legacy_attributes option in the config' do
+    let(:option) { :legacy_attributes }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
 
   describe "#load!" do
 
@@ -456,6 +469,40 @@ describe Mongoid::Config do
       end
     end
 
+    context "when provided an environment with driver options" do
+
+      before do
+        described_class.load!(file, :test)
+      end
+
+      after do
+        described_class.reset
+      end
+
+      it "sets the Mongo.broken_view_options option" do
+        expect(Mongo.broken_view_options).to eq(false)
+      end
+
+      it "does not override the unset Mongo.validate_update_replace option" do
+        expect(Mongo.validate_update_replace).to eq(false)
+      end
+    end
+
+    context "when provided an environment with a nil driver option" do
+
+      before do
+        described_class.load!(file, :test_nil)
+      end
+
+      after do
+        described_class.reset
+      end
+
+      it "sets the Mongo.broken_view_options option to nil" do
+        expect(Mongo.broken_view_options).to be_nil
+      end
+    end
+
     context "when the rack environment is set" do
 
       before do
@@ -536,6 +583,43 @@ describe Mongoid::Config do
             end
           end
         end
+      end
+    end
+
+    context 'when schema map is provided with uuid' do
+      let(:file) do
+        File.join(File.dirname(__FILE__), "..", "config", "mongoid_with_schema_map_uuid.yml")
+      end
+
+      before do
+        described_class.load!(file, :test)
+      end
+
+      let(:client) { Mongoid.default_client }
+
+      it 'passes uuid to driver' do
+        Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
+          auto_encryption_options: {
+            'key_vault_namespace' => 'admin.datakeys',
+            'kms_providers' => {'local' => {'key' => 'z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U'}},
+            'schema_map' => {'blog_development.comments' => {
+              'bsonType' => 'object',
+              'properties' => {
+                'message' => {'encrypt' => {
+                  'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+                  'bsonType' => 'string',
+                  'keyId' => [BSON::Binary.new("G\xF0 5\xCC@HX\xA2%b\x97\xA9a\xA8\xE7", :uuid)],
+                }},
+              },
+            }}},
+          database: 'mongoid_test',
+          platform: "mongoid-#{Mongoid::VERSION}",
+          wrapping_libraries: [
+            {'name' => 'Mongoid', 'version' => Mongoid::VERSION},
+          ],
+        )
+
+        client
       end
     end
   end

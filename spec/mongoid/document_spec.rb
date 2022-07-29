@@ -165,12 +165,39 @@ describe Mongoid::Document do
 
   describe "#attributes" do
 
-    let(:person) do
-      Person.new(title: "Sir")
+    let!(:person) do
+      Person.create!(title: "Sir")
     end
 
     it "returns the attributes with indifferent access" do
       expect(person[:title]).to eq("Sir")
+    end
+
+    context "when instantiating a new document" do
+      it "returns a Hash" do
+        expect(person.attributes.class).to eq(Hash)
+      end
+    end
+
+    context "when retrieving a document from the database" do
+
+      let(:from_db) { Person.first }
+
+      context "when legacy_attributes is false" do
+        config_override :legacy_attributes, false
+
+        it "returns a Hash" do
+          expect(from_db.attributes.class).to eq(Hash)
+        end
+      end
+
+      context "when legacy_attributes is true" do
+        config_override :legacy_attributes, true
+
+        it "returns a BSON::Document" do
+          expect(from_db.attributes.class).to eq(BSON::Document)
+        end
+      end
     end
   end
 
@@ -465,12 +492,12 @@ describe Mongoid::Document do
         end
 
         it 'logs a deprecation warning when :compact is given' do
-          expect_any_instance_of(Logger).to receive(:warn).with(message)
+          expect(Mongoid::Warnings).to receive(:warn_as_json_compact_deprecated)
           church.as_json(compact: true)
         end
 
         it 'does not log a deprecation warning when :compact is not given' do
-          expect_any_instance_of(Logger).to_not receive(:warn).with(message)
+          expect(Mongoid::Warnings).to_not receive(:warn_as_json_compact_deprecated)
           church.as_json
         end
       end
@@ -591,7 +618,7 @@ describe Mongoid::Document do
       end
 
       it "does not include the document in the hash" do
-        expect(person.as_document["addresses"]).to be_empty
+        expect(person.as_document).to_not have_key("addresses")
       end
     end
 

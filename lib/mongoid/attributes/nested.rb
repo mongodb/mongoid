@@ -33,15 +33,15 @@ module Mongoid
         #     accepts_nested_attributes_for :addresses, :game, :posts
         #   end
         #
-        # @param [ Array<Symbol>, Hash ] args A list of association names, followed
-        #   by a hash of options.
+        # @param [ Symbol..., Hash ] *args A list of association names, followed
+        #   by an optional hash of options.
         #
-        # @option *args [ true, false ] :allow_destroy Can deletion occur?
-        # @option *args [ Proc, Symbol ] :reject_if Block or symbol pointing
+        # @option *args [ true | false ] :allow_destroy Can deletion occur?
+        # @option *args [ Proc | Symbol ] :reject_if Block or symbol pointing
         #   to a class method to reject documents with.
         # @option *args [ Integer ] :limit The max number to create.
-        # @option *args [ true, false ] :update_only Only update existing docs.
-        # @options *args [ true, false ] :autosave Whether autosave should be enabled on the
+        # @option *args [ true | false ] :update_only Only update existing docs.
+        # @option *args [ true | false ] :autosave Whether autosave should be enabled on the
         #   association. Note that since the default is true, setting autosave to nil will still
         #   enable it.
         def accepts_nested_attributes_for(*args)

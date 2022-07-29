@@ -15,7 +15,7 @@ describe Mongoid::Errors::InvalidField do
     end
 
     let(:error) do
-      described_class.new(Person, :crazy_method)
+      described_class.new(Person, :crazy_method, :crazy_method)
     end
 
     it "contains the problem in the message" do

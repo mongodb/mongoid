@@ -56,7 +56,7 @@ module Mongoid
     # @example Check if frozen
     #   document.frozen?
     #
-    # @return [ true, false ] True if frozen, else false.
+    # @return [ true | false ] True if frozen, else false.
     def frozen?
       attributes.frozen?
     end
@@ -150,14 +150,14 @@ module Mongoid
     #
     # @param [ Hash ] options The options.
     #
-    # @option options [ true, false ] :compact (Deprecated) Whether to include fields
+    # @option options [ true | false ] :compact (Deprecated) Whether to include fields
     #   with nil values in the json document.
     #
     # @return [ Hash ] The document as json.
     def as_json(options = nil)
       rv = super
       if options && options[:compact]
-        Mongoid.logger.warn('#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.')
+        Mongoid::Warnings.warn_as_json_compact_deprecated
         rv = rv.compact
       end
       rv
@@ -224,6 +224,7 @@ module Mongoid
         process_attributes(attrs) do
           yield(self) if block_given?
         end
+        @attributes_before_type_cast = @attributes.merge(attributes_before_type_cast)
 
         if execute_callbacks
           apply_post_processed_defaults
@@ -309,10 +310,19 @@ module Mongoid
       #
       # @api private
       def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
-        attributes = attrs || {}
+        attributes = if Mongoid.legacy_attributes
+          attrs
+        else
+          attrs&.to_h
+        end || {}
+
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
+        # TODO: remove the to_h when the legacy_attributes flag is removed.
+        # The to_h ensures that we don't accidentally make attributes_before_type_cast
+        # a BSON::Document.
+        doc.instance_variable_set(:@attributes_before_type_cast, attributes&.to_h.dup)
 
         if execute_callbacks
           doc.apply_defaults

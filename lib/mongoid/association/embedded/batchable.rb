@@ -50,7 +50,7 @@ module Mongoid
           _unscoped.clear
         end
 
-        # Batch remove the provided documents as a $pullAll.
+        # Batch remove the provided documents as a $pullAll or $pull.
         #
         # @example Batch remove the documents.
         #   batchable.batch_remove([ doc_one, doc_two ])
@@ -58,12 +58,30 @@ module Mongoid
         # @param [ Array<Document> ] docs The docs to remove.
         # @param [ Symbol ] method Delete or destroy.
         def batch_remove(docs, method = :delete)
+          # If the _id is nil, we cannot use $pull and delete by searching for
+          # the id. Therefore we have to use pullAll with the documents'
+          # attributes.
           removals = pre_process_batch_remove(docs, method)
+          pulls, pull_alls = removals.partition { |o| !o["_id"].nil? }
+
+          if !_base.persisted?
+            post_process_batch_remove(docs, method) unless docs.empty?
+            return reindex
+          end
+
           if !docs.empty?
-            collection.find(selector).update_one(
-              positionally(selector, "$pullAll" => { path => removals }),
-              session: _session
-            )
+            if !pulls.empty?
+              collection.find(selector).update_one(
+                positionally(selector, "$pull" => { path => { "_id" => { "$in" => pulls.pluck("_id") } } }),
+                session: _session
+              )
+            end
+            if !pull_alls.empty?
+              collection.find(selector).update_one(
+                positionally(selector, "$pullAll" => { path => pull_alls }),
+                session: _session
+              )
+            end
             post_process_batch_remove(docs, method)
           else
             collection.find(selector).update_one(
@@ -85,7 +103,8 @@ module Mongoid
         def batch_replace(docs)
           if docs.blank?
             if _assigning? && !empty?
-              _base.delayed_atomic_sets.clear
+              _base.delayed_atomic_sets.delete(path)
+              clear_atomic_path_cache
               _base.add_atomic_unset(first)
               target_duplicate = _target.dup
               pre_process_batch_remove(target_duplicate, :delete)
@@ -94,10 +113,11 @@ module Mongoid
               batch_remove(_target.dup)
             end
           elsif _target != docs
-            _base.delayed_atomic_sets.clear unless _assigning?
+            _base.delayed_atomic_sets.delete(path) unless _assigning?
             docs = normalize_docs(docs).compact
             _target.clear and _unscoped.clear
-            _base.delayed_atomic_unsets.clear
+            _base.delayed_atomic_unsets.delete(path)
+            clear_atomic_path_cache
             inserts = execute_batch_set(docs)
             add_atomic_sets(inserts)
           end
@@ -176,7 +196,7 @@ module Mongoid
         # @example Can inserts be performed?
         #   batchable.insertable?
         #
-        # @return [ true, false ] If inserts can be performed.
+        # @return [ true | false ] If inserts can be performed.
         def insertable?
           persistable? && !_assigning? && inserts_valid
         end
@@ -188,7 +208,7 @@ module Mongoid
         # @example Are the inserts currently valid.
         #   batchable.inserts_valid
         #
-        # @return [ true, false ] If inserts are currently valid.
+        # @return [ true | false ] If inserts are currently valid.
         def inserts_valid
           @inserts_valid
         end
@@ -200,9 +220,9 @@ module Mongoid
         # @example Set the flag.
         #   batchable.inserts_valid = true
         #
-        # @param [ true, false ] value The flag.
+        # @param [ true | false ] value The flag.
         #
-        # @return [ true, false ] The flag.
+        # @return [ true | false ] The flag.
         def inserts_valid=(value)
           @inserts_valid = value
         end
@@ -215,7 +235,7 @@ module Mongoid
         # @example Normalize the docs.
         #   batchable.normalize_docs(docs)
         #
-        # @param [ Array<Hash, Document> ] docs The docs to normalize.
+        # @param [ Array<Hash | Document> ] docs The docs to normalize.
         #
         # @return [ Array<Document> ] The docs.
         def normalize_docs(docs)
@@ -244,6 +264,17 @@ module Mongoid
           else
             _unscoped.first.atomic_path
           end
+        end
+
+        # Clear the cache for path and atomic_paths. This method is used when
+        # the path method is used, and the association has not been set on the
+        # document yet, which can cause path and atomic_paths to be calculated
+        # incorrectly later.
+        #
+        # @api private
+        def clear_atomic_path_cache
+          self.path = nil
+          _base.instance_variable_set("@atomic_paths", nil)
         end
 
         # Set the atomic path.

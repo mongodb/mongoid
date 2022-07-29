@@ -17,7 +17,7 @@ module Mongoid
         #   Storage.validate(:collection_name)
         #
         # @param [ Class ] klass The model class.
-        # @param [ Hash, String, Symbol ] options The provided options.
+        # @param [ Hash | String | Symbol ] options The provided options.
         def validate(klass, options)
           valid_keys?(options) or raise Errors::InvalidStorageOptions.new(klass, options)
           valid_parent?(klass) or raise Errors::InvalidStorageParent.new(klass)
@@ -31,7 +31,7 @@ module Mongoid
         #
         # @param [ Class ] klass
         #
-        # @return [ true, false ] If the class is valid
+        # @return [ true | false ] If the class is valid.
         def valid_parent?(klass)
           !klass.superclass.include?(Mongoid::Document)
         end
@@ -45,7 +45,7 @@ module Mongoid
         #
         # @param [ Hash ] options The options hash.
         #
-        # @return [ true, false ] If all keys are valid.
+        # @return [ true | false ] If all keys are valid.
         def valid_keys?(options)
           return false unless options.is_a?(::Hash)
           options.keys.all? do |key|

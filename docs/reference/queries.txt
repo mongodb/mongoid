@@ -575,6 +575,16 @@ Since ``ne`` does not support merge strategies, the ``union`` strategy was
 ignored and reset and when ``in`` was invoked the second time there was no
 strategy active.
 
+.. warning::
+
+  Merge strategies currently assume the previous condition(s) have been added
+  to the top level of the query, however this is not always the case
+  (conditions may be nested under an ``$and`` clause). Using merge strategies
+  with complex criteria may cause incorrect queries to be constructed.
+  This misbehavior is `intended to be fixed in the future
+  <https://jira.mongodb.org/browse/MONGOID-5350>`_.
+
+
 Supported Operator Methods
 --------------------------
 
@@ -1239,6 +1249,29 @@ Mongoid also has some helpful methods on criteria.
           Band.exists?
           Band.where(name: "Photek").exists?
 
+   * - ``Criteria#fifth``
+
+       *Get the fifth document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fifth
+
+   * - ``Criteria#fifth!``
+
+       *Get the fifth document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fifth!
+
    * - ``Criteria#find_by``
 
        *Find a document by the provided attributes. If not found,
@@ -1291,8 +1324,10 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#first|last``
 
-       *Finds a single document given the provided criteria. This automatically adds a sort on id.
-       Opt out of adding the id sort with the {id_sort: :none} option.*
+       *Finds a single document given the provided criteria. Get a list of
+       documents by passing in a limit argument. This method automatically adds
+       a sort on _id. This can cause performance issues, so if the sort is
+       undesirable, Criteria#take can be used instead.*
 
      -
         .. code-block:: ruby
@@ -1300,6 +1335,21 @@ Mongoid also has some helpful methods on criteria.
           Band.first
           Band.where(:members.with_size => 3).first
           Band.where(:members.with_size => 3).last
+          Band.first(2)
+
+   * - ``Criteria#first!|last!``
+
+       *Finds a single document given the provided criteria, or raises an error
+       if none are found. This method automatically adds a sort on _id if no
+       sort is given. This can cause performance issues, so if the sort is
+       undesirable, Criteria#take! can be used instead.*
+
+     -
+        .. code-block:: ruby
+
+          Band.first!
+          Band.where(:members.with_size => 3).first!
+          Band.where(:members.with_size => 3).last!
 
    * - ``Criteria#first_or_create``
 
@@ -1348,6 +1398,29 @@ Mongoid also has some helpful methods on criteria.
           # MongoDB 4.2 and lower
           Band.for_js("this.name = param", param: "Tool")
 
+   * - ``Criteria#fourth``
+
+       *Get the fourth document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fourth
+
+   * - ``Criteria#fourth!``
+
+       *Get the fourth document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fourth!
+
    * - ``Criteria#length|size``
 
        *Same as count but caches subsequent calls to the database*
@@ -1357,6 +1430,32 @@ Mongoid also has some helpful methods on criteria.
 
           Band.length
           Band.where(name: "FKA Twigs").size
+
+   * - ``Criteria#pick``
+
+       *Get the values from one document for the provided fields.
+       Returns nil for unset fields and for non-existent fields.*
+
+       *This method does not apply a sort to the documents, so it
+       will not necessarily return the values from the first document.*
+
+       *This method accepts the dot notation, thus permitting referencing
+       fields in embedded associations.*
+
+       *This method respects :ref:`field aliases <field-aliases>`,
+       including those defined in embedded documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.pick(:name)
+
+          Band.all.pick('cities.name')
+
+          # Using the earlier definition of Manager,
+          # expands out to "managers.name" in the query:
+          Band.all.pick('managers.n')
+
 
    * - ``Criteria#pluck``
 
@@ -1373,12 +1472,159 @@ Mongoid also has some helpful methods on criteria.
         .. code-block:: ruby
 
           Band.all.pluck(:name)
+            #=> ["Daft Punk", "Aphex Twin", "Ween"]
 
-          Band.all.pluck('cities.name')
+          Band.all.pluck('address.city')
+            #=> ["Paris", "Limerick", "New Hope"]
 
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.pluck('managers.n')
+            #=> [ ["Berry Gordy", "Tommy Mottola"], [], ["Quincy Jones"] ]
+
+          # Accepts multiple field arguments, in which case
+          # the result will be returned as an Array of Arrays.
+          Band.all.pluck(:name, :likes)
+            #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
+
+   * - ``Criteria#second``
+
+       *Get the second document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second
+
+   * - ``Criteria#second!``
+
+       *Get the second document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second!
+
+   * - ``Criteria#second_to_last``
+
+       *Get the second to last document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second_to_last
+
+   * - ``Criteria#second_to_last!``
+
+       *Get the second to last document for the given criteria, or raise an
+       error if none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second_to_last!
+
+   * - ``Criteria#take``
+
+       *Get a list of n documents from the database or just one if no parameter
+       is provided.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take
+          Band.take(5)
+
+   * - ``Criteria#take!``
+
+       *Get a document from the database or raise an error if none exist.*
+
+       *This method does not apply a sort to the documents, so it can return
+       different document(s) than #first and #last.*
+
+     -
+        .. code-block:: ruby
+
+          Band.take!
+
+   * - ``Criteria#tally``
+
+       *Get a mapping of values to counts for the provided field.*
+
+       *This method accepts the dot notation, thus permitting referencing
+       fields in embedded associations.*
+
+       *This method respects :ref:`field aliases <field-aliases>`,
+       including those defined in embedded documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.tally(:name)
+
+          Band.all.tally('cities.name')
+
+          # Using the earlier definition of Manager,
+          # expands out to "managers.name" in the query:
+          Band.all.tally('managers.n')
+
+   * - ``Criteria#third``
+
+       *Get the third document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third
+
+   * - ``Criteria#third!``
+
+       *Get the third document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third!
+
+   * - ``Criteria#third_to_last``
+
+       *Get the third to last document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third_to_last
+
+   * - ``Criteria#third_to_last!``
+
+       *Get the third to last document for the given criteria, or raise an
+       error if none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third_to_last!
 
 
 Eager Loading
@@ -2003,31 +2249,19 @@ document inserts, updates, and deletion.
 Query Cache
 ===========
 
-Mongoid and the underlying Ruby MongoDB driver provide query caching
-functionality. When enabled, the query cache saves the results of
-previously executed find and aggregation queries and reuses them in
-the future instead of performing the queries again, thus increasing
-application performance and reducing database load.
+The Ruby MongoDB driver provide query caching functionality. When enabled, the
+query cache saves the results of previously executed find and aggregation
+queries and reuses them in the future instead of performing the queries again,
+thus increasing application performance and reducing database load.
 
 The query cache has historically been provided by Mongoid but as of driver
 version 2.14.0, the query cache implementation has been moved into the driver.
 When Mongoid is used with driver version 2.14.0 or later, Mongoid delegates
-all work to the driver's query cache implementation. When Mongoid is used
-with driver versions 2.13.x and earlier, Mongoid utilizes its own, legacy,
-query cache implementation.
+all work to the driver's query cache implementation.
 
 Please review the `driver query cache documentation
 <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_
 for details about the driver's query cache behavior.
-
-.. warning::
-
-  The legacy query cache implementation that Mongoid uses when it detects
-  driver version 2.13.x and earlier has a number of limitations and
-  known issues, some of which are severe. If you wish to use the query cache,
-  it is strongly recommended to use driver 2.14.0 or later. The limitations
-  of the legacy Mongoid query cache are :ref:`described below
-  <legacy-query-cache-limitations>`.
 
 The rest of this section assumes that driver 2.14.0 or later is being used and
 Mongoid delegates to the driver's query cache.
@@ -2147,22 +2381,3 @@ To use the cached results, call ``all.to_a.first`` on the model class.
 
 .. _legacy-query-cache-limitations:
 
-Legacy Query Cache Limitations
-------------------------------
-
-When Mongoid uses its legacy query cache due to driver version being older
-than 2.14.0, the following limitations apply:
-
-* The query cache does not cache query results that exceed the batch size.
-  The default batch size is 1000 documents (refer to :ref:`batch_size <batch-size>`.)
-
-* The query cache does not take into account read preference or read concern
-  when deciding whether to return cached results. When performing the same
-  query with a different read preference or read concern with the query cache
-  enabled, incorrect results may be returned.
-
-* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
-  do not invalidate the query cache. Cached results may be stale after performing
-  any of these operations.
-
-* Aggregation results are not cached.

@@ -13,7 +13,6 @@ module Mongoid
           :database,
           :default_language,
           :language_override,
-          :drop_dups,
           :name,
           :sparse,
           :unique,
@@ -29,7 +28,8 @@ module Mongoid
           :text_version,
           :version,
           :partial_filter_expression,
-          :collation
+          :collation,
+          :wildcard_projection,
         ]
 
         VALID_TYPES = [
@@ -97,6 +97,10 @@ module Mongoid
             next if name == :options
             unless VALID_TYPES.include?(value)
               raise Errors::InvalidIndex.new(klass, spec, options)
+            end
+
+            if value == "geoHaystack"
+              Mongoid::Warnings.warn_geo_haystack_deprecated
             end
           end
         end

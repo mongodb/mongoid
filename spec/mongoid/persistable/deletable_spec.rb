@@ -33,7 +33,7 @@ describe Mongoid::Persistable::Deletable do
       it 'deletes the matching document from the database' do
         lambda do
           person.reload
-        end.should raise_error(Mongoid::Errors::DocumentNotFound)
+        end.should raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
       end
     end
 
@@ -46,7 +46,7 @@ describe Mongoid::Persistable::Deletable do
       it "deletes the document from the collection" do
         expect {
           Person.find(person.id)
-        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
       end
 
       it "returns true" do

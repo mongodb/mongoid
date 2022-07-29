@@ -16,7 +16,7 @@ module Mongoid
         #
         # @param [ Association ] association The association metadata.
         #
-        # @return [ true, false ] If we can sync.
+        # @return [ true | false ] If we can sync.
         def _syncable?(association)
           !_synced?(association.foreign_key) && send(association.foreign_key_check)
         end
@@ -38,7 +38,7 @@ module Mongoid
         #
         # @param [ String ] foreign_key The foreign key.
         #
-        # @return [ true, false ] If we can sync.
+        # @return [ true | false ] If we can sync.
         def _synced?(foreign_key)
           !!_synced[foreign_key]
         end

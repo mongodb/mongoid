@@ -94,7 +94,7 @@ describe 'has_one associations' do
         context 'using send' do
           it 'delegates to the field' do
             if reloaded
-              pending 'MONGOID-4018'
+              pending 'MONGOID-5018'
             end
 
             parent.accreditation.send(:format).should == 'fmt'
@@ -253,6 +253,20 @@ describe 'has_one associations' do
         post.reload
         expect(post.comment).to eq(nil)
       end
+    end
+  end
+
+  context "when overwriting an association" do
+    let(:post1) { HomPost.create!(title: "post 1") }
+    let(:post2) { HomPost.create!(title: "post 2") }
+    let(:comment) { HomComment.create(post: post1) }
+
+    it "does not overwrite the original value" do
+      pending "MONGOID-3999"
+      p1 = comment.post
+      expect(p1.title).to eq("post 1")
+      comment.post = post2
+      expect(p1.title).to eq("post 1")
     end
   end
 end

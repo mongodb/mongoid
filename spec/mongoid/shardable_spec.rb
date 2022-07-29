@@ -186,5 +186,19 @@ describe Mongoid::Shardable do
         it { is_expected.to eq({ 'name' => value }) }
       end
     end
+
+    context "when record is not found" do
+      let!(:instance) { klass.create!(name: value) }
+
+      before do
+        instance.destroy
+      end
+
+      it "raises a DocumentNotFound error with the shard key in the description on reload" do
+        expect do
+          instance.reload
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class Band with id #{instance.id.to_s} and shard key name: a-brand-name./)
+      end
+    end
   end
 end

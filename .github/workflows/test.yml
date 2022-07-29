@@ -59,7 +59,7 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '5.0'
-          ruby: jruby-9.2
+          ruby: jruby-9.3
           topology: replica_set
           os: ubuntu-20.04
           task: test
@@ -109,7 +109,7 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '3.6'
-          ruby: ruby-2.5
+          ruby: ruby-2.6
           topology: server
           os: ubuntu-18.04
           task: test
@@ -119,7 +119,7 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '3.6'
-          ruby: ruby-2.5
+          ruby: ruby-2.6
           topology: replica_set
           os: ubuntu-18.04
           task: test
@@ -149,7 +149,7 @@ jobs:
           gemfile: gemfiles/driver_stable.gemfile
           experimental: false
         - mongodb: '4.0'
-          ruby: ruby-2.5
+          ruby: ruby-2.6
           topology: replica_set
           os: ubuntu-18.04
           task: test
@@ -159,7 +159,7 @@ jobs:
           gemfile: gemfiles/driver_oldstable.gemfile
           experimental: false
         - mongodb: '4.0'
-          ruby: ruby-2.5
+          ruby: ruby-2.6
           topology: replica_set
           os: ubuntu-18.04
           task: test
@@ -169,7 +169,7 @@ jobs:
           gemfile: gemfiles/driver_min.gemfile
           experimental: false
         - mongodb: '3.6'
-          ruby: ruby-2.5
+          ruby: ruby-2.6
           topology: server
           os: ubuntu-18.04
           task: test
@@ -234,22 +234,12 @@ jobs:
           os: ubuntu-18.04
           task: test
           driver: current
-          rails: '5.1'
-          i18n:
-          gemfile: gemfiles/rails-5.1.gemfile
-          experimental: false
-        - mongodb: '4.0'
-          ruby: ruby-2.7
-          topology: server
-          os: ubuntu-18.04
-          task: test
-          driver: current
           rails: '5.2'
           i18n:
           gemfile: gemfiles/rails-5.2.gemfile
           experimental: false
         - mongodb: '4.4'
-          ruby: ruby-2.5
+          ruby: ruby-2.6
           topology: server
           os: ubuntu-20.04
           task: test
@@ -284,22 +274,12 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails: '5.1'
-          i18n:
-          gemfile: gemfiles/rails-5.1.gemfile
-          experimental: false
-        - mongodb: '5.0'
-          ruby: ruby-2.7
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
           rails: '5.2'
           i18n:
           gemfile: gemfiles/rails-5.2.gemfile
           experimental: false
         - mongodb: '5.0'
-          ruby: jruby-9.2
+          ruby: jruby-9.3
           topology: server
           os: ubuntu-20.04
           task: test

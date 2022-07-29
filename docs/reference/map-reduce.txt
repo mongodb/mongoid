@@ -16,6 +16,13 @@ Map/Reduce
 Mongoid provides a DSL around MongoDB's map/reduce framework, for performing
 custom map/reduce jobs or simple aggregations.
 
+.. note::
+
+  The map-reduce operation is deprecated.
+  The :ref:`aggregation framework <aggregation-pipeline>` provides better
+  performance and usability than map-reduce operations, and should be
+  preferred for new development.
+
 Execution
 ---------
 

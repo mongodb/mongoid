@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative 'embeds_many_models'
 
 describe Mongoid::Association::Embedded::EmbedsMany do
 
@@ -859,6 +860,73 @@ describe Mongoid::Association::Embedded::EmbedsMany do
 
     it 'returns an instance of Mongoid::Atomic::Paths::Root' do
       expect(association.path(double( :_parent => true))).to be_a(Mongoid::Atomic::Paths::Embedded::Many)
+    end
+  end
+
+  context "when the document and embedded document's klass is in a submodule" do
+
+    let(:tank) { EmmSpec::Tank.create! }
+    let(:gun) { tank.guns.create! }
+
+    let(:inverse_assoc) { gun._association.inverse_association }
+
+    it "has the correct inverses" do
+      pending 'MONGOID-5080'
+
+      inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+      inverse_assoc.name.should == :tank
+    end
+
+    context "when embedded association is not namespaced but has class_name" do
+
+      let(:turret) { tank.emm_turrets.create! }
+
+      let(:inverse_assoc) { turret._association.inverse_association }
+
+      it "has the correct inverses" do
+        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        inverse_assoc.name.should == :tank
+      end
+    end
+
+    context "when embedded association is not namespaced and lacks class_name" do
+
+      let(:hatch) { tank.emm_hatches.create! }
+
+      let(:inverse_assoc) { hatch._association.inverse_association }
+
+      it "does not find the inverse" do
+        inverse_assoc.should be nil
+      end
+    end
+
+    context "when the class names exist on top level and namespaced" do
+
+      let(:car) { EmmSpec::Car.create! }
+      let(:door) { car.doors.create! }
+
+      let(:inverse_assoc) { door._association.inverse_association }
+
+      it "has the correct inverses" do
+        pending 'MONGOID-5080'
+
+        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        inverse_assoc.name.should == :car
+      end
+    end
+
+    context "when the association has an unqualified class_name in same module" do
+
+      let(:launcher) { tank.launchers.create! }
+
+      let(:inverse_assoc) { launcher._association.inverse_association }
+
+      it "has the correct inverses" do
+        pending 'unqualified class_name arguments do not work per MONGOID-5080'
+
+        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        inverse_assoc.name.should == :tank
+      end
     end
   end
 end

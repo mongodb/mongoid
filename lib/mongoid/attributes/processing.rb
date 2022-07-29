@@ -40,10 +40,16 @@ module Mongoid
       # @param [ Symbol ] key The name of the attribute.
       # @param [ Object ] value The value of the attribute.
       #
-      # @return [ true, false ] True if pending, false if not.
+      # @return [ true | false ] True if pending, false if not.
       def pending_attribute?(key, value)
         name = key.to_s
-        aliased = aliased_associations[name] if aliased_associations.key?(name)
+
+        aliased = if aliased_associations.key?(name)
+          aliased_associations[name]
+        else
+          name
+        end
+
         if relations.has_key?(aliased)
           pending_relations[name] = value
           return true

@@ -37,16 +37,6 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
-      # Is the context cached?
-      #
-      # @example Is the context cached?
-      #   context.cached?
-      #
-      # @return [ true, false ] If the context is cached.
-      def cached?
-        !!@cache
-      end
-
       # Get the number of documents matching the query.
       #
       # @example Get the number of matching documents.
@@ -66,7 +56,7 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        try_cache(:count) { view.count_documents(options) }
+        view.count_documents(options)
       end
 
       # Get the estimated number of documents matching the query.
@@ -85,7 +75,7 @@ module Mongoid
         unless self.criteria.selector.empty?
           raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
         end
-        try_cache(:estimated_count) { view.estimated_document_count(options) }
+        view.estimated_document_count(options)
       end
 
       # Delete all documents in the database that match the selector.
@@ -119,7 +109,7 @@ module Mongoid
       # @example Get the distinct values.
       #   context.distinct(:name)
       #
-      # @param [ String, Symbol ] field The name of the field.
+      # @param [ String | Symbol ] field The name of the field.
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
@@ -153,7 +143,6 @@ module Mongoid
           documents_for_iteration.each do |doc|
             yield_document(doc, &block)
           end
-          @cache_loaded = true
           self
         else
           to_enum
@@ -166,17 +155,11 @@ module Mongoid
       #   context.exists?
       #
       # @note We don't use count here since Mongo does not use counted
-      #   b-tree indexes, unless a count is already cached then that is
-      #   used to determine the value.
+      #   b-tree indexes.
       #
-      # @return [ true, false ] If the count is more than zero.
+      # @return [ true | false ] If the count is more than zero.
       def exists?
-        return !documents.empty? if cached? && cache_loaded?
-        return @count > 0 if instance_variable_defined?(:@count)
-
-        try_cache(:exists) do
-          !!(view.projection(_id: 1).limit(1).first)
-        end
+        !!(view.projection(_id: 1).limit(1).first)
       end
 
       # Run an explain on the criteria.
@@ -198,9 +181,9 @@ module Mongoid
       # @param [ Hash ] update The updates.
       # @param [ Hash ] options The command options.
       #
-      # @option options [ :before, :after ] :return_document Return the updated document
+      # @option options [ :before | :after ] :return_document Return the updated document
       #   from before or after update.
-      # @option options [ true, false ] :upsert Create the document if it doesn't exist.
+      # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
       def find_one_and_update(update, options = {})
@@ -218,9 +201,9 @@ module Mongoid
       # @param [ Hash ] replacement The replacement.
       # @param [ Hash ] options The command options.
       #
-      # @option options [ :before, :after ] :return_document Return the updated document
+      # @option options [ :before | :after ] :return_document Return the updated document
       #   from before or after update.
-      # @option options [ true, false ] :upsert Create the document if it doesn't exist.
+      # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
       def find_one_and_replace(replacement, options = {})
@@ -242,46 +225,10 @@ module Mongoid
         end
       end
 
-      # Get the first document in the database for the criteria's selector.
-      #
-      # @example Get the first document.
-      #   context.first
-      #
-      # @note Automatically adding a sort on _id when no other sort is
-      #   defined on the criteria has the potential to cause bad performance issues.
-      #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
-      #
-      # @param [ Hash ] opts The options for the query returning the first document.
-      #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
-      #
-      # @return [ Document ] The first document.
-      def first(opts = {})
-        return documents.first if cached? && cache_loaded?
-        try_cache(:first) do
-          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
-            if raw_doc = view.sort(sort).limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
-          else
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
-          end
-        end
-      end
-      alias :one :first
-
       # Return the first result without applying sort
       #
       # @api private
       def find_first
-        return documents.first if cached? && cache_loaded?
         if raw_doc = view.first
           doc = Factory.from_db(klass, raw_doc, criteria)
           eager_load([doc]).first
@@ -311,29 +258,6 @@ module Mongoid
         GeoNear.new(collection, criteria, coordinates)
       end
 
-      # Invoke the block for each element of Contextual. Create a new array
-      # containing the values returned by the block.
-      #
-      # If the symbol field name is passed instead of the block, additional
-      # optimizations would be used.
-      #
-      # @example Map by some field.
-      #   context.map(:field1)
-      #
-      # @example Map with block.
-      #   context.map(&:field1)
-      #
-      # @param [ Symbol ] field The field name.
-      #
-      # @return [ Array ] The result of mapping.
-      def map(field = nil, &block)
-        if block_given?
-          super(&block)
-        else
-          criteria.pluck(field)
-        end
-      end
-
       # Create the new Mongo context. This delegates operations to the
       # underlying driver.
       #
@@ -342,7 +266,7 @@ module Mongoid
       #
       # @param [ Criteria ] criteria The criteria.
       def initialize(criteria)
-        @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
+        @criteria, @klass = criteria, criteria.klass
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
         @view = collection.find(criteria.selector, session: _session)
@@ -351,40 +275,15 @@ module Mongoid
 
       def_delegator :@klass, :database_field_name
 
-      # Get the last document in the database for the criteria's selector.
-      #
-      # @example Get the last document.
-      #   context.last
-      #
-      # @note Automatically adding a sort on _id when no other sort is
-      #   defined on the criteria has the potential to cause bad performance issues.
-      #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
-      #   Be aware that #first/#last won't guarantee order in this case.
-      #
-      # @param [ Hash ] opts The options for the query returning the first document.
-      #
-      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
-      #   is defined on the criteria.
-      def last(opts = {})
-        try_cache(:last) do
-          with_inverse_sorting(opts) do
-            if raw_doc = view.limit(1).first
-              doc = Factory.from_db(klass, raw_doc, criteria)
-              eager_load([doc]).first
-            end
-          end
-        end
-      end
-
-      # Get's the number of documents matching the query selector.
+      # Returns the number of documents in the database matching
+      # the query selector.
       #
       # @example Get the length.
       #   context.length
       #
       # @return [ Integer ] The number of documents.
       def length
-        @length ||= self.count
+        self.count
       end
       alias :size :length
 
@@ -413,18 +312,22 @@ module Mongoid
         MapReduce.new(collection, criteria, map, reduce)
       end
 
-      # Pluck the single field values from the database. Will return duplicates
-      # if they exist and only works for top level fields.
+      # Pluck the field value(s) from the database. Returns one
+      # result for each document found in the database for
+      # the context. The results are normalized according to their
+      # Mongoid field types. Note that the results may include
+      # duplicates and nil values.
       #
       # @example Pluck a field.
       #   context.pluck(:_id)
       #
-      # @note This method will return the raw db values - it performs no custom
-      #   serialization.
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pluck,
+      #   which may include nested fields using dot-notation.
       #
-      # @param [ String, Symbol, Array ] fields Fields to pluck.
-      #
-      # @return [ Array<Object, Array> ] The plucked values.
+      # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
+      #   If the *fields arg contains a single value, each result
+      #   in the array will be a single value. Otherwise, each
+      #   result in the array will be an array of values.
       def pluck(*fields)
         # Multiple fields can map to the same field name. For example, plucking
         # a field and its _translations field map to the same field in the database.
@@ -451,6 +354,125 @@ module Mongoid
             end
           end
           plucked << (values.size == 1 ? values.first : values)
+        end
+      end
+
+      # Pick the single field values from the database.
+      #
+      # @example Pick a field.
+      #   context.pick(:_id)
+      #
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pick.
+      #
+      # @return [ Object | Array<Object> ] The picked values.
+      def pick(*fields)
+        limit(1).pluck(*fields).first
+      end
+
+      # Take the given number of documents from the database.
+      #
+      # @example Take 10 documents
+      #   context.take(10)
+      #
+      # @param [ Integer | nil ] limit The number of documents to return or nil.
+      #
+      # @return [ Document | Array<Document> ] The list of documents, or one
+      #   document if no value was given.
+      def take(limit = nil)
+        if limit
+          limit(limit).to_a
+        else
+          # Do to_a first so that the Mongo#first method is not used and the
+          # result is not sorted.
+          limit(1).to_a.first
+        end
+      end
+
+      # Take one document from the database and raise an error if there are none.
+      #
+      # @example Take a document
+      #   context.take!
+      #
+      # @return [ Document ] The document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents to take.
+      def take!
+        # Do to_a first so that the Mongo#first method is not used and the
+        # result is not sorted.
+        if fst = limit(1).to_a.first
+          fst
+        else
+          raise Errors::DocumentNotFound.new(klass, nil, nil)
+        end
+      end
+
+      # Get a hash of counts for the values of a single field. For example,
+      # if the following documents were in the database:
+      #
+      #   { _id: 1, age: 21 }
+      #   { _id: 2, age: 21 }
+      #   { _id: 3, age: 22 }
+      #
+      #   Model.tally("age")
+      #
+      # would yield the following result:
+      #
+      #   { 21 => 2, 22 => 1 }
+      #
+      # When tallying a field inside an array or embeds_many association:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 2, array: [ { x: 1 }, { x: 2 } ] }
+      #   { _id: 3, array: [ { x: 1 }, { x: 3 } ] }
+      #
+      #   Model.tally("array.x")
+      #
+      # The keys of the resulting hash are arrays:
+      #
+      #   { [ 1, 2 ] => 2, [ 1, 3 ] => 1 }
+      #
+      # Note that if tallying an element in an array of hashes, and the key
+      # doesn't exist in some of the hashes, tally will not include those
+      # nil keys in the resulting hash:
+      #
+      #   { _id: 1, array: [ { x: 1 }, { x: 2 }, { y: 3 } ] }
+      #
+      #   Model.tally("array.x")
+      #   # => { [ 1, 2 ] => 1 }
+      #
+      # @param [ String | Symbol ] field The field name.
+      #
+      # @return [ Hash ] The hash of counts.
+      def tally(field)
+        name = klass.cleanse_localized_field_names(field)
+
+        fld = klass.traverse_association_tree(name)
+        pipeline = [ { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } } ]
+        pipeline.unshift("$match" => view.filter) unless view.filter.blank?
+
+        collection.aggregate(pipeline).reduce({}) do |tallies, doc|
+          is_translation = "#{name}_translations" == field.to_s
+          val = doc["_id"]
+
+          key = if val.is_a?(Array)
+            val.map do |v|
+              demongoize_with_field(fld, v, is_translation)
+            end
+          else
+            demongoize_with_field(fld, val, is_translation)
+          end
+
+          # The only time where a key will already exist in the tallies hash
+          # is when the values are stored differently in the database, but
+          # demongoize to the same value. A good example of when this happens
+          # is when using localized fields. While the server query won't group
+          # together hashes that have other values in different languages, the
+          # demongoized value is just the translation in the current locale,
+          # which can be the same across multiple of those unequal hashes.
+          tallies[key] ||= 0
+          tallies[key] += doc["counts"]
+          tallies
         end
       end
 
@@ -497,7 +519,7 @@ module Mongoid
       # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
       #   an update should apply.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update(attributes = nil, opts = {})
         update_documents(attributes, :update_one, opts)
       end
@@ -513,28 +535,245 @@ module Mongoid
       # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
       #   an update should apply.
       #
-      # @return [ nil, false ] False if no attributes were provided.
+      # @return [ nil | false ] False if no attributes were provided.
       def update_all(attributes = nil, opts = {})
         update_documents(attributes, :update_many, opts)
       end
 
-      private
-
-      # yield the block given or return the cached value
+      # Get the first document in the database for the criteria's selector.
       #
-      # @param [ String, Symbol ] key The instance variable name
+      # @example Get the first document.
+      #   context.first
       #
-      # @return the result of the block
-      def try_cache(key, &block)
-        unless cached?
-          yield
+      # @note Automatically adding a sort on _id when no other sort is
+      #   defined on the criteria has the potential to cause bad performance issues.
+      #   If you experience unexpected poor performance when using #first or #last
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document | nil ] The first document or nil if none is found.
+      def first(limit = nil)
+        if limit.nil?
+          retrieve_nth(0)
         else
-          unless ret = instance_variable_get("@#{key}")
-            instance_variable_set("@#{key}", ret = yield)
-          end
-          ret
+          retrieve_nth_with_limit(0, limit)
         end
       end
+      alias :one :first
+
+      # Get the first document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the first document.
+      #   context.first!
+      #
+      # @note Automatically adding a sort on _id when no other sort is
+      #   defined on the criteria has the potential to cause bad performance issues.
+      #   If you experience unexpected poor performance when using #first! or #last!
+      #   and have no sort defined on the criteria, use #take! instead.
+      #   Be aware that #take! won't guarantee order.
+      #
+      # @return [ Document ] The first document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def first!
+        first || raise_document_not_found_error
+      end
+
+      # Get the last document in the database for the criteria's selector.
+      #
+      # @example Get the last document.
+      #   context.last
+      #
+      # @note Automatically adding a sort on _id when no other sort is
+      #   defined on the criteria has the potential to cause bad performance issues.
+      #   If you experience unexpected poor performance when using #first or #last
+      #   and have no sort defined on the criteria, use #take instead.
+      #   Be aware that #take won't guarantee order.
+      #
+      # @param [ Integer ] limit The number of documents to return.
+      #
+      # @return [ Document | nil ] The last document or nil if none is found.
+      def last(limit = nil)
+        if limit.nil?
+          retrieve_nth_to_last(0)
+        else
+          retrieve_nth_to_last_with_limit(0, limit)
+        end
+      end
+
+      # Get the last document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the last document.
+      #   context.last!
+      #
+      # @note Automatically adding a sort on _id when no other sort is
+      #   defined on the criteria has the potential to cause bad performance issues.
+      #   If you experience unexpected poor performance when using #first! or #last!
+      #   and have no sort defined on the criteria, use #take! instead.
+      #   Be aware that #take! won't guarantee order.
+      #
+      # @return [ Document ] The last document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def last!
+        last || raise_document_not_found_error
+      end
+
+      # Get the second document in the database for the criteria's selector.
+      #
+      # @example Get the second document.
+      #   context.second
+      #
+      # @return [ Document | nil ] The second document or nil if none is found.
+      def second
+        retrieve_nth(1)
+      end
+
+      # Get the second document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the second document.
+      #   context.second!
+      #
+      # @return [ Document ] The second document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def second!
+        second || raise_document_not_found_error
+      end
+
+      # Get the third document in the database for the criteria's selector.
+      #
+      # @example Get the third document.
+      #   context.third
+      #
+      # @return [ Document | nil ] The third document or nil if none is found.
+      def third
+        retrieve_nth(2)
+      end
+
+      # Get the third document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the third document.
+      #   context.third!
+      #
+      # @return [ Document ] The third document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def third!
+        third || raise_document_not_found_error
+      end
+
+      # Get the fourth document in the database for the criteria's selector.
+      #
+      # @example Get the fourth document.
+      #   context.fourth
+      #
+      # @return [ Document | nil ] The fourth document or nil if none is found.
+      def fourth
+        retrieve_nth(3)
+      end
+
+      # Get the fourth document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the fourth document.
+      #   context.fourth!
+      #
+      # @return [ Document ] The fourth document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def fourth!
+        fourth || raise_document_not_found_error
+      end
+
+      # Get the fifth document in the database for the criteria's selector.
+      #
+      # @example Get the fifth document.
+      #   context.fifth
+      #
+      # @return [ Document | nil ] The fifth document or nil if none is found.
+      def fifth
+        retrieve_nth(4)
+      end
+
+      # Get the fifth document in the database for the criteria's selector or
+      # raise an error if none is found.
+      #
+      # @example Get the fifth document.
+      #   context.fifth!
+      #
+      # @return [ Document ] The fifth document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def fifth!
+        fifth || raise_document_not_found_error
+      end
+
+      # Get the second to last document in the database for the criteria's
+      # selector.
+      #
+      # @example Get the second to last document.
+      #   context.second_to_last
+      #
+      # @return [ Document | nil ] The second to last document or nil if none
+      # is found.
+      def second_to_last
+        retrieve_nth_to_last(1)
+      end
+
+      # Get the second to last document in the database for the criteria's
+      # selector or raise an error if none is found.
+      #
+      # @example Get the second to last document.
+      #   context.second_to_last!
+      #
+      # @return [ Document ] The second to last document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def second_to_last!
+        second_to_last || raise_document_not_found_error
+      end
+
+      # Get the third to last document in the database for the criteria's
+      # selector.
+      #
+      # @example Get the third to last document.
+      #   context.third_to_last
+      #
+      # @return [ Document | nil ] The third to last document or nil if none
+      # is found.
+      def third_to_last
+        retrieve_nth_to_last(2)
+      end
+
+      # Get the third to last document in the database for the criteria's
+      # selector or raise an error if none is found.
+      #
+      # @example Get the third to last document.
+      #   context.third_to_last!
+      #
+      # @return [ Document ] The third to last document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      #   documents available.
+      def third_to_last!
+        third_to_last || raise_document_not_found_error
+      end
+
+      private
 
       # Update the documents for the provided method.
       #
@@ -546,7 +785,7 @@ module Mongoid
       # @param [ Hash ] attributes The updates.
       # @param [ Symbol ] method The method to use.
       #
-      # @return [ true, false ] If the update succeeded.
+      # @return [ true | false ] If the update succeeded.
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
@@ -596,55 +835,9 @@ module Mongoid
       # Map the inverse sort symbols to the correct MongoDB values.
       #
       # @api private
-      #
-      # @example Apply the inverse sorting params to the given block
-      #   context.with_inverse_sorting
-      def with_inverse_sorting(opts = {})
-        begin
-          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
-            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
-          end
-          yield
-        ensure
-          apply_option(:sort)
-        end
-      end
-
-      # Is the cache able to be added to?
-      #
-      # @api private
-      #
-      # @example Is the context cacheable?
-      #   context.cacheable?
-      #
-      # @return [ true, false ] If caching, and the cache isn't loaded.
-      def cacheable?
-        cached? && !cache_loaded?
-      end
-
-      # Is the cache fully loaded? Will be true if caching after one full
-      # iteration.
-      #
-      # @api private
-      #
-      # @example Is the cache loaded?
-      #   context.cache_loaded?
-      #
-      # @return [ true, false ] If the cache is loaded.
-      def cache_loaded?
-        !!@cache_loaded
-      end
-
-      # Get the documents for cached queries.
-      #
-      # @api private
-      #
-      # @example Get the cached documents.
-      #   context.documents
-      #
-      # @return [ Array<Document> ] The documents.
-      def documents
-        @documents ||= []
+      def inverse_sorting
+        sort = view.sort || { _id: 1 }
+        Hash[sort.map{|k, v| [k, -1*v]}]
       end
 
       # Get the documents the context should iterate. This follows 3 rules:
@@ -660,9 +853,8 @@ module Mongoid
       # @example Get the documents for iteration.
       #   context.documents_for_iteration
       #
-      # @return [ Array<Document>, Mongo::Collection::View ] The docs to iterate.
+      # @return [ Array<Document> | Mongo::Collection::View ] The docs to iterate.
       def documents_for_iteration
-        return documents if cached? && !documents.empty?
         return view unless eager_loadable?
         docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
         eager_load(docs)
@@ -682,10 +874,7 @@ module Mongoid
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
         yield(doc)
-        documents.push(doc) if cacheable?
       end
-
-      private
 
       def _session
         @criteria.send(:_session)
@@ -693,6 +882,26 @@ module Mongoid
 
       def acknowledged_write?
         collection.write_concern.nil? || collection.write_concern.acknowledged?
+      end
+
+      # Fetch the element from the given hash and demongoize it using the
+      # given field. If the obj is an array, map over it and call this method
+      # on all of its elements.
+      #
+      # @param [ Hash | Array<Hash> ] obj The hash or array of hashes to fetch from.
+      # @param [ String ] meth The key to fetch from the hash.
+      # @param [ Field ] field The field to use for demongoization.
+      #
+      # @return [ Object ] The demongoized value.
+      #
+      # @api private
+      def fetch_and_demongoize(obj, meth, field)
+        if obj.is_a?(Array)
+          obj.map { |doc| fetch_and_demongoize(doc, meth, field) }
+        else
+          res = obj.try(:fetch, meth, nil)
+          field ? field.demongoize(res) : res.class.demongoize(res)
+        end
       end
 
       # Extracts the value for the given field name from the given attribute
@@ -703,21 +912,12 @@ module Mongoid
       #
       # @param [ Object ] The value for the given field name
       def extract_value(attrs, field_name)
-        def fetch_and_demongoize(d, meth, klass)
-          res = d.try(:fetch, meth, nil)
-          if field = klass.fields[meth]
-            field.demongoize(res)
-          else
-            res.class.demongoize(res)
-          end
-        end
-
         i = 1
         num_meths = field_name.count('.') + 1
-        k = klass
         curr = attrs.dup
 
         klass.traverse_association_tree(field_name) do |meth, obj, is_field|
+          field = obj if is_field
           is_translation = false
           # If no association or field was found, check if the meth is an
           # _translations field.
@@ -737,24 +937,20 @@ module Mongoid
           #    value so the full hash is returned.
           # 4. Otherwise, fetch and demongoize the value for the key meth.
           curr = if curr.is_a? Array
-            res = curr.map { |x| fetch_and_demongoize(x, meth, k) }
+            res = fetch_and_demongoize(curr, meth, field)
             res.empty? ? nil : res
-          elsif !is_translation && k.fields[meth]&.localized?
+          elsif !is_translation && field&.localized?
             if i < num_meths
               curr.try(:fetch, meth, nil)
             else
-              fetch_and_demongoize(curr, meth, k)
+              fetch_and_demongoize(curr, meth, field)
             end
           elsif is_translation
             curr.try(:fetch, meth, nil)
           else
-            fetch_and_demongoize(curr, meth, k)
+            fetch_and_demongoize(curr, meth, field)
           end
 
-          # If it's a relation, update the current klass with the relation klass.
-          if !is_field && !obj.nil?
-            k = obj.klass
-          end
           i += 1
         end
         curr
@@ -765,18 +961,34 @@ module Mongoid
       #
       # @param [ String ] field_name The name of the field to demongoize.
       # @param [ Object ] value The value to demongoize.
-      # @param [ Boolean ] is_translation The field we are retrieving is an
+      # @param [ true | false ] is_translation The field we are retrieving is an
       #   _translations field.
       #
       # @return [ Object ] The demongoized value.
       def recursive_demongoize(field_name, value, is_translation)
         field = klass.traverse_association_tree(field_name)
+        demongoize_with_field(field, value, is_translation)
+      end
 
+      # Demongoize the value for the given field. If the field is nil or the
+      # field is a translations field, the value is demongoized using its class.
+      #
+      # @param [ Field ] field The field to use to demongoize.
+      # @param [ Object ] value The value to demongoize.
+      # @param [ true | false ] is_translation The field we are retrieving is an
+      #   _translations field.
+      #
+      # @return [ Object ] The demongoized value.
+      #
+      # @api private
+      def demongoize_with_field(field, value, is_translation)
         if field
           # If it's a localized field that's not a hash, don't demongoize
           # again, we already have the translation. If it's an _translations
           # field, don't demongoize, we want the full hash not just a
           # specific translation.
+          # If it is a hash, and it's not a translations field, we need to
+          # demongoize to get the correct translation.
           if field.localized? && (!value.is_a?(Hash) || is_translation)
             value.class.demongoize(value)
           else
@@ -785,6 +997,46 @@ module Mongoid
         else
           value.class.demongoize(value)
         end
+      end
+
+      # Process the raw documents retrieved for #first/#last.
+      #
+      # @return [ Array<Document> | Document ] The list of documents or a
+      #   single document.
+      def process_raw_docs(raw_docs, limit)
+        docs = raw_docs.map do |d|
+          Factory.from_db(klass, d, criteria)
+        end
+        docs = eager_load(docs)
+        limit ? docs : docs.first
+      end
+
+      def raise_document_not_found_error
+        raise Errors::DocumentNotFound.new(klass, nil, nil)
+      end
+
+      def retrieve_nth(n)
+        retrieve_nth_with_limit(n, 1).first
+      end
+
+      def retrieve_nth_with_limit(n, limit)
+        sort = view.sort || { _id: 1 }
+        v = view.sort(sort).limit(limit || 1)
+        v = v.skip(n) if n > 0
+        if raw_docs = v.to_a
+          process_raw_docs(raw_docs, limit)
+        end
+      end
+
+      def retrieve_nth_to_last(n)
+        retrieve_nth_to_last_with_limit(n, 1).first
+      end
+
+      def retrieve_nth_to_last_with_limit(n, limit)
+        v = view.sort(inverse_sorting).skip(n).limit(limit || 1)
+        v = v.skip(n) if n > 0
+        raw_docs = v.to_a.reverse
+        process_raw_docs(raw_docs, limit)
       end
     end
   end

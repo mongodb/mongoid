@@ -20,11 +20,13 @@ class Band
   field :y, as: :years, type: Integer
   field :founded, type: Date
   field :deleted, type: Boolean
+  field :mojo, type: Object
   field :fans
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
   embeds_many :labels
+  embeds_many :fanatics
   embeds_one :label, cascade_callbacks: true
 
   scope :highly_rated, -> { gte(rating: 7) }

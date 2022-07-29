@@ -28,6 +28,7 @@ module Mongoid
                   if _base.referenced_many?
                     _target.__send__(inverse).push(_base)
                   else
+                    remove_associated(_target)
                     _target.set_relation(inverse, _base)
                   end
                 end

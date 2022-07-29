@@ -12,7 +12,7 @@ describe Mongoid::Errors::TooManyNestedAttributeRecords do
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "Accepting nested attributes for favorites is limited to 5 records."
+        "Accepting nested attributes for favorites is limited to 5 documents."
       )
     end
 

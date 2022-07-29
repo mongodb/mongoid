@@ -15,7 +15,7 @@ module Mongoid
       #   Binding.new(base, target, association)
       #
       # @param [ Document ] base The base of the binding.
-      # @param [ Document, Array<Document> ] target The target of the binding.
+      # @param [ Document | Array<Document> ] target The target of the binding.
       # @param [ Association ] association The association metadata.
       def initialize(base, target, association)
         @_base, @_target, @_association = base, target, association
@@ -57,6 +57,53 @@ module Mongoid
               doc.class,
               _association.foreign_key
           )
+        end
+      end
+
+      # Remove the associated document from the inverse's association.
+      #
+      # @param [ Document ] doc The document to remove.
+      def remove_associated(doc)
+        if inverse = _association.inverse(doc)
+          if _association.many?
+            remove_associated_many(doc, inverse)
+          elsif _association.in_to?
+            remove_associated_in_to(doc, inverse)
+          end
+        end
+      end
+
+      # Remove the associated document from the inverse's association.
+      #
+      # This method removes the associated on *_many relationships.
+      #
+      # @param [ Document ] doc The document to remove.
+      # @param [ Symbol ] inverse The name of the inverse.
+      def remove_associated_many(doc, inverse)
+        # We only want to remove the inverse association when the inverse
+        # document is in memory.
+        if inv = doc.ivar(inverse)
+          # This first condition is needed because when assigning the
+          # embeds_many association using the same embeds_many
+          # association, we delete from the array we are about to assign.
+          if _base != inv && (associated = inv.ivar(_association.name))
+            associated.delete(doc)
+          end
+        end
+      end
+
+      # Remove the associated document from the inverse's association.
+      #
+      # This method removes associated on belongs_to and embedded_in
+      # associations.
+      #
+      # @param [ Document ] doc The document to remove.
+      # @param [ Symbol ] inverse The name of the inverse.
+      def remove_associated_in_to(doc, inverse)
+        # We only want to remove the inverse association when the inverse
+        # document is in memory.
+        if associated = doc.ivar(inverse)
+          associated.send(_association.setter, nil)
         end
       end
 
@@ -134,6 +181,7 @@ module Mongoid
       # @param [ Document ] doc The document to bind.
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
+        remove_associated(doc)
         bind_foreign_key(doc, record_id(_base))
         bind_polymorphic_type(doc, _base.class.name)
         bind_inverse(doc, _base)
@@ -152,7 +200,7 @@ module Mongoid
       # @example Set the base association.
       #   binding.set_base_association
       #
-      # @return [ true, false ] If the association changed.
+      # @return [ true | false ] If the association changed.
       def set_base_association
         inverse_association = _association.inverse_association(_target)
         if inverse_association != _association && !inverse_association.nil?

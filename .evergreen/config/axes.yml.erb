@@ -1,0 +1,232 @@
+axes:
+  - id: "mongodb-version"
+    display_name: MongoDB Version
+    values:
+      - id: "6.0"
+        display_name: "MongoDB 6.0"
+        variables:
+           VERSION: "5.0"
+      - id: "5.3"
+        display_name: "MongoDB 5.3"
+        variables:
+           VERSION: "5.3"
+      - id: "5.0"
+        display_name: "MongoDB 5.0"
+        variables:
+           VERSION: "5.0"
+      - id: "4.4"
+        display_name: "MongoDB 4.4"
+        variables:
+           VERSION: "4.4"
+      - id: "4.2"
+        display_name: "MongoDB 4.2"
+        variables:
+           VERSION: "4.2"
+      - id: "4.0"
+        display_name: "MongoDB 4.0"
+        variables:
+           VERSION: "4.0"
+      - id: "3.6"
+        display_name: "MongoDB 3.6"
+        variables:
+           VERSION: "3.6"
+
+  - id: "topology"
+    display_name: Topology
+    values:
+      - id: "standalone"
+        display_name: Standalone
+        variables:
+           TOPOLOGY: "standalone"
+      - id: "replica-set"
+        display_name: Replica Set
+        variables:
+           TOPOLOGY: "replica-set"
+      - id: "sharded-cluster"
+        display_name: Sharded Cluster
+        variables:
+           TOPOLOGY: "sharded-cluster"
+           SINGLE_MONGOS: true
+
+  - id: "auth"
+    display_name: Authentication
+    values:
+      - id: "auth"
+        display_name: Auth
+        variables:
+           AUTH: "auth"
+      - id: "noauth"
+        display_name: NoAuth
+        variables:
+           AUTH: "noauth"
+
+  - id: "ssl"
+    display_name: SSL
+    values:
+      - id: "ssl"
+        display_name: SSL
+        variables:
+           SSL: "ssl"
+      - id: "nossl"
+        display_name: NoSSL
+        variables:
+           SSL: "nossl"
+
+  - id: "ruby"
+    display_name: Ruby Version
+    values:
+      - id: "ruby-2.6"
+        display_name: ruby-2.6
+        variables:
+           RVM_RUBY: "ruby-2.6"
+      - id: "ruby-2.7"
+        display_name: ruby-2.7
+        variables:
+           RVM_RUBY: "ruby-2.7"
+      - id: "ruby-3.0"
+        display_name: ruby-3.0
+        variables:
+          RVM_RUBY: "ruby-3.0"
+      - id: "ruby-3.1"
+        display_name: ruby-3.1
+        variables:
+          RVM_RUBY: "ruby-3.1"
+      - id: "ruby-head"
+        display_name: ruby-head
+        variables:
+           RVM_RUBY: "ruby-head"
+
+  - id: "jruby"
+    display_name: JRuby Version
+    values:
+      - id: "jruby-9.3"
+        display_name: jruby-9.3
+        variables:
+           RVM_RUBY: "jruby-9.3"
+
+  - id: "os"
+    display_name: OS
+    values:
+      - id: ubuntu-16.04
+        display_name: "Ubuntu 16.04"
+        run_on: ubuntu1604-small
+        variables:
+          DOCKER_DISTRO: ubuntu1604
+      - id: ubuntu-18.04
+        display_name: "Ubuntu 18.04"
+        run_on: ubuntu1804-small
+        variables:
+          DOCKER_DISTRO: ubuntu1804
+      - id: ubuntu-20.04
+        display_name: "Ubuntu 20.04"
+        run_on: ubuntu2004-small
+        variables:
+          DOCKER_DISTRO: ubuntu2004
+      - id: rhel70
+        display_name: "RHEL 7.0"
+        run_on: rhel70-small
+        variables:
+          DOCKER_DISTRO: rhel70
+      - id: rhel80
+        display_name: "RHEL 8.0"
+        run_on: rhel80-small
+        variables:
+          DOCKER_DISTRO: rhel80
+
+  - id: "driver"
+    display_name: Driver Version
+    values:
+      - id: current
+        display_name: "Driver-current"
+        variables:
+          DRIVER: "current"
+      - id: master
+        display_name: "Driver-master"
+        variables:
+          DRIVER: "master"
+      - id: master-jruby
+        display_name: "Driver-master (JRuby)"
+        variables:
+          DRIVER: "master-jruby"
+      - id: stable
+        display_name: "Driver-stable"
+        variables:
+          DRIVER: "stable"
+      - id: stable-jruby
+        display_name: "Driver-stable (JRuby)"
+        variables:
+          DRIVER: "stable-jruby"
+      - id: oldstable
+        display_name: "Driver-oldstable"
+        variables:
+          DRIVER: "oldstable"
+      - id: oldstable-jruby
+        display_name: "Driver-oldstable (JRuby)"
+        variables:
+          DRIVER: "oldstable-jruby"
+      - id: min
+        display_name: "Driver-min"
+        variables:
+          DRIVER: "min"
+      - id: min-jruby
+        display_name: "Driver-min (JRuby)"
+        variables:
+          DRIVER: "min-jruby"
+      - id: bson-min
+        display_name: "BSON-min"
+        variables:
+          DRIVER: "bson-min"
+      - id: bson-master
+        display_name: "BSON-master"
+        variables:
+          DRIVER: "bson-master"
+
+  - id: "rails"
+    display_name: Rails Version
+    values:
+      - id: master
+        display_name: "Rails master"
+        variables:
+          RAILS: "master"
+      - id: "5.2"
+        display_name: "Rails 5.2"
+        variables:
+          RAILS: "5.2"
+      - id: "6.0"
+        display_name: "Rails 6.0"
+        variables:
+          RAILS: "6.0"
+      - id: "6.1"
+        display_name: "Rails 6.1"
+        variables:
+          RAILS: "6.1"
+      - id: "7.0"
+        display_name: "Rails 7.0"
+        variables:
+          RAILS: "7.0"
+
+  - id: "i18n"
+    display_name: I18n version
+    values:
+      - id: '1.0'
+        display_name: "i18n-1.0"
+        variables:
+           I18N: "1.0"
+      - id: current
+        display_name: "i18n-current"
+
+  - id: "test-i18n-fallbacks"
+    display_name: Test i18n fallbacks
+    values:
+      - id: yes
+        display_name: "i18n-fallbacks"
+        variables:
+           TEST_I18N_FALLBACKS: yes
+
+  - id: app-tests
+    display_name: Mongoid application tests
+    values:
+      - id: yes
+        display_name: Yes
+        variables:
+          APP_TESTS: yes

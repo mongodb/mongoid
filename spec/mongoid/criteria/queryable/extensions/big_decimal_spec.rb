@@ -60,6 +60,30 @@ describe BigDecimal do
           expect(described_class.evolve(nil)).to be_nil
         end
       end
+
+      context "when provided a numeric" do
+        it "returns a string" do
+          expect(described_class.evolve(1)).to eq('1')
+        end
+      end
+
+      context "when provided a bogus value" do
+        it "returns the value" do
+          expect(described_class.evolve(:bogus)).to eq(:bogus)
+        end
+      end
+
+      context "when provided a bogus string" do
+        it "returns the string" do
+          expect(described_class.evolve("bogus")).to eq("bogus")
+        end
+      end
+
+      context "when provided a valid string" do
+        it "returns the string" do
+          expect(described_class.evolve("1")).to eq("1")
+        end
+      end
     end
 
     context 'when map_big_decimal_to_decimal128 is true' do
@@ -114,6 +138,30 @@ describe BigDecimal do
 
         it "returns nil" do
           expect(described_class.evolve(nil)).to be_nil
+        end
+      end
+
+      context "when provided a numeric" do
+        it "returns a string" do
+          expect(described_class.evolve(1)).to eq(BSON::Decimal128.new('1'))
+        end
+      end
+
+      context "when provided a bogus value" do
+        it "returns the value" do
+          expect(described_class.evolve(:bogus)).to eq(:bogus)
+        end
+      end
+
+      context "when provided a bogus string" do
+        it "returns the string" do
+          expect(described_class.evolve("bogus")).to eq("bogus")
+        end
+      end
+
+      context "when provided a valid string" do
+        it "returns the string" do
+          expect(described_class.evolve("1")).to eq("1")
         end
       end
     end

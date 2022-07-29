@@ -103,7 +103,7 @@ describe Mongoid::Reloadable do
       end
 
       it "resets attributes_before_type_cast" do
-        expect(person.attributes_before_type_cast).to be_empty
+        expect(person.attributes_before_type_cast).to eq(person.attributes)
       end
     end
 
@@ -114,7 +114,7 @@ describe Mongoid::Reloadable do
         it "raises an error" do
           expect {
             Person.new.reload
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
         end
       end
 

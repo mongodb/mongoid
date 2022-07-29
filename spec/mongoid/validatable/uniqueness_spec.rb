@@ -120,7 +120,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             it "adds the uniqueness error to the aliased field name" do
               dictionary.valid?
               expect(dictionary.errors).to have_key(:language)
-              expect(dictionary.errors[:language]).to eq([ "is already taken" ])
+              expect(dictionary.errors[:language]).to eq([ "has already been taken" ])
             end
           end
 
@@ -137,7 +137,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             it "adds the uniqueness error to the underlying field name" do
               dictionary.valid?
               expect(dictionary.errors).to have_key(:l)
-              expect(dictionary.errors[:l]).to eq([ "is already taken" ])
+              expect(dictionary.errors[:l]).to eq([ "has already been taken" ])
             end
           end
         end
@@ -239,7 +239,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
                     it "adds the uniqueness error" do
                       dictionary.valid?
-                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                      expect(dictionary.errors[:description]).to eq([ "has already been taken" ])
                     end
                   end
 
@@ -260,7 +260,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
                     it "adds the uniqueness error" do
                       dictionary.valid?
-                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                      expect(dictionary.errors[:description]).to eq([ "has already been taken" ])
                     end
                   end
                 end
@@ -330,7 +330,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
                     it "adds the uniqueness error" do
                       dictionary.valid?
-                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                      expect(dictionary.errors[:description]).to eq([ "has already been taken" ])
                     end
                   end
 
@@ -351,7 +351,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
                     it "adds the uniqueness error" do
                       dictionary.valid?
-                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                      expect(dictionary.errors[:description]).to eq([ "has already been taken" ])
                     end
                   end
                 end
@@ -399,7 +399,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
                 it "adds the uniqueness error" do
                   dictionary.valid?
-                  expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                  expect(dictionary.errors[:description]).to eq([ "has already been taken" ])
                 end
               end
             end
@@ -460,7 +460,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 dictionary.valid?
-                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "has already been taken" ])
               end
             end
 
@@ -623,7 +623,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "has already been taken" ])
               end
             end
 
@@ -701,7 +701,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
             it "should set an error for associated object not being unique" do
               item.update_attributes(folder_id: personal_folder.id)
-              expect(item.errors.messages[:name].first).to eq("is already taken")
+              expect(item.errors.messages[:name].first).to eq("has already been taken")
             end
           end
 
@@ -753,7 +753,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "has already been taken" ])
               end
             end
 
@@ -792,7 +792,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "has already been taken" ])
               end
             end
           end
@@ -815,7 +815,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               expect do
                 Dictionary.create!(name: "French-English", year: 1960)
-              end.to raise_error(Mongoid::Errors::Validations, /Name is already taken/)
+              end.to raise_error(Mongoid::Errors::Validations, /Name has already been taken/)
 
               expect(Dictionary.all.size).to eq(1)
             end
@@ -954,7 +954,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1018,7 +1018,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 dictionary.valid?
-                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1096,7 +1096,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 dictionary.valid?
-                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1218,7 +1218,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 login.valid?
-                expect(login.errors[:username]).to eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1323,7 +1323,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness errors" do
                 login.valid?
-                expect(login.errors[:username]).to eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1383,7 +1383,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 login.valid?
-                expect(login.errors[:username]).to eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1461,7 +1461,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 login.valid?
-                expect(login.errors[:username]).to eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1710,7 +1710,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 definition.valid?
-                expect(definition.errors[:description]).to eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1838,7 +1838,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness errors" do
                 definition.valid?
-                expect(definition.errors[:description]).to eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "has already been taken" ])
               end
             end
 
@@ -1976,7 +1976,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness errors" do
                 definition.valid?
-                expect(definition.errors[:description]).to eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "has already been taken" ])
               end
             end
 
@@ -2040,7 +2040,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 definition.valid?
-                expect(definition.errors[:description]).to eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "has already been taken" ])
               end
             end
 
@@ -2118,7 +2118,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 definition.valid?
-                expect(definition.errors[:description]).to eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "has already been taken" ])
               end
             end
 
@@ -2214,7 +2214,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             it "adds the uniqueness error to the aliased field name" do
               definition.valid?
               expect(definition.errors).to have_key(:part)
-              expect(definition.errors[:part]).to eq([ "is already taken" ])
+              expect(definition.errors[:part]).to eq([ "has already been taken" ])
             end
           end
 
@@ -2231,7 +2231,7 @@ describe Mongoid::Validatable::UniquenessValidator do
             it "adds the uniqueness error to the underlying field name" do
               definition.valid?
               expect(definition.errors).to have_key(:p)
-              expect(definition.errors[:p]).to eq([ "is already taken" ])
+              expect(definition.errors[:p]).to eq([ "has already been taken" ])
             end
           end
 
@@ -2250,7 +2250,7 @@ describe Mongoid::Validatable::UniquenessValidator do
               it "adds the uniqueness error to the aliased field name" do
                 definition.valid?
                 expect(definition.errors).to have_key(:synonyms)
-                expect(definition.errors[:synonyms]).to eq([ "is already taken" ])
+                expect(definition.errors[:synonyms]).to eq([ "has already been taken" ])
               end
             end
 
@@ -2267,7 +2267,7 @@ describe Mongoid::Validatable::UniquenessValidator do
               it "adds the uniqueness error to the aliased field name" do
                 definition.valid?
                 expect(definition.errors).to have_key(:syn)
-                expect(definition.errors[:syn]).to eq([ "is already taken" ])
+                expect(definition.errors[:syn]).to eq([ "has already been taken" ])
               end
             end
           end
@@ -2319,7 +2319,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
               it "adds the uniqueness error" do
                 word_origin.valid?
-                expect(word_origin.errors[:origin_id]).to eq([ "is already taken" ])
+                expect(word_origin.errors[:origin_id]).to eq([ "has already been taken" ])
               end
             end
 
@@ -2444,7 +2444,7 @@ describe Mongoid::Validatable::UniquenessValidator do
     it "should be invalid" do
       subclass_document_with_duplicated_name.tap do |d|
         expect(d).to be_invalid
-        expect(d.errors[:name]).to eq([ "is already taken" ])
+        expect(d.errors[:name]).to eq([ "has already been taken" ])
       end
     end
   end
@@ -2470,6 +2470,35 @@ describe Mongoid::Validatable::UniquenessValidator do
       expect {
         Person.create!(ssn: "132-11-1111", username: "asdfsdfA")
       }.to raise_error(Mongo::Error::OperationFailure)
+    end
+  end
+
+  describe "i18n" do
+
+    context 'when using a different locale' do
+
+      around do |example|
+        I18n.with_locale(:fr) { example.run }
+      end
+
+      before do
+        # Translation key location is as per rails-i18n gem.
+        # See: https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/en.yml
+        I18n.backend.store_translations(:fr, { errors: { messages: { taken: 'est déjà utilisé(e)' } } })
+      end
+
+      after do
+        # i18n 1.0 requires +send+ because +translations+ aren't public.
+        # Newer i18n versions have it as public.
+        I18n.backend.send(:translations).delete(:fr)
+      end
+
+      it "correctly translates the error message" do
+        Circus.create!(slogan: 'The Greatest Show on Mars')
+        dict = Circus.new(slogan: 'The Greatest Show on Mars')
+        dict.valid?
+        expect(dict.errors.messages[:slogan]).to eq(["est déjà utilisé(e)"])
+      end
     end
   end
 end

@@ -121,7 +121,7 @@ module Mongoid
       # @return [ MapReduce ] The map/reduce object.
       def out(location)
         normalized = location.dup
-        normalized.update_values do |value|
+        normalized.transform_values! do |value|
           value.is_a?(::Symbol) ? value.to_s : value
         end
         @map_reduce = @map_reduce.out(normalized)

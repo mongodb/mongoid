@@ -54,7 +54,7 @@ module Mongoid
       # @api private
       #
       # @param [ Object ] criteria
-      # @return [ Boolean ] if should permit
+      # @return [ true | false ] if should permit
       def should_permit?(criteria)
         if criteria.respond_to?(:permitted?)
           return criteria.permitted?

@@ -13,7 +13,7 @@ module Mongoid
       #   NestedAttributesMetadataNotFound.new(klass, name)
       #
       # @param [ Class ] klass The class of the document.
-      # @param [ Symbol, String ] name The name of the association
+      # @param [ Symbol | String ] name The name of the association
       def initialize(klass, name)
         super(
           compose_message(

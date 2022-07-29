@@ -124,8 +124,11 @@ describe Mongoid::Fields::Localized do
 
             context "when fallbacks are defined" do
 
-              before do
+              around do |example|
+                prev_fallbacks = I18n.fallbacks.dup
                 ::I18n.fallbacks[:de] = [ :de, :en, :es ]
+                example.run
+                I18n.fallbacks = prev_fallbacks
               end
 
               context "when the first fallback translation exists" do
@@ -164,8 +167,11 @@ describe Mongoid::Fields::Localized do
 
             context "when no fallbacks are defined" do
 
-              before do
+              around do |example|
+                prev_fallbacks = I18n.fallbacks.dup
                 ::I18n.fallbacks[:de] = [ :de ]
+                example.run
+                I18n.fallbacks = prev_fallbacks
               end
 
               let(:value) do
@@ -179,8 +185,11 @@ describe Mongoid::Fields::Localized do
 
             context 'when fallbacks are empty' do
 
-              before do
+              around do |example|
+                prev_fallbacks = I18n.fallbacks.dup
                 ::I18n.fallbacks[:de] = [ ]
+                example.run
+                I18n.fallbacks = prev_fallbacks
               end
 
               let(:value) do
@@ -282,8 +291,11 @@ describe Mongoid::Fields::Localized do
 
             context "when fallbacks are defined" do
 
-              before do
+              around do |example|
+                prev_fallbacks = I18n.fallbacks.dup
                 ::I18n.fallbacks[:de] = [ :de, :en, :es ]
+                example.run
+                I18n.fallbacks = prev_fallbacks
               end
 
               context 'when fallbacks are enabled' do
@@ -340,8 +352,11 @@ describe Mongoid::Fields::Localized do
 
             context "when no fallbacks are defined" do
 
-              before do
+              around do |example|
+                prev_fallbacks = I18n.fallbacks.dup
                 ::I18n.fallbacks[:de] = [ :de ]
+                example.run
+                I18n.fallbacks = prev_fallbacks
               end
 
               let(:value) do
@@ -485,8 +500,11 @@ describe Mongoid::Fields::Localized do
 
             context "when the value is false" do
 
-              before do
+              around do |example|
+                prev_fallbacks = I18n.fallbacks.dup
                 ::I18n.fallbacks[:de] = [:en, :es]
+                example.run
+                I18n.fallbacks = prev_fallbacks
               end
 
               let(:field) do
@@ -504,8 +522,11 @@ describe Mongoid::Fields::Localized do
 
             context "when the value is true" do
 
-              before do
+              around do |example|
+                prev_fallbacks = I18n.fallbacks.dup
                 ::I18n.fallbacks[:de] = [:en, :es]
+                example.run
+                I18n.fallbacks = prev_fallbacks
               end
 
               let(:field) do
@@ -522,6 +543,39 @@ describe Mongoid::Fields::Localized do
             end
           end
         end
+      end
+    end
+  end
+
+  describe "localize: :present" do
+
+    let(:field) do
+      described_class.new(:description, localize: :present, type: String)
+    end
+
+    context "when setting the localize to present" do
+
+      it "is localized?" do
+        expect(field.localized?).to be true
+      end
+
+      it "is localize_present?" do
+        expect(field.localize_present?).to be true
+      end
+    end
+
+    context "when localize is not localize_present" do
+
+      let(:field) do
+        described_class.new(:description, localize: true, type: String)
+      end
+
+      it "is localized?" do
+        expect(field.localized?).to be true
+      end
+
+      it "is not localize_present?" do
+        expect(field.localize_present?).to be false
       end
     end
   end

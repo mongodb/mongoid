@@ -150,7 +150,7 @@ module Mongoid
       # @example Unset the field on the matches.
       #   context.unset(:name)
       #
-      # @param [ String | Symbol | Array<String|Symbol> | Hash ] args
+      # @param [ [ String | Symbol | Array<String | Symbol> | Hash ]... ] *args
       #   The name(s) of the field(s) to unset.
       #   If a Hash is specified, its keys will be used irrespective of what
       #   each key's value is, even if the value is nil or false.

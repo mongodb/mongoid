@@ -10,8 +10,6 @@ module Mongoid
       module Selectable
         extend Macroable
 
-        Mongoid.deprecate(self, :geo_spacial)
-
         # Constant for a LineString $geometry.
         LINE_STRING = "LineString"
 
@@ -33,7 +31,7 @@ module Mongoid
         # @example Execute an $all in a where query.
         #   selectable.where(:field.all => [ 1, 2 ])
         #
-        # @param [ Hash ] criterion The key value pairs for $all matching.
+        # @param [ Hash... ] *criteria The key value pair(s) for $all matching.
         #
         # @return [ Selectable ] The cloned selectable.
         def all(*criteria)
@@ -71,8 +69,9 @@ module Mongoid
         # @example Add the criterion.
         #   selectable.and({ field: value }, { other: value })
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
-        #   matches or Criteria objects that all must match to return results.
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        #   Multiple key/value pair matches or Criteria objects that all must
+        #   match to return results.
         #
         # @return [ Selectable ] The new selectable.
         def and(*criteria)
@@ -156,7 +155,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :elem_match
           end
 
-          __override__(criterion, "$elemMatch")
+          and_or_override(criterion, "$elemMatch")
         end
         key :elem_match, :override, "$elemMatch"
 
@@ -229,19 +228,6 @@ module Mongoid
           __merge__(criterion)
         end
 
-        # Alias for +geo_spatial+.
-        #
-        # @deprecated
-        def geo_spacial(criterion)
-          # Duplicate method body so that we can raise this exception with
-          # geo_spacial as the indicated operator rather than geo_spatial.
-          if criterion.nil?
-            raise Errors::CriteriaArgumentRequired, :geo_spacial
-          end
-
-          __merge__(criterion)
-        end
-
         key :intersects_line, :override, "$geoIntersects", "$geometry" do |value|
           { "type" => LINE_STRING, "coordinates" => value }
         end
@@ -272,7 +258,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :eq
           end
 
-          __override__(criterion, "$eq")
+          and_or_override(criterion, "$eq")
         end
         key :eq, :override, "$eq"
 
@@ -292,7 +278,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :gt
           end
 
-          __override__(criterion, "$gt")
+          and_or_override(criterion, "$gt")
         end
         key :gt, :override, "$gt"
 
@@ -312,7 +298,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :gte
           end
 
-          __override__(criterion, "$gte")
+          and_or_override(criterion, "$gte")
         end
         key :gte, :override, "$gte"
 
@@ -368,7 +354,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :lt
           end
 
-          __override__(criterion, "$lt")
+          and_or_override(criterion, "$lt")
         end
         key :lt, :override, "$lt"
 
@@ -388,7 +374,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :lte
           end
 
-          __override__(criterion, "$lte")
+          and_or_override(criterion, "$lte")
         end
         key :lte, :override, "$lte"
 
@@ -425,7 +411,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :mod
           end
 
-          __override__(criterion, "$mod")
+          and_or_override(criterion, "$mod")
         end
         key :mod, :override, "$mod"
 
@@ -445,7 +431,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :ne
           end
 
-          __override__(criterion, "$ne")
+          and_or_override(criterion, "$ne")
         end
         alias :excludes :ne
         key :ne, :override, "$ne"
@@ -466,7 +452,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :near
           end
 
-          __override__(criterion, "$near")
+          and_or_override(criterion, "$near")
         end
         key :near, :override, "$near"
 
@@ -486,7 +472,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :near_sphere
           end
 
-          __override__(criterion, "$nearSphere")
+          and_or_override(criterion, "$nearSphere")
         end
         key :near_sphere, :override, "$nearSphere"
 
@@ -531,8 +517,8 @@ module Mongoid
         # @example Add the $nor selection.
         #   selectable.nor(field: 1, field: 2)
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
-        #   matches or Criteria objects.
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        #   Multiple key/value pair matches or Criteria objects.
         #
         # @return [ Selectable ] The new selectable.
         def nor(*criteria)
@@ -544,7 +530,7 @@ module Mongoid
         # @example Is the selectable negating?
         #   selectable.negating?
         #
-        # @return [ true, false ] If the selectable is negating.
+        # @return [ true | false ] If the selectable is negating.
         def negating?
           !!negating
         end
@@ -560,7 +546,7 @@ module Mongoid
         # @example Execute a $not in a where query.
         #   selectable.where(:field.not => /Bob/)
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
         #   matches or Criteria objects to negate.
         #
         # @return [ Selectable ] The new selectable.
@@ -620,7 +606,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.or([{field: 1}], [{field: 2}])
         #
-        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] criteria
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #
@@ -650,7 +636,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.any_of([{field: 1}], [{field: 2}])
         #
-        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] criteria
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #
@@ -751,7 +737,7 @@ module Mongoid
         #   conditions in a query. Mongoid will build such a query but the
         #   server will return an error when trying to execute it.
         #
-        # @param [ String, Symbol ] terms A string of terms that MongoDB parses
+        # @param [ String | Symbol ] terms A string of terms that MongoDB parses
         #   and uses to query the text index.
         # @param [ Hash ] opts Text search options. See MongoDB documentation
         #   for options.
@@ -789,7 +775,8 @@ module Mongoid
         # @example Add a javascript selection.
         #   selectable.where("this.name == 'syd'")
         #
-        # @param [ String, Hash ] criterion The javascript or standard selection.
+        # @param [ [ Hash | String ]... ] *criterion The standard selection
+        #   or javascript string.
         #
         # @return [ Selectable ] The cloned selectable.
         def where(*criteria)
@@ -867,7 +854,7 @@ module Mongoid
         # @param [ Hash ] criterion The criterion.
         def typed_override(criterion, operator)
           if criterion
-            criterion.update_values do |value|
+            criterion.transform_values! do |value|
               yield(value)
             end
           end
@@ -914,6 +901,22 @@ module Mongoid
               end
             end
             query.reset_strategies!
+          end
+        end
+
+        # Combine operator expessions onto a Criteria using either
+        # an override or ands depending on the status of the
+        # Mongoid.overwrite_chained_operators feature flag.
+        #
+        # @param [ Hash ] The criterion to add to the criteria.
+        # @param [ String ] operator The MongoDB operator.
+        #
+        # @return [ Criteria ] The resulting criteria.
+        def and_or_override(criterion, operator)
+          if Mongoid.overwrite_chained_operators
+            __override__(criterion, operator)
+          else
+            and_with_operator(criterion, operator)
           end
         end
 

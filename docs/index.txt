@@ -18,6 +18,7 @@ for MongoDB in Ruby.
   working-with-data
   API <https://mongodb.com/docs/mongoid/master/api/>
   release-notes
+  contributing
   additional-resources
   ecosystem
 

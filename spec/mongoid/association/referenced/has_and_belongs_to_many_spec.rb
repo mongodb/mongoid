@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "./has_and_belongs_to_many_models"
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
@@ -1060,12 +1061,44 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
         expect(association.inverse_foreign_key).to eq('bar_ref')
       end
     end
+
+    context "when using a model that uses the class_name option" do
+      let(:inverse_foreign_key) { HabtmmSchool.relations[:students].inverse_foreign_key }
+      it "gets the correct inverse foreign key" do
+        expect(inverse_foreign_key).to eq("school_ids")
+      end
+    end
   end
 
   describe '#inverse_foreign_key_setter' do
 
     it 'returns generated method name' do
       expect(association.inverse_foreign_key_setter).to eq('has_many_left_object_ids=')
+    end
+  end
+
+  context "when adding an object to the association" do
+    let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+    let(:update_time) do
+      Timecop.freeze(Time.at(Time.now.to_i) + 2)
+    end
+
+    after do
+      Timecop.return
+    end
+
+    let!(:school) { HabtmmSchool.create! }
+    let!(:student) { HabtmmStudent.create! }
+
+    before do
+      update_time
+      school.update(students: [student])
+    end
+
+    it "updates the updated at" do
+      pending "MONGOID-4953"
+      expect(school.updated_at).to eq(update_time)
     end
   end
 end

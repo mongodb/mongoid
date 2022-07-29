@@ -27,7 +27,7 @@ module Mongoid
       #
       # @param [ Specification ] other The spec to compare against.
       #
-      # @return [ true, false ] If the specs are equal.
+      # @return [ true | false ] If the specs are equal.
       def ==(other)
         fields == other.fields && key == other.key
       end
@@ -86,7 +86,7 @@ module Mongoid
       # @api private
       #
       # @example Normalize the index options.
-      #   specification.normalize_options(drop_dups: true)
+      #   specification.normalize_options(unique: true)
       #
       # @param [ Hash ] opts The index options.
       #

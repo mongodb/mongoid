@@ -92,7 +92,7 @@ module Mongoid
 
         # Is this association polymorphic?
         #
-        # @return [ true, false ] Whether this association is polymorphic.
+        # @return [ true | false ] Whether this association is polymorphic.
         def polymorphic?
           @polymorphic ||= !!@options[:as]
         end
@@ -101,7 +101,7 @@ module Mongoid
         #
         # @note Only relevant if the association is polymorphic.
         #
-        # @return [ String, nil ] The field for storing the associated object's type.
+        # @return [ String | nil ] The field for storing the associated object's type.
         def type
           @type ||= "#{as}_type" if polymorphic?
         end

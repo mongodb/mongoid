@@ -12,7 +12,7 @@ module Mongoid
       # @example Create the error.
       #   InvalidSessionUse.new(:invalid_session_use)
       #
-      # @param [ :invalid_session_use, :invalid_session_nesting ] error_type The type of session misuse.
+      # @param [ :invalid_session_use | :invalid_session_nesting ] error_type The type of session misuse.
       def initialize(error_type)
         super(compose_message(error_type.to_s))
       end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './has_many_models'
 
 describe Mongoid::Association::Referenced::HasMany do
 
@@ -1243,6 +1244,30 @@ describe Mongoid::Association::Referenced::HasMany do
     it 'returns an the target (EmbeddedObject)' do
       expect(Mongoid::Association::Referenced::HasMany::Proxy).to receive(:new).and_call_original
       expect(association.create_relation(owner, target)).to be_a(Array)
+    end
+  end
+
+  context "when adding an object to the association" do
+    let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+    let(:update_time) do
+      Timecop.freeze(Time.at(Time.now.to_i) + 2)
+    end
+
+    after do
+      Timecop.return
+    end
+
+    let!(:school) { HmmSchool.create! }
+    let!(:student) { HmmStudent.create! }
+
+    before do
+      update_time
+      student.update(school: school)
+    end
+
+    it "updates the updated_at" do
+      expect(student.updated_at).to eq(update_time)
     end
   end
 end

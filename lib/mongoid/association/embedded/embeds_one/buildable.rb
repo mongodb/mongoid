@@ -25,11 +25,25 @@ module Mongoid
           #
           # @return [ Document ] A single document.
           def build(base, object, _type = nil, selected_fields = nil)
-            return object unless object.is_a?(Hash)
-            if _loading? && base.persisted?
-              Factory.execute_from_db(klass, object, nil, selected_fields, execute_callbacks: false)
+            if object.is_a?(Hash)
+              if _loading? && base.persisted?
+                Factory.execute_from_db(klass, object, nil, selected_fields, execute_callbacks: false)
+              else
+                Factory.build(klass, object)
+              end
             else
-              Factory.build(klass, object)
+              clear_associated(object)
+              object
+            end
+          end
+
+          private
+
+          def clear_associated(doc)
+            if doc && (inv = inverse(doc))
+              if associated = doc.ivar(inv)
+                associated.substitute(nil)
+              end
             end
           end
         end

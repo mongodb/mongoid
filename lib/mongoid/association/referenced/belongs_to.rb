@@ -97,7 +97,7 @@ module Mongoid
 
         # Is this association polymorphic?
         #
-        # @return [ true, false ] Whether this association is polymorphic.
+        # @return [ true | false ] Whether this association is polymorphic.
         def polymorphic?
           @polymorphic ||= !!@options[:polymorphic]
         end
@@ -153,7 +153,7 @@ module Mongoid
           create_foreign_key_field!
           setup_index!
           define_touchable!
-          @owner_class.validates_associated(name) if validate?
+          @owner_class.validates_associated(name) if validate? || require_association?
           @owner_class.validates(name, presence: true) if require_association?
         end
 

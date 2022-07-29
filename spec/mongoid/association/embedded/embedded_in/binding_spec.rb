@@ -58,7 +58,8 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Binding do
         end
 
         it "does nothing" do
-          expect(name).to receive(:namable=).never
+          expect(name).to receive(:namable=).with(person).never
+          expect(name).to receive(:namable=).with(nil).once
           binding.bind_one
         end
       end

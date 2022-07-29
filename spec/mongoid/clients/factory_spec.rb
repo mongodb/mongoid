@@ -36,6 +36,7 @@ describe Mongoid::Clients::Factory do
       context "when the configuration exists" do
 
         context "when the configuration is standard" do
+          restore_config_clients
 
           let(:config) do
             {
@@ -46,7 +47,6 @@ describe Mongoid::Clients::Factory do
 
           before do
             Mongoid::Config.send(:clients=, config)
-            # TODO: We should restore overwritten configuration in after block
           end
 
           after do
@@ -65,10 +65,7 @@ describe Mongoid::Clients::Factory do
             expect(client).to be_a(Mongo::Client)
           end
 
-          context 'not JRuby' do
-            # Run this test on JRuby when driver 2.16.0 is released -
-            # see RUBY-2771.
-            fails_on_jruby
+          context 'on driver versions that do not report spurious EOF errors' do
 
             it 'does not produce driver warnings' do
               Mongo::Logger.logger.should_not receive(:warn)
@@ -86,40 +83,37 @@ describe Mongoid::Clients::Factory do
             expect(client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
           end
 
-          context 'driver 2.13+' do
-            min_driver_version '2.13'
+          it 'sets Mongoid as a wrapping library' do
+            client.options[:wrapping_libraries].should == [BSON::Document.new(
+              Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)]
+          end
 
-            it 'sets Mongoid as a wrapping library' do
-              client.options[:wrapping_libraries].should == [BSON::Document.new(
-                Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)]
+          context 'when configuration specifies a wrapping library' do
+
+            let(:config) do
+              {
+                default: { hosts: SpecConfig.instance.addresses, database: database_id },
+                analytics: {
+                  hosts: SpecConfig.instance.addresses,
+                  database: database_id,
+                  options: {
+                    wrapping_libraries: [{name: 'Foo'}],
+                  },
+                }
+              }
             end
 
-            context 'when configuration specifies a wrapping library' do
-
-              let(:config) do
-                {
-                  default: { hosts: SpecConfig.instance.addresses, database: database_id },
-                  analytics: {
-                    hosts: SpecConfig.instance.addresses,
-                    database: database_id,
-                    options: {
-                      wrapping_libraries: [{name: 'Foo'}],
-                    },
-                  }
-                }
-              end
-
-              it 'adds Mongoid as another wrapping library' do
-                client.options[:wrapping_libraries].should == [
-                  BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
-                  {'name' => 'Foo'},
-                ]
-              end
+            it 'adds Mongoid as another wrapping library' do
+              client.options[:wrapping_libraries].should == [
+                BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
+                {'name' => 'Foo'},
+              ]
             end
           end
         end
 
         context "when the configuration has no ports" do
+          restore_config_clients
 
           let(:config) do
             {
@@ -130,7 +124,6 @@ describe Mongoid::Clients::Factory do
 
           before do
             Mongoid::Config.send(:clients=, config)
-            # TODO: We should restore overwritten configuration in after block
           end
 
           after do
@@ -165,6 +158,7 @@ describe Mongoid::Clients::Factory do
         context "when configured via a uri" do
 
           context "when the uri has a single host:port" do
+            restore_config_clients
 
             let(:config) do
               {
@@ -175,7 +169,6 @@ describe Mongoid::Clients::Factory do
 
             before do
               Mongoid::Config.send(:clients=, config)
-              # TODO: We should restore overwritten configuration in after block
             end
 
             after do
@@ -204,6 +197,7 @@ describe Mongoid::Clients::Factory do
           end
 
           context "when the uri has multiple host:port pairs" do
+            restore_config_clients
 
             let(:config) do
               {
@@ -214,7 +208,6 @@ describe Mongoid::Clients::Factory do
 
             before do
               Mongoid::Config.send(:clients=, config)
-              # TODO: We should restore overwritten configuration in after block
             end
 
             after do
@@ -255,6 +248,7 @@ describe Mongoid::Clients::Factory do
     end
 
     context "when no name is provided" do
+      restore_config_clients
 
       let(:config) do
         { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
@@ -262,7 +256,6 @@ describe Mongoid::Clients::Factory do
 
       before do
         Mongoid::Config.send(:clients=, config)
-        # TODO: We should restore overwritten configuration in after block
       end
 
       after do
@@ -289,12 +282,12 @@ describe Mongoid::Clients::Factory do
     end
 
     context "when nil is provided and no default config" do
+      restore_config_clients
 
       let(:config) { nil }
 
       before do
         Mongoid.clients[:default] = nil
-        # TODO: We should restore overwritten configuration in after block
       end
 
       it "raises NoClientsConfig error" do
@@ -304,6 +297,7 @@ describe Mongoid::Clients::Factory do
   end
 
   describe ".default" do
+    restore_config_clients
 
     let(:config) do
       { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
@@ -311,7 +305,6 @@ describe Mongoid::Clients::Factory do
 
     before do
       Mongoid::Config.send(:clients=, config)
-      # TODO: We should restore overwritten configuration in after block
     end
 
     after do
@@ -338,6 +331,7 @@ describe Mongoid::Clients::Factory do
   end
 
   context "when options are provided with string keys" do
+    restore_config_clients
 
     let(:config) do
       {
@@ -354,7 +348,6 @@ describe Mongoid::Clients::Factory do
 
     before do
       Mongoid::Config.send(:clients=, config)
-      # TODO: We should restore overwritten configuration in after block
     end
 
     after do
@@ -393,6 +386,8 @@ describe Mongoid::Clients::Factory do
   end
 
   context "unexpected config options" do
+    restore_config_clients
+
     let(:unknown_opts) do
       {
         bad_one: 1,
@@ -410,11 +405,8 @@ describe Mongoid::Clients::Factory do
       }
     end
 
-    around(:each) do |example|
-      old_config = Mongoid::Config.clients
+    before do
       Mongoid::Config.send(:clients=, config)
-      example.run
-      Mongoid::Config.send(:clients=, old_config)
     end
 
     [:bad_one, :bad_two].each do |env|

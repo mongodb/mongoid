@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+
+$: << File.join(ROOT, 'spec/shared/lib')
+
+require 'mrss/eg_config_utils'
+
+class Runner
+  include Mrss::EgConfigUtils
+
+  def run
+    transform('config.yml')
+  end
+
+  def transform(output_file_name)
+    contents = generated_file_warning
+
+    template_path = File.join(File.dirname(__FILE__), 'config/options.yml.erb')
+    contents << transform_config(template_path, self)
+
+    template_path = File.join(File.dirname(__FILE__), 'config/commands.yml.erb')
+    contents << transform_config(template_path, self)
+
+    template_path = File.join(File.dirname(__FILE__), 'config/axes.yml.erb')
+    contents << transform_config(template_path, self)
+
+    template_path = File.join(File.dirname(__FILE__), 'config/variants.yml.erb')
+    contents << transform_config(template_path, self)
+
+    output_path = File.join(File.dirname(__FILE__), output_file_name)
+    File.open(output_path, 'w') do |f|
+      f << contents
+    end
+  end
+
+  def get_binding
+    binding
+  end
+end
+
+Runner.new.run
