@@ -950,7 +950,7 @@ describe Mongoid::Attributes do
       end
     end
 
-    context "when providing tainted parameters" do
+    context "when providing unpermitted parameters" do
 
       let(:params) do
         ActionController::Parameters.new(title: "sir")
@@ -962,24 +962,80 @@ describe Mongoid::Attributes do
         }.to raise_error(ActiveModel::ForbiddenAttributesError)
       end
     end
+
+    context "when providing permitted parameters" do
+
+      let(:params) do
+        ActionController::Parameters.new(title: "sir").permit!
+      end
+
+      let(:person) do
+        Person.new(params)
+      end
+
+      it "assigns the attributes" do
+        expect(person.title).to eq("sir")
+      end
+    end
   end
 
   context "updating when attributes already exist" do
-
     let(:person) do
       Person.new(title: "Sir")
     end
 
-    let(:attributes) do
-      { dob: "2000-01-01" }
+    context 'when attribute not overwritten' do
+      let(:attributes) do
+        { dob: "2000-01-01" }
+      end
+
+      before do
+        person.process_attributes(attributes)
+      end
+
+      it "does not change existing attributes" do
+        expect(person.title).to eq("Sir")
+      end
     end
 
-    before do
-      person.process_attributes(attributes)
+    context 'when attribute overwritten' do
+      let(:attributes) do
+        { title: 'Mister', dob: "2000-01-01" }
+      end
+
+      before do
+        person.process_attributes(attributes)
+      end
+
+      it "overwrites supplied attributes" do
+        expect(person.title).to eq("Mister")
+      end
     end
 
-    it "only overwrites supplied attributes" do
-      expect(person.title).to eq("Sir")
+    context "when providing unpermitted parameters" do
+      let(:attributes) do
+        ActionController::Parameters.new(title: 'Mister')
+      end
+
+      it "raises an error" do
+        expect {
+          person.process_attributes(attributes)
+        }.to raise_error(ActiveModel::ForbiddenAttributesError)
+      end
+    end
+
+    context "when providing permitted parameters" do
+      let(:attributes) do
+        ActionController::Parameters.new(title: 'Mister').permit!
+      end
+
+      before do
+        person.process_attributes(attributes)
+      end
+
+      it "assigns the attributes" do
+        expect(person.title).to eq('Mister')
+      end
     end
   end
 

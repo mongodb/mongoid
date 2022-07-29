@@ -18,7 +18,13 @@ module Mongoid
       def process_attributes(attrs = nil)
         attrs ||= {}
         if !attrs.empty?
+
+          # MONGOID-5308: Here we use #sanitize_for_mass_assignment to
+          # preserve legacy behavior in case the user is using the
+          # protected_attributes_continued gem. Note this is only
+          # supported on the root document and not any nested attributes.
           attrs = sanitize_for_mass_assignment(attrs)
+
           attrs.each_pair do |key, value|
             next if pending_attribute?(key, value)
             process_attribute(key, value)
@@ -105,6 +111,7 @@ module Mongoid
       #   document.process_nested
       def process_nested
         pending_nested.each_pair do |name, value|
+          value = sanitize_nested_forbidden_attributes(value)
           send("#{name}=", value)
         end
       end
@@ -126,11 +133,26 @@ module Mongoid
       def process_relations
         pending_relations.each_pair do |name, value|
           association = relations[name]
+          value = sanitize_nested_forbidden_attributes(value)
           if value.is_a?(Hash)
             association.nested_builder(value, {}).build(self)
           else
             send("#{name}=", value)
           end
+        end
+      end
+
+      # Sanitize nested ActionController::Parameter objects, including
+      # Array of ActionController::Parameter.
+      # 
+      # MONGOID-5308: Here we intentionally use #sanitize_forbidden_attributes
+      # instead of #sanitize_for_mass_assignment. The former only resolves
+      # Strong Parameters permitted attributes.
+      def sanitize_nested_forbidden_attributes(attrs)
+        if attrs.is_a?(Array)
+          attrs.map(&method(:sanitize_forbidden_attributes))
+        else
+          sanitize_forbidden_attributes(attrs)
         end
       end
     end

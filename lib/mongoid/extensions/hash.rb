@@ -224,7 +224,26 @@ module Mongoid
             # Need to use transform_values! which maintains the BSON::Document
             # instead of transform_values which always returns a hash. To do this,
             # we first need to dup the hash.
-            object.dup.transform_values!(&:mongoize)
+            evolve(object.dup).transform_values!(&:mongoize)
+          end
+        end
+
+        # Evolve the object when the serializer is defined as a hash.
+        #
+        # @example Evolve the object.
+        #   Hash.evolve([[:foo, :bar]])
+        #
+        # @param [ Object ] object The object to evolve.
+        #
+        # @return [ Object ] The evolved object.
+        def evolve(object)
+          return if object.nil?
+          if object.is_a?(::Hash)
+            object
+          elsif object.respond_to?(:to_h)
+            object.to_h
+          else
+            object
           end
         end
 

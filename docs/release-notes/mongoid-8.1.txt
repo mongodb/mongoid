@@ -116,3 +116,38 @@ from the ``_translations`` hash:
 
 See the section on :ref:`Localize :present Field Option <present-fields>` for
 more details on how these are used.
+
+
+Support for Assignment of Nested ``ActionController::Parameters``
+-----------------------------------------------------------------
+
+Prior to Mongoid 8.0, attempting to instantiate or assign nested
+``ActionController::Parameters`` to a document would raise a
+``MethodMissing`` error. The following now works as expected.
+
+.. code-block:: ruby
+
+  class Company
+    include Mongoid::Document
+
+    field :name, type: String, localized: true
+    field :data, type: Hash
+
+    has_many :shops
+    accepts_nested_attributes_for :shops
+  end
+
+  params = ActionController::Parameters.new({
+    name: { 'en' => 'ACME Co.' },
+    data: { key: [:value1, { key2: :value2 }] }
+    shops_attributes: { ... }
+  }).permit!
+
+  Company.new(params) #=> raises MethodMissing error prior to Mongoid 8.0
+
+If you are using the `Protected Attributes Continued gem
+<https://github.com/westonganger/protected_attributes_continued>`_
+to preserve legacy Rails 4 ``attr_accessible`` functionality, please note
+that it will only protect document root-level field assignment and will
+not protect ``accepts_nested_attributes_for`` nested assignment.
+Please use Strong Parameters (``permit!``, etc.) in this case.
