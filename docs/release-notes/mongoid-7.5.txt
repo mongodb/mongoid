@@ -26,6 +26,31 @@ Mongoid 8 will require Ruby 2.6 or newer, JRuby 9.3 or newer and Rails 5.2 or
 newer.
 
 
+Feature Flags Summary
+---------------------
+
+To ensure a stable upgrade path from Mongoid 7.4, Mongoid 7.5
+introduces feature flags which are further explained in the
+sections below.
+
+To enable all new behavior in Mongoid 7.5, please use the following
+:ref:`configuration options <configuration-options>` in your mongoid.yml file.
+We recommend newly created apps to do this as well.
+
+.. code-block:: yaml
+
+  development:
+    ...
+    options:
+      # Enable all new behavior in Mongoid 7.5
+      legacy_attributes: false
+      overwrite_chained_operators: false
+
+In addition, please refer to the release notes of earlier 7.x versions for
+feature flags introduced in each version. For clarity, Mongoid 7.5 does
+not switch the behavior of any previously introduced feature flag.
+
+
 Implemented ``Criteria#take/take!`` Method
 ------------------------------------------
 
