@@ -93,5 +93,19 @@ module Mongoid
         end
       end
     end
+
+    def with_default_i18n_configs
+      around do |ex|
+        I18n.locale = :en
+        I18n.default_locale = :en
+        I18n.fallbacks = []
+        I18n.enforce_available_locales = false
+        ex.run
+        I18n.locale = :en
+        I18n.default_locale = :en
+        I18n.fallbacks = []
+        I18n.enforce_available_locales = false
+      end
+    end
   end
 end

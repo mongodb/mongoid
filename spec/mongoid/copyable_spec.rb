@@ -164,6 +164,7 @@ describe Mongoid::Copyable do
       end
 
       context "when cloning a document with multiple languages field" do
+        with_default_i18n_configs
 
         before do
           I18n.enforce_available_locales = false
@@ -171,10 +172,6 @@ describe Mongoid::Copyable do
           person.desc = "descrição"
           person.addresses.first.name = "descrição"
           person.save!
-        end
-
-        after do
-          I18n.locale = :en
         end
 
         let!(:from_db) do
@@ -212,6 +209,7 @@ describe Mongoid::Copyable do
       end
 
       context "when cloning a document with polymorphic embedded documents with multiple language field" do
+        with_default_i18n_configs
 
         let!(:shipment_address) do
           person.addresses.build({ shipping_name: "Title" }, ShipmentAddress)
@@ -222,10 +220,6 @@ describe Mongoid::Copyable do
           I18n.locale = 'pt_BR'
           person.addresses.type(ShipmentAddress).each { |address| address.shipping_name = "Título" }
           person.save!
-        end
-
-        after do
-          I18n.locale = :en
         end
 
         let!(:from_db) do

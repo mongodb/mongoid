@@ -561,8 +561,9 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when getting a localized field" do
+      with_default_i18n_configs
+
       before do
-        I18n.locale = :en
         d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
@@ -661,12 +662,10 @@ describe Mongoid::Contextual::Mongo do
 
       context 'when fallbacks are enabled with a locale list' do
         with_i18n_fallbacks
+        with_default_i18n_configs
 
-        around(:all) do |example|
-          prev_fallbacks = I18n.fallbacks.dup
+        before(:all) do |example|
           I18n.fallbacks[:he] = [ :en ]
-          example.run
-          I18n.fallbacks = prev_fallbacks
         end
 
         let(:distinct) do
@@ -694,9 +693,10 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context "when the localized field is embedded" do
+        with_default_i18n_configs
+
         before do
           p = Passport.new
-          I18n.locale = :en
           p.name = "Neil"
           I18n.locale = :he
           p.name = "Nissim"
@@ -839,8 +839,9 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when tallying a localized field" do
+      with_default_i18n_configs
+
       before do
-        I18n.locale = :en
         d1 = Dictionary.create!(description: 'en1')
         d2 = Dictionary.create!(description: 'en1')
         d3 = Dictionary.create!(description: 'en1')
@@ -893,9 +894,9 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when tallying an embedded localized field" do
+      with_default_i18n_configs
 
       before do
-        I18n.locale = :en
         address1a = Address.new(name: "en1")
         address1b = Address.new(name: "en2")
         address2a = Address.new(name: "en1")

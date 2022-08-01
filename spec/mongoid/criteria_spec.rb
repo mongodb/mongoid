@@ -1953,17 +1953,13 @@ describe Mongoid::Criteria do
     end
 
     context 'when plucking a localized field' do
+      with_default_i18n_configs
 
       before do
-        I18n.locale = :en
         d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
         d.save!
-      end
-
-      after do
-        I18n.locale = :en
       end
 
       context 'when plucking the entire field' do
@@ -2061,11 +2057,8 @@ describe Mongoid::Criteria do
       context 'when fallbacks are enabled with a locale list' do
         with_i18n_fallbacks
 
-        around(:all) do |example|
-          prev_fallbacks = I18n.fallbacks.dup
+        before(:all) do
           I18n.fallbacks[:he] = [ :en ]
-          example.run
-          I18n.fallbacks = prev_fallbacks
         end
 
         let(:plucked) do
@@ -2093,9 +2086,10 @@ describe Mongoid::Criteria do
       end
 
       context "when the localized field is embedded" do
+        with_default_i18n_configs
+
         before do
           p = Passport.new
-          I18n.locale = :en
           p.name = "Neil"
           I18n.locale = :he
           p.name = "Nissim"

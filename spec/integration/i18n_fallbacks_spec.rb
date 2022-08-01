@@ -6,8 +6,9 @@ describe 'i18n fallbacks' do
   with_i18n_fallbacks
 
   context 'when fallbacks are enabled with a locale list' do
+    with_default_i18n_configs
+
     before do
-      I18n.default_locale = :en
       I18n.fallbacks[:de] = [ :en ]
     end
 
@@ -36,6 +37,7 @@ describe 'i18n fallbacks' do
     context 'when translation is missing in all locales' do
 
       context 'i18n >= 1.1' do
+        with_default_i18n_configs
 
         before(:all) do
           unless Gem::Version.new(I18n::VERSION) >= Gem::Version.new('1.1')
@@ -45,7 +47,6 @@ describe 'i18n fallbacks' do
 
         it 'returns nil' do
           product = Product.new
-          I18n.locale = :en
           product.description = "Marvelous!"
           I18n.locale = :ru
           product.description.should be nil
@@ -53,6 +54,7 @@ describe 'i18n fallbacks' do
       end
 
       context 'i18n 1.0' do
+        with_default_i18n_configs
 
         before(:all) do
           unless Gem::Version.new(I18n::VERSION) < Gem::Version.new('1.1')
@@ -62,7 +64,6 @@ describe 'i18n fallbacks' do
 
         it 'falls back on default locale' do
           product = Product.new
-          I18n.locale = :en
           product.description = "Marvelous!"
           I18n.locale = :ru
           product.description.should == 'Marvelous!'

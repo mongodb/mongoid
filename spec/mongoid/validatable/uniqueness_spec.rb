@@ -2476,11 +2476,10 @@ describe Mongoid::Validatable::UniquenessValidator do
   describe "i18n" do
 
     context 'when using a different locale' do
-      around do |example|
-        I18n.with_locale(:fr) { example.run }
-      end
+      with_default_i18n_configs
 
       before do
+        I18n.locale = :fr
         # Translation key location is as per rails-i18n gem.
         # See: https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/en.yml
         I18n.backend.store_translations(:fr, { errors: { messages: { taken: 'est déjà utilisé(e)' } } })

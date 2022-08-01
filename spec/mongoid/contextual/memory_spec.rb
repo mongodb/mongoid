@@ -522,16 +522,13 @@ describe Mongoid::Contextual::Memory do
       end
 
       context "when getting a localized field" do
+        with_default_i18n_configs
+
         before do
-          I18n.locale = :en
           d = Dictionary.create!(description: 'english-text')
           I18n.locale = :de
           d.description = 'deutsch-text'
           d.save!
-        end
-
-        after do
-          I18n.locale = :en
         end
 
         let(:criteria) do
@@ -577,16 +574,10 @@ describe Mongoid::Contextual::Memory do
 
         context 'when fallbacks are enabled with a locale list' do
           with_i18n_fallbacks
+          with_default_i18n_configs
 
-          around(:all) do |example|
-            prev_fallbacks = I18n.fallbacks.dup
+          before(:all) do |example|
             I18n.fallbacks[:he] = [ :en ]
-            example.run
-            I18n.fallbacks = prev_fallbacks
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:distinct) do
@@ -602,18 +593,15 @@ describe Mongoid::Contextual::Memory do
         end
 
         context "when the localized field is embedded" do
+          with_default_i18n_configs
+
           let(:person) do
             p = Passport.new
-            I18n.locale = :en
             p.name = "Neil"
             I18n.locale = :he
             p.name = "Nissim"
 
             Person.create!(passport: p, employer_id: 12345)
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:criteria) do
@@ -1697,17 +1685,13 @@ describe Mongoid::Contextual::Memory do
       end
 
       context 'when plucking a localized field' do
+        with_default_i18n_configs
 
         before do
-          I18n.locale = :en
           d = Dictionary.create!(description: 'english-text')
           I18n.locale = :de
           d.description = 'deutsch-text'
           d.save!
-        end
-
-        after do
-          I18n.locale = :en
         end
 
         let(:criteria) do
@@ -1767,16 +1751,10 @@ describe Mongoid::Contextual::Memory do
 
         context 'when fallbacks are enabled with a locale list' do
           with_i18n_fallbacks
+          with_default_i18n_configs
 
-          around(:all) do |example|
-            prev_fallbacks = I18n.fallbacks.dup
+          before(:all) do |example|
             I18n.fallbacks[:he] = [ :en ]
-            example.run
-            I18n.fallbacks = prev_fallbacks
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:plucked) do
@@ -1792,18 +1770,15 @@ describe Mongoid::Contextual::Memory do
         end
 
         context "when the localized field is embedded" do
+          with_default_i18n_configs
+
           before do
             p = Passport.new
-            I18n.locale = :en
             p.name = "Neil"
             I18n.locale = :he
             p.name = "Nissim"
 
             Person.create!(passport: p, employer_id: 12345)
-          end
-
-          after do
-            I18n.locale = :en
           end
 
           let(:plucked) do
@@ -2045,13 +2020,14 @@ describe Mongoid::Contextual::Memory do
     end
 
     context "when tallying a localized field" do
+      with_default_i18n_configs
+
       let(:d1) { Dictionary.new(description: 'en1') }
       let(:d2) { Dictionary.new(description: 'en1') }
       let(:d3) { Dictionary.new(description: 'en1') }
       let(:d4) { Dictionary.new(description: 'en2') }
 
       before do
-        I18n.locale = :en
         d1
         d2
         d3
@@ -2106,6 +2082,7 @@ describe Mongoid::Contextual::Memory do
     end
 
     context "when tallying an embedded localized field" do
+      with_default_i18n_configs
 
       let(:person1) { Person.create!(addresses: [ address1a, address1b ]) }
       let(:person2) { Person.create!(addresses: [ address2a, address2b ]) }
@@ -2116,7 +2093,6 @@ describe Mongoid::Contextual::Memory do
       let(:address2b) { Address.new(name: "en3") }
 
       before do
-        I18n.locale = :en
         address1a
         address1b
         address2a
