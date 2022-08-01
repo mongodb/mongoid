@@ -372,7 +372,7 @@ for details on driver options.
       # When this flag is true, the attributes method on a document will return
       # a BSON::Document when that document is retrieved from the database, and
       # a Hash otherwise. When this flag is false, the attributes method will
-      # always return a Hash. (default: false)
+      # always return a Hash. (default: true)
       #legacy_attributes: true
 
       # Maintain legacy behavior of pluck and distinct, which does not demongoize
