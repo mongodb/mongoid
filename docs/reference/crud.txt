@@ -320,15 +320,13 @@ Mongoid provides the following persistence-related attributes:
           person.persisted? # => true
 
 
-
 Atomic
 ------
 
-Although Mongoid performs atomic operations under the covers by default,
-there may be cases where you want to do this explicitly without persisting
-other fields. Mongoid provides support for all of these operations as well.
-When executing atomic operations via these methods, callbacks and validations
-are not invoked.
+Mongoid exposes :manual:`MongoDB update operators </reference/operator/update/>`
+as methods on Mongoid documents. When these methods are used, callbacks are
+not invoked and validations are not performed. The supported update operators
+are:
 
 .. list-table::
    :header-rows: 1
@@ -471,6 +469,12 @@ are not invoked.
         .. code-block:: ruby
 
           person.unset(:name)
+
+Note that, because these methods skip validations, it is possible to both
+save invalid documents into the database and end up with invalid documents
+in the application (which would subsequently fail to save via a ``save``
+call due to the failing validations).
+
 
 .. _atomic-operation-grouping:
 

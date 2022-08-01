@@ -69,7 +69,7 @@ Mongoid 8 by default (with this feature flag turned on), values assigned to
 fields of type ``BigDecimal`` are stored in the database as type
 ``BSON::Decimal128``. In Mongoid 7 and earlier, and in Mongoid 8 with this
 feature flag turned off, values assigned to fields of type ``BigDecimal`` are
-stored as Strings. See the section on :ref:`BigDecimal Fields <bigdecimal-fields>`
+stored as Strings. See the section on :ref:`BigDecimal Fields <field-type-big-decimal>`
 for more details.
 
 

@@ -28,17 +28,14 @@ Field type definitions determine how Mongoid behaves when constructing queries
 and retrieving/writing fields from/to the database. Specifically:
 
 1. When assigning values to fields at runtime, the values are converted to the
-specified type.
-
+   specified type.
 2. When persisting data to MongoDB, the data is sent in an appropriate
-type, permitting richer data manipulation within MongoDB or by other
-tools.
-
+   type, permitting richer data manipulation within MongoDB or by other
+   tools.
 3. When querying documents, query parameters are converted to the specified
-type before being sent to MongoDB.
-
+   type before being sent to MongoDB.
 4. When retrieving documents from the database, field values are converted
-to the specified type.
+   to the specified type.
 
 Changing the field definitions in a model class does not alter data already stored in
 MongoDB. To update type or contents of fields of existing documents,
@@ -63,25 +60,26 @@ on a person by using the ``field`` macro.
 The valid types for fields are as follows:
 
 - ``Array``
-- ``BigDecimal``
+- ``BSON::Binary``
+- :ref:`BigDecimal <field-type-big-decimal>`
 - ``Mongoid::Boolean``, which may be specified simply as ``Boolean`` in the
   scope of a class which included ``Mongoid::Document``.
-- ``Date``
-- ``DateTime``
+- :ref:`Date <field-type-date>`
+- :ref:`DateTime <field-type-date-time>`
 - ``Float``
-- ``Hash``
+- :ref:`Hash <field-type-hash>`
 - ``Integer``
+- :ref:`Object <untyped-fields>`
 - ``BSON::ObjectId``
-- ``BSON::Binary``
 - ``Range``
-- ``Regexp``
+- :ref:`Regexp <field-type-regexp>`
 - ``Set``
 - ``String``
-- ``Mongoid::StringifiedSymbol``, which may be specified simply as
-  ``StringifiedSymbol`` in the scope of a class which included
-  ``Mongoid::Document``.
-- ``Symbol``
-- ``Time``
+- :ref:`Mongoid::StringifiedSymbol <field-type-stringified-symbol>`,
+  which may be specified simply as ``StringifiedSymbol`` in the scope of a
+  class which included ``Mongoid::Document``.
+- :ref:`Symbol <field-type-stringified-symbol>`
+- :ref:`Time <field-type-time>`
 - ``ActiveSupport::TimeWithZone``
 
 Mongoid also recognizes the string ``"Boolean"`` as an alias for the
@@ -97,34 +95,60 @@ To define custom field types, refer to :ref:`Custom Field Types <custom-field-ty
   ``BSON::Decimal128`` will return values of type ``BSON::Decimal128`` in
   BSON <=4 and values of type ``BigDecimal`` in BSON 5+.
 
-.. _omitting-field-type-definition:
 
-Omitting Field Type Definition
-------------------------------
+.. _untyped-fields:
 
-If you decide not to specify the type of field with the definition, Mongoid will treat
-it as an object and not try to typecast it when sending the values to the database.
-This can be advantageous as the lack of attempted conversion will yield a slight
-performance gain. However some types are not supported if not defined as fields.
-You can safely omit type specifications when:
+Untyped Fields
+--------------
 
-- You're not using a web front end and values are already properly cast.
-- All of your fields are strings.
+Not specifying a type for a field is the same as specifying the ``Object``
+type. Such fields are untyped:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :first_name
-     field :middle_name
-     field :last_name
-   end
+  class Product
+    include Mongoid::Document
+     
+    field :properties
+    # Equivalent to:
+    field :properties, type: Object
+  end
 
-Types that are not supported as dynamic attributes since they cannot be cast are:
+An untyped field can store values of any type which is directly serializable
+to BSON. This is useful when a field may contain values of different types
+(i.e. it is a variant type field), or when the type of values is not known
+ahead of time:
 
-- ``Date``
-- ``DateTime``
-- ``Range``
+.. code-block:: ruby
+
+  product = Product.new(properties: "color=white,size=large")
+  product.properties
+  # => "color=white,size=large"
+  
+  product = Product.new(properties: {color: "white", size: "large"})
+  product.properties
+  # => {:color=>"white", :size=>"large"}
+
+When values are assigned to the field, Mongoid still performs mongoization but
+uses the class of the value rather than the field type for mongoization logic.
+
+.. code-block:: ruby
+
+  product = Product.new(properties: 0..10)
+  product.properties
+  # The range 0..10, mongoized:
+  # => {"min"=>0, "max"=>10}
+
+When reading data from the database, Mongoid does not perform any type
+conversions on untyped fields. For this reason, even though it is possible
+to write any BSON-serializable value into an untyped fields, values which
+require special handling on the database reading side will generally not work
+correctly in an untyped field. Among field types supported by Mongoid,
+values of the following types should not be stored in untyped fields:
+
+- ``Date`` (values will be returned as ``Time``)
+- ``DateTime`` (values will be returned as ``Time``)
+- ``Range`` (values will be returned as ``Hash``)
 
 
 .. _field-type-stringified-symbol:
@@ -447,7 +471,7 @@ matches strings containing "hello" before a newline, besides strings ending in
 This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
 
-.. _bigdecimal-fields:
+.. _field-type-big-decimal:
 
 BigDecimal Fields
 -----------------
