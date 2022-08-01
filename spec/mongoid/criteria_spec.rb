@@ -3126,6 +3126,19 @@ describe Mongoid::Criteria do
         end
       end
     end
+
+    context "when searching for a regex on a symbol field" do
+      let!(:person) { Person.create!(species: :hello)}
+      let(:criteria) { Person.where(species: /ell/) }
+
+      it "creates the correct criteria" do
+        expect(criteria.selector).to eq({ "species" => /ell/ })
+      end
+
+      it "finds the document" do
+        expect(criteria.first).to eq(person)
+      end
+    end
   end
 
   describe "#for_js" do
