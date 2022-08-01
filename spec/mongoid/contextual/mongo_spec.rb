@@ -664,7 +664,7 @@ describe Mongoid::Contextual::Mongo do
         with_i18n_fallbacks
         with_default_i18n_configs
 
-        before(:all) do |example|
+        before do
           I18n.fallbacks[:he] = [ :en ]
         end
 

@@ -2057,7 +2057,7 @@ describe Mongoid::Criteria do
       context 'when fallbacks are enabled with a locale list' do
         with_i18n_fallbacks
 
-        before(:all) do
+        before do
           I18n.fallbacks[:he] = [ :en ]
         end
 

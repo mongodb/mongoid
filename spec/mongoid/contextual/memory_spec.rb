@@ -576,7 +576,7 @@ describe Mongoid::Contextual::Memory do
           with_i18n_fallbacks
           with_default_i18n_configs
 
-          before(:all) do |example|
+          before do
             I18n.fallbacks[:he] = [ :en ]
           end
 
@@ -1753,7 +1753,7 @@ describe Mongoid::Contextual::Memory do
           with_i18n_fallbacks
           with_default_i18n_configs
 
-          before(:all) do |example|
+          before do
             I18n.fallbacks[:he] = [ :en ]
           end
 
