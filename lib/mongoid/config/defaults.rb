@@ -40,11 +40,11 @@ module Mongoid
         when "7.4"
           # flags introduced in 7.5 - old functionality
           self.overwrite_chained_operators = true
+          self.legacy_attributes = true
 
           load_defaults "7.5"
         when "7.5"
           # flags introduced in 8.0 - old functionality
-          self.legacy_attributes = true
           self.map_big_decimal_to_decimal128 = false
         when "8.0"
           # All flag defaults currently reflect 8.0 behavior.
