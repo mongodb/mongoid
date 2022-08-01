@@ -167,7 +167,6 @@ describe Mongoid::Copyable do
         with_default_i18n_configs
 
         before do
-          I18n.enforce_available_locales = false
           I18n.locale = 'pt_BR'
           person.desc = "descrição"
           person.addresses.first.name = "descrição"
@@ -216,7 +215,6 @@ describe Mongoid::Copyable do
         end
 
         before do
-          I18n.enforce_available_locales = false
           I18n.locale = 'pt_BR'
           person.addresses.type(ShipmentAddress).each { |address| address.shipping_name = "Título" }
           person.save!

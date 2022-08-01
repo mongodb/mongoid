@@ -18,7 +18,6 @@ describe Mongoid::Fields do
 
         before do
           product.description = "test"
-          I18n.enforce_available_locales = false
           ::I18n.locale = :de
           product.description = "The best"
         end
