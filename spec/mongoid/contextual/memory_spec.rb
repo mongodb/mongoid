@@ -1766,7 +1766,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         context 'when fallbacks are enabled with a locale list' do
-          require_fallbacks
+          with_i18n_fallbacks
 
           around(:all) do |example|
             prev_fallbacks = I18n.fallbacks.dup
