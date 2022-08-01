@@ -120,7 +120,7 @@ module Mongoid
     # a BSON::Document when that document is retrieved from the database, and
     # a Hash otherwise. When this flag is false, the attributes method will
     # always return a Hash.
-    option :legacy_attributes, default: false
+    option :legacy_attributes, default: true
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
