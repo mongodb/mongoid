@@ -207,13 +207,13 @@ describe Mongoid::Changeable do
 
         it "returns an array of the original value and new value" do
           expect(person.send(:attribute_change, "map")).to eq(
-            [{ location: "Home" }, { location: "Work" }]
+            [{ "location" => "Home" }, { "location" => "Work" }]
           )
         end
 
         it "allows access via (attribute)_change" do
           expect(person.map_change).to eq(
-            [{ location: "Home" }, { location: "Work" }]
+            [{ "location" => "Home" }, { "location" => "Work" }]
           )
         end
 
@@ -225,7 +225,7 @@ describe Mongoid::Changeable do
 
           it "returns an array of the original value and new value" do
             expect(person.send(:attribute_change, "map")).to eq(
-              [{ location: "Home" }, { location: "Work", lat: 20.0 }]
+              [{ "location" => "Home" }, { "location" => "Work", "lat" => 20.0 }]
             )
           end
         end
