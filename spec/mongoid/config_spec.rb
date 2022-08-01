@@ -337,7 +337,7 @@ describe Mongoid::Config do
 
   context 'when setting the legacy_attributes option in the config' do
     let(:option) { :legacy_attributes }
-    let(:default) { false }
+    let(:default) { true }
 
     it_behaves_like "a config option"
   end
