@@ -597,6 +597,7 @@ describe Mongoid::Contextual::Memory do
 
           let(:person) do
             p = Passport.new
+            I18n.locale = :en
             p.name = "Neil"
             I18n.locale = :he
             p.name = "Nissim"
@@ -1774,6 +1775,7 @@ describe Mongoid::Contextual::Memory do
 
           before do
             p = Passport.new
+            I18n.locale = :en
             p.name = "Neil"
             I18n.locale = :he
             p.name = "Nissim"

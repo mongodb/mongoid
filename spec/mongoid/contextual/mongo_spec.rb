@@ -697,6 +697,7 @@ describe Mongoid::Contextual::Mongo do
 
         before do
           p = Passport.new
+          I18n.locale = :en
           p.name = "Neil"
           I18n.locale = :he
           p.name = "Nissim"
