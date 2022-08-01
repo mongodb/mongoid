@@ -576,7 +576,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         context 'when fallbacks are enabled with a locale list' do
-          require_fallbacks
+          with_i18n_fallbacks
 
           around(:all) do |example|
             prev_fallbacks = I18n.fallbacks.dup
@@ -595,7 +595,7 @@ describe Mongoid::Contextual::Memory do
 
           it "correctly uses the fallback" do
             I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
+            Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             distinct.should == "english-text"
           end
@@ -1785,7 +1785,7 @@ describe Mongoid::Contextual::Memory do
 
           it "correctly uses the fallback" do
             I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
+            Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             plucked.should == "english-text"
           end
@@ -2128,7 +2128,6 @@ describe Mongoid::Contextual::Memory do
         address2b.name = "de3"
         person1
         person2
-
         I18n.locale = :en
       end
 

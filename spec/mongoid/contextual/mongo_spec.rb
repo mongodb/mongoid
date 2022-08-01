@@ -686,7 +686,7 @@ describe Mongoid::Contextual::Mongo do
 
           it "correctly uses the fallback" do
             I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
+            Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             distinct.should == "english-text"
           end
@@ -854,7 +854,6 @@ describe Mongoid::Contextual::Mongo do
         d2.save!
         d3.save!
         d4.save!
-
         I18n.locale = :en
       end
 
@@ -908,7 +907,6 @@ describe Mongoid::Contextual::Mongo do
         address2b.name = "de3"
         Person.create!(addresses: [ address1a, address1b ])
         Person.create!(addresses: [ address2a, address2b ])
-
         I18n.locale = :en
       end
 
