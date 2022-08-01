@@ -18,9 +18,14 @@ describe 'i18n fallbacks' do
   end
 
   context 'when fallbacks are enabled with a locale list' do
-    before do
+    around do |example|
+      prev_fallbacks = I18n.fallbacks.dup
+      prev_default = I18n.default_locale
       I18n.default_locale = :en
       I18n.fallbacks[:de] = [ :en ]
+      example.run
+      I18n.fallbacks = prev_fallbacks
+      I18n.default_locale = prev_default
     end
 
     context 'when translation is present in active locale' do
@@ -55,6 +60,10 @@ describe 'i18n fallbacks' do
           unless Gem::Version.new(I18n::VERSION) >= Gem::Version.new('1.1')
             skip "Test requires i18n >= 1.1, we have #{I18n::VERSION}"
           end
+        end
+
+        after do
+          I18n.locale = :en
         end
 
         it 'returns nil' do
