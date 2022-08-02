@@ -205,7 +205,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
       context "when passing in a bogus value" do
         let(:arg) { "bogus" }
 
-        it "returns nil" do
+        it "returns the original value" do
           expect(evolved).to eq(arg)
         end
       end
