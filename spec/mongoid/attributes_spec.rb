@@ -1675,6 +1675,50 @@ describe Mongoid::Attributes do
         end
       end
     end
+
+    context "when comparing the object_ids of the written value" do
+      config_override :legacy_attributes, false
+
+      before do
+        Person.create!
+      end
+
+      let(:person) do
+        Person.first
+      end
+
+      context "when the field is not resizable" do
+        let(:test) do
+          person.write_attribute(:test, "aliased field to test")
+        end
+
+        it "has the same object_id as the attributes hash value" do
+          expect(test.object_id).to eq(person.test.object_id)
+        end
+      end
+
+      context "when the field is resizable" do
+
+        let(:arrays) do
+          person.write_attribute(:arrays, [])
+        end
+
+        it "has the same object_id as the attributes hash value" do
+          expect(arrays.object_id).to eq(person.arrays.object_id)
+        end
+      end
+
+      context "when the field is a HABTM foreign key array" do
+
+        let(:preference_ids) do
+          person.write_attribute(:preference_ids, [])
+        end
+
+        it "has the same object_id as the attributes hash value" do
+          expect(preference_ids.object_id).to eq(person.preference_ids.object_id)
+        end
+      end
+    end
   end
 
   describe "#typed_value_for" do

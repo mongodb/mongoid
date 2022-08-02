@@ -277,8 +277,15 @@ module Mongoid
       #   criteria.
       #
       # @return [ Document ] A new document.
+      #
+      # @api private
       def instantiate(attrs = nil, selected_fields = nil)
-        attributes = attrs || {}
+        attributes = if Mongoid.legacy_attributes
+          attrs
+        else
+          attrs&.to_h
+        end || {}
+
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)

@@ -4089,4 +4089,24 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       expect(band.same_name).to eq([agent])
     end
   end
+
+  context "when executing concat on foreign key array from the db" do
+    config_override :legacy_attributes, false
+
+    before do
+      Agent.create!
+      Basic.create!
+    end
+
+    let!(:agent) { Agent.first }
+    let!(:basic) { Basic.first }
+
+    before do
+      agent.basic_ids.concat([basic.id])
+    end
+
+    it "works on the first attempt" do
+      expect(agent.basic_ids).to eq([basic.id])
+    end
+  end
 end

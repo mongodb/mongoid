@@ -116,6 +116,12 @@ module Mongoid
     # using and's instead of overwriting them.
     option :overwrite_chained_operators, default: true
 
+    # When this flag is true, the attributes method on a document will return
+    # a BSON::Document when that document is retrieved from the database, and
+    # a Hash otherwise. When this flag is false, the attributes method will
+    # always return a Hash.
+    option :legacy_attributes, default: true
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
