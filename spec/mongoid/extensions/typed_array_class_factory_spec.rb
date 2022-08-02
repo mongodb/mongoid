@@ -220,12 +220,6 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         it "has the correct type" do
           expect(evolved.class).to eq(Array)
         end
-
-        it "doesn't evolve the values again" do
-          arg
-          expect(String).to receive(:evolve).never
-          evolved
-        end
       end
 
       context "when passing in a Mongoid::IntegerArray" do

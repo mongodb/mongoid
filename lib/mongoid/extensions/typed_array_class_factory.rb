@@ -69,7 +69,7 @@ module Mongoid
               def evolve(object)
                 case object
                 when Array, Set
-                  object.map { |x| const_get("Type").mongoize(x) }
+                  object.map { |x| const_get("Type").evolve(x) }
                 else
                   object
                 end
