@@ -505,15 +505,15 @@ the user to use their typed arrays like ordinary arrays, and have their values
 ``mongoized`` under the hood. The ``TypedArray`` class overrides the following
 methods:
 
-- <<
-- push
-- append
-- unshift
-- prepend
-- insert
-- fill
-- replace
-- concat
+- ``<<``
+- ``push``
+- ``append``
+- ``unshift``
+- ``prepend``
+- ``insert``
+- ``fill``
+- ``replace``
+- ``concat``
 
 The ``Mongoid::TypedArray`` class also differs from ``Array`` in that its
 constructor takes in a type as well as the normal ``Array#new`` parameters.
@@ -528,22 +528,32 @@ Here's an example of using typed array fields:
 
   > band = Band.new(members: [ 1, 2, 3 ])
   # => #<Band _id: 62e1c39e3282a40b321f8e8e, members: ["1", "2", "3"]>
-  > band.members
+  > string_array = band.members
   # => ["1", "2", "3"]
-  > band.members.push(4)
-  # => ["1", "2", "3", "4"]
-  > band.members.unshift(true)
-  # => ["true", "1", "2", "3", "4"]
-  > band.members.fill(3) { |i| i * i }
-  # => ["true", "1", "2", "9", "16"]
-  > band.members.class
+  > string_array.class
   # => Mongoid::StringArray
+  > string_array.push(4)
+  # => ["1", "2", "3", "4"]
+  > string_array.unshift(true)
+  # => ["true", "1", "2", "3", "4"]
+  > string_array.fill(3) { |i| i * i }
+  # => ["true", "1", "2", "9", "16"]
+  > string_array.class
+  # => Mongoid::StringArray
+  > band.members = string_array
+  # => ["true", "1", "2", "9", "16"]
   > band.save
   # => true
   > band.reload
   # => #<Band _id: 62e1c3603282a40b321f8e8e, members: ["true", "1", "2", "9", "16"]>
   > band.members.class
   # => Mongoid::StringArray
+
+.. note::
+
+  Note that until `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_
+  is resolved, typed array fields, as well as fields of all container types,
+  must be assigned to for their values to be persisted to the database.
 
 
 .. _field-type-big-decimal:

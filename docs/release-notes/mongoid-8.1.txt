@@ -389,9 +389,11 @@ code:: ruby
   end
 
   band = Band.new(members: [ 1, 2, 3 ])
-  band.members
+  string_array = band.members
   # => [ "1", "2", "3" ]
-  band.members.push(4)
+  string_array.push(4)
+  # => [ "1", "2", "3", "4" ]
+  band.members = string_array
   # => [ "1", "2", "3", "4" ]
   band.members.class
   # => Mongoid::StringArray
