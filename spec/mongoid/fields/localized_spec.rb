@@ -113,6 +113,18 @@ describe Mongoid::Fields::Localized do
           end
         end
 
+
+        context "passing a bogus value" do
+
+          let(:value) do
+            field.demongoize("bogus")
+          end
+
+          it "returns nil" do
+            expect(value).to be_nil
+          end
+        end
+
         context "when the value does not exist" do
 
           context "when not using fallbacks" do
