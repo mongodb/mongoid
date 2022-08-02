@@ -1593,8 +1593,8 @@ describe Mongoid::Attributes do
         expect(person.map).to be_nil
       end
 
-      it "can set a Hash value" do
-        expect(person.map).to eq( { somekey: "somevalue" } )
+      it "can set a Hash value with stringified keys" do
+        expect(person.map).to eq( { "somekey" => "somevalue" } )
       end
     end
 

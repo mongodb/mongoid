@@ -893,6 +893,34 @@ describe Mongoid::Fields do
         expect(product.attributes_before_type_cast["price"]).to eq(1)
       end
     end
+
+    context "when assigning a hash" do
+      let(:person) { Person.create!(map: { x: 1 }) }
+
+      it "is a BSON::Document" do
+        expect(person.map).to be_a(BSON::Document)
+      end
+
+      it "has the correct contents" do
+        expect(person.map).to eq({ "x" => 1 })
+      end
+    end
+
+    context "when loading a hash from the db" do
+      before do
+        Person.create!(map: { x: 1 })
+      end
+
+      let(:person) { Person.first }
+
+      it "is a BSON::Document" do
+        expect(person.map).to be_a(BSON::Document)
+      end
+
+      it "has the correct contents" do
+        expect(person.map).to eq({ "x" => 1 })
+      end
+    end
   end
 
   describe "#defaults" do
