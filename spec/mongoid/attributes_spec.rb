@@ -2718,6 +2718,7 @@ describe Mongoid::Attributes do
     end
 
     it "persists the updated hash" do
+      pending "MONGOID-2951"
       band.mates.should == [ "John", "Paul", "George", "Ringo" ]
     end
   end
