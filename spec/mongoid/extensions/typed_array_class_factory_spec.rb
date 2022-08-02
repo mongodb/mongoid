@@ -58,7 +58,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(mongoized.class).to eq(Mongoid::StringArray)
+          expect(mongoized.class).to eq(Array)
         end
       end
 
@@ -70,7 +70,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(mongoized.class).to eq(Mongoid::StringArray)
+          expect(mongoized.class).to eq(Array)
         end
       end
 
@@ -90,13 +90,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(mongoized.class).to eq(Mongoid::StringArray)
-        end
-
-        it "doesn't mongoize the values again" do
-          arg
-          expect(String).to receive(:mongoize).never
-          mongoized
+          expect(mongoized.class).to eq(Array)
         end
       end
 
@@ -108,7 +102,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(mongoized.class).to eq(Mongoid::StringArray)
+          expect(mongoized.class).to eq(Array)
         end
       end
     end
@@ -192,7 +186,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(evolved.class).to eq(Mongoid::StringArray)
+          expect(evolved.class).to eq(Array)
         end
       end
 
@@ -204,7 +198,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(evolved.class).to eq(Mongoid::StringArray)
+          expect(evolved.class).to eq(Array)
         end
       end
 
@@ -224,7 +218,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(evolved.class).to eq(Mongoid::StringArray)
+          expect(evolved.class).to eq(Array)
         end
 
         it "doesn't evolve the values again" do
@@ -242,7 +236,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "has the correct type" do
-          expect(evolved.class).to eq(Mongoid::StringArray)
+          expect(evolved.class).to eq(Array)
         end
       end
     end
@@ -268,7 +262,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "mongoizes to an array in the attributes hash" do
-          expect(band.attributes["mate_ids"].class).to eq(Mongoid::IntegerArray)
+          expect(band.attributes["mate_ids"].class).to eq(Array)
         end
       end
 
@@ -293,7 +287,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "mongoizes to an array in the attributes hash" do
-          expect(from_db.attributes["mate_ids"].class).to eq(Mongoid::IntegerArray)
+          expect(from_db.attributes["mate_ids"].class).to eq(Array)
         end
       end
 
@@ -314,7 +308,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "demongoizes to a hash" do
-          expect(band.range_array).to eq([ { "min" => 1, "max" => 3 } ])
+          expect(band.range_array).to eq([ 1..3 ])
         end
 
         it "is stored as a hash in the database" do
@@ -322,7 +316,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "demongoizes to a hash from the database" do
-          expect(from_db.range_array).to eq([ { "min" => 1, "max" => 3 } ])
+          expect(from_db.range_array).to eq([ 1..3 ])
         end
       end
 
@@ -335,6 +329,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
         end
 
         it "adds the element to the array" do
+          pending "MONGOID-2951"
           expect(band.mates).to eq([ "1", "2", "3", "4" ])
         end
       end

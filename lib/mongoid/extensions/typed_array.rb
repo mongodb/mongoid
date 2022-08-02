@@ -8,7 +8,7 @@ module Mongoid
     # @return [ Class ] The inner class of the array.
     attr_reader :element_klass
 
-    # Initialize a typed array. Sets the element klass and mongoizes all of the
+    # Initialize a typed array. Sets the element klass and demongoizes all of the
     # elements in the given array.
     #
     # @param [ Class ] type The inner type of the array.
@@ -19,30 +19,30 @@ module Mongoid
       # There are a few ways to instantiate an array:
       #
       # - Array.new(4) { |i| i * i } # => [ 0, 1, 4, 9 ]
-      #   In this case we can't mongoize the inputs since the values are
+      #   In this case we can't demongoize the inputs since the values are
       #   calculated inside Array's constructor. Instead we can map over the
       #   results.
       # - Array.new([ 1, 2, 3 ]) # => [ 1, 2, 3 ]
-      #   Map over and mongoize the input and pass it into the constructor.
+      #   Map over and demongoize the input and pass it into the constructor.
       # - Array(3, "value") # => [ "value", "value", "value" ]
-      #   Mongoize the default value and pass it into the constructor.
+      #   Demongoize the default value and pass it into the constructor.
       # - Else, we are either instantiating an empty array or raising an error.
       #
       # Now, we could just do what we do for case 1 for all cases, but this
       # would be very inefficient in case 3, since we could be mapping over a
-      # large array instead of just mongoizing one value.
+      # large array instead of just demongoizing one value.
       if block_given?
-        super(*args, &block).map! { |x| type.mongoize(x) }
+        super(*args, &block).map! { |x| type.demongoize(x) }
       elsif args.length == 1 && args.first.is_a?(Array)
-        super(args.first.map { |x| type.mongoize(x) })
+        super(args.first.map { |x| type.demongoize(x) })
       elsif args.length == 2
-        super(args.first, type.mongoize(args[1]))
+        super(args.first, type.demongoize(args[1]))
       else
         super(*args, &block)
       end
     end
 
-    # Append an item to the Array. The item will be mongoized into the
+    # Append an item to the Array. The item will be demongoized into the
     # TypedArray's inner type.
     #
     # @example Append the item.
@@ -52,10 +52,10 @@ module Mongoid
     #
     # @return [ Array ] The resulting array.
     def <<(arg)
-      super(element_klass.mongoize(arg))
+      super(element_klass.demongoize(arg))
     end
 
-    # Push item(s) to the Array. The item will be mongoized into the
+    # Push item(s) to the Array. The item will be demongoized into the
     # TypedArray's inner type.
     #
     # @example Push the item.
@@ -65,11 +65,11 @@ module Mongoid
     #
     # @return [ Array ] The resulting array.
     def push(*args)
-      super(*mongoize_with_array(args))
+      super(*demongoize_with_array(args))
     end
     alias :append :push
 
-    # Prepend item(s) to the Array. The item will be mongoized into the
+    # Prepend item(s) to the Array. The item will be demongoized into the
     # TypedArray's inner type.
     #
     # @example Prepend the item.
@@ -79,11 +79,11 @@ module Mongoid
     #
     # @return [ Array ] The resulting array.
     def unshift(*args)
-      super(*mongoize_with_array(args))
+      super(*demongoize_with_array(args))
     end
     alias :prepend :unshift
 
-    # Insert item(s) into the Array. The item will be mongoized into the
+    # Insert item(s) into the Array. The item will be demongoized into the
     # TypedArray's inner type.
     #
     # @example Insert an item.
@@ -94,10 +94,10 @@ module Mongoid
     # @return [ Array ] The resulting array.
     def insert(*args)
       return super if args.length == 0
-      super(args.first, *mongoize_with_array(args[1, args.length-1]))
+      super(args.first, *demongoize_with_array(args[1, args.length-1]))
     end
 
-    # Fill the Array with item(s). The item will be mongoized into the
+    # Fill the Array with item(s). The item will be demongoized into the
     # TypedArray's inner type.
     #
     # @example Fill the array.
@@ -113,9 +113,9 @@ module Mongoid
       return super if args.length == 0
 
       if block_given?
-        super.map! { |x| element_klass.mongoize(x) }
+        super.map! { |x| element_klass.demongoize(x) }
       else
-        super(element_klass.mongoize(args.first), *args[1, args.length-1])
+        super(element_klass.demongoize(args.first), *args[1, args.length-1])
       end
     end
 
@@ -128,7 +128,7 @@ module Mongoid
     #
     # @return [ Array ] The resulting array.
     def replace(arg)
-      super(mongoize_only_array(arg))
+      super(demongoize_only_array(arg))
     end
 
     # Concat the given arrays with this array.
@@ -140,7 +140,7 @@ module Mongoid
     #
     # @return [ Array ] The resulting array.
     def concat(*args)
-      super(*args.map(&method(:mongoize_only_array)))
+      super(*args.map(&method(:demongoize_only_array)))
     end
 
     # Set the element as the given index.
@@ -149,28 +149,28 @@ module Mongoid
     #
     # @return [ Object ] The assigned value.
     def []=(*args)
-      super(*mongoize_bracket_args(args))
+      super(*demongoize_bracket_args(args))
     end
 
     private
 
     # Given a type and an array, return a new array with all of the elements
-    # mongoized with the given type.
+    # demongoized with the given type.
     #
-    # @param [ Class ] type The type to use for mongoization.
-    # @param [ Array ] array The array to mongoize.
+    # @param [ Class ] type The type to use for demongoization.
+    # @param [ Array ] array The array to demongoize.
     #
-    # @return [ Array ] The mongoized array.
+    # @return [ Array ] The demongoized array.
     #
     # @api private
-    def mongoize_with_type(type, array)
+    def demongoize_with_type(type, array)
       case array
       when ::Array, ::Set
-        array.map { |o| type.mongoize(o) }
+        array.map { |o| type.demongoize(o) }
       end
     end
 
-    # Given the arguments to the Array#[]= mongoize the correct argument to
+    # Given the arguments to the Array#[]= demongoize the correct argument to
     # the TypedArray's inner type.
     #
     # There are three types of arguments to that method:
@@ -179,58 +179,58 @@ module Mongoid
     #   2. array[start..end] = object or [ object ]
     #   3. array[start, end] = object or [ object ]
     #
-    # In each case we want to mongoize only the last argument, however,
+    # In each case we want to demongoize only the last argument, however,
     # depending on the first one or two arguments, we may want to map over an
-    # array and mongoize each inner element, rather than mongoizing the array
+    # array and demongoize each inner element, rather than demongoizing the array
     # itself.
     #
     # @param [ Array ] args The arguments to []=.
     #
-    # @return [ Array ] The arguments with the correct argument mongoized.
+    # @return [ Array ] The arguments with the correct argument demongoized.
     #
     # @api private
-    def mongoize_bracket_args(args)
+    def demongoize_bracket_args(args)
       args = args.dup
       if args.length == 2
         last = args.last
         args[-1] = if args.first.is_a?(Range)
-          mongoize_with_array(last)
+          demongoize_with_array(last)
         else
-          element_klass.mongoize(last)
+          element_klass.demongoize(last)
         end
       elsif args.length == 3
-        args[-1] = mongoize_with_array(args.last)
+        args[-1] = demongoize_with_array(args.last)
       end
       args
     end
 
-    # If the given object is an array, mongoize each element in the array,
-    # if it isn't mongoize the individual element.
+    # If the given object is an array, demongoize each element in the array,
+    # if it isn't demongoize the individual element.
     #
-    # @param [ Array | Object ] object The object to be mongoized.
+    # @param [ Array | Object ] object The object to be demongoized.
     #
-    # @return [ Array | Object ] The mongoized object.
+    # @return [ Array | Object ] The demongoized object.
     #
     # @api private
-    def mongoize_with_array(object)
+    def demongoize_with_array(object)
       if object.is_a?(Array)
-        object.map { |x| element_klass.mongoize(x) }
+        object.map { |x| element_klass.demongoize(x) }
       else
-        element_klass.mongoize(object)
+        element_klass.demongoize(object)
       end
     end
 
-    # If the given object is an array, mongoize each element in the array,
+    # If the given object is an array, demongoize each element in the array,
     # if it isn't, return the individual element.
     #
-    # @param [ Array | Object ] object The object to be mongoized.
+    # @param [ Array | Object ] object The object to be demongoized.
     #
-    # @return [ Array | Object ] The mongoized object or the given object.
+    # @return [ Array | Object ] The demongoized object or the given object.
     #
     # @api private
-    def mongoize_only_array(object)
+    def demongoize_only_array(object)
       if object.is_a?(Array)
-        object.map { |x| element_klass.mongoize(x) }
+        object.map { |x| element_klass.demongoize(x) }
       else
         object
       end

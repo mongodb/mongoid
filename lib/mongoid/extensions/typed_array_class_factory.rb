@@ -44,15 +44,20 @@ module Mongoid
         # @api private
         def typed_array_class(type)
           Class.new(Mongoid::TypedArray) do
-            attr_reader :type
-
             def initialize(*args, &block)
-              @type = self.class.const_get("Type")
-              super(@type, *args, &block)
+              super(self.class.const_get("Type"), *args, &block)
             end
 
             class << self
               def mongoize(object)
+                return if object.nil?
+                case object
+                when Array, Set
+                  object.map { |x| const_get("Type").mongoize(x) }
+                end
+              end
+
+              def demongoize(object)
                 return if object.nil?
                 case object
                 when self then object
@@ -60,13 +65,11 @@ module Mongoid
                   new(object.to_a)
                 end
               end
-              alias :demongoize :mongoize
 
               def evolve(object)
                 case object
-                when self then object
                 when Array, Set
-                  new(object.to_a)
+                  object.map { |x| const_get("Type").mongoize(x) }
                 else
                   object
                 end
