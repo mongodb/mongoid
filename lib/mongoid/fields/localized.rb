@@ -15,10 +15,7 @@ module Mongoid
       # @return [ Object ] The value for the current locale.
       def demongoize(object)
         return if object.nil?
-        case object
-        when Hash
-          type.demongoize(lookup(object))
-        end
+        type.demongoize(lookup(object))
       end
 
       # Is the field localized or not?
