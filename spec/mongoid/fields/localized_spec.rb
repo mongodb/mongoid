@@ -102,6 +102,17 @@ describe Mongoid::Fields::Localized do
           end
         end
 
+        context "when key is a symbol" do
+
+          let(:value) do
+            field.demongoize({ :de => "This is a test" })
+          end
+
+          it "returns the string from the set locale" do
+            expect(value).to eq("This is a test")
+          end
+        end
+
         context "when the value does not exist" do
 
           context "when not using fallbacks" do
@@ -132,6 +143,17 @@ describe Mongoid::Fields::Localized do
 
                 let(:value) do
                   field.demongoize({ "en" => "testing" })
+                end
+
+                it "returns the fallback translation" do
+                  expect(value).to eq("testing")
+                end
+              end
+
+              context "when the fallback translation exists and is a symbol" do
+
+                let(:value) do
+                  field.demongoize({ :es => "testing" })
                 end
 
                 it "returns the fallback translation" do
