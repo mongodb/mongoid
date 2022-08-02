@@ -478,7 +478,7 @@ Field Type: Typed Arrays
 ------------------------
 
 Mongoid supports declaring a typed array field on models. This field will
-enforce the type of the elements in the array by ``mongoizing`` each element
+enforce the type of the elements in the array by ``demongoizing`` each element
 inserted into the array. To make a typed array field:
 
 .. code:: ruby
@@ -489,21 +489,23 @@ inserted into the array. To make a typed array field:
   end
 
 The members field on the Band class will have class ``Mongoid::StringArray``.
-When an array is assigned to the members field, it is ``mongoized`` to a
-``Mongoid::StringArray`` value, and its elements are ``mongoized`` to Strings.
-When subsequently appending to this array, the appended elements will also be
-mongoized to Strings.
+When an array is assigned to the members field, all of its elements are
+``mongoized`` to Strings. When retrieving the array from the members field, the
+array is ``demongoized`` into a ``Mongoid::StringArray`` and all of its
+elements are ``demongoized`` as well. When subsequently appending to this array,
+the appended elements will also be ``demongoized`` to Strings.
 
 When a typed array field is declared, Mongoid will create a custom class for
-the type: ``Mongoid::<Type>Array``. This class overrides the ``mongoize`` and
-``demongoize`` methods to convert the elements in the array to the array's inner
-type. This class inherits from the ``Mongoid::TypedArray`` class.
+the type: ``Mongoid::<Type>Array``. This class overrides the ``mongoize``,
+``demongoize`` and ``evolve`` methods to convert the elements in the array to
+the array's inner type. This class inherits from the ``Mongoid::TypedArray``
+class.
 
 The ``Mongoid::TypedArray`` class is a subclass of ``Array`` which overrides
-methods for mutating arrays in order to mongoize their inputs. This class allows
-the user to use their typed arrays like ordinary arrays, and have their values
-``mongoized`` under the hood. The ``TypedArray`` class overrides the following
-methods:
+methods for mutating arrays in order to ``demongoize`` their inputs. This class
+allows the user to use their typed arrays like ordinary arrays, and have their
+values ``demongoized`` under the hood. The ``TypedArray`` class overrides the
+following methods:
 
 - ``<<``
 - ``push``
@@ -519,8 +521,8 @@ The ``Mongoid::TypedArray`` class also differs from ``Array`` in that its
 constructor takes in a type as well as the normal ``Array#new`` parameters.
 A user should never need to directly instantiate a ``Mongoid::TypedArray``
 or a ``Mongoid::<Type>Array``, instead, use ordinary arrays that will be
-converted to ``Mongoid::<Type>Array`` values on assignment to the corresponding
-field.
+converted to ``Mongoid::<Type>Array`` values on the assignment and subsequent
+retrieval from the corresponding field.
 
 Here's an example of using typed array fields:
 
