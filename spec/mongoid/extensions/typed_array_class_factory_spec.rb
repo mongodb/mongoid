@@ -301,7 +301,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
           expect(band.attributes["range_array"]).to eq([ { "min" => 1, "max" => 3 } ])
         end
 
-        it "demongoizes to a hash" do
+        it "demongoizes to a range" do
           expect(band.range_array).to eq([ 1..3 ])
         end
 
@@ -309,7 +309,7 @@ describe Mongoid::Extensions::TypedArrayClassFactory do
           expect(from_db.attributes["range_array"]).to eq([ { "min" => 1, "max" => 3 } ])
         end
 
-        it "demongoizes to a hash from the database" do
+        it "demongoizes to a range from the database" do
           expect(from_db.range_array).to eq([ 1..3 ])
         end
       end
