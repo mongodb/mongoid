@@ -171,7 +171,6 @@ describe Mongoid::Criteria do
 
         let(:dictionary) do
           Dictionary.only(:description).first
-
         end
 
         it 'loads all translations' do
