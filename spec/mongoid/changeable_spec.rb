@@ -476,6 +476,188 @@ describe Mongoid::Changeable do
         end
       end
     end
+
+    context "when including key word args" do
+
+      let(:person) { Person.new }
+
+      context "when only including from" do
+
+        context "when the object has not changed" do
+
+          it "returns false" do
+            expect(person.send(:attribute_changed?, :score, from: nil)).to be false
+          end
+
+          it "returns false using (attribute)_changed?" do
+            expect(person.score_changed?(from: nil)).to be false
+          end
+        end
+
+        context "when the object has changed from the wrong item" do
+
+          before do
+            person.score = 2
+          end
+
+          it "returns false" do
+            expect(person.send(:attribute_changed?, :score, from: 1)).to be false
+          end
+
+          it "returns false using (attribute)_changed?" do
+            expect(person.score_changed?(from: 1)).to be false
+          end
+        end
+
+        context "when the object has changed from the correct item" do
+
+          before do
+            person.score = 2
+          end
+
+          it "returns true" do
+            expect(person.send(:attribute_changed?, :score, from: nil)).to be true
+          end
+
+          it "returns true using (attribute)_changed?" do
+            expect(person.score_changed?(from: nil)).to be true
+          end
+        end
+      end
+
+      context "when only including to" do
+
+        context "when the object has not changed" do
+
+          it "returns false" do
+            expect(person.send(:attribute_changed?, :score, to: nil)).to be false
+          end
+
+          it "returns false using (attribute)_changed?" do
+            expect(person.score_changed?(to: nil)).to be false
+          end
+        end
+
+        context "when the object has changed to the wrong item" do
+
+          before do
+            person.score = 2
+          end
+
+          it "returns false" do
+            expect(person.send(:attribute_changed?, :score, to: 1)).to be false
+          end
+
+          it "returns false using (attribute)_changed?" do
+            expect(person.score_changed?(to: 1)).to be false
+          end
+        end
+
+        context "when the object has changed to the correct item" do
+
+          before do
+            person.score = 2
+          end
+
+          it "returns true" do
+            expect(person.send(:attribute_changed?, :score, to: 2)).to be true
+          end
+
+          it "returns true using (attribute)_changed?" do
+            expect(person.score_changed?(to: 2)).to be true
+          end
+        end
+      end
+
+      context "when including from and to" do
+
+        context "when the object has not changed" do
+
+          it "returns false" do
+            expect(person.send(:attribute_changed?, :score, from: nil, to: nil)).to be false
+          end
+
+          it "returns false using (attribute)_changed?" do
+            expect(person.score_changed?(from: nil, to: nil)).to be false
+          end
+        end
+
+        context "when only the from is correct" do
+
+          before do
+            person.score = 2
+          end
+
+          it "returns false" do
+            expect(person.send(:attribute_changed?, :score, from: nil, to: 3)).to be false
+          end
+
+          it "returns false using (attribute)_changed?" do
+            expect(person.score_changed?(from: nil, to: 3)).to be false
+          end
+        end
+
+        context "when only the to is correct" do
+
+          before do
+            person.score = 2
+          end
+
+          it "returns false" do
+            expect(person.send(:attribute_changed?, :score, from: 1, to: 2)).to be false
+          end
+
+          it "returns false using (attribute)_changed?" do
+            expect(person.score_changed?(from: 1, to: 2)).to be false
+          end
+        end
+
+        context "when the from and to are correct" do
+
+          before do
+            person.score = 2
+          end
+
+          it "returns true" do
+            expect(person.send(:attribute_changed?, :score, from: nil, to: 2)).to be true
+          end
+
+          it "returns true using (attribute)_changed?" do
+            expect(person.score_changed?(from: nil, to: 2)).to be true
+          end
+        end
+
+        context "when value is mongoized" do
+
+          before do
+            person.score = "2"
+          end
+
+          it "returns true with mongoized value" do
+            expect(person.send(:attribute_changed?, :score, from: nil, to: 2)).to be true
+          end
+
+          it "returns true with mongoized value using (attribute)_changed?" do
+            expect(person.score_changed?(from: nil, to: 2)).to be true
+          end
+        end
+
+        context "when value is mongoized" do
+
+          before do
+            person.score = "2"
+          end
+
+          it "returns false with unmongoized value" do
+            expect(person.send(:attribute_changed?, :score, from: nil, to: "2")).to be false
+          end
+
+          it "returns false with unmongoized value using (attribute)_changed?" do
+            expect(person.score_changed?(from: nil, to: "2")).to be false
+          end
+        end
+      end
+    end
   end
 
   describe "#attribute_changed_from_default?" do
