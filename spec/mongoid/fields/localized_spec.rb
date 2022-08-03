@@ -135,11 +135,9 @@ describe Mongoid::Fields::Localized do
           end
 
           context "when using fallbacks" do
-
             with_i18n_fallbacks
 
             context "when fallbacks are defined" do
-              with_default_i18n_configs
 
               before do
                 ::I18n.fallbacks[:de] = [ :de, :en, :es ]
@@ -191,7 +189,6 @@ describe Mongoid::Fields::Localized do
             end
 
             context "when no fallbacks are defined" do
-              with_default_i18n_configs
 
               before do
                 ::I18n.fallbacks[:de] = [ :de ]
@@ -207,7 +204,6 @@ describe Mongoid::Fields::Localized do
             end
 
             context 'when fallbacks are empty' do
-              with_default_i18n_configs
 
               before do
                 ::I18n.fallbacks[:de] = [ ]

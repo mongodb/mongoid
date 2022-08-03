@@ -37,7 +37,6 @@ describe 'i18n fallbacks' do
     context 'when translation is missing in all locales' do
 
       context 'i18n >= 1.1' do
-        with_default_i18n_configs
 
         before(:all) do
           unless Gem::Version.new(I18n::VERSION) >= Gem::Version.new('1.1')
@@ -54,7 +53,6 @@ describe 'i18n fallbacks' do
       end
 
       context 'i18n 1.0' do
-        with_default_i18n_configs
 
         before(:all) do
           unless Gem::Version.new(I18n::VERSION) < Gem::Version.new('1.1')
