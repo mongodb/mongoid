@@ -279,6 +279,10 @@ describe Mongoid::Extensions::BigDecimal do
           2.hours
         end
 
+        before do
+          expect(value).to be_a(ActiveSupport::Duration)
+        end
+
         it "returns nil" do
           expect(mongoized).to eq(7200)
         end
