@@ -128,10 +128,7 @@ describe Mongoid::Fields::Localized do
 
           context "when using fallbacks" do
 
-            before(:all) do
-              require "i18n/backend/fallbacks"
-              I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-            end
+            with_i18n_fallbacks
 
             context "when fallbacks are defined" do
 
@@ -306,10 +303,7 @@ describe Mongoid::Fields::Localized do
 
           context "when using fallbacks" do
 
-            before(:all) do
-              require "i18n/backend/fallbacks"
-              I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-            end
+            with_i18n_fallbacks
 
             context "when fallbacks are defined" do
 
@@ -513,10 +507,7 @@ describe Mongoid::Fields::Localized do
 
         context "when fallbacks are defined" do
 
-          before(:all) do
-            require "i18n/backend/fallbacks"
-            I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-          end
+          with_i18n_fallbacks
 
           context "when the lookup does not need to use fallbacks" do
 

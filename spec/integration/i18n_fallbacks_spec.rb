@@ -3,19 +3,7 @@
 require 'spec_helper'
 
 describe 'i18n fallbacks' do
-  # These tests modify the environment
-  before(:all) do
-    unless %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
-      skip 'Set TEST_I18N_FALLBACKS=1 environment variable to run these tests'
-    end
-  end
-
-  before(:all) do
-    puts "I18n version: #{I18n::VERSION}"
-
-    require "i18n/backend/fallbacks"
-    I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-  end
+  with_i18n_fallbacks
 
   context 'when fallbacks are enabled with a locale list' do
     before do
@@ -36,7 +24,6 @@ describe 'i18n fallbacks' do
     end
 
     context 'when translation is missing in active locale and present in fallback locale' do
-
       it 'falls back on default locale' do
         product = Product.new
         I18n.locale = :en
@@ -44,7 +31,6 @@ describe 'i18n fallbacks' do
         I18n.locale = :de
         product.description.should == 'Marvelous!'
       end
-
     end
 
     context 'when translation is missing in all locales' do
@@ -64,7 +50,6 @@ describe 'i18n fallbacks' do
           I18n.locale = :ru
           product.description.should be nil
         end
-
       end
 
       context 'i18n 1.0' do
@@ -82,7 +67,6 @@ describe 'i18n fallbacks' do
           I18n.locale = :ru
           product.description.should == 'Marvelous!'
         end
-
       end
     end
   end

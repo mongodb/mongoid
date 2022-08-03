@@ -2,6 +2,10 @@
 
 module Mongoid
   module Macros
+    class I18nBackendWithFallbacks < I18n::Backend::Simple
+      include I18n::Backend::Fallbacks
+    end
+
     def use_spec_mongoid_config
       around do |example|
         config_path = File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -36,6 +40,18 @@ module Mongoid
 
           class_exec(value, &block)
         end
+      end
+    end
+
+    def with_i18n_fallbacks
+      require_fallbacks
+
+      around do |example|
+        old_backend = I18n.backend
+        I18n.backend = I18nBackendWithFallbacks.new
+        example.run
+      ensure
+        I18n.backend = old_backend
       end
     end
 
