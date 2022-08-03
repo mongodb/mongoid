@@ -98,12 +98,12 @@ module Mongoid
       around do |ex|
         I18n.locale = :en
         I18n.default_locale = :en
-        I18n.try(:fallbacks=, Hash.new { |_, x| [x] })
+        I18n.try(:fallbacks=, I18n::Locale::Fallbacks.new)
         I18n.enforce_available_locales = false
         ex.run
         I18n.locale = :en
         I18n.default_locale = :en
-        I18n.try(:fallbacks=, Hash.new { |_, x| [x] })
+        I18n.try(:fallbacks=, I18n::Locale::Fallbacks.new)
         I18n.enforce_available_locales = false
       end
     end
