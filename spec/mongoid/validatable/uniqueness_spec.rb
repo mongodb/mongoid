@@ -2476,7 +2476,6 @@ describe Mongoid::Validatable::UniquenessValidator do
   describe "i18n" do
 
     context 'when using a different locale' do
-
       around do |example|
         I18n.with_locale(:fr) { example.run }
       end
