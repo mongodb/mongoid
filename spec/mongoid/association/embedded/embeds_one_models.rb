@@ -71,3 +71,17 @@ class EomCompany
   embeds_one :delivery_address, class_name: 'EomAddress', as: :addressable
   accepts_nested_attributes_for :delivery_address
 end
+
+class EomValidatingParent
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  embeds_one :child, class_name: 'EomValidatingChild'
+  validates_presence_of :child
+end
+
+class EomValidatingChild
+  include Mongoid::Document
+
+  embedded_in :parent, class_name: 'EomValidatingParent'
+end

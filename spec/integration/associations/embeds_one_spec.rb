@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../mongoid/association/embedded/embeds_one_models'
 
 describe 'embeds_one associations' do
 
@@ -36,6 +37,51 @@ describe 'embeds_one associations' do
       address = Address.new
       instance.address = address
       expect(instance.address).to eq address
+    end
+  end
+
+  context 'when embedded document is removed resulting in invalid parent' do
+    let!(:parent) do
+      EomValidatingParent.create!(child: EomValidatingChild.new)
+    end
+
+    shared_examples 'removes embedded document and leaves parent invalid' do
+      # This behavior may change if MONGOID-3573 is done.
+      it 'removes embedded document and leaves parent invalid' do
+        operation
+
+        parent.reload
+
+        parent.child.should be nil
+        parent.valid?.should be false
+      end
+    end
+
+    context 'nullify' do
+      let(:operation) do
+        # saves immediately
+        parent.child = nil
+      end
+
+      include_examples 'removes embedded document and leaves parent invalid'
+    end
+
+    context 'delete' do
+      let(:operation) do
+        # saves immediately
+        parent.child.delete
+      end
+
+      include_examples 'removes embedded document and leaves parent invalid'
+    end
+
+    context 'destroy' do
+      let(:operation) do
+        # saves immediately
+        parent.child.destroy
+      end
+
+      include_examples 'removes embedded document and leaves parent invalid'
     end
   end
 end
