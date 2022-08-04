@@ -49,7 +49,7 @@ changed in Mongoid 8.0:
 - ``:broken_scoping`` => ``false``
 - ``:broken_updates`` => ``false``
 - ``:compare_time_by_ms`` => ``true``
-- ``:legacy_attributes`` => true
+- ``:legacy_attributes`` => ``false``
 - ``:legacy_pluck_distinct`` => ``false``
 - ``:legacy_triple_equals`` => ``false``
 - ``:object_id_as_json_oid`` => ``false``
