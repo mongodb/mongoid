@@ -122,8 +122,8 @@ Added ``:to`` and ``:from`` options to ``attribute_changed?``
 -------------------------------------------------------------
 
 Mongoid 8.1 adds the ``:to`` and ``:from`` options on the ``attribute_changed?``
-method. These options can be used to assert that the attribute has been changed
-to or from certain values:
+method. These options can be used to inquire whether the attribute has been changed
+to or from a certain value:
 
 .. code:
 
