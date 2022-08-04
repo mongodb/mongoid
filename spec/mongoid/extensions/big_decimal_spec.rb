@@ -273,6 +273,21 @@ describe Mongoid::Extensions::BigDecimal do
         end
       end
 
+      context "when the value is castable" do
+
+        let(:value) do
+          2.hours
+        end
+
+        before do
+          expect(value).to be_a(ActiveSupport::Duration)
+        end
+
+        it "returns nil" do
+          expect(mongoized).to eq(7200)
+        end
+      end
+
       context "when the value is nil" do
 
         let(:value) do
