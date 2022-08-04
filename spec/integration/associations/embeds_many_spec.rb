@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../mongoid/association/embedded/embeds_many_models'
 
 describe 'embeds_many associations' do
 
@@ -214,6 +215,51 @@ describe 'embeds_many associations' do
       expect { klass }.to_not raise_error
       expect { klass.new.addresses }.to_not raise_error
       expect(klass.new.addresses.build).to be_a Address
+    end
+  end
+
+  context 'when embedded document is removed resulting in invalid parent' do
+    let!(:parent) do
+      EmmValidatingParent.create!(children: [EmmValidatingChild.new])
+    end
+
+    shared_examples 'removes embedded document and leaves parent invalid' do
+      # This behavior may change if MONGOID-3573 is done.
+      it 'removes embedded document and leaves parent invalid' do
+        operation
+
+        parent.reload
+
+        parent.children.should be_empty
+        parent.valid?.should be false
+      end
+    end
+
+    context 'nullify' do
+      let(:operation) do
+        # saves immediately
+        parent.children = []
+      end
+
+      include_examples 'removes embedded document and leaves parent invalid'
+    end
+
+    context 'delete' do
+      let(:operation) do
+        # saves immediately
+        parent.children.first.delete
+      end
+
+      include_examples 'removes embedded document and leaves parent invalid'
+    end
+
+    context 'destroy' do
+      let(:operation) do
+        # saves immediately
+        parent.children.first.destroy
+      end
+
+      include_examples 'removes embedded document and leaves parent invalid'
     end
   end
 end

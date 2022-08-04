@@ -236,3 +236,16 @@ class EmmChild
   field :t
 end
 
+class EmmValidatingParent
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  embeds_many :children, class_name: 'EmmValidatingChild'
+  validates_presence_of :children
+end
+
+class EmmValidatingChild
+  include Mongoid::Document
+
+  embedded_in :parent, class_name: 'EmmValidatingParent'
+end
