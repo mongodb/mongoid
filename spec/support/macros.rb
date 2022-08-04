@@ -2,9 +2,6 @@
 
 module Mongoid
   module Macros
-    class I18nBackendWithFallbacks < I18n::Backend::Simple
-      include I18n::Backend::Fallbacks
-    end
 
     def use_spec_mongoid_config
       around do |example|
@@ -47,11 +44,23 @@ module Mongoid
       require_fallbacks
 
       around do |example|
-        old_backend = I18n.backend
-        I18n.backend = I18nBackendWithFallbacks.new
+        include I18n::Backend::Fallbacks
+        if I18n.respond_to?(:temp_fallbacks)
+          class << I18n
+            alias :fallbacks :temp_fallbacks
+            alias :fallbacks= :temp_fallbacks=
+            undef_method :temp_fallbacks
+            undef_method :temp_fallbacks=
+          end
+        end
         example.run
       ensure
-        I18n.backend = old_backend
+        class << I18n
+          alias :temp_fallbacks :fallbacks
+          alias :temp_fallbacks= :fallbacks=
+          undef_method :fallbacks
+          undef_method :fallbacks=
+        end
       end
     end
 

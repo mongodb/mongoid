@@ -297,7 +297,6 @@ describe Mongoid::Fields::Localized do
           end
 
           context "when using fallbacks" do
-
             with_i18n_fallbacks
 
             context "when fallbacks are defined" do
