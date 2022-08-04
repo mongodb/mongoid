@@ -1273,7 +1273,7 @@ as part of the operation. The save is performed regardless of whether
 :ref:`validation <validation>`, thus may leave documents in an invalid state.
 A non-exhaustive list of these operations is as follows:
 
-- Assignment to ``has_many`` association:
+- Assignment to ``has_many``, ``embeds_many``, ``embeds_one`` associations:
 
   .. code-block:: ruby
 
