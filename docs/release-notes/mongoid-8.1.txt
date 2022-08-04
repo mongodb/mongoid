@@ -143,3 +143,5 @@ to or from a certain value:
   # => true
   person.name_changed?(from: "Trout", to: "Ohtani")
   # => true
+  person.name_changed?(from: "Trout", to: "Fletcher")
+  # => false
