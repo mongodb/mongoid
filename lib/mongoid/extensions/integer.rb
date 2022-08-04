@@ -45,8 +45,12 @@ module Mongoid
         # @return [ Integer | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.blank?
-          if object.numeric?
-            object.to_i
+          if object.is_a?(String)
+            if object.numeric?
+              object.to_i
+            end
+          else
+            object.try(:to_i)
           end
         end
         alias :demongoize :mongoize

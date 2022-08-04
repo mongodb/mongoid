@@ -94,10 +94,10 @@ describe Mongoid::Extensions::Integer do
           end
         end
 
-        context "when the string is numerical" do
+        context "when the string starts with a number" do
 
-          it "returns the integer value for the string" do
-            expect(Integer.send(method, "3")).to eq(3)
+          it "returns nil" do
+            expect(Integer.send(method, "42bogus")).to be_nil
           end
         end
 
@@ -112,6 +112,13 @@ describe Mongoid::Extensions::Integer do
 
           it "returns nil" do
             expect(Integer.send(method, nil)).to be_nil
+          end
+        end
+
+        context "when giving an object that is castable to an Integer" do
+
+          it "returns the integer value" do
+            expect(Integer.send(method, 2.hours)).to eq(7200)
           end
         end
       end
