@@ -1,3 +1,5 @@
+.. _validation:
+
 **********
 Validation
 **********
@@ -23,6 +25,45 @@ Mongoid behaves slightly differently to Active Record when using ``#valid?``
 on already persisted data. Active Record's ``#valid?`` will run all
 validations whereas Mongoid's ``#valid?`` will only run validations on
 documents that are in memory as an optimization.
+
+.. note:
+
+  Operations which :ref:`persist their changes immediately
+  <immediate-persistence>` do not perform validation. For example,
+  it is possible to remove a child from a parent which requires its child to
+  exist:
+
+  .. code-block:: ruby
+
+    class Parent
+      include Mongoid::Document
+      
+      embeds_one :child
+      
+      validates_presence_of :child
+    end
+    
+    class Child
+      include Mongoid::Document
+      
+      embedded_in :parent
+    end
+    
+    parent = Parent.create!(child: Child.new)
+    
+    # Assignment to association persists changes immediately and removes
+    # the child from the association, making the parent invalid.
+    parent.child = nil
+    
+    parent.reload
+    
+    # Child has been removed from parent in the database.
+    parent.child
+    # => nil
+    
+    # Parent is now invalid.
+    parent.valid?
+    # => false
 
 
 ``validates_uniqueness_of`` and ``:conditions``  Option
