@@ -1269,29 +1269,26 @@ Immediately Persisting Operations
 
 Some operations on associations always save the parent and the child documents
 as part of the operation. The save is performed regardless of whether
-:ref:`autosaving <autosaving>` is enabled. These operations do not perform
-:ref:`validation <validation>`, thus may leave documents in an invalid state.
-A non-exhaustive list of these operations is as follows:
+:ref:`autosaving <autosaving>` is enabled. These operations perform
+:ref:`validation <validation>` and validation failures will prevent models
+which are invalid, and subsequent models, from being saved. However, Mongoid
+presently :ref:`validates models as they are being persisted
+<https://jira.mongodb.org/browse/MONGOID-4597>`_ rather than the entire object
+tree together, which may result in a partial write and an inconsistent object
+tree.
 
-- Assignment to ``has_many``, ``embeds_many``, ``embeds_one`` associations:
+A non-exhaustive list of immediately persisting operations is as follows:
+
+- Assignment to associations:
 
   .. code-block:: ruby
 
     # Saves the band and the album.
     band.albums = [Album.new]
 
-- ``push``, ``<<``:
-
-  .. code-block:: ruby
-
-    band.albums << Album.new
-    band.albums.push(Album.new)
-
-Some operations perform validation and if validation passes, persist the models
-to the database. If validation fails, the operation does not persist the models.
-A non-exhaustive list of these operations is as follows:
-
-- Nullification of ``has_one`` association:
+  This includes nullification of ``has_one`` associations which may fail
+  if the ``belongs_to`` association is declared as requiring the parent,
+  which is the default:
 
   .. code-block:: ruby
 
@@ -1342,6 +1339,13 @@ A non-exhaustive list of these operations is as follows:
     #     The following errors were found: Band can't be blank
     #   resolution:
     #     Try persisting the document with valid data or remove the validations.
+
+- ``push``, ``<<``:
+
+  .. code-block:: ruby
+
+    band.albums << Album.new
+    band.albums.push(Album.new)
 
 
 .. _autosaving:
