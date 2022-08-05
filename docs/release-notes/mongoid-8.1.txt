@@ -116,3 +116,32 @@ from the ``_translations`` hash:
 
 See the section on :ref:`Localize :present Field Option <present-fields>` for
 more details on how these are used.
+
+
+Added ``:to`` and ``:from`` options to ``attribute_changed?``
+-------------------------------------------------------------
+
+Mongoid 8.1 adds the ``:to`` and ``:from`` options on the ``attribute_changed?``
+method. These options can be used to inquire whether the attribute has been changed
+to or from a certain value:
+
+.. code:
+
+  class Person
+    include Mongoid::Document
+    field :name, type: String
+  end
+
+  person = Person.create!(name: "Trout")
+  person.name = "Ohtani"
+
+  person.name_changed?
+  # => true
+  person.name_changed?(from: "Trout")
+  # => true
+  person.name_changed?(to: "Ohtani")
+  # => true
+  person.name_changed?(from: "Trout", to: "Ohtani")
+  # => true
+  person.name_changed?(from: "Trout", to: "Fletcher")
+  # => false

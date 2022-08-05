@@ -161,12 +161,24 @@ module Mongoid
     #   model.attribute_changed?("name")
     #
     # @param [ String ] attr The name of the attribute.
+    # @param **kwargs The optional keyword arguments.
+    #
+    # @option **kwargs [ Object ] :from The object the attribute was changed from.
+    # @option **kwargs [ Object ] :to The object the attribute was changed to.
     #
     # @return [ true | false ] Whether the attribute has changed.
-    def attribute_changed?(attr)
+    def attribute_changed?(attr, **kwargs)
       attr = database_field_name(attr)
       return false unless changed_attributes.key?(attr)
-      changed_attributes[attr] != attributes[attr]
+      return false if changed_attributes[attr] == attributes[attr]
+      if kwargs.key?(:from)
+        return false if changed_attributes[attr] != kwargs[:from]
+      end
+      if kwargs.key?(:to)
+        return false if attributes[attr] != kwargs[:to]
+      end
+
+      true
     end
 
     # Get whether or not the field has a different value from the default.
@@ -302,8 +314,8 @@ module Mongoid
       # @param [ String ] meth The name of the accessor.
       def create_dirty_change_check(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_changed?") do
-            attribute_changed?(name)
+          re_define_method("#{meth}_changed?") do |**kwargs|
+            attribute_changed?(name, **kwargs)
           end
         end
       end
