@@ -283,6 +283,6 @@ Type Declaration
   .. code-block:: ruby
 
     # @param **kwargs The optional keyword argument(s).
-    # @option **kwargs [ String | Array<String> ] :items The items(s) as Strings to include.
-    # @option **kwargs [ Integer ] :limit An Integer denoting the limit.
+    # @option [ String | Array<String> ] :items The items(s) as Strings to include.
+    # @option [ Integer ] :limit An Integer denoting the limit.
     def buy_groceries(**kwargs)
