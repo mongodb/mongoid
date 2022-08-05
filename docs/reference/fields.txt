@@ -743,7 +743,7 @@ Custom Field Options
 ====================
 
 You may define custom options for the ``field`` macro function
-which extend its behavior at the your time model classes are loaded.
+which extend its behavior at the time your model classes are loaded.
 
 As an example, we will define a ``:required`` option which will add a presence
 validator for the field. First, declare the new field option in an initializer,
