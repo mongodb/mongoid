@@ -920,8 +920,8 @@ Note that the original uncastable values will be stored in the
   fields, ``to_f`` for Floats, and ``to_d`` for BigDecimals, is castable.
   Strings are the exception and will only call the corresponding ``to_*``
   method if the string is numeric. If a class only defines ``to_i`` and not
-  ``to_f`` and is being assigned to a Float field, this is uncastable, and we
-  will not do a two-step conversion (i.e. ``to_i`` and then ``to_f``).
+  ``to_f`` and is being assigned to a Float field, this is uncastable, and Mongoid
+  will not perform a two-step conversion (i.e. ``to_i`` and then ``to_f``).
 
 
 Reading Uncastable Values
