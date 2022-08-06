@@ -18,11 +18,11 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
-Raise AttributeNotLoaded error for fields omitted from query
-------------------------------------------------------------
+Raise AttributeNotLoaded error when accessing fields omitted from query projection
+----------------------------------------------------------------------------------
 
 When attempting to access a field on a model instance which was
-excluded with ``.only`` or ``.without`` query projections methods
+excluded with the ``.only`` or ``.without`` query projections methods
 when the instance was loaded, Mongoid will now raise a
 ``Mongoid::Errors::AttributeNotLoaded`` error.
 
