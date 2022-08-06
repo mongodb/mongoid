@@ -72,7 +72,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -95,7 +95,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -118,7 +118,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -140,7 +140,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -162,7 +162,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def has_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -184,7 +184,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def has_and_belongs_to_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -206,7 +206,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def has_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
