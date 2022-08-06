@@ -23,7 +23,7 @@ describe Mongoid::Association::Referenced::HasOne do
       # has a default value specified in the model
       expect do
         accreditation.year
-      end.to raise_error(ActiveModel::MissingAttributeError)
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded)
       expect(legislator.attributes.keys).to eq(['_id', 'degree'])
     end
 
