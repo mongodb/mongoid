@@ -17,14 +17,18 @@ module Mongoid
     #   #=> raises Mongoid::Errors::AttributeNotLoaded
     #
     # @example Setting a field which has not been loaded.
-    #   Band.only(:name).first.label = 'Sub Pop Records'
+    #   Band.without(:label).first.label = 'Sub Pop Records'
     #   #=> raises Mongoid::Errors::AttributeNotLoaded
-    #
-    # @param [ Class ] klass The model class.
-    # @param [ String | Symbol ] name The name of the attribute.
     class AttributeNotLoaded < ::ActiveModel::MissingAttributeError
       include ErrorComposable
 
+      # Create the new error.
+      #
+      # @example Instantiate the error.
+      #   AttributeNotLoaded.new(Person, "title")
+      #
+      # @param [ Class ] klass The model class.
+      # @param [ String | Symbol ] name The name of the attribute.
       def initialize(klass, name)
         super(
           compose_message("attribute_not_loaded", { klass: klass.name, name: name })
