@@ -21,7 +21,7 @@ describe Mongoid::Criteria do
         it "limits the returned fields" do
           expect {
             criteria.first.name
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'name' on Band which was not loaded/)
         end
 
         it "does not add _type to the fields" do
@@ -55,7 +55,7 @@ describe Mongoid::Criteria do
         it "excludes the non included fields" do
           expect {
             criteria.first.active
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'active' on Band which was not loaded/)
         end
 
         it "does not add _type to the fields" do
@@ -214,8 +214,8 @@ describe Mongoid::Criteria do
           expect(dictionary.description_translations.keys).to_not include('de', 'en')
         end
 
-        it 'raises an ActiveModel::MissingAttributeError when attempting to access the field' do
-          expect{dictionary.description}.to raise_error ActiveModel::MissingAttributeError
+        it 'raises an Mongoid::Errors::AttributeNotLoaded when attempting to access the field' do
+          expect{dictionary.description}.to raise_error Mongoid::Errors::AttributeNotLoaded
         end
       end
 
@@ -359,7 +359,7 @@ describe Mongoid::Criteria do
         it 'does not return id' do
           lambda do
             instance.id
-          end.should raise_error(ActiveModel::MissingAttributeError)
+          end.should raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'id' on Shirt which was not loaded/)
         end
       end
 

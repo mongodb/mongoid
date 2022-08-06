@@ -23,6 +23,17 @@ en:
           resolution: "On the %{name} association on %{inverse} you must add an
             :inverse_of option to specify the exact association on %{klass}
             that is the opposite of %{name}."
+        attribute_not_loaded:
+          message: "Attempted to access attribute '%{name}' on %{klass} which
+            was not loaded."
+          summary:
+            "You loaded an instance of %{klass} using a query projection method
+            such as `.only` or `.without`, then attempted to read or write an
+            attribute '%{name}' which was not included in the projection.
+            Mongoid intentionally prevents this to avoid overwriting data."
+          resolution: "Ensure your query projection methods such as `.only` and
+            `.without` include field '%{name}' when loading instances of %{klass},
+            or remove such projections methods entirely."
         callbacks:
           message: "Calling %{method} on %{klass} resulted in a false return
             from a callback."

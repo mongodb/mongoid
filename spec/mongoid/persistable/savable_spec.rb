@@ -467,7 +467,7 @@ describe Mongoid::Persistable::Savable do
         expect {
           person.username = 'unloaded-attribute'
           person.save
-        }.to raise_error(ActiveModel::MissingAttributeError)
+        }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'username' on Person which was not loaded/)
       end
 
       context 'when the changed attribute is aliased' do
