@@ -108,7 +108,7 @@ type. Such fields are untyped:
 
   class Product
     include Mongoid::Document
-     
+
     field :properties
     # Equivalent to:
     field :properties, type: Object
@@ -124,7 +124,7 @@ ahead of time:
   product = Product.new(properties: "color=white,size=large")
   product.properties
   # => "color=white,size=large"
-  
+
   product = Product.new(properties: {color: "white", size: "large"})
   product.properties
   # => {:color=>"white", :size=>"large"}
@@ -913,6 +913,15 @@ Note that the original uncastable values will be stored in the
 
   user.attributes_before_type_cast["name"]
   # => ["Mike", "Trout"]
+
+.. note::
+
+  Note that for numeric fields, any class that defines ``to_i`` for Integer
+  fields, ``to_f`` for Floats, and ``to_d`` for BigDecimals, is castable.
+  Strings are the exception and will only call the corresponding ``to_*``
+  method if the string is numeric. If a class only defines ``to_i`` and not
+  ``to_f`` and is being assigned to a Float field, this is uncastable, and Mongoid
+  will not perform a two-step conversion (i.e. ``to_i`` and then ``to_f``).
 
 
 Reading Uncastable Values
