@@ -1217,7 +1217,7 @@ specifiying its handler function as a block:
   # in /config/initializers/mongoid_custom_fields.rb
 
   Mongoid::Fields.option :max_length do |model, field, value|
-    model.validates_length_of field.name, maximum: 10 if value
+    model.validates_length_of field.name, maximum: value
   end
 
 Then, use it your model class:
@@ -1227,7 +1227,7 @@ Then, use it your model class:
   class Person
     include Mongoid::Document
 
-    field :name, type: String, min_length: true
+    field :name, type: String, max_length: 10
   end
 
 Note that the handler function will be invoked whenever the option is used
