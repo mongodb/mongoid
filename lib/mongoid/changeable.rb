@@ -68,7 +68,9 @@ module Mongoid
     # @example Move the changes to previous.
     #   person.move_changes
     def move_changes
+      @changes_before_last_save = @previous_changes
       @previous_changes = changes
+      @attributes_before_last_save = @previous_attributes
       @previous_attributes = attributes.dup
       Atomic::UPDATES.each do |update|
         send(update).clear
@@ -133,6 +135,46 @@ module Mongoid
       mods
     end
 
+    # Returns the original value of an attribute before the last save.
+    #
+    # This method is useful in after callbacks to get the original value of
+    #   an attribute before the save that triggered the callbacks to run.
+    #
+    # @param [ Symbol | String ] attr The name of the attribute.
+    #
+    # @return [ Object ] Value of the attribute before the last save.
+    def attribute_before_last_save(attr)
+      attr = database_field_name(attr)
+      attributes_before_last_save[attr]
+    end
+
+    # Returns the change to an attribute during the last save.
+    #
+    # @param [ Symbol | String ] attr The name of the attribute.
+    #
+    # @return [ Array<Object> | nil ] If the attribute was changed, returns
+    #   an array containing the original value and the saved value, otherwise nil.
+    def saved_change_to_attribute(attr)
+      attr = database_field_name(attr)
+      previous_changes[attr]
+    end
+
+    # Returns whether this attribute change the next time we save.
+    #
+    # This method is useful in validations and before callbacks to determine
+    #   if the next call to save will change a particular attribute.
+    #
+    # @param [ String ] attr The name of the attribute.
+    # @param **kwargs The optional keyword arguments.
+    #
+    # @option **kwargs [ Object ] :from The object the attribute was changed from.
+    # @option **kwargs [ Object ] :to The object the attribute was changed to.
+    #
+    # @return [ true | false ] Whether the attribute change the next time we save.
+    def will_save_change_to_attribute?(attr, **kwargs)
+      attribute_changed?(attr, **kwargs)
+    end
+
     private
 
     # Get attributes of the document before the document was saved.
@@ -140,6 +182,14 @@ module Mongoid
     # @return [ Hash ] Previous attributes
     def previous_attributes
       @previous_attributes ||= {}
+    end
+
+    def changes_before_last_save
+      @changes_before_last_save ||= {}
+    end
+
+    def attributes_before_last_save
+      @attributes_before_last_save ||= {}
     end
 
     # Get the old and new value for the provided attribute.
@@ -317,6 +367,9 @@ module Mongoid
           re_define_method("#{meth}_changed?") do |**kwargs|
             attribute_changed?(name, **kwargs)
           end
+          re_define_method("will_save_change_to_#{meth}?") do |**kwargs|
+            will_save_change_to_attribute?(name, **kwargs)
+          end
         end
       end
 
@@ -349,6 +402,12 @@ module Mongoid
           end
           re_define_method("#{meth}_previously_was") do
             attribute_previously_was(name)
+          end
+          re_define_method("#{meth}_before_last_save") do
+            attribute_before_last_save(name)
+          end
+          re_define_method("saved_change_to_#{meth}") do
+            saved_change_to_attribute(name)
           end
         end
       end

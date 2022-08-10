@@ -17,6 +17,48 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Added ``attribute_before_last_save``, ``saved_change_to_attribute`` and ``will_save_change_to_attribute?`` methods
+------------------------------------------------------------------------------------------------------------------
+
+These new methods behave identically to corresponding methods
+from ``ActiveRecord::AttributeMethods::Dirty``. The methods are particularly useful in
+callbacks:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :name, type: String
+
+    before_save do
+      puts "will_save_change_to_attribute?(:name): #{will_save_change_to_attribute?(:name)}"
+    end
+
+    after_save do
+      puts "attribute_was(:name): #{attribute_was(:name)}"
+      puts "attribute_before_last_save(:name): #{attribute_before_last_save(:name)}"
+      puts "saved_change_to_attribute(:name): #{saved_change_to_attribute(:name)}"
+    end
+  end
+
+  person = Person.create(name: 'John')
+  # "will_save_change_to_attribute?(:name): true"
+  # attribute_was(:name): John => New value
+  # attribute_before_last_save(:name): nil => Value before save
+  # saved_change_to_attribute(:name): [nil, "John"] => Both values
+  person.name = 'Jane'
+  person.save
+  # "will_save_change_to_attribute?(:name): true"
+  # attribute_was(:name): Jane => New value
+  # attribute_before_last_save(:name): John => Value before save
+  # saved_change_to_attribute(:name): ["John", "Jane"] => Both values
+
+For all of the new method there is also a shorter form created dynamically, e.g.
+``attribute_before_last_save(:name)`` is equivalent to ``name_before_last_save``,
+``saved_change_to_attribute(:name)`` is equivalent to ````saved_change_to_name``,
+and ``will_save_change_to_attribute?(:name)`` is equivalent to ``will_save_change_to_name?``.
+
 
 Configuration DSL No Longer Requires an Argument to its Block
 -------------------------------------------------------------

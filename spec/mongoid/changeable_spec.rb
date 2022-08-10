@@ -1661,6 +1661,80 @@ describe Mongoid::Changeable do
     end
   end
 
+  describe '#attribute_before_last_save' do
+    let(:person) do
+      Person.create!(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    context "when the document has been saved" do
+      before do
+        person.save!
+      end
+
+      it "returns the changes" do
+        expect(person.attribute_before_last_save(:title)).to eq("Grand Poobah")
+        expect(person.title_before_last_save).to eq("Grand Poobah")
+      end
+    end
+
+    context "when the document has not been saved" do
+      it "returns no changes" do
+        expect(person.attribute_before_last_save(:title)).to be_nil
+        expect(person.title_before_last_save).to be_nil
+      end
+    end
+  end
+
+  describe '#saved_change_to_attribute' do
+    let(:person) do
+      Person.create!(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    context "when the document has been saved" do
+      before do
+        person.save!
+      end
+
+      it "returns the changes" do
+        expect(person.saved_change_to_attribute(:title)).to eq(["Grand Poobah", "Captain Obvious"])
+        expect(person.saved_change_to_title).to eq(["Grand Poobah", "Captain Obvious"])
+      end
+    end
+
+    context "when the document has not been saved" do
+      it "returns changes for the previous save" do
+        expect(person.saved_change_to_attribute(:title)).to eq([nil, "Grand Poobah"])
+        expect(person.saved_change_to_title).to eq([nil, "Grand Poobah"])
+      end
+    end
+  end
+
+  describe '#will_save_change_to_attribute?' do
+    let(:person) do
+      Person.create!(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    it 'correctly detects changes' do
+      expect(person.will_save_change_to_attribute?(:title)).to eq(true)
+      expect(person.will_save_change_to_title?).to eq(true)
+      expect(person.will_save_change_to_attribute?(:score)).to eq(false)
+      expect(person.will_save_change_to_score?).to eq(false)
+    end
+
+  end
+
   context "when fields have been defined pre-dirty inclusion" do
 
     let(:document) do
