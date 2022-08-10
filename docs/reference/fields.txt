@@ -1502,6 +1502,24 @@ language, translations will be looked up in the fallback languages:
   I18n.locale = :de
   product.description # "Marvelous!"
 
+Mongoid also defines a ``:fallbacks`` option on fields, which can be used to
+disable fallback functionality on a specific field:
+
+.. code:: ruby
+
+  class Product
+    include Mongoid::Document
+    field :description, type: String, localize: true, fallbacks: false
+  end
+
+  product = Product.new
+  I18n.locale = :en
+  product.description = "Marvelous!"
+  I18n.locale = :de
+  product.description # nil
+
+Note that this option defaults to ``true``.
+
 .. note::
 
   In i18n 1.1, the behavior of fallbacks `changed <https://github.com/ruby-i18n/i18n/pull/415>`_
