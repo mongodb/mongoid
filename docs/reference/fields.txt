@@ -1208,7 +1208,7 @@ Custom Field Options
 You may define custom options for the ``field`` macro function
 which extend its behavior at the your time model classes are loaded.
 
-As an example, we will define a ``:required`` option which will add a presence
+As an example, we will define a ``:max_length`` option which will add a length
 validator for the field. First, declare the new field option in an initializer,
 specifiying its handler function as a block:
 
@@ -1216,8 +1216,8 @@ specifiying its handler function as a block:
 
   # in /config/initializers/mongoid_custom_fields.rb
 
-  Mongoid::Fields.option :required do |model, field, value|
-    model.validates_presence_of field if value
+  Mongoid::Fields.option :max_length do |model, field, value|
+    model.validates_length_of field.name, maximum: value
   end
 
 Then, use it your model class:
@@ -1227,7 +1227,7 @@ Then, use it your model class:
   class Person
     include Mongoid::Document
 
-    field :name, type: String, required: true
+    field :name, type: String, max_length: 10
   end
 
 Note that the handler function will be invoked whenever the option is used
