@@ -1044,6 +1044,8 @@ describe Mongoid::Clients do
     end
 
     context 'when using on different objects' do
+      require_mri
+
       let(:first_band) do
         Band.create!(name: "The Beatles")
       end
