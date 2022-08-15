@@ -249,12 +249,11 @@ module Mongoid
           if Mongoid.scope_overwrite_exception
             raise Errors::ScopeOverwrite.new(self.name, name)
           else
-            if Mongoid.logger
-              Mongoid.logger.warn(
-                "Creating scope :#{name}. " +
-                "Overwriting existing method #{self.name}.#{name}."
-              )
-            end
+            Mongoid.logger.warn(
+              "Creating scope :#{name} which conflicts with #{self.name}.#{name}. " +
+              "Calls to `#{name}' will delegate to #{self.name}.#{name} and " +
+              "will ignore the declared scope."
+            )
           end
         end
       end
