@@ -1421,7 +1421,7 @@ Mongoid supports localized fields via `i18n <https://github.com/ruby-i18n/i18n>`
 
    class Product
      include Mongoid::Document
-     field :description, localize: true
+     field :description, type: String, localize: true
    end
 
 By telling the field to ``localize``, Mongoid will under the covers store the field
@@ -1446,6 +1446,36 @@ You can get and set all the translations at once by using the corresponding ``_t
    # { "en" => "Marvelous!", "de" => "Fantastisch!" }
    product.description_translations =
      { "en" => "Marvelous!", "de" => "Wunderbar!" }
+
+Localized fields can be used with any field type. For example, they can be used
+with float fields for differences with currency:
+
+.. code:: ruby
+
+  class Product
+    include Mongoid::Document
+
+    field :price, type: Float, localize: true
+    field :currency, type: String, localize: true
+  end
+
+By creating the model in this way, we can separate the price from the currency
+type, which allows you to use all of the number-related functionalities on the
+price when querying or aggregating that field (provided that you index into the
+stored translations hash). We can create an instance of this model as follows:
+
+.. code:: ruby
+
+  product = Product.new
+  I18n.locale = :en
+  product.price = 1.00
+  product.currency = "$"
+  I18n.locale = :he
+  product.price = 3.24
+  product.currency = "₪"
+
+  product.attributes
+  # => { "price" => { "en" => 1.0, "he" => 3.24 }, "currency" => { "en" => "$", "he" => "₪"  } }
 
 
 .. _present-fields:
