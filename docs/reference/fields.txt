@@ -1127,11 +1127,25 @@ The ``demongoize`` method is used when calling the getters of fields for your cu
 Note that in the example above, since ``demongoize`` calls ``Point.new``, a new instance of
 ``Point`` will be generated on each call to the getter.
 
-.. note::
+Mongoid will always call the ``demongoize`` method on values that were
+retrieved from the database, but applications may, in theory, call
+``demongoize`` with arbitrary input. It is recommended that applications add
+handling for arbitrary input in their ``demongoize`` methods. We can rewrite
+``Point``'s demongoize method as follows:
 
-  The ``mongoize`` and ``demongoize`` methods should return ``nil`` on values
-  that are uncastable to your custom type. See the section on :ref:`Uncastable
-  Values <uncastable-values>` for more details.
+.. code:: ruby
+
+  def demongoize(object)
+    if object.is_a?(Array) && object.length == 2
+      Point.new(object[0], object[1])
+    end
+  end
+
+Notice that ``demongoize`` will only create a new ``Point`` if given an array
+of length 2, and will return ``nil`` otherwise. Both the ``mongoize`` and
+``demongoize`` methods should be prepared to receive arbitrary input and should
+return ``nil`` on values that are uncastable to your custom type. See the
+section on :ref:`Uncastable Values <uncastable-values>` for more details.
 
 Lastly, the class method ``evolve`` is similar to ``mongoize``, however it is used
 when transforming objects for use in Mongoid query criteria.
@@ -1140,6 +1154,11 @@ when transforming objects for use in Mongoid query criteria.
 
    point = Point.new(12, 24)
    Venue.where(location: point) # This uses Point.evolve
+
+The ``evolve`` method should also be prepared to receive arbitrary input,
+however, unlike the ``mongoize`` and ``demongoize`` methods, it should return
+the inputted value on values that are uncastable to your custom type. See the
+section on :ref:`Uncastable Values <uncastable-values>` for more details.
 
 
 .. _phantom-custom-field-types:
