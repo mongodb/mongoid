@@ -250,8 +250,8 @@ module Mongoid
             raise Errors::ScopeOverwrite.new(self.name, name)
           else
             Mongoid.logger.warn(
-              "Creating scope :#{name} which collides with #{self.name}.#{name}. " +
-              "Calls to this scope will delegate to #{self.name}.#{name} and " +
+              "Creating scope :#{name} which conflicts with #{self.name}.#{name}. " +
+              "Calls to `#{name}' will delegate to #{self.name}.#{name} and " +
               "will ignore the declared scope."
             )
           end
