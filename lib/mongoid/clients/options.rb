@@ -29,8 +29,17 @@ module Mongoid
             clear_persistence_context(original_cluster, @original_context)
           end
         else
-          set_persistence_context(options_or_context)
-          self
+          # If #with is called on a Criteria we want to return a new criteria,
+          # but if it's called on a document, we want to return the same document
+          # since duping a document changes its _id.
+          if is_a?(Criteria)
+            crit = dup
+            crit.send(:set_persistence_context, options_or_context)
+            crit
+          else
+            set_persistence_context(options_or_context)
+            self
+          end
         end
       end
 

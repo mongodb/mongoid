@@ -76,7 +76,7 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when reading using with" do
+    context "when changing the collection using #with" do
 
       context "when calling #with on a criteria" do
 
@@ -135,8 +135,8 @@ describe Mongoid::Contextual::Mongo do
       context "when calling #with on the klass" do
 
         before do
-          expect(criteria.count).to eq(0)
           Band.with(collection: 'artists') do |klass|
+            expect(klass.count).to eq(0)
             5.times { klass.create! }
             expect(klass.count).to eq(5)
           end
@@ -182,6 +182,27 @@ describe Mongoid::Contextual::Mongo do
 
           it "doesn't populate klass persistence context" do
             expect(Band.persistence_context?).to be false
+          end
+        end
+
+        context "when using an old criteria" do
+
+          let(:old_criteria) do
+            Band.all.tap do |crit|
+              crit.view # load the view
+            end
+          end
+
+          let(:criteria) do
+            old_criteria.with(collection: 'artists')
+          end
+
+          it "reads from the correct collection" do
+            expect(criteria.count).to eq(5)
+          end
+
+          it "creates a new criteria" do
+            expect(old_criteria).to_not be(criteria)
           end
         end
       end
@@ -252,9 +273,178 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context "when setting the database" do
+
+      context "when calling #with on a criteria" do
+
+        let(:criteria) do
+          Band.criteria
+        end
+
+        before do
+          Band.with(database: database_id_alt) do |klass|
+            klass.destroy_all
+            expect(klass.count).to eq(0)
+            5.times { klass.create! }
+            expect(klass.count).to eq(5)
+          end
+          expect(Band.count).to eq(0)
+        end
+
+        context "when using the block form" do
+
+          it "reads from the correct database" do
+            criteria.with(database: database_id_alt) do |crit|
+              expect(crit.count).to eq(5)
+            end
+          end
+        end
+
+        context "when not using blocks" do
+
+          let!(:criteria) do
+            Band.criteria.with(database: database_id_alt)
+          end
+
+          it "reads correctly" do
+            expect(criteria.count).to eq(5)
+          end
+        end
+      end
+
+      context "when calling #with on the klass" do
+
+        before do
+          Band.with(database: database_id_alt) do |klass|
+            klass.destroy_all
+            expect(klass.count).to eq(0)
+            5.times { klass.create! }
+            expect(klass.count).to eq(5)
+          end
+          expect(Band.count).to eq(0)
+        end
+
+        context "when using the block form" do
+
+          it "reads from the correct database" do
+            Band.with(database: database_id_alt) do |klass|
+              expect(klass.count).to eq(5)
+            end
+          end
+        end
+
+        context "when not using block form" do
+
+          let!(:criteria) { Band.with(database: database_id_alt) }
+
+          it "reads from the correct database" do
+            expect(criteria.count).to eq(5)
+          end
+        end
+
+        context "when using an old criteria" do
+
+          let(:criteria) do
+            crit = Band.all
+            crit.view # load the view
+            crit.with(database: database_id_alt)
+          end
+
+          it "reads from the correct database" do
+            expect(criteria.count).to eq(5)
+          end
+        end
+      end
+
+      context "when calling #with on a document" do
+
+        let(:band) { Band.new }
+
+        before do
+          Band.with(database: database_id_alt) do |klass|
+            klass.destroy_all
+            expect(klass.count).to eq(0)
+          end
+          expect(Band.count).to eq(0)
+        end
+
+        context "when using the block form" do
+
+          before do
+            band.with(database: database_id_alt) do |band|
+              band.save
+            end
+            expect(Band.count).to eq(0)
+          end
+
+          it "reads from the correct database" do
+            Band.with(database: database_id_alt) do |klass|
+              expect(klass.count).to eq(1)
+              expect(klass.first).to eq(band)
+            end
+          end
+        end
+
+        context "when not using block form" do
+
+          let(:band) { Band.new.with(database: database_id_alt) }
+
+          before do
+            band.save
+            expect(Band.count).to eq(0)
+          end
+
+          it "reads from the correct database" do
+            Band.with(database: database_id_alt) do |klass|
+              expect(klass.count).to eq(1)
+              expect(klass.first).to eq(band)
+            end
+          end
+        end
+      end
+    end
   end
 
-  describe "#clear_persistence_context!" do
+  # describe "#clear_persistence_context!" do
 
-  end
+  #   context "when calling on a criteria" do
+  #     let(:criteria) { Band.with(collection: "artists") }
+
+  #     before do
+  #       expect(criteria.persistence_context?).to be true
+  #     end
+
+  #     it "clears the persistence context" do
+  #       criteria.clear_persistence_context!
+  #       expect(criteria.persistence_context?).to be false
+  #     end
+  #   end
+
+  #   context "when calling on a document" do
+
+  #     let(:band) { Band.new.with(collection: "artists") }
+
+  #     before do
+  #       expect(band.persistence_context?).to be true
+  #     end
+
+  #     it "clears the persistence context" do
+  #       band.clear_persistence_context!
+  #       expect(band.persistence_context?).to be false
+  #     end
+  #   end
+
+  #   context "when there is no persistence context" do
+
+  #     before do
+  #       expect(Band.persistence_context?).to be false
+  #     end
+
+  #     it "clears the persistence context" do
+  #       Band.clear_persistence_context!
+  #       expect(Band.persistence_context?).to be false
+  #     end
+  #   end
+  # end
 end
