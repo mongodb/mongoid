@@ -404,6 +404,138 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context "when setting a new client" do
+      use_spec_mongoid_config
+
+      context "when calling #with on a criteria" do
+
+        let(:criteria) do
+          Band.criteria
+        end
+
+        before do
+          Band.with(client: :reports) do |klass|
+            klass.destroy_all
+            expect(klass.count).to eq(0)
+            5.times { klass.create! }
+            expect(klass.count).to eq(5)
+          end
+          expect(Band.count).to eq(0)
+        end
+
+        context "when using the block form" do
+
+          it "reads from the correct database" do
+            criteria.with(client: :reports) do |crit|
+              expect(crit.count).to eq(5)
+            end
+          end
+        end
+
+        context "when not using blocks" do
+
+          let!(:criteria) do
+            Band.criteria.with(client: :reports)
+          end
+
+          it "reads correctly" do
+            expect(criteria.count).to eq(5)
+          end
+        end
+      end
+
+      context "when calling #with on the klass" do
+
+        before do
+          Band.with(client: :reports) do |klass|
+            klass.destroy_all
+            expect(klass.count).to eq(0)
+            5.times { klass.create! }
+            expect(klass.count).to eq(5)
+          end
+          expect(Band.count).to eq(0)
+        end
+
+        context "when using the block form" do
+
+          it "reads from the correct database" do
+            Band.with(client: :reports) do |klass|
+              expect(klass.count).to eq(5)
+            end
+          end
+        end
+
+        context "when not using block form" do
+
+          let!(:criteria) { Band.with(client: :reports) }
+
+          it "reads from the correct database" do
+            expect(criteria.count).to eq(5)
+          end
+        end
+
+        context "when using an old criteria" do
+
+          let(:criteria) do
+            crit = Band.all
+            crit.view # load the view
+            crit.with(client: :reports)
+          end
+
+          it "reads from the correct database" do
+            expect(criteria.count).to eq(5)
+          end
+        end
+      end
+
+      context "when calling #with on a document" do
+
+        let(:band) { Band.new }
+
+        before do
+          Band.with(client: :reports) do |klass|
+            klass.destroy_all
+            expect(klass.count).to eq(0)
+          end
+          expect(Band.count).to eq(0)
+        end
+
+        context "when using the block form" do
+
+          before do
+            band.with(client: :reports) do |band|
+              band.save
+            end
+            expect(Band.count).to eq(0)
+          end
+
+          it "reads from the correct database" do
+            Band.with(client: :reports) do |klass|
+              expect(klass.count).to eq(1)
+              expect(klass.first).to eq(band)
+            end
+          end
+        end
+
+        context "when not using block form" do
+
+          let(:band) { Band.new.with(client: :reports) }
+
+          before do
+            band.save
+            expect(Band.count).to eq(0)
+          end
+
+          it "reads from the correct database" do
+            Band.with(client: :reports) do |klass|
+              expect(klass.count).to eq(1)
+              expect(klass.first).to eq(band)
+            end
+          end
+        end
+      end
+    end
   end
 
   # describe "#clear_persistence_context!" do
