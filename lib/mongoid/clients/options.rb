@@ -26,7 +26,7 @@ module Mongoid
             set_persistence_context(options_or_context)
             yield self
           ensure
-            clear_persistence_context(original_cluster, @original_context)
+            clear_persistence_context(original_cluster, original_context)
           end
         else
           # If #with is called on a Criteria we want to return a new criteria,
@@ -126,7 +126,7 @@ module Mongoid
               set_persistence_context(options_or_context)
               yield self
             ensure
-              clear_persistence_context(original_cluster, @original_context)
+              clear_persistence_context(original_cluster, original_context)
             end
           else
             crit = criteria
