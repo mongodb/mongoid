@@ -406,7 +406,16 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when setting a new client" do
-      use_spec_mongoid_config
+
+      let(:client_name) { :alternative }
+
+      before do
+        Mongoid.clients[client_name] = { database: database_id_alt, hosts: SpecConfig.instance.addresses }
+      end
+
+      after do
+        Mongoid.clients.delete(client_name)
+      end
 
       context "when calling #with on a criteria" do
 
@@ -415,7 +424,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         before do
-          Band.with(client: :reports) do |klass|
+          Band.with(client: :alternative) do |klass|
             klass.destroy_all
             expect(klass.count).to eq(0)
             5.times { klass.create! }
@@ -427,7 +436,7 @@ describe Mongoid::Contextual::Mongo do
         context "when using the block form" do
 
           it "reads from the correct client" do
-            criteria.with(client: :reports) do |crit|
+            criteria.with(client: :alternative) do |crit|
               expect(crit.count).to eq(5)
             end
           end
@@ -436,7 +445,7 @@ describe Mongoid::Contextual::Mongo do
         context "when not using blocks" do
 
           let!(:criteria) do
-            Band.criteria.with(client: :reports)
+            Band.criteria.with(client: :alternative)
           end
 
           it "reads correctly" do
@@ -448,7 +457,7 @@ describe Mongoid::Contextual::Mongo do
       context "when calling #with on the klass" do
 
         before do
-          Band.with(client: :reports) do |klass|
+          Band.with(client: :alternative) do |klass|
             klass.destroy_all
             expect(klass.count).to eq(0)
             5.times { klass.create! }
@@ -460,7 +469,7 @@ describe Mongoid::Contextual::Mongo do
         context "when using the block form" do
 
           it "reads from the correct client" do
-            Band.with(client: :reports) do |klass|
+            Band.with(client: :alternative) do |klass|
               expect(klass.count).to eq(5)
             end
           end
@@ -468,7 +477,7 @@ describe Mongoid::Contextual::Mongo do
 
         context "when not using block form" do
 
-          let!(:criteria) { Band.with(client: :reports) }
+          let!(:criteria) { Band.with(client: :alternative) }
 
           it "reads from the correct client" do
             expect(criteria.count).to eq(5)
@@ -480,7 +489,7 @@ describe Mongoid::Contextual::Mongo do
           let(:criteria) do
             crit = Band.all
             crit.view # load the view
-            crit.with(client: :reports)
+            crit.with(client: :alternative)
           end
 
           it "reads from the correct client" do
@@ -494,7 +503,7 @@ describe Mongoid::Contextual::Mongo do
         let(:band) { Band.new }
 
         before do
-          Band.with(client: :reports) do |klass|
+          Band.with(client: :alternative) do |klass|
             klass.destroy_all
             expect(klass.count).to eq(0)
           end
@@ -504,14 +513,14 @@ describe Mongoid::Contextual::Mongo do
         context "when using the block form" do
 
           before do
-            band.with(client: :reports) do |band|
+            band.with(client: :alternative) do |band|
               band.save
             end
             expect(Band.count).to eq(0)
           end
 
           it "reads from the correct client" do
-            Band.with(client: :reports) do |klass|
+            Band.with(client: :alternative) do |klass|
               expect(klass.count).to eq(1)
               expect(klass.first).to eq(band)
             end
@@ -520,7 +529,7 @@ describe Mongoid::Contextual::Mongo do
 
         context "when not using block form" do
 
-          let(:band) { Band.new.with(client: :reports) }
+          let(:band) { Band.new.with(client: :alternative) }
 
           before do
             band.save
@@ -528,7 +537,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "reads from the correct client" do
-            Band.with(client: :reports) do |klass|
+            Band.with(client: :alternative) do |klass|
               expect(klass.count).to eq(1)
               expect(klass.first).to eq(band)
             end
