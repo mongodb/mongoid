@@ -91,10 +91,10 @@ used for persistence:
 
   Band.client_name
   # => :default
-  
+
   Band.database_name
   # => "mongoid"
-  
+
   Band.collection_name
   # => :bands
 
@@ -128,6 +128,8 @@ If no ``store_in`` macro would have been provided, Mongoid would store the model
 collection named "bands" in the default database in the default client.
 
 
+.. _runtime-persistence-options:
+
 Runtime Persistence Options
 ---------------------------
 
@@ -139,21 +141,21 @@ operations by using the ``with`` method on a model class or instance:
 
   Band.with(database: "music-non-stop") do |klass|
     klass.create(...)
-    
+
     band = Band.first
-    
+
     Band.create(...)
   end
-  
+
   Band.with(collection: "artists") do |klass|
     klass.delete_all
-    
+
     Band.delete_all
   end
-  
+
   band.with(client: :tertiary) do |band_object|
     band_object.save!
-    
+
     band.save!
   end
 
@@ -163,6 +165,15 @@ the persistence context on the model class or instance that ``with`` was
 called on is changed to the temporary persistence context. For convenience,
 the model class or instance that ``with`` was called on is yielded to the
 block.
+
+The ``with`` method can be used to set the persistence context for a specific
+criteria as well:
+
+.. code-block:: ruby
+
+  Band.all.with(collection: "artists") do |criteria|
+    band = criteria.first
+  end
 
 The temporary persistence context applies to both queries and writes.
 
@@ -177,22 +188,52 @@ failing subsequent updates:
   band.with(collection: "artists") do |band_object|
     band_object.save!
   end
-  
+
   # This will not save - updates the collection "bands" which does not have
   # the Scuba band
   band.update_attribute(likes: 1000)
-  
+
   # This will update the document.
   band.with(collection: "artists") do |band_object|
     band_object.update_attribute(likes: 1000)
   end
 
-As of Mongoid 6.0, the ``with`` method must always be called with a block,
-and the temporary persistence context exists only for the duration of the block.
-This is because a new client is created under the covers with the options
-passed to ``with``. To ensure that this client is closed and its associated
-resources are freed, the scope when this client could be used must be
-well-defined.
+The ``with`` command can also be used without a block:
+
+.. code-block:: ruby
+
+  # The #with method on Model classes returns a criteria.
+  criteria = Band.with(database: "music-non-stop")
+  # => #<Mongoid::Criteria
+         selector: {}
+         options:  {}
+         class:    Band
+         embedded: false>
+
+  criteria.first
+  criteria.clear_persistance_context!
+
+  # The #with method on documents modifies the document object itself since
+  # calling #dup on it will change that document's _id. The #with method on
+  # documents will also return the same document.
+  band = Band.new
+  band.with(client: :tertiary)
+  band.save!
+  band.clear_persistance_context!
+
+  # The #with method on criteria returns a new criteria.
+  criteria = Band.all.with(collection: "artists")
+  band = criteria.first
+  criteria.clear_persistance_context!
+
+As of Mongoid 8.1, the ``with`` method can be called with or without a block.
+If it is called with a block, the temporary persistence context will exist only
+for the duration of the block. If the ``with`` method is called without a block,
+the ``clear_persistance_context!`` method must be called on the criteria or
+document returned from the ``with`` method. This is because a new client is
+created under the covers with the options passed to ``with``. To ensure that
+this client is closed and its associated resources are freed, the scope when this
+client could be used must be well-defined.
 
 
 Global Override

@@ -239,3 +239,40 @@ documents should be stored in using the ``store_in`` macro:
 Previously, an error was raised if this was done. See the section on
 :ref:`Inheritance Persistence Context <inheritance-persistence-context>`
 for more details.
+
+
+Added non-block form to ``#with``
+---------------------------------
+
+Mongoid 8.1 adds support for a non-block form for the ``#with`` method. The
+``#with`` method is used for changing the ``persistence context`` of a Model
+class, a document, and, starting in Mongoid 8.1, a criteria:
+
+.. code-block:: ruby
+
+  # The #with method on Model classes returns a criteria.
+  criteria = Band.with(database: "music-non-stop")
+  # => #<Mongoid::Criteria
+         selector: {}
+         options:  {}
+         class:    Band
+         embedded: false>
+
+  criteria.first
+  criteria.clear_persistance_context!
+
+  # The #with method on documents modifies the document object itself since
+  # calling #dup on it will change that document's _id. The #with method on
+  # documents will also return the same document.
+  band = Band.new
+  band.with(client: :tertiary)
+  band.save!
+  band.clear_persistance_context!
+
+  # The #with method on criteria returns a new criteria.
+  criteria = Band.all.with(collection: "artists")
+  band = criteria.first
+  criteria.clear_persistance_context!
+
+For more information on changing persistence contexts at runtime, see the
+section on :ref:`Runtime Persistence Options <runtime-persistence-options>`.
