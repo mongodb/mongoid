@@ -6,10 +6,18 @@ module Mongoid
     # Module containing functionality for getting options on a Criteria object.
     module Options
 
+      # Returns the current persistence context or a new one constructed with
+      # self.
+      #
+      # @return [ Mongoid::PersistenceContext ] the persistence context.
       def persistence_context
         PersistenceContext.get(self) || klass.persistence_context
       end
 
+      # Was a persistence context set?
+      #
+      # @return [ true | false ] true if a persistence context was set,
+      #   false otherwise.
       def persistence_context?
         !!(PersistenceContext.get(self) || klass.persistence_context?)
       end

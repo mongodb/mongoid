@@ -55,12 +55,20 @@ module Mongoid
         persistence_context.client
       end
 
+      # Returns the current persistence context or a new one constructed with
+      # self.
+      #
+      # @return [ Mongoid::PersistenceContext ] the persistence context.
       def persistence_context
         PersistenceContext.get(self) ||
             PersistenceContext.get(self.class) ||
             PersistenceContext.new(self.class)
       end
 
+      # Was a persistence context set?
+      #
+      # @return [ true | false ] true if a persistence context was set,
+      #   false otherwise.
       def persistence_context?
         !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
       end
@@ -127,11 +135,18 @@ module Mongoid
           end
         end
 
+        # Returns the current persistence context or a new one constructed with
+        # self.
+        #
+        # @return [ Mongoid::PersistenceContext ] the persistence context.
         def persistence_context
           PersistenceContext.get(self) || PersistenceContext.new(self)
         end
 
-        # TODO test this
+        # Was a persistence context set?
+        #
+        # @return [ true | false ] true if a persistence context was set,
+        #   false otherwise.
         def persistence_context?
           !!PersistenceContext.get(self)
         end
