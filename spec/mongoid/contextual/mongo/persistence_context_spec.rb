@@ -426,7 +426,7 @@ describe Mongoid::Contextual::Mongo do
 
         context "when using the block form" do
 
-          it "reads from the correct database" do
+          it "reads from the correct client" do
             criteria.with(client: :reports) do |crit|
               expect(crit.count).to eq(5)
             end
@@ -459,7 +459,7 @@ describe Mongoid::Contextual::Mongo do
 
         context "when using the block form" do
 
-          it "reads from the correct database" do
+          it "reads from the correct client" do
             Band.with(client: :reports) do |klass|
               expect(klass.count).to eq(5)
             end
@@ -470,7 +470,7 @@ describe Mongoid::Contextual::Mongo do
 
           let!(:criteria) { Band.with(client: :reports) }
 
-          it "reads from the correct database" do
+          it "reads from the correct client" do
             expect(criteria.count).to eq(5)
           end
         end
@@ -483,7 +483,7 @@ describe Mongoid::Contextual::Mongo do
             crit.with(client: :reports)
           end
 
-          it "reads from the correct database" do
+          it "reads from the correct client" do
             expect(criteria.count).to eq(5)
           end
         end
@@ -510,7 +510,7 @@ describe Mongoid::Contextual::Mongo do
             expect(Band.count).to eq(0)
           end
 
-          it "reads from the correct database" do
+          it "reads from the correct client" do
             Band.with(client: :reports) do |klass|
               expect(klass.count).to eq(1)
               expect(klass.first).to eq(band)
@@ -527,8 +527,127 @@ describe Mongoid::Contextual::Mongo do
             expect(Band.count).to eq(0)
           end
 
-          it "reads from the correct database" do
+          it "reads from the correct client" do
             Band.with(client: :reports) do |klass|
+              expect(klass.count).to eq(1)
+              expect(klass.first).to eq(band)
+            end
+          end
+        end
+      end
+    end
+
+    context "when setting a client option" do
+
+      let(:client) { Band.collection.client }
+
+      before do
+        client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+      end
+
+      after do
+        client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+      end
+
+      let(:subscriber) do
+        EventSubscriber.new
+      end
+
+      context "when calling #with on a criteria" do
+
+        let(:criteria) do
+          Band.criteria
+        end
+
+        before do
+          5.times { Band.create! }
+        end
+
+        context "when using the block form" do
+
+          it "has the correct write preference" do
+            criteria.with(write: { w: 0 }) do |crit|
+              expect(crit.destroy_all).to eq(0)
+            end
+          end
+        end
+
+        context "when not using blocks" do
+
+          let!(:criteria) do
+            Band.criteria.with(write: { w: 0 })
+          end
+
+          it "has the correct write preference" do
+            expect(criteria.destroy_all).to eq(0)
+          end
+        end
+      end
+
+      context "when calling #with on the klass" do
+
+        before do
+          5.times { Band.create! }
+        end
+
+        context "when using the block form" do
+
+          it "has the correct write preference" do
+            Band.with(write: { w: 0 }) do |klass|
+              expect(klass.destroy_all).to eq(0)
+            end
+          end
+        end
+
+        context "when not using block form" do
+
+          let!(:criteria) { Band.with(write: { w: 0 }) }
+
+          it "has the correct write preference" do
+            expect(criteria.destroy_all).to eq(0)
+          end
+        end
+
+        context "when using an old criteria" do
+
+          let(:criteria) do
+            crit = Band.all
+            crit.view # load the view
+            crit.with(write: { w: 0 })
+          end
+
+          it "has the correct write preference" do
+            expect(criteria.destroy_all).to eq(0)
+          end
+        end
+      end
+
+      # TODO: cant figure out if this is relevant or not. havent been able to
+      # test effectively
+      xcontext "when calling #with on a document" do
+
+        let(:band) { Band.new }
+
+        context "when using the block form" do
+
+          it "has the correct write preference" do
+            band.with(write: { w: 0 }) do |band|
+              band.save
+            end
+          end
+        end
+
+        context "when not using block form" do
+
+          let(:band) { Band.new.with(write: { w: 0 }) }
+
+          before do
+            band.save
+            expect(Band.count).to eq(0)
+          end
+
+          it "has the correct write preference" do
+            Band.with(write: { w: 0 }) do |klass|
               expect(klass.count).to eq(1)
               expect(klass.first).to eq(band)
             end
@@ -538,45 +657,47 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  # describe "#clear_persistence_context!" do
+  # this might be a difficult method to implement because we'll have to keep around
+  # the original cluster and configuration.
+  xdescribe "#clear_persistence_context!" do
 
-  #   context "when calling on a criteria" do
-  #     let(:criteria) { Band.with(collection: "artists") }
+    context "when calling on a criteria" do
+      let(:criteria) { Band.with(collection: "artists") }
 
-  #     before do
-  #       expect(criteria.persistence_context?).to be true
-  #     end
+      before do
+        expect(criteria.persistence_context?).to be true
+      end
 
-  #     it "clears the persistence context" do
-  #       criteria.clear_persistence_context!
-  #       expect(criteria.persistence_context?).to be false
-  #     end
-  #   end
+      it "clears the persistence context" do
+        criteria.clear_persistence_context!
+        expect(criteria.persistence_context?).to be false
+      end
+    end
 
-  #   context "when calling on a document" do
+    context "when calling on a document" do
 
-  #     let(:band) { Band.new.with(collection: "artists") }
+      let(:band) { Band.new.with(collection: "artists") }
 
-  #     before do
-  #       expect(band.persistence_context?).to be true
-  #     end
+      before do
+        expect(band.persistence_context?).to be true
+      end
 
-  #     it "clears the persistence context" do
-  #       band.clear_persistence_context!
-  #       expect(band.persistence_context?).to be false
-  #     end
-  #   end
+      it "clears the persistence context" do
+        band.clear_persistence_context!
+        expect(band.persistence_context?).to be false
+      end
+    end
 
-  #   context "when there is no persistence context" do
+    context "when there is no persistence context" do
 
-  #     before do
-  #       expect(Band.persistence_context?).to be false
-  #     end
+      before do
+        expect(Band.persistence_context?).to be false
+      end
 
-  #     it "clears the persistence context" do
-  #       Band.clear_persistence_context!
-  #       expect(Band.persistence_context?).to be false
-  #     end
-  #   end
-  # end
+      it "clears the persistence context" do
+        Band.clear_persistence_context!
+        expect(Band.persistence_context?).to be false
+      end
+    end
+  end
 end
