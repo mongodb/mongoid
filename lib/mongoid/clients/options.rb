@@ -34,9 +34,13 @@ module Mongoid
           # since duping a document changes its _id.
           if is_a?(Criteria)
             crit = dup
+            crit.instance_variable_set("@original_cluster", original_cluster)
+            crit.instance_variable_set("@original_context", original_context)
             crit.send(:set_persistence_context, options_or_context)
             crit
           else
+            @original_cluster = original_cluster
+            @original_context = original_context
             set_persistence_context(options_or_context)
             self
           end
@@ -71,6 +75,10 @@ module Mongoid
       #   false otherwise.
       def persistence_context?
         !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
+      end
+
+      def clear_persistence_context!
+        clear_persistence_context(@original_cluster, @original_context)
       end
 
       private

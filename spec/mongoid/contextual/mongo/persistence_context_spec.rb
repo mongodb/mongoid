@@ -666,9 +666,7 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  # this might be a difficult method to implement because we'll have to keep around
-  # the original cluster and configuration.
-  xdescribe "#clear_persistence_context!" do
+  describe "#clear_persistence_context!" do
 
     context "when calling on a criteria" do
       let(:criteria) { Band.with(collection: "artists") }
@@ -699,13 +697,15 @@ describe Mongoid::Contextual::Mongo do
 
     context "when there is no persistence context" do
 
+      let(:criteria) { Band.criteria }
+
       before do
-        expect(Band.persistence_context?).to be false
+        expect(criteria.persistence_context?).to be false
       end
 
       it "clears the persistence context" do
-        Band.clear_persistence_context!
-        expect(Band.persistence_context?).to be false
+        criteria.clear_persistence_context!
+        expect(criteria.persistence_context?).to be false
       end
     end
   end

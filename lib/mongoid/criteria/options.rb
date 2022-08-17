@@ -22,6 +22,10 @@ module Mongoid
         !!(PersistenceContext.get(self) || klass.persistence_context?)
       end
 
+      def clear_persistence_context!
+        clear_persistence_context(@original_cluster, @original_context)
+      end
+
       private
 
       def set_persistence_context(options)
