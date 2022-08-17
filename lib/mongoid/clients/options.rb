@@ -21,10 +21,17 @@ module Mongoid
       def with(options_or_context, &block)
         original_context = PersistenceContext.get(self)
         original_cluster = persistence_context.cluster
-        set_persistence_context(options_or_context)
-        yield self
-      ensure
-        clear_persistence_context(original_cluster, original_context)
+        if block_given?
+          begin
+            set_persistence_context(options_or_context)
+            yield self
+          ensure
+            clear_persistence_context(original_cluster, @original_context)
+          end
+        else
+          set_persistence_context(options_or_context)
+          self
+        end
       end
 
       def collection(parent = nil)
@@ -88,22 +95,46 @@ module Mongoid
         #     m.create
         #   end
         #
-        # @param [ Hash ] options The storage options.
+        # @param [ Hash | Mongoid::PersistenceContext ] options_or_context
+        #   The storage options or a persistence context.
         #
         # @option options [ String | Symbol ] :collection The collection name.
         # @option options [ String | Symbol ] :database The database name.
         # @option options [ String | Symbol ] :client The client name.
-        def with(options, &block)
+        def with(options_or_context, &block)
           original_context = PersistenceContext.get(self)
           original_cluster = persistence_context.cluster
-          PersistenceContext.set(self, options)
-          yield self
-        ensure
-          PersistenceContext.clear(self, original_cluster, original_context)
+          if block_given?
+            begin
+              set_persistence_context(options_or_context)
+              yield self
+            ensure
+              clear_persistence_context(original_cluster, @original_context)
+            end
+          else
+            crit = criteria
+            crit.send(:set_persistence_context, options_or_context)
+            crit
+          end
         end
 
         def persistence_context
           PersistenceContext.get(self) || PersistenceContext.new(self)
+        end
+
+        # TODO test this
+        def persistence_context?
+          !!PersistenceContext.get(self)
+        end
+
+        private
+
+        def set_persistence_context(options_or_context)
+          PersistenceContext.set(self, options_or_context)
+        end
+
+        def clear_persistence_context(original_cluster = nil, context = nil)
+          PersistenceContext.clear(self, original_cluster, context)
         end
       end
     end

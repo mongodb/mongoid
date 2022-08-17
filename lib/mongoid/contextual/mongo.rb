@@ -267,7 +267,7 @@ module Mongoid
       # @param [ Criteria ] criteria The criteria.
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
-        @collection = @klass.collection
+        @collection = criteria.collection || @klass.collection
         criteria.send(:merge_type_selection)
         @view = collection.find(criteria.selector, session: _session)
         apply_options
