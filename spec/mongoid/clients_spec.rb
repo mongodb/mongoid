@@ -794,6 +794,12 @@ describe Mongoid::Clients do
             expect(db_child1).to eq({ "_id" => child1.id, "_type" => "StoreChild1" })
             expect(db_child2).to eq({ "_id" => child2.id, "_type" => "StoreChild2" })
           end
+
+          it "only queries from its own collections" do
+            expect(StoreParent.count).to eq(1)
+            expect(StoreChild1.count).to eq(1)
+            expect(StoreChild2.count).to eq(1)
+          end
         end
 
         context "when it is called on one of the subclasses" do
@@ -811,6 +817,12 @@ describe Mongoid::Clients do
             expect(db_parent).to eq({ "_id" => parent.id, "_type" => "StoreParent" })
             expect(db_child1).to eq({ "_id" => child1.id, "_type" => "StoreChild1" })
             expect(db_child2).to eq({ "_id" => child2.id, "_type" => "StoreChild2" })
+          end
+
+          it "queries from its own collections" do
+            expect(StoreParent.count).to eq(2)
+            expect(StoreChild1.count).to eq(1)
+            expect(StoreChild2.count).to eq(1)
           end
         end
       end
