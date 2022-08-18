@@ -491,7 +491,7 @@ describe 'callbacks integration tests' do
       end
     end
 
-    it 'respoduces ActiveRecord::AttributeMethods::Dirty behavior' do
+    it 'reproduces ActiveRecord::AttributeMethods::Dirty behavior' do
       subject = TestSCTAAndABLSInCallbacks.new(name: 'Name 1')
       subject.save!
       subject.age = 18
