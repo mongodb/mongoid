@@ -54,7 +54,7 @@ callbacks:
   # attribute_before_last_save(:name): John => Value before save
   # saved_change_to_attribute(:name): ["John", "Jane"] => Both values
 
-For all of the new method there is also a shorter form created dynamically, e.g.
+For all of the new methods there are also shorter forms created dynamically, e.g.
 ``attribute_before_last_save(:name)`` is equivalent to ``name_before_last_save``,
 ``saved_change_to_attribute(:name)`` is equivalent to ````saved_change_to_name``,
 and ``will_save_change_to_attribute?(:name)`` is equivalent to ``will_save_change_to_name?``.
