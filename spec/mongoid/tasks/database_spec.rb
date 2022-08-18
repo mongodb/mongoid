@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './models'
 
 describe "Mongoid::Tasks::Database" do
 
@@ -16,6 +17,26 @@ describe "Mongoid::Tasks::Database" do
 
   let(:models) do
     [ User, Account, Address, Draft ]
+  end
+
+  describe '.create_collections' do
+    let(:models) do
+      [DatabaseSpec::Measurement, Person]
+    end
+
+    context 'collection_options are specified' do
+      it 'creates the collection' do
+        expect(DatabaseSpec::Measurement).to receive(:create_collection).once
+        Mongoid::Tasks::Database.create_collections(models)
+      end
+    end
+
+    context 'collection_options are not specified' do
+      it 'does nothing' do
+        expect(Person).to receive(:create_collection).never
+        Mongoid::Tasks::Database.create_collections(models)
+      end
+    end
   end
 
   describe ".create_indexes" do

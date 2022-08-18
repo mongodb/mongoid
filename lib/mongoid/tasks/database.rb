@@ -5,6 +5,18 @@ module Mongoid
     module Database
       extend self
 
+      def create_collections(models = ::Mongoid.models)
+        models.each do |model|
+          next if model.storage_options.fetch(:collection_options, {}).empty?
+          if !model.embedded? || model.cyclic?
+            model.create_collection
+            logger.info("MONGOID: Created collection for #{model}:")
+          else
+            logger.info("MONGOID: collection options ignored on: #{model}, please define in the root model.")
+          end
+        end
+      end
+
       # Create indexes for each model given the provided globs and the class is
       # not embedded.
       #
