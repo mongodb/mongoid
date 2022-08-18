@@ -471,23 +471,33 @@ describe 'callbacks integration tests' do
       end
 
       def saved_change_to_attribute_values_before
-        @saved_change_to_attribute_values_before ||= Hash.new([])
+        @saved_change_to_attribute_values_before ||= Hash.new do
+          []
+        end
       end
 
       def attribute_before_last_save_values_before
-        @attribute_before_last_save_values_before ||= Hash.new([])
+        @attribute_before_last_save_values_before ||= Hash.new do
+          []
+        end
       end
 
       def saved_change_to_attribute_values_after
-        @saved_change_to_attribute_values_after ||= Hash.new([])
+        @saved_change_to_attribute_values_after ||= Hash.new do
+          []
+        end
       end
 
       def attribute_before_last_save_values_after
-        @attribute_before_last_save_values_after ||= Hash.new([])
+        @attribute_before_last_save_values_after ||= Hash.new do
+          []
+        end
       end
 
       def will_save_change_to_attribute_values_before
-        @will_save_change_to_attribute_values_before ||= Hash.new([])
+        @will_save_change_to_attribute_values_before ||= Hash.new do
+          []
+        end
       end
     end
 

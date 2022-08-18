@@ -32,6 +32,8 @@ callbacks:
     field :name, type: String
 
     before_save do
+      puts "attribute_was(:name): #{attribute_was(:name)}"
+      puts "attribute_before_last_save(:name): #{attribute_before_last_save(:name)}"
       puts "will_save_change_to_attribute?(:name): #{will_save_change_to_attribute?(:name)}"
     end
 
@@ -43,16 +45,33 @@ callbacks:
   end
 
   person = Person.create(name: 'John')
-  # "will_save_change_to_attribute?(:name): true"
-  # attribute_was(:name): John => New value
-  # attribute_before_last_save(:name): nil => Value before save
-  # saved_change_to_attribute(:name): [nil, "John"] => Both values
+  #
+  # before_save
+  #
+  ## attribute_was(:name): nil
+  ## attribute_before_last_save(:name): nil
+  ## will_save_change_to_attribute?(:name): true
+  #
+  # after_save
+  #
+  ## attribute_was(:name): John => New value
+  ## attribute_before_last_save(:name): nil => Value before save
+  ## saved_change_to_attribute(:name): [nil, "John"] => Both values
+
   person.name = 'Jane'
   person.save
-  # "will_save_change_to_attribute?(:name): true"
-  # attribute_was(:name): Jane => New value
-  # attribute_before_last_save(:name): John => Value before save
-  # saved_change_to_attribute(:name): ["John", "Jane"] => Both values
+  #
+  # before_save
+  #
+  ## attribute_was(:name): John => attribute_was not look back before the last save
+  ## attribute_before_last_save(:name): nil => value before the last save
+  ## will_save_change_to_attribute?(:name): true
+  #
+  # after_save
+  #
+  ## attribute_was(:name): Jane => New value
+  ## attribute_before_last_save(:name): John => Value before save
+  ## saved_change_to_attribute(:name): ["John", "Jane"] => Both values
 
 For all of the new methods there are also shorter forms created dynamically, e.g.
 ``attribute_before_last_save(:name)`` is equivalent to ``name_before_last_save``,
