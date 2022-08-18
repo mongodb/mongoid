@@ -6,10 +6,6 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-
-        # NOTE: use class_attribute here so that when the child modifies its
-        # storage options, the parent is not also modified. Using cattr_accessor
-        # causes both to be modified
         class_attribute :storage_options, instance_writer: false, default: storage_options_defaults
       end
 
