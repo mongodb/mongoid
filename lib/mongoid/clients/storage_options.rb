@@ -7,9 +7,10 @@ module Mongoid
 
       included do
 
-        cattr_accessor :storage_options, instance_writer: false do
-          storage_options_defaults
-        end
+        # NOTE: use class_attribute here so that when the child modifies its
+        # storage options, the parent is not also modified. Using cattr_accessor
+        # causes both to be modified
+        class_attribute :storage_options, instance_writer: false, default: storage_options_defaults
       end
 
       module ClassMethods
@@ -49,7 +50,7 @@ module Mongoid
         # @return [ Class ] The model class.
         def store_in(options)
           Validators::Storage.validate(self, options)
-          storage_options.merge!(options)
+          self.storage_options = self.storage_options.merge(options)
         end
 
         # Reset the store_in options

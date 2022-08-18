@@ -324,12 +324,6 @@ en:
             \_\_\_\_include Mongoid::Document\n
             \_\_\_\_store_in collection: 'artists', database: 'music'\n
             \_\_end\n\n"
-        invalid_storage_parent:
-          message: "Invalid store_in call on class %{klass}."
-          summary: "The :store_in macro can only be called on a base Mongoid Document"
-          resolution: "Remove the store_in call on class %{klass}, as it will use its
-            parent store configuration. Or remove the hierarchy extension for this
-            class."
         invalid_time:
           message: "'%{value}' is not a valid Time."
           summary: "Mongoid tries to serialize the values for Date, DateTime, and
