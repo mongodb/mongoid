@@ -1717,6 +1717,43 @@ describe Mongoid::Changeable do
     end
   end
 
+  describe '#saved_change_to_attribute?' do
+    context "when the document has been saved" do
+      let(:person) do
+        Person.create!(title: "Grand Poobah")
+      end
+
+      before do
+        person.title = "Captain Obvious"
+      end
+
+      before do
+        person.save!
+      end
+
+      it "detects the changes" do
+        expect(person.saved_change_to_attribute?(:title)).to be_truthy
+        expect(person.saved_change_to_attribute?(:title, from: "Grand Poobah")).to be_truthy
+        expect(person.saved_change_to_attribute?(:title, to: "Captain Obvious")).to be_truthy
+        expect(person.saved_change_to_attribute?(:title, from: "Grand Poobah", to: "Captain Obvious")).to be_truthy
+        expect(person.saved_change_to_title?(from: "Grand Poobah", to: "Captain Obvious")).to be_truthy
+        expect(person.saved_change_to_attribute?(:age)).to be_falsey
+        expect(person.saved_change_to_age?).to be_falsey
+      end
+    end
+
+    context "when the document has not been saved" do
+      let(:person) do
+        Person.new(title: "Grand Poobah")
+      end
+
+      it "returns changes for the previous save" do
+        expect(person.saved_change_to_attribute?(:title)).to be_falsey
+        expect(person.saved_change_to_title?).to be_falsey
+      end
+    end
+  end
+
   describe '#will_save_change_to_attribute?' do
     let(:person) do
       Person.create!(title: "Grand Poobah")

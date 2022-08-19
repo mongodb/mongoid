@@ -159,6 +159,32 @@ module Mongoid
       previous_changes[attr]
     end
 
+    # Returns whether this attribute changed during the last save.
+    #
+    # This method is useful in after callbacks, to see the change
+    #   in an attribute during the save that triggered the callbacks to run.
+    #
+    # @param [ String ] attr The name of the attribute.
+    # @param **kwargs The optional keyword arguments.
+    #
+    # @option **kwargs [ Object ] :from The object the attribute was changed from.
+    # @option **kwargs [ Object ] :to The object the attribute was changed to.
+    #
+    # @return [ true | false ] Whether the attribute has changed during the last save.
+    def saved_change_to_attribute?(attr, **kwargs)
+      changes = saved_change_to_attribute(attr)
+      return false unless changes.is_a?(Array)
+      if kwargs.key?(:from) && kwargs.key?(:to)
+        changes.first == kwargs[:from] && changes.last == kwargs[:to]
+      elsif kwargs.key?(:from)
+        changes.first == kwargs[:from]
+      elsif kwargs.key?(:to)
+        changes.last == kwargs[:to]
+      else
+        true
+      end
+    end
+
     # Returns whether this attribute change the next time we save.
     #
     # This method is useful in validations and before callbacks to determine
@@ -408,6 +434,9 @@ module Mongoid
           end
           re_define_method("saved_change_to_#{meth}") do
             saved_change_to_attribute(name)
+          end
+          re_define_method("saved_change_to_#{meth}?") do |**kwargs|
+            saved_change_to_attribute?(name, **kwargs)
           end
         end
       end

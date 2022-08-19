@@ -448,7 +448,7 @@ describe 'callbacks integration tests' do
     end
   end
 
-  context 'saved_change_to_attribute and attribute_before_last_save' do
+  context 'saved_change_to_attribute, attribute_before_last_save, will_save_change_to_attribute' do
     class TestSCTAAndABLSInCallbacks
       include Mongoid::Document
 
@@ -466,6 +466,7 @@ describe 'callbacks integration tests' do
       set_callback :save, :after do |doc|
         [:name, :age].each do |attr|
           saved_change_to_attribute_values_after[attr] += [saved_change_to_attribute(attr)]
+          saved_change_to_attribute_q_values_after[attr] += [saved_change_to_attribute?(attr)]
           attribute_before_last_save_values_after[attr] += [attribute_before_last_save(attr)]
         end
       end
@@ -484,6 +485,12 @@ describe 'callbacks integration tests' do
 
       def saved_change_to_attribute_values_after
         @saved_change_to_attribute_values_after ||= Hash.new do
+          []
+        end
+      end
+
+      def saved_change_to_attribute_q_values_after
+        @saved_change_to_attribute_q_values_after ||= Hash.new do
           []
         end
       end
@@ -519,6 +526,12 @@ describe 'callbacks integration tests' do
         {
           :name => [[nil, "Name 1"], nil, ["Name 1", "Name 2"]],
           :age => [nil, [nil, 18], nil],
+        }
+      )
+      expect(subject.saved_change_to_attribute_q_values_after).to eq(
+        {
+          :name => [true, false, true],
+          :age => [false, true, false],
         }
       )
       expect(subject.attribute_before_last_save_values_before).to eq(
