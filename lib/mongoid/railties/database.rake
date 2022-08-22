@@ -25,7 +25,7 @@ namespace :db do
 
   unless Rake::Task.task_defined?("db:setup")
     desc "Create the database, and initialize with the seed data"
-    task :setup => [ "db:create", "mongoid:create_indexes", "db:seed" ]
+    task :setup => [ "db:create", "mongoid:create_indexes", "mongoid:create_collections", "db:seed" ]
   end
 
   unless Rake::Task.task_defined?("db:reset")
@@ -55,7 +55,7 @@ namespace :db do
 
   unless Rake::Task.task_defined?("db:test:prepare")
     namespace :test do
-      task :prepare => "mongoid:create_indexes"
+      task :prepare => ["mongoid:create_indexes", "mongoid:create_collections"]
     end
   end
 
@@ -65,7 +65,7 @@ namespace :db do
   end
 
   unless Rake::Task.task_defined?("db:create_collections")
-    desc "Create indexes specified in Mongoid models"
+    desc "Create collections specified in Mongoid models"
     task :create_indexes => "mongoid:create_collections"
   end
 
