@@ -5,6 +5,12 @@ namespace :db do
     task :load_models do
     end
 
+    desc "Create collections specified in Mongoid models"
+    task :create_collections => [:environment, :load_models] do
+      ::Mongoid::Tasks::Database.create_collections
+    end
+
+
     desc "Create indexes specified in Mongoid models"
     task :create_indexes => [:environment, :load_models] do
       ::Mongoid::Tasks::Database.create_indexes

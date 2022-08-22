@@ -59,14 +59,14 @@ namespace :db do
     end
   end
 
+  unless Rake::Task.task_defined?("db:create_collections")
+    desc "Create collections specified in Mongoid models"
+    task :create_collections => "mongoid:create_collections"
+  end
+
   unless Rake::Task.task_defined?("db:create_indexes")
     desc "Create indexes specified in Mongoid models"
     task :create_indexes => "mongoid:create_indexes"
-  end
-
-  unless Rake::Task.task_defined?("db:create_collections")
-    desc "Create collections specified in Mongoid models"
-    task :create_indexes => "mongoid:create_collections"
   end
 
   unless Rake::Task.task_defined?("db:remove_indexes")
