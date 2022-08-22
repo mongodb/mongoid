@@ -82,7 +82,7 @@ describe Mongoid::CollectionConfigurable do
       end
 
       after do
-        subject.store_in({})
+        Object.send(:remove_const, :CollectionConfigurableTimeseries)
       end
 
       it 'raises an error' do
