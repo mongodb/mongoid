@@ -20,11 +20,11 @@ describe "Mongoid::Tasks::Database" do
   end
 
   describe '.create_collections' do
-    let(:models) do
-      [DatabaseSpec::Measurement, Person]
-    end
-
     context 'collection_options are specified' do
+      let(:models) do
+        [DatabaseSpec::Measurement]
+      end
+
       it 'creates the collection' do
         expect(DatabaseSpec::Measurement).to receive(:create_collection).once
         Mongoid::Tasks::Database.create_collections(models)
@@ -32,6 +32,10 @@ describe "Mongoid::Tasks::Database" do
     end
 
     context 'collection_options are not specified' do
+      let(:models) do
+        [Person]
+      end
+
       it 'does nothing' do
         expect(Person).to receive(:create_collection).never
         Mongoid::Tasks::Database.create_collections(models)
