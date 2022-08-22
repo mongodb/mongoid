@@ -4,14 +4,6 @@ require "spec_helper"
 
 class CollectionConfigurableTimeseries
   include Mongoid::Document
-
-  store_in collection_options: {
-    time_series: {
-      timeField: "timestamp",
-      granularity: "hours"
-    },
-    expire_after: 604800
-  }
 end
 
 class CollectionConfigurableCapped
@@ -75,6 +67,22 @@ describe Mongoid::CollectionConfigurable do
 
       let(:subject) do
         CollectionConfigurableTimeseries
+      end
+
+      before do
+        subject.store_in(
+          collection_options: {
+            time_series: {
+              timeField: "timestamp",
+              granularity: "hours"
+            },
+            expire_after: 604800
+          }
+        )
+      end
+
+      after do
+        subject.store_in({})
       end
 
       it 'raises an error' do
