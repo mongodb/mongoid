@@ -2,10 +2,6 @@
 
 require "spec_helper"
 
-class CollectionConfigurableTimeseries
-  include Mongoid::Document
-end
-
 class CollectionConfigurableCapped
   include Mongoid::Document
 
@@ -27,7 +23,6 @@ end
 describe Mongoid::CollectionConfigurable do
   before(:each) do
     [
-      CollectionConfigurableTimeseries,
       CollectionConfigurableCapped,
       CollectionConfigurableUnknownOptions
     ].each do |klaz|
@@ -63,35 +58,22 @@ describe Mongoid::CollectionConfigurable do
     end
 
     context 'with unsupported options' do
-      max_server_version '4.99'
 
       let(:subject) do
-        CollectionConfigurableTimeseries
+        CollectionConfigurableCapped
       end
 
       before do
-        subject.store_in(
-          collection_options: {
-            time_series: {
-              timeField: "timestamp",
-              granularity: "hours"
-            },
-            expire_after: 604800
-          }
-        )
-      end
-
-      after do
-        Object.send(:remove_const, :CollectionConfigurableTimeseries)
+        expect_any_instance_of(Mongo::Collection)
+          .to receive(:create)
+          .with({ capped: true, size: 10000 })
+          .and_raise(Mongo::Error::OperationFailure)
       end
 
       it 'raises an error' do
         expect do
           subject.create_collection
         end.to raise_error(Mongoid::Errors::CreateCollection)
-        expect(
-          subject.collection.database.list_collections(filter: { name: subject.collection_name.to_s })
-        ).to be_empty
       end
     end
   end
