@@ -17,6 +17,74 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Added ``attribute_before_last_save``, ``saved_change_to_attribute``, ``saved_change_to_attribute?``, and ``will_save_change_to_attribute?``  methods
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+These new methods behave identically to corresponding methods
+from ``ActiveRecord::AttributeMethods::Dirty``. The methods are particularly useful in
+callbacks:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :name, type: String
+
+    before_save do
+      puts "attribute_was(:name): #{attribute_was(:name)}"
+      puts "attribute_before_last_save(:name): #{attribute_before_last_save(:name)}"
+      puts "will_save_change_to_attribute?(:name): #{will_save_change_to_attribute?(:name)}"
+    end
+
+    after_save do
+      puts "attribute_was(:name): #{attribute_was(:name)}"
+      puts "attribute_before_last_save(:name): #{attribute_before_last_save(:name)}"
+      puts "saved_change_to_attribute(:name): #{saved_change_to_attribute(:name)}"
+      puts "attribute_changed?(:name): #{attribute_changed?(:name)}"
+      puts "saved_change_to_attribute?(:name): #{saved_change_to_attribute?(:name)}"
+    end
+  end
+
+  person = Person.create(name: 'John')
+  #
+  # before_save
+  #
+  ## attribute_was(:name): nil
+  ## attribute_before_last_save(:name): nil
+  ## will_save_change_to_attribute?(:name): true
+  #
+  # after_save
+  #
+  ## attribute_was(:name): John => New value
+  ## attribute_before_last_save(:name): nil => Value before save
+  ## saved_change_to_attribute(:name): [nil, "John"] => Both values
+  ## attribute_changed?(:name): false
+  ## saved_change_to_attribute?(:name): true => Correctly indicates that the change for :name was saved
+
+  person.name = 'Jane'
+  person.save
+  #
+  # before_save
+  #
+  ## attribute_was(:name): John => attribute_was not look back before the last save
+  ## attribute_before_last_save(:name): nil => value before the last save
+  ## will_save_change_to_attribute?(:name): true
+  #
+  # after_save
+  #
+  ## attribute_was(:name): Jane => New value
+  ## attribute_before_last_save(:name): John => Value before save
+  ## saved_change_to_attribute(:name): ["John", "Jane"] => Both values
+  ## attribute_changed?(:name): false
+  ## saved_change_to_attribute?(:name): true => Correctly indicates that the change for :name was saved
+
+For all of the new methods there are also shorter forms created dynamically, e.g.
+``attribute_before_last_save(:name)`` is equivalent to ``name_before_last_save``,
+``saved_change_to_attribute(:name)`` is equivalent to ``saved_change_to_name``,
+``saved_change_to_attribute?(:name)`` is equivalent to ``saved_change_to_name?``,
+and ``will_save_change_to_attribute?(:name)`` is equivalent to ``will_save_change_to_name?``.
+
 
 Configuration DSL No Longer Requires an Argument to its Block
 -------------------------------------------------------------

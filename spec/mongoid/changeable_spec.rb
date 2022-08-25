@@ -1661,6 +1661,117 @@ describe Mongoid::Changeable do
     end
   end
 
+  describe '#attribute_before_last_save' do
+    let(:person) do
+      Person.create!(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    context "when the document has been saved" do
+      before do
+        person.save!
+      end
+
+      it "returns the changes" do
+        expect(person.attribute_before_last_save(:title)).to eq("Grand Poobah")
+        expect(person.title_before_last_save).to eq("Grand Poobah")
+      end
+    end
+
+    context "when the document has not been saved" do
+      it "returns no changes" do
+        expect(person.attribute_before_last_save(:title)).to be_nil
+        expect(person.title_before_last_save).to be_nil
+      end
+    end
+  end
+
+  describe '#saved_change_to_attribute' do
+    let(:person) do
+      Person.create!(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    context "when the document has been saved" do
+      before do
+        person.save!
+      end
+
+      it "returns the changes" do
+        expect(person.saved_change_to_attribute(:title)).to eq(["Grand Poobah", "Captain Obvious"])
+        expect(person.saved_change_to_title).to eq(["Grand Poobah", "Captain Obvious"])
+      end
+    end
+
+    context "when the document has not been saved" do
+      it "returns changes for the previous save" do
+        expect(person.saved_change_to_attribute(:title)).to eq([nil, "Grand Poobah"])
+        expect(person.saved_change_to_title).to eq([nil, "Grand Poobah"])
+      end
+    end
+  end
+
+  describe '#saved_change_to_attribute?' do
+    context "when the document has been saved" do
+      let(:person) do
+        Person.create!(title: "Grand Poobah")
+      end
+
+      before do
+        person.title = "Captain Obvious"
+      end
+
+      before do
+        person.save!
+      end
+
+      it "detects the changes" do
+        expect(person.saved_change_to_attribute?(:title)).to be_truthy
+        expect(person.saved_change_to_attribute?(:title, from: "Grand Poobah")).to be_truthy
+        expect(person.saved_change_to_attribute?(:title, to: "Captain Obvious")).to be_truthy
+        expect(person.saved_change_to_attribute?(:title, from: "Grand Poobah", to: "Captain Obvious")).to be_truthy
+        expect(person.saved_change_to_title?(from: "Grand Poobah", to: "Captain Obvious")).to be_truthy
+        expect(person.saved_change_to_attribute?(:age)).to be_falsey
+        expect(person.saved_change_to_age?).to be_falsey
+      end
+    end
+
+    context "when the document has not been saved" do
+      let(:person) do
+        Person.new(title: "Grand Poobah")
+      end
+
+      it "returns changes for the previous save" do
+        expect(person.saved_change_to_attribute?(:title)).to be_falsey
+        expect(person.saved_change_to_title?).to be_falsey
+      end
+    end
+  end
+
+  describe '#will_save_change_to_attribute?' do
+    let(:person) do
+      Person.create!(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    it 'correctly detects changes' do
+      expect(person.will_save_change_to_attribute?(:title)).to eq(true)
+      expect(person.will_save_change_to_title?).to eq(true)
+      expect(person.will_save_change_to_attribute?(:score)).to eq(false)
+      expect(person.will_save_change_to_score?).to eq(false)
+    end
+
+  end
+
   context "when fields have been defined pre-dirty inclusion" do
 
     let(:document) do
