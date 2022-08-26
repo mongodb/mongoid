@@ -238,7 +238,7 @@ module Mongoid
       # @api private
       #
       # @example Warn or raise error if name exists.
-      #   Model.valid_scope_name?("test")
+      #   Model.check_scope_name("test")
       #
       # @param [ String | Symbol ] name The name of the scope.
       #
