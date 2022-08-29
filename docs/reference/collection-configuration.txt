@@ -89,7 +89,7 @@ Collection Management Rake Task
 ===============================
 
 If you specify collection options for a document, then the corresponding collection
-must be explicitly created. To do so, use the provided
+must be explicitly created prior to use. To do so, use the provided
 ``db:mongoid:create_collections`` Rake task:
 
 .. code-block:: bash
