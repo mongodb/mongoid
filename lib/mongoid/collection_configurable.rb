@@ -21,7 +21,7 @@ module Mongoid
           )
         else
           begin
-            collection.database[collection_name].create(storage_options[:collection_options])
+            collection.database[collection_name].create(storage_options.fetch(:collection_options, {}))
           rescue Mongo::Error::OperationFailure => e
             raise Errors::CreateCollectionFailure.new(
               collection_name,

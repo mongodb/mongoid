@@ -36,8 +36,8 @@ describe "Mongoid::Tasks::Database" do
         [Person]
       end
 
-      it 'does nothing' do
-        expect(Person).to receive(:create_collection).never
+      it 'creates the collection' do
+        expect(Person).to receive(:create_collection).once
         Mongoid::Tasks::Database.create_collections(models)
       end
     end
