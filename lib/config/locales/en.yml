@@ -632,6 +632,13 @@ en:
             the expression %{javascript} is not allowed."
           resolution: "Please provide a standard hash to #where when the criteria
             is for an embedded association."
+        unsupported_with:
+          message: "Calling #with on a document instance is not supported."
+          summary: "Mongoid does not support calling #with on instances of a
+            document, since in order to change the persistence context of a
+            document instance, the document itself must be modified."
+          resolution: "Please use the #with! method instead. Note that #with!
+            modifies its caller."
         validations:
           message: "Validation of %{document} failed."
           summary: "The following errors were found: %{errors}"
