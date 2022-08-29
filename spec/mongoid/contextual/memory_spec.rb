@@ -525,6 +525,7 @@ describe Mongoid::Contextual::Memory do
         with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           d = Dictionary.create!(description: 'english-text')
           I18n.locale = :de
           d.description = 'deutsch-text'
@@ -1689,6 +1690,7 @@ describe Mongoid::Contextual::Memory do
         with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           d = Dictionary.create!(description: 'english-text')
           I18n.locale = :de
           d.description = 'deutsch-text'
@@ -2030,6 +2032,7 @@ describe Mongoid::Contextual::Memory do
       let(:d4) { Dictionary.new(description: 'en2') }
 
       before do
+        I18n.locale = :en
         d1
         d2
         d3
@@ -2095,6 +2098,7 @@ describe Mongoid::Contextual::Memory do
       let(:address2b) { Address.new(name: "en3") }
 
       before do
+        I18n.locale = :en
         address1a
         address1b
         address2a

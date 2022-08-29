@@ -17,8 +17,9 @@ describe Mongoid::Fields do
         with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           product.description = "test"
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "The best"
         end
 
@@ -526,7 +527,7 @@ describe Mongoid::Fields do
         with_default_i18n_configs
 
         before do
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "The best"
         end
 
@@ -543,8 +544,9 @@ describe Mongoid::Fields do
         with_default_i18n_configs
 
         before do
+          I18n.locale = :end
           product.description = "Cheap drinks"
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
         end
 
@@ -828,7 +830,7 @@ describe Mongoid::Fields do
         with_default_i18n_configs
 
         before do
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
         end
 
@@ -845,8 +847,9 @@ describe Mongoid::Fields do
         with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           product.description = "Cheap drinks"
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
         end
 
@@ -2002,8 +2005,9 @@ describe Mongoid::Fields do
       with_default_i18n_configs
 
       before do
+        I18n.locale = :en
         product.title = "hello"
-        ::I18n.locale = :de
+        I18n.locale = :de
         product.title = "hello there!"
         product.title = ""
       end
@@ -2021,8 +2025,9 @@ describe Mongoid::Fields do
       with_default_i18n_configs
 
       before do
+        I18n.locale = :en
         product.title = "hello"
-        ::I18n.locale = :de
+        I18n.locale = :de
         product.title = "hello there!"
         product.title = nil
       end
@@ -2040,8 +2045,9 @@ describe Mongoid::Fields do
       with_default_i18n_configs
 
       before do
+        I18n.locale = :en
         product.title = "hello"
-        ::I18n.locale = :de
+        I18n.locale = :de
         product.title = "hello there!"
         product.title = []
       end

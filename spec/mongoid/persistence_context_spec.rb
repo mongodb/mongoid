@@ -121,7 +121,6 @@ describe Mongoid::PersistenceContext do
         end
 
         context 'when the cluster is not the same as that of the persistence context on the current thread' do
-          retry_test
 
           let!(:client) do
             persistence_context.client

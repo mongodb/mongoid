@@ -46,6 +46,7 @@ describe 'i18n fallbacks' do
 
         it 'returns nil' do
           product = Product.new
+          I18n.locale = :en
           product.description = "Marvelous!"
           I18n.locale = :ru
           product.description.should be nil
@@ -62,6 +63,7 @@ describe 'i18n fallbacks' do
 
         it 'falls back on default locale' do
           product = Product.new
+          I18n.locale = :en
           product.description = "Marvelous!"
           I18n.locale = :ru
           product.description.should == 'Marvelous!'

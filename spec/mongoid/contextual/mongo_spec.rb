@@ -564,6 +564,7 @@ describe Mongoid::Contextual::Mongo do
       with_default_i18n_configs
 
       before do
+        I18n.locale = :en
         d = Dictionary.create!(description: 'english-text')
         I18n.locale = :de
         d.description = 'deutsch-text'
@@ -843,6 +844,7 @@ describe Mongoid::Contextual::Mongo do
       with_default_i18n_configs
 
       before do
+        I18n.locale = :en
         d1 = Dictionary.create!(description: 'en1')
         d2 = Dictionary.create!(description: 'en1')
         d3 = Dictionary.create!(description: 'en1')
@@ -898,6 +900,7 @@ describe Mongoid::Contextual::Mongo do
       with_default_i18n_configs
 
       before do
+        I18n.locale = :en
         address1a = Address.new(name: "en1")
         address1b = Address.new(name: "en2")
         address2a = Address.new(name: "en1")
