@@ -241,12 +241,19 @@ Previously, an error was raised if this was done. See the section on
 for more details.
 
 
-Added non-block form to ``#with``
----------------------------------
+Added non-block form to ``#with`` and added ``#with!`` method
+-------------------------------------------------------------
 
-Mongoid 8.1 adds support for a non-block form for the ``#with`` method. The
-``#with`` method is used for changing the ``persistence context`` of a Model
-class, a document, and, starting in Mongoid 8.1, a criteria:
+Mongoid 8.1 adds support for a non-block form for the ``#with`` method and for
+a new ``with!`` method. The ``#with`` method is used for changing the
+``persistence context`` of a Model class, a document, and, starting in Mongoid
+8.1, a criteria.
+
+Note that, ``with`` cannot be called on document instances without a block, since
+in order to change the persistence context of a document instance, the document
+itself must be modified. This is where the ``#with!`` method comes in: The
+``#with!`` method modifies its caller, and returns it with the given
+persistence context. This method can be used on document and criteria instances.
 
 .. code-block:: ruby
 
@@ -261,11 +268,9 @@ class, a document, and, starting in Mongoid 8.1, a criteria:
   criteria.first
   criteria.clear_persistance_context!
 
-  # The #with method on documents modifies the document object itself since
-  # calling #dup on it will change that document's _id. The #with method on
-  # documents will also return the same document.
+  # Use #with! here instead of #with
   band = Band.new
-  band.with(client: :tertiary)
+  band.with!(client: :tertiary)
   band.save!
   band.clear_persistance_context!
 

@@ -198,6 +198,14 @@ failing subsequent updates:
     band_object.update_attribute(likes: 1000)
   end
 
+The ``with!`` method was also introduced on document and criteria instances,
+which modifies and returns those instances with the new persistence context.
+Note that, since document instances cannot be ``dup``'ed, since doing so
+changes its _id, in order to change a document instance's persistence context
+we have to modify the document itself. Therefore, calling the ``with`` method
+on document instances without providing a block is unsupported, and ``with!``
+must be used.
+
 The ``with`` command can also be used without a block:
 
 .. code-block:: ruby
@@ -217,11 +225,12 @@ The ``with`` command can also be used without a block:
   end
 
   begin
-    # The #with method on documents modifies the document object itself since
-    # calling #dup on it will change that document's _id. The #with method on
-    # documents will also return the same document.
+    # Since a document instance cannot be duped (doing so changes its _id), in
+    # order to change its persistence context, the document itself has to be
+    # modified. Use the #with! method instead, which modifies and returns the
+    # document instance itself.
     band = Band.new
-    band.with(client: :tertiary)
+    band.with!(client: :tertiary)
     band.save!
   ensure
     band.clear_persistance_context!
