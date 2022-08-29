@@ -15,7 +15,7 @@ Configuring a Document Collection
 
 You can specify collection options for documents using the ``store_in`` macro.
 This macro accepts ``:collection_options`` argument, which can contain any collection
-options that is supported by the driver.
+options that are supported by the driver.
 
 .. note::
 
