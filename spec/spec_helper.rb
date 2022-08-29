@@ -164,7 +164,13 @@ RSpec.configure do |config|
     end
   end
 
-  config.after(:all) do
+  config.before(:suite) do
+    unless %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
+      expect(I18n).to_not respond_to(:fallbacks)
+    end
+  end
+
+  config.after(:suite) do
     unless %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
       expect(I18n).to_not respond_to(:fallbacks)
     end
