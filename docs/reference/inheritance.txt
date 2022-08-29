@@ -260,10 +260,10 @@ either normal setting or through the build and create methods on the association
 Persistence Contexts
 ====================
 
-Mongoid allows the persistence context of subclasses to be changed from the
+Mongoid allows the persistence context of a subclass to be changed from the
 persistence context of its parent. This means that, using the ``store_in``
 method, we can store the documents of the subclasses in different collections
-(as well as different databases, clients) than their parent:
+(as well as different databases, clients) than their parents:
 
 .. code:: ruby
 
