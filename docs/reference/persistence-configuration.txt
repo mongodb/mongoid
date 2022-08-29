@@ -247,7 +247,7 @@ The ``with`` command can also be used without a block:
 As of Mongoid 8.1, the ``with`` method can be called with or without a block.
 If it is called with a block, the temporary persistence context will exist only
 for the duration of the block. If the ``with`` method is called without a block,
-the ``clear_persistance_context!`` method must be called on the criteria or
+the ``clear_persistence_context!`` method must be called on the criteria or
 document returned from the ``with`` method. This is because a new client is
 created under the covers with the options passed to ``with``. To ensure that
 this client is closed and its associated resources are freed, the scope when this
