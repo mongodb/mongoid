@@ -31,10 +31,10 @@ en:
             since the document did not actually get saved."
           resolution: "Double check all before callbacks to make sure they are
             not unintentionally returning false."
-        create_collection:
+        create_collection_failure:
           message: "Cannot create collection %{collection_name}
             with options %{collection_options}. The following error was raised:
-            %{server_error}."
+            %{error}."
           summary: "The server rejected createCollection command with given collection
             options. This may happen when some of the options are invalid, or not
             supported by your version of the server."

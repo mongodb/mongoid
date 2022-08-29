@@ -5,9 +5,14 @@ module Mongoid
     module Database
       extend self
 
+      # Create collections for each model given the provided globs and the class is
+      # not embedded.
+      #
+      # @param [ Array<Mongoid::Document> ] models. Array of document classes for
+      #   which collections should be created. Defaulted to all document classes
+      #   in the application.
       def create_collections(models = ::Mongoid.models)
         models.each do |model|
-          next if model.storage_options.fetch(:collection_options, {}).empty?
           if !model.embedded? || model.cyclic?
             model.create_collection
             logger.info("MONGOID: Created collection for #{model}:")

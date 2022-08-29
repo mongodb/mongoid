@@ -29,8 +29,8 @@ for the more information about collection options.
 .. note::
 
   Collection options depend on the driver version and MongoDB server version.
-  It is possible that some options, like time series collectios, are not available
-  on older server versions. Mongoid does not validate collection options.
+  It is possible that some options, like time series collections, are not available
+  on older server versions.
 
 Time Series Collection
 ----------------------
@@ -95,3 +95,11 @@ must be explicitly created prior to use. To do so, use the provided
 .. code-block:: bash
 
     $ rake db:mongoid:create_collections
+
+The create collections command also works for just one model by running
+in Rails console:
+
+.. code-block:: ruby
+
+    # Create collection for Model
+    Model.create_collections

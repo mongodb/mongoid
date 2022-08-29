@@ -73,7 +73,7 @@ describe Mongoid::CollectionConfigurable do
       it 'raises an error' do
         expect do
           subject.create_collection
-        end.to raise_error(Mongoid::Errors::CreateCollection)
+        end.to raise_error(Mongoid::Errors::CreateCollectionFailure)
       end
     end
   end

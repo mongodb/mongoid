@@ -7,6 +7,12 @@ module Mongoid
     extend ActiveSupport::Concern
 
     module ClassMethods
+      # Create collection for the Mongoid document this module is included into.
+      #
+      # This method does not re-create existing collections.
+      #
+      # If the document includes `store_in` macro with `collection_options` key,
+      #   these options are used when creating the collection.
       def create_collection
         if coll_options = collection.database.list_collections(filter: { name: collection_name.to_s }).first
           logger.info(
@@ -17,7 +23,7 @@ module Mongoid
           begin
             collection.database[collection_name].create(storage_options[:collection_options])
           rescue Mongo::Error::OperationFailure => e
-            raise Errors::CreateCollection.new(
+            raise Errors::CreateCollectionFailure.new(
               collection_name,
               storage_options[:collection_options],
               e
