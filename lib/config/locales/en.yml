@@ -252,7 +252,7 @@ en:
           summary: "Model '%{klass}' defines a field '%{field}' with an invalid
             typed value array value. Attempted to pass %{types} types, when only
             one is permitted."
-          resolution: "Please only pass in one type for a typed array."
+          resolution: "Please pass in a one-element array as the type for a typed array."
         invalid_global_executor_concurrency:
           message: "Invalid global_executor_concurrency option."
           summary: "You set global_executor_concurrency while async_query_executor
