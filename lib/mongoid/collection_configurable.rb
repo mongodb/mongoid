@@ -10,7 +10,7 @@ module Mongoid
       def create_collection
         if coll_options = collection.database.list_collections(filter: { name: collection_name.to_s }).first
           logger.info(
-            "MONGOID: Collection '#{collection_name}' already exist " +
+            "MONGOID: Collection '#{collection_name}' already exists " +
             "in database '#{database_name}' with options '#{coll_options}'."
           )
         else
