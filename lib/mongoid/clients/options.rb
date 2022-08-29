@@ -5,12 +5,17 @@ module Mongoid
     module Options
       extend ActiveSupport::Concern
 
-      # Change the persistence context for this object during the block.
+      # Change the persistence context for this object. Optionally provide a
+      # block to demarcate when the persistence context should be cleared.
       #
       # @example Save the current document to a different collection.
       #   model.with(collection: "bands") do |m|
       #     m.save
       #   end
+      #
+      # @example Retrieve a document from a different collection.
+      #   criteria = crit.with(collection: "bands")
+      #   criteria.first
       #
       # @param [ Hash | Mongoid::PersistenceContext ] options_or_context
       #   The storage options or a persistence context.
@@ -18,6 +23,12 @@ module Mongoid
       # @option options [ String | Symbol ] :collection The collection name.
       # @option options [ String | Symbol ] :database The database name.
       # @option options [ String | Symbol ] :client The client name.
+      #
+      # @return [ self | Object ] The result of the block, if one is provided,
+      #   or self.
+      #
+      # @raises [ Mongoid::Errors::UnsupportedWith ] when this method is called
+      #   on a document instance.
       def with(options_or_context, &block)
         original_context = PersistenceContext.get(self)
         original_cluster = persistence_context.cluster
@@ -33,18 +44,37 @@ module Mongoid
           # but if it's called on a document, we want to return the same document
           # since duping a document changes its _id.
           if is_a?(Criteria)
-            crit = dup
-            crit.instance_variable_set("@original_cluster", original_cluster)
-            crit.instance_variable_set("@original_context", original_context)
-            crit.send(:set_persistence_context, options_or_context)
-            crit
+            dup.with!(options_or_context)
           else
-            @original_cluster = original_cluster
-            @original_context = original_context
-            set_persistence_context(options_or_context)
-            self
+            raise Mongoid::Errors::UnsupportedWith.new
           end
         end
+      end
+
+      # Change the persistence context for this object. This method modifies
+      # the caller, and, unlike #with, does not accept a block.
+      #
+      # @example Save the current document to a different collection.
+      #   band.with!(collection: "bands")
+      #   band.save!
+
+      # @example Retrieve a document from a different collection.
+      #   criteria.with!(collection: "bands")
+      #   criteria.first
+      #
+      # @param [ Hash | Mongoid::PersistenceContext ] options_or_context
+      #   The storage options or a persistence context.
+      #
+      # @option options [ String | Symbol ] :collection The collection name.
+      # @option options [ String | Symbol ] :database The database name.
+      # @option options [ String | Symbol ] :client The client name.
+      #
+      # @return [ self ] returns self.
+      def with!(options_or_context)
+        @original_context = PersistenceContext.get(self)
+        @original_cluster = persistence_context.cluster
+        set_persistence_context(options_or_context)
+        self
       end
 
       def collection(parent = nil)
@@ -113,12 +143,17 @@ module Mongoid
           persistence_context.client
         end
 
-        # Change the persistence context for this class during the block.
+        # Change the persistence context for this class. Optionally provide a
+        # block to demarcate when the persistence context should be cleared.
         #
         # @example Save the current document to a different collection.
         #   Model.with(collection: "bands") do |m|
-        #     m.create
+        #     m.create!
         #   end
+        #
+        # @example Retrieve a document from a different collection.
+        #   criteria = Model.with(collection: "bands")
+        #   criteria.first
         #
         # @param [ Hash | Mongoid::PersistenceContext ] options_or_context
         #   The storage options or a persistence context.
@@ -126,6 +161,9 @@ module Mongoid
         # @option options [ String | Symbol ] :collection The collection name.
         # @option options [ String | Symbol ] :database The database name.
         # @option options [ String | Symbol ] :client The client name.
+        #
+        # @return [ Criteria | Object ] The result of the block, if one is provided,
+        #   or a criteria with the given persistence context.
         def with(options_or_context, &block)
           original_context = PersistenceContext.get(self)
           original_cluster = persistence_context.cluster

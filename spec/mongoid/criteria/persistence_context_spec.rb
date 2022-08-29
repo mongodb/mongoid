@@ -121,6 +121,10 @@ describe Mongoid::Contextual::Mongo do
             Band.criteria.with(collection: 'artists')
           end
 
+          after do
+            criteria.clear_persistence_context!
+          end
+
           it "reads correctly" do
             expect(criteria.count).to eq(5)
           end
@@ -167,6 +171,10 @@ describe Mongoid::Contextual::Mongo do
         context "when not using block form" do
 
           let!(:criteria) { Band.with(collection: 'artists') }
+
+          after do
+            criteria.clear_persistence_context!
+          end
 
           it "returns a criteria" do
             expect(criteria).to be_a(Mongoid::Criteria)
@@ -219,7 +227,7 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             band.with(collection: "artists") do |band|
-              band.save
+              band.save!
             end
             expect(Band.count).to eq(0)
           end
@@ -251,24 +259,10 @@ describe Mongoid::Contextual::Mongo do
 
           let(:band) { Band.new.with(collection: "artists") }
 
-          before do
-            band.save
-            expect(Band.count).to eq(0)
-          end
-
-          it "reads from the correct collection" do
-            Band.with(collection: "artists") do |klass|
-              expect(klass.count).to eq(1)
-              expect(klass.first).to eq(band)
-            end
-          end
-
-          it "has a persistence context" do
-            expect(band.persistence_context?).to be true
-          end
-
-          it "doesn't populate klass persistence context" do
-            expect(Band.persistence_context?).to be false
+          it "raises an unsupported with error" do
+            expect do
+              band
+            end.to raise_error(Mongoid::Errors::UnsupportedWith)
           end
         end
       end
@@ -307,6 +301,10 @@ describe Mongoid::Contextual::Mongo do
             Band.criteria.with(database: database_id_alt)
           end
 
+          after do
+            criteria.clear_persistence_context!
+          end
+
           it "reads correctly" do
             expect(criteria.count).to eq(5)
           end
@@ -337,6 +335,10 @@ describe Mongoid::Contextual::Mongo do
         context "when not using block form" do
 
           let!(:criteria) { Band.with(database: database_id_alt) }
+
+          after do
+            criteria.clear_persistence_context!
+          end
 
           it "reads from the correct database" do
             expect(criteria.count).to eq(5)
@@ -373,7 +375,7 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             band.with(database: database_id_alt) do |band|
-              band.save
+              band.save!
             end
             expect(Band.count).to eq(0)
           end
@@ -390,16 +392,10 @@ describe Mongoid::Contextual::Mongo do
 
           let(:band) { Band.new.with(database: database_id_alt) }
 
-          before do
-            band.save
-            expect(Band.count).to eq(0)
-          end
-
-          it "reads from the correct database" do
-            Band.with(database: database_id_alt) do |klass|
-              expect(klass.count).to eq(1)
-              expect(klass.first).to eq(band)
-            end
+          it "raises an unsupported with error" do
+            expect do
+              band
+            end.to raise_error(Mongoid::Errors::UnsupportedWith)
           end
         end
       end
@@ -448,6 +444,10 @@ describe Mongoid::Contextual::Mongo do
             Band.criteria.with(client: :alternative)
           end
 
+          after do
+            criteria.clear_persistence_context!
+          end
+
           it "reads correctly" do
             expect(criteria.count).to eq(5)
           end
@@ -478,6 +478,10 @@ describe Mongoid::Contextual::Mongo do
         context "when not using block form" do
 
           let!(:criteria) { Band.with(client: :alternative) }
+
+          after do
+            criteria.clear_persistence_context!
+          end
 
           it "reads from the correct client" do
             expect(criteria.count).to eq(5)
@@ -514,7 +518,7 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             band.with(client: :alternative) do |band|
-              band.save
+              band.save!
             end
             expect(Band.count).to eq(0)
           end
@@ -531,16 +535,10 @@ describe Mongoid::Contextual::Mongo do
 
           let(:band) { Band.new.with(client: :alternative) }
 
-          before do
-            band.save
-            expect(Band.count).to eq(0)
-          end
-
-          it "reads from the correct client" do
-            Band.with(client: :alternative) do |klass|
-              expect(klass.count).to eq(1)
-              expect(klass.first).to eq(band)
-            end
+          it "raises an unsupported with error" do
+            expect do
+              band
+            end.to raise_error(Mongoid::Errors::UnsupportedWith)
           end
         end
       end
@@ -587,6 +585,10 @@ describe Mongoid::Contextual::Mongo do
             Band.criteria.with(write: { w: 0 })
           end
 
+          after do
+            criteria.clear_persistence_context!
+          end
+
           it "has the correct write preference" do
             expect(criteria.destroy_all).to eq(0)
           end
@@ -611,6 +613,10 @@ describe Mongoid::Contextual::Mongo do
         context "when not using block form" do
 
           let!(:criteria) { Band.with(write: { w: 0 }) }
+
+          after do
+            criteria.clear_persistence_context!
+          end
 
           it "has the correct write preference" do
             expect(criteria.destroy_all).to eq(0)
@@ -641,7 +647,7 @@ describe Mongoid::Contextual::Mongo do
 
           it "has the correct write preference" do
             band.with(write: { w: 0 }) do |band|
-              band.save
+              band.save!
             end
           end
         end
@@ -651,8 +657,12 @@ describe Mongoid::Contextual::Mongo do
           let(:band) { Band.new.with(write: { w: 0 }) }
 
           before do
-            band.save
+            band.save!
             expect(Band.count).to eq(0)
+          end
+
+          after do
+            criteria.clear_persistence_context!
           end
 
           it "has the correct write preference" do
@@ -662,6 +672,70 @@ describe Mongoid::Contextual::Mongo do
             end
           end
         end
+      end
+    end
+  end
+
+  describe "#with!" do
+
+    let(:criteria) { Band.criteria }
+
+    context "when calling #with! on a criteria" do
+
+      before do
+        Band.with(collection: 'artists') do |klass|
+          expect(klass.count).to eq(0)
+          5.times { klass.create! }
+          expect(klass.count).to eq(5)
+        end
+        expect(Band.count).to eq(0)
+      end
+
+      before do
+        criteria.with!(collection: 'artists')
+      end
+
+      after do
+        criteria.clear_persistence_context!
+      end
+
+      it "reads correctly" do
+        expect(criteria.count).to eq(5)
+      end
+
+      it "doesn't populate klass persistence context" do
+        expect(criteria.persistence_context?).to be true
+        expect(Band.persistence_context?).to be false
+      end
+    end
+
+    context "when calling #with on a document" do
+
+      let(:band) { Band.new }
+
+      before do
+        band.with!(collection: "artists")
+        band.save!
+        expect(Band.count).to eq(0)
+      end
+
+      after do
+        band.clear_persistence_context!
+      end
+
+      it "reads from the correct collection" do
+        Band.with(collection: "artists") do |klass|
+          expect(klass.count).to eq(1)
+          expect(klass.first).to eq(band)
+        end
+      end
+
+      it "has a persistence context" do
+        expect(band.persistence_context?).to be true
+      end
+
+      it "doesn't populate klass persistence context" do
+        expect(Band.persistence_context?).to be false
       end
     end
   end
@@ -683,7 +757,7 @@ describe Mongoid::Contextual::Mongo do
 
     context "when calling on a document" do
 
-      let(:band) { Band.new.with(collection: "artists") }
+      let(:band) { Band.new.with!(collection: "artists") }
 
       before do
         expect(band.persistence_context?).to be true
