@@ -40,30 +40,6 @@ module Mongoid
       end
     end
 
-    def with_i18n_fallbacks
-      require_fallbacks
-
-      around do |example|
-        include I18n::Backend::Fallbacks
-        if I18n.respond_to?(:temp_fallbacks)
-          class << I18n
-            alias :fallbacks :temp_fallbacks
-            alias :fallbacks= :temp_fallbacks=
-            undef_method :temp_fallbacks
-            undef_method :temp_fallbacks=
-          end
-        end
-        example.run
-      ensure
-        class << I18n
-          alias :temp_fallbacks :fallbacks
-          alias :temp_fallbacks= :fallbacks=
-          undef_method :fallbacks
-          undef_method :fallbacks=
-        end
-      end
-    end
-
     def driver_config_override(key, value)
       around do |example|
         existing = Mongo.send(key)

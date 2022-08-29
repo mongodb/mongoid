@@ -124,6 +124,7 @@ describe Mongoid::Fields::Localized do
         context "when the value does not exist" do
 
           context "when not using fallbacks" do
+            require_no_fallbacks
 
             let(:value) do
               field.demongoize({ "en" => "testing" })
@@ -135,7 +136,7 @@ describe Mongoid::Fields::Localized do
           end
 
           context "when using fallbacks" do
-            with_i18n_fallbacks
+            require_fallbacks
 
             context "when fallbacks are defined" do
 
@@ -297,7 +298,7 @@ describe Mongoid::Fields::Localized do
           end
 
           context "when using fallbacks" do
-            with_i18n_fallbacks
+            require_fallbacks
 
             context "when fallbacks are defined" do
               with_default_i18n_configs
@@ -486,8 +487,7 @@ describe Mongoid::Fields::Localized do
         end
 
         context "when fallbacks are defined" do
-
-          with_i18n_fallbacks
+          require_fallbacks
 
           context "when the lookup does not need to use fallbacks" do
 

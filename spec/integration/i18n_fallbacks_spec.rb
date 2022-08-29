@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'i18n fallbacks' do
-  with_i18n_fallbacks
+  require_fallbacks
 
   context 'when fallbacks are enabled with a locale list' do
     with_default_i18n_configs

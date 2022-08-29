@@ -662,7 +662,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when fallbacks are enabled with a locale list' do
-        with_i18n_fallbacks
+        require_fallbacks
         with_default_i18n_configs
 
         before do
