@@ -251,8 +251,9 @@ module Mongoid
           else
             Mongoid.logger.warn(
               "Creating scope :#{name} which conflicts with #{self.name}.#{name}. " +
-              "Calls to `#{name}' will delegate to #{self.name}.#{name} and " +
-              "will ignore the declared scope."
+              "Calls to `Mongoid::Criteria##{name}` will delegate to " +
+              "`Mongoid::Criteria##{name}` for criteria with klass #{self.name} " +
+              "and will ignore the declared scope."
             )
           end
         end
