@@ -300,3 +300,9 @@ If the collection is set on some of the subclasses and not others, the subclasse
 with set collections will store documents in those collections, and the
 subclasses without set collections will be store documents in the parent's
 collection.
+
+.. note::
+
+  Note that changing the collection that a subclass is stored in will cause
+  documents of that subclass to no longer be found in the results of querying
+  its parent class.
