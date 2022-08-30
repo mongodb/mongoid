@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative './models'
+require_relative './database_spec_models'
 
 describe "Mongoid::Tasks::Database" do
 
@@ -25,6 +25,10 @@ describe "Mongoid::Tasks::Database" do
         [DatabaseSpec::Measurement]
       end
 
+      after do
+        DatabaseSpec::Measurement.collection.drop
+      end
+
       it 'creates the collection' do
         expect(DatabaseSpec::Measurement).to receive(:create_collection).once
         Mongoid::Tasks::Database.create_collections(models)
@@ -39,6 +43,44 @@ describe "Mongoid::Tasks::Database" do
       it 'creates the collection' do
         expect(Person).to receive(:create_collection).once
         Mongoid::Tasks::Database.create_collections(models)
+      end
+
+      context "when collection options is defined on embedded model" do
+
+        let(:models) do
+          [DatabaseSpec::Comment]
+        end
+
+        let(:logger) do
+          double("logger").tap do |log|
+            expect(log).to receive(:info).once.with(/MONGOID: collection options ignored on: .*, please define in the root model/)
+          end
+        end
+
+        before do
+          allow(Mongoid::Tasks::Database).to receive(:logger).and_return(logger)
+        end
+
+        it "does nothing, but logging" do
+          expect(DatabaseSpec::Comment).to receive(:create_collection).never
+          Mongoid::Tasks::Database.create_collections(models)
+        end
+      end
+
+      context "when collection options is defined on cyclic model" do
+
+        let(:models) do
+          [DatabaseSpec::Note]
+        end
+
+        after do
+          DatabaseSpec::Note.collection.drop
+        end
+
+        it "creates the collection" do
+          expect(DatabaseSpec::Note).to receive(:create_collection).once
+          Mongoid::Tasks::Database.create_collections(models)
+        end
       end
     end
   end

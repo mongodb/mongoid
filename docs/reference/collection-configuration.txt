@@ -102,4 +102,4 @@ in Rails console:
 .. code-block:: ruby
 
     # Create collection for Model
-    Model.create_collections
+    Model.create_collection

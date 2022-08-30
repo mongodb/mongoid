@@ -7,7 +7,7 @@ module Mongoid
     extend ActiveSupport::Concern
 
     module ClassMethods
-      # Create collection for the Mongoid document this module is included into.
+      # Create the collection for the called upon Mongoid model.
       #
       # This method does not re-create existing collections.
       #
@@ -21,7 +21,7 @@ module Mongoid
           )
         else
           begin
-            collection.database[collection_name].create(storage_options.fetch(:collection_options, {}))
+            collection.database[collection_name, storage_options.fetch(:collection_options, {})].create
           rescue Mongo::Error::OperationFailure => e
             raise Errors::CreateCollectionFailure.new(
               collection_name,
