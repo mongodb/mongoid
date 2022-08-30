@@ -262,7 +262,7 @@ Type Declaration
 
     # @param [ [ String | Symbol ]... ] *fields A splat of mixed Symbols and Strings.
 
-- **Keyword Args:** Following YARD conventions, use ``@param`` for keyword
+- **Keyword Arguments:** Following YARD conventions, use ``@param`` for keyword
   arguments, and specify keyword argument names as symbols.
 
   .. code-block:: ruby
