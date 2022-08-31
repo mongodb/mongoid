@@ -213,3 +213,29 @@ to or from a certain value:
   # => true
   person.name_changed?(from: "Trout", to: "Fletcher")
   # => false
+
+
+Allowed ``store_in`` to be called on subclasses
+-----------------------------------------------
+
+Starting in Mongoid 8.1, subclasses can now specify which collection its
+documents should be stored in using the ``store_in`` macro:
+
+.. code:: ruby
+
+  class Shape
+    include Mongoid::Document
+    store_in collection: :shapes
+  end
+
+  class Circle < Shape
+    store_in collection: :circles
+  end
+
+  class Square < Shape
+    store_in collection: :squares
+  end
+
+Previously, an error was raised if this was done. See the section on
+:ref:`Inheritance Persistence Context <inheritance-persistence-context>`
+for more details.

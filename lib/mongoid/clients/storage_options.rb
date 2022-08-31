@@ -6,10 +6,7 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-
-        cattr_accessor :storage_options, instance_writer: false do
-          storage_options_defaults
-        end
+        class_attribute :storage_options, instance_writer: false, default: storage_options_defaults
       end
 
       module ClassMethods
@@ -49,7 +46,7 @@ module Mongoid
         # @return [ Class ] The model class.
         def store_in(options)
           Validators::Storage.validate(self, options)
-          storage_options.merge!(options)
+          self.storage_options = self.storage_options.merge(options)
         end
 
         # Reset the store_in options
