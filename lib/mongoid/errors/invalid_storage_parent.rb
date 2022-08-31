@@ -4,6 +4,8 @@ module Mongoid
   module Errors
 
     # Raised when calling store_in in a sub-class of Mongoid::Document
+    #
+    # @deprecated
     class InvalidStorageParent < MongoidError
 
       # Create the new error.

@@ -253,3 +253,56 @@ either normal setting or through the build and create methods on the association
 
    rect = Rectangle.new(width: 100, height: 200)
    firefox.shapes
+
+
+.. _inheritance-persistence-context:
+
+Persistence Contexts
+====================
+
+Mongoid allows the persistence context of a subclass to be changed from the
+persistence context of its parent. This means that, using the ``store_in``
+method, we can store the documents of the subclasses in different collections
+(as well as different databases, clients) than their parents:
+
+.. code:: ruby
+
+  class Shape
+    include Mongoid::Document
+    store_in collection: :shapes
+  end
+
+  class Circle < Shape
+    store_in collection: :circles
+  end
+
+  class Square < Shape
+    store_in collection: :squares
+  end
+
+  Shape.create!
+  Circle.create!
+  Square.create!
+
+Setting the collection on the children causes the documents for those children
+to be stored in the set collection, instead of in the parent's collection:
+
+.. code:: javascript
+
+  > db.shapes.find()
+  { "_id" : ObjectId("62fe9a493282a43d6b725e10"), "_type" : "Shape" }
+  > db.circles.find()
+  { "_id" : ObjectId("62fe9a493282a43d6b725e11"), "_type" : "Circle" }
+  > db.squares.find()
+  { "_id" : ObjectId("62fe9a493282a43d6b725e12"), "_type" : "Square" }
+
+If the collection is set on some of the subclasses and not others, the subclasses
+with set collections will store documents in those collections, and the
+subclasses without set collections will be store documents in the parent's
+collection.
+
+.. note::
+
+  Note that changing the collection that a subclass is stored in will cause
+  documents of that subclass to no longer be found in the results of querying
+  its parent class.
