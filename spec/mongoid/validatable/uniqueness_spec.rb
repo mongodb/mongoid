@@ -8,6 +8,28 @@ describe Mongoid::Validatable::UniquenessValidator do
 
     context "when the document is a root document" do
 
+      context "when setting the read preference to non-primary" do
+
+        before do
+          Dictionary.validates_uniqueness_of :name
+        end
+
+        after do
+          Dictionary.reset_callbacks(:validate)
+        end
+
+        it "reads from the primary" do
+          expect_any_instance_of(Mongoid::Criteria).to receive(:read).once.and_wrap_original do |m, *args|
+            crit = m.call(*args)
+            expect(crit.view.options["read"]).to eq({ "mode" => :primary })
+            crit
+          end
+          Dictionary.with(read: { mode: :secondary }) do |klass|
+            klass.create!(name: "Websters")
+          end
+        end
+      end
+
       context "when adding custom persistence options" do
 
         before do
@@ -1632,6 +1654,30 @@ describe Mongoid::Validatable::UniquenessValidator do
 
       let!(:def_two) do
         word.definitions.create!(description: "2")
+      end
+
+      context "when setting the read preference to non-primary" do
+
+        before do
+          Definition.validates_uniqueness_of :description
+        end
+
+        after do
+          Definition.reset_callbacks(:validate)
+        end
+
+        let(:word) { Word.create! }
+
+        it "reads from the primary" do
+          expect_any_instance_of(Mongoid::Criteria).to receive(:read).once.and_wrap_original do |m, *args|
+            crit = m.call(*args)
+            expect(crit.options[:read]).to eq({ mode: :primary })
+            crit
+          end
+          Definition.with(read: { mode: :secondary }) do |klass|
+            word.definitions.create!
+          end
+        end
       end
 
       context "when a document is being destroyed" do
