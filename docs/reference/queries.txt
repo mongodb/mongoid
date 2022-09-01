@@ -1487,6 +1487,15 @@ Mongoid also has some helpful methods on criteria.
           Band.all.pluck(:name, :likes)
             #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
 
+   * - ``Criteria#read``
+
+       *Sets the read preference for the criteria.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.read(mode: :primary)
+
    * - ``Criteria#second``
 
        *Get the second document for the given criteria.*

@@ -447,4 +447,111 @@ describe 'callbacks integration tests' do
       expect(saved_person.previously_persisted_value).to be_truthy
     end
   end
+
+  context 'saved_change_to_attribute, attribute_before_last_save, will_save_change_to_attribute' do
+    class TestSCTAAndABLSInCallbacks
+      include Mongoid::Document
+
+      field :name, type: String
+      field :age, type: Integer
+
+      set_callback :save, :before do |doc|
+        [:name, :age].each do |attr|
+          saved_change_to_attribute_values_before[attr] += [saved_change_to_attribute(attr)]
+          attribute_before_last_save_values_before[attr] += [attribute_before_last_save(attr)]
+          will_save_change_to_attribute_values_before[attr] += [will_save_change_to_attribute?(attr)]
+        end
+      end
+
+      set_callback :save, :after do |doc|
+        [:name, :age].each do |attr|
+          saved_change_to_attribute_values_after[attr] += [saved_change_to_attribute(attr)]
+          saved_change_to_attribute_q_values_after[attr] += [saved_change_to_attribute?(attr)]
+          attribute_before_last_save_values_after[attr] += [attribute_before_last_save(attr)]
+        end
+      end
+
+      def saved_change_to_attribute_values_before
+        @saved_change_to_attribute_values_before ||= Hash.new do
+          []
+        end
+      end
+
+      def attribute_before_last_save_values_before
+        @attribute_before_last_save_values_before ||= Hash.new do
+          []
+        end
+      end
+
+      def saved_change_to_attribute_values_after
+        @saved_change_to_attribute_values_after ||= Hash.new do
+          []
+        end
+      end
+
+      def saved_change_to_attribute_q_values_after
+        @saved_change_to_attribute_q_values_after ||= Hash.new do
+          []
+        end
+      end
+
+      def attribute_before_last_save_values_after
+        @attribute_before_last_save_values_after ||= Hash.new do
+          []
+        end
+      end
+
+      def will_save_change_to_attribute_values_before
+        @will_save_change_to_attribute_values_before ||= Hash.new do
+          []
+        end
+      end
+    end
+
+    it 'reproduces ActiveRecord::AttributeMethods::Dirty behavior' do
+      subject = TestSCTAAndABLSInCallbacks.new(name: 'Name 1')
+      subject.save!
+      subject.age = 18
+      subject.save!
+      subject.name = 'Name 2'
+      subject.save!
+
+      expect(subject.saved_change_to_attribute_values_before).to eq(
+        {
+          :name => [nil, [nil, "Name 1"], nil],
+          :age => [nil, nil, [nil, 18]],
+        }
+      )
+      expect(subject.saved_change_to_attribute_values_after).to eq(
+        {
+          :name => [[nil, "Name 1"], nil, ["Name 1", "Name 2"]],
+          :age => [nil, [nil, 18], nil],
+        }
+      )
+      expect(subject.saved_change_to_attribute_q_values_after).to eq(
+        {
+          :name => [true, false, true],
+          :age => [false, true, false],
+        }
+      )
+      expect(subject.attribute_before_last_save_values_before).to eq(
+        {
+          :name => [nil, nil, "Name 1"],
+          :age => [nil, nil, nil]
+        }
+      )
+      expect(subject.attribute_before_last_save_values_after).to eq(
+        {
+          :name => [nil, "Name 1", "Name 1"],
+          :age => [nil, nil, 18]
+        }
+      )
+      expect(subject.will_save_change_to_attribute_values_before).to eq(
+        {
+          :name => [true, false, true],
+          :age => [false, true, false]
+        }
+      )
+    end
+  end
 end

@@ -40,26 +40,26 @@ describe Mongoid::Config::Defaults do
 
     shared_examples "turns off 7.5 flags" do
       it "turns off the 7.5 flags" do
+        expect(Mongoid.legacy_attributes).to be true
         expect(Mongoid.overwrite_chained_operators).to be true
       end
     end
 
     shared_examples "turns on 7.5 flags" do
       it "turns on the 7.5 flags" do
+        expect(Mongoid.legacy_attributes).to be false
         expect(Mongoid.overwrite_chained_operators).to be false
       end
     end
 
     shared_examples "turns off 8.0 flags" do
       it "turns off the 8.0 flags" do
-        expect(Mongoid.legacy_attributes).to be true
         expect(Mongoid.map_big_decimal_to_decimal128).to be false
       end
     end
 
     shared_examples "turns on 8.0 flags" do
       it "turns on the 8.0 flags" do
-        expect(Mongoid.legacy_attributes).to be false
         expect(Mongoid.map_big_decimal_to_decimal128).to be true
       end
     end
