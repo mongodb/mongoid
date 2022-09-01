@@ -22,7 +22,7 @@ module Mongoid
       # @raise [ Errors::DropCollectionFailure ] If an attempt to drop collection failed.
       def create_collection(force: false)
         if collection_name.empty?
-          logger.ward(
+          logger.warn(
             "MONGOID: Creating a collection with an empty name is impossible, skipping."
           )
           return
