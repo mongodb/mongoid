@@ -115,7 +115,7 @@ module Mongoid
         # during binding or when cascading callbacks. Whenever we retrieve
         # associations within the codebase, we use without_autobuild.
         if !without_autobuild? && association.embedded? && attribute_missing?(field_name)
-          raise ActiveModel::MissingAttributeError, "Missing attribute: '#{field_name}'"
+          raise Mongoid::Errors::AttributeNotLoaded.new(self.class, field_name)
         end
 
         if !reload && (value = ivar(name)) != false

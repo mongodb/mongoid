@@ -657,7 +657,7 @@ Mongoid provides several ways of accessing field values.
 .. note::
 
   All of the access methods described below raise
-  ``ActiveModel::MissingAttributeError`` when the field being accessed is
+  ``Mongoid::Errors::AttributeNotLoaded`` when the field being accessed is
   :ref:`projected out <projection>`, either by virtue of not being included in
   :ref:`only <only>` or by virtue of being included in
   :ref:`without <without>`. This applies to both reads and writes.

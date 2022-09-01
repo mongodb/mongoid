@@ -25,7 +25,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
       # has a default value specified in the model
       expect do
         signature.year
-      end.to raise_error(ActiveModel::MissingAttributeError)
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded)
       expect(signature.attributes.keys).to eq(['_id', 'name'])
     end
 

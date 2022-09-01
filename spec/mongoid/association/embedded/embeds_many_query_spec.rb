@@ -23,7 +23,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       # has a default value specified in the model
       expect do
         legislator.b
-      end.to raise_error(ActiveModel::MissingAttributeError)
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'b' on EmmLegislator which was not loaded/)
       expect(legislator.attributes.keys).to eq(['_id', 'a'])
     end
 
@@ -53,10 +53,10 @@ describe Mongoid::Association::Embedded::EmbedsMany do
         EmmCongress.where(name: 'foo').only(:_id).first
       end
 
-      it 'raises a MissingAttributeError' do
+      it 'raises AttributeNotLoaded' do
         expect do
           congress.legislators
-        end.to raise_error(ActiveModel::MissingAttributeError)
+        end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'legislators' on EmmCongress which was not loaded/)
       end
     end
   end

@@ -1,0 +1,42 @@
+***********
+Mongoid 9.0
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 9.0.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Raise AttributeNotLoaded error when accessing fields omitted from query projection
+----------------------------------------------------------------------------------
+
+When attempting to access a field on a model instance which was
+excluded with the ``.only`` or ``.without`` query projections methods
+when the instance was loaded, Mongoid will now raise a
+``Mongoid::Errors::AttributeNotLoaded`` error.
+
+.. code-block:: ruby
+
+  Band.only(:name).first.label
+  #=> raises Mongoid::Errors::AttributeNotLoaded
+
+  Band.without(:label).first.label = 'Sub Pop Records'
+  #=> raises Mongoid::Errors::AttributeNotLoaded
+
+In earlier Mongoid versions, the same conditions would raise an
+``ActiveModel::MissingAttributeError``. Please check your code for
+any Mongoid-specific usages of this class, and change them to
+``Mongoid::Errors::AttributeNotLoaded``. Note additionally that
+``AttributeNotLoaded`` inherits from ``Mongoid::Errors::MongoidError``,
+while ``ActiveModel::MissingAttributeError`` does not.

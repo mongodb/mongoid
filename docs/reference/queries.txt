@@ -775,12 +775,12 @@ operation is sometimes called "projection".
   band = Band.only(:name).first
 
 Attempting to reference attributes which have not been loaded results in
-``ActiveModel::MissingAttributeError``.
+``Mongoid::Errors::AttributeNotLoaded``.
 
 .. code-block:: ruby
 
   band.label
-  # ActiveModel::MissingAttributeError (Missing attribute: 'label'.)
+  #=> raises Mongoid::Errors::AttributeNotLoaded
 
 Even though Mongoid currently allows writing to attributes that have not
 been loaded, such writes will not be persisted

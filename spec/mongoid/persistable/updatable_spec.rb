@@ -429,7 +429,7 @@ describe Mongoid::Persistable::Updatable do
         it 'does not allow the field to be updated' do
           expect {
             person.update_attribute(:title, 'Esteemed')
-          }.to raise_exception(ActiveModel::MissingAttributeError)
+          }.to raise_exception(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
         end
 
         it 'does not persist the change' do
@@ -441,7 +441,7 @@ describe Mongoid::Persistable::Updatable do
           it 'does not allow the field to be updated' do
             expect {
               person.update_attribute('title', 'Esteemed')
-            }.to raise_exception(ActiveModel::MissingAttributeError)
+            }.to raise_exception(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
 
           it 'does not persist the change' do

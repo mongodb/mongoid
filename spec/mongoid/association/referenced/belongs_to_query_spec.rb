@@ -23,7 +23,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
       # has a default value specified in the model
       expect do
         school.team
-      end.to raise_error(ActiveModel::MissingAttributeError)
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded)
       expect(student.attributes.keys).to eq(['_id', 'name'])
     end
 

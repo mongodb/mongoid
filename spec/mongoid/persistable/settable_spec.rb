@@ -522,20 +522,20 @@ describe Mongoid::Persistable::Settable do
     end
 
     context 'field exists in database' do
-      it "raises MissingAttributeError" do
+      it "raises AttributeNotLoaded" do
         lambda do
           agent.set(title: '008')
-        end.should raise_error(ActiveModel::MissingAttributeError)
+        end.should raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Agent which was not loaded/)
 
         expect(agent.reload.title).to eq 'Double-Oh Eight'
       end
     end
 
     context 'field does not exist in database' do
-      it "raises MissingAttributeError" do
+      it "raises AttributeNotLoaded" do
         lambda do
           agent.set(number: '008')
-        end.should raise_error(ActiveModel::MissingAttributeError)
+        end.should raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'number' on Agent which was not loaded/)
 
         expect(agent.reload.read_attribute(:number)).to be nil
       end

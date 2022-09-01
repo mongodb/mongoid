@@ -2360,14 +2360,14 @@ describe Mongoid::Interceptable do
   # was fixed by using `.pluck` over `.only`. Look at MONGOID-5306 for a more
   # detailed explanation.
   context "when accessing _ids in validate and access an association in after_initialize" do
-    it "doesn't raise a MissingAttributeError" do
+    it "doesn't raise AttributeNotLoaded" do
       company = InterceptableCompany.create!
       shop = InterceptableShop.create!(company: company)
       user = InterceptableUser.new
       user.company = company
       expect do
         user.save!
-      end.to_not raise_error(ActiveModel::MissingAttributeError)
+      end.to_not raise_error(Mongoid::Errors::AttributeNotLoaded)
     end
   end
 end

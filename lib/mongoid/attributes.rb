@@ -31,7 +31,7 @@ module Mongoid
     def attribute_present?(name)
       attribute = read_raw_attribute(name)
       !attribute.blank? || attribute == false
-    rescue ActiveModel::MissingAttributeError
+    rescue Mongoid::Errors::AttributeNotLoaded
       false
     end
 
@@ -165,7 +165,7 @@ module Mongoid
       field_name = database_field_name(name)
 
       if attribute_missing?(field_name)
-        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'"
+        raise Mongoid::Errors::AttributeNotLoaded.new(self.class, field_name)
       end
 
       if attribute_writable?(field_name)
@@ -291,7 +291,7 @@ module Mongoid
       normalized = database_field_name(name.to_s)
 
       if attribute_missing?(normalized)
-        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'"
+        raise Mongoid::Errors::AttributeNotLoaded.new(self.class, name)
       end
 
       if hash_dot_syntax?(normalized)
