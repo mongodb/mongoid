@@ -29,9 +29,13 @@ describe "Mongoid::Tasks::Database" do
         DatabaseSpec::Measurement.collection.drop
       end
 
-      it 'creates the collection' do
-        expect(DatabaseSpec::Measurement).to receive(:create_collection).once
-        Mongoid::Tasks::Database.create_collections(models)
+      [true, false].each do |force|
+        context "when force is #{force}" do
+          it 'creates the collection' do
+            expect(DatabaseSpec::Measurement).to receive(:create_collection).once.with(force: force)
+            Mongoid::Tasks::Database.create_collections(models, force: force)
+          end
+        end
       end
     end
 
@@ -40,9 +44,13 @@ describe "Mongoid::Tasks::Database" do
         [Person]
       end
 
-      it 'creates the collection' do
-        expect(Person).to receive(:create_collection).once
-        Mongoid::Tasks::Database.create_collections(models)
+      [true, false].each do |force|
+        context "when force is #{force}" do
+          it 'creates the collection' do
+            expect(Person).to receive(:create_collection).once.with(force: force)
+            Mongoid::Tasks::Database.create_collections(models, force: force)
+          end
+        end
       end
 
       context "when collection options is defined on embedded model" do

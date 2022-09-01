@@ -97,6 +97,12 @@ en:
           resolution: "Search for an id/shard key that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
             which will cause nil to be returned instead of raising this error."
+        drop_collection_failure:
+          message: "Cannot drop collection %{collection_name}."
+          summary: "Mongoid tried to drop collection %{collection_name}, but the
+            collection still exists in the database."
+          resolution: "Try to drop the collection manually using Ruby driver or
+            mongo shell."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."

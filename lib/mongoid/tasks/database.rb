@@ -11,10 +11,13 @@ module Mongoid
       # @param [ Array<Mongoid::Document> ] models. Array of document classes for
       #   which collections should be created. Defaulted to all document classes
       #   in the application.
-      def create_collections(models = ::Mongoid.models)
+      # @param [ true | false ] force If true, the method will drop existing
+      #   collections before creating new ones. If false, the method will create
+      #   only new collection (that do not exist in the database).
+      def create_collections(models = ::Mongoid.models, force: false)
         models.each do |model|
           if !model.embedded? || model.cyclic?
-            model.create_collection
+            model.create_collection(force: force)
             logger.info("MONGOID: Created collection for #{model}:")
           else
             logger.info("MONGOID: collection options ignored on: #{model}, please define in the root model.")

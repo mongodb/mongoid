@@ -215,6 +215,17 @@ module Mongoid
       end
     end
 
+    # Deregister a model in the application with Mongoid.
+    #
+    # @param [ Class ] klass The model to deregister.
+    #
+    # @api private
+    def deregister_model(klass)
+      LOCK.synchronize do
+        models.delete(klass)
+      end
+    end
+
     # From a hash of settings, load all the configuration.
     #
     # @example Load the configuration.
