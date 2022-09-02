@@ -14,16 +14,13 @@ describe Mongoid::Fields do
     context "when the field is localized" do
 
       context "when translations exist" do
+        with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           product.description = "test"
-          I18n.enforce_available_locales = false
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "The best"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:translations) do
@@ -527,14 +524,11 @@ describe Mongoid::Fields do
       end
 
       context "when a single locale is set" do
+        with_default_i18n_configs
 
         before do
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "The best"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -547,15 +541,13 @@ describe Mongoid::Fields do
       end
 
       context "when multiple locales are set" do
+        with_default_i18n_configs
 
         before do
+          I18n.locale = :end
           product.description = "Cheap drinks"
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -835,14 +827,11 @@ describe Mongoid::Fields do
       end
 
       context "when a locale is set" do
+        with_default_i18n_configs
 
         before do
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -855,15 +844,13 @@ describe Mongoid::Fields do
       end
 
       context "when having multiple locales" do
+        with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           product.description = "Cheap drinks"
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -1987,17 +1974,14 @@ describe Mongoid::Fields do
     end
 
     context "when assigning an empty string" do
+      with_default_i18n_configs
 
       before do
-        ::I18n.locale = :en
+        I18n.locale = :en
         product.title = "hello"
-        ::I18n.locale = :de
+        I18n.locale = :de
         product.title = "hello there!"
         product.title = ""
-      end
-
-      after do
-        ::I18n.locale = :en
       end
 
       it "assigns the value" do
@@ -2010,17 +1994,14 @@ describe Mongoid::Fields do
     end
 
     context "when assigning nil" do
+      with_default_i18n_configs
 
       before do
-        ::I18n.locale = :en
+        I18n.locale = :en
         product.title = "hello"
-        ::I18n.locale = :de
+        I18n.locale = :de
         product.title = "hello there!"
         product.title = nil
-      end
-
-      after do
-        ::I18n.locale = :en
       end
 
       it "assigns the value" do
@@ -2033,17 +2014,14 @@ describe Mongoid::Fields do
     end
 
     context "when assigning an empty array" do
+      with_default_i18n_configs
 
       before do
-        ::I18n.locale = :en
+        I18n.locale = :en
         product.title = "hello"
-        ::I18n.locale = :de
+        I18n.locale = :de
         product.title = "hello there!"
         product.title = []
-      end
-
-      after do
-        ::I18n.locale = :en
       end
 
       it "assigns the value" do
@@ -2056,14 +2034,10 @@ describe Mongoid::Fields do
     end
 
     context "when assigning an empty string first" do
+      with_default_i18n_configs
 
       before do
-        ::I18n.locale = :en
         product.title = ""
-      end
-
-      after do
-        ::I18n.locale = :en
       end
 
       it "assigns the value" do
@@ -2076,19 +2050,15 @@ describe Mongoid::Fields do
     end
 
     context "when assigning an empty string with only one translation" do
+      with_default_i18n_configs
 
       before do
-        ::I18n.locale = :en
         product.title = "Hello"
         product.title = ""
         product.save!
       end
 
       let(:from_db) { Product.first }
-
-      after do
-        ::I18n.locale = :en
-      end
 
       it "assigns the value" do
         expect(product.title).to eq(nil)

@@ -608,6 +608,7 @@ describe Mongoid::Criteria::Queryable::Selector do
         end
 
         context "when the serializer is localized" do
+          with_default_i18n_configs
 
           before(:all) do
             class Field
@@ -623,7 +624,6 @@ describe Mongoid::Criteria::Queryable::Selector do
 
           after(:all) do
             Object.send(:remove_const, :Field)
-            ::I18n.locale = :en
           end
 
           let(:selector) do

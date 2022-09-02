@@ -124,6 +124,11 @@ end
 
 I18n.config.enforce_available_locales = false
 
+
+if %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
+  require "i18n/backend/fallbacks"
+end
+
 # The user must be created before any of the tests are loaded, until
 # https://jira.mongodb.org/browse/MONGOID-4827 is implemented.
 client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)

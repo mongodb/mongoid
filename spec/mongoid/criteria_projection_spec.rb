@@ -154,6 +154,7 @@ describe Mongoid::Criteria do
     end
 
     context 'when the field is localized' do
+      with_default_i18n_configs
 
       before do
         I18n.locale = :en
@@ -161,10 +162,6 @@ describe Mongoid::Criteria do
         I18n.locale = :de
         d.description = 'deutsch-text'
         d.save!
-      end
-
-      after do
-        I18n.locale = :en
       end
 
       context 'when entire field is included' do

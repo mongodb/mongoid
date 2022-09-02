@@ -81,14 +81,10 @@ describe Mongoid::Fields::Localized do
       end
 
       context "when a locale is provided" do
+        with_default_i18n_configs
 
         before do
-          I18n.enforce_available_locales = false
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         context "when the value exists" do
@@ -128,6 +124,7 @@ describe Mongoid::Fields::Localized do
         context "when the value does not exist" do
 
           context "when not using fallbacks" do
+            require_no_fallbacks
 
             let(:value) do
               field.demongoize({ "en" => "testing" })
@@ -139,16 +136,12 @@ describe Mongoid::Fields::Localized do
           end
 
           context "when using fallbacks" do
-
-            with_i18n_fallbacks
+            require_fallbacks
 
             context "when fallbacks are defined" do
 
-              around do |example|
-                prev_fallbacks = I18n.fallbacks.dup
+              before do
                 ::I18n.fallbacks[:de] = [ :de, :en, :es ]
-                example.run
-                I18n.fallbacks = prev_fallbacks
               end
 
               context "when the first fallback translation exists" do
@@ -198,11 +191,8 @@ describe Mongoid::Fields::Localized do
 
             context "when no fallbacks are defined" do
 
-              around do |example|
-                prev_fallbacks = I18n.fallbacks.dup
+              before do
                 ::I18n.fallbacks[:de] = [ :de ]
-                example.run
-                I18n.fallbacks = prev_fallbacks
               end
 
               let(:value) do
@@ -216,11 +206,8 @@ describe Mongoid::Fields::Localized do
 
             context 'when fallbacks are empty' do
 
-              around do |example|
-                prev_fallbacks = I18n.fallbacks.dup
+              before do
                 ::I18n.fallbacks[:de] = [ ]
-                example.run
-                I18n.fallbacks = prev_fallbacks
               end
 
               let(:value) do
@@ -280,13 +267,10 @@ describe Mongoid::Fields::Localized do
       end
 
       context "when a locale is provided" do
+        with_default_i18n_configs
 
         before do
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         context "when the value exists" do
@@ -314,16 +298,13 @@ describe Mongoid::Fields::Localized do
           end
 
           context "when using fallbacks" do
-
-            with_i18n_fallbacks
+            require_fallbacks
 
             context "when fallbacks are defined" do
+              with_default_i18n_configs
 
-              around do |example|
-                prev_fallbacks = I18n.fallbacks.dup
+              before do
                 ::I18n.fallbacks[:de] = [ :de, :en, :es ]
-                example.run
-                I18n.fallbacks = prev_fallbacks
               end
 
               context 'when fallbacks are enabled' do
@@ -379,12 +360,10 @@ describe Mongoid::Fields::Localized do
             end
 
             context "when no fallbacks are defined" do
+              with_default_i18n_configs
 
-              around do |example|
-                prev_fallbacks = I18n.fallbacks.dup
+              before do
                 ::I18n.fallbacks[:de] = [ :de ]
-                example.run
-                I18n.fallbacks = prev_fallbacks
               end
 
               let(:value) do
@@ -421,13 +400,10 @@ describe Mongoid::Fields::Localized do
       end
 
       context "when a locale is provided" do
+        with_default_i18n_configs
 
         before do
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:value) do
@@ -458,13 +434,10 @@ describe Mongoid::Fields::Localized do
       end
 
       context "when a locale is provided" do
+        with_default_i18n_configs
 
         before do
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:value) do
@@ -477,14 +450,10 @@ describe Mongoid::Fields::Localized do
       end
 
       context 'when the type is Boolean' do
+        with_default_i18n_configs
 
         before do
-          I18n.enforce_available_locales = false
           ::I18n.locale = :de
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         context "when the value is false" do
@@ -518,18 +487,15 @@ describe Mongoid::Fields::Localized do
         end
 
         context "when fallbacks are defined" do
-
-          with_i18n_fallbacks
+          require_fallbacks
 
           context "when the lookup does not need to use fallbacks" do
 
             context "when the value is false" do
+              with_default_i18n_configs
 
-              around do |example|
-                prev_fallbacks = I18n.fallbacks.dup
+              before do
                 ::I18n.fallbacks[:de] = [:en, :es]
-                example.run
-                I18n.fallbacks = prev_fallbacks
               end
 
               let(:field) do
@@ -546,12 +512,10 @@ describe Mongoid::Fields::Localized do
             end
 
             context "when the value is true" do
+              with_default_i18n_configs
 
-              around do |example|
-                prev_fallbacks = I18n.fallbacks.dup
+              before do
                 ::I18n.fallbacks[:de] = [:en, :es]
-                example.run
-                I18n.fallbacks = prev_fallbacks
               end
 
               let(:field) do
