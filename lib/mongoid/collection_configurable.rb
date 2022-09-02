@@ -22,9 +22,11 @@ module Mongoid
       # @raise [ Errors::DropCollectionFailure ] If an attempt to drop collection failed.
       def create_collection(force: false)
         if collection_name.empty?
-          logger.warn(
-            "MONGOID: Creating a collection with an empty name is impossible, skipping."
-          )
+          # This is most probably an anonymous class, we ignore them.
+          return
+        end
+        if collection_name.match(/^system\./)
+          # We do not do anything with system collections.
           return
         end
         if force
@@ -34,7 +36,7 @@ module Mongoid
           if force
             raise Errors::DropCollectionFailure.new(collection_name)
           else
-            logger.info(
+            logger.debug(
               "MONGOID: Collection '#{collection_name}' already exists " +
               "in database '#{database_name}' with options '#{coll_options}'."
             )
