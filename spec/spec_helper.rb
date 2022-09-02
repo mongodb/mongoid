@@ -123,8 +123,10 @@ ActiveSupport::Inflector.inflections do |inflect|
 end
 
 I18n.config.enforce_available_locales = false
+
+
 if %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
-  include I18n::Backend::Fallbacks
+  require "i18n/backend/fallbacks"
 end
 
 # The user must be created before any of the tests are loaded, until
@@ -161,18 +163,6 @@ RSpec.configure do |config|
     end
     Mongoid.default_client.collections.each do |coll|
       coll.delete_many
-    end
-  end
-
-  config.before(:suite) do
-    unless %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
-      expect(I18n).to_not respond_to(:fallbacks)
-    end
-  end
-
-  config.after(:suite) do
-    unless %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
-      expect(I18n).to_not respond_to(:fallbacks)
     end
   end
 end
