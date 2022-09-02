@@ -110,7 +110,7 @@ describe Mongoid::CollectionConfigurable do
     context 'when force is false' do
       let(:logger) do
         double("logger").tap do |log|
-          expect(log).to receive(:info).once.with(/Collection '#{subject.collection_name}' already exist/)
+          expect(log).to receive(:debug).once.with(/Collection '#{subject.collection_name}' already exist/)
         end
       end
 
@@ -139,7 +139,7 @@ describe Mongoid::CollectionConfigurable do
       end
 
       it 'does not log a message' do
-        expect(logger).to receive(:info).never.with(/Collection '#{subject.collection_name}' already exist/)
+        expect(logger).to receive(:debug).never.with(/Collection '#{subject.collection_name}' already exist/)
         subject.create_collection(force: true)
       end
 
