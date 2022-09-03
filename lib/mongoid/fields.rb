@@ -287,8 +287,7 @@ module Mongoid
       #   end
       #
       # @param [ Symbol ] option_name the option name to match against
-      # @param [ Proc ] block the handler to execute when the option is
-      #   provided.
+      # @param &block the handler to execute when the option is provided.
       def option(option_name, &block)
         options[option_name] = block
       end
@@ -320,8 +319,10 @@ module Mongoid
       # @param [ Hash ] associations The associations to begin the search with.
       # @param [ Hash ] aliased_associations The alaised associations to begin
       #   the search with.
-      # @param [ Proc ] block The block takes in three paramaters, the current
-      #   meth, the field or the relation, and whether the second parameter is a
+      # @param &block The block.
+      # @yieldparam [ Symbol ] The current method.
+      # @yieldparam [ Symbol | String ] The field or the relation.
+      # @yieldparam [ true | false ] Whether the second yield parameter is a
       #   field or not.
       #
       # @return [ Field ] The field found for the given key at the end of the
@@ -516,8 +517,10 @@ module Mongoid
       # given key.
       #
       # @param [ String ] key The key used to search the association tree.
-      # @param [ Proc ] block The block takes in three paramaters, the current
-      #   meth, the field or the relation, and whether the second parameter is a
+      # @param &block The block.
+      # @yieldparam [ Symbol ] The current method.
+      # @yieldparam [ Symbol | String ] The field or the relation.
+      # @yieldparam [ true | false ] Whether the second yield parameter is a
       #   field or not.
       #
       # @return [ Field ] The field found for the given key at the end of the

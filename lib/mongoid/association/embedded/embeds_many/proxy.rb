@@ -236,7 +236,8 @@ module Mongoid
           #   person.addresses.find { |addr| addr.state == 'CA' }
           #
           # @param [ Object... ] *args Various arguments.
-          # @param [ Proc ] block Optional block to pass.
+          # @param &block Optional block to pass.
+          # @yield [ Object ] Yields each enumerable element to the block.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
           def find(*args, &block)
@@ -431,7 +432,7 @@ module Mongoid
           #
           # @param [ Symbol | String ] name The name of the method.
           # @param [ Object... ] *args The method args.
-          # @param [ Proc ] block Optional block to pass.
+          # @param &block Optional block to pass.
           #
           # @return [ Criteria | Object ] A Criteria or return value from the target.
           ruby2_keywords def method_missing(name, *args, &block)

@@ -35,7 +35,7 @@ Structure
     class CardboardBox
 
 - **Methods:** All method definitions should be preceded by a documentation comment.
-  Use ``@param`` and ``@return`` to specify input(s) and output respectively.
+  Use ``@param``, ``@yield``, and ``@return`` to specify inputs and output.
   For further details, refer to
   :ref:`Type Declaration <code-documentation-type-declaration>` below.
 
@@ -295,3 +295,59 @@ Type Declaration
     # @option **kwargs [ String | Array<String> ] :items The items(s) as Strings to include.
     # @option **kwargs [ Integer ] :limit An Integer denoting the limit.
     def buy_groceries(**kwargs)
+
+- **Blocks:** Use ``@yield`` to specify when the method yields to a block.
+
+  .. code-block:: ruby
+
+    # @yield [ Symbol, Symbol, Symbol ] Evaluate the guess of who did the crime.
+    #   Must take the person, location, and weapon used. Must return true or false.
+    def whodunit
+      yield(:mustard, :ballroom, :candlestick)
+    end
+
+- **Blocks:** If the method explicitly specifies a block argument, specify the block
+  argument using ``@param`` preceded by an ampersand ``&``, and also specify ``@yield``.
+  Note ``@yield`` should be used even when method calls ``block.call`` rather than
+  ``yield`` internally.
+
+  .. code-block:: ruby
+
+    # @param &block The block.
+    # @yield [ Symbol, Symbol, Symbol ] Evaluate the guess of who did the crime.
+    #   Must take the person, location, and weapon used. Must return true or false.
+    def whodunit(&block)
+      yield(:scarlet, :library, :rope)
+    end
+
+    # @param &block The block.
+    # @yield [ Symbol, Symbol, Symbol ] Evaluate the guess of who did the crime.
+    #   Must take the person, location, and weapon used. Must return true or false.
+    def whodunit(&block)
+      block.call(:plum, :kitchen, :pipe)
+    end
+
+- **Blocks:** Use ``@yieldparam`` and ``@yieldreturn`` instead of ``@yield`` where
+  beneficial for clarity.
+
+  .. code-block:: ruby
+
+    # @param &block The block.
+    # @yieldparam [ Symbol ] The person.
+    # @yieldparam [ Symbol ] The location.
+    # @yieldparam [ Symbol ] The weapon used.
+    # @yieldreturn [ true | false ] Whether the guess is correct.
+    def whodunit(&block)
+      yield(:peacock, :conservatory, :wrench)
+    end
+
+- **Proc Args:** Proc arguments should use ``@param`` (not ``@yield``). The
+  inputs to the proc may be specified as subtype(s).
+
+  .. code-block:: ruby
+
+    # @param [ Proc<Integer, Integer, Integer> ] my_proc Proc argument which must
+    #   take 3 integers and must return true or false whether the guess is valid.
+    def guess_three(my_proc)
+      my_proc.call(42, 7, 88)
+    end
