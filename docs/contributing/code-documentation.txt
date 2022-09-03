@@ -48,33 +48,30 @@ Structure
     # @return [ Tiger ] The transmogrified result.
     def transmogrify(person)
 
+- **Errors:** Use ``@raise`` to explain errors specific to the method.
+
+  .. code-block:: ruby
+
+    # @raise [ Errors::Validations ] If validation failed.
+    def validate!
+
 - **Private Methods:** Private methods should be documented unless they are
   so brief and straightforward that it is obvious what they do. Note that,
   for example, a method may be brief and straightforward but the type of
-  its parameter may not be obvious, in which case the parameter needs to
-  be appropriately documented.
+  its parameter may not be obvious, in which case the parameter must be
+  appropriately documented.
 
   .. code-block:: ruby
 
     private
 
     # Documentation is optional here.
-    def my_internal_method
-
-- **Notes:** Use the ``@note`` macro to explain caveats, edge cases,
-  and behavior which may surprise users.
-
-  .. code-block:: ruby
-
-    # Clear all stored data.
-    #
-    # @note This operation deletes data in the database.
-    def erase_data!
+    def do_something_obvious
 
 - **API Private:** Classes and public methods which are not intended for
   external usage should be marked ``@api private``. This macro does not
   require a comment.
-  
+
   Note that, because Mongoid's modules are mixed into application classes,
   ``private`` visibility of a method does not necessarily indicate its
   status as an API private method.
@@ -85,6 +82,18 @@ Structure
     #
     # @api private
     def dont_call_me_from_outside
+
+- **Notes and TODOs:** Use ``@note`` to explain caveats, edge cases,
+  and behavior which may surprise users. Use ``@todo`` to record
+  follow-ups and suggestions for future improvement.
+
+  .. code-block:: ruby
+
+    # Clear all stored data.
+    #
+    # @note This operation deletes data in the database.
+    # @todo Refactor this method for performance.
+    def erase_data!
 
 - **Deprecation:** Use the ``@deprecated`` macro to indicate deprecated
   functionality. This macro does not require a comment.
