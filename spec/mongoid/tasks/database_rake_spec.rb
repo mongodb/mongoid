@@ -35,6 +35,22 @@ shared_context "rake task" do
       task.invoke
     end
   end
+
+  shared_examples_for "create_collections" do
+
+    it "receives create_collections" do
+      expect(Mongoid::Tasks::Database).to receive(:create_collections)
+      task.invoke
+    end
+  end
+
+  shared_examples_for "force create_collections" do
+
+    it "receives create_collections" do
+      expect(Mongoid::Tasks::Database).to receive(:create_collections).with(force: true)
+      task.invoke
+    end
+  end
 end
 
 shared_context "rails rake task" do
@@ -99,6 +115,10 @@ describe "db:setup" do
     expect(task.prerequisites).to include("mongoid:create_indexes")
   end
 
+  it "calls db:mongoid:create_collections" do
+    expect(task.prerequisites).to include("mongoid:create_collections")
+  end
+
   it "calls db:seed" do
     expect(task.prerequisites).to include("db:seed")
   end
@@ -113,6 +133,7 @@ describe "db:setup" do
 
   it "works" do
     expect(Mongoid::Tasks::Database).to receive(:create_indexes)
+    expect(Mongoid::Tasks::Database).to receive(:create_collections)
     expect(Rails).to receive(:root).and_return(".")
     expect(Rails).to receive(:application).and_return(application)
     task.invoke
@@ -169,9 +190,14 @@ describe "db:test:prepare" do
     expect(task.prerequisites).to include("mongoid:create_indexes")
   end
 
+  it "calls mongoid:create_collections" do
+    expect(task.prerequisites).to include("mongoid:create_collections")
+  end
+
   it "works" do
     expect(Rails).to receive(:application).and_return(application)
     expect(Mongoid::Tasks::Database).to receive(:create_indexes)
+    expect(Mongoid::Tasks::Database).to receive(:create_collections)
     task.invoke
   end
 end
@@ -197,6 +223,54 @@ describe "db:mongoid:create_indexes" do
     end
 
     it_behaves_like "create_indexes"
+  end
+end
+
+describe "db:mongoid:create_collections" do
+  include_context "rake task"
+
+  it_behaves_like "create_collections"
+
+  it "calls load_models" do
+    expect(task.prerequisites).to include("load_models")
+  end
+
+  it "calls environment" do
+    expect(task.prerequisites).to include("environment")
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    before do
+      expect(Rails).to receive(:application).and_return(application)
+    end
+
+    it_behaves_like "create_collections"
+  end
+end
+
+describe "db:mongoid:create_collections:force" do
+  include_context "rake task"
+
+  it_behaves_like "force create_collections"
+
+  it "calls load_models" do
+    expect(task.prerequisites).to include("load_models")
+  end
+
+  it "calls environment" do
+    expect(task.prerequisites).to include("environment")
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    before do
+      expect(Rails).to receive(:application).and_return(application)
+    end
+
+    it_behaves_like "force create_collections"
   end
 end
 

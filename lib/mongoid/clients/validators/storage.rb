@@ -9,7 +9,7 @@ module Mongoid
         extend self
 
         # The valid options for storage.
-        VALID_OPTIONS = [ :collection, :database, :client ].freeze
+        VALID_OPTIONS = [ :collection, :collection_options, :database, :client ].freeze
 
         # Validate the options provided to :store_in.
         #

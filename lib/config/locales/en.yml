@@ -42,6 +42,17 @@ en:
             since the document did not actually get saved."
           resolution: "Double check all before callbacks to make sure they are
             not unintentionally returning false."
+        create_collection_failure:
+          message: "Cannot create collection %{collection_name}
+            with options %{collection_options}. The following error was raised:
+            %{error}."
+          summary: "The server rejected createCollection command with given collection
+            options. This may happen when some of the options are invalid, or not
+            supported by your version of the server."
+          resolution: "Double check that collection options for the collection
+            %{collection_name} are valid. Consult with Ruby driver documentation
+            and MongoDB documentation if the desired options are supported by
+            your version of the server."
         criteria_argument_required:
           message: "Calling Criteria methods with nil arguments is not allowed."
           summary: "Arguments to Criteria methods cannot be nil, and most
@@ -97,6 +108,12 @@ en:
           resolution: "Search for an id/shard key that is in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
             which will cause nil to be returned instead of raising this error."
+        drop_collection_failure:
+          message: "Cannot drop collection %{collection_name}."
+          summary: "Mongoid tried to drop collection %{collection_name}, but the
+            collection still exists in the database."
+          resolution: "Try to drop the collection manually using Ruby driver or
+            mongo shell."
         empty_config_file:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
@@ -326,7 +343,7 @@ en:
         invalid_storage_options:
           message: "Invalid options passed to %{klass}.store_in: %{options}."
           summary: "The :store_in macro takes only a hash of parameters with
-            the keys :database, :collection, or :client."
+            the keys :database, :collection, :collection_options, or :client."
           resolution: "Change the options passed to store_in to match the
             documented API, and ensure all keys in the options hash are
             symbols.\n\n
