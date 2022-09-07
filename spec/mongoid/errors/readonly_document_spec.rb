@@ -12,13 +12,13 @@ describe Mongoid::Errors::ReadonlyDocument do
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "Attempted to persist the readonly document 'Band'."
+        "Attempted to persist a readonly document of class 'Band'."
       )
     end
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Documents loaded from the database using #only"
+        "Documents that are marked readonly cannot be persisted"
       )
     end
 
