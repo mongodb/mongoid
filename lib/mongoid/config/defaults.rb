@@ -48,9 +48,9 @@ module Mongoid
           self.map_big_decimal_to_decimal128 = false
         when "8.0"
           # All flag defaults currently reflect 8.0 behavior.
-          self.legacy_readonly = true
         when "8.1"
-          # All flag defaults currently reflect 8.1 behavior.
+          # flags introduced in 8.1 - new functionality
+          self.legacy_readonly = false
         else
           raise ArgumentError, "Unknown version: #{version}"
         end

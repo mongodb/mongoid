@@ -135,7 +135,7 @@ module Mongoid
     # deletable/destroyable, but they will be savable/updatable.
     # When this feature flag is turned on, the read-only state will be reset on
     # reload, but when it is turned off, it won't be.
-    option :legacy_readonly, default: false
+    option :legacy_readonly, default: true
 
     # Returns the Config singleton, for use in the configure DSL.
     #
