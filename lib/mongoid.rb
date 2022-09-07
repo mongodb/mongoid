@@ -132,4 +132,14 @@ module Mongoid
   class << self
     prepend GlobalDiscriminatorKeyAssignment
   end
+
+  def global_thread_pool_async_query_executor
+    concurrency = Mongoid.global_executor_concurrency || 4
+    @@global_thread_pool_async_query_executor ||= Concurrent::ThreadPoolExecutor.new(
+      min_threads: 0,
+      max_threads: concurrency,
+      max_queue: concurrency * 4,
+      fallback_policy: :caller_runs
+    )
+  end
 end

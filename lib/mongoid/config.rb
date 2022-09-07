@@ -127,6 +127,16 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
+    # Sets the async_query_executor for an application. By default the thread pool executor
+    #   set to `:immediate. Options are:
+    #
+    #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
+    #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
+    #      that uses the +async_query_concurrency+ for the +max_threads+ value.
+    option :async_query_executor, default: :immediate
+
+    option :global_executor_concurrency, default: nil
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.

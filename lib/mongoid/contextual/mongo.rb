@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "mongoid/contextual/mongo/async_load_task"
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
@@ -773,6 +774,10 @@ module Mongoid
         third_to_last || raise_document_not_found_error
       end
 
+      def load_async
+        @preload_task = AsyncLoadTask.new(view, klass, criteria) unless @load_task
+      end
+
       private
 
       # Update the documents for the provided method.
@@ -855,9 +860,20 @@ module Mongoid
       #
       # @return [ Array<Document> | Mongo::Collection::View ] The docs to iterate.
       def documents_for_iteration
-        return view unless eager_loadable?
-        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
-        eager_load(docs)
+        if @preload_task
+          if @preload_task.started?
+            @preload_task.future.value!
+          else
+            @preload_task.cancel
+            @preload_task.execute
+          end
+        else
+          return view unless eager_loadable?
+          docs = view.map do |doc|
+            Factory.from_db(klass, doc, criteria)
+          end
+          eager_load(docs)
+        end
       end
 
       # Yield to the document.

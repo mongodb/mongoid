@@ -35,6 +35,11 @@ module Mongoid
       @context ||= create_context
     end
 
+    def load_async
+      context.load_async if context.respond_to?(:load_async)
+      self
+    end
+
     private
 
     # Create the context for the queries to execute. Will be memory for
