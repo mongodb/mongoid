@@ -127,6 +127,16 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
+    # When this flag is true, a document is only readonly if it has been
+    # projected using #only or #without, and readonly documents will only not
+    # be able to be deleted/destroyed. When this flag is false, a document will
+    # become readonly only once the #readonly! method is called, and an error
+    # will be raised on attempting to save or update such documents, instead
+    # of just on delete.
+    # When this feature flag is turned on, the readonly state will be reset on
+    # reload, but when it is turned off, it won't be.
+    option :legacy_readonly, default: true
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.

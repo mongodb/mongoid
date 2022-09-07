@@ -167,5 +167,41 @@ describe Mongoid::Persistable::Unsettable do
         end
       end
     end
+
+    context "when executing on a readonly document" do
+
+      let(:person) do
+        Person.create!(title: "sir", age: 30)
+      end
+
+      context "when legacy_readonly is true" do
+        config_override :legacy_readonly, true
+
+        before do
+          person.__selected_fields = { "title" => 1, "age" => 1 }
+        end
+
+        it "persists the changes" do
+          expect(person).to be_readonly
+          person.unset(:title)
+          expect(person.title).to be nil
+        end
+      end
+
+      context "when legacy_readonly is false" do
+        config_override :legacy_readonly, false
+
+        before do
+          person.readonly!
+        end
+
+        it "raises a ReadonlyDocument error" do
+          expect(person).to be_readonly
+          expect do
+            person.unset(:title)
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
+      end
+    end
   end
 end

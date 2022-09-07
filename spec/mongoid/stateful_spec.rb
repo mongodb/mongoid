@@ -136,21 +136,75 @@ describe Mongoid::Stateful do
       Band.new
     end
 
-    context "when the document is readonly" do
+    context "when legacy_readonly is true" do
+      config_override :legacy_readonly, true
 
-      before do
-        document.__selected_fields = { test: 1 }
+      context "when the selected fields are set" do
+
+        before do
+          document.__selected_fields = { test: 1 }
+        end
+
+        it "returns true" do
+          expect(document).to be_readonly
+        end
       end
 
-      it "returns true" do
-        expect(document).to be_readonly
+      context "when no readonly has been set" do
+
+        it "returns false" do
+          expect(document).to_not be_readonly
+        end
+      end
+
+      context "when the readonly! method is called" do
+
+        let(:op) do
+          document.readonly!
+        end
+
+        it "returns false" do
+          op
+          expect(document).to_not be_readonly
+        end
+
+        it "warns" do
+          expect(Mongoid::Warnings).to receive(:warn_legacy_readonly)
+          op
+        end
       end
     end
 
-    context "when no readonly has been set" do
+    context "when legacy_readonly is false" do
+      config_override :legacy_readonly, false
 
-      it "returns false" do
-        expect(document).to_not be_readonly
+      context "when the selected fields are set" do
+
+        before do
+          document.__selected_fields = { test: 1 }
+        end
+
+        it "returns false" do
+          expect(document).to_not be_readonly
+        end
+      end
+
+      context "when the readonly! method is called" do
+
+        before do
+          document.readonly!
+        end
+
+        it "returns true" do
+          expect(document).to be_readonly
+        end
+      end
+
+      context "when no readonly has been set" do
+
+        it "returns false" do
+          expect(document).to_not be_readonly
+        end
       end
     end
   end

@@ -155,5 +155,42 @@ describe Mongoid::Persistable::Logical do
         end
       end
     end
+
+    context "when executing on a readonly document" do
+
+      let(:person) do
+        Person.create!(age: 10, score: 100)
+      end
+
+      context "when legacy_readonly is true" do
+        config_override :legacy_readonly, true
+
+        before do
+          person.__selected_fields = { "age" => 1, "score" => 1 }
+        end
+
+        it "persists the changes" do
+          expect(person).to be_readonly
+          person.bit(age: { and: 6 }, score: { or: 122 })
+          expect(person.age).to eq(2)
+          expect(person.score).to eq(126)
+        end
+      end
+
+      context "when legacy_readonly is false" do
+        config_override :legacy_readonly, false
+
+        before do
+          person.readonly!
+        end
+
+        it "raises a ReadonlyDocument error" do
+          expect(person).to be_readonly
+          expect do
+            person.bit(age: { and: 6 }, score: { or: 122 })
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
+      end
+    end
   end
 end

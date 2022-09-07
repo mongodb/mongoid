@@ -95,6 +95,25 @@ module Mongoid
         !_parent.delayed_atomic_sets[atomic_path]
     end
 
+    # Flags the document as readonly. Will cause a ReadonlyDocument error to be
+    # raised if the document is attempted to be saved, updated or destroyed.
+    #
+    # @example Flag the document as readonly.
+    #   document.readonly!
+    #
+    # @return [ true | false ] true if the document was successfully marked
+    #   readonly, false otherwise.
+    #
+    # @since 4.0.0
+    def readonly!
+      if Mongoid.legacy_readonly
+        Mongoid::Warnings.warn_legacy_readonly
+        false
+      else
+        @readonly = true
+      end
+    end
+
     # Is the document readonly?
     #
     # @example Is the document readonly?
@@ -102,7 +121,11 @@ module Mongoid
     #
     # @return [ true | false ] If the document is readonly.
     def readonly?
-      __selected_fields != nil
+      if Mongoid.legacy_readonly
+        __selected_fields != nil
+      else
+        @readonly ||= false
+      end
     end
 
     # Determine if the document can be set.

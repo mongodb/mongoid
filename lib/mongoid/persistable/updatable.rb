@@ -96,6 +96,7 @@ module Mongoid
       #
       # @return [ true | false ] The result of the update.
       def prepare_update(options = {})
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys

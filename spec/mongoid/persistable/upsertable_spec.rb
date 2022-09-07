@@ -118,5 +118,50 @@ describe Mongoid::Persistable::Upsertable do
         end
       end
     end
+
+    context "when the document is readonly" do
+
+      context "when legacy_readonly is true" do
+        config_override :legacy_readonly, true
+
+        let!(:existing) do
+          Band.create!(name: "Photek")
+        end
+
+        before do
+          existing.name = "Depeche Mode"
+        end
+
+        let!(:upsert) do
+          existing.upsert
+        end
+
+        it "updates the existing document" do
+          expect(existing.reload.name).to eq("Depeche Mode")
+        end
+
+        it "returns true" do
+          expect(upsert).to be true
+        end
+      end
+
+      context "when legacy_readonly is false" do
+        config_override :legacy_readonly, false
+
+        let!(:existing) do
+          Band.create!(name: "Photek").tap(&:readonly!)
+        end
+
+        before do
+          existing.name = "Depeche Mode"
+        end
+
+        it 'raises a ReadonlyDocument error' do
+          expect do
+            existing.upsert
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
+      end
+    end
   end
 end

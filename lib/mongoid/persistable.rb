@@ -180,6 +180,7 @@ module Mongoid
     #
     # @return [ Object ] The result of the operation.
     def prepare_atomic_operation
+      raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
       operations = yield({})
       persist_or_delay_atomic_operation(operations)
       self

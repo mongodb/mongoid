@@ -127,6 +127,42 @@ describe Mongoid::Persistable::Pullable do
         end
       end
     end
+
+    context "when executing on a readonly document" do
+
+      let(:person) do
+        Person.create!(test_array: [ 1, 1, 2, 3 ])
+      end
+
+      context "when legacy_readonly is true" do
+        config_override :legacy_readonly, true
+
+        before do
+          person.__selected_fields = { "test_array" => 1 }
+        end
+
+        it "persists the changes" do
+          expect(person).to be_readonly
+          person.pull(test_array: 1)
+          expect(person.test_array).to eq([ 2, 3 ])
+        end
+      end
+
+      context "when legacy_readonly is false" do
+        config_override :legacy_readonly, false
+
+        before do
+          person.readonly!
+        end
+
+        it "raises a ReadonlyDocument error" do
+          expect(person).to be_readonly
+          expect do
+            person.pull(test_array: 1)
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
+      end
+    end
   end
 
   describe "#pull_all" do
@@ -251,6 +287,42 @@ describe Mongoid::Persistable::Pullable do
         person.atomically do
           person.pull_all test_array: [ 1, 2 ]
           expect(person.changes).to eq({"test_array" => [[ 1, 1, 2, 3, 4 ], [ 3, 4 ]]})
+        end
+      end
+    end
+
+    context "when executing on a readonly document" do
+
+      let(:person) do
+        Person.create!(test_array: [ 1, 1, 2, 3, 4 ])
+      end
+
+      context "when legacy_readonly is true" do
+        config_override :legacy_readonly, true
+
+        before do
+          person.__selected_fields = { "test_array" => 1 }
+        end
+
+        it "persists the changes" do
+          expect(person).to be_readonly
+          person.pull_all(test_array: [ 1, 2 ])
+          expect(person.test_array).to eq([ 3, 4 ])
+        end
+      end
+
+      context "when legacy_readonly is false" do
+        config_override :legacy_readonly, false
+
+        before do
+          person.readonly!
+        end
+
+        it "raises a ReadonlyDocument error" do
+          expect(person).to be_readonly
+          expect do
+            person.pull_all(test_array: [ 1, 2 ])
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
         end
       end
     end
