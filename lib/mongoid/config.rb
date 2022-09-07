@@ -135,7 +135,7 @@ module Mongoid
     # of just on delete.
     # When this feature flag is turned on, the readonly state will be reset on
     # reload, but when it is turned off, it won't be.
-    option :legacy_readonly, default: true
+    option :legacy_readonly, default: false
 
     # Returns the Config singleton, for use in the configure DSL.
     #
