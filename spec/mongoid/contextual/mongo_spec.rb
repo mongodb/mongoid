@@ -223,6 +223,27 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context "when including a default scope" do
+
+      let(:criteria) do
+        Band.where(name: "New Order")
+      end
+
+      before do
+        Band.default_scope ->{ criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it 'raises an error' do
+        expect do
+          Band.estimated_count
+        end.to raise_error(Mongoid::Errors::InvalidEstimatedCountScoping)
+      end
+    end
   end
 
 
