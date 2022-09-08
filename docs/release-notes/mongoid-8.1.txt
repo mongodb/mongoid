@@ -266,18 +266,18 @@ persistence context. This method can be used on document and criteria instances.
          embedded: false>
 
   criteria.first
-  criteria.clear_persistance_context!
+  criteria.clear_persistence_context!
 
   # Use #with! here instead of #with
   band = Band.new
   band.with!(client: :tertiary)
   band.save!
-  band.clear_persistance_context!
+  band.clear_persistence_context!
 
   # The #with method on criteria returns a new criteria.
   criteria = Band.all.with(collection: "artists")
   band = criteria.first
-  criteria.clear_persistance_context!
+  criteria.clear_persistence_context!
 
 For more information on changing persistence contexts at runtime, see the
 section on :ref:`Runtime Persistence Options <runtime-persistence-options>`.

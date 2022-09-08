@@ -22,6 +22,7 @@ module Mongoid
         !!(PersistenceContext.get(self) || klass.persistence_context?)
       end
 
+      # Clears the persistence context on the called object.
       def clear_persistence_context!
         clear_persistence_context(@original_cluster, @original_context)
       end

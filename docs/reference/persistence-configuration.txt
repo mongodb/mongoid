@@ -221,7 +221,7 @@ The ``with`` command can also be used without a block:
 
     criteria.first
   ensure
-    criteria.clear_persistance_context!
+    criteria.clear_persistence_context!
   end
 
   begin
@@ -233,7 +233,7 @@ The ``with`` command can also be used without a block:
     band.with!(client: :tertiary)
     band.save!
   ensure
-    band.clear_persistance_context!
+    band.clear_persistence_context!
   end
 
   begin
@@ -241,7 +241,7 @@ The ``with`` command can also be used without a block:
     criteria = Band.all.with(collection: "artists")
     band = criteria.first
   ensure
-    criteria.clear_persistance_context!
+    criteria.clear_persistence_context!
   end
 
 As of Mongoid 8.1, the ``with`` method can be called with or without a block.
