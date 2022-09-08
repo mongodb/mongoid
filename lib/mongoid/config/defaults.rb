@@ -19,7 +19,7 @@ module Mongoid
         # versions are to give old functionality. Because of this, it is
         # possible to recurse to later version to get all of the options to
         # turn off. Note that this won't be true when adding feature flags to
-        # 8.1, since the default will be the old functionality until the next
+        # 9.x, since the default will be the old functionality until the next
         # major version is released. More likely, the recursion will have to go
         # in the other direction (towards earlier versions).
 
@@ -48,6 +48,7 @@ module Mongoid
           self.map_big_decimal_to_decimal128 = false
         when "8.0"
           # All flag defaults currently reflect 8.0 behavior.
+          self.legacy_readonly = true
         when "8.1"
           # All flag defaults currently reflect 8.1 behavior.
         else
