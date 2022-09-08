@@ -567,9 +567,8 @@ en:
           resolution: "Don't define '%{name}' as readonly, or do not attempt
             to update its value after the document is persisted."
         readonly_document:
-          message: "Attempted to persist the readonly document '%{klass}'."
-          summary: "Documents loaded from the database using #only
-            cannot be persisted."
+          message: "Attempted to persist a readonly document of class '%{klass}'."
+          summary: "Documents that are marked readonly cannot be persisted."
           resolution: "Don't attempt to persist documents that are flagged as
             readonly."
         scope_overwrite:

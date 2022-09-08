@@ -100,6 +100,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def prepare_insert(options = {})
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self if performing_validations?(options) &&
           invalid?(options[:context] || :create)
         run_callbacks(:save, with_children: false) do
