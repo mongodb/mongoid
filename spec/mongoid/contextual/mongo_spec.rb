@@ -4445,4 +4445,70 @@ describe Mongoid::Contextual::Mongo do
       end
     end
   end
+
+  describe '#load_async' do
+    let!(:band) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context 'with global thread pool async query executor' do
+      config_override :async_query_executor, :global_thread_pool
+
+      it 'preloads the documents' do
+        context.load_async
+        context.preload_task.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::PreloadTask)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.preload_task.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
+      end
+    end
+
+    context 'with immediate thread pool async query executor' do
+      config_override :async_query_executor, :immediate
+
+      it 'preloads the documents' do
+        context.load_async
+        context.preload_task.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::PreloadTask)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.preload_task.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
+      end
+    end
+  end
 end

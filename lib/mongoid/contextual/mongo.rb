@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "mongoid/contextual/mongo/async_load_task"
+require "mongoid/contextual/mongo/preload_task"
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
@@ -37,6 +37,8 @@ module Mongoid
 
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
+
+      attr_reader :preload_task
 
       # Get the number of documents matching the query.
       #
@@ -775,7 +777,7 @@ module Mongoid
       end
 
       def load_async
-        @preload_task = AsyncLoadTask.new(view, klass, criteria) unless @load_task
+        @preload_task = PreloadTask.new(view, klass, criteria) unless @preload_task
       end
 
       private
@@ -862,9 +864,9 @@ module Mongoid
       def documents_for_iteration
         if @preload_task
           if @preload_task.started?
-            @preload_task.future.value!
+            @preload_task.value!
           else
-            @preload_task.cancel
+            @preload_task.unschedule
             @preload_task.execute
           end
         else

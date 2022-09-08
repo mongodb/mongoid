@@ -3,26 +3,28 @@ require "mongoid/association/eager_loadable"
 module Mongoid
   module Contextual
     class Mongo
-      class AsyncLoadTask
+      # @api private
+      class PreloadTask
+        extend Forwardable
         include Association::EagerLoadable
+
+        def_delegators :@future, :value!, :value, :wait!, :wait
 
         IMMEDIATE_EXECUTOR = Concurrent::ImmediateExecutor.new
 
-        attr_accessor :future, :criteria
+        attr_accessor :criteria
 
         def initialize(view, klass, criteria)
           @view = view
           @klass = klass
           @criteria = criteria
-
           @mutex = Mutex.new
-          @started = false
-          @cancelled = false
+          @state = :pending
           @future = Concurrent::Promises.future_on(executor, self) do |task|
-            if !task.started? && !task.cancelled?
+            if task.pending?
               task.execute
             end
-          end.touch
+          end
         end
 
         def executor
@@ -34,26 +36,26 @@ module Mongoid
           end
         end
 
+        def pending?
+          @mutex.synchronize do
+            @state == :pending
+          end
+        end
+
         def started?
           @mutex.synchronize do
-            @started
+            @state == :started
           end
         end
 
-        def cancel
+        def unschedule
           @mutex.synchronize do
-            @cancelled = true
-          end
-        end
-
-        def cancelled?
-          @mutex.synchronize do
-            @cancelled
+            @state = :cancelled
           end
         end
 
         def execute
-          started!
+          start
           documents = @view.map do |doc|
             Factory.from_db(@klass, doc, @criteria)
           end
@@ -63,9 +65,9 @@ module Mongoid
 
         private
 
-        def started!
+        def start
           @mutex.synchronize do
-            @started = true
+            @state = :started
           end
         end
       end
