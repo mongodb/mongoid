@@ -128,7 +128,7 @@ module Mongoid
     option :legacy_attributes, default: false
 
     # When this flag is true, a document is only readonly if it has been
-    # projected using #only or #without, and readonly documents will only not
+    # projected using #only or #without, and readonly documents will not
     # be deletable/destroyable. When this flag is false, a document will
     # become readonly only once the #readonly! method is called, and an error
     # will be raised on attempting to save or update such documents, instead
