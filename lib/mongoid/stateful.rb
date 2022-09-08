@@ -103,8 +103,6 @@ module Mongoid
     #
     # @return [ true | false ] true if the document was successfully marked
     #   readonly, false otherwise.
-    #
-    # @since 4.0.0
     def readonly!
       if Mongoid.legacy_readonly
         Mongoid::Warnings.warn_legacy_readonly

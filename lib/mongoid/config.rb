@@ -129,7 +129,7 @@ module Mongoid
 
     # When this flag is true, a document is only readonly if it has been
     # projected using #only or #without, and readonly documents will only not
-    # be able to be deleted/destroyed. When this flag is false, a document will
+    # be deletable/destroyable. When this flag is false, a document will
     # become readonly only once the #readonly! method is called, and an error
     # will be raised on attempting to save or update such documents, instead
     # of just on delete.
