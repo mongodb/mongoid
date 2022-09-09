@@ -231,6 +231,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       before do
+        5.times { Band.create! }
         Band.default_scope ->{ criteria }
       end
 
@@ -242,6 +243,12 @@ describe Mongoid::Contextual::Mongo do
         expect do
           Band.estimated_count
         end.to raise_error(Mongoid::Errors::InvalidEstimatedCountScoping)
+      end
+
+      it "does not raise an error on unscoped" do
+        expect do
+          expect(Band.unscoped.estimated_count).to eq(5)
+        end
       end
     end
   end
