@@ -173,6 +173,36 @@ describe Mongoid::Stateful do
           op
         end
       end
+
+      context "when overriding readonly?" do
+
+        let(:doc) { ReadonlyModel.create! }
+
+        before do
+          class ReadonlyModel
+            include Mongoid::Document
+
+            attr_accessor :locked
+
+            def readonly?
+              !!locked
+            end
+          end
+        end
+
+        after do
+          Object.send(:remove_const, :ReadonlyModel)
+        end
+
+        it "raises when readonly? is true" do
+          expect(doc.readonly?).to be false
+          doc.locked = true
+          expect(doc.readonly?).to be true
+          expect do
+            doc.destroy
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
+      end
     end
 
     context "when legacy_readonly is false" do
@@ -204,6 +234,36 @@ describe Mongoid::Stateful do
 
         it "returns false" do
           expect(document).to_not be_readonly
+        end
+      end
+
+      context "when overriding readonly?" do
+
+        let(:doc) { ReadonlyModel.new }
+
+        before do
+          class ReadonlyModel
+            include Mongoid::Document
+
+            attr_accessor :locked
+
+            def readonly?
+              !!locked
+            end
+          end
+        end
+
+        after do
+          Object.send(:remove_const, :ReadonlyModel)
+        end
+
+        it "raises when readonly? is true" do
+          expect(doc.readonly?).to be false
+          doc.locked = true
+          expect(doc.readonly?).to be true
+          expect do
+            doc.save!
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
         end
       end
     end
