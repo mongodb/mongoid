@@ -981,14 +981,14 @@ back to the model as follows:
 Readonly Documents
 ==================
 
-Documents can be marked readonly in two ways, depending on the value of the
+Documents can be marked read-only in two ways, depending on the value of the
 ``Mongoid.legacy_readonly`` feature flag:
 
-If this flag is turned on, a document is marked readonly when that document
-has been projected (i.e. using ``#only`` or ``#without``). A readonly document,
+If this flag is turned on, a document is marked read-only when that document
+has been projected (i.e. using ``#only`` or ``#without``). A read-only document,
 with this flag turned on, will not be deletable or destroyable (a
 ``ReadonlyDocument`` error will be raised), but will be saveable and updatabale.
-The readonly status is reset on reloading the document.
+The read-only status is reset on reloading the document.
 
 .. code:: ruby
 
@@ -1003,11 +1003,11 @@ The readonly status is reset on reloading the document.
   band.destroy # => raises ReadonlyDocument error
   band.reload.readonly? # => false
 
-If this flag is turned off, a document is marked readonly when the ``#readonly!``
-method is called on that documnet. A readonly document, with this flag turned off,
+If this flag is turned off, a document is marked read-only when the ``#readonly!``
+method is called on that documnet. A read-only document, with this flag turned off,
 will raise a ReadonlyDocument error on attempting to perform any persistence
 operation, including (but not limited to) saving, updating, deleting and
-destroying. Note that reloading does not reset the readonly state.
+destroying. Note that reloading does not reset the read-only state.
 
 .. code:: ruby
 
