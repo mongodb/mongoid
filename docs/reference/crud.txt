@@ -974,3 +974,69 @@ back to the model as follows:
 
   band.tours
   # => #<Set: {"London"}>
+
+
+.. _readonly-documents:
+
+Readonly Documents
+==================
+
+Documents can be marked read-only in two ways, depending on the value of the
+``Mongoid.legacy_readonly`` feature flag:
+
+If this flag is turned off, a document is marked read-only when the ``#readonly!``
+method is called on that documnet. A read-only document, with this flag turned off,
+will raise a ReadonlyDocument error on attempting to perform any persistence
+operation, including (but not limited to) saving, updating, deleting and
+destroying. Note that reloading does not reset the read-only state.
+
+.. code:: ruby
+
+  band = Band.first
+  band.readonly? # => false
+  band.readonly!
+  band.readonly? # => true
+  band.name = "The Rolling Stones"
+  band.save # => raises ReadonlyDocument error
+  band.reload.readonly? # => true
+
+If this flag is turned on, a document is marked read-only when that document
+has been projected (i.e. using ``#only`` or ``#without``). A read-only document,
+with this flag turned on, will not be deletable or destroyable (a
+``ReadonlyDocument`` error will be raised), but will be saveable and updatable.
+The read-only status is reset on reloading the document.
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :genre, type: String
+  end
+
+  band = Band.only(:name).first
+  band.readonly? # => true
+  band.destroy # => raises ReadonlyDocument error
+  band.reload.readonly? # => false
+
+
+Overriding ``readonly?``
+------------------------
+
+Another way to make a document read-only is by overriding the readonly? method:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :genre, type: String
+
+    def readonly?
+      true
+    end
+  end
+
+  band = Band.first
+  band.readonly? # => true
+  band.destroy # => raises ReadonlyDocument error
