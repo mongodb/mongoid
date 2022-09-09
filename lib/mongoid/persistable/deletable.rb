@@ -16,7 +16,6 @@ module Mongoid
       #
       # @return [ TrueClass ] True.
       def delete(options = {})
-        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_delete do
           unless options[:persist] == false
             if embedded?
@@ -102,6 +101,7 @@ module Mongoid
       #
       # @return [ Object ] The result of the block.
       def prepare_delete
+        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         yield(self)
         freeze
         self.destroyed = true

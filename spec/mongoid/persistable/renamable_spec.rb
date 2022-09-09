@@ -147,5 +147,41 @@ describe Mongoid::Persistable::Renamable do
         end
       end
     end
+
+    context "when executing on a readonly document" do
+
+      let(:person) do
+        Person.create!(title: "sir")
+      end
+
+      context "when legacy_readonly is true" do
+        config_override :legacy_readonly, true
+
+        before do
+          person.__selected_fields = { "test_array" => 1 }
+        end
+
+        it "persists the changes" do
+          expect(person).to be_readonly
+          person.rename title: :salutation
+          expect(person.reload.salutation).to eq("sir")
+        end
+      end
+
+      context "when legacy_readonly is false" do
+        config_override :legacy_readonly, false
+
+        before do
+          person.readonly!
+        end
+
+        it "raises a ReadonlyDocument error" do
+          expect(person).to be_readonly
+          expect do
+            person.rename(title: :salutation)
+          end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
+      end
+    end
   end
 end
