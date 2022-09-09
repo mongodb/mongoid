@@ -4464,20 +4464,20 @@ describe Mongoid::Contextual::Mongo do
 
       it 'preloads the documents' do
         context.load_async
-        context.preload_task.wait
+        context.documents_loader.wait
 
         expect(context.view).not_to receive(:map)
         expect(context.to_a).to eq([band])
       end
 
       it 're-raises exception during preload' do
-        expect_any_instance_of(Mongoid::Contextual::Mongo::PreloadTask)
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
           .to receive(:execute)
           .at_least(:once)
           .and_raise(Mongo::Error::OperationFailure)
 
         context.load_async
-        context.preload_task.wait
+        context.documents_loader.wait
 
         expect do
           context.to_a
@@ -4490,20 +4490,20 @@ describe Mongoid::Contextual::Mongo do
 
       it 'preloads the documents' do
         context.load_async
-        context.preload_task.wait
+        context.documents_loader.wait
 
         expect(context.view).not_to receive(:map)
         expect(context.to_a).to eq([band])
       end
 
       it 're-raises exception during preload' do
-        expect_any_instance_of(Mongoid::Contextual::Mongo::PreloadTask)
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
           .to receive(:execute)
           .at_least(:once)
           .and_raise(Mongo::Error::OperationFailure)
 
         context.load_async
-        context.preload_task.wait
+        context.documents_loader.wait
 
         expect do
           context.to_a

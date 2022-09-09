@@ -2388,5 +2388,51 @@ will query the database and separately cache their results.
 To use the cached results, call ``all.to_a.first`` on the model class.
 
 
-.. _legacy-query-cache-limitations:
+.. _load-async:
+
+Asynchronous Queries
+====================
+
+Mongoid allows running database queries asynchronously in the background.
+This can be beneficial when there is a need to get documents from different
+collections.
+
+In order to schedule an asynchronous query call ``load_async`` method on a
+``Criteria``:
+
+.. code-block:: ruby
+
+  class PagesController < ApplicationController
+    def index
+      @active_bands = Band.where(active: true).load_async
+      @best_events = Event.best.load_async
+      @public_articles = Article.where(public: true).load_async
+    end
+  end
+
+In the above example three queries will be scheduled for asynchronous execution.
+Queries will be executed as soon as there are available threads in the thread pool.
+Results of the queries can be later accessed as usual:
+
+.. code-block:: html
+
+  <ul>
+    <%- @active_bands.each do -%>
+      <li><%= band.name %></li>
+    <%- end -%>
+  </ul>
+
+Asynchronous queries are disabled by default. In order to enable them, the
+following config options should be set:
+
+.. code-block:: yaml
+
+  development:
+    ...
+    options:
+      # Execute asynchronous queries using a global thread pool.
+      async_query_executor: :global_thread_pool
+      # Number of threads in the pool. This option is defaulted to 4.
+      global_executor_concurrency: 5
+
 
