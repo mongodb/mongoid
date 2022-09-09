@@ -181,8 +181,13 @@ en:
           message: "Invalid criteria for estimated_count."
           summary: "Estimated count is strictly a collection-level operation and cannot be called
             on a filtered criteria."
-          resolution: "Try calling estimated_count directly on the class: %{class_name}.estimated_count.\n\n
-            \_If the class defines a default scope, use unscoped: %{class_name}.unscoped.estimated_count."
+          resolution: "Try calling estimated_count directly on the class: %{class_name}.estimated_count."
+        invalid_estimated_count_scoping:
+          message: "Invalid criteria for estimated_count."
+          summary: "Estimated count is strictly a collection-level operation and cannot be called
+            on a model that uses a default scope."
+          resolution: "Try calling estimated_count using unscoped: %{class_name}.unscoped.estimated_count.
+            Alternatively, the #count method can be used, which is usable with scoping."
         invalid_expression_operator:
           message: "Invalid expression operator '%{operator}'."
           summary: "You misspelled an operator, are using an operator that
