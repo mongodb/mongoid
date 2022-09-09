@@ -17,6 +17,7 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+
 Added ``attribute_before_last_save``, ``saved_change_to_attribute``, ``saved_change_to_attribute?``, and ``will_save_change_to_attribute?``  methods
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -239,3 +240,45 @@ documents should be stored in using the ``store_in`` macro:
 Previously, an error was raised if this was done. See the section on
 :ref:`Inheritance Persistence Context <inheritance-persistence-context>`
 for more details.
+
+
+Added ``readonly!`` method and ``legacy_readonly`` feature flag
+---------------------------------------------------------------
+
+Mongoid 8.1 changes the meaning of read-only documents. In Mongoid 8.1 with 
+this feature flag turned off, a document becomes read-only when calling the 
+``readonly!`` method:
+
+.. code:: ruby
+
+  band = Band.first
+  band.readonly? # => false
+  band.readonly!
+  band.readonly? # => true
+  band.name = "The Rolling Stones"
+  band.save # => raises ReadonlyDocument error
+
+With this feature flag turned off, a ``ReadonlyDocument`` error will be
+raised when destroying or deleting, as well as when saving or updating.
+
+Prior to Mongoid 8.1 and in 8.1 with the ``legacy_readonly`` feature flag 
+turned on, documents become read-only when they are projected (i.e. using 
+``#only`` or ``#without``).
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :genre, type: String
+  end
+
+  band = Band.only(:name).first
+  band.readonly? # => true
+  band.destroy # => raises ReadonlyDocument error
+
+Note that with this feature flag on, a ``ReadonlyDocument`` error will only be
+raised when destroying or deleting, and not on saving or updating. See the 
+section on :ref:`Read-only Documents <readonly-documents>` for more details.
+
+
