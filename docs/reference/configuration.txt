@@ -391,8 +391,8 @@ for details on driver options.
       # deletable/destroyable, but will be savable/updatable.
       # When this feature flag is turned on, the read-only state will be reset on
       # reload, but when it is turned off, it won't be.
-      # (default: true)
-      legacy_readonly: false
+      # (default: false)
+      #legacy_readonly: true
 
       # Maintain legacy behavior of === on Mongoid document classes, which
       # returns true in a number of cases where Ruby's === implementation would
