@@ -1018,3 +1018,25 @@ The read-only status is reset on reloading the document.
   band.readonly? # => true
   band.destroy # => raises ReadonlyDocument error
   band.reload.readonly? # => false
+
+
+Overriding ``readonly?``
+------------------------
+
+Another way to make a document read-only is by overriding the readonly? method:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :genre, type: String
+
+    def readonly?
+      true
+    end
+  end
+
+  band = Band.first
+  band.readonly? # => true
+  band.destroy # => raises ReadonlyDocument error
