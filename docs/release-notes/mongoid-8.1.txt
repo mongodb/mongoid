@@ -245,9 +245,25 @@ for more details.
 Added ``readonly!`` method and ``legacy_readonly`` feature flag
 ---------------------------------------------------------------
 
-Mongoid 8.1 changes the meaning of read-only documents. Prior to Mongoid 8.1 and
-in 8.1 with the ``legacy_readonly`` feature flag turned on, documents become
-read-only when they are projected (i.e. using ``#only`` or ``#without``).
+Mongoid 8.1 changes the meaning of read-only documents. In Mongoid 8.1 with 
+this feature flag turned off, a document becomes read-only when calling the 
+``readonly!`` method:
+
+.. code:: ruby
+
+  band = Band.first
+  band.readonly? # => false
+  band.readonly!
+  band.readonly? # => true
+  band.name = "The Rolling Stones"
+  band.save # => raises ReadonlyDocument error
+
+With this feature flag turned off, a ``ReadonlyDocument`` error will be
+raised when destroying or deleting, as well as when saving or updating.
+
+Prior to Mongoid 8.1 and in 8.1 with the ``legacy_readonly`` feature flag 
+turned on, documents become read-only when they are projected (i.e. using 
+``#only`` or ``#without``).
 
 .. code:: ruby
 
@@ -262,22 +278,7 @@ read-only when they are projected (i.e. using ``#only`` or ``#without``).
   band.destroy # => raises ReadonlyDocument error
 
 Note that with this feature flag on, a ``ReadonlyDocument`` error will only be
-raised when destroying or deleting, and not on saving or updating.
+raised when destroying or deleting, and not on saving or updating. See the 
+section on :ref:`Read-only Documents <readonly-documents>` for more details.
 
-In Mongoid 8.1 with this feature flag turned off, a document becomes read-only
-when calling the ``readonly!`` method:
-
-.. code:: ruby
-
-  band = Band.first
-  band.readonly? # => false
-  band.readonly!
-  band.readonly? # => true
-  band.name = "The Rolling Stones"
-  band.save # => raises ReadonlyDocument error
-
-With this feature flag turned off, a ``ReadonlyDocument`` error will be
-raised when destroying or deleting, as well as when saving or updating.
-See the section on :ref:`Read-only Documents <readonly-documents>` for more
-details.
 
