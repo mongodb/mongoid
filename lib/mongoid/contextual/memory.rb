@@ -110,9 +110,16 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
+      # @param [ Hash | BSON::ObjectId | String ] id_or_conditions an _id to
+      #   search for, or a hash of conditions.
+      #
       # @return [ true | false ] If the count is more than zero.
-      def exists?
-        any?
+      def exists?(id_or_conditions = nil)
+        case id_or_conditions
+        when nil then any?
+        when Hash then Memory.new(criteria.where(id_or_conditions)).exists?
+        else Memory.new(criteria.where(_id: id_or_conditions)).exists?
+        end
       end
 
       # Get the first document in the database for the criteria's selector.

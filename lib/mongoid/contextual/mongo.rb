@@ -161,9 +161,16 @@ module Mongoid
       # @note We don't use count here since Mongo does not use counted
       #   b-tree indexes.
       #
+      # @param [ Hash | BSON::ObjectId | String ] id_or_conditions an _id to
+      #   search for, or a hash of conditions.
+      #
       # @return [ true | false ] If the count is more than zero.
-      def exists?
-        !!(view.projection(_id: 1).limit(1).first)
+      def exists?(id_or_conditions = nil)
+        case id_or_conditions
+        when nil then !!(view.projection(_id: 1).limit(1).first)
+        when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
+        else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
+        end
       end
 
       # Run an explain on the criteria.

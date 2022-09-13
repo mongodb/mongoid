@@ -766,52 +766,153 @@ describe Mongoid::Contextual::Memory do
       Address.new(street: "friedel")
     end
 
-    context "when there are matching documents" do
+    let!(:band) do
+      Band.create!(name: "Depeche Mode", active: true)
+    end
 
-      let(:criteria) do
-        Address.where(street: "hobrecht").tap do |crit|
-          crit.documents = [ hobrecht, friedel ]
+    context "when not passing options" do
+
+      context "when there are matching documents" do
+
+        let(:criteria) do
+          Address.where(street: "hobrecht").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns true" do
+          expect(context).to be_exists
         end
       end
 
-      let(:context) do
-        described_class.new(criteria)
-      end
+      context "when there are no matching documents" do
 
-      it "returns true" do
-        expect(context).to be_exists
-      end
-    end
+        let(:criteria) do
+          Address.where(street: "pfluger").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end
+        end
 
-    context "when there are no matching documents" do
+        let(:context) do
+          described_class.new(criteria)
+        end
 
-      let(:criteria) do
-        Address.where(street: "pfluger").tap do |crit|
-          crit.documents = [ hobrecht, friedel ]
+        it "returns false" do
+          expect(context).to_not be_exists
         end
       end
 
-      let(:context) do
-        described_class.new(criteria)
-      end
+      context 'when there is a collation on the criteria' do
 
-      it "returns false" do
-        expect(context).to_not be_exists
+        let(:criteria) do
+          Address.where(street: "pfluger").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
       end
     end
 
-    context 'when there is a collation on the criteria' do
+    context "when passing an _id" do
 
       let(:criteria) do
-        Address.where(street: "pfluger").tap do |crit|
-          crit.documents = [ hobrecht, friedel ]
-        end.collation(locale: 'en_US', strength: 2)
+        Band.criteria.tap do |crit|
+          crit.documents = [ band ]
+        end
       end
 
-      it "raises an exception" do
-        expect {
-          context
-        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      context "when its of type BSON::ObjectId" do
+
+        context "when calling it on an empty criteria" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that includes the object" do
+
+          it "returns true" do
+            expect(Band.where(name: band.name).exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that does not include the object" do
+
+          it "returns false" do
+            expect(Band.where(name: "bogus").exists?(band._id)).to be false
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new)).to be false
+          end
+        end
+      end
+
+      context "when its of type String" do
+
+        context "when the id exists" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id.to_s)).to be true
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new.to_s)).to be false
+          end
+        end
+      end
+    end
+
+    context "when passing a hash" do
+
+      let(:criteria) do
+        Band.criteria.tap do |crit|
+          crit.documents = [ band ]
+        end
+      end
+
+      context "when calling it on an empty criteria" do
+
+        it "returns true" do
+          expect(Band.exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that includes the object" do
+
+        it "returns true" do
+          expect(Band.where(active: true).exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that does not include the object" do
+
+        it "returns false" do
+          expect(Band.where(active: false).exists?(name: band.name)).to be false
+        end
+      end
+
+      context "when the conditions don't match" do
+
+        it "returns false" do
+          expect(Band.exists?(name: "bogus")).to be false
+        end
       end
     end
   end
