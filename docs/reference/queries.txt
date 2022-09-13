@@ -1248,6 +1248,8 @@ Mongoid also has some helpful methods on criteria.
 
           Band.exists?
           Band.where(name: "Photek").exists?
+          Band.exists?(name: "Photek")
+          Band.exists?(BSON::ObjectId('6320d96a3282a48cfce9e72c'))
 
    * - ``Criteria#fifth``
 
