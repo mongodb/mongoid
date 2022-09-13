@@ -80,6 +80,12 @@ module Mongoid
       # @example Do any documents exist in the null context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
       # @param [ Hash | BSON::ObjectId | String ] id_or_conditions an _id to
       #   search for, or a hash of conditions.
       #

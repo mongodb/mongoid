@@ -101,6 +101,12 @@ module Mongoid
     # @example Do any documents exist for the conditions?
     #   Person.exists?
     #
+    # @example Do any documents exist for given _id.
+    #   Person.exists?(BSON::ObjectId(...))
+    #
+    # @example Do any documents exist for given conditions.
+    #   Person.exists?(name: "...")
+    #
     # @param [ Hash | BSON::ObjectId ] id_or_conditions an _id to
     #   search for, or a hash of conditions.
     #

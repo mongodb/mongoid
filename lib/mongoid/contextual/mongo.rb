@@ -158,6 +158,12 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
       # @note We don't use count here since Mongo does not use counted
       #   b-tree indexes.
       #
