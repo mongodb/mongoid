@@ -2422,7 +2422,7 @@ Results of the queries can be later accessed as usual:
   </ul>
 
 Even if a query is scheduled for asynchronous execution, it might be executed
-synchronously on the caller's thread. There are the following options depending
+synchronously on the caller's thread. There are three possible scenarios depending
 on when the query results are being accessed:
 
 #. If the scheduled asynchronous task has been already executed, the results are returned.
