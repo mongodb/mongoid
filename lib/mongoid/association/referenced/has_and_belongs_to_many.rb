@@ -263,8 +263,8 @@ module Mongoid
 
         def query_criteria(id_list)
           crit = relation_class.criteria
-          crit = crit.apply_scope(scope)
           crit = if id_list
+            crit = crit.apply_scope(scope)
             crit.all_of(primary_key => { "$in" => id_list })
           else
             crit.none
