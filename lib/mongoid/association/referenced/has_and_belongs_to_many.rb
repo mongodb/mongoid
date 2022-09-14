@@ -264,7 +264,12 @@ module Mongoid
         def query_criteria(id_list)
           crit = relation_class.criteria
           crit = crit.apply_scope(scope)
-          crit = crit.all_of(primary_key => {"$in" => id_list || []})
+          crit = if id_list
+            crit.all_of(primary_key => { "$in" => id_list })
+          else
+            crit.all.to_a
+            crit.none
+          end
           with_ordering(crit)
         end
       end
