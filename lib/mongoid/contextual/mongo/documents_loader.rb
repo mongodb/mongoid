@@ -35,7 +35,7 @@ module Mongoid
         #   `Association::EagerLoadable` expects is to be available.
         attr_accessor :criteria
 
-        # Instantiates the document loader instance an immediately schedules
+        # Instantiates the document loader instance and immediately schedules
         # its execution using the provided executor.
         #
         # @param [ Mongo::Collection::View ] view The collection view to get
