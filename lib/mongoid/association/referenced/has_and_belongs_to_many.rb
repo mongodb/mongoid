@@ -267,7 +267,6 @@ module Mongoid
           crit = if id_list
             crit.all_of(primary_key => { "$in" => id_list })
           else
-            crit.all.to_a
             crit.none
           end
           with_ordering(crit)
