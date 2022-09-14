@@ -2397,7 +2397,7 @@ Mongoid allows running database queries asynchronously in the background.
 This can be beneficial when there is a need to get documents from different
 collections.
 
-In order to schedule an asynchronous query call ``load_async`` method on a
+In order to schedule an asynchronous query call the ``load_async`` method on a
 ``Criteria``:
 
 .. code-block:: ruby
