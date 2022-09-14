@@ -93,7 +93,7 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
     end
 
     context 'asynchronously' do
-      it 'loads documents ' do
+      it 'loads documents' do
         subject.wait!
         expect(subject.value).to eq([band])
       end
