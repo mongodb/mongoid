@@ -36,7 +36,7 @@ module Mongoid
         attr_accessor :criteria
 
         # Instantiates the document loader instance an immediately schedules
-        # its execution using provided executor.
+        # its execution using the provided executor.
         #
         # @param [ Mongo::Collection::View ] view The collection view to get
         #   records from the database.
