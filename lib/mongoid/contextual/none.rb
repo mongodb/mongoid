@@ -87,7 +87,7 @@ module Mongoid
       #   context.exists?(name: "...")
       #
       # @param [ Hash | BSON::ObjectId | String ] id_or_conditions an _id to
-      #   search for, or a hash of conditions.
+      #   search for, a hash of conditions, or false.
       #
       # @return [ false ] Always false.
       def exists?(id_or_conditions = nil); false; end

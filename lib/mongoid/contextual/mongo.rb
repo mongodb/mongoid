@@ -168,12 +168,14 @@ module Mongoid
       #   b-tree indexes.
       #
       # @param [ Hash | BSON::ObjectId | String ] id_or_conditions an _id to
-      #   search for, or a hash of conditions.
+      #   search for, a hash of conditions, or false.
       #
       # @return [ true | false ] If the count is more than zero.
+      #   Always false if passed false.
       def exists?(id_or_conditions = nil)
         case id_or_conditions
         when nil then !!(view.projection(_id: 1).limit(1).first)
+        when false then false
         when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
         else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
         end
