@@ -2411,7 +2411,6 @@ In order to schedule an asynchronous query call ``load_async`` method on a
   end
 
 In the above example three queries will be scheduled for asynchronous execution.
-Queries will be executed as soon as there are available threads in the thread pool.
 Results of the queries can be later accessed as usual:
 
 .. code-block:: html
@@ -2421,6 +2420,25 @@ Results of the queries can be later accessed as usual:
       <li><%= band.name %></li>
     <%- end -%>
   </ul>
+
+Even if a query is scheduled for asynchronous execution, it might be executed
+synchronously on the caller's thread. There are the following options depending
+on when the query results are being accessed:
+
+#. If the scheduled asynchronous task has been already executed, the results are returned.
+#. If the task has been started, but not finished yet, the caller's thread blocks until the task is finished.
+#. If the task has not been started yet, it it being removed from the execution queue, and the query is being executed synchronously on the caller's thread.
+
+.. note::
+
+  Even though ``load_async`` method returns ``Criteria`` object, you should not
+  do any operations of this object expect accessing query results. The query is
+  scheduled for an execution immediately after calling ``load_async``, therefore
+  later changes on the `Criteria`` object may not be applied.
+
+
+Configuring asynchronous query execution
+----------------------------------------
 
 Asynchronous queries are disabled by default. In order to enable them, the
 following config options should be set:
@@ -2434,5 +2452,3 @@ following config options should be set:
       async_query_executor: :global_thread_pool
       # Number of threads in the pool. This option is defaulted to 4.
       global_executor_concurrency: 5
-
-
