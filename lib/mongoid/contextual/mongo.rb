@@ -788,7 +788,7 @@ module Mongoid
       #
       # @api private
       def load_async
-        @documents_loader = DocumentsLoader.new(view, klass, criteria) unless @documents_loader
+        @documents_loader ||= DocumentsLoader.new(view, klass, criteria)
       end
 
       private
