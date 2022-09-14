@@ -1246,8 +1246,7 @@ Mongoid also has some helpful methods on criteria.
        ``#exists?`` *now takes a number of argument types:*
 
        - ``Hash``: *A hash of conditions.*
-       - ``BSON::ObjectId``: *An _id to search for.*
-       - ``String``: *An _id corresponding to the given string to search for.*
+       - ``Object``: *An _id to search for.*
        - ``false``: *Always returns false.*
 
      -

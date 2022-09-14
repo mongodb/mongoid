@@ -167,7 +167,7 @@ module Mongoid
       # @note We don't use count here since Mongo does not use counted
       #   b-tree indexes.
       #
-      # @param [ Hash | BSON::ObjectId | String ] id_or_conditions an _id to
+      # @param [ Hash | Object | false ] id_or_conditions an _id to
       #   search for, a hash of conditions, or false.
       #
       # @return [ true | false ] If the count is more than zero.
