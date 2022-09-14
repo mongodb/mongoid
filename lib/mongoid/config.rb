@@ -128,7 +128,7 @@ module Mongoid
     option :legacy_attributes, default: false
 
     # Sets the async_query_executor for an application. By default the thread pool executor
-    #   set to `:immediate. Options are:
+    #   is set to `:immediate. Options are:
     #
     #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
     #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
