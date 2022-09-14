@@ -135,6 +135,9 @@ module Mongoid
     #      that uses the +async_query_concurrency+ for the +max_threads+ value.
     option :async_query_executor, default: :immediate
 
+    # Defines how many asynchronous queries can be executed concurrently.
+    # This option should be set only if `async_query_executor` is set
+    # to `:global_thread_pool`, it will be ignored otherwise.
     option :global_executor_concurrency, default: nil
 
     # When this flag is false, a document will become read-only only once the

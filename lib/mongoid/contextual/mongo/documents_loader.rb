@@ -97,7 +97,7 @@ module Mongoid
         # unscheduling does not have any effect.
         def unschedule
           @mutex.synchronize do
-            @state = :cancelled unless state == :started
+            @state = :cancelled unless @state == :started
           end
         end
 

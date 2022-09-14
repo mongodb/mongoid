@@ -224,6 +224,79 @@ describe Mongoid::Config do
     end
   end
 
+  context 'async_query_executor option' do
+    let(:option) { :async_query_executor }
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to eq(:immediate)
+      end
+    end
+
+    context 'when the value is :immediate' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => :immediate })
+      end
+
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(:immediate)
+      end
+    end
+
+    context 'when the value is :global_thread_pool' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => :global_thread_pool })
+      end
+
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(:global_thread_pool)
+      end
+    end
+  end
+
+  context 'global_executor_concurrency option' do
+    let(:option) { :global_executor_concurrency }
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to eq(nil)
+      end
+    end
+
+    context 'when the value is set to a number' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => 5 })
+      end
+
+      it "is set to the number" do
+        expect(Mongoid.send(option)).to be(5)
+      end
+    end
+  end
+
   shared_examples "a config option" do
 
     before do

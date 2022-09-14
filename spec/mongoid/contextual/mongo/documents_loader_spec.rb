@@ -114,4 +114,22 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
       end
     end
   end
+
+  describe '.executor' do
+    context 'when immediate executor configured' do
+      config_override :async_query_executor, :immediate
+
+      it 'returns immediate executor' do
+        expect(described_class.executor).to eq(described_class::IMMEDIATE_EXECUTOR)
+      end
+    end
+
+    context 'when global thread pool executor configured' do
+      config_override :async_query_executor, :global_thread_pool
+
+      it 'returns global thread pool executor' do
+        expect(described_class.executor).to eq(Mongoid.global_thread_pool_async_query_executor)
+      end
+    end
+  end
 end
