@@ -2427,7 +2427,7 @@ on when the query results are being accessed:
 
 #. If the scheduled asynchronous task has been already executed, the results are returned.
 #. If the task has been started, but not finished yet, the caller's thread blocks until the task is finished.
-#. If the task has not been started yet, it it being removed from the execution queue, and the query is being executed synchronously on the caller's thread.
+#. If the task has not been started yet, it is removed from the execution queue, and the query is executed synchronously on the caller's thread.
 
 .. note::
 
