@@ -1648,7 +1648,7 @@ Assignments to read-only attributes using their setters will be ignored:
   # => "The Rolling Stones"
 
 Calls to atomic persistence operators, like ``bit`` and ``inc``, will persist
-changes to readonly fields.
+changes to read-only fields.
 
 Timestamp Fields
 ================

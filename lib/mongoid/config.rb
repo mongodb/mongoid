@@ -137,13 +137,13 @@ module Mongoid
 
     option :global_executor_concurrency, default: nil
 
-    # When this flag is true, a document is only readonly if it has been
-    # projected using #only or #without, and readonly documents will not
-    # be deletable/destroyable. When this flag is false, a document will
-    # become readonly only once the #readonly! method is called, and an error
-    # will be raised on attempting to save or update such documents, instead
-    # of just on delete.
-    # When this feature flag is turned on, the readonly state will be reset on
+    # When this flag is false, a document will become read-only only once the
+    # #readonly! method is called, and an error will be raised on attempting
+    # to save or update such documents, instead of just on delete. When this
+    # flag is true, a document is only read-only if it has been projected
+    # using #only or #without, and read-only documents will not be
+    # deletable/destroyable, but they will be savable/updatable.
+    # When this feature flag is turned on, the read-only state will be reset on
     # reload, but when it is turned off, it won't be.
     option :legacy_readonly, default: false
 

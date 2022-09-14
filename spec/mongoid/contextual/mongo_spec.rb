@@ -223,6 +223,34 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context "when including a default scope" do
+
+      let(:criteria) do
+        Band.where(name: "New Order")
+      end
+
+      before do
+        5.times { Band.create! }
+        Band.default_scope ->{ criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it 'raises an error' do
+        expect do
+          Band.estimated_count
+        end.to raise_error(Mongoid::Errors::InvalidEstimatedCountScoping)
+      end
+
+      it "does not raise an error on unscoped" do
+        expect do
+          expect(Band.unscoped.estimated_count).to eq(5)
+        end
+      end
+    end
   end
 
 

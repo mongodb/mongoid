@@ -76,7 +76,11 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def estimated_count(options = {})
         unless self.criteria.selector.empty?
-          raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
+          if klass.default_scoping?
+            raise Mongoid::Errors::InvalidEstimatedCountScoping.new(self.klass)
+          else
+            raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
+          end
         end
         view.estimated_document_count(options)
       end
