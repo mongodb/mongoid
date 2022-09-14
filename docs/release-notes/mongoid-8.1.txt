@@ -20,7 +20,7 @@ the complete list of issues fixed in each release, including bug fixes.
 Added ``load_async`` method on ``Criteria`` to asynchronously load documents
 ----------------------------------------------------------------------------
 
-The new ``load_async`` method on ``Criteria`` allows :ref:`running database queries asynchronously <load-async>`
+The new ``load_async`` method on ``Criteria`` allows :ref:`running database queries asynchronously <load-async>`.
 
 
 Added ``attribute_before_last_save``, ``saved_change_to_attribute``, ``saved_change_to_attribute?``, and ``will_save_change_to_attribute?``  methods
