@@ -97,6 +97,10 @@ describe Mongoid do
   end
 
   describe ".global_thread_pool_async_query_executor" do
+    before(:each) do
+      Mongoid.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
+    end
+
     after(:each) do
       Mongoid.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
     end
