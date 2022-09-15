@@ -116,19 +116,55 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
   end
 
   describe '.executor' do
-    context 'when immediate executor configured' do
-      config_override :async_query_executor, :immediate
-
+    context 'when immediate executor requested' do
       it 'returns immediate executor' do
-        expect(described_class.executor).to eq(described_class::IMMEDIATE_EXECUTOR)
+        expect(
+          described_class.executor(:immediate)
+        ).to eq(described_class.immediate_executor)
       end
     end
 
-    context 'when global thread pool executor configured' do
-      config_override :async_query_executor, :global_thread_pool
-
+    context 'when global thread pool executor requested' do
       it 'returns global thread pool executor' do
-        expect(described_class.executor).to eq(Mongoid.global_thread_pool_async_query_executor)
+        expect(
+          described_class.executor(:global_thread_pool)
+        ).to eq(described_class.global_thread_pool_async_query_executor)
+      end
+    end
+
+    context 'when an unknown executor requested' do
+      it 'raises an error' do
+        expect do
+          described_class.executor(:i_am_an_invalid_option)
+        end.to raise_error(Mongoid::Errors::InvalidQueryExecutor)
+      end
+    end
+  end
+
+  describe ".global_thread_pool_async_query_executor" do
+    before(:each) do
+      described_class.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
+    end
+
+    after(:each) do
+      described_class.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
+    end
+
+    context 'when global_executor_concurrency option is set' do
+      config_override :global_executor_concurrency, 50
+
+      it 'returns an executor' do
+        executor = described_class.global_thread_pool_async_query_executor
+        expect(executor).not_to be_nil
+        expect(executor.max_length).to eq( 50 )
+      end
+    end
+
+    context 'when global_executor_concurrency option is not set' do
+      it 'returns an executor' do
+        executor = described_class.global_thread_pool_async_query_executor
+        expect(executor).not_to be_nil
+        expect(executor.max_length).to eq( 4 )
       end
     end
   end

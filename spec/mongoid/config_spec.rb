@@ -725,6 +725,17 @@ describe Mongoid::Config do
         }.to raise_error(Mongoid::Errors::InvalidConfigOption)
       end
     end
+
+    context 'when invalid global_executor_concurrency option provided' do
+      it "raises an error" do
+        expect do
+          described_class.options = {
+            async_query_executor: :immediate,
+            global_executor_concurrency: 5
+          }
+        end.to raise_error(Mongoid::Errors::InvalidGlobalExecutorConcurrency)
+      end
+    end
   end
 
   describe "#clients=" do

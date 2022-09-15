@@ -95,32 +95,4 @@ describe Mongoid do
       expect(Mongoid.models).to include(Band)
     end
   end
-
-  describe ".global_thread_pool_async_query_executor" do
-    before(:each) do
-      Mongoid.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
-    end
-
-    after(:each) do
-      Mongoid.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
-    end
-
-    context 'when global_executor_concurrency option is set' do
-      config_override :global_executor_concurrency, 50
-
-      it 'returns an executor' do
-        executor = Mongoid.global_thread_pool_async_query_executor
-        expect(executor).not_to be_nil
-        expect(executor.max_length).to eq( 50 )
-      end
-    end
-
-    context 'when global_executor_concurrency option is not set' do
-      it 'returns an executor' do
-        executor = Mongoid.global_thread_pool_async_query_executor
-        expect(executor).not_to be_nil
-        expect(executor.max_length).to eq( 4 )
-      end
-    end
-  end
 end

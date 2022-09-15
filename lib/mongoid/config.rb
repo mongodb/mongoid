@@ -137,7 +137,7 @@ module Mongoid
 
     # Defines how many asynchronous queries can be executed concurrently.
     # This option should be set only if `async_query_executor` is set
-    # to `:global_thread_pool`, it will be ignored otherwise.
+    # to `:global_thread_pool`.
     option :global_executor_concurrency, default: nil
 
     # When this flag is false, a document will become read-only only once the
@@ -321,6 +321,7 @@ module Mongoid
     # @param [ Hash ] options The configuration options.
     def options=(options)
       if options
+        Validators::AsyncQueryExecutor.validate(options)
         options.each_pair do |option, value|
           Validators::Option.validate(option)
           send("#{option}=", value)

@@ -133,6 +133,14 @@ en:
             A collation option is only supported if the query is executed on a MongoDB server
             with version >= 3.4."
           resolution: "Remove the collation option from the query."
+        invalid_async_query_executor:
+          message: "Invalid async_query_executor option: %{executor}."
+          summary: "A invalid async query executor was specified.
+            The valid options are: %{options}."
+          resolution: "Pick an allowed option or fix the typo. If you were
+            expecting the option to be there, please consult the following page
+            with respect to Mongoid's configuration:\n\n
+            \_\_https://www.mongodb.com/docs/mongoid/current/reference/configuration/#mongoid-configuration-options"
         invalid_config_file:
           message: "Invalid configuration file: %{path}."
           summary: "Your mongoid.yml configuration file does not contain the
@@ -238,6 +246,13 @@ en:
           resolution: "Please provide a valid type value for the field.
             Refer to:
             https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
+        invalid_global_executor_concurrency:
+          message: "Invalid global_executor_concurrency option."
+          summary: "You set global_executor_concurrency while async_query_executor
+            option is not set to :global_thread_pool. The global_executor_concurrency is
+            allowed only for the global thread pool executor."
+          resolution: "Set global_executor_concurrency option to :global_thread_pool
+            or remove global_executor_concurrency option."
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments

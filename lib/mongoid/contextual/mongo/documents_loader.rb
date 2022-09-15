@@ -12,21 +12,50 @@ module Mongoid
 
         def_delegators :@future, :value!, :value, :wait!, :wait
 
-        # Synchronous executor to be used when async_query_executor config option
-        # is set to :immediate. This excutor runs all operations on the current
+        # Returns synchronous executor to be used when async_query_executor config option
+        # is set to :immediate. This executor runs all operations on the current
         # thread, blocking as necessary.
-        IMMEDIATE_EXECUTOR = Concurrent::ImmediateExecutor.new
+        #
+        # @return [ Concurrent::ImmediateExecutor ] The executor
+        #   to be used to execute document loading tasks.
+        def self.immediate_executor
+          @@immediate_executor ||= Concurrent::ImmediateExecutor.new
+        end
+
+        # Returns asynchronous executor to be used when async_query_executor config option
+        # is set to :global_thread_pool. This executor runs operations on background threads
+        # using a thread pool.
+        #
+        # @return [ Concurrent::ThreadPoolExecutor ] The executor
+        #   to be used to execute document loading tasks.
+        def self.global_thread_pool_async_query_executor
+          concurrency = Mongoid.global_executor_concurrency || 4
+          @@global_thread_pool_async_query_executor ||= Concurrent::ThreadPoolExecutor.new(
+            min_threads: 0,
+            max_threads: concurrency,
+            max_queue: concurrency * 4,
+            fallback_policy: :caller_runs
+          )
+        end
 
         # Returns suitable executor according to Mongoid config options.
         #
+        # @param [ String | Symbol] name The query executor name, can be either
+        #   :immediate or :global_thread_pool. Defaulted to `async_query_executor`
+        #   config option.
+        #
         # @return [ Concurrent::ImmediateExecutor | Concurrent::ThreadPoolExecutor ] The executor
         #   to be used to execute document loading tasks.
-        def self.executor
-          case Mongoid.async_query_executor
+        #
+        # @raise [ Errors::InvalidQueryExecutor ] If an unknown name is provided.
+        def self.executor(name = Mongoid.async_query_executor)
+          case name.to_sym
           when :immediate
-            IMMEDIATE_EXECUTOR
+            immediate_executor
           when :global_thread_pool
-            Mongoid.global_thread_pool_async_query_executor
+            global_thread_pool_async_query_executor
+          else
+            raise Errors::InvalidQueryExecutor.new(name)
           end
         end
 
