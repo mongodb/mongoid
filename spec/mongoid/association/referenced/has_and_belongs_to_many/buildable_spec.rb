@@ -111,7 +111,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
         end
 
         let(:criteria) do
-          Preference.all_of("_id" => { "$in" => [] })
+          Preference.none
         end
 
         it "a criteria object" do
