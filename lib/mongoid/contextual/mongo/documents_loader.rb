@@ -82,11 +82,8 @@ module Mongoid
           @criteria = criteria
           @mutex = Mutex.new
           @state = :pending
-          @future = Concurrent::Promises.future_on(executor, self) do |task|
-            if task.pending?
-              task.send(:start)
-              task.execute
-            end
+          @future = Concurrent::Promises.future_on(executor) do
+            start && execute
           end
         end
 
@@ -152,10 +149,17 @@ module Mongoid
 
         private
 
-        # Mark the loader as started.
+        # Mark the loader as started if possible.
+        #
+        # @return [ true | false ] Whether the state was changed to :started.
         def start
           @mutex.synchronize do
-            @state = :started
+            if @state == :pending
+              @state = :started
+              true
+            else
+              false
+            end
           end
         end
       end
