@@ -25,7 +25,7 @@ module Mongoid
           #
           # @return [ Time ] The date as a local time.
           def __evolve_time__
-            ::Time.local(year, month, day)
+            ::Time.configured.local(year, month, day).to_time
           end
 
           module ClassMethods
