@@ -64,4 +64,80 @@ describe Float do
       end
     end
   end
+
+  describe "#__evolve_time__" do
+
+    context 'UTC time zone' do
+      let(:time) do
+        Time.parse("2022-01-01 16:15:01 UTC")
+      end
+
+      let(:evolved) do
+        time.to_f.__evolve_time__
+      end
+
+      it 'evolves the correct time' do
+        expect(evolved).to eq(time)
+      end
+    end
+
+    context 'other time zone' do
+      let(:time) do
+        Time.parse("2022-01-01 16:15:01 +0900")
+      end
+
+      let(:evolved) do
+        time.to_f.__evolve_time__
+      end
+
+      it 'evolves the correct time' do
+        expect(evolved).to eq(time)
+      end
+    end
+  end
+
+  describe "#__evolve_date__" do
+
+    context 'exact match' do
+      let(:date) do
+        Date.parse("2022-01-01")
+      end
+
+      let(:evolved) do
+        Time.parse("2022-01-01 0:00 UTC").to_f.__evolve_date__
+      end
+
+      it 'evolves the correct time' do
+        expect(evolved).to eq(date)
+      end
+    end
+
+    context 'one second earlier' do
+      let(:date) do
+        Date.parse("2021-12-31")
+      end
+
+      let(:evolved) do
+        (Time.parse("2022-01-01 0:00 UTC").to_f - 1).__evolve_date__
+      end
+
+      it 'evolves the correct time' do
+        expect(evolved).to eq(date)
+      end
+    end
+
+    context 'one second later' do
+      let(:date) do
+        Date.parse("2022-01-01")
+      end
+
+      let(:evolved) do
+        (Time.parse("2022-01-01 0:00 UTC").to_f + 1).__evolve_date__
+      end
+
+      it 'evolves the correct time' do
+        expect(evolved).to eq(date)
+      end
+    end
+  end
 end
