@@ -41,7 +41,7 @@ describe Date do
       end
 
       it 'is an AS::TimeWithZone' do
-        expect(evolved.class).to eq(Time)
+        expect(evolved.class).to eq(ActiveSupport::TimeWithZone)
       end
 
       it 'is equal to expected time' do
