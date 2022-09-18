@@ -33,7 +33,7 @@ module Mongoid
                   end
                 # Always return on string for backwards compatibility with querying
                 # string-backed BigDecimal fields.
-                when BSON::Decimal128, String then obj
+                when BSON::Decimal128 then obj
                 else
                   if obj.numeric?
                     if Mongoid.map_big_decimal_to_decimal128

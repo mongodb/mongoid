@@ -142,14 +142,14 @@ describe BigDecimal do
       end
 
       context "when provided a numeric" do
-        it "returns a string" do
+        it "returns a BSON::Decimal128" do
           expect(described_class.evolve(1)).to eq(BSON::Decimal128.new('1'))
         end
       end
 
-      context "when provided a bogus value" do
-        it "returns the value" do
-          expect(described_class.evolve(:bogus)).to eq(:bogus)
+      context "when provided a valid string" do
+        it "returns a BSON::Decimal128" do
+          expect(described_class.evolve("1")).to eq(BSON::Decimal128.new('1'))
         end
       end
 
@@ -159,9 +159,9 @@ describe BigDecimal do
         end
       end
 
-      context "when provided a valid string" do
-        it "returns the string" do
-          expect(described_class.evolve("1")).to eq("1")
+      context "when provided a bogus value" do
+        it "returns the value" do
+          expect(described_class.evolve(:bogus)).to eq(:bogus)
         end
       end
     end
