@@ -149,7 +149,7 @@ describe BigDecimal do
 
       context "when provided a valid string" do
         it "returns a BSON::Decimal128" do
-          expect(described_class.evolve("1")).to eq(BSON::Decimal128.new('1'))
+          expect(described_class.evolve('1')).to eq(BSON::Decimal128.new('1'))
         end
       end
 
