@@ -1,0 +1,35 @@
+.. _contributing-guildelines:
+
+***********************
+Contributing Guidelines
+***********************
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+
+
+Contributing Guidelines
+=======================
+
+When contributing code to Mongoid, the following guildelines should be followed:
+
+1. Create a fork of Mongoid.
+2. Create a new branch in that fork.
+3. Make your changes.
+4. Raise a PR against Mongoid master. If these changes correspond to a specific
+   Jira ticket, title the PR: "MONGOID-<ticket #> Description of Changes".
+5. The Mongoid team will review the PR and make comments/suggest changes.
+6. Once all of the changes and fixes are made, and the Mongoid team determine
+   the PR fit for merging, we will merge the PR into master and determine
+   whether it needs to be backported.
+7. Backports to 7.3-present are done if the change is a bug fix, is not backwards
+   breaking, and if the commit is applicable to the corresponding stable branch.
+8. Changes to 6.0-7.2 are generally not made unless it fixes a security
+   vulnerability.
+9. 5.x and earlier is generally not supported.
