@@ -13,7 +13,6 @@ Contributing Guidelines
    :class: singlecol
 
 
-
 Contributing Guidelines
 =======================
 
