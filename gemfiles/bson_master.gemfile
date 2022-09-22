@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 gemspec path: '..'
 
-gem 'bson', git: "https://github.com/mongodb/bson-ruby"
+gem 'bson', git: "https://github.com/mongodb/bson-ruby", branch: "RUBY-2896"
 gem 'mongo'
 
 gem 'actionpack'
