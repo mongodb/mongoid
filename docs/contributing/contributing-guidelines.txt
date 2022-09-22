@@ -28,8 +28,10 @@ When contributing code to Mongoid, the following guildelines should be followed:
 #. Once all of the changes and fixes are made, and the Mongoid team determine
    the PR fit for merging, we will merge the PR into master and determine
    whether it needs to be backported.
-#. Backports to 7.3-present are done if the change is a bug fix, is not backwards
-   breaking, and if the commit is applicable to the corresponding stable branch.
+#. Backports to previous stable versions are done if the change is a bug fix, 
+   is not backwards breaking, and if the commit is applicable to the 
+   corresponding stable branch. Presently backport candidates would include 
+   versions 7.3-8.0.
 #. Changes to 6.0-7.2 are generally not made unless it fixes a security
    vulnerability.
 #. 5.x and earlier is generally not supported.
