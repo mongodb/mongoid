@@ -1887,8 +1887,8 @@ in the default scope, the value in the default scope takes precedence:
   Band.new # => #<Band _id: 5c3f74ddce4ef3791abbb088, name: nil, active: false>
 
 Because a default scope initializes fields in new models as just described,
-defining a default scope with a dotted key and a simple literal value is
-not possible:
+defining a default scope with a dotted key and a simple literal value, while
+possible, is not recommended:
 
 .. code-block:: ruby
 
@@ -1900,7 +1900,36 @@ not possible:
     default_scope ->{ where('tags.foo' => 'bar') }
   end
 
-  Band.create! # exception: BSON::String::IllegalKey ('tags.foo' is an illegal key in MongoDB. Keys may not start with '$' or contain a '.'.)
+  Band.create!
+  # => Created document: {"_id"=>BSON::ObjectId('632de48f3282a404bee1877b'), "tags.foo"=>"bar"}
+  Band.create!(tags: { 'foo' => 'bar' })
+  # => Created document: {"_id"=>BSON::ObjectId('632de4ad3282a404bee1877c'), "tags.foo"=>"bar", "tags"=>{"foo"=>"bar"}}
+  Band.all.to_a
+  # => [ #<Band _id: 632de4ad3282a404bee1877c, tags: {"foo"=>"bar"}> ]
+
+Mongoid 8 allows dotted keys to be used in Mongoid, and when creating a document,
+the scope is added as a dotted key in the attributes:
+
+.. code-block:: ruby
+
+  Band.new.attribute
+  # => {"_id"=>BSON::ObjectId('632de97d3282a404bee1877d'), "tags.foo"=>"bar"}
+
+Whereas when querying, Mongoid looks for an embedded document:
+
+.. code-block:: ruby
+
+  Band.create!
+  # => Created document: {"_id"=>BSON::ObjectId('632de48f3282a404bee1877b'), "tags.foo"=>"bar"}
+  Band.where
+  # => #<Mongoid::Criteria
+         selector: {"tags.foo"=>"bar"}
+         options:  {}
+         class:    Band
+         embedded: false>
+  # This looks for something like: { tags: { "foo" => "bar" } }
+  Band.count
+  # => 0
 
 A workaround is to define the default scope as a complex query:
 
@@ -1914,9 +1943,11 @@ A workaround is to define the default scope as a complex query:
     default_scope ->{ where('tags.foo' => {'$eq' => 'bar'}) }
   end
 
-  Band.create!(tags: {hello: 'world'})
-  Band.create!(tags: {foo: 'bar'})
-  Band.count # => 1
+  Band.create!(tags: { hello: 'world' })
+  Band.create!(tags: { foo: 'bar' })
+  # does not add a "tags.foo" dotted attribute
+  Band.count
+  # => 1
 
 You can tell Mongoid not to apply the default scope by using
 ``unscoped``, which can be inline or take a block.
