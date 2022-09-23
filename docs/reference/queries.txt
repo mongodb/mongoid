@@ -1888,7 +1888,7 @@ in the default scope, the value in the default scope takes precedence:
 
 Because a default scope initializes fields in new models as just described,
 defining a default scope with a dotted key and a simple literal value, while
-possible, is not recommended.
+possible, is not recommended:
 
 .. code-block:: ruby
 
