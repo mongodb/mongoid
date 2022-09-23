@@ -16,7 +16,13 @@ Contributing Guidelines
 Contributing Guidelines
 =======================
 
-When contributing code to Mongoid, the following guildelines should be followed:
+If you wish to propose an enhancement to Mongoid, please create a Jira ticket 
+describing the enhancement and what it would enable you to achieve in your 
+application that is not already possible. If you believe Mongoid is not 
+behaving correctly, please create a Jira ticket describing how you use Mongoid,
+what the existing behavior is that you consider incorrect or problematic, and
+what your desired behavior is. If you wish to make changes yourself, the 
+following guildelines should be followed:
 
 #. Create a fork of Mongoid.
 #. Create a new branch in that fork.
