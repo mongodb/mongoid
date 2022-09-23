@@ -121,6 +121,37 @@ describe Mongoid::Scopable do
         expect(selector).to eq({'active' => true})
       end
     end
+
+    context "when the default scope is dotted" do
+
+      let(:criteria) do
+        Band.where('tags.foo' => 'bar')
+      end
+
+      let!(:band) do
+        Band.create!('tags' => { 'foo' => 'bar' })
+      end
+
+      before do
+        Band.default_scope ->{ criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it "adds the default scope to the class" do
+        expect(Band.default_scoping.call).to eq(criteria)
+      end
+
+      it "flags as being default scoped" do
+        expect(Band).to be_default_scoping
+      end
+
+      it "finds the correct document" do
+        expect(Band.where.first).to eq(band)
+      end
+    end
   end
 
   describe ".default_scopable?" do

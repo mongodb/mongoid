@@ -1886,38 +1886,6 @@ in the default scope, the value in the default scope takes precedence:
 
   Band.new # => #<Band _id: 5c3f74ddce4ef3791abbb088, name: nil, active: false>
 
-Because a default scope initializes fields in new models as just described,
-defining a default scope with a dotted key and a simple literal value is
-not possible:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-    field :tags, type: Hash
-
-    default_scope ->{ where('tags.foo' => 'bar') }
-  end
-
-  Band.create! # exception: BSON::String::IllegalKey ('tags.foo' is an illegal key in MongoDB. Keys may not start with '$' or contain a '.'.)
-
-A workaround is to define the default scope as a complex query:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-    field :tags, type: Hash
-
-    default_scope ->{ where('tags.foo' => {'$eq' => 'bar'}) }
-  end
-
-  Band.create!(tags: {hello: 'world'})
-  Band.create!(tags: {foo: 'bar'})
-  Band.count # => 1
-
 You can tell Mongoid not to apply the default scope by using
 ``unscoped``, which can be inline or take a block.
 
