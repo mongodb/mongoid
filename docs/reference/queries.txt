@@ -1886,6 +1886,22 @@ in the default scope, the value in the default scope takes precedence:
 
   Band.new # => #<Band _id: 5c3f74ddce4ef3791abbb088, name: nil, active: false>
 
+As of Mongoid 8, a default scope can be defined with a dotted key:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :tags, type: Hash
+
+    default_scope ->{ where('tags.foo' => 'bar') }
+  end
+
+  Band.create!(tags: { 'foo' => 'bar' })
+  Band.where.first
+  # => <Band _id: 632dcf3e3282a400ccd3fd1d, tags: {"foo"=>"bar"}>
+
 You can tell Mongoid not to apply the default scope by using
 ``unscoped``, which can be inline or take a block.
 
