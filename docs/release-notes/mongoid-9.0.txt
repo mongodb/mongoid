@@ -42,7 +42,7 @@ any Mongoid-specific usages of this class, and change them to
 while ``ActiveModel::MissingAttributeError`` does not.
 
 
-Use configured Rails time zone to typecast Date to Time in queries
+Use configured time zone to typecast Date to Time in queries
 ------------------------------------------------------------------
 
 When querying for a Time field using a Date value, Mongoid now correctly
