@@ -43,7 +43,7 @@ while ``ActiveModel::MissingAttributeError`` does not.
 
 
 Use configured time zone to typecast Date to Time in queries
-------------------------------------------------------------------
+-------------------------------------------------------------
 
 When querying for a Time field using a Date value, Mongoid now correctly
 considers the ``Mongoid.use_activesupport_time_zone`` to perform type
