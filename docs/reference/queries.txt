@@ -2443,7 +2443,7 @@ Configuring asynchronous query execution
 Asynchronous queries are disabled by default. When asynchronous queries are
 disabled, ``load_async`` will execute the query immediately on the current thread,
 blocking as necessary. Therefore, calling ``load_async`` on criteria in this case
-is roughly the equivalent of calling ``to_a``.
+is roughly the equivalent of calling ``to_a`` to force query execution.
 
 In order to enable asynchronous query execution, the following config options
 should be set:
