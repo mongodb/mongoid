@@ -2455,5 +2455,5 @@ should be set:
     options:
       # Execute asynchronous queries using a global thread pool.
       async_query_executor: :global_thread_pool
-      # Number of threads in the pool. This option is defaulted to 4.
+      # Number of threads in the pool. The default is 4.
       # global_executor_concurrency: 4
