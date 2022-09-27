@@ -5,6 +5,8 @@ module Mongoid
     module Validators
 
       # Validator for async query executor configuration.
+      #
+      # @api private
       module AsyncQueryExecutor
         extend self
 
