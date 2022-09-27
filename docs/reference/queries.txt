@@ -2431,7 +2431,7 @@ on when the query results are being accessed:
 
 .. note::
 
-  Even though ``load_async`` method returns ``Criteria`` object, you should not
+  Even though ``load_async`` method returns a ``Criteria`` object, you should not
   do any operations on this object except accessing query results. The query is
   scheduled for execution immediately after calling ``load_async``, therefore
   later changes to the `Criteria`` object may not be applied.
