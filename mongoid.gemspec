@@ -8,7 +8,8 @@ Gem::Specification.new do |s|
   s.name        = "mongoid"
   s.version     = Mongoid::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Durran Jordan"]
+  s.authors     = ["The MongoDB Ruby Team"]
+  s.email       = "dbx-ruby@mongodb.com"
   s.homepage    = "https://mongoid.org"
   s.summary     = "Elegant Persistence in Ruby for MongoDB."
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
