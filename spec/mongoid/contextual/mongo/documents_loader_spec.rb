@@ -167,5 +167,18 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
         expect(executor.max_length).to eq( 4 )
       end
     end
+
+    context 'when global_executor_concurrency option changes' do
+      config_override :global_executor_concurrency, 50
+
+      it 'creates new executor' do
+        first_executor = described_class.global_thread_pool_async_query_executor
+        Mongoid.global_executor_concurrency = 100
+        second_executor = described_class.global_thread_pool_async_query_executor
+
+        expect(first_executor).not_to eq(second_executor)
+        expect(second_executor.max_length).to eq( 100 )
+      end
+    end
   end
 end

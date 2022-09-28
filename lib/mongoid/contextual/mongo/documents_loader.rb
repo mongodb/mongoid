@@ -29,13 +29,22 @@ module Mongoid
         # @return [ Concurrent::ThreadPoolExecutor ] The executor
         #   to be used to execute document loading tasks.
         def self.global_thread_pool_async_query_executor
+          create_pool = Proc.new do |concurrency|
+            Concurrent::ThreadPoolExecutor.new(
+              min_threads: 0,
+              max_threads: concurrency,
+              max_queue: concurrency * 4,
+              fallback_policy: :caller_runs
+            )
+          end
           concurrency = Mongoid.global_executor_concurrency || 4
-          @@global_thread_pool_async_query_executor ||= Concurrent::ThreadPoolExecutor.new(
-            min_threads: 0,
-            max_threads: concurrency,
-            max_queue: concurrency * 4,
-            fallback_policy: :caller_runs
-          )
+          @@global_thread_pool_async_query_executor ||= create_pool.call(concurrency)
+
+          if @@global_thread_pool_async_query_executor.max_length != concurrency
+            @@global_thread_pool_async_query_executor = create_pool.call(concurrency)
+
+          end
+          @@global_thread_pool_async_query_executor
         end
 
         # Returns suitable executor according to Mongoid config options.
@@ -61,7 +70,7 @@ module Mongoid
 
         # @return [ Mongoid::Criteria ] Criteria that specifies which documents should
         #   be loaded. Exposed here because `eager_loadable?` method from
-        #   `Association::EagerLoadable` expects is to be available.
+        #   `Association::EagerLoadable` expects this to be available.
         attr_accessor :criteria
 
         # Instantiates the document loader instance and immediately schedules
