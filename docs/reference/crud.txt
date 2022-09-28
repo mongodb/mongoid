@@ -51,8 +51,9 @@ operations with examples.
        has been retrieved from the database, and a* ``Hash`` *with string keys
        if it is a new document.*
 
-       *If an embedded association is empty, its key will not show up in the
-       returned hash.*
+       *The attributes hash also contains the attributes of all embedded 
+       documents, as well as their embedded documents, etc. If an embedded 
+       association is empty, its key will not show up in the returned hash.*
 
      -
         .. code-block:: ruby
