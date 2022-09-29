@@ -2756,13 +2756,33 @@ describe Mongoid::Criteria do
             Band.create!(name: "Boards of Canada", sales: sales)
           end
 
-          let(:from_db) do
+          it "cannot find values when querying using a BigDecimal value" do
             Mongoid.map_big_decimal_to_decimal128 = true
-            Band.where(sales: sales.to_s).first
+            from_db = Band.where(sales: sales).first
+            expect(from_db).to eq(nil)
           end
 
-          it "finds the document by the big decimal value" do
-            expect(from_db).to eq(band)
+          it "cannot find values when querying using a string value" do
+            Mongoid.map_big_decimal_to_decimal128 = true
+            from_db = Band.where(sales: sales.to_s).first
+            expect(from_db).to eq(nil)
+          end
+
+          context "after converting value" do
+            before do
+              Mongoid.map_big_decimal_to_decimal128 = true
+              band.set(sales: band.sales)
+            end
+
+            it "can find values when querying using a BigDecimal value" do
+              from_db = Band.where(sales: sales).first
+              expect(from_db).to eq(band)
+            end
+
+            it "can find values when querying using a string value" do
+              from_db = Band.where(sales: sales.to_s).first
+              expect(from_db).to eq(band)
+            end
           end
         end
       end
