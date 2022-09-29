@@ -1565,6 +1565,20 @@ describe Mongoid::Contextual::Mongo do
         expect(Band.exists?(nil)).to be false
       end
     end
+
+    context "when the limit is 0" do
+
+      it "returns false" do
+        expect(Band.limit(0).exists?).to be false
+      end
+    end
+
+    context "when the criteria limit is 0" do
+
+      it "returns false" do
+        expect(Band.criteria.limit(0).exists?).to be false
+      end
+    end
   end
 
   describe "#explain" do

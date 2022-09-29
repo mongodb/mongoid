@@ -173,6 +173,7 @@ module Mongoid
       # @return [ true | false ] If the count is more than zero.
       #   Always false if passed nil or false.
       def exists?(id_or_conditions = :none)
+        return false if self.view.limit == 0
         case id_or_conditions
         when :none then !!(view.projection(_id: 1).limit(1).first)
         when nil, false then false

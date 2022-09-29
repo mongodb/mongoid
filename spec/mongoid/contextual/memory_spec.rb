@@ -766,19 +766,15 @@ describe Mongoid::Contextual::Memory do
       Address.new(street: "friedel")
     end
 
-    let!(:band) do
-      Band.create!(name: "Depeche Mode", active: true)
+    let(:criteria) do
+      Address.where(street: "hobrecht").tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
     end
 
     context "when not passing options" do
 
       context "when there are matching documents" do
-
-        let(:criteria) do
-          Address.where(street: "hobrecht").tap do |crit|
-            crit.documents = [ hobrecht, friedel ]
-          end
-        end
 
         let(:context) do
           described_class.new(criteria)
@@ -824,39 +820,33 @@ describe Mongoid::Contextual::Memory do
 
     context "when passing an _id" do
 
-      let(:criteria) do
-        Band.criteria.tap do |crit|
-          crit.documents = [ band ]
-        end
-      end
-
       context "when its of type BSON::ObjectId" do
 
         context "when calling it on an empty criteria" do
 
           it "returns true" do
-            expect(Band.exists?(band._id)).to be true
+            expect(criteria.exists?(hobrecht._id)).to be true
           end
         end
 
         context "when calling it on a criteria that includes the object" do
 
           it "returns true" do
-            expect(Band.where(name: band.name).exists?(band._id)).to be true
+            expect(criteria.where(street: hobrecht.street).exists?(hobrecht._id)).to be true
           end
         end
 
         context "when calling it on a criteria that does not include the object" do
 
           it "returns false" do
-            expect(Band.where(name: "bogus").exists?(band._id)).to be false
+            expect(criteria.where(street: "bogus").exists?(hobrecht._id)).to be false
           end
         end
 
         context "when the id does not exist" do
 
           it "returns false" do
-            expect(Band.exists?(BSON::ObjectId.new)).to be false
+            expect(criteria.exists?(BSON::ObjectId.new)).to be false
           end
         end
       end
@@ -866,14 +856,14 @@ describe Mongoid::Contextual::Memory do
         context "when the id exists" do
 
           it "returns true" do
-            expect(Band.exists?(band._id.to_s)).to be true
+            expect(criteria.exists?(hobrecht._id.to_s)).to be true
           end
         end
 
         context "when the id does not exist" do
 
           it "returns false" do
-            expect(Band.exists?(BSON::ObjectId.new.to_s)).to be false
+            expect(criteria.exists?(BSON::ObjectId.new.to_s)).to be false
           end
         end
       end
@@ -881,48 +871,36 @@ describe Mongoid::Contextual::Memory do
 
     context "when passing a hash" do
 
-      let(:criteria) do
-        Band.criteria.tap do |crit|
-          crit.documents = [ band ]
-        end
-      end
-
       context "when calling it on an empty criteria" do
 
         it "returns true" do
-          expect(Band.exists?(name: band.name)).to be true
+          expect(criteria.exists?(street: hobrecht.street)).to be true
         end
       end
 
       context "when calling it on a criteria that includes the object" do
 
         it "returns true" do
-          expect(Band.where(active: true).exists?(name: band.name)).to be true
+          expect(criteria.where(_id: hobrecht._id).exists?(street: hobrecht.street)).to be true
         end
       end
 
       context "when calling it on a criteria that does not include the object" do
 
         it "returns false" do
-          expect(Band.where(active: false).exists?(name: band.name)).to be false
+          expect(criteria.where(_id: BSON::ObjectId.new).exists?(street: hobrecht.street)).to be false
         end
       end
 
       context "when the conditions don't match" do
 
         it "returns false" do
-          expect(Band.exists?(name: "bogus")).to be false
+          expect(criteria.exists?(street: "bogus")).to be false
         end
       end
     end
 
     context "when passing false" do
-
-      let(:criteria) do
-        Band.criteria.tap do |crit|
-          crit.documents = [ band ]
-        end
-      end
 
       it "returns false" do
         expect(criteria.exists?(false)).to be false
@@ -931,14 +909,15 @@ describe Mongoid::Contextual::Memory do
 
     context "when passing nil" do
 
-      let(:criteria) do
-        Band.criteria.tap do |crit|
-          crit.documents = [ band ]
-        end
-      end
-
       it "returns false" do
         expect(criteria.exists?(nil)).to be false
+      end
+    end
+
+    context "when the limit is 0" do
+
+      it "returns false" do
+        expect(criteria.limit(0).exists?).to be false
       end
     end
   end
