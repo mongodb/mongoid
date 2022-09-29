@@ -414,10 +414,7 @@ describe Mongoid::QueryCache do
     end
 
     context "when query cache is disabled" do
-
-      before do
-        Mongoid::QueryCache.enabled = false
-      end
+      override_query_cache false
 
       it "queries again" do
         expect_query(1) do
