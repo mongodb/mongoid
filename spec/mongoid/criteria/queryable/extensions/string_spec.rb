@@ -73,10 +73,7 @@ describe String do
 
       context "when using active support's time zone" do
         config_override :use_activesupport_time_zone, true
-
-        before do
-          ::Time.zone = "Tokyo"
-        end
+        time_zone_override "Tokyo"
 
         let(:date) do
           "2010-01-01 5:00:00"
@@ -93,10 +90,7 @@ describe String do
 
       context "when not using active support's time zone" do
         config_override :use_activesupport_time_zone, false
-
-        before do
-          ::Time.zone = nil
-        end
+        time_zone_override nil
 
         let(:date) do
           "2010-01-01 5:00:00"

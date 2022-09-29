@@ -17,12 +17,7 @@ describe Mongoid::Timestamps do
 
     let(:time_zone) { "Pacific Time (US & Canada)" }
 
-    around do |ex|
-      z = Time.zone
-      Time.zone = time_zone
-      ex.run
-      Time.zone = z
-    end
+    time_zone_override "Pacific Time (US & Canada)"
 
     before do
       document.run_callbacks(:create)
