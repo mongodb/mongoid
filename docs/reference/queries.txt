@@ -168,6 +168,70 @@ name, as follows:
   #   class:    Band
   #   embedded: false>
 
+
+Fields
+======
+
+Querying on Defined Fields
+--------------------------
+
+In order to query on a field, it is not necessary to add the field to
+:ref:`the model class definition <fields>`. However, if a field is defined in
+the model class, Mongoid will coerce query values to match defined field types
+when constructing the query:
+
+.. code-block:: ruby
+
+  Band.where(name: 2020, founded: "2020")
+  #   => #<Mongoid::Criteria
+  #   selector: {"name"=>"2020", "founded"=>2020}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Querying for Raw Values
+-----------------------
+
+If you'd like to bypass Mongoid's query type coercion behavior and query
+directly for the raw-typed value in the database, wrap the query value in
+``Mongoid::RawValue`` class. This can be useful when working with legacy data.
+
+.. code-block:: ruby
+
+  Band.where(founded: Mongoid::RawValue("2020"))
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>"2020"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Field Aliases
+-------------
+
+Queries take into account :ref:`storage field names <storage-field-names>`
+and :ref:`field aliases <field-aliases>`:
+
+.. code-block:: ruby
+
+  Band.where(name: 'Astral Projection')
+  #   => #<Mongoid::Criteria
+  #   selector: {"n"=>"Astral Projection"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Since `id` and `_id` fields are aliases, either one can be used for queries:
+
+.. code-block:: ruby
+
+  Band.where(id: '5ebdeddfe1b83265a376a760')
+  # => #<Mongoid::Criteria
+  #   selector: {"_id"=>BSON::ObjectId('5ebdeddfe1b83265a376a760')}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+
 Embedded Documents
 ==================
 
@@ -193,56 +257,6 @@ To match values of fields of embedded documents, use the dot notation:
 
   Queries always return top-level model instances, even if all of the
   conditions are referencing embedded documents.
-
-Field Types
-===========
-
-In order to query on a field, it is not necessary to add the field to
-:ref:`the model class definition <fields>`. However, if a field is defined in
-the model class, the type of the field is taken into account when constructing
-the query:
-
-.. code-block:: ruby
-
-  Band.where(name: 2020)
-  #   => #<Mongoid::Criteria
-  #   selector: {"name"=>"2020"}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.where(founded: 2020)
-  # => #<Mongoid::Criteria
-  #   selector: {"founded"=>2020}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-Aliases
-=======
-
-Queries take into account :ref:`storage field names <storage-field-names>`
-and :ref:`field aliases <field-aliases>`:
-
-.. code-block:: ruby
-
-  Band.where(name: 'Astral Projection')
-  #   => #<Mongoid::Criteria
-  #   selector: {"n"=>"Astral Projection"}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-Since `id` and `_id` fields are aliases, either one can be used for queries:
-
-.. code-block:: ruby
-
-  Band.where(id: '5ebdeddfe1b83265a376a760')
-  # => #<Mongoid::Criteria
-  #   selector: {"_id"=>BSON::ObjectId('5ebdeddfe1b83265a376a760')}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
 
 
 .. _logical-operations:
