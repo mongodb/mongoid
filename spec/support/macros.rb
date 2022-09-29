@@ -88,6 +88,16 @@ module Mongoid
       end
     end
 
+    def persistence_context_override(component, value)
+      around do |example|
+        meth = "#{component}_override"
+        old_value = Mongoid::Threaded.send(meth)
+        Mongoid::Threaded.send("#{meth}=", value)
+        example.run
+        Mongoid::Threaded.send("#{meth}=", old_value)
+      end
+    end
+
     def with_default_i18n_configs
       around do |example|
         I18n.locale = :en
