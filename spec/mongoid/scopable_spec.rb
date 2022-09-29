@@ -1265,8 +1265,6 @@ describe Mongoid::Scopable do
       let(:c1) { Band.where(active: true) }
 
       it 'restores previous scope' do
-        pending 'MONGOID-5214'
-
         Band.with_scope(c1) do |crit|
           Band.unscoped do |crit2|
             Mongoid::Threaded.current_scope(Band).should be nil
