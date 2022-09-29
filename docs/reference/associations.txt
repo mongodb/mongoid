@@ -1396,19 +1396,21 @@ Mongoid to instantiate a new document when the association is accessed and it is
 
 Touching
 --------
-
 Any ``belongs_to`` association can take an optional ``:touch`` option which
-will cause the parent document be touched whenever the child document is
-touched:
+will cause the parent document to be touched whenever the child document is
+updated:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+    field :name
     belongs_to :label, touch: true
   end
 
   band = Band.first
+  band.name = "The Rolling Stones"
+  band.save! # Calls touch on the parent label.
   band.touch # Calls touch on the parent label.
 
 ``:touch`` can also take a string or symbol argument specifying a field to
