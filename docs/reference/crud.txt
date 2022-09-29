@@ -37,6 +37,32 @@ operations with examples.
    * - Operation
      - Example
 
+   * - ``Model#attributes``
+
+       *Returns a hash of the document's attributes with its values in
+       mongoized form (i.e. the way they are stored in the db).*
+
+       *In Mongoid 8.0 by default, and Mongoid 7.5 with the*
+       ``legacy_attributes`` *flag set to false, the object returned from this
+       method will have class* ``Hash``, *and have string keys. In Mongoid 7.5
+       by default, and in Mongoid 8.0 with the* ``legacy_attributes`` *flag set
+       to true, the object returned from this method will be a*
+       ``BSON::Document`` *(and thus, indifferently accessible) if the document
+       has been retrieved from the database, and a* ``Hash`` *with string keys
+       if it is a new document.*
+
+       *The attributes hash also contains the attributes of all embedded 
+       documents, as well as their embedded documents, etc. If an embedded 
+       association is empty, its key will not show up in the returned hash.*
+
+     -
+        .. code-block:: ruby
+
+          person = Person.new(first_name: "Heinrich", last_name: "Heine")
+
+          person.attributes
+          # => { "_id" => BSON::ObjectId('633467d03282a43784c2d56e'), "first_name" => "Heinrich", "last_name" => "Heine" }
+
    * - ``Model.create!``
 
        *Insert a document or multiple documents into the database, raising an
