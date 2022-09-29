@@ -108,10 +108,11 @@ module Mongoid
     #   Person.exists?(name: "...")
     #
     # @param [ Hash | Object | false ] id_or_conditions an _id to
-    #   search for or a hash of conditions.
+    #   search for, a hash of conditions, nil or false.
     #
     # @return [ true | false ] If any documents exist for the conditions.
-    def exists?(id_or_conditions = nil)
+    #   Always false if passed nil or false.
+    def exists?(id_or_conditions = :none)
       with_default_scope.exists?(id_or_conditions)
     end
 

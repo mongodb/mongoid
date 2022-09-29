@@ -1551,6 +1551,20 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context "when passing false" do
+
+      it "returns false" do
+        expect(Band.exists?(false)).to be false
+      end
+    end
+
+    context "when passing nil" do
+
+      it "returns false" do
+        expect(Band.exists?(nil)).to be false
+      end
+    end
   end
 
   describe "#explain" do

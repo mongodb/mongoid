@@ -915,6 +915,32 @@ describe Mongoid::Contextual::Memory do
         end
       end
     end
+
+    context "when passing false" do
+
+      let(:criteria) do
+        Band.criteria.tap do |crit|
+          crit.documents = [ band ]
+        end
+      end
+
+      it "returns false" do
+        expect(criteria.exists?(false)).to be false
+      end
+    end
+
+    context "when passing nil" do
+
+      let(:criteria) do
+        Band.criteria.tap do |crit|
+          crit.documents = [ band ]
+        end
+      end
+
+      it "returns false" do
+        expect(criteria.exists?(nil)).to be false
+      end
+    end
   end
 
   [ :first, :one ].each do |method|
