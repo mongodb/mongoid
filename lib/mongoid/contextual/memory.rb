@@ -117,14 +117,12 @@ module Mongoid
       #   context.exists?(name: "...")
       #
       # @param [ Hash | Object | false ] id_or_conditions an _id to
-      #   search for, a hash of conditions, or false.
+      #   search for or a hash of conditions.
       #
       # @return [ true | false ] If the count is more than zero.
-      #   Always false if passed false.
       def exists?(id_or_conditions = nil)
         case id_or_conditions
         when nil then any?
-        when false then false
         when Hash then Memory.new(criteria.where(id_or_conditions)).exists?
         else Memory.new(criteria.where(_id: id_or_conditions)).exists?
         end

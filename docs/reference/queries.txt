@@ -1247,7 +1247,6 @@ Mongoid also has some helpful methods on criteria.
 
        - ``Hash``: *A hash of conditions.*
        - ``Object``: *An _id to search for.*
-       - ``false``: *Always returns false.*
 
      -
         .. code-block:: ruby
@@ -1257,7 +1256,6 @@ Mongoid also has some helpful methods on criteria.
           Band.exists?(name: "Photek")
           Band.exists?(BSON::ObjectId('6320d96a3282a48cfce9e72c'))
           Band.exists?('6320d96a3282a48cfce9e72c')
-          Band.exists?(false)
 
    * - ``Criteria#fifth``
 
