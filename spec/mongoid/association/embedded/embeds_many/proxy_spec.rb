@@ -2401,7 +2401,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         context "when config set not to raise error" do
-          config_override, :raise_not_found_error, false
+          config_override :raise_not_found_error, false
 
           let(:addresses) do
             person.addresses.find([ BSON::ObjectId.new ])
