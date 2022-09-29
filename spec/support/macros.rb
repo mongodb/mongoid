@@ -88,6 +88,10 @@ module Mongoid
       end
     end
 
+    # Override the global persistence context.
+    #
+    # @param [ :client, :database ] component The component to override.
+    # @param [ Object ] value The value to override to.
     def persistence_context_override(component, value)
       around do |example|
         meth = "#{component}_override"
