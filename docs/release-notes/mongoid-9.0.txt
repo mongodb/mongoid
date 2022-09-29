@@ -40,3 +40,36 @@ any Mongoid-specific usages of this class, and change them to
 ``Mongoid::Errors::AttributeNotLoaded``. Note additionally that
 ``AttributeNotLoaded`` inherits from ``Mongoid::Errors::MongoidError``,
 while ``ActiveModel::MissingAttributeError`` does not.
+
+
+Use configured time zone to typecast Date to Time in queries
+-------------------------------------------------------------
+
+When querying for a Time field using a Date value, Mongoid now correctly
+considers the ``Mongoid.use_activesupport_time_zone`` configuration option
+to perform type conversion.
+
+.. code-block:: ruby
+
+  Mongoid.use_activesupport_time_zone = true
+
+  class Magazine
+    include Mongoid::Document
+
+    field :published_at, type: Time
+  end
+
+  Time.zone = 'Asia/Tokyo'
+
+  Magazine.gte(published_at: Date.parse('2022-09-26'))
+  #=> will return all results on or after Sept 26th, 2022
+  #   at 0:00 in Asia/Tokyo time zone.
+
+In prior Mongoid versions, the above code would ignore the
+``Mongoid.use_activesupport_time_zone`` setting and behave as if
+it were false, i.e. always using the system time zone to perform
+the type conversion.
+
+Note that in prior Mongoid versions, typecasting Date to Time during
+persistence operations was already correctly using the
+``Mongoid.use_activesupport_time_zone`` setting.

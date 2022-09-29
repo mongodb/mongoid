@@ -25,20 +25,54 @@ describe Date do
 
   describe "#__evolve_time__" do
 
-    let(:date) do
-      Date.new(2010, 1, 1)
+    context "when using ActiveSupport's time zone" do
+      include_context 'using AS time zone'
+
+      let(:date) do
+        Date.new(2010, 1, 1)
+      end
+
+      let(:expected_time) do
+        Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+      end
+
+      let(:evolved) do
+        date.__evolve_time__
+      end
+
+      it 'is an AS::TimeWithZone' do
+        expect(evolved.class).to eq(ActiveSupport::TimeWithZone)
+      end
+
+      it 'is equal to expected time' do
+        expect(expected_time).to be_a(ActiveSupport::TimeWithZone)
+        expect(evolved).to eq(expected_time)
+      end
     end
 
-    let(:evolved) do
-      date.__evolve_time__
-    end
+    context "when not using ActiveSupport's time zone" do
+      include_context 'not using AS time zone'
 
-    let(:expected) do
-      Time.local(2010, 1, 1, 0, 0, 0)
-    end
+      let(:date) do
+        Date.new(2010, 1, 1)
+      end
 
-    it "returns the time" do
-      expect(evolved).to eq(expected)
+      let(:expected_time) do
+        Time.local(2010, 1, 1, 0, 0, 0, 0)
+      end
+
+      let(:evolved) do
+        date.__evolve_time__
+      end
+
+      it 'is a Time' do
+        expect(evolved.class).to eq(Time)
+      end
+
+      it 'is equal to expected time' do
+        expect(expected_time).to be_a(Time)
+        expect(evolved).to eq(expected_time)
+      end
     end
   end
 
