@@ -79,6 +79,15 @@ module Mongoid
       end
     end
 
+    def override_query_cache(enabled)
+      around do |example|
+        cache_enabled = Mongoid::QueryCache.enabled?
+        Mongoid::QueryCache.enabled = enabled
+        example.run
+        Mongoid::QueryCache.enabled = cache_enabled
+      end
+    end
+
     def with_default_i18n_configs
       around do |example|
         I18n.locale = :en

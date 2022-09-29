@@ -393,11 +393,10 @@ describe Mongoid::Attributes do
         end
 
         context "when reloaded" do
+          config_override :raise_not_found_error, false
 
           before do
-            Mongoid.raise_not_found_error = false
             person.reload
-            Mongoid.raise_not_found_error = true
           end
 
           it "returns the default value" do
@@ -1037,6 +1036,9 @@ describe Mongoid::Attributes do
             .update_one({ "$unset" => { age: 1 }})
           Mongoid.raise_not_found_error = false
           person.reload
+        end
+
+        after do
           Mongoid.raise_not_found_error = true
         end
 
