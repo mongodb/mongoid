@@ -1029,13 +1029,12 @@ describe Mongoid::Attributes do
       end
 
       context "when the attribute does not exist" do
-        config_override :raise_not_found_error, true
+        config_override :raise_not_found_error, false
 
         before do
           person.collection
             .find({ _id: person.id })
             .update_one({ "$unset" => { age: 1 }})
-          Mongoid.raise_not_found_error = false
           person.reload
         end
 
@@ -1160,13 +1159,12 @@ describe Mongoid::Attributes do
       end
 
       context "when the attribute does not exist" do
-        config_override :raise_not_found_error, true
+        config_override :raise_not_found_error, false
 
         before do
           person.collection
             .find({ _id: person.id })
             .update_one({ "$unset" => { age: 1 }})
-          Mongoid.raise_not_found_error = false
           person.reload
         end
 
