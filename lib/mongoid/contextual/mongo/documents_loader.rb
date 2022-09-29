@@ -39,10 +39,10 @@ module Mongoid
           end
           concurrency = Mongoid.global_executor_concurrency || 4
           @@global_thread_pool_async_query_executor ||= create_pool.call(concurrency)
-
           if @@global_thread_pool_async_query_executor.max_length != concurrency
+            old_pool = @@global_thread_pool_async_query_executor
             @@global_thread_pool_async_query_executor = create_pool.call(concurrency)
-
+            old_pool.shutdown
           end
           @@global_thread_pool_async_query_executor
         end
