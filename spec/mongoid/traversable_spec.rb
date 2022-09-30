@@ -531,19 +531,15 @@ describe Mongoid::Traversable do
         end
 
         context "before class creation" do
-          before do
-            Mongoid.discriminator_key = "test"
+          config_override :discriminator_key, "test"
 
+          before do
             class PreGlobalDiscriminatorParent
               include Mongoid::Document
             end
 
             class PreGlobalDiscriminatorChild < PreGlobalDiscriminatorParent
             end
-          end
-
-          after do
-            Mongoid.discriminator_key = "_type"
           end
 
           it "creates a field with new discriminator key in the parent" do
@@ -677,19 +673,15 @@ describe Mongoid::Traversable do
         end
 
         context "before class creation" do
-          before do
-            Mongoid.discriminator_key = :test
+          config_override :discriminator_key, :test
 
+          before do
             class PreGlobalSymDiscriminatorParent
               include Mongoid::Document
             end
 
             class PreGlobalSymDiscriminatorChild < PreGlobalSymDiscriminatorParent
             end
-          end
-
-          after do
-            Mongoid.discriminator_key = "_type"
           end
 
           it "creates a field with new discriminator key as a string in the parent" do
@@ -829,8 +821,9 @@ describe Mongoid::Traversable do
     end
 
     context "when setting a field equal to discriminator key and duplicate_fields_exception is true" do
+      config_override :duplicate_fields_exception, true
+
       before do
-        Mongoid.duplicate_fields_exception = true
 
         class DuplicateDiscriminatorKeyParent
           include Mongoid::Document
@@ -839,10 +832,6 @@ describe Mongoid::Traversable do
 
         class DuplicateDiscriminatorKeyChild < DuplicateDiscriminatorKeyParent
         end
-      end
-
-      after do
-        Mongoid.duplicate_fields_exception = false
       end
 
       it "does not raise an error" do
@@ -871,9 +860,10 @@ describe Mongoid::Traversable do
     end
 
     context "when setting a field equal to global discriminator key and duplicate_fields_exception is true" do
+      config_override :duplicate_fields_exception, true
+      config_override :discriminator_key, "dkey"
+
       before do
-        Mongoid.duplicate_fields_exception = true
-        Mongoid.discriminator_key = "dkey"
 
         class GlobalDuplicateDiscriminatorKeyParent
           include Mongoid::Document
@@ -881,11 +871,6 @@ describe Mongoid::Traversable do
 
         class GlobalDuplicateDiscriminatorKeyChild < GlobalDuplicateDiscriminatorKeyParent
         end
-      end
-
-      after do
-        Mongoid.duplicate_fields_exception = false
-        Mongoid.discriminator_key = "_type"
       end
 
       it "raises an error" do

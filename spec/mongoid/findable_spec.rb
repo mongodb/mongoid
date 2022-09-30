@@ -75,12 +75,7 @@ describe Mongoid::Findable do
       context "when the document is not found" do
 
         context "when raising a not found error" do
-
-          let!(:raise_option) { Mongoid.raise_not_found_error }
-
-          before { Mongoid.raise_not_found_error = true }
-
-          after { Mongoid.raise_not_found_error = raise_option }
+          config_override :raise_not_found_error, true
 
           it "raises an error" do
             expect {
@@ -90,12 +85,7 @@ describe Mongoid::Findable do
         end
 
         context "when raising no error" do
-
-          let!(:raise_option) { Mongoid.raise_not_found_error }
-
-          before { Mongoid.raise_not_found_error = false }
-
-          after { Mongoid.raise_not_found_error = raise_option }
+          config_override :raise_not_found_error, false
 
           it "returns nil" do
             expect(person.messages.find_by(body: 'bar')).to be_nil
@@ -134,12 +124,7 @@ describe Mongoid::Findable do
     context "when the document is not found" do
 
       context "when raising a not found error" do
-
-        let!(:raise_option) { Mongoid.raise_not_found_error }
-
-        before { Mongoid.raise_not_found_error = true }
-
-        after { Mongoid.raise_not_found_error = raise_option }
+        config_override :raise_not_found_error, true
 
         it "raises an error" do
           expect {
@@ -149,12 +134,7 @@ describe Mongoid::Findable do
       end
 
       context "when raising no error" do
-
-        let!(:raise_option) { Mongoid.raise_not_found_error }
-
-        before { Mongoid.raise_not_found_error = false }
-
-        after { Mongoid.raise_not_found_error = raise_option }
+        config_override :raise_not_found_error, false
 
         context "when no block is provided" do
 
