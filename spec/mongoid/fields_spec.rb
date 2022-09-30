@@ -1082,14 +1082,7 @@ describe Mongoid::Fields do
       end
 
       context "when reading the field" do
-
-        before do
-          Time.zone = "Berlin"
-        end
-
-        after do
-          Time.zone = nil
-        end
+        time_zone_override "Berlin"
 
         it "performs the necessary time conversions" do
           expect(person.lunch_time.to_s).to eq(time.getlocal.to_s)

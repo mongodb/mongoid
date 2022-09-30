@@ -102,6 +102,15 @@ module Mongoid
       end
     end
 
+    def time_zone_override(tz)
+      around do |example|
+        old_tz = Time.zone
+        Time.zone = tz
+        example.run
+        Time.zone = old_tz
+      end
+    end
+
     def with_default_i18n_configs
       around do |example|
         I18n.locale = :en
