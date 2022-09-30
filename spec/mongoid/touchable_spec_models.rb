@@ -20,8 +20,8 @@ module TouchableSpec
 
       embedded_in :building, class_name: "TouchableSpec::Embedded::Building"
 
-      embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
-      embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
+      embeds_many :keypads, class_name: "TouchableSpec::Embedded::Keypad"
+      embeds_many :cameras, class_name: "TouchableSpec::Embedded::Camera"
     end
 
     class Floor
@@ -37,18 +37,32 @@ module TouchableSpec
       embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
     end
 
+    class Keypad
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :entrance, class_name: "TouchableSpec::Embedded::Entrance"
+    end
+
+    class Camera
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :entrance, touch: true, class_name: "TouchableSpec::Embedded::Entrance"
+    end
+
     class Chair
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :chairable, polymorphic: true
+      embedded_in :floor, class_name: "TouchableSpec::Embedded::Floor"
     end
 
     class Sofa
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :sofable, touch: true, polymorphic: true
+      embedded_in :floor, touch: true, class_name: "TouchableSpec::Embedded::Floor"
     end
   end
 
@@ -67,8 +81,8 @@ module TouchableSpec
 
       belongs_to :building, touch: false, class_name: "TouchableSpec::Referenced::Building"
 
-      embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
-      embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
+      embeds_many :keypads, class_name: "TouchableSpec::Referenced::Keypad"
+      embeds_many :cameras, class_name: "TouchableSpec::Referenced::Camera"
     end
 
     class Floor
@@ -79,8 +93,8 @@ module TouchableSpec
 
       belongs_to :building, touch: true, class_name: "TouchableSpec::Referenced::Building"
 
-      embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
-      embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
+      embeds_many :chairs, class_name: "TouchableSpec::Referenced::Chair"
+      embeds_many :sofas, class_name: "TouchableSpec::Referenced::Sofa"
 
       has_many :plants, class_name: "TouchableSpec::Referenced::Plant"
       has_many :windows, class_name: "TouchableSpec::Referenced::Window"
@@ -98,6 +112,34 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       belongs_to :floor, touch: true, class_name: "TouchableSpec::Referenced::Floor"
+    end
+
+    class Keypad
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :entrance, class_name: "TouchableSpec::Referenced::Entrance"
+    end
+
+    class Camera
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :entrance, touch: true, class_name: "TouchableSpec::Referenced::Entrance"
+    end
+
+    class Chair
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :floor, class_name: "TouchableSpec::Referenced::Floor"
+    end
+
+    class Sofa
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :floor, touch: true, class_name: "TouchableSpec::Referenced::Floor"
     end
   end
 end
