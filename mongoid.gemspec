@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
   # See: https://github.com/rails/rails/pull/43951
   s.add_dependency("activemodel", ['>=5.1', '<7.1', '!= 7.0.0'])
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
+  s.add_dependency("concurrent-ruby", ['>= 1.0.5', '<1.2'])
 
   # The ruby2_keywords gem is recommended for handling argument delegation issues,
   # especially if support for 2.6 or prior is required.

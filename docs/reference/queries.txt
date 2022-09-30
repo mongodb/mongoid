@@ -2419,5 +2419,72 @@ will query the database and separately cache their results.
 To use the cached results, call ``all.to_a.first`` on the model class.
 
 
-.. _legacy-query-cache-limitations:
+.. _load-async:
 
+Asynchronous Queries
+====================
+
+Mongoid allows running database queries asynchronously in the background.
+This can be beneficial when there is a need to get documents from different
+collections.
+
+In order to schedule an asynchronous query call the ``load_async`` method on a
+``Criteria``:
+
+.. code-block:: ruby
+
+  class PagesController < ApplicationController
+    def index
+      @active_bands = Band.where(active: true).load_async
+      @best_events = Event.best.load_async
+      @public_articles = Article.where(public: true).load_async
+    end
+  end
+
+In the above example three queries will be scheduled for asynchronous execution.
+Results of the queries can be later accessed as usual:
+
+.. code-block:: html
+
+  <ul>
+    <%- @active_bands.each do -%>
+      <li><%= band.name %></li>
+    <%- end -%>
+  </ul>
+
+Even if a query is scheduled for asynchronous execution, it might be executed
+synchronously on the caller's thread. There are three possible scenarios depending
+on when the query results are being accessed:
+
+#. If the scheduled asynchronous task has been already executed, the results are returned.
+#. If the task has been started, but not finished yet, the caller's thread blocks until the task is finished.
+#. If the task has not been started yet, it is removed from the execution queue, and the query is executed synchronously on the caller's thread.
+
+.. note::
+
+  Even though ``load_async`` method returns a ``Criteria`` object, you should not
+  do any operations on this object except accessing query results. The query is
+  scheduled for execution immediately after calling ``load_async``, therefore
+  later changes to the `Criteria`` object may not be applied.
+
+
+Configuring asynchronous query execution
+----------------------------------------
+
+Asynchronous queries are disabled by default. When asynchronous queries are
+disabled, ``load_async`` will execute the query immediately on the current thread,
+blocking as necessary. Therefore, calling ``load_async`` on criteria in this case
+is roughly the equivalent of calling ``to_a`` to force query execution.
+
+In order to enable asynchronous query execution, the following config options
+must be set:
+
+.. code-block:: yaml
+
+  development:
+    ...
+    options:
+      # Execute asynchronous queries using a global thread pool.
+      async_query_executor: :global_thread_pool
+      # Number of threads in the pool. The default is 4.
+      # global_executor_concurrency: 4
