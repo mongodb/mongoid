@@ -48,8 +48,6 @@ module Mongoid
             object.to_big_decimal
           elsif object.numeric?
             BigDecimal(object.to_s)
-          elsif object.numeric?
-            object.to_d
           end
         end
 
@@ -79,7 +77,7 @@ module Mongoid
             if object.is_a?(BSON::Decimal128) || object.numeric?
               object.to_s
             elsif !object.is_a?(String)
-              object.try(:to_d)
+              object.try(:to_d).to_s
             end
           end
         end
