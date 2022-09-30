@@ -158,7 +158,7 @@ module Mongoid
         queryable.scoped(options)
       end
 
-      # Get the criteria without the any scoping applied.
+      # Get the criteria without any scoping applied.
       #
       # @example Get the unscoped criteria.
       #   Band.unscoped
