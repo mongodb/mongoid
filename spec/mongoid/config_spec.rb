@@ -936,4 +936,31 @@ describe Mongoid::Config do
       end
     end
   end
+
+  describe '#use_activesupport_time_zone=' do
+
+    before do
+      Mongoid::Warnings.class_eval do
+        @use_activesupport_time_zone_deprecated = false
+      end
+    end
+
+    let(:warning) do
+      "Config option :use_activesupport_time_zone is deprecated and should be removed from your config. It will be always true beginning in Mongoid 9.0."
+    end
+
+    context 'when set to true' do
+      it 'does not give a deprecation warning' do
+        expect(Mongoid.logger).to receive(:warn).with(warning)
+        described_class.use_activesupport_time_zone = true
+      end
+    end
+
+    context 'when set to false' do
+      it 'gives a deprecation warning' do
+        expect(Mongoid.logger).to receive(:warn).with(warning)
+        described_class.use_activesupport_time_zone = false
+      end
+    end
+  end
 end

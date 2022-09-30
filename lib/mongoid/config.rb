@@ -72,6 +72,7 @@ module Mongoid
 
     # Use ActiveSupport's time zone in time operations instead of the
     # Ruby default time zone.
+    # @deprecated
     option :use_activesupport_time_zone, default: true
 
     # Return stored times as UTC.
@@ -389,5 +390,14 @@ module Mongoid
         client
       end
     end
+
+    module DecprecateUseActivesupportTimeZone
+      def use_activesupport_time_zone=(value)
+        Mongoid::Warnings.warn_use_activesupport_time_zone_deprecated
+        super(value)
+      end
+    end
+
+    prepend DecprecateUseActivesupportTimeZone
   end
 end

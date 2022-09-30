@@ -25,5 +25,6 @@ module Mongoid
     warning :as_json_compact_deprecated, '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
     warning :symbol_type_deprecated, 'The BSON Symbol type is deprecated by MongoDB. Please use String or StringifiedSymbol field types instead of the Symbol field type'
     warning :legacy_readonly, 'The readonly! method will only mark the document readonly when the legacy_readonly feature flag is switched off.'
+    warning :use_activesupport_time_zone_deprecated, 'Config option :use_activesupport_time_zone is deprecated and should be removed from your config. It will be always true beginning in Mongoid 9.0.'
   end
 end
