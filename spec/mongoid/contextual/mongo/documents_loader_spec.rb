@@ -3,6 +3,9 @@
 require "spec_helper"
 
 describe Mongoid::Contextual::Mongo::DocumentsLoader do
+  # https://jira.mongodb.org/browse/MONGOID-5505
+  require_mri
+
   let(:view) do
     double('view').tap do |view|
       allow(view).to receive(:map)
