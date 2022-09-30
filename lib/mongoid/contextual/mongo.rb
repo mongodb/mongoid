@@ -161,12 +161,28 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
       # @note We don't use count here since Mongo does not use counted
       #   b-tree indexes.
       #
+      # @param [ Hash | Object | false ] id_or_conditions an _id to
+      #   search for, a hash of conditions, nil or false.
+      #
       # @return [ true | false ] If the count is more than zero.
-      def exists?
-        !!(view.projection(_id: 1).limit(1).first)
+      #   Always false if passed nil or false.
+      def exists?(id_or_conditions = :none)
+        return false if self.view.limit == 0
+        case id_or_conditions
+        when :none then !!(view.projection(_id: 1).limit(1).first)
+        when nil, false then false
+        when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
+        else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
+        end
       end
 
       # Run an explain on the criteria.

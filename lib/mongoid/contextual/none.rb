@@ -80,8 +80,17 @@ module Mongoid
       # @example Do any documents exist in the null context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
+      # @param [ Hash | Object | false ] id_or_conditions an _id to
+      #   search for, a hash of conditions, nil or false.
+      #
       # @return [ false ] Always false.
-      def exists?; false; end
+      def exists?(id_or_conditions = :none); false; end
 
       # Pluck the field values in null context.
       #

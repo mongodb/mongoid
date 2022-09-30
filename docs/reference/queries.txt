@@ -1243,11 +1243,22 @@ Mongoid also has some helpful methods on criteria.
        *Determine if any matching documents exist. Will return true if there
        are 1 or more.*
 
+       ``#exists?`` *now takes a number of argument types:*
+
+       - ``Hash``: *A hash of conditions.*
+       - ``Object``: *An _id to search for.*
+       - ``false``/``nil``: *Always returns false.*
+
      -
         .. code-block:: ruby
 
           Band.exists?
           Band.where(name: "Photek").exists?
+          Band.exists?(name: "Photek")
+          Band.exists?(BSON::ObjectId('6320d96a3282a48cfce9e72c'))
+          Band.exists?('6320d96a3282a48cfce9e72c')
+          Band.exists?(false)
+          Band.exists?(nil)
 
    * - ``Criteria#fifth``
 
