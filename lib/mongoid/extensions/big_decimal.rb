@@ -46,6 +46,8 @@ module Mongoid
           return if object.blank?
           if object.is_a?(BSON::Decimal128)
             object.to_big_decimal
+          elsif object.is_a?(Time)
+            BigDecimal("#{object.to_i}.#{object.nsec.to_s.rjust(9, '0')}")
           elsif object.numeric?
             BigDecimal(object.to_s)
           end
@@ -70,12 +72,16 @@ module Mongoid
               BSON::Decimal128.new(object)
             elsif object.numeric?
               BSON::Decimal128.new(object.to_s)
+            elsif object.is_a?(Time) || object.is_a?(DateTime)
+              BSON::Decimal128.new("#{object.to_i}.#{object.nsec.to_s.rjust(9, '0')}")
             elsif !object.is_a?(String)
               object.try(:to_d)
             end
           else
             if object.is_a?(BSON::Decimal128) || object.numeric?
               object.to_s
+            elsif object.is_a?(Time) || object.is_a?(DateTime)
+              "#{object.to_i}.#{object.nsec.to_s.rjust(9, '0')}"
             elsif !object.is_a?(String)
               object.try(:to_d).to_s
             end

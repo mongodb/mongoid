@@ -32,6 +32,14 @@ module Mongoid
                     obj.to_s
                   end
                 when BSON::Decimal128 then obj
+                when Time, DateTime
+                  obj = obj.__evolve_time__
+                  str = "#{obj.to_i}.#{obj.nsec.to_s.rjust(9, '0')}"
+                  if Mongoid.map_big_decimal_to_decimal128
+                    BSON::Decimal128.new(str)
+                  else
+                    str
+                  end
                 else
                   if obj.numeric?
                     if Mongoid.map_big_decimal_to_decimal128
