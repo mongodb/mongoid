@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.metadata = {
     'bug_tracker_uri' => 'https://jira.mongodb.org/projects/MONGOID',
     'changelog_uri' => 'https://github.com/mongodb/mongoid/releases',
-    'documentation_uri' => 'https://docs.mongodb.com/mongoid/',
+    'documentation_uri' => 'https://www.mongodb.com/docs/mongoid/',
     'homepage_uri' => 'https://mongoid.org/',
     'source_code_uri' => 'https://github.com/mongodb/mongoid',
   }
