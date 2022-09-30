@@ -738,6 +738,10 @@ describe Mongoid::Touchable do
 
     context 'multi-level' do
 
+      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+      let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
       let(:child_name) do
         child_cls.name.demodulize.underscore
       end
@@ -806,23 +810,10 @@ describe Mongoid::Touchable do
         end
       end
 
-      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
-      let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
-
       before do
         grandchild
         update_time
-        puts meth
-        puts "start_time:  #{update_time}"
-        puts "update_time: #{update_time}"
         grandchild.send(meth)
-        puts "--------"
-        puts "p            #{parent.updated_at}"
-        puts "p reload     #{parent.reload.updated_at}"
-        puts "c            #{child.updated_at}"
-        puts "c reload     #{child.reload.updated_at}"
-        puts "g            #{grandchild.updated_at}"
-        puts "g reload     #{grandchild.reload.updated_at unless grandchild.destroyed?}"
       end
 
       after do

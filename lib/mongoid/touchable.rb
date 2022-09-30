@@ -45,10 +45,8 @@ module Mongoid
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
         write_attribute(field, now) if field
 
-        touch_parent = _parent && _association&.inverse_association&.touchable?
-
         touches = __extract_touches_from_atomic_sets(field) || {}
-        touches.merge!(_parent.__gather_touch_updates(now) || {}) if touch_parent
+        touches.merge!(_parent.__gather_touch_updates(now) || {}) if __touchable_parent?
         touches
       end
 
@@ -58,8 +56,12 @@ module Mongoid
       #
       # @api private
       def __run_touch_callbacks_from_root
-        _parent.__run_touch_callbacks_from_root if _parent
+        _parent.__run_touch_callbacks_from_root if __touchable_parent?
         run_callbacks(:touch)
+      end
+
+      def __touchable_parent?
+        _parent && _association&.inverse_association&.touchable?
       end
 
       private
@@ -142,7 +144,7 @@ module Mongoid
               if association.touch_field
                 # Note that this looks up touch_field at runtime, rather than
                 # at method definition time.
-                relation.touch association.touch_field
+                relation.touch(association.touch_field)
               else
                 relation.touch
               end
