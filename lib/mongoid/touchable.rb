@@ -60,6 +60,9 @@ module Mongoid
         run_callbacks(:touch)
       end
 
+      # Indicates whether the parent exists and is touchable.
+      #
+      # @api private
       def __touchable_parent?
         _parent && _association&.inverse_association&.touchable?
       end
