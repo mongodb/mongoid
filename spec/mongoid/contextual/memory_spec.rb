@@ -766,52 +766,158 @@ describe Mongoid::Contextual::Memory do
       Address.new(street: "friedel")
     end
 
-    context "when there are matching documents" do
-
-      let(:criteria) do
-        Address.where(street: "hobrecht").tap do |crit|
-          crit.documents = [ hobrecht, friedel ]
-        end
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns true" do
-        expect(context).to be_exists
+    let(:criteria) do
+      Address.where(street: "hobrecht").tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
       end
     end
 
-    context "when there are no matching documents" do
+    context "when not passing options" do
 
-      let(:criteria) do
-        Address.where(street: "pfluger").tap do |crit|
-          crit.documents = [ hobrecht, friedel ]
+      context "when there are matching documents" do
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns true" do
+          expect(context).to be_exists
         end
       end
 
-      let(:context) do
-        described_class.new(criteria)
+      context "when there are no matching documents" do
+
+        let(:criteria) do
+          Address.where(street: "pfluger").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns false" do
+          expect(context).to_not be_exists
+        end
       end
+
+      context 'when there is a collation on the criteria' do
+
+        let(:criteria) do
+          Address.where(street: "pfluger").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
+      end
+    end
+
+    context "when passing an _id" do
+
+      context "when its of type BSON::ObjectId" do
+
+        context "when calling it on an empty criteria" do
+
+          it "returns true" do
+            expect(criteria.exists?(hobrecht._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that includes the object" do
+
+          it "returns true" do
+            expect(criteria.where(street: hobrecht.street).exists?(hobrecht._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that does not include the object" do
+
+          it "returns false" do
+            expect(criteria.where(street: "bogus").exists?(hobrecht._id)).to be false
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(criteria.exists?(BSON::ObjectId.new)).to be false
+          end
+        end
+      end
+
+      context "when its of type String" do
+
+        context "when the id exists" do
+
+          it "returns true" do
+            expect(criteria.exists?(hobrecht._id.to_s)).to be true
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(criteria.exists?(BSON::ObjectId.new.to_s)).to be false
+          end
+        end
+      end
+    end
+
+    context "when passing a hash" do
+
+      context "when calling it on an empty criteria" do
+
+        it "returns true" do
+          expect(criteria.exists?(street: hobrecht.street)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that includes the object" do
+
+        it "returns true" do
+          expect(criteria.where(_id: hobrecht._id).exists?(street: hobrecht.street)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that does not include the object" do
+
+        it "returns false" do
+          expect(criteria.where(_id: BSON::ObjectId.new).exists?(street: hobrecht.street)).to be false
+        end
+      end
+
+      context "when the conditions don't match" do
+
+        it "returns false" do
+          expect(criteria.exists?(street: "bogus")).to be false
+        end
+      end
+    end
+
+    context "when passing false" do
 
       it "returns false" do
-        expect(context).to_not be_exists
+        expect(criteria.exists?(false)).to be false
       end
     end
 
-    context 'when there is a collation on the criteria' do
+    context "when passing nil" do
 
-      let(:criteria) do
-        Address.where(street: "pfluger").tap do |crit|
-          crit.documents = [ hobrecht, friedel ]
-        end.collation(locale: 'en_US', strength: 2)
+      it "returns false" do
+        expect(criteria.exists?(nil)).to be false
       end
+    end
 
-      it "raises an exception" do
-        expect {
-          context
-        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+    context "when the limit is 0" do
+
+      it "returns false" do
+        expect(criteria.limit(0).exists?).to be false
       end
     end
   end
