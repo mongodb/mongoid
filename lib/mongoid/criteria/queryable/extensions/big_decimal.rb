@@ -31,8 +31,6 @@ module Mongoid
                   else
                     obj.to_s
                   end
-                # Always return on string for backwards compatibility with querying
-                # string-backed BigDecimal fields.
                 when BSON::Decimal128 then obj
                 else
                   if obj.numeric?
