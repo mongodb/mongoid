@@ -23,8 +23,8 @@ Deprecated ``use_activesupport_time_zone`` config option
 
 The config option ``use_activesupport_time_zone`` has been deprecated.
 Beginning in Mongoid 9.0, it will be ignored and always behave as true.
-As ``use_activesupport_time_zone`` defaults to true, it is safe to remove
-from your config definitation at this time.
+Since ``use_activesupport_time_zone`` currently defaults to true, it is
+safe to remove from your config file at this time.
 
 
 Added ``load_async`` method on ``Criteria`` to asynchronously load documents
