@@ -72,9 +72,9 @@ describe String do
     context "when the string without timezone" do
 
       context "when using active support's time zone" do
+        config_override :use_activesupport_time_zone, true
 
         before do
-          Mongoid.use_activesupport_time_zone = true
           ::Time.zone = "Tokyo"
         end
 
@@ -92,9 +92,9 @@ describe String do
       end
 
       context "when not using active support's time zone" do
+        config_override :use_activesupport_time_zone, false
 
         before do
-          Mongoid.use_activesupport_time_zone = false
           ::Time.zone = nil
         end
 

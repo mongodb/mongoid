@@ -2352,10 +2352,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context "when the id does not match" do
 
         context "when config set to raise error" do
-
-          before do
-            Mongoid.raise_not_found_error = true
-          end
+          config_override :raise_not_found_error, true
 
           it "raises an error" do
             expect {
@@ -2365,17 +2362,10 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         context "when config set not to raise error" do
+          config_override :raise_not_found_error, false
 
           let(:address) do
             person.addresses.find(BSON::ObjectId.new)
-          end
-
-          before do
-            Mongoid.raise_not_found_error = false
-          end
-
-          after do
-            Mongoid.raise_not_found_error = true
           end
 
           it "returns nil" do
@@ -2401,10 +2391,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context "when the ids do not match" do
 
         context "when config set to raise error" do
-
-          before do
-            Mongoid.raise_not_found_error = true
-          end
+          config_override :raise_not_found_error, true
 
           it "raises an error" do
             expect {
@@ -2414,17 +2401,10 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         context "when config set not to raise error" do
+          config_override :raise_not_found_error, false
 
           let(:addresses) do
             person.addresses.find([ BSON::ObjectId.new ])
-          end
-
-          before do
-            Mongoid.raise_not_found_error = false
-          end
-
-          after do
-            Mongoid.raise_not_found_error = true
           end
 
           it "returns an empty array" do
