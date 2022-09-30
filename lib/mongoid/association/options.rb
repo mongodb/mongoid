@@ -112,8 +112,11 @@ module Mongoid
         @touch_field ||= options[:touch] if (options[:touch].is_a?(String) || options[:touch].is_a?(Symbol))
       end
 
-      private
-
+      # Whether the association object should be automatically touched
+      # when its inverse object is updated.
+      #
+      # @return [ true | false ] returns true if this association is
+      #   automatically touched, false otherwise. The default is false.
       def touchable?
         !!@options[:touch]
       end

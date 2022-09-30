@@ -16,9 +16,12 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :building, touch: false, class_name: "TouchableSpec::Embedded::Building"
-
       field :last_used_at, type: Time
+
+      embedded_in :building, class_name: "TouchableSpec::Embedded::Building"
+
+      embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
+      embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
     end
 
     class Floor
@@ -26,8 +29,26 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       field :level, type: Integer
+      field :last_used_at, type: Time
 
       embedded_in :building, touch: true, class_name: "TouchableSpec::Embedded::Building"
+
+      embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
+      embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
+    end
+
+    class Chair
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :chairable, polymorphic: true
+    end
+
+    class Sofa
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      embedded_in :sofable, touch: true, polymorphic: true
     end
   end
 
@@ -45,6 +66,9 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       belongs_to :building, touch: false, class_name: "TouchableSpec::Referenced::Building"
+
+      embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
+      embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
     end
 
     class Floor
@@ -54,6 +78,26 @@ module TouchableSpec
       field :level, type: Integer
 
       belongs_to :building, touch: true, class_name: "TouchableSpec::Referenced::Building"
+
+      embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
+      embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
+
+      has_many :plants, class_name: "TouchableSpec::Referenced::Plant"
+      has_many :windows, class_name: "TouchableSpec::Referenced::Window"
+    end
+
+    class Plant
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      belongs_to :floor, touch: false, class_name: "TouchableSpec::Referenced::Floor"
+    end
+
+    class Window
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      belongs_to :floor, touch: true, class_name: "TouchableSpec::Referenced::Floor"
     end
   end
 end
