@@ -83,7 +83,7 @@ module Mongoid
             elsif object.is_a?(Time) || object.is_a?(DateTime)
               "#{object.to_i}.#{object.nsec.to_s.rjust(9, '0')}"
             elsif !object.is_a?(String)
-              object.try(:to_d).to_s
+              object.try(:to_d)&.to_s
             end
           end
         end
