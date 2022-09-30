@@ -109,7 +109,6 @@ describe Mongoid::Indexable do
 
       after do
         klass.remove_indexes
-        Mongoid::Config.background_indexing = false
       end
 
       let(:indexes) do
@@ -118,20 +117,27 @@ describe Mongoid::Indexable do
         end
       end
 
-      it "creates the indexes by using default background_indexing option" do
-        klass.create_indexes
+      context "when the background_indexing option is false" do
+        config_override :background_indexing, false
 
-        index = indexes.get(_type: 1)
-        expect(index[:background]).to eq(Mongoid::Config.background_indexing)
+        it "creates the indexes correctly" do
+          klass.create_indexes
+
+          index = indexes.get(_type: 1)
+          expect(index[:background]).to be false
+        end
       end
 
-      it "creates the indexes by using specified background_indexing option" do
-        Mongoid::Config.background_indexing = true
+      context "when the background_indexing option is true" do
+        config_override :background_indexing, true
 
-        klass.create_indexes
+        it "creates the indexes correctly" do
 
-        index = indexes.get(_type: 1)
-        expect(index[:background]).to eq(true)
+          klass.create_indexes
+
+          index = indexes.get(_type: 1)
+          expect(index[:background]).to be true
+        end
       end
     end
 

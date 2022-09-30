@@ -14,19 +14,19 @@ describe Mongoid::Serializable do
       expect(guitar.send(:field_names, {})).to eq(guitar.fields.except("_type").keys.sort)
     end
 
-    context "when using a custom discriminator_key" do 
-      before do 
+    context "when using a custom discriminator_key" do
+      before do
         Instrument.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Instrument.discriminator_key = nil
       end
 
       let(:guitar) do
         Guitar.new
       end
-  
+
       it "includes _type but does not include the new discriminator key" do
         expect(guitar.send(:field_names, {})).to eq(guitar.fields.except("dkey").keys.sort)
       end
@@ -41,15 +41,11 @@ describe Mongoid::Serializable do
       end
 
       after do
-        Mongoid.include_root_in_json = false
         reload_model(:Minim)
       end
 
       context "when global config is set to true" do
-
-        before do
-          Mongoid.include_root_in_json = true
-        end
+        config_override :include_root_in_json, true
 
         it "returns true" do
           expect(Minim.public_send(meth)).to be true
@@ -67,10 +63,7 @@ describe Mongoid::Serializable do
       end
 
       context "when global config set to false" do
-
-        before do
-          Mongoid.include_root_in_json = false
-        end
+        config_override :include_root_in_json, false
 
         it "returns false" do
           expect(Minim.public_send(meth)).to be false
@@ -89,13 +82,13 @@ describe Mongoid::Serializable do
     end
 
     describe "#include_root_in_json" do
+      config_override :include_root_in_json, false
 
       before do
         reload_model(:Minim)
       end
 
       after do
-        Mongoid.include_root_in_json = false
         reload_model(:Minim)
       end
 
@@ -126,10 +119,6 @@ describe Mongoid::Serializable do
       end
 
       context "when global config set to false" do
-
-        before do
-          Mongoid.include_root_in_json = false
-        end
 
         it "returns false" do
           expect(minim.public_send(meth)).to be false
@@ -297,14 +286,7 @@ describe Mongoid::Serializable do
       end
 
       context "when include_type_for_serialization is true" do
-
-        before do
-          Mongoid.include_type_for_serialization = true
-        end
-
-        after do
-          Mongoid.include_type_for_serialization = false
-        end
+        config_override :include_type_for_serialization, true
 
         it "includes _type field" do
           expect(person.serializable_hash.keys).to include '_type'
@@ -881,14 +863,11 @@ describe Mongoid::Serializable do
     end
 
     context "when including root in json via Mongoid" do
+      config_override :include_root_in_json, false
 
       before do
         account.include_root_in_json.should be false
         Mongoid.include_root_in_json = true
-      end
-
-      after do
-        Mongoid.include_root_in_json = false
       end
 
       it "uses the mongoid configuration" do

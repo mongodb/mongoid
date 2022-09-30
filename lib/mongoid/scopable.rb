@@ -175,7 +175,9 @@ module Mongoid
       def unscoped
         if block_given?
           without_default_scope do
-            yield(self)
+            with_scope(nil) do
+              yield(self)
+            end
           end
         else
           queryable.unscoped
