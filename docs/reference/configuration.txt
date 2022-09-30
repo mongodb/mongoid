@@ -265,6 +265,16 @@ for details on driver options.
       # if the database name is not explicitly defined. (default: nil)
       app_name: MyApplicationName
 
+      # Type of executor for queries scheduled using ``load_async`` method.
+      #
+      # There are two possible values for this option:
+      #
+      #   - :immediate - Queries will be immediately executed on a current thread.
+      #       This is the default option.
+      #   - :global_thread_pool - Queries will be executed asynchronously in
+      #       background using a thread pool.
+      #async_query_executor: :immediate
+
       # Mark belongs_to associations as required by default, so that saving a
       # model with a missing belongs_to association will trigger a validation
       # error. (default: true)
@@ -357,6 +367,11 @@ for details on driver options.
 
       # Raise an exception when a field is redefined. (default: false)
       duplicate_fields_exception: false
+
+      # Defines how many asynchronous queries can be executed concurrently.
+      # This option should be set only if `async_query_executor` option is set
+      # to `:global_thread_pool`.
+      #global_executor_concurrency: nil
 
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false

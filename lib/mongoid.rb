@@ -12,6 +12,8 @@ require "active_support/inflector"
 require "active_support/time_with_zone"
 require "active_model"
 
+require 'concurrent-ruby'
+
 require "mongo"
 require 'mongo/active_support'
 
