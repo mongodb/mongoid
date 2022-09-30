@@ -391,13 +391,13 @@ module Mongoid
       end
     end
 
-    module DecprecateUseActivesupportTimeZone
+    module DeprecateUseActivesupportTimeZone
       def use_activesupport_time_zone=(value)
         Mongoid::Warnings.warn_use_activesupport_time_zone_deprecated
         super(value)
       end
     end
 
-    prepend DecprecateUseActivesupportTimeZone
+    prepend DeprecateUseActivesupportTimeZone
   end
 end
