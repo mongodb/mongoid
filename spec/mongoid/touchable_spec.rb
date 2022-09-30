@@ -1085,7 +1085,7 @@ describe Mongoid::Touchable do
       end
     end
 
-    context "when saving embedded associations with cascadable callbacks" do
+    context "when saving embedded associations with cascading callbacks" do
 
       shared_examples "timeless is cleared" do
         it "clears the timeless option" do
