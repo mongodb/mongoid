@@ -391,13 +391,28 @@ module Mongoid
       end
     end
 
-    module DeprecateUseActivesupportTimeZone
-      def use_activesupport_time_zone=(value)
-        Mongoid::Warnings.warn_use_activesupport_time_zone_deprecated
-        super(value)
+    module DeprecatedOptions
+      OPTIONS = %i[ use_activesupport_time_zone
+                    broken_aggregables
+                    broken_alias_handling
+                    broken_and
+                    broken_scoping
+                    broken_updates
+                    compare_time_by_ms
+                    legacy_attributes
+                    legacy_pluck_distinct
+                    legacy_triple_equals
+                    object_id_as_json_oid
+                    overwrite_chained_operators ]
+
+      OPTIONS.each do |option|
+        define_method(:"#{option}=") do |value|
+          Mongoid::Warnings.send(:"warn_#{option}_deprecated")
+          super(value)
+        end
       end
     end
 
-    prepend DeprecateUseActivesupportTimeZone
+    prepend DeprecatedOptions
   end
 end

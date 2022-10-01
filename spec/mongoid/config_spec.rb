@@ -937,29 +937,45 @@ describe Mongoid::Config do
     end
   end
 
-  describe '#use_activesupport_time_zone=' do
+  describe 'deprecations' do
+    { use_activesupport_time_zone: true,
+      broken_aggregables: false,
+      broken_alias_handling: false,
+      broken_and: false,
+      broken_scoping: false,
+      broken_updates: false,
+      compare_time_by_ms: true,
+      legacy_attributes: false,
+      legacy_pluck_distinct: false,
+      legacy_triple_equals: false,
+      object_id_as_json_oid: false,
+      overwrite_chained_operators: false }.each do |option, default|
 
-    before do
-      Mongoid::Warnings.class_eval do
-        @use_activesupport_time_zone_deprecated = false
-      end
-    end
+      context ":#{option} option" do
 
-    let(:warning) do
-      "Config option :use_activesupport_time_zone is deprecated and should be removed from your config. It will be always true beginning in Mongoid 9.0."
-    end
+        before do
+          Mongoid::Warnings.class_eval do
+            instance_variable_set(:"@#{option}_deprecated", false)
+          end
+        end
 
-    context 'when set to true' do
-      it 'does not give a deprecation warning' do
-        expect(Mongoid.logger).to receive(:warn).with(warning)
-        described_class.use_activesupport_time_zone = true
-      end
-    end
+        let(:matcher) do
+          /Config option :#{option}.+\. It will always be #{default} beginning in Mongoid 9\.0\./
+        end
 
-    context 'when set to false' do
-      it 'gives a deprecation warning' do
-        expect(Mongoid.logger).to receive(:warn).with(warning)
-        described_class.use_activesupport_time_zone = false
+        context 'when set to true' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", true)
+          end
+        end
+
+        context 'when set to false' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", false)
+          end
+        end
       end
     end
   end
