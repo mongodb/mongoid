@@ -81,8 +81,8 @@ module Mongoid
         updates = atomic_updates['$set']
         return {} unless updates
 
-        touchable_keys = Set.new(%w(updated_at u_at))
-        touchable_keys << field.to_s
+        touchable_keys = Set['updated_at', 'u_at']
+        touchable_keys << field.to_s if field.present?
 
         updates.keys.each_with_object({}) do |key, touches|
           if touchable_keys.include?(key.split('.').last)
