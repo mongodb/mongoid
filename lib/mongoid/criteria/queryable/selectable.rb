@@ -200,7 +200,7 @@ module Mongoid
         #   the upper right (north east) as the second argument.
         #   Important: When latitude and longitude are passed, longitude is
         #   expected as the first element of the coordinate pair.
-        #   Source: https://docs.mongodb.com/manual/reference/operator/query/box/
+        #   Source: https://www.mongodb.com/docs/manual/reference/operator/query/box/
         #
         # @example Add a geo intersect criterion for a line.
         #   query.geo_spatial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
@@ -732,7 +732,7 @@ module Mongoid
         # @example Construct a text search selector with options.
         #   selectable.text_search("testing", :$language => "fr")
         #
-        # @note Per https://docs.mongodb.com/manual/reference/operator/query/text/
+        # @note Per https://www.mongodb.com/docs/manual/reference/operator/query/text/
         #   it is not currently possible to supply multiple text search
         #   conditions in a query. Mongoid will build such a query but the
         #   server will return an error when trying to execute it.
@@ -752,7 +752,7 @@ module Mongoid
             criterion = {'$text' => { '$search' => terms }}
             criterion['$text'].merge!(opts) if opts
             if query.selector['$text']
-              # Per https://docs.mongodb.com/manual/reference/operator/query/text/
+              # Per https://www.mongodb.com/docs/manual/reference/operator/query/text/
               # multiple $text expressions are not currently supported by
               # MongoDB server, but build the query correctly instead of
               # overwriting previous text search condition with the currently

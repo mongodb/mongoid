@@ -2045,7 +2045,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
 
       # MongoDB server can only handle one text expression at a time,
-      # per https://docs.mongodb.com/manual/reference/operator/query/text/.
+      # per https://www.mongodb.com/docs/manual/reference/operator/query/text/.
       # Nonetheless we test that the query is built correctly when
       # a user supplies more than one text condition.
       it 'merges conditions' do

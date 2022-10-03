@@ -206,7 +206,7 @@ module Mongoid
 
         # Positional projection is specified as "foo.$". In this case the
         # document that the $ is referring to should be retrieved with all
-        # fields. See https://docs.mongodb.com/manual/reference/operator/projection/positional/
+        # fields. See https://www.mongodb.com/docs/manual/reference/operator/projection/positional/
         # and https://jira.mongodb.org/browse/MONGOID-4769.
         if filtered.keys == %w($)
           filtered = nil

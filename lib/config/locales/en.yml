@@ -107,7 +107,7 @@ en:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
           resolution: "Ensure your configuration file contains the correct contents.
-            Refer to: https://docs.mongodb.com/mongoid/current/reference/configuration/"
+            Refer to: https://www.mongodb.com/docs/mongoid/current/reference/configuration/"
         invalid_collection:
           message: "Access to the collection for %{klass} is not allowed."
           summary: "%{klass}.collection was called, and %{klass} is an embedded
@@ -135,7 +135,7 @@ en:
           summary: "Your mongoid.yml configuration file does not contain the
             correct file structure."
           resolution: "Ensure your configuration file contains the correct contents.
-            Refer to: https://docs.mongodb.com/mongoid/current/reference/configuration/"
+            Refer to: https://www.mongodb.com/docs/mongoid/current/reference/configuration/"
         invalid_config_option:
           message: "Invalid configuration option: %{name}."
           summary: "A invalid configuration option was provided in your
@@ -222,14 +222,14 @@ en:
             \_\_\_\_field :%{name}, %{option}: true\n
             \_\_end\n\n
             Refer to:
-            https://docs.mongodb.com/mongoid/current/reference/fields/#custom-field-options"
+            https://www.mongodb.com/docs/mongoid/current/reference/fields/#custom-field-options"
         invalid_field_type:
           message: "Invalid field type %{type_inspection} for field '%{field}' on model '%{klass}'."
           summary: "Model '%{klass}' defines a field '%{field}' with an unknown type value
             %{type_inspection}."
           resolution: "Please provide a valid type value for the field.
             Refer to:
-            https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
+            https://www.mongodb.com/docs/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
         invalid_global_executor_concurrency:
           message: "Invalid global_executor_concurrency option."
           summary: "You set global_executor_concurrency while async_query_executor
