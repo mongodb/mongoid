@@ -144,13 +144,9 @@ module Mongoid
         define_method(method_name) do
           without_autobuild do
             if relation = __send__(name)
-              if association.touch_field
-                # Note that this looks up touch_field at runtime, rather than
-                # at method definition time.
-                relation.touch(association.touch_field)
-              else
-                relation.touch
-              end
+              # This looks up touch_field at runtime, rather than at method definition time.
+              # If touch_field is nil, it will only touch the default field (updated_at)
+              relation.touch(association.touch_field)
             end
           end
         end
