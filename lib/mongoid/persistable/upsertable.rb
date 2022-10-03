@@ -15,11 +15,19 @@ module Mongoid
       #
       # @param [ Hash ] options The validation options.
       #
+      # @option options [ true | false ] :validate Whether or not to validate.
+      # @option options [ true | false ] :replace Whether or not to replace the document on upsert.
+      #
       # @return [ true ] True.
       def upsert(options = {})
         prepare_upsert(options) do
-          collection.find(atomic_selector).replace_one(
+          if options[:replace]
+            collection.find(atomic_selector).replace_one(
               as_attributes, upsert: true, session: _session)
+          else
+            collection.find(atomic_selector).update_one(
+              { "$set" => as_attributes }, upsert: true, session: _session)
+          end
         end
       end
 
@@ -35,6 +43,8 @@ module Mongoid
       #   end
       #
       # @param [ Hash ] options The options hash.
+      #
+      # @option options [ true | false ] :validate Whether or not to validate.
       #
       # @return [ true | false ] If the operation succeeded.
       def prepare_upsert(options = {})
