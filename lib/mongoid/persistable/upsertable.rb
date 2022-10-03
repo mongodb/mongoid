@@ -12,13 +12,13 @@ module Mongoid
       #
       # If the replace option is true, unspecified attributes will be dropped,
       # and if it is false, unspecified attributes will be maintained. The
-      # replace option defaults to false in Mongoid 9.
+      # replace option defaults to true in Mongoid 8.1 and earlier.
       #
       # @example Upsert the document.
       #   document.upsert
       #
-      # @example Upsert the document with replace.
-      #   document.upsert(replace: true)
+      # @example Upsert the document without replace.
+      #   document.upsert(replace: false)
       #
       # @param [ Hash ] options The validation options.
       #
@@ -28,7 +28,7 @@ module Mongoid
       # @return [ true ] True.
       def upsert(options = {})
         prepare_upsert(options) do
-          if options[:replace]
+          if options.fetch(:replace, true)
             collection.find(atomic_selector).replace_one(
               as_attributes, upsert: true, session: _session)
           else

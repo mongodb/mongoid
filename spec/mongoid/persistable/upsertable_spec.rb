@@ -83,7 +83,7 @@ describe Mongoid::Persistable::Upsertable do
 
           context "when not passing any options" do
             let(:options) { {} }
-            it_behaves_like "retains the existing fields"
+            it_behaves_like "replaces the existing fields"
           end
 
           context "when passing replace: false" do
