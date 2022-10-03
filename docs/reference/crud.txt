@@ -51,8 +51,8 @@ operations with examples.
        has been retrieved from the database, and a* ``Hash`` *with string keys
        if it is a new document.*
 
-       *The attributes hash also contains the attributes of all embedded 
-       documents, as well as their embedded documents, etc. If an embedded 
+       *The attributes hash also contains the attributes of all embedded
+       documents, as well as their embedded documents, etc. If an embedded
        association is empty, its key will not show up in the returned hash.*
 
      -
@@ -224,9 +224,12 @@ operations with examples.
    * - ``Model#upsert``
 
        *Performs a MongoDB replace with upsert on the document. If the document
-       exists in the database, it will get overwritten with the current
-       document in the application (any attributes present in the database but
-       not in the application's document instance will be lost).
+       exists in the database and the* ``:replace`` *option is set to true, it
+       will get overwritten with the current document in the application (any
+       attributes present in the database but not in the application's document
+       instance will be lost). If the* ``:replace`` *option is false (default),
+       the document will be updated, and any attributes not in the application's
+       document will be maintained.
        If the document does not exist in the database, it will be inserted.
        Note that this only runs the* ``{before|after|around}_upsert`` *callbacks.*
      -
@@ -237,6 +240,7 @@ operations with examples.
             last_name: "Heine"
           )
           person.upsert
+          person.upsert(replace: true)
 
    * - ``Model#touch``
 

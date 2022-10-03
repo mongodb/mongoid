@@ -73,3 +73,16 @@ the type conversion.
 Note that in prior Mongoid versions, typecasting Date to Time during
 persistence operations was already correctly using the
 ``Mongoid.use_activesupport_time_zone`` setting.
+
+
+Flipped default for ``:replace`` option in ``#upsert``
+------------------------------------------------------
+
+Mongoid 8.1 added the ``:replace`` option to the ``#upsert`` method. This
+option was used to specify whether or not the existing document should be
+updated or replaced.
+
+Mongoid 9.0 flips the default of this flag from ``true`` => ``false``.
+
+This means that, by default, Mongoid 9 will update the existing document and
+will not replace it.

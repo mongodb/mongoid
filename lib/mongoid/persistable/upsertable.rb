@@ -10,8 +10,15 @@ module Mongoid
       # database, then Mongo will insert a new one, otherwise the fields will get
       # overwritten with new values on the existing document.
       #
+      # If the replace option is true, unspecified attributes will be dropped,
+      # and if it is false, unspecified attributes will be maintained. The
+      # replace option defaults to false in Mongoid 9.
+      #
       # @example Upsert the document.
       #   document.upsert
+      #
+      # @example Upsert the document with replace.
+      #   document.upsert(replace: true)
       #
       # @param [ Hash ] options The validation options.
       #
