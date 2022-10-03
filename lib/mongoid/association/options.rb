@@ -117,6 +117,8 @@ module Mongoid
       #
       # @return [ true | false ] returns true if this association is
       #   automatically touched, false otherwise. The default is false.
+      #
+      # @api private
       def touchable?
         !!@options[:touch]
       end
