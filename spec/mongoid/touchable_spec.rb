@@ -998,40 +998,84 @@ describe Mongoid::Touchable do
 
         let(:parent_cls) { TouchableSpec::Referenced::Building }
 
-        let(:child_cls) do
-          TouchableSpec::Referenced::Floor
-        end
+        context 'child touch: true' do
 
-        context 'grandchild touch: true' do
-
-          let(:grandchild_cls) do
-            TouchableSpec::Referenced::Window
+          let(:child_cls) do
+            TouchableSpec::Referenced::Floor
           end
 
-          [ :save!, :destroy, :touch ].each do |meth|
-            context "when calling #{meth} method" do
-              let(:meth) { meth }
+          context 'grandchild touch: true' do
 
-              it_behaves_like "updates the parent"
-              it_behaves_like "updates the child"
-              it_behaves_like "updates the grandchild"
+            let(:grandchild_cls) do
+              TouchableSpec::Referenced::Window
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "updates the parent"
+                it_behaves_like "updates the child"
+                it_behaves_like "updates the grandchild"
+              end
+            end
+          end
+
+          context 'grandchild touch: false' do
+
+            let(:grandchild_cls) do
+              TouchableSpec::Referenced::Plant
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "does not update the parent"
+                it_behaves_like "does not update the child"
+                it_behaves_like "updates the grandchild"
+              end
             end
           end
         end
 
-        context 'grandchild touch: false' do
+        context 'child touch: false' do
 
-          let(:grandchild_cls) do
-            TouchableSpec::Referenced::Plant
+          let(:child_cls) do
+            TouchableSpec::Referenced::Entrance
           end
 
-          [ :save!, :destroy, :touch ].each do |meth|
-            context "when calling #{meth} method" do
-              let(:meth) { meth }
+          context 'grandchild touch: true' do
 
-              it_behaves_like "does not update the parent"
-              it_behaves_like "does not update the child"
-              it_behaves_like "updates the grandchild"
+            let(:grandchild_cls) do
+              TouchableSpec::Referenced::Window
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "does not update the parent"
+                it_behaves_like "updates the child"
+                it_behaves_like "updates the grandchild"
+              end
+            end
+          end
+
+          context 'grandchild touch: false' do
+
+            let(:grandchild_cls) do
+              TouchableSpec::Referenced::Plant
+            end
+
+            [ :save!, :destroy, :touch ].each do |meth|
+              context "when calling #{meth} method" do
+                let(:meth) { meth }
+
+                it_behaves_like "does not update the parent"
+                it_behaves_like "does not update the child"
+                it_behaves_like "updates the grandchild"
+              end
             end
           end
         end

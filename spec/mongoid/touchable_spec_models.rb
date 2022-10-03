@@ -83,6 +83,9 @@ module TouchableSpec
 
       embeds_many :keypads, class_name: "TouchableSpec::Referenced::Keypad"
       embeds_many :cameras, class_name: "TouchableSpec::Referenced::Camera"
+
+      has_many :plants, class_name: "TouchableSpec::Referenced::Plant"
+      has_many :windows, class_name: "TouchableSpec::Referenced::Window"
     end
 
     class Floor
@@ -105,6 +108,7 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       belongs_to :floor, touch: false, class_name: "TouchableSpec::Referenced::Floor"
+      belongs_to :entrance, touch: false, class_name: "TouchableSpec::Referenced::Entrance"
     end
 
     class Window
@@ -112,6 +116,7 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       belongs_to :floor, touch: true, class_name: "TouchableSpec::Referenced::Floor"
+      belongs_to :entrance, touch: true, class_name: "TouchableSpec::Referenced::Entrance"
     end
 
     class Keypad
