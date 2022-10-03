@@ -242,7 +242,7 @@ Field Type: Hash
 ----------------
 
 When using a field of type Hash, be wary of adhering to the
-`legal key names for mongoDB <http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>`_,
+`legal key names for mongoDB <https://www.mongodb.com/docs/manual/reference/limits/#naming-restrictions>`_,
 or else the values will not store properly.
 
 .. code-block:: ruby
