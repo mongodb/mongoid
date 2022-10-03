@@ -15,8 +15,8 @@ module Mongoid
           # @example Build the document.
           #   Builder.new(meta, attrs).build
           #
-          # @param [ Object ] base The object.
-          # @param [ Object ] object The parent hash or document.
+          # @param [ Document ] base The object.
+          # @param [ Document | Hash ] object The parent hash or document.
           # @param [ String ] type Not used in this context.
           # @param [ Hash ] selected_fields Fields which were retrieved via
           #   #only. If selected_fields are specified, fields not listed in it
