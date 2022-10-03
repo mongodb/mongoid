@@ -23,10 +23,10 @@ module Mongoid
       def touch(field = nil)
         return false if _root.new_record?
 
-        touches = __gather_touch_updates(Time.configured.now, field)
+        touches = _gather_touch_updates(Time.configured.now, field)
         _root.send(:persist_atomic_operations, '$set' => touches) if touches.present?
 
-        __run_touch_callbacks_from_root
+        _run_touch_callbacks_from_root
         true
       end
 
@@ -40,13 +40,13 @@ module Mongoid
       # @return [ Hash<String, Time> ] The touch operations to perform as an atomic $set.
       #
       # @api private
-      def __gather_touch_updates(now, field = nil)
+      def _gather_touch_updates(now, field = nil)
         field = database_field_name(field)
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
         write_attribute(field, now) if field
 
-        touches = __extract_touches_from_atomic_sets(field) || {}
-        touches.merge!(_parent.__gather_touch_updates(now) || {}) if __touchable_parent?
+        touches = _extract_touches_from_atomic_sets(field) || {}
+        touches.merge!(_parent._gather_touch_updates(now) || {}) if _touchable_parent?
         touches
       end
 
@@ -55,15 +55,15 @@ module Mongoid
       # child document.
       #
       # @api private
-      def __run_touch_callbacks_from_root
-        _parent.__run_touch_callbacks_from_root if __touchable_parent?
+      def _run_touch_callbacks_from_root
+        _parent._run_touch_callbacks_from_root if _touchable_parent?
         run_callbacks(:touch)
       end
 
       # Indicates whether the parent exists and is touchable.
       #
       # @api private
-      def __touchable_parent?
+      def _touchable_parent?
         _parent && _association&.inverse_association&.touchable?
       end
 
@@ -77,7 +77,7 @@ module Mongoid
       # @return [ Hash ] The field-value pairs to update atomically.
       #
       # @api private
-      def __extract_touches_from_atomic_sets(field = nil)
+      def _extract_touches_from_atomic_sets(field = nil)
         updates = atomic_updates['$set']
         return {} unless updates
 
