@@ -326,7 +326,7 @@ describe 'Mongoid application tests' do
   end
 
   def wait_for_port(port, timeout, process)
-    deadline = Utils.monotonic_time + timeout
+    deadline = Mongoid::Utils.monotonic_time + timeout
     loop do
       begin
         Socket.tcp('localhost', port, nil, nil, connect_timeout: 0.5) do |socket|
@@ -336,7 +336,7 @@ describe 'Mongoid application tests' do
         unless process.alive?
           raise "Process #{process} died while waiting for port #{port}"
         end
-        if Utils.monotonic_time > deadline
+        if Mongoid::Utils.monotonic_time > deadline
           raise
         end
       end
