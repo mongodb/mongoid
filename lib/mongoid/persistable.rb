@@ -161,6 +161,8 @@ module Mongoid
     # @param [ Object ] result The result of the operation.
     # @param [ Hash ] options The options.
     #
+    # @option options [ true | false ] :validate Whether or not to validate.
+    #
     # @return [ true ] true.
     def post_process_persist(result, options = {})
       post_persist unless result == false

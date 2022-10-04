@@ -283,7 +283,7 @@ module Mongoid
                     # The new value is a simple value.
                     # Transform the implicit equality to either $eq or $regexp
                     # depending on the type of the argument. See
-                    # https://docs.mongodb.com/manual/reference/operator/query/eq/#std-label-eq-usage-examples
+                    # https://www.mongodb.com/docs/manual/reference/operator/query/eq/#std-label-eq-usage-examples
                     # for the description of relevant server behavior.
                     op = case v
                     when Regexp, BSON::Regexp::Raw
