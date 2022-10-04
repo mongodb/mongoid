@@ -359,6 +359,43 @@ module Mongoid
       @running_with_passenger ||= defined?(PhusionPassenger)
     end
 
+    # Defines a field type mapping, for later use in field :type option.
+    #
+    # @example
+    #   Mongoid.configure do |config|
+    #     config.field_type :point, Point
+    #   end
+    #
+    # @param [ Symbol | String ] type_name The identifier of the
+    #   defined type. This identifier may be accessible as either a
+    #   Symbol or a String regardless of the type passed to this method.
+    # @param [ Module ] klass the class of the defined type, which must
+    #   include mongoize, demongoize, and evolve methods.
+    def field_type(type_name, klass)
+      Mongoid::Fields::FieldTypes.define_type(type_name, klass)
+    end
+
+    # Defines an option for the field macro, which runs the handler
+    # provided as a block.
+    #
+    # No assumptions are made about what functionality the handler might
+    # perform, so it will always be called if the `option_name` key is
+    # provided in the field definition -- even if it is false or nil.
+    #
+    # @example
+    #   Mongoid.configure do |config|
+    #     config.field_option :required do |model, field, value|
+    #       model.validates_presence_of field.name if value
+    #     end
+    #   end
+    #
+    # @param [ Symbol ] option_name the option name to match against
+    # @param [ Proc ] block the handler to execute when the option is
+    #   provided.
+    def field_option(option_name, &block)
+      Mongoid::Fields.option(option_name, &block)
+    end
+
     private
 
     def set_log_levels
