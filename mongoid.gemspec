@@ -41,6 +41,9 @@ Gem::Specification.new do |s|
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
   s.add_dependency("concurrent-ruby", ['>= 1.0.5', '<1.2'])
 
+  # The constraint on I18n gem can be removed when activemodel >= 6.1 is required.
+  s.add_dependency("i18n", '>=1.1')
+
   # The ruby2_keywords gem is recommended for handling argument delegation issues,
   # especially if support for 2.6 or prior is required.
   # See https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/#delegation

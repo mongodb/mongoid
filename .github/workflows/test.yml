@@ -238,26 +238,6 @@ jobs:
           i18n:
           gemfile: gemfiles/rails-5.2.gemfile
           experimental: false
-        - mongodb: '4.4'
-          ruby: ruby-2.6
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails:
-          i18n: '1.0'
-          gemfile: gemfiles/i18n-1.0.gemfile
-          experimental: false
-        - mongodb: '4.2'
-          ruby: ruby-2.6
-          topology: server
-          os: ubuntu-18.04
-          task: test
-          driver: current
-          rails:
-          i18n: '1.0'
-          gemfile: gemfiles/i18n-1.0.gemfile
-          experimental: false
         - mongodb: '4.2'
           ruby: ruby-2.6
           topology: server

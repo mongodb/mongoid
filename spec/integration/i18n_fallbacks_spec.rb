@@ -35,39 +35,12 @@ describe 'i18n fallbacks' do
     end
 
     context 'when translation is missing in all locales' do
-
-      context 'i18n >= 1.1' do
-
-        before(:all) do
-          unless Gem::Version.new(I18n::VERSION) >= Gem::Version.new('1.1')
-            skip "Test requires i18n >= 1.1, we have #{I18n::VERSION}"
-          end
-        end
-
-        it 'returns nil' do
-          product = Product.new
-          I18n.locale = :en
-          product.description = "Marvelous!"
-          I18n.locale = :ru
-          product.description.should be nil
-        end
-      end
-
-      context 'i18n 1.0' do
-
-        before(:all) do
-          unless Gem::Version.new(I18n::VERSION) < Gem::Version.new('1.1')
-            skip "Test requires i18n < 1.1, we have #{I18n::VERSION}"
-          end
-        end
-
-        it 'falls back on default locale' do
-          product = Product.new
-          I18n.locale = :en
-          product.description = "Marvelous!"
-          I18n.locale = :ru
-          product.description.should == 'Marvelous!'
-        end
+      it 'returns nil' do
+        product = Product.new
+        I18n.locale = :en
+        product.description = "Marvelous!"
+        I18n.locale = :ru
+        product.description.should be nil
       end
     end
   end

@@ -280,7 +280,6 @@ functions:
             RVM_RUBY="${RVM_RUBY}" \
             RAILS="${RAILS}" \
             DRIVER="${DRIVER}" \
-            I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             ./egos .evergreen/run-tests-docker.sh
 
@@ -528,16 +527,6 @@ axes:
         variables:
           RAILS: "7.0"
 
-  - id: "i18n"
-    display_name: I18n version
-    values:
-      - id: '1.0'
-        display_name: "i18n-1.0"
-        variables:
-           I18N: "1.0"
-      - id: current
-        display_name: "i18n-current"
-
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
     values:
@@ -709,18 +698,6 @@ buildvariants:
     rails: ['5.2']
     os: ubuntu-18.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
-- matrix_name: "i18n-1.0"
-  matrix_spec:
-    ruby: "ruby-2.6"
-    driver: ["current"]
-    mongodb-version: "4.4"
-    topology: "standalone"
-    i18n: '1.0'
-    os: ubuntu-18.04
-  display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
 

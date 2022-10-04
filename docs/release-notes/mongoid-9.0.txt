@@ -18,6 +18,17 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Require I18n version 1.1 or newer
+---------------------------------
+
+Mongoid 9.0 requires I18n gem version 1.1 or newer.
+
+Apps using earlier versions of Mongoid are also recommended to upgrade the I18n gem.
+In Mongoid 8 and earlier, `a bug <https://jira.mongodb.org/browse/MONGOID-5290>`_
+affected reading :ref:`localized field <localized-fields>` data from the database
+on `I18n gem <https://github.com/ruby-i18n/i18n>`_ versions 1.0 and earlier.
+
+
 Raise AttributeNotLoaded error when accessing fields omitted from query projection
 ----------------------------------------------------------------------------------
 
