@@ -18,7 +18,7 @@ module TouchableSpec
 
       field :last_used_at, type: Time
 
-      embedded_in :building, class_name: "TouchableSpec::Embedded::Building"
+      embedded_in :building, touch: false, class_name: "TouchableSpec::Embedded::Building"
 
       embeds_many :keypads, class_name: "TouchableSpec::Embedded::Keypad"
       embeds_many :cameras, class_name: "TouchableSpec::Embedded::Camera"
@@ -41,7 +41,7 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :entrance, class_name: "TouchableSpec::Embedded::Entrance"
+      embedded_in :entrance, touch: false, class_name: "TouchableSpec::Embedded::Entrance"
     end
 
     class Camera
@@ -55,7 +55,7 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :floor, class_name: "TouchableSpec::Embedded::Floor"
+      embedded_in :floor, touch: false, class_name: "TouchableSpec::Embedded::Floor"
     end
 
     class Sofa
@@ -123,7 +123,7 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :entrance, class_name: "TouchableSpec::Referenced::Entrance"
+      embedded_in :entrance, touch: false, class_name: "TouchableSpec::Referenced::Entrance"
     end
 
     class Camera
@@ -137,7 +137,7 @@ module TouchableSpec
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :floor, class_name: "TouchableSpec::Referenced::Floor"
+      embedded_in :floor, touch: false, class_name: "TouchableSpec::Referenced::Floor"
     end
 
     class Sofa

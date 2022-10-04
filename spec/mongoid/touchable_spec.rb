@@ -705,7 +705,8 @@ describe Mongoid::Touchable do
         before do
           entrance
           update_time
-          entrance.touch
+          entrance.reload # TODO: remove this after MONGOID-5504
+          entrance.send(meth)
         end
 
         it "updates the child's timestamp" do
