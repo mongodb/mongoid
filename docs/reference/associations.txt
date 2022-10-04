@@ -875,12 +875,14 @@ documents that exist in the application:
   band.tours.destroy_all
 
 
+.. _hash-assignment:
+
 Hash Assignment
 ---------------
 
 Embedded associations allow the user to assign a ``Hash`` instead of a document
-to an association. On assignment, this hash is coerced into the class of the
-document for the association that it's being assigned to. Take the following
+to an association. On assignment, this hash is coerced into a document of the
+class of the association that it's being assigned to. Take the following
 example:
 
 .. code:: ruby
