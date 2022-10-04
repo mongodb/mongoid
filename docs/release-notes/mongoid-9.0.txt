@@ -127,10 +127,6 @@ Bug Fixes and Improvements
 
 This section will be for smaller bug fixes and improvements:
 
-- With the ``map_big_decimal_to_decimal128`` flag set to false, ``demongoizing``
-  a non-numeric, non-string value that implements ``:to_d`` will return a string
-  rather than a ``BigDecimal``
-  `MONGOID-5507 <https://jira.mongodb.org/browse/MONGOID-5507>`_.
 - The ``.unscoped`` method now also clears scopes declared using ``.with_scope``
   `MONGOID-5214 <https://jira.mongodb.org/browse/MONGOID-5214>`_.
 - When evolving a ``String`` to a ``BigDecimal`` (i.e. when querying a
@@ -148,3 +144,7 @@ This section will be for smaller bug fixes and improvements:
   `MONGOID-5334 <https://jira.mongodb.org/browse/MONGOID-5334>`_.
 - Added index wildcard option
   `MONGOID-5388 <https://jira.mongodb.org/browse/MONGOID-5388>`_.
+- With the ``map_big_decimal_to_decimal128`` flag set to false, ``demongoizing``
+  a non-numeric, non-string value that implements ``:to_d`` will return a string
+  rather than a ``BigDecimal``
+  `MONGOID-5507 <https://jira.mongodb.org/browse/MONGOID-5507>`_.
