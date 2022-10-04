@@ -906,6 +906,7 @@ example:
 This works for ``embeds_one``, ``embeds_many``, and ``embedded_in`` associations.
 Note that you cannot assign hashes to referenced associations.
 
+
 Common Behavior
 ===============
 
