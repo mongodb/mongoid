@@ -640,7 +640,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
 
     it "creates the objects correctly" do
       expect(building_address.building).to be_a(Building)
-      expect(building_address.building.name).to eq("Empire Station")
+      expect(building_address.building.name).to eq("Empire State")
     end
   end
 end
