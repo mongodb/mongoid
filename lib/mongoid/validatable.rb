@@ -44,6 +44,8 @@ module Mongoid
     #
     # @param [ Hash ] options The options to check.
     #
+    # @option options [ true | false ] :validate Whether or not to validate.
+    #
     # @return [ true | false ] If we are validating.
     def performing_validations?(options = {})
       options[:validate].nil? ? true : options[:validate]
