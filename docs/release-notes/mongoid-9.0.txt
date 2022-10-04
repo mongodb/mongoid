@@ -75,6 +75,40 @@ persistence operations was already correctly using the
 ``Mongoid.use_activesupport_time_zone`` setting.
 
 
+```#touch`` method on embedded documents correctly handles ``touch: false`` option
+----------------------------------------------------------------------------------
+
+When the ``touch: false`` option is set on an ``embedded_in`` relation,
+calling the ``#touch`` method on an embedded child document will not
+invoke ``#touch`` on its parent document.
+
+.. code-block:: ruby
+
+  class Address
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embedded_in :mall, touch: false
+  end
+
+  class Mall
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embeds_many :addresses
+  end
+
+  mall = Mall.create!
+  address = mall.addresses.create!
+
+  address.touch
+  #=> updates address.updated_at but not mall.updated_at
+
+In addition, the ``#touch`` method has been optimized to perform one
+persistence operation per parent document, even when using multiple
+levels of nested embedded documents.
+
+
 Flipped default for ``:replace`` option in ``#upsert``
 ------------------------------------------------------
 
