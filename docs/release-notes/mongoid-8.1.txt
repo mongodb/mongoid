@@ -300,3 +300,44 @@ An _id, a hash of conditions, or ``false``/``nil`` can now be included:
   Band.exists?(BSON::ObjectId('6320d96a3282a48cfce9e72c'))
   Band.exists?(false) # always false
   Band.exists?(nil) # always false
+
+
+Added ``:replace`` option to ``#upsert``
+----------------------------------------
+
+Mongoid 8.1 adds the ``:replace`` option to the ``#upsert`` method. This option
+is ``false`` by default.
+
+In Mongoid 8 and earlier, and in Mongoid 8.1 when passing ``replace: true``
+(the default) the upserted document will overwrite the current document in the
+database if it exists. Consider the following example:
+
+.. code:: ruby
+
+  existing = Player.create!(name: "Juan Soto", age: 23, team: "WAS")
+
+  player = Player.new(name: "Juan Soto", team: "SD")
+  player.id = existing.id
+  player.upsert # :replace defaults to true in 8.1
+
+  p Player.find(existing.id)
+  # => <Player _id: 633b42f43282a45fadfaaf9d, name: "Juan Soto", age: nil, team: "SD">
+
+As you can see, the value for the ``:age`` field was dropped, because the
+upsert replaced the entire document instead of just updating it. If we take the
+same example and set ``:replace`` to ``false``, however:
+
+.. code:: ruby
+
+  player.upsert(replace: false)
+
+  p Player.find(existing.id)
+  # => <Player _id: 633b42f43282a45fadfaaf9d, name: "Juan Soto", age: 23, team: "SD">
+
+This time, the value for the ``:age`` field is maintained.
+
+.. note::
+
+  The default for the ``:replace`` option will be changed to ``false`` in
+  Mongoid 9.0, therefore it is recommended to explicitly specify this option
+  while using ``#upsert`` in 8.1 for easier upgradability.
