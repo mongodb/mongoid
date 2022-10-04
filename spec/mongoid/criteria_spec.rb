@@ -2864,6 +2864,17 @@ describe Mongoid::Criteria do
           expect(selector['ratable_id']).to eq(movie.id)
         end
       end
+
+      context "when querying an embedded document with aliases" do
+
+        let(:criteria) do
+          Person.where("phones.extension" => "123")
+        end
+
+        it "expands the aliases" do
+          expect(criteria.selector).to eq("mobile_phones.ext" => "123")
+        end
+      end
     end
 
     context 'when given multiple keys in separate calls' do
