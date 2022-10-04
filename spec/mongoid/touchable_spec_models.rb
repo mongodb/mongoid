@@ -10,6 +10,7 @@ module TouchableSpec
 
       embeds_many :entrances, class_name: "TouchableSpec::Embedded::Entrance"
       embeds_many :floors, class_name: "TouchableSpec::Embedded::Floor"
+      embeds_many :desks, class_name: "TouchableSpec::Embedded::Desk"
     end
 
     class Entrance
@@ -36,6 +37,15 @@ module TouchableSpec
 
       embeds_many :chairs, class_name: "TouchableSpec::Embedded::Chair"
       embeds_many :sofas, class_name: "TouchableSpec::Embedded::Sofa"
+    end
+
+    class Desk
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      field :height, type: Integer
+
+      embedded_in :building, class_name: "TouchableSpec::Embedded::Building"
     end
 
     class Keypad
@@ -74,6 +84,7 @@ module TouchableSpec
 
       has_many :entrances, inverse_of: :building, class_name: "TouchableSpec::Referenced::Entrance"
       has_many :floors, inverse_of: :building, class_name: "TouchableSpec::Referenced::Floor"
+      has_many :desks, inverse_of: :building, class_name: "TouchableSpec::Referenced::Desk"
     end
 
     class Entrance
@@ -104,6 +115,15 @@ module TouchableSpec
 
       has_many :plants, class_name: "TouchableSpec::Referenced::Plant"
       has_many :windows, class_name: "TouchableSpec::Referenced::Window"
+    end
+
+    class Desk
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      field :height, type: Integer
+
+      belongs_to :building, class_name: "TouchableSpec::Referenced::Building"
     end
 
     class Plant

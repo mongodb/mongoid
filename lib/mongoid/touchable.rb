@@ -133,10 +133,10 @@ module Mongoid
     # @return [ Symbol ] The method name.
     def define_relation_touch_method(name, association)
       relation_classes = if association.polymorphic?
-                           association.send(:inverse_association_classes)
-                         else
-                           [ association.relation_class ]
-                         end
+        association.send(:inverse_association_classes)
+      else
+        [ association.relation_class ]
+      end
 
       relation_classes.each { |c| c.send(:include, InstanceMethods) }
       method_name = "touch_#{name}_after_create_or_destroy"

@@ -42,6 +42,10 @@ describe Mongoid::Touchable do
         building.floors.create!
       end
 
+      let(:desk) do
+        building.desks.create!
+      end
+
       let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
       let(:update_time) do
@@ -107,8 +111,40 @@ describe Mongoid::Touchable do
         end
       end
 
+      shared_examples 'updates the parent when :touch is not set' do
+        it 'updates updated_at on parent' do
+          desk
+          update_time
+          desk.touch
+
+          expect(building.updated_at).to eq(update_time)
+        end
+
+        it 'persists updated updated_at on parent' do
+          desk
+          update_time
+          desk.touch
+
+          expect(building.reload.updated_at).to eq(update_time)
+        end
+      end
+
       shared_examples 'does not update the parent when :touch is not set' do
-        it_behaves_like 'does not update the parent when :touch is false'
+        it 'does not update updated_at on parent' do
+          desk
+          update_time
+          desk.touch
+
+          expect(building.updated_at).to eq(start_time)
+        end
+
+        it 'does not persist updated updated_at on parent' do
+          desk
+          update_time
+          desk.touch
+
+          expect(building.reload.updated_at).to eq(start_time)
+        end
       end
 
       context "when the document is embedded" do
@@ -116,7 +152,8 @@ describe Mongoid::Touchable do
 
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
-        include_examples 'does not update the parent when :touch is not set'
+        include_examples 'does not update the parent when :touch is false'
+        include_examples 'updates the parent when :touch is not set'
 
         context 'when also updating an additional field when :touch is true' do
           it 'persists the update to the additional field' do
@@ -161,6 +198,7 @@ describe Mongoid::Touchable do
         include_examples 'updates the child'
         include_examples 'updates the parent when :touch is true'
         include_examples 'does not update the parent when :touch is false'
+        include_examples 'does not update the parent when :touch is not set'
       end
     end
 
@@ -660,8 +698,8 @@ describe Mongoid::Touchable do
         end
 
         it "updates the child's timestamp" do
-          floor.updated_at.should == update_time
-          floor.reload.updated_at.should == update_time
+          expect(floor.updated_at).to eq(update_time)
+          expect(floor.reload.updated_at).to eq(update_time)
         end
       end
 
@@ -737,6 +775,101 @@ describe Mongoid::Touchable do
           let(:parent_cls) { TouchableSpec::Embedded::Building }
 
           include_examples "does not update the parent"
+        end
+      end
+    end
+
+    context "when the touch option is not set" do
+
+      shared_examples "does not update the parent" do
+        let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+        let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+        after do
+          Timecop.return
+        end
+
+        let(:building) do
+          parent_cls.create!
+        end
+
+        let(:desk) do
+          building.desks.create!
+        end
+
+        before do
+          desk
+          update_time
+          desk.height = 1
+          desk.send(meth)
+        end
+
+        it "updates the child's timestamp" do
+          if desk.destroyed?
+            expect(desk.updated_at).to eq(start_time)
+          else
+            expect(desk.updated_at).to eq(update_time)
+            expect(desk.reload.updated_at).to eq(update_time)
+          end
+        end
+
+        it "does not update the parent's timestamp" do
+          expect(building.updated_at).to eq(start_time)
+          expect(building.reload.updated_at).to eq(start_time)
+        end
+      end
+
+      shared_examples "updates the parent" do
+        let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+        let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+        after do
+          Timecop.return
+        end
+
+        let(:building) do
+          parent_cls.create!
+        end
+
+        let(:desk) do
+          building.desks.create!
+        end
+
+        before do
+          desk
+          update_time
+          desk.height = 1
+          desk.send(meth)
+        end
+
+        it "updates the child's timestamp" do
+          if desk.destroyed?
+            expect(desk.updated_at).to eq(start_time)
+          else
+            expect(desk.updated_at).to eq(update_time)
+            expect(desk.reload.updated_at).to eq(update_time)
+          end
+        end
+
+        it "updates the parent's timestamp" do
+          expect(building.updated_at).to eq(update_time)
+          expect(building.reload.updated_at).to eq(update_time)
+        end
+      end
+
+      [ :save!, :destroy, :touch].each do |meth|
+        context "with #{meth} on belongs_to" do
+          let(:meth) { meth }
+          let(:parent_cls) { TouchableSpec::Referenced::Building }
+
+          include_examples "does not update the parent"
+        end
+
+        context "with #{meth} on embedded_in" do
+          let(:meth) { meth }
+          let(:parent_cls) { TouchableSpec::Embedded::Building }
+
+          include_examples "updates the parent"
         end
       end
     end

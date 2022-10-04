@@ -120,7 +120,7 @@ module Mongoid
       #
       # @api private
       def touchable?
-        !!@options[:touch]
+        embedded? ? @options.fetch(:touch, true) : !!@options[:touch]
       end
     end
   end
