@@ -104,7 +104,7 @@ invoke ``#touch`` on its parent document.
   address.touch
   #=> updates address.updated_at but not mall.updated_at
 
-In addition, the ``#touch`` method has been optimized perform one
+In addition, the ``#touch`` method has been optimized to perform one
 persistence operation per parent document, even when using multiple
 levels of nested embedded documents.
 
