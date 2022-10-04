@@ -17,6 +17,7 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       field :last_used_at, type: Time
+      field :level, type: Integer
 
       embedded_in :building, touch: false, class_name: "TouchableSpec::Embedded::Building"
 
@@ -78,6 +79,8 @@ module TouchableSpec
     class Entrance
       include Mongoid::Document
       include Mongoid::Timestamps
+
+      field :level, type: Integer
 
       belongs_to :building, touch: false, class_name: "TouchableSpec::Referenced::Building"
 

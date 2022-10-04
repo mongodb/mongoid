@@ -58,7 +58,7 @@ describe Mongoid::Touchable do
           update_time
           entrance.touch
 
-          expect(entrance.updated_at).to eq update_time
+          expect(entrance.updated_at).to eq(update_time)
         end
 
         it "persists the changes" do
@@ -66,7 +66,7 @@ describe Mongoid::Touchable do
           update_time
           entrance.touch
 
-          expect(entrance.reload.updated_at).to eq update_time
+          expect(entrance.reload.updated_at).to eq(update_time)
         end
       end
 
@@ -77,7 +77,7 @@ describe Mongoid::Touchable do
           update_time
           floor.touch
 
-          expect(building.updated_at).to eq update_time
+          expect(building.updated_at).to eq(update_time)
         end
 
         it 'persists updated updated_at on parent' do
@@ -85,7 +85,7 @@ describe Mongoid::Touchable do
           update_time
           floor.touch
 
-          expect(building.reload.updated_at).to eq update_time
+          expect(building.reload.updated_at).to eq(update_time)
         end
       end
 
@@ -95,7 +95,7 @@ describe Mongoid::Touchable do
           update_time
           entrance.touch
 
-          expect(building.updated_at).to eq start_time
+          expect(building.updated_at).to eq(start_time)
         end
 
         it 'does not persist updated updated_at on parent' do
@@ -103,7 +103,7 @@ describe Mongoid::Touchable do
           update_time
           entrance.touch
 
-          expect(building.reload.updated_at).to eq start_time
+          expect(building.reload.updated_at).to eq(start_time)
         end
       end
 
@@ -128,11 +128,11 @@ describe Mongoid::Touchable do
             building.reload
 
             # This is the assertion we want.
-            expect(entrance.last_used_at).to eq update_time
+            expect(entrance.last_used_at).to eq(update_time)
 
             # Check other timestamps for good measure.
-            expect(entrance.updated_at).to eq update_time
-            expect(building.updated_at).to eq start_time
+            expect(entrance.updated_at).to eq(update_time)
+            expect(building.updated_at).to eq(start_time)
           end
         end
 
@@ -146,11 +146,11 @@ describe Mongoid::Touchable do
             building.reload
 
             # This is the assertion we want.
-            expect(floor.last_used_at).to eq update_time
+            expect(floor.last_used_at).to eq(update_time)
 
             # Check other timestamps for good measure.
-            expect(floor.updated_at).to eq update_time
-            expect(building.updated_at).to eq update_time
+            expect(floor.updated_at).to eq(update_time)
+            expect(building.updated_at).to eq(update_time)
           end
         end
       end
@@ -623,8 +623,8 @@ describe Mongoid::Touchable do
         end
 
         it "updates the parent's timestamp" do
-          expect(building.updated_at).to eq update_time
-          expect(building.reload.updated_at).to eq update_time
+          expect(building.updated_at).to eq(update_time)
+          expect(building.reload.updated_at).to eq(update_time)
         end
       end
 
@@ -705,18 +705,22 @@ describe Mongoid::Touchable do
         before do
           entrance
           update_time
-          entrance.reload # TODO: remove this after MONGOID-5504
+          entrance.level = 1
           entrance.send(meth)
         end
 
         it "updates the child's timestamp" do
-          expect(entrance.updated_at).to eq update_time
-          expect(entrance.reload.updated_at).to eq update_time
+          if entrance.destroyed?
+            expect(entrance.updated_at).to eq(start_time)
+          else
+            expect(entrance.updated_at).to eq(update_time)
+            expect(entrance.reload.updated_at).to eq(update_time)
+          end
         end
 
         it "does not update the parent's timestamp" do
-          expect(building.updated_at).to eq start_time
-          expect(building.reload.updated_at).to eq start_time
+          expect(building.updated_at).to eq(start_time)
+          expect(building.reload.updated_at).to eq(start_time)
         end
       end
 
@@ -767,47 +771,47 @@ describe Mongoid::Touchable do
 
       shared_examples "updates the parent" do
         it "updates the parent's timestamp" do
-          expect(parent.updated_at).to eq update_time
-          expect(parent.reload.updated_at).to eq update_time
+          expect(parent.updated_at).to eq(update_time)
+          expect(parent.reload.updated_at).to eq(update_time)
         end
       end
 
       shared_examples "does not update the parent" do
         it "does not update the parent's timestamp" do
-          expect(parent.updated_at).to eq start_time
-          expect(parent.reload.updated_at).to eq start_time
+          expect(parent.updated_at).to eq(start_time)
+          expect(parent.reload.updated_at).to eq(start_time)
         end
       end
 
       shared_examples "updates the child" do
         it "updates the child's timestamp" do
-          expect(child.updated_at).to eq update_time
-          expect(child.reload.updated_at).to eq update_time
+          expect(child.updated_at).to eq(update_time)
+          expect(child.reload.updated_at).to eq(update_time)
         end
       end
 
       shared_examples "does not update the child" do
         it "does not update the child's timestamp" do
-          expect(child.updated_at).to eq start_time
-          expect(child.reload.updated_at).to eq start_time
+          expect(child.updated_at).to eq(start_time)
+          expect(child.reload.updated_at).to eq(start_time)
         end
       end
 
       shared_examples "updates the grandchild" do
         it "updates the grandchild's timestamp" do
           if grandchild.destroyed?
-            expect(grandchild.updated_at).to eq start_time
+            expect(grandchild.updated_at).to eq(start_time)
           else
-            expect(grandchild.updated_at).to eq update_time
-            expect(grandchild.reload.updated_at).to eq update_time
+            expect(grandchild.updated_at).to eq(update_time)
+            expect(grandchild.reload.updated_at).to eq(update_time)
           end
         end
       end
 
       shared_examples "does not update the grandchild" do
         it "does not update the grandchild's timestamp" do
-          expect(grandchild.updated_at).to eq start_time
-          expect(grandchild.reload.updated_at).to eq start_time unless grandchild.destroyed?
+          expect(grandchild.updated_at).to eq(start_time)
+          expect(grandchild.reload.updated_at).to eq(start_time) unless grandchild.destroyed?
         end
       end
 
