@@ -274,7 +274,7 @@ module Mongoid
       # @param [ Proc ] &block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator, Memory ] An enumerator, or the context
+      # @return [ Enumerator | Memory ] An enumerator, or the context
       #   if a block was given.
       def pluck_each(*fields, &block)
         enum = pluck(*fields).each(&block)

@@ -366,10 +366,10 @@ module Mongoid
       #
       # @param [ [ String | Symbol ]... ] *fields Field(s) to pluck,
       #   which may include nested fields using dot-notation.
-      # @param [ Proc ] block The block to call once for each plucked
+      # @param [ Proc ] &block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator, Mongo ] The enumerator, or the context
+      # @return [ Enumerator | Mongo ] The enumerator, or the context
       #   if a block was given.
       def pluck_each(*fields, &block)
         enum = PluckEnumerator.new(klass, view, fields).each(&block)

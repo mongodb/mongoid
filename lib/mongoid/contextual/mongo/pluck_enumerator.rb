@@ -19,7 +19,7 @@ module Mongoid
         #
         # @param [ Class ] klass The base of the binding.
         # @param [ Mongo::Collection::View ] view The Mongo view context.
-        # @param [ String, Symbol ] *fields Field(s) to pluck,
+        # @param [ String | Symbol ] *fields Field(s) to pluck,
         #   which may include nested fields using dot-notation.
         def initialize(klass, view, fields)
           @klass = klass
@@ -37,10 +37,10 @@ module Mongoid
         # @example Iterate through the plucked values from the database.
         #   context.pluck_each(:name) { |name| puts name }
         #
-        # @param [ Proc ] block The block to call once for each plucked
+        # @param [ Proc ] &block The block to call once for each plucked
         #   result.
         #
-        # @return [ Enumerator, PluckEnumerator ] The enumerator, or
+        # @return [ Enumerator | PluckEnumerator ] The enumerator, or
         #   self if a block was given.
         def each(&block)
           return to_enum unless block_given?

@@ -110,10 +110,10 @@ module Mongoid
       #   context.pluck_each(:name) { |name| puts name }
       #
       # @param [ [ String | Symbol ]... ] *_fields Field(s) to pluck.
-      # @param [ Proc ] block The block which will not be called
+      # @param [ Proc ] &block The block which will not be called
       #   due to null context.
       #
-      # @return [ Enumerator, None ] An enumerator, or the context
+      # @return [ Enumerator | None ] An enumerator, or the context
       #   if a block was given.
       def pluck_each(*_fields, &block)
         enum = pluck(*_fields).each(&block)
