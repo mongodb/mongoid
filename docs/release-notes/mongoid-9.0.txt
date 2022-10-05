@@ -120,3 +120,32 @@ Mongoid 9.0 flips the default of this flag from ``true`` => ``false``.
 
 This means that, by default, Mongoid 9 will update the existing document and
 will not replace it.
+
+
+``Criteria#pluck_each`` Method Added
+----------------------------------------
+
+The newly introduced ``Criteria#pluck_each`` method returns
+an Enumerator for the results of ``pluck``, or if a block is given,
+calls the block once for each pluck result in a progressively-loaded
+fashion.
+
+Previously, calling ``criteria.pluck(:name).each`` would load the
+entire result set into Ruby's memory before iterating over the results.
+In contrast, ``criteria.pluck_each(:name)`` uses the `MongoDB getMore command
+<https://mongodb.com/docs/manual/reference/command/getMore/>`_
+to load results in batches, similar to how ``criteria.each`` behaves.
+This is useful for working with large query results.
+
+The method arguments and behavior of ``pluck_each`` are otherwise
+identical to ``pluck``.
+
+.. code-block:: ruby
+
+  Band.all.pluck_each(:name, 'address.city', :founded) do |name, city, founded|
+    puts "#{name} from #{city} started in #{founded}"
+  end
+  # =>
+  # The Rolling Stones from London started in 1962
+  # The Beatles from Liverpool started in 1960
+  # The Monkees from Los Angeles started in 1966

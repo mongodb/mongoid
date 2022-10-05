@@ -2290,6 +2290,611 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#pluck_each" do
+
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 3)
+    end
+
+    let!(:photek) do
+      Band.create!(name: "Photek", likes: 1)
+    end
+
+    let(:maniacs) do
+      Band.create!(name: "10,000 Maniacs", likes: 1, sales: "1E2")
+    end
+
+    context "when block given" do
+
+      let!(:plucked_values) { [] }
+
+      let!(:plucked) do
+        Band.pluck_each(:name) { |value| plucked_values << value }
+      end
+
+      it "returns the context" do
+        expect(plucked).to be_a Mongoid::Contextual::Mongo
+      end
+
+      it "yields values to the block" do
+        expect(plucked_values).to eq([ "Depeche Mode", "Tool", "Photek" ])
+      end
+    end
+
+    context "when block not given" do
+
+      let!(:plucked) do
+        Band.pluck_each(:name)
+      end
+
+      it "returns an Enumerator" do
+        expect(plucked).to be_an Enumerator
+      end
+
+      it "can yield the values" do
+        expect(plucked.map { |value| value }).to eq([ "Depeche Mode", "Tool", "Photek" ])
+      end
+    end
+
+    context "when the field is aliased" do
+
+      let!(:expensive) do
+        Product.create!(price: 100000)
+      end
+
+      let!(:cheap) do
+        Product.create!(price: 1)
+      end
+
+      context "when using alias_attribute" do
+
+        let!(:plucked) { [] }
+        let!(:pluck_each) { Product.pluck_each(:price) { |v| plucked << v } }
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "uses the aliases" do
+            expect(plucked).to eq([ 100000, 1 ])
+          end
+        end
+      end
+    end
+
+    context "when the criteria matches" do
+
+      context "when there are no duplicate values" do
+
+        let(:criteria) do
+          Band.where(:name.exists => true)
+        end
+
+        let!(:plucked) { [] }
+        let!(:pluck_each) { criteria.pluck_each(:name) { |v| plucked << v } }
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the values" do
+            expect(plucked).to contain_exactly("Depeche Mode", "Tool", "Photek")
+          end
+        end
+
+        context "when subsequently executing the criteria without a pluck" do
+
+          with_config_values :legacy_pluck_distinct, true, false do
+            it "does not limit the fields" do
+              expect(criteria.first.likes).to eq(3)
+            end
+          end
+        end
+
+        context 'when the field is a subdocument' do
+
+          let(:criteria) do
+            Band.where(name: 'FKA Twigs')
+          end
+
+          context 'when a top-level field and a subdocument field are plucked' do
+            before do
+              Band.create!(name: 'FKA Twigs')
+              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+            end
+
+            context "when legacy_pluck_distinct is set" do
+              config_override :legacy_pluck_distinct, true
+              let(:expected) do
+                [
+                  ["FKA Twigs", nil],
+                  ['FKA Twigs', [{ "name" => "LP1" }]]
+                ]
+              end
+
+              it 'returns the list of top-level field and subdocument values' do
+                plucked = []
+                criteria.pluck_each(:name, 'records.name') { |v| plucked << v }
+                expect(plucked).to eq(expected)
+              end
+            end
+
+            context "when legacy_pluck_distinct is not set" do
+              config_override :legacy_pluck_distinct, false
+              let(:expected) do
+                [
+                  ["FKA Twigs", nil],
+                  ['FKA Twigs', ["LP1"]]
+                ]
+              end
+
+              it 'returns the list of top-level field and subdocument values' do
+                plucked = []
+                criteria.pluck_each(:name, 'records.name') { |v| plucked << v }
+                expect(plucked).to eq(expected)
+              end
+            end
+          end
+
+          context 'when only a subdocument field is plucked' do
+
+            before do
+              Band.create!(name: 'FKA Twigs')
+              Band.create!(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+            end
+
+            context "when legacy_pluck_distinct is set" do
+              config_override :legacy_pluck_distinct, true
+              let(:expected) do
+                [
+                  nil,
+                  [{ "name" => "LP1" }]
+                ]
+              end
+
+              it 'returns the list of subdocument values' do
+                plucked = []
+                criteria.pluck_each('records.name') { |v| plucked << v }
+                expect(plucked).to eq(expected)
+              end
+            end
+
+            context "when legacy_pluck_distinct is not set" do
+              config_override :legacy_pluck_distinct, false
+              let(:expected) do
+                [
+                  nil,
+                  ["LP1"]
+                ]
+              end
+
+              it 'returns the list of subdocument values' do
+                plucked = []
+                criteria.pluck_each('records.name') { |v| plucked << v }
+                expect(plucked).to eq(expected)
+              end
+            end
+          end
+        end
+      end
+
+      context "when plucking multi-fields" do
+
+        let!(:plucked) { [] }
+        let!(:pluck_each) { Band.where(:name.exists => true).pluck_each(:name, :likes) { |v| plucked << v } }
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the values" do
+            expect(plucked).to contain_exactly(["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
+          end
+        end
+      end
+
+      context "when there are duplicate values" do
+
+        let!(:plucked) { [] }
+        let!(:pluck_each) { Band.where(:name.exists => true).pluck_each(:likes) { |v| plucked << v } }
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns the duplicates" do
+            expect(plucked).to contain_exactly(3, 3, 1)
+          end
+        end
+      end
+    end
+
+    context "when the criteria does not match" do
+
+      let!(:plucked) { [] }
+      let!(:pluck_each) { Band.where(name: "New Order").pluck_each(:_id) { |v| plucked << v } }
+
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns an empty array" do
+          expect(plucked).to be_empty
+        end
+      end
+    end
+
+    context "when plucking an aliased field" do
+
+      let!(:plucked) { [] }
+      let!(:pluck_each) { Band.all.pluck_each(:id) { |v| plucked << v } }
+
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns the field values" do
+          expect(plucked).to eq([ depeche.id, tool.id, photek.id ])
+        end
+      end
+    end
+
+    context "when plucking existent and non-existent fields" do
+
+      let!(:plucked) { [] }
+      let!(:pluck_each) { Band.all.pluck_each(:id, :fooz) { |v| plucked << v } }
+
+      with_config_values :legacy_pluck_distinct, true, false do
+        it "returns nil for the field that doesnt exist" do
+          expect(plucked).to eq([[depeche.id, nil], [tool.id, nil], [photek.id, nil] ])
+        end
+      end
+    end
+
+    context "when plucking a field that doesnt exist" do
+
+      context "when pluck one field" do
+
+        let!(:plucked) { [] }
+        let!(:pluck_each) { Band.all.pluck_each(:foo) { |v| plucked << v } }
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns a array with nil values" do
+            expect(plucked).to eq([nil, nil, nil])
+          end
+        end
+      end
+
+      context "when pluck multiple fields" do
+
+        let!(:plucked) { [] }
+        let!(:pluck_each) { Band.all.pluck_each(:foo, :bar) { |v| plucked << v } }
+
+        with_config_values :legacy_pluck_distinct, true, false do
+          it "returns a nil arrays" do
+            expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
+          end
+        end
+      end
+    end
+
+    context 'when plucking a localized field' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create!(description: 'english-text')
+        I18n.locale = :de
+        d.description = 'deutsch-text'
+        d.save!
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      context 'when plucking the entire field' do
+
+        let!(:plucked) { [] }
+        let!(:plucked_translations) { [] }
+        let!(:plucked_translations_both) { [] }
+
+        let!(:pluck_each) do
+          Dictionary.all.pluck_each(:description) { |v| plucked << v }
+        end
+
+        let!(:pluck_each_translations) do
+          Dictionary.all.pluck_each(:description_translations) { |v| plucked_translations << v }
+        end
+
+        let!(:pluck_each_translations_both) do
+          Dictionary.all.pluck_each(:description_translations, :description) { |v| plucked_translations_both << v }
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the non-demongoized translations' do
+            expect(plucked.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+
+          it 'returns nil' do
+            expect(plucked_translations.first).to eq(nil)
+          end
+
+          it 'returns nil for _translations' do
+            expect(plucked_translations_both.first).to eq([nil, {"de"=>"deutsch-text", "en"=>"english-text"}])
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the demongoized translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+
+          it 'returns the full translations hash to _translations' do
+            expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+          end
+
+          it 'returns both' do
+            expect(plucked_translations_both.first).to eq([{"de"=>"deutsch-text", "en"=>"english-text"}, "deutsch-text"])
+          end
+        end
+      end
+
+      context 'when plucking a specific locale' do
+
+        let(:plucked) do
+          Dictionary.all.pluck_each(:'description.de')
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq({'de' => 'deutsch-text'})
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+      end
+
+      context 'when plucking a specific locale from _translations field' do
+
+        let(:plucked) do
+          Dictionary.all.pluck_each(:'description_translations.de')
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq(nil)
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+      end
+
+      context 'when fallbacks are enabled with a locale list' do
+        require_fallbacks
+
+        around(:all) do |example|
+          prev_fallbacks = I18n.fallbacks.dup
+          I18n.fallbacks[:he] = [ :en ]
+          example.run
+          I18n.fallbacks = prev_fallbacks
+        end
+
+        let(:plucked) do
+          Dictionary.all.pluck_each(:description).first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "does not correctly use the fallback" do
+            plucked.should == {"de"=>"deutsch-text", "en"=>"english-text"}
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "correctly uses the fallback" do
+            I18n.locale = :en
+            d = Dictionary.create!(description: 'english-text')
+            I18n.locale = :he
+            plucked.should == "english-text"
+          end
+        end
+      end
+
+      context "when the localized field is embedded" do
+        before do
+          p = Passport.new
+          I18n.locale = :en
+          p.name = "Neil"
+          I18n.locale = :he
+          p.name = "Nissim"
+
+          Person.create!(passport: p, employer_id: 12345)
+        end
+
+        let(:plucked) do
+          Person.where(employer_id: 12345).pluck_each("pass.name").first
+        end
+
+        let(:plucked_translations) do
+          Person.where(employer_id: 12345).pluck_each("pass.name_translations").first
+        end
+
+        let(:plucked_translations_field) do
+          Person.where(employer_id: 12345).pluck_each("pass.name_translations.en").first
+        end
+
+        context "when legacy_pluck_distinct is set" do
+          config_override :legacy_pluck_distinct, true
+
+          it "returns the full hash embedded" do
+            expect(plucked).to eq({ "name" => { "en" => "Neil", "he" => "Nissim" } })
+          end
+
+          it "returns the empty hash" do
+            expect(plucked_translations).to eq({})
+          end
+
+          it "returns the empty hash" do
+            expect(plucked_translations_field).to eq({})
+          end
+        end
+
+        context "when legacy_pluck_distinct is not set" do
+          config_override :legacy_pluck_distinct, false
+
+          it "returns the translation for the current locale" do
+            expect(plucked).to eq("Nissim")
+          end
+
+          it "returns the full _translation hash" do
+            expect(plucked_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+          end
+
+          it "returns the translation for the requested locale" do
+            expect(plucked_translations_field).to eq("Neil")
+          end
+        end
+      end
+    end
+
+    context 'when plucking a field to be demongoized' do
+
+      let(:plucked) do
+        Band.where(name: maniacs.name).pluck_each(:sales)
+      end
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+
+        context 'when value is stored as string' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          it "does not demongoize the field" do
+            expect(plucked.first).to be_a(String)
+            expect(plucked.first).to eq("1E2")
+          end
+        end
+
+        context 'when value is stored as decimal128' do
+          config_override :map_big_decimal_to_decimal128, true
+          max_bson_version '4.99.99'
+
+          it "does not demongoize the field" do
+            expect(plucked.first).to be_a(BSON::Decimal128)
+            expect(plucked.first).to eq(BSON::Decimal128.new("1E2"))
+          end
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        context 'when value is stored as string' do
+          config_override :map_big_decimal_to_decimal128, false
+
+          it "demongoizes the field" do
+            expect(plucked.first).to be_a(BigDecimal)
+            expect(plucked.first).to eq(BigDecimal("1E2"))
+          end
+        end
+
+        context 'when value is stored as decimal128' do
+          config_override :map_big_decimal_to_decimal128, true
+
+          it "demongoizes the field" do
+            expect(plucked.first).to be_a(BigDecimal)
+            expect(plucked.first).to eq(BigDecimal("1E2"))
+          end
+        end
+      end
+    end
+
+    context "when plucking an embedded field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(label: label) }
+
+      let!(:plucked) { [] }
+      let!(:pluck_each) { Band.where(_id: band.id).pluck_each("label.sales") { |v| plucked << v } }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+        config_override :map_big_decimal_to_decimal128, true
+        max_bson_version '4.99.99'
+
+        it "returns a hash with a non-demongoized field" do
+          expect(plucked.first).to eq({ 'sales' => BSON::Decimal128.new('1E+2') })
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "demongoizes the field" do
+          expect(plucked.first).to eq(BigDecimal("1E2"))
+        end
+      end
+    end
+
+    context "when plucking an embeds_many field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(labels: [label]) }
+
+      let!(:plucked) { [] }
+      let!(:pluck_each) { Band.where(_id: band.id).pluck_each("labels.sales") { |v| plucked << v } }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+        config_override :map_big_decimal_to_decimal128, true
+        max_bson_version '4.99.99'
+
+        it "returns a hash with a non-demongoized field" do
+          expect(plucked.first).to eq([{ 'sales' => BSON::Decimal128.new('1E+2') }])
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "demongoizes the field" do
+          expect(plucked.first).to eq([BigDecimal("1E2")])
+        end
+      end
+    end
+
+    context "when plucking a nonexistent embedded field" do
+      let(:label) { Label.new(sales: "1E2") }
+      let!(:band) { Band.create!(label: label) }
+
+      let!(:plucked) { [] }
+      let!(:pluck_each) { Band.where(_id: band.id).pluck_each("label.qwerty") { |v| plucked << v } }
+
+      context "when legacy_pluck_distinct is set" do
+        config_override :legacy_pluck_distinct, true
+
+        it "returns an empty hash" do
+          expect(plucked.first).to eq({})
+        end
+      end
+
+      context "when legacy_pluck_distinct is not set" do
+        config_override :legacy_pluck_distinct, false
+
+        it "returns nil" do
+          expect(plucked.first).to eq(nil)
+        end
+      end
+    end
+  end
+
   describe "#pick" do
 
     let!(:depeche) do

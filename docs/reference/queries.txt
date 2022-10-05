@@ -1498,6 +1498,41 @@ Mongoid also has some helpful methods on criteria.
           Band.all.pluck(:name, :likes)
             #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
 
+   * - ``Criteria#pluck_each``
+
+       *This method returns an Enumerator for the results of ``pluck``.
+       A block may optionally be given, which will be called once for
+       each result.*
+
+       *Similar to the ``each`` method, this method will use the
+       `MongoDB getMore command
+       <https://mongodb.com/docs/manual/reference/command/getMore/>`_
+       to load results in batches. This is useful for working with
+       large query results.*
+
+       *The method arguments and field normalization behavior are
+       otherwise identical to ``pluck``.*
+
+     -
+       .. code-block:: ruby
+
+         Band.all.pluck_each(:name)
+           #=> #<Enumerator: ... >
+
+         Band.all.pluck_each(:name, 'address.city', :founded) do |name, city, founded|
+           puts "#{name} from #{city} started in #{founded}"
+         end
+           # =>
+           # The Rolling Stones from London started in 1962
+           # The Beatles from Liverpool started in 1960
+           # The Monkees from Los Angeles started in 1966
+            #=> [ ["Berry Gordy", "Tommy Mottola"], [], ["Quincy Jones"] ]
+
+          # Accepts multiple field arguments, in which case
+          # the result will be returned as an Array of Arrays.
+          Band.all.pluck(:name, :likes)
+            #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
+
    * - ``Criteria#read``
 
        *Sets the read preference for the criteria.*
