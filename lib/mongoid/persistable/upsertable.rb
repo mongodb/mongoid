@@ -12,7 +12,8 @@ module Mongoid
       #
       # If the replace option is true, unspecified attributes will be dropped,
       # and if it is false, unspecified attributes will be maintained. The
-      # replace option defaults to true in Mongoid 8.1 and earlier.
+      # replace option defaults to true in Mongoid 8.1 and earlier. The default
+      # will be flipped to false in Mongoid 9.
       #
       # @example Upsert the document.
       #   document.upsert
