@@ -24,6 +24,8 @@ class Band
   field :tags, type: Hash
   field :fans
 
+  alias_attribute :d, :deleted
+
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
   embeds_many :labels
