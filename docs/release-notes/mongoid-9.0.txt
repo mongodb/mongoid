@@ -120,3 +120,14 @@ Mongoid 9.0 flips the default of this flag from ``true`` => ``false``.
 
 This means that, by default, Mongoid 9 will update the existing document and
 will not replace it.
+
+
+Bug Fixes and Improvements
+--------------------------
+
+This section will be for smaller bug fixes and improvements:
+
+- With the ``map_big_decimal_to_decimal128`` flag set to false, ``demongoizing``
+  a non-numeric, non-string value that implements ``:to_d`` will return a string
+  rather than a ``BigDecimal``
+  `MONGOID-5507 <https://jira.mongodb.org/browse/MONGOID-5507>`_.
