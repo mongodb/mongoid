@@ -260,7 +260,6 @@ en:
             allowed only for the global thread pool executor."
           resolution: "Set global_executor_concurrency option to :global_thread_pool
             or remove global_executor_concurrency option."
-            https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
