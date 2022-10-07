@@ -127,6 +127,23 @@ Bug Fixes and Improvements
 
 This section will be for smaller bug fixes and improvements:
 
+- The ``.unscoped`` method now also clears scopes declared using ``.with_scope``
+  `MONGOID-5214 <https://jira.mongodb.org/browse/MONGOID-5214>`_.
+- When evolving a ``String`` to a ``BigDecimal`` (i.e. when querying a
+  ``BigDecimal`` field with a ``String`` object), if the
+  ``map_big_decimal_to_decimal128`` flag set to true, the conversion will
+  return a ``BSON::Decimal128`` and not a ``String``
+  `MONGOID-5484 <https://jira.mongodb.org/browse/MONGOID-5484>`_.
+- Created new error ``Mongoid::Errors::InvalidEstimatedCountCriteria`` for
+  when calling ``estimated_document_count`` on a document class with a
+  default scope
+  `MONGOID-4960 <https://jira.mongodb.org/browse/MONGOID-4960>`_.
+- Mongoid now uses primary reads for validations in all cases
+  `MONGOID-5150 <https://jira.mongodb.org/browse/MONGOID-5150>`_.
+- Added support for symbol keys in localized field translation hashes
+  `MONGOID-5334 <https://jira.mongodb.org/browse/MONGOID-5334>`_.
+- Added index wildcard option
+  `MONGOID-5388 <https://jira.mongodb.org/browse/MONGOID-5388>`_.
 - With the ``map_big_decimal_to_decimal128`` flag set to false, ``demongoizing``
   a non-numeric, non-string value that implements ``:to_d`` will return a string
   rather than a ``BigDecimal``
