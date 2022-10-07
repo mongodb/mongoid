@@ -15,7 +15,7 @@ require "active_model"
 require 'concurrent-ruby'
 
 require "mongo"
-require 'mongo/active_support'
+require "mongo/active_support"
 
 require "mongoid/version"
 require "mongoid/deprecable"
@@ -27,6 +27,7 @@ require "mongoid/document"
 require "mongoid/tasks/database"
 require "mongoid/query_cache"
 require "mongoid/warnings"
+require "mongoid/utils"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
