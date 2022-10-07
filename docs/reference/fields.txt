@@ -478,8 +478,8 @@ Field Type: Typed Arrays
 ------------------------
 
 Mongoid supports declaring a typed array field on models. This field will
-enforce the type of the elements in the array by ``demongoizing`` each element
-inserted into the array. To make a typed array field:
+enforce the type of the elements in the array.
+To make a typed array field:
 
 .. code:: ruby
 
