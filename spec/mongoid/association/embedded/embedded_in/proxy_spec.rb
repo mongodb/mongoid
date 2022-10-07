@@ -630,7 +630,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
     end
   end
 
-  context "when assigning an association with a hash" do
+  context "when replacing an association with a hash" do
     let(:building_address) { BuildingAddress.new }
 
     before do
