@@ -341,3 +341,34 @@ This time, the value for the ``:age`` field is maintained.
   The default for the ``:replace`` option will be changed to ``false`` in
   Mongoid 9.0, therefore it is recommended to explicitly specify this option
   while using ``#upsert`` in 8.1 for easier upgradability.
+
+
+Allow Hash Assignment to ``embedded_in``
+----------------------------------------
+
+Mongoid 8.1 allows the assignment of a hash to an ``embedded_in`` association.
+On assignment, the hash will be coerced into a document of the class of the
+association that it is being assigned to. This functionality already exists
+for ``embeds_one`` and ``embeds_many`` associations. Consider the following
+example:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    embeds_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    embedded_in :band
+  end
+
+  album = Album.new
+  album.band = { name: "Death Cab For Cutie" }
+  p album.band
+  # => <Band _id: 633c74113282a438a15d2b56, name: "Death Cab For Cutie">
+
+See the section on :ref:`Hash Assignment on Embedded Associations <hash-assignment>`
+for more details

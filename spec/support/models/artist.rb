@@ -87,5 +87,4 @@ class Artist
   def after_remove_album(album)
     @after_remove_referenced_called = true
   end
-
 end
