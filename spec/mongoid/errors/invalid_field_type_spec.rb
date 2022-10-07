@@ -71,7 +71,7 @@ describe Mongoid::Errors::InvalidFieldType do
 
       it "contains the resolution in the message" do
         expect(error.message).to include(
-          'Please only pass in one type for a typed array.'
+          'Please pass in a one-element array as the type for a typed array.'
         )
       end
     end
