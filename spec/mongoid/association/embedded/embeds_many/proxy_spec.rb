@@ -4840,4 +4840,19 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       expect(from_db.company_tags.size).to eq(2)
     end
   end
+
+  context "when assigning hashes" do
+    let(:user) { EmmUser.create! }
+
+    before do
+      user.orders = [ { sku: 1 }, { sku: 2 } ]
+    end
+
+    it "creates the objects correctly" do
+      expect(user.orders.first).to be_a(EmmOrder)
+      expect(user.orders.last).to be_a(EmmOrder)
+
+      expect(user.orders.map(&:sku).sort).to eq([ 1, 2 ])
+    end
+  end
 end

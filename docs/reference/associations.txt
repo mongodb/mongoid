@@ -875,6 +875,38 @@ documents that exist in the application:
   band.tours.destroy_all
 
 
+.. _hash-assignment:
+
+Hash Assignment
+---------------
+
+Embedded associations allow the user to assign a ``Hash`` instead of a document
+to an association. On assignment, this hash is coerced into a document of the
+class of the association that it's being assigned to. Take the following
+example:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    field :name, type: String
+    embedded_in :band
+  end
+
+  band = Band.create!
+  band.albums = [ { name: "Narrow Stairs" }, { name: "Transatlanticism" } ]
+  p band.albums
+  # => [ #<Album _id: 633c71e93282a4357bb608e5, name: "Narrow Stairs">, #<Album _id: 633c71e93282a4357bb608e6, name: "Transatlanticism"> ]
+
+This works for ``embeds_one``, ``embeds_many``, and ``embedded_in`` associations.
+Note that you cannot assign hashes to referenced associations.
+
+
 Common Behavior
 ===============
 

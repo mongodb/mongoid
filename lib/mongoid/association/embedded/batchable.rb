@@ -97,7 +97,7 @@ module Mongoid
         # @example Batch replace the documents.
         #   batchable.batch_replace([ doc_one, doc_two ])
         #
-        # @param [ Array<Document> ] docs The docs to replace with.
+        # @param [ Array<Document> | Array<Hash> ] docs The docs to replace with.
         #
         # @return [ Array<Hash> ] The inserts.
         def batch_replace(docs)
@@ -235,7 +235,7 @@ module Mongoid
         # @example Normalize the docs.
         #   batchable.normalize_docs(docs)
         #
-        # @param [ Array<Hash | Document> ] docs The docs to normalize.
+        # @param [ Array<Document> | Array<Hash> ] docs The docs to normalize.
         #
         # @return [ Array<Document> ] The docs.
         def normalize_docs(docs)
