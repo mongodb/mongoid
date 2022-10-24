@@ -39,8 +39,8 @@ Support
 License
 -------
 
+Copyright (c) 2015-Present MongoDB Inc.  
 Copyright (c) 2009-2016 Durran Jordan
-Copyright (c) 2015-2020 MongoDB, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -60,11 +60,6 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Credits
--------
-
-Durran Jordan: durran at gmail dot com
 
 [rubygems-img]: https://badge.fury.io/rb/mongoid.svg
 [rubygems-url]: http://badge.fury.io/rb/mongoid
