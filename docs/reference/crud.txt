@@ -745,6 +745,15 @@ write the values directly into the attributes hash:
   person.attributes
   # => {"_id"=>BSON::ObjectId('606477dc2c97a628cf47075b'), "fn"=>"Artem"}
 
+.. note::
+
+  The custom setters are called during the assignment of
+  :ref:`nested attributes <nested-attributes>`, however they are called before
+  the associations are set up. Because of this, associations may not always
+  be available during these methods, and it is encouraged to include checks
+  for their presence whenever referring to them. :ref:`Callbacks <callbacks>`
+  can also be used to perform operations on certain events, and associations
+  will have already been setup and are available during their execution.
 
 .. _read-write-attribute:
 
