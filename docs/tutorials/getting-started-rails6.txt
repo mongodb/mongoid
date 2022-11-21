@@ -1,6 +1,6 @@
-***********************
-Getting Started (Rails)
-***********************
+*************************
+Getting Started (Rails 6)
+*************************
 
 .. default-domain:: mongodb
 
@@ -9,6 +9,11 @@ Getting Started (Rails)
    :backlinks: none
    :depth: 2
    :class: singlecol
+
+.. note::
+
+  This tutorial is for Ruby on Rails 6. If this is not the version you're using choose
+  the appropriate tutorial for your Rails version from the navigation menu.
 
 New Application
 ===============
