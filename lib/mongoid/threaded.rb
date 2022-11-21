@@ -26,6 +26,9 @@ module Mongoid
       hash[key] = "[mongoid]:#{key}-stack"
     end
 
+    # The key for the current thread's sessions.
+    SESSIONS_KEY="[mongoid]:sessions"
+
     extend self
 
     # Begin entry into a named thread local stack.
@@ -315,36 +318,46 @@ module Mongoid
       validations[klass] ||= []
     end
 
-    # Cache a session for this thread.
+    # Cache a session for this thread for a client.
     #
-    # @example Save a session for this thread.
-    #   Threaded.set_session(session)
+    # @note For backward compatibility it is allowed to call this method without
+    # specifying `client` parameter.
     #
     # @param [ Mongo::Session ] session The session to save.
-    def set_session(session)
-      Thread.current["[mongoid]:session"] = session
+    # @param [ Mongo::Client | nil ] client The client to cache the session for.
+    def set_session(session, client: nil)
+      sessions[client.object_id] = session
     end
 
-    # Get the cached session for this thread.
+    # Get the cached session for this thread for a client.
     #
-    # @example Get the session for this thread.
-    #   Threaded.get_session
+    # @note For backward compatibility it is allowed to call this method without
+    # specifying `client` parameter.
+    #
+    # @param [ Mongo::Client | nil ] client The client to cache the session for.
     #
     # @return [ Mongo::Session | nil ] The session cached on this thread or nil.
-    def get_session
-      Thread.current["[mongoid]:session"]
+    def get_session(client: nil)
+      sessions[client.object_id]
     end
 
-    # Clear the cached session for this thread.
+    # Clear the cached session for this thread for a client.
     #
-    # @example Clear this thread's session.
-    #   Threaded.clear_session
+    # @note For backward compatibility it is allowed to call this method without
+    # specifying `client` parameter.
+    #
+    # @param [ Mongo::Client | nil ] client The client to clear the session for.
     #
     # @return [ nil ]
-    def clear_session
-      session = get_session
-      session.end_session if session
-      Thread.current["[mongoid]:session"] = nil
+    def clear_session(client: nil)
+      session = sessions[client.object_id]
+      session&.end_session
+      sessions.delete(client.object_id)
+    end
+
+    # @api private
+    def sessions
+      Thread.current[SESSIONS_KEY] ||= {}
     end
   end
 end

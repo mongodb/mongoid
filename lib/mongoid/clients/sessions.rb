@@ -36,11 +36,11 @@ module Mongoid
       #
       # @yieldparam [ Mongo::Session ] The session being used for the block.
       def with_session(options = {})
-        if Threaded.get_session
+        if Threaded.get_session(client: persistence_context.client)
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
         end
         session = persistence_context.client.start_session(options)
-        Threaded.set_session(session)
+        Threaded.set_session(session, client: persistence_context.client)
         yield(session)
       rescue Mongo::Error::InvalidSession => ex
         if Mongo::Error::SessionsNotSupported === ex
@@ -48,13 +48,13 @@ module Mongoid
         end
         raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
       ensure
-        Threaded.clear_session
+        Threaded.clear_session(client: persistence_context.client)
       end
 
       private
 
       def _session
-        Threaded.get_session
+        Threaded.get_session(client: persistence_context.client)
       end
 
       module ClassMethods
@@ -87,11 +87,11 @@ module Mongoid
         #
         # @yieldparam [ Mongo::Session ] The session being used for the block.
         def with_session(options = {})
-          if Threaded.get_session
+          if Threaded.get_session(client: persistence_context.client)
             raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
           end
           session = persistence_context.client.start_session(options)
-          Threaded.set_session(session)
+          Threaded.set_session(session, client: persistence_context.client)
           yield(session)
         rescue Mongo::Error::InvalidSession => ex
           if Mongo::Error::SessionsNotSupported === ex
@@ -99,13 +99,13 @@ module Mongoid
           end
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
         ensure
-          Threaded.clear_session
+          Threaded.clear_session(client: persistence_context.client)
         end
 
         private
 
         def _session
-          Threaded.get_session
+          Threaded.get_session(client: persistence_context.client)
         end
       end
     end
