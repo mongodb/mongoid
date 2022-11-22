@@ -51,6 +51,24 @@ module Mongoid
         Threaded.clear_session(client: persistence_context.client)
       end
 
+      def transaction(opts = {})
+        with_session do |session|
+          begin
+            session.start_transaction(opts)
+            yield
+            session.commit_transaction
+          rescue Mongo::Error::InvalidTransactionOperation, Mongoid::Errors::InvalidSessionUse => e
+            session&.abort_transaction
+            raise Mongoid::Errors::TransactionError
+          rescue StandardError => e
+            session&.abort_transaction
+            raise e
+          end
+        end
+      rescue Mongoid::Errors::InvalidSessionUse => e
+        raise Mongoid::Errors::TransactionError
+      end
+
       private
 
       def _session
@@ -100,6 +118,24 @@ module Mongoid
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
         ensure
           Threaded.clear_session(client: persistence_context.client)
+        end
+
+        def transaction(opts = {})
+          with_session do |session|
+            begin
+              session.start_transaction(opts)
+              yield
+              session.commit_transaction
+            rescue Mongo::Error::InvalidTransactionOperation, Mongoid::Errors::InvalidSessionUse => e
+              session&.abort_transaction
+              raise Mongoid::Errors::TransactionError
+            rescue StandardError => e
+              session&.abort_transaction
+              raise e
+            end
+          end
+        rescue Mongoid::Errors::InvalidSessionUse => e
+          raise Mongoid::Errors::TransactionError
         end
 
         private
