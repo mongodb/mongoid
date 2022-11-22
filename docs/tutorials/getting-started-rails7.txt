@@ -298,98 +298,32 @@ You should now be able to leave comments for the posts:
 Existing Application
 ====================
 
-Follow these steps to switch an existing Ruby on Rails application to use
-Mongoid instead of ActiveRecord.
+Mongoid can be easily added to an existing Rails application and run alongside other ActiveRecord
+adapters. If this is your use case, updating dependencies and populating the configuration file will
+allow you to start using MongoDB within your application.
+
+To switch an existing Ruby on Rails application to use Mongoid instead of ActiveRecord additional
+configuration changes will be required, as described below.
 
 Dependencies
 ------------
 
-Remove or comment out any RDBMS libraries like ``sqlite``, ``pg`` etc.
-mentioned in ``Gemfile``, and add ``mongoid``:
+First, the ``mongoid`` gem will need to be added your ``Gemfile``.
 
 .. code-block:: ruby
   :name: Gemfile
   :caption: Gemfile
 
-    gem 'mongoid', '~> 7.0.5'
+    gem 'mongoid'
 
-.. note::
-
-    Mongoid 7.0.5 or higher is required to use Rails 6.0.
+If Mongoid will be the **only** database adapter, remove or comment out any RDBMS libraries
+like ``sqlite`` or ``pg`` mentioned in the ``Gemfile``.
 
 Install gem dependencies:
 
 .. code-block:: sh
 
     bundle install
-
-Loaded Frameworks
------------------
-
-Examine ``config/application.rb``. If it is requiring all components of Rails
-via ``require 'rails/all'``, change it to require individual frameworks:
-
-.. code-block:: ruby
-  :name: config/application.rb
-  :caption: config/application.rb
-
-  # Remove or comment out
-  #require "rails/all"
-
-  # Add this require instead of "rails/all":
-  require "rails"
-
-  # Pick the frameworks you want:
-  require "active_model/railtie"
-  require "active_job/railtie"
-  require "action_controller/railtie"
-  require "action_mailer/railtie"
-  # require "action_mailbox/engine"
-  # require "action_text/engine"
-  require "action_view/railtie"
-  require "action_cable/engine"
-  require "sprockets/railtie"
-  require "rails/test_unit/railtie"
-
-  # Remove or comment out ActiveRecord and ActiveStorage:
-  # require "active_record/railtie"
-  # require "active_storage/engine"
-
-.. note::
-
-    At this time ActiveStorage requires ActiveRecord and is not usable with
-    Mongoid.
-
-ActiveRecord Configuration
---------------------------
-
-Review all configuration files (``config/application.rb``,
-``config/environments/{development,production.test}.rb``) and remove or
-comment out any references to ``config.active_record`` and
-``config.active_storage``.
-
-Stop Spring
------------
-
-If your application is using Spring, which is the default on Rails 6,
-Spring must be stopped after changing dependencies or configuration.
-
-.. code-block:: sh
-
-  ./bin/spring stop
-
-.. note::
-
-    Sometimes running ``./bin/spring stop`` claims to stop Spring, but does
-    not. Verify that all Spring processes are terminated before proceeding.
-
-.. note::
-
-    Sometimes Spring tries to load ActiveRecord even when the application
-    contains no ActiveRecord references. If this happens, add an ActiveRecord
-    adapter dependency such as ``sqlite3`` to your ``Gemfile`` so that
-    ActiveRecord may be completely loaded or remove Spring from your
-    application.
 
 Mongoid Configuration
 ---------------------
@@ -403,9 +337,53 @@ Generate the default Mongoid configuration:
 This generator will create the ``config/mongoid.yml`` configuration file,
 which is used to configure the connection to the MongoDB deployment.
 
-Review the sections `Run MongoDB Locally`_ and `Use MongoDB Atlas`_
-to decide how you would like to deploy MongoDB, and adjust Mongoid
+Review the sections `Configure for Self Managed MongoDB`_ and `Configure for MongoDB Atlas`_
+to decide how you would like to deploy MongoDB, and adjust the Mongoid
 configuration (``config/mongoid.yml``) to match.
+
+Loaded Frameworks
+-----------------
+
+Examine ``config/application.rb``. If it is requiring all components of Rails
+via ``require 'rails/all'``, change it to require individual frameworks. To verify the contents of
+``rails/all`` for your version see the `Github Repository
+<https://github.com/rails/rails/blob/7-0-stable/railties/lib/rails/all.rb>`_:
+
+.. code-block:: ruby
+  :name: config/application.rb
+  :caption: config/application.rb
+
+  # Remove or comment out
+  #require "rails/all"
+
+  # Add the following instead of "rails/all":
+  require "rails"
+
+  # require "active_record/railtie" rescue LoadError
+  # require "active_storage/engine" rescue LoadError
+  require "action_controller/railtie" rescue LoadError
+  require "action_view/railtie" rescue LoadError
+  require "action_mailer/railtie" rescue LoadError
+  require "active_job/railtie" rescue LoadError
+  require "action_cable/engine" rescue LoadError
+  # require "action_mailbox/engine" rescue LoadError
+  # require "action_text/engine" rescue LoadError
+  require "rails/test_unit/railtie" rescue LoadError
+
+.. warning::
+
+    Due to their reliance on ActiveRecord, `ActionText <https://guides.rubyonrails.org/action_text_overview.html>`_,
+    `ActiveStorage <https://edgeguides.rubyonrails.org/active_storage_overview.html>`_ and
+    `ActionMailbox <https://guides.rubyonrails.org/action_mailbox_basics.html>`_ cannot be used
+    with Mongoid.
+
+ActiveRecord Configuration
+--------------------------
+
+Review all configuration files (``config/application.rb``,
+``config/environments/{development,production.test}.rb``) and remove or
+comment out any references to ``config.active_record`` and
+``config.active_storage``.
 
 Adjust Models
 -------------
