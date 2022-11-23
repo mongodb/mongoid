@@ -259,21 +259,27 @@ association for the comments:
       has_many :comments, dependent: :destroy
     end
 
-Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
-generated ``embedded_in`` association to ``belongs_to``:
+.. note::
+  *The following is only required if using a version of Mongoid < 7.0.8 or 7.1.2 (see*
+  `MONGOID-4885 <https://jira.mongodb.org/browse/MONGOID-4885>`_ *for details)*
 
-.. code-block:: ruby
-  :name: app/models/comment.rb
-  :caption: app/models/comment.rb
 
-    class Comment
-      include Mongoid::Document
+  Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
+  generated ``embedded_in`` association to ``belongs_to``:
 
-      field :name, type: String
-      field :message, type: String
+  .. code-block:: ruby
+    :name: app/models/comment.rb
+    :caption: app/models/comment.rb
 
-      belongs_to :post
-    end
+      class Comment
+        include Mongoid::Document
+
+        field :name, type: String
+        field :message, type: String
+
+        belongs_to :post
+      end
+
 
 Open the post show view file, ``app/views/posts/show.html.erb``, and add
 a section rendering existing comments and prompting to leave a new comment:
