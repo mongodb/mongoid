@@ -40,13 +40,23 @@ module Mongoid
       end
 
       def persistence_context
-        PersistenceContext.get(self) ||
-            PersistenceContext.get(self.class) ||
-            PersistenceContext.new(self.class)
+        # TODO: Add feature flag
+        if embedded?
+          _root.persistence_context
+        else
+          PersistenceContext.get(self) ||
+              PersistenceContext.get(self.class) ||
+              PersistenceContext.new(self.class)
+        end
       end
 
       def persistence_context?
-        !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
+        # TODO: Add feature flag
+        if embedded?
+          _root.persistence_context?
+        else
+          !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
+        end
       end
 
       private
