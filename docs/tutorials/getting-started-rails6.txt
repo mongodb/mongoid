@@ -263,7 +263,6 @@ association for the comments:
   *The following is only required if using a version of Mongoid < 7.0.8 or 7.1.2 (see*
   `MONGOID-4885 <https://jira.mongodb.org/browse/MONGOID-4885>`_ *for details)*
 
-
   Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
   generated ``embedded_in`` association to ``belongs_to``:
 
@@ -279,7 +278,6 @@ association for the comments:
 
         belongs_to :post
       end
-
 
 Open the post show view file, ``app/views/posts/show.html.erb``, and add
 a section rendering existing comments and prompting to leave a new comment:
