@@ -337,7 +337,7 @@ should look like this:
     </div>
   <% end %>
 
-Create a partial for the comment view, ``app/view/comments/_comment.html.erb``
+Create a partial for the comment view, ``app/views/comments/_comment.html.erb``
 with the following contents:
 
 .. code-block:: html
