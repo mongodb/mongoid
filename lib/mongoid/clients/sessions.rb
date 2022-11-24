@@ -51,17 +51,19 @@ module Mongoid
         Threaded.clear_session(client: persistence_context.client)
       end
 
-      def transaction(opts = {})
-        with_session do |session|
+      def transaction(options = {}, session_options: {})
+        with_session(session_options) do |session|
           begin
-            session.start_transaction(opts)
+            session.start_transaction(options)
             yield
             session.commit_transaction
+          rescue Mongoid::Errors::Rollback
+            session.abort_transaction
           rescue Mongo::Error::InvalidTransactionOperation, Mongoid::Errors::InvalidSessionUse => e
-            session&.abort_transaction
+            session.abort_transaction
             raise Mongoid::Errors::TransactionError
           rescue StandardError => e
-            session&.abort_transaction
+            session.abort_transaction
             raise e
           end
         end
@@ -126,11 +128,13 @@ module Mongoid
               session.start_transaction(opts)
               yield
               session.commit_transaction
+            rescue Mongoid::Errors::Rollback
+              session.abort_transaction
             rescue Mongo::Error::InvalidTransactionOperation, Mongoid::Errors::InvalidSessionUse => e
-              session&.abort_transaction
+              session.abort_transaction
               raise Mongoid::Errors::TransactionError
             rescue StandardError => e
-              session&.abort_transaction
+              session.abort_transaction
               raise e
             end
           end

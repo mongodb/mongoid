@@ -328,6 +328,30 @@ describe Mongoid::Clients::Sessions do
           end
         end
       end
+
+      context 'when Mongoid::Errors:Rollback raised' do
+        let!(:error) do
+          error = nil
+          begin
+            Person.transaction do
+              Person.create!
+              raise Mongoid::Errors::Rollback
+            end
+          rescue => e
+            error = e
+          end
+          error
+        end
+
+        it 'does not bass on the exception' do
+          expect(error).to be_nil
+        end
+
+        it 'aborts the transaction' do
+          expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(1)
+          expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(0)
+        end
+      end
     end
 
     context 'when sessions are supported but transactions are not' do
@@ -596,6 +620,31 @@ describe Mongoid::Clients::Sessions do
             end
           end
 
+        end
+      end
+
+      context 'when Mongoid::Errors:Rollback raised' do
+        let!(:error) do
+          error = nil
+          begin
+            person.transaction do
+              person.username = 'John'
+              person.save!
+              raise Mongoid::Errors::Rollback
+            end
+          rescue => e
+            error = e
+          end
+          error
+        end
+
+        it 'does not bass on the exception' do
+          expect(error).to be_nil
+        end
+
+        it 'aborts the transaction' do
+          expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(1)
+          expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(0)
         end
       end
     end
