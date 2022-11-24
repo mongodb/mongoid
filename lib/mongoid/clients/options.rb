@@ -41,7 +41,7 @@ module Mongoid
 
       def persistence_context
         # TODO: Add feature flag
-        if embedded?
+        if embedded? && !_root?
           _root.persistence_context
         else
           PersistenceContext.get(self) ||
@@ -52,7 +52,7 @@ module Mongoid
 
       def persistence_context?
         # TODO: Add feature flag
-        if embedded?
+        if embedded? && !_root?
           _root.persistence_context?
         else
           !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
