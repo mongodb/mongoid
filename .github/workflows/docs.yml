@@ -1,0 +1,56 @@
+name: "Docs"
+
+on:
+  pull_request:
+    branches:
+      - "v*.*"
+      - "master"
+      - "feature/*"
+  push:
+    branches:
+      - "v*.*"
+      - "master"
+      - "feature/*"
+
+jobs:
+  giza:
+    name: "Build Docs"
+    runs-on: "ubuntu-20.04"
+
+    steps:
+      - name: "Checkout library"
+        uses: "actions/checkout@v3"
+        with:
+          path: library
+          fetch-depth: 2
+
+      - name: "Checkout docs"
+        uses: "actions/checkout@v3"
+        with:
+          repository: mongodb/docs-mongoid
+          path: docs
+          fetch-depth: 2
+
+      - name: "Setup python"
+        uses: actions/setup-python@v4
+        with:
+          python-version: '2.7'
+
+      # The requirements file installs urllib3 with an incompatible version; we replace it with one that works
+      - name: "Install giza"
+        run: |
+          pip install -r https://raw.githubusercontent.com/mongodb/docs-tools/master/giza/requirements.txt
+          pip install urllib3==1.25.2
+
+      - name: "Sync documentation"
+        run: "rsync -a library/docs/ docs/source/"
+
+      - name: "Run Giza"
+        run: "giza make publish"
+        working-directory: docs
+
+      - name: "Upload built documentation"
+        uses: actions/upload-artifact@v3
+        with:
+          name: mongoid-docs.tar.gz
+          path: docs/build/public/master/mongoid.tar.gz
