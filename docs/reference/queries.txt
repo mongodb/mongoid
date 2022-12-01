@@ -233,7 +233,7 @@ and :ref:`field aliases <field-aliases>`:
   #   class:    Band
   #   embedded: false>
 
-Since `id` and `_id` fields are aliases, either one can be used for queries:
+Since ``id`` and ``_id`` fields are aliases, either one can be used for queries:
 
 .. code-block:: ruby
 
@@ -1713,43 +1713,43 @@ For example, consider the following model definition that contains a ``Time``
 field, a ``Date`` field and an implicit ``Object`` field, and also
 intentionally does not define a field called ``deregistered_at``:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    class Voter
-      include Mongoid::Document
+  class Voter
+    include Mongoid::Document
 
-      field :born_on, type: Date
-      field :registered_at, type: Time
-      field :voted_at
-    end
+    field :born_on, type: Date
+    field :registered_at, type: Time
+    field :voted_at
+  end
 
 Queries on ``born_on`` and ``registered_at`` fields using ``Date`` and ``Time``
 values, respectively, are straightforward:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    Voter.where(born_on: Date.today).selector
-    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+  Voter.where(born_on: Date.today).selector
+  # => {"born_on"=>2020-12-18 00:00:00 UTC}
 
-    Voter.where(registered_at: Time.now).selector
-    # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
+  Voter.where(registered_at: Time.now).selector
+  # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
 
 But, note the differences in behavior when providing a ``Date`` instance
 in all possible scenarios:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    Voter.where(born_on: Date.today).selector
-    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+  Voter.where(born_on: Date.today).selector
+  # => {"born_on"=>2020-12-18 00:00:00 UTC}
 
-    Voter.where(registered_at: Date.today).selector
-    # => {"registered_at"=>2020-12-18 00:00:00 -0500}
+  Voter.where(registered_at: Date.today).selector
+  # => {"registered_at"=>2020-12-18 00:00:00 -0500}
 
-    Voter.where(voted_at: Date.today).selector
-    # => {"voted_at"=>Fri, 18 Dec 2020}
+  Voter.where(voted_at: Date.today).selector
+  # => {"voted_at"=>Fri, 18 Dec 2020}
 
-    Voter.where(deregistered_at: Date.today).selector
-    # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
+  Voter.where(deregistered_at: Date.today).selector
+  # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
 
 When using the ``registered_at`` field which is of type ``Time``, the date
 was interpreted to be in local time (as per the :ref:`configured time zone
@@ -2467,7 +2467,7 @@ on when the query results are being accessed:
   Even though ``load_async`` method returns a ``Criteria`` object, you should not
   do any operations on this object except accessing query results. The query is
   scheduled for execution immediately after calling ``load_async``, therefore
-  later changes to the `Criteria`` object may not be applied.
+  later changes to the ``Criteria`` object may not be applied.
 
 
 Configuring asynchronous query execution
