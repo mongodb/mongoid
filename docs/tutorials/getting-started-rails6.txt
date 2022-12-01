@@ -131,6 +131,8 @@ Note that as we are not using ActiveRecord we will not have a ``database.yml``
 file.
 
 
+.. _run-locally:
+
 Run MongoDB Locally
 -------------------
 
@@ -155,6 +157,8 @@ like this:
           options:
             server_selection_timeout: 1
 
+
+.. _use-atlas:
 
 Use MongoDB Atlas
 -----------------
@@ -464,9 +468,9 @@ Generate the default Mongoid configuration:
 This generator will create the ``config/mongoid.yml`` configuration file,
 which is used to configure the connection to the MongoDB deployment.
 
-Review the sections `Run MongoDB Locally`_ and `Use MongoDB Atlas`_
-to decide how you would like to deploy MongoDB, and adjust Mongoid
-configuration (``config/mongoid.yml``) to match.
+Review the sections :ref:`Run MongoDB Locally <run-locally>` and
+:ref:`Use MongoDB Atlas <use-atlas>` to decide how you would like to deploy
+MongoDB, and adjust Mongoid configuration (``config/mongoid.yml``) to match.
 
 Adjust Models
 -------------
@@ -544,5 +548,5 @@ as when creating a regular application, with the only change being the
 Mongoid follows the same process described above for regular Rails applications.
 
 A complete Rails API application similar to the one described in this tutorial
-can be found in the `mongoid-demo GitHub repository
+can be found in `the mongoid-demo GitHub repository
 <https://github.com/mongoid/mongoid-demo/tree/master/rails-api>`_.
