@@ -105,7 +105,6 @@ Add Mongoid
 `mongoid <https://rubygems.org/gems/mongoid/>`_ gem:
 
 .. code-block:: ruby
-  :name: Gemfile
   :caption: Gemfile
 
     gem 'mongoid', '~> 7.0.5'
@@ -247,7 +246,6 @@ Open the ``Post`` model file, ``app/models/post.rb``, and add a ``has_many``
 association for the comments:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
     class Post
@@ -267,7 +265,6 @@ association for the comments:
   generated ``embedded_in`` association to ``belongs_to``:
 
   .. code-block:: ruby
-    :name: app/models/comment.rb
     :caption: app/models/comment.rb
 
       class Comment
@@ -283,7 +280,6 @@ Open the post show view file, ``app/views/posts/show.html.erb``, and add
 a section rendering existing comments and prompting to leave a new comment:
 
 .. code-block:: html
-  :name: app/views/posts/show.html.erb
   :caption: app/views/posts/show.html.erb
 
   <section class="section comments">
@@ -306,7 +302,6 @@ from ``text_field`` to ``text_area``, as well as the type of field for
 should look like this:
 
 .. code-block:: html
-  :name: app/views/comments/_form.html.erb
   :caption: app/views/comments/_form.html.erb
 
   <%= form_with(model: comment, local: true) do |form| %>
@@ -345,7 +340,6 @@ Create a partial for the comment view, ``app/views/comments/_comment.html.erb``
 with the following contents:
 
 .. code-block:: html
-  :name: app/views/comments/_comment.html.erb
   :caption: app/views/comments/_comment.html.erb
 
   <p>
@@ -377,7 +371,6 @@ Remove or comment out any RDBMS libraries like ``sqlite``, ``pg`` etc.
 mentioned in ``Gemfile``, and add ``mongoid``:
 
 .. code-block:: ruby
-  :name: Gemfile
   :caption: Gemfile
 
     gem 'mongoid', '~> 7.0.5'
@@ -399,7 +392,6 @@ Examine ``config/application.rb``. If it is requiring all components of Rails
 via ``require 'rails/all'``, change it to require individual frameworks:
 
 .. code-block:: ruby
-  :name: config/application.rb
   :caption: config/application.rb
 
   # Remove or comment out
@@ -491,7 +483,6 @@ explicit field definitions).
 For example, a bare-bones Post model may look like this in ActiveRecord:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post < ApplicationRecord
@@ -501,7 +492,6 @@ For example, a bare-bones Post model may look like this in ActiveRecord:
 The same model may look like this in Mongoid:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post
@@ -516,7 +506,6 @@ The same model may look like this in Mongoid:
 Or like this with dynamic fields:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post
