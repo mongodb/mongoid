@@ -3,9 +3,7 @@
 module Mongoid
   module Clients
 
-    # Encapsulates behavior for getting a session from the client of a model class or instance,
-    # setting the session on the current thread, and yielding to a block.
-    # The session will be closed after the block completes or raises an error.
+    # Encapsulates behavior for using sessions and transactions.
     module Sessions
 
       # Execute a block within the context of a session.
@@ -21,14 +19,6 @@ module Mongoid
       # @param [ Hash ] options The session options. Please see the driver
       #   documentation for the available session options.
       #
-      # @note You cannot do any operations in the block using models or objects
-      #   that use a different client; the block will execute all operations
-      #   in the context of the implicit session and operations on any models using
-      #   another client will fail. For example, if you set a client using store_in on a
-      #   particular model and execute an operation on it in the session context block,
-      #   that operation can't use the block's session and an error will be raised.
-      #   An error will also be raised if sessions are nested.
-      #
       # @raise [ Errors::InvalidSessionUse ] If an operation is attempted on a model using another
       #   client from which the session was started or if sessions are nested.
       #
@@ -37,20 +27,30 @@ module Mongoid
       # @yieldparam [ Mongo::Session ] The session being used for the block.
       def with_session(options = {})
         if Threaded.get_session(client: persistence_context.client)
-          raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
+          raise Mongoid::Errors::InvalidSessionNesting.new
         end
         session = persistence_context.client.start_session(options)
         Threaded.set_session(session, client: persistence_context.client)
         yield(session)
       rescue Mongo::Error::InvalidSession => ex
         if Mongo::Error::SessionsNotSupported === ex
-          raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
+          raise Mongoid::Errors::SessionsNotSupported.new
+        else
+          raise ex
         end
-        raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
       ensure
         Threaded.clear_session(client: persistence_context.client)
       end
 
+      # Executes a block within the context of a transaction.
+      #
+      # @param [ Hash ] options The transaction options. Please see the driver
+      #   documentation for the available session options.
+      # @param [ Hash ] session_options The session options. A MongoDB
+      #   transaction must be started inside a session, therefore a session will
+      #   be started. Please see the driver documentation for the available session options.
+      #
+      # @yield Provided block will be executed inside a transaction.
       def transaction(options = {}, session_options: {})
         with_session(session_options) do |session|
           begin
@@ -59,16 +59,20 @@ module Mongoid
             session.commit_transaction
           rescue Mongoid::Errors::Rollback
             session.abort_transaction
-          rescue Mongo::Error::InvalidTransactionOperation, Mongoid::Errors::InvalidSessionUse => e
-            session.abort_transaction
-            raise Mongoid::Errors::TransactionError
+          rescue Mongoid::Errors::InvalidSessionNesting
+            session.abort_transaction unless session.ended?
+            raise Mongoid::Errors::InvalidTransactionNesting.new
+          rescue Mongoid::Errors::SessionsNotSupported
+            session.abort_transaction unless session.ended?
+            raise Mongoid::Errors::TransactionsNotSupported.new
+          rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
+            session.abort_transaction unless session.ended?
+            raise Mongoid::Errors::TransactionError(e)
           rescue StandardError => e
-            session.abort_transaction
+            session.abort_transaction unless session.ended?
             raise e
           end
         end
-      rescue Mongoid::Errors::InvalidSessionUse => e
-        raise Mongoid::Errors::TransactionError
       end
 
       private
@@ -92,14 +96,6 @@ module Mongoid
         # @param [ Hash ] options The session options. Please see the driver
         #   documentation for the available session options.
         #
-        # @note You cannot do any operations in the block using models or objects
-        #   that use a different client; the block will execute all operations
-        #   in the context of the implicit session and operations on any models using
-        #   another client will fail. For example, if you set a client using store_in on a
-        #   particular model and execute an operation on it in the session context block,
-        #   that operation can't use the block's session and an error will be raised.
-        #   You also cannot nest sessions.
-        #
         # @raise [ Errors::InvalidSessionUse ] If an operation is attempted on a model using another
         #   client from which the session was started or if sessions are nested.
         #
@@ -108,38 +104,43 @@ module Mongoid
         # @yieldparam [ Mongo::Session ] The session being used for the block.
         def with_session(options = {})
           if Threaded.get_session(client: persistence_context.client)
-            raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
+            raise Mongoid::Errors::InvalidSessionNesting.new
           end
           session = persistence_context.client.start_session(options)
           Threaded.set_session(session, client: persistence_context.client)
           yield(session)
         rescue Mongo::Error::InvalidSession => ex
           if Mongo::Error::SessionsNotSupported === ex
-            raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
+            raise Mongoid::Errors::SessionsNotSupported.new
+          else
+            raise ex
           end
-          raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
         ensure
           Threaded.clear_session(client: persistence_context.client)
         end
 
-        def transaction(opts = {})
-          with_session do |session|
+        def transaction(options = {}, session_options: {})
+          with_session(session_options) do |session|
             begin
-              session.start_transaction(opts)
+              session.start_transaction(options)
               yield
               session.commit_transaction
             rescue Mongoid::Errors::Rollback
-              session.abort_transaction
-            rescue Mongo::Error::InvalidTransactionOperation, Mongoid::Errors::InvalidSessionUse => e
-              session.abort_transaction
-              raise Mongoid::Errors::TransactionError
+              session.abort_transaction unless session.ended?
+            rescue Mongoid::Errors::InvalidSessionNesting
+              session.abort_transaction unless session.ended?
+              raise Mongoid::Errors::InvalidTransactionNesting.new
+            rescue Mongoid::Errors::SessionsNotSupported
+              session.abort_transaction unless session.ended?
+              raise Mongoid::Errors::TransactionsNotSupported.new
+            rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
+              session.abort_transaction unless session.ended?
+              raise Mongoid::Errors::TransactionError(e)
             rescue StandardError => e
-              session.abort_transaction
+              session.abort_transaction unless session.ended?
               raise e
             end
           end
-        rescue Mongoid::Errors::InvalidSessionUse => e
-          raise Mongoid::Errors::TransactionError
         end
 
         private

@@ -156,7 +156,7 @@ describe Mongoid::Clients::Sessions do
           end
 
           it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+            expect(error).to be_a(Mongoid::Errors::InvalidSessionNesting)
           end
 
           it 'does not execute any operations' do
@@ -282,7 +282,7 @@ describe Mongoid::Clients::Sessions do
           end
 
           it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+            expect(error).to be_a(Mongoid::Errors::InvalidSessionNesting)
           end
 
           it 'does not execute any operations' do
