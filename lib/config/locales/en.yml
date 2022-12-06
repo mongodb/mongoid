@@ -628,6 +628,12 @@ en:
             server versions 3.6 and higher."
           resolution: "Verify that all servers in your deployment are at least
             version 3.6 or don't attempt to use transactions with older server versions."
+        transaction_error:
+          message: "Transaction failed with the following error: %{error}."
+          summary: "The transaction failed because MongoDB server or MongoDB driver
+            raised an unexpected error."
+          resolution: "Consult with Ruby driver documentation
+            and MongoDB documentation."
         unknown_attribute:
           message: "Attempted to set a value for '%{name}' which is not
             allowed on the model %{klass}."
