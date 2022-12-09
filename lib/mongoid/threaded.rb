@@ -350,9 +350,7 @@ module Mongoid
     #
     # @return [ nil ]
     def clear_session(client: nil)
-      session = sessions[client.object_id]
-      session&.end_session
-      sessions.delete(client.object_id)
+      sessions.delete(client.object_id)&.end_session
     end
 
     # @api private

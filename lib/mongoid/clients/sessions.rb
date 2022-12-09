@@ -44,6 +44,12 @@ module Mongoid
           else
             raise ex
           end
+        rescue Mongo::Error::OperationFailure => ex
+          if ex.server_message =~ /startTransaction' is an unknown field/
+            raise Mongoid::Errors::TransactionsNotSupported.new
+          else
+            raise ex
+          end
         ensure
           Threaded.clear_session(client: persistence_context.client)
         end
@@ -80,9 +86,6 @@ module Mongoid
             rescue Mongoid::Errors::InvalidSessionNesting
               session.abort_transaction unless session.ended?
               raise Mongoid::Errors::InvalidTransactionNesting.new
-            rescue Mongoid::Errors::SessionsNotSupported
-              session.abort_transaction unless session.ended?
-              raise Mongoid::Errors::TransactionsNotSupported.new
             rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
               session.abort_transaction unless session.ended?
               raise Mongoid::Errors::TransactionError(e)

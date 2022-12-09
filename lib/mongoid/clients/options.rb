@@ -40,7 +40,6 @@ module Mongoid
       end
 
       def persistence_context
-        # TODO: Add feature flag
         if embedded? && !_root?
           _root.persistence_context
         else
