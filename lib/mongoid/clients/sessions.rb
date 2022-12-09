@@ -82,15 +82,15 @@ module Mongoid
               yield
               session.commit_transaction
             rescue Mongoid::Errors::Rollback
-              session.abort_transaction unless session.ended?
+              session.abort_transaction
             rescue Mongoid::Errors::InvalidSessionNesting
-              session.abort_transaction unless session.ended?
+              # Session should be ended here.
               raise Mongoid::Errors::InvalidTransactionNesting.new
             rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
-              session.abort_transaction unless session.ended?
+              session.abort_transaction
               raise Mongoid::Errors::TransactionError(e)
             rescue StandardError => e
-              session.abort_transaction unless session.ended?
+              session.abort_transaction
               raise e
             end
           end
