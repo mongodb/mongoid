@@ -72,144 +72,284 @@ describe Mongoid::Clients::Sessions do
       end
 
       context 'when another thread is started' do
-
-        let!(:last_use_diff) do
-          Person.with_session do |s|
-            s.start_transaction
-            Person.create!
-            Person.create!
-            Thread.new { Person.create! }.value
-            s.commit_transaction
+        shared_examples 'it does not use the transaction for that thread' do
+          it do
+            expect(Person.count).to be(2)
+            expect(Person.with(client: :default) { Person.count }).to be(1)
+            expect(insert_events.count { |e| e.command['startTransaction'] }).to be(1)
+            expect(other_events.count { |e| e.command_name == 'commitTransaction' }).to be(1)
           end
         end
 
-        it 'does not use the transaction for that thread' do
-          expect(Person.count).to be(2)
-          expect(Person.with(client: :default) { Person.count }).to be(1)
-          expect(insert_events.count { |e| e.command['startTransaction'] }).to be(1)
-          expect(other_events.count { |e| e.command_name == 'commitTransaction' }).to be(1)
+        context 'using #with_session' do
+          let!(:last_use_diff) do
+            Person.with_session do |s|
+              s.start_transaction
+              Person.create!
+              Person.create!
+              Thread.new { Person.create! }.value
+              s.commit_transaction
+            end
+          end
+
+          include_examples 'it does not use the transaction for that thread'
+        end
+
+        context 'using #transaction' do
+          let!(:last_use_diff) do
+            Person.transaction do
+              Person.create!
+              Person.create!
+              Thread.new { Person.create! }.value
+            end
+          end
+
+          include_examples 'it does not use the transaction for that thread'
         end
       end
 
       context 'when the operations in the transactions block are all on the class' do
-
-        before do
-          Person.with_session do |s|
-            s.start_transaction
-            Person.create!
-            Person.create!
-            s.commit_transaction
-          end
-        end
-
-        it 'uses a single transaction number for all operations on the class' do
-          expect(Person.count).to be(2)
-          expect(insert_events_txn_numbers.size).to eq(2)
-          expect(insert_events_txn_numbers.uniq.size).to eq(1)
-        end
-      end
-
-      context 'when the operations in the transactions block are also on another class' do
-
-        context 'when the other class uses the same client' do
-
-          before do
-            Post.with(client: :other) do
-              Person.with_session do |s|
-                s.start_transaction
-                Person.create!
-                Person.create!
-                Post.create!
-                s.commit_transaction
-              end
-            end
-          end
-
-          it 'uses a single transaction number for all operations on the class' do
-            expect(Post.with(client: :other) { |klass| klass.count }).to be(1)
-            expect(insert_events_txn_numbers.size).to eq(3)
+        shared_examples 'it uses a single transaction number for all operations on the class' do
+          it do
+            expect(Person.count).to be(2)
+            expect(insert_events_txn_numbers.size).to eq(2)
             expect(insert_events_txn_numbers.uniq.size).to eq(1)
           end
         end
 
-        context 'when the other class uses a different client' do
-
-          let!(:error) do
-            e = nil
-            begin
-              Person.with_session do |s|
-                s.start_transaction
-                Person.create!
-                Person.create!
-                Post.create!
-                s.commit_transaction
-              end
-            rescue => ex
-                e = ex
+        context 'using #with_session' do
+          before do
+            Person.with_session do |s|
+              s.start_transaction
+              Person.create!
+              Person.create!
+              s.commit_transaction
             end
-            e
           end
 
-          it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+          include_examples 'it uses a single transaction number for all operations on the class'
+        end
+
+        context 'using #transaction' do
+          before do
+            Person.transaction do
+              Person.create!
+              Person.create!
+            end
           end
 
-          it 'aborted the transaction' do
-            expect(Person.count).to be(0)
-            expect(Post.count).to be(0)
-            expect(insert_events_txn_numbers.size).to eq(2)
-            expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(1)
-            expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(0)
+          include_examples 'it uses a single transaction number for all operations on the class'
+        end
+      end
+
+      context 'when the operations in the transactions block are also on another class' do
+        context 'when the other class uses the same client' do
+          shared_examples 'it uses a single transaction number for all operations on the class' do
+            it do
+              expect(Post.with(client: :other) { |klass| klass.count }).to be(1)
+              expect(insert_events_txn_numbers.size).to eq(3)
+              expect(insert_events_txn_numbers.uniq.size).to eq(1)
+            end
+          end
+
+          context 'using #with_session' do
+            before do
+              Post.with(client: :other) do
+                Person.with_session do |s|
+                  s.start_transaction
+                  Person.create!
+                  Person.create!
+                  Post.create!
+                  s.commit_transaction
+                end
+              end
+            end
+
+            include_examples 'it uses a single transaction number for all operations on the class'
+          end
+
+          context 'using #transaction' do
+            before do
+              Post.with(client: :other) do
+                Person.transaction do
+                  Person.create!
+                  Person.create!
+                  Post.create!
+                end
+              end
+            end
+
+            include_examples 'it uses a single transaction number for all operations on the class'
+          end
+        end
+
+        context 'when the other class uses a different client' do
+          shared_examples 'it does not abort the transaction' do
+            it 'does not raise an error' do
+              expect(error).to be_nil
+            end
+
+            it 'committed the transaction' do
+              expect(Person.count).to be(2)
+              expect(Post.count).to be(1)
+              expect(insert_events_txn_numbers.size).to eq(2)
+              expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(0)
+              expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(1)
+            end
+          end
+
+          context 'using #with_session' do
+            let!(:error) do
+              e = nil
+              begin
+                Person.with_session do |s|
+                  s.start_transaction
+                  Person.create!
+                  Person.create!
+                  Post.create!
+                  s.commit_transaction
+                end
+              rescue => ex
+                  e = ex
+              end
+              e
+            end
+
+            include_examples 'it does not abort the transaction'
+          end
+
+          context 'using #transaction' do
+            let!(:error) do
+              e = nil
+              begin
+                Person.transaction do
+                  Person.create!
+                  Person.create!
+                  Post.create!
+                end
+              rescue => ex
+                  e = ex
+              end
+              e
+            end
+
+            include_examples 'it does not abort the transaction'
           end
         end
 
         context 'when transactions are nested' do
-
-          let!(:error) do
-            e = nil
-            begin
-              Person.with_session do |s|
-                s.start_transaction
-                s.start_transaction
-                Person.create!
-                Post.create!
-                s.commit_transaction
-              end
-            rescue => ex
-              e = ex
+          shared_examples 'it aborts the transaction' do |error_class|
+            it 'raises an error' do
+              expect(error).to be_a(error_class)
             end
-            e
+
+            it 'does not execute any operations' do
+              expect(Person.count).to be(0)
+              expect(Post.count).to be(0)
+              expect(insert_events).to be_empty
+            end
           end
 
-          it 'raises an error' do
-            expect(error).to be_a(Mongo::Error::InvalidTransactionOperation)
+          context 'using #with_session' do
+            let!(:error) do
+              e = nil
+              begin
+                Person.with_session do |s|
+                  s.start_transaction
+                  s.start_transaction
+                  Person.create!
+                  Post.create!
+                  s.commit_transaction
+                end
+              rescue => ex
+                e = ex
+              end
+              e
+            end
+
+            include_examples 'it aborts the transaction', Mongo::Error::InvalidTransactionOperation
           end
 
-          it 'does not execute any operations' do
-            expect(Person.count).to be(0)
-            expect(Post.count).to be(0)
-            expect(insert_events).to be_empty
+          context 'using #transaction' do
+            let!(:error) do
+              e = nil
+              begin
+                Person.transaction do
+                  Person.transaction do
+                    Person.create!
+                    Post.create!
+                  end
+                end
+              rescue => ex
+                e = ex
+              end
+              e
+            end
+
+            include_examples 'it aborts the transaction', Mongoid::Errors::InvalidTransactionNesting
           end
         end
       end
 
-      context 'When reloading an embedded document created inside a transaction' do
-        it 'does not raise an error and has the correct document' do
-          Canvas.with_session do |s|
-            s.start_transaction
+      context 'when reloading an embedded document created inside a transaction' do
+        context 'using #with_session' do
+          it 'does not raise an error and has the correct document' do
+            Canvas.with_session do |s|
+              s.start_transaction
+              p = Palette.new
+              c = Canvas.new(palette: p)
+              c.save!
 
-            p = Palette.new
-            c = Canvas.new(palette: p)
-            c.save!
+              expect do
+                p.reload
+              end.to_not raise_error
 
-            expect do
-              p.reload
-            end.to_not raise_error
+              expect(c.palette).to eq(p)
 
-            expect(c.palette).to eq(p)
-
-            s.commit_transaction
+              s.commit_transaction
+            end
           end
+        end
+
+        context 'using #transaction' do
+          it 'does not raise an error and has the correct document' do
+            Canvas.transaction do
+
+              p = Palette.new
+              c = Canvas.new(palette: p)
+              c.save!
+
+              expect do
+                p.reload
+              end.to_not raise_error
+
+              expect(c.palette).to eq(p)
+            end
+          end
+        end
+      end
+
+      context 'when Mongoid::Errors:Rollback raised' do
+        let!(:error) do
+          error = nil
+          begin
+            Person.transaction do
+              Person.create!
+              raise Mongoid::Errors::Rollback
+            end
+          rescue => e
+            error = e
+          end
+          error
+        end
+
+        it 'does not bass on the exception' do
+          expect(error).to be_nil
+        end
+
+        it 'aborts the transaction' do
+          expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(1)
+          expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(0)
         end
       end
     end
@@ -217,25 +357,59 @@ describe Mongoid::Clients::Sessions do
     context 'when sessions are supported but transactions are not' do
       min_server_version '3.6'
       # Could also test 4.0 in sharded cluster
-      max_server_version '3.6'
+      max_server_version '3.6.99'
 
-      let!(:error) do
-        e = nil
-        begin
-          Person.with_session do |s|
-            s.start_transaction
-            Person.create!
-            s.commit_transaction
-          end
-        rescue => ex
-          e = ex
+      shared_examples 'it raises a transactions not supported error' do
+        it do
+          expect(Person.count).to eq(0)
+          expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
         end
-        e
       end
 
-      it 'raises a transactions not supported error' do
-        expect(Person.count).to eq(0)
-        expect(error).to be_a(Mongo::Error::OperationFailure)
+      context 'using #with_session' do
+        let!(:error) do
+          e = nil
+          begin
+            Person.with_session do |s|
+              s.start_transaction
+              Person.create!
+              s.commit_transaction
+            end
+          rescue => ex
+            e = ex
+          end
+          e
+        end
+
+        include_examples 'it raises a transactions not supported error'
+      end
+
+      context 'using #transaction' do
+        let!(:error) do
+          e = nil
+          begin
+            Person.transaction do
+              Person.create!
+            end
+          rescue => ex
+            e = ex
+          end
+          e
+        end
+
+        include_examples 'it raises a transactions not supported error'
+      end
+    end
+
+    context 'when transactions are not supported' do
+      require_topology :single
+
+      it 'it raises a transactions not supported error' do
+        expect do
+          Person.transaction do
+            Person.create!
+          end
+        end.to raise_error(Mongoid::Errors::TransactionsNotSupported)
       end
     end
   end
@@ -263,111 +437,226 @@ describe Mongoid::Clients::Sessions do
       end
 
       context 'when the operations in the transaction block are all on the instance' do
-
-        before do
-          person.with_session do |s|
-            s.start_transaction
-            person.username = 'Emily'
-            person.save!
-            person.age = 80
-            person.save!
-            s.commit_transaction
+        shared_examples 'it uses a single transaction number for all operations on the class' do
+          it do
+            expect(person.reload.username).to eq('Emily')
+            expect(person.reload.age).to eq(80)
+            expect(update_events_txn_numbers.size).to eq(2)
+            expect(update_events_txn_numbers.uniq.size).to eq(1)
           end
         end
 
-        it 'uses a single transaction number for all operations on the class' do
-          expect(person.reload.username).to eq('Emily')
-          expect(person.reload.age).to eq(80)
-          expect(update_events_txn_numbers.size).to eq(2)
-          expect(update_events_txn_numbers.uniq.size).to eq(1)
+        context 'using #with_session' do
+          before do
+            person.with_session do |s|
+              s.start_transaction
+              person.username = 'Emily'
+              person.save!
+              person.age = 80
+              person.save!
+              s.commit_transaction
+            end
+          end
+
+          include_examples 'it uses a single transaction number for all operations on the class'
+        end
+
+        context 'using #transaction' do
+          before do
+            person.transaction do
+              person.username = 'Emily'
+              person.save!
+              person.age = 80
+              person.save!
+            end
+          end
+
+          include_examples 'it uses a single transaction number for all operations on the class'
         end
       end
 
       context 'when the operations in the transaction block are also on another class' do
 
         context 'when the other class uses the same client' do
-
-          before do
-            Post.with(client: :other) do
-              person.with_session do |s|
-                s.start_transaction
-                person.username = 'Emily'
-                person.save!
-                person.posts << Post.create!
-                s.commit_transaction
-              end
+          shared_examples 'it uses a single transaction number for all operations on the class' do
+            it do
+              expect(person.reload.username).to eq('Emily')
+              expect(Post.with(client: :other) { Post.count }).to be(1)
+              expect(update_events_txn_numbers.size).to eq(3) # person update, counter cache, post assignment
+              expect(update_events_txn_numbers.uniq.size).to eq(1) # person update, counter cache, post assignment
+              expect(insert_events_txn_numbers.size).to eq(2)
+              expect(insert_events_txn_numbers.uniq.size).to eq(1)
+              expect(update_events_txn_numbers.uniq).to eq(insert_events_txn_numbers.uniq)
             end
           end
 
-          it 'uses a single transaction number for all operations on the class' do
-            expect(person.reload.username).to eq('Emily')
-            expect(Post.with(client: :other) { Post.count }).to be(1)
-            expect(update_events_txn_numbers.size).to eq(3) # person update, counter cache, post assignment
-            expect(update_events_txn_numbers.uniq.size).to eq(1) # person update, counter cache, post assignment
-            expect(insert_events_txn_numbers.size).to eq(2)
-            expect(insert_events_txn_numbers.uniq.size).to eq(1)
-            expect(update_events_txn_numbers.uniq).to eq(insert_events_txn_numbers.uniq)
+          context 'using #with_session' do
+            before do
+              Post.with(client: :other) do
+                person.with_session do |s|
+                  s.start_transaction
+                  person.username = 'Emily'
+                  person.save!
+                  person.posts << Post.create!
+                  s.commit_transaction
+                end
+              end
+            end
+
+            include_examples 'it uses a single transaction number for all operations on the class'
+          end
+
+          context 'using #transaction' do
+            before do
+              Post.with(client: :other) do
+                person.transaction do
+                  person.username = 'Emily'
+                  person.save!
+                  person.posts << Post.create!
+                end
+              end
+            end
+
+            include_examples 'it uses a single transaction number for all operations on the class'
           end
         end
 
         context 'when the other class uses a different client' do
-
-          let!(:error) do
-            e = nil
-            begin
-              person.with_session do |s|
-                s.start_transaction
-                person.username = 'Emily'
-                person.save!
-                person.posts << Post.create!
-                s.commit_transaction
-              end
-            rescue => ex
-              e = ex
+          shared_examples 'does not abort the transaction' do
+            it 'raises an error' do
+              expect(error).to be_nil
             end
-            e
+
+            it 'did not abort the transaction' do
+              expect(person.reload.username).to eq('Emily')
+              expect(Post.count).to be(1)
+              expect(update_events_txn_numbers.size).to eq(2)
+              expect(insert_events_txn_numbers.size).to eq(1)
+            end
           end
 
-          it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+          context 'using #with_session' do
+            let!(:error) do
+              e = nil
+              begin
+                person.with_session do |s|
+                  s.start_transaction
+                  person.username = 'Emily'
+                  person.save!
+                  person.posts << Post.create!
+                  s.commit_transaction
+                end
+              rescue => ex
+                e = ex
+              end
+              e
+            end
+
+            include_examples 'does not abort the transaction'
           end
 
-          it 'aborted the transction' do
-            expect(person.reload.username).not_to eq('Emily')
-            expect(Post.count).to be(0)
-            expect(update_events_txn_numbers.size).to eq(1)
-            expect(insert_events_txn_numbers.size).to eq(1)
+          context 'using #transaction' do
+            let!(:error) do
+              e = nil
+              begin
+                person.transaction do
+                  person.username = 'Emily'
+                  person.save!
+                  person.posts << Post.create!
+                end
+              rescue => ex
+                e = ex
+              end
+              e
+            end
+
+            include_examples 'does not abort the transaction'
           end
         end
 
         context 'when transactions are nested' do
-
-          let!(:error) do
-            e = nil
-            begin
-              person.with_session do |s|
-                s.start_transaction
-                s.start_transaction
-                person.username = 'Emily'
-                person.save!
-                person.posts << Post.create!
-                s.commit_transaction
+          context 'use #with_session' do
+            let!(:error) do
+              e = nil
+              begin
+                person.with_session do |s|
+                  s.start_transaction
+                  s.start_transaction
+                  person.username = 'Emily'
+                  person.save!
+                  person.posts << Post.create!
+                  s.commit_transaction
+                end
+              rescue => ex
+                e = ex
               end
-            rescue => ex
-              e = ex
+              e
             end
-            e
+
+            it 'raises an error' do
+              expect(error).to be_a(Mongo::Error::InvalidTransactionOperation)
+            end
+
+            it 'does not execute any operations' do
+              expect(person.reload.username).not_to eq('Emily')
+              expect(Post.count).to be(0)
+              expect(update_events).to be_empty
+            end
           end
 
-          it 'raises an error' do
-            expect(error).to be_a(Mongo::Error::InvalidTransactionOperation)
+          context 'use #transaction' do
+            let!(:error) do
+              e = nil
+              begin
+                person.transaction do
+                  person.transaction do
+                    person.username = 'Emily'
+                    person.save!
+                    person.posts << Post.create!
+                  end
+                end
+              rescue => ex
+                e = ex
+              end
+              e
+            end
+
+            it 'raises an error' do
+              expect(error).to be_a(Mongoid::Errors::InvalidTransactionNesting)
+            end
+
+            it 'does not execute any operations' do
+              expect(person.reload.username).not_to eq('Emily')
+              expect(Post.count).to be(0)
+              expect(update_events).to be_empty
+            end
           end
 
-          it 'does not execute any operations' do
-            expect(person.reload.username).not_to eq('Emily')
-            expect(Post.count).to be(0)
-            expect(update_events).to be_empty
+        end
+      end
+
+      context 'when Mongoid::Errors:Rollback raised' do
+        let!(:error) do
+          error = nil
+          begin
+            person.transaction do
+              person.username = 'John'
+              person.save!
+              raise Mongoid::Errors::Rollback
+            end
+          rescue => e
+            error = e
           end
+          error
+        end
+
+        it 'does not bass on the exception' do
+          expect(error).to be_nil
+        end
+
+        it 'aborts the transaction' do
+          expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(1)
+          expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(0)
         end
       end
     end
@@ -375,7 +664,7 @@ describe Mongoid::Clients::Sessions do
     context 'when sessions are supported but transactions are not' do
       min_server_version '3.6'
       # Could also test 4.0 in sharded cluster
-      max_server_version '3.6'
+      max_server_version '3.6.99'
 
       around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
@@ -391,24 +680,58 @@ describe Mongoid::Clients::Sessions do
         end
       end
 
-      let!(:error) do
-        e = nil
-        begin
-          person.with_session do |s|
-            s.start_transaction
-            person.username = 'Emily'
-            person.save!
-            s.commit_transaction
+      context 'using #with_session' do
+        let!(:error) do
+          e = nil
+          begin
+            person.with_session do |s|
+              s.start_transaction
+              person.username = 'Emily'
+              person.save!
+              s.commit_transaction
+            end
+          rescue => ex
+            e = ex
           end
-        rescue => ex
-          e = ex
+          e
         end
-        e
+
+        it 'raises a transactions not supported error' do
+          expect(person.reload.username).not_to be('Emily')
+          expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
+        end
       end
 
-      it 'raises a sessions not supported error' do
-        expect(person.reload.username).not_to be('Emily')
-        expect(error).to be_a(Mongo::Error::OperationFailure)
+      context 'using #transaction' do
+        let!(:error) do
+          e = nil
+          begin
+            person.transaction do
+              person.username = 'Emily'
+              person.save!
+            end
+          rescue => ex
+            e = ex
+          end
+          e
+        end
+
+        it 'raises a transactions not supported error' do
+          expect(person.reload.username).not_to be('Emily')
+          expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
+        end
+      end
+    end
+
+    context 'when transactions are not supported' do
+      require_topology :single
+
+      it 'it raises a transactions not supported error' do
+        expect do
+          Person.transaction do
+            Person.create!
+          end
+        end.to raise_error(Mongoid::Errors::TransactionsNotSupported)
       end
     end
   end
