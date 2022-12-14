@@ -45,7 +45,9 @@ module Mongoid
             raise ex
           end
         rescue Mongo::Error::OperationFailure => ex
-          if ex.server_message =~ /startTransaction' is an unknown field/
+          if (ex.code == 40415 && ex.server_message =~ /startTransaction/) ||
+            (ex.code == 20 && ex.server_message =~ /Transaction/)
+          then
             raise Mongoid::Errors::TransactionsNotSupported.new
           else
             raise ex

@@ -357,12 +357,12 @@ describe Mongoid::Clients::Sessions do
     context 'when sessions are supported but transactions are not' do
       min_server_version '3.6'
       # Could also test 4.0 in sharded cluster
-      max_server_version '3.6'
+      max_server_version '3.6.99'
 
       shared_examples 'it raises a transactions not supported error' do
         it do
           expect(Person.count).to eq(0)
-          expect(error).to be_a(Mongo::Error::OperationFailure)
+          expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
         end
       end
 
@@ -398,6 +398,18 @@ describe Mongoid::Clients::Sessions do
         end
 
         include_examples 'it raises a transactions not supported error'
+      end
+    end
+
+    context 'when transactions are not supported' do
+      require_topology :single
+
+      it 'it raises a transactions not supported error' do
+        expect do
+          Person.transaction do
+            Person.create!
+          end
+        end.to raise_error(Mongoid::Errors::TransactionsNotSupported)
       end
     end
   end
@@ -708,6 +720,18 @@ describe Mongoid::Clients::Sessions do
           expect(person.reload.username).not_to be('Emily')
           expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
         end
+      end
+    end
+
+    context 'when transactions are not supported' do
+      require_topology :single
+
+      it 'it raises a transactions not supported error' do
+        expect do
+          Person.transaction do
+            Person.create!
+          end
+        end.to raise_error(Mongoid::Errors::TransactionsNotSupported)
       end
     end
   end
