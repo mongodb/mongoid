@@ -69,7 +69,7 @@ and ``--skip-system-test`` options:
 
 .. code-block:: sh
 
-    rails new blog --skip-bundle --skip-active-record --skip-test --skip-system-test
+    rails new blog --skip-active-record --skip-test --skip-system-test
     cd blog
 
 Setup Mongoid
