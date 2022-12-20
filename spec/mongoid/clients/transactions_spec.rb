@@ -735,4 +735,71 @@ describe Mongoid::Clients::Sessions do
       end
     end
   end
+
+  context 'when a transaction is used on Mongoid module' do
+    let(:subscriber) do
+      Mongoid::Clients.with_name(:default).send(:monitoring).subscribers['Command'].find do |s|
+        s.is_a?(EventSubscriber)
+      end
+    end
+
+    before do
+      Mongoid::Clients.with_name(:default).subscribe(Mongo::Monitoring::COMMAND, EventSubscriber.new)
+      subscriber.clear_events!
+    end
+
+    after do
+      Mongoid::Clients.with_name(:default).database.collections.each(&:drop)
+    end
+
+    context 'when transactions are supported' do
+      require_transaction_support
+
+      context 'when no error raised' do
+        before do
+          Mongoid.transaction do
+            Person.create!
+          end
+        end
+
+        it 'commits the transacrion' do
+          expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(0)
+          expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(1)
+        end
+
+        it 'executes the commands inside the transaction' do
+          expect(Person.count).to be(1)
+        end
+      end
+
+      context 'When an error raised' do
+        let!(:error) do
+          e = nil
+          begin
+            Mongoid.transaction do
+              Person.create!
+              Account.create!
+            end
+          rescue => ex
+            e = ex
+          end
+          e
+        end
+
+        it 'aborts the transaction' do
+          expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(1)
+          expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(0)
+        end
+
+        it 'passes on the error' do
+          expect(error).to be_a(Mongoid::Errors::Validations)
+        end
+
+        it 'reverts changes' do
+          expect(Account.count).to be(0)
+          expect(Person.count).to be(0)
+        end
+      end
+    end
+  end
 end
