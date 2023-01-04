@@ -123,7 +123,7 @@ module Mongoid
   end
 
   # Define client that is used when a transaction method is called
-  # on Mongoid module.
+  # on Mongoid module. This MUST be the default client.
   #
   # @api private
   def storage_options
