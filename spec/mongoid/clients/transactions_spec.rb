@@ -2,6 +2,16 @@
 
 require "spec_helper"
 
+def capture_exception
+  e = nil
+  begin
+    yield
+  rescue => ex
+    e = ex
+  end
+  e
+end
+
 describe Mongoid::Clients::Sessions do
   before(:all) do
     if Gem::Version.new(Mongo::VERSION) < Gem::Version.new('2.6')
@@ -200,8 +210,7 @@ describe Mongoid::Clients::Sessions do
 
           context 'using #with_session' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 Person.with_session do |s|
                   s.start_transaction
                   Person.create!
@@ -209,10 +218,7 @@ describe Mongoid::Clients::Sessions do
                   Post.create!
                   s.commit_transaction
                 end
-              rescue => ex
-                  e = ex
               end
-              e
             end
 
             include_examples 'it does not abort the transaction'
@@ -220,17 +226,13 @@ describe Mongoid::Clients::Sessions do
 
           context 'using #transaction' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 Person.transaction do
                   Person.create!
                   Person.create!
                   Post.create!
                 end
-              rescue => ex
-                  e = ex
               end
-              e
             end
 
             include_examples 'it does not abort the transaction'
@@ -252,8 +254,7 @@ describe Mongoid::Clients::Sessions do
 
           context 'using #with_session' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 Person.with_session do |s|
                   s.start_transaction
                   s.start_transaction
@@ -261,10 +262,7 @@ describe Mongoid::Clients::Sessions do
                   Post.create!
                   s.commit_transaction
                 end
-              rescue => ex
-                e = ex
               end
-              e
             end
 
             include_examples 'it aborts the transaction', Mongo::Error::InvalidTransactionOperation
@@ -272,18 +270,14 @@ describe Mongoid::Clients::Sessions do
 
           context 'using #transaction' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 Person.transaction do
                   Person.transaction do
                     Person.create!
                     Post.create!
                   end
                 end
-              rescue => ex
-                e = ex
               end
-              e
             end
 
             include_examples 'it aborts the transaction', Mongoid::Errors::InvalidTransactionNesting
@@ -331,16 +325,12 @@ describe Mongoid::Clients::Sessions do
 
       context 'when Mongoid::Errors:Rollback raised' do
         let!(:error) do
-          error = nil
-          begin
+          capture_exception do
             Person.transaction do
               Person.create!
               raise Mongoid::Errors::Rollback
             end
-          rescue => e
-            error = e
           end
-          error
         end
 
         it 'does not bass on the exception' do
@@ -368,17 +358,13 @@ describe Mongoid::Clients::Sessions do
 
       context 'using #with_session' do
         let!(:error) do
-          e = nil
-          begin
+          capture_exception do
             Person.with_session do |s|
               s.start_transaction
               Person.create!
               s.commit_transaction
             end
-          rescue => ex
-            e = ex
           end
-          e
         end
 
         include_examples 'it raises a transactions not supported error'
@@ -386,15 +372,11 @@ describe Mongoid::Clients::Sessions do
 
       context 'using #transaction' do
         let!(:error) do
-          e = nil
-          begin
+          capture_exception do
             Person.transaction do
               Person.create!
             end
-          rescue => ex
-            e = ex
           end
-          e
         end
 
         include_examples 'it raises a transactions not supported error'
@@ -537,8 +519,7 @@ describe Mongoid::Clients::Sessions do
 
           context 'using #with_session' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 person.with_session do |s|
                   s.start_transaction
                   person.username = 'Emily'
@@ -546,10 +527,7 @@ describe Mongoid::Clients::Sessions do
                   person.posts << Post.create!
                   s.commit_transaction
                 end
-              rescue => ex
-                e = ex
               end
-              e
             end
 
             include_examples 'does not abort the transaction'
@@ -557,17 +535,14 @@ describe Mongoid::Clients::Sessions do
 
           context 'using #transaction' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 person.transaction do
                   person.username = 'Emily'
                   person.save!
                   person.posts << Post.create!
                 end
               rescue => ex
-                e = ex
               end
-              e
             end
 
             include_examples 'does not abort the transaction'
@@ -577,8 +552,7 @@ describe Mongoid::Clients::Sessions do
         context 'when transactions are nested' do
           context 'use #with_session' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 person.with_session do |s|
                   s.start_transaction
                   s.start_transaction
@@ -587,10 +561,7 @@ describe Mongoid::Clients::Sessions do
                   person.posts << Post.create!
                   s.commit_transaction
                 end
-              rescue => ex
-                e = ex
               end
-              e
             end
 
             it 'raises an error' do
@@ -606,8 +577,7 @@ describe Mongoid::Clients::Sessions do
 
           context 'use #transaction' do
             let!(:error) do
-              e = nil
-              begin
+              capture_exception do
                 person.transaction do
                   person.transaction do
                     person.username = 'Emily'
@@ -615,10 +585,7 @@ describe Mongoid::Clients::Sessions do
                     person.posts << Post.create!
                   end
                 end
-              rescue => ex
-                e = ex
               end
-              e
             end
 
             it 'raises an error' do
@@ -637,17 +604,13 @@ describe Mongoid::Clients::Sessions do
 
       context 'when Mongoid::Errors:Rollback raised' do
         let!(:error) do
-          error = nil
-          begin
+          capture_exception do
             person.transaction do
               person.username = 'John'
               person.save!
               raise Mongoid::Errors::Rollback
             end
-          rescue => e
-            error = e
           end
-          error
         end
 
         it 'does not bass on the exception' do
@@ -682,18 +645,14 @@ describe Mongoid::Clients::Sessions do
 
       context 'using #with_session' do
         let!(:error) do
-          e = nil
-          begin
+          capture_exception do
             person.with_session do |s|
               s.start_transaction
               person.username = 'Emily'
               person.save!
               s.commit_transaction
             end
-          rescue => ex
-            e = ex
           end
-          e
         end
 
         it 'raises a transactions not supported error' do
@@ -704,16 +663,12 @@ describe Mongoid::Clients::Sessions do
 
       context 'using #transaction' do
         let!(:error) do
-          e = nil
-          begin
+          capture_exception do
             person.transaction do
               person.username = 'Emily'
               person.save!
             end
-          rescue => ex
-            e = ex
           end
-          e
         end
 
         it 'raises a transactions not supported error' do
@@ -774,16 +729,12 @@ describe Mongoid::Clients::Sessions do
 
       context 'When an error raised' do
         let!(:error) do
-          e = nil
-          begin
+          capture_exception do
             Mongoid.transaction do
               Person.create!
               Account.create!
             end
-          rescue => ex
-            e = ex
           end
-          e
         end
 
         it 'aborts the transaction' do
