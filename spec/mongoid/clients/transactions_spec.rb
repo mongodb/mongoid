@@ -983,6 +983,139 @@ describe Mongoid::Clients::Sessions do
               subject.update_attributes!(name: 'Austin Powers')
               raise Mongoid::Errors::Rollback
             end
+
+            it_behaves_like 'commit callbacks are called'
+          end
+
+          context 'when modified multiple times' do
+            before do
+              subject.transaction do
+                subject.name = 'Austin Powers'
+                subject.save!
+                subject.name = 'Jason Bourne'
+                subject.save!
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
+        end
+
+        context 'destroy' do
+          let(:after_commit_counter) do
+            TransactionsSpecCounter.new
+          end
+
+          let(:after_rollback_counter) do
+            TransactionsSpecCounter.new
+          end
+
+          let(:subject) do
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
+              p.after_commit_counter = after_commit_counter
+              p.after_rollback_counter = after_rollback_counter
+            end
+          end
+
+          before do
+            subject.transaction do
+              subject.destroy
+              raise Mongoid::Errors::Rollback
+            end
+            person
+          end
+
+          it_behaves_like 'rollback callbacks are called'
+        end
+
+        context 'save' do
+          let(:subject) do
+            TransactionsSpecPerson.create!(name: 'James Bond')
+          end
+
+          context 'when modified once' do
+            before do
+              begin
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                  raise 'Something went wrong'
+                end
+              rescue RuntimeError
+              end
+            end
+
+            it_behaves_like 'rollback callbacks are called'
+          end
+
+          context 'when modified multiple times' do
+            before do
+              subject.transaction do
+                subject.name = 'Austin Powers'
+                subject.save!
+                subject.name = 'Jason Bourne'
+                subject.save!
+                raise Mongoid::Errors::Rollback
+              end
+            end
+
+            it_behaves_like 'rollback callbacks are called'
+          end
+
+          context 'when exception is raised in a callback' do
+            context 'in before_save' do
+              let(:subject) do
+                TransactionSpecRaisesBeforeSave.new
+              end
+
+              before do
+                begin
+                  subject.transaction do
+                    subject.save!
+                  end
+                rescue RuntimeError
+                end
+              end
+
+              it 'does not call any transaction callbacks' do
+                # This is according to Rails behavior
+                expect(subject.after_commit_counter.value).to eq(0)
+                expect(subject.after_rollback_counter.value).to eq(0)
+              end
+            end
+
+            context 'in after_save' do
+              let(:subject) do
+                TransactionSpecRaisesAfterSave.new
+              end
+
+              before do
+                begin
+                  subject.transaction do
+                    subject.save!
+                  end
+                rescue RuntimeError
+                end
+              end
+
+              it_behaves_like 'rollback callbacks are called'
+            end
+          end
+        end
+
+        context 'update_attributes' do
+          let(:subject) do
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
+              p.after_commit_counter.reset
+              p.after_rollback_counter.reset
+            end
+          end
+
+          before do
+            subject.transaction do
+              subject.update_attributes!(name: 'Austin Powers')
+              raise Mongoid::Errors::Rollback
+            end
           end
 
           it_behaves_like 'rollback callbacks are called'

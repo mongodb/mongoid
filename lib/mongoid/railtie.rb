@@ -9,6 +9,13 @@ module Rails
     # Hooks Mongoid into Rails 3 and higher.
     class Railtie < Rails::Railtie
 
+      console do |app|
+        if app.sandbox?
+          require "mongoid/railties/console_sandbox"
+          start_sandbox
+        end
+      end
+
       # Mapping of rescued exceptions to HTTP responses
       #
       # @example
