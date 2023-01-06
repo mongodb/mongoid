@@ -42,6 +42,7 @@ module Mongoid
   extend Forwardable
   extend Loggable
   extend self
+  extend Clients::Sessions::ClassMethods
 
   # A string added to the platform details of Ruby driver client handshake documents.
   PLATFORM_DETAILS = "mongoid-#{VERSION}".freeze
@@ -113,6 +114,21 @@ module Mongoid
   #   Mongoid.database = Mongo::Connection.new.db("test")
   def_delegators Config, *(Config.public_instance_methods(false) - [ :logger=, :logger ])
 
+  # Define persistence context that is used when a transaction method is called
+  # on Mongoid module.
+  #
+  # @api private
+  def persistence_context
+    PersistenceContext.get(Mongoid) || PersistenceContext.new(Mongoid)
+  end
+
+  # Define client that is used when a transaction method is called
+  # on Mongoid module. This MUST be the default client.
+  #
+  # @api private
+  def storage_options
+    { client: :default }
+  end
 
   # Module used to prepend the discriminator key assignment function to change
   # the value assigned to the discriminator key to a string.
