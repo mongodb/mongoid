@@ -699,6 +699,9 @@ describe Mongoid::Clients::Sessions do
     end
 
     before do
+      Mongoid::Clients.with_name(:default).database.collections.each(&:drop)
+      Person.collection.create
+      Account.collection.create
       Mongoid::Clients.with_name(:default).subscribe(Mongo::Monitoring::COMMAND, EventSubscriber.new)
       subscriber.clear_events!
     end
