@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './transactions_spec_models'
 
 def capture_exception
   e = nil
@@ -753,6 +754,212 @@ describe Mongoid::Clients::Sessions do
           expect(Account.count).to be(0)
           expect(Person.count).to be(0)
         end
+      end
+    end
+  end
+
+  context 'callbacks' do
+    require_transaction_support
+
+    before do
+      TransactionsSpecPerson.collection.create
+    end
+
+    after do
+      TransactionsSpecPerson.collection.drop
+    end
+
+    shared_examples 'commit callbacks are called' do
+      it 'calls after_commit once' do
+        expect(person.after_commit_counter.value).to eq(1)
+      end
+
+      it 'does not call after_rollback' do
+        expect(person.after_rollback_counter.value).to eq(0)
+      end
+    end
+
+    shared_examples 'rollback callbacks are called' do
+      it 'does not call after_commit' do
+        expect(person.after_commit_counter.value).to eq(0)
+      end
+
+      it 'calls after_rollback once' do
+        expect(person.after_rollback_counter.value).to eq(1)
+      end
+    end
+
+    context 'when commit the transaction' do
+      context 'create' do
+        let!(:person) do
+          person = nil
+          TransactionsSpecPerson.transaction do
+            person = TransactionsSpecPerson.create!(name: 'James Bond')
+          end
+          person
+        end
+
+        it_behaves_like 'commit callbacks are called'
+      end
+
+      context 'save' do
+        let(:person) do
+          TransactionsSpecPerson.create!(name: 'James Bond')
+        end
+
+        context 'when modified once' do
+          before do
+            person.transaction do
+              person.name = 'Austin Powers'
+              person.save!
+            end
+          end
+
+          it_behaves_like 'commit callbacks are called'
+        end
+
+        context 'when modified multiple times' do
+          before do
+            person.transaction do
+              person.name = 'Austin Powers'
+              person.save!
+              person.name = 'Jason Bourne'
+              person.save!
+            end
+          end
+
+          it_behaves_like 'commit callbacks are called'
+        end
+      end
+
+      context 'update_attributes' do
+        let(:person) do
+          TransactionsSpecPerson.create!(name: 'James Bond')
+        end
+
+        before do
+          person.transaction do
+            person.update_attributes!(name: 'Austin Powers')
+          end
+        end
+
+        it_behaves_like 'commit callbacks are called'
+      end
+
+      context 'delete' do
+        let(:after_commit_counter) do
+          TransactionsSpecCounter.new
+        end
+
+        let(:after_rollback_counter) do
+          TransactionsSpecCounter.new
+        end
+
+        let(:person) do
+          TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
+            p.after_commit_counter = after_commit_counter
+            p.after_rollback_counter = after_rollback_counter
+          end
+        end
+
+        before do
+          person.transaction do
+            person.delete
+          end
+        end
+
+        it_behaves_like 'commit callbacks are called'
+      end
+    end
+
+    context 'when rollback the transaction' do
+      context 'create' do
+        let!(:person) do
+          person = nil
+          TransactionsSpecPerson.transaction do
+            person = TransactionsSpecPerson.create!(name: 'James Bond')
+            raise Mongoid::Errors::Rollback
+          end
+          person
+        end
+
+        it_behaves_like 'rollback callbacks are called'
+      end
+
+      context 'save' do
+        let(:person) do
+          TransactionsSpecPerson.create!(name: 'James Bond')
+        end
+
+        context 'when modified once' do
+          before do
+            begin
+              person.transaction do
+                person.name = 'Austin Powers'
+                person.save!
+                raise 'Something went wrong'
+              end
+            rescue RuntimeError
+            end
+          end
+
+          it_behaves_like 'rollback callbacks are called'
+        end
+
+        context 'when modified multiple times' do
+          before do
+            person.transaction do
+              person.name = 'Austin Powers'
+              person.save!
+              person.name = 'Jason Bourne'
+              person.save!
+              raise Mongoid::Errors::Rollback
+            end
+          end
+
+          it_behaves_like 'rollback callbacks are called'
+        end
+      end
+
+      context 'update_attributes' do
+        let(:person) do
+          TransactionsSpecPerson.create!(name: 'James Bond')
+        end
+
+        before do
+          person.transaction do
+            person.update_attributes!(name: 'Austin Powers')
+            raise Mongoid::Errors::Rollback
+          end
+        end
+
+        it_behaves_like 'rollback callbacks are called'
+      end
+
+      context 'delete' do
+        let(:after_commit_counter) do
+          TransactionsSpecCounter.new
+        end
+
+        let(:after_rollback_counter) do
+          TransactionsSpecCounter.new
+        end
+
+        let(:person) do
+          TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
+            p.after_commit_counter = after_commit_counter
+            p.after_rollback_counter = after_rollback_counter
+          end
+        end
+
+        before do
+          person.transaction do
+            person.delete
+            raise Mongoid::Errors::Rollback
+          end
+        end
+
+        it_behaves_like 'rollback callbacks are called'
       end
     end
   end

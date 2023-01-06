@@ -5,7 +5,6 @@ module Mongoid
 
     # Encapsulates behavior for using sessions and transactions.
     module Sessions
-
       def self.included(base)
         base.include(ClassMethods)
       end
@@ -46,8 +45,7 @@ module Mongoid
           end
         rescue Mongo::Error::OperationFailure => ex
           if (ex.code == 40415 && ex.server_message =~ /startTransaction/) ||
-            (ex.code == 20 && ex.server_message =~ /Transaction/)
-          then
+             (ex.code == 20 && ex.server_message =~ /Transaction/)
             raise Mongoid::Errors::TransactionsNotSupported.new
           else
             raise ex
@@ -82,17 +80,17 @@ module Mongoid
             begin
               session.start_transaction(options)
               yield
-              session.commit_transaction
+              commit_transaction(session)
             rescue Mongoid::Errors::Rollback
-              session.abort_transaction
+              abort_transaction(session)
             rescue Mongoid::Errors::InvalidSessionNesting
               # Session should be ended here.
               raise Mongoid::Errors::InvalidTransactionNesting.new
             rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
-              session.abort_transaction
+              abort_transaction(session)
               raise Mongoid::Errors::TransactionError(e)
             rescue StandardError => e
-              session.abort_transaction
+              abort_transaction(session)
               raise e
             end
           end
@@ -102,6 +100,20 @@ module Mongoid
 
         def _session
           Threaded.get_session(client: persistence_context.client)
+        end
+
+        def commit_transaction(session)
+          session.commit_transaction
+          Threaded.clear_modified_documents(session).each do |doc|
+            doc.run_after_callbacks(:commit)
+          end
+        end
+
+        def abort_transaction(session)
+          session.abort_transaction
+          Threaded.clear_modified_documents(session).each do |doc|
+            doc.run_after_callbacks(:rollback)
+          end
         end
       end
     end

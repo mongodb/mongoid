@@ -167,6 +167,7 @@ module Mongoid
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
+      Threaded.add_modified_document(_session, self)
       true
     end
 

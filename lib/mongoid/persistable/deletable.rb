@@ -105,6 +105,7 @@ module Mongoid
         yield(self)
         freeze
         self.destroyed = true
+        Threaded.add_modified_document(_session, self)
       end
 
       module ClassMethods
