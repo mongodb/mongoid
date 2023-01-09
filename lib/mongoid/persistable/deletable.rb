@@ -99,7 +99,7 @@ module Mongoid
       #     collection.find(atomic_selector).remove
       #   end
       #
-      # @return [ Object ] The result of the block.
+      # @return [ true ] If the object was deleted successfully.
       def prepare_delete
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         yield(self)
