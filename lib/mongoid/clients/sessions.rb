@@ -98,10 +98,16 @@ module Mongoid
 
         private
 
+        # @return [ Mongo::Session ] Session for the current client.
         def _session
           Threaded.get_session(client: persistence_context.client)
         end
 
+        # Commits the active transaction on the session, and calls
+        # after_commit callbacks on modified documents.
+        #
+        # @param [ Mongo::Session ] session Session on which
+        #   a transaction is started.
         def commit_transaction(session)
           session.commit_transaction
           Threaded.clear_modified_documents(session).each do |doc|
@@ -109,6 +115,11 @@ module Mongoid
           end
         end
 
+        # Aborts the active transaction on the session, and calls
+        # after_rollback callbacks on modified documents.
+        #
+        # @param [ Mongo::Session ] session Session on which
+        #   a transaction is started.
         def abort_transaction(session)
           session.abort_transaction
           Threaded.clear_modified_documents(session).each do |doc|

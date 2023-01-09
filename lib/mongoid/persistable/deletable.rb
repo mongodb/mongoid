@@ -104,8 +104,8 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         yield(self)
         freeze
-        self.destroyed = true
         Threaded.add_modified_document(_session, self)
+        self.destroyed = true
       end
 
       module ClassMethods
