@@ -771,27 +771,27 @@ describe Mongoid::Clients::Sessions do
 
     shared_examples 'commit callbacks are called' do
       it 'calls after_commit once' do
-        expect(person.after_commit_counter.value).to eq(1)
+        expect(subject.after_commit_counter.value).to eq(1)
       end
 
       it 'does not call after_rollback' do
-        expect(person.after_rollback_counter.value).to eq(0)
+        expect(subject.after_rollback_counter.value).to eq(0)
       end
     end
 
     shared_examples 'rollback callbacks are called' do
       it 'does not call after_commit' do
-        expect(person.after_commit_counter.value).to eq(0)
+        expect(subject.after_commit_counter.value).to eq(0)
       end
 
       it 'calls after_rollback once' do
-        expect(person.after_rollback_counter.value).to eq(1)
+        expect(subject.after_rollback_counter.value).to eq(1)
       end
     end
 
     context 'when commit the transaction' do
       context 'create' do
-        let!(:person) do
+        let!(:subject) do
           person = nil
           TransactionsSpecPerson.transaction do
             person = TransactionsSpecPerson.create!(name: 'James Bond')
@@ -803,15 +803,15 @@ describe Mongoid::Clients::Sessions do
       end
 
       context 'save' do
-        let(:person) do
+        let(:subject) do
           TransactionsSpecPerson.create!(name: 'James Bond')
         end
 
         context 'when modified once' do
           before do
-            person.transaction do
-              person.name = 'Austin Powers'
-              person.save!
+            subject.transaction do
+              subject.name = 'Austin Powers'
+              subject.save!
             end
           end
 
@@ -820,11 +820,11 @@ describe Mongoid::Clients::Sessions do
 
         context 'when modified multiple times' do
           before do
-            person.transaction do
-              person.name = 'Austin Powers'
-              person.save!
-              person.name = 'Jason Bourne'
-              person.save!
+            subject.transaction do
+              subject.name = 'Austin Powers'
+              subject.save!
+              subject.name = 'Jason Bourne'
+              subject.save!
             end
           end
 
@@ -833,13 +833,13 @@ describe Mongoid::Clients::Sessions do
       end
 
       context 'update_attributes' do
-        let(:person) do
+        let(:subject) do
           TransactionsSpecPerson.create!(name: 'James Bond')
         end
 
         before do
-          person.transaction do
-            person.update_attributes!(name: 'Austin Powers')
+          subject.transaction do
+            subject.update_attributes!(name: 'Austin Powers')
           end
         end
 
@@ -855,7 +855,7 @@ describe Mongoid::Clients::Sessions do
           TransactionsSpecCounter.new
         end
 
-        let(:person) do
+        let(:subject) do
           TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
             p.after_commit_counter = after_commit_counter
             p.after_rollback_counter = after_rollback_counter
@@ -863,8 +863,8 @@ describe Mongoid::Clients::Sessions do
         end
 
         before do
-          person.transaction do
-            person.delete
+          subject.transaction do
+            subject.delete
           end
         end
 
@@ -874,7 +874,7 @@ describe Mongoid::Clients::Sessions do
 
     context 'when rollback the transaction' do
       context 'create' do
-        let!(:person) do
+        let!(:subject) do
           person = nil
           TransactionsSpecPerson.transaction do
             person = TransactionsSpecPerson.create!(name: 'James Bond')
@@ -887,16 +887,16 @@ describe Mongoid::Clients::Sessions do
       end
 
       context 'save' do
-        let(:person) do
+        let(:subject) do
           TransactionsSpecPerson.create!(name: 'James Bond')
         end
 
         context 'when modified once' do
           before do
             begin
-              person.transaction do
-                person.name = 'Austin Powers'
-                person.save!
+              subject.transaction do
+                subject.name = 'Austin Powers'
+                subject.save!
                 raise 'Something went wrong'
               end
             rescue RuntimeError
@@ -908,27 +908,67 @@ describe Mongoid::Clients::Sessions do
 
         context 'when modified multiple times' do
           before do
-            person.transaction do
-              person.name = 'Austin Powers'
-              person.save!
-              person.name = 'Jason Bourne'
-              person.save!
+            subject.transaction do
+              subject.name = 'Austin Powers'
+              subject.save!
+              subject.name = 'Jason Bourne'
+              subject.save!
               raise Mongoid::Errors::Rollback
             end
           end
 
           it_behaves_like 'rollback callbacks are called'
         end
+
+        context 'when exception is raised in a callback' do
+          context 'in before_save' do
+            let(:subject) do
+              TransactionSpecRaisesBeforeSave.new
+            end
+
+            before do
+              begin
+                subject.transaction do
+                  subject.save!
+                end
+              rescue RuntimeError
+              end
+            end
+
+            it 'does not call any transaction callbacks' do
+              # This is according to Rails behavior
+              expect(subject.after_commit_counter.value).to eq(0)
+              expect(subject.after_rollback_counter.value).to eq(0)
+            end
+          end
+
+          context 'in after_save' do
+            let(:subject) do
+              TransactionSpecRaisesAfterSave.new
+            end
+
+            before do
+              begin
+                subject.transaction do
+                  subject.save!
+                end
+              rescue RuntimeError
+              end
+            end
+
+            it_behaves_like 'rollback callbacks are called'
+          end
+        end
       end
 
       context 'update_attributes' do
-        let(:person) do
+        let(:subject) do
           TransactionsSpecPerson.create!(name: 'James Bond')
         end
 
         before do
-          person.transaction do
-            person.update_attributes!(name: 'Austin Powers')
+          subject.transaction do
+            subject.update_attributes!(name: 'Austin Powers')
             raise Mongoid::Errors::Rollback
           end
         end
@@ -945,7 +985,7 @@ describe Mongoid::Clients::Sessions do
           TransactionsSpecCounter.new
         end
 
-        let(:person) do
+        let(:subject) do
           TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
             p.after_commit_counter = after_commit_counter
             p.after_rollback_counter = after_rollback_counter
@@ -953,8 +993,8 @@ describe Mongoid::Clients::Sessions do
         end
 
         before do
-          person.transaction do
-            person.delete
+          subject.transaction do
+            subject.delete
             raise Mongoid::Errors::Rollback
           end
         end
