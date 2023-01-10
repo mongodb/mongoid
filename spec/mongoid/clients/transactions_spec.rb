@@ -762,7 +762,7 @@ describe Mongoid::Clients::Sessions do
     require_transaction_support
 
     before do
-      Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
+      Mongoid::Clients.with_name(:default).database.collections.each(&:drop)
       TransactionsSpecPerson.collection.create
       TransactionSpecRaisesBeforeSave.collection.create
       TransactionSpecRaisesAfterSave.collection.create
