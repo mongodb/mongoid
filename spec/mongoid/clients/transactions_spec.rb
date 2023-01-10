@@ -762,11 +762,10 @@ describe Mongoid::Clients::Sessions do
     require_transaction_support
 
     before do
+      Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
       TransactionsSpecPerson.collection.create
-    end
-
-    after do
-      TransactionsSpecPerson.collection.drop
+      TransactionSpecRaisesBeforeSave.collection.create
+      TransactionSpecRaisesAfterSave.collection.create
     end
 
     shared_examples 'commit callbacks are called' do
