@@ -150,6 +150,14 @@ describe Mongoid::Extensions::Time do
       end
     end
 
+    context "when time is a BSON::Timestamp" do
+
+      it "returns the timestamp as a Time" do
+        expect(Time.demongoize(BSON::Timestamp.new(1000, 1)))
+          .to be == Time.at(1000)
+      end
+    end
+
     context "when the value is a string" do
 
       context "when use_utc is false" do
