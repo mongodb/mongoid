@@ -937,4 +937,48 @@ describe Mongoid::Contextual::Atomic do
       end
     end
   end
+
+  describe '#current_date' do
+    let!(:tmbg) { Band.create! }
+    let(:criteria) { Band.all }
+    let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
+    
+    context 'when the field does not exist' do
+      it 'creates the field' do
+        context.current_date(significant_date: true)
+        expect(tmbg.reload[:significant_date]).to be > 1.second.ago
+      end
+    end
+
+    context 'when an using a symbolic type' do
+      context 'when the type is implied' do
+        it 'assumes the type is `true`' do
+          context.current_date(:founded)
+          expect(tmbg.reload.founded).to be == Date.today
+        end
+      end
+
+      context 'when the type is known' do
+        it 'accepts the type' do
+          context.current_date(founded: :date)
+          expect(tmbg.reload.founded).to be == Date.today
+        end
+      end
+
+      context 'when the type is unknown' do
+        it 'raises an exception' do
+          expect { context.current_date(founded: :bogus) }
+            .to raise_error(Mongo::Error::OperationFailure)
+        end
+      end
+
+      context 'with mixed argument types' do
+        it 'accepts the arguments' do
+          context.current_date(:created, founded: :date)
+          expect(tmbg.reload.founded).to be == Date.today
+          expect(tmbg.created).to be > 1.second.ago
+        end
+      end
+    end
+  end
 end

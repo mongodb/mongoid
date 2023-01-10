@@ -150,7 +150,7 @@ describe Mongoid::Extensions::Time do
       end
     end
 
-    context "when time is a BSON::Timestamp" do
+    context "when the value is a BSON::Timestamp" do
 
       it "returns the timestamp as a Time" do
         expect(Time.demongoize(BSON::Timestamp.new(1000, 1)))
