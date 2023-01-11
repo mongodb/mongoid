@@ -8,6 +8,7 @@ require "mongoid/persistable/incrementable"
 require "mongoid/persistable/logical"
 require "mongoid/persistable/maxable"
 require "mongoid/persistable/minable"
+require "mongoid/persistable/multipliable"
 require "mongoid/persistable/poppable"
 require "mongoid/persistable/pullable"
 require "mongoid/persistable/pushable"
@@ -31,6 +32,7 @@ module Mongoid
     include Logical
     include Maxable
     include Minable
+    include Multipliable
     include Poppable
     include Positional
     include Pullable
