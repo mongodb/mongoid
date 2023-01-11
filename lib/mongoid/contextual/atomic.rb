@@ -185,6 +185,27 @@ module Mongoid
         view.update_many("$currentDate" => fields)
       end
 
+      # Performs an atomic $min update operation on the given field or fields.
+      #
+      # @note Because of the existence of
+      #   Mongoid::Contextual::Aggregable::Mongo#min, this method cannot be
+      #   named #min, and thus breaks that convention of other similar methods
+      #   of being named for the MongoDB operation they perform.
+      #
+      # @example Set "views" to be no more than 100.
+      #   context.update_min(views: 100)
+      #
+      # @example Set multiple fields to the current date.
+      #   context.current_date(:completed, last_viewed: :timestamp)
+      #
+      # @param [ Hash ] fields The fields with the maximum value that each
+      #   may be set to.
+      #
+      # @return [ nil ] Nil.
+      def update_min(fields)
+        view.update_many("$min" => collect_operations(fields))
+      end
+
       private
 
       # Collects nested operations, where `ops` is assumed to be an array of
