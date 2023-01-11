@@ -103,6 +103,10 @@ module Mongoid
           Threaded.get_session(client: persistence_context.client)
         end
 
+        def in_transaction?
+          _session&.in_transaction? || false
+        end
+
         # Commits the active transaction on the session, and calls
         # after_commit callbacks on modified documents.
         #

@@ -10,6 +10,10 @@ class TransactionsSpecCounter
   def value
     @called
   end
+
+  def reset
+    @called = 0
+  end
 end
 
 module TransactionsSpecCountable
