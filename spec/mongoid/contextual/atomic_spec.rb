@@ -306,7 +306,7 @@ describe Mongoid::Contextual::Atomic do
     context "when the field does not exist" do
 
       it "does not error on the inc" do
-        expect(smiths.likes).to be_nil
+        expect(smiths.reload.likes).to be == 10
       end
     end
 
@@ -346,6 +346,64 @@ describe Mongoid::Contextual::Atomic do
 
       it "incs the value and read from alias" do
         expect(depeche_mode.reload.years).to eq(1)
+      end
+    end
+  end
+
+  describe "#mul" do
+
+    let!(:depeche_mode) { Band.create!(likes: 60) }
+    let!(:smiths) { Band.create! }
+    let!(:beatles) { Band.create!(years: 2) }
+
+    let(:criteria) { Band.all }
+    let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
+
+    before { context.mul(likes: 10) }
+
+    context "when the field exists" do
+
+      it "muls the value" do
+        expect(depeche_mode.reload.likes).to eq(600)
+      end
+    end
+
+    context "when the field does not exist" do
+
+      it "sets undefined fields to zero" do
+        expect(smiths.reload.likes).to be == 0
+      end
+    end
+
+    context "when using the alias" do
+
+      before do
+        context.mul(years: 2)
+      end
+
+      it "muls the value and read from alias" do
+        expect(beatles.reload.years).to eq(4)
+      end
+
+      it "muls the value and read from field" do
+        expect(beatles.reload.y).to eq(4)
+      end
+    end
+
+    context 'when the criteria has a collation' do
+      min_server_version '3.4'
+
+      let!(:depeche_mode) { Band.create!(members: [ "Dave" ], years: 3) }
+      let(:criteria) do
+        Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
+
+      before { context.mul(years: 2) }
+
+      it "muls the value" do
+        expect(depeche_mode.reload.years).to eq(6)
       end
     end
   end

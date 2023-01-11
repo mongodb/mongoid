@@ -52,6 +52,18 @@ module Mongoid
         view.update_many("$inc" => collect_operations(incs))
       end
 
+      # Perform an atomic $mul operation on the matching documents.
+      #
+      # @example Perform the atomic multiplication.
+      #   context.mul(likes: 10)
+      #
+      # @param [ Hash ] factors The operations.
+      #
+      # @return [ nil ] Nil.
+      def mul(factors)
+        view.update_many("$mul" => collect_operations(factors))
+      end
+
       # Perform an atomic $pop operation on the matching documents.
       #
       # @example Pop the first value on the matches.
