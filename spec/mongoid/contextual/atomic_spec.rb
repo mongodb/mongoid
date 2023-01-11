@@ -1001,16 +1001,14 @@ describe Mongoid::Contextual::Atomic do
     shared_examples_for 'a min-able context' do
       it 'chooses the smaller value' do
         context.update_min("member_count" => given_members, views: given_views)
-        expect(band.reload.member_count).to be == expect_members
-        expect(band.views).to be == expect_views
+        expect(band.reload.member_count).to be == [ member_count, given_members ].min
+        expect(band.views).to be == [ views, given_views ].min
       end
     end
 
     context 'when given value < existing value' do
       let(:given_views) { views - 1 }
       let(:given_members) { member_count - 1 }
-      let(:expect_views) { given_views }
-      let(:expect_members) { given_members }
 
       it_behaves_like 'a min-able context'
     end
@@ -1018,8 +1016,6 @@ describe Mongoid::Contextual::Atomic do
     context 'when given value == existing value' do
       let(:given_views) { views }
       let(:given_members) { member_count }
-      let(:expect_views) { given_views }
-      let(:expect_members) { given_members }
 
       it_behaves_like 'a min-able context'
     end
@@ -1027,8 +1023,6 @@ describe Mongoid::Contextual::Atomic do
     context 'when given value > existing value' do
       let(:given_views) { views + 1 }
       let(:given_members) { member_count + 1 }
-      let(:expect_views) { views }
-      let(:expect_members) { member_count }
 
       it_behaves_like 'a min-able context'
     end
@@ -1044,6 +1038,66 @@ describe Mongoid::Contextual::Atomic do
       it 'picks the earliest date' do
         context.update_min(founded: founded - 1)
         expect(band.reload.founded).to be == founded - 1
+      end
+    end
+  end
+
+  describe '#update_max' do
+    let(:member_count) { 5 }
+    let(:views) { 25_000 }
+    let(:founded) { 2.years.ago.to_date }
+    let(:decimal) { 3.1415 }
+
+    let!(:band) do
+      Band.create!(
+        member_count: member_count,
+        founded: founded,
+        views: views)
+    end
+
+    let(:criteria) { Band.all }
+    let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
+
+    shared_examples_for 'a max-able context' do
+      it 'chooses the larger value' do
+        context.update_max("member_count" => given_members, views: given_views)
+        expect(band.reload.member_count).to be == [ member_count, given_members ].max
+        expect(band.views).to be == [ views, given_views ].max
+      end
+    end
+
+    context 'when given value < existing value' do
+      let(:given_views) { views - 1 }
+      let(:given_members) { member_count - 1 }
+
+      it_behaves_like 'a max-able context'
+    end
+
+    context 'when given value == existing value' do
+      let(:given_views) { views }
+      let(:given_members) { member_count }
+
+      it_behaves_like 'a max-able context'
+    end
+
+    context 'when given value > existing value' do
+      let(:given_views) { views + 1 }
+      let(:given_members) { member_count + 1 }
+
+      it_behaves_like 'a max-able context'
+    end
+
+    context 'when the named field does not yet exist on the document' do
+      it 'sets the field to the argument' do
+        context.update_max(new_field: 100)
+        expect(band.reload.new_field).to be == 100
+      end
+    end
+
+    context 'when arguments are dates/times' do
+      it 'picks the earliest date' do
+        context.update_max(founded: founded + 1)
+        expect(band.reload.founded).to be == founded + 1
       end
     end
   end
