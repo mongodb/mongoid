@@ -20,20 +20,33 @@ module Mongoid
       # @example Upsert the document with replace.
       #   document.upsert(replace: true)
       #
+      # @example Upsert with extra attributes to use when inserting.
+      #   document.upsert(set_on_insert: { created_at: DateTime.now })
+      #
       # @param [ Hash ] options The validation options.
       #
       # @option options [ true | false ] :validate Whether or not to validate.
-      # @option options [ true | false ] :replace Whether or not to replace the document on upsert.
+      # @option options [ true | false ] :replace Whether or not to replace
+      #   the document on upsert.
+      # @option options [ Hash ] :set_on_insert The attributes to include if
+      #   the document does not already exist.
       #
       # @return [ true ] True.
       def upsert(options = {})
         prepare_upsert(options) do
           if options[:replace]
+            if options[:set_on_insert]
+              raise ArgumentError, "cannot specify :set_on_insert with `replace: true`"
+            end
+
             collection.find(atomic_selector).replace_one(
               as_attributes, upsert: true, session: _session)
           else
+            attrs = { "$set" => as_attributes }
+            attrs["$setOnInsert"] = options[:set_on_insert] if options[:set_on_insert]
+
             collection.find(atomic_selector).update_one(
-              { "$set" => as_attributes }, upsert: true, session: _session)
+              attrs, upsert: true, session: _session)
           end
         end
       end
