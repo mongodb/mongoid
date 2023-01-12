@@ -112,6 +112,8 @@ module Mongoid
                   if !result.is_a?(Document) || result.errors.empty?
                     post_process_insert
                     post_process_persist(result, options)
+                  elsif !in_transaction?
+                    run_targeted_callbacks(:after, :rollback)
                   end
                 end
               end
@@ -119,6 +121,11 @@ module Mongoid
           end
         end
         self
+      rescue
+        unless in_transaction?
+          run_targeted_callbacks(:after, :rollback)
+        end
+        raise
       end
 
       module ClassMethods

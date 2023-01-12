@@ -86,3 +86,29 @@ class TransactionSpecRaisesAfterSave
     after_rollback_counter.inc
   end
 end
+
+class TransactionSpecRaisesBeforeCreate
+  include Mongoid::Document
+
+  def self.after_commit_counter
+    @@after_commit_counter ||= TransactionsSpecCounter.new
+  end
+
+  def self.after_rollback_counter
+    @@after_rollback_counter ||= TransactionsSpecCounter.new
+  end
+
+  field :attr, type: String
+
+  before_create do
+    raise "I cannot be saved"
+  end
+
+  after_commit do
+    self.class.after_commit_counter.inc
+  end
+
+  after_rollback do
+    self.class.after_rollback_counter.inc
+  end
+end

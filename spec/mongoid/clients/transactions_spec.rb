@@ -804,7 +804,10 @@ describe Mongoid::Clients::Sessions do
 
         context 'save' do
           let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond')
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
+              subject.after_commit_counter.reset
+              subject.after_rollback_counter.reset
+            end
           end
 
           context 'when modified once' do
@@ -834,7 +837,10 @@ describe Mongoid::Clients::Sessions do
 
         context 'update_attributes' do
           let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond')
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
+              subject.after_commit_counter.reset
+              subject.after_rollback_counter.reset
+            end
           end
 
           before do
@@ -888,7 +894,10 @@ describe Mongoid::Clients::Sessions do
 
         context 'save' do
           let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond')
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
+              subject.after_commit_counter.reset
+              subject.after_rollback_counter.reset
+            end
           end
 
           context 'when modified once' do
@@ -963,7 +972,10 @@ describe Mongoid::Clients::Sessions do
 
         context 'update_attributes' do
           let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond')
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
+              p.after_commit_counter.reset
+              p.after_rollback_counter.reset
+            end
           end
 
           before do
@@ -1005,58 +1017,85 @@ describe Mongoid::Clients::Sessions do
     end
 
     context 'without explicit transaction' do
+      context 'when operation is successful' do
+        context 'create' do
+          let!(:subject) do
+            TransactionsSpecPerson.create!(name: 'James Bond')
+          end
+
+          it_behaves_like 'commit callbacks are called'
+        end
+
+        context 'save' do
+          let(:subject) do
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |person|
+              person.after_commit_counter.reset
+              person.after_rollback_counter.reset
+            end
+          end
+
+          before do
+            subject.name = 'Jason Bourne'
+            subject.save!
+          end
+
+          it_behaves_like 'commit callbacks are called'
+        end
+
+        context 'save' do
+          let(:subject) do
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |person|
+              person.after_commit_counter.reset
+              person.after_rollback_counter.reset
+            end
+          end
+
+          before do
+            subject.update_attributes!(name: 'Jason Bourne')
+          end
+
+          it_behaves_like 'commit callbacks are called'
+        end
+
+        context 'destroy' do
+          let(:subject) do
+            TransactionsSpecPerson.create!(name: 'James Bond').tap do |person|
+              person.after_commit_counter.reset
+              person.after_rollback_counter.reset
+            end
+          end
+
+          before do
+            subject.destroy
+          end
+
+          it_behaves_like 'commit callbacks are called'
+        end
+      end
+    end
+
+    context 'when operation failed' do
       context 'create' do
-        let!(:subject) do
-          TransactionsSpecPerson.create!(name: 'James Bond')
-        end
-
-        it_behaves_like 'commit callbacks are called'
-      end
-
-      context 'save' do
         let(:subject) do
-          TransactionsSpecPerson.create!(name: 'James Bond').tap do |person|
-            person.after_commit_counter.reset
-            person.after_rollback_counter.reset
-          end
+          TransactionSpecRaisesBeforeCreate
         end
 
         before do
-          subject.name = 'Jason Bourne'
-          subject.save!
-        end
+          TransactionSpecRaisesBeforeCreate.after_commit_counter.reset
+          TransactionSpecRaisesBeforeCreate.after_rollback_counter.reset
 
-        it_behaves_like 'commit callbacks are called'
-      end
-
-      context 'save' do
-        let(:subject) do
-          TransactionsSpecPerson.create!(name: 'James Bond').tap do |person|
-            person.after_commit_counter.reset
-            person.after_rollback_counter.reset
+          begin
+            subject.create
+          rescue RuntimeError
           end
         end
 
-        before do
-          subject.update_attributes!(name: 'Jason Bourne')
+        after do
+          TransactionSpecRaisesBeforeCreate.after_commit_counter.reset
+          TransactionSpecRaisesBeforeCreate.after_rollback_counter.reset
         end
 
-        it_behaves_like 'commit callbacks are called'
-      end
-
-      context 'destroy' do
-        let(:subject) do
-          TransactionsSpecPerson.create!(name: 'James Bond').tap do |person|
-            person.after_commit_counter.reset
-            person.after_rollback_counter.reset
-          end
-        end
-
-        before do
-          subject.destroy
-        end
-
-        it_behaves_like 'commit callbacks are called'
+        it_behaves_like 'rollback callbacks are called'
       end
     end
   end
