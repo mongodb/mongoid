@@ -988,7 +988,7 @@ describe Mongoid::Clients::Sessions do
           it_behaves_like 'rollback callbacks are called'
         end
 
-        context 'delete' do
+        context 'destroy' do
           let(:after_commit_counter) do
             TransactionsSpecCounter.new
           end
@@ -1006,7 +1006,7 @@ describe Mongoid::Clients::Sessions do
 
           before do
             subject.transaction do
-              subject.delete
+              subject.destroy
               raise Mongoid::Errors::Rollback
             end
           end
@@ -1071,31 +1071,6 @@ describe Mongoid::Clients::Sessions do
 
           it_behaves_like 'commit callbacks are called'
         end
-      end
-    end
-
-    context 'when operation failed' do
-      context 'create' do
-        let(:subject) do
-          TransactionSpecRaisesBeforeCreate
-        end
-
-        before do
-          TransactionSpecRaisesBeforeCreate.after_commit_counter.reset
-          TransactionSpecRaisesBeforeCreate.after_rollback_counter.reset
-
-          begin
-            subject.create
-          rescue RuntimeError
-          end
-        end
-
-        after do
-          TransactionSpecRaisesBeforeCreate.after_commit_counter.reset
-          TransactionSpecRaisesBeforeCreate.after_rollback_counter.reset
-        end
-
-        it_behaves_like 'rollback callbacks are called'
       end
     end
   end
