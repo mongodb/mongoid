@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "mongoid/persistable/creatable"
-require "mongoid/persistable/datable"
 require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"
 require "mongoid/persistable/incrementable"
@@ -25,7 +24,6 @@ module Mongoid
   module Persistable
     extend ActiveSupport::Concern
     include Creatable
-    include Datable
     include Deletable
     include Destroyable
     include Incrementable
