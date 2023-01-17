@@ -12,12 +12,12 @@ module Mongoid
       # be set to zero.
       #
       # @example Multiply the fields.
-      #   document.mul(score: 10, place: 1, lives: -10)
+      #   document.set_mul(score: 10, place: 1, lives: -10)
       #
       # @param [ Hash ] factors The field/factor multiplier pairs.
       #
       # @return [ Document ] The document.
-      def mul(factors)
+      def set_mul(factors)
         prepare_atomic_operation do |ops|
           process_atomic_operations(factors) do |field, value|
             factor = value.__to_inc__
