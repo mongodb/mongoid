@@ -1106,13 +1106,13 @@ describe Mongoid::Contextual::Atomic do
       include_examples 'min-able comparisons'
     end
 
-    context 'as #set_upper_bound' do
-      let(:min_method) { :set_upper_bound }
+    context 'as #clamp_upper_bound' do
+      let(:min_method) { :clamp_upper_bound }
       include_examples 'min-able comparisons'
     end
   end
 
-  describe '#update_max' do
+  describe '#set_max' do
     let(:member_count) { 5 }
     let(:views) { 25_000 }
     let(:founded) { 2.years.ago.to_date }
@@ -1128,47 +1128,59 @@ describe Mongoid::Contextual::Atomic do
     let(:criteria) { Band.all }
     let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
 
-    shared_examples_for 'a max-able context' do
-      it 'chooses the larger value' do
-        context.update_max("member_count" => given_members, views: given_views)
-        expect(band.reload.member_count).to be == [ member_count, given_members ].max
-        expect(band.views).to be == [ views, given_views ].max
+    shared_examples_for 'max-able comparisons' do
+      shared_examples_for 'a max-able context' do
+        it 'chooses the larger value' do
+          context.send(max_method, "member_count" => given_members, views: given_views)
+          expect(band.reload.member_count).to be == [ member_count, given_members ].max
+          expect(band.views).to be == [ views, given_views ].max
+        end
+      end
+
+      context 'when given value < existing value' do
+        let(:given_views) { views - 1 }
+        let(:given_members) { member_count - 1 }
+
+        it_behaves_like 'a max-able context'
+      end
+
+      context 'when given value == existing value' do
+        let(:given_views) { views }
+        let(:given_members) { member_count }
+
+        it_behaves_like 'a max-able context'
+      end
+
+      context 'when given value > existing value' do
+        let(:given_views) { views + 1 }
+        let(:given_members) { member_count + 1 }
+
+        it_behaves_like 'a max-able context'
+      end
+
+      context 'when the named field does not yet exist on the document' do
+        it 'sets the field to the argument' do
+          context.send(max_method, new_field: 100)
+          expect(band.reload.new_field).to be == 100
+        end
+      end
+
+      context 'when arguments are dates/times' do
+        it 'picks the earliest date' do
+          context.send(max_method, founded: founded + 1)
+          expect(band.reload.founded).to be == founded + 1
+        end
       end
     end
 
-    context 'when given value < existing value' do
-      let(:given_views) { views - 1 }
-      let(:given_members) { member_count - 1 }
-
-      it_behaves_like 'a max-able context'
+    context 'as itself' do
+      let(:max_method) { :set_max }
+      include_examples 'max-able comparisons'
     end
 
-    context 'when given value == existing value' do
-      let(:given_views) { views }
-      let(:given_members) { member_count }
-
-      it_behaves_like 'a max-able context'
-    end
-
-    context 'when given value > existing value' do
-      let(:given_views) { views + 1 }
-      let(:given_members) { member_count + 1 }
-
-      it_behaves_like 'a max-able context'
-    end
-
-    context 'when the named field does not yet exist on the document' do
-      it 'sets the field to the argument' do
-        context.update_max(new_field: 100)
-        expect(band.reload.new_field).to be == 100
-      end
-    end
-
-    context 'when arguments are dates/times' do
-      it 'picks the earliest date' do
-        context.update_max(founded: founded + 1)
-        expect(band.reload.founded).to be == founded + 1
-      end
+    context 'as #clamp_lower_bound' do
+      let(:max_method) { :clamp_lower_bound }
+      include_examples 'max-able comparisons'
     end
   end
 end

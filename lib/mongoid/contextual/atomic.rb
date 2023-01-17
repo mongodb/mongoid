@@ -218,7 +218,7 @@ module Mongoid
       def set_min(fields)
         view.update_many("$min" => collect_operations(fields))
       end
-      alias :set_upper_bound :set_min
+      alias :clamp_upper_bound :set_min
 
       # Performs an atomic $max update operation on the given field or fields.
       # Each field will be set to the maximum of [current_value, given value].
@@ -232,15 +232,16 @@ module Mongoid
       #   of being named for the MongoDB operation they perform.
       #
       # @example Set "views" to be no less than 100.
-      #   context.update_max(views: 100)
+      #   context.set_max(views: 100)
       #
       # @param [ Hash ] fields The fields with the minimum value that each
       #   may be set to.
       #
       # @return [ nil ] Nil.
-      def update_max(fields)
+      def set_max(fields)
         view.update_many("$max" => collect_operations(fields))
       end
+      alias :clamp_lower_bound :set_max
 
       private
 
