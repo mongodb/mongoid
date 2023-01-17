@@ -121,7 +121,7 @@ module Mongoid
     # @param [ Proc | nil ] skip_if A condition tha
     def run_callbacks(kind, with_children: true, skip_if: nil, &block)
       if skip_if&.call
-        return block&.call || true
+        return block&.call
       end
       if with_children
         cascadable_children(kind).each do |child|
