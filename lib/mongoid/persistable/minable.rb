@@ -18,7 +18,7 @@ module Mongoid
       #   set, with corresponding maximum values.
       #
       # @return [ Document ] The document.
-      def min(fields)
+      def set_min(fields)
         prepare_atomic_operation do |ops|
           process_atomic_operations(fields) do |field, value|
             current_value = attributes[field]
@@ -30,6 +30,7 @@ module Mongoid
           { "$min" => ops }
         end
       end
+      alias :clamp_upper_bound :set_min
     end
   end
 end
