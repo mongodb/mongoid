@@ -12,13 +12,13 @@ module Mongoid
       # value, or a given value.
       #
       # @example Set a field to be no less than 100.
-      #   document.max(field: 100)
+      #   document.set_max(field: 100)
       #
       # @param [ Hash<Symbol | String, Comparable> ] fields The fields to
       #   set, with corresponding minimum values.
       #
       # @return [ Document ] The document.
-      def max(fields)
+      def set_max(fields)
         prepare_atomic_operation do |ops|
           process_atomic_operations(fields) do |field, value|
             current_value = attributes[field]
@@ -30,6 +30,7 @@ module Mongoid
           { "$max" => ops }
         end
       end
+      alias :clamp_lower_bound :set_max
     end
   end
 end
