@@ -175,28 +175,6 @@ module Mongoid
         view.update_many("$unset" => Hash[fields])
       end
 
-      # Performs an atomic $currentDate operation on the given field or fields.
-      #
-      # @example Set the "last viewed" timestamp.
-      #   context.current_date(last_viewed: :timestamp)
-      #
-      # @example Set the completion date.
-      #   context.current_date(:completed)
-      #   # or
-      #   context.current_date(completed: true)
-      #
-      # @example Set multiple fields to the current date.
-      #   context.current_date(:completed, last_viewed: :timestamp)
-      #
-      # @param [ Array<Hash | Symbol | String> ] fields The fields with the
-      #   corresponding date format to use (true, :timestamp, or :date)
-      #
-      # @return [ nil ] Nil.
-      def current_date(*fields)
-        fields = collect_nested_operations(fields) { |value| translate_date_type(value) }
-        view.update_many("$currentDate" => fields)
-      end
-
       # Performs an atomic $min update operation on the given field or fields.
       # Each field will be set to the minimum of [current_value, given value].
       # This has the effect of making sure that each field is no
@@ -245,29 +223,15 @@ module Mongoid
 
       private
 
-      # Collects nested operations, where `ops` is assumed to be an array of
-      # Arrays, Hashes, Symbols, or Strings.
-      #
-      # @param [ Array<Hash | Array | Symbol | String> ] ops The operations
-      #   to collect
-      #
-      # @return [ Hash ] The aggregated operations, by field.
-      def collect_nested_operations(ops, &translator)
-        ops.each_with_object({}) do |item, aggregator|
-          collect_operations(Array(item), aggregator, &translator)
-        end
-      end
-
       # Collects and aggregates operations by field.
       #
       # @param [ Array | Hash ] ops The operations to collect.
       # @param [ Hash ] aggregator The hash to use to aggregate the operations.
       # 
       # @return [ Hash ] The aggregated operations, by field.
-      def collect_operations(ops, aggregator = {}, &translator)
-        translator ||= ->(v) { v }
+      def collect_operations(ops, aggregator = {})
         ops.each_with_object(aggregator) do |(field, value), operations|
-          operations[database_field_name(field)] = translator[value.mongoize]
+          operations[database_field_name(field)] = value.mongoize
         end
       end
 
