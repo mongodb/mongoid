@@ -104,11 +104,6 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         yield(self)
         freeze
-        if in_transaction?
-          Threaded.add_modified_document(_session, self)
-        else
-          run_targeted_callbacks(:after, :commit)
-        end
         self.destroyed = true
       end
 

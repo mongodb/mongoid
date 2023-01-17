@@ -169,8 +169,6 @@ module Mongoid
       errors.clear unless performing_validations?(options)
       if in_transaction?
         Threaded.add_modified_document(_session, self)
-      else
-        run_targeted_callbacks(:after, :commit)
       end
       true
     end
