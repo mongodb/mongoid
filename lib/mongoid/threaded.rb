@@ -29,6 +29,9 @@ module Mongoid
     # The key for the current thread's sessions.
     SESSIONS_KEY="[mongoid]:sessions"
 
+    # The key for storing documents modified inside transactions.
+    MODIFIED_DOCUMENTS_KEY="[mongoid]:modified-documents"
+
     extend self
 
     # Begin entry into a named thread local stack.
@@ -353,9 +356,41 @@ module Mongoid
       sessions.delete(client.object_id)&.end_session
     end
 
+    # Store a reference to the document that was modified inside a transaction
+    # associated with the session.
+    #
+    # @param [ Mongo::Session ] session Session in scope of which the document
+    #   was modified.
+    # @param [ Mongoid::Document ] document Mongoid document that was modified.
+    def add_modified_document(session, document)
+      if session&.in_transaction?
+        modified_documents[session] << document
+      end
+    end
+
+    # Clears the set of modified documents for the given session, and return the
+    # content of the set before the clearance.
+    # @param [ Mongo::Session ] session Session for which the modified documents
+    #   set should be cleared.
+    #
+    # @return [ Set<Mongoid::Document> ] Collection of modified documents before
+    #   it was cleared.
+    def clear_modified_documents(session)
+      modified_documents[session].dup
+    ensure
+      modified_documents[session].clear
+    end
+
     # @api private
     def sessions
       Thread.current[SESSIONS_KEY] ||= {}
+    end
+
+    # @api private
+    def modified_documents
+      Thread.current[MODIFIED_DOCUMENTS_KEY] ||= Hash.new do |h, k|
+        h[k] = Set.new
+      end
     end
   end
 end
