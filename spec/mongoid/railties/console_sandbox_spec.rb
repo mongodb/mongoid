@@ -31,6 +31,11 @@ describe 'console_sandbox' do
       start_sandbox_transaction(Mongoid.default_client)
     end
 
+    after do
+      Mongoid.send(:_session).abort_transaction
+      Threaded.clear_session(client: Mongoid.default_client)
+    end
+
     it 'starts transaction' do
       expect(Mongoid.send(:_session)).to be_in_transaction
     end
