@@ -117,8 +117,10 @@ module Mongoid
     #   end
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ true | false ] with_children Flag specifies whether callbacks of embedded document should be run.
-    # @param [ Proc | nil ] skip_if A condition tha
+    # @param [ true | false ] with_children Flag specifies whether callbacks
+    #   of embedded document should be run.
+    # @param [ Proc | nil ] skip_if If this proc returns true, the callbacks
+    #   will not be triggered, while the given block will be still called.
     def run_callbacks(kind, with_children: true, skip_if: nil, &block)
       if skip_if&.call
         return block&.call

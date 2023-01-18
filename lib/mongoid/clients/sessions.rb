@@ -103,6 +103,16 @@ module Mongoid
           Threaded.get_session(client: persistence_context.client)
         end
 
+        # This method should be used to detect whether a persistence operation
+        # is executed inside transaction or not.
+        #
+        # Currently this method is used to detect when +after_commit+ callbacks
+        # should be triggered. If we introduce implicit transactions and
+        # therefore do not need to handle two different ways of triggering callbacks,
+        # we may want to remove this method.
+        #
+        # @return [ true | false ] Whether there is a session for the current
+        #   client, and there is a transaction in progress for this session.
         def in_transaction?
           _session&.in_transaction? || false
         end
