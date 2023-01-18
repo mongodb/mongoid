@@ -33,7 +33,7 @@ describe 'console_sandbox' do
 
     after do
       Mongoid.send(:_session).abort_transaction
-      Threaded.clear_session(client: Mongoid.default_client)
+      Mongoid::Threaded.clear_session(client: Mongoid.default_client)
     end
 
     it 'starts transaction' do
