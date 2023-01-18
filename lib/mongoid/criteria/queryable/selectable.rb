@@ -581,6 +581,35 @@ module Mongoid
         end
         key :not, :override, "$not"
 
+        # Negate the arguments, constraining the query to only those documents
+        # that do NOT match the arguments.
+        #
+        # @example Exclude a single criterion.
+        #   selectable.none_of(name: /Bob/)
+        #
+        # @example Exclude multiple criteria.
+        #   selectable.none_of(name: /Bob/, country: "USA")
+        #
+        # @example Exclude multiple criteria as an array.
+        #   selectable.none_of([{ name: /Bob/ }, { country: "USA" }])
+        #
+        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
+        #   matches or Criteria objects to negate.
+        #
+        # @return [ Selectable ] The new selectable.
+        def none_of(*criteria)
+          criteria = _mongoid_flatten_arrays(criteria)
+          return dup if criteria.empty?
+
+          exprs = criteria.map do |criterion|
+            _mongoid_expand_keys(
+                criterion.is_a?(Selectable) ?
+                  criterion.selector : criterion)
+          end
+
+          self.and('$nor' => exprs)
+        end
+
         # Creates a disjunction using $or from the existing criteria in the
         # receiver and the provided arguments.
         #
