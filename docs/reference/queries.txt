@@ -428,7 +428,7 @@ The conditions are hoisted to the top level if possible:
 .. _none-of:
 
 ``none_of`` Behavior
--------------------
+--------------------
 
 ``none_of`` adds a negated disjunction ("nor") built from its arguments to
 the existing conditions in the criteria. For example:
