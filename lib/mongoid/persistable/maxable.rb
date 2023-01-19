@@ -27,7 +27,7 @@ module Mongoid
               ops[atomic_attribute_name(field)] = value
             end
           end
-          { "$max" => ops }
+          { "$max" => ops } unless ops.empty?
         end
       end
       alias :clamp_lower_bound :set_max

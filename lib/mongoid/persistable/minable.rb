@@ -27,7 +27,7 @@ module Mongoid
               ops[atomic_attribute_name(field)] = value
             end
           end
-          { "$min" => ops }
+          { "$min" => ops } unless ops.empty?
         end
       end
       alias :clamp_upper_bound :set_min
