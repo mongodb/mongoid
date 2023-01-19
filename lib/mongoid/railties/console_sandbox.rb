@@ -5,7 +5,7 @@ require "mongoid/errors/transactions_not_supported"
 # does not support transactions in any case. At the moment this is the case
 # of the standalone topology.
 #
-# Please not that if this method did not raise, it does not guarantee that
+# Please note that if this method did not raise, it does not guarantee that
 # transactions are available for the cluster.
 #
 # @param [ Mongo::Client ] client Client connected to a cluster to be tested.
@@ -30,6 +30,8 @@ def start_sandbox_transaction(client)
   session.start_transaction
 end
 
+# Prepares console sandbox mode. This method should be called when
+# a user starts rails console with '--sandbox' flag.
 def start_sandbox
   Mongoid.persistence_context.client.tap do |client|
     check_if_transactions_might_be_available!(client)
