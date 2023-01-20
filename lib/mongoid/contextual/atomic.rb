@@ -52,6 +52,18 @@ module Mongoid
         view.update_many("$inc" => collect_operations(incs))
       end
 
+      # Perform an atomic $mul operation on the matching documents.
+      #
+      # @example Perform the atomic multiplication.
+      #   context.set_mul(likes: 10)
+      #
+      # @param [ Hash ] factors The operations.
+      #
+      # @return [ nil ] Nil.
+      def set_mul(factors)
+        view.update_many("$mul" => collect_operations(factors))
+      end
+
       # Perform an atomic $pop operation on the matching documents.
       #
       # @example Pop the first value on the matches.
@@ -163,10 +175,62 @@ module Mongoid
         view.update_many("$unset" => Hash[fields])
       end
 
+      # Performs an atomic $min update operation on the given field or fields.
+      # Each field will be set to the minimum of [current_value, given value].
+      # This has the effect of making sure that each field is no
+      # larger than the given value; in other words, the given value is the
+      # effective *maximum* for that field.
+      #
+      # @note Because of the existence of
+      #   Mongoid::Contextual::Aggregable::Mongo#min, this method cannot be
+      #   named #min, and thus breaks that convention of other similar methods
+      #   of being named for the MongoDB operation they perform.
+      #
+      # @example Set "views" to be no more than 100.
+      #   context.set_min(views: 100)
+      #
+      # @param [ Hash ] fields The fields with the maximum value that each
+      #   may be set to.
+      #
+      # @return [ nil ] Nil.
+      def set_min(fields)
+        view.update_many("$min" => collect_operations(fields))
+      end
+      alias :clamp_upper_bound :set_min
+
+      # Performs an atomic $max update operation on the given field or fields.
+      # Each field will be set to the maximum of [current_value, given value].
+      # This has the effect of making sure that each field is no
+      # smaller than the given value; in other words, the given value is the
+      # effective *minimum* for that field.
+      #
+      # @note Because of the existence of
+      #   Mongoid::Contextual::Aggregable::Mongo#max, this method cannot be
+      #   named #max, and thus breaks that convention of other similar methods
+      #   of being named for the MongoDB operation they perform.
+      #
+      # @example Set "views" to be no less than 100.
+      #   context.set_max(views: 100)
+      #
+      # @param [ Hash ] fields The fields with the minimum value that each
+      #   may be set to.
+      #
+      # @return [ nil ] Nil.
+      def set_max(fields)
+        view.update_many("$max" => collect_operations(fields))
+      end
+      alias :clamp_lower_bound :set_max
+
       private
 
-      def collect_operations(ops)
-        ops.each_with_object({}) do |(field, value), operations|
+      # Collects and aggregates operations by field.
+      #
+      # @param [ Array | Hash ] ops The operations to collect.
+      # @param [ Hash ] aggregator The hash to use to aggregate the operations.
+      # 
+      # @return [ Hash ] The aggregated operations, by field.
+      def collect_operations(ops, aggregator = {})
+        ops.each_with_object(aggregator) do |(field, value), operations|
           operations[database_field_name(field)] = value.mongoize
         end
       end
@@ -175,6 +239,10 @@ module Mongoid
         ops.each_with_object({}) do |(field, value), operations|
           operations[database_field_name(field)] = { "$each" => Array.wrap(value).mongoize }
         end
+      end
+
+      def translate_date_type(type)
+        Mongoid::Persistable::Datable.translate_date_field_spec(type)
       end
     end
   end
