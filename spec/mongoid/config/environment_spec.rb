@@ -1,21 +1,13 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "support/feature_sandbox"
 
 describe Mongoid::Config::Environment do
 
   around do |example|
-    if defined?(Rails)
-      SavedRails = Rails
+    FeatureSandbox.quarantine do
       example.run
-      Object.send(:remove_const, :Rails) if defined?(Rails)
-      Rails = SavedRails
-      Object.send(:remove_const, :SavedRails)
-    else
-      example.run
-      if defined?(Rails)
-        Object.send(:remove_const, :Rails)
-      end
     end
   end
 
@@ -26,11 +18,8 @@ describe Mongoid::Config::Environment do
       context "when an environment exists" do
 
         before do
-          module Rails
-            class << self
-              def env; "production"; end
-            end
-          end
+          require "support/rails_mock"
+          Rails.env = "production"
         end
 
         it "returns the rails environment" do
@@ -41,20 +30,7 @@ describe Mongoid::Config::Environment do
 
     context "when using sinatra" do
 
-      before do
-        Object.send(:remove_const, :Rails) if defined?(Rails)
-
-        module Sinatra
-          module Base
-            extend self
-            def environment; :staging; end
-          end
-        end
-      end
-
-      after do
-        Object.send(:remove_const, :Sinatra)
-      end
+      before { require "support/sinatra_mock" }
 
       it "returns the sinatra environment" do
         expect(described_class.env_name).to eq("staging")
@@ -63,14 +39,9 @@ describe Mongoid::Config::Environment do
 
     context "when the rack env variable is defined" do
 
-      before do
-        Object.send(:remove_const, :Rails) if defined?(Rails)
-        ENV["RACK_ENV"] = "acceptance"
-      end
+      before { ENV["RACK_ENV"] = "acceptance" }
 
-      after do
-        ENV["RACK_ENV"] = nil
-      end
+      after { ENV["RACK_ENV"] = nil }
 
       it "returns the rack environment" do
         expect(described_class.env_name).to eq("acceptance")
@@ -78,10 +49,6 @@ describe Mongoid::Config::Environment do
     end
 
     context "when no environment information is found" do
-
-      before do
-        Object.send(:remove_const, :Rails) if defined?(Rails)
-      end
 
       it "raises an error" do
         expect { described_class.env_name }.to raise_error(
@@ -94,7 +61,11 @@ describe Mongoid::Config::Environment do
   describe "#load_yaml" do
     let(:path) { 'mongoid.yml' }
     let(:environment) {}
-    before { allow(Rails).to receive('env').and_return('test') }
+
+    before do
+      require "support/rails_mock"
+      Rails.env = "test"
+    end
 
     subject { described_class.load_yaml(path, environment) }
 

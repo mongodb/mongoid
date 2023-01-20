@@ -21,19 +21,10 @@ describe Mongoid::Loadable do
     before { Mongoid.model_paths = nil }
 
     context "when Rails is defined" do
-      let(:mock_application) do
-        OpenStruct.new(
-          config: OpenStruct.new(
-            paths: { "app/models" => OpenStruct.new(expanded: [ "app/models" ]) }
-          )
-        )
-      end
-
       around do |example|
         FeatureSandbox.quarantine do
+          require "support/rails_mock"
           require "rails/mongoid"
-          Rails.extend Mongoid::Loadable::RailsApplication  
-          Rails.application = mock_application
           example.run
         end
       end
