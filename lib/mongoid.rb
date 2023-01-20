@@ -21,6 +21,7 @@ require "mongoid/version"
 require "mongoid/deprecable"
 require "mongoid/config"
 require "mongoid/persistence_context"
+require "mongoid/loadable"
 require "mongoid/loggable"
 require "mongoid/clients"
 require "mongoid/document"
@@ -41,6 +42,7 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 module Mongoid
   extend Forwardable
   extend Loggable
+  extend Loadable
   extend self
   extend Clients::Sessions::ClassMethods
 
@@ -70,7 +72,7 @@ module Mongoid
   #
   #     config.preload_models = true
   #
-  # @return [ Config ] The configuration object.
+  # @return [ Config ] The xuration object.
   def configure(&block)
     return Config unless block_given?
 
