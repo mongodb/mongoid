@@ -372,3 +372,29 @@ example:
 
 See the section on :ref:`Hash Assignment on Embedded Associations <hash-assignment>`
 for more details
+
+
+Added ``none_of`` Query Method
+------------------------------
+
+With the addition of ``none_of``, Mongoid 8.1 allows queries to exclude
+conditions in bulk. The emitted query will encapsulate the specified 
+criteria in a ``$nor`` operation. For example:
+
+.. code:: ruby
+
+  class Building
+    include Mongoid::Document
+    field :city, type: String
+    field :height, type: Integer
+    field :purpose, type: String
+    field :occupancy, type: Integer
+  end
+
+  Building.where(city: 'Portland').
+    none_of(:height.lt => 100,
+            :purpose => 'apartment',
+            :occupancy.gt => 2500)
+
+This would query all buildings in Portland, excluding apartments, buildings less than
+100 units tall, and buildings with an occupancy greater than 2500 people.
