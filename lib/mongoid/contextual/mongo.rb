@@ -260,16 +260,16 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       def first(limit_or_opts = nil)
-        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
+        limit, opts = extract_limit_and_opts(limit_or_opts)
         if cached? && cache_loaded?
           return limit ? documents.first(limit) : documents.first
         end
         try_numbered_cache(:first, limit) do
-          if limit_or_opts.try(:key?, :id_sort)
+          if opts.key?(:id_sort)
             Mongoid::Warnings.warn_id_sort_deprecated
           end
           sorted_view = view
-          if sort = view.sort || ({ _id: 1 } unless limit_or_opts.try(:fetch, :id_sort) == :none)
+          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
             sorted_view = view.sort(sort)
           end
           if raw_docs = sorted_view.limit(limit || 1).to_a
@@ -376,12 +376,12 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       def last(limit_or_opts = nil)
-        limit = limit_or_opts unless limit_or_opts.is_a?(Hash)
+        limit, opts = extract_limit_and_opts(limit_or_opts)
         if cached? && cache_loaded?
           return limit ? documents.last(limit) : documents.last
         end
         res = try_numbered_cache(:last, limit) do
-          with_inverse_sorting(limit_or_opts) do
+          with_inverse_sorting(opts) do
             if raw_docs = view.limit(limit || 1).to_a
               process_raw_docs(raw_docs, limit)
             end
@@ -612,6 +612,23 @@ module Mongoid
         end
       end
 
+      # Extract the limit and opts from the given argument, so that code
+      # can operate without having to worry about the current type and
+      # state of the argument.
+      #
+      # @param [ nil | Integer | Hash ] limit_or_opts The value to pull the
+      #   limit and option hash from.
+      #
+      # @return [ Array<nil | Integer, Hash> ] A 2-array of the limit and the
+      #   option hash.
+      def extract_limit_and_opts(limit_or_opts)
+        case limit_or_opts
+        when nil, Integer then [ limit_or_opts, {} ]
+        when Hash then [ nil, limit_or_opts ]
+        else raise ArgumentError, "expected nil, Integer, or Hash"
+        end
+      end
+
       # Update the documents for the provided method.
       #
       # @api private
@@ -676,10 +693,10 @@ module Mongoid
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
       def with_inverse_sorting(opts = {})
-        Mongoid::Warnings.warn_id_sort_deprecated if opts.try(:key?, :id_sort)
+        Mongoid::Warnings.warn_id_sort_deprecated if opts.key?(:id_sort)
 
         begin
-          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts.try(:fetch, :id_sort) == :none )
+          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
             @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
           end
           yield
