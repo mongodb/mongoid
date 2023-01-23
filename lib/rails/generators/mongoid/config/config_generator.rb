@@ -28,6 +28,9 @@ module Mongoid
         template 'mongoid.yml', File.join('config', "mongoid.yml")
       end
 
+      def create_initializer_file
+        template 'mongoid.rb', File.join('config', 'initializers', 'mongoid.rb')
+      end
     end
   end
 end
