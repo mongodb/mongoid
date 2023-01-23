@@ -6,9 +6,9 @@
 # @example Quarantining a block of code.
 #   FeatureSandbox.quarantine do
 #      require "support/rails_mock"
-#      expect(defined? Rails).to be == "constant"
+#      expect(defined?(Rails)).to be == "constant"
 #   end
-#   expect(defined? Rails).to be_nil
+#   expect(defined?(Rails)).to be_nil
 module FeatureSandbox
   extend self
 

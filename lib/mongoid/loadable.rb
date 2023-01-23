@@ -42,7 +42,7 @@ module Mongoid
     #
     # @api private
     def load_model(file)
-      if defined? require_dependency
+      if defined?(require_dependency)
         require_dependency(file)
       else
         require(file)

@@ -68,9 +68,9 @@ describe Mongoid::Loadable do
       end
 
       it "should find models in the default paths" do
-        expect(defined? AppModelsMessage).to be == "constant"
-        expect(defined? LibModelsMessage).to be == "constant"
-        expect(defined? SandboxMessage).to be_nil
+        expect(defined?(AppModelsMessage)).to be == "constant"
+        expect(defined?(LibModelsMessage)).to be == "constant"
+        expect(defined?(SandboxMessage)).to be_nil
       end
     end
 
@@ -82,9 +82,9 @@ describe Mongoid::Loadable do
       end
 
       it "should find models in the specified paths" do
-        expect(defined? AppModelsMessage).to be == "constant"
-        expect(defined? LibModelsMessage).to be_nil
-        expect(defined? SandboxMessage).to be_nil
+        expect(defined?(AppModelsMessage)).to be == "constant"
+        expect(defined?(LibModelsMessage)).to be_nil
+        expect(defined?(SandboxMessage)).to be_nil
       end
     end
 
@@ -95,10 +95,10 @@ describe Mongoid::Loadable do
       end
 
       it "should find models in the specified paths" do
-        expect(defined? AppModelsMessage).to be == "constant"
-        expect(defined? LibModelsMessage).to be == "constant"
-        expect(defined? SandboxMessage).to be == "constant"
-        expect(defined? SandboxComment).to be == "constant"
+        expect(defined?(AppModelsMessage)).to be == "constant"
+        expect(defined?(LibModelsMessage)).to be == "constant"
+        expect(defined?(SandboxMessage)).to be == "constant"
+        expect(defined?(SandboxComment)).to be == "constant"
       end
     end
   end

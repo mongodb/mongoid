@@ -32,9 +32,9 @@ describe "Rails::Mongoid" do
       config_override :preload_models, false
 
       it "does not load any models" do
-        expect(defined? SandboxMessage).to be_nil
-        expect(defined? SandboxUser).to be_nil
-        expect(defined? SandboxComment).to be_nil
+        expect(defined?(SandboxMessage)).to be_nil
+        expect(defined?(SandboxUser)).to be_nil
+        expect(defined?(SandboxComment)).to be_nil
       end
     end
 
