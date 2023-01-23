@@ -4,6 +4,11 @@ module Mongoid
 
   # Defines how Mongoid can autoload all defined models.
   module Loadable
+    # The default list of paths where model classes should be looked for. If
+    # Rails is present, the "app/models" paths will be used instead.
+    # (See #model_paths.)
+    DEFAULT_MODEL_PATHS = %w( ./app/models ./lib/models ).freeze
+
     # Search a list of model paths to get every model and require it, so
     # that indexing and inheritance work in both development and production
     # with the same results.
@@ -62,7 +67,7 @@ module Mongoid
     def model_paths
       @model_paths ||= defined?(Rails) ?
         Rails.application.config.paths["app/models"].expanded :
-        %w( ./app/models ./lib/models )
+        DEFAULT_MODEL_PATHS
     end
 
     # Sets the model paths to the given array of paths. These are the paths
