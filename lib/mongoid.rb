@@ -72,7 +72,7 @@ module Mongoid
   #
   #     config.preload_models = true
   #
-  # @return [ Config ] The xuration object.
+  # @return [ Config ] The configuration object.
   def configure(&block)
     return Config unless block_given?
 
