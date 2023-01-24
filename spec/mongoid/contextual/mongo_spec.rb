@@ -1554,9 +1554,9 @@ describe Mongoid::Contextual::Mongo do
           expect(context.send(method)).to eq(depeche_mode)
         end
 
-        context 'when calling #last' do
+        context "when calling ##{method}" do
 
-          it 'returns the last document, sorted by _id' do
+          it 'returns the requested document, sorted by _id' do
             expect(context.send(method)).to eq(depeche_mode)
             expect(context.last).to eq(rolling_stones)
           end
@@ -1571,7 +1571,7 @@ describe Mongoid::Contextual::Mongo do
             expect(context.send(method, opts)).to eq(depeche_mode)
           end
 
-          context 'when calling #last' do
+          context "when calling ##{method}" do
 
             it 'doesn\'t apply a sort on _id' do
               expect(context.send(method, opts)).to eq(depeche_mode)
@@ -1883,6 +1883,16 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
+      context "when given an empty hash" do
+        let(:context) { described_class.new(criteria) }
+        let(:criteria) { Band.criteria }
+        let(:docs) { context.send(method, {}) }
+
+        it "behaves as if limit is nil" do
+          expect(docs).to eq(depeche_mode)
+        end
+      end
+      
       context "when calling #first then #last" do
 
         let(:context) do
@@ -2356,6 +2366,16 @@ describe Mongoid::Contextual::Mongo do
           pending "MONGOID-5416"
           expect(docs).to eq([ depeche_mode ])
         end
+      end
+    end
+
+    context "when given an empty hash" do
+      let(:context) { described_class.new(criteria) }
+      let(:criteria) { Band.criteria }
+      let(:docs) { context.last({}) }
+
+      it "behaves as if limit is nil" do
+        expect(docs).to eq(rolling_stones)
       end
     end
   end
