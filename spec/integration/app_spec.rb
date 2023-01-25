@@ -247,7 +247,7 @@ describe 'Mongoid application tests' do
   def write_mongoid_yml
     # HACK: the driver does not provide a MongoDB URI parser and assembler,
     # and the Ruby standard library URI module doesn't handle multiple hosts.
-    parts = parse_mongodb_uri(SpecConfig.instance.uri_str)
+    parts = parse_mongodb_uri(SpecConfig.instance.safe_uri)
     parts[:database] = 'mongoid_test'
     uri = build_mongodb_uri(parts)
     p uri

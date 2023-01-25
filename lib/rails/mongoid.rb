@@ -13,18 +13,7 @@ module Rails
     #
     # @param [ Application ] app The rails application.
     def load_models(app)
-      app.config.paths["app/models"].expanded.each do |path|
-        preload = ::Mongoid.preload_models
-        if preload.resizable?
-          files = preload.map { |model| "#{path}/#{model.underscore}.rb" }
-        else
-          files = Dir.glob("#{path}/**/*.rb")
-        end
-
-        files.sort.each do |file|
-          load_model(file.gsub("#{path}/" , "").gsub(".rb", ""))
-        end
-      end
+      ::Mongoid.load_models(app.config.paths["app/models"].expanded)
     end
 
     # Conditionally calls `Rails::Mongoid.load_models(app)` if the
@@ -33,23 +22,6 @@ module Rails
     # @param [ Application ] app The rails application.
     def preload_models(app)
       load_models(app) if ::Mongoid.preload_models
-    end
-
-    private
-
-    # I don't want to mock out kernel for unit testing purposes, so added this
-    # method as a convenience.
-    #
-    # @example Load the model.
-    #   Mongoid.load_model("/mongoid/behavior")
-    #
-    # @param [ String ] file The base filename.
-    def load_model(file)
-      begin
-        require_dependency(file)
-      rescue Exception => e
-        Logger.new(STDERR).warn(e.message)
-      end
     end
   end
 end
