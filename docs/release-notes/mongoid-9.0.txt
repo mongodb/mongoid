@@ -17,6 +17,46 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Sandbox Mode for Rails Console
+------------------------------
+
+Mongoid now supports Rails console sandbox mode. If the Rails console started
+with ``--sandbox`` flag, Mongoid starts a transaction on the ``:default`` client
+before opening the console. This transaction won't be committed; therefore, all
+the commands executed in the console using the ``:default`` client won't
+be persisted in the database.
+
+.. note::
+  If you execute commands in the sandbox mode *using any other client than default*,
+  these changes will be persisted as usual.
+
+New Transactions API
+--------------------
+
+Mongoid 9.0 introduces new transactions API that is inspired by ActiveRecord:
+
+.. code-block:: ruby
+
+  Band.transaction do
+    Band.create(title: 'Led Zeppelin')
+  end
+
+  band = Band.create(title: 'Deep Purple')
+  band.transaction do
+    band.active = false
+    band.save!
+  end
+
+Please consult :ref:`transactions documentation <transactions>` for more details.
+
+Embedded Documents Always Use Parent Persistence Context
+--------------------------------------------------------
+
+Mongoid 8.x and older allows user to specify persistence context for an
+embedded document (using ``store_in`` macro). In Mongoid 9.0 these settings are
+ignored for embedded documents; an embedded document now always uses the persistence
+context of its parent.
+
 
 Raise AttributeNotLoaded error when accessing fields omitted from query projection
 ----------------------------------------------------------------------------------
