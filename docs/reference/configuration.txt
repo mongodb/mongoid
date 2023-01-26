@@ -13,7 +13,7 @@ Configuration
    :class: singlecol
 
 Mongoid is customarily configured through a ``mongoid.yml`` file that specifies
-options and clients. The simplest configuration is as follows, which configures
+clients. The simplest configuration is as follows, which configures
 Mongoid to talk to a MongoDB server at "localhost:27017" and use the database
 named "mongoid".
 
@@ -43,7 +43,9 @@ configuration file for you by running the following command:
 
   rails g mongoid:config
 
-The configuration file will be placed in ``config/mongoid.yml``.
+The configuration file will be placed in ``config/mongoid.yml``. Another
+configuration file, ``config/initializers/mongoid.rb``, will be added for
+setting Mongoid options.
 
 If you are not using Ruby on Rails, you can copy the minimal configuration
 given above and save it as ``config/mongoid.yml``.
@@ -258,6 +260,8 @@ for details on driver options.
           compressors: [zlib]
 
     # Configure Mongoid-specific options. (optional)
+    # Note that for Rails applications, it is preferable to set these options
+    # in the config/initializers/mongoid.rb file, instead.
     options:
       # Application name that is printed to the MongoDB logs upon establishing
       # a connection in server versions 3.4 or greater. Note that the name
@@ -463,6 +467,7 @@ for details on driver options.
       # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
       # indexes in the background by default. (default: false)
       background_indexing: false
+
     # Configure driver-specific options. (optional)
     driver_options:
       # When this flag is turned off, inline options will be correctly

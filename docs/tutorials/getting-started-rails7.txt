@@ -100,6 +100,9 @@ which is used to configure the connection to the MongoDB deployment.
 Note that as we are not using ActiveRecord we will not have a ``database.yml``
 file.
 
+The generator will also create a ``config/initializers/mongoid.rb`` file,
+where you may adjust Mongoid's settings as needed.
+
 
 .. _configure-self-managed:
 
@@ -335,6 +338,9 @@ Generate the default Mongoid configuration:
 
 This generator will create the ``config/mongoid.yml`` configuration file,
 which is used to configure the connection to the MongoDB deployment.
+
+The generator will also create a ``config/initializers/mongoid.rb`` file,
+where you may adjust Mongoid's settings as needed.
 
 Review the sections :ref:`Configure for Self Managed MongoDB <configure-self-managed>`
 and :ref:`Configure for MongoDB Atlas <configure-atlas>` to decide how you
