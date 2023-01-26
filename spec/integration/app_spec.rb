@@ -247,7 +247,7 @@ describe 'Mongoid application tests' do
   def write_mongoid_yml
     # HACK: the driver does not provide a MongoDB URI parser and assembler,
     # and the Ruby standard library URI module doesn't handle multiple hosts.
-    parts = parse_mongodb_uri(SpecConfig.instance.uri_str)
+    parts = parse_mongodb_uri(SpecConfig.instance.safe_uri)
     parts[:database] = 'mongoid_test'
     uri = build_mongodb_uri(parts)
     p uri
@@ -326,7 +326,7 @@ describe 'Mongoid application tests' do
   end
 
   def wait_for_port(port, timeout, process)
-    deadline = Time.now + timeout
+    deadline = Mongoid::Utils.monotonic_time + timeout
     loop do
       begin
         Socket.tcp('localhost', port, nil, nil, connect_timeout: 0.5) do |socket|
@@ -336,7 +336,7 @@ describe 'Mongoid application tests' do
         unless process.alive?
           raise "Process #{process} died while waiting for port #{port}"
         end
-        if Time.now > deadline
+        if Mongoid::Utils.monotonic_time > deadline
           raise
         end
       end
