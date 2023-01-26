@@ -231,19 +231,15 @@ describe Mongoid::Persistable::Updatable do
     end
 
     context "when persisting a localized field" do
+      with_default_i18n_configs
 
       let!(:product) do
         Product.create!(description: "The bomb")
       end
 
       before do
-        I18n.enforce_available_locales = false
         ::I18n.locale = :de
         product.update_attribute(:description, "Die Bombe")
-      end
-
-      after do
-        ::I18n.locale = :en
       end
 
       let(:attributes) do
@@ -429,7 +425,7 @@ describe Mongoid::Persistable::Updatable do
         it 'does not allow the field to be updated' do
           expect {
             person.update_attribute(:title, 'Esteemed')
-          }.to raise_exception(ActiveModel::MissingAttributeError)
+          }.to raise_exception(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
         end
 
         it 'does not persist the change' do
@@ -441,7 +437,7 @@ describe Mongoid::Persistable::Updatable do
           it 'does not allow the field to be updated' do
             expect {
               person.update_attribute('title', 'Esteemed')
-            }.to raise_exception(ActiveModel::MissingAttributeError)
+            }.to raise_exception(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
 
           it 'does not persist the change' do

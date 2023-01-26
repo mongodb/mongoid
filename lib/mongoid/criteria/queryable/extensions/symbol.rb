@@ -14,7 +14,7 @@ module Mongoid
           #   :field.__expr_part__(value)
           #
           # @param [ Object ] value The value of the criteria.
-          # @param [ true, false ] negating If the selection should be negated.
+          # @param [ true | false ] negating If the selection should be negated.
           #
           # @return [ Hash ] The selection.
           def __expr_part__(value, negating = false)
@@ -59,7 +59,9 @@ module Mongoid
             #
             # @return [ Symbol ] The value as a symbol.
             def evolve(object)
-              __evolve__(object) { |obj| obj.to_sym }
+              __evolve__(object) do |obj|
+                obj.try(:to_sym)
+              end
             end
           end
         end

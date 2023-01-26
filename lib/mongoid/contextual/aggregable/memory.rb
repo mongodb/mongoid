@@ -9,7 +9,7 @@ module Mongoid
         # Get all the aggregate values for the provided field.
         # Provided for interface consistency with Aggregable::Mongo.
         #
-        # @param [ String, Symbol ] field The field name.
+        # @param [ String | Symbol ] field The field name.
         #
         # @return [ Hash ] A Hash containing the aggregate values.
         #   If no documents are present, then returned Hash will have
@@ -27,9 +27,13 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to average.
         #
-        # @return [ Float ] The average.
+        # @return [ Numeric ] The average.
         def avg(field)
-          any? ? sum(field).to_f / count.to_f : nil
+          total = count { |doc| !doc.send(field).nil? }
+          return nil unless total > 0
+
+          total = total.to_f if total.is_a?(Integer)
+          sum(field) / total
         end
 
         # Get the max value of the provided field. If provided a block, will
@@ -46,10 +50,12 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to max.
         #
-        # @return [ Float, Document ] The max value or document with the max
+        # @return [ Numeric | Document ] The max value or document with the max
         #   value.
         def max(field = nil)
-          block_given? ? super() : aggregate_by(field, :max_by)
+          return super() if block_given?
+
+          aggregate_by(field, :max)
         end
 
         # Get the min value of the provided field. If provided a block, will
@@ -66,10 +72,12 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to min.
         #
-        # @return [ Float, Document ] The min value or document with the min
+        # @return [ Numeric | Document ] The min value or document with the min
         #   value.
         def min(field = nil)
-          block_given? ? super() : aggregate_by(field, :min_by)
+          return super() if block_given?
+
+          aggregate_by(field, :min)
         end
 
         # Get the sum value of the provided field. If provided a block, will
@@ -83,13 +91,11 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to sum.
         #
-        # @return [ Float ] The sum value.
+        # @return [ Numeric ] The sum value.
         def sum(field = nil)
-          if block_given?
-            super()
-          else
-            any? ? super(0) { |doc| doc.public_send(field) } : 0
-          end
+          return super() if block_given?
+
+          aggregate_by(field, :sum) || 0
         end
 
         private
@@ -99,14 +105,16 @@ module Mongoid
         # @api private
         #
         # @example Aggregate by the field and method.
-        #   aggregable.aggregate_by(:name, :min_by)
+        #   aggregable.aggregate_by(:likes, :min_by)
         #
         # @param [ Symbol ] field The field to aggregate on.
         # @param [ Symbol ] method The method (min_by or max_by).
         #
-        # @return [ Integer ] The aggregate.
+        # @return [ Numeric | nil ] The aggregate.
         def aggregate_by(field, method)
-          any? ? send(method) { |doc| doc.public_send(field) }.public_send(field) : nil
+          return nil unless any?
+
+          map { |doc| doc.public_send(field) }.compact.public_send(method)
         end
       end
     end

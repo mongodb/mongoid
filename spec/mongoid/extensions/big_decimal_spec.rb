@@ -67,7 +67,7 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -89,7 +89,7 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -100,7 +100,7 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -270,6 +270,21 @@ describe Mongoid::Extensions::BigDecimal do
 
         it "returns nil" do
           expect(mongoized).to be_nil
+        end
+      end
+
+      context "when the value is castable" do
+
+        let(:value) do
+          2.hours
+        end
+
+        before do
+          expect(value).to be_a(ActiveSupport::Duration)
+        end
+
+        it "returns the casted value as a string" do
+          expect(mongoized).to eq("7200.0")
         end
       end
 
@@ -468,7 +483,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "raises an error" do
-          expect(demongoized).to be_nil
+          expect(demongoized).to eq(nil)
         end
       end
 
@@ -511,7 +526,7 @@ describe Mongoid::Extensions::BigDecimal do
           "1a2"
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -611,7 +626,7 @@ describe Mongoid::Extensions::BigDecimal do
           true
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end
@@ -622,7 +637,7 @@ describe Mongoid::Extensions::BigDecimal do
           false
         end
 
-        it "raises an error" do
+        it "returns nil" do
           expect(demongoized).to be_nil
         end
       end

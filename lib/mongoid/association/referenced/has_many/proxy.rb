@@ -25,7 +25,7 @@ module Mongoid
           # @example Concat with other documents.
           #   person.posts.concat([ post_one, post_two ])
           #
-          # @param [ Document, Array<Document> ] args Any number of documents.
+          # @param [ Document... ] *args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
           def <<(*args)
@@ -168,7 +168,7 @@ module Mongoid
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
-          # @return [ true, false ] True is persisted documents exist, false if not.
+          # @return [ true | false ] True is persisted documents exist, false if not.
           def exists?
             criteria.exists?
           end
@@ -184,6 +184,9 @@ module Mongoid
           # of those found by the current Criteria object for which the block
           # returns a truthy value.
           #
+          # @note Each argument can be an individual id, an array of ids or
+          #   a nested array. Each array will be flattened.
+          #
           # @example Find by an id.
           #   person.posts.find(BSON::ObjectId.new)
           #
@@ -196,8 +199,9 @@ module Mongoid
           # @note This will keep matching documents in memory for iteration
           #   later.
           #
-          # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] args The ids.
-          # @param [ Proc ] block Optional block to pass.
+          # @param [ [ Object | Array<Object> ]... ] *args The ids.
+          # @param &block Optional block to pass.
+          # @yield [ Object ] Yields each enumerable element to the block.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
           def find(*args, &block)
@@ -328,7 +332,7 @@ module Mongoid
           #   relation.with_add_callbacks(document, false)
           #
           # @param [ Document ] document The document to append to the target.
-          # @param [ true, false ] already_related Whether the document is already related
+          # @param [ true | false ] already_related Whether the document is already related
           #   to the target.
           def with_add_callbacks(document, already_related)
             execute_callback :before_add, document unless already_related
@@ -343,7 +347,7 @@ module Mongoid
           #
           # @param [ Document ] document The document to possibly append to the target.
           #
-          # @return [ true, false ] Whether the document is already related to the base and the
+          # @return [ true | false ] Whether the document is already related to the base and the
           #   association is persisted.
           def already_related?(document)
             document.persisted? &&
@@ -391,7 +395,7 @@ module Mongoid
           #
           # @param [ Document ] document The document to cascade on.
           #
-          # @return [ true, false ] If the association is destructive.
+          # @return [ true | false ] If the association is destructive.
           def cascade!(document)
             if persistable?
               case _association.dependent
@@ -410,11 +414,11 @@ module Mongoid
           #
           # If the method exists on the array, use the default proxy behavior.
           #
-          # @param [ Symbol, String ] name The name of the method.
-          # @param [ Array ] args The method args
-          # @param [ Proc ] block Optional block to pass.
+          # @param [ Symbol | String ] name The name of the method.
+          # @param [ Object... ] *args The method args
+          # @param &block Optional block to pass.
           #
-          # @return [ Criteria, Object ] A Criteria or return value from the target.
+          # @return [ Criteria | Object ] A Criteria or return value from the target.
           ruby2_keywords def method_missing(name, *args, &block)
             if _target.respond_to?(name)
               _target.send(name, *args, &block)
@@ -450,7 +454,7 @@ module Mongoid
           # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the association is persistable.
+          # @return [ true | false ] If the association is persistable.
           def persistable?
             !_binding? && (_creating? || _base.persisted? && !_building?)
           end

@@ -12,8 +12,8 @@ module Mongoid
       #     self
       #   end
       #
-      # @param [ String, Symbol ] name The name of the method.
-      # @param [ Proc ] block The method body.
+      # @param [ String | Symbol ] name The name of the method.
+      # @param &block The method body.
       #
       # @return [ Method ] The new method.
       def re_define_method(name, &block)

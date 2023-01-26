@@ -14,11 +14,11 @@ describe Mongoid::Document do
     it 'populates specified fields only' do
       expect do
         person.title
-      end.to raise_error(ActiveModel::MissingAttributeError)
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
       # has a default value specified in the model
       expect do
         person.age
-      end.to raise_error(ActiveModel::MissingAttributeError)
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'age' on Person which was not loaded/)
       expect(person.attributes.keys).to eq(['_id', 'username'])
     end
 
@@ -27,7 +27,7 @@ describe Mongoid::Document do
 
       expect do
         person.age
-      end.to raise_error(ActiveModel::MissingAttributeError)
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded)
       person.age = 42
       expect(person.age).to be 42
       person.save!
@@ -82,7 +82,7 @@ describe Mongoid::Document do
       it 'prohibits the retrieval' do
         lambda do
           person.pet.name
-        end.should raise_error(ActiveModel::MissingAttributeError)
+        end.should raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'name' on Animal which was not loaded/)
       end
     end
   end

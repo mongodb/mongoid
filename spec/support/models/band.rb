@@ -20,6 +20,8 @@ class Band
   field :y, as: :years, type: Integer
   field :founded, type: Date
   field :deleted, type: Boolean
+  field :mojo, type: Object
+  field :tags, type: Hash
   field :fans
 
   embeds_many :records, cascade_callbacks: true

@@ -101,16 +101,6 @@ Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
   autoload name.camelize.to_sym, name
 end
 
-module Rails
-  class Application
-  end
-end
-
-module MyApp
-  class Application < Rails::Application
-  end
-end
-
 module Mongoid
   class Query
     include Mongoid::Criteria::Queryable
@@ -123,6 +113,11 @@ ActiveSupport::Inflector.inflections do |inflect|
 end
 
 I18n.config.enforce_available_locales = false
+
+
+if %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
+  require "i18n/backend/fallbacks"
+end
 
 # The user must be created before any of the tests are loaded, until
 # https://jira.mongodb.org/browse/MONGOID-4827 is implemented.

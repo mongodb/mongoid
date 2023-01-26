@@ -40,7 +40,7 @@ module Mongoid
       #
       # @param [ Array ] other The other array.
       #
-      # @return [ true, false ] If the objects are equal.
+      # @return [ true | false ] If the objects are equal.
       def ==(other)
         other.is_a?(None)
       end
@@ -80,19 +80,40 @@ module Mongoid
       # @example Do any documents exist in the null context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
+      # @param [ Hash | Object | false ] id_or_conditions an _id to
+      #   search for, a hash of conditions, nil or false.
+      #
       # @return [ false ] Always false.
-      def exists?; false; end
+      def exists?(id_or_conditions = :none); false; end
 
       # Pluck the field values in null context.
       #
       # @example Get the values for null context.
       #   context.pluck(:name)
       #
-      # @param [ String | Symbol ] *_fields Field or fields to pluck.
+      # @param [ [ String | Symbol ]... ] *_fields Field(s) to pluck.
       #
       # @return [ Array ] An empty Array.
       def pluck(*_fields)
         []
+      end
+
+      # Pick the field values in null context.
+      #
+      # @example Get the value for null context.
+      #   context.pick(:name)
+      #
+      # @param [ [ String | Symbol ]... ] *_fields Field(s) to pick.
+      #
+      # @return [ nil ] Always return nil.
+      def pick(*_fields)
+        nil
       end
 
       # Tally the field values in null context.
@@ -124,9 +145,19 @@ module Mongoid
       #
       # @param [ Integer ] limit The number of documents to return.
       #
-      # @return [ nil ] Always nil.
+      # @return [ [] | nil ] Empty array or nil.
       def first(limit = nil)
         [] unless limit.nil?
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the first document in null context.
+      #   context.first!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def first!
+        raise_document_not_found_error
       end
 
       # Always returns nil.
@@ -136,9 +167,19 @@ module Mongoid
       #
       # @param [ Integer ] limit The number of documents to return.
       #
-      # @return [ nil ] Always nil.
+      # @return [ [] | nil ] Empty array or nil.
       def last(limit = nil)
         [] unless limit.nil?
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the last document in null context.
+      #   context.last!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def last!
+        raise_document_not_found_error
       end
 
       # Returns nil or empty array.
@@ -160,7 +201,127 @@ module Mongoid
       #
       # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
       def take!
-        raise Errors::DocumentNotFound.new(klass, nil, nil)
+        raise_document_not_found_error
+      end
+
+      # Always returns nil.
+      #
+      # @example Get the second document in null context.
+      #   context.second
+      #
+      # @return [ nil ] Always nil.
+      def second
+        nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the second document in null context.
+      #   context.second!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def second!
+        raise_document_not_found_error
+      end
+
+      # Always returns nil.
+      #
+      # @example Get the third document in null context.
+      #   context.third
+      #
+      # @return [ nil ] Always nil.
+      def third
+        nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the third document in null context.
+      #   context.third!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def third!
+        raise_document_not_found_error
+      end
+
+      # Always returns nil.
+      #
+      # @example Get the fourth document in null context.
+      #   context.fourth
+      #
+      # @return [ nil ] Always nil.
+      def fourth
+        nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the fourth document in null context.
+      #   context.fourth!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def fourth!
+        raise_document_not_found_error
+      end
+
+      # Always returns nil.
+      #
+      # @example Get the fifth document in null context.
+      #   context.fifth
+      #
+      # @return [ nil ] Always nil.
+      def fifth
+        nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the fifth document in null context.
+      #   context.fifth!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def fifth!
+        raise_document_not_found_error
+      end
+
+      # Always returns nil.
+      #
+      # @example Get the second to last document in null context.
+      #   context.second_to_last
+      #
+      # @return [ nil ] Always nil.
+      def second_to_last
+        nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the second to last document in null context.
+      #   context.second_to_last!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def second_to_last!
+        raise_document_not_found_error
+      end
+
+      # Always returns nil.
+      #
+      # @example Get the third to last document in null context.
+      #   context.third_to_last
+      #
+      # @return [ nil ] Always nil.
+      def third_to_last
+        nil
+      end
+
+      # Always raises an error.
+      #
+      # @example Get the third to last document in null context.
+      #   context.third_to_last!
+      #
+      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      def third_to_last!
+        raise_document_not_found_error
       end
 
       # Always returns zero.
@@ -176,6 +337,12 @@ module Mongoid
 
       alias :find_first :first
       alias :one :first
+
+      private
+
+      def raise_document_not_found_error
+        raise Errors::DocumentNotFound.new(klass, nil, nil)
+      end
     end
   end
 end

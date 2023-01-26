@@ -546,17 +546,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
       end
 
       context 'when the global config option is true' do
-
-        around(:example) do |example|
-          original_config = Mongoid.belongs_to_required_by_default
-          Mongoid.belongs_to_required_by_default = true
-          example.run
-          Mongoid.belongs_to_required_by_default = original_config
-        end
-
-        let!(:original_required_config) do
-          Mongoid.belongs_to_required_by_default
-        end
+        config_override :belongs_to_required_by_default, true
 
         context 'when the required option is true' do
 
@@ -684,13 +674,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
       end
 
       context 'when the global config option is false' do
-
-        around(:example) do |example|
-          original_config = Mongoid.belongs_to_required_by_default
-          Mongoid.belongs_to_required_by_default = false
-          example.run
-          Mongoid.belongs_to_required_by_default = original_config
-        end
+        config_override :belongs_to_required_by_default, false
 
         context 'when the required option is true' do
 

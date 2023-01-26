@@ -23,7 +23,7 @@ module Mongoid
     # @example Apply the default scoping.
     #   document.apply_default_scoping
     #
-    # @return [ true, false ] If default scoping was applied.
+    # @return [ true | false ] If default scoping was applied.
     def apply_default_scoping
       if default_scoping
         default_scoping.call.selector.each do |field, value|
@@ -74,7 +74,7 @@ module Mongoid
       #     default_scope ->{ where(active: true) }
       #   end
       #
-      # @param [ Proc, Criteria ] value The default scope.
+      # @param [ Proc | Criteria ] value The default scope.
       #
       # @raise [ Errors::InvalidScope ] If the scope is not a proc or criteria.
       #
@@ -90,7 +90,7 @@ module Mongoid
       # @example Can the default scope be applied?
       #   Band.default_scopable?
       #
-      # @return [ true, false ] If the default scope can be applied.
+      # @return [ true | false ] If the default scope can be applied.
       def default_scopable?
         default_scoping? && !Threaded.without_default_scope?(self)
       end
@@ -158,24 +158,27 @@ module Mongoid
         queryable.scoped(options)
       end
 
-      # Get the criteria without the default scoping applied.
+      # Get the criteria without any scoping applied.
       #
       # @example Get the unscoped criteria.
       #   Band.unscoped
       #
-      # @example Yield to block with no default scoping.
+      # @example Yield to block with no scoping.
       #   Band.unscoped do
       #     Band.where(name: "Depeche Mode")
       #   end
       #
-      # @note This will force the default scope to be removed.
+      # @note This will force the default scope, as well as any scope applied
+      #   using ``.with_scope``, to be removed.
       #
-      # @return [ Criteria, Object ] The unscoped criteria or result of the
+      # @return [ Criteria | Object ] The unscoped criteria or result of the
       #   block.
       def unscoped
         if block_given?
           without_default_scope do
-            yield(self)
+            with_scope(nil) do
+              yield(self)
+            end
           end
         else
           queryable.unscoped
@@ -238,9 +241,9 @@ module Mongoid
       # @api private
       #
       # @example Warn or raise error if name exists.
-      #   Model.valid_scope_name?("test")
+      #   Model.check_scope_name("test")
       #
-      # @param [ String, Symbol ] name The name of the scope.
+      # @param [ String | Symbol ] name The name of the scope.
       #
       # @raise [ Errors::ScopeOverwrite ] If the name exists and configured to
       #   raise the error.
@@ -249,12 +252,12 @@ module Mongoid
           if Mongoid.scope_overwrite_exception
             raise Errors::ScopeOverwrite.new(self.name, name)
           else
-            if Mongoid.logger
-              Mongoid.logger.warn(
-                "Creating scope :#{name}. " +
-                "Overwriting existing method #{self.name}.#{name}."
-              )
-            end
+            Mongoid.logger.warn(
+              "Creating scope :#{name} which conflicts with #{self.name}.#{name}. " +
+              "Calls to `Mongoid::Criteria##{name}` will delegate to " +
+              "`Mongoid::Criteria##{name}` for criteria with klass #{self.name} " +
+              "and will ignore the declared scope."
+            )
           end
         end
       end
@@ -289,15 +292,17 @@ module Mongoid
       # @return [ Method ] The defined method.
       def define_scope_method(name)
         singleton_class.class_eval do
-          define_method(name) do |*args|
-            scoping = _declared_scopes[name]
-            scope = instance_exec(*args, &scoping[:scope])
-            extension = scoping[:extension]
-            to_merge = scope || queryable
-            criteria = to_merge.empty_and_chainable? ? to_merge : with_default_scope.merge(to_merge)
-            criteria.extend(extension)
-            criteria
-          end
+          ruby2_keywords(
+            define_method(name) do |*args|
+              scoping = _declared_scopes[name]
+              scope = instance_exec(*args, &scoping[:scope])
+              extension = scoping[:extension]
+              to_merge = scope || queryable
+              criteria = to_merge.empty_and_chainable? ? to_merge : with_default_scope.merge(to_merge)
+              criteria.extend(extension)
+              criteria
+            end
+          )
         end
       end
 
@@ -309,7 +314,7 @@ module Mongoid
       # @example Process the default scope.
       #   Model.process_default_scope(value)
       #
-      # @param [ Criteria, Proc ] value The default scope value.
+      # @param [ Criteria | Proc ] value The default scope value.
       def process_default_scope(value)
         if existing = default_scoping
           ->{ existing.call.merge(value.to_proc.call) }

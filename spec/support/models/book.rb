@@ -15,4 +15,5 @@ class Book
   end
 
   embeds_many :pages, cascade_callbacks: true
+  embeds_many :covers, cascade_callbacks: true
 end

@@ -118,7 +118,7 @@ module Mongoid
     #
     # @param [ Object ] other The object to be compared with this one.
     #
-    # @return [ true, false ] Whether the two persistence contexts are equal.
+    # @return [ true | false ] Whether the two persistence contexts are equal.
     def ==(other)
       return false unless other.is_a?(PersistenceContext)
       options == other.options
@@ -184,13 +184,12 @@ module Mongoid
       #  PersistenceContext.set(model)
       #
       # @param [ Object ] object The class or model instance.
-      # @param [ Hash, Mongoid::PersistenceContext ] options_or_context The persistence
+      # @param [ Hash | Mongoid::PersistenceContext ] options_or_context The persistence
       #   options or a persistence context object.
       #
       # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
       def set(object, options_or_context)
-        key = "[mongoid][#{object.object_id}]:context"
-        existing_context = Thread.current[key]
+        existing_context = get_context(object)
         existing_options = if existing_context
           existing_context.options
         else
@@ -201,7 +200,7 @@ module Mongoid
         end
         new_options = existing_options.merge(options_or_context)
         context = PersistenceContext.new(object, new_options)
-        Thread.current[key] = context
+        store_context(object, context)
       end
 
       # Get the persistence context for a particular class or model instance.
@@ -213,7 +212,7 @@ module Mongoid
       #
       # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
       def get(object)
-        Thread.current["[mongoid][#{object.object_id}]:context"]
+        get_context(object)
       end
 
       # Clear the persistence context for a particular class or model instance.
@@ -221,7 +220,7 @@ module Mongoid
       # @example Clear the persistence context for a class or model instance.
       #  PersistenceContext.clear(model)
       #
-      # @param [ Class, Object ] object The class or model instance.
+      # @param [ Class | Object ] object The class or model instance.
       # @param [ Mongo::Cluster ] cluster The original cluster before this context was used.
       # @param [ Mongoid::PersistenceContext ] original_context The original persistence
       #   context that was set before this context was used.
@@ -232,7 +231,44 @@ module Mongoid
           end
         end
       ensure
-        Thread.current["[mongoid][#{object.object_id}]:context"] = original_context
+        store_context(object, original_context)
+      end
+
+      private
+
+      # Key to store persistence contexts in the thread local storage.
+      #
+      # @api private
+      PERSISTENCE_CONTEXT_KEY = :"[mongoid]:persistence_context"
+
+      # Get the persistence context for a given object from the thread local
+      #   storage.
+      #
+      # @param [ Object ] object Object to get the persistance context for.
+      #
+      # @return [ Mongoid::PersistenceContext | nil ] The persistence context
+      #   for the object if previously stored, otherwise nil.
+      #
+      # @api private
+      def get_context(object)
+        Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
+        Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id]
+      end
+
+      # Store persistence context for a given object in the thread local
+      #   storage.
+      #
+      # @param [ Object ] object Object to store the persistance context for.
+      # @param [ Mongoid::PersistenceContext ] context Context to store
+      #
+      # @api private
+      def store_context(object, context)
+        if context.nil?
+          Thread.current[PERSISTENCE_CONTEXT_KEY]&.delete(object.object_id)
+        else
+          Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
+          Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id] = context
+        end
       end
     end
   end

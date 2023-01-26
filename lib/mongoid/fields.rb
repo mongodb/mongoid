@@ -128,7 +128,7 @@ module Mongoid
     # @example Apply all the non-proc defaults.
     #   model.apply_pre_processed_defaults
     #
-    # @return [ Array<String ] The names of the non-proc defaults.
+    # @return [ Array<String> ] The names of the non-proc defaults.
     def apply_pre_processed_defaults
       pre_processed_defaults.each do |name|
         apply_default(name)
@@ -140,7 +140,7 @@ module Mongoid
     # @example Apply all the proc defaults.
     #   model.apply_post_processed_defaults
     #
-    # @return [ Array<String ] The names of the proc defaults.
+    # @return [ Array<String> ] The names of the proc defaults.
     def apply_post_processed_defaults
       pending_callbacks.delete(:apply_post_processed_defaults)
       post_processed_defaults.each do |name|
@@ -195,7 +195,7 @@ module Mongoid
     # @example Get the database field name.
     #   model.database_field_name(:authorization)
     #
-    # @param [ String, Symbol ] name The name to get.
+    # @param [ String | Symbol ] name The name to get.
     #
     # @return [ String ] The name of the field as it's stored in the db.
     def database_field_name(name)
@@ -210,7 +210,7 @@ module Mongoid
     # @param [ Field ] field The field.
     # @param [ Object ] value The current value.
     #
-    # @return [ true, false ] If we set the field lazily.
+    # @return [ true | false ] If we set the field lazily.
     def lazy_settable?(field, value)
       !frozen? && value.nil? && field.lazy?
     end
@@ -222,7 +222,7 @@ module Mongoid
     # @example Is the document using object ids?
     #   model.using_object_ids?
     #
-    # @return [ true, false ] Using object ids.
+    # @return [ true | false ] Using object ids.
     def using_object_ids?
       self.class.using_object_ids?
     end
@@ -233,7 +233,7 @@ module Mongoid
     #
     # @param [ String ] name The field name.
     #
-    # @return [ true, false ] If this field is dotted or dollared.
+    # @return [ true | false ] If this field is dotted or dollared.
     def dot_dollar_field?(name)
       n = aliased_fields[name] || name
       fields.key?(n) && (n.include?('.') || n.start_with?('$'))
@@ -291,8 +291,7 @@ module Mongoid
       #   end
       #
       # @param [ Symbol ] option_name the option name to match against
-      # @param [ Proc ] block the handler to execute when the option is
-      #   provided.
+      # @param &block the handler to execute when the option is provided.
       def option(option_name, &block)
         options[option_name] = block
       end
@@ -324,8 +323,10 @@ module Mongoid
       # @param [ Hash ] associations The associations to begin the search with.
       # @param [ Hash ] aliased_associations The alaised associations to begin
       #   the search with.
-      # @param [ Proc ] block The block takes in three paramaters, the current
-      #   meth, the field or the relation, and whether the second parameter is a
+      # @param &block The block.
+      # @yieldparam [ Symbol ] The current method.
+      # @yieldparam [ Symbol | String ] The field or the relation.
+      # @yieldparam [ true | false ] Whether the second yield parameter is a
       #   field or not.
       #
       # @return [ Field ] The field found for the given key at the end of the
@@ -400,7 +401,7 @@ module Mongoid
       # If the belongs_to association is the last part of the name, we will
       # pass back the _id field.
       #
-      # @param [ String, Symbol ] name The name to get.
+      # @param [ String | Symbol ] name The name to get.
       # @param [ Hash ] relations The associations.
       # @param [ Hash ] alaiased_fields The aliased fields.
       # @param [ Hash ] alaiased_associations The aliased associations.
@@ -459,7 +460,7 @@ module Mongoid
       # Get the name of the provided field as it is stored in the database.
       # Used in determining if the field is aliased or not.
       #
-      # @param [ String, Symbol ] name The name to get.
+      # @param [ String | Symbol ] name The name to get.
       #
       # @return [ String ] The name of the field as it's stored in the db.
       def database_field_name(name)
@@ -511,7 +512,7 @@ module Mongoid
       # @example Does this class use object ids?
       #   person.using_object_ids?
       #
-      # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
+      # @return [ true | false ] If the class uses BSON::ObjectIds for the id.
       def using_object_ids?
         fields["_id"].object_id_field?
       end
@@ -520,8 +521,10 @@ module Mongoid
       # given key.
       #
       # @param [ String ] key The key used to search the association tree.
-      # @param [ Proc ] block The block takes in three paramaters, the current
-      #   meth, the field or the relation, and whether the second parameter is a
+      # @param &block The block.
+      # @yieldparam [ Symbol ] The current method.
+      # @yieldparam [ Symbol | String ] The field or the relation.
+      # @yieldparam [ true | false ] Whether the second yield parameter is a
       #   field or not.
       #
       # @return [ Field ] The field found for the given key at the end of the
@@ -542,6 +545,8 @@ module Mongoid
       #   Model.add_defaults(field)
       #
       # @param [ Field ] field The field to add for.
+      #
+      # @api private
       def add_defaults(field)
         default, name = field.default_val, field.name.to_s
         remove_defaults(name)
@@ -561,6 +566,8 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The hash of options.
+      #
+      # @api private
       def add_field(name, options = {})
         aliased = options[:as]
         aliased_fields[aliased.to_s] = name if aliased
@@ -588,6 +595,8 @@ module Mongoid
       #   # => "called"
       #
       # @param [ Field ] field the field to process
+      #
+      # @api private
       def process_options(field)
         field_options = field.options
 
@@ -610,6 +619,8 @@ module Mongoid
       # @param [ Symbol ] name The name of the field.
       # @param [ Symbol ] meth The name of the accessor.
       # @param [ Hash ] options The options.
+      #
+      # @api private
       def create_accessors(name, meth, options = {})
         field = fields[name]
 
@@ -633,6 +644,8 @@ module Mongoid
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
       # @param [ Field ] field The field.
+      #
+      # @api private
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
@@ -655,6 +668,8 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
+      #
+      # @api private
       def create_field_getter_before_type_cast(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_before_type_cast") do
@@ -675,6 +690,8 @@ module Mongoid
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
       # @param [ Field ] field The field.
+      #
+      # @api private
       def create_field_setter(name, meth, field)
         generated_methods.module_eval do
           re_define_method("#{meth}=") do |value|
@@ -694,6 +711,8 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
+      #
+      # @api private
       def create_field_check(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}?") do
@@ -710,6 +729,8 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
+      #
+      # @api private
       def create_translations_getter(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_translations") do
@@ -728,6 +749,8 @@ module Mongoid
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
       # @param [ Field ] field The field.
+      #
+      # @api private
       def create_translations_setter(name, meth, field)
         generated_methods.module_eval do
           re_define_method("#{meth}_translations=") do |value|
@@ -747,6 +770,8 @@ module Mongoid
       #   Person.generated_methods
       #
       # @return [ Module ] The module of generated methods.
+      #
+      # @api private
       def generated_methods
         @generated_methods ||= begin
           mod = Module.new
@@ -761,21 +786,49 @@ module Mongoid
       #   Model.remove_defaults(name)
       #
       # @param [ String ] name The field name.
+      #
+      # @api private
       def remove_defaults(name)
         pre_processed_defaults.delete_one(name)
         post_processed_defaults.delete_one(name)
       end
 
+      # Create a field for the given name and options.
+      #
+      # @param [ Symbol ] name The name of the field.
+      # @param [ Hash ] options The hash of options.
+      #
+      # @return [ Field ] The created field.
+      #
+      # @api private
       def field_for(name, options)
         opts = options.merge(klass: self)
-        type_mapping = TYPE_MAPPINGS[options[:type]]
-        opts[:type] = type_mapping || unmapped_type(options)
-        if !opts[:type].is_a?(Class)
-          raise Errors::InvalidFieldType.new(self, name, options[:type])
+        opts[:type] = retrieve_and_validate_type(name, options[:type])
+        return Fields::Localized.new(name, opts) if options[:localize]
+        return Fields::ForeignKey.new(name, opts) if options[:identity]
+        Fields::Standard.new(name, opts)
+      end
+
+      # Get the class for the given type.
+      #
+      # @param [ Symbol ] name The name of the field.
+      # @param [ Symbol | Class ] type The type of the field.
+      #
+      # @return [ Class ] The type of the field.
+      #
+      # @raises [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
+      #   type.
+      #
+      # @api private
+      def retrieve_and_validate_type(name, type)
+        type_mapping = TYPE_MAPPINGS[type]
+        result = type_mapping || unmapped_type(type)
+        if !result.is_a?(Class)
+          raise Errors::InvalidFieldType.new(self, name, type)
         else
-          if INVALID_BSON_CLASSES.include?(opts[:type])
-            warn_message = "Using #{opts[:type]} as the field type is not supported. "
-            if opts[:type] == BSON::Decimal128
+          if INVALID_BSON_CLASSES.include?(result)
+            warn_message = "Using #{result} as the field type is not supported. "
+            if result == BSON::Decimal128
               warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
             else
               warn_message += "Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type."
@@ -783,15 +836,29 @@ module Mongoid
             Mongoid.logger.warn(warn_message)
           end
         end
-        return Fields::Localized.new(name, opts) if options[:localize]
-        return Fields::ForeignKey.new(name, opts) if options[:identity]
-        Fields::Standard.new(name, opts)
+        result
       end
 
       def field_type_klass_for(field, type)
         klass = Fields::FieldTypes.get(type)
         return klass if klass
         raise Mongoid::Errors::InvalidFieldType.new(self.name, field, type)
+      end
+
+      # Returns the type of the field if the type was not in the TYPE_MAPPINGS
+      # hash.
+      #
+      # @param [ Symbol | Class ] type The type of the field.
+      #
+      # @return [ Class ] The type of the field.
+      #
+      # @api private
+      def unmapped_type(type)
+        if "Boolean" == type.to_s
+          Mongoid::Boolean
+        else
+          type || Object
+        end
       end
     end
   end

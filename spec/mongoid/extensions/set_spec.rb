@@ -22,6 +22,37 @@ describe Mongoid::Extensions::Set do
     end
   end
 
+  describe ".demongoize" do
+
+    context "when passing an array" do
+
+      it "returns a set" do
+        expect(Set.demongoize([ "test" ])).to eq([ "test" ].to_set)
+      end
+    end
+
+    context "when passing a set" do
+
+      it "returns a set " do
+        expect(Set.demongoize(Set.new([ "test" ]))).to eq([ "test" ].to_set)
+      end
+    end
+
+    context "when passing nil" do
+
+      it "returns nil" do
+        expect(Set.demongoize(nil)).to be_nil
+      end
+    end
+
+    context "when passing an uncastable value" do
+
+      it "returns nil" do
+        expect(Set.demongoize("bogus")).to be_nil
+      end
+    end
+  end
+
   describe "#mongoize" do
 
     let(:set) do

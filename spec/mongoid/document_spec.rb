@@ -492,12 +492,12 @@ describe Mongoid::Document do
         end
 
         it 'logs a deprecation warning when :compact is given' do
-          expect_any_instance_of(Logger).to receive(:warn).with(message)
+          expect(Mongoid::Warnings).to receive(:warn_as_json_compact_deprecated)
           church.as_json(compact: true)
         end
 
         it 'does not log a deprecation warning when :compact is not given' do
-          expect_any_instance_of(Logger).to_not receive(:warn).with(message)
+          expect(Mongoid::Warnings).to_not receive(:warn_as_json_compact_deprecated)
           church.as_json
         end
       end

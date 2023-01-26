@@ -43,6 +43,8 @@ module Mongoid
       # @api private
       define_model_callbacks :persist_parent
 
+      define_model_callbacks :commit, :rollback, only: :after
+
       attr_accessor :before_callback_halted
     end
 
@@ -53,7 +55,7 @@ module Mongoid
     #
     # @param [ Symbol ] kind The type of callback.
     #
-    # @return [ true, false ] If the callback can be executed.
+    # @return [ true | false ] If the callback can be executed.
     def callback_executable?(kind)
       respond_to?("_#{kind}_callbacks")
     end
@@ -66,7 +68,7 @@ module Mongoid
     #
     # @param [ Symbol ] kind The callback kind.
     #
-    # @return [ true, false ] If the document is in a callback state.
+    # @return [ true | false ] If the document is in a callback state.
     def in_callback_state?(kind)
       [ :create, :destroy ].include?(kind) || new_record? || flagged_for_destroy? || changed?
     end
@@ -79,7 +81,7 @@ module Mongoid
     # @example Run only the after save callbacks.
     #   model.run_after_callbacks(:save)
     #
-    # @param [ Array<Symbol> ] kinds The events that are occurring.
+    # @param [ Symbol... ] *kinds The events that are occurring.
     #
     # @return [ Object ] The result of the chain executing.
     def run_after_callbacks(*kinds)
@@ -96,7 +98,7 @@ module Mongoid
     # @example Run only the before save callbacks.
     #   model.run_before_callbacks(:save, :create)
     #
-    # @param [ Array<Symbol> ] kinds The events that are occurring.
+    # @param [ Symbol... ] *kinds The events that are occurring.
     #
     # @return [ Object ] The result of the chain executing.
     def run_before_callbacks(*kinds)
@@ -115,8 +117,14 @@ module Mongoid
     #   end
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ true | false ] with_children Flag specifies whether callbacks of embedded document should be run.
-    def run_callbacks(kind, with_children: true, &block)
+    # @param [ true | false ] with_children Flag specifies whether callbacks
+    #   of embedded document should be run.
+    # @param [ Proc | nil ] skip_if If this proc returns true, the callbacks
+    #   will not be triggered, while the given block will be still called.
+    def run_callbacks(kind, with_children: true, skip_if: nil, &block)
+      if skip_if&.call
+        return block&.call
+      end
       if with_children
         cascadable_children(kind).each do |child|
           if child.run_callbacks(child_callback_type(kind, child), with_children: with_children) == false
@@ -134,7 +142,7 @@ module Mongoid
     # Run the callbacks for embedded documents.
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array<Document> ] children Children to exeute callbacks on. If
+    # @param [ Array<Document> ] children Children to execute callbacks on. If
     #   nil, callbacks will be executed on all cascadable children of
     #   the document.
     #
@@ -195,7 +203,7 @@ module Mongoid
     # @example Was a before callback halted?
     #   document.before_callback_halted?
     #
-    # @return [ true, false ] If a before callback was halted.
+    # @return [ true | false ] If a before callback was halted.
     def before_callback_halted?
       !!@before_callback_halted
     end
@@ -235,7 +243,7 @@ module Mongoid
     # @param [ Symbol ] kind The type of callback.
     # @param [ Document ] child The child document.
     #
-    # @return [ true, false ] If the child should fire the callback.
+    # @return [ true | false ] If the child should fire the callback.
     def cascadable_child?(kind, child, association)
       return false if kind == :initialize || kind == :find || kind == :touch
       return false if kind == :validate && association.validate?

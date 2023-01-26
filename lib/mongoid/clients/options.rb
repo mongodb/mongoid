@@ -12,7 +12,7 @@ module Mongoid
       #     m.save
       #   end
       #
-      # @param [ Hash, Mongoid::PersistenceContext ] options_or_context
+      # @param [ Hash | Mongoid::PersistenceContext ] options_or_context
       #   The storage options or a persistence context.
       #
       # @option options [ String | Symbol ] :collection The collection name.
@@ -40,13 +40,21 @@ module Mongoid
       end
 
       def persistence_context
-        PersistenceContext.get(self) ||
-            PersistenceContext.get(self.class) ||
-            PersistenceContext.new(self.class)
+        if embedded? && !_root?
+          _root.persistence_context
+        else
+          PersistenceContext.get(self) ||
+              PersistenceContext.get(self.class) ||
+              PersistenceContext.new(self.class)
+        end
       end
 
       def persistence_context?
-        !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
+        if embedded? && !_root?
+          _root.persistence_context?
+        else
+          !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
+        end
       end
 
       private

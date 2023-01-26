@@ -14,16 +14,13 @@ describe Mongoid::Fields do
     context "when the field is localized" do
 
       context "when translations exist" do
+        with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           product.description = "test"
-          I18n.enforce_available_locales = false
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "The best"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:translations) do
@@ -414,25 +411,25 @@ describe Mongoid::Fields do
     context "when the Symbol type is used" do
 
       before do
-        Mongoid::Fields::Validators::Macro.class_eval do
-          @field_type_is_symbol_warned = false
+        Mongoid::Warnings.class_eval do
+          @symbol_type_deprecated = false
         end
       end
 
       after do
-        Band.fields.delete("should_warn")
+        Label.fields.delete("should_warn")
       end
 
       it "warns that the BSON symbol type is deprecated" do
         expect(Mongoid.logger).to receive(:warn)
 
-        Band.field :should_warn, type: Symbol
+        Label.field :should_warn, type: Symbol
       end
 
       it "warns on first use of Symbol type only" do
         expect(Mongoid.logger).to receive(:warn).once
 
-        Band.field :should_warn, type: Symbol
+        Label.field :should_warn, type: Symbol
       end
 
       context 'when using Symbol field type in multiple classes' do
@@ -443,7 +440,7 @@ describe Mongoid::Fields do
         it "warns on first use of Symbol type only" do
           expect(Mongoid.logger).to receive(:warn).once
 
-          Band.field :should_warn, type: Symbol
+          Label.field :should_warn, type: Symbol
           Truck.field :should_warn, type: Symbol
         end
       end
@@ -453,7 +450,7 @@ describe Mongoid::Fields do
 
       it "raises an error" do
         expect {
-          Band.field :unacceptable, bad: true
+          Label.field :unacceptable, bad: true
         }.to raise_error(Mongoid::Errors::InvalidFieldOption)
       end
     end
@@ -498,14 +495,11 @@ describe Mongoid::Fields do
       end
 
       context "when a single locale is set" do
+        with_default_i18n_configs
 
         before do
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "The best"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -518,15 +512,13 @@ describe Mongoid::Fields do
       end
 
       context "when multiple locales are set" do
+        with_default_i18n_configs
 
         before do
+          I18n.locale = :end
           product.description = "Cheap drinks"
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -806,14 +798,11 @@ describe Mongoid::Fields do
       end
 
       context "when a locale is set" do
+        with_default_i18n_configs
 
         before do
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -826,15 +815,13 @@ describe Mongoid::Fields do
       end
 
       context "when having multiple locales" do
+        with_default_i18n_configs
 
         before do
+          I18n.locale = :en
           product.description = "Cheap drinks"
-          ::I18n.locale = :de
+          I18n.locale = :de
           product.description = "Cheaper drinks"
-        end
-
-        after do
-          ::I18n.locale = :en
         end
 
         let(:description) do
@@ -862,6 +849,34 @@ describe Mongoid::Fields do
 
       it "stores the value in the mongoized form" do
         expect(product.attributes_before_type_cast["price"]).to eq(1)
+      end
+    end
+
+    context "when assigning a hash" do
+      let(:person) { Person.create!(map: { x: 1 }) }
+
+      it "is a BSON::Document" do
+        expect(person.map).to be_a(BSON::Document)
+      end
+
+      it "has the correct contents" do
+        expect(person.map).to eq({ "x" => 1 })
+      end
+    end
+
+    context "when loading a hash from the db" do
+      before do
+        Person.create!(map: { x: 1 })
+      end
+
+      let(:person) { Person.first }
+
+      it "is a BSON::Document" do
+        expect(person.map).to be_a(BSON::Document)
+      end
+
+      it "has the correct contents" do
+        expect(person.map).to eq({ "x" => 1 })
       end
     end
   end
@@ -1038,14 +1053,7 @@ describe Mongoid::Fields do
       end
 
       context "when reading the field" do
-
-        before do
-          Time.zone = "Berlin"
-        end
-
-        after do
-          Time.zone = nil
-        end
+        time_zone_override "Berlin"
 
         it "performs the necessary time conversions" do
           expect(person.lunch_time.to_s).to eq(time.getlocal.to_s)
@@ -1985,6 +1993,128 @@ describe Mongoid::Fields do
         instance = klass.new
         expect(instance.valid?).to eq false
         expect(instance.errors.full_messages).to eq ["My field can't be blank"]
+      end
+    end
+  end
+
+  describe "localize: :present" do
+
+    let(:product) do
+      Product.new
+    end
+
+    context "when assigning a non blank value" do
+
+      before do
+        product.title = "hello"
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq("hello")
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning an empty string" do
+      with_default_i18n_configs
+
+      before do
+        I18n.locale = :en
+        product.title = "hello"
+        I18n.locale = :de
+        product.title = "hello there!"
+        product.title = ""
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning nil" do
+      with_default_i18n_configs
+
+      before do
+        I18n.locale = :en
+        product.title = "hello"
+        I18n.locale = :de
+        product.title = "hello there!"
+        product.title = nil
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning an empty array" do
+      with_default_i18n_configs
+
+      before do
+        I18n.locale = :en
+        product.title = "hello"
+        I18n.locale = :de
+        product.title = "hello there!"
+        product.title = []
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({ "en" => "hello" })
+      end
+    end
+
+    context "when assigning an empty string first" do
+      with_default_i18n_configs
+
+      before do
+        product.title = ""
+      end
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({})
+      end
+    end
+
+    context "when assigning an empty string with only one translation" do
+      with_default_i18n_configs
+
+      before do
+        product.title = "Hello"
+        product.title = ""
+        product.save!
+      end
+
+      let(:from_db) { Product.first }
+
+      it "assigns the value" do
+        expect(product.title).to eq(nil)
+      end
+
+      it "populates the translations hash" do
+        expect(product.title_translations).to eq({})
+      end
+
+      it "round trips an empty hash" do
+        expect(from_db.title_translations).to eq({})
       end
     end
   end

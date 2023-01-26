@@ -45,14 +45,30 @@ module Mongoid
         #
         # @param [ Time ] object The time from Mongo.
         #
-        # @return [ Time ] The object as a date.
+        # @return [ Time | nil ] The object as a time.
         def demongoize(object)
-          return nil if object.blank?
-          object = object.getlocal unless Mongoid::Config.use_utc?
-          if Mongoid::Config.use_activesupport_time_zone?
-            object = object.in_time_zone(Mongoid.time_zone)
+          return if object.blank?
+          time = if object.acts_like?(:time)
+            Mongoid::Config.use_utc? ? object : object.getlocal
+          elsif object.acts_like?(:date)
+            ::Date.demongoize(object).to_time
+          elsif object.is_a?(String)
+            begin
+              object.__mongoize_time__
+            rescue ArgumentError
+              nil
+            end
+          elsif object.is_a?(BSON::Timestamp)
+            ::Time.at(object.seconds)
           end
-          object
+
+          return if time.nil?
+
+          if Mongoid::Config.use_activesupport_time_zone?
+            time.in_time_zone(Mongoid.time_zone)
+          else
+            time
+          end
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

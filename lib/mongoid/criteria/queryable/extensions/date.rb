@@ -23,9 +23,9 @@ module Mongoid
           # @example Evolve the date.
           #   date.__evolve_time__
           #
-          # @return [ Time ] The date as a local time.
+          # @return [ Time | ActiveSupport::TimeWithZone ] The date as a local time.
           def __evolve_time__
-            ::Time.local(year, month, day)
+            ::Time.configured.local(year, month, day)
           end
 
           module ClassMethods
@@ -45,7 +45,12 @@ module Mongoid
             #
             # @return [ Time ] The evolved date.
             def evolve(object)
-              object.__evolve_date__
+              res = begin
+                object.try(:__evolve_date__)
+              rescue ArgumentError
+                nil
+              end
+              res.nil? ? object : res
             end
           end
         end

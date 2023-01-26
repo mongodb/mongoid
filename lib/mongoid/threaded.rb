@@ -26,6 +26,12 @@ module Mongoid
       hash[key] = "[mongoid]:#{key}-stack"
     end
 
+    # The key for the current thread's sessions.
+    SESSIONS_KEY="[mongoid]:sessions"
+
+    # The key for storing documents modified inside transactions.
+    MODIFIED_DOCUMENTS_KEY="[mongoid]:modified-documents"
+
     extend self
 
     # Begin entry into a named thread local stack.
@@ -45,7 +51,7 @@ module Mongoid
     # @example Get the global database override.
     #   Threaded.database_override
     #
-    # @return [ String, Symbol ] The override.
+    # @return [ String | Symbol ] The override.
     def database_override
       Thread.current[DATABASE_OVERRIDE_KEY]
     end
@@ -55,9 +61,9 @@ module Mongoid
     # @example Set the global database override.
     #   Threaded.database_override = :testing
     #
-    # @param [ String, Symbol ] name The global override name.
+    # @param [ String | Symbol ] name The global override name.
     #
-    # @return [ String, Symbol ] The override.
+    # @return [ String | Symbol ] The override.
     def database_override=(name)
       Thread.current[DATABASE_OVERRIDE_KEY] = name
     end
@@ -167,7 +173,7 @@ module Mongoid
     # @example Get the global client override.
     #   Threaded.client_override
     #
-    # @return [ String, Symbol ] The override.
+    # @return [ String | Symbol ] The override.
     def client_override
       Thread.current[CLIENT_OVERRIDE_KEY]
     end
@@ -177,9 +183,9 @@ module Mongoid
     # @example Set the global client override.
     #   Threaded.client_override = :testing
     #
-    # @param [ String, Symbol ] name The global override name.
+    # @param [ String | Symbol ] name The global override name.
     #
-    # @return [ String, Symbol ] The override.
+    # @return [ String | Symbol ] The override.
     def client_override=(name)
       Thread.current[CLIENT_OVERRIDE_KEY] = name
     end
@@ -255,7 +261,7 @@ module Mongoid
     #
     # @param [ Document ] document The document to check.
     #
-    # @return [ true, false ] If the document is autosaved.
+    # @return [ true | false ] If the document is autosaved.
     def autosaved?(document)
       autosaves_for(document.class).include?(document._id)
     end
@@ -267,7 +273,7 @@ module Mongoid
     #
     # @param [ Document ] document The document to check.
     #
-    # @return [ true, false ] If the document is validated.
+    # @return [ true | false ] If the document is validated.
     def validated?(document)
       validations_for(document.class).include?(document._id)
     end
@@ -315,36 +321,76 @@ module Mongoid
       validations[klass] ||= []
     end
 
-    # Cache a session for this thread.
+    # Cache a session for this thread for a client.
     #
-    # @example Save a session for this thread.
-    #   Threaded.set_session(session)
+    # @note For backward compatibility it is allowed to call this method without
+    # specifying `client` parameter.
     #
     # @param [ Mongo::Session ] session The session to save.
-    def set_session(session)
-      Thread.current[:session] = session
+    # @param [ Mongo::Client | nil ] client The client to cache the session for.
+    def set_session(session, client: nil)
+      sessions[client.object_id] = session
     end
 
-    # Get the cached session for this thread.
+    # Get the cached session for this thread for a client.
     #
-    # @example Get the session for this thread.
-    #   Threaded.get_session
+    # @note For backward compatibility it is allowed to call this method without
+    # specifying `client` parameter.
     #
-    # @return [ Mongo::Session, nil ] The session cached on this thread or nil.
-    def get_session
-      Thread.current[:session]
+    # @param [ Mongo::Client | nil ] client The client to cache the session for.
+    #
+    # @return [ Mongo::Session | nil ] The session cached on this thread or nil.
+    def get_session(client: nil)
+      sessions[client.object_id]
     end
 
-    # Clear the cached session for this thread.
+    # Clear the cached session for this thread for a client.
     #
-    # @example Clear this thread's session.
-    #   Threaded.clear_session
+    # @note For backward compatibility it is allowed to call this method without
+    # specifying `client` parameter.
+    #
+    # @param [ Mongo::Client | nil ] client The client to clear the session for.
     #
     # @return [ nil ]
-    def clear_session
-      session = get_session
-      session.end_session if session
-      Thread.current[:session] = nil
+    def clear_session(client: nil)
+      sessions.delete(client.object_id)&.end_session
+    end
+
+    # Store a reference to the document that was modified inside a transaction
+    # associated with the session.
+    #
+    # @param [ Mongo::Session ] session Session in scope of which the document
+    #   was modified.
+    # @param [ Mongoid::Document ] document Mongoid document that was modified.
+    def add_modified_document(session, document)
+      if session&.in_transaction?
+        modified_documents[session] << document
+      end
+    end
+
+    # Clears the set of modified documents for the given session, and return the
+    # content of the set before the clearance.
+    # @param [ Mongo::Session ] session Session for which the modified documents
+    #   set should be cleared.
+    #
+    # @return [ Set<Mongoid::Document> ] Collection of modified documents before
+    #   it was cleared.
+    def clear_modified_documents(session)
+      modified_documents[session].dup
+    ensure
+      modified_documents[session].clear
+    end
+
+    # @api private
+    def sessions
+      Thread.current[SESSIONS_KEY] ||= {}
+    end
+
+    # @api private
+    def modified_documents
+      Thread.current[MODIFIED_DOCUMENTS_KEY] ||= Hash.new do |h, k|
+        h[k] = Set.new
+      end
     end
   end
 end

@@ -5,6 +5,9 @@ require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"
 require "mongoid/persistable/incrementable"
 require "mongoid/persistable/logical"
+require "mongoid/persistable/maxable"
+require "mongoid/persistable/minable"
+require "mongoid/persistable/multipliable"
 require "mongoid/persistable/poppable"
 require "mongoid/persistable/pullable"
 require "mongoid/persistable/pushable"
@@ -25,6 +28,9 @@ module Mongoid
     include Destroyable
     include Incrementable
     include Logical
+    include Maxable
+    include Minable
+    include Multipliable
     include Poppable
     include Positional
     include Pullable
@@ -79,11 +85,11 @@ module Mongoid
     #     document.set name: "Tool"
     #   end
     #
-    # @param [ true, false ] join_context Join the context (i.e. merge
+    # @param [ true | false ] join_context Join the context (i.e. merge
     #   declared atomic operations) of the atomically block wrapping this one
     #   for the same document, if one exists.
     #
-    # @return [ true, false ] If the operation succeeded.
+    # @return [ true | false ] If the operation succeeded.
     def atomically(join_context: nil)
       join_context = Mongoid.join_contexts if join_context.nil?
       call_depth = @atomic_depth ||= 0
@@ -146,7 +152,7 @@ module Mongoid
     # @example Are we executing atomically?
     #   document.executing_atomically?
     #
-    # @return [ true, false ] If we are current executing atomically.
+    # @return [ true | false ] If we are current executing atomically.
     def executing_atomically?
       !@atomic_updates_to_execute_stack.nil?
     end
@@ -161,10 +167,15 @@ module Mongoid
     # @param [ Object ] result The result of the operation.
     # @param [ Hash ] options The options.
     #
+    # @option options [ true | false ] :validate Whether or not to validate.
+    #
     # @return [ true ] true.
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
+      if in_transaction?
+        Threaded.add_modified_document(_session, self)
+      end
       true
     end
 
@@ -180,6 +191,7 @@ module Mongoid
     #
     # @return [ Object ] The result of the operation.
     def prepare_atomic_operation
+      raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
       operations = yield({})
       persist_or_delay_atomic_operation(operations)
       self

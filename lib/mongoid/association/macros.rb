@@ -13,7 +13,8 @@ module Mongoid
         class_attribute :embedded_relations
         class_attribute :relations
 
-        # A hash that maps aliases to their associations. This is used when
+        # A hash that maps aliases to their associations. This hash maps the
+        # associations "in database name" to its "in code" name. This is used when
         # associations specify the `store_as` option, or on a referenced association.
         # On a referenced association, this is used to map the foreign key to
         # the association's name. For example, if we had the following
@@ -71,7 +72,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -94,7 +95,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -117,7 +118,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -139,7 +140,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -161,7 +162,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def has_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -183,7 +184,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def has_and_belongs_to_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
@@ -205,7 +206,7 @@ module Mongoid
         #
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
-        # @param [ Proc ] block Optional block for defining extensions.
+        # @param &block Optional block for defining extensions.
         def has_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end

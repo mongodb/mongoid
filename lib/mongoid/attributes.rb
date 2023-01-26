@@ -25,13 +25,13 @@ module Mongoid
     # @example Is the attribute present?
     #   person.attribute_present?("title")
     #
-    # @param [ String, Symbol ] name The name of the attribute.
+    # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] True if present, false if not.
+    # @return [ true | false ] True if present, false if not.
     def attribute_present?(name)
       attribute = read_raw_attribute(name)
       !attribute.blank? || attribute == false
-    rescue ActiveModel::MissingAttributeError
+    rescue Mongoid::Errors::AttributeNotLoaded
       false
     end
 
@@ -50,9 +50,9 @@ module Mongoid
     # @example Does the document have the attribute?
     #   model.has_attribute?(:name)
     #
-    # @param [ String, Symbol ] name The name of the attribute.
+    # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] If the key is present in the attributes.
+    # @return [ true | false ] If the key is present in the attributes.
     def has_attribute?(name)
       attributes.key?(name.to_s)
     end
@@ -63,9 +63,9 @@ module Mongoid
     # @example Does the document have the attribute before it was assigned?
     #   model.has_attribute_before_type_cast?(:name)
     #
-    # @param [ String, Symbol ] name The name of the attribute.
+    # @param [ String | Symbol ] name The name of the attribute.
     #
-    # @return [ true, false ] If the key is present in the
+    # @return [ true | false ] If the key is present in the
     #   attributes_before_type_cast.
     def has_attribute_before_type_cast?(name)
       attributes_before_type_cast.key?(name.to_s)
@@ -80,7 +80,7 @@ module Mongoid
     # @example Read an attribute (alternate syntax.)
     #   person[:title]
     #
-    # @param [ String, Symbol ] name The name of the attribute to get.
+    # @param [ String | Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute.
     def read_attribute(name)
@@ -113,7 +113,7 @@ module Mongoid
     # @example Read an attribute before type cast.
     #   person.read_attribute_before_type_cast(:price)
     #
-    # @param [ String, Symbol ] name The name of the attribute to get.
+    # @param [ String | Symbol ] name The name of the attribute to get.
     #
     # @return [ Object ] The value of the attribute before type cast, if
     #   available. Otherwise, the value of the attribute.
@@ -132,7 +132,7 @@ module Mongoid
     # @example Remove the attribute.
     #   person.remove_attribute(:title)
     #
-    # @param [ String, Symbol ] name The name of the attribute to remove.
+    # @param [ String | Symbol ] name The name of the attribute to remove.
     #
     # @raise [ Errors::ReadonlyAttribute ] If the field cannot be removed due
     #   to being flagged as reaodnly.
@@ -157,7 +157,7 @@ module Mongoid
     # @example Write the attribute (alternate syntax.)
     #   person[:title] = "Mr."
     #
-    # @param [ String, Symbol ] name The name of the attribute to update.
+    # @param [ String | Symbol ] name The name of the attribute to update.
     # @param [ Object ] value The value to set for the attribute.
     def write_attribute(name, value)
       validate_writable_field_name!(name.to_s)
@@ -165,7 +165,7 @@ module Mongoid
       field_name = database_field_name(name)
 
       if attribute_missing?(field_name)
-        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'"
+        raise Mongoid::Errors::AttributeNotLoaded.new(self.class, field_name)
       end
 
       if attribute_writable?(field_name)
@@ -177,8 +177,14 @@ module Mongoid
             attribute_will_change!(field_name)
           end
           if localized
-            attributes[field_name] ||= {}
-            attributes[field_name].merge!(typed_value)
+            present = fields[field_name].try(:localize_present?)
+            loc_key, loc_val = typed_value.first
+            if present && loc_val.blank?
+              attributes[field_name]&.delete(loc_key)
+            else
+              attributes[field_name] ||= {}
+              attributes[field_name].merge!(typed_value)
+            end
           else
             attributes[field_name] = typed_value
           end
@@ -237,7 +243,7 @@ module Mongoid
     #
     # @param [ String ] name The name of the attribute.
     #
-    # @return [ true, false ] If the attribute is missing.
+    # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
       !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
     end
@@ -261,7 +267,7 @@ module Mongoid
     # @example Is the string in dot syntax.
     #   model.hash_dot_syntax?
     #
-    # @return [ true, false ] If the string contains a "."
+    # @return [ true | false ] If the string contains a "."
     def hash_dot_syntax?(string)
       string.include?(".")
     end
@@ -271,7 +277,7 @@ module Mongoid
     # @example Get the value typecasted.
     #   person.typed_value_for(:title, :sir)
     #
-    # @param [ String, Symbol ] key The field name.
+    # @param [ String | Symbol ] key The field name.
     # @param [ Object ] value The uncast value.
     #
     # @return [ Object ] The cast value.
@@ -285,7 +291,7 @@ module Mongoid
       normalized = database_field_name(name.to_s)
 
       if attribute_missing?(normalized)
-        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'"
+        raise Mongoid::Errors::AttributeNotLoaded.new(self.class, name)
       end
 
       if hash_dot_syntax?(normalized)

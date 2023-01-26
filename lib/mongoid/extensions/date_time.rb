@@ -39,7 +39,7 @@ module Mongoid
         #
         # @param [ Time ] object The time from Mongo.
         #
-        # @return [ DateTime ] The object as a date.
+        # @return [ DateTime | nil ] The object as a datetime or nil.
         def demongoize(object)
           ::Time.demongoize(object).try(:to_datetime)
         end

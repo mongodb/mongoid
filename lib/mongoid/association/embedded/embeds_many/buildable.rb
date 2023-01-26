@@ -17,8 +17,9 @@ module Mongoid
           # @example Build the documents.
           #   Builder.new(meta, attrs).build
           #
-          # @param [ Object ] base The base object.
-          # @param [ Object ] object The object to use to build the association.
+          # @param [ Document ] base The base object.
+          # @param [ Array<Document> | Array<Hash> ] object The object to use
+          #   to build the association.
           # @param [ String ] type Not used in this context.
           # @param [ Hash ] selected_fields Fields which were retrieved via
           #   #only. If selected_fields are specified, fields not listed in it

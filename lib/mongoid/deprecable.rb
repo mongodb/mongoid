@@ -24,7 +24,7 @@ module Mongoid
     #   #=> Mongoid.logger.warn("meow is deprecated and will be removed from Mongoid 8.0 (eat :catnip instead)")
     #
     # @param [ Module ] target_module The parent which contains the method.
-    # @param [ Symbol | Hash<Symbol, [Symbol|String]> ] method_descriptors
+    # @param [ [ Symbol | Hash<Symbol, [ Symbol | String ]> ]... ] *method_descriptors
     #   The methods to deprecate, with optional replacement instructions.
     def deprecate(target_module, *method_descriptors)
       Mongoid::Deprecation.deprecate_methods(target_module, *method_descriptors)

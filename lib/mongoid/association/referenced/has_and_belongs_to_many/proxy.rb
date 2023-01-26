@@ -21,7 +21,7 @@ module Mongoid
           # @example Concat with other documents.
           #   person.posts.concat([ post_one, post_two ])
           #
-          # @param [ Document, Array<Document> ] args Any number of documents.
+          # @param [ Document... ] *args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
           def <<(*args)
@@ -282,7 +282,7 @@ module Mongoid
           #
           # @param [ Document ] doc The document.
           #
-          # @return [ true, false ] If the document can be persisted.
+          # @return [ true | false ] If the document can be persisted.
           def child_persistable?(doc)
             (persistable? || _creating?) &&
                 !(doc.persisted? && _association.forced_nil_inverse?)

@@ -100,9 +100,21 @@ end
 class EmmOrder
   include Mongoid::Document
 
+  field :sku
   field :amount, type: Integer
 
   embedded_in :user, class_name: 'EmmUser'
+
+  embeds_many :surcharges, class_name: 'EmmSurcharge'
+end
+
+class EmmSurcharge
+  include Mongoid::Document
+
+  field :sku
+  field :amount, type: Integer
+
+  embedded_in :order, class_name: 'EmmOrder'
 end
 
 module EmmSpec

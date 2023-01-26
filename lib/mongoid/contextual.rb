@@ -30,9 +30,21 @@ module Mongoid
     # @example Get the context.
     #   criteria.context
     #
-    # @return [ Memory, Mongo ] The context.
+    # @return [ Memory | Mongo ] The context.
     def context
       @context ||= create_context
+    end
+
+    # Instructs the context to schedule an asynchronous loading of documents
+    # specified by the criteria.
+    #
+    # Note that depending on the context and on the Mongoid configuration,
+    # documents can be loaded synchronously on the caller's thread.
+    #
+    # @return [ Criteria ] Returns self.
+    def load_async
+      context.load_async if context.respond_to?(:load_async)
+      self
     end
 
     private
@@ -45,7 +57,7 @@ module Mongoid
     # @example Create the context.
     #   contextual.create_context
     #
-    # @return [ Mongo, Memory ] The context.
+    # @return [ Mongo | Memory ] The context.
     def create_context
       return None.new(self) if empty_and_chainable?
       embedded ? Memory.new(self) : Mongo.new(self)

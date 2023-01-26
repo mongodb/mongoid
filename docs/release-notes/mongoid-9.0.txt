@@ -1,0 +1,150 @@
+***********
+Mongoid 9.0
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 9.0.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Raise AttributeNotLoaded error when accessing fields omitted from query projection
+----------------------------------------------------------------------------------
+
+When attempting to access a field on a model instance which was
+excluded with the ``.only`` or ``.without`` query projections methods
+when the instance was loaded, Mongoid will now raise a
+``Mongoid::Errors::AttributeNotLoaded`` error.
+
+.. code-block:: ruby
+
+  Band.only(:name).first.label
+  #=> raises Mongoid::Errors::AttributeNotLoaded
+
+  Band.without(:label).first.label = 'Sub Pop Records'
+  #=> raises Mongoid::Errors::AttributeNotLoaded
+
+In earlier Mongoid versions, the same conditions would raise an
+``ActiveModel::MissingAttributeError``. Please check your code for
+any Mongoid-specific usages of this class, and change them to
+``Mongoid::Errors::AttributeNotLoaded``. Note additionally that
+``AttributeNotLoaded`` inherits from ``Mongoid::Errors::MongoidError``,
+while ``ActiveModel::MissingAttributeError`` does not.
+
+
+Use configured time zone to typecast Date to Time in queries
+-------------------------------------------------------------
+
+When querying for a Time field using a Date value, Mongoid now correctly
+considers the ``Mongoid.use_activesupport_time_zone`` configuration option
+to perform type conversion.
+
+.. code-block:: ruby
+
+  Mongoid.use_activesupport_time_zone = true
+
+  class Magazine
+    include Mongoid::Document
+
+    field :published_at, type: Time
+  end
+
+  Time.zone = 'Asia/Tokyo'
+
+  Magazine.gte(published_at: Date.parse('2022-09-26'))
+  #=> will return all results on or after Sept 26th, 2022
+  #   at 0:00 in Asia/Tokyo time zone.
+
+In prior Mongoid versions, the above code would ignore the
+``Mongoid.use_activesupport_time_zone`` setting and behave as if
+it were false, i.e. always using the system time zone to perform
+the type conversion.
+
+Note that in prior Mongoid versions, typecasting Date to Time during
+persistence operations was already correctly using the
+``Mongoid.use_activesupport_time_zone`` setting.
+
+
+```#touch`` method on embedded documents correctly handles ``touch: false`` option
+----------------------------------------------------------------------------------
+
+When the ``touch: false`` option is set on an ``embedded_in`` relation,
+calling the ``#touch`` method on an embedded child document will not
+invoke ``#touch`` on its parent document.
+
+.. code-block:: ruby
+
+  class Address
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embedded_in :mall, touch: false
+  end
+
+  class Mall
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embeds_many :addresses
+  end
+
+  mall = Mall.create!
+  address = mall.addresses.create!
+
+  address.touch
+  #=> updates address.updated_at but not mall.updated_at
+
+In addition, the ``#touch`` method has been optimized to perform one
+persistence operation per parent document, even when using multiple
+levels of nested embedded documents.
+
+
+Flipped default for ``:replace`` option in ``#upsert``
+------------------------------------------------------
+
+Mongoid 8.1 added the ``:replace`` option to the ``#upsert`` method. This
+option was used to specify whether or not the existing document should be
+updated or replaced.
+
+Mongoid 9.0 flips the default of this flag from ``true`` => ``false``.
+
+This means that, by default, Mongoid 9 will update the existing document and
+will not replace it.
+
+
+Bug Fixes and Improvements
+--------------------------
+
+This section will be for smaller bug fixes and improvements:
+
+- The ``.unscoped`` method now also clears scopes declared using ``.with_scope``
+  `MONGOID-5214 <https://jira.mongodb.org/browse/MONGOID-5214>`_.
+- When evolving a ``String`` to a ``BigDecimal`` (i.e. when querying a
+  ``BigDecimal`` field with a ``String`` object), if the
+  ``map_big_decimal_to_decimal128`` flag set to true, the conversion will
+  return a ``BSON::Decimal128`` and not a ``String``
+  `MONGOID-5484 <https://jira.mongodb.org/browse/MONGOID-5484>`_.
+- Created new error ``Mongoid::Errors::InvalidEstimatedCountCriteria`` for
+  when calling ``estimated_document_count`` on a document class with a
+  default scope
+  `MONGOID-4960 <https://jira.mongodb.org/browse/MONGOID-4960>`_.
+- Mongoid now uses primary reads for validations in all cases
+  `MONGOID-5150 <https://jira.mongodb.org/browse/MONGOID-5150>`_.
+- Added support for symbol keys in localized field translation hashes
+  `MONGOID-5334 <https://jira.mongodb.org/browse/MONGOID-5334>`_.
+- Added index wildcard option
+  `MONGOID-5388 <https://jira.mongodb.org/browse/MONGOID-5388>`_.
+- With the ``map_big_decimal_to_decimal128`` flag set to false, ``demongoizing``
+  a non-numeric, non-string value that implements ``:to_d`` will return a string
+  rather than a ``BigDecimal``
+  `MONGOID-5507 <https://jira.mongodb.org/browse/MONGOID-5507>`_.

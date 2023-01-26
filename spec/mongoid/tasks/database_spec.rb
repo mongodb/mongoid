@@ -4,6 +4,59 @@ require "spec_helper"
 
 describe "Mongoid::Tasks::Database" do
 
+  before(:all) do
+    module DatabaseSpec
+      class Measurement
+        include Mongoid::Document
+
+        field :timestamp, type: Time
+        field :temperature, type: Integer
+
+        embeds_many :comments
+
+        store_in collection: "measurement",
+          collection_options: {
+            capped: true, size: 10000
+          }
+      end
+
+      class Comment
+        include Mongoid::Document
+
+        field :content, type: String
+
+        embedded_in :measurement
+
+        store_in collection_options: {
+            capped: true, size: 10000
+          }
+      end
+
+      class Note
+        include Mongoid::Document
+
+        field :text
+
+        recursively_embeds_one
+
+        store_in collection_options: {
+          capped: true, size: 10000
+        }
+      end
+    end
+  end
+
+  after(:all) do
+    Mongoid.deregister_model(DatabaseSpec::Measurement)
+    DatabaseSpec.send(:remove_const, :Measurement)
+    Mongoid.deregister_model(DatabaseSpec::Comment)
+    DatabaseSpec.send(:remove_const, :Comment)
+    Mongoid.deregister_model(DatabaseSpec::Note)
+    DatabaseSpec.send(:remove_const, :Note)
+    Object.send(:remove_const, :DatabaseSpec)
+  end
+
+
   let(:logger) do
     double("logger").tap do |log|
       allow(log).to receive(:info)
@@ -16,6 +69,80 @@ describe "Mongoid::Tasks::Database" do
 
   let(:models) do
     [ User, Account, Address, Draft ]
+  end
+
+  describe '.create_collections' do
+    context 'collection_options are specified' do
+      let(:models) do
+        [DatabaseSpec::Measurement]
+      end
+
+      after do
+        DatabaseSpec::Measurement.collection.drop
+      end
+
+      [true, false].each do |force|
+        context "when force is #{force}" do
+          it 'creates the collection' do
+            expect(DatabaseSpec::Measurement).to receive(:create_collection).once.with(force: force)
+            Mongoid::Tasks::Database.create_collections(models, force: force)
+          end
+        end
+      end
+    end
+
+    context 'collection_options are not specified' do
+      let(:models) do
+        [Person]
+      end
+
+      [true, false].each do |force|
+        context "when force is #{force}" do
+          it 'creates the collection' do
+            expect(Person).to receive(:create_collection).once.with(force: force)
+            Mongoid::Tasks::Database.create_collections(models, force: force)
+          end
+        end
+      end
+
+      context "when collection options is defined on embedded model" do
+
+        let(:models) do
+          [DatabaseSpec::Comment]
+        end
+
+        let(:logger) do
+          double("logger").tap do |log|
+            expect(log).to receive(:info).once.with(/MONGOID: collection options ignored on: .*, please define in the root model/)
+          end
+        end
+
+        before do
+          allow(Mongoid::Tasks::Database).to receive(:logger).and_return(logger)
+        end
+
+        it "does nothing, but logging" do
+          expect(DatabaseSpec::Comment).to receive(:create_collection).never
+          Mongoid::Tasks::Database.create_collections(models)
+        end
+      end
+
+      context "when collection options is defined on cyclic model" do
+
+        let(:models) do
+          [DatabaseSpec::Note]
+        end
+
+        after do
+          DatabaseSpec::Note.collection.drop
+        end
+
+        it "creates the collection" do
+          expect(DatabaseSpec::Note).to receive(:create_collection).once
+          Mongoid::Tasks::Database.create_collections(models)
+        end
+      end
+    end
   end
 
   describe ".create_indexes" do

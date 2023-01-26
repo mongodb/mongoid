@@ -16,7 +16,6 @@ module Mongoid
       #
       # @return [ TrueClass ] True.
       def delete(options = {})
-        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_delete do
           unless options[:persist] == false
             if embedded?
@@ -86,7 +85,7 @@ module Mongoid
       #
       # @param [ Hash ] options The delete options.
       #
-      # @return [ true, false ] If the parent should be notified.
+      # @return [ true | false ] If the parent should be notified.
       def notifying_parent?(options = {})
         !options.delete(:suppress)
       end
@@ -100,8 +99,9 @@ module Mongoid
       #     collection.find(atomic_selector).remove
       #   end
       #
-      # @return [ Object ] The result of the block.
+      # @return [ true ] If the object was deleted successfully.
       def prepare_delete
+        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         yield(self)
         freeze
         self.destroyed = true

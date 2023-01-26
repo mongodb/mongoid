@@ -24,6 +24,7 @@ Support for MongoDB 3.4 and Earlier Servers Dropped
 Mongoid 8 requires MongoDB 3.6 or newer. Earlier server versions are not
 supported.
 
+
 Support for Ruby 2.5 Dropped
 ----------------------------
 
@@ -48,7 +49,7 @@ changed in Mongoid 8.0:
 - ``:broken_scoping`` => ``false``
 - ``:broken_updates`` => ``false``
 - ``:compare_time_by_ms`` => ``true``
-- ``:legacy_attributes`` => true
+- ``:legacy_attributes`` => ``false``
 - ``:legacy_pluck_distinct`` => ``false``
 - ``:legacy_triple_equals`` => ``false``
 - ``:object_id_as_json_oid`` => ``false``
@@ -57,33 +58,115 @@ changed in Mongoid 8.0:
 Please refer to :ref:`configuration option <configuration-options>` for
 the description and effects of each of these options.
 
-Storing Uncastable Value
-------------------------
 
-In Mongoid 8, Mongoid standardizes the storing of "uncastable values." On
-attempting to write an uncastable value, a ``nil`` is written instead. See the
-secion on :ref:`Uncastable Values <uncastable-values>` for more details.
+``Decimal128``-backed ``BigDecimal`` Fields
+-------------------------------------------
 
-Some ``mongoize`` methods were also changed to perform consistently with rails
-and the other mongoize methods. The following is a table of the changes in
-functionality:
+Mongoid 8 introduces the ``map_big_decimal_to_decimal128`` feature flag, which
+allows values assigned to a field of type ``BigDecimal`` to be stored as type
+``String`` in the database for compatibility with Mongoid 7 and earlier. In
+Mongoid 8 by default (with this feature flag turned on), values assigned to
+fields of type ``BigDecimal`` are stored in the database as type
+``BSON::Decimal128``. In Mongoid 7 and earlier, and in Mongoid 8 with this
+feature flag turned off, values assigned to fields of type ``BigDecimal`` are
+stored as Strings. See the section on :ref:`BigDecimal Fields <field-type-big-decimal>`
+for more details.
 
-+--------------+------------------------+------------------------+-------------------+
-| Field Type   | Situation              | Previous Functionality | New Functionality |
-+==============+========================+========================+===================+
-| Boolean      | When a non-boolean     | return ``false``       | return ``nil``    |
-|              | string is assigned:    |                        |                   |
-|              | "bogus value"          |                        |                   |
-+--------------+------------------------+------------------------+-------------------+
-| Array/Set    | When a value that is   | raise ``InvalidValue`` | return ``nil``    |
-|              | not an array or set is | error                  |                   |
-|              | assigned, and does NOT |                        |                   |
-|              | respond to ``to_a``: 1 |                        |                   |
-+--------------+------------------------+------------------------+-------------------+
-| All Other    | When an uncastable     | undefined behavior,    | return ``nil``    |
-| Types        | value is assigned      | occasionally raises    |                   |
-|              |                        | ``NoMethodError``      |                   |
-+--------------+------------------------+------------------------+-------------------+
+
+Storing/Retrieving/Evolving Uncastable Values
+---------------------------------------------
+
+**Breaking change:** In Mongoid 8, Mongoid standardizes the storing, retrieving
+and evolving of "uncastable values." On attempting to read or write an
+uncastable value, a ``nil`` is returned or written instead. When attempting to
+evolve an uncastable value, the inputted value is returned. See the section on
+:ref:`Uncastable Values <uncastable-values>` for more details.
+
+Some ``mongoize``, ``demongoize`` and ``evolve`` methods were also changed to
+perform consistently with rails and the other ``mongoize``, ``demongoize`` and
+``evolve`` methods. The following is a table of the changes in functionality:
+
++--------------+------------------------+------------------------+-----------------------+
+| Field Type   | Situation              | Previous Functionality | New Functionality     |
++==============+========================+========================+=======================+
+| Boolean      | When a non-boolean     | return ``false``       | return ``nil``        |
+|              | string is assigned:    |                        |                       |
+|              | "bogus value"          |                        |                       |
++--------------+------------------------+------------------------+-----------------------+
+| Array/Hash   | When a value that is   | raise ``InvalidValue`` | return ``nil``        |
+|              | not an array or hash   | error                  |                       |
+|              | is assigned            |                        |                       |
++--------------+------------------------+------------------------+-----------------------+
+| Set          | When a value that is   | raise ``NoMethodError``| return ``nil``        |
+|              | not a set is assigned: | Exception: undefined   |                       |
+|              | 1                      | method ``to_a`` for    |                       |
+|              |                        | 1:Integer              |                       |
++--------------+------------------------+------------------------+-----------------------+
+| Regexp       | When persisting and    | return a               | return a              |
+|              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``            |
+|              | the database           |                        |                       |
++--------------+------------------------+------------------------+-----------------------+
+| Time/DateTime| When assigning a       | raise ``NoMethodError``| return ``nil``        |
+|              | bogus value: ``:bogus``| Exception: undefined   |                       |
+|              |                        | method ``to_i``        |                       |
+|              |                        | for :bogus:Symbol      |                       |
++--------------+------------------------+------------------------+-----------------------+
+| Time/DateTime| When demongoizing a    | raise ``NoMethodError``| "bogus":              |
+|              | non-Time value:        | Exception: undefined   | return ``nil``        |
+|              | "bogus",               | method ``getlocal``    |                       |
+|              | ``Date.today``         | for "bogus":String     | ``Date.today``:       |
+|              |                        |                        | return a              |
+|              |                        |                        | ``Time/DateTime``     |
++--------------+------------------------+------------------------+-----------------------+
+| Date         | When assigning or      | raise ``NoMethodError``| return ``nil``        |
+|              | demongoizing a bogus   | Exception: undefined   |                       |
+|              | value: :bogus          | method ``year``        |                       |
+|              |                        | for :bogus:Symbol      |                       |
++--------------+------------------------+------------------------+-----------------------+
+| Time/DateTime| When demongoizing a    | raise ``NoMethodError``| return a              |
+| /Date        | valid string:          | Exception: undefined   | ``Time/DateTime/Date``|
+|              | "2022-07-14 14:45:51   | method ``getlocal``    |                       |
+|              | -0400"                 | for "2022-07-14        |                       |
+|              |                        | 14:45:51 -0400":String |                       |
++--------------+------------------------+------------------------+-----------------------+
+| All Types    | When an uncastable     | undefined behavior,    | return ``nil``        |
+|              | value is assigned or   | occasionally raise     |                       |
+|              | demongoized            | ``NoMethodError``      |                       |
++--------------+------------------------+------------------------+-----------------------+
+| All Types    | When an uncastable     | undefined behavior,    | return inputted value |
+|              | value is evolved       | occasionally raise     |                       |
+|              |                        | ``NoMethodError``      |                       |
++--------------+------------------------+------------------------+-----------------------+
+
+.. note::
+
+  The ``demongoize`` methods on container objects (i.e. Hash, Array) have not
+  changed to prevent bugs when modifying and saving those objects. See
+  https://jira.mongodb.org/browse/MONGOID-2951 for a longer discussion on these
+  bugs.
+
+
+Changes to the ``attributes_before_type_cast`` Hash
+---------------------------------------------------
+
+The ``attributes_before_type_cast`` hash has been changed to function more like
+ActiveRecord:
+
+- On instantiation of a new model (without parameters), the
+  ``attributes_before_type_cast`` hash has the same contents as the
+  ``attributes`` hash. If parameters are passed to the initializer, those
+  values will be stored in the ``attributes_before_type_cast`` hash before
+  they are ``mongoized``.
+- When assigning a value to the model, the ``mongoized`` value (i.e. when
+  assiging '1' to an Integer field, it is ``mongoized`` to 1) is stored in
+  the ``attributes`` hash, whereas the raw value (i.e. '1') is stored in the
+  ``attributes_before_type_cast`` hash.
+- When saving, creating (i.e. using the ``create!`` method), or reloading the
+  model, the ``attributes_before_type_cast`` hash is reset to have the same
+  contents as the ``attributes`` hash.
+- When reading a document from the database, the ``attributes_before_type_cast``
+  hash contains the attributes as they appear in the database, as opposed to
+  their ``demongoized`` form.
 
 
 Order of Callback Invocation
@@ -187,61 +270,6 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
 +---------------------------------------+---------------------------------------+
 
 
-``any_of`` Adds Multiple Arguments As Top-Level Conditions
-----------------------------------------------------------
-
-**Breaking change:** When ``any_of`` is invoked with multiple conditions, the
-conditions are now added to the top level of the criteria, same as when
-``any_of`` is invoked with a single condition. Previously when multiple
-conditions were provided, and the criteria already had an ``$or`` operator,
-the new conditions would be added to the existing ``$or`` as an additional
-branch.
-
-Mongoid 8.0 behavior:
-
-.. code-block:: ruby
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
-    any_of({members: 2}, {last_tour: 1995})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}],
-  #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-Mongoid 7 behavior:
-
-.. code-block:: ruby
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
-    any_of({members: 2}, {last_tour: 1995})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990},
-  #     {"members"=>2}, {"last_tour"=>1995}]}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
-  # =>
-  # #<Mongoid::Criteria
-  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-
 ``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
 --------------------------------------------------------------------------
 
@@ -282,6 +310,7 @@ Mongoid 7 output:
 
 Notice that in 7 ``attribute_was(:age)`` returns the old attribute value,
 while in 8.0 ``attribute_was(:age)`` returns the new value.
+
 
 ``*_previously_was``, ``previously_new_record?``, and ``previously_persisted?`` helpers
 ---------------------------------------------------------------------------------------
@@ -336,9 +365,9 @@ removed in a future major version of Mongoid.
 Unknown Field Type Symbols/Strings Prohibited
 ---------------------------------------------
 
-Mongoid 8 prohibits using symbols and strings as field types when these symbols
-and strings do not map to a known type. Previously such usage would create a
-field of type ``Object``.
+**Breaking change:** Mongoid 8 prohibits using symbols and strings as field
+types when these symbols and strings do not map to a known type. Previously
+such usage would create a field of type ``Object``.
 
 Mongoid 8 behavior:
 
@@ -378,6 +407,61 @@ Mongoid 8.0 adds the ability to define custom ``field :type`` Symbol values as f
   end
 
 Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
+
+
+``any_of`` Adds Multiple Arguments As Top-Level Conditions
+----------------------------------------------------------
+
+**Breaking change:** When ``any_of`` is invoked with multiple conditions, the
+conditions are now added to the top level of the criteria, same as when
+``any_of`` is invoked with a single condition. Previously when multiple
+conditions were provided, and the criteria already had an ``$or`` operator,
+the new conditions would be added to the existing ``$or`` as an additional
+branch.
+
+Mongoid 8.0 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}],
+  #     "$and"=>[{"$or"=>[{"members"=>2}, {"last_tour"=>1995}]}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Mongoid 7 behavior:
+
+.. code-block:: ruby
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).
+    any_of({members: 2}, {last_tour: 1995})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990},
+  #     {"members"=>2}, {"last_tour"=>1995}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.any_of({name: 'The Rolling Stones'}, {founded: 1990}).any_of({members: 2})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"$or"=>[{"name"=>"The Rolling Stones"}, {"founded"=>1990}], "members"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
 
 
 ``#pluck`` on Embedded Criteria Returns ``nil`` Values
@@ -435,29 +519,6 @@ For clarity, the following behavior is unchanged from Mongoid 7 to Mongoid 8.0:
     #=> ['Elm Street', nil]
 
 
-Removed ``:drop_dups`` Option from Indexes
-------------------------------------------
-
-The ``:drop_dups`` option has been removed from the ``index`` macro. This option
-was specific to MongoDB server 2.6 and earlier, which Mongoid no longer supports.
-
-
-Removed ``Document#to_a`` Method
---------------------------------
-
-The previously deprecated ``Document#to_a`` method has been removed in
-Mongoid 8.
-
-
-Removed ``Mongoid::Errors::EagerLoad`` Exception Class
-------------------------------------------------------
-
-The previously deprecated ``Mongoid::Errors::EagerLoad`` exception class
-has been removed in Mongoid 8. It has not been used by Mongoid since
-version 7.1.1 when eager loading for polymorphic ``belongs_to`` associations
-was implemented.
-
-
 Replaced ``Mongoid::Criteria#geo_spacial`` with ``#geo_spatial``
 ----------------------------------------------------------------
 
@@ -466,22 +527,100 @@ removed in Mongoid 8. It has been replaced one-for-one with ``#geo_spatial``
 which was added in Mongoid 7.2.0.
 
 
-Removed Deprecated Constants
-----------------------------
+Implemented ``.tally`` method on ``Mongoid#Criteria``
+-----------------------------------------------------
 
-Mongoid 8 removes the following deprecated constants that are not expected
-to have been used outside of Mongoid:
+Mongoid 8 implements the ``.tally`` method on ``Mongoid#Criteria``. ``tally``
+takes a field name as a parameter and returns a mapping from values to their
+counts. For example, take the following model:
 
-- ``Mongoid::Extensions::Date::EPOCH``
-- ``Mongoid::Extensions::Time::EPOCH``
-- ``Mongoid::Factory::TYPE``
+.. code::
+
+  class User
+    include Mongoid::Document
+    field :age
+  end
+
+and the following documents in the database:
+
+.. code::
+
+  { _id: 1, age: 21 }
+  { _id: 2, age: 21 }
+  { _id: 3, age: 22 }
+
+Calling ``tally`` on the age field yields the following:
+
+.. code::
+
+  User.tally("age")
+  # => { 21 => 2, 22 => 1 }
+
+The ``tally`` method accepts the dot notation and field aliases. It also
+allows for tallying localized fields.
 
 
-Removed ``Array#update_values`` and ``Hash#update_values`` methods
-------------------------------------------------------------------
+Implemented ``.pick`` method on ``Mongoid#Criteria``
+-----------------------------------------------------
 
-The previously deprecated ``Array#update_values`` and ``Hash#update_values``
-methods have been removed in Mongoid 8.
+Mongoid 8 implements the ``.pick`` method on ``Mongoid#Criteria``. ``pick``
+takes one or more field names as a parameter and returns the values for those
+fields from one document. Consider the following model:
+
+.. code::
+
+  class User
+    include Mongoid::Document
+    field :age
+  end
+
+and the following documents in the database:
+
+.. code::
+
+  { _id: 1, age: 21 }
+  { _id: 2, age: 21 }
+  { _id: 3, age: 22 }
+
+Calling ``pick`` on the age field yields the following:
+
+.. code::
+
+  User.pick(:age)
+  # => 21
+
+This method does not apply a sort to the documents, so it will not necessarily
+return the values from the first document.
+
+The ``pick`` method accepts the dot notation and field aliases. It also
+allows for picking localized fields.
+
+
+``find`` delegates to ``Enumerable#find`` when given a block
+------------------------------------------------------------
+
+When given a block, without ``_id`` arguments, ``find`` delegates to
+``Enumerable#find``. Consider the following model:
+
+.. code::
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+  end
+
+  Band.create!(name: "Depeche Mode")
+  Band.create!(name: "The Rolling Stones")
+
+Calling ``find`` with a block returns the first document for which the block
+returns ``true``:
+
+.. code::
+
+  Band.find do |b|
+    b.name == "Depeche Mode"
+  end
+  # => #<Band _id: 62c58e383282a4cbe82bd74b, name: "Depeche Mode">
 
 
 No Longer Persisting Documents with Invalid ``belongs_to`` Associations
@@ -582,9 +721,9 @@ Mongoid 8 correctly updates the number of elements without requiring a reload.
 Repaired Storing Strings in BSON::Binary fields
 -----------------------------------------------
 
-In Mongoid 8, storing a String in a field of type ``BSON::Binary`` will be
-stored in and returned from the database as a ``BSON::Binary``. Prior to Mongoid 8
-it was stored and returned as a String.
+**Breaking change:** In Mongoid 8, storing a String in a field of type
+``BSON::Binary`` will be stored in and returned from the database as a
+``BSON::Binary``. Prior to Mongoid 8 it was stored and returned as a String:
 
 .. code::
 
@@ -604,101 +743,45 @@ it was stored and returned as a String.
   # => Mongoid 8: <BSON::Binary:0x2600 type=generic data=0x6461746121...>
 
 
-``Decimal128``-backed ``BigDecimal`` fields
--------------------------------------------
+Removed ``Document#to_a`` Method
+--------------------------------
 
-Mongoid 8 introduces the ``map_big_decimal_to_decimal128`` feature flag, which
-allows values assigned to a field of type ``BigDecimal`` to be stored as type
-``String`` in the database for compatibility with Mongoid 7 and earlier. In
-Mongoid 8 by default (with this feature flag turned on), values assigned to
-fields of type ``BigDecimal`` are stored in the database as type
-``BSON::Decimal128``. In Mongoid 7 and earlier, and in Mongoid 8 with this
-feature flag turned off, values assigned to fields of type ``BigDecimal`` are
-stored as Strings. See the section on :ref:`BigDecimal Fields <bigdecimal-fields>`
-for more details.
+The previously deprecated ``Document#to_a`` method has been removed in
+Mongoid 8.
 
 
-Implemented ``.tally`` method on ``Mongoid#Criteria``
------------------------------------------------------
+Removed ``:drop_dups`` Option from Indexes
+------------------------------------------
 
-Mongoid 8 implements the ``.tally`` method on ``Mongoid#Criteria``. ``tally``
-takes a field name as a parameter and returns a mapping from values to their
-counts. For example, take the following model:
-
-.. code::
-
-  class User
-    include Mongoid::Document
-    field :age
-  end
-
-and the following documents in the database:
-
-.. code::
-
-  { _id: 1, age: 21 }
-  { _id: 2, age: 21 }
-  { _id: 3, age: 22 }
-
-Calling ``tally`` on the age field yields the following:
-
-.. code::
-
-  User.tally("age")
-  # => { 21 => 2, 22 => 1 }
-
-The ``tally`` method accepts the dot notation and field aliases. It also
-allows for tallying localized fields.
+The ``:drop_dups`` option has been removed from the ``index`` macro. This option
+was specific to MongoDB server 2.6 and earlier, which Mongoid no longer supports.
 
 
-``find`` delegates to ``Enumerable#find`` when given a block
-------------------------------------------------------------
+Removed ``Mongoid::Errors::EagerLoad`` Exception Class
+------------------------------------------------------
 
-When given a block, without ``_id`` arguments, ``find`` delegates to
-``Enumerable#find``. Consider the following model:
-
-.. code::
-
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-  end
-
-  Band.create!(name: "Depeche Mode")
-  Band.create!(name: "The Rolling Stones")
-
-Calling ``find`` with a block returns the first document for which the block
-returns ``true``:
-
-.. code::
-
-  Band.find do |b|
-    b.name == "Depeche Mode"
-  end
-  # => #<Band _id: 62c58e383282a4cbe82bd74b, name: "Depeche Mode">
+The previously deprecated ``Mongoid::Errors::EagerLoad`` exception class
+has been removed in Mongoid 8. It has not been used by Mongoid since
+version 7.1.1 when eager loading for polymorphic ``belongs_to`` associations
+was implemented.
 
 
-Changes to the ``attributes_before_type_cast`` Hash
----------------------------------------------------
+Removed Deprecated Constants
+----------------------------
 
-The ``attributes_before_type_cast`` hash has been changed to function more like
-ActiveRecord:
+Mongoid 8 removes the following deprecated constants that are not expected
+to have been used outside of Mongoid:
 
-  - On instantiation of a new model (without parameters), the
-    ``attributes_before_type_cast`` hash has the same contents as the
-    ``attributes`` hash. If parameters are passed to the initializer, those
-    values will be stored in the ``attributes_before_type_cast`` hash before
-    they are ``mongoized``.
-  - When assigning a value to the model, the ``mongoized`` value (i.e. when
-    assiging '1' to an Integer field, it is ``mongoized`` to 1) is stored in
-    the ``attributes`` hash, whereas the raw value (i.e. '1') is stored in the
-    ``attributes_before_type_cast`` hash.
-  - When saving, creating (i.e. using the ``create!`` method), or reloading the
-    model, the ``attributes_before_type_cast`` hash is reset to have the same
-    contents as the ``attributes`` hash.
-  - When reading a document from the database, the ``attributes_before_type_cast``
-    hash contains the attributes as they appear in the database, as opposed to
-    their ``demongoized`` form.
+- ``Mongoid::Extensions::Date::EPOCH``
+- ``Mongoid::Extensions::Time::EPOCH``
+- ``Mongoid::Factory::TYPE``
+
+
+Removed ``Array#update_values`` and ``Hash#update_values`` methods
+------------------------------------------------------------------
+
+The previously deprecated ``Array#update_values`` and ``Hash#update_values``
+methods have been removed in Mongoid 8.
 
 
 Deprecated the ``geoHaystack``, ``geoSearch`` Options
@@ -707,8 +790,17 @@ Deprecated the ``geoHaystack``, ``geoSearch`` Options
 The ``geoHaystack`` and ``geoSearch`` options on indexes have been deprecated.
 
 
-Support Dropped for the ``:id_sort`` Option on ``#first/last``
---------------------------------------------------------------
+``:id_sort`` Option on ``#first/last`` Removed
+----------------------------------------------
 
 Support for the ``:id_sort`` option on the ``#first`` and ``#last`` options has
 been dropped. These methods now only except a limit as a positional argument.
+
+
+Mongoid::Criteria Cache Removed
+-------------------------------
+
+Support for individually caching criteria objects has been dropped in Mongoid 8.
+
+In order to get caching functionality, enable the Mongoid Query Cache. See the
+section on :ref:`Query Cache <query-cache>` for more details.

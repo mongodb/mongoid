@@ -738,19 +738,6 @@ describe Mongoid::Clients do
       end
     end
 
-    context "when provided a class that extends another document" do
-
-      let(:klass) do
-        Class.new(Band)
-      end
-
-      it "raises an error" do
-        expect {
-          klass.store_in(database: :artists)
-        }.to raise_error(Mongoid::Errors::InvalidStorageParent)
-      end
-    end
-
     context "when provided a hash" do
 
       context "when the hash is not valid" do
@@ -759,6 +746,128 @@ describe Mongoid::Clients do
           expect {
             Band.store_in coll: "artists"
           }.to raise_error(Mongoid::Errors::InvalidStorageOptions)
+        end
+      end
+    end
+
+    context "when it is called on a subclass" do
+
+      let(:client) { StoreParent.collection.client }
+      let(:parent) { StoreParent.create! }
+      let(:child1) { StoreChild1.create! }
+      let(:child2) { StoreChild2.create! }
+
+      before do
+        class StoreParent
+          include Mongoid::Document
+        end
+
+        class StoreChild1 < StoreParent
+        end
+
+        class StoreChild2 < StoreParent
+        end
+      end
+
+      after do
+        Object.send(:remove_const, :StoreParent)
+        Object.send(:remove_const, :StoreChild1)
+        Object.send(:remove_const, :StoreChild2)
+      end
+
+      context "when it is not called on the parent" do
+
+        context "when it is called on all subclasses" do
+
+          before do
+            StoreChild1.store_in collection: :store_ones
+            StoreChild2.store_in collection: :store_twos
+            [ parent, child1, child2 ]
+          end
+
+          let(:db_parent) { client['store_parents'].find.first }
+          let(:db_child1) { client['store_ones'].find.first }
+          let(:db_child2) { client['store_twos'].find.first }
+
+          it "stores the documents in the correct collections" do
+            expect(db_parent).to eq({ "_id" => parent.id, "_type" => "StoreParent" })
+            expect(db_child1).to eq({ "_id" => child1.id, "_type" => "StoreChild1" })
+            expect(db_child2).to eq({ "_id" => child2.id, "_type" => "StoreChild2" })
+          end
+
+          it "only queries from its own collections" do
+            expect(StoreParent.count).to eq(1)
+            expect(StoreChild1.count).to eq(1)
+            expect(StoreChild2.count).to eq(1)
+          end
+        end
+
+        context "when it is called on one of the subclasses" do
+
+          before do
+            StoreChild1.store_in collection: :store_ones
+            [ parent, child1, child2 ]
+          end
+
+          let(:db_parent) { client['store_parents'].find.first }
+          let(:db_child1) { client['store_ones'].find.first }
+          let(:db_child2) { client['store_parents'].find.to_a.last }
+
+          it "stores the documents in the correct collections" do
+            expect(db_parent).to eq({ "_id" => parent.id, "_type" => "StoreParent" })
+            expect(db_child1).to eq({ "_id" => child1.id, "_type" => "StoreChild1" })
+            expect(db_child2).to eq({ "_id" => child2.id, "_type" => "StoreChild2" })
+          end
+
+          it "queries from its own collections" do
+            expect(StoreParent.count).to eq(2)
+            expect(StoreChild1.count).to eq(1)
+            expect(StoreChild2.count).to eq(1)
+          end
+        end
+      end
+
+      context "when it is called on the parent" do
+
+        before do
+          StoreParent.store_in collection: :st_parents
+        end
+
+        context "when it is called on all subclasses" do
+
+          before do
+            StoreChild1.store_in collection: :store_ones
+            StoreChild2.store_in collection: :store_twos
+            [ parent, child1, child2 ]
+          end
+
+          let(:db_parent) { client['st_parents'].find.first }
+          let(:db_child1) { client['store_ones'].find.first }
+          let(:db_child2) { client['store_twos'].find.first }
+
+          it "stores the documents in the correct collections" do
+            expect(db_parent).to eq({ "_id" => parent.id, "_type" => "StoreParent" })
+            expect(db_child1).to eq({ "_id" => child1.id, "_type" => "StoreChild1" })
+            expect(db_child2).to eq({ "_id" => child2.id, "_type" => "StoreChild2" })
+          end
+        end
+
+        context "when it is called on one of the subclasses" do
+
+          before do
+            StoreChild1.store_in collection: :store_ones
+            [ parent, child1, child2 ]
+          end
+
+          let(:db_parent) { client['st_parents'].find.first }
+          let(:db_child1) { client['store_ones'].find.first }
+          let(:db_child2) { client['st_parents'].find.to_a.last }
+
+          it "stores the documents in the correct collections" do
+            expect(db_parent).to eq({ "_id" => parent.id, "_type" => "StoreParent" })
+            expect(db_child1).to eq({ "_id" => child1.id, "_type" => "StoreChild1" })
+            expect(db_child2).to eq({ "_id" => child2.id, "_type" => "StoreChild2" })
+          end
         end
       end
     end
@@ -1042,6 +1151,31 @@ describe Mongoid::Clients do
         end
       end
     end
+
+    context 'when using on different objects' do
+      require_mri
+
+      let(:first_band) do
+        Band.create!(name: "The Beatles")
+      end
+
+      let(:second_band) do
+        Band.create!(name: 'Led Zeppelin')
+      end
+
+      it 'does not create extra symbols symbols' do
+        first_band.with(write: { w: 0, j: false }) do |band|
+          band.set(active: false)
+        end
+        initial_symbols_count = Symbol.all_symbols.size
+        second_band.with(write: { w: 0, j: false }) do |band|
+          band.set(active: false)
+        end
+        expect(Symbol.all_symbols.size).to eq(initial_symbols_count)
+      end
+
+    end
+
   end
 
   context "when overriding the default database" do

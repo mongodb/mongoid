@@ -75,12 +75,7 @@ describe Mongoid::Findable do
       context "when the document is not found" do
 
         context "when raising a not found error" do
-
-          let!(:raise_option) { Mongoid.raise_not_found_error }
-
-          before { Mongoid.raise_not_found_error = true }
-
-          after { Mongoid.raise_not_found_error = raise_option }
+          config_override :raise_not_found_error, true
 
           it "raises an error" do
             expect {
@@ -90,12 +85,7 @@ describe Mongoid::Findable do
         end
 
         context "when raising no error" do
-
-          let!(:raise_option) { Mongoid.raise_not_found_error }
-
-          before { Mongoid.raise_not_found_error = false }
-
-          after { Mongoid.raise_not_found_error = raise_option }
+          config_override :raise_not_found_error, false
 
           it "returns nil" do
             expect(person.messages.find_by(body: 'bar')).to be_nil
@@ -134,12 +124,7 @@ describe Mongoid::Findable do
     context "when the document is not found" do
 
       context "when raising a not found error" do
-
-        let!(:raise_option) { Mongoid.raise_not_found_error }
-
-        before { Mongoid.raise_not_found_error = true }
-
-        after { Mongoid.raise_not_found_error = raise_option }
+        config_override :raise_not_found_error, true
 
         it "raises an error" do
           expect {
@@ -149,12 +134,7 @@ describe Mongoid::Findable do
       end
 
       context "when raising no error" do
-
-        let!(:raise_option) { Mongoid.raise_not_found_error }
-
-        before { Mongoid.raise_not_found_error = false }
-
-        after { Mongoid.raise_not_found_error = raise_option }
+        config_override :raise_not_found_error, false
 
         context "when no block is provided" do
 
@@ -222,31 +202,411 @@ describe Mongoid::Findable do
 
     describe "##{method}" do
 
-      let!(:person) do
+      let!(:person1) do
+        Person.create!
+      end
+
+      let!(:person2) do
         Person.create!
       end
 
       it "returns the first matching document" do
-        expect(Person.send(method)).to eq(person)
+        expect(Person.send(method)).to eq(person1)
       end
 
       it "passes the limit through" do
-        expect(Person.last(1)).to eq([ person ])
+        expect(Person.send(method, 1)).to eq([ person1 ])
+      end
+
+      it "returns nil when no documents are found" do
+        expect(Band.send(method)).to be_nil
       end
     end
   end
 
-  describe "#last" do
-    let!(:person) do
+  describe "#first!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
       Person.create!
     end
 
     it "returns the first matching document" do
-      expect(Person.last).to eq(person)
+      expect(Person.first!).to eq(person1)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.first!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  describe "#last" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    it "returns the first matching document" do
+      expect(Person.last).to eq(person2)
     end
 
     it "passes the limit through" do
-      expect(Person.last(1)).to eq([ person ])
+      expect(Person.last(1)).to eq([ person2 ])
+    end
+
+    it "returns nil when no documents are found" do
+      expect(Band.last).to be_nil
+    end
+  end
+
+  describe "#last!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    it "returns the last matching document" do
+      expect(Person.last!).to eq(person2)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.last!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  describe "#second" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    it "returns the second matching document" do
+      expect(Person.second).to eq(person2)
+    end
+
+    it "returns nil when no documents are found" do
+      expect(Band.second).to be_nil
+    end
+  end
+
+  describe "#second!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    it "returns the second matching document" do
+      expect(Person.second!).to eq(person2)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.second!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  describe "#third" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    it "returns the third matching document" do
+      expect(Person.third).to eq(person3)
+    end
+
+    it "returns nil when no documents are found" do
+      expect(Band.third).to be_nil
+    end
+  end
+
+  describe "#third!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    it "returns the third matching document" do
+      expect(Person.third!).to eq(person3)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.third!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  describe "#fourth" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    it "returns the fourth matching document" do
+      expect(Person.fourth).to eq(person4)
+    end
+
+    it "returns nil when no documents are found" do
+      expect(Band.fourth).to be_nil
+    end
+  end
+
+  describe "#fourth!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    it "returns the fourth matching document" do
+      expect(Person.fourth!).to eq(person4)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.fourth!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  describe "#fifth" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    let!(:person5) do
+      Person.create!
+    end
+
+    it "returns the fifth matching document" do
+      expect(Person.fifth).to eq(person5)
+    end
+
+    it "returns nil when no documents are found" do
+      expect(Band.fifth).to be_nil
+    end
+  end
+
+  describe "#fifth!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    let!(:person5) do
+      Person.create!
+    end
+
+    it "returns the fifth matching document" do
+      expect(Person.fifth!).to eq(person5)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.fifth!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  describe "#second_to_last" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    let!(:person5) do
+      Person.create!
+    end
+
+    it "returns the second to last matching document" do
+      expect(Person.second_to_last).to eq(person4)
+    end
+
+    it "returns nil when no documents are found" do
+      expect(Band.second_to_last).to be_nil
+    end
+  end
+
+  describe "#second_to_last!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    let!(:person5) do
+      Person.create!
+    end
+
+    it "returns the second to last matching document" do
+      expect(Person.second_to_last!).to eq(person4)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.second_to_last!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+    end
+  end
+
+  describe "#third_to_last" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    let!(:person5) do
+      Person.create!
+    end
+
+    it "returns the third to last matching document" do
+      expect(Person.third_to_last).to eq(person3)
+    end
+
+    it "returns nil when no documents are found" do
+      expect(Band.third_to_last).to be_nil
+    end
+  end
+
+  describe "#third_to_last!" do
+    let!(:person1) do
+      Person.create!
+    end
+
+    let!(:person2) do
+      Person.create!
+    end
+
+    let!(:person3) do
+      Person.create!
+    end
+
+    let!(:person4) do
+      Person.create!
+    end
+
+    let!(:person5) do
+      Person.create!
+    end
+
+    it "returns the third to last matching document" do
+      expect(Person.third_to_last!).to eq(person3)
+    end
+
+    it "raises an error when there are no documents" do
+      expect do
+        Band.third_to_last!
+      end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
     end
   end
 
@@ -541,10 +901,7 @@ describe Mongoid::Findable do
   context 'when Mongoid is configured to use activesupport time zone' do
     config_override :use_utc, false
     config_override :use_activesupport_time_zone, true
-
-    before do
-      Time.zone = "Asia/Kolkata"
-    end
+    time_zone_override "Asia/Kolkata"
 
     let!(:time) do
       Time.zone.now.tap do |t|

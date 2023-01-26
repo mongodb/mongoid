@@ -52,6 +52,37 @@ describe Mongoid::Scopable do
       end
     end
 
+    context "when a class method" do
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      before do
+        class DefaultScopeAsClassMethod
+          include Mongoid::Document
+
+          def self.default_scope
+            criteria
+          end
+        end
+      end
+
+      after do
+        Mongoid.deregister_model(DefaultScopeAsClassMethod)
+        Object.send(:remove_const, :DefaultScopeAsClassMethod)
+      end
+
+      it "adds the default scope to the class" do
+        pending 'https://jira.mongodb.org/browse/MONGOID-5483'
+        expect(DefaultScopeAsClassMethod.default_scoping.call).to eq(criteria)
+      end
+
+      it "flags as being default scoped" do
+        pending 'https://jira.mongodb.org/browse/MONGOID-5483'
+        expect(DefaultScopeAsClassMethod).to be_default_scoping
+      end
+    end
+
     context "when provided a non proc" do
 
       it "raises an error" do
@@ -119,6 +150,76 @@ describe Mongoid::Scopable do
 
       it "the subclass doesn't duplicate the default scope in the selector" do
         expect(selector).to eq({'active' => true})
+      end
+    end
+
+    context "when the default scope is dotted" do
+
+      let(:criteria) do
+        Band.where('tags.foo' => 'bar')
+      end
+
+      before do
+        Band.default_scope ->{ criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      let!(:band) do
+        Band.create!
+      end
+
+      it "adds the scope as a dotted key attribute" do
+        expect(band.attributes['tags.foo']).to eq('bar')
+      end
+
+      it "adds the default scope to the class" do
+        expect(Band.default_scoping.call).to eq(criteria)
+      end
+
+      it "flags as being default scoped" do
+        expect(Band).to be_default_scoping
+      end
+
+      it "does not find the correct document" do
+        expect(Band.count).to eq(0)
+      end
+    end
+
+    context "when the default scope is dotted with a query" do
+
+      let(:criteria) do
+        Band.where('tags.foo' => {'$eq' => 'bar'})
+      end
+
+      before do
+        Band.default_scope ->{ criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      let!(:band) do
+        Band.create!('tags' => { 'foo' => 'bar' })
+      end
+
+      it "does not add the scope as a dotted key attribute" do
+        expect(band.attributes).to_not have_key('tags.foo')
+      end
+
+      it "adds the default scope to the class" do
+        expect(Band.default_scoping.call).to eq(criteria)
+      end
+
+      it "flags as being default scoped" do
+        expect(Band).to be_default_scoping
+      end
+
+      it "finds the correct document" do
+        expect(Band.where.first).to eq(band)
       end
     end
   end
@@ -481,27 +582,45 @@ describe Mongoid::Scopable do
 
       context "when a block is provided" do
 
-        before do
-          Band.scope(:active, ->{ Band.where(active: true) }) do
-            def add_origin
-              tap { |c| c.selector[:origin] = "Deutschland" }
+        context "when with optional and keyword arguments" do
+          before do
+            Band.scope(:named_by, ->(name, deleted: false) {
+              Band.where(name: name, deleted: deleted)
+            })
+          end
+
+          let(:scope) do
+            Band.named_by("Emily", deleted: true)
+          end
+
+          it "sets the conditions from keyword arguments" do
+            scope.selector.should == {'name' => 'Emily', 'deleted' => true}
+          end
+        end
+
+        context "when without arguments" do
+          before do
+            Band.scope(:active, ->{ Band.where(active: true) }) do
+              def add_origin
+                tap { |c| c.selector[:origin] = "Deutschland" }
+              end
             end
           end
-        end
 
-        after do
-          class << Band
-            undef_method :active
+          after do
+            class << Band
+              undef_method :active
+            end
+            Band._declared_scopes.clear
           end
-          Band._declared_scopes.clear
-        end
 
-        let(:scope) do
-          Band.active.add_origin
-        end
+          let(:scope) do
+            Band.active.add_origin
+          end
 
-        it "adds the extension to the scope" do
-          expect(scope.selector).to eq({ "active" => true, "origin" => "Deutschland" })
+          it "adds the extension to the scope" do
+            expect(scope.selector).to eq({ "active" => true, "origin" => "Deutschland" })
+          end
         end
       end
 
@@ -1173,12 +1292,10 @@ describe Mongoid::Scopable do
       end
     end
 
-    context 'when nesting unsoped under with_scope' do
+    context 'when nesting unscoped under with_scope' do
       let(:c1) { Band.where(active: true) }
 
       it 'restores previous scope' do
-        pending 'MONGOID-5214'
-
         Band.with_scope(c1) do |crit|
           Band.unscoped do |crit2|
             Mongoid::Threaded.current_scope(Band).should be nil

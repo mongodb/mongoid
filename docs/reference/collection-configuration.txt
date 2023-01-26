@@ -10,51 +10,96 @@ Collection Configuration
    :depth: 2
    :class: singlecol
 
+Configuring a Document Collection
+=================================
+
+You can specify collection options for documents using the ``store_in`` macro.
+This macro accepts ``:collection_options`` argument, which can contain any collection
+options that are supported by the driver.
+
+.. note::
+
+  In order to apply the options, the collection must be explicitly created up-front.
+  This should be done using  :ref:`Collection Management Rake Task<collection-management-task>`.
+
+Please refer to `the driver collections page
+<https://mongodb.com/docs/ruby-driver/current/reference/collection-tasks/>`_
+for the more information about collection options.
+
+.. note::
+
+  Collection options depend on the driver version and MongoDB server version.
+  It is possible that some options, like time series collections, are not available
+  on older server versions.
+
+Time Series Collection
+----------------------
+
+.. code-block:: ruby
+
+  class Measurement
+    include Mongoid::Document
+
+    field :temperature, type: Integer
+    field :timestamp, type: Time
+
+    store_in collection_options: {
+      time_series: {
+        timeField: "timestamp",
+        granularity: "minutes"
+      },
+      expire_after: 604800
+    }
+  end
+
+
 
 Capped Collections
 ------------------
-
-Mongoid does not provide a mechanism for creating capped collections on the fly - you
-will need to create these yourself one time up front either with the driver or via the
-Mongo console.
-
-To create a capped collection with the driver, first retrieve the client:
 
 .. code-block:: ruby
 
   class Name
     include Mongoid::Document
+
+    store_in collection_options: {
+      capped: true,
+      size: 1024
+    }
   end
-  client = Name.collection.client
-
-Then create the collection:
-
-.. code-block:: ruby
-
-  client["names", :capped => true, :size => 1024].create
-
-To create a capped collection from the Mongo console:
-
-.. code-block:: javascript
-
-  db.createCollection("name", { capped: true, size: 1024 });
-
 
 Set a Default Collation on a Collection
 ---------------------------------------
 
-Mongoid does not provide a mechanism for creating a collection with a default collation.
-Like capped collections, you will need to create the collection yourself one time, up-front,
-either with the driver or via the Mongo console.
+.. code-block:: ruby
 
-To create a collection with a default collation with the driver:
+  class Name
+    include Mongoid::Document
+
+    store_in collection_options: {
+      collation: {
+        locale: 'fr'
+      }
+    }
+  end
+
+.. _collection-management-task:
+
+Collection Management Rake Task
+===============================
+
+If you specify collection options for a document, then the corresponding collection
+must be explicitly created prior to use. To do so, use the provided
+``db:mongoid:create_collections`` Rake task:
+
+.. code-block:: bash
+
+    $ rake db:mongoid:create_collections
+
+The create collections command also works for just one model by running
+in Rails console:
 
 .. code-block:: ruby
 
-  client["name", :collation => { :locale => 'fr'}].create
-
-To create a collection with a default collation from the Mongo console:
-
-.. code-block:: javascript
-
-  db.createCollection("name", { collation: { locale: 'fr' } });
+    # Create collection for Model
+    Model.create_collection

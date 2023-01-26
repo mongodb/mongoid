@@ -383,10 +383,11 @@ describe Mongoid::Criteria do
       Person.create!
     end
 
-    context "when no eager loading is involved" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.all.cache
+        Person.all
       end
 
       before do
@@ -394,17 +395,19 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
 
     context "when the criteria is eager loading" do
+      query_cache_enabled
 
       let(:criteria) do
-        Person.includes(:posts).cache
+        Person.includes(:posts)
       end
 
       before do
@@ -412,9 +415,10 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        expect(criteria.context.view).to receive(:each).never
-        criteria.each do |doc|
-          expect(doc).to eq(person)
+        expect_no_queries do
+          criteria.each do |doc|
+            expect(doc).to eq(person)
+          end
         end
       end
     end
@@ -488,17 +492,6 @@ describe Mongoid::Criteria do
       it 'does not convert the option keys to string from symbols' do
         expect(clone.options[:read][:mode]).to eq(:secondary)
       end
-    end
-  end
-
-  describe "#cache" do
-
-    let(:criteria) do
-      Band.where(name: "Depeche Mode")
-    end
-
-    it "sets the cache option to true" do
-      expect(criteria.cache).to be_cached
     end
   end
 
@@ -1960,6 +1953,7 @@ describe Mongoid::Criteria do
     end
 
     context 'when plucking a localized field' do
+      with_default_i18n_configs
 
       before do
         I18n.locale = :en
@@ -1967,10 +1961,6 @@ describe Mongoid::Criteria do
         I18n.locale = :de
         d.description = 'deutsch-text'
         d.save!
-      end
-
-      after do
-        I18n.locale = :en
       end
 
       context 'when plucking the entire field' do
@@ -2068,11 +2058,8 @@ describe Mongoid::Criteria do
       context 'when fallbacks are enabled with a locale list' do
         require_fallbacks
 
-        around(:all) do |example|
-          prev_fallbacks = I18n.fallbacks.dup
+        before do
           I18n.fallbacks[:he] = [ :en ]
-          example.run
-          I18n.fallbacks = prev_fallbacks
         end
 
         let(:plucked) do
@@ -2100,6 +2087,8 @@ describe Mongoid::Criteria do
       end
 
       context "when the localized field is embedded" do
+        with_default_i18n_configs
+
         before do
           p = Passport.new
           I18n.locale = :en
@@ -2297,6 +2286,47 @@ describe Mongoid::Criteria do
         expect(plucked).to eq([
           [ [ 1, 2 ] ], [ [ 1, 2 ] ], [ [ 1, 3 ] ]
         ])
+      end
+    end
+  end
+
+  describe "#pick" do
+
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode", likes: 3)
+    end
+
+    let!(:tool) do
+      Band.create!(name: "Tool", likes: 3)
+    end
+
+    context "when picking a field" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name)
+      end
+
+      it "returns one element" do
+        expect(picked).to eq("Depeche Mode")
+      end
+    end
+
+    context "when picking multiple fields" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:picked) do
+        criteria.pick(:name, :likes)
+      end
+
+      it "returns an array" do
+        expect(picked).to eq([ "Depeche Mode", 3 ])
       end
     end
   end
@@ -2726,13 +2756,33 @@ describe Mongoid::Criteria do
             Band.create!(name: "Boards of Canada", sales: sales)
           end
 
-          let(:from_db) do
+          it "cannot find values when querying using a BigDecimal value" do
             Mongoid.map_big_decimal_to_decimal128 = true
-            Band.where(sales: sales.to_s).first
+            from_db = Band.where(sales: sales).first
+            expect(from_db).to eq(nil)
           end
 
-          it "finds the document by the big decimal value" do
-            expect(from_db).to eq(band)
+          it "cannot find values when querying using a string value" do
+            Mongoid.map_big_decimal_to_decimal128 = true
+            from_db = Band.where(sales: sales.to_s).first
+            expect(from_db).to eq(nil)
+          end
+
+          context "after converting value" do
+            before do
+              Mongoid.map_big_decimal_to_decimal128 = true
+              band.set(sales: band.sales)
+            end
+
+            it "can find values when querying using a BigDecimal value" do
+              from_db = Band.where(sales: sales).first
+              expect(from_db).to eq(band)
+            end
+
+            it "can find values when querying using a string value" do
+              from_db = Band.where(sales: sales.to_s).first
+              expect(from_db).to eq(band)
+            end
           end
         end
       end
@@ -2812,6 +2862,17 @@ describe Mongoid::Criteria do
 
         it 'properly converts the object to an ObjectId' do
           expect(selector['ratable_id']).to eq(movie.id)
+        end
+      end
+
+      context "when querying an embedded document with aliases" do
+
+        let(:criteria) do
+          Person.where("phones.extension" => "123")
+        end
+
+        it "expands the aliases" do
+          expect(criteria.selector).to eq("mobile_phones.ext" => "123")
         end
       end
     end
@@ -3090,6 +3151,19 @@ describe Mongoid::Criteria do
             }
           )
         end
+      end
+    end
+
+    context "when searching for a regex on a symbol field" do
+      let!(:person) { Person.create!(species: :hello)}
+      let(:criteria) { Person.where(species: /ell/) }
+
+      it "creates the correct criteria" do
+        expect(criteria.selector).to eq({ "species" => /ell/ })
+      end
+
+      it "finds the document" do
+        expect(criteria.first).to eq(person)
       end
     end
   end

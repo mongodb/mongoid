@@ -14,15 +14,21 @@ module Mongoid
       #
       # @param [ Hash ] options Options to pass to destroy.
       #
-      # @return [ true, false ] True if successful, false if not.
+      # @return [ true | false ] True if successful, false if not.
       def destroy(options = nil)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         self.flagged_for_destroy = true
-        result = run_callbacks(:destroy) do
-          if catch(:abort) { apply_destroy_dependencies! }
-            delete(options || {})
-          else
-            false
+        result = run_callbacks(:commit, skip_if: -> { in_transaction? }) do
+          run_callbacks(:destroy) do
+            if catch(:abort) { apply_destroy_dependencies! }
+              delete(options || {}).tap do |res|
+                if res && in_transaction?
+                  Threaded.add_modified_document(_session, self)
+                end
+              end
+            else
+              false
+            end
           end
         end
         self.flagged_for_destroy = false

@@ -114,6 +114,25 @@ describe Mongoid::Extensions::String do
         it_behaves_like 'maintains precision when mongoized'
       end
 
+      context "when the string is a valid time without time" do
+
+        let(:string) do
+          "2010-11-19"
+        end
+
+        let(:mongoized) do
+          string.__mongoize_time__
+        end
+
+        let(:expected_time) { Time.parse("2010-11-18 15:00:00 +0000").in_time_zone }
+
+        it "converts to the AS time zone" do
+          expect(mongoized.zone).to eq("JST")
+        end
+
+        it_behaves_like 'mongoizes to AS::TimeWithZone'
+      end
+
       context "when the string is an invalid time" do
 
         let(:string) do
@@ -171,6 +190,29 @@ describe Mongoid::Extensions::String do
         it_behaves_like 'maintains precision when mongoized'
       end
 
+      context "when the string is a valid time without time" do
+
+        let(:string) do
+          "2010-11-19"
+        end
+
+        let(:mongoized) do
+          string.__mongoize_time__
+        end
+
+        let(:utc_offset) do
+          Time.now.utc_offset
+        end
+
+        let(:expected_time) { Time.parse("2010-11-19 00:00:00 +0000") - Time.parse(string).utc_offset }
+
+        it 'test operates in multiple time zones' do
+          expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
+        end
+
+        it_behaves_like 'mongoizes to Time'
+      end
+
       context "when the string is an invalid time" do
 
         let(:string) do
@@ -209,23 +251,6 @@ describe Mongoid::Extensions::String do
     end
   end
 
-  describe ".demongoize" do
-
-    context "when the object is not a string" do
-
-      it "returns the string" do
-        expect(String.demongoize(:test)).to eq("test")
-      end
-    end
-
-    context "when the object is nil" do
-
-      it "returns nil" do
-        expect(String.demongoize(nil)).to be_nil
-      end
-    end
-  end
-
   describe "#mongoid_id?" do
 
     context "when the string is id" do
@@ -257,19 +282,22 @@ describe Mongoid::Extensions::String do
     end
   end
 
-  describe ".mongoize" do
+  [ :mongoize, :demongoize ].each do |method|
 
-    context "when the object is not a string" do
+    describe ".#{method}" do
 
-      it "returns the string" do
-        expect(String.mongoize(:test)).to eq("test")
+      context "when the object is not a string" do
+
+        it "returns the string" do
+          expect(String.send(method, :test)).to eq("test")
+        end
       end
-    end
 
-    context "when the object is nil" do
+      context "when the object is nil" do
 
-      it "returns nil" do
-        expect(String.mongoize(nil)).to be_nil
+        it "returns nil" do
+          expect(String.send(method, nil)).to be_nil
+        end
       end
     end
   end

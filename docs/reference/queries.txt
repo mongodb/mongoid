@@ -233,7 +233,7 @@ and :ref:`field aliases <field-aliases>`:
   #   class:    Band
   #   embedded: false>
 
-Since `id` and `_id` fields are aliases, either one can be used for queries:
+Since ``id`` and ``_id`` fields are aliases, either one can be used for queries:
 
 .. code-block:: ruby
 
@@ -324,7 +324,7 @@ conditions are added to the criteria:
   Band.where(name: 1).or(name: 2).selector
   # => {"$or"=>[{"name"=>"1"}, {"name"=>"2"}]}
 
-``any_of``, ``nor`` and ``not`` behave similarly, with ``not`` producing
+``any_of``, ``none_of``, ``nor`` and ``not`` behave similarly, with ``not`` producing
 different query shapes as described below.
 
 When ``and``, ``or`` and ``nor`` logical operators are used, they
@@ -423,6 +423,20 @@ The conditions are hoisted to the top level if possible:
 
   Band.where(label: /Trust/).any_of({name: 'Astral Projection'})
   # => {"label"=>/Trust/, "name"=>"Astral Projection"}
+
+
+.. _none-of:
+
+``none_of`` Behavior
+--------------------
+
+``none_of`` adds a negated disjunction ("nor") built from its arguments to
+the existing conditions in the criteria. For example:
+
+.. code-block:: ruby
+
+  Band.where(label: /Trust/).none_of({name: 'Astral Projection'}, {name: /Best/})
+  # => {"label"=>/Trust/, "$nor"=>[{"name"=>"Astral Projection"}, {"name"=>/Best/}]}
 
 
 ``not`` Behavior
@@ -775,12 +789,12 @@ operation is sometimes called "projection".
   band = Band.only(:name).first
 
 Attempting to reference attributes which have not been loaded results in
-``ActiveModel::MissingAttributeError``.
+``Mongoid::Errors::AttributeNotLoaded``.
 
 .. code-block:: ruby
 
   band.label
-  # ActiveModel::MissingAttributeError (Missing attribute: 'label'.)
+  #=> raises Mongoid::Errors::AttributeNotLoaded
 
 Even though Mongoid currently allows writing to attributes that have not
 been loaded, such writes will not be persisted
@@ -1243,11 +1257,45 @@ Mongoid also has some helpful methods on criteria.
        *Determine if any matching documents exist. Will return true if there
        are 1 or more.*
 
+       ``#exists?`` *now takes a number of argument types:*
+
+       - ``Hash``: *A hash of conditions.*
+       - ``Object``: *An _id to search for.*
+       - ``false``/``nil``: *Always returns false.*
+
      -
         .. code-block:: ruby
 
           Band.exists?
           Band.where(name: "Photek").exists?
+          Band.exists?(name: "Photek")
+          Band.exists?(BSON::ObjectId('6320d96a3282a48cfce9e72c'))
+          Band.exists?('6320d96a3282a48cfce9e72c')
+          Band.exists?(false)
+          Band.exists?(nil)
+
+   * - ``Criteria#fifth``
+
+       *Get the fifth document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fifth
+
+   * - ``Criteria#fifth!``
+
+       *Get the fifth document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fifth!
 
    * - ``Criteria#find_by``
 
@@ -1314,6 +1362,20 @@ Mongoid also has some helpful methods on criteria.
           Band.where(:members.with_size => 3).last
           Band.first(2)
 
+   * - ``Criteria#first!|last!``
+
+       *Finds a single document given the provided criteria, or raises an error
+       if none are found. This method automatically adds a sort on _id if no
+       sort is given. This can cause performance issues, so if the sort is
+       undesirable, Criteria#take! can be used instead.*
+
+     -
+        .. code-block:: ruby
+
+          Band.first!
+          Band.where(:members.with_size => 3).first!
+          Band.where(:members.with_size => 3).last!
+
    * - ``Criteria#first_or_create``
 
        *Find the first document by the provided attributes, and if not found
@@ -1361,6 +1423,29 @@ Mongoid also has some helpful methods on criteria.
           # MongoDB 4.2 and lower
           Band.for_js("this.name = param", param: "Tool")
 
+   * - ``Criteria#fourth``
+
+       *Get the fourth document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fourth
+
+   * - ``Criteria#fourth!``
+
+       *Get the fourth document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.fourth!
+
    * - ``Criteria#length|size``
 
        *Same as count but caches subsequent calls to the database*
@@ -1370,6 +1455,32 @@ Mongoid also has some helpful methods on criteria.
 
           Band.length
           Band.where(name: "FKA Twigs").size
+
+   * - ``Criteria#pick``
+
+       *Get the values from one document for the provided fields.
+       Returns nil for unset fields and for non-existent fields.*
+
+       *This method does not apply a sort to the documents, so it
+       will not necessarily return the values from the first document.*
+
+       *This method accepts the dot notation, thus permitting referencing
+       fields in embedded associations.*
+
+       *This method respects :ref:`field aliases <field-aliases>`,
+       including those defined in embedded documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.pick(:name)
+
+          Band.all.pick('cities.name')
+
+          # Using the earlier definition of Manager,
+          # expands out to "managers.name" in the query:
+          Band.all.pick('managers.n')
+
 
    * - ``Criteria#pluck``
 
@@ -1386,12 +1497,75 @@ Mongoid also has some helpful methods on criteria.
         .. code-block:: ruby
 
           Band.all.pluck(:name)
+            #=> ["Daft Punk", "Aphex Twin", "Ween"]
 
-          Band.all.pluck('cities.name')
+          Band.all.pluck('address.city')
+            #=> ["Paris", "Limerick", "New Hope"]
 
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.pluck('managers.n')
+            #=> [ ["Berry Gordy", "Tommy Mottola"], [], ["Quincy Jones"] ]
+
+          # Accepts multiple field arguments, in which case
+          # the result will be returned as an Array of Arrays.
+          Band.all.pluck(:name, :likes)
+            #=> [ ["Daft Punk", 342], ["Aphex Twin", 98], ["Ween", 227] ]
+
+   * - ``Criteria#read``
+
+       *Sets the read preference for the criteria.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.read(mode: :primary)
+
+   * - ``Criteria#second``
+
+       *Get the second document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second
+
+   * - ``Criteria#second!``
+
+       *Get the second document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second!
+
+   * - ``Criteria#second_to_last``
+
+       *Get the second to last document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second_to_last
+
+   * - ``Criteria#second_to_last!``
+
+       *Get the second to last document for the given criteria, or raise an
+       error if none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.second_to_last!
 
    * - ``Criteria#take``
 
@@ -1439,6 +1613,52 @@ Mongoid also has some helpful methods on criteria.
           # Using the earlier definition of Manager,
           # expands out to "managers.name" in the query:
           Band.all.tally('managers.n')
+
+   * - ``Criteria#third``
+
+       *Get the third document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third
+
+   * - ``Criteria#third!``
+
+       *Get the third document for the given criteria, or raise an error if
+       none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third!
+
+   * - ``Criteria#third_to_last``
+
+       *Get the third to last document for the given criteria.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third_to_last
+
+   * - ``Criteria#third_to_last!``
+
+       *Get the third to last document for the given criteria, or raise an
+       error if none exist.*
+
+       *This method automatically adds a sort on _id if no sort is given.*
+
+     -
+        .. code-block:: ruby
+
+          Band.third_to_last!
 
 
 Eager Loading
@@ -1516,43 +1736,43 @@ For example, consider the following model definition that contains a ``Time``
 field, a ``Date`` field and an implicit ``Object`` field, and also
 intentionally does not define a field called ``deregistered_at``:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    class Voter
-      include Mongoid::Document
+  class Voter
+    include Mongoid::Document
 
-      field :born_on, type: Date
-      field :registered_at, type: Time
-      field :voted_at
-    end
+    field :born_on, type: Date
+    field :registered_at, type: Time
+    field :voted_at
+  end
 
 Queries on ``born_on`` and ``registered_at`` fields using ``Date`` and ``Time``
 values, respectively, are straightforward:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    Voter.where(born_on: Date.today).selector
-    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+  Voter.where(born_on: Date.today).selector
+  # => {"born_on"=>2020-12-18 00:00:00 UTC}
 
-    Voter.where(registered_at: Time.now).selector
-    # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
+  Voter.where(registered_at: Time.now).selector
+  # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
 
 But, note the differences in behavior when providing a ``Date`` instance
 in all possible scenarios:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    Voter.where(born_on: Date.today).selector
-    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+  Voter.where(born_on: Date.today).selector
+  # => {"born_on"=>2020-12-18 00:00:00 UTC}
 
-    Voter.where(registered_at: Date.today).selector
-    # => {"registered_at"=>2020-12-18 00:00:00 -0500}
+  Voter.where(registered_at: Date.today).selector
+  # => {"registered_at"=>2020-12-18 00:00:00 -0500}
 
-    Voter.where(voted_at: Date.today).selector
-    # => {"voted_at"=>Fri, 18 Dec 2020}
+  Voter.where(voted_at: Date.today).selector
+  # => {"voted_at"=>Fri, 18 Dec 2020}
 
-    Voter.where(deregistered_at: Date.today).selector
-    # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
+  Voter.where(deregistered_at: Date.today).selector
+  # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
 
 When using the ``registered_at`` field which is of type ``Time``, the date
 was interpreted to be in local time (as per the :ref:`configured time zone
@@ -1692,8 +1912,8 @@ in the default scope, the value in the default scope takes precedence:
   Band.new # => #<Band _id: 5c3f74ddce4ef3791abbb088, name: nil, active: false>
 
 Because a default scope initializes fields in new models as just described,
-defining a default scope with a dotted key and a simple literal value is
-not possible:
+defining a default scope with a dotted key and a simple literal value, while
+possible, is not recommended:
 
 .. code-block:: ruby
 
@@ -1705,7 +1925,36 @@ not possible:
     default_scope ->{ where('tags.foo' => 'bar') }
   end
 
-  Band.create! # exception: BSON::String::IllegalKey ('tags.foo' is an illegal key in MongoDB. Keys may not start with '$' or contain a '.'.)
+  Band.create!
+  # => Created document: {"_id"=>BSON::ObjectId('632de48f3282a404bee1877b'), "tags.foo"=>"bar"}
+  Band.create!(tags: { 'foo' => 'bar' })
+  # => Created document: {"_id"=>BSON::ObjectId('632de4ad3282a404bee1877c'), "tags.foo"=>"bar", "tags"=>{"foo"=>"bar"}}
+  Band.all.to_a
+  # => [ #<Band _id: 632de4ad3282a404bee1877c, tags: {"foo"=>"bar"}> ]
+
+Mongoid 8 allows dotted keys to be used in Mongoid, and when creating a document,
+the scope is added as a dotted key in the attributes:
+
+.. code-block:: ruby
+
+  Band.new.attribute
+  # => {"_id"=>BSON::ObjectId('632de97d3282a404bee1877d'), "tags.foo"=>"bar"}
+
+Whereas when querying, Mongoid looks for an embedded document:
+
+.. code-block:: ruby
+
+  Band.create!
+  # => Created document: {"_id"=>BSON::ObjectId('632de48f3282a404bee1877b'), "tags.foo"=>"bar"}
+  Band.where
+  # => #<Mongoid::Criteria
+         selector: {"tags.foo"=>"bar"}
+         options:  {}
+         class:    Band
+         embedded: false>
+  # This looks for something like: { tags: { "foo" => "bar" } }
+  Band.count
+  # => 0
 
 A workaround is to define the default scope as a complex query:
 
@@ -1719,9 +1968,11 @@ A workaround is to define the default scope as a complex query:
     default_scope ->{ where('tags.foo' => {'$eq' => 'bar'}) }
   end
 
-  Band.create!(tags: {hello: 'world'})
-  Band.create!(tags: {foo: 'bar'})
-  Band.count # => 1
+  Band.create!(tags: { hello: 'world' })
+  Band.create!(tags: { foo: 'bar' })
+  # does not add a "tags.foo" dotted attribute
+  Band.count
+  # => 1
 
 You can tell Mongoid not to apply the default scope by using
 ``unscoped``, which can be inline or take a block.
@@ -2063,31 +2314,19 @@ document inserts, updates, and deletion.
 Query Cache
 ===========
 
-Mongoid and the underlying Ruby MongoDB driver provide query caching
-functionality. When enabled, the query cache saves the results of
-previously executed find and aggregation queries and reuses them in
-the future instead of performing the queries again, thus increasing
-application performance and reducing database load.
+The Ruby MongoDB driver provide query caching functionality. When enabled, the
+query cache saves the results of previously executed find and aggregation
+queries and reuses them in the future instead of performing the queries again,
+thus increasing application performance and reducing database load.
 
 The query cache has historically been provided by Mongoid but as of driver
 version 2.14.0, the query cache implementation has been moved into the driver.
 When Mongoid is used with driver version 2.14.0 or later, Mongoid delegates
-all work to the driver's query cache implementation. When Mongoid is used
-with driver versions 2.13.x and earlier, Mongoid utilizes its own, legacy,
-query cache implementation.
+all work to the driver's query cache implementation.
 
 Please review the `driver query cache documentation
 <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_
 for details about the driver's query cache behavior.
-
-.. warning::
-
-  The legacy query cache implementation that Mongoid uses when it detects
-  driver version 2.13.x and earlier has a number of limitations and
-  known issues, some of which are severe. If you wish to use the query cache,
-  it is strongly recommended to use driver 2.14.0 or later. The limitations
-  of the legacy Mongoid query cache are :ref:`described below
-  <legacy-query-cache-limitations>`.
 
 The rest of this section assumes that driver 2.14.0 or later is being used and
 Mongoid delegates to the driver's query cache.
@@ -2205,24 +2444,72 @@ will query the database and separately cache their results.
 To use the cached results, call ``all.to_a.first`` on the model class.
 
 
-.. _legacy-query-cache-limitations:
+.. _load-async:
 
-Legacy Query Cache Limitations
-------------------------------
+Asynchronous Queries
+====================
 
-When Mongoid uses its legacy query cache due to driver version being older
-than 2.14.0, the following limitations apply:
+Mongoid allows running database queries asynchronously in the background.
+This can be beneficial when there is a need to get documents from different
+collections.
 
-* The query cache does not cache query results that exceed the batch size.
-  The default batch size is 1000 documents (refer to :ref:`batch_size <batch-size>`.)
+In order to schedule an asynchronous query call the ``load_async`` method on a
+``Criteria``:
 
-* The query cache does not take into account read preference or read concern
-  when deciding whether to return cached results. When performing the same
-  query with a different read preference or read concern with the query cache
-  enabled, incorrect results may be returned.
+.. code-block:: ruby
 
-* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
-  do not invalidate the query cache. Cached results may be stale after performing
-  any of these operations.
+  class PagesController < ApplicationController
+    def index
+      @active_bands = Band.where(active: true).load_async
+      @best_events = Event.best.load_async
+      @public_articles = Article.where(public: true).load_async
+    end
+  end
 
-* Aggregation results are not cached.
+In the above example three queries will be scheduled for asynchronous execution.
+Results of the queries can be later accessed as usual:
+
+.. code-block:: html
+
+  <ul>
+    <%- @active_bands.each do -%>
+      <li><%= band.name %></li>
+    <%- end -%>
+  </ul>
+
+Even if a query is scheduled for asynchronous execution, it might be executed
+synchronously on the caller's thread. There are three possible scenarios depending
+on when the query results are being accessed:
+
+#. If the scheduled asynchronous task has been already executed, the results are returned.
+#. If the task has been started, but not finished yet, the caller's thread blocks until the task is finished.
+#. If the task has not been started yet, it is removed from the execution queue, and the query is executed synchronously on the caller's thread.
+
+.. note::
+
+  Even though ``load_async`` method returns a ``Criteria`` object, you should not
+  do any operations on this object except accessing query results. The query is
+  scheduled for execution immediately after calling ``load_async``, therefore
+  later changes to the ``Criteria`` object may not be applied.
+
+
+Configuring asynchronous query execution
+----------------------------------------
+
+Asynchronous queries are disabled by default. When asynchronous queries are
+disabled, ``load_async`` will execute the query immediately on the current thread,
+blocking as necessary. Therefore, calling ``load_async`` on criteria in this case
+is roughly the equivalent of calling ``to_a`` to force query execution.
+
+In order to enable asynchronous query execution, the following config options
+must be set:
+
+.. code-block:: yaml
+
+  development:
+    ...
+    options:
+      # Execute asynchronous queries using a global thread pool.
+      async_query_executor: :global_thread_pool
+      # Number of threads in the pool. The default is 4.
+      # global_executor_concurrency: 4

@@ -265,6 +265,16 @@ for details on driver options.
       # if the database name is not explicitly defined. (default: nil)
       app_name: MyApplicationName
 
+      # Type of executor for queries scheduled using ``load_async`` method.
+      #
+      # There are two possible values for this option:
+      #
+      #   - :immediate - Queries will be immediately executed on a current thread.
+      #       This is the default option.
+      #   - :global_thread_pool - Queries will be executed asynchronously in
+      #       background using a thread pool.
+      #async_query_executor: :immediate
+
       # Mark belongs_to associations as required by default, so that saving a
       # model with a missing belongs_to association will trigger a validation
       # error. (default: true)
@@ -358,6 +368,11 @@ for details on driver options.
       # Raise an exception when a field is redefined. (default: false)
       duplicate_fields_exception: false
 
+      # Defines how many asynchronous queries can be executed concurrently.
+      # This option should be set only if `async_query_executor` option is set
+      # to `:global_thread_pool`.
+      #global_executor_concurrency: nil
+
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
 
@@ -382,6 +397,17 @@ for details on driver options.
       # putting them in a hash).
       # (default: false)
       #legacy_pluck_distinct: true
+
+      # When this flag is false, a document will become read-only only once the
+      # #readonly! method is called, and an error will be raised on attempting
+      # to save or update such documents, instead of just on delete. When this
+      # flag is true, a document is only read-only if it has been projected
+      # using #only or #without, and read-only documents will not be
+      # deletable/destroyable, but will be savable/updatable.
+      # When this feature flag is turned on, the read-only state will be reset on
+      # reload, but when it is turned off, it won't be.
+      # (default: true)
+      legacy_readonly: false
 
       # Maintain legacy behavior of === on Mongoid document classes, which
       # returns true in a number of cases where Ruby's === implementation would
@@ -437,6 +463,84 @@ for details on driver options.
       # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
       # indexes in the background by default. (default: false)
       background_indexing: false
+    # Configure driver-specific options. (optional)
+    driver_options:
+      # When this flag is turned off, inline options will be correctly
+      # propagated to Mongoid and Driver finder methods. When this flag is turned
+      # on those options will be ignored. For example, with this flag turned
+      # off, Band.all.limit(1).count will take the limit into account, while
+      # when this flag is turned on, that limit is ignored. The affected driver
+      # methods are: aggregate, count, count_documents, distinct, and
+      # estimated_document_count. The corresponding Mongoid methods are also
+      # affected. (default: false, driver version: 2.18.0+)
+      #broken_view_options: false
+
+      # Validates that there are no atomic operators (those that start with $)
+      # in the root of a replacement document, and that there are only atomic
+      # operators at the root of an update document. If this feature flag is on,
+      # an error will be raised on an invalid update or replacement document,
+      # if not, a warning will be output to the logs. This flag does not affect
+      # Mongoid as of 8.0, but will affect calls to driver update/replace
+      # methods. (default: false, driver version: 2.18.0+)
+      #validate_update_replace: false
+
+
+.. _load-defaults:
+
+Version Based Defaults
+======================
+
+Mongoid supports setting the configuration options to the defaults for specific
+versions. This is useful for upgrading to a new Mongoid version. When upgrading
+your Mongoid version, the following should be set on ``Mongoid::Config``:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults <OLD VERSION>
+  end
+
+This way, when upgrading to a new version of Mongoid, your code will run with
+the configuration options from the previous version of Mongoid. Then,
+one-by-one, you can change the feature flags for the new version, and test that
+your code still acts as expected. Once all of the new feature flags have been
+accounted for, the call to ``load_defaults`` can be changed to take in the *new*
+version, and all of the changed feature flags can be removed. For example, say
+we're upgrading from 7.5 to 8.0. Between these two versions, only two feature
+flags were added: ``legacy_attributes`` and ``map_big_decimal_to_decimal128``.
+Before upgrading to Mongoid 8, the following line can be added:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults 7.5
+  end
+
+Now, after upgrading, those two feature flags will default to their 7.5
+functionality (``legacy_attributes: true, map_big_decimal_to_decimal128: false``).
+Now you can set these feature flags one-by-one and flip them to their 8.0
+behavior:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults 7.5
+    config.legacy_attributes = false
+    # config.map_big_decimal_to_decimal128 = true
+  end
+
+It is advised to do these one at a time, so I have left the second flag
+commented out. After verifying your code works as expected with the
+``legacy_attributes`` flag turned off, the ``map_big_decimal_to_decimal128``
+setting can be uncommented. Once that functionality is verified as well, both
+of those lines can be removed and the ``load_defaults`` replaced with:
+
+.. code:: ruby
+
+  Mongoid.configure do |config|
+    config.load_defaults 8.0
+  end
+
 
 ERb Preprocessing
 =================
@@ -552,7 +656,7 @@ use an initializer as follows:
   same instance as the Rails logger, modifying any of the instances affects
   all of them. For example the following changes log level for all three
   loggers, unless the application assigned a separate ``Logger`` instance
-  to `Mongo::Logger.logger`` as described above:
+  to ``Mongo::Logger.logger`` as described above:
 
   .. code-block:: ruby
 
@@ -735,7 +839,7 @@ Every ``Proc`` in ``Mongo.tls_context_hooks`` will be passed an
 ``OpenSSL::SSL::SSLContext`` object as its sole argument. These procs will
 be executed sequentially during socket creation.
 
-..warning ::
+.. warning::
 
   TLS context hooks are global and will affect all ``Mongo::Client`` instances
   in an application.
@@ -881,8 +985,8 @@ Query Cache Middleware
 .. note::
 
   When used with Ruby driver version 2.15 or newer, Mongoid's Query Cache
-  Middleware delegates to :ref:`the driver's Query Cache Middleware
-  <driver:query-cache-middleware>`.
+  Middleware delegates to `the driver's Query Cache Middleware
+  <https://www.mongodb.com/docs/ruby-driver/current/reference/query-cache/index.html#query-cache-middleware>`_.
 
 Mongoid provides a Rack middleware which enables the :ref:`Query Cache
 <query-cache>` for the duration of each web request. Below is an example of

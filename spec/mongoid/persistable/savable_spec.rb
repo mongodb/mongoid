@@ -467,7 +467,7 @@ describe Mongoid::Persistable::Savable do
         expect {
           person.username = 'unloaded-attribute'
           person.save
-        }.to raise_error(ActiveModel::MissingAttributeError)
+        }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'username' on Person which was not loaded/)
       end
 
       context 'when the changed attribute is aliased' do
@@ -517,6 +517,90 @@ describe Mongoid::Persistable::Savable do
         it "returns false" do
           persisted_contextable_item.title = nil
           expect(persisted_contextable_item.save(context: :in_context)).to be false
+        end
+      end
+    end
+
+    context "when saving a readonly document" do
+
+      context "when legacy_readonly is true" do
+        config_override :legacy_readonly, true
+
+        context "when its a new document" do
+
+          let(:document) do
+            Band.new
+          end
+
+          before do
+            document.__selected_fields = { 'test' => 1 }
+            expect(document).to be_readonly
+          end
+
+          it "persists the document" do
+            expect(Band.count).to eq(0)
+            document.save!
+            expect(Band.count).to eq(1)
+          end
+        end
+
+        context "when its an old document" do
+
+          let(:document) do
+            Band.only(:name).first
+          end
+
+          before do
+            Band.create!
+            expect(document).to be_readonly
+          end
+
+          it "updates the document" do
+            document.name = "The Rolling Stones"
+            document.save!
+            expect(Band.first.name).to eq("The Rolling Stones")
+          end
+        end
+      end
+
+      context "when legacy_readonly is false" do
+        config_override :legacy_readonly, false
+
+        context "when its a new document" do
+
+          let(:document) do
+            Band.new
+          end
+
+          before do
+            document.readonly!
+            expect(document).to be_readonly
+          end
+
+          it "raises a readonly error" do
+            expect do
+              document.save!
+            end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+          end
+        end
+
+        context "when its an old document" do
+
+          let(:document) do
+            Band.first.tap(&:readonly!)
+          end
+
+          before do
+            Band.create!
+            expect(document).to be_readonly
+          end
+
+          it "raises a readonly error" do
+            document.name = "The Rolling Stones"
+            expect do
+              document.save!
+            end.to raise_error(Mongoid::Errors::ReadonlyDocument)
+          end
         end
       end
     end

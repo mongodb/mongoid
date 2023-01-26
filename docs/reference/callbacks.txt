@@ -1,3 +1,5 @@
+.. _callbacks:
+
 *********
 Callbacks
 *********
@@ -59,13 +61,13 @@ for cross-cutting concerns, like queueing up background jobs.
      field :name, type: String
      field :body, type: String
      field :slug, type: String
-   
+
      before_create :send_message
-   
+
      after_save do |document|
        # Handle callback here.
      end
-   
+
      protected
      def send_message
        # Message sending code here.
@@ -80,7 +82,7 @@ syntax as well:
    class Article
      include Mongoid::Document
      field :name, type: String
-  
+
      set_callback(:create, :before) do |document|
        # Message sending code here.
      end
@@ -109,10 +111,10 @@ callback. Example:
 
    class Person
      include Mongoid::Document
-   
+
      has_many :posts, after_add: :send_email_to_subscribers
    end
-   
+
    def send_email_to_subscribers(post)
      Notifications.new_post(post).deliver
    end

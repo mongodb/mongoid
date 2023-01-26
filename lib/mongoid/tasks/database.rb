@@ -5,6 +5,26 @@ module Mongoid
     module Database
       extend self
 
+      # Create collections for each model given the provided globs and the class is
+      # not embedded.
+      #
+      # @param [ Array<Mongoid::Document> ] models. Array of document classes for
+      #   which collections should be created. Defaulted to all document classes
+      #   in the application.
+      # @param [ true | false ] force If true, the method will drop existing
+      #   collections before creating new ones. If false, the method will create
+      #   only new collection (that do not exist in the database).
+      def create_collections(models = ::Mongoid.models, force: false)
+        models.each do |model|
+          if !model.embedded? || model.cyclic?
+            model.create_collection(force: force)
+            logger.info("MONGOID: Created collection for #{model}:")
+          else
+            logger.info("MONGOID: collection options ignored on: #{model}, please define in the root model.")
+          end
+        end
+      end
+
       # Create indexes for each model given the provided globs and the class is
       # not embedded.
       #
@@ -36,7 +56,6 @@ module Mongoid
       #   Mongoid::Tasks::Database.undefined_indexes
       #
       # @return [ Array<Hash> ] The list of undefined indexes by model.
-      #
       def undefined_indexes(models = ::Mongoid.models)
         undefined_by_model = {}
 
@@ -90,7 +109,6 @@ module Mongoid
       #   Mongoid::Tasks::Database.remove_indexes
       #
       # @return [ Array<Class> ] The un-indexed models.
-      #
       def remove_indexes(models = ::Mongoid.models)
         models.each do |model|
           next if model.embedded?

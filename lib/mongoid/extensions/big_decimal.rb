@@ -39,19 +39,15 @@ module Mongoid
 
         # Convert the object from its mongo friendly ruby type to this type.
         #
-        # @example Demongoize the object.
-        #   Object.demongoize(object)
-        #
         # @param [ Object ] object The object to demongoize.
         #
-        # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
+        # @return [ BigDecimal | nil ] A BigDecimal derived from the object or nil.
         def demongoize(object)
-          unless object.nil?
-            if object.is_a?(BSON::Decimal128)
-              object.to_big_decimal
-            elsif object.numeric?
-              BigDecimal(object.to_s)
-            end
+          return if object.blank?
+          if object.is_a?(BSON::Decimal128)
+            object.to_big_decimal
+          elsif object.numeric?
+            object.to_d
           end
         end
 
@@ -74,10 +70,14 @@ module Mongoid
               BSON::Decimal128.new(object)
             elsif object.numeric?
               BSON::Decimal128.new(object.to_s)
+            elsif !object.is_a?(String)
+              object.try(:to_d)
             end
           else
             if object.is_a?(BSON::Decimal128) || object.numeric?
               object.to_s
+            elsif !object.is_a?(String)
+              object.try(:to_d)&.to_s
             end
           end
         end

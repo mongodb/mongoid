@@ -190,7 +190,7 @@ module Mongoid
       #
       # @param [ String ] operator The operator.
       # @param [ Class ] klass The model class.
-      # @param [ String, Symbol ] key The field key.
+      # @param [ String | Symbol ] key The field key.
       # @param [ Object ] value The value to mongoize.
       #
       # @return [ Object ] The mongoized value.
@@ -220,8 +220,11 @@ module Mongoid
         # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
-          if object.is_a?(Hash)
+          case object
+          when BSON::Document
             object.dup.transform_values!(&:mongoize)
+          when Hash
+            BSON::Document.new(object.transform_values(&:mongoize))
           end
         end
 

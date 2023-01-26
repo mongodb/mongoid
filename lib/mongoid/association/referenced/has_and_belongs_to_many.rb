@@ -78,7 +78,7 @@ module Mongoid
 
         # Are ids only saved on this side of the association?
         #
-        # @return [ true, false ] Whether this association has a forced nil inverse.
+        # @return [ true | false ] Whether this association has a forced nil inverse.
         def forced_nil_inverse?
           @forced_nil_inverse ||= @options.key?(:inverse_of) && !@options[:inverse_of]
         end
@@ -131,7 +131,7 @@ module Mongoid
         #
         # @param [ Document ] doc The document to be bound.
         #
-        # @return [ true, false ] Whether the document can be bound.
+        # @return [ true | false ] Whether the document can be bound.
         def bindable?(doc)
           forced_nil_inverse? || (!!inverse && doc.fields.keys.include?(foreign_key))
         end
@@ -263,8 +263,12 @@ module Mongoid
 
         def query_criteria(id_list)
           crit = relation_class.criteria
-          crit = crit.apply_scope(scope)
-          crit = crit.all_of(primary_key => {"$in" => id_list || []})
+          crit = if id_list
+            crit = crit.apply_scope(scope)
+            crit.all_of(primary_key => { "$in" => id_list })
+          else
+            crit.none
+          end
           with_ordering(crit)
         end
       end

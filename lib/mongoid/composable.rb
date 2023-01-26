@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "mongoid/changeable"
+require "mongoid/collection_configurable"
 require "mongoid/findable"
 require "mongoid/indexable"
 require "mongoid/inspectable"
@@ -36,6 +37,7 @@ module Mongoid
     include Atomic
     include Changeable
     include Clients
+    include CollectionConfigurable
     include Attributes
     include Evolvable
     include Fields

@@ -23,7 +23,7 @@ module Mongoid
     # @example Is the document new?
     #   person.new_record?
     #
-    # @return [ true, false ] True if new, false if not.
+    # @return [ true | false ] True if new, false if not.
     def new_record?
       @new_record ||= false
     end
@@ -32,7 +32,7 @@ module Mongoid
     # save, the object didn't exist in the database and new_record? would have
     # returned true.
     #
-    # @return [ true, false ] True if was just created, false if not.
+    # @return [ true | false ] True if was just created, false if not.
     def previously_new_record?
       @previously_new_record ||= false
     end
@@ -43,7 +43,7 @@ module Mongoid
     # @example Is the document persisted?
     #   person.persisted?
     #
-    # @return [ true, false ] True if persisted, false if not.
+    # @return [ true | false ] True if persisted, false if not.
     def persisted?
       !new_record? && !destroyed?
     end
@@ -51,7 +51,7 @@ module Mongoid
     # Checks if the document was previously saved to the database
     # but now it has been deleted.
     #
-    # @return [ true, false ] True if was persisted but now destroyed,
+    # @return [ true | false ] True if was persisted but now destroyed,
     #   otherwise false.
     def previously_persisted?
       !new_record? && destroyed?
@@ -63,7 +63,7 @@ module Mongoid
     # @example Is the document flagged?
     #   document.flagged_for_destroy?
     #
-    # @return [ true, false ] If the document is flagged.
+    # @return [ true | false ] If the document is flagged.
     def flagged_for_destroy?
       @flagged_for_destroy ||= false
     end
@@ -77,7 +77,7 @@ module Mongoid
     # @example Is the document destroyed?
     #   person.destroyed?
     #
-    # @return [ true, false ] True if destroyed, false if not.
+    # @return [ true | false ] True if destroyed, false if not.
     def destroyed?
       @destroyed ||= false
     end
@@ -87,7 +87,7 @@ module Mongoid
     # @example Is this pushable?
     #   person.pushable?
     #
-    # @return [ true, false ] Is the document new and embedded?
+    # @return [ true | false ] Is the document new and embedded?
     def pushable?
       new_record? &&
         embedded_many? &&
@@ -95,14 +95,35 @@ module Mongoid
         !_parent.delayed_atomic_sets[atomic_path]
     end
 
+    # Flags the document as readonly. Will cause a ReadonlyDocument error to be
+    # raised if the document is attempted to be saved, updated or destroyed.
+    #
+    # @example Flag the document as readonly.
+    #   document.readonly!
+    #
+    # @return [ true | false ] true if the document was successfully marked
+    #   readonly, false otherwise.
+    def readonly!
+      if Mongoid.legacy_readonly
+        Mongoid::Warnings.warn_legacy_readonly
+        false
+      else
+        @readonly = true
+      end
+    end
+
     # Is the document readonly?
     #
     # @example Is the document readonly?
     #   document.readonly?
     #
-    # @return [ true, false ] If the document is readonly.
+    # @return [ true | false ] If the document is readonly.
     def readonly?
-      __selected_fields != nil
+      if Mongoid.legacy_readonly
+        __selected_fields != nil
+      else
+        @readonly ||= false
+      end
     end
 
     # Determine if the document can be set.
@@ -110,7 +131,7 @@ module Mongoid
     # @example Is this settable?
     #   person.settable?
     #
-    # @return [ true, false ] Is this document a new embeds one?
+    # @return [ true | false ] Is this document a new embeds one?
     def settable?
       new_record? && embedded_one? && _parent.persisted?
     end
@@ -120,7 +141,7 @@ module Mongoid
     # @example Is the document updateable?
     #   person.updateable?
     #
-    # @return [ true, false ] If the document is changed and persisted.
+    # @return [ true | false ] If the document is changed and persisted.
     def updateable?
       persisted? && changed?
     end

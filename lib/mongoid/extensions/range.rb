@@ -48,9 +48,19 @@ module Mongoid
         #
         # @note Ruby 2.6 and lower do not support endless ranges that Ruby 2.7+ support.
         def demongoize(object)
-          object.nil? ? nil : ::Range.new(object["min"], object["max"], object["exclude_end"])
-        rescue ArgumentError # can be removed when Ruby version >= 2.7
-          nil
+          return if object.nil?
+          if object.is_a?(Hash)
+            hash = object.slice('min', 'max', 'exclude_end', :min, :max, :exclude_end)
+            unless hash.blank?
+              begin
+                ::Range.new(hash["min"] || hash[:min],
+                            hash["max"] || hash[:max],
+                            hash["exclude_end"] || hash[:exclude_end])
+              rescue ArgumentError # can be removed when Ruby version >= 2.7
+                nil
+              end
+            end
+          end
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

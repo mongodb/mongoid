@@ -37,6 +37,32 @@ operations with examples.
    * - Operation
      - Example
 
+   * - ``Model#attributes``
+
+       *Returns a hash of the document's attributes with its values in
+       mongoized form (i.e. the way they are stored in the db).*
+
+       *In Mongoid 8.0 by default, and Mongoid 7.5 with the*
+       ``legacy_attributes`` *flag set to false, the object returned from this
+       method will have class* ``Hash``, *and have string keys. In Mongoid 7.5
+       by default, and in Mongoid 8.0 with the* ``legacy_attributes`` *flag set
+       to true, the object returned from this method will be a*
+       ``BSON::Document`` *(and thus, indifferently accessible) if the document
+       has been retrieved from the database, and a* ``Hash`` *with string keys
+       if it is a new document.*
+
+       *The attributes hash also contains the attributes of all embedded
+       documents, as well as their embedded documents, etc. If an embedded
+       association is empty, its key will not show up in the returned hash.*
+
+     -
+        .. code-block:: ruby
+
+          person = Person.new(first_name: "Heinrich", last_name: "Heine")
+
+          person.attributes
+          # => { "_id" => BSON::ObjectId('633467d03282a43784c2d56e'), "first_name" => "Heinrich", "last_name" => "Heine" }
+
    * - ``Model.create!``
 
        *Insert a document or multiple documents into the database, raising an
@@ -145,6 +171,11 @@ operations with examples.
        the save.*
 
        *Pass* ``validate: false`` *option to bypass validations.*
+
+       *Pass* ``touch: false`` *option to ignore the updates to the updated_at
+       field. If the document being save has not been previously persisted,
+       this option is ignored and the created_at and updated_at fields will be
+       updated with the current time.*
      -
         .. code-block:: ruby
 
@@ -154,6 +185,7 @@ operations with examples.
           )
           person.save
           person.save(validate: false)
+          person.save(touch: false)
 
           person.first_name = "Christian Johan"
           person.save
@@ -192,9 +224,12 @@ operations with examples.
    * - ``Model#upsert``
 
        *Performs a MongoDB replace with upsert on the document. If the document
-       exists in the database, it will get overwritten with the current
-       document in the application (any attributes present in the database but
-       not in the application's document instance will be lost).
+       exists in the database and the* ``:replace`` *option is set to true, it
+       will get overwritten with the current document in the application (any
+       attributes present in the database but not in the application's document
+       instance will be lost). If the* ``:replace`` *option is false (default),
+       the document will be updated, and any attributes not in the application's
+       document will be maintained.
        If the document does not exist in the database, it will be inserted.
        Note that this only runs the* ``{before|after|around}_upsert`` *callbacks.*
      -
@@ -205,6 +240,7 @@ operations with examples.
             last_name: "Heine"
           )
           person.upsert
+          person.upsert(replace: true)
 
    * - ``Model#touch``
 
@@ -314,15 +350,13 @@ Mongoid provides the following persistence-related attributes:
           person.persisted? # => true
 
 
-
 Atomic
 ------
 
-Although Mongoid performs atomic operations under the covers by default,
-there may be cases where you want to do this explicitly without persisting
-other fields. Mongoid provides support for all of these operations as well.
-When executing atomic operations via these methods, callbacks and validations
-are not invoked.
+Mongoid exposes :manual:`MongoDB update operators </reference/operator/update/>`
+as methods on Mongoid documents. When these methods are used, callbacks are
+not invoked and validations are not performed. The supported update operators
+are:
 
 .. list-table::
    :header-rows: 1
@@ -465,6 +499,12 @@ are not invoked.
         .. code-block:: ruby
 
           person.unset(:name)
+
+Note that, because these methods skip validations, it is possible to both
+save invalid documents into the database and end up with invalid documents
+in the application (which would subsequently fail to save via a ``save``
+call due to the failing validations).
+
 
 .. _atomic-operation-grouping:
 
@@ -647,7 +687,7 @@ Mongoid provides several ways of accessing field values.
 .. note::
 
   All of the access methods described below raise
-  ``ActiveModel::MissingAttributeError`` when the field being accessed is
+  ``Mongoid::Errors::AttributeNotLoaded`` when the field being accessed is
   :ref:`projected out <projection>`, either by virtue of not being included in
   :ref:`only <only>` or by virtue of being included in
   :ref:`without <without>`. This applies to both reads and writes.
@@ -709,6 +749,15 @@ write the values directly into the attributes hash:
   person.attributes
   # => {"_id"=>BSON::ObjectId('606477dc2c97a628cf47075b'), "fn"=>"Artem"}
 
+.. note::
+
+  The custom setters are called during the assignment of
+  :ref:`nested attributes <nested-attributes>`, however they are called before
+  the associations are set up. Because of this, associations may not always
+  be available during these methods, and it is encouraged to include checks
+  for their presence whenever referring to them. :ref:`Callbacks <callbacks>`
+  can also be used to perform operations on certain events, and associations
+  will have already been setup and are available during their execution.
 
 .. _read-write-attribute:
 
@@ -964,3 +1013,69 @@ back to the model as follows:
 
   band.tours
   # => #<Set: {"London"}>
+
+
+.. _readonly-documents:
+
+Readonly Documents
+==================
+
+Documents can be marked read-only in two ways, depending on the value of the
+``Mongoid.legacy_readonly`` feature flag:
+
+If this flag is turned off, a document is marked read-only when the ``#readonly!``
+method is called on that documnet. A read-only document, with this flag turned off,
+will raise a ReadonlyDocument error on attempting to perform any persistence
+operation, including (but not limited to) saving, updating, deleting and
+destroying. Note that reloading does not reset the read-only state.
+
+.. code:: ruby
+
+  band = Band.first
+  band.readonly? # => false
+  band.readonly!
+  band.readonly? # => true
+  band.name = "The Rolling Stones"
+  band.save # => raises ReadonlyDocument error
+  band.reload.readonly? # => true
+
+If this flag is turned on, a document is marked read-only when that document
+has been projected (i.e. using ``#only`` or ``#without``). A read-only document,
+with this flag turned on, will not be deletable or destroyable (a
+``ReadonlyDocument`` error will be raised), but will be saveable and updatable.
+The read-only status is reset on reloading the document.
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :genre, type: String
+  end
+
+  band = Band.only(:name).first
+  band.readonly? # => true
+  band.destroy # => raises ReadonlyDocument error
+  band.reload.readonly? # => false
+
+
+Overriding ``readonly?``
+------------------------
+
+Another way to make a document read-only is by overriding the readonly? method:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :genre, type: String
+
+    def readonly?
+      true
+    end
+  end
+
+  band = Band.first
+  band.readonly? # => true
+  band.destroy # => raises ReadonlyDocument error

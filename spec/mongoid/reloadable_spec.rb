@@ -488,12 +488,32 @@ describe Mongoid::Reloadable do
         Person.create!
       end
 
-      let(:reloaded) do
-        Person.only(:name).first.reload
+      context "when legacy_readonly is on" do
+        config_override :legacy_readonly, true
+
+        let(:reloaded) do
+          Person.only(:name).first.reload
+        end
+
+        it 'resets the readonly state after reloading' do
+          expect(reloaded.readonly?).to be(false)
+        end
       end
 
-      it 'resets the readonly state after reloading' do
-        expect(reloaded.readonly?).to be(false)
+      context "when legacy_readonly is off" do
+        config_override :legacy_readonly, false
+
+        let(:reloaded) do
+          Person.only(:name).first.tap do |doc|
+            doc.readonly!
+            expect(doc.readonly?).to be true
+            doc.reload
+          end
+        end
+
+        it 'does not reset the readonly state after reloading' do
+          expect(reloaded.readonly?).to be(true)
+        end
       end
     end
 

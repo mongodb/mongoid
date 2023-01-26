@@ -97,7 +97,7 @@ module Mongoid
         # @example Batch replace the documents.
         #   batchable.batch_replace([ doc_one, doc_two ])
         #
-        # @param [ Array<Document> ] docs The docs to replace with.
+        # @param [ Array<Document> | Array<Hash> ] docs The docs to replace with.
         #
         # @return [ Array<Hash> ] The inserts.
         def batch_replace(docs)
@@ -196,7 +196,7 @@ module Mongoid
         # @example Can inserts be performed?
         #   batchable.insertable?
         #
-        # @return [ true, false ] If inserts can be performed.
+        # @return [ true | false ] If inserts can be performed.
         def insertable?
           persistable? && !_assigning? && inserts_valid
         end
@@ -208,7 +208,7 @@ module Mongoid
         # @example Are the inserts currently valid.
         #   batchable.inserts_valid
         #
-        # @return [ true, false ] If inserts are currently valid.
+        # @return [ true | false ] If inserts are currently valid.
         def inserts_valid
           @inserts_valid
         end
@@ -220,9 +220,9 @@ module Mongoid
         # @example Set the flag.
         #   batchable.inserts_valid = true
         #
-        # @param [ true, false ] value The flag.
+        # @param [ true | false ] value The flag.
         #
-        # @return [ true, false ] The flag.
+        # @return [ true | false ] The flag.
         def inserts_valid=(value)
           @inserts_valid = value
         end
@@ -235,7 +235,7 @@ module Mongoid
         # @example Normalize the docs.
         #   batchable.normalize_docs(docs)
         #
-        # @param [ Array<Hash, Document> ] docs The docs to normalize.
+        # @param [ Array<Document> | Array<Hash> ] docs The docs to normalize.
         #
         # @return [ Array<Document> ] The docs.
         def normalize_docs(docs)

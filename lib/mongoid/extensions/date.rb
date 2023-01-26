@@ -37,9 +37,20 @@ module Mongoid
         #
         # @param [ Time ] object The time from Mongo.
         #
-        # @return [ Date ] The object as a date.
+        # @return [ Date | nil ] The object as a date or nil.
         def demongoize(object)
-          ::Date.new(object.year, object.month, object.day) if object
+          return if object.nil?
+          if object.is_a?(String)
+            object = begin
+              object.__mongoize_time__
+            rescue ArgumentError
+              nil
+            end
+          end
+
+          if object.acts_like?(:time) || object.acts_like?(:date)
+            ::Date.new(object.year, object.month, object.day)
+          end
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

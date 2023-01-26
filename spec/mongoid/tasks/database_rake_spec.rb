@@ -2,11 +2,7 @@
 
 require "rake"
 require "spec_helper"
-
-unless defined?(Rails)
-  module Rails
-  end
-end
+require "support/feature_sandbox"
 
 shared_context "rake task" do
   let(:task_name) { self.class.top_level_description }
@@ -35,15 +31,32 @@ shared_context "rake task" do
       task.invoke
     end
   end
+
+  shared_examples_for "create_collections" do
+
+    it "receives create_collections" do
+      expect(Mongoid::Tasks::Database).to receive(:create_collections)
+      task.invoke
+    end
+  end
+
+  shared_examples_for "force create_collections" do
+
+    it "receives create_collections" do
+      expect(Mongoid::Tasks::Database).to receive(:create_collections).with(force: true)
+      task.invoke
+    end
+  end
 end
 
 shared_context "rails rake task" do
   let(:task_file) { "mongoid/railties/database" }
 
-  let(:application) do
-    app = double("application")
-    allow(app).to receive(:eager_load!)
-    app
+  around do |example|
+    FeatureSandbox.quarantine do
+      require "support/rails_mock"
+      example.run
+    end
   end
 end
 
@@ -82,7 +95,6 @@ describe "db:seed" do
   end
 
   it "works" do
-    expect(Rails).to receive(:root).and_return(".")
     task.invoke
   end
 end
@@ -99,22 +111,19 @@ describe "db:setup" do
     expect(task.prerequisites).to include("mongoid:create_indexes")
   end
 
+  it "calls db:mongoid:create_collections" do
+    expect(task.prerequisites).to include("mongoid:create_collections")
+  end
+
   it "calls db:seed" do
     expect(task.prerequisites).to include("db:seed")
   end
 
-  it_behaves_like "create_indexes" do
-
-    before do
-      expect(Rails).to receive(:root).and_return(".")
-      expect(Rails).to receive(:application).and_return(application)
-    end
-  end
+  it_behaves_like "create_indexes"
 
   it "works" do
     expect(Mongoid::Tasks::Database).to receive(:create_indexes)
-    expect(Rails).to receive(:root).and_return(".")
-    expect(Rails).to receive(:application).and_return(application)
+    expect(Mongoid::Tasks::Database).to receive(:create_collections)
     task.invoke
   end
 end
@@ -132,7 +141,6 @@ describe "db:reset" do
   end
 
   it "works" do
-    expect(Rails).to receive(:root).and_return(".")
     task.invoke
   end
 end
@@ -159,19 +167,19 @@ describe "db:test:prepare" do
   include_context "rake task"
   include_context "rails rake task"
 
-  it_behaves_like "create_indexes" do
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
-  end
+  it_behaves_like "create_indexes"
 
   it "calls mongoid:create_indexes" do
     expect(task.prerequisites).to include("mongoid:create_indexes")
   end
 
+  it "calls mongoid:create_collections" do
+    expect(task.prerequisites).to include("mongoid:create_collections")
+  end
+
   it "works" do
-    expect(Rails).to receive(:application).and_return(application)
     expect(Mongoid::Tasks::Database).to receive(:create_indexes)
+    expect(Mongoid::Tasks::Database).to receive(:create_collections)
     task.invoke
   end
 end
@@ -192,11 +200,47 @@ describe "db:mongoid:create_indexes" do
   context "when using rails task" do
     include_context "rails rake task"
 
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
-
     it_behaves_like "create_indexes"
+  end
+end
+
+describe "db:mongoid:create_collections" do
+  include_context "rake task"
+
+  it_behaves_like "create_collections"
+
+  it "calls load_models" do
+    expect(task.prerequisites).to include("load_models")
+  end
+
+  it "calls environment" do
+    expect(task.prerequisites).to include("environment")
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    it_behaves_like "create_collections"
+  end
+end
+
+describe "db:mongoid:create_collections:force" do
+  include_context "rake task"
+
+  it_behaves_like "force create_collections"
+
+  it "calls load_models" do
+    expect(task.prerequisites).to include("load_models")
+  end
+
+  it "calls environment" do
+    expect(task.prerequisites).to include("environment")
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    it_behaves_like "force create_collections"
   end
 end
 
@@ -214,10 +258,6 @@ describe "db:mongoid:remove_undefined_indexes" do
 
   context "when using rails task" do
     include_context "rails rake task"
-
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
 
     it "receives remove_undefined_indexes" do
       expect(Mongoid::Tasks::Database).to receive(:remove_undefined_indexes)
@@ -240,10 +280,6 @@ describe "db:mongoid:remove_indexes" do
 
   context "when using rails task" do
     include_context "rails rake task"
-
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
 
     it "receives remove_indexes" do
       expect(Mongoid::Tasks::Database).to receive(:remove_indexes)

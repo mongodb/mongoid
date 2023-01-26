@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "support/feature_sandbox"
 
 describe Mongoid::Config do
-
-  after(:all) do
-    if defined?(RailsTemp)
-      Rails = RailsTemp
-    end
-  end
 
   after do
     Mongoid.configure do |config|
@@ -70,11 +65,6 @@ describe Mongoid::Config do
   context "when the log level is not set in the configuration" do
 
     before do
-      if defined?(Rails)
-        RailsTemp = Rails unless defined?(RailsTemp)
-        Object.send(:remove_const, :Rails)
-      end
-
       Mongoid.configure do |config|
         config.load_configuration(CONFIG)
       end
@@ -224,6 +214,79 @@ describe Mongoid::Config do
     end
   end
 
+  context 'async_query_executor option' do
+    let(:option) { :async_query_executor }
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to eq(:immediate)
+      end
+    end
+
+    context 'when the value is :immediate' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => :immediate })
+      end
+
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(:immediate)
+      end
+    end
+
+    context 'when the value is :global_thread_pool' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => :global_thread_pool })
+      end
+
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(:global_thread_pool)
+      end
+    end
+  end
+
+  context 'global_executor_concurrency option' do
+    let(:option) { :global_executor_concurrency }
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to eq(nil)
+      end
+    end
+
+    context 'when the value is set to a number' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => 5 })
+      end
+
+      it "is set to the number" do
+        expect(Mongoid.send(option)).to be(5)
+      end
+    end
+  end
+
   shared_examples "a config option" do
 
     before do
@@ -349,14 +412,14 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  describe "#load!" do
+  context 'when setting the legacy_attributes option in the config' do
+    let(:option) { :legacy_readonly }
+    let(:default) { false }
 
-    before(:all) do
-      if defined?(Rails)
-        RailsTemp = Rails
-        Object.send(:remove_const, :Rails)
-      end
-    end
+    it_behaves_like "a config option"
+  end
+
+  describe "#load!" do
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -398,20 +461,12 @@ describe Mongoid::Config do
 
       context "when in a Rails environment" do
 
-        before do
-          module Rails
-            def self.logger
-              ::Logger.new($stdout)
-            end
-          end
-          Mongoid.logger = Rails.logger
-          described_class.load!(file, :test)
-        end
-
-        after do
-          if defined?(Rails)
-            RailsTemp = Rails unless defined?(RailsTemp)
-            Object.send(:remove_const, :Rails)
+        around do |example|
+          FeatureSandbox.quarantine do
+            require "support/rails_mock"
+            Mongoid.logger = Rails.logger
+            described_class.load!(file, :test)
+            example.run
           end
         end
 
@@ -466,6 +521,40 @@ describe Mongoid::Config do
 
       it "sets the join_contexts default option" do
         expect(described_class.join_contexts).to be false
+      end
+    end
+
+    context "when provided an environment with driver options" do
+
+      before do
+        described_class.load!(file, :test)
+      end
+
+      after do
+        described_class.reset
+      end
+
+      it "sets the Mongo.broken_view_options option" do
+        expect(Mongo.broken_view_options).to eq(false)
+      end
+
+      it "does not override the unset Mongo.validate_update_replace option" do
+        expect(Mongo.validate_update_replace).to eq(false)
+      end
+    end
+
+    context "when provided an environment with a nil driver option" do
+
+      before do
+        described_class.load!(file, :test_nil)
+      end
+
+      after do
+        described_class.reset
+      end
+
+      it "sets the Mongo.broken_view_options option to nil" do
+        expect(Mongo.broken_view_options).to be_nil
       end
     end
 
@@ -563,9 +652,6 @@ describe Mongoid::Config do
 
       let(:client) { Mongoid.default_client }
 
-      # Wrapping libraries are only recognized by driver 2.13.0+.
-      min_driver_version '2.13'
-
       it 'passes uuid to driver' do
         Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
           auto_encryption_options: {
@@ -612,6 +698,17 @@ describe Mongoid::Config do
         expect {
           described_class.options = { bad_option: true }
         }.to raise_error(Mongoid::Errors::InvalidConfigOption)
+      end
+    end
+
+    context 'when invalid global_executor_concurrency option provided' do
+      it "raises an error" do
+        expect do
+          described_class.options = {
+            async_query_executor: :immediate,
+            global_executor_concurrency: 5
+          }
+        end.to raise_error(Mongoid::Errors::InvalidGlobalExecutorConcurrency)
       end
     end
   end

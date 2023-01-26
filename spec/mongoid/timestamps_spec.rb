@@ -17,12 +17,7 @@ describe Mongoid::Timestamps do
 
     let(:time_zone) { "Pacific Time (US & Canada)" }
 
-    around do |ex|
-      z = Time.zone
-      Time.zone = time_zone
-      ex.run
-      Time.zone = z
-    end
+    time_zone_override "Pacific Time (US & Canada)"
 
     before do
       document.run_callbacks(:create)
@@ -127,7 +122,7 @@ describe Mongoid::Timestamps do
   end
 
   # This section of tests describes the behavior of the updated_at field for
-  # different updates on associations, as outlined in PR #5219.
+  # different updates on referenced associations, as outlined in PR #5219.
   describe "updated_at attribute" do
     let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 

@@ -12,14 +12,34 @@ describe Mongoid::Persistable::Deletable do
 
     context "when deleting a readonly document" do
 
-      let(:from_db) do
-        Person.only(:_id).first
+      context "when legacy_attributes is true" do
+        config_override :legacy_readonly, true
+
+        let(:from_db) do
+          Person.only(:_id).first
+        end
+
+        it "raises an error" do
+          expect(from_db.readonly?).to be true
+          expect {
+            from_db.delete
+          }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
       end
 
-      it "raises an error" do
-        expect {
-          from_db.delete
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+      context "when legacy_attributes is false" do
+        config_override :legacy_readonly, false
+
+        let(:from_db) do
+          Person.first.tap(&:readonly!)
+        end
+
+        it "raises an error" do
+          expect(from_db.readonly?).to be true
+          expect {
+            from_db.delete
+          }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        end
       end
     end
 

@@ -31,7 +31,7 @@ module Mongoid
         # @example Execute an $all in a where query.
         #   selectable.where(:field.all => [ 1, 2 ])
         #
-        # @param [ Hash ] criterion The key value pairs for $all matching.
+        # @param [ Hash... ] *criteria The key value pair(s) for $all matching.
         #
         # @return [ Selectable ] The cloned selectable.
         def all(*criteria)
@@ -69,8 +69,9 @@ module Mongoid
         # @example Add the criterion.
         #   selectable.and({ field: value }, { other: value })
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
-        #   matches or Criteria objects that all must match to return results.
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        #   Multiple key/value pair matches or Criteria objects that all must
+        #   match to return results.
         #
         # @return [ Selectable ] The new selectable.
         def and(*criteria)
@@ -199,7 +200,7 @@ module Mongoid
         #   the upper right (north east) as the second argument.
         #   Important: When latitude and longitude are passed, longitude is
         #   expected as the first element of the coordinate pair.
-        #   Source: https://docs.mongodb.com/manual/reference/operator/query/box/
+        #   Source: https://www.mongodb.com/docs/manual/reference/operator/query/box/
         #
         # @example Add a geo intersect criterion for a line.
         #   query.geo_spatial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
@@ -516,8 +517,8 @@ module Mongoid
         # @example Add the $nor selection.
         #   selectable.nor(field: 1, field: 2)
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
-        #   matches or Criteria objects.
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        #   Multiple key/value pair matches or Criteria objects.
         #
         # @return [ Selectable ] The new selectable.
         def nor(*criteria)
@@ -529,7 +530,7 @@ module Mongoid
         # @example Is the selectable negating?
         #   selectable.negating?
         #
-        # @return [ true, false ] If the selectable is negating.
+        # @return [ true | false ] If the selectable is negating.
         def negating?
           !!negating
         end
@@ -545,7 +546,7 @@ module Mongoid
         # @example Execute a $not in a where query.
         #   selectable.where(:field.not => /Bob/)
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
         #   matches or Criteria objects to negate.
         #
         # @return [ Selectable ] The new selectable.
@@ -580,6 +581,35 @@ module Mongoid
         end
         key :not, :override, "$not"
 
+        # Negate the arguments, constraining the query to only those documents
+        # that do NOT match the arguments.
+        #
+        # @example Exclude a single criterion.
+        #   selectable.none_of(name: /Bob/)
+        #
+        # @example Exclude multiple criteria.
+        #   selectable.none_of(name: /Bob/, country: "USA")
+        #
+        # @example Exclude multiple criteria as an array.
+        #   selectable.none_of([{ name: /Bob/ }, { country: "USA" }])
+        #
+        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
+        #   matches or Criteria objects to negate.
+        #
+        # @return [ Selectable ] The new selectable.
+        def none_of(*criteria)
+          criteria = _mongoid_flatten_arrays(criteria)
+          return dup if criteria.empty?
+
+          exprs = criteria.map do |criterion|
+            _mongoid_expand_keys(
+                criterion.is_a?(Selectable) ?
+                  criterion.selector : criterion)
+          end
+
+          self.and('$nor' => exprs)
+        end
+
         # Creates a disjunction using $or from the existing criteria in the
         # receiver and the provided arguments.
         #
@@ -605,7 +635,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.or([{field: 1}], [{field: 2}])
         #
-        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] criteria
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #
@@ -635,7 +665,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.any_of([{field: 1}], [{field: 2}])
         #
-        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] criteria
+        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #
@@ -731,12 +761,12 @@ module Mongoid
         # @example Construct a text search selector with options.
         #   selectable.text_search("testing", :$language => "fr")
         #
-        # @note Per https://docs.mongodb.com/manual/reference/operator/query/text/
+        # @note Per https://www.mongodb.com/docs/manual/reference/operator/query/text/
         #   it is not currently possible to supply multiple text search
         #   conditions in a query. Mongoid will build such a query but the
         #   server will return an error when trying to execute it.
         #
-        # @param [ String, Symbol ] terms A string of terms that MongoDB parses
+        # @param [ String | Symbol ] terms A string of terms that MongoDB parses
         #   and uses to query the text index.
         # @param [ Hash ] opts Text search options. See MongoDB documentation
         #   for options.
@@ -751,7 +781,7 @@ module Mongoid
             criterion = {'$text' => { '$search' => terms }}
             criterion['$text'].merge!(opts) if opts
             if query.selector['$text']
-              # Per https://docs.mongodb.com/manual/reference/operator/query/text/
+              # Per https://www.mongodb.com/docs/manual/reference/operator/query/text/
               # multiple $text expressions are not currently supported by
               # MongoDB server, but build the query correctly instead of
               # overwriting previous text search condition with the currently
@@ -774,7 +804,8 @@ module Mongoid
         # @example Add a javascript selection.
         #   selectable.where("this.name == 'syd'")
         #
-        # @param [ String, Hash ] criterion The javascript or standard selection.
+        # @param [ [ Hash | String ]... ] *criterion The standard selection
+        #   or javascript string.
         #
         # @return [ Selectable ] The cloned selectable.
         def where(*criteria)

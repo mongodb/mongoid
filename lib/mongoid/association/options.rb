@@ -7,7 +7,7 @@ module Mongoid
 
       # Returns the name of the parent to a polymorphic child.
       #
-      # @return [ String, Symbol ] The name.
+      # @return [ String | Symbol ] The name.
       def as
         @options[:as]
       end
@@ -28,21 +28,21 @@ module Mongoid
 
       # Whether to index the primary or foreign key field.
       #
-      # @return [ true, false ]
+      # @return [ true | false ]
       def indexed?
         @indexed ||= !!@options[:index]
       end
 
       # Whether the association is autobuilding.
       #
-      # @return [ true, false ]
+      # @return [ true | false ]
       def autobuilding?
         !!@options[:autobuild]
       end
 
       # Is the association cyclic.
       #
-      # @return [ true, false ] Whether the association is cyclic.
+      # @return [ true | false ] Whether the association is cyclic.
       def cyclic?
         !!@options[:cyclic]
       end
@@ -57,7 +57,7 @@ module Mongoid
       # Mongoid assumes that the field used to hold the primary key of the association is id.
       # You can override this and explicitly specify the primary key with the :primary_key option.
       #
-      # @return [ Symbol, String ] The primary key.
+      # @return [ Symbol | String ] The primary key.
       def primary_key
         @primary_key ||= @options[:primary_key] ? @options[:primary_key].to_s : Relatable::PRIMARY_KEY_DEFAULT
       end
@@ -65,7 +65,7 @@ module Mongoid
       # Options to save any loaded members and destroy members that are marked for destruction
       # when the parent object is saved.
       #
-      # @return [ true, false ] The autosave option.
+      # @return [ true | false ] The autosave option.
       def autosave
         !!@options[:autosave]
       end
@@ -73,19 +73,19 @@ module Mongoid
 
       # Whether the association is counter-cached.
       #
-      # @return [ true, false ]
+      # @return [ true | false ]
       def counter_cached?
         !!@options[:counter_cache]
       end
 
       # Whether this association is polymorphic.
       #
-      # @return [ true, false ] Whether the association is polymorphic.
+      # @return [ true | false ] Whether the association is polymorphic.
       def polymorphic?; false; end
 
       # Whether the association has callbacks cascaded down from the parent.
       #
-      # @return [ true, false ] Whether callbacks are cascaded.
+      # @return [ true | false ] Whether callbacks are cascaded.
       def cascading_callbacks?
         !!@options[:cascade_callbacks]
       end
@@ -112,8 +112,13 @@ module Mongoid
         @touch_field ||= options[:touch] if (options[:touch].is_a?(String) || options[:touch].is_a?(Symbol))
       end
 
-      private
-
+      # Whether the association object should be automatically touched
+      # when its inverse object is updated.
+      #
+      # @return [ true | false ] returns true if this association is
+      #   automatically touched, false otherwise. The default is false.
+      #
+      # @api private
       def touchable?
         !!@options[:touch]
       end

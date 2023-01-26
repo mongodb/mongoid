@@ -202,7 +202,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
             end
           end
         end
-        
+
         context 'when the original document does not need to be unset because it will be replaced by the $set' do
 
           let!(:pet_owner) do
@@ -1020,6 +1020,19 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
 
     it "parent successfully embeds an invalid child" do
       expect(building.building_address).to be_a(BuildingAddress)
+    end
+  end
+
+  context "when assigning a hash" do
+    let(:building) { Building.create! }
+
+    before do
+      building.building_address = { city: "NYC" }
+    end
+
+    it "creates the objects correctly" do
+      expect(building.building_address).to be_a(BuildingAddress)
+      expect(building.building_address.city).to eq("NYC")
     end
   end
 end

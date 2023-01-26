@@ -12,7 +12,7 @@ module Mongoid
         # @example Do we allow a destroy?
         #   builder.allow_destroy?
         #
-        # @return [ true, false ] True if the allow destroy option was set.
+        # @return [ true | false ] True if the allow destroy option was set.
         def allow_destroy?
           options[:allow_destroy] || false
         end
@@ -25,7 +25,7 @@ module Mongoid
         # @param [ Document ] document The parent document of the association
         # @param [ Hash ] attrs The attributes to check for rejection.
         #
-        # @return [ true, false ] True and call proc or method if rejectable, false if not.
+        # @return [ true | false ] True and call proc or method if rejectable, false if not.
         def reject?(document, attrs)
           case callback = options[:reject_if]
             when Symbol
@@ -43,7 +43,7 @@ module Mongoid
         # @example Is this update only?
         #   builder.update_only?
         #
-        # @return [ true, false ] True if the update_only option was set.
+        # @return [ true | false ] True if the update_only option was set.
         def update_only?
           options[:update_only] || false
         end
@@ -56,7 +56,7 @@ module Mongoid
         # @param [ Class ] klass The class we're trying to convert for.
         # @param [ String ] id The id, usually coming from the form.
         #
-        # @return [ BSON::ObjectId, String, Object ] The converted id.
+        # @return [ BSON::ObjectId | String | Object ] The converted id.
         def convert_id(klass, id)
           klass.using_object_ids? ? BSON::ObjectId.mongoize(id) : id
         end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "mongoid/config/defaults"
 require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
@@ -11,6 +12,7 @@ module Mongoid
   module Config
     extend Forwardable
     extend Options
+    extend Defaults
     extend self
 
     def_delegators ::Mongoid, :logger, :logger=
@@ -125,13 +127,43 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
+    # Sets the async_query_executor for the application. By default the thread pool executor
+    #   is set to `:immediate. Options are:
+    #
+    #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
+    #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
+    #      that uses the +async_query_concurrency+ for the +max_threads+ value.
+    option :async_query_executor, default: :immediate
+
+    # Defines how many asynchronous queries can be executed concurrently.
+    # This option should be set only if `async_query_executor` is set
+    # to `:global_thread_pool`.
+    option :global_executor_concurrency, default: nil
+
+    # When this flag is false, a document will become read-only only once the
+    # #readonly! method is called, and an error will be raised on attempting
+    # to save or update such documents, instead of just on delete. When this
+    # flag is true, a document is only read-only if it has been projected
+    # using #only or #without, and read-only documents will not be
+    # deletable/destroyable, but they will be savable/updatable.
+    # When this feature flag is turned on, the read-only state will be reset on
+    # reload, but when it is turned off, it won't be.
+    option :legacy_readonly, default: false
+
+    # Returns the Config singleton, for use in the configure DSL.
+    #
+    # @return [ self ] The Config singleton.
+    def config
+      self
+    end
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
     # @example Is Mongoid configured?
     #   config.configured?
     #
-    # @return [ true, false ] If Mongoid is configured.
+    # @return [ true | false ] If Mongoid is configured.
     def configured?
       clients.key?(:default)
     end
@@ -172,7 +204,7 @@ module Mongoid
     #   Mongoid.load!("/path/to/mongoid.yml")
     #
     # @param [ String ] path The path to the file.
-    # @param [ String, Symbol ] environment The environment to load.
+    # @param [ String | Symbol ] environment The environment to load.
     def load!(path, environment = nil)
       settings = Environment.load_yaml(path, environment)
       if settings.present?
@@ -206,6 +238,17 @@ module Mongoid
       end
     end
 
+    # Deregister a model in the application with Mongoid.
+    #
+    # @param [ Class ] klass The model to deregister.
+    #
+    # @api private
+    def deregister_model(klass)
+      LOCK.synchronize do
+        models.delete(klass)
+      end
+    end
+
     # From a hash of settings, load all the configuration.
     #
     # @example Load the configuration.
@@ -216,6 +259,7 @@ module Mongoid
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
       self.clients = configuration[:clients]
+      Mongo.options = configuration[:driver_options] || {}
       set_log_levels
     end
 
@@ -224,9 +268,9 @@ module Mongoid
     # @example Override the database globally.
     #   config.override_database(:optional)
     #
-    # @param [ String, Symbol ] name The name of the database.
+    # @param [ String | Symbol ] name The name of the database.
     #
-    # @return [ String, Symbol ] The global override.
+    # @return [ String | Symbol ] The global override.
     def override_database(name)
       Threaded.database_override = name
     end
@@ -236,9 +280,9 @@ module Mongoid
     # @example Override the client globally.
     #   config.override_client(:optional)
     #
-    # @param [ String, Symbol ] name The name of the client.
+    # @param [ String | Symbol ] name The name of the client.
     #
-    # @return [ String, Symbol ] The global override.
+    # @return [ String | Symbol ] The global override.
     def override_client(name)
       Threaded.client_override = name ? name.to_s : nil
     end
@@ -277,6 +321,7 @@ module Mongoid
     # @param [ Hash ] options The configuration options.
     def options=(options)
       if options
+        Validators::AsyncQueryExecutor.validate(options)
         options.each_pair do |option, value|
           Validators::Option.validate(option)
           send("#{option}=", value)
@@ -309,7 +354,7 @@ module Mongoid
     # @example Is the application using passenger?
     #   config.running_with_passenger?
     #
-    # @return [ true, false ] If the app is deployed on Passenger.
+    # @return [ true | false ] If the app is deployed on Passenger.
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end

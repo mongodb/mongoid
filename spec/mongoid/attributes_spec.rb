@@ -166,7 +166,7 @@ describe Mongoid::Attributes do
         it "raises an error" do
           expect {
             from_db.title
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
         end
 
         context "accessing via []" do
@@ -174,7 +174,7 @@ describe Mongoid::Attributes do
           it "raises an error" do
             expect {
               from_db["title"]
-            }.to raise_error(ActiveModel::MissingAttributeError)
+            }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
         end
       end
@@ -188,7 +188,7 @@ describe Mongoid::Attributes do
         it "raises an error" do
           expect {
             from_db.title
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
         end
       end
     end
@@ -270,7 +270,7 @@ describe Mongoid::Attributes do
           it "raises an error" do
             expect {
               from_db[:title]
-            }.to raise_error(ActiveModel::MissingAttributeError)
+            }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
         end
 
@@ -283,7 +283,7 @@ describe Mongoid::Attributes do
           it "raises an error" do
             expect {
               from_db[:title]
-            }.to raise_error(ActiveModel::MissingAttributeError)
+            }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
         end
       end
@@ -299,7 +299,7 @@ describe Mongoid::Attributes do
           it "raises an error" do
             expect {
               from_db[:undefined_field]
-            }.to raise_error(ActiveModel::MissingAttributeError)
+            }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'undefined_field' on Person which was not loaded/)
           end
         end
 
@@ -312,7 +312,7 @@ describe Mongoid::Attributes do
           it "raises an error" do
             expect {
               from_db[:title]
-            }.to raise_error(ActiveModel::MissingAttributeError)
+            }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
         end
 
@@ -364,10 +364,10 @@ describe Mongoid::Attributes do
           end
 
           context 'when retrieving a non-projected field' do
-            it 'raises MissingAttributeError' do
+            it 'raises AttributeNotLoaded' do
               expect do
                 from_db['name.first_name']
-              end.to raise_error(ActiveModel::MissingAttributeError)
+              end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'name.first_name' on Person which was not loaded/)
             end
           end
         end
@@ -393,11 +393,10 @@ describe Mongoid::Attributes do
         end
 
         context "when reloaded" do
+          config_override :raise_not_found_error, false
 
           before do
-            Mongoid.raise_not_found_error = false
             person.reload
-            Mongoid.raise_not_found_error = true
           end
 
           it "returns the default value" do
@@ -488,7 +487,7 @@ describe Mongoid::Attributes do
           it "raises an error" do
             expect {
               from_db[:undefined_field] = 'x'
-            }.to raise_error(ActiveModel::MissingAttributeError)
+            }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'undefined_field' on Person which was not loaded/)
           end
         end
 
@@ -501,7 +500,7 @@ describe Mongoid::Attributes do
           it "raises an error" do
             expect {
               from_db[:title] = 'x'
-            }.to raise_error(ActiveModel::MissingAttributeError)
+            }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
         end
 
@@ -1030,14 +1029,13 @@ describe Mongoid::Attributes do
       end
 
       context "when the attribute does not exist" do
+        config_override :raise_not_found_error, false
 
         before do
           person.collection
             .find({ _id: person.id })
             .update_one({ "$unset" => { age: 1 }})
-          Mongoid.raise_not_found_error = false
           person.reload
-          Mongoid.raise_not_found_error = true
         end
 
         it "returns the default value" do
@@ -1098,7 +1096,7 @@ describe Mongoid::Attributes do
         it "raises an error" do
           expect {
             from_db.read_attribute(:undefined_field)
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'undefined_field' on Person which was not loaded/)
         end
       end
 
@@ -1111,7 +1109,7 @@ describe Mongoid::Attributes do
         it "raises an error" do
           expect {
             from_db.read_attribute(:title)
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
         end
       end
 
@@ -1161,14 +1159,13 @@ describe Mongoid::Attributes do
       end
 
       context "when the attribute does not exist" do
+        config_override :raise_not_found_error, false
 
         before do
           person.collection
             .find({ _id: person.id })
             .update_one({ "$unset" => { age: 1 }})
-          Mongoid.raise_not_found_error = false
           person.reload
-          Mongoid.raise_not_found_error = true
         end
 
         it "returns true" do
@@ -1593,8 +1590,8 @@ describe Mongoid::Attributes do
         expect(person.map).to be_nil
       end
 
-      it "can set a Hash value" do
-        expect(person.map).to eq( { somekey: "somevalue" } )
+      it "can set a Hash value with stringified keys" do
+        expect(person.map).to eq( { "somekey" => "somevalue" } )
       end
     end
 
@@ -1644,7 +1641,7 @@ describe Mongoid::Attributes do
         it "raises an error" do
           expect {
             from_db.write_attribute(:undefined_field, 'x')
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'undefined_field' on Person which was not loaded/)
         end
       end
 
@@ -1657,7 +1654,7 @@ describe Mongoid::Attributes do
         it "raises an error" do
           expect {
             from_db.write_attribute(:title, 'x')
-          }.to raise_error(ActiveModel::MissingAttributeError)
+          }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
         end
       end
 
@@ -2694,6 +2691,21 @@ describe Mongoid::Attributes do
 
     it "persists the updated hash" do
       church.location.should == { "x" => 1, "y" => 2 }
+    end
+  end
+
+  context "when modifiying a set referenced with the [] notation" do
+    let(:catalog) { Catalog.create!(set_field: [ 1 ].to_set) }
+
+    before do
+      catalog[:set_field] << 2
+      catalog.save!
+      catalog.reload
+    end
+
+    it "persists the updated hash" do
+      pending "MONGOID-2951"
+      catalog.set_field.should == Set.new([ 1, 2 ])
     end
   end
 end

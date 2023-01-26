@@ -48,7 +48,7 @@ module Mongoid
       # @example Is the field a foreign key?
       #   field.foreign_key?
       #
-      # @return [ true, false ] If the field is a foreign key.
+      # @return [ true | false ] If the field is a foreign key.
       def foreign_key?
         false
       end
@@ -82,7 +82,7 @@ module Mongoid
       # @example Is the field lazy?
       #   field.lazy?
       #
-      # @return [ true, false ] If the field is lazy.
+      # @return [ true | false ] If the field is lazy.
       def lazy?
         false
       end
@@ -92,8 +92,18 @@ module Mongoid
       # @example Is the field localized?
       #   field.localized?
       #
-      # @return [ true, false ] If the field is localized.
+      # @return [ true | false ] If the field is localized.
       def localized?
+        false
+      end
+
+      # Is the localized field enforcing values to be present?
+      #
+      # @example Is the localized field enforcing values to be present?
+      #   field.localize_present?
+      #
+      # @return [ true | false ] If the field enforces present.
+      def localize_present?
         false
       end
 
@@ -112,7 +122,7 @@ module Mongoid
       # @example Is the field a BSON::ObjectId?
       #   field.object_id_field?
       #
-      # @return [ true, false ] If the field is a BSON::ObjectId.
+      # @return [ true | false ] If the field is a BSON::ObjectId.
       def object_id_field?
         @object_id_field ||= (type == BSON::ObjectId)
       end
@@ -122,7 +132,7 @@ module Mongoid
       # @example Does the field pre-process the default?
       #   field.pre_processed?
       #
-      # @return [ true, false ] If the field's default is pre-processed.
+      # @return [ true | false ] If the field's default is pre-processed.
       def pre_processed?
         @pre_processed ||=
           (options[:pre_processed] || (default_val && !default_val.is_a?(::Proc)))
@@ -161,7 +171,7 @@ module Mongoid
       #
       # @note Ruby's instance_exec was just too slow.
       #
-      # @param [ Class, Module ] object The class or module the field is
+      # @param [ Class | Module ] object The class or module the field is
       #   defined on.
       def define_default_method(object)
         object.__send__(:define_method, default_name, default_val)
@@ -177,7 +187,7 @@ module Mongoid
       #
       # @param [ Hash ] fields The field limitations.
       #
-      # @return [ true, false ] If the field was included.
+      # @return [ true | false ] If the field was included.
       def included?(fields)
         (fields.values.first == 1 && fields[name.to_s] == 1) ||
           (fields.values.first == 0 && !fields.has_key?(name.to_s))

@@ -118,7 +118,7 @@ module Mongoid
         #
         # @note Only relevant for polymorphic associations.
         #
-        # @return [ String, nil ] The type field.
+        # @return [ String | nil ] The type field.
         def type
           @type ||= "#{as}_type" if polymorphic?
         end
@@ -140,7 +140,7 @@ module Mongoid
 
         # Is this association polymorphic?
         #
-        # @return [ true, false ] Whether this association is polymorphic.
+        # @return [ true | false ] Whether this association is polymorphic.
         def polymorphic?
           @polymorphic ||= !!as
         end
@@ -150,7 +150,7 @@ module Mongoid
         #
         # @param [ Document ] doc The document to be bound.
         #
-        # @return [ true, false ] Whether the document can be bound.
+        # @return [ true | false ] Whether the document can be bound.
         def bindable?(doc)
           forced_nil_inverse? || (!!inverse && doc.fields.keys.include?(foreign_key))
         end

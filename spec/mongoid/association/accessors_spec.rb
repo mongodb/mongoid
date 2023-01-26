@@ -625,7 +625,7 @@ describe Mongoid::Association::Accessors do
           it 'does not create an accessor for another field on the embedded document' do
             expect do
               persisted_person.passport.country
-            end.to raise_error(ActiveModel::MissingAttributeError)
+            end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'country' on Passport which was not loaded/)
           end
         end
 
@@ -655,7 +655,7 @@ describe Mongoid::Association::Accessors do
               it 'does not create an accessor for another field on the embedded document' do
                 expect do
                   persisted_person.passport.country
-                end.to raise_error(ActiveModel::MissingAttributeError)
+                end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'country' on Passport which was not loaded/)
               end
             end
 
@@ -717,7 +717,7 @@ describe Mongoid::Association::Accessors do
           it 'does not create an accessor for another field on the embedded document' do
             expect do
               persisted_person.phone_numbers.first.landline
-            end.to raise_error(ActiveModel::MissingAttributeError)
+            end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'landline' on Phone which was not loaded/)
           end
         end
 
@@ -746,7 +746,7 @@ describe Mongoid::Association::Accessors do
               it 'does not create an accessor for another field on the embedded document' do
                 expect do
                   persisted_person.phone_numbers.first.landline
-                end.to raise_error(ActiveModel::MissingAttributeError)
+                end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'landline' on Phone which was not loaded/)
               end
 
             end

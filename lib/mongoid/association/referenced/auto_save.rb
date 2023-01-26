@@ -12,7 +12,7 @@ module Mongoid
         # @example Is the document autosaved?
         #   document.autosaved?
         #
-        # @return [ true, false ] Has the document already been autosaved?
+        # @return [ true | false ] Has the document already been autosaved?
         def autosaved?
           Threaded.autosaved?(self)
         end

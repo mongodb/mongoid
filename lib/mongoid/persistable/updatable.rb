@@ -13,13 +13,13 @@ module Mongoid
       # @example Update the attribute.
       #   person.update_attribute(:title, "Sir")
       #
-      # @param [ Symbol, String ] name The name of the attribute.
+      # @param [ Symbol | String ] name The name of the attribute.
       # @param [ Object ] value The new value of the attribute.a
       #
       # @raise [ Errors::ReadonlyAttribute ] If the field cannot be changed due
       #   to being flagged as read-only.
       #
-      # @return [ true, false ] True if save was successful, false if not.
+      # @return [ true | false ] True if save was successful, false if not.
       def update_attribute(name, value)
         as_writable_attribute!(name, value) do |access|
           normalized = name.to_s
@@ -35,7 +35,7 @@ module Mongoid
       #
       # @param [ Hash ] attributes The attributes to update.
       #
-      # @return [ true, false ] True if validation passed, false if not.
+      # @return [ true | false ] True if validation passed, false if not.
       def update(attributes = {})
         assign_attributes(attributes)
         save
@@ -53,7 +53,7 @@ module Mongoid
       # @raise [ Errors::Validations ] If validation failed.
       # @raise [ Errors::Callbacks ] If a callback returns false.
       #
-      # @return [ true, false ] True if validation passed.
+      # @return [ true | false ] True if validation passed.
       def update!(attributes = {})
         result = update_attributes(attributes)
         unless result
@@ -91,20 +91,28 @@ module Mongoid
       #
       # @param [ Hash ] options The options.
       #
-      # @return [ true, false ] The result of the update.
+      # @option options [ true | false ] :touch Whether or not the updated_at
+      #   attribute will be updated with the current time.
+      #
+      # @return [ true | false ] The result of the update.
       def prepare_update(options = {})
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys
-        run_callbacks(:save, with_children: false) do
-          run_callbacks(:update, with_children: false) do
-            run_callbacks(:persist_parent, with_children: false) do
-              _mongoid_run_child_callbacks(:save) do
-                _mongoid_run_child_callbacks(:update) do
-                  result = yield(self)
-                  self.previously_new_record = false
-                  post_process_persist(result, options)
-                  true
+        update_children = cascadable_children(:update)
+        process_touch_option(options, update_children)
+        run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
+          run_callbacks(:save, with_children: false) do
+            run_callbacks(:update, with_children: false) do
+              run_callbacks(:persist_parent, with_children: false) do
+                _mongoid_run_child_callbacks(:save) do
+                  _mongoid_run_child_callbacks(:update, children: update_children) do
+                    result = yield(self)
+                    self.previously_new_record = false
+                    post_process_persist(result, options)
+                    true
+                  end
                 end
               end
             end
@@ -119,9 +127,9 @@ module Mongoid
       #
       # @param [ Hash ] options Options to pass to update.
       #
-      # @option options [ true, false ] :validate Whether or not to validate.
+      # @option options [ true | false ] :validate Whether or not to validate.
       #
-      # @return [ true, false ] True if succeeded, false if not.
+      # @return [ true | false ] True if succeeded, false if not.
       def update_document(options = {})
         prepare_update(options) do
           updates, conflicts = init_atomic_updates
@@ -158,6 +166,24 @@ module Mongoid
               end
             end
           end
+        end
+      end
+
+      # If there is a touch option and it is false, this method will call the
+      # timeless method so that the updated_at attribute is not updated. It
+      # will call the timeless method on all of the cascadable children as
+      # well. Note that timeless is cleared in the before_update callback.
+      #
+      # @param [ Hash ] options The options.
+      # @param [ Array<Document> ] children The children that the :update
+      #   callbacks will be executed on.
+      #
+      # @option options [ true | false ] :touch Whether or not the updated_at
+      #   attribute will be updated with the current time.
+      def process_touch_option(options, children)
+        unless options.fetch(:touch, true)
+          timeless
+          children.each(&:timeless)
         end
       end
     end

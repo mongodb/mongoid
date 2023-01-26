@@ -44,39 +44,6 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  describe "#cached?" do
-
-    context "when the criteria is cached" do
-
-      let(:criteria) do
-        Band.all.cache
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns true" do
-        expect(context).to be_cached
-      end
-    end
-
-    context "when the criteria is not cached" do
-
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns false" do
-        expect(context).to_not be_cached
-      end
-    end
-  end
-
   describe "#count" do
 
     let!(:depeche) do
@@ -102,15 +69,17 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
-        described_class.new(criteria.cache)
+        described_class.new(criteria)
       end
 
-      it "returns the count cached value after first call" do
-        expect(context.view).to receive(:count_documents).once.and_return(1)
-        2.times { expect(context.count).to eq(1) }
+      it "only executes the count query once" do
+        expect_query(1) do
+          2.times { expect(context.count).to eq(1) }
+        end
       end
     end
 
@@ -217,16 +186,18 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
-        described_class.new(criteria.cache)
+        described_class.new(criteria)
       end
 
-      it "returns the count cached value after first call" do
-        expect(context.view).to receive(:estimated_document_count).once.and_return(1)
-        2.times do
-          context.estimated_count
+      it "the results are not cached" do
+        expect_query(2) do
+          2.times do
+            context.estimated_count
+          end
         end
       end
     end
@@ -249,6 +220,34 @@ describe Mongoid::Contextual::Mongo do
           expect do
             criteria.estimated_count(maxTimeMS: 1000)
           end.to raise_error(Mongoid::Errors::InvalidEstimatedCountCriteria)
+        end
+      end
+    end
+
+    context "when including a default scope" do
+
+      let(:criteria) do
+        Band.where(name: "New Order")
+      end
+
+      before do
+        5.times { Band.create! }
+        Band.default_scope ->{ criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it 'raises an error' do
+        expect do
+          Band.estimated_count
+        end.to raise_error(Mongoid::Errors::InvalidEstimatedCountScoping)
+      end
+
+      it "does not raise an error on unscoped" do
+        expect do
+          expect(Band.unscoped.estimated_count).to eq(5)
         end
       end
     end
@@ -590,6 +589,8 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when getting a localized field" do
+      with_default_i18n_configs
+
       before do
         I18n.locale = :en
         d = Dictionary.create!(description: 'english-text')
@@ -690,12 +691,10 @@ describe Mongoid::Contextual::Mongo do
 
       context 'when fallbacks are enabled with a locale list' do
         require_fallbacks
+        with_default_i18n_configs
 
-        around(:all) do |example|
-          prev_fallbacks = I18n.fallbacks.dup
+        before do
           I18n.fallbacks[:he] = [ :en ]
-          example.run
-          I18n.fallbacks = prev_fallbacks
         end
 
         let(:distinct) do
@@ -715,7 +714,7 @@ describe Mongoid::Contextual::Mongo do
 
           it "correctly uses the fallback" do
             I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
+            Dictionary.create!(description: 'english-text')
             I18n.locale = :he
             distinct.should == "english-text"
           end
@@ -723,6 +722,8 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context "when the localized field is embedded" do
+        with_default_i18n_configs
+
         before do
           p = Passport.new
           I18n.locale = :en
@@ -868,6 +869,8 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when tallying a localized field" do
+      with_default_i18n_configs
+
       before do
         I18n.locale = :en
         d1 = Dictionary.create!(description: 'en1')
@@ -883,7 +886,6 @@ describe Mongoid::Contextual::Mongo do
         d2.save!
         d3.save!
         d4.save!
-
         I18n.locale = :en
       end
 
@@ -923,6 +925,7 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when tallying an embedded localized field" do
+      with_default_i18n_configs
 
       before do
         I18n.locale = :en
@@ -937,7 +940,6 @@ describe Mongoid::Contextual::Mongo do
         address2b.name = "de3"
         Person.create!(addresses: [ address1a, address1b ])
         Person.create!(addresses: [ address2a, address2b ])
-
         I18n.locale = :en
       end
 
@@ -1406,98 +1408,175 @@ describe Mongoid::Contextual::Mongo do
 
   describe "#exists?" do
 
-    before do
-      Band.create!(name: "Depeche Mode")
+    let!(:band) do
+      Band.create!(name: "Depeche Mode", active: true)
     end
 
-    context "when the count is zero" do
+    context "when not passing options" do
 
-      let(:criteria) do
-        Band.where(name: "New Order")
-      end
+      context "when the count is zero" do
 
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns false" do
-        expect(context).to_not be_exists
-      end
-    end
-
-    context "when the count is greater than zero" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns true" do
-        expect(context).to be_exists
-      end
-    end
-
-    context "when caching is not enabled" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      context "when exists? already called" do
-
-        before do
-          context.exists?
+        let(:criteria) do
+          Band.where(name: "New Order")
         end
 
-        it "hits the database again" do
-          expect(context).to receive(:view).once.and_call_original
-          expect(context).to be_exists
-        end
-      end
-    end
-
-    context "when caching is enabled" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode").cache
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      context "when the cache is loaded" do
-
-        before do
-          context.to_a
+        let(:context) do
+          described_class.new(criteria)
         end
 
-        it "does not hit the database" do
-          expect(context).to receive(:view).never
+        it "returns false" do
+          expect(context).to_not be_exists
+        end
+      end
+
+      context "when the count is greater than zero" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns true" do
           expect(context).to be_exists
         end
       end
 
-      context "when the cache is not loaded" do
+      context "when caching is not enabled" do
 
-        context "when a count has been executed" do
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when exists? already called and query cache is enabled" do
+          query_cache_enabled
 
           before do
-            context.count
+            context.exists?
           end
 
-          it "does not hit the database" do
-            expect(context).to receive(:view).never
-            expect(context).to be_exists
+          it "does not hit the database again" do
+            expect_no_queries do
+              expect(context).to be_exists
+            end
           end
         end
+      end
+    end
+
+    context "when passing an _id" do
+
+      context "when its of type BSON::ObjectId" do
+
+        context "when calling it on the class" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that includes the object" do
+
+          it "returns true" do
+            expect(Band.where(name: band.name).exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that does not include the object" do
+
+          it "returns false" do
+            expect(Band.where(name: "bogus").exists?(band._id)).to be false
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new)).to be false
+          end
+        end
+      end
+
+      context "when its of type String" do
+
+        context "when the id exists" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id.to_s)).to be true
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new.to_s)).to be false
+          end
+        end
+      end
+    end
+
+    context "when passing a hash" do
+
+      context "when calling it on the class" do
+
+        it "returns true" do
+          expect(Band.exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that includes the object" do
+
+        it "returns true" do
+          expect(Band.where(active: true).exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that does not include the object" do
+
+        it "returns false" do
+          expect(Band.where(active: false).exists?(name: band.name)).to be false
+        end
+      end
+
+      context "when the conditions don't match" do
+
+        it "returns false" do
+          expect(Band.exists?(name: "bogus")).to be false
+        end
+      end
+    end
+
+    context "when passing false" do
+
+      it "returns false" do
+        expect(Band.exists?(false)).to be false
+      end
+    end
+
+    context "when passing nil" do
+
+      it "returns false" do
+        expect(Band.exists?(nil)).to be false
+      end
+    end
+
+    context "when the limit is 0" do
+
+      it "returns false" do
+        expect(Band.limit(0).exists?).to be false
+      end
+    end
+
+    context "when the criteria limit is 0" do
+
+      it "returns false" do
+        expect(Band.criteria.limit(0).exists?).to be false
       end
     end
   end
@@ -2045,26 +2124,15 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the context is cached" do
+      context "when the query cache is enabled" do
+        query_cache_enabled
 
         let(:criteria) do
-          Band.where(name: "Depeche Mode").cache
+          Band.where(name: "Depeche Mode")
         end
 
         let(:context) do
           described_class.new(criteria)
-        end
-
-        context "when the cache is loaded" do
-
-          before do
-            context.to_a
-          end
-
-          it "returns the first document without touching the database" do
-            expect(context).to receive(:view).never
-            expect(context.send(method)).to eq(depeche_mode)
-          end
         end
 
         context "when first method was called before" do
@@ -2074,8 +2142,9 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first document without touching the database" do
-            expect(context).to receive(:view).never
-            expect(context.send(method)).to eq(depeche_mode)
+            expect_no_queries do
+              expect(context.send(method)).to eq(depeche_mode)
+            end
           end
         end
       end
@@ -2129,77 +2198,21 @@ describe Mongoid::Contextual::Mongo do
           end
         end
 
-        context "when the context is cached" do
+        context "when the query cache is enabled" do
 
           let(:context) do
             described_class.new(criteria)
           end
 
-          context "when the whole context is loaded" do
-
-            before do
-              context.to_a
-            end
-
-            context "when all of the documents are cached" do
-
-              let(:criteria) do
-                Band.all.cache
-              end
-
-              context "when requesting all of the documents" do
-
-                let(:docs) do
-                  context.send(method, 3)
-                end
-
-                it "returns all of the documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
-                end
-              end
-
-              context "when requesting fewer than all of the documents" do
-
-                let(:docs) do
-                  context.send(method, 2)
-                end
-
-                it "returns all of the documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order ])
-                end
-              end
-            end
-
-            context "when only one document is cached" do
-
-              let(:criteria) do
-                Band.where(name: "Depeche Mode").cache
-              end
-
-              context "when requesting one document" do
-
-                let(:docs) do
-                  context.send(method, 1)
-                end
-
-                it "returns one document without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode ])
-                end
-              end
-            end
-          end
-
-          context "when the first method was called before" do
+          context "when calling first beforehand" do
+            query_cache_enabled
 
             let(:context) do
               described_class.new(criteria)
             end
 
             let(:criteria) do
-              Band.all.cache
+              Band.all
             end
 
             before do
@@ -2217,8 +2230,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns all documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
                 end
               end
 
@@ -2226,8 +2240,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 2 }
 
                 it "returns the correct documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order ])
+                  end
                 end
               end
             end
@@ -2239,8 +2254,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 2 }
 
                 it "returns the correct documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode, new_order ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode, new_order ])
+                  end
                 end
               end
 
@@ -2248,8 +2264,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).twice.and_call_original
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  expect_query(1) do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
                 end
               end
             end
@@ -2261,8 +2278,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 1 }
 
                 it "returns the correct documents without touching the database" do
-                  expect(context).to receive(:view).never
-                  expect(docs).to eq([ depeche_mode ])
+                  expect_no_queries do
+                    expect(docs).to eq([ depeche_mode ])
+                  end
                 end
               end
 
@@ -2270,8 +2288,9 @@ describe Mongoid::Contextual::Mongo do
                 let(:limit) { 3 }
 
                 it "returns the correct documents and touches the database" do
-                  expect(context).to receive(:view).twice.and_call_original
-                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  expect_query(1) do
+                    expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                  end
                 end
               end
             end
@@ -2279,14 +2298,15 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when calling #first then #last" do
+      context "when calling #first then #last and the query cache is enabled" do
+        query_cache_enabled
 
         let(:context) do
           described_class.new(criteria)
         end
 
         let(:criteria) do
-          Band.all.cache
+          Band.all
         end
 
         before do
@@ -2301,8 +2321,10 @@ describe Mongoid::Contextual::Mongo do
           let(:before_limit) { 2 }
           let(:limit) { 1 }
 
-          it "gets the correct document" do
-            expect(docs).to eq([rolling_stones])
+          it "gets the correct document and hits the database" do
+            expect_query(1) do
+              expect(docs).to eq([rolling_stones])
+            end
           end
         end
       end
@@ -2448,26 +2470,15 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when the context is cached" do
+    context "when the query cache is enabled" do
+      query_cache_enabled
 
       let(:criteria) do
-        Band.where(name: "Depeche Mode").cache
+        Band.where(name: "Depeche Mode")
       end
 
       let(:context) do
         described_class.new(criteria)
-      end
-
-      context "when the cache is loaded" do
-
-        before do
-          context.to_a
-        end
-
-        it "returns the last document without touching the database" do
-          expect(context).to receive(:view).never
-          expect(context.last).to eq(depeche_mode)
-        end
       end
 
       context "when last method was called before" do
@@ -2477,8 +2488,9 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "returns the last document without touching the database" do
-          expect(context).to receive(:view).never
-          expect(context.last).to eq(depeche_mode)
+          expect_no_queries do
+            expect(context.last).to eq(depeche_mode)
+          end
         end
       end
     end
@@ -2538,71 +2550,15 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        context "when the whole context is loaded" do
-
-          before do
-            context.to_a
-          end
-
-          context "when all of the documents are cached" do
-
-            let(:criteria) do
-              Band.all.cache
-            end
-
-            context "when requesting all of the documents" do
-
-              let(:docs) do
-                context.last(3)
-              end
-
-              it "returns all of the documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
-              end
-            end
-
-            context "when requesting fewer than all of the documents" do
-
-              let(:docs) do
-                context.last(2)
-              end
-
-              it "returns all of the documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ new_order, rolling_stones ])
-              end
-            end
-          end
-
-          context "when only one document is cached" do
-
-            let(:criteria) do
-              Band.where(name: "Depeche Mode").cache
-            end
-
-            context "when requesting one document" do
-
-              let(:docs) do
-                context.last(1)
-              end
-
-              it "returns one document without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ depeche_mode ])
-              end
-            end
-          end
-        end
-
-        context "when the last method was called before" do
+        context "when query cache is enabled" do
+          query_cache_enabled
 
           let(:context) do
             described_class.new(criteria)
           end
 
           let(:criteria) do
-            Band.all.cache
+            Band.all
           end
 
           before do
@@ -2619,18 +2575,20 @@ describe Mongoid::Contextual::Mongo do
             context "when getting all of the documents" do
               let(:limit) { 3 }
 
-              it "returns all documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+              it "returns all documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
               end
             end
 
             context "when getting fewer documents" do
               let(:limit) { 2 }
 
-              it "returns the correct documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ new_order, rolling_stones ])
+              it "returns the correct documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ new_order, rolling_stones ])
+                end
               end
             end
           end
@@ -2641,9 +2599,10 @@ describe Mongoid::Contextual::Mongo do
             context "when getting the same number of documents" do
               let(:limit) { 2 }
 
-              it "returns the correct documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ new_order, rolling_stones ])
+              it "returns the correct documents without touching the db" do
+                expect_no_queries do
+                  expect(docs).to eq([ new_order, rolling_stones ])
+                end
               end
             end
 
@@ -2651,8 +2610,9 @@ describe Mongoid::Contextual::Mongo do
               let(:limit) { 3 }
 
               it "returns the correct documents and touches the database" do
-                expect(context).to receive(:view).twice.and_call_original
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                expect_query(1) do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
               end
             end
           end
@@ -2664,8 +2624,9 @@ describe Mongoid::Contextual::Mongo do
               let(:limit) { 1 }
 
               it "returns the correct documents without touching the database" do
-                expect(context).to receive(:view).never
-                expect(docs).to eq([ rolling_stones ])
+                expect_no_queries do
+                  expect(docs).to eq([ rolling_stones ])
+                end
               end
             end
 
@@ -2673,8 +2634,9 @@ describe Mongoid::Contextual::Mongo do
               let(:limit) { 3 }
 
               it "returns the correct documents and touches the database" do
-                expect(context).to receive(:view).twice.and_call_original
-                expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                expect_query(1) do
+                  expect(docs).to eq([ depeche_mode, new_order, rolling_stones ])
+                end
               end
             end
           end
@@ -2682,14 +2644,15 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when calling #last then #first" do
+    context "when calling #last then #first and the query cache is enabled" do
+      query_cache_enabled
 
       let(:context) do
         described_class.new(criteria)
       end
 
       let(:criteria) do
-        Band.all.cache
+        Band.all
       end
 
       before do
@@ -2705,8 +2668,9 @@ describe Mongoid::Contextual::Mongo do
         let(:limit) { 1 }
 
         it "hits the database" do
-          expect(context).to receive(:view).twice.and_call_original
-          docs
+          expect_query(1) do
+            docs
+          end
         end
 
         it "gets the correct document" do
@@ -2762,37 +2726,28 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        it "returns the number of documents that match" do
-          expect(context.send(method)).to eq(2)
-        end
+        context "when broken_view_options is false" do
+          driver_config_override :broken_view_options, false
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(2)
-            2.times { expect(context.send(method)).to eq(2) }
+          it "returns the number of documents that match" do
+            expect(context.send(method)).to eq(1)
           end
         end
 
-        context "when the results have been iterated over" do
+        context "when broken_view_options is true" do
+          driver_config_override :broken_view_options, true
 
-          before do
-            context.entries
-          end
-
-          it "returns the cached value for all calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(2)
+          it "returns the number of documents that match" do
             expect(context.send(method)).to eq(2)
           end
+        end
 
-          context "when the results have been iterated over multiple times" do
+        context "when calling more than once with different limits" do
+          driver_config_override :broken_view_options, false
 
-            before do
-              context.entries
-            end
-
-            it "resets the length on each full iteration" do
-              expect(context.size).to eq(2)
-            end
+          it "does not cache the value" do
+            expect(context.limit(1).send(method)).to eq(1)
+            expect(context.limit(2).send(method)).to eq(2)
           end
         end
       end
@@ -2811,10 +2766,12 @@ describe Mongoid::Contextual::Mongo do
           expect(context.send(method)).to eq(1)
         end
 
-        context "when calling more than once" do
-          it "returns the cached value for subsequent calls" do
-            expect(context.view).to receive(:count_documents).once.and_return(1)
-            2.times { expect(context.send(method)).to eq(1) }
+        context "when calling more than once with different skips" do
+          driver_config_override :broken_view_options, false
+
+          it "does not cache the value" do
+            expect(context.skip(0).send(method)).to eq(1)
+            expect(context.skip(1).send(method)).to eq(0)
           end
         end
 
@@ -2958,8 +2915,10 @@ describe Mongoid::Contextual::Mongo do
 
     context "when passed the symbol field name" do
 
-      it "performs mapping" do
-        expect(context.map(:name)).to eq ["Depeche Mode", "New Order"]
+      it "raises an error" do
+        expect do
+          context.map(:name)
+        end.to raise_error(ArgumentError)
       end
     end
 
@@ -3858,6 +3817,838 @@ describe Mongoid::Contextual::Mongo do
 
       it 'creates a pipeline with the $exists operator as one of the $match criteria' do
         expect(pipeline_match).to include({ 'some_field' => { '$exists' => true } })
+      end
+    end
+  end
+
+  describe "#first!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the first document" do
+        expect(context.first!).to eq(depeche_mode)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the first document" do
+        expect(context.sort(name: 1).first!).to eq(death_cab)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.first!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#last!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the last document" do
+        expect(context.last!).to eq(death_cab)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the last document" do
+        expect(context.sort(name: 1).last!).to eq(rolling_stones)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.last!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#second" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second document" do
+        expect(context.second).to eq(new_order)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second document" do
+        expect(context.sort(name: 1).second).to eq(depeche_mode)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.second).to be_nil
+      end
+    end
+  end
+
+  describe "#second!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second document" do
+        expect(context.second!).to eq(new_order)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second document" do
+        expect(context.sort(name: 1).second!).to eq(depeche_mode)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.second!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#third" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third document" do
+        expect(context.third).to eq(rolling_stones)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third document" do
+        expect(context.sort(name: 1).third).to eq(new_order)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.third).to be_nil
+      end
+    end
+  end
+
+  describe "#third!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third document" do
+        expect(context.third!).to eq(rolling_stones)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third document" do
+        expect(context.sort(name: 1).third!).to eq(new_order)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.third!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#fourth" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fourth document" do
+        expect(context.fourth).to eq(death_cab)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fourth document" do
+        expect(context.sort(name: 1).fourth).to eq(rolling_stones)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.fourth).to be_nil
+      end
+    end
+  end
+
+  describe "#fourth!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fourth document" do
+        expect(context.fourth!).to eq(death_cab)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fourth document" do
+        expect(context.sort(name: 1).fourth!).to eq(rolling_stones)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.fourth!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#fifth" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let!(:guns_and_roses) do
+      Band.create!(name: "Guns and Roses")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fifth document" do
+        expect(context.fifth).to eq(guns_and_roses)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fifth document" do
+        expect(context.sort(name: 1).fifth).to eq(rolling_stones)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.fifth).to be_nil
+      end
+    end
+  end
+
+  describe "#fifth!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let!(:guns_and_roses) do
+      Band.create!(name: "Guns and Roses")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fifth document" do
+        expect(context.fifth!).to eq(guns_and_roses)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the fifth document" do
+        expect(context.sort(name: 1).fifth!).to eq(rolling_stones)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.fifth!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#second_to_last" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.second_to_last).to eq(rolling_stones)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.sort(name: 1).second_to_last).to eq(new_order)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.second_to_last).to be_nil
+      end
+    end
+  end
+
+  describe "#second_to_last!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.second_to_last!).to eq(rolling_stones)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the second_to_last document" do
+        expect(context.sort(name: 1).second_to_last!).to eq(new_order)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.second_to_last!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe "#third_to_last" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.third_to_last).to eq(new_order)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.sort(name: 1).third_to_last).to eq(depeche_mode)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "returns nil" do
+        expect(context.third_to_last).to be_nil
+      end
+    end
+  end
+
+  describe "#third_to_last!" do
+
+    let!(:depeche_mode) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create!(name: "New Order")
+    end
+
+    let!(:rolling_stones) do
+      Band.create!(name: "The Rolling Stones")
+    end
+
+    let!(:death_cab) do
+      Band.create!(name: "Death Cab For Cutie")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when there's no sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.third_to_last!).to eq(new_order)
+      end
+    end
+
+    context "when there's a custom sort" do
+      let(:criteria) do
+        Band.all
+      end
+
+      it "gets the third_to_last document" do
+        expect(context.sort(name: 1).third_to_last!).to eq(depeche_mode)
+      end
+    end
+
+    context "when there are no documents" do
+      let(:criteria) do
+        Band.where(name: "bogus")
+      end
+
+      it "raises an error" do
+        expect do
+          context.third_to_last!
+        end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe '#load_async' do
+    let!(:band) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context 'with global thread pool async query executor' do
+      config_override :async_query_executor, :global_thread_pool
+
+      it 'preloads the documents' do
+        context.load_async
+        context.documents_loader.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.documents_loader.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
+      end
+    end
+
+    context 'with immediate thread pool async query executor' do
+      config_override :async_query_executor, :immediate
+
+      it 'preloads the documents' do
+        context.load_async
+        context.documents_loader.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.documents_loader.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
       end
     end
   end

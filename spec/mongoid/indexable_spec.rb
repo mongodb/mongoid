@@ -109,7 +109,6 @@ describe Mongoid::Indexable do
 
       after do
         klass.remove_indexes
-        Mongoid::Config.background_indexing = false
       end
 
       let(:indexes) do
@@ -118,20 +117,27 @@ describe Mongoid::Indexable do
         end
       end
 
-      it "creates the indexes by using default background_indexing option" do
-        klass.create_indexes
+      context "when the background_indexing option is false" do
+        config_override :background_indexing, false
 
-        index = indexes.get(_type: 1)
-        expect(index[:background]).to eq(Mongoid::Config.background_indexing)
+        it "creates the indexes correctly" do
+          klass.create_indexes
+
+          index = indexes.get(_type: 1)
+          expect(index[:background]).to be false
+        end
       end
 
-      it "creates the indexes by using specified background_indexing option" do
-        Mongoid::Config.background_indexing = true
+      context "when the background_indexing option is true" do
+        config_override :background_indexing, true
 
-        klass.create_indexes
+        it "creates the indexes correctly" do
 
-        index = indexes.get(_type: 1)
-        expect(index[:background]).to eq(true)
+          klass.create_indexes
+
+          index = indexes.get(_type: 1)
+          expect(index[:background]).to be true
+        end
       end
     end
 
@@ -223,8 +229,11 @@ describe Mongoid::Indexable do
     let(:klass) do
       Class.new do
         include Mongoid::Document
-        field :a, as: :authentication_token
+
         store_in collection: :specs
+
+        field :a, as: :authentication_token
+        field :username
       end
     end
 
@@ -423,6 +432,18 @@ describe Mongoid::Indexable do
       end
     end
 
+    context "when providing a geo haystack index with a bucket_size" do
+
+      let(:message) do
+        'The geoHaystack type is deprecated.'
+      end
+
+      it "logs a deprecation warning" do
+        expect(Mongoid::Warnings).to receive(:warn_geo_haystack_deprecated)
+        klass.index({ location: "geoHaystack" }, { min: -200, max: 200, bucket_size: 0.5 })
+      end
+    end
+
     context "when providing a Spherical Geospatial index" do
 
       before do
@@ -573,6 +594,25 @@ describe Mongoid::Indexable do
 
       it "sets the index with expire_after option" do
         expect(options).to eq(expire_after: 3600)
+      end
+    end
+
+    context "when using a wildcard index" do
+
+      before do
+        klass.index({ '$**': 1 }, wildcard_projection: { _id: 1, username: 0 })
+      end
+
+      let(:spec) do
+        klass.index_specification('$**': 1)
+      end
+
+      it "creates the index" do
+        expect(spec).to be_a(Mongoid::Indexable::Specification)
+      end
+
+      it "sets the index with correct options" do
+        expect(spec.options).to eq(wildcard_projection: { _id: 1, username: 0 })
       end
     end
 
