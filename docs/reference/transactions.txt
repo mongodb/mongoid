@@ -45,12 +45,12 @@ of a Mongoid document class, on a Mongoid document class, on or ``Mongoid`` modu
     band.destroy
   end
 
-When the ``transaction`` method is called, Mongoid will do the following:
+When the ``transaction`` method is called, Mongoid does the following:
 
 * creates a session on a client that is used by the receiver of the
   ``transaction`` method call;
 * starts a transaction on the session;
-* executed the given block;
+* executes the given block;
 * commits the transaction if no exception raised in the block;
 
   * calls ``after_commit`` callbacks for all objects modified inside the transaction
@@ -63,7 +63,7 @@ When the ``transaction`` method is called, Mongoid will do the following:
 
   Since a transaction is tied to a particular client, _only_ operations on
   the same client will be in scope of the transaction. Therefore it
-  is recommended that only objects that use the same client is used inside the
+  is recommended that only objects that use the same client are used inside the
   ``transaction`` method block.
 
   .. code-block:: ruby
@@ -100,15 +100,15 @@ When the ``transaction`` method is called, Mongoid will do the following:
 Aborting Transaction
 ~~~~~~~~~~~~~~~~~~~~
 
-Any exception raised inside the ``transaction`` method block aborts the the
+Any exception raised inside the ``transaction`` method block aborts the
 transaction. Normally the raised exception passed on, except for the
 ``Mongoid::Errors::Rollback``. This error should be raised if you  want to
-explicitly abort the transaction without passing on en exception.
+explicitly abort the transaction without passing on an exception.
 
 Callbacks
 ~~~~~~~~~
 
-Transaction API introduces two new callback - ``after_commit`` and ``after_rollback``.
+Transaction API introduces two new callbacks - ``after_commit`` and ``after_rollback``.
 
 ``after_commit`` callback is triggered for an object that was created, saved,
 or destroyed:
