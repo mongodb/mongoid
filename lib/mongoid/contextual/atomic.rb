@@ -240,10 +240,6 @@ module Mongoid
           operations[database_field_name(field)] = { "$each" => Array.wrap(value).mongoize }
         end
       end
-
-      def translate_date_type(type)
-        Mongoid::Persistable::Datable.translate_date_field_spec(type)
-      end
     end
   end
 end

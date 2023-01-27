@@ -3,6 +3,7 @@
 namespace :db do
   namespace :mongoid do
     task :load_models do
+      ::Mongoid.load_models
     end
 
     desc "Create collections for Mongoid models"
