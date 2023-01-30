@@ -26,6 +26,11 @@ describe Mongoid::Touchable do
         updatable.touch
         expect(updatable.updated_at).to be > updated_at
       end
+
+      it 'does not leave model in changed state' do
+        updatable.touch
+        expect(updatable).not_to be_changed
+      end
     end
 
     context 'when the document has a parent association' do
@@ -255,8 +260,8 @@ describe Mongoid::Touchable do
             expect(touched).to be true
           end
 
-          it "keeps changes for next callback" do
-            expect(agent.changes).to_not be_empty
+          it "clears changes" do
+            expect(agent.changes).to be_empty
           end
         end
 
@@ -290,8 +295,8 @@ describe Mongoid::Touchable do
             expect(touched).to be true
           end
 
-          it "keeps changes for next callback" do
-            expect(agent.changes).to_not be_empty
+          it "clears changes" do
+            expect(agent.changes).to be_empty
           end
         end
       end
@@ -1318,6 +1323,27 @@ describe Mongoid::Touchable do
           include_examples "timeless is cleared"
         end
       end
+    end
+  end
+
+  context 'when updated after touch' do
+    let(:touch_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+    let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 4) }
+
+    let!(:book) { Book.create! }
+
+    after do
+      Timecop.return
+    end
+
+    it 'updates updated_at' do
+      touch_time
+      book.touch
+      update_time
+      book.title = 'This book has no name'
+      book.save!
+      expect(book.updated_at).to eq(update_time)
     end
   end
 end
