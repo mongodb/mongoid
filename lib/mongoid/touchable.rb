@@ -23,10 +23,14 @@ module Mongoid
       def touch(field = nil)
         return false if _root.new_record?
 
-        touches = _gather_touch_updates(Time.configured.now, field)
-        _root.send(:persist_atomic_operations, '$set' => touches) if touches.present?
+        begin
+          touches = _gather_touch_updates(Time.configured.now, field)
+          _root.send(:persist_atomic_operations, '$set' => touches) if touches.present?
+          _run_touch_callbacks_from_root
+        ensure
+          _clear_touch_updates(field)
+        end
 
-        _run_touch_callbacks_from_root
         true
       end
 
@@ -48,6 +52,17 @@ module Mongoid
         touches = _extract_touches_from_atomic_sets(field) || {}
         touches.merge!(_parent._gather_touch_updates(now) || {}) if _touchable_parent?
         touches
+      end
+
+      # Clears changes for the model caused by touch operation.
+      #
+      # @param [ Symbol ] field The name of an additional field to update.
+      #
+      # @api private
+      def _clear_touch_updates(field = nil)
+        remove_change(:updated_at)
+        remove_change(field) if field
+        _parent._clear_touch_updates if _touchable_parent?
       end
 
       # Recursively runs :touch callbacks for the document and its parents,

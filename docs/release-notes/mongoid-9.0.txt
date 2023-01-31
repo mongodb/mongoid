@@ -17,6 +17,30 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+``touch`` method now clears changed state
+-----------------------------------------
+
+In Mongoid 8.x and older ``touch`` method leaves models in the changed state:
+
+.. code-block:: ruby
+
+  # Mongoid 8.x behaviour
+  band = Band.create!
+  band.touch
+  band.changed? # => true
+  band.changes # => {"updated_at"=>[2023-01-30 13:12:57.477191135 UTC, 2023-01-30 13:13:11.482975646 UTC]}
+
+Starting from 9.0 Mongoid now correctly clears changed state after using ``touch``
+method.
+
+.. code-block:: ruby
+
+  # Mongoid 9.0 behaviour
+  band = Band.create!
+  band.touch
+  band.changed? # => false
+  band.changes # => {}
+
 Sandbox Mode for Rails Console
 ------------------------------
 
