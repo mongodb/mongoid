@@ -54,6 +54,11 @@ module Mongoid
         touches
       end
 
+      # Clears changes for the model caused by touch operation.
+      #
+      # @param [ Symbol ] field The name of an additional field to update.
+      #
+      # @api private
       def _clear_touch_updates(field = nil)
         remove_change(:updated_at)
         remove_change(field) if field
