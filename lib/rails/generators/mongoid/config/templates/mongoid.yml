@@ -116,7 +116,14 @@ development:
         
         # Whether to truncate long log lines. (default: true)
         # truncate_logs: true
+  
+  # Configure Mongoid specific options. (optional)
+  options:
+<%- mongoid_config_options(indent: 4).each do |opt| -%>
+    <%= opt[:desc].strip %>
+    # <%= opt[:name] %>: <%= opt[:default] %>
 
+<%- end -%>
 test:
   clients:
     default:

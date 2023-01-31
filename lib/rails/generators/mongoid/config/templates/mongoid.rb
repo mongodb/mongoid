@@ -4,11 +4,6 @@ Mongoid.configure do
   # Load Mongoid behavior defaults. This automatically sets
   # features flags (refer to documentation)
   config.load_defaults target_version
-<%- mongoid_config_options.each do |opt| -%>
-
-  <%= opt[:desc].strip %>
-  # config.<%= opt[:name] %> = <%= opt[:default] %>
-<%- end -%>
 end
  
 # Enable Mongo driver query cache for Rack

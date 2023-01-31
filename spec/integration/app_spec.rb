@@ -127,6 +127,15 @@ describe 'Mongoid application tests' do
         config_text = File.read(mongoid_config_file)
         config_text.should =~ /mongoid_test_config_development/
         config_text.should =~ /mongoid_test_config_test/
+
+        # deprecated options should not be included
+        config_text.should_not =~ /config\.background_indexing/
+
+        # make sure the different option types are emitted
+        config_text.should =~ /# config\.app_name: nil/
+        config_text.should =~ /# config\.discriminator_key: "_type"/
+        config_text.should =~ /# config\.join_contexts: false/
+        config_text.should =~ /# config\.log_level: :info/
       end
     end
 
@@ -137,17 +146,6 @@ describe 'Mongoid application tests' do
         File.exist?(mongoid_initializer).should be false
         check_call(%w(rails g mongoid:config), env: clean_env)
         File.exist?(mongoid_initializer).should be true
-
-        init_text = File.read(mongoid_initializer)
-
-        # deprecated options should not be included
-        init_text.should_not =~ /config\.background_indexing/
-
-        # make sure the different option types are emitted
-        init_text.should =~ /# config\.app_name = nil/
-        init_text.should =~ /# config\.discriminator_key = "_type"/
-        init_text.should =~ /# config\.join_contexts = false/
-        init_text.should =~ /# config\.log_level = :info/
       end
     end
   end
