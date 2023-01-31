@@ -129,13 +129,13 @@ describe 'Mongoid application tests' do
         config_text.should =~ /mongoid_test_config_test/
 
         # deprecated options should not be included
-        config_text.should_not =~ /config\.background_indexing/
+        config_text.should_not =~ /background_indexing/
 
         # make sure the different option types are emitted
-        config_text.should =~ /# config\.app_name: nil/
-        config_text.should =~ /# config\.discriminator_key: "_type"/
-        config_text.should =~ /# config\.join_contexts: false/
-        config_text.should =~ /# config\.log_level: :info/
+        config_text.should =~ /# app_name: nil/
+        config_text.should =~ /# discriminator_key: "_type"/
+        config_text.should =~ /# join_contexts: false/
+        config_text.should =~ /# log_level: :info/
       end
     end
 
