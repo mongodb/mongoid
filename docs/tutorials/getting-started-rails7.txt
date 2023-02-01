@@ -95,10 +95,11 @@ Setup Mongoid
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file,
-which is used to configure the connection to the MongoDB deployment.
-Note that as we are not using ActiveRecord we will not have a ``database.yml``
-file.
+This generator will create the ``config/mongoid.yml`` configuration file 
+(used to configure the connection to the MongoDB deployment) and the
+``config/initializers/mongoid.rb`` initializer file (which may be used for
+other Mongoid-related configuration). Note that as we are not using
+ActiveRecord we will not have a ``database.yml`` file.
 
 
 .. _configure-self-managed:
@@ -333,8 +334,11 @@ Generate the default Mongoid configuration:
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file,
-which is used to configure the connection to the MongoDB deployment.
+This generator will create the ``config/mongoid.yml`` configuration file 
+(used to configure the connection to the MongoDB deployment) and the
+``config/initializers/mongoid.rb`` initializer file (which may be used for
+other Mongoid-related configuration). In general, it is recommended to use
+``mongoid.yml`` for all Mongoid configuration.
 
 Review the sections :ref:`Configure for Self Managed MongoDB <configure-self-managed>`
 and :ref:`Configure for MongoDB Atlas <configure-atlas>` to decide how you
