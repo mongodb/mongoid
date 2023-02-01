@@ -75,7 +75,7 @@ could do the following:
       'awards._id' => {'$exists' => true},
     } },
     {'$project' => {_id: 1}},
-  ])  
+  ])
   bands = Band.find(band_ids.to_a)
 
 Note that the aggregation pipeline, since it is implemented by the Ruby driver
