@@ -26,6 +26,12 @@ class SpecConfig
     end
   end
 
+  # returns the URI string, or constructs one from the defaults if no URI
+  # string was given.
+  def safe_uri
+    @uri_str || "mongodb://#{addresses.first}"
+  end
+
   def mri?
     !jruby?
   end

@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require 'concurrent-ruby'
 
 describe Mongoid::Contextual::Mongo::DocumentsLoader do
-  # https://jira.mongodb.org/browse/MONGOID-5505
-  require_mri
-
   let(:view) do
     double('view').tap do |view|
       allow(view).to receive(:map)
@@ -31,6 +29,10 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
   end
 
   context 'state management' do
+    # Java does not allow creating a ThreadPoolExecutor with 0 max and
+    # min threads.
+    require_mri
+
     let(:executor) do
       # Such executor will never execute a task, so it guarantees that
       # our task will stay in its initial state.
@@ -103,6 +105,10 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
     end
 
     context 'synchronously' do
+      # Java does not allow creating a ThreadPoolExecutor with 0 max and
+      # min threads.
+      require_mri
+
       let(:executor) do
         # Such executor will never execute a task, so it guarantees that
         # our task will stay in its initial state.

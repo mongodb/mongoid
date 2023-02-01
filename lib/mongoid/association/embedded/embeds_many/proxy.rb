@@ -332,7 +332,7 @@ module Mongoid
           # @example Substitute the association's target.
           #   person.addresses.substitute([ address ])
           #
-          # @param [ Array<Document> ] docs The replacement docs.
+          # @param [ Array<Document> | Array<Hash> ] docs The replacement docs.
           #
           # @return [ Many ] The proxied association.
           def substitute(docs)

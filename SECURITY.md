@@ -15,5 +15,5 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-Please [follow the instructions here](https://docs.mongodb.com/manual/tutorial/create-a-vulnerability-report/)
+Please [follow the instructions here](https://www.mongodb.com/docs/manual/tutorial/create-a-vulnerability-report/)
 to report a vulnerability.

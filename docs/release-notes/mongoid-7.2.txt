@@ -260,7 +260,7 @@ instead of loading the entire association.
 ``StringifiedSymbol`` Field Type
 --------------------------------
 
-New feature: the :ref:`StringifiedSymbol field type <stringified-symbol>`
+New feature: the :ref:`StringifiedSymbol field type <field-type-stringified-symbol>`
 was added for storing Ruby symbol values in MongoDB in a manner interoperable
 with other programming languages.
 
@@ -414,7 +414,7 @@ of the legacy query cache, see :ref:`the query cache documentation <query-cache>
 Minor change: when a ``String`` value is written in a ``Regexp`` field,
 Mongoid 7.2 stores that value in MongoDB as a regular expression.
 Subsequently it would be retrieved :ref:`as a BSON::Regexp::Raw instance
-<regular-expression-fields>`.
+<field-type-regexp>`.
 Previously the value would be stored as a string and would be retrieved as
 a string.
 

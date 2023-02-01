@@ -126,8 +126,8 @@ describe Mongoid::Clients::Sessions do
             e
           end
 
-          it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+          it 'does not raise an error' do
+            expect(error).to be_nil
           end
 
           it 'uses a single session id for all operations on the class' do
@@ -156,7 +156,7 @@ describe Mongoid::Clients::Sessions do
           end
 
           it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+            expect(error).to be_a(Mongoid::Errors::InvalidSessionNesting)
           end
 
           it 'does not execute any operations' do
@@ -251,15 +251,15 @@ describe Mongoid::Clients::Sessions do
             e
           end
 
-          it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+          it 'does not raise an error' do
+            expect(error).to be_nil
           end
 
           it 'uses a single session id for all operations on the class' do
             expect(person.reload.username).to eq('Emily')
-            expect(Post.count).to be(0)
+            expect(Post.count).to be(1)
             update_lsids_sent = update_events.collect { |event| event.command['lsid'] }
-            expect(update_lsids_sent.size).to eq(1)
+            expect(update_lsids_sent.size).to eq(2)
           end
         end
 
@@ -282,7 +282,7 @@ describe Mongoid::Clients::Sessions do
           end
 
           it 'raises an error' do
-            expect(error).to be_a(Mongoid::Errors::InvalidSessionUse)
+            expect(error).to be_a(Mongoid::Errors::InvalidSessionNesting)
           end
 
           it 'does not execute any operations' do

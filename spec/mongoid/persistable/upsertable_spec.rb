@@ -42,8 +42,10 @@ describe Mongoid::Persistable::Upsertable do
           end
         end
 
+        let(:options) { {} }
+
         before do
-          updated.upsert
+          updated.upsert(options)
         end
 
         it "updates the existing document" do
@@ -54,17 +56,44 @@ describe Mongoid::Persistable::Upsertable do
           expect(existing).to be_persisted
         end
 
-        context 'when existing document contains other fields' do
-          let!(:existing) do
-            Band.create!(name: "Photek", views: 42)
-          end
-
-          it 'removes the existing fields' do
+        shared_examples "replaces the existing fields" do
+          it 'replaces the existing fields' do
             Band.count.should == 1
 
             existing.reload
             existing.views.should be nil
             existing.name.should == 'Tool'
+          end
+        end
+
+        shared_examples "retains the existing fields" do
+          it 'retains the existing fields' do
+            Band.count.should == 1
+
+            existing.reload
+            existing.views.should eq(42)
+            existing.name.should == 'Tool'
+          end
+        end
+
+        context 'when existing document contains other fields' do
+          let!(:existing) do
+            Band.create!(name: "Photek", views: 42)
+          end
+
+          context "when not passing any options" do
+            let(:options) { {} }
+            it_behaves_like "retains the existing fields"
+          end
+
+          context "when passing replace: false" do
+            let(:options) { { replace: false } }
+            it_behaves_like "retains the existing fields"
+          end
+
+          context "when passing replace: true" do
+            let(:options) { { replace: true } }
+            it_behaves_like "replaces the existing fields"
           end
         end
       end
@@ -115,6 +144,38 @@ describe Mongoid::Persistable::Upsertable do
 
         it "returns true" do
           expect(upsert).to be true
+        end
+      end
+    end
+
+    context 'when `set_on_insert` is given' do
+      let!(:existing_document) { Band.create!(name: "They Might Be Giants") }
+      let!(:new_document) { Band.new(name: "Panic! at the Disco") }
+
+      context 'with `replace: true`' do
+        it 'should raise an ArgumentError' do
+          existing_document.name = "John and John"
+          expect {
+            existing_document.upsert(replace: true, set_on_insert: { member_count: 1 })
+          }.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'without `replace: true`' do
+        context 'when document exists' do
+          it 'ignores set_on_insert' do
+            existing_document.name = "John and John"
+            existing_document.upsert(set_on_insert: { member_count: 1 })
+            expect(existing_document.reload.member_count).to be_nil
+          end
+        end
+
+        context 'when document does not exist' do
+          it 'applies set_on_insert' do
+            new_document.name = "Brendon Urie"
+            new_document.upsert(set_on_insert: { member_count: 1 })
+            expect(new_document.reload.member_count).to be == 1
+          end
         end
       end
     end

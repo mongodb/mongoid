@@ -283,8 +283,8 @@ describe Mongoid::Extensions::BigDecimal do
           expect(value).to be_a(ActiveSupport::Duration)
         end
 
-        it "returns nil" do
-          expect(mongoized).to eq(7200)
+        it "returns the casted value as a string" do
+          expect(mongoized).to eq("7200.0")
         end
       end
 

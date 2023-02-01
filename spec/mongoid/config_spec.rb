@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "support/feature_sandbox"
 
 describe Mongoid::Config do
-
-  after(:all) do
-    if defined?(RailsTemp)
-      Rails = RailsTemp
-    end
-  end
 
   after do
     Mongoid.configure do |config|
@@ -70,11 +65,6 @@ describe Mongoid::Config do
   context "when the log level is not set in the configuration" do
 
     before do
-      if defined?(Rails)
-        RailsTemp = Rails unless defined?(RailsTemp)
-        Object.send(:remove_const, :Rails)
-      end
-
       Mongoid.configure do |config|
         config.load_configuration(CONFIG)
       end
@@ -431,13 +421,6 @@ describe Mongoid::Config do
 
   describe "#load!" do
 
-    before(:all) do
-      if defined?(Rails)
-        RailsTemp = Rails
-        Object.send(:remove_const, :Rails)
-      end
-    end
-
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
     end
@@ -478,20 +461,12 @@ describe Mongoid::Config do
 
       context "when in a Rails environment" do
 
-        before do
-          module Rails
-            def self.logger
-              ::Logger.new($stdout)
-            end
-          end
-          Mongoid.logger = Rails.logger
-          described_class.load!(file, :test)
-        end
-
-        after do
-          if defined?(Rails)
-            RailsTemp = Rails unless defined?(RailsTemp)
-            Object.send(:remove_const, :Rails)
+        around do |example|
+          FeatureSandbox.quarantine do
+            require "support/rails_mock"
+            Mongoid.logger = Rails.logger
+            described_class.load!(file, :test)
+            example.run
           end
         end
 

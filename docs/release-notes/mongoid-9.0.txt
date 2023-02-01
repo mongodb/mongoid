@@ -17,6 +17,70 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+``touch`` method now clears changed state
+-----------------------------------------
+
+In Mongoid 8.x and older ``touch`` method leaves models in the changed state:
+
+.. code-block:: ruby
+
+  # Mongoid 8.x behaviour
+  band = Band.create!
+  band.touch
+  band.changed? # => true
+  band.changes # => {"updated_at"=>[2023-01-30 13:12:57.477191135 UTC, 2023-01-30 13:13:11.482975646 UTC]}
+
+Starting from 9.0 Mongoid now correctly clears changed state after using ``touch``
+method.
+
+.. code-block:: ruby
+
+  # Mongoid 9.0 behaviour
+  band = Band.create!
+  band.touch
+  band.changed? # => false
+  band.changes # => {}
+
+Sandbox Mode for Rails Console
+------------------------------
+
+Mongoid now supports Rails console sandbox mode. If the Rails console started
+with ``--sandbox`` flag, Mongoid starts a transaction on the ``:default`` client
+before opening the console. This transaction won't be committed; therefore, all
+the commands executed in the console using the ``:default`` client won't
+be persisted in the database.
+
+.. note::
+  If you execute commands in the sandbox mode *using any other client than default*,
+  these changes will be persisted as usual.
+
+New Transactions API
+--------------------
+
+Mongoid 9.0 introduces new transactions API that is inspired by ActiveRecord:
+
+.. code-block:: ruby
+
+  Band.transaction do
+    Band.create(title: 'Led Zeppelin')
+  end
+
+  band = Band.create(title: 'Deep Purple')
+  band.transaction do
+    band.active = false
+    band.save!
+  end
+
+Please consult :ref:`transactions documentation <transactions>` for more details.
+
+Embedded Documents Always Use Parent Persistence Context
+--------------------------------------------------------
+
+Mongoid 8.x and older allows user to specify persistence context for an
+embedded document (using ``store_in`` macro). In Mongoid 9.0 these settings are
+ignored for embedded documents; an embedded document now always uses the persistence
+context of its parent.
+
 
 Raise AttributeNotLoaded error when accessing fields omitted from query projection
 ----------------------------------------------------------------------------------
@@ -73,3 +137,78 @@ the type conversion.
 Note that in prior Mongoid versions, typecasting Date to Time during
 persistence operations was already correctly using the
 ``Mongoid.use_activesupport_time_zone`` setting.
+
+
+```#touch`` method on embedded documents correctly handles ``touch: false`` option
+----------------------------------------------------------------------------------
+
+When the ``touch: false`` option is set on an ``embedded_in`` relation,
+calling the ``#touch`` method on an embedded child document will not
+invoke ``#touch`` on its parent document.
+
+.. code-block:: ruby
+
+  class Address
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embedded_in :mall, touch: false
+  end
+
+  class Mall
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embeds_many :addresses
+  end
+
+  mall = Mall.create!
+  address = mall.addresses.create!
+
+  address.touch
+  #=> updates address.updated_at but not mall.updated_at
+
+In addition, the ``#touch`` method has been optimized to perform one
+persistence operation per parent document, even when using multiple
+levels of nested embedded documents.
+
+
+Flipped default for ``:replace`` option in ``#upsert``
+------------------------------------------------------
+
+Mongoid 8.1 added the ``:replace`` option to the ``#upsert`` method. This
+option was used to specify whether or not the existing document should be
+updated or replaced.
+
+Mongoid 9.0 flips the default of this flag from ``true`` => ``false``.
+
+This means that, by default, Mongoid 9 will update the existing document and
+will not replace it.
+
+
+Bug Fixes and Improvements
+--------------------------
+
+This section will be for smaller bug fixes and improvements:
+
+- The ``.unscoped`` method now also clears scopes declared using ``.with_scope``
+  `MONGOID-5214 <https://jira.mongodb.org/browse/MONGOID-5214>`_.
+- When evolving a ``String`` to a ``BigDecimal`` (i.e. when querying a
+  ``BigDecimal`` field with a ``String`` object), if the
+  ``map_big_decimal_to_decimal128`` flag set to true, the conversion will
+  return a ``BSON::Decimal128`` and not a ``String``
+  `MONGOID-5484 <https://jira.mongodb.org/browse/MONGOID-5484>`_.
+- Created new error ``Mongoid::Errors::InvalidEstimatedCountCriteria`` for
+  when calling ``estimated_document_count`` on a document class with a
+  default scope
+  `MONGOID-4960 <https://jira.mongodb.org/browse/MONGOID-4960>`_.
+- Mongoid now uses primary reads for validations in all cases
+  `MONGOID-5150 <https://jira.mongodb.org/browse/MONGOID-5150>`_.
+- Added support for symbol keys in localized field translation hashes
+  `MONGOID-5334 <https://jira.mongodb.org/browse/MONGOID-5334>`_.
+- Added index wildcard option
+  `MONGOID-5388 <https://jira.mongodb.org/browse/MONGOID-5388>`_.
+- With the ``map_big_decimal_to_decimal128`` flag set to false, ``demongoizing``
+  a non-numeric, non-string value that implements ``:to_d`` will return a string
+  rather than a ``BigDecimal``
+  `MONGOID-5507 <https://jira.mongodb.org/browse/MONGOID-5507>`_.

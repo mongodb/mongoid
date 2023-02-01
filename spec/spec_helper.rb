@@ -101,16 +101,6 @@ Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
   autoload name.camelize.to_sym, name
 end
 
-module Rails
-  class Application
-  end
-end
-
-module MyApp
-  class Application < Rails::Application
-  end
-end
-
 module Mongoid
   class Query
     include Mongoid::Criteria::Queryable
