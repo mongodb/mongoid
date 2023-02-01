@@ -19,15 +19,16 @@ Mongoid provides a stable upgrade path for users migrate to new versions.
 Versioning
 ==========
 
-Each Mongoid release has a version in number in ``major.minor.patch`` format. Beginning in
-Mongoid 7.4, Mongoid uses `Semantic Versioning (SemVer) <https://semver.org/>`_.
-In a nutshell, this means:
+Each Mongoid release has a version number in ``major.minor.patch`` format. Beginning in
+Mongoid 7.4, Mongoid uses `Semantic Versioning (SemVer) <https://semver.org/>`_, which 
+typically means:
 
 - Breaking changes, enablement of new functionality, and removal of deprecated
   functionality will only be done in major version releases.
 
 - New functionality will be added using feature flags, which must be enabled via
-  an opt-in config change. These feature flags may be added in either major or minor releases.
+  an opt-in configuration change. These feature flags may be added in either major 
+  or minor releases.
 
 - Functionality may be marked as deprecated in either major or minor releases, but will
   not be removed until the next major release, at the earliest.
@@ -36,8 +37,8 @@ In a nutshell, this means:
 
 .. warning::
 
-  Mongoid 7.3 and prior do not follow SemVer and may contain breaking changes even in minor
-  version releases. Users should excercise additional caution when upgrading to
+  Mongoid 7.3 and prior do not strictly adhere to SemVer and may contain breaking changes even 
+  in minor version releases. Users should exercise additional caution when upgrading to 
   these versions.
 
 
@@ -50,9 +51,8 @@ Before you Upgrade
 - *Test Coverage:* The best way to be sure that your application still works after upgrading
 is to have good test coverage before you start the process.
 
-- *Upgrade Ruby and Rails:*
-
-https://guides.rubyonrails.org/upgrading_ruby_on_rails.html
+- *Upgrade Ruby and Rails:* See `"Upgrading Ruby on Rails" <https://guides.rubyonrails.org/upgrading_ruby_on_rails.html>`_
+for more information
 
 
 Upgrading Mongoid
@@ -62,7 +62,7 @@ The following outlines our recommended procedure to upgrade to a new Mongoid ver
 
 1. Upgrade to each minor version individually.
 
-   For example, if you are upgrading from Mongoid 7.4 to 8.1, we recommend to follow this
+   For example, if you are upgrading from Mongoid 7.4 to 8.1, we recommend you follow this
    procedure for the latest patch version of each minor version, e.g. first to 7.5.x,
    then to 8.0.x, and finally to 8.1.x.
 
