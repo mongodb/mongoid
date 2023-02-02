@@ -607,7 +607,7 @@ module Mongoid
                   criterion.selector : criterion)
           end
 
-          self.and('$nor' => exprs)
+          self.where('$nor' => exprs)
         end
 
         # Creates a disjunction using $or from the existing criteria in the
@@ -679,7 +679,7 @@ module Mongoid
             # When we have a single criteria, any_of behaves like and.
             # Note: criteria can be a Query object, which #where method does
             # not support.
-            self.and(*criteria)
+            self.where(*criteria)
           else
             # When we have multiple criteria, combine them all with $or
             # and add the result to self.
@@ -696,7 +696,7 @@ module Mongoid
                 end]
               end
             end
-            self.and('$or' => exprs)
+            self.where('$or' => exprs)
           end
         end
 
