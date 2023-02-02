@@ -411,17 +411,10 @@ describe Mongoid::PersistenceContext do
         end
 
         context 'when there is a database override' do
+          persistence_context_override :database, :other
 
           before do
             object.store_in database: :musique
-          end
-
-          before do
-            Mongoid::Threaded.database_override = :other
-          end
-
-          after do
-            Mongoid::Threaded.database_override = nil
           end
 
           it 'uses the override' do
@@ -458,14 +451,7 @@ describe Mongoid::PersistenceContext do
         end
 
         context 'when there is a database override' do
-
-          before do
-            Mongoid::Threaded.database_override = :other
-          end
-
-          after do
-            Mongoid::Threaded.database_override = nil
-          end
+          persistence_context_override :database, :other
 
           it 'uses the persistence context options' do
             expect(persistence_context.database_name).to eq(:musique)
@@ -517,14 +503,7 @@ describe Mongoid::PersistenceContext do
         end
 
         context 'when there is a database override' do
-
-          before do
-            Mongoid::Threaded.database_override = :other
-          end
-
-          after do
-            Mongoid::Threaded.database_override = nil
-          end
+          persistence_context_override :database, :other
 
           it 'uses the persistence context options' do
             expect(persistence_context.database_name).to eq(:musique)
@@ -535,14 +514,7 @@ describe Mongoid::PersistenceContext do
       context 'when there are no options passed to the Persistence Context' do
 
         context 'when there is a database override' do
-
-          before do
-            Mongoid::Threaded.database_override = :other
-          end
-
-          after do
-            Mongoid::Threaded.database_override = nil
-          end
+          persistence_context_override :database, :other
 
           it 'uses the database override options' do
             expect(persistence_context.database_name).to eq(Mongoid::Threaded.database_override)
@@ -585,15 +557,7 @@ describe Mongoid::PersistenceContext do
       end
 
       context 'when there is a client override' do
-
-        before do
-          Mongoid::Threaded.client_override = :other
-        end
-
-        after do
-          persistence_context.client.close
-          Mongoid::Threaded.client_override = nil
-        end
+        persistence_context_override :client, :other
 
         it 'uses the client option' do
           expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
@@ -637,14 +601,7 @@ describe Mongoid::PersistenceContext do
       end
 
       context 'when there is a client override' do
-
-        before do
-          Mongoid::Threaded.client_override = :alternative
-        end
-
-        after do
-          Mongoid::Threaded.client_override = nil
-        end
+        persistence_context_override :client, :alternative
 
         it 'uses the client override' do
           expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
@@ -680,14 +637,7 @@ describe Mongoid::PersistenceContext do
         end
 
         context 'when there is a client override' do
-
-          before do
-            Mongoid::Threaded.client_override = :alternative
-          end
-
-          after do
-            Mongoid::Threaded.client_override = nil
-          end
+          persistence_context_override :client, :alternative
 
           it 'uses the client override' do
             expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))

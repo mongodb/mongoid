@@ -63,7 +63,7 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid now uses the official Mongo Ruby Driver 2.x instead of Moped.
 
-* Most driver specific configuration options have changed, please see [here](http://docs.mongodb.org/ecosystem/tutorial/ruby-driver-tutorial/#ruby-options) for the new options.
+* Most driver specific configuration options have changed, please see [here](https://www.mongodb.com/docs/ecosystem/tutorial/ruby-driver-tutorial/#ruby-options) for the new options.
 
 * All references to `session` are now replaced with `client`. This includes the mongoid.yml configuration, `store_in` options, and all exceptions and modules with `Session` in the name.
 
@@ -872,8 +872,8 @@ child elements.
   handling of validations. (Gerad Suyderhoud)
 
 * \#2443 `expire_after_seconds` is now a valid index option
-  (http://docs.mongodb.org/manual/core/indexes/#ttl-indexes,
-   http://docs.mongodb.org/manual/tutorial/expire-data/).
+  (https://www.mongodb.com/docs/manual/core/indexes/#ttl-indexes,
+   https://www.mongodb.com/docs/manual/tutorial/expire-data/).
 
         class Event
           include Mongoid::Document

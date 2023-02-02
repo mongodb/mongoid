@@ -158,24 +158,27 @@ module Mongoid
         queryable.scoped(options)
       end
 
-      # Get the criteria without the default scoping applied.
+      # Get the criteria without any scoping applied.
       #
       # @example Get the unscoped criteria.
       #   Band.unscoped
       #
-      # @example Yield to block with no default scoping.
+      # @example Yield to block with no scoping.
       #   Band.unscoped do
       #     Band.where(name: "Depeche Mode")
       #   end
       #
-      # @note This will force the default scope to be removed.
+      # @note This will force the default scope, as well as any scope applied
+      #   using ``.with_scope``, to be removed.
       #
       # @return [ Criteria | Object ] The unscoped criteria or result of the
       #   block.
       def unscoped
         if block_given?
           without_default_scope do
-            yield(self)
+            with_scope(nil) do
+              yield(self)
+            end
           end
         else
           queryable.unscoped

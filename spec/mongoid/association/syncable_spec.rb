@@ -3,9 +3,9 @@
 require "spec_helper"
 
 describe "Syncable Association" do
+  config_override :raise_not_found_error, true
 
   before(:all) do
-    Mongoid.raise_not_found_error = true
     Person._synced(Person.relations["preferences"])
     Person.has_and_belongs_to_many :preferences
     Preference.has_and_belongs_to_many :people

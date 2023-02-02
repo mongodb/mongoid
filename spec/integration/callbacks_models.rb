@@ -23,7 +23,7 @@ class Star
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :galaxy
+  embedded_in :galaxy, touch: true
 
   field :age, type: Integer
   field :was_touched_after_parent, type: Mongoid::Boolean, default: false
@@ -47,7 +47,7 @@ class Planet
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :star
+  embedded_in :star, touch: true
 
   field :age, type: Integer
   field :was_touched_after_parent, type: Mongoid::Boolean, default: false

@@ -220,7 +220,7 @@ and :ref:`field aliases <field-aliases>`:
   #   class:    Band
   #   embedded: false>
 
-Since `id` and `_id` fields are aliases, either one can be used for queries:
+Since ``id`` and ``_id`` fields are aliases, either one can be used for queries:
 
 .. code-block:: ruby
 
@@ -338,7 +338,7 @@ conditions are added to the criteria:
   Band.where(name: 1).or(name: 2).selector
   # => {"$or"=>[{"name"=>"1"}, {"name"=>"2"}]}
 
-``any_of``, ``nor`` and ``not`` behave similarly, with ``not`` producing
+``any_of``, ``none_of``, ``nor`` and ``not`` behave similarly, with ``not`` producing
 different query shapes as described below.
 
 When ``and``, ``or`` and ``nor`` logical operators are used, they
@@ -437,6 +437,20 @@ The conditions are hoisted to the top level if possible:
 
   Band.where(label: /Trust/).any_of({name: 'Astral Projection'})
   # => {"label"=>/Trust/, "name"=>"Astral Projection"}
+
+
+.. _none-of:
+
+``none_of`` Behavior
+--------------------
+
+``none_of`` adds a negated disjunction ("nor") built from its arguments to
+the existing conditions in the criteria. For example:
+
+.. code-block:: ruby
+
+  Band.where(label: /Trust/).none_of({name: 'Astral Projection'}, {name: /Best/})
+  # => {"label"=>/Trust/, "$nor"=>[{"name"=>"Astral Projection"}, {"name"=>/Best/}]}
 
 
 ``not`` Behavior
@@ -1257,11 +1271,22 @@ Mongoid also has some helpful methods on criteria.
        *Determine if any matching documents exist. Will return true if there
        are 1 or more.*
 
+       ``#exists?`` *now takes a number of argument types:*
+
+       - ``Hash``: *A hash of conditions.*
+       - ``Object``: *An _id to search for.*
+       - ``false``/``nil``: *Always returns false.*
+
      -
         .. code-block:: ruby
 
           Band.exists?
           Band.where(name: "Photek").exists?
+          Band.exists?(name: "Photek")
+          Band.exists?(BSON::ObjectId('6320d96a3282a48cfce9e72c'))
+          Band.exists?('6320d96a3282a48cfce9e72c')
+          Band.exists?(false)
+          Band.exists?(nil)
 
    * - ``Criteria#fifth``
 
@@ -1725,43 +1750,43 @@ For example, consider the following model definition that contains a ``Time``
 field, a ``Date`` field and an implicit ``Object`` field, and also
 intentionally does not define a field called ``deregistered_at``:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    class Voter
-      include Mongoid::Document
+  class Voter
+    include Mongoid::Document
 
-      field :born_on, type: Date
-      field :registered_at, type: Time
-      field :voted_at
-    end
+    field :born_on, type: Date
+    field :registered_at, type: Time
+    field :voted_at
+  end
 
 Queries on ``born_on`` and ``registered_at`` fields using ``Date`` and ``Time``
 values, respectively, are straightforward:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    Voter.where(born_on: Date.today).selector
-    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+  Voter.where(born_on: Date.today).selector
+  # => {"born_on"=>2020-12-18 00:00:00 UTC}
 
-    Voter.where(registered_at: Time.now).selector
-    # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
+  Voter.where(registered_at: Time.now).selector
+  # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
 
 But, note the differences in behavior when providing a ``Date`` instance
 in all possible scenarios:
 
-  .. code-block:: ruby
+.. code-block:: ruby
 
-    Voter.where(born_on: Date.today).selector
-    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+  Voter.where(born_on: Date.today).selector
+  # => {"born_on"=>2020-12-18 00:00:00 UTC}
 
-    Voter.where(registered_at: Date.today).selector
-    # => {"registered_at"=>2020-12-18 00:00:00 -0500}
+  Voter.where(registered_at: Date.today).selector
+  # => {"registered_at"=>2020-12-18 00:00:00 -0500}
 
-    Voter.where(voted_at: Date.today).selector
-    # => {"voted_at"=>Fri, 18 Dec 2020}
+  Voter.where(voted_at: Date.today).selector
+  # => {"voted_at"=>Fri, 18 Dec 2020}
 
-    Voter.where(deregistered_at: Date.today).selector
-    # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
+  Voter.where(deregistered_at: Date.today).selector
+  # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
 
 When using the ``registered_at`` field which is of type ``Time``, the date
 was interpreted to be in local time (as per the :ref:`configured time zone
@@ -2433,5 +2458,72 @@ will query the database and separately cache their results.
 To use the cached results, call ``all.to_a.first`` on the model class.
 
 
-.. _legacy-query-cache-limitations:
+.. _load-async:
 
+Asynchronous Queries
+====================
+
+Mongoid allows running database queries asynchronously in the background.
+This can be beneficial when there is a need to get documents from different
+collections.
+
+In order to schedule an asynchronous query call the ``load_async`` method on a
+``Criteria``:
+
+.. code-block:: ruby
+
+  class PagesController < ApplicationController
+    def index
+      @active_bands = Band.where(active: true).load_async
+      @best_events = Event.best.load_async
+      @public_articles = Article.where(public: true).load_async
+    end
+  end
+
+In the above example three queries will be scheduled for asynchronous execution.
+Results of the queries can be later accessed as usual:
+
+.. code-block:: html
+
+  <ul>
+    <%- @active_bands.each do -%>
+      <li><%= band.name %></li>
+    <%- end -%>
+  </ul>
+
+Even if a query is scheduled for asynchronous execution, it might be executed
+synchronously on the caller's thread. There are three possible scenarios depending
+on when the query results are being accessed:
+
+#. If the scheduled asynchronous task has been already executed, the results are returned.
+#. If the task has been started, but not finished yet, the caller's thread blocks until the task is finished.
+#. If the task has not been started yet, it is removed from the execution queue, and the query is executed synchronously on the caller's thread.
+
+.. note::
+
+  Even though ``load_async`` method returns a ``Criteria`` object, you should not
+  do any operations on this object except accessing query results. The query is
+  scheduled for execution immediately after calling ``load_async``, therefore
+  later changes to the ``Criteria`` object may not be applied.
+
+
+Configuring asynchronous query execution
+----------------------------------------
+
+Asynchronous queries are disabled by default. When asynchronous queries are
+disabled, ``load_async`` will execute the query immediately on the current thread,
+blocking as necessary. Therefore, calling ``load_async`` on criteria in this case
+is roughly the equivalent of calling ``to_a`` to force query execution.
+
+In order to enable asynchronous query execution, the following config options
+must be set:
+
+.. code-block:: yaml
+
+  development:
+    ...
+    options:
+      # Execute asynchronous queries using a global thread pool.
+      async_query_executor: :global_thread_pool
+      # Number of threads in the pool. The default is 4.
+      # global_executor_concurrency: 4

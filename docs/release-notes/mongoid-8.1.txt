@@ -17,6 +17,11 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Added ``load_async`` method on ``Criteria`` to asynchronously load documents
+----------------------------------------------------------------------------
+
+The new ``load_async`` method on ``Criteria`` allows :ref:`running database queries asynchronously <load-async>`.
+
 
 Added ``attribute_before_last_save``, ``saved_change_to_attribute``, ``saved_change_to_attribute?``, and ``will_save_change_to_attribute?``  methods
 ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -245,8 +250,8 @@ for more details.
 Added ``readonly!`` method and ``legacy_readonly`` feature flag
 ---------------------------------------------------------------
 
-Mongoid 8.1 changes the meaning of read-only documents. In Mongoid 8.1 with 
-this feature flag turned off, a document becomes read-only when calling the 
+Mongoid 8.1 changes the meaning of read-only documents. In Mongoid 8.1 with
+this feature flag turned off, a document becomes read-only when calling the
 ``readonly!`` method:
 
 .. code:: ruby
@@ -261,8 +266,8 @@ this feature flag turned off, a document becomes read-only when calling the
 With this feature flag turned off, a ``ReadonlyDocument`` error will be
 raised when destroying or deleting, as well as when saving or updating.
 
-Prior to Mongoid 8.1 and in 8.1 with the ``legacy_readonly`` feature flag 
-turned on, documents become read-only when they are projected (i.e. using 
+Prior to Mongoid 8.1 and in 8.1 with the ``legacy_readonly`` feature flag
+turned on, documents become read-only when they are projected (i.e. using
 ``#only`` or ``#without``).
 
 .. code:: ruby
@@ -278,7 +283,118 @@ turned on, documents become read-only when they are projected (i.e. using
   band.destroy # => raises ReadonlyDocument error
 
 Note that with this feature flag on, a ``ReadonlyDocument`` error will only be
-raised when destroying or deleting, and not on saving or updating. See the 
+raised when destroying or deleting, and not on saving or updating. See the
 section on :ref:`Read-only Documents <readonly-documents>` for more details.
 
 
+Added method parameters to ``#exists?``
+---------------------------------------
+
+Mongoid 8.1 introduces method paramters to the ``Contextual#exists?`` method.
+An _id, a hash of conditions, or ``false``/``nil`` can now be included:
+
+.. code:: ruby
+
+  Band.exists?
+  Band.exists?(name: "The Rolling Stones")
+  Band.exists?(BSON::ObjectId('6320d96a3282a48cfce9e72c'))
+  Band.exists?(false) # always false
+  Band.exists?(nil) # always false
+
+
+Added ``:replace`` option to ``#upsert``
+----------------------------------------
+
+Mongoid 8.1 adds the ``:replace`` option to the ``#upsert`` method. This option
+is ``false`` by default.
+
+In Mongoid 8 and earlier, and in Mongoid 8.1 when passing ``replace: true``
+(the default) the upserted document will overwrite the current document in the
+database if it exists. Consider the following example:
+
+.. code:: ruby
+
+  existing = Player.create!(name: "Juan Soto", age: 23, team: "WAS")
+
+  player = Player.new(name: "Juan Soto", team: "SD")
+  player.id = existing.id
+  player.upsert # :replace defaults to true in 8.1
+
+  p Player.find(existing.id)
+  # => <Player _id: 633b42f43282a45fadfaaf9d, name: "Juan Soto", age: nil, team: "SD">
+
+As you can see, the value for the ``:age`` field was dropped, because the
+upsert replaced the entire document instead of just updating it. If we take the
+same example and set ``:replace`` to ``false``, however:
+
+.. code:: ruby
+
+  player.upsert(replace: false)
+
+  p Player.find(existing.id)
+  # => <Player _id: 633b42f43282a45fadfaaf9d, name: "Juan Soto", age: 23, team: "SD">
+
+This time, the value for the ``:age`` field is maintained.
+
+.. note::
+
+  The default for the ``:replace`` option will be changed to ``false`` in
+  Mongoid 9.0, therefore it is recommended to explicitly specify this option
+  while using ``#upsert`` in 8.1 for easier upgradability.
+
+
+Allow Hash Assignment to ``embedded_in``
+----------------------------------------
+
+Mongoid 8.1 allows the assignment of a hash to an ``embedded_in`` association.
+On assignment, the hash will be coerced into a document of the class of the
+association that it is being assigned to. This functionality already exists
+for ``embeds_one`` and ``embeds_many`` associations. Consider the following
+example:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    embeds_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    embedded_in :band
+  end
+
+  album = Album.new
+  album.band = { name: "Death Cab For Cutie" }
+  p album.band
+  # => <Band _id: 633c74113282a438a15d2b56, name: "Death Cab For Cutie">
+
+See the section on :ref:`Hash Assignment on Embedded Associations <hash-assignment>`
+for more details
+
+
+Added ``none_of`` Query Method
+------------------------------
+
+With the addition of ``none_of``, Mongoid 8.1 allows queries to exclude
+conditions in bulk. The emitted query will encapsulate the specified 
+criteria in a ``$nor`` operation. For example:
+
+.. code:: ruby
+
+  class Building
+    include Mongoid::Document
+    field :city, type: String
+    field :height, type: Integer
+    field :purpose, type: String
+    field :occupancy, type: Integer
+  end
+
+  Building.where(city: 'Portland').
+    none_of(:height.lt => 100,
+            :purpose => 'apartment',
+            :occupancy.gt => 2500)
+
+This would query all buildings in Portland, excluding apartments, buildings less than
+100 units tall, and buildings with an occupancy greater than 2500 people.

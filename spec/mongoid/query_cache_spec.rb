@@ -36,9 +36,7 @@ describe Mongoid::QueryCache do
     context 'with driver query cache' do
 
       context 'when query cache is not enabled' do
-        before do
-          Mongoid::QueryCache.enabled = false
-        end
+        override_query_cache false
 
         it 'turns on the query cache within the block' do
           expect(Mongoid::QueryCache.enabled?).to be false
@@ -52,9 +50,7 @@ describe Mongoid::QueryCache do
       end
 
       context 'when query cache is enabled' do
-        before do
-          Mongoid::QueryCache.enabled = true
-        end
+        override_query_cache true
 
         it 'keeps the query cache enabled within the block' do
           expect(Mongoid::QueryCache.enabled?).to be true
@@ -87,9 +83,7 @@ describe Mongoid::QueryCache do
     context 'with driver query cache' do
 
       context 'when query cache is not enabled' do
-        before do
-          Mongoid::QueryCache.enabled = false
-        end
+        override_query_cache false
 
         it 'keeps the query cache turned off within the block' do
           expect(Mongoid::QueryCache.enabled?).to be false
@@ -103,9 +97,7 @@ describe Mongoid::QueryCache do
       end
 
       context 'when query cache is enabled' do
-        before do
-          Mongoid::QueryCache.enabled = true
-        end
+        override_query_cache true
 
         it 'turns off the query cache within the block' do
           expect(Mongoid::QueryCache.enabled?).to be true
@@ -159,10 +151,7 @@ describe Mongoid::QueryCache do
       end
 
       context 'does not query for the relation and instead sets the base' do
-
-        before do
-          Mongoid::QueryCache.enabled = false
-        end
+        override_query_cache false
 
         it 'queries for each access to the base' do
           expect(server).to receive(:with_connection).exactly(0).times.and_call_original
@@ -180,10 +169,7 @@ describe Mongoid::QueryCache do
       end
 
       context 'when query cache is disabled' do
-
-        before do
-          Mongoid::QueryCache.enabled = false
-        end
+        override_query_cache false
 
         it 'does not query for access to the base' do
           expect(server).to receive(:context).exactly(0).times.and_call_original
@@ -194,10 +180,7 @@ describe Mongoid::QueryCache do
       end
 
       context 'when query cache is enabled' do
-
-        before do
-          Mongoid::QueryCache.enabled = true
-        end
+        override_query_cache true
 
         it 'does not query for access to the base' do
           expect(server).to receive(:context).exactly(0).times.and_call_original
@@ -243,10 +226,7 @@ describe Mongoid::QueryCache do
     end
 
     context 'when block is cached' do
-
-      before do
-        Mongoid::QueryCache.enabled = false
-      end
+      override_query_cache false
 
       it 'uses the driver query cache' do
         expect(Mongo::QueryCache).to receive(:cache).and_call_original
@@ -259,10 +239,7 @@ describe Mongoid::QueryCache do
     end
 
     context 'when block is uncached' do
-
-      before do
-        Mongoid::QueryCache.enabled = true
-      end
+      override_query_cache true
 
       it 'uses the driver query cache' do
         expect(Mongo::QueryCache).to receive(:uncached).and_call_original
@@ -314,10 +291,7 @@ describe Mongoid::QueryCache do
       end
 
       context "when query cache is disabled" do
-
-        before do
-          Mongoid::QueryCache.enabled = false
-        end
+        override_query_cache false
 
         it "queries again" do
           expect_query(1) do
@@ -440,10 +414,7 @@ describe Mongoid::QueryCache do
     end
 
     context "when query cache is disabled" do
-
-      before do
-        Mongoid::QueryCache.enabled = false
-      end
+      override_query_cache false
 
       it "queries again" do
         expect_query(1) do
@@ -669,13 +640,7 @@ describe Mongoid::QueryCache do
    end
 
     context "when query caching is enabled and the batch_size is set" do
-
-      around(:each) do |example|
-        query_cache_enabled = Mongoid::QueryCache.enabled?
-        Mongoid::QueryCache.enabled = true
-        example.run
-        Mongoid::QueryCache.enabled = query_cache_enabled
-      end
+      override_query_cache true
 
       it "does not raise an error when requesting the second batch" do
         expect {
@@ -684,7 +649,6 @@ describe Mongoid::QueryCache do
           end
         }.not_to raise_error
       end
-
     end
   end
 
@@ -752,10 +716,7 @@ describe Mongoid::QueryCache do
     end
 
     context 'when query cache is disabled' do
-
-      before do
-        Mongoid::QueryCache.enabled = false
-      end
+      override_query_cache false
 
       it "queries again" do
         band = Band.find(band_id)
@@ -819,8 +780,9 @@ describe Mongoid::QueryCache do
   end
 
   context 'when the initial query does not exhaust the results' do
+    override_query_cache true
+
     before do
-      Mongoid::QueryCache.enabled = true
       10.times { Band.create! }
 
       Band.batch_size(4).to_a

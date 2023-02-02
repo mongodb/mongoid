@@ -1408,62 +1408,175 @@ describe Mongoid::Contextual::Mongo do
 
   describe "#exists?" do
 
-    before do
-      Band.create!(name: "Depeche Mode")
+    let!(:band) do
+      Band.create!(name: "Depeche Mode", active: true)
     end
 
-    context "when the count is zero" do
+    context "when not passing options" do
 
-      let(:criteria) do
-        Band.where(name: "New Order")
-      end
+      context "when the count is zero" do
 
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns false" do
-        expect(context).to_not be_exists
-      end
-    end
-
-    context "when the count is greater than zero" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns true" do
-        expect(context).to be_exists
-      end
-    end
-
-    context "when caching is not enabled" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      context "when exists? already called and query cache is enabled" do
-        query_cache_enabled
-
-        before do
-          context.exists?
+        let(:criteria) do
+          Band.where(name: "New Order")
         end
 
-        it "does not hit the database again" do
-          expect_no_queries do
-            expect(context).to be_exists
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns false" do
+          expect(context).to_not be_exists
+        end
+      end
+
+      context "when the count is greater than zero" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns true" do
+          expect(context).to be_exists
+        end
+      end
+
+      context "when caching is not enabled" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when exists? already called and query cache is enabled" do
+          query_cache_enabled
+
+          before do
+            context.exists?
+          end
+
+          it "does not hit the database again" do
+            expect_no_queries do
+              expect(context).to be_exists
+            end
           end
         end
+      end
+    end
+
+    context "when passing an _id" do
+
+      context "when its of type BSON::ObjectId" do
+
+        context "when calling it on the class" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that includes the object" do
+
+          it "returns true" do
+            expect(Band.where(name: band.name).exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that does not include the object" do
+
+          it "returns false" do
+            expect(Band.where(name: "bogus").exists?(band._id)).to be false
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new)).to be false
+          end
+        end
+      end
+
+      context "when its of type String" do
+
+        context "when the id exists" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id.to_s)).to be true
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new.to_s)).to be false
+          end
+        end
+      end
+    end
+
+    context "when passing a hash" do
+
+      context "when calling it on the class" do
+
+        it "returns true" do
+          expect(Band.exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that includes the object" do
+
+        it "returns true" do
+          expect(Band.where(active: true).exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that does not include the object" do
+
+        it "returns false" do
+          expect(Band.where(active: false).exists?(name: band.name)).to be false
+        end
+      end
+
+      context "when the conditions don't match" do
+
+        it "returns false" do
+          expect(Band.exists?(name: "bogus")).to be false
+        end
+      end
+    end
+
+    context "when passing false" do
+
+      it "returns false" do
+        expect(Band.exists?(false)).to be false
+      end
+    end
+
+    context "when passing nil" do
+
+      it "returns false" do
+        expect(Band.exists?(nil)).to be false
+      end
+    end
+
+    context "when the limit is 0" do
+
+      it "returns false" do
+        expect(Band.limit(0).exists?).to be false
+      end
+    end
+
+    context "when the criteria limit is 0" do
+
+      it "returns false" do
+        expect(Band.criteria.limit(0).exists?).to be false
       end
     end
   end
@@ -4470,6 +4583,72 @@ describe Mongoid::Contextual::Mongo do
         expect do
           context.third_to_last!
         end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe '#load_async' do
+    let!(:band) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context 'with global thread pool async query executor' do
+      config_override :async_query_executor, :global_thread_pool
+
+      it 'preloads the documents' do
+        context.load_async
+        context.documents_loader.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.documents_loader.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
+      end
+    end
+
+    context 'with immediate thread pool async query executor' do
+      config_override :async_query_executor, :immediate
+
+      it 'preloads the documents' do
+        context.load_async
+        context.documents_loader.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.documents_loader.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
       end
     end
   end

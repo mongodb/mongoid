@@ -52,6 +52,37 @@ describe Mongoid::Scopable do
       end
     end
 
+    context "when a class method" do
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      before do
+        class DefaultScopeAsClassMethod
+          include Mongoid::Document
+
+          def self.default_scope
+            criteria
+          end
+        end
+      end
+
+      after do
+        Mongoid.deregister_model(DefaultScopeAsClassMethod)
+        Object.send(:remove_const, :DefaultScopeAsClassMethod)
+      end
+
+      it "adds the default scope to the class" do
+        pending 'https://jira.mongodb.org/browse/MONGOID-5483'
+        expect(DefaultScopeAsClassMethod.default_scoping.call).to eq(criteria)
+      end
+
+      it "flags as being default scoped" do
+        pending 'https://jira.mongodb.org/browse/MONGOID-5483'
+        expect(DefaultScopeAsClassMethod).to be_default_scoping
+      end
+    end
+
     context "when provided a non proc" do
 
       it "raises an error" do
@@ -1265,8 +1296,6 @@ describe Mongoid::Scopable do
       let(:c1) { Band.where(active: true) }
 
       it 'restores previous scope' do
-        pending 'MONGOID-5214'
-
         Band.with_scope(c1) do |crit|
           Band.unscoped do |crit2|
             Mongoid::Threaded.current_scope(Band).should be nil
