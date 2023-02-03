@@ -150,9 +150,9 @@ module Mongoid
         #
         # @return [ Object ] The serialized object.
         def evolve(serializer, value)
-          return value.raw_value if value.is_a?(Mongoid::RawValue)
-
           case value
+          when Mongoid::RawValue
+            value.raw_value
           when Hash
             evolve_hash(serializer, value)
           when Array
