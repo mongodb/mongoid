@@ -2,6 +2,13 @@
 
 # Wrapper class used when a value cannot be casted in evolve method.
 module Mongoid
+
+  # Creates a Mongoid::RawValue object. Used as a syntax shortcut.
+  #
+  # @example Create a Mongoid::RawValue object.
+  #   Mongoid::RawValue("Beagle")
+  #
+  # @return [ Mongoid::RawValue ] The object inspection.
   def RawValue(*args)
     RawValue.new(*args)
   end
