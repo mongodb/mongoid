@@ -8,7 +8,7 @@ module Mongoid
   # @example Create a Mongoid::RawValue object.
   #   Mongoid::RawValue("Beagle")
   #
-  # @return [ Mongoid::RawValue ] The object inspection.
+  # @return [ Mongoid::RawValue ] The created object.
   def RawValue(*args)
     RawValue.new(*args)
   end
