@@ -4,6 +4,7 @@ require "mongoid/config/defaults"
 require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
+require "mongoid/config/introspection"
 
 module Mongoid
 
