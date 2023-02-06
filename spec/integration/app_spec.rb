@@ -127,17 +127,17 @@ describe 'Mongoid application tests' do
           File.exist?(mongoid_config_file).should be true
 
           config_text = File.read(mongoid_config_file)
-          config_text.should =~ /mongoid_test_config_development/
-          config_text.should =~ /mongoid_test_config_test/
+          expect(config_text).to match /mongoid_test_config_development/
+          expect(config_text).to match /mongoid_test_config_text/
 
           # deprecated options should not be included
-          config_text.should_not =~ /background_indexing/
+          expect(config_text).not_to match /background_indexing/
 
           # make sure the different option types are emitted
-          config_text.should =~ /# app_name: nil/
-          config_text.should =~ /# discriminator_key: "_type"/
-          config_text.should =~ /# join_contexts: false/
-          config_text.should =~ /# log_level: :info/
+          expect(config_text).to match /# app_name: nil/
+          expect(config_text).to match /# discriminator_key: "_type"/
+          expect(config_text).to match /# join_contexts: false/
+          expect(config_text).to match /# log_level: :info/
         end
       end
     end
