@@ -41,7 +41,7 @@ describe Mongoid::Config::Introspection do
 
         it "should be parsed by the introspection scraper" do
           expect(option).not_to be_nil
-          expect(eval(option.default)).to be == default_value
+          expect(option.default).to be == default_value.inspect
           expect(option.comment.strip).not_to be_empty
         end
 
