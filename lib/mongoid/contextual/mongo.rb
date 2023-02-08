@@ -473,8 +473,10 @@ module Mongoid
         name = klass.cleanse_localized_field_names(field)
 
         fld = klass.traverse_association_tree(name)
-        pipeline = [ { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } } ]
-        pipeline.unshift("$match" => view.filter) unless view.filter.blank?
+        pipeline = []
+        pipeline << { "$match" => view.filter } unless view.filter.blank?
+        pipeline << { "$unwind" => "$#{name}" } if splat_arrays
+        pipeline << { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } }
 
         collection.aggregate(pipeline).each_with_object({}) do |doc, tallies|
           is_translation = "#{name}_translations" == field.to_s
@@ -493,15 +495,8 @@ module Mongoid
           # together hashes that have other values in different languages, the
           # demongoized value is just the translation in the current locale,
           # which can be the same across multiple of those unequal hashes.
-          if splat_arrays && tally_key.is_a?(Array)
-            key.each do |array_value|
-              tallies[array_value] ||= 0
-              tallies[array_value] += doc["counts"]
-            end
-          else
-            tallies[key] ||= 0
-            tallies[key] += doc["counts"]
-          end
+          tallies[key] ||= 0
+          tallies[key] += doc["counts"]
         end
       end
 
