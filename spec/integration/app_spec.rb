@@ -128,16 +128,18 @@ describe 'Mongoid application tests' do
 
           config_text = File.read(mongoid_config_file)
           expect(config_text).to match /mongoid_test_config_development/
-          expect(config_text).to match /mongoid_test_config_text/
+          expect(config_text).to match /mongoid_test_config_test/
 
-          # deprecated options should not be included
-          expect(config_text).not_to match /background_indexing/
-
-          # make sure the different option types are emitted
-          expect(config_text).to match /# app_name: nil/
-          expect(config_text).to match /# discriminator_key: "_type"/
-          expect(config_text).to match /# join_contexts: false/
-          expect(config_text).to match /# log_level: :info/
+          Mongoid::Config::Introspection.options(include_deprecated: true).each do |opt|
+            if opt.deprecated?
+              # deprecated options should not be included
+              expect(config_text).not_to include "# #{opt.name}:"
+            else
+              block = "    #{opt.indented_comment(indent: 4)}\n" \
+                      "    # #{opt.name}: #{opt.default}\n"
+              expect(config_text).to include block
+            end
+          end
         end
       end
     end
