@@ -285,13 +285,23 @@ module Mongoid
       #   context.tally(:name)
       #
       # @param [ String | Symbol ] field Field to tally.
+      # @param [ Boolean ] :splat_arrays Whether to tally array
+      #   member values individually. Default false.
       #
       # @return [ Hash ] The hash of counts.
-      def tally(field)
-        return documents.each_with_object({}) do |d, acc|
+      def tally(field, splat_arrays: false)
+        documents.each_with_object({}) do |d, acc|
           v = retrieve_value_at_path(d, field)
-          acc[v] ||= 0
-          acc[v] += 1
+
+          if splat_arrays && v.is_a?(Array)
+            v.each do |vv|
+              acc[vv] ||= 0
+              acc[vv] += 1
+            end
+          else
+            acc[v] ||= 0
+            acc[v] += 1
+          end
         end
       end
 

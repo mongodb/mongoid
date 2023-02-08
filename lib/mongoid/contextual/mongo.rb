@@ -465,6 +465,8 @@ module Mongoid
       #   # => { [ 1, 2 ] => 1 }
       #
       # @param [ String | Symbol ] field The field name.
+      # @param [ Boolean ] :splat_arrays Whether to tally array
+      #   member values individually. Default false.
       #
       # @return [ Hash ] The hash of counts.
       def tally(field, splat_arrays: false)

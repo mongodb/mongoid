@@ -122,9 +122,12 @@ module Mongoid
       #   context.tally(:name)
       #
       # @param [ String | Symbol ] _field Field to tally.
+      # @param [ Boolean ] :splat_arrays Whether to tally array
+      #   member values individually. Default false.
+      # @param [ String | Symbol ] _field Field to tally.
       #
       # @return [ Hash ] An empty Hash.
-      def tally(_field)
+      def tally(_field, splat_arrays: false)
         {}
       end
 
