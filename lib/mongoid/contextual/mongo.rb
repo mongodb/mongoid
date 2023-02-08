@@ -476,36 +476,32 @@ module Mongoid
         pipeline = [ { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } } ]
         pipeline.unshift("$match" => view.filter) unless view.filter.blank?
 
-        collection.aggregate(pipeline).reduce({}) do |tallies, doc|
+        collection.aggregate(pipeline).each_with_object({}) do |doc, tallies|
           is_translation = "#{name}_translations" == field.to_s
           val = doc["_id"]
 
           key = if val.is_a?(Array)
-            val.map do |v|
-              demongoize_with_field(fld, v, is_translation)
-            end
+            val.map { |v| demongoize_with_field(fld, v, is_translation) }
           else
             demongoize_with_field(fld, val, is_translation)
           end
 
-          if splat_arrays && key.is_a?(Array)
-            key.each do |k|
-              tallies[k] ||= 0
-              tallies[k] += doc["counts"]
+          # The only time where a key will already exist in the tallies hash
+          # is when the values are stored differently in the database, but
+          # demongoize to the same value. A good example of when this happens
+          # is when using localized fields. While the server query won't group
+          # together hashes that have other values in different languages, the
+          # demongoized value is just the translation in the current locale,
+          # which can be the same across multiple of those unequal hashes.
+          if splat_arrays && tally_key.is_a?(Array)
+            key.each do |array_value|
+              tallies[array_value] ||= 0
+              tallies[array_value] += doc["counts"]
             end
           else
-            # The only time where a key will already exist in the tallies hash
-            # is when the values are stored differently in the database, but
-            # demongoize to the same value. A good example of when this happens
-            # is when using localized fields. While the server query won't group
-            # together hashes that have other values in different languages, the
-            # demongoized value is just the translation in the current locale,
-            # which can be the same across multiple of those unequal hashes.
             tallies[key] ||= 0
             tallies[key] += doc["counts"]
           end
-
-          tallies
         end
       end
 

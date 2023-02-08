@@ -290,17 +290,17 @@ module Mongoid
       #
       # @return [ Hash ] The hash of counts.
       def tally(field, splat_arrays: false)
-        documents.each_with_object({}) do |d, acc|
-          v = retrieve_value_at_path(d, field)
+        documents.each_with_object({}) do |doc, tallies|
+          key = retrieve_value_at_path(doc, field)
 
-          if splat_arrays && v.is_a?(Array)
-            v.each do |vv|
-              acc[vv] ||= 0
-              acc[vv] += 1
+          if splat_arrays && value.is_a?(Array)
+            key.each do |array_value|
+              tallies[array_value] ||= 0
+              tallies[array_value] += 1
             end
           else
-            acc[v] ||= 0
-            acc[v] += 1
+            tallies[key] ||= 0
+            tallies[key] += 1
           end
         end
       end
