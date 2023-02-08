@@ -1040,6 +1040,20 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
+    context "when tallying a field of type array with splat_arrays true" do
+      let(:criteria) { Band.where(origin: "tally2") }
+
+      let(:tally) do
+        criteria.tally("genres", splat_arrays: true)
+      end
+
+      it "returns the correct hash" do
+        expect(tally).to eq(1 => 3,
+                            2 => 2,
+                            3 => 1)
+      end
+    end
+
     context "when tallying an element from an array of hashes" do
       let(:criteria) { Band.where(origin: "tally") }
 

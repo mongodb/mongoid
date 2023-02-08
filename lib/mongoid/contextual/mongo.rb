@@ -467,7 +467,7 @@ module Mongoid
       # @param [ String | Symbol ] field The field name.
       #
       # @return [ Hash ] The hash of counts.
-      def tally(field)
+      def tally(field, splat_arrays: false)
         name = klass.cleanse_localized_field_names(field)
 
         fld = klass.traverse_association_tree(name)
@@ -486,15 +486,23 @@ module Mongoid
             demongoize_with_field(fld, val, is_translation)
           end
 
-          # The only time where a key will already exist in the tallies hash
-          # is when the values are stored differently in the database, but
-          # demongoize to the same value. A good example of when this happens
-          # is when using localized fields. While the server query won't group
-          # together hashes that have other values in different languages, the
-          # demongoized value is just the translation in the current locale,
-          # which can be the same across multiple of those unequal hashes.
-          tallies[key] ||= 0
-          tallies[key] += doc["counts"]
+          if splat_arrays && key.is_a?(Array)
+            key.each do |k|
+              tallies[k] ||= 0
+              tallies[k] += doc["counts"]
+            end
+          else
+            # The only time where a key will already exist in the tallies hash
+            # is when the values are stored differently in the database, but
+            # demongoize to the same value. A good example of when this happens
+            # is when using localized fields. While the server query won't group
+            # together hashes that have other values in different languages, the
+            # demongoized value is just the translation in the current locale,
+            # which can be the same across multiple of those unequal hashes.
+            tallies[key] ||= 0
+            tallies[key] += doc["counts"]
+          end
+
           tallies
         end
       end
