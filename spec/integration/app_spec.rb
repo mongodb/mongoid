@@ -125,8 +125,19 @@ describe 'Mongoid application tests' do
         File.exist?(mongoid_config_file).should be true
 
         config_text = File.read(mongoid_config_file)
-        config_text.should =~ /mongoid_test_config_development/
-        config_text.should =~ /mongoid_test_config_test/
+        expect(config_text).to match /mongoid_test_config_development/
+        expect(config_text).to match /mongoid_test_config_test/
+
+        Mongoid::Config::Introspection.options(include_deprecated: true).each do |opt|
+          if opt.deprecated?
+            # deprecated options should not be included
+            expect(config_text).not_to include "# #{opt.name}:"
+          else
+            block = "    #{opt.indented_comment(indent: 4)}\n" \
+                    "    # #{opt.name}: #{opt.default}\n"
+            expect(config_text).to include block
+          end
+        end
       end
     end
 
