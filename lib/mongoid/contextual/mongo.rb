@@ -478,7 +478,7 @@ module Mongoid
 
         fld = klass.traverse_association_tree(name)
         pipeline = []
-        pipeline << { "$match" => view.filter } unless view.filter.blank?
+        pipeline << { "$match" => view.filter } if view.filter.present?
         pipeline << { "$project" => { "#{projected}" => "$#{name}" } } if projected
         pipeline << { "$unwind" => "$#{projected || name}" } if splat_arrays
         pipeline << { "$group" => { _id: "$#{projected || name}", counts: { "$sum": 1 } } }
