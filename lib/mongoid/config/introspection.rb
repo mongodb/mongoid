@@ -55,7 +55,7 @@ module Mongoid
         # @param [ String ] comment The multi-line comment describing the
         #   option.
         def initialize(name, default, comment)
-          @name, @default, @comment = name, default, unindent(comment.strip)
+          @name, @default, @comment = name, default, unindent(comment)
         end
 
         # Indent the comment by the requested amount, optionally indenting the

@@ -80,17 +80,17 @@ describe Mongoid::Config::Introspection do
     end
 
     context "#indented_comment" do
-      it "has default defaults" do
+      it "has defaults" do
         expect(option.indented_comment).to be == "# line 1\n  # line 2"
       end
 
       it "allows indentation to be specified" do
-        expect(option.indented_comment(indent: 4)).to be == "# line 1\n    # line 2"
+        expect(option.indented_comment(indent: 3)).to be == "# line 1\n   # line 2"
       end
 
       it "allows the first line to be indented" do
-        expect(option.indented_comment(indent: 4, indent_first_line: true))
-          .to be == "    # line 1\n    # line 2"
+        expect(option.indented_comment(indent: 3, indent_first_line: true))
+          .to be == "   # line 1\n   # line 2"
       end
     end
 
