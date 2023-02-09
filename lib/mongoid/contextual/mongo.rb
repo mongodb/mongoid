@@ -473,7 +473,7 @@ module Mongoid
         name = klass.cleanse_localized_field_names(field)
         is_translation = "#{name}_translations" == field.to_s
 
-        # Add a $project stage when using $unwind with nested fields
+        # Must add a $project stage when using $unwind with nested fields
         projected = 'p' if splat_arrays && (is_translation || name.include?('.'))
 
         fld = klass.traverse_association_tree(name)
