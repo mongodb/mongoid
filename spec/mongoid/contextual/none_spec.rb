@@ -78,6 +78,10 @@ describe Mongoid::Contextual::None do
     it "returns an empty hash" do
       expect(context.tally(:id)).to eq({})
     end
+
+    it "ignores :splat_arrays arg" do
+      expect(context.tally(:id, splat_arrays: true)).to eq({})
+    end
   end
 
   describe "#first" do

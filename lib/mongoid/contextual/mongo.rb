@@ -471,15 +471,19 @@ module Mongoid
       # @return [ Hash ] The hash of counts.
       def tally(field, splat_arrays: false)
         name = klass.cleanse_localized_field_names(field)
+        is_translation = "#{name}_translations" == field.to_s
+
+        # Add a $project stage when using $unwind with nested fields
+        projected = 'p' if splat_arrays && (is_translation || name.include?('.'))
 
         fld = klass.traverse_association_tree(name)
         pipeline = []
         pipeline << { "$match" => view.filter } unless view.filter.blank?
-        pipeline << { "$unwind" => "$#{name}" } if splat_arrays
-        pipeline << { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } }
+        pipeline << { "$project" => { "#{projected}" => "$#{name}" } } if projected
+        pipeline << { "$unwind" => "$#{projected || name}" } if splat_arrays
+        pipeline << { "$group" => { _id: "$#{projected || name}", counts: { "$sum": 1 } } }
 
         collection.aggregate(pipeline).each_with_object({}) do |doc, tallies|
-          is_translation = "#{name}_translations" == field.to_s
           val = doc["_id"]
 
           key = if val.is_a?(Array)

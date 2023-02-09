@@ -837,91 +837,168 @@ describe Mongoid::Contextual::Mongo do
     end
 
     let(:criteria) { Band.where(origin: "tally") }
+    let(:splat_arrays) { false }
 
-    context "when tallying a string" do
-      let(:tally) do
-        criteria.tally(:name)
-      end
+    shared_examples_for "scalar value examples" do
 
-      it "returns the correct hash" do
-        expect(tally).to eq("Depeche Mode" => 1, "New Order" => 1, "10,000 Maniacs" => 1)
-      end
-    end
-
-    context "using an aliased field" do
-      let(:tally) do
-        criteria.tally(:years)
-      end
-
-      it "returns the correct hash" do
-        expect(tally).to eq(30 => 3)
-      end
-    end
-
-    context "when tallying a demongoizable field" do
-      let(:tally) do
-        criteria.tally(:sales)
-      end
-
-      it "returns the correct hash" do
-        expect(tally).to eq(BigDecimal("1E2") => 2, BigDecimal("2E3") => 1)
-      end
-    end
-
-    context "when tallying a localized field" do
-      with_default_i18n_configs
-
-      before do
-        I18n.locale = :en
-        d1 = Dictionary.create!(description: 'en1')
-        d2 = Dictionary.create!(description: 'en1')
-        d3 = Dictionary.create!(description: 'en1')
-        d4 = Dictionary.create!(description: 'en2')
-        I18n.locale = :de
-        d1.description = 'de1'
-        d2.description = 'de1'
-        d3.description = 'de2'
-        d4.description = 'de3'
-        d1.save!
-        d2.save!
-        d3.save!
-        d4.save!
-        I18n.locale = :en
-      end
-
-      context "when getting the demongoized field" do
-        let(:tallied) do
-          Dictionary.tally(:description)
+      context "when tallying a string" do
+        let(:tally) do
+          criteria.tally(:name, splat_arrays: splat_arrays)
         end
-
-        it "returns the translation for the current locale" do
-          expect(tallied).to eq("en1" => 3, "en2" => 1)
+  
+        it "returns the correct hash" do
+          expect(tally).to eq("Depeche Mode" => 1, "New Order" => 1, "10,000 Maniacs" => 1)
         end
       end
-
-      context "when getting a specific locale" do
-        let(:tallied) do
-          Dictionary.tally("description.de")
+  
+      context "using an aliased field" do
+        let(:tally) do
+          criteria.tally(:years, splat_arrays: splat_arrays)
         end
-
-        it "returns the translation for the the specific locale" do
-          expect(tallied).to eq("de1" => 2, "de2" => 1, "de3" => 1)
+  
+        it "returns the correct hash" do
+          expect(tally).to eq(30 => 3)
+        end
+      end
+  
+      context "when tallying a demongoizable field" do
+        let(:tally) do
+          criteria.tally(:sales, splat_arrays: splat_arrays)
+        end
+  
+        it "returns the correct hash" do
+          expect(tally).to eq(BigDecimal("1E2") => 2, BigDecimal("2E3") => 1)
+        end
+      end
+  
+      context "when tallying a localized field" do
+        with_default_i18n_configs
+  
+        before do
+          I18n.locale = :en
+          d1 = Dictionary.create!(description: 'en1')
+          d2 = Dictionary.create!(description: 'en1')
+          d3 = Dictionary.create!(description: 'en1')
+          d4 = Dictionary.create!(description: 'en2')
+          I18n.locale = :de
+          d1.description = 'de1'
+          d2.description = 'de1'
+          d3.description = 'de2'
+          d4.description = 'de3'
+          d1.save!
+          d2.save!
+          d3.save!
+          d4.save!
+          I18n.locale = :en
+        end
+  
+        context "when getting the demongoized field" do
+          let(:tallied) do
+            Dictionary.tally(:description, splat_arrays: splat_arrays)
+          end
+  
+          it "returns the translation for the current locale" do
+            expect(tallied).to eq("en1" => 3, "en2" => 1)
+          end
+        end
+  
+        context "when getting a specific locale" do
+          let(:tallied) do
+            Dictionary.tally("description.de", splat_arrays: splat_arrays)
+          end
+  
+          it "returns the translation for the the specific locale" do
+            expect(tallied).to eq("de1" => 2, "de2" => 1, "de3" => 1)
+          end
+        end
+  
+        context "when getting the full hash" do
+          let(:tallied) do
+            Dictionary.tally("description_translations", splat_arrays: splat_arrays)
+          end
+  
+          it "returns the correct hash" do
+            expect(tallied).to eq(
+              {"de" => "de1", "en" => "en1" } => 2,
+              {"de" => "de2", "en" => "en1" } => 1,
+              {"de" => "de3", "en" => "en2" } => 1
+            )
+          end
         end
       end
 
-      context "when getting the full hash" do
-        let(:tallied) do
-          Dictionary.tally("description_translations")
+      context "when tallying an embedded field" do
+        let(:tally) do
+          criteria.tally("label.name", splat_arrays: splat_arrays)
         end
 
         it "returns the correct hash" do
-          expect(tallied).to eq(
-            {"de" => "de1", "en" => "en1" } => 2,
-            {"de" => "de2", "en" => "en1" } => 1,
-            {"de" => "de3", "en" => "en2" } => 1
-          )
+          expect(tally).to eq("Atlantic" => 2, "Columbia" => 1)
         end
       end
+
+      context "when some keys are missing" do
+        before do
+          3.times { Band.create!(origin: "tally", splat_arrays: splat_arrays) }
+        end
+  
+        let(:tally) do
+          criteria.tally(:name)
+        end
+  
+        it "returns the correct hash" do
+          expect(tally).to eq(
+                             "Depeche Mode" => 1,
+                             "New Order" => 1,
+                             "10,000 Maniacs" => 1,
+                             nil => 3
+                           )
+        end
+      end
+    
+      context "when tallying demongoizable values from typeless fields" do
+        let!(:person1) { Person.create!(ssn: /hello/) }
+        let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
+        let(:tally) { Person.tally("ssn", splat_arrays: splat_arrays) }
+  
+        context "< BSON 5" do
+          max_bson_version '4.99.99'
+  
+          it "stores the correct types in the database" do
+            Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
+            Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+          end
+  
+          it "tallies the correct type" do
+            tally.keys.map(&:class).sort do |a,b|
+              a.to_s <=> b.to_s
+            end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+          end
+        end
+  
+        context ">= BSON 5" do
+          min_bson_version "5.0"
+  
+          it "stores the correct types in the database" do
+            Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
+            Person.find(person2.id).ssn.should be_a BigDeimal
+          end
+  
+          it "tallies the correct type" do
+            tally.keys.map(&:class).sort do |a,b|
+              a.to_s <=> b.to_s
+            end.should == [BigDecimal, BSON::Regexp::Raw]
+          end
+        end
+      end
+    end
+
+    it_behaves_like 'scalar value examples'
+
+    context 'when :splat_arrays is true' do
+      let(:splat_arrays) { true }
+
+      it_behaves_like 'scalar value examples'
     end
 
     context "when tallying an embedded localized field" do
@@ -945,7 +1022,7 @@ describe Mongoid::Contextual::Mongo do
 
       context "when getting the demongoized field" do
         let(:tallied) do
-          Person.tally("addresses.name")
+          Person.tally("addresses.name", splat_arrays: splat_arrays)
         end
 
         it "returns the translation for the current locale" do
@@ -954,11 +1031,21 @@ describe Mongoid::Contextual::Mongo do
             [ "en1", "en3" ] => 1,
           )
         end
+
+        context "when :splat_arrays true" do
+          let(:splat_arrays) { true }
+
+          it "returns the correct hash" do
+            expect(tallied).to eq({ "en1" => 2,
+                                    "en2" => 1,
+                                    "en3" => 1 })
+          end
+        end
       end
 
       context "when getting a specific locale" do
         let(:tallied) do
-          Person.tally("addresses.name.de")
+          Person.tally("addresses.name.de", splat_arrays: splat_arrays)
         end
 
         it "returns the translation for the the specific locale" do
@@ -967,11 +1054,21 @@ describe Mongoid::Contextual::Mongo do
             [ "de1", "de3" ] => 1,
           )
         end
+
+        context "when :splat_arrays true" do
+          let(:splat_arrays) { true }
+
+          it "returns the correct hash" do
+            expect(tallied).to eq({ "de1" => 2,
+                                    "de2" => 1,
+                                    "de3" => 1 })
+          end
+        end
       end
 
       context "when getting the full hash" do
         let(:tallied) do
-          Person.tally("addresses.name_translations")
+          Person.tally("addresses.name_translations", splat_arrays: splat_arrays)
         end
 
         it "returns the correct hash" do
@@ -980,17 +1077,16 @@ describe Mongoid::Contextual::Mongo do
             [{ "de" => "de1", "en" => "en1" }, { "de" => "de3", "en" => "en3" }] => 1,
           )
         end
-      end
 
-    end
+        context "when :splat_arrays true" do
+          let(:splat_arrays) { true }
 
-    context "when tallying an embedded field" do
-      let(:tally) do
-        criteria.tally("label.name")
-      end
-
-      it "returns the correct hash" do
-        expect(tally).to eq("Atlantic" => 2, "Columbia" => 1)
+          it "returns the correct hash" do
+            expect(tallied).to eq({ { "de" => "de1", "en" => "en1" } => 2,
+                                    { "de" => "de2", "en" => "en2" } => 1,
+                                    { "de" => "de3", "en" => "en3" } => 1 })
+          end
+        end
       end
     end
 
@@ -998,7 +1094,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("fanatics.age")
+        criteria.tally("fanatics.age", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
@@ -1006,6 +1102,16 @@ describe Mongoid::Contextual::Mongo do
           [1, 2] => 2,
           [1, 3] => 1
         )
+      end
+
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
+
+        it "returns the correct hash" do
+          expect(tally).to eq(1 => 3,
+                              2 => 2,
+                              3 => 1)
+        end
       end
     end
 
@@ -1013,15 +1119,21 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("fanatics")
+        criteria.tally("fanatics", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
-        expect(tally).to eq(
-          fans1.map(&:attributes) => 1,
-          fans2.map(&:attributes) => 1,
-          fans3.map(&:attributes) => 1,
-        )
+        exp = [fans1, fans2, fans3].map { |f| f.map(&:attributes) }.index_with(1)
+        expect(tally).to eq(exp)
+      end
+
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
+
+        it "returns the correct hash" do
+          exp = [fans1, fans2, fans3].flatten.map(&:attributes).index_with(1)
+          expect(tally).to eq(exp)
+        end
       end
     end
 
@@ -1029,7 +1141,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally2") }
 
       let(:tally) do
-        criteria.tally("genres")
+        criteria.tally("genres", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
@@ -1038,19 +1150,15 @@ describe Mongoid::Contextual::Mongo do
           [1, 3] => 1
         )
       end
-    end
 
-    context "when tallying a field of type array with splat_arrays true" do
-      let(:criteria) { Band.where(origin: "tally2") }
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
 
-      let(:tally) do
-        criteria.tally("genres", splat_arrays: true)
-      end
-
-      it "returns the correct hash" do
-        expect(tally).to eq(1 => 3,
-                            2 => 2,
-                            3 => 1)
+        it "returns the correct hash" do
+          expect(tally).to eq(1 => 3,
+                              2 => 2,
+                              3 => 1)
+        end
       end
     end
 
@@ -1058,7 +1166,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally") }
 
       let(:tally) do
-        criteria.tally("genres.x")
+        criteria.tally("genres.x", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash without the nil keys" do
@@ -1066,6 +1174,16 @@ describe Mongoid::Contextual::Mongo do
           [1, 2] => 2,
           [1, 3] => 1
         )
+      end
+
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
+
+        it "returns the correct hash" do
+          expect(tally).to eq(1 => 3,
+                              2 => 2,
+                              3 => 1)
+        end
       end
     end
 
@@ -1078,7 +1196,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally") }
 
       let(:tally) do
-        criteria.tally("genres.x")
+        criteria.tally("genres.x", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash without the nil keys" do
@@ -1087,6 +1205,16 @@ describe Mongoid::Contextual::Mongo do
           [1, 3] => 1,
           [1, 1] => 1,
         )
+      end
+
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
+
+        it "returns the correct hash without the nil keys" do
+          expect(tally).to eq(1 => 5,
+                              2 => 2,
+                              3 => 1)
+        end
       end
     end
 
@@ -1098,7 +1226,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("array")
+        Person.tally("array", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
@@ -1107,20 +1235,15 @@ describe Mongoid::Contextual::Mongo do
           [1, 3] => 1
         )
       end
-    end
 
-    context "when going multiple levels deep in arrays" do
-      let(:criteria) { Band.where(origin: "tally") }
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
 
-      let(:tally) do
-        criteria.tally("genres.y.z")
-      end
-
-      it "returns the correct hash" do
-        expect(tally).to eq(
-          [1, 2] => 2,
-          [1, 3] => 1
-        )
+        it "returns the correct hash without the nil keys" do
+          expect(tally).to eq(1 => 2,
+                              2 => 1,
+                              3 => 1)
+        end
       end
     end
 
@@ -1128,7 +1251,7 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(origin: "tally") }
 
       let(:tally) do
-        criteria.tally("genres.y.z")
+        criteria.tally("genres.y.z", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
@@ -1137,10 +1260,19 @@ describe Mongoid::Contextual::Mongo do
           [1, 3] => 1
         )
       end
+
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
+
+        it "returns the correct hash without the nil keys" do
+          expect(tally).to eq(1 => 3,
+                              2 => 2,
+                              3 => 1)
+        end
+      end
     end
 
     context "when tallying deeply nested arrays/embedded associations" do
-
       before do
         Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
         Person.create!(addresses: [ Address.new(code: Code.new(deepest: Deepest.new(array: [ { y: { z: 1 } }, { y: { z: 2 } } ]))) ])
@@ -1148,14 +1280,21 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("addresses.code.deepest.array.y.z")
+        Person.tally("addresses.code.deepest.array.y.z", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
-        expect(tally).to eq(
-          [ [ 1, 2 ] ] => 2,
-          [ [ 1, 3 ] ] => 1
-        )
+        expect(tally).to eq([ [ 1, 2 ] ] => 2,
+                            [ [ 1, 3 ] ] => 1)
+      end
+
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
+
+        it "returns the correct hash without the nil keys" do
+          expect(tally).to eq([ 1, 2 ] => 2,
+                              [ 1, 3 ] => 1)
+        end
       end
     end
 
@@ -1171,7 +1310,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("addresses.code.deepest.array.y.z")
+        Person.tally("addresses.code.deepest.array.y.z", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
@@ -1180,24 +1319,14 @@ describe Mongoid::Contextual::Mongo do
           [ [ 1, 3 ], [ 1, 3 ] ] => 1
         )
       end
-    end
 
-    context "when some keys are missing" do
-      before do
-        3.times { Band.create!(origin: "tally") }
-      end
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
 
-      let(:tally) do
-        criteria.tally(:name)
-      end
-
-      it "returns the correct hash" do
-        expect(tally).to eq(
-          "Depeche Mode" => 1,
-          "New Order" => 1,
-          "10,000 Maniacs" => 1,
-          nil => 3
-        )
+        it "returns the correct hash without the nil keys" do
+          expect(tally).to eq([ 1, 2 ] => 4,
+                              [ 1, 3 ] => 2)
+        end
       end
     end
 
@@ -1209,7 +1338,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:tally) do
-        Person.tally("name.translations.language")
+        Person.tally("name.translations.language", splat_arrays: splat_arrays)
       end
 
       it "returns the correct hash" do
@@ -1218,41 +1347,14 @@ describe Mongoid::Contextual::Mongo do
           [1, 3] => 1
         )
       end
-    end
 
-    context "when tallying demongoizable values from typeless fields" do
+      context "when :splat_arrays true" do
+        let(:splat_arrays) { true }
 
-      let!(:person1) { Person.create!(ssn: /hello/) }
-      let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
-      let(:tally) { Person.tally("ssn") }
-
-      context "< BSON 5" do
-        max_bson_version '4.99.99'
-
-        it "stores the correct types in the database" do
-          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
-          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
-        end
-
-        it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
-        end
-      end
-
-      context ">= BSON 5" do
-        min_bson_version "5.0"
-
-        it "stores the correct types in the database" do
-          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
-          Person.find(person2.id).ssn.should be_a BigDeimal
-        end
-
-        it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BigDecimal, BSON::Regexp::Raw]
+        it "returns the correct hash without the nil keys" do
+          expect(tally).to eq(1 => 3,
+                              2 => 2,
+                              3 => 1)
         end
       end
     end
