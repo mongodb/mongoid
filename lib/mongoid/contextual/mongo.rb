@@ -485,7 +485,6 @@ module Mongoid
 
         collection.aggregate(pipeline).each_with_object({}) do |doc, tallies|
           val = doc["_id"]
-
           key = if val.is_a?(Array)
             val.map { |v| demongoize_with_field(fld, v, is_translation) }
           else
