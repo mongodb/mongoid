@@ -947,12 +947,10 @@ describe Mongoid::Contextual::Mongo do
         end
   
         it "returns the correct hash" do
-          expect(tally).to eq(
-                             "Depeche Mode" => 1,
-                             "New Order" => 1,
-                             "10,000 Maniacs" => 1,
-                             nil => 3
-                           )
+          expect(tally).to eq("Depeche Mode" => 1,
+                              "New Order" => 1,
+                              "10,000 Maniacs" => 1,
+                              nil => 3)
         end
       end
     

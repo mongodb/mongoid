@@ -293,7 +293,7 @@ module Mongoid
         documents.each_with_object({}) do |doc, tallies|
           key = retrieve_value_at_path(doc, field)
 
-          if splat_arrays && value.is_a?(Array)
+          if splat_arrays && key.is_a?(Array)
             key.each do |array_value|
               tallies[array_value] ||= 0
               tallies[array_value] += 1
