@@ -191,6 +191,9 @@ Bug Fixes and Improvements
 
 This section will be for smaller bug fixes and improvements:
 
+- The ``.tally`` method can now take a keyword arg :splat_arrays
+  which tallies array values individually (using the ``$unwind`` operator.)
+  `MONGOID-5556 <https://jira.mongodb.org/browse/MONGOID-5556>`_.
 - The ``.unscoped`` method now also clears scopes declared using ``.with_scope``
   `MONGOID-5214 <https://jira.mongodb.org/browse/MONGOID-5214>`_.
 - When evolving a ``String`` to a ``BigDecimal`` (i.e. when querying a
