@@ -97,6 +97,7 @@ module Mongoid
       # @return [ true | false ] The result of the update.
       def prepare_update(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        enforce_immutability_of_id_field!
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys
@@ -184,6 +185,18 @@ module Mongoid
         unless options.fetch(:touch, true)
           timeless
           children.each(&:timeless)
+        end
+      end
+
+      # Checks to see if the _id field has been modified. If it has, and if
+      # the document has already been persisted, this is an error. Otherwise,
+      # returns without side-effects.
+      #
+      # @raise [ Errors::ReadonlyAttribute ] if _id has changed, and document
+      #   has been persisted.
+      def enforce_immutability_of_id_field!
+        if _id_changed? && persisted?
+          raise Errors::ReadonlyAttribute.new(:_id, _id)
         end
       end
     end
