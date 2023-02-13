@@ -151,6 +151,11 @@ module Mongoid
     # reload, but when it is turned off, it won't be.
     option :legacy_readonly, default: false
 
+    # When this flag is true, any attempt to change an immutable attribute
+    # (e.g. `_id`) will be silently ignored. This was the default behavior
+    # prior to 9.0.
+    option :ignore_changes_to_immutable_attributes, default: false
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.

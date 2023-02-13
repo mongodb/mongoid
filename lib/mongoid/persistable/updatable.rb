@@ -196,7 +196,11 @@ module Mongoid
       #   has been persisted.
       def enforce_immutability_of_id_field!
         if _id_changed? && persisted?
-          raise Errors::ImmutableAttribute.new(:_id, _id)
+          if Mongoid::Config.ignore_changes_to_immutable_attributes
+            Mongoid::Warnings.warn_ignore_immutable_deprecated
+          else
+            raise Errors::ImmutableAttribute.new(:_id, _id)
+          end
         end
       end
     end
