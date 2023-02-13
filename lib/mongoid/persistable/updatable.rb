@@ -192,11 +192,11 @@ module Mongoid
       # the document has already been persisted, this is an error. Otherwise,
       # returns without side-effects.
       #
-      # @raise [ Errors::ReadonlyAttribute ] if _id has changed, and document
+      # @raise [ Errors::ImmutableAttribute ] if _id has changed, and document
       #   has been persisted.
       def enforce_immutability_of_id_field!
         if _id_changed? && persisted?
-          raise Errors::ReadonlyAttribute.new(:_id, _id)
+          raise Errors::ImmutableAttribute.new(:_id, _id)
         end
       end
     end

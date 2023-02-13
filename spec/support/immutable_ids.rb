@@ -21,7 +21,7 @@ module Mongoid
     
               it 'should disallow _id to be updated' do
                 expect { invoke_operation! }
-                  .to raise_error(Mongoid::Errors::ReadonlyAttribute)
+                  .to raise_error(Mongoid::Errors::ImmutableAttribute)
               end
 
               context 'when id is set to the existing value' do
@@ -54,7 +54,7 @@ module Mongoid
     
               it 'should disallow _id to be updated' do
                 expect { invoke_operation! }
-                  .to raise_error(Mongoid::Errors::ReadonlyAttribute)
+                  .to raise_error(Mongoid::Errors::ImmutableAttribute)
               end
 
               context 'when id is set to the existing value' do
