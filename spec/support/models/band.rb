@@ -15,10 +15,12 @@ class Band
   field :rating, type: Float
   field :upserted, type: Mongoid::Boolean, default: false
   field :created, type: DateTime
+  field :updated, type: Time
   field :sales, type: BigDecimal
   field :decimal, type: BSON::Decimal128
   field :y, as: :years, type: Integer
   field :founded, type: Date
+  field :decibels, type: Range
   field :deleted, type: Boolean
   field :mojo, type: Object
   field :tags, type: Hash
