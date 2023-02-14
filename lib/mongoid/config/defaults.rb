@@ -46,7 +46,6 @@ module Mongoid
         when "7.5"
           # flags introduced in 8.0 - old functionality
           self.map_big_decimal_to_decimal128 = false
-          self.ignore_changes_to_immutable_attributes = true
           
           load_defaults "8.0"
         when "8.0"
@@ -54,7 +53,7 @@ module Mongoid
 
           load_defaults "8.1"
         when "8.1"
-          self.ignore_changes_to_immutable_attributes = true
+          self.immutable_ids = true
 
           load_defaults "9.0"
         when "9.0"

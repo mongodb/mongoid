@@ -25,6 +25,6 @@ module Mongoid
     warning :as_json_compact_deprecated, '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
     warning :symbol_type_deprecated, 'The BSON Symbol type is deprecated by MongoDB. Please use String or StringifiedSymbol field types instead of the Symbol field type.'
     warning :legacy_readonly, 'The readonly! method will only mark the document readonly when the legacy_readonly feature flag is switched off.'
-    warning :ignore_immutable_deprecated, 'Ignoring updates to immutable attribute `_id`. Please set Mongoid::Config.ignore_changes_to_immutable_attributes to false and update your code so that `_id` is never updated.'
+    warning :mutable_ids, 'Ignoring updates to immutable attribute `_id`. Please set Mongoid::Config.immutable_ids to true and update your code so that `_id` is never updated.'
   end
 end

@@ -77,13 +77,13 @@ describe Mongoid::Config::Defaults do
 
     shared_examples "uses settings for 8.1" do
       it "uses settings for 8.1" do
-        expect(Mongoid.ignore_changes_to_immutable_attributes).to be true
+        expect(Mongoid.immutable_ids).to be false
       end
     end
 
     shared_examples "does not use settings for 8.1" do
       it "does not use settings for 8.1" do
-        expect(Mongoid.ignore_changes_to_immutable_attributes).to be false
+        expect(Mongoid.immutable_ids).to be true
       end
     end
 

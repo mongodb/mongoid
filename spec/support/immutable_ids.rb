@@ -8,19 +8,14 @@ module Mongoid
               .to raise_error(Mongoid::Errors::ImmutableAttribute)
           end
     
-          context 'when ignore_changes_to_immutable_attributes is true' do
-            before { Mongoid::Config.ignore_changes_to_immutable_attributes = true }
-            after { Mongoid::Config.ignore_changes_to_immutable_attributes = false }
+          context 'when immutable_ids is false' do
+            before { Mongoid::Config.immutable_ids = false }
+            after { Mongoid::Config.immutable_ids = true }
 
             it 'should ignore the change and issue a warning' do
-              expect(Mongoid::Warnings).to receive(:warn_ignore_immutable_deprecated)
+              expect(Mongoid::Warnings).to receive(:warn_mutable_ids)
               expect { invoke_operation! }.not_to raise_error
-p object
-p original_id
-p parent.favorites.where(_id: original_id).to_a
-p parent.favorites.where(_id: new_id_value).to_a
-p id_is_unchanged
-              expect(id_is_unchanged).to be true
+              expect(id_is_unchanged).not_to be legacy_behavior_expects_id_to_change
             end
           end
 
@@ -38,6 +33,8 @@ p id_is_unchanged
           let(:new_id_value) { 1234 }
 
           context 'when the document is top-level' do    
+            let(:legacy_behavior_expects_id_to_change) { false }
+
             context 'when the document is new' do
               let(:object) { Person.new }
     
@@ -59,7 +56,8 @@ p id_is_unchanged
     
           context 'when the document is embedded' do
             let(:parent) { Person.create }
-  
+            let(:legacy_behavior_expects_id_to_change) { true }
+
             context 'when the document is new' do
               let(:object) { parent.favorites.new }
     
@@ -76,6 +74,41 @@ p id_is_unchanged
               let(:id_is_unchanged) { parent.favorites.where(_id: original_id).exists? }
       
               it_behaves_like 'a persisted document'
+
+              context 'updating embeds_one via parent' do
+                context 'when immutable_ids is false' do
+                  before { Mongoid::Config.immutable_ids = false }
+                  after { Mongoid::Config.immutable_ids = true }
+
+                  it 'should ignore the change' do
+                    expect(Mongoid::Warnings).to receive(:warn_mutable_ids)
+
+                    parent.pet = pet = Pet.new
+                    parent.save
+
+                    original_id = pet._id
+                    new_id = BSON::ObjectId.new
+
+                    expect { parent.update(pet: { _id: new_id }) }.not_to raise_error
+                    expect(parent.reload.pet._id.to_s).to be == original_id.to_s
+                  end
+                end
+
+                context 'when immutable_ids is true' do
+                  before { expect(Mongoid::Config.immutable_ids).to be true }
+
+                  it 'should raise an exception' do
+                    parent.pet = pet = Pet.new
+                    parent.save
+
+                    original_id = pet._id
+                    new_id = BSON::ObjectId.new
+
+                    expect { parent.update(pet: { _id: new_id }) }
+                      .to raise_error(Mongoid::Errors::ImmutableAttribute)
+                  end
+                end
+              end
             end
           end
         end

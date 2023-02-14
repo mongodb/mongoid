@@ -192,14 +192,17 @@ module Mongoid
       # the document has already been persisted, this is an error. Otherwise,
       # returns without side-effects.
       #
+      # Note that if `Mongoid::Config.immutable_ids` is false, this will do
+      # nothing.
+      #
       # @raise [ Errors::ImmutableAttribute ] if _id has changed, and document
       #   has been persisted.
       def enforce_immutability_of_id_field!
         if _id_changed? && persisted?
-          if Mongoid::Config.ignore_changes_to_immutable_attributes
-            Mongoid::Warnings.warn_ignore_immutable_deprecated
-          else
+          if Mongoid::Config.immutable_ids
             raise Errors::ImmutableAttribute.new(:_id, _id)
+          else
+            Mongoid::Warnings.warn_mutable_ids
           end
         end
       end
