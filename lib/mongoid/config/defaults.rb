@@ -53,7 +53,7 @@ module Mongoid
 
           load_defaults "8.1"
         when "8.1"
-          self.immutable_ids = true
+          self.immutable_ids = false
 
           load_defaults "9.0"
         when "9.0"
