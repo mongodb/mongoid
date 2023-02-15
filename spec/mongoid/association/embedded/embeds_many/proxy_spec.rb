@@ -4566,7 +4566,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     before do
       band.collection.
           find(_id: band.id).
-          update_one("$set" => { records: [{ name: "Moderat" }]})
+          update_one("$set" => { records: [{ _id: BSON::ObjectId.new, name: "Moderat" }]})
     end
 
     context "when loading the documents" do
