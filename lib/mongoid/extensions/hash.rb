@@ -225,6 +225,8 @@ module Mongoid
             object.dup.transform_values!(&:mongoize)
           when Hash
             BSON::Document.new(object.transform_values(&:mongoize))
+          else
+            Mongoid::RawValue(object, 'Hash')
           end
         end
 

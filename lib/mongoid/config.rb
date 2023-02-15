@@ -71,6 +71,14 @@ module Mongoid
     # existing method.
     option :scope_overwrite_exception, default: false
 
+    # Indicates whether or not to raise an error when attempting
+    # to assign an incompatible type to a field.
+    option :strict_type_assignment, default: false
+
+    # Indicates whether uncastable values from the database should
+    # be returned wrapped by Mongoid::RawValue class.
+    option :wrap_uncastable_values_from_database, default: false
+
     # Use ActiveSupport's time zone in time operations instead of the
     # Ruby default time zone.
     option :use_activesupport_time_zone, default: true

@@ -17,13 +17,16 @@ module Mongoid
         # @return [ Regexp | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
-          case object
-          when String then ::Regexp.new(object)
-          when ::Regexp then object
-          when BSON::Regexp::Raw then object.compile
+          begin
+            _object = case object
+                      when String then ::Regexp.new(object)
+                      when ::Regexp then object
+                      when BSON::Regexp::Raw then object.compile
+                      end
+            return _object if _object
+          rescue RegexpError
           end
-        rescue RegexpError
-          nil
+          Mongoid::RawValue(object, 'Regexp')
         end
         alias :demongoize :mongoize
       end

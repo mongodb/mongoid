@@ -159,7 +159,9 @@ module Mongoid
         #
         # @return [ String ] The object mongoized.
         def mongoize(object)
-          object.try(:to_s)
+          return if object.nil?
+          return object.to_s if object.respond_to?(:to_s)
+          Mongoid::RawValue.new(object, 'String')
         end
         alias :demongoize :mongoize
       end

@@ -30,6 +30,7 @@ module Mongoid
           case object
           when BSON::Binary then object
           when String, Symbol then BSON::Binary.new(object.to_s)
+          else Mongoid::RawValue(object, 'BSON::Binary')
           end
         end
         alias :demongoize :mongoize

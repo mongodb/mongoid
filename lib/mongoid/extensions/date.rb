@@ -71,12 +71,13 @@ module Mongoid
             else
               time = object.__mongoize_time__
             end
+
+            if time.acts_like?(:time)
+              return ::Time.utc(time.year, time.month, time.day)
+            end
           rescue ArgumentError
-            nil
           end
-          if time.acts_like?(:time)
-            ::Time.utc(time.year, time.month, time.day)
-          end
+          Mongoid::RawValue(object, 'Date')
         end
       end
     end

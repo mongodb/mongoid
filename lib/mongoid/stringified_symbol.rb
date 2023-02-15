@@ -17,11 +17,9 @@ module Mongoid
       #
       # @api private
       def demongoize(object)
-        if object.nil?
-          object
-        else
-          object.to_s.to_sym
-        end
+        return if object.nil?
+        return object.to_s.to_sym if object.respond_to?(:to_s)
+        Mongoid::RawValue.new(object, 'String')
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -36,11 +34,9 @@ module Mongoid
       #
       # @api private
       def mongoize(object)
-         if object.nil?
-           object
-         else
-           object.to_s
-         end
+        return if object.nil?
+        return object.to_s if object.respond_to?(:to_s)
+        Mongoid::RawValue.new(object, 'String')
       end
 
       # @api private

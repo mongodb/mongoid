@@ -26,7 +26,9 @@ module Mongoid
         #
         # @return [ Symbol | nil ] The object mongoized or nil.
         def mongoize(object)
-          object.try(:to_sym)
+          return if object.nil?
+          return object.to_sym if object.respond_to?(:to_sym)
+          Mongoid::RawValue.new(object, 'Symbol')
         end
         alias :demongoize :mongoize
       end

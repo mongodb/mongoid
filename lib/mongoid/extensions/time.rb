@@ -84,19 +84,18 @@ module Mongoid
           return if object.blank?
           begin
             time = object.__mongoize_time__
-          rescue ArgumentError
-            return
-          end
-
-          if time.acts_like?(:time)
-            if object.respond_to?(:sec_fraction)
-              ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
-            elsif time.respond_to?(:subsec)
-              ::Time.at(time.to_i, time.subsec * 10**6).utc
-            else
-              ::Time.at(time.to_i, time.usec).utc
+            if time.acts_like?(:time)
+              if object.respond_to?(:sec_fraction)
+                return ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
+              elsif time.respond_to?(:subsec)
+                return ::Time.at(time.to_i, time.subsec * 10**6).utc
+              else
+                return ::Time.at(time.to_i, time.usec).utc
+              end
             end
+          rescue ArgumentError
           end
+          Mongoid::RawValue.new(object, 'Time')
         end
       end
     end

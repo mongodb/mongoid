@@ -41,8 +41,10 @@ module Mongoid
             if object.numeric?
               object.to_f
             end
+          elsif object.respond_to?(:to_f)
+            object.to_f
           else
-            object.try(:to_f)
+            Mongoid::RawValue(object, 'Float')
           end
         end
         alias :demongoize :mongoize
