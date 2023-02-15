@@ -198,7 +198,13 @@ module Mongoid
       # @raise [ Errors::ImmutableAttribute ] if _id has changed, and document
       #   has been persisted.
       def enforce_immutability_of_id_field!
-        if _id_changed? && persisted?
+        # special case here: we *do* allow the _id to be mutated if it was
+        # previously nil. This addresses an odd case exposed in
+        # has_one/proxy_spec.rb where `person.create_address` would
+        # (somehow?) create the address with a nil _id first, before then
+        # saving it *again* with the correct _id.
+
+        if _id_changed? && !_id_was.nil? && persisted?
           if Mongoid::Config.immutable_ids
             raise Errors::ImmutableAttribute.new(:_id, _id)
           else
