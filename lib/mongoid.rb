@@ -138,12 +138,16 @@ module Mongoid
   #
   # @api private
   module GlobalDiscriminatorKeyAssignment
+
     # This class is used for obtaining the method definition location for
     # Mongoid methods.
     class InvalidFieldHost
       include Mongoid::Document
     end
 
+    # Sets the global discriminator key name.
+    #
+    # @param [ String | Symbol ] value The new discriminator key name.
     def discriminator_key=(value)
       Mongoid::Fields::Validators::Macro.validate_field_name(InvalidFieldHost, value)
       value = value.to_s

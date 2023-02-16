@@ -61,6 +61,14 @@ module Mongoid
         end
       end
 
+      # Validates that an association's dependent strategy is
+      # within the allowed enumeration.
+      #
+      # @param [ Mongoid::Association::Relatable ] association
+      #   The association to validate.
+      #
+      # @raises [ Mongoid::Errors::InvalidDependentStrategy ]
+      #   Error if invalid.
       def self.validate!(association)
         unless STRATEGIES.include?(association.dependent)
           raise Errors::InvalidDependentStrategy.new(association,
