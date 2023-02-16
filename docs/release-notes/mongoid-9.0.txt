@@ -82,6 +82,24 @@ ignored for embedded documents; an embedded document now always uses the persist
 context of its parent.
 
 
+Support for Passing Raw Values into Queries
+-------------------------------------------
+
+When performing queries, it is now possible skip Mongoid's type coercion logic
+using the ``Mongoid::RawValue`` wrapper class. This can be useful when legacy
+data in the database is of a different type than the field definition.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     field :age, type: Integer
+   end
+
+   # Query for the string "42", not the integer 42
+   Person.where(age: Mongoid::RawValue("42"))
+
+
 Raise AttributeNotLoaded error when accessing fields omitted from query projection
 ----------------------------------------------------------------------------------
 
