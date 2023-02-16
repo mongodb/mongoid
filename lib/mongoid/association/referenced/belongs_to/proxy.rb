@@ -20,7 +20,7 @@ module Mongoid
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Document | Array<Document> ] target The target (parent) of the
           #   association.
-          # @param [ Association ] association The association object.
+          # @param [ Mongoid::Association::Relatable ] association The association object.
           def initialize(base, target, association)
             init(base, target, association) do
               characterize_one(_target)
@@ -100,7 +100,7 @@ module Mongoid
             #
             # @example Get the eager loader object
             #
-            # @param [ Association ] association The association object.
+            # @param [ Mongoid::Association::Relatable ] association The association object.
             # @param [ Array<Document> ] docs The array of documents.
             def eager_loader(association, docs)
               Eager.new(association, docs)

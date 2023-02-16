@@ -53,7 +53,7 @@ module Mongoid
 
         # The list of association complements.
         #
-        # @return [ Array<Association> ] The association complements.
+        # @return [ Array<Mongoid::Association::Relatable> ] The association complements.
         def relation_complements
           @relation_complements ||= [ self.class ].freeze
         end
