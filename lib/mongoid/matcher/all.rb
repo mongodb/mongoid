@@ -3,6 +3,15 @@ module Mongoid
 
     # @api private
     module All
+
+      # Returns whether a document satisfies an $all expression.
+      #
+      # @param document [ Mongoid::Document ] document The document.
+      # @param expr [ Array<Hash> ] expr The $all conditions.
+      #
+      # @return [ true | false ] Whether the document matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         unless Array === condition
           raise Errors::InvalidQuery, "$all argument must be an array: #{Errors::InvalidQuery.truncate_expr(condition)}"

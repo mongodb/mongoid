@@ -3,6 +3,16 @@ module Mongoid
 
     # @api private
     module ElemMatch
+
+      # Returns whether a value satisfies an $elemMatch expression.
+      #
+      # @param exists [ true | false ] exists Whether the value exists.
+      # @param value [ Array | Object ] value The value to check.
+      # @param condition [ Hash ] expr The condition.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         unless Hash === condition
           raise Errors::InvalidQuery, "$elemMatch requires a Hash operand: #{Errors::InvalidQuery.truncate_expr(condition)}"

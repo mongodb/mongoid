@@ -3,6 +3,15 @@ module Mongoid
 
     # @api private
     module And
+
+      # Returns whether a document satisfies an $and expression.
+      #
+      # @param document [ Mongoid::Document ] document The document.
+      # @param expr [ Array<Hash> ] expr The $and conditions.
+      #
+      # @return [ true | false ] Whether the document matches.
+      #
+      # @api private
       module_function def matches?(document, expr)
         unless expr.is_a?(Array)
           raise Errors::InvalidQuery, "$and argument must be an array: #{Errors::InvalidQuery.truncate_expr(expr)}"

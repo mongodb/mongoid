@@ -3,6 +3,15 @@ module Mongoid
 
     # @api private
     module Expression
+
+      # Returns whether a document satisfies a query expression.
+      #
+      # @param document [ Mongoid::Document ] document The document.
+      # @param expr [ Hash | Array<Hash> ] expr The expression.
+      #
+      # @return [ true | false ] Whether the document matches.
+      #
+      # @api private
       module_function def matches?(document, expr)
         if expr.nil?
           raise Errors::InvalidQuery, "Nil condition in expression context"

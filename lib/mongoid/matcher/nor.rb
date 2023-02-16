@@ -3,6 +3,15 @@ module Mongoid
 
     # @api private
     module Nor
+
+      # Returns whether a document satisfies a $nor expression.
+      #
+      # @param document [ Mongoid::Document ] document The document.
+      # @param expr [ Array<Hash> ] expr The $nor conditions.
+      #
+      # @return [ true | false ] Whether the document matches.
+      #
+      # @api private
       module_function def matches?(document, expr)
         unless expr.is_a?(Array)
           raise Errors::InvalidQuery, "$nor argument must be an array: #{Errors::InvalidQuery.truncate_expr(expr)}"
