@@ -3,6 +3,17 @@ module Mongoid
 
     # @api private
     module Not
+
+      # Returns whether a value satisfies an $not expression.
+      #
+      # @param exists [ true | false ] exists Whether the value exists.
+      # @param value [ Object ] value The value to check.
+      # @param condition [ Hash | Regexp | BSON::Regexp::Raw ] condition
+      #   The $not condition.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         case condition
         when ::Regexp, BSON::Regexp::Raw

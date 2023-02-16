@@ -4,12 +4,13 @@ module Mongoid
     # @api private
     module All
 
-      # Returns whether a document satisfies an $all expression.
+      # Returns whether a value satisfies an $all expression.
       #
-      # @param document [ Mongoid::Document ] document The document.
-      # @param expr [ Array<Hash> ] expr The $all conditions.
+      # @param exists [ true | false ] exists Whether the value exists.
+      # @param value [ Object ] value The value to check.
+      # @param expr [ Array<Hash> ] condition The $all conditions.
       #
-      # @return [ true | false ] Whether the document matches.
+      # @return [ true | false ] Whether the value matches.
       #
       # @api private
       module_function def matches?(exists, value, condition)
