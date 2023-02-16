@@ -10,8 +10,8 @@ describe Mongoid::Config::Defaults do
 
   describe ".load_defaults" do
 
-    shared_examples "turns off 7.4 flags" do
-      it "turns off the 7.4 flags" do
+    shared_examples "uses settings for 7.3" do
+      it "uses settings for 7.3" do
         expect(Mongoid.broken_aggregables).to be true
         expect(Mongoid.broken_alias_handling).to be true
         expect(Mongoid.broken_and).to be true
@@ -24,8 +24,8 @@ describe Mongoid::Config::Defaults do
       end
     end
 
-    shared_examples "turns on 7.4 flags" do
-      it "turns on the 7.4 flags" do
+    shared_examples "does not use settings for 7.3" do
+      it "does not use settings for 7.3" do
         expect(Mongoid.broken_aggregables).to be false
         expect(Mongoid.broken_alias_handling).to be false
         expect(Mongoid.broken_and).to be false
@@ -34,33 +34,50 @@ describe Mongoid::Config::Defaults do
         expect(Mongoid.compare_time_by_ms).to be true
         expect(Mongoid.legacy_pluck_distinct).to be false
         expect(Mongoid.legacy_triple_equals).to be false
-        expect(Mongoid.object_id_as_json_oid).to be false
       end
     end
 
-    shared_examples "turns off 7.5 flags" do
-      it "turns off the 7.5 flags" do
+    shared_examples "uses settings for 7.4" do
+      it "uses settings for 7.4" do
         expect(Mongoid.legacy_attributes).to be true
         expect(Mongoid.overwrite_chained_operators).to be true
       end
     end
 
-    shared_examples "turns on 7.5 flags" do
-      it "turns on the 7.5 flags" do
+    shared_examples "does not use settings for 7.4" do
+      it "does not use settings for 7.4" do
         expect(Mongoid.legacy_attributes).to be false
         expect(Mongoid.overwrite_chained_operators).to be false
       end
     end
 
-    shared_examples "turns off 8.0 flags" do
-      it "turns off the 8.0 flags" do
+    shared_examples "uses settings for 7.5" do
+      it "uses settings for 7.5" do
         expect(Mongoid.map_big_decimal_to_decimal128).to be false
       end
     end
 
-    shared_examples "turns on 8.0 flags" do
-      it "turns on the 8.0 flags" do
+    shared_examples "does not use settings for 7.5" do
+      it "does not use settings for 7.5" do
         expect(Mongoid.map_big_decimal_to_decimal128).to be true
+      end
+    end
+
+    shared_examples "uses settings for 8.0" do
+      it "uses settings for 8.0" do
+        expect(Mongoid.legacy_readonly).to be true
+      end
+    end
+
+    shared_examples "does not use settings for 8.0" do
+      it "does not use settings for 8.0" do
+        expect(Mongoid.legacy_readonly).to be false
+      end
+    end
+
+    shared_examples "uses settings for 8.1" do
+      it "uses settings for 8.1" do
+        expect(Mongoid.immutable_ids).to be false
       end
     end
 
@@ -78,45 +95,55 @@ describe Mongoid::Config::Defaults do
 
         let(:version) { 7.3 }
 
-        it_behaves_like "turns off 7.4 flags"
-        it_behaves_like "turns off 7.5 flags"
-        it_behaves_like "turns off 8.0 flags"
+        it_behaves_like "uses settings for 7.3"
+        it_behaves_like "uses settings for 7.4"
+        it_behaves_like "uses settings for 7.5"
+        it_behaves_like "uses settings for 8.0"
+        it_behaves_like "uses settings for 8.1"
       end
 
       context "when the given version is 7.4" do
 
         let(:version) { 7.4 }
 
-        it_behaves_like "turns on 7.4 flags"
-        it_behaves_like "turns off 7.5 flags"
-        it_behaves_like "turns off 8.0 flags"
+        it_behaves_like "does not use settings for 7.3"
+        it_behaves_like "uses settings for 7.4"
+        it_behaves_like "uses settings for 7.5"
+        it_behaves_like "uses settings for 8.0"
+        it_behaves_like "uses settings for 8.1"
       end
 
       context "when the given version is 7.5" do
 
         let(:version) { 7.5 }
 
-        it_behaves_like "turns on 7.4 flags"
-        it_behaves_like "turns on 7.5 flags"
-        it_behaves_like "turns off 8.0 flags"
+        it_behaves_like "does not use settings for 7.3"
+        it_behaves_like "does not use settings for 7.4"
+        it_behaves_like "uses settings for 7.5"
+        it_behaves_like "uses settings for 8.0"
+        it_behaves_like "uses settings for 8.1"
       end
 
       context "when the given version is 8.0" do
 
         let(:version) { 8.0 }
 
-        it_behaves_like "turns on 7.4 flags"
-        it_behaves_like "turns on 7.5 flags"
-        it_behaves_like "turns on 8.0 flags"
+        it_behaves_like "does not use settings for 7.3"
+        it_behaves_like "does not use settings for 7.4"
+        it_behaves_like "does not use settings for 7.5"
+        it_behaves_like "uses settings for 8.0"
+        it_behaves_like "uses settings for 8.1"
       end
 
       context "when the given version is 8.1" do
 
-        let(:version) { 8.0 }
+        let(:version) { 8.1 }
 
-        it_behaves_like "turns on 7.4 flags"
-        it_behaves_like "turns on 7.5 flags"
-        it_behaves_like "turns on 8.0 flags"
+        it_behaves_like "does not use settings for 7.3"
+        it_behaves_like "does not use settings for 7.4"
+        it_behaves_like "does not use settings for 7.5"
+        it_behaves_like "does not use settings for 8.0"
+        it_behaves_like "uses settings for 8.1"
       end
     end
 
