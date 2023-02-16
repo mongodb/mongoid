@@ -77,8 +77,7 @@ module Mongoid
 
               context 'updating embeds_one via parent' do
                 context 'when immutable_ids is false' do
-                  before { Mongoid::Config.immutable_ids = false }
-                  after { Mongoid::Config.immutable_ids = true }
+                  before { expect(Mongoid::Config.immutable_ids).to be false }
 
                   it 'should ignore the change' do
                     expect(Mongoid::Warnings).to receive(:warn_mutable_ids)
