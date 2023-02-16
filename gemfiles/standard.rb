@@ -15,6 +15,7 @@ def standard_dependencies
     # Evergreen configuration generation
     gem 'erubi'
     gem 'tilt'
+    gem 'solargraph'
   end
 
   group :development, :test do
