@@ -1,0 +1,70 @@
+inherit_from: .rubocop_todo.yml
+
+require:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  Exclude:
+    - 'spec/shared/lib/mrss/**/*'
+    - 'vendor/**/*'
+
+# -----------------------------------
+# TODO: Enable and fix the cops below
+# -----------------------------------
+
+Gemspec:
+  Enabled: false
+
+Layout:
+  Enabled: false
+
+Lint:
+  Enabled: false
+
+Metrics:
+  Enabled: false
+
+Naming:
+  Enabled: false
+
+Performance:
+  Enabled: false
+
+Rake:
+  Enabled: false
+
+Rails:
+  Enabled: false
+
+RSpec:
+  Enabled: false
+
+Security:
+  Exclude:
+    - 'spec/**/*'
+
+Style:
+  Enabled: false
+
+# --------------------------------------
+# Cops below this line set intentionally
+# --------------------------------------
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Gemspec/OrderedDependencies:
+  Enabled: false
+
+# Not used by Mongoid
+Rails/RedundantPresenceValidationOnBelongsTo:
+  Enabled: false
+
+Style/Documentation:
+  Exclude:
+    - 'spec/**/*'
