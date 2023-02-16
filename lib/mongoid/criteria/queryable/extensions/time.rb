@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional time behavior.
+        # Adds query type-casting behavior to Time class.
         module Time
 
           # Evolve the time as a date, UTC midnight.

@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional object behavior.
+        # Adds query type-casting behavior to String class.
         module String
 
           # Evolve the string into a mongodb friendly date.

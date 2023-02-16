@@ -13,6 +13,7 @@ module Mongoid
     RawValue.new(*args)
   end
 
+  # Represents a value which cannot be type-casted between Ruby and MongoDB.
   class RawValue
 
     attr_reader :raw_value

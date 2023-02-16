@@ -2,6 +2,9 @@
 
 module Mongoid
   module Contextual
+
+    # Mixin module which adds methods to Mongoid::Criteria that
+    # indicate the criteria query result will be an empty set.
     module Queryable
 
       # @attribute [r] collection The collection to query against.

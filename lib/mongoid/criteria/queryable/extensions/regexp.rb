@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional regex behavior.
+        # Adds query type-casting behavior to Regexp class.
         module Regexp
 
           # Is the object a regexp?

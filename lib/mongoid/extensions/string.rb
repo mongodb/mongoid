@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to String class.
     module String
 
       # @attribute [rw] unconvertable_to_bson If the document is unconvertable.

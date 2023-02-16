@@ -2,6 +2,10 @@
 
 module Mongoid
   module Fields
+
+    # Represents a BSON document field definition which stores
+    # a foreign key that references the ID of another document.
+    # Used for association behavior.
     class ForeignKey < Standard
 
       # Adds the atomic changes for this type of resizable field.
@@ -147,7 +151,6 @@ module Mongoid
       def primary_key_field
         @primary_key_field ||= association.klass.fields[association.primary_key]
       end
-
 
       # This is used when default values need to be serialized. Most of the
       # time just return the object.

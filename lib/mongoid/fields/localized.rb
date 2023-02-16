@@ -2,6 +2,11 @@
 
 module Mongoid
   module Fields
+
+    # Represents a BSON document field definition which stores
+    # different values for different user locale keys in a Ruby
+    # hashmap (BSON "Object" type). Used for internationalization
+    # (I18n) support.
     class Localized < Standard
 
       # Demongoize the object based on the current locale. Will look in the

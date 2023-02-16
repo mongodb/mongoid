@@ -30,15 +30,16 @@ require "mongoid/query_cache"
 require "mongoid/warnings"
 require "mongoid/utils"
 
-# If we are using Rails then we will include the Mongoid railtie. This has all
-# the nifty initializers that Mongoid needs.
+# If we are using Rails then we will include the Mongoid railtie.
+# This configures initializers required to integrate Mongoid with Rails.
 if defined?(Rails)
   require "mongoid/railtie"
 end
 
-# add english load path by default
+# Add English locale config to load path by default.
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
+# Top-level module for project.
 module Mongoid
   extend Forwardable
   extend Loggable

@@ -66,5 +66,8 @@ Rails/RedundantPresenceValidationOnBelongsTo:
   Enabled: false
 
 Style/Documentation:
-  Exclude:
-    - 'spec/**/*'
+  Enabled: true
+  Include:
+    - 'lib/**/*'
+  AllowedConstants:
+    - ClassMethods

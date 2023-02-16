@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Date class.
     module Date
 
       # Convert the date into a time.

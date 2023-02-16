@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to ActiveSupport::TimeWithZone class.
     module TimeWithZone
 
       # Mongoizes an ActiveSupport::TimeWithZone into a time.

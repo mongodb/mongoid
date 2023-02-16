@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-# A class which sends values to the database as Strings but returns them to the user as Symbols.
 module Mongoid
+
+  # A class which sends values to the database as Strings but returns
+  # them to the user as Symbols.
   class StringifiedSymbol
 
     class << self
