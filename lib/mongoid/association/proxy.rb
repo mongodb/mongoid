@@ -127,7 +127,7 @@ module Mongoid
       # Whether the proxy can forward the method to the target.
       #
       # @param [ String | Symbol ] name The name of the method.
-      # @param [ Object... ] *args The ++respond_to?++ arguments.
+      # @param [ Object... ] *args The +respond_to?+ arguments.
       #
       # @api private
       ruby2_keywords def respond_to_missing?(name, *args)

@@ -133,7 +133,7 @@ module Mongoid
     # even if its _id is given multiple times in the argument to +find+.
     # If the +raise_not_found_error+ Mongoid configuration option is truthy,
     # +Errors::DocumentNotFound+ exception is raised if any of the specified
-    # _ids were not found in the database. If the ++raise_not_found_error+
+    # _ids were not found in the database. If the +raise_not_found_error+
     # Mongoid configuration option is falsy, only those documents which are
     # found are returned; if no documents are found, the return value is an
     # empty array.
