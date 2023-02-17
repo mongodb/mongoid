@@ -5,31 +5,26 @@ require 'singleton'
 class SpecConfig
   include Singleton
 
+  DEFAULT_MONGODB_URI = "mongodb://127.0.0.1:27017"
+
   def initialize
     if ENV['MONGODB_URI']
       @uri_str = ENV['MONGODB_URI']
-      @uri = Mongo::URI.new(@uri_str)
+    else
+      STDERR.puts "Environment variable 'MONGODB_URI' is not set, so the default url will be used."
+      STDERR.puts "This may lead to unexpected test failures because service discovery will raise unexpected warnings."
+      STDERR.puts "Please consider providing the correct uri via MONGODB_URI environment variable."
+      @uri_str = DEFAULT_MONGODB_URI
     end
+    
+    @uri = Mongo::URI.new(@uri_str)
   end
 
   attr_reader :uri_str
   attr_reader :uri
 
   def addresses
-    if @uri
-      @uri.servers
-    else
-      STDERR.puts "Environment variable 'MONGODB_URI' is not set, so the default url will be used."
-      STDERR.puts "This may lead to unexpected test failures because service discovery will raise unexpected warnings."
-      STDERR.puts "Please consider providing the correct uri via MONGODB_URI environment variable."
-      ['127.0.0.1:27017']
-    end
-  end
-
-  # returns the URI string, or constructs one from the defaults if no URI
-  # string was given.
-  def safe_uri
-    @uri_str || "mongodb://#{addresses.first}"
+    @uri.servers
   end
 
   def mri?
