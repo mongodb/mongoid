@@ -6,8 +6,8 @@ module Mongoid
 
       # Returns whether a document satisfies an $or expression.
       #
-      # @param document [ Mongoid::Document ] document The document.
-      # @param expr [ Array<Hash> ] expr The $or conditions.
+      # @param [ Mongoid::Document ] document The document.
+      # @param [ Array<Hash> ] expr The $or conditions.
       #
       # @return [ true | false ] Whether the document matches.
       #

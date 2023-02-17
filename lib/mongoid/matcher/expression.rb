@@ -6,8 +6,8 @@ module Mongoid
 
       # Returns whether a document satisfies a query expression.
       #
-      # @param document [ Mongoid::Document ] document The document.
-      # @param expr [ Hash | Array<Hash> ] expr The expression.
+      # @param [ Mongoid::Document ] document The document.
+      # @param [ Hash | Array<Hash> ] expr The expression.
       #
       # @return [ true | false ] Whether the document matches.
       #

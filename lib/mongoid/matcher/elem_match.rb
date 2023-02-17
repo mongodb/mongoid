@@ -6,9 +6,9 @@ module Mongoid
 
       # Returns whether a value satisfies an $elemMatch expression.
       #
-      # @param exists [ true | false ] exists Whether the value exists.
-      # @param value [ Object ] value The value to check.
-      # @param condition [ Hash ] expr The condition.
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Hash ] expr The $elemMatch condition predicate.
       #
       # @return [ true | false ] Whether the value matches.
       #

@@ -9,8 +9,8 @@ module Mongoid
 
       # Returns whether a document satisfies an $elemMatch expression.
       #
-      # @param document [ Mongoid::Document ] document The document.
-      # @param expr [ Hash ] expr The $elemMatch condition.
+      # @param [ Mongoid::Document ] document The document.
+      # @param [ Hash ] expr The $elemMatch condition predicate.
       #
       # @return [ true | false ] Whether the document matches.
       #

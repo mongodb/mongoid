@@ -6,9 +6,9 @@ module Mongoid
 
       # Returns whether a value satisfies an $in expression.
       #
-      # @param exists [ true | false ] exists Whether the value exists.
-      # @param value [ Object ] value The value to check.
-      # @param expr [ Array<Hash> ] condition The $in conditions.
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Array<Hash> ] condition The $in conditions.
       #
       # @return [ true | false ] Whether the value matches.
       #

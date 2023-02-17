@@ -6,8 +6,8 @@ module Mongoid
 
       # Returns whether a document satisfies a $nor expression.
       #
-      # @param document [ Mongoid::Document ] document The document.
-      # @param expr [ Array<Hash> ] expr The $nor conditions.
+      # @param [ Mongoid::Document ] document The document.
+      # @param [ Array<Hash> ] expr The $nor conditions.
       #
       # @return [ true | false ] Whether the document matches.
       #

@@ -6,9 +6,9 @@ module Mongoid
 
       # Returns whether a value satisfies a $nin expression.
       #
-      # @param exists [ true | false ] exists Whether the value exists.
-      # @param value [ Object ] value The value to check.
-      # @param expr [ Array<Hash> ] condition The $nin conditions.
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Array<Hash> ] condition The $nin conditions.
       #
       # @return [ true | false ] Whether the value matches.
       #

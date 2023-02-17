@@ -6,9 +6,9 @@ module Mongoid
 
       # Returns whether a value satisfies an $ne expression.
       #
-      # @param exists [ true | false ] exists Whether the value exists.
-      # @param value [ Object ] value The value to check.
-      # @param condition [ Object ] condition The $ne condition.
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Object ] condition The $ne condition predicate.
       #
       # @return [ true | false ] Whether the value matches.
       #

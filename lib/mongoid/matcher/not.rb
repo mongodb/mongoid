@@ -6,10 +6,10 @@ module Mongoid
 
       # Returns whether a value satisfies an $not expression.
       #
-      # @param exists [ true | false ] exists Whether the value exists.
-      # @param value [ Object ] value The value to check.
-      # @param condition [ Hash | Regexp | BSON::Regexp::Raw ] condition
-      #   The $not condition.
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Hash | Regexp | BSON::Regexp::Raw ] condition
+      #   The $not condition predicate.
       #
       # @return [ true | false ] Whether the value matches.
       #
