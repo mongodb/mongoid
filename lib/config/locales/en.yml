@@ -108,6 +108,13 @@ en:
           summary: "Your mongoid.yml configuration file appears to be empty."
           resolution: "Ensure your configuration file contains the correct contents.
             Refer to: https://www.mongodb.com/docs/mongoid/current/reference/configuration/"
+        immutable_attribute:
+          message: "Attempted to change the immutable attribute '%{name}' with
+            the value: %{value}."
+          summary: "Immutable attributes can only have values set when the
+            document is a new record."
+          resolution: "Do not attempt to update the value of '%{name}' after
+            the document is persisted."
         invalid_collection:
           message: "Access to the collection for %{klass} is not allowed."
           summary: "%{klass}.collection was called, and %{klass} is an embedded
