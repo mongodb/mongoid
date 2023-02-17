@@ -3,6 +3,8 @@ Mongoid
 [![Inline docs][inch-img]][inch-url]
 ====
 
+dot
+
 Mongoid is an ODM (Object-Document Mapper) framework for MongoDB in Ruby.
 
 Documentation
@@ -39,7 +41,7 @@ Support
 License
 -------
 
-Copyright (c) 2015-Present MongoDB Inc.  
+Copyright (c) 2015-Present MongoDB Inc.
 Copyright (c) 2009-2016 Durran Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining
