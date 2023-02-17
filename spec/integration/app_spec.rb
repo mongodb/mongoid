@@ -10,6 +10,10 @@ def check_call(cmd, **opts)
   Mrss::ChildProcessHelper.check_call(cmd, **opts)
 end
 
+def gem_version_argument(version)
+  "_#{version}_" if version
+end
+
 describe 'Mongoid application tests' do
   before(:all) do
     unless SpecConfig.instance.app_tests?
@@ -91,7 +95,8 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(%W(rails new #{name} --skip-spring --skip-active-record), env: clean_env)
+      gem_version = gem_version_argument(SpecConfig.instance.installed_rails_version)
+      check_call(%W(rails #{gem_version} new #{name} --skip-spring --skip-active-record), env: clean_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults

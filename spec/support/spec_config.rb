@@ -62,4 +62,19 @@ class SpecConfig
     end
     v || '6.1'
   end
+
+  # Scrapes the output of `gem list` to find which versions of Rails are
+  # installed, and looks for first one that best matches whatever rails version
+  # was requested (see `#rails_version`).
+  #
+  # @return [ String | nil ] the version of the requested Rails install, or
+  #    nil if nothing matches.
+  def installed_rails_version
+    output = `gem list --exact rails`
+    if output =~ /^rails \((.*)\)/
+      versions = $1.split(/,\s*/)
+      rails_version_re = /^#{rails_version}(?:\..*)?$/
+      versions.detect { |v| v =~ rails_version_re }
+    end
+  end
 end
