@@ -1,8 +1,10 @@
 module Mongoid
   module Matcher
 
-    # $elemMatch argument can be a top-level expression and some specific
-    # operator combinations like $not with a regular expression.
+    # In-memory matcher used to evaluate whether an $elemMatch predicate
+    # matches and individual document. The $elemMatch predicate can be a
+    # logical expressions including $and, $or, $nor, and $not. $not can
+    # also have a regular expression predicate.
     #
     # @api private
     module ElemMatchExpression

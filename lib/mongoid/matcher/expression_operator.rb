@@ -1,6 +1,8 @@
 module Mongoid
   module Matcher
 
+    # Singleton module provides lookup of logical query operators.
+    #
     # @api private
     module ExpressionOperator
       MAP = {

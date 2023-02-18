@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $not expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/not/
+    #
     # @api private
     module Not
 

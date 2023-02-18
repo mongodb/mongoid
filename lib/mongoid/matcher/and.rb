@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $and expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/and/
+    #
     # @api private
     module And
 

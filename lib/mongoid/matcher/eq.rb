@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $eq expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/eq/
+    #
     # @api private
     module Eq
 

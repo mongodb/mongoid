@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $nor expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/nor/
+    #
     # @api private
     module Nor
 

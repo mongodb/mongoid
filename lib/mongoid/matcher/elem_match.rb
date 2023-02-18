@@ -1,13 +1,17 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $elemMatch expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/elemMatch/
+    #
     # @api private
     module ElemMatch
 
       # Returns whether a value satisfies an $elemMatch expression.
       #
       # @param [ true | false ] exists Whether the value exists.
-      # @param [ Object ] value The value to check.
+      # @param [ Object | Array<Object> ] value The value to check.
       # @param [ Hash ] expr The $elemMatch condition predicate.
       #
       # @return [ true | false ] Whether the value matches.

@@ -1,6 +1,8 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $mod expression.
+    #
     # @api private
     module Mod
       module_function def matches?(exists, value, condition)

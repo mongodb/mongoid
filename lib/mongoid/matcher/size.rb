@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $size expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/size/
+    #
     # @api private
     module Size
       module_function def matches?(exists, value, condition)

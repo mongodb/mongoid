@@ -1,6 +1,9 @@
 module Mongoid
   module Matcher
 
+    # Base singleton module used for evaluating whether a given
+    # document in-memory matches an MSQL query expression.
+    #
     # @api private
     module Expression
 

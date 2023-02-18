@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $exists expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/exists/
+    #
     # @api private
     module Exists
 

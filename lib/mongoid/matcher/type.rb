@@ -1,6 +1,8 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $type expression.
+    #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/type/
     #
     # @api private

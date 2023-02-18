@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $in expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/in/
+    #
     # @api private
     module In
 
@@ -8,7 +12,7 @@ module Mongoid
       #
       # @param [ true | false ] exists Whether the value exists.
       # @param [ Object ] value The value to check.
-      # @param [ Array<Hash> ] condition The $in conditions.
+      # @param [ Array<Object> ] condition The $in condition predicate.
       #
       # @return [ true | false ] Whether the value matches.
       #

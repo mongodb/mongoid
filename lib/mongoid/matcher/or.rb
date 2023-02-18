@@ -1,6 +1,10 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $or expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/or/
+    #
     # @api private
     module Or
 
