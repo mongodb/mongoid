@@ -36,7 +36,7 @@ module Mongoid
       end
 
       def destroy!(options = {})
-        destroy || raise(Errors::DocumentNotDestroyed.new(_id, self.class))
+        destroy(options) || raise(Errors::DocumentNotDestroyed.new(_id, self.class))
       end
 
       module ClassMethods
