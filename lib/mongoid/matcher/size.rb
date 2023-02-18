@@ -7,6 +7,17 @@ module Mongoid
     #
     # @api private
     module Size
+
+      # Returns whether a value satisfies a $size expression.
+      #
+      # @param [ true | false ] exists Not used.
+      # @param [ Numeric ] value The value to check.
+      # @param [ Integer | Array<Object> ] condition The $size condition
+      #   predicate, either a non-negative Integer or an Array to match size.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         case condition
         when Float

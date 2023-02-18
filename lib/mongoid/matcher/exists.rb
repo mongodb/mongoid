@@ -12,7 +12,7 @@ module Mongoid
       #
       # @param [ true | false ] exists Whether the value exists.
       # @param [ Object ] value Not used.
-      # @param [ Array<Hash> ] condition The $exists condition.
+      # @param [ true | false ] condition The $exists condition predicate.
       #
       # @return [ true | false ] Whether the existence condition is met.
       #

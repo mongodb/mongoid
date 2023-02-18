@@ -10,9 +10,9 @@ module Mongoid
 
       # Returns whether a value satisfies an $all expression.
       #
-      # @param [ true | false ] exists Whether the value exists.
+      # @param [ true | false ] exists Not used.
       # @param [ Object ] value The value to check.
-      # @param [ Array<Hash> ] condition The $all conditions.
+      # @param [ Array<Object> ] condition The $all condition predicate.
       #
       # @return [ true | false ] Whether the value matches.
       #

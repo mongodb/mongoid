@@ -10,7 +10,7 @@ module Mongoid
 
       # Returns whether a value satisfies an $in expression.
       #
-      # @param [ true | false ] exists Whether the value exists.
+      # @param [ true | false ] exists Not used.
       # @param [ Object ] value The value to check.
       # @param [ Array<Object> ] condition The $in condition predicate.
       #

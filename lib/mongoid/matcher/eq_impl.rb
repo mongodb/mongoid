@@ -12,7 +12,7 @@ module Mongoid
 
       # Returns whether a value satisfies an $eq (or similar) expression.
       #
-      # @param [ true | false ] exists Whether the value exists.
+      # @param [ true | false ] exists Not used.
       # @param [ Object ] value The value to check.
       # @param [ Object | Range ] condition The equality condition predicate.
       # @param [ String ] original_operator Operator to use in exception messages.
