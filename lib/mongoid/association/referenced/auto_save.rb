@@ -4,6 +4,9 @@ module Mongoid
   module Association
     module Referenced
 
+      # Mixin module included into Mongoid::Document which adds
+      # the ability to automatically save opposite-side documents
+      # in referenced associations when saving the subject document.
       module AutoSave
         extend ActiveSupport::Concern
 

@@ -5,13 +5,13 @@ module Mongoid
     module Referenced
       class HasAndBelongsToMany
 
-        # Transparent proxy for has_and_belongs_to_many (many-to-many)
-        # associations. An instance of this class is returned when
-        # calling the association getter method on the subject document.
+        # Transparent proxy for has_and_belongs_to_many associations.
+        # An instance of this class is returned when calling
+        # the association getter method on the subject document.
         # This class inherits from Mongoid::Association::Proxy and
         # forwards most of its methods to the _target of the association,
-        # i.e. the documents on the opposite-side collection which must be
-        # loaded.
+        # i.e. the array of documents on the opposite-side collection
+        # which must be loaded.
         class Proxy < Referenced::HasMany::Proxy
 
           # Appends a document or array of documents to the association. Will set

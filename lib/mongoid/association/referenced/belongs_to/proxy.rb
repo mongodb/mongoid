@@ -5,11 +5,10 @@ module Mongoid
     module Referenced
       class BelongsTo
 
-        # Transparent proxy for belong_to associations, which includes
-        # both one-to-one and one-to-many relationships where the subject
-        # document stores the foreign key. An instance of this class is
-        # returned when calling the association getter method on the subject
-        # document. This class inherits from Mongoid::Association::Proxy and
+        # Transparent proxy for belong_to associations.
+        # An instance of this class is returned when calling the
+        # association getter method on the subject document.
+        # This class inherits from Mongoid::Association::Proxy and
         # forwards most of its methods to the _target of the association,
         # i.e. the document on the opposite-side collection which must
         # be loaded.
