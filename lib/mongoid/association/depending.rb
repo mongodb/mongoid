@@ -19,6 +19,12 @@ module Mongoid
       end
 
       class_methods do
+
+        # Returns all dependent association metadata objects.
+        #
+        # @return [ Array<Mongoid::Association::Relatable> ] The dependent
+        #   association metadata.
+        #
         # @api private
         def _all_dependents
           superclass_dependents = superclass.respond_to?(:_all_dependents) ? superclass._all_dependents : []

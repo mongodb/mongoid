@@ -381,11 +381,20 @@ module Mongoid
       modified_documents[session].clear
     end
 
+    # Returns the thread store of sessions.
+    #
+    # @return [ Hash<Integer, Set> ] The sessions indexed by client object ID.
+    #
     # @api private
     def sessions
       Thread.current[SESSIONS_KEY] ||= {}
     end
 
+    # Returns the thread store of modified documents.
+    #
+    # @return [ Hash<Mongo::Session, Set<Mongoid::Document>> ] The modified
+    #   documents indexed by session.
+    #
     # @api private
     def modified_documents
       Thread.current[MODIFIED_DOCUMENTS_KEY] ||= Hash.new do |h, k|
