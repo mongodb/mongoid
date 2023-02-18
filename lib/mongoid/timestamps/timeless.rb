@@ -34,6 +34,10 @@ module Mongoid
         self
       end
 
+      # Returns whether the document should skip timestamping.
+      #
+      # @return [ true | false ] Whether the document should
+      #   skip timestamping.
       def timeless?
         self.class.timeless?
       end
@@ -41,6 +45,12 @@ module Mongoid
       class << self
         extend Forwardable
 
+        # Returns the in-memory thread cache of classes
+        # for which to skip timestamping.
+        #
+        # @return [ Hash ] The timeless table.
+        #
+        # @api private
         def timeless_table
           Thread.current['[mongoid]:timeless'] ||= Hash.new
         end
@@ -66,6 +76,9 @@ module Mongoid
           self
         end
 
+        # Removes the timeless option on the current class.
+        #
+        # @return [ true ] Always true.
         def clear_timeless_option
           if counter = Timeless[name]
             counter -= 1
@@ -74,6 +87,10 @@ module Mongoid
           true
         end
 
+        # Sets to remove the timeless option when the next
+        # instance of the current class is updated.
+        #
+        # @return [ true ] Always true.
         def clear_timeless_option_on_update
           if counter = Timeless[name]
             counter -= 1 if self < Mongoid::Timestamps::Created
@@ -82,10 +99,21 @@ module Mongoid
           end
         end
 
+        # Clears the timeless counter for the current class
+        # if the value has reached zero.
+        #
+        # @param [ Integer ] counter The counter value.
+        #
+        # @return [ Integer | nil ] The counter value, or nil
+        #   if the counter was cleared.
         def set_timeless_counter(counter)
           Timeless[name] = (counter == 0) ? nil : counter
         end
 
+        # Returns whether the current class should skip timestamping.
+        #
+        # @return [ true | false ] Whether the current class should
+        #   skip timestamping.
         def timeless?
           !!Timeless[name]
         end

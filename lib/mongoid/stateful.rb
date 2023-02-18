@@ -2,12 +2,17 @@
 
 module Mongoid
 
-  # This module contains the behavior for getting the various states a
-  # document can transition through.
+  # Mixin module included into Mongoid::Document which adds behavior for
+  # getting the various lifecycle states a document can transition through.
   module Stateful
 
     attr_writer :destroyed, :flagged_for_destroy, :previously_new_record
 
+    # Sets whether the document has been persisted to the database.
+    #
+    # @param [ true | false ] new_value The value to set.
+    #
+    # @return [ true | false ] The set value.
     def new_record=(new_value)
       @new_record ||= false
       if @new_record && !new_value
@@ -16,7 +21,7 @@ module Mongoid
       @new_record = new_value
     end
 
-    # Returns true if the +Document+ has not been persisted to the database,
+    # Returns true if the document has not been persisted to the database,
     # false if it has. This is determined by the variable @new_record
     # and NOT if the object has an id.
     #
