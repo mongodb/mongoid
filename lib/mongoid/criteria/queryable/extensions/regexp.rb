@@ -33,6 +33,7 @@ module Mongoid
             end
           end
 
+          # Adds query type-casting behavior to BSON::Regexp::Raw class.
           module Raw_
 
             # Is the object a regexp?

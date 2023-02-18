@@ -2,6 +2,10 @@
 
 module Mongoid
   class Criteria
+
+    # Mixin module for Mongoid::Criteria which adds the ability
+    # to build or create new documents with attributes initialized
+    # to the conditions of the criteria.
     module Modifiable
 
       # @attribute [r] create_attrs Additional attributes to add to the Document upon creation.

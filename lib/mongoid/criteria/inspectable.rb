@@ -2,6 +2,9 @@
 
 module Mongoid
   class Criteria
+
+    # Mixin module included in Mongoid::Criteria which adds custom
+    # +#inspect+ method functionality.
     module Inspectable
 
       # Get a pretty string representation of the criteria, including the
