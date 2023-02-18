@@ -35,6 +35,18 @@ module Mongoid
         result
       end
 
+      # Remove the document from the database with callbacks.
+      # Raises an error if the document was not destroyed.
+      #
+      # @example Destroy a document.
+      #   document.destroy!
+      #
+      # @param [ Hash ] options Options to pass to destroy.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotDestroyed ] Raised if
+      #   the document was not destroyed.
+      #
+      # @return [ true ] Always returns true.
       def destroy!(options = {})
         destroy || raise(Errors::DocumentNotDestroyed.new(_id, self.class))
       end

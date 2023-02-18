@@ -105,6 +105,13 @@ module Mongoid
       end
     end
 
+    # Get the client name for this persistence context.
+    #
+    # @example Get the client name for this persistence context.
+    #   context.client_name
+    #
+    # @return [ Symbol ] The client name for this persistence
+    #   context.
     def client_name
       @client_name ||= options[:client] ||
                          Threaded.client_override ||
