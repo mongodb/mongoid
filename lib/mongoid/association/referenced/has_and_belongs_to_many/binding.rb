@@ -49,6 +49,11 @@ module Mongoid
           end
 
           # Find the inverse id referenced by inverse_keys
+          #
+          # @param [ Mongoid::Document ] doc The document for which
+          #   to determine the inverse id.
+          #
+          # @return [ BSON::ObjectId ] The inverse id.
           def inverse_record_id(doc)
             if pk = _association.options[:inverse_primary_key]
               _base.send(pk)
@@ -62,6 +67,12 @@ module Mongoid
             end
           end
 
+          # Find the inverse association given a document.
+          #
+          # @param [ Mongoid::Document ] doc The document for which
+          #   to determine the inverse association.
+          #
+          # @return [ Mongoid::Association::Relatable ] The inverse association.
           def determine_inverse_association(doc)
             doc.relations[_base.class.name.demodulize.underscore.pluralize]
           end

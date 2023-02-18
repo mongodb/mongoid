@@ -9,7 +9,7 @@ module Mongoid
         # An instance of this class is returned when calling the
         # association getter method on the subject document. This class
         # inherits from Mongoid::Association::Proxy and forwards most of
-        # its methods to the _target of the association, i.e. the
+        # its methods to the target of the association, i.e. the
         # document on the opposite-side collection which must be loaded.
         class Proxy < Association::One
 
@@ -90,6 +90,15 @@ module Mongoid
 
           class << self
 
+            # Get the Eager object for this type of association.
+            #
+            # @example Get the eager loader object
+            #
+            # @param [ Association ] association The association object.
+            # @param [ Array<Document> ] docs The array of documents.
+            #
+            # @return [ Mongoid::Association::Referenced::HasOne::Eager ]
+            #   The eager loader.
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end
