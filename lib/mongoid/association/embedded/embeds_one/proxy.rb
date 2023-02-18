@@ -5,6 +5,12 @@ module Mongoid
     module Embedded
       class EmbedsOne
 
+        # Transparent proxy for embeds_many associations, the relation
+        # of a parent document to a single embedded child. An instance
+        # of this class is returned when calling the association getter
+        # method on the parent document. This class inherits from
+        # Mongoid::Association::Proxy and forwards most of its methods
+        # to the _target of the association, i.e. the child document.
         class Proxy < Association::One
 
           # The valid options when defining this association.
