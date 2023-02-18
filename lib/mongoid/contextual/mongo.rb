@@ -10,6 +10,10 @@ require "mongoid/association/eager_loadable"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on documents which are persisted in the database and
+    # have not been loaded into application memory.
     class Mongo
       extend Forwardable
       include Enumerable
