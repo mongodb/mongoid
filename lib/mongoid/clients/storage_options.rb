@@ -2,6 +2,10 @@
 
 module Mongoid
   module Clients
+
+    # Mixin module included into Mongoid::Document which adds
+    # the ability to set the collection in which to store the
+    # document by default.
     module StorageOptions
       extend ActiveSupport::Concern
 

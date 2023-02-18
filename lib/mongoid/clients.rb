@@ -7,6 +7,10 @@ require "mongoid/clients/options"
 require "mongoid/clients/sessions"
 
 module Mongoid
+
+  # Mixin module included into Mongoid::Document which adds
+  # database client connection functionality. Also contains
+  # singleton class methods related to managing database clients.
   module Clients
     extend ActiveSupport::Concern
     include StorageOptions
@@ -47,7 +51,9 @@ module Mongoid
         end
       end
 
-      # Get a client with the provided name.
+      # Get a stored client with the provided name. If no client exists
+      # with the given name, a new one will be created, stored, and
+      # returned.
       #
       # @example Get a client with the name.
       #   Mongoid::Clients.with_name(:replica)
@@ -63,10 +69,22 @@ module Mongoid
         end
       end
 
+      # Store a client with the provided name.
+      #
+      # @example Set a client.
+      #   Mongoid::Clients.set(:analytics, my_client)
+      #
+      # @param [ String | Symbol ] name The name of the client to set.
+      # @param [ Mongo::Client ] client The client to set.
+      #
+      # @return [ Mongo::Client ] The set client.
       def set(name, client)
         clients[name.to_sym] = client
       end
 
+      # Returns the stored clients indexed by name.
+      #
+      # @return [ Hash<Symbol, Mongo::Client> ] The index of clients.
       def clients
         @clients ||= {}
       end
