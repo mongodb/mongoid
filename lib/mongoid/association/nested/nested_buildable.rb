@@ -3,6 +3,10 @@
 module Mongoid
   module Association
     module Nested
+
+      # Mixin module containing common functionality used to
+      # perform #accepts_nested_attributes_for attribute assignment
+      # on associations.
       module Buildable
 
         attr_accessor :attributes, :existing, :association, :options

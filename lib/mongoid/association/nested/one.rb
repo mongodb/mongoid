@@ -3,11 +3,13 @@
 module Mongoid
   module Association
     module Nested
+
+      # Builder class used to perform #accepts_nested_attributes_for
+      # attribute assignment on one-to-n associations.
       class One
         include Buildable
 
         attr_accessor :destroy
-
 
         # Builds the association depending on the attributes and the options
         # passed to the macro.

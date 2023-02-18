@@ -66,8 +66,13 @@ Rails/RedundantPresenceValidationOnBelongsTo:
   Enabled: false
 
 Style/Documentation:
-  Enabled: true
+  Enabled: true # remove when "Style" cop is globally enabled
   Include:
     - 'lib/**/*'
   AllowedConstants:
     - ClassMethods
+
+Style/DocumentationMethod:
+  Enabled: true # remove when "Style" cop is globally enabled
+  Include:
+    - 'lib/**/*'
