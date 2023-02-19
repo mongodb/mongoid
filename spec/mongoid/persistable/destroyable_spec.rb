@@ -57,7 +57,7 @@ describe Mongoid::Persistable::Destroyable do
       end
     end
 
-    context "when removing a root document" do
+    context "when destroying a root document" do
 
       let!(:destroyed) do
         person.destroy
@@ -76,9 +76,28 @@ describe Mongoid::Persistable::Destroyable do
       it "resets the flagged for destroy flag" do
         expect(person).to_not be_flagged_for_destroy
       end
+
+      context 'when :persist option false' do
+
+        let!(:destroyed) do
+          person.destroy(persist: false)
+        end
+
+        it "does not destroy the document from the collection" do
+          expect(Person.find(person.id)).to eq person
+        end
+
+        it "returns true" do
+          expect(destroyed).to be true
+        end
+
+        it "does not set the flagged for destroy flag" do
+          expect(person).to_not be_flagged_for_destroy
+        end
+      end
     end
 
-    context "when removing an embedded document" do
+    context "when destroying an embedded document" do
 
       let(:address) do
         person.addresses.build(street: "Bond Street")
@@ -114,12 +133,59 @@ describe Mongoid::Persistable::Destroyable do
           Person.find(person.id)
         end
 
-        it "removes the object from the parent and database" do
+        it "removes the object from the parent" do
+          expect(person.addresses).to be_empty
+        end
+
+        it "removes the object from the database" do
           expect(from_db.addresses).to be_empty
         end
       end
 
-      context 'when removing from a list of embedded documents' do
+      context 'when :persist option false' do
+
+        before do
+          address.save!
+          address.destroy(persist: false)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not remove the object from the parent" do
+          expect(person.addresses).to eq [address]
+          expect(person.addresses.first).to_not be_flagged_for_destroy
+        end
+
+        it "does not remove the object from the database" do
+          expect(from_db.addresses).to eq [address]
+          expect(from_db.addresses.first).to_not be_flagged_for_destroy
+        end
+      end
+
+      context 'when :suppress option true' do
+
+        before do
+          address.save!
+          address.destroy(suppress: true)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not remove the object from the parent" do
+          expect(person.addresses).to eq [address]
+          expect(person.addresses.first).to_not be_flagged_for_destroy
+        end
+
+        it "removes the object from the database" do
+          expect(from_db.addresses).to be_empty
+        end
+      end
+
+      context 'when destroying from a list of embedded documents' do
 
         context 'when the embedded documents list is reversed in memory' do
 
@@ -149,7 +215,7 @@ describe Mongoid::Persistable::Destroyable do
       end
     end
 
-    context "when removing deeply embedded documents" do
+    context "when destroying deeply embedded documents" do
 
       context "when the document has been saved" do
 
@@ -266,11 +332,11 @@ describe Mongoid::Persistable::Destroyable do
 
   describe "#destroy!" do
 
-    context "when no validation callback returns false" do
+    let(:person) do
+      Person.create!
+    end
 
-      let(:person) do
-        Person.create!
-      end
+    context "when no validation callback returns false" do
 
       it "returns true" do
         expect(person.destroy!).to eq(true)
@@ -295,6 +361,149 @@ describe Mongoid::Persistable::Destroyable do
         expect {
           album.destroy!
         }.to raise_error(Mongoid::Errors::DocumentNotDestroyed)
+      end
+    end
+
+    context 'when destroying a document that was not saved' do
+      let(:unsaved_person) { Person.new(id: person.id) }
+
+      before do
+        unsaved_person.destroy!
+      end
+
+      it 'deletes the matching document from the database' do
+        lambda do
+          person.reload
+        end.should raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
+      end
+    end
+
+    context "when destroying a root document" do
+
+      let!(:destroyed) do
+        person.destroy!
+      end
+
+      it "destroys the document from the collection" do
+        expect {
+          Person.find(person.id)
+        }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
+      end
+
+      it "returns true" do
+        expect(destroyed).to be true
+      end
+
+      it "resets the flagged for destroy flag" do
+        expect(person).to_not be_flagged_for_destroy
+      end
+
+      context 'when :persist option false' do
+
+        let!(:destroyed) do
+          person.destroy!(persist: false)
+        end
+
+        it "does not destroy the document from the collection" do
+          expect(Person.find(person.id)).to eq person
+        end
+
+        it "returns true" do
+          expect(destroyed).to be true
+        end
+
+        it "does not set the flagged for destroy flag" do
+          expect(person).to_not be_flagged_for_destroy
+        end
+      end
+    end
+
+    context "when destroying an embedded document" do
+
+      let(:address) do
+        person.addresses.build(street: "Bond Street")
+      end
+
+      context "when the document is not yet saved" do
+
+        before do
+          address.destroy!
+        end
+
+        it "removes the document from the parent" do
+          expect(person.addresses).to be_empty
+        end
+
+        it "removes the attributes from the parent" do
+          expect(person.raw_attributes["addresses"]).to be_nil
+        end
+
+        it "resets the flagged for destroy flag" do
+          expect(address).to_not be_flagged_for_destroy
+        end
+      end
+
+      context "when the document has been saved" do
+
+        before do
+          address.save!
+          address.destroy!
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "removes the object from the parent" do
+          expect(person.addresses).to be_empty
+        end
+
+        it "removes the object from the database" do
+          expect(from_db.addresses).to be_empty
+        end
+      end
+
+      context 'when :persist option false' do
+
+        before do
+          address.save!
+          address.destroy!(persist: false)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not remove the object from the parent" do
+          expect(person.addresses).to eq [address]
+          expect(person.addresses.first).to_not be_flagged_for_destroy
+        end
+
+        it "does not remove the object from the database" do
+          expect(from_db.addresses).to eq [address]
+          expect(from_db.addresses.first).to_not be_flagged_for_destroy
+        end
+      end
+
+      context 'when :suppress option true' do
+
+        before do
+          address.save!
+          address.destroy!(suppress: true)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not remove the object from the parent" do
+          expect(person.addresses).to eq [address]
+          expect(person.addresses.first).to_not be_flagged_for_destroy
+        end
+
+        it "removes the object from the database" do
+          expect(from_db.addresses).to be_empty
+        end
       end
     end
   end
@@ -361,7 +570,7 @@ describe Mongoid::Persistable::Destroyable do
       end
     end
 
-    context 'when removing a list of embedded documents' do
+    context 'when destroying a list of embedded documents' do
 
       context 'when the embedded documents list is reversed in memory' do
 
