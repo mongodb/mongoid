@@ -100,6 +100,7 @@ end
 class EmmOrder
   include Mongoid::Document
 
+  field :sku
   field :amount, type: Integer
 
   embedded_in :user, class_name: 'EmmUser'

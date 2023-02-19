@@ -151,6 +151,13 @@ module Mongoid
     # reload, but when it is turned off, it won't be.
     option :legacy_readonly, default: true
 
+    # When this flag is true, any attempt to change the _id of a persisted
+    # document will raise an exception (`Errors::ImmutableAttribute`).
+    # This will be the default in 9.0. When this flag is false (the default
+    # in 8.x), changing the _id of a persisted document might be ignored,
+    # or it might work, depending on the situation.
+    option :immutable_ids, default: false
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.

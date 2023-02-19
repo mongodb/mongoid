@@ -46,7 +46,7 @@ module Mongoid
         end
       end
 
-      # Per https://docs.mongodb.com/ruby-driver/current/tutorials/bson-v4/#time-instances,
+      # Per https://www.mongodb.com/docs/ruby-driver/current/tutorials/bson-v4/#time-instances,
       # > Times in BSON (and MongoDB) can only have millisecond precision. When Ruby Time instances
       # are serialized to BSON or Extended JSON, the times are floored to the nearest millisecond.
       #

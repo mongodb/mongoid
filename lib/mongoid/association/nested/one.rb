@@ -32,6 +32,8 @@ module Mongoid
             parent.send(association.setter, Factory.build(@class_name, attributes))
           elsif delete?
             parent.send(association.setter, nil)
+          else
+            check_for_id_violation!
           end
         end
 
@@ -54,6 +56,17 @@ module Mongoid
 
         private
 
+        # Extracts and converts the id to the expected type.
+        #
+        # @return [ BSON::ObjectId | String | Object | nil ] The converted id,
+        #   or nil if no id is present in the attributes hash.
+        def extracted_id
+          @extracted_id ||= begin
+            id = association.klass.extract_id_field(attributes)
+            convert_id(existing.class, id)
+          end
+        end
+
         # Is the id in the attributes acceptable for allowing an update to
         # the existing association?
         #
@@ -64,8 +77,7 @@ module Mongoid
         #
         # @return [ true | false ] If the id part of the logic will allow an update.
         def acceptable_id?
-          id = association.klass.extract_id_field(attributes)
-          id = convert_id(existing.class, id)
+          id = extracted_id
           existing._id == id || id.nil? || (existing._id != id && update_only?)
         end
 
@@ -109,6 +121,32 @@ module Mongoid
         # @return [ true | false ] If the object should have its attributes updated.
         def update?
           existing && !destroyable? && acceptable_id?
+        end
+
+        # Checks to see if the _id attribute (which is supposed to be
+        # immutable) is being asked to change. If so, raise an exception.
+        #
+        # If Mongoid::Config.immutable_ids is false, this will do nothing,
+        # and the update operation will fail silently.
+        #
+        # @raise [ Errors::ImmutableAttribute ] if _id has changed, and
+        #   the document has been persisted.
+        def check_for_id_violation!
+          # look for the basic criteria of an update (see #update?)
+          return unless existing&.persisted? && !destroyable?
+
+          # if the id is either absent, or if it equals the existing record's
+          # id, there is no immutability violation.
+          id = extracted_id
+          return if existing._id == id || id.nil?
+
+          # otherwise, an attempt has been made to set the _id of an existing,
+          # persisted document.
+          if Mongoid::Config.immutable_ids
+            raise Errors::ImmutableAttribute.new(:_id, id)
+          else
+            Mongoid::Warnings.warn_mutable_ids
+          end
         end
       end
     end

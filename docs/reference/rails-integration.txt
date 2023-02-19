@@ -61,7 +61,7 @@ Controller Runtime Instrumentation
 
 Mongoid provides time spent executing MongoDB commands (obtained via a
 driver command monitoring subscription) to Rails' instrumentation event
-`process_action.action_controller`. This time is logged together with view
+``process_action.action_controller``. This time is logged together with view
 time like so:
 
 .. code-block:: none
