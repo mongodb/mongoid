@@ -473,7 +473,8 @@ module Mongoid
         name = klass.cleanse_localized_field_names(field)
         is_translation = "#{name}_translations" == field.to_s
 
-        # Must add a $project stage when using $unwind with nested fields
+        # Must add a $project stage when using $unwind with nested fields.
+        # See: https://jira.mongodb.org/browse/SERVER-59713
         projected = 'p' if splat_arrays && (is_translation || name.include?('.'))
 
         fld = klass.traverse_association_tree(name)
