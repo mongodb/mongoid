@@ -14,6 +14,11 @@ def gem_version_argument(version)
   "_#{version}_" if version
 end
 
+def insert_rails_gem_version(cmd)
+  gem_version = gem_version_argument(SpecConfig.instance.installed_rails_version)
+  cmd.tap { cmd[1,0] = gem_version if gem_version }
+end
+
 describe 'Mongoid application tests' do
   before(:all) do
     unless SpecConfig.instance.app_tests?
@@ -95,8 +100,7 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      gem_version = gem_version_argument(SpecConfig.instance.installed_rails_version)
-      check_call(%W(rails #{gem_version} new #{name} --skip-spring --skip-active-record), env: clean_env)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --skip-spring --skip-active-record)), env: clean_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
