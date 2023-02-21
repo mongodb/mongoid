@@ -140,6 +140,10 @@ RSpec.configure do |config|
   config.extend(Constraints)
   config.extend(Mongoid::Macros)
 
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+
   config.before(:suite) do
     Mongoid.purge!
   end
