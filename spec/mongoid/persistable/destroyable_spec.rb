@@ -51,9 +51,7 @@ describe Mongoid::Persistable::Destroyable do
       end
 
       it 'deletes the matching document from the database' do
-        lambda do
-          person.reload
-        end.should raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
+        expect { person.reload }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
       end
     end
 
@@ -279,9 +277,7 @@ describe Mongoid::Persistable::Destroyable do
 
           it 'raises an exception' do
             Sealer.count.should == 1
-            lambda do
-              parent.destroy
-            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            expect { parent.destroy }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Sealer.count.should == 1
           end
         end
@@ -320,9 +316,7 @@ describe Mongoid::Persistable::Destroyable do
 
           it 'raises an exception' do
             Spacer.count.should == 1
-            lambda do
-              parent.destroy
-            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            expect { parent.destroy }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Spacer.count.should == 1
           end
         end
@@ -372,9 +366,7 @@ describe Mongoid::Persistable::Destroyable do
       end
 
       it 'deletes the matching document from the database' do
-        lambda do
-          person.reload
-        end.should raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
+        expect { person.reload }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Person with id\(s\)/)
       end
     end
 
@@ -631,9 +623,7 @@ describe Mongoid::Persistable::Destroyable do
 
           it 'raises an exception' do
             Sealer.count.should == 1
-            lambda do
-              Hole.destroy_all
-            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            expect { Hole.destroy_all }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Sealer.count.should == 1
           end
         end
@@ -672,9 +662,7 @@ describe Mongoid::Persistable::Destroyable do
 
           it 'raises an exception' do
             Spacer.count.should == 1
-            lambda do
-              Hole.destroy_all
-            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            expect { Hole.destroy_all }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Spacer.count.should == 1
           end
         end
