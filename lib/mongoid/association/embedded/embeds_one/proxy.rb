@@ -83,6 +83,15 @@ module Mongoid
               unbind_one
               unless replacement
                 update_attributes_hash(replacement)
+
+                # when `touch: true` is the default (see MONGOID-5016), creating
+                # an embedded document will touch the parent, and will cause the
+                # _descendants list to be initialized and memoized. If the object
+                # is then deleted, we need to make sure and un-memoize that list,
+                # otherwise when the update happens, the memoized _descendants list
+                # gets used and the "deleted" subdocument gets added again.
+                _reset_memoized_descendants!
+
                 return nil
               end
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
