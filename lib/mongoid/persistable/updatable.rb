@@ -102,17 +102,18 @@ module Mongoid
           invalid?(options[:context] || :update)
         process_flagged_destroys
         update_children = cascadable_children(:update)
-        process_touch_option(options, update_children)
-        run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
-          run_callbacks(:save, with_children: false) do
-            run_callbacks(:update, with_children: false) do
-              run_callbacks(:persist_parent, with_children: false) do
-                _mongoid_run_child_callbacks(:save) do
-                  _mongoid_run_child_callbacks(:update, children: update_children) do
-                    result = yield(self)
-                    self.previously_new_record = false
-                    post_process_persist(result, options)
-                    true
+        process_touch_option(options, update_children) do
+          run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
+            run_callbacks(:save, with_children: false) do
+              run_callbacks(:update, with_children: false) do
+                run_callbacks(:persist_parent, with_children: false) do
+                  _mongoid_run_child_callbacks(:save) do
+                    _mongoid_run_child_callbacks(:update, children: update_children) do
+                      result = yield(self)
+                      self.previously_new_record = false
+                      post_process_persist(result, options)
+                      true
+                    end
                   end
                 end
               end
@@ -182,9 +183,12 @@ module Mongoid
       # @option options [ true | false ] :touch Whether or not the updated_at
       #   attribute will be updated with the current time.
       def process_touch_option(options, children)
-        unless options.fetch(:touch, true)
+        if options.fetch(:touch, true)
+          yield
+        else
           timeless
           children.each(&:timeless)
+          suppress_touch_callbacks { yield }
         end
       end
 
