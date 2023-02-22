@@ -1500,11 +1500,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           fresh_movie
 
           expect_query(1) do
-            fresh_movie.ratings.any?.should be expected_result
+            expect(fresh_movie.ratings.any?).to be expected_result
           end
 
           expect_query(1) do
-            fresh_movie.ratings.any?.should be expected_result
+            expect(fresh_movie.ratings.any?).to be expected_result
           end
         end
 
@@ -1513,11 +1513,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             fresh_movie
 
             expect_query(1) do
-              fresh_movie.ratings.any? { false }.should be false
+              expect(fresh_movie.ratings.any? { false }).to be false
             end
 
             expect_no_queries do
-              fresh_movie.ratings.any? { false }.should be false
+              expect(fresh_movie.ratings.any? { false }).to be false
             end
           end
         end
@@ -1528,13 +1528,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           fresh_movie
 
           expect_query(1) do
-            fresh_movie.ratings.any?.should be expected_result
+            expect(fresh_movie.ratings.any?).to be expected_result
           end
 
           fresh_movie.ratings.to_a
 
           expect_no_queries do
-            fresh_movie.ratings.any?.should be expected_result
+            expect(fresh_movie.ratings.any?).to be expected_result
           end
         end
       end
@@ -1593,12 +1593,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       context 'when association is not loaded' do
         before do
-          movie.ratings._loaded?.should be false
+          expect(movie.ratings._loaded?).to be false
         end
 
         it 'does not query the database because it knows about the added models' do
           expect_no_queries do
-            movie.ratings.any?.should be true
+            expect(movie.ratings.any?).to be true
           end
         end
       end
@@ -1606,13 +1606,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context 'when association is loaded' do
         it 'does not query database' do
           expect_no_queries do
-            movie.ratings.any?.should be true
+            expect(movie.ratings.any?).to be true
           end
 
           movie.ratings.to_a
 
           expect_no_queries do
-            movie.ratings.any?.should be true
+            expect(movie.ratings.any?).to be true
           end
         end
       end
@@ -2385,11 +2385,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context 'when association is not loaded' do
         it 'queries database on each call' do
           expect_query(1) do
-            person.posts.exists?.should be true
+            expect(person.posts.exists?).to be true
           end
 
           expect_query(1) do
-            person.posts.exists?.should be true
+            expect(person.posts.exists?).to be true
           end
         end
       end
@@ -2397,13 +2397,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context 'when association is loaded' do
         it 'queries database on each call' do
           expect_query(1) do
-            person.posts.exists?.should be true
+            expect(person.posts.exists?).to be true
           end
 
           person.posts.to_a
 
           expect_query(1) do
-            person.posts.exists?.should be true
+            expect(person.posts.exists?).to be true
           end
         end
       end
@@ -2422,11 +2422,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context 'when association is not loaded' do
         it 'queries database on each call' do
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
 
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
         end
       end
@@ -2434,13 +2434,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context 'when association is loaded' do
         it 'queries database on each call' do
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
 
           person.posts.to_a
 
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
         end
       end
@@ -2455,11 +2455,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context 'when association is not loaded' do
         it 'queries database on each call' do
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
 
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
         end
       end
@@ -2467,13 +2467,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       context 'when association is loaded' do
         it 'queries database on each call' do
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
 
           person.posts.to_a
 
           expect_query(1) do
-            person.posts.exists?.should be false
+            expect(person.posts.exists?).to be false
           end
         end
       end

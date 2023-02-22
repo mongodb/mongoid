@@ -119,7 +119,7 @@ describe Mongoid::Atomic::Paths do
         end
 
         before do
-          person.should be_persisted
+          expect(person).to be_persisted
         end
 
         it "returns the association with id.atomic_selector" do
@@ -131,7 +131,7 @@ describe Mongoid::Atomic::Paths do
 
       context 'when the parent is not persisted' do
         before do
-          person.should be_new_record
+          expect(person).to be_new_record
         end
 
         it "returns the association with id.atomic_selector" do
@@ -156,7 +156,7 @@ describe Mongoid::Atomic::Paths do
         end
 
         before do
-          person.should be_persisted
+          expect(person).to be_persisted
         end
 
         it "returns the JSON notation to the document with ids" do
@@ -172,7 +172,7 @@ describe Mongoid::Atomic::Paths do
 
       context 'when the parent is not persisted' do
         before do
-          person.should be_new_record
+          expect(person).to be_new_record
         end
 
         it "returns the JSON notation to the document with ids" do

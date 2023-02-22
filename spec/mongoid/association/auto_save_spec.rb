@@ -40,7 +40,7 @@ describe Mongoid::Association::Referenced::AutoSave do
         context "when saving the parent document" do
 
           before do
-            parent.associations[:students].options[:autosave].should be_falsy
+            expect(parent.associations[:students].options[:autosave]).to be_falsy
 
             parent.save!
           end
@@ -68,7 +68,7 @@ describe Mongoid::Association::Referenced::AutoSave do
         context "when saving the parent document" do
 
           before do
-            parent.associations[:accreditation].options[:autosave].should be_falsy
+            expect(parent.associations[:accreditation].options[:autosave]).to be_falsy
 
             parent.save!
           end

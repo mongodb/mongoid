@@ -165,8 +165,8 @@ describe Mongoid::Config::Environment do
           end
 
           it 'loads successfully' do
-            subject.should be_a(Hash)
-            subject.fetch('clients').fetch('default').fetch('options').fetch('auto_encryption_options').fetch('schema_map').should be_a(Hash)
+            expect(subject).to be_a(Hash)
+            expect(subject.fetch('clients').fetch('default').fetch('options').fetch('auto_encryption_options').fetch('schema_map')).to be_a(Hash)
           end
         end
       end

@@ -71,7 +71,7 @@ describe Mongoid::Contextual::Aggregable::Memory do
       end
 
       it 'returns a float' do
-        avg.should be_a(Float)
+        expect(avg).to be_a(Float)
       end
 
       context 'when integers are negative' do
@@ -85,7 +85,7 @@ describe Mongoid::Contextual::Aggregable::Memory do
         end
 
         it 'returns a float' do
-          avg.should be_a(Float)
+          expect(avg).to be_a(Float)
         end
       end
     end
@@ -413,11 +413,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
       shared_examples 'sums and returns an integer' do
         it 'sums' do
-          sum.should == 1500
+          expect(sum).to eq(1500)
         end
 
         it 'returns integer' do
-          sum.should be_a(Integer)
+          expect(sum).to be_a(Integer)
         end
       end
 
@@ -440,11 +440,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
         shared_examples 'sums and returns an integer' do
           it 'sums' do
-            sum.should == -500
+            expect(sum).to eq(-500)
           end
 
           it 'returns integer' do
-            sum.should be_a(Integer)
+            expect(sum).to be_a(Integer)
           end
         end
 
@@ -472,11 +472,11 @@ describe Mongoid::Contextual::Aggregable::Memory do
       end
 
       it 'sums' do
-        sum.should == 1500
+        expect(sum).to eq(1500)
       end
 
       it 'returns integer' do
-        sum.should be_a(Integer)
+        expect(sum).to be_a(Integer)
       end
     end
 

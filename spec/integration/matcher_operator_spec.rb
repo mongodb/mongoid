@@ -62,13 +62,13 @@ describe 'Matcher operators' do
 
             if mop_error?(spec, 'matcher')
               it 'produces an error' do
-                lambda do
+                expect do
                   document._matches?(query)
-                end.should raise_error(Mongoid::Errors::InvalidQuery)
+                end.to raise_error(Mongoid::Errors::InvalidQuery)
               end
             else
               it 'produces the correct result' do
-                document._matches?(query).should be result
+                expect(document._matches?(query)).to be result
               end
             end
           end
@@ -90,7 +90,7 @@ describe 'Matcher operators' do
                 end
               else
                 it 'produces the correct result' do
-                  Mop.collection.find(query).any?.should be result
+                  expect(Mop.collection.find(query).any?).to be result
                 end
               end
             end
@@ -110,7 +110,7 @@ describe 'Matcher operators' do
                 end
               else
                 it 'produces the correct result' do
-                  Mop.where(query).any?.should be result
+                  expect(Mop.where(query).any?).to be result
                 end
               end
             end

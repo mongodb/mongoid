@@ -713,38 +713,38 @@ describe 'Matcher' do
         end
 
         it 'does not find' do
-          band.records.where(producers: {'$elemMatch': {foo: 'bar'}}).first.should be nil
+          expect(band.records.where(producers: {'$elemMatch': {foo: 'bar'}}).first).to be nil
         end
 
         context 'primitive value query' do
 
           it 'does not find' do
-            lambda do
+            expect do
               band.records.where(producers: {'$elemMatch': 'bar'}).first
-            end.should raise_error(Mongoid::Errors::InvalidQuery, /elemMatch requires a Hash operand/)
+            end.to raise_error(Mongoid::Errors::InvalidQuery, /elemMatch requires a Hash operand/)
           end
         end
 
         context '$not with primitive value' do
 
           it 'does not find' do
-            lambda do
+            expect do
               band.records.where(producers: {'$elemMatch': {'$not': 'bar'}}).first
-            end.should raise_error(Mongoid::Errors::InvalidQuery, /\$not argument must be a Hash or a regular expression/)
+            end.to raise_error(Mongoid::Errors::InvalidQuery, /\$not argument must be a Hash or a regular expression/)
           end
         end
 
         context '$not with regexp' do
 
           it 'finds' do
-            band.records.where(producers: {'$elemMatch': {'$not': /bar/}}).count.should == 1
+            expect(band.records.where(producers: {'$elemMatch': {'$not': /bar/}}).count).to eq(1)
           end
         end
 
         context '$not with operator' do
 
           it 'finds' do
-            band.records.where(producers: {'$elemMatch': {'$not': {'$eq': 'bar'}}}).count.should == 1
+            expect(band.records.where(producers: {'$elemMatch': {'$not': {'$eq': 'bar'}}}).count).to eq(1)
           end
         end
       end
@@ -757,7 +757,7 @@ describe 'Matcher' do
         end
 
         it 'does not find' do
-          band.records.where(producers: {'$elemMatch': {foo: 'bar'}}).first.should be nil
+          expect(band.records.where(producers: {'$elemMatch': {foo: 'bar'}}).first).to be nil
         end
       end
     end

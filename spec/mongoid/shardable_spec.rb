@@ -27,51 +27,51 @@ describe Mongoid::Shardable do
     context 'when full syntax is used' do
       context 'with symbol value' do
         it 'sets shard key fields to symbol value' do
-          SmProducer.shard_key_fields.should == %i(age gender)
+          expect(SmProducer.shard_key_fields).to eq(%i(age gender))
         end
 
         it 'sets shard config' do
-          SmProducer.shard_config.should == {
+          expect(SmProducer.shard_config).to eq({
             key: {age: 1, gender: 'hashed'},
             options: {
               unique: true,
               numInitialChunks: 2,
             },
-          }
+          })
         end
 
         it 'keeps hashed as string' do
-          SmProducer.shard_config[:key][:gender].should == 'hashed'
+          expect(SmProducer.shard_config[:key][:gender]).to eq('hashed')
         end
       end
 
       context 'with string value' do
         it 'sets shard key fields to symbol value' do
-          SmActor.shard_key_fields.should == %i(age gender hello)
+          expect(SmActor.shard_key_fields).to eq(%i(age gender hello))
         end
 
         it 'sets shard config' do
-          SmActor.shard_config.should == {
+          expect(SmActor.shard_config).to eq({
             key: {age: 1, gender: 'hashed', hello: 'hashed'},
             options: {},
-          }
+          })
         end
 
         it 'sets hashed to string' do
-          SmActor.shard_config[:key][:gender].should == 'hashed'
+          expect(SmActor.shard_config[:key][:gender]).to eq('hashed')
         end
       end
 
       context 'when passed association name' do
         it 'uses foreign key as shard key in shard config' do
-          SmDriver.shard_config.should == {
+          expect(SmDriver.shard_config).to eq({
             key: {age: 1, agency_id: 'hashed'},
             options: {},
-          }
+          })
         end
 
         it 'uses foreign key as shard key in shard key fields' do
-          SmDriver.shard_key_fields.should == %i(age agency_id)
+          expect(SmDriver.shard_key_fields).to eq(%i(age agency_id))
         end
       end
     end
@@ -79,26 +79,26 @@ describe Mongoid::Shardable do
     context 'when shorthand syntax is used' do
       context 'with symbol value' do
         it 'sets shard key fields to symbol value' do
-          SmMovie.shard_key_fields.should == %i(year)
+          expect(SmMovie.shard_key_fields).to eq(%i(year))
         end
       end
 
       context 'with string value' do
         it 'sets shard key fields to symbol value' do
-          SmTrailer.shard_key_fields.should == %i(year)
+          expect(SmTrailer.shard_key_fields).to eq(%i(year))
         end
       end
 
       context 'when passed association name' do
         it 'uses foreign key as shard key in shard config' do
-          SmDirector.shard_config.should == {
+          expect(SmDirector.shard_config).to eq({
             key: {agency_id: 1},
             options: {},
-          }
+          })
         end
 
         it 'uses foreign key as shard key in shard key fields' do
-          SmDirector.shard_key_fields.should == %i(agency_id)
+          expect(SmDirector.shard_key_fields).to eq(%i(agency_id))
         end
       end
     end
@@ -140,7 +140,7 @@ describe Mongoid::Shardable do
         end
 
         it 'uses the newly set shard key value' do
-          subject.should == { 'name' => new_value }
+          expect(subject).to eq({ 'name' => new_value })
         end
       end
     end
@@ -166,7 +166,7 @@ describe Mongoid::Shardable do
         end
 
         it 'uses the existing shard key value' do
-          subject.should == { 'name' => new_value }
+          expect(subject).to eq({ 'name' => new_value })
         end
       end
     end

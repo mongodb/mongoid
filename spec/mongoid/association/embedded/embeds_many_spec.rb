@@ -873,8 +873,8 @@ describe Mongoid::Association::Embedded::EmbedsMany do
     it "has the correct inverses" do
       pending 'MONGOID-5080'
 
-      inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-      inverse_assoc.name.should == :tank
+      expect(inverse_assoc).to be_a(Mongoid::Association::Embedded::EmbeddedIn)
+      expect(inverse_assoc.name).to eq(:tank)
     end
 
     context "when embedded association is not namespaced but has class_name" do
@@ -884,8 +884,8 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       let(:inverse_assoc) { turret._association.inverse_association }
 
       it "has the correct inverses" do
-        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-        inverse_assoc.name.should == :tank
+        expect(inverse_assoc).to be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        expect(inverse_assoc.name).to eq(:tank)
       end
     end
 
@@ -896,7 +896,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       let(:inverse_assoc) { hatch._association.inverse_association }
 
       it "does not find the inverse" do
-        inverse_assoc.should be nil
+        expect(inverse_assoc).to be nil
       end
     end
 
@@ -910,8 +910,8 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       it "has the correct inverses" do
         pending 'MONGOID-5080'
 
-        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-        inverse_assoc.name.should == :car
+        expect(inverse_assoc).to be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        expect(inverse_assoc.name).to eq(:car)
       end
     end
 
@@ -924,8 +924,8 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       it "has the correct inverses" do
         pending 'unqualified class_name arguments do not work per MONGOID-5080'
 
-        inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-        inverse_assoc.name.should == :tank
+        expect(inverse_assoc).to be_a(Mongoid::Association::Embedded::EmbeddedIn)
+        expect(inverse_assoc.name).to eq(:tank)
       end
     end
   end

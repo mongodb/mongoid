@@ -393,17 +393,17 @@ describe Mongoid::Fields do
 
       context 'when using an unknown symbol' do
         it 'raises InvalidFieldType' do
-          lambda do
+          expect do
             klass.field(:test, type:  :bogus)
-          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value :bogus/)
+          end.to raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value :bogus/)
         end
       end
 
       context 'when using an unknown string' do
         it 'raises InvalidFieldType' do
-          lambda do
+          expect do
             klass.field(:test, type:  'bogus')
-          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
+          end.to raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
         end
       end
     end
@@ -1632,7 +1632,7 @@ describe Mongoid::Fields do
       let(:shape) { Shape.new }
 
       it 'is correctly set' do
-        shape.attributes['_type'].should == 'Shape'
+        expect(shape.attributes['_type']).to eq('Shape')
       end
     end
 
@@ -1640,7 +1640,7 @@ describe Mongoid::Fields do
       let(:circle) { Circle.new }
 
       it 'is correctly set' do
-        circle.attributes['_type'].should == 'Circle'
+        expect(circle.attributes['_type']).to eq('Circle')
       end
     end
   end

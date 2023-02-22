@@ -826,7 +826,7 @@ describe Mongoid::QueryCache do
     end
 
     it 'returns all children for the association' do
-      school.students.to_a.length.should == 5
+      expect(school.students.to_a.length).to eq(5)
     end
   end
 end

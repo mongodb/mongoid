@@ -22,7 +22,7 @@ describe 'embedded associations' do
       let(:subject) { EmmOuter.first }
 
       it 'performs dirty tracking efficiently' do
-        subject.changed?.should be false
+        expect(subject.changed?).to be false
       end
 
       it 'calculates the descendants properly' do
@@ -46,7 +46,7 @@ describe 'embedded associations' do
       let(:subject) { EmmOuter.first }
 
       it 'performs dirty tracking efficiently' do
-        subject.changed?.should be false
+        expect(subject.changed?).to be false
       end
 
       it 'calculates the descendants properly' do

@@ -241,7 +241,7 @@ describe Mongoid::Criteria do
       context 'when id is aliased to _id' do
         shared_examples 'requests _id field' do
           it 'requests _id field' do
-            criteria.options[:fields].should == {'_id' => 1}
+            expect(criteria.options[:fields]).to eq({'_id' => 1})
           end
         end
 
@@ -261,7 +261,7 @@ describe Mongoid::Criteria do
           end
 
           it 'requests content field and _id field' do
-            criteria.options[:fields].should == {'_id' => 1, 'name' => 1}
+            expect(criteria.options[:fields]).to eq({'_id' => 1, 'name' => 1})
           end
         end
       end
@@ -269,13 +269,13 @@ describe Mongoid::Criteria do
       context 'when id is not aliased to _id' do
         shared_examples 'requests _id field' do
           it 'requests _id field' do
-            criteria.options[:fields].should == {'_id' => 1}
+            expect(criteria.options[:fields]).to eq({'_id' => 1})
           end
         end
 
         shared_examples 'requests id field and _id field' do
           it 'requests id field and _id field' do
-            criteria.options[:fields].should == {'_id' => 1, 'id' => 1}
+            expect(criteria.options[:fields]).to eq({'_id' => 1, 'id' => 1})
           end
         end
 
@@ -334,7 +334,7 @@ describe Mongoid::Criteria do
 
       shared_examples 'does not unproject _id' do
         it 'does not unproject _id' do
-          criteria.options[:fields].should be nil
+          expect(criteria.options[:fields]).to be nil
         end
 
         it "returns id anyway" do
@@ -344,19 +344,19 @@ describe Mongoid::Criteria do
 
       shared_examples 'unprojects id' do
         it 'does not unproject _id' do
-          criteria.options[:fields].should == {'id' => 0}
+          expect(criteria.options[:fields]).to eq({'id' => 0})
         end
 
         let(:instance) { criteria.first }
 
         it "returns _id" do
-          instance._id.should == 'foo'
+          expect(instance._id).to eq('foo')
         end
 
         it 'does not return id' do
-          lambda do
+          expect do
             instance.id
-          end.should raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'id' on Shirt which was not loaded/)
+          end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'id' on Shirt which was not loaded/)
         end
       end
 

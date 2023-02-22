@@ -705,7 +705,7 @@ describe Mongoid::Contextual::Mongo do
           config_override :legacy_pluck_distinct, true
 
           it "does not correctly use the fallback" do
-            distinct.should == {"de"=>"deutsch-text", "en"=>"english-text"}
+            expect(distinct).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
           end
         end
 
@@ -716,7 +716,7 @@ describe Mongoid::Contextual::Mongo do
             I18n.locale = :en
             Dictionary.create!(description: 'english-text')
             I18n.locale = :he
-            distinct.should == "english-text"
+            expect(distinct).to eq("english-text")
           end
         end
       end
@@ -1216,14 +1216,14 @@ describe Mongoid::Contextual::Mongo do
         max_bson_version '4.99.99'
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
-          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+          expect(Person.find(person1.id).attributes["ssn"]).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).attributes["ssn"]).to be_a BSON::Decimal128
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
+          expect(tally.keys.map(&:class).sort do |a,b|
             a.to_s <=> b.to_s
-          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+          end).to eq([BSON::Decimal128, BSON::Regexp::Raw])
         end
       end
 
@@ -1231,14 +1231,14 @@ describe Mongoid::Contextual::Mongo do
         min_bson_version "5.0"
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
-          Person.find(person2.id).ssn.should be_a BigDeimal
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BigDeimal
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
+          expect(tally.keys.map(&:class).sort do |a,b|
             a.to_s <=> b.to_s
-          end.should == [BigDecimal, BSON::Regexp::Raw]
+          end).to eq([BigDecimal, BSON::Regexp::Raw])
         end
       end
     end

@@ -17,25 +17,25 @@ describe 'embedded associations' do
     shared_examples_for 'an embedded association' do
       it 'adds child documents to parent association object' do
         legislator
-        congress.legislators._target.should == [legislator]
+        expect(congress.legislators._target).to eq([legislator])
       end
 
       it 'adds child documents to parent association object criteria' do
         legislator
-        congress.legislators.criteria.documents.should == [legislator]
+        expect(congress.legislators.criteria.documents).to eq([legislator])
       end
 
       it 'populates documents on parent association object' do
-        congress.legislators.documents.should == [legislator]
+        expect(congress.legislators.documents).to eq([legislator])
       end
 
       it 'returns created child when referencing embedded association' do
-        congress.legislators.should == [legislator]
+        expect(congress.legislators).to eq([legislator])
       end
 
       it 'returns created child when referencing Criteria created from embedded association' do
-        congress.legislators.all.should be_a(Mongoid::Criteria)
-        congress.legislators.all.to_a.should == [legislator]
+        expect(congress.legislators.all).to be_a(Mongoid::Criteria)
+        expect(congress.legislators.all.to_a).to eq([legislator])
       end
     end
 
@@ -70,32 +70,32 @@ describe 'embedded associations' do
 
     shared_examples_for 'adds child documents to parent association' do
       it 'adds child documents to parent association' do
-        manufactory.products._target.should == [product]
+        expect(manufactory.products._target).to eq([product])
       end
     end
 
     shared_examples_for 'an embedded association' do
       it 'adds child documents to parent association object' do
         product
-        manufactory.products._target.should == [product]
+        expect(manufactory.products._target).to eq([product])
       end
 
       it 'adds child documents to parent association object criteria' do
         product
-        manufactory.products.criteria.documents.should == [product]
+        expect(manufactory.products.criteria.documents).to eq([product])
       end
 
       it 'populates documents on parent association object' do
-        manufactory.products.documents.should == [product]
+        expect(manufactory.products.documents).to eq([product])
       end
 
       it 'returns created child when referencing embedded association' do
-        manufactory.products.should == [product]
+        expect(manufactory.products).to eq([product])
       end
 
       it 'returns created child when referencing Criteria created from embedded association' do
-        manufactory.products.all.should be_a(Mongoid::Criteria)
-        manufactory.products.all.to_a.should == [product]
+        expect(manufactory.products.all).to be_a(Mongoid::Criteria)
+        expect(manufactory.products.all.to_a).to eq([product])
       end
     end
 
@@ -129,7 +129,7 @@ describe 'embedded associations' do
       shared_examples 'is set' do
         it 'is set' do
           parent.child = child_cls.new
-          parent.child.parent.should == parent
+          expect(parent.child.parent).to eq(parent)
         end
       end
 
@@ -154,7 +154,7 @@ describe 'embedded associations' do
 
       shared_examples 'is set' do
         it 'is set' do
-          child.congress.should == parent
+          expect(child.congress).to eq(parent)
         end
       end
 
@@ -185,7 +185,7 @@ describe 'embedded associations' do
           parent.child = EomChild.new
           parent.save!
 
-          parent.updated_at.should > first_updated_at
+          expect(parent.updated_at).to be > first_updated_at
         end
       end
 
@@ -200,7 +200,7 @@ describe 'embedded associations' do
           parent.legislators << EmmLegislator.new
           parent.save!
 
-          parent.updated_at.should > first_updated_at
+          expect(parent.updated_at).to be > first_updated_at
         end
       end
     end
@@ -215,7 +215,7 @@ describe 'embedded associations' do
           parent.child.a = 42
           parent.save!
 
-          parent.updated_at.should > first_updated_at
+          expect(parent.updated_at).to be > first_updated_at
         end
       end
 
@@ -228,7 +228,7 @@ describe 'embedded associations' do
           parent.legislators.first.a = 42
           parent.save!
 
-          parent.updated_at.should > first_updated_at
+          expect(parent.updated_at).to be > first_updated_at
         end
       end
     end
@@ -245,7 +245,7 @@ describe 'embedded associations' do
           parent.child = nil
           parent.save!
 
-          parent.updated_at.should > first_updated_at
+          expect(parent.updated_at).to be > first_updated_at
         end
       end
 
@@ -260,7 +260,7 @@ describe 'embedded associations' do
           parent.legislators.clear
           parent.save!
 
-          parent.updated_at.should > first_updated_at
+          expect(parent.updated_at).to be > first_updated_at
         end
       end
     end
@@ -297,9 +297,9 @@ describe 'embedded associations' do
         user.save!
         user.reload
 
-        user.orders.map do
+        expect(user.orders.map do
           |order| [order.sku, order.amount]
-        end.should == [[1, 10], [2, 2]]
+        end).to eq([[1, 10], [2, 2]])
       end
     end
 
@@ -310,9 +310,9 @@ describe 'embedded associations' do
         user.save!
         user.reload
 
-        user.orders.map do
+        expect(user.orders.map do
           |order| [order.sku, order.amount]
-        end.should == [[1, 1], [2, 20]]
+        end).to eq([[1, 1], [2, 20]])
       end
     end
   end
@@ -335,9 +335,9 @@ describe 'embedded associations' do
         user.save!
         user.reload
 
-        user.orders.map do
+        expect(user.orders.map do
           |order| [order.sku, order.surcharges.first.amount]
-        end.should == [[1, 10], [2, 2]]
+        end).to eq([[1, 10], [2, 2]])
       end
     end
 
@@ -348,9 +348,9 @@ describe 'embedded associations' do
         user.save!
         user.reload
 
-        user.orders.map do
+        expect(user.orders.map do
           |order| [order.sku, order.surcharges.first.amount]
-        end.should == [[1, 1], [2, 20]]
+        end).to eq([[1, 1], [2, 20]])
       end
     end
   end

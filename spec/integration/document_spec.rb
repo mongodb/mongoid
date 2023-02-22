@@ -11,11 +11,11 @@ describe Mongoid::Document do
     end
 
     it 'works for instance level delegation' do
-      patient.address.should == 'test@example.com'
+      expect(patient.address).to eq('test@example.com')
     end
 
     it 'works for class level delegation' do
-      DelegatingPatient.default_client.should be Mongoid.default_client
+      expect(DelegatingPatient.default_client).to be Mongoid.default_client
     end
   end
 
@@ -23,8 +23,8 @@ describe Mongoid::Document do
     it 'persists separate id and _id values' do
       shirt = Shirt.create!(id: 'hello', _id: 'foo')
       shirt = Shirt.find(shirt._id)
-      shirt.id.should == 'hello'
-      shirt._id.should == 'foo'
+      expect(shirt.id).to eq('hello')
+      expect(shirt._id).to eq('foo')
     end
   end
 

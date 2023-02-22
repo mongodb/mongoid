@@ -9,13 +9,13 @@ describe 'Matcher operators' do
 
   shared_examples 'is true' do
     it 'is true' do
-      result.should be true
+      expect(result).to be true
     end
   end
 
   shared_examples 'is false' do
     it 'is false 'do
-      result.should be false
+      expect(result).to be false
     end
   end
 

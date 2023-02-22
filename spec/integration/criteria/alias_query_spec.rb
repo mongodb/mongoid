@@ -35,7 +35,7 @@ describe 'distinct on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['key'].should == 't'
+        expect(command['key']).to eq('t')
       end
     end
 
@@ -47,7 +47,7 @@ describe 'distinct on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['key'].should == 'phone_numbers.ext'
+        expect(command['key']).to eq('phone_numbers.ext')
       end
     end
   end
@@ -63,7 +63,7 @@ describe 'distinct on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['key'].should == 't'
+        expect(command['key']).to eq('t')
       end
     end
 
@@ -75,7 +75,7 @@ describe 'distinct on aliased fields' do
       it 'deos not expands the alias' do
         query
 
-        command['key'].should == 'phone_numbers.extension'
+        expect(command['key']).to eq('phone_numbers.extension')
       end
     end
   end
@@ -114,7 +114,7 @@ describe 'pluck on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['projection'].should == {'t' => true}
+        expect(command['projection']).to eq({'t' => true})
       end
     end
 
@@ -126,7 +126,7 @@ describe 'pluck on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['projection'].should == {'phone_numbers.ext' => true}
+        expect(command['projection']).to eq({'phone_numbers.ext' => true})
       end
     end
   end
@@ -142,7 +142,7 @@ describe 'pluck on aliased fields' do
       it 'expands the alias' do
         query
 
-        command['projection'].should == {'t' => true}
+        expect(command['projection']).to eq({'t' => true})
       end
     end
 
@@ -154,7 +154,7 @@ describe 'pluck on aliased fields' do
       it 'does not expand the alias' do
         query
 
-        command['projection'].should == {'phone_numbers.extension' => true}
+        expect(command['projection']).to eq({'phone_numbers.extension' => true})
       end
     end
   end

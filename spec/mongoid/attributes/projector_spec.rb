@@ -28,7 +28,7 @@ describe Mongoid::Attributes::Projector do
 
               context 'attribute_or_path_allowed?' do
                 it "is #{query_spec.fetch('allowed')}" do
-                  projector.attribute_or_path_allowed?(query).should be query_spec['allowed']
+                  expect(projector.attribute_or_path_allowed?(query)).to be query_spec['allowed']
                 end
               end
             end

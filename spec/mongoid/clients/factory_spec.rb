@@ -68,7 +68,7 @@ describe Mongoid::Clients::Factory do
           context 'on driver versions that do not report spurious EOF errors' do
 
             it 'does not produce driver warnings' do
-              Mongo::Logger.logger.should_not receive(:warn)
+              expect(Mongo::Logger.logger).not_to receive(:warn)
               client
             end
           end
@@ -84,8 +84,8 @@ describe Mongoid::Clients::Factory do
           end
 
           it 'sets Mongoid as a wrapping library' do
-            client.options[:wrapping_libraries].should == [BSON::Document.new(
-              Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)]
+            expect(client.options[:wrapping_libraries]).to eq([BSON::Document.new(
+              Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)])
           end
 
           context 'when configuration specifies a wrapping library' do
@@ -104,10 +104,10 @@ describe Mongoid::Clients::Factory do
             end
 
             it 'adds Mongoid as another wrapping library' do
-              client.options[:wrapping_libraries].should == [
+              expect(client.options[:wrapping_libraries]).to eq([
                 BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
                 {'name' => 'Foo'},
-              ]
+              ])
             end
           end
         end

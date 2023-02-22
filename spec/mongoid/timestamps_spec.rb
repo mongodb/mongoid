@@ -157,14 +157,14 @@ describe Mongoid::Timestamps do
 
           it "updates the timestamps correctly" do
             pending "MONGOID-4953"
-            user.updated_at.should == update_time
-            address.updated_at.should == update_time
+            expect(user.updated_at).to eq(update_time)
+            expect(address.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
             pending "MONGOID-4953"
-            user.reload.updated_at.should == update_time
-            address.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(address.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -174,13 +174,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == update_time
-            address.updated_at.should == start_time
+            expect(user.updated_at).to eq(update_time)
+            expect(address.updated_at).to eq(start_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            address.reload.updated_at.should == start_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(address.reload.updated_at).to eq(start_time)
           end
         end
       end
@@ -193,13 +193,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == update_time
-            account.updated_at.should == update_time
+            expect(user.updated_at).to eq(update_time)
+            expect(account.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -209,8 +209,8 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == update_time
-            account.updated_at.should == start_time
+            expect(user.updated_at).to eq(update_time)
+            expect(account.updated_at).to eq(start_time)
           end
 
           # The Account object's updated_at is updated in the database but not
@@ -218,8 +218,8 @@ describe Mongoid::Timestamps do
           # the update function, so the Account object updated locally is not
           # the same as the one that we have locally here.
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
       end
@@ -232,13 +232,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == update_time
-            account.updated_at.should == update_time
+            expect(user.updated_at).to eq(update_time)
+            expect(account.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -248,8 +248,8 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            account.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(account.updated_at).to eq(update_time)
           end
 
           # The User object's updated_at is updated in the database but not
@@ -257,8 +257,8 @@ describe Mongoid::Timestamps do
           # the update function, so the User object updated locally is not
           # the same as the one that we have locally here.
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
       end
@@ -271,13 +271,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == update_time
-            pet.updated_at.should == update_time
+            expect(user.updated_at).to eq(update_time)
+            expect(pet.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            pet.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(pet.reload.updated_at).to eq(update_time)
           end
         end
       end
@@ -290,13 +290,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == update_time
-            pet.updated_at.should == update_time
+            expect(user.updated_at).to eq(update_time)
+            expect(pet.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            pet.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(pet.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -306,13 +306,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            pet.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(pet.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            pet.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(pet.reload.updated_at).to eq(update_time)
           end
         end
       end
@@ -338,14 +338,14 @@ describe Mongoid::Timestamps do
 
           it "updates the timestamps correctly" do
             pending "MONGOID-4953"
-            user.updated_at.should == update_time
-            address.updated_at.should == update_time
+            expect(user.updated_at).to eq(update_time)
+            expect(address.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
             pending "MONGOID-4953"
-            user.reload.updated_at.should == update_time
-            address.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(address.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -355,13 +355,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == update_time
-            address.updated_at.should == start_time
+            expect(user.updated_at).to eq(update_time)
+            expect(address.updated_at).to eq(start_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == update_time
-            address.reload.updated_at.should == start_time
+            expect(user.reload.updated_at).to eq(update_time)
+            expect(address.reload.updated_at).to eq(start_time)
           end
         end
       end
@@ -374,13 +374,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            account.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(account.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -390,8 +390,8 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            account.updated_at.should == start_time
+            expect(user.updated_at).to eq(start_time)
+            expect(account.updated_at).to eq(start_time)
           end
 
           # The Account object's updated_at is updated in the database but not
@@ -399,8 +399,8 @@ describe Mongoid::Timestamps do
           # the update function, so the Account object updated locally is not
           # the same as the one that we have locally here.
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
       end
@@ -413,13 +413,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            account.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(account.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -429,13 +429,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            account.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(account.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            account.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(account.reload.updated_at).to eq(update_time)
           end
         end
       end
@@ -448,13 +448,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            pet.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(pet.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            pet.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(pet.reload.updated_at).to eq(update_time)
           end
         end
       end
@@ -467,13 +467,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            pet.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(pet.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            pet.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(pet.reload.updated_at).to eq(update_time)
           end
         end
 
@@ -483,13 +483,13 @@ describe Mongoid::Timestamps do
           end
 
           it "updates the timestamps correctly" do
-            user.updated_at.should == start_time
-            pet.updated_at.should == update_time
+            expect(user.updated_at).to eq(start_time)
+            expect(pet.updated_at).to eq(update_time)
           end
 
           it "updates the timestamps in the db correctly" do
-            user.reload.updated_at.should == start_time
-            pet.reload.updated_at.should == update_time
+            expect(user.reload.updated_at).to eq(start_time)
+            expect(pet.reload.updated_at).to eq(update_time)
           end
         end
       end

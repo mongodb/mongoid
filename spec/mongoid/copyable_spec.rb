@@ -99,7 +99,7 @@ describe Mongoid::Copyable do
           let(:cls) { CopyableSpec::Reg }
 
           before do
-            cls.should_not include(Mongoid::Attributes::Dynamic)
+            expect(cls).not_to include(Mongoid::Attributes::Dynamic)
           end
 
           include_examples 'behaves as expected'
@@ -109,7 +109,7 @@ describe Mongoid::Copyable do
           let(:cls) { CopyableSpec::Dyn }
 
           before do
-            cls.should include(Mongoid::Attributes::Dynamic)
+            expect(cls).to include(Mongoid::Attributes::Dynamic)
           end
 
           include_examples 'behaves as expected'
@@ -661,12 +661,12 @@ describe Mongoid::Copyable do
           before do
             # When embedded class is the root in hierarchy, their
             # discriminator value is not explicitly stored.
-            child_cls.discriminator_mapping[child_cls.name].should be nil
+            expect(child_cls.discriminator_mapping[child_cls.name]).to be nil
           end
 
           it 'works' do
-            copy.class.should be original.class
-            copy.object_id.should_not == original.object_id
+            expect(copy.class).to be original.class
+            expect(copy.object_id).not_to eq(original.object_id)
           end
         end
 
@@ -678,12 +678,12 @@ describe Mongoid::Copyable do
           before do
             # When embedded class is a leaf in hierarchy, their
             # discriminator value is explicitly stored.
-            child_cls.discriminator_mapping[child_cls.name].should_not be nil
+            expect(child_cls.discriminator_mapping[child_cls.name]).not_to be nil
           end
 
           it 'works' do
-            copy.class.should be original.class
-            copy.object_id.should_not == original.object_id
+            expect(copy.class).to be original.class
+            expect(copy.object_id).not_to eq(original.object_id)
           end
         end
       end

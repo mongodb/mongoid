@@ -14,19 +14,19 @@ describe Mongoid::Document do
 
   describe '.client_name' do
     it 'returns client name' do
-      Person.client_name.should == :default
+      expect(Person.client_name).to eq(:default)
     end
   end
 
   describe '.database_name' do
     it 'returns database name' do
-      Person.database_name.should == 'mongoid_test'
+      expect(Person.database_name).to eq('mongoid_test')
     end
   end
 
   describe '.collection_name' do
     it 'returns collection name' do
-      Person.collection_name.should == :people
+      expect(Person.collection_name).to eq(:people)
     end
   end
 end

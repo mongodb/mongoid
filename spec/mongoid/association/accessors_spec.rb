@@ -635,9 +635,9 @@ describe Mongoid::Association::Accessors do
               min_server_version '4.4'
 
               it 'is not allowed by server' do
-                lambda do
+                expect do
                   persisted_person
-                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass/)
+                end.to raise_error(Mongo::Error::OperationFailure, /Path collision at pass/)
               end
             end
           end
@@ -673,7 +673,7 @@ describe Mongoid::Association::Accessors do
               end
 
               it 'retrieves other fields' do
-                persisted_person.passport.country.should == 'USA'
+                expect(persisted_person.passport.country).to eq('USA')
               end
             end
 
@@ -728,9 +728,9 @@ describe Mongoid::Association::Accessors do
               min_server_version '4.4'
 
               it 'is not allowed by server' do
-                lambda do
+                expect do
                   persisted_person
-                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers/)
+                end.to raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers/)
               end
             end
           end
@@ -763,7 +763,7 @@ describe Mongoid::Association::Accessors do
               include_examples 'allows access to field of projected association'
 
               it 'retrieves all fields of association' do
-                persisted_person.phone_numbers.first.landline.should be true
+                expect(persisted_person.phone_numbers.first.landline).to be true
               end
             end
 

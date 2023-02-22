@@ -1195,8 +1195,8 @@ describe Mongoid::Changeable do
       end
 
       it 'should not add to the changes or changed_attributes hash' do
-        person.changes.should == {}
-        person.changed_attributes.should == {}
+        expect(person.changes).to eq({})
+        expect(person.changed_attributes).to eq({})
       end
     end
 
@@ -1215,8 +1215,8 @@ describe Mongoid::Changeable do
       end
 
       it 'should add to the changes or changed_attributes hash' do
-        person.changes.should == { "user_account_ids" => [ nil, [ user_account._id ] ] }
-        person.changed_attributes.should == { "user_account_ids" => nil }
+        expect(person.changes).to eq({ "user_account_ids" => [ nil, [ user_account._id ] ] })
+        expect(person.changed_attributes).to eq({ "user_account_ids" => nil })
       end
     end
 
@@ -1235,8 +1235,8 @@ describe Mongoid::Changeable do
       end
 
       it 'should not add to the changes or changed_attributes hash' do
-        person.changes.should == {}
-        person.changed_attributes.should == {}
+        expect(person.changes).to eq({})
+        expect(person.changed_attributes).to eq({})
       end
     end
 
@@ -1255,8 +1255,8 @@ describe Mongoid::Changeable do
       end
 
       it 'should not add to the changes or changed_attributes hash' do
-        person.changes.should == { "user_account_ids" => [ [ user_account._id ], [] ] }
-        person.changed_attributes.should ==  { "user_account_ids" => [ user_account._id ] }
+        expect(person.changes).to eq({ "user_account_ids" => [ [ user_account._id ], [] ] })
+        expect(person.changed_attributes).to eq({ "user_account_ids" => [ user_account._id ] })
       end
     end
 

@@ -16,7 +16,7 @@ describe 'embeds_many associations' do
         canvas.shapes = [shape]
         canvas.save!
         canvas.reload
-        canvas.shapes.should == [shape]
+        expect(canvas.shapes).to eq([shape])
       end
     end
   end
@@ -30,21 +30,21 @@ describe 'embeds_many associations' do
       it 'deletes the target from the database' do
         unsaved_parent.shapes.clear
 
-        unsaved_parent.shapes.should be_empty
+        expect(unsaved_parent.shapes).to be_empty
 
-        unsaved_parent.new_record?.should be true
+        expect(unsaved_parent.new_record?).to be true
         parent.reload
-        parent.shapes.should be_empty
+        expect(parent.shapes).to be_empty
       end
     end
 
     shared_examples 'does not delete the target from the database' do
       it 'does not delete the target from the database' do
-        unsaved_parent.shapes.should be_empty
+        expect(unsaved_parent.shapes).to be_empty
 
-        unsaved_parent.new_record?.should be true
+        expect(unsaved_parent.new_record?).to be true
         parent.reload
-        parent.shapes.length.should == 1
+        expect(parent.shapes.length).to eq(1)
       end
     end
 
@@ -73,9 +73,9 @@ describe 'embeds_many associations' do
 
       shared_examples 'persists correctly' do
         it 'persists correctly' do
-          canvas.shapes.should be_empty
+          expect(canvas.shapes).to be_empty
           _canvas = Canvas.find(canvas.id)
-          _canvas.shapes.should be_empty
+          expect(_canvas.shapes).to be_empty
         end
       end
 
@@ -117,9 +117,9 @@ describe 'embeds_many associations' do
 
       shared_examples 'persists correctly' do
         it 'persists correctly' do
-          canvas.shapes.length.should eq 2
+          expect(canvas.shapes.length).to eq 2
           _canvas = Canvas.find(canvas.id)
-          _canvas.shapes.length.should eq 2
+          expect(_canvas.shapes.length).to eq 2
         end
       end
 
@@ -161,9 +161,9 @@ describe 'embeds_many associations' do
 
       shared_examples 'persists correctly' do
         it 'persists correctly' do
-          canvas.shapes.should be_empty
+          expect(canvas.shapes).to be_empty
           _canvas = Canvas.find(canvas.id)
-          _canvas.shapes.should be_empty
+          expect(_canvas.shapes).to be_empty
         end
       end
 

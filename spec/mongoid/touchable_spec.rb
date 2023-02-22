@@ -665,8 +665,8 @@ describe Mongoid::Touchable do
         end
 
         it "updates the child's timestamp" do
-          floor.updated_at.should == update_time
-          floor.reload.updated_at.should == update_time
+          expect(floor.updated_at).to eq(update_time)
+          expect(floor.reload.updated_at).to eq(update_time)
         end
       end
 

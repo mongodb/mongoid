@@ -80,9 +80,9 @@ describe Mongoid::Document do
       let(:person) { Person.where(username: 'Dev').without('pet.name').first }
 
       it 'prohibits the retrieval' do
-        lambda do
+        expect do
           person.pet.name
-        end.should raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'name' on Animal which was not loaded/)
+        end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'name' on Animal which was not loaded/)
       end
     end
   end

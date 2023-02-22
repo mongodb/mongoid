@@ -322,9 +322,9 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.crates.length.should == 2
-          _truck.crates.first.volume.should == 2
-          _truck.crates.last.volume.should == 1
+          expect(_truck.crates.length).to eq(2)
+          expect(_truck.crates.first.volume).to eq(2)
+          expect(_truck.crates.last.volume).to eq(1)
         end
       end
 
@@ -339,9 +339,9 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.seats.length.should == 1
-          _truck.seats.first.armrests.length.should == 1
-          _truck.seats.first.armrests.first.side.should == 'left'
+          expect(_truck.seats.length).to eq(1)
+          expect(_truck.seats.first.armrests.length).to eq(1)
+          expect(_truck.seats.first.armrests.first.side).to eq('left')
         end
       end
 
@@ -356,10 +356,10 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.crates.length.should == 2
-          _truck.crates.first.toys.length.should == 1
-          _truck.crates.first.toys.first.name.should == 'Bear'
-          _truck.crates.last.toys.length.should == 0
+          expect(_truck.crates.length).to eq(2)
+          expect(_truck.crates.first.toys.length).to eq(1)
+          expect(_truck.crates.first.toys.first.name).to eq('Bear')
+          expect(_truck.crates.last.toys.length).to eq(0)
         end
 
         context 'when also updating first embedded top level association' do
@@ -371,10 +371,10 @@ describe Mongoid::Persistable::Savable do
             truck.save!
 
             _truck = Truck.find(truck.id)
-            _truck.crates.length.should == 2
-            _truck.crates.first.toys.length.should == 1
-            _truck.crates.first.toys.first.name.should == 'Bear'
-            _truck.crates.last.toys.length.should == 0
+            expect(_truck.crates.length).to eq(2)
+            expect(_truck.crates.first.toys.length).to eq(1)
+            expect(_truck.crates.first.toys.first.name).to eq('Bear')
+            expect(_truck.crates.last.toys.length).to eq(0)
           end
         end
       end

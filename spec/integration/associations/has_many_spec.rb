@@ -25,8 +25,8 @@ describe 'has_many associations' do
       it 'destroys' do
         address
 
-        HmmCompany.count.should == 1
-        HmmAddress.count.should == 1
+        expect(HmmCompany.count).to eq(1)
+        expect(HmmAddress.count).to eq(1)
 
         company.with_session do |session|
           session.with_transaction do
@@ -34,8 +34,8 @@ describe 'has_many associations' do
           end
         end
 
-        HmmCompany.count.should == 0
-        HmmAddress.count.should == 0
+        expect(HmmCompany.count).to eq(0)
+        expect(HmmAddress.count).to eq(0)
       end
     end
 
@@ -49,19 +49,19 @@ describe 'has_many associations' do
       it 'destroys' do
         address
 
-        HmmCompany.count.should == 1
-        HmmAddress.count.should == 1
+        expect(HmmCompany.count).to eq(1)
+        expect(HmmAddress.count).to eq(1)
 
-        lambda do
+        expect do
           company.with_session do |session|
             session.with_transaction do
               company.destroy!
             end
           end
-        end.should raise_error(Mongoid::Errors::DocumentNotDestroyed)
+        end.to raise_error(Mongoid::Errors::DocumentNotDestroyed)
 
-        HmmCompany.count.should == 1
-        HmmAddress.count.should == 1
+        expect(HmmCompany.count).to eq(1)
+        expect(HmmAddress.count).to eq(1)
       end
     end
   end
@@ -69,7 +69,7 @@ describe 'has_many associations' do
   context 'when child does not have parent association' do
     context 'Child.new' do
       it 'creates a child instance' do
-        HmmBusSeat.new.should be_a(HmmBusSeat)
+        expect(HmmBusSeat.new).to be_a(HmmBusSeat)
       end
     end
 
@@ -77,9 +77,9 @@ describe 'has_many associations' do
       let(:parent) { HmmBus.new }
 
       it 'raises InverseNotFound' do
-        lambda do
+        expect do
           parent.seats << HmmBusSeat.new
-        end.should raise_error(Mongoid::Errors::InverseNotFound)
+        end.to raise_error(Mongoid::Errors::InverseNotFound)
       end
     end
   end
@@ -97,11 +97,11 @@ describe 'has_many associations' do
       end
 
       it 'does not destroy the dependent object' do
-        wiki_page.comments.should == [comment]
+        expect(wiki_page.comments).to eq([comment])
         wiki_page.comments = [comment]
         wiki_page.save!
         wiki_page.reload
-        wiki_page.comments.should == [comment]
+        expect(wiki_page.comments).to eq([comment])
       end
     end
 
@@ -117,11 +117,11 @@ describe 'has_many associations' do
       end
 
       it 'does not destroy the dependent object' do
-        series.books.should == [book]
+        expect(series.books).to eq([book])
         series.books = [book]
         series.save!
         series.reload
-        series.books.should == [book]
+        expect(series.books).to eq([book])
       end
     end
   end

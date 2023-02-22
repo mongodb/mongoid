@@ -12,7 +12,7 @@ describe Mongoid::Criteria::Queryable::Expandable do
     shared_examples_for 'expands' do
 
       it 'expands' do
-        query.send(:expand_condition_to_array_values, criterion).should == expected
+        expect(query.send(:expand_condition_to_array_values, criterion)).to eq(expected)
       end
 
       context 'when input is frozen' do
@@ -21,14 +21,14 @@ describe Mongoid::Criteria::Queryable::Expandable do
         end
 
         it 'expands' do
-          query.send(:expand_condition_to_array_values, criterion).should == expected
+          expect(query.send(:expand_condition_to_array_values, criterion)).to eq(expected)
         end
       end
 
       it 'does not modify input' do
         criterion_copy = criterion.dup.freeze
 
-        query.send(:expand_condition_to_array_values, criterion).should == expected
+        expect(query.send(:expand_condition_to_array_values, criterion)).to eq(expected)
 
         expect(criterion).to eq(criterion_copy)
       end

@@ -20,7 +20,7 @@ describe 'Server queries' do
     end
 
     it 'finds' do
-      Survey.collection.find(query).to_a.should == [document.attributes]
+      expect(Survey.collection.find(query).to_a).to eq([document.attributes])
     end
   end
 
@@ -41,7 +41,7 @@ describe 'Server queries' do
       end
 
       it 'finds' do
-        Bar.collection.find(query).to_a.should == [document.attributes.with_indifferent_access]
+        expect(Bar.collection.find(query).to_a).to eq([document.attributes.with_indifferent_access])
       end
     end
 
@@ -52,7 +52,7 @@ describe 'Server queries' do
         end
 
         it 'matches array and does not find' do
-          Bar.collection.find(query).to_a.should == []
+          expect(Bar.collection.find(query).to_a).to eq([])
         end
       end
 
@@ -62,7 +62,7 @@ describe 'Server queries' do
         end
 
         it 'finds' do
-          Bar.collection.find(query).to_a.should == [document.attributes.with_indifferent_access]
+          expect(Bar.collection.find(query).to_a).to eq([document.attributes.with_indifferent_access])
         end
       end
     end
@@ -74,7 +74,7 @@ describe 'Server queries' do
 
       it 'finds' do
         # This finds the document - https://jira.mongodb.org/browse/DOCSP-10717
-        Bar.collection.find(query).to_a.should == [document.attributes.with_indifferent_access]
+        expect(Bar.collection.find(query).to_a).to eq([document.attributes.with_indifferent_access])
       end
     end
 
@@ -94,7 +94,7 @@ describe 'Server queries' do
       end
 
       it 'does not find' do
-        Bar.collection.find(query).to_a.should == []
+        expect(Bar.collection.find(query).to_a).to eq([])
       end
     end
 
@@ -114,7 +114,7 @@ describe 'Server queries' do
       end
 
       it 'finds' do
-        Bar.collection.find(query).to_a.should == [document.attributes.with_indifferent_access]
+        expect(Bar.collection.find(query).to_a).to eq([document.attributes.with_indifferent_access])
       end
     end
 
@@ -134,7 +134,7 @@ describe 'Server queries' do
       end
 
       it 'finds' do
-        Bar.collection.find(query).to_a.should == [document.attributes.with_indifferent_access]
+        expect(Bar.collection.find(query).to_a).to eq([document.attributes.with_indifferent_access])
       end
     end
   end

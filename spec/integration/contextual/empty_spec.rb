@@ -6,19 +6,19 @@ describe 'Contextual classes when dealing with empty result set' do
   shared_examples 'behave as expected' do
     context '#exists?' do
       it 'is false' do
-        context.exists?.should be false
+        expect(context.exists?).to be false
       end
     end
 
     context '#count' do
       it 'is 0' do
-        context.count.should == 0
+        expect(context.count).to eq(0)
       end
     end
 
     context '#length' do
       it 'is 0' do
-        context.length.should == 0
+        expect(context.length).to eq(0)
       end
     end
 
@@ -26,7 +26,7 @@ describe 'Contextual classes when dealing with empty result set' do
 
     context '#distinct' do
       it 'is empty array' do
-        context.distinct(:foo).should == []
+        expect(context.distinct(:foo)).to eq([])
       end
     end
 
@@ -37,17 +37,17 @@ describe 'Contextual classes when dealing with empty result set' do
           context.each do
             called = true
           end
-          called.should be false
+          expect(called).to be false
         end
       end
 
       context 'without block' do
         it 'returns Enumerable' do
-          context.each.should be_a(Enumerable)
+          expect(context.each).to be_a(Enumerable)
         end
 
         it 'returns empty Enumerable' do
-          context.each.to_a.should == []
+          expect(context.each.to_a).to eq([])
         end
       end
     end
@@ -59,7 +59,7 @@ describe 'Contextual classes when dealing with empty result set' do
           context.map do
             called = true
           end
-          called.should be false
+          expect(called).to be false
         end
       end
 
@@ -67,32 +67,32 @@ describe 'Contextual classes when dealing with empty result set' do
         it 'returns empty array' do
           skip 'MONGOID-5148'
 
-          context.map(:field).should == []
+          expect(context.map(:field)).to eq([])
         end
       end
     end
 
     context '#first' do
       it 'is nil' do
-        context.first.should be nil
+        expect(context.first).to be nil
       end
     end
 
     context '#find_first' do
       it 'is nil' do
-        context.find_first.should be nil
+        expect(context.find_first).to be nil
       end
     end
 
     context '#one' do
       it 'is nil' do
-        context.one.should be nil
+        expect(context.one).to be nil
       end
     end
 
     context '#last' do
       it 'is nil' do
-        context.last.should be nil
+        expect(context.last).to be nil
       end
     end
   end

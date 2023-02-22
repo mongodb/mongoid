@@ -743,10 +743,10 @@ describe Mongoid::Persistable::Updatable do
     end
 
     it 'calls update_attributes' do
-      person.should receive(:update_attributes).with(attributes).and_call_original
-      lambda do
+      expect(person).to receive(:update_attributes).with(attributes).and_call_original
+      expect do
         person.update_attributes!(attributes)
-      end.should_not raise_error
+      end.not_to raise_error
     end
   end
 end

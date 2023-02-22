@@ -594,7 +594,7 @@ describe Mongoid::Scopable do
           end
 
           it "sets the conditions from keyword arguments" do
-            scope.selector.should == {'name' => 'Emily', 'deleted' => true}
+            expect(scope.selector).to eq({'name' => 'Emily', 'deleted' => true})
           end
         end
 
@@ -1261,15 +1261,15 @@ describe Mongoid::Scopable do
         it 'restores previous scope' do
           Band.with_scope(c1) do |crit|
             Band.with_scope(c2) do |crit2|
-              Mongoid::Threaded.current_scope(Band).selector.should == {
+              expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
                 'active' => true,
                 '$and' => ['active' => false],
-              }
+              })
             end
 
-            Mongoid::Threaded.current_scope(Band).selector.should == {
+            expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
               'active' => true,
-            }
+            })
           end
         end
       end
@@ -1280,13 +1280,13 @@ describe Mongoid::Scopable do
         it 'does not restore previous scope' do
           Band.with_scope(c1) do |crit|
             Band.with_scope(c2) do |crit2|
-              Mongoid::Threaded.current_scope(Band).selector.should == {
+              expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
                 'active' => true,
                 '$and' => ['active' => false],
-              }
+              })
             end
 
-            Mongoid::Threaded.current_scope(Band).should be_nil
+            expect(Mongoid::Threaded.current_scope(Band)).to be_nil
           end
         end
       end
@@ -1298,12 +1298,12 @@ describe Mongoid::Scopable do
       it 'restores previous scope' do
         Band.with_scope(c1) do |crit|
           Band.unscoped do |crit2|
-            Mongoid::Threaded.current_scope(Band).should be nil
+            expect(Mongoid::Threaded.current_scope(Band)).to be nil
           end
 
-          Mongoid::Threaded.current_scope(Band).selector.should == {
+          expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
             'active' => true,
-          }
+          })
         end
       end
     end

@@ -375,13 +375,13 @@ describe Mongoid::Atomic do
           it 'correctly distributes the operations' do
             pending 'https://jira.mongodb.org/browse/MONGOID-4982'
 
-            truck.atomic_updates.should == {
+            expect(truck.atomic_updates).to eq({
               '$set' => {'crates.0.volume' => 2},
               '$push' => {'crates.0.toys' => {'$each' => [crate.toys.first.attributes]}},
               conflicts: {
                 '$push' => {'crates' => {'$each' => [truck.crates.last.attributes]}},
               },
-            }
+            })
           end
         end
       end
@@ -396,7 +396,7 @@ describe Mongoid::Atomic do
       end
 
       it "has the correct updates" do
-        account.atomic_updates.should == {
+        expect(account.atomic_updates).to eq({
           "$push" => {
             "memberships" => {
               "$each" => [
@@ -405,7 +405,7 @@ describe Mongoid::Atomic do
               ]
             }
           }
-        }
+        })
       end
     end
   end

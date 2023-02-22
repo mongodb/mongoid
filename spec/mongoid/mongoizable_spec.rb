@@ -19,11 +19,11 @@ describe "mongoize/demongoize/evolve methods" do
         let(:catalog) { Catalog.create!(field_name => invalid_value) }
 
         it "returns nil" do
-          catalog.attributes[field_name].should be_nil
+          expect(catalog.attributes[field_name]).to be_nil
         end
 
         it "persists nil" do
-          Catalog.find(catalog._id).attributes[field_name].should be_nil
+          expect(Catalog.find(catalog._id).attributes[field_name]).to be_nil
         end
       end
     end
@@ -47,7 +47,7 @@ describe "mongoize/demongoize/evolve methods" do
         let(:catalog) { Catalog.first }
 
         it "returns nil" do
-          catalog.send(field_name).should be_nil
+          expect(catalog.send(field_name)).to be_nil
         end
       end
     end
@@ -68,11 +68,11 @@ describe "mongoize/demongoize/evolve methods" do
       let(:from_db) { Catalog.find(catalog._id) }
 
       it "returns the inputted value" do
-        catalog.attributes[field_name].should be_nil
+        expect(catalog.attributes[field_name]).to be_nil
       end
 
       it "persists the inputted value" do
-        from_db.attributes[field_name].should be_nil
+        expect(from_db.attributes[field_name]).to be_nil
       end
     end
   end
@@ -87,7 +87,7 @@ describe "mongoize/demongoize/evolve methods" do
       let(:from_db) { Catalog.first }
 
       it "reads the inputted value" do
-        from_db.send(field_name).should eq(demongoized_value)
+        expect(from_db.send(field_name)).to eq(demongoized_value)
       end
     end
   end

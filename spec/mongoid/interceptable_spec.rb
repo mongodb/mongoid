@@ -2367,7 +2367,7 @@ describe Mongoid::Interceptable do
       user.company = company
       expect do
         user.save!
-      end.to_not raise_error(Mongoid::Errors::AttributeNotLoaded)
+      end.to_not raise_error
     end
   end
 end

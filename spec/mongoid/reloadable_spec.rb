@@ -125,13 +125,13 @@ describe Mongoid::Reloadable do
         let(:agent) { Agent.new(id: previous.id) }
 
         it 'loads the existing document' do
-          agent.title.should be nil
+          expect(agent.title).to be nil
 
-          lambda do
+          expect do
             agent.reload
-          end.should_not raise_error
+          end.not_to raise_error
 
-          agent.title.should == '007'
+          expect(agent.title).to eq('007')
         end
       end
     end
@@ -600,11 +600,11 @@ describe Mongoid::Reloadable do
         end
 
         it 'reloads the document' do
-          band.name.should == 'test'
+          expect(band.name).to eq('test')
 
           band.reload
 
-          band.name.should == 'Sun Project'
+          expect(band.name).to eq('Sun Project')
         end
       end
 
@@ -617,14 +617,14 @@ describe Mongoid::Reloadable do
 
         it 'creates a new document with default values' do
           original_id = band.id
-          band.name.should == 'test'
+          expect(band.name).to eq('test')
 
           band.reload
 
-          band.name.should be nil
-          band.id.should_not be nil
+          expect(band.name).to be nil
+          expect(band.id).not_to be nil
           # _id changes
-          band.id.should_not == original_id
+          expect(band.id).not_to eq(original_id)
         end
       end
     end
@@ -639,13 +639,13 @@ describe Mongoid::Reloadable do
       end
 
       it 'resets the associations' do
-        church.acolytes.first.name.should == 'test'
+        expect(church.acolytes.first.name).to eq('test')
 
         church.reload
 
-        church.acolytes._loaded?.should be false
+        expect(church.acolytes._loaded?).to be false
 
-        church.acolytes.first.name.should == 'Borg'
+        expect(church.acolytes.first.name).to eq('Borg')
       end
     end
 

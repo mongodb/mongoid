@@ -16,7 +16,7 @@ describe 'embeds_one associations' do
         canvas.palette = canvas.palette
         canvas.save!
         canvas.reload
-        canvas.palette.should == palette
+        expect(canvas.palette).to eq(palette)
       end
     end
   end

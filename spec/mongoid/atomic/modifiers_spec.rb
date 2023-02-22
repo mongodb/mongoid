@@ -22,7 +22,7 @@ describe Mongoid::Atomic::Modifiers do
         it 'does not conflict' do
           pending 'https://jira.mongodb.org/browse/MONGOID-4982'
 
-          result.should be false
+          expect(result).to be false
         end
       end
     end
@@ -382,12 +382,12 @@ describe Mongoid::Atomic::Modifiers do
       it "does not conflict and adds push to top level" do
         pending 'https://jira.mongodb.org/browse/MONGOID-4982'
 
-        modifiers.should == {
+        expect(modifiers).to eq({
           '$set' => { "addresses.0.name" => 'test' },
           '$push' => {"addresses.0.locations" => {'$each' => [
             { "street" => "Oxford St" },
           ]}},
-        }
+        })
       end
     end
   end

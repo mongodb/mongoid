@@ -323,7 +323,7 @@ describe Mongoid::Attributes do
           end
 
           it "returns nil" do
-            from_db[:undefined_field].should be nil
+            expect(from_db[:undefined_field]).to be nil
           end
         end
       end
@@ -465,11 +465,11 @@ describe Mongoid::Attributes do
       end
 
       it 'writes the value into attributes' do
-        bar.attributes.should == {'_id' => bar.id, 'missing_field' => 42}
+        expect(bar.attributes).to eq({'_id' => bar.id, 'missing_field' => 42})
       end
 
       it 'makes the attribute accessible via []' do
-        bar['missing_field'].should == 42
+        expect(bar['missing_field']).to eq(42)
       end
 
       context 'when writing fields on a document with projection' do
@@ -512,7 +512,7 @@ describe Mongoid::Attributes do
 
           it "writes the value" do
             from_db[:undefined_field] = 'x'
-            from_db[:undefined_field].should == 'x'
+            expect(from_db[:undefined_field]).to eq('x')
           end
         end
       end
@@ -1120,7 +1120,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns nil" do
-          from_db.read_attribute(:undefined_field).should be nil
+          expect(from_db.read_attribute(:undefined_field)).to be nil
         end
       end
     end
@@ -1666,7 +1666,7 @@ describe Mongoid::Attributes do
 
         it "writes the value" do
           from_db.write_attribute(:undefined_field, 'x')
-          from_db.read_attribute(:undefined_field).should == 'x'
+          expect(from_db.read_attribute(:undefined_field)).to eq('x')
         end
       end
     end
@@ -2690,7 +2690,7 @@ describe Mongoid::Attributes do
     end
 
     it "persists the updated hash" do
-      church.location.should == { "x" => 1, "y" => 2 }
+      expect(church.location).to eq({ "x" => 1, "y" => 2 })
     end
   end
 
@@ -2705,7 +2705,7 @@ describe Mongoid::Attributes do
 
     it "persists the updated hash" do
       pending "MONGOID-2951"
-      catalog.set_field.should == Set.new([ 1, 2 ])
+      expect(catalog.set_field).to eq(Set.new([ 1, 2 ]))
     end
   end
 end

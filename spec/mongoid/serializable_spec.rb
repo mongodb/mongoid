@@ -99,7 +99,7 @@ describe Mongoid::Serializable do
       context "when global config is set to true" do
 
         before do
-          Minim.include_root_in_json.should be false
+          expect(Minim.include_root_in_json).to be false
           Mongoid.include_root_in_json = true
         end
 
@@ -866,7 +866,7 @@ describe Mongoid::Serializable do
       config_override :include_root_in_json, false
 
       before do
-        account.include_root_in_json.should be false
+        expect(account.include_root_in_json).to be false
         Mongoid.include_root_in_json = true
       end
 
@@ -878,7 +878,7 @@ describe Mongoid::Serializable do
     context "when including root in json via class" do
 
       before do
-        account.include_root_in_json.should be false
+        expect(account.include_root_in_json).to be false
         Account.include_root_in_json = true
       end
 
@@ -894,7 +894,7 @@ describe Mongoid::Serializable do
     context "when not including root in json" do
 
       before do
-        account.include_root_in_json.should be false
+        expect(account.include_root_in_json).to be false
       end
 
       it "uses the mongoid configuration" do

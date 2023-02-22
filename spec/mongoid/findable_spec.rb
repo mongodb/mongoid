@@ -917,7 +917,7 @@ describe Mongoid::Findable do
       end
 
       it 'uses activesupport time zone' do
-        distinct.should be_a(ActiveSupport::TimeWithZone)
+        expect(distinct).to be_a(ActiveSupport::TimeWithZone)
         expect(distinct.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
       end
     end
@@ -930,7 +930,7 @@ describe Mongoid::Findable do
       end
 
       it 'uses activesupport time zone' do
-        distinct.should be_a(DateTime)
+        expect(distinct).to be_a(DateTime)
         # Time and DateTime have different stringifications:
         # 2022-03-16T21:12:32+00:00
         # 2022-03-16 21:12:32 UTC
@@ -961,7 +961,7 @@ describe Mongoid::Findable do
       end
 
       it 'uses utc' do
-        distinct.should be_a(Time)
+        expect(distinct).to be_a(Time)
         expect(distinct.to_s).to eql(time.utc.to_s)
       end
     end
@@ -974,7 +974,7 @@ describe Mongoid::Findable do
       end
 
       it 'uses utc' do
-        distinct.should be_a(DateTime)
+        expect(distinct).to be_a(DateTime)
         # Time and DateTime have different stringifications:
         # 2022-03-16T21:12:32+00:00
         # 2022-03-16 21:12:32 UTC

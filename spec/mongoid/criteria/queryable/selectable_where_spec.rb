@@ -545,19 +545,19 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       shared_examples_for 'adds conditions to existing query' do
         it 'adds conditions to existing query' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             'test' => 1,
             mql_operator => ['hello' => 'world'],
-          }
+          })
         end
       end
 
       shared_examples_for 'adds conditions to existing query with an extra $and' do
         it 'adds conditions to existing query' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             'test' => 1,
             mql_operator => ['hello' => 'world'],
-          }
+          })
         end
       end
 

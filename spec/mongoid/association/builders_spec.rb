@@ -248,8 +248,8 @@ describe Mongoid::Association::Builders do
 
       subject { services.build }
 
-      it { should be_a_kind_of(Service) }
-      it { should_not be_persisted }
+      it { is_expected.to be_a_kind_of(Service) }
+      it { is_expected.not_to be_persisted }
     end
   end
 end

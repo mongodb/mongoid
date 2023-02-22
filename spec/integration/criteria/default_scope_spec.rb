@@ -12,10 +12,10 @@ describe 'Criteria and default scope' do
     end
 
     it 'is added after order of default scope' do
-      sort_options.should == {'status' => -1, 'name' => 1}
+      expect(sort_options).to eq({'status' => -1, 'name' => 1})
 
       # Keys in Ruby are ordered
-      sort_options.keys.should == %w(name status)
+      expect(sort_options.keys).to eq(%w(name status))
     end
   end
 
@@ -25,7 +25,7 @@ describe 'Criteria and default scope' do
       let(:base) { Appointment.where }
 
       it 'has default scope' do
-        base.selector.should == {'active' => true}
+        expect(base.selector).to eq({'active' => true})
       end
 
       context '.or' do
@@ -34,10 +34,10 @@ describe 'Criteria and default scope' do
         end
 
         it 'adds new condition in parallel to default scope conditions' do
-          criteria.selector.should == {'$or' => [
+          expect(criteria.selector).to eq({'$or' => [
             {'active' => true},
             {'timed' => true},
-          ]}
+          ]})
         end
       end
 
@@ -47,7 +47,7 @@ describe 'Criteria and default scope' do
         end
 
         it 'maintains default scope conditions' do
-          criteria.selector.should == {'active' => true, 'timed' => true}
+          expect(criteria.selector).to eq({'active' => true, 'timed' => true})
         end
       end
     end
@@ -61,10 +61,10 @@ describe 'Criteria and default scope' do
         end
 
         it 'adds new condition in parallel to default scope conditions' do
-          criteria.selector.should == {'$or' => [
+          expect(criteria.selector).to eq({'$or' => [
             {'active' => true},
             {'timed' => true},
-          ]}
+          ]})
         end
       end
     end

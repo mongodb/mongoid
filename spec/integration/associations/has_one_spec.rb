@@ -25,8 +25,8 @@ describe 'has_one associations' do
       it 'destroys' do
         address
 
-        HomCollege.count.should == 1
-        HomAddress.count.should == 1
+        expect(HomCollege.count).to eq(1)
+        expect(HomAddress.count).to eq(1)
 
         HomCollege.with_session do |session|
           session.with_transaction do
@@ -34,8 +34,8 @@ describe 'has_one associations' do
           end
         end
 
-        HomCollege.count.should == 0
-        HomAddress.count.should == 0
+        expect(HomCollege.count).to eq(0)
+        expect(HomAddress.count).to eq(0)
       end
     end
 
@@ -49,19 +49,19 @@ describe 'has_one associations' do
       it 'does not destroy' do
         address
 
-        HomCollege.count.should == 1
-        HomAddress.count.should == 1
+        expect(HomCollege.count).to eq(1)
+        expect(HomAddress.count).to eq(1)
 
-        lambda do
+        expect do
           HomCollege.with_session do |session|
             session.with_transaction do
               college.destroy!
             end
           end
-        end.should raise_error(Mongoid::Errors::DocumentNotDestroyed)
+        end.to raise_error(Mongoid::Errors::DocumentNotDestroyed)
 
-        HomCollege.count.should == 1
-        HomAddress.count.should == 1
+        expect(HomCollege.count).to eq(1)
+        expect(HomAddress.count).to eq(1)
       end
     end
   end
@@ -76,19 +76,19 @@ describe 'has_one associations' do
     shared_examples 'delegates to the field' do |reloaded: false|
       context 'non-conflicting field name' do
         it 'delegates to the field' do
-          parent.accreditation.price.should == 42
+          expect(parent.accreditation.price).to eq(42)
         end
 
         context 'using send' do
           it 'delegates to the field' do
-            parent.accreditation.send(:price).should == 42
+            expect(parent.accreditation.send(:price)).to eq(42)
           end
         end
       end
 
       context 'field name that conflicts with Kernel' do
         it 'delegates to the field' do
-          parent.accreditation.format.should == 'fmt'
+          expect(parent.accreditation.format).to eq('fmt')
         end
 
         context 'using send' do
@@ -97,7 +97,7 @@ describe 'has_one associations' do
               pending 'MONGOID-5018'
             end
 
-            parent.accreditation.send(:format).should == 'fmt'
+            expect(parent.accreditation.send(:format)).to eq('fmt')
           end
         end
       end
@@ -117,7 +117,7 @@ describe 'has_one associations' do
   context 'when child does not have parent association' do
     context 'Child.new' do
       it 'creates a child instance' do
-        HomBusDriver.new.should be_a(HomBusDriver)
+        expect(HomBusDriver.new).to be_a(HomBusDriver)
       end
     end
 
@@ -125,9 +125,9 @@ describe 'has_one associations' do
       let(:parent) { HomBus.new }
 
       it 'raises InverseNotFound' do
-        lambda do
+        expect do
           parent.driver = HomBusDriver.new
-        end.should raise_error(Mongoid::Errors::InverseNotFound)
+        end.to raise_error(Mongoid::Errors::InverseNotFound)
       end
     end
   end
@@ -145,11 +145,11 @@ describe 'has_one associations' do
       end
 
       it 'does not destroy the dependent object' do
-        person.game.should == game
+        expect(person.game).to eq(game)
         person.game = person.game
         person.save!
         person.reload
-        person.game.should == game
+        expect(person.game).to eq(game)
       end
     end
 
@@ -165,11 +165,11 @@ describe 'has_one associations' do
       end
 
       it 'does not destroy the dependent object' do
-        person.account.should == account
+        expect(person.account).to eq(account)
         person.account = person.account
         person.save!
         person.reload
-        person.account.should == account
+        expect(person.account).to eq(account)
       end
     end
   end

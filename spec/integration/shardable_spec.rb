@@ -17,14 +17,14 @@ describe 'Sharding helpers' do
 
     shared_examples_for 'shards collection' do
       it 'returns the model class' do
-        shard_collections.should == [model_cls]
+        expect(shard_collections).to eq([model_cls])
       end
 
       it 'shards collection' do
         shard_collections
 
         stats = model_cls.collection.database.command(collStats: model_cls.collection.name).first
-        stats[:sharded].should be true
+        expect(stats[:sharded]).to be true
       end
     end
 
@@ -98,14 +98,14 @@ describe 'Sharding helpers' do
       let(:model_cls) { SmActor }
 
       it 'returns empty array' do
-        shard_collections.should == []
+        expect(shard_collections).to eq([])
       end
 
       it 'does not shards collection' do
         shard_collections
 
         stats = model_cls.collection.database.command(collStats: model_cls.collection.name).first
-        stats[:sharded].should be false
+        expect(stats[:sharded]).to be false
       end
 
     end
@@ -114,11 +114,11 @@ describe 'Sharding helpers' do
       let(:model_cls) { SmNotSharded }
 
       before do
-        model_cls.shard_config.should be nil
+        expect(model_cls.shard_config).to be nil
       end
 
       it 'returns empty array' do
-        shard_collections.should == []
+        expect(shard_collections).to eq([])
       end
 
       context 'pre-4.2' do
@@ -127,9 +127,9 @@ describe 'Sharding helpers' do
         it 'does not shards collection' do
           shard_collections
 
-          lambda do
+          expect do
             model_cls.collection.database.command(collStats: model_cls.collection.name).first
-          end.should raise_error(Mongo::Error::OperationFailure, /Collection.*not found/)
+          end.to raise_error(Mongo::Error::OperationFailure, /Collection.*not found/)
         end
       end
 
@@ -140,7 +140,7 @@ describe 'Sharding helpers' do
           shard_collections
 
           stats = model_cls.collection.database.command(collStats: model_cls.collection.name).first
-          stats[:sharded].should be false
+          expect(stats[:sharded]).to be false
         end
       end
     end

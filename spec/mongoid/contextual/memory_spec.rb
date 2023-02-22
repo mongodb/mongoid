@@ -589,7 +589,7 @@ describe Mongoid::Contextual::Memory do
             I18n.locale = :en
             Dictionary.create!(description: 'english-text')
             I18n.locale = :he
-            distinct.should == "english-text"
+            expect(distinct).to eq("english-text")
           end
         end
 
@@ -1874,7 +1874,7 @@ describe Mongoid::Contextual::Memory do
             I18n.locale = :en
             Dictionary.create!(description: 'english-text')
             I18n.locale = :he
-            plucked.should == "english-text"
+            expect(plucked).to eq("english-text")
           end
         end
 

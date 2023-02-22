@@ -653,7 +653,7 @@ describe Mongoid::Config do
       let(:client) { Mongoid.default_client }
 
       it 'passes uuid to driver' do
-        Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
+        expect(Mongo::Client).to receive(:new).with(SpecConfig.instance.addresses,
           auto_encryption_options: {
             'key_vault_namespace' => 'admin.datakeys',
             'kms_providers' => {'local' => {'key' => 'z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U'}},

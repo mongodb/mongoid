@@ -79,7 +79,7 @@ describe Mongoid::Inspectable do
       let(:shirt) { Shirt.new(id: 1, _id: 2) }
 
       it 'shows the correct _id and id values' do
-        shirt.inspect.should == "#<Shirt _id: 2, color: nil, id: \"1\">"
+        expect(shirt.inspect).to eq("#<Shirt _id: 2, color: nil, id: \"1\">")
       end
     end
   end

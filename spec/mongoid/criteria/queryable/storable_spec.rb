@@ -17,7 +17,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to top level' do
-          modified.selector.should == {'$and' => [{'foo' => 'bar'}]}
+          expect(modified.selector).to eq({'$and' => [{'foo' => 'bar'}]})
         end
       end
 
@@ -31,8 +31,8 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to top level' do
-          modified.selector.should == {'zoom' => 'zoom',
-            '$and' => [{'foo' => 'bar'}]}
+          expect(modified.selector).to eq({'zoom' => 'zoom',
+            '$and' => [{'foo' => 'bar'}]})
         end
       end
 
@@ -46,8 +46,8 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to existing $and' do
-          modified.selector.should == {
-            '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}]}
+          expect(modified.selector).to eq({
+            '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}]})
         end
       end
 
@@ -61,9 +61,9 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to existing $and' do
-          modified.selector.should == {
+          expect(modified.selector).to eq({
             '$and' => [{'foo' => 'zoom'}, {'foo' => 'bar'}],
-          }
+          })
         end
       end
 
@@ -80,8 +80,8 @@ describe Mongoid::Criteria::Queryable::Storable do
           end
 
           it 'adds to existing $and' do
-            modified.selector.should == {
-              '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
+            expect(modified.selector).to eq({
+              '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'})
           end
         end
       end
@@ -99,8 +99,8 @@ describe Mongoid::Criteria::Queryable::Storable do
           end
 
           it 'does not add to existing $and' do
-            modified.selector.should == {
-              '$and' => [{'foo' => 'bar'}], 'foo' => 'baz'}
+            expect(modified.selector).to eq({
+              '$and' => [{'foo' => 'bar'}], 'foo' => 'baz'})
           end
         end
       end
@@ -113,7 +113,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to top level' do
-          modified.selector.should == {'$or' => [{'foo' => 'bar'}]}
+          expect(modified.selector).to eq({'$or' => [{'foo' => 'bar'}]})
         end
       end
 
@@ -127,10 +127,10 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds the new conditions' do
-          modified.selector.should == {
+          expect(modified.selector).to eq({
             'zoom' => 'zoom',
             '$or' => ['foo' => 'bar'],
-          }
+          })
         end
       end
 
@@ -144,8 +144,8 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to existing $or' do
-          modified.selector.should == {
-            '$or' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}]}
+          expect(modified.selector).to eq({
+            '$or' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}]})
         end
       end
 
@@ -159,9 +159,9 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the condition' do
-        modified.selector.should == {
+        expect(modified.selector).to eq({
           'foo' => 'bar'
-        }
+        })
       end
     end
 
@@ -171,9 +171,9 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'is not allowed' do
-        lambda do
+        expect do
           modified
-        end.should raise_error(ArgumentError, /Field cannot be an operator/)
+        end.to raise_error(ArgumentError, /Field cannot be an operator/)
       end
     end
 
@@ -187,10 +187,10 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the condition' do
-        modified.selector.should == {
+        expect(modified.selector).to eq({
           'foo' => 'bar',
           'zoom' => 'zoom',
-        }
+        })
       end
     end
 
@@ -204,10 +204,10 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the new condition using $and' do
-        modified.selector.should == {
+        expect(modified.selector).to eq({
           'foo' => 'bar',
           '$and' => ['foo' => 'zoom'],
-        }
+        })
       end
     end
   end

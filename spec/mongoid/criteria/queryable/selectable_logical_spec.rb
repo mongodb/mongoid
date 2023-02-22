@@ -125,7 +125,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'keeps argument type' do
-          selection.selector['field']['$gte'].should be_a(Time)
+          expect(selection.selector['field']['$gte']).to be_a(Time)
         end
       end
 
@@ -141,7 +141,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'converts argument to a time' do
-          selection.selector['field']['$gte'].should be_a(Time)
+          expect(selection.selector['field']['$gte']).to be_a(Time)
         end
       end
 
@@ -157,7 +157,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'converts argument to a time' do
-          selection.selector['field']['$gte'].should be_a(Time)
+          expect(selection.selector['field']['$gte']).to be_a(Time)
         end
       end
     end
@@ -764,10 +764,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'adds new conditions to top level' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             'foo' => 'bar',
             'hello' => 'world',
-          }
+          })
         end
       end
 
@@ -777,10 +777,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'adds new conditions to top level' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             'foo' => 'bar',
             'hello' => 'world',
-          }
+          })
         end
       end
 
@@ -790,13 +790,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'adds new conditions to top level' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             'foo' => 'bar',
             '$or' => [
               {'one' => 'one'},
               {'two' => 'two'},
             ],
-          }
+          })
         end
       end
     end
@@ -966,7 +966,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
 
           it 'keeps the type' do
-            selection.selector[expected_operator].first['field']['$gte'].should be_a(Time)
+            expect(selection.selector[expected_operator].first['field']['$gte']).to be_a(Time)
           end
         end
 
@@ -982,7 +982,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
 
           it 'converts argument to a time' do
-            selection.selector[expected_operator].first['field']['$gte'].should be_a(Time)
+            expect(selection.selector[expected_operator].first['field']['$gte']).to be_a(Time)
           end
         end
 
@@ -998,7 +998,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
 
           it 'converts argument to a time' do
-            selection.selector[expected_operator].first['field']['$gte'].should be_a(Time)
+            expect(selection.selector[expected_operator].first['field']['$gte']).to be_a(Time)
           end
         end
       end
@@ -1137,11 +1137,11 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'combines conditions with $eq' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             expected_operator => [
               'field' => {'$eq' => 1, '$gt' => 0},
             ]
-          }
+          })
         end
       end
 
@@ -1151,11 +1151,11 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'combines conditions with $regex' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             expected_operator => [
               'field' => {'$regex' => /t/, '$gt' => 0},
             ]
-          }
+          })
         end
       end
 
@@ -1657,13 +1657,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'generates the expected query' do
-          query.selector.should == {'$or' => [
+          expect(query.selector).to eq({'$or' => [
             {'a' => 1},
             # Date instance is converted to a Time instance in local time,
             # because we are querying on a Time field and dates are interpreted
             # in local time when assigning to Time fields
             {'published' => {'$gt' => Time.local(2020, 2, 3)}},
-          ]}
+          ]})
         end
       end
 
@@ -1674,13 +1674,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'generates the expected query' do
-          query.selector.should == {'$or' => [
+          expect(query.selector).to eq({'$or' => [
             {'a' => 1},
             # Date instance is converted to a Time instance in UTC,
             # because we are querying on a Date field and dates are interpreted
             # in UTC when persisted as dates by Mongoid
             {'submitted_on' => {'$gt' => Time.utc(2020, 2, 3)}},
-          ]}
+          ]})
         end
       end
     end
@@ -2071,11 +2071,11 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'combines conditions with $eq' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             '$and' => ['$nor' => [
               'field' => {'$eq' => 1, '$gt' => 0},
             ]]
-          }
+          })
         end
       end
 
@@ -2085,11 +2085,11 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'combines conditions with $regex' do
-          selection.selector.should == {
+          expect(selection.selector).to eq({
             '$and' => ['$nor' => [
               'field' => {'$regex' => /t/, '$gt' => 0},
             ]]
-          }
+          })
         end
       end
     end
@@ -2508,13 +2508,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'generates the expected query' do
-          query.selector.should == {'$nor' => [
+          expect(query.selector).to eq({'$nor' => [
             {'a' => 1},
             # Date instance is converted to a Time instance in local time,
             # because we are querying on a Time field and dates are interpreted
             # in local time when assigning to Time fields
             {'published' => {'$gt' => Time.local(2020, 2, 3) } },
-          ] }
+          ] })
         end
       end
 
@@ -2524,13 +2524,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it 'generates the expected query' do
-          query.selector.should == {'$nor' => [
+          expect(query.selector).to eq({'$nor' => [
             {'a' => 1},
             # Date instance is converted to a Time instance in UTC,
             # because we are querying on a Date field and dates are interpreted
             # in UTC when persisted as dates by Mongoid
             {'submitted_on' => {'$gt' => Time.utc(2020, 2, 3)}},
-          ]}
+          ]})
         end
       end
     end

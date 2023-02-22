@@ -17,14 +17,14 @@ describe Mongoid::Document do
       it 'does not freeze the specified data' do
         registry
 
-        data.should_not be_frozen
+        expect(data).not_to be_frozen
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should == data
+        expect(_registry.data).to eq(data)
       end
     end
 
@@ -40,14 +40,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns as a BSON::Binary object' do
-        registry.data.should be_a(BSON::Binary)
+        expect(registry.data).to be_a(BSON::Binary)
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should == BSON::Binary.new(data)
+        expect(_registry.data).to eq(BSON::Binary.new(data))
       end
     end
 
@@ -61,14 +61,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.data.should be nil
+        expect(registry.data).to be nil
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should be nil
+        expect(_registry.data).to be nil
       end
     end
 
@@ -82,14 +82,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.data.should be nil
+        expect(registry.data).to be nil
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should be nil
+        expect(_registry.data).to be nil
       end
     end
   end
@@ -107,14 +107,14 @@ describe Mongoid::Document do
       it 'does not freeze the specified data' do
         registry
 
-        obj_id.should_not be_frozen
+        expect(obj_id).not_to be_frozen
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == obj_id
+        expect(_registry.obj_id).to eq(obj_id)
       end
     end
 
@@ -128,14 +128,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns as a BSON::Binary object' do
-        registry.obj_id.should be_a(BSON::ObjectId)
+        expect(registry.obj_id).to be_a(BSON::ObjectId)
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == BSON::ObjectId.from_string(obj_id)
+        expect(_registry.obj_id).to eq(BSON::ObjectId.from_string(obj_id))
       end
     end
 
@@ -149,14 +149,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.obj_id.should be nil
+        expect(registry.obj_id).to be nil
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should be nil
+        expect(_registry.obj_id).to be nil
       end
     end
 
@@ -170,14 +170,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.obj_id.should == "hello"
+        expect(registry.obj_id).to eq("hello")
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == "hello"
+        expect(_registry.obj_id).to eq("hello")
       end
     end
 
@@ -191,14 +191,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.obj_id.should == :sym
+        expect(registry.obj_id).to eq(:sym)
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == :sym
+        expect(_registry.obj_id).to eq(:sym)
       end
     end
   end
@@ -214,11 +214,11 @@ describe Mongoid::Document do
       end
 
       it 'round-trips the value' do
-        found_church.location[:state].should == :ny
+        expect(found_church.location[:state]).to eq(:ny)
       end
 
       it 'stringifies the key' do
-        found_church.location.keys.should == %w(state)
+        expect(found_church.location.keys).to eq(%w(state))
       end
 
       it 'retrieves value as symbol via driver' do
@@ -227,7 +227,7 @@ describe Mongoid::Document do
         church
 
         v = Church.collection.find.first
-        v['location'].should == {'state' => :ny}
+        expect(v['location']).to eq({'state' => :ny})
       end
     end
   end

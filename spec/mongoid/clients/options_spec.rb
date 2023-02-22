@@ -127,8 +127,8 @@ describe Mongoid::Clients::Options, retry: 3 do
           it 'disconnects the new cluster when the block exits' do
             expect(cluster_after).not_to be(cluster_during)
 
-            cluster_during.connected?.should be false
-            cluster_before.connected?.should be true
+            expect(cluster_during.connected?).to be false
+            expect(cluster_before.connected?).to be true
           end
         end
 
@@ -143,13 +143,13 @@ describe Mongoid::Clients::Options, retry: 3 do
           it 'does not create a new cluster' do
             expect(connections_during).to eq(connections_before)
 
-            cluster_during.should be cluster_before
+            expect(cluster_during).to be cluster_before
           end
 
           it 'does not disconnect the original cluster' do
             expect(cluster_before).to be(cluster_after)
 
-            cluster_before.connected?.should be true
+            expect(cluster_before.connected?).to be true
           end
         end
 
