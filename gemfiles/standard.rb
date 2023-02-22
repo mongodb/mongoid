@@ -20,7 +20,7 @@ def standard_dependencies
 
   group :development, :test do
     gem 'rspec-core', '~> 3.10'
-    gem 'rubocop', git: 'https://github.com/rubocop/rubocop.git'
+    gem 'rubocop', '~> 1.46.0'
     gem 'rubocop-performance', '~> 1.16.0'
     gem 'rubocop-rails', '~> 2.17.4'
     gem 'rubocop-rake', '~> 0.6.0'
