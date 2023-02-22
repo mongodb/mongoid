@@ -12,7 +12,11 @@ module Mongoid
       # @example Remove the document.
       #   document.remove
       #
-      # @param [ Hash ] options Options to pass to remove.
+      # @param [ Hash ] options The options.
+      # @option options [ true | false ] :persist Whether to persist
+      #   the delete action.
+      # @option options [ true | false ] :suppress Whether to update
+      #   the parent document in-memory when deleting an embedded document.
       #
       # @return [ TrueClass ] True.
       def delete(options = {})
