@@ -204,6 +204,25 @@ This means that, by default, Mongoid 9 will update the existing document and
 will not replace it.
 
 
+The immutability of the ``_id`` field is now enforced
+-----------------------------------------------------
+
+Prior to Mongoid 9.0, mutating the ``_id`` field behaved inconsistently
+depending on whether the document was top-level or embedded, and depending on
+how the update was performed. As of 9.0, changing the ``_id`` field will now
+raise an exception when the document is saved, if the document had been
+previously persisted.
+
+Mongoid 9.0 also introduces a new feature flag, ``immutable_ids``, which
+defaults to ``true``.
+
+.. code-block:: ruby
+
+  Mongoid::Config.immutable_ids = true
+
+When set to false, the older, inconsistent behavior is restored.
+
+
 Bug Fixes and Improvements
 --------------------------
 
