@@ -167,7 +167,7 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
         it_behaves_like ':touch is in the options'
       end
 
-      context 'when the option is true' do
+      context 'when the option is false' do
         let(:options) { { touch: false } }
         it_behaves_like ':touch is in the options'
       end
