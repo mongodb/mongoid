@@ -5,7 +5,6 @@ require 'lite_spec_helper'
 MODELS = File.join(File.dirname(__FILE__), "support/models")
 $LOAD_PATH.unshift(MODELS)
 
-require 'logger'
 require "action_controller"
 require 'rspec/retry'
 
