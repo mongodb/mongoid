@@ -341,12 +341,11 @@ module Mongoid
           klass.re_define_method("#{name}=") do |object|
             without_autobuild do
               if value = get_relation(name, association, object)
-                if value.respond_to?(:substitute)
-                  set_relation(name, value.substitute(object.substitutable))
-                else
-                  value = __build__(name, value, association)
-                  set_relation(name, value.substitute(object.substitutable))
+                if !value.respond_to?(:substitute)
+                  value = __build__(name, value, association) 
                 end
+
+                set_relation(name, value.substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, association)
               end

@@ -191,6 +191,24 @@ persistence operation per parent document, even when using multiple
 levels of nested embedded documents.
 
 
+``embedded_in`` associations now default to ``touch: true``
+-----------------------------------------------------------
+
+Updating an embedded subdocument will now automatically touch the parent,
+unless you explicitly set ``touch: false`` on the relation:
+
+.. code-block:: ruby
+
+  class Address
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embedded_in :mall, touch: false
+  end
+
+For all other associations, the default remains ``touch: false``.
+
+
 Flipped default for ``:replace`` option in ``#upsert``
 ------------------------------------------------------
 
