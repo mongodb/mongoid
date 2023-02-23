@@ -18,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - mongodb: '6.0'
+        - mongodb: '5.0'
           ruby: ruby-3.1
-          topology: replica_set
+          topology: server
           os: ubuntu-20.04
           task: test
           driver: current
@@ -28,120 +28,49 @@ jobs:
           i18n:
           gemfile: Gemfile
           experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails:
-          i18n:
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails:
-          i18n:
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: master
-          rails:
-          i18n:
-          gemfile: gemfiles/driver_master.gemfile
-          experimental: true
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: stable
-          rails:
-          i18n:
-          gemfile: gemfiles/driver_stable.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '7.0'
-          i18n:
-          gemfile: gemfiles/rails-7.0.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.1'
-          i18n:
-          gemfile: gemfiles/rails-6.1.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '7.0'
-          i18n:
-          gemfile: gemfiles/rails-7.0.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.1'
-          i18n:
-          gemfile: gemfiles/rails-6.1.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.0'
-          i18n:
-          gemfile: gemfiles/rails-6.0.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-2.7
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '5.2'
-          i18n:
-          gemfile: gemfiles/rails-5.2.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: jruby-9.3
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.0'
-          i18n:
-          gemfile: gemfiles/rails-6.0.gemfile
-          experimental: false
-
         - mongodb: '5.0'
           ruby: ruby-3.1
           topology: replica_set
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails:
+          i18n:
+          gemfile: Gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails:
+          i18n:
+          gemfile: Gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: replica_set
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails:
+          i18n:
+          gemfile: Gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: jruby-9.3
+          topology: replica_set
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails:
+          i18n:
+          gemfile: Gemfile
+          experimental: false
+        - mongodb: '4.4'
+          ruby: ruby-2.7
+          topology: server
           os: ubuntu-20.04
           task: test
           driver: current
@@ -160,7 +89,17 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '4.0'
-          ruby: ruby-2.7
+          ruby: ruby-2.6
+          topology: server
+          os: ubuntu-18.04
+          task: test
+          driver: current
+          rails:
+          i18n:
+          gemfile: Gemfile
+          experimental: false
+        - mongodb: '4.0'
+          ruby: ruby-2.6
           topology: replica_set
           os: ubuntu-18.04
           task: test
@@ -170,7 +109,17 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '3.6'
-          ruby: ruby-2.7
+          ruby: ruby-2.6
+          topology: server
+          os: ubuntu-18.04
+          task: test
+          driver: current
+          rails:
+          i18n:
+          gemfile: Gemfile
+          experimental: false
+        - mongodb: '3.6'
+          ruby: ruby-2.6
           topology: replica_set
           os: ubuntu-18.04
           task: test
@@ -179,7 +128,166 @@ jobs:
           i18n:
           gemfile: Gemfile
           experimental: false
-
+        - mongodb: '5.0'
+          ruby: ruby-3.1
+          topology: replica_set
+          os: ubuntu-20.04
+          task: test
+          driver: master
+          rails:
+          i18n:
+          gemfile: gemfiles/driver_master.gemfile
+          experimental: true
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: replica_set
+          os: ubuntu-20.04
+          task: test
+          driver: stable
+          rails:
+          i18n:
+          gemfile: gemfiles/driver_stable.gemfile
+          experimental: false
+        - mongodb: '4.0'
+          ruby: ruby-2.6
+          topology: replica_set
+          os: ubuntu-18.04
+          task: test
+          driver: oldstable
+          rails:
+          i18n:
+          gemfile: gemfiles/driver_oldstable.gemfile
+          experimental: false
+        - mongodb: '4.0'
+          ruby: ruby-2.6
+          topology: replica_set
+          os: ubuntu-18.04
+          task: test
+          driver: min
+          rails:
+          i18n:
+          gemfile: gemfiles/driver_min.gemfile
+          experimental: false
+        - mongodb: '3.6'
+          ruby: ruby-2.6
+          topology: server
+          os: ubuntu-18.04
+          task: test
+          driver: min
+          rails:
+          i18n:
+          gemfile: gemfiles/driver_min.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.1
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '7.0'
+          i18n:
+          gemfile: gemfiles/rails-7.0.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.1
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '6.1'
+          i18n:
+          gemfile: gemfiles/rails-6.1.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '7.0'
+          i18n:
+          gemfile: gemfiles/rails-7.0.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '6.1'
+          i18n:
+          gemfile: gemfiles/rails-6.1.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-3.0
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '6.0'
+          i18n:
+          gemfile: gemfiles/rails-6.0.gemfile
+          experimental: false
+        - mongodb: '4.0'
+          ruby: ruby-2.7
+          topology: server
+          os: ubuntu-18.04
+          task: test
+          driver: current
+          rails: '5.2'
+          i18n:
+          gemfile: gemfiles/rails-5.2.gemfile
+          experimental: false
+        - mongodb: '4.4'
+          ruby: ruby-2.6
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails:
+          i18n: '1.0'
+          gemfile: gemfiles/i18n-1.0.gemfile
+          experimental: false
+        - mongodb: '4.2'
+          ruby: ruby-2.6
+          topology: server
+          os: ubuntu-18.04
+          task: test
+          driver: current
+          rails:
+          i18n: '1.0'
+          gemfile: gemfiles/i18n-1.0.gemfile
+          experimental: false
+        - mongodb: '4.2'
+          ruby: ruby-2.6
+          topology: server
+          os: ubuntu-18.04
+          task: test
+          driver: current
+          rails:
+          i18n: current
+          gemfile: Gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: ruby-2.7
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '5.2'
+          i18n:
+          gemfile: gemfiles/rails-5.2.gemfile
+          experimental: false
+        - mongodb: '5.0'
+          ruby: jruby-9.3
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '6.0'
+          i18n:
+          gemfile: gemfiles/rails-6.0.gemfile
+          experimental: false
 
     steps:
     - name: repo checkout
@@ -198,7 +306,9 @@ jobs:
         BUNDLE_GEMFILE: "${{matrix.gemfile}}"
       with:
         ruby-version: "${{matrix.ruby}}"
-        bundler: 2
+        bundler: 2.4.7
+    - name: rubygems
+      run: gem update --system
     - name: bundle
       run: bundle install --jobs 4 --retry 3
       env:
