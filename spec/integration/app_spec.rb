@@ -10,6 +10,15 @@ def check_call(cmd, **opts)
   Mrss::ChildProcessHelper.check_call(cmd, **opts)
 end
 
+def gem_version_argument(version)
+  "_#{version}_" if version
+end
+
+def insert_rails_gem_version(cmd)
+  gem_version = gem_version_argument(SpecConfig.instance.installed_rails_version)
+  cmd.tap { cmd[1,0] = gem_version if gem_version }
+end
+
 describe 'Mongoid application tests' do
   before(:all) do
     unless SpecConfig.instance.app_tests?
@@ -91,7 +100,7 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(%W(rails new #{name} --skip-spring --skip-active-record), env: clean_env)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --skip-spring --skip-active-record)), env: clean_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
@@ -265,7 +274,7 @@ describe 'Mongoid application tests' do
   def write_mongoid_yml
     # HACK: the driver does not provide a MongoDB URI parser and assembler,
     # and the Ruby standard library URI module doesn't handle multiple hosts.
-    parts = parse_mongodb_uri(SpecConfig.instance.safe_uri)
+    parts = parse_mongodb_uri(SpecConfig.instance.uri_str)
     parts[:database] = 'mongoid_test'
     uri = build_mongodb_uri(parts)
     p uri
