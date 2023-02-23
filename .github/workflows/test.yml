@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
         - mongodb: '6.0'
-          ruby: ruby-3.2
+          ruby: ruby-3.1
           topology: replica_set
           os: ubuntu-20.04
           task: test
@@ -69,7 +69,7 @@ jobs:
           gemfile: gemfiles/driver_stable.gemfile
           experimental: false
         - mongodb: '6.0'
-          ruby: ruby-3.2
+          ruby: ruby-3.1
           topology: server
           os: ubuntu-20.04
           task: test
