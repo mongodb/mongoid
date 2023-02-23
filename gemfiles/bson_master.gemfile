@@ -4,8 +4,8 @@ gemspec path: '..'
 gem 'bson', git: "https://github.com/mongodb/bson-ruby"
 gem 'mongo'
 
-gem 'actionpack', '~> 5.2'
-gem 'activemodel', '~> 5.2'
+gem 'actionpack', '>= 5.1'
+gem 'activemodel', '>= 5.1'
 
 gemspec path: '..'
 
