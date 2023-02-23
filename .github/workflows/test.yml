@@ -49,16 +49,6 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '6.0'
-          ruby: jruby-9.4
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails:
-          i18n:
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '6.0'
           ruby: ruby-3.1
           topology: replica_set
           os: ubuntu-20.04
@@ -180,7 +170,7 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '3.6'
-          ruby: ruby-2.6
+          ruby: ruby-2.7
           topology: replica_set
           os: ubuntu-18.04
           task: test
