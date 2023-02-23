@@ -180,7 +180,7 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '3.6'
-          ruby: ruby-2.7
+          ruby: ruby-2.6
           topology: replica_set
           os: ubuntu-18.04
           task: test
