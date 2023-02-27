@@ -6,7 +6,7 @@ module Mongoid
       class BelongsTo
 
         # Eager class for belongs_to associations.
-        class Eager < Association::Referenced::Eager::Base
+        class Eager < Association::Eager
 
           private
 
