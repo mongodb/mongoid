@@ -280,7 +280,7 @@ for details on driver options.
       # error. (default: true)
       belongs_to_required_by_default: true
 
-      # Maintain broken behavior of sum over empty result sets for backwards
+      # (Deprecated) Maintain broken behavior of sum over empty result sets for backwards
       # compatibility. When calculating a sum on a field with a null context,
       # for example:
       #
@@ -297,12 +297,12 @@ for details on driver options.
       # (default: false)
       #broken_aggregables: true
 
-      # Ignore aliased fields in embedded documents when performing pluck and
+      # (Deprecated) Ignore aliased fields in embedded documents when performing pluck and
       # distinct operations, for backwards compatibility.
       # (default: false)
       #broken_alias_handling: true
 
-      # Maintain broken `and' method behavior that existed in Mongoid 7.3
+      # (Deprecated) Maintain broken `and' method behavior that existed in Mongoid 7.3
       # and earlier for backwards compatibility: in some situations, conditions
       # already present in a Criteria object would be replaced by newer
       # conditions when `and' method is used instead of the new conditions
@@ -325,12 +325,12 @@ for details on driver options.
       # (default: false)
       #broken_and: true
 
-      # When exiting a nested `with_scope' block, set the current scope to
+      # (Deprecated) When exiting a nested `with_scope' block, set the current scope to
       # nil instead of the parent scope for backwards compatibility.
       # (default: false)
       #broken_scoping: true
 
-      # Maintain broken update behavior in some cases for backwards
+      # (Deprecated) Maintain broken update behavior in some cases for backwards
       # compatibility.
       #
       # In Mongoid 7.3 and earlier, when assigning a value to an embedded
@@ -350,7 +350,7 @@ for details on driver options.
       # (default: false)
       #broken_updates: true
 
-      # Time objects in Ruby have nanosecond precision, whereas MongoDB server
+      # (Deprecated) Time objects in Ruby have nanosecond precision, whereas MongoDB server
       # can only store times with millisecond precision. Set this option to
       # true to truncate times to millisecond precision when performing
       # queries on already loaded embedded associations (this is also called
@@ -383,13 +383,13 @@ for details on driver options.
       # to parent contexts by default. (default: false)
       join_contexts: false
 
-      # When this flag is true, the attributes method on a document will return
+      # (Deprecated) When this flag is true, the attributes method on a document will return
       # a BSON::Document when that document is retrieved from the database, and
       # a Hash otherwise. When this flag is false, the attributes method will
       # always return a Hash. (default: false)
       #legacy_attributes: true
 
-      # Maintain legacy behavior of pluck and distinct, which does not demongoize
+      # (Deprecated) Maintain legacy behavior of pluck and distinct, which does not demongoize
       # values on returning them. Setting this option to false will cause
       # pluck and distinct to return demongoized values. Setting this option to
       # false will also allow retrieving *_translations fields from pluck and
@@ -409,7 +409,7 @@ for details on driver options.
       # (default: false)
       #legacy_readonly: true
 
-      # Maintain legacy behavior of === on Mongoid document classes, which
+      # (Deprecated) Maintain legacy behavior of === on Mongoid document classes, which
       # returns true in a number of cases where Ruby's === implementation would
       # return false. Note that the behavior of === on Mongoid document
       # instances differs from both the behavior of === on document classes
@@ -426,13 +426,13 @@ for details on driver options.
       # as a BSON::Decimal128 instead of a string. (default: true)
       #map_big_decimal_to_decimal128: true
 
-      # Force ``BSON::ObjectId#as_json`` method to return the hash
+      # (Deprecated) Force ``BSON::ObjectId#as_json`` method to return the hash
       # { "$oid" => id.to_s }. When this option is false, and bson-ruby 5
       # is used, the return value will be the hexadecimal ObjectId string only.
       # (default: false)
       #object_id_as_json_oid: true
 
-      # When chaining the same operators that use the same field, setting this
+      # (Deprecated) When chaining the same operators that use the same field, setting this
       # feature flag to false will cause those operators to be combined using an
       # and. Setting this feature flag to true will cause the later chained
       # operators to overwrite the earlier ones. (default: false)
