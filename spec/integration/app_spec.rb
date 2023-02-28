@@ -10,6 +10,15 @@ def check_call(cmd, **opts)
   Mrss::ChildProcessHelper.check_call(cmd, **opts)
 end
 
+def gem_version_argument(version)
+  "_#{version}_" if version
+end
+
+def insert_rails_gem_version(cmd)
+  gem_version = gem_version_argument(SpecConfig.instance.installed_rails_version)
+  cmd.tap { cmd[1,0] = gem_version if gem_version }
+end
+
 describe 'Mongoid application tests' do
   before(:all) do
     unless SpecConfig.instance.app_tests?
@@ -86,50 +95,68 @@ describe 'Mongoid application tests' do
     rv
   end
 
+  def prepare_new_rails_app(name)
+    install_rails
+
+    Dir.chdir(TMP_BASE) do
+      FileUtils.rm_rf(name)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --skip-spring --skip-active-record)), env: clean_env)
+
+      Dir.chdir(name) do
+        adjust_rails_defaults
+        adjust_app_gemfile
+        check_call(%w(bundle install), env: clean_env)
+
+        yield
+      end
+    end
+  end
+
   context 'new application - rails' do
     it 'creates' do
-      install_rails
+      prepare_new_rails_app 'mongoid-test' do
+        check_call(%w(rails g model post), env: clean_env)
+        check_call(%w(rails g model comment post:belongs_to), env: clean_env)
 
-      Dir.chdir(TMP_BASE) do
-        FileUtils.rm_rf('mongoid-test')
-        check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
-
-        Dir.chdir('mongoid-test') do
-          adjust_app_gemfile
-          check_call(%w(bundle install), env: clean_env)
-
-          check_call(%w(rails g model post), env: clean_env)
-          check_call(%w(rails g model comment post:belongs_to), env: clean_env)
-
-          # https://jira.mongodb.org/browse/MONGOID-4885
-          comment_text = File.read('app/models/comment.rb')
-          comment_text.should =~ /belongs_to :post/
-          comment_text.should_not =~ /embedded_in :post/
-        end
+        # https://jira.mongodb.org/browse/MONGOID-4885
+        comment_text = File.read('app/models/comment.rb')
+        comment_text.should =~ /belongs_to :post/
+        comment_text.should_not =~ /embedded_in :post/
       end
     end
 
     it 'generates Mongoid config' do
-      install_rails
+      prepare_new_rails_app 'mongoid-test-config' do
+        mongoid_config_file = File.join(TMP_BASE, 'mongoid-test-config/config/mongoid.yml')
 
-      Dir.chdir(TMP_BASE) do
-        FileUtils.rm_rf('mongoid-test-config')
-        check_call(%w(rails new mongoid-test-config --skip-spring --skip-active-record), env: clean_env)
+        File.exist?(mongoid_config_file).should be false
+        check_call(%w(rails g mongoid:config), env: clean_env)
+        File.exist?(mongoid_config_file).should be true
 
-        Dir.chdir('mongoid-test-config') do
-          adjust_app_gemfile
-          check_call(%w(bundle install), env: clean_env)
+        config_text = File.read(mongoid_config_file)
+        expect(config_text).to match /mongoid_test_config_development/
+        expect(config_text).to match /mongoid_test_config_test/
 
-          mongoid_config_file = File.join(TMP_BASE,'mongoid-test-config/config/mongoid.yml')
-
-          File.exist?(mongoid_config_file).should be false
-          check_call(%w(rails g mongoid:config), env: clean_env)
-          File.exist?(mongoid_config_file).should be true
-
-          config_text = File.read(mongoid_config_file)
-          config_text.should =~ /mongoid_test_config_development/
-          config_text.should =~ /mongoid_test_config_test/
+        Mongoid::Config::Introspection.options(include_deprecated: true).each do |opt|
+          if opt.deprecated?
+            # deprecated options should not be included
+            expect(config_text).not_to include "# #{opt.name}:"
+          else
+            block = "    #{opt.indented_comment(indent: 4)}\n" \
+                    "    # #{opt.name}: #{opt.default}\n"
+            expect(config_text).to include block
+          end
         end
+      end
+    end
+
+    it 'generates Mongoid initializer' do
+      prepare_new_rails_app 'mongoid-test-init' do
+        mongoid_initializer = File.join(TMP_BASE, 'mongoid-test-init/config/initializers/mongoid.rb')
+
+        File.exist?(mongoid_initializer).should be false
+        check_call(%w(rails g mongoid:config), env: clean_env)
+        File.exist?(mongoid_initializer).should be true
       end
     end
   end
@@ -247,7 +274,7 @@ describe 'Mongoid application tests' do
   def write_mongoid_yml
     # HACK: the driver does not provide a MongoDB URI parser and assembler,
     # and the Ruby standard library URI module doesn't handle multiple hosts.
-    parts = parse_mongodb_uri(SpecConfig.instance.safe_uri)
+    parts = parse_mongodb_uri(SpecConfig.instance.uri_str)
     parts[:database] = 'mongoid_test'
     uri = build_mongodb_uri(parts)
     p uri

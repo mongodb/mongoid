@@ -46,11 +46,16 @@ module Mongoid
         when "7.5"
           # flags introduced in 8.0 - old functionality
           self.map_big_decimal_to_decimal128 = false
+          
+          load_defaults "8.0"
         when "8.0"
-          # All flag defaults currently reflect 8.0 behavior.
           self.legacy_readonly = true
+
+          load_defaults "8.1"
         when "8.1"
-          # All flag defaults currently reflect 8.1 behavior.
+          self.immutable_ids = false
+
+          load_defaults "9.0"
         when "9.0"
           # All flag defaults currently reflect 9.0 behavior.
         else

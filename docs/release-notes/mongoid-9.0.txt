@@ -17,6 +17,88 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+``touch`` method now clears changed state
+-----------------------------------------
+
+In Mongoid 8.x and older ``touch`` method leaves models in the changed state:
+
+.. code-block:: ruby
+
+  # Mongoid 8.x behaviour
+  band = Band.create!
+  band.touch
+  band.changed? # => true
+  band.changes # => {"updated_at"=>[2023-01-30 13:12:57.477191135 UTC, 2023-01-30 13:13:11.482975646 UTC]}
+
+Starting from 9.0 Mongoid now correctly clears changed state after using ``touch``
+method.
+
+.. code-block:: ruby
+
+  # Mongoid 9.0 behaviour
+  band = Band.create!
+  band.touch
+  band.changed? # => false
+  band.changes # => {}
+
+Sandbox Mode for Rails Console
+------------------------------
+
+Mongoid now supports Rails console sandbox mode. If the Rails console started
+with ``--sandbox`` flag, Mongoid starts a transaction on the ``:default`` client
+before opening the console. This transaction won't be committed; therefore, all
+the commands executed in the console using the ``:default`` client won't
+be persisted in the database.
+
+.. note::
+  If you execute commands in the sandbox mode *using any other client than default*,
+  these changes will be persisted as usual.
+
+New Transactions API
+--------------------
+
+Mongoid 9.0 introduces new transactions API that is inspired by ActiveRecord:
+
+.. code-block:: ruby
+
+  Band.transaction do
+    Band.create(title: 'Led Zeppelin')
+  end
+
+  band = Band.create(title: 'Deep Purple')
+  band.transaction do
+    band.active = false
+    band.save!
+  end
+
+Please consult :ref:`transactions documentation <transactions>` for more details.
+
+Embedded Documents Always Use Parent Persistence Context
+--------------------------------------------------------
+
+Mongoid 8.x and older allows user to specify persistence context for an
+embedded document (using ``store_in`` macro). In Mongoid 9.0 these settings are
+ignored for embedded documents; an embedded document now always uses the persistence
+context of its parent.
+
+
+Support for Passing Raw Values into Queries
+-------------------------------------------
+
+When performing queries, it is now possible skip Mongoid's type coercion logic
+using the ``Mongoid::RawValue`` wrapper class. This can be useful when legacy
+data in the database is of a different type than the field definition.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     field :age, type: Integer
+   end
+
+   # Query for the string "42", not the integer 42
+   Person.where(age: Mongoid::RawValue("42"))
+
 
 Raise AttributeNotLoaded error when accessing fields omitted from query projection
 ----------------------------------------------------------------------------------
@@ -109,6 +191,24 @@ persistence operation per parent document, even when using multiple
 levels of nested embedded documents.
 
 
+``embedded_in`` associations now default to ``touch: true``
+-----------------------------------------------------------
+
+Updating an embedded subdocument will now automatically touch the parent,
+unless you explicitly set ``touch: false`` on the relation:
+
+.. code-block:: ruby
+
+  class Address
+    include Mongoid::Document
+    include Mongoid::Timestamps
+
+    embedded_in :mall, touch: false
+  end
+
+For all other associations, the default remains ``touch: false``.
+
+
 Flipped default for ``:replace`` option in ``#upsert``
 ------------------------------------------------------
 
@@ -120,6 +220,25 @@ Mongoid 9.0 flips the default of this flag from ``true`` => ``false``.
 
 This means that, by default, Mongoid 9 will update the existing document and
 will not replace it.
+
+
+The immutability of the ``_id`` field is now enforced
+-----------------------------------------------------
+
+Prior to Mongoid 9.0, mutating the ``_id`` field behaved inconsistently
+depending on whether the document was top-level or embedded, and depending on
+how the update was performed. As of 9.0, changing the ``_id`` field will now
+raise an exception when the document is saved, if the document had been
+previously persisted.
+
+Mongoid 9.0 also introduces a new feature flag, ``immutable_ids``, which
+defaults to ``true``.
+
+.. code-block:: ruby
+
+  Mongoid::Config.immutable_ids = true
+
+When set to false, the older, inconsistent behavior is restored.
 
 
 Support for Defining Custom Field Type Values
