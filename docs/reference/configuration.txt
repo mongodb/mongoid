@@ -450,7 +450,7 @@ for details on driver options.
       # existing method. (default: false)
       scope_overwrite_exception: false
 
-      # Use ActiveSupport's time zone in time operations instead of
+      # (Deprecated) Use ActiveSupport's time zone in time operations instead of
       # the Ruby default time zone. See the time zone section below for
       # further information. (default: true)
       use_activesupport_time_zone: true
@@ -463,6 +463,7 @@ for details on driver options.
       # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
       # indexes in the background by default. (default: false)
       background_indexing: false
+
     # Configure driver-specific options. (optional)
     driver_options:
       # When this flag is turned off, inline options will be correctly
@@ -768,7 +769,11 @@ Note that MongoDB stores all times in UTC without time zone information.
 
 Mongoid offers the following time zone-related configuration options:
 
-- ``use_activesupport_time_zone``: If true, prefer to work with times using
+- ``use_activesupport_time_zone``:
+  This option is deprecated and will be removed in Mongoid 9.0,
+  always behaving as true.
+
+  If true (default), prefer to work with times using
   ``ActiveSupport::TimeWithZone``. Values in fields of type ``Time``
   will be returned as instances of ``ActiveSupport::TimeWithZone``.
   When parsing times without time zone information (such as when
@@ -787,6 +792,7 @@ Mongoid offers the following time zone-related configuration options:
   Also note that Mongoid may still utilize both ``Time`` and
   ``ActiveSupport::TimeWithZone`` classes internally, as appropriate,
   regardless of the ``use_activesupport_time_zone`` setting.
+
 - ``use_utc``:
   If true, times stored in MongoDB will be returned in UTC.
   If false, times stored in MongoDB will be returned in local time

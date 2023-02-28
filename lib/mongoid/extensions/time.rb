@@ -34,6 +34,8 @@ module Mongoid
         #   ::Time.configured
         #
         # @return [ Time ] The configured time.
+        #
+        # @deprecated
         def configured
           Mongoid.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
         end
