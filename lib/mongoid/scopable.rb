@@ -168,7 +168,9 @@ module Mongoid
       #     Band.where(name: "Depeche Mode")
       #   end
       #
-      # @note This will force the default scope to be removed.
+      # @note This will force the default scope to be removed, but will not
+      #   remove scopes declared with ``.with_scope``. This will be changed
+      #   in Mongoid 9.
       #
       # @return [ Criteria | Object ] The unscoped criteria or result of the
       #   block.

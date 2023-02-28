@@ -1,7 +1,7 @@
 module Mongoid
   module Matcher
 
-    # @see https://docs.mongodb.com/manual/reference/operator/query/type/
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/type/
     #
     # @api private
     module Type

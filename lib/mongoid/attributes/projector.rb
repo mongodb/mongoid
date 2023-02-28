@@ -6,7 +6,7 @@ module Mongoid
     # This module defines projection helpers.
     #
     # Projection rules are rather non-trivial. See
-    # https://docs.mongodb.com/manual/reference/method/db.collection.find/#find-projection
+    # https://www.mongodb.com/docs/manual/reference/method/db.collection.find/#find-projection
     # for server documentation.
     # 4.4 server (and presumably all older ones) requires that a projection
     # for content fields is either exclusionary or inclusionary, i.e. one
