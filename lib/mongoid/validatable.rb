@@ -118,7 +118,7 @@ module Mongoid
       # @example Set up validation.
       #   Person.validates_relation(association)
       #
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       def validates_relation(association)
         if association.validate?
           validates_associated(association.name)

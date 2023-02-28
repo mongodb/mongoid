@@ -14,7 +14,7 @@ module Mongoid
           #
           # @param [ Document ] base The document the association hangs off of.
           # @param [ Document ] target The target (parent) of the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           #
           # @return [ In ] The proxy.
           def initialize(base, target, association)
