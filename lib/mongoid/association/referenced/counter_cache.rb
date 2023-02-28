@@ -92,7 +92,7 @@ module Mongoid
         # @example Add the touchable.
         #   Mongoid::Association::Referenced::CounterCache.define_callbacks!(association)
         #
-        # @param [ Association ] association The association.
+        # @param [ Mongoid::Association::Relatable ] association The association.
         #
         # @return [ Class ] The association's owning class.
         def self.define_callbacks!(association)

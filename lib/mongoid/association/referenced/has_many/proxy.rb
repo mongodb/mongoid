@@ -222,7 +222,7 @@ module Mongoid
           #
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Array<Document> ] target The target of the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def initialize(base, target, association)
             enum = HasMany::Enumerable.new(target, base, association)
             init(base, enum, association) do

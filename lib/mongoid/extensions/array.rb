@@ -126,7 +126,7 @@ module Mongoid
         # @example Mongoize the object.
         #   Array.__mongoize_fk__(constraint, object)
         #
-        # @param [ Association ] association The association metadata.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         # @param [ Object ] object The object to convert.
         #
         # @return [ Array ] The array of ids.

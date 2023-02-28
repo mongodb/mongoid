@@ -45,7 +45,7 @@ module Mongoid
             # trying to store the empty list.
             #
             # @param [ Document ] parent The parent document to store in.
-            # @param [ Association ] association The association.
+            # @param [ Mongoid::Association::Relatable ] association The association metadata.
             #
             # @return [ String ] The position string.
             def position_without_document(parent, association)
