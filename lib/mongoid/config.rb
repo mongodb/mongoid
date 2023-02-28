@@ -4,6 +4,7 @@ require "mongoid/config/defaults"
 require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
+require "mongoid/config/introspection"
 
 module Mongoid
 
@@ -149,6 +150,13 @@ module Mongoid
     # When this feature flag is turned on, the read-only state will be reset on
     # reload, but when it is turned off, it won't be.
     option :legacy_readonly, default: false
+
+    # When this flag is true, any attempt to change the _id of a persisted
+    # document will raise an exception (`Errors::ImmutableAttribute`).
+    # This is the default in 9.0. Setting this flag to false restores the
+    # pre-9.0 behavior, where changing the _id of a persisted
+    # document might be ignored, or it might work, depending on the situation.
+    option :immutable_ids, default: true
 
     # Returns the Config singleton, for use in the configure DSL.
     #

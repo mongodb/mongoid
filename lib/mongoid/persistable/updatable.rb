@@ -97,23 +97,17 @@ module Mongoid
       # @return [ true | false ] The result of the update.
       def prepare_update(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        enforce_immutability_of_id_field!
         return false if performing_validations?(options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys
         update_children = cascadable_children(:update)
-        process_touch_option(options, update_children)
-        run_callbacks(:save, with_children: false) do
-          run_callbacks(:update, with_children: false) do
-            run_callbacks(:persist_parent, with_children: false) do
-              _mongoid_run_child_callbacks(:save) do
-                _mongoid_run_child_callbacks(:update, children: update_children) do
-                  result = yield(self)
-                  self.previously_new_record = false
-                  post_process_persist(result, options)
-                  true
-                end
-              end
-            end
+        process_touch_option(options, update_children) do
+          run_all_callbacks_for_update(update_children) do
+            result = yield(self)
+            self.previously_new_record = false
+            post_process_persist(result, options)
+            true
           end
         end
       end
@@ -179,11 +173,61 @@ module Mongoid
       # @option options [ true | false ] :touch Whether or not the updated_at
       #   attribute will be updated with the current time.
       def process_touch_option(options, children)
-        unless options.fetch(:touch, true)
+        if options.fetch(:touch, true)
+          yield
+        else
           timeless
           children.each(&:timeless)
+          suppress_touch_callbacks { yield }
         end
       end
+
+      # Checks to see if the _id field has been modified. If it has, and if
+      # the document has already been persisted, this is an error. Otherwise,
+      # returns without side-effects.
+      #
+      # Note that if `Mongoid::Config.immutable_ids` is false, this will do
+      # nothing.
+      #
+      # @raise [ Errors::ImmutableAttribute ] if _id has changed, and document
+      #   has been persisted.
+      def enforce_immutability_of_id_field!
+        # special case here: we *do* allow the _id to be mutated if it was
+        # previously nil. This addresses an odd case exposed in
+        # has_one/proxy_spec.rb where `person.create_address` would
+        # (somehow?) create the address with a nil _id first, before then
+        # saving it *again* with the correct _id.
+
+        if _id_changed? && !_id_was.nil? && persisted?
+          if Mongoid::Config.immutable_ids
+            raise Errors::ImmutableAttribute.new(:_id, _id)
+          else
+            Mongoid::Warnings.warn_mutable_ids
+          end
+        end
+      end
+
+      # Consolidates all the callback invocations into a single place, to
+      # avoid cluttering the logic in #prepare_update.
+      #
+      # @param [ Array<Document> ] update_children The children that the
+      #   :update callbacks will be executed on.
+      def run_all_callbacks_for_update(update_children)
+        run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
+          run_callbacks(:save, with_children: false) do
+            run_callbacks(:update, with_children: false) do
+              run_callbacks(:persist_parent, with_children: false) do
+                _mongoid_run_child_callbacks(:save) do
+                  _mongoid_run_child_callbacks(:update, children: update_children) do
+                    yield
+                  end # _mongoid_run_child_callbacks :update
+                end # _mongoid_run_child_callbacks :save
+              end # :persist_parent
+            end # :update
+          end # :save
+        end # :commit
+      end
+
     end
   end
 end

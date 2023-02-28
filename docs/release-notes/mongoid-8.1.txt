@@ -341,3 +341,60 @@ This time, the value for the ``:age`` field is maintained.
   The default for the ``:replace`` option will be changed to ``false`` in
   Mongoid 9.0, therefore it is recommended to explicitly specify this option
   while using ``#upsert`` in 8.1 for easier upgradability.
+
+
+Allow Hash Assignment to ``embedded_in``
+----------------------------------------
+
+Mongoid 8.1 allows the assignment of a hash to an ``embedded_in`` association.
+On assignment, the hash will be coerced into a document of the class of the
+association that it is being assigned to. This functionality already exists
+for ``embeds_one`` and ``embeds_many`` associations. Consider the following
+example:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    embeds_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    embedded_in :band
+  end
+
+  album = Album.new
+  album.band = { name: "Death Cab For Cutie" }
+  p album.band
+  # => <Band _id: 633c74113282a438a15d2b56, name: "Death Cab For Cutie">
+
+See the section on :ref:`Hash Assignment on Embedded Associations <hash-assignment>`
+for more details
+
+
+Added ``none_of`` Query Method
+------------------------------
+
+With the addition of ``none_of``, Mongoid 8.1 allows queries to exclude
+conditions in bulk. The emitted query will encapsulate the specified 
+criteria in a ``$nor`` operation. For example:
+
+.. code:: ruby
+
+  class Building
+    include Mongoid::Document
+    field :city, type: String
+    field :height, type: Integer
+    field :purpose, type: String
+    field :occupancy, type: Integer
+  end
+
+  Building.where(city: 'Portland').
+    none_of(:height.lt => 100,
+            :purpose => 'apartment',
+            :occupancy.gt => 2500)
+
+This would query all buildings in Portland, excluding apartments, buildings less than
+100 units tall, and buildings with an occupancy greater than 2500 people.

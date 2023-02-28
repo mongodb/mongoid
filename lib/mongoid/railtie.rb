@@ -9,6 +9,13 @@ module Rails
     # Hooks Mongoid into Rails 3 and higher.
     class Railtie < Rails::Railtie
 
+      console do |app|
+        if app.sandbox?
+          require "mongoid/railties/console_sandbox"
+          start_sandbox
+        end
+      end
+
       # Mapping of rescued exceptions to HTTP responses
       #
       # @example
@@ -44,7 +51,11 @@ module Rails
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
-      initializer "mongoid.load-config" do
+      #
+      # It runs after all config/initializers have loaded, so that the YAML
+      # options can override options specified in
+      # (e.g.) config/initializers/mongoid.rb.
+      initializer "mongoid.load-config", after: :load_config_initializers do
         config_file = Rails.root.join("config", "mongoid.yml")
         if config_file.file?
           begin

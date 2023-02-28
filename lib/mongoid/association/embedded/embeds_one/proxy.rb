@@ -25,7 +25,7 @@ module Mongoid
           #
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Document ] target The child document in the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def initialize(base, target, association)
             init(base, target, association) do
               characterize_one(_target)
@@ -43,7 +43,7 @@ module Mongoid
           # @example Substitute the new document.
           #   person.name.substitute(new_name)
           #
-          # @param [ Document ] replacement A document to replace the target.
+          # @param [ Document | Hash ] replacement A document to replace the target.
           #
           # @return [ Document | nil ] The association or nil.
           def substitute(replacement)
@@ -83,6 +83,15 @@ module Mongoid
               unbind_one
               unless replacement
                 update_attributes_hash(replacement)
+
+                # when `touch: true` is the default (see MONGOID-5016), creating
+                # an embedded document will touch the parent, and will cause the
+                # _descendants list to be initialized and memoized. If the object
+                # is then deleted, we need to make sure and un-memoize that list,
+                # otherwise when the update happens, the memoized _descendants list
+                # gets used and the "deleted" subdocument gets added again.
+                _reset_memoized_descendants!
+
                 return nil
               end
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)

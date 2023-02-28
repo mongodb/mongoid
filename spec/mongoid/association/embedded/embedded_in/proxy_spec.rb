@@ -616,4 +616,31 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
       end
     end
   end
+
+  context "when assigning a hash" do
+    let(:building_address) { BuildingAddress.new }
+
+    before do
+      building_address.building = { name: "Chrysler" }
+    end
+
+    it "creates the objects correctly" do
+      expect(building_address.building).to be_a(Building)
+      expect(building_address.building.name).to eq("Chrysler")
+    end
+  end
+
+  context "when replacing an association with a hash" do
+    let(:building_address) { BuildingAddress.new }
+
+    before do
+      building_address.building = { name: "Chrysler" }
+      building_address.building = { name: "Empire State" }
+    end
+
+    it "creates the objects correctly" do
+      expect(building_address.building).to be_a(Building)
+      expect(building_address.building.name).to eq("Empire State")
+    end
+  end
 end

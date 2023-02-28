@@ -10,6 +10,7 @@ Tutorials
   :titlesonly:
 
   tutorials/getting-started-sinatra
-  tutorials/getting-started-rails
+  tutorials/getting-started-rails7
+  tutorials/getting-started-rails6
   tutorials/documents
   tutorials/common-errors
