@@ -17,7 +17,7 @@ module Mongoid
           #   Builder.new(meta, attrs).build
           #
           # @param [ Document ] base The document this association hangs off of.
-          # @param [ Document ] object The related document.
+          # @param [ Document | Hash ] object The related document.
           # @param [ String ] _type Not used in this context.
           # @param [ Hash ] selected_fields Fields which were retrieved via
           #   #only. If selected_fields are specified, fields not listed in it

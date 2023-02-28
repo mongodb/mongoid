@@ -43,7 +43,13 @@ configuration file for you by running the following command:
 
   rails g mongoid:config
 
-The configuration file will be placed in ``config/mongoid.yml``.
+The configuration file will be placed in ``config/mongoid.yml``. An
+initializer will also be created and placed in
+``config/initializers/mongoid.rb``. It is recommended that all configuration
+be specified in ``config/mongoid.yml``, but if you prefer, the ``mongoid.rb``
+initializer may also be used to set configuration options. Note, though, that
+settings in ``mongoid.yml`` always take precedence over settings in the
+initializer.
 
 If you are not using Ruby on Rails, you can copy the minimal configuration
 given above and save it as ``config/mongoid.yml``.
@@ -656,7 +662,7 @@ use an initializer as follows:
   same instance as the Rails logger, modifying any of the instances affects
   all of them. For example the following changes log level for all three
   loggers, unless the application assigned a separate ``Logger`` instance
-  to `Mongo::Logger.logger`` as described above:
+  to ``Mongo::Logger.logger`` as described above:
 
   .. code-block:: ruby
 
@@ -839,7 +845,7 @@ Every ``Proc`` in ``Mongo.tls_context_hooks`` will be passed an
 ``OpenSSL::SSL::SSLContext`` object as its sole argument. These procs will
 be executed sequentially during socket creation.
 
-..warning ::
+.. warning::
 
   TLS context hooks are global and will affect all ``Mongo::Client`` instances
   in an application.
@@ -985,8 +991,8 @@ Query Cache Middleware
 .. note::
 
   When used with Ruby driver version 2.15 or newer, Mongoid's Query Cache
-  Middleware delegates to :ref:`the driver's Query Cache Middleware
-  <driver:query-cache-middleware>`.
+  Middleware delegates to `the driver's Query Cache Middleware
+  <https://www.mongodb.com/docs/ruby-driver/current/reference/query-cache/index.html#query-cache-middleware>`_.
 
 Mongoid provides a Rack middleware which enables the :ref:`Query Cache
 <query-cache>` for the duration of each web request. Below is an example of

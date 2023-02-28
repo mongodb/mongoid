@@ -1,6 +1,6 @@
-***********************
-Getting Started (Rails)
-***********************
+*************************
+Getting Started (Rails 7)
+*************************
 
 .. default-domain:: mongodb
 
@@ -10,14 +10,19 @@ Getting Started (Rails)
    :depth: 2
    :class: singlecol
 
+.. note::
+
+  This tutorial is for Ruby on Rails 7. If this is not the version you're using choose
+  the appropriate tutorial for your Rails version from the navigation menu.
+
 New Application
 ===============
 
-This section shows how to create a new Ruby on Rails application using Mongoid
-for data access. The application will be similar to the blog application
-described in the `Ruby on Rails Getting Started
-<https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application>`_
-guide, however using Mongoid instead of ActiveRecord as the database adapter.
+This section demonstrates how to create a new Ruby on Rails application using the Mongoid ODM.
+By replacing Rails' default `ActiveRecord <https://guides.rubyonrails.org/active_record_basics.html>`_
+adapter with MongoDB's ORM-like library for data access we will create an application similar to the
+blog application described in the `Ruby on Rails Getting Started
+<https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application>`_ guide.
 
 The complete source code for this application can be found in the
 `mongoid-demo GitHub repository
@@ -39,7 +44,7 @@ In order to do so, the first step is to install the ``rails`` gem:
 
 .. code-block:: sh
 
-    gem install rails -v '~> 6.0.0'
+    gem install rails -v '~> 7'
 
 
 Create New Application
@@ -49,65 +54,34 @@ Use the ``rails`` command to create the application skeleton, as follows:
 
 .. code-block:: sh
 
-    rails new blog --skip-active-record --skip-bundle
+    rails new blog --skip-active-record
     cd blog
 
-.. note::
-
-    You may receive a warning like this:
-
-    .. code-block:: sh
-
-        Could not find gem 'puma (~> 3.11)' in any of the gem sources listed in your Gemfile.
-        Run `bundle install` to install missing gems.
-
-    Disregard it as we will be taking care of gem installation
-    in a moment.
-
 We pass ``--skip-active-record`` to request that ActiveRecord is not added
-as a dependency, because we will be using Mongoid instead. Additionally
-we pass ``--skip-bundle`` because we'll be modifying the ``Gemfile`` to
-add the ``mongoid`` dependency.
+as a dependency, because we will be using Mongoid instead.
 
-If you intend to test your application with RSpec, you can instruct the
-generator to omit default Rails test setup by passing ``--skip-test``
+Optionally Skip Tests
+`````````````````````
+
+If you intend to test your application with `RSpec <https://rspec.info/>`_, you can instruct the
+generator to omit the default Rails test setup by passing ``--skip-test``
 and ``--skip-system-test`` options:
 
 .. code-block:: sh
 
-    rails new blog --skip-bundle --skip-active-record --skip-test --skip-system-test
+    rails new blog --skip-active-record --skip-test --skip-system-test
     cd blog
 
-
-Create Git Repo
----------------
-
-While not required, we recommend creating a Git repository for your application:
-
-.. code-block:: sh
-
-    git init .
-    git add .
-    git commit
-
-Commit your changes as you are following this tutorial.
-
-
-Add Mongoid
------------
+Setup Mongoid
+-------------
 
 1. Modify the ``Gemfile`` to add a reference to the
 `mongoid <https://rubygems.org/gems/mongoid/>`_ gem:
 
 .. code-block:: ruby
-  :name: Gemfile
   :caption: Gemfile
 
-    gem 'mongoid', '~> 7.0.5'
-
-.. note::
-
-    Mongoid 7.0.5 or higher is required to use Rails 6.0.
+    gem 'mongoid'
 
 2. Install gem dependencies:
 
@@ -115,20 +89,23 @@ Add Mongoid
 
     bundle install
 
-3. Generate the default Mongoid configuration:
+3. Generate the default `Mongoid configuration <https://www.mongodb.com/docs/mongoid/current/reference/configuration/#mongoid-configuration-options>`_:
 
 .. code-block:: sh
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file,
-which is used to configure the connection to the MongoDB deployment.
-Note that as we are not using ActiveRecord we will not have a ``database.yml``
-file.
+This generator will create the ``config/mongoid.yml`` configuration file 
+(used to configure the connection to the MongoDB deployment) and the
+``config/initializers/mongoid.rb`` initializer file (which may be used for
+other Mongoid-related configuration). Note that as we are not using
+ActiveRecord we will not have a ``database.yml`` file.
 
 
-Run MongoDB Locally
--------------------
+.. _configure-self-managed:
+
+Configure for Self Managed MongoDB
+``````````````````````````````````
 
 The configuration created in the previous step is suitable when
 a MongoDB server is running locally. If you do not already have a
@@ -140,7 +117,7 @@ we recommend reducing the server selection timeout for development.
 With this change, the uncommented lines of ``mongoid.yml`` should look
 like this:
 
-.. code-block:: none
+.. code-block:: yaml
 
     development:
       clients:
@@ -152,8 +129,10 @@ like this:
             server_selection_timeout: 1
 
 
-Use MongoDB Atlas
------------------
+.. _configure-atlas:
+
+Configure for MongoDB Atlas
+```````````````````````````
 
 Instead of downloading, installing and running MongoDB locally, you can create
 a free MongoDB Atlas account and create a `free MongoDB cluster in Atlas
@@ -177,24 +156,6 @@ The uncommented contents of ``config/mongoid.yml`` should look like this:
           options:
             server_selection_timeout: 5
 
-
-Other Rails Dependencies
-------------------------
-
-If this is the first Rails application you are creating, you may need to
-install Node.js on your computer. This can be done via your operating system
-packages or by `downloading a binary <https://nodejs.org/en/download/>`_.
-
-Next, if you do not have Yarn installed, `follow its installation instructions
-<https://yarnpkg.com/lang/en/docs/install/>`_.
-
-Finally, install webpacker:
-
-.. code-block:: sh
-
-    rails webpacker:install
-
-
 Run Application
 ---------------
 
@@ -202,7 +163,7 @@ You can now start the application server by running:
 
 .. code-block:: sh
 
-    rails s
+    bin/rails s
 
 Access the application by navigating to `localhost:3000
 <http://localhost:3000>`_.
@@ -242,39 +203,21 @@ Open the ``Post`` model file, ``app/models/post.rb``, and add a ``has_many``
 association for the comments:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
     class Post
       include Mongoid::Document
-
+      include Mongoid::Timestamps
       field :title, type: String
       field :body, type: String
 
       has_many :comments, dependent: :destroy
     end
 
-Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
-generated ``embedded_in`` association to ``belongs_to``:
-
-.. code-block:: ruby
-  :name: app/models/comment.rb
-  :caption: app/models/comment.rb
-
-    class Comment
-      include Mongoid::Document
-
-      field :name, type: String
-      field :message, type: String
-
-      belongs_to :post
-    end
-
-Open the post show view file, ``app/views/posts/show.html.erb``, and add
+Open ``app/views/posts/show.html.erb`` and add
 a section rendering existing comments and prompting to leave a new comment:
 
-.. code-block:: html
-  :name: app/views/posts/show.html.erb
+.. code-block:: erb
   :caption: app/views/posts/show.html.erb
 
   <section class="section comments">
@@ -291,13 +234,12 @@ a section rendering existing comments and prompting to leave a new comment:
     </div>
   </section>
 
-Open the comment form file and change the type of field for ``:message``
+Open ``app/views/comments/_form.html.erb`` and change the type of field for ``:message``
 from ``text_field`` to ``text_area``, as well as the type of field for
 ``:post_id`` from ``text_field`` to ``hidden_field``. The result
 should look like this:
 
-.. code-block:: html
-  :name: app/views/comments/_form.html.erb
+.. code-block:: erb
   :caption: app/views/comments/_form.html.erb
 
   <%= form_with(model: comment, local: true) do |form| %>
@@ -332,22 +274,21 @@ should look like this:
     </div>
   <% end %>
 
-Create a partial for the comment view, ``app/view/comments/_comment.html.erb``
-with the following contents:
+Next replace ``app/view/comments/_comment.html.erb`` with the following contents:
 
-.. code-block:: html
-  :name: app/views/comments/_comment.html.erb
+.. code-block:: erb
   :caption: app/views/comments/_comment.html.erb
 
   <p>
     <strong><%= comment.name %>:</strong>
     <%= comment.message %>
-  <br>
-  <%= link_to 'Delete', [comment],
-    method: :delete,
-    class: "button is-danger",
-    data: { confirm: 'Are you sure?' } %>
+    <%= link_to 'Delete', [comment],
+      data: {
+        "turbo-method": :delete,
+        "turbo-confirm": 'Are you sure?'
+      } %>
   </p>
+
 
 You should now be able to leave comments for the posts:
 
@@ -358,98 +299,31 @@ You should now be able to leave comments for the posts:
 Existing Application
 ====================
 
-Follow these steps to switch an existing Ruby on Rails application to use
-Mongoid instead of ActiveRecord.
+Mongoid can be easily added to an existing Rails application and run alongside other ActiveRecord
+adapters. If this is your use case, updating dependencies and populating the configuration file will
+allow you to start using MongoDB within your application.
+
+To switch an existing Ruby on Rails application to use Mongoid instead of ActiveRecord additional
+configuration changes will be required, as described below.
 
 Dependencies
 ------------
 
-Remove or comment out any RDBMS libraries like ``sqlite``, ``pg`` etc.
-mentioned in ``Gemfile``, and add ``mongoid``:
+First, the ``mongoid`` gem will need to be added your ``Gemfile``.
 
 .. code-block:: ruby
-  :name: Gemfile
   :caption: Gemfile
 
-    gem 'mongoid', '~> 7.0.5'
+    gem 'mongoid'
 
-.. note::
-
-    Mongoid 7.0.5 or higher is required to use Rails 6.0.
+If Mongoid will be the **only** database adapter, remove or comment out any RDBMS libraries
+like ``sqlite`` or ``pg`` mentioned in the ``Gemfile``.
 
 Install gem dependencies:
 
 .. code-block:: sh
 
     bundle install
-
-Loaded Frameworks
------------------
-
-Examine ``config/application.rb``. If it is requiring all components of Rails
-via ``require 'rails/all'``, change it to require individual frameworks:
-
-.. code-block:: ruby
-  :name: config/application.rb
-  :caption: config/application.rb
-
-  # Remove or comment out
-  #require "rails/all"
-
-  # Add this require instead of "rails/all":
-  require "rails"
-
-  # Pick the frameworks you want:
-  require "active_model/railtie"
-  require "active_job/railtie"
-  require "action_controller/railtie"
-  require "action_mailer/railtie"
-  # require "action_mailbox/engine"
-  # require "action_text/engine"
-  require "action_view/railtie"
-  require "action_cable/engine"
-  require "sprockets/railtie"
-  require "rails/test_unit/railtie"
-
-  # Remove or comment out ActiveRecord and ActiveStorage:
-  # require "active_record/railtie"
-  # require "active_storage/engine"
-
-.. note::
-
-    At this time ActiveStorage requires ActiveRecord and is not usable with
-    Mongoid.
-
-ActiveRecord Configuration
---------------------------
-
-Review all configuration files (``config/application.rb``,
-``config/environments/{development,production.test}.rb``) and remove or
-comment out any references to ``config.active_record`` and
-``config.active_storage``.
-
-Stop Spring
------------
-
-If your application is using Spring, which is the default on Rails 6,
-Spring must be stopped after changing dependencies or configuration.
-
-.. code-block:: sh
-
-  ./bin/spring stop
-
-.. note::
-
-    Sometimes running ``./bin/spring stop`` claims to stop Spring, but does
-    not. Verify that all Spring processes are terminated before proceeding.
-
-.. note::
-
-    Sometimes Spring tries to load ActiveRecord even when the application
-    contains no ActiveRecord references. If this happens, add an ActiveRecord
-    adapter dependency such as ``sqlite3`` to your ``Gemfile`` so that
-    ActiveRecord may be completely loaded or remove Spring from your
-    application.
 
 Mongoid Configuration
 ---------------------
@@ -460,12 +334,59 @@ Generate the default Mongoid configuration:
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file,
-which is used to configure the connection to the MongoDB deployment.
+This generator will create the ``config/mongoid.yml`` configuration file 
+(used to configure the connection to the MongoDB deployment) and the
+``config/initializers/mongoid.rb`` initializer file (which may be used for
+other Mongoid-related configuration). In general, it is recommended to use
+``mongoid.yml`` for all Mongoid configuration.
 
-Review the sections `Run MongoDB Locally`_ and `Use MongoDB Atlas`_
-to decide how you would like to deploy MongoDB, and adjust Mongoid
-configuration (``config/mongoid.yml``) to match.
+Review the sections :ref:`Configure for Self Managed MongoDB <configure-self-managed>`
+and :ref:`Configure for MongoDB Atlas <configure-atlas>` to decide how you
+would like to deploy MongoDB, and adjust the Mongoid configuration
+(``config/mongoid.yml``) to match.
+
+Loaded Frameworks
+-----------------
+
+Examine ``config/application.rb``. If it is requiring all components of Rails
+via ``require 'rails/all'``, change it to require individual frameworks. To verify the contents of
+``rails/all`` for your version see the `Github Repository
+<https://github.com/rails/rails/blob/7-0-stable/railties/lib/rails/all.rb>`_:
+
+.. code-block:: ruby
+  :caption: config/application.rb
+
+  # Remove or comment out
+  #require "rails/all"
+
+  # Add the following instead of "rails/all":
+  require "rails"
+
+  # require "active_record/railtie" rescue LoadError
+  # require "active_storage/engine" rescue LoadError
+  require "action_controller/railtie" rescue LoadError
+  require "action_view/railtie" rescue LoadError
+  require "action_mailer/railtie" rescue LoadError
+  require "active_job/railtie" rescue LoadError
+  require "action_cable/engine" rescue LoadError
+  # require "action_mailbox/engine" rescue LoadError
+  # require "action_text/engine" rescue LoadError
+  require "rails/test_unit/railtie" rescue LoadError
+
+.. warning::
+
+    Due to their reliance on ActiveRecord, `ActionText <https://guides.rubyonrails.org/action_text_overview.html>`_,
+    `ActiveStorage <https://edgeguides.rubyonrails.org/active_storage_overview.html>`_ and
+    `ActionMailbox <https://guides.rubyonrails.org/action_mailbox_basics.html>`_ cannot be used
+    with Mongoid.
+
+ActiveRecord Configuration
+--------------------------
+
+Review all configuration files (``config/application.rb``,
+``config/environments/{development,production.test}.rb``) and remove or
+comment out any references to ``config.active_record`` and
+``config.active_storage``.
 
 Adjust Models
 -------------
@@ -482,7 +403,6 @@ explicit field definitions).
 For example, a bare-bones Post model may look like this in ActiveRecord:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post < ApplicationRecord
@@ -492,7 +412,6 @@ For example, a bare-bones Post model may look like this in ActiveRecord:
 The same model may look like this in Mongoid:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post
@@ -507,7 +426,6 @@ The same model may look like this in Mongoid:
 Or like this with dynamic fields:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post
@@ -546,5 +464,5 @@ as when creating a regular application, with the only change being the
 Mongoid follows the same process described above for regular Rails applications.
 
 A complete Rails API application similar to the one described in this tutorial
-can be found in the `mongoid-demo GitHub repository
+can be found in `the mongoid-demo GitHub repository
 <https://github.com/mongoid/mongoid-demo/tree/master/rails-api>`_.

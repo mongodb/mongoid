@@ -34,6 +34,7 @@ module Mongoid
         #
         # @return [ self ]
         def setup!
+          setup_defaults!
           setup_instance_methods!
           @owner_class.embedded = true
           self
@@ -91,6 +92,11 @@ module Mongoid
         end
 
         private
+
+        # Set up default values for any options used by this association.
+        def setup_defaults!
+          @options[:touch] = true unless @options.key?(:touch)
+        end
 
         def setup_instance_methods!
           define_getter!

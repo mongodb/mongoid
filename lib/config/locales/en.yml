@@ -119,6 +119,13 @@ en:
           summary: "Your mongoid.yml configuration file appears to be empty."
           resolution: "Ensure your configuration file contains the correct contents.
             Refer to: https://www.mongodb.com/docs/mongoid/current/reference/configuration/"
+        immutable_attribute:
+          message: "Attempted to change the immutable attribute '%{name}' with
+            the value: %{value}."
+          summary: "Immutable attributes can only have values set when the
+            document is a new record."
+          resolution: "Do not attempt to update the value of '%{name}' after
+            the document is persisted."
         invalid_collection:
           message: "Access to the collection for %{klass} is not allowed."
           summary: "%{klass}.collection was called, and %{klass} is an embedded
@@ -357,9 +364,9 @@ en:
             in the session block share the same driver client. For example, a model may have a different
             client specified in its 'store_in' options.\n\n"
         invalid_session_nesting:
-          message: "A session was started while another session was being used."
-          summary: "Sessions cannot be nested. Only one session can be used in a thread at once."
-          resolution: "Only use one session at a time; sessions cannot be nested."
+          message: "A session was started while another session was being used on this client."
+          summary: "Sessions cannot be nested. Only one session can be used in a thread per client."
+          resolution: "Only use one session per client at a time; sessions cannot be nested."
         invalid_storage_options:
           message: "Invalid options passed to %{klass}.store_in: %{options}."
           summary: "The :store_in macro takes only a hash of parameters with
@@ -381,6 +388,10 @@ en:
             for Date, DateTime, and Time objects. When this is a String it needs
             to be valid for Time.parse. Other objects must be valid to pass to
             Time.local."
+        invalid_transaction_nesting:
+          message: "A transaction was started while another transaction was being used on this client."
+          summary: "Transactions cannot be nested. Only one transaction can be used in a thread per client."
+          resolution: "Only use one transaction per client at a time; transactions cannot be nested."
         inverse_not_found:
           message: "When adding a(n) %{klass} to %{base}#%{name}, Mongoid could
             not determine the inverse foreign key to set. The attempted key was
@@ -617,6 +628,19 @@ en:
             accepts_nested_attributes_for :%{association}, limit: %{limit}.
             Consider raising this limit or making sure no more are sent than
             the set value."
+        transactions_not_supported:
+          message: "Transactions are not supported by the connected server(s)."
+          summary: "A session was attempted to be used with a MongoDB server version
+            that doesn't support transactions. Transactions are supported in MongoDB
+            server versions 3.6 and higher."
+          resolution: "Verify that all servers in your deployment are at least
+            version 3.6 or don't attempt to use transactions with older server versions."
+        transaction_error:
+          message: "Transaction failed with the following error: %{error}."
+          summary: "The transaction failed because MongoDB server or MongoDB driver
+            raised an unexpected error."
+          resolution: "Consult with Ruby driver documentation
+            and MongoDB documentation."
         unknown_attribute:
           message: "Attempted to set a value for '%{name}' which is not
             allowed on the model %{klass}."

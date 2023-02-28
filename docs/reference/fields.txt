@@ -21,7 +21,7 @@ Field Types
 MongoDB stores underlying document data using
 `BSON types <https://mongodb.com/docs/manual/reference/bson-types/>`_, and
 Mongoid converts BSON types to Ruby types at runtime in your application.
-For example, a field defined with `type: :float` will use the Ruby ``Float``
+For example, a field defined with ``type: :float`` will use the Ruby ``Float``
 class in-memory and will persist in the database as the the BSON ``double`` type.
 
 Field type definitions determine how Mongoid behaves when constructing queries
@@ -217,9 +217,9 @@ and has the same behavior in all circumstances.
 
 Mongoid also provides the deprecated ``Symbol`` field type for serializing
 Ruby symbols to BSON symbols. Because the BSON specification deprecated the
-BSON symbol type, the `bson` gem will serialize Ruby symbols into BSON strings
+BSON symbol type, the ``bson`` gem will serialize Ruby symbols into BSON strings
 when used on its own. However, in order to maintain backwards compatibility
-with older datasets, the `mongo` gem overrides this behavior to serialize Ruby
+with older datasets, the ``mongo`` gem overrides this behavior to serialize Ruby
 symbols as BSON symbols. This is necessary to be able to specify queries for
 documents which contain BSON symbols as fields.
 

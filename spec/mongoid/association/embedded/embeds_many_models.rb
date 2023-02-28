@@ -172,7 +172,11 @@ class EmmHatch
   include Mongoid::Document
 
   # No :class_name option on this association intentionally.
-  embedded_in :tank
+  # Also, re: MONGOID-5016, `touch: true` is the default, which means Mongoid
+  # will try to load the associated class in order to add relevant callbacks.
+  # We must set `touch: false` here to avoid Mongoid trying to load a
+  # non-existent class.
+  embedded_in :tank, touch: false
 end
 
 class EmmPost
@@ -235,4 +239,3 @@ class EmmChild
   field :order, type: Integer
   field :t
 end
-

@@ -5,6 +5,9 @@ require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"
 require "mongoid/persistable/incrementable"
 require "mongoid/persistable/logical"
+require "mongoid/persistable/maxable"
+require "mongoid/persistable/minable"
+require "mongoid/persistable/multipliable"
 require "mongoid/persistable/poppable"
 require "mongoid/persistable/pullable"
 require "mongoid/persistable/pushable"
@@ -25,6 +28,9 @@ module Mongoid
     include Destroyable
     include Incrementable
     include Logical
+    include Maxable
+    include Minable
+    include Multipliable
     include Poppable
     include Positional
     include Pullable
@@ -167,6 +173,9 @@ module Mongoid
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
+      if in_transaction?
+        Threaded.add_modified_document(_session, self)
+      end
       true
     end
 

@@ -148,6 +148,38 @@ describe Mongoid::Persistable::Upsertable do
       end
     end
 
+    context 'when `set_on_insert` is given' do
+      let!(:existing_document) { Band.create!(name: "They Might Be Giants") }
+      let!(:new_document) { Band.new(name: "Panic! at the Disco") }
+
+      context 'with `replace: true`' do
+        it 'should raise an ArgumentError' do
+          existing_document.name = "John and John"
+          expect {
+            existing_document.upsert(replace: true, set_on_insert: { member_count: 1 })
+          }.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'without `replace: true`' do
+        context 'when document exists' do
+          it 'ignores set_on_insert' do
+            existing_document.name = "John and John"
+            existing_document.upsert(set_on_insert: { member_count: 1 })
+            expect(existing_document.reload.member_count).to be_nil
+          end
+        end
+
+        context 'when document does not exist' do
+          it 'applies set_on_insert' do
+            new_document.name = "Brendon Urie"
+            new_document.upsert(set_on_insert: { member_count: 1 })
+            expect(new_document.reload.member_count).to be == 1
+          end
+        end
+      end
+    end
+
     context "when the document is readonly" do
 
       context "when legacy_readonly is true" do

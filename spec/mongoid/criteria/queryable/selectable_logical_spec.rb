@@ -2116,4 +2116,423 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
   end
+
+  describe "#none_of" do
+    context 'when argument is a mix of Criteria and hashes' do
+      let(:query) { Mongoid::Query.new.where(hello: 'world') }
+      let(:other1) { Mongoid::Query.new.where(foo: 'bar') }
+      let(:other2) { { bar: 42 } }
+      let(:other3) { Mongoid::Query.new.where(a: 2) }
+
+      let(:result) { query.none_of(other1, other2, other3) }
+
+      it 'combines' do
+        expect(result.selector).to eq(
+          'hello' => 'world',
+          '$nor' => [
+            {'foo' => 'bar'},
+            {'bar' => 42},
+            {'a' => 2},
+          ],
+        )
+      end
+    end
+
+    context "when provided no arguments" do
+      let(:selection) { query.none_of }
+
+      it_behaves_like 'returns a cloned query'
+
+      it "does not add any criteria" do
+        expect(selection.selector).to eq({})
+      end
+
+      it "returns the query" do
+        expect(selection).to eq(query)
+      end
+    end
+
+    context "when provided nil" do
+      let(:selection) { query.none_of(nil) }
+
+      it_behaves_like 'returns a cloned query'
+
+      it "does not add any criteria" do
+        expect(selection.selector).to eq({})
+      end
+
+      it "returns the query" do
+        expect(selection).to eq(query)
+      end
+    end
+
+    context "when provided a single criterion" do
+      let(:selection) { query.none_of(field: [ 1, 2 ]) }
+
+      it_behaves_like 'returns a cloned query'
+
+      it 'adds the $nor selector' do
+        expect(selection.selector).to eq(
+          '$nor' => [ { 'field' => [ 1, 2 ] } ],
+        )
+      end
+
+      context 'when the criterion is wrapped in array' do
+        let(:selection) { query.none_of([{ field: [ 1, 2 ] }]) }
+
+        it_behaves_like 'returns a cloned query'
+
+        it 'adds the condition' do
+          expect(selection.selector).to eq(
+            '$nor' => [ { 'field' => [ 1, 2 ] } ],
+          )
+        end
+
+        context 'when the array has nil as one of the elements' do
+          let(:selection) { query.none_of([{ field: [ 1, 2 ] }, nil]) }
+
+          it_behaves_like 'returns a cloned query'
+
+          it 'adds the $nor selector ignoring the nil element' do
+            expect(selection.selector).to eq(
+              '$nor' => [ { 'field' => [ 1, 2 ] } ],
+            )
+          end
+        end
+      end
+
+      context 'when query already has a condition on another field' do
+        context 'when there is one argument' do
+          let(:selection) { query.where(foo: 'bar').none_of(field: [ 1, 2 ]) }
+
+          it 'adds the new condition' do
+            expect(selection.selector).to eq(
+              'foo' => 'bar',
+              '$nor' => [ { 'field' => [1, 2] } ],
+            )
+          end
+        end
+
+        context 'when there are multiple arguments' do
+          let(:selection) do
+            query.where(foo: 'bar').none_of({ field: [ 1, 2 ] }, { hello: 'world' })
+          end
+
+          it 'adds the new condition' do
+            expect(selection.selector).to eq(
+              'foo' => 'bar',
+              '$nor' => [
+                { 'field' => [1, 2] },
+                { 'hello' => 'world' },
+              ],
+            )
+          end
+        end
+      end
+
+      context 'when query already has a $nor condition and another condition' do
+        let(:selection) do
+          query.nor(field: [ 1, 2 ]).where(foo: 'bar').none_of(test: 1)
+        end
+
+        it 'adds the new condition' do
+          expect(selection.selector).to eq(
+            '$nor' => [ { 'field' => [1, 2] } ],
+            'foo' => 'bar',
+            '$and' => [ { '$nor' => [ { 'test' => 1 } ] } ]
+          )
+        end
+      end
+
+      context 'when none_of has multiple arguments' do
+        let(:selection) do
+          query.nor(field: [ 1, 2 ]).where(foo: 'bar').none_of({a: 1}, {b: 2})
+        end
+
+        it 'adds the new condition to top level' do
+          expect(selection.selector).to eq(
+            'foo' => 'bar',
+            '$nor' => [ { 'field' => [1, 2] } ],
+            '$and' => [ { '$nor' => [ { 'a' => 1 }, { 'b' => 2 } ] } ]
+          )
+        end
+
+        context 'when query already has a top-level $and' do
+          let(:selection) do
+            query.nor(field: [ 1, 2 ]).where('$and' => [foo: 'bar']).none_of({a: 1}, {b: 2})
+          end
+
+          it 'adds the new condition to top level $and' do
+            expect(selection.selector).to eq(
+              '$nor' => [ { 'field' => [1, 2] } ],
+              '$and' => [
+                { 'foo' => 'bar' },
+                { '$nor' => [ { 'a' => 1 }, { 'b' => 2 } ] }
+              ],
+            )
+          end
+        end
+      end
+    end
+
+    context "when provided multiple criteria" do
+      context "when the criteria are for different fields" do
+        let(:selection) do
+          query.none_of({ first: [ 1, 2 ] }, { second: [ 3, 4 ] })
+        end
+
+        it_behaves_like 'returns a cloned query'
+
+        it "adds the $nor selector" do
+          expect(selection.selector).to eq({
+            "$nor" => [
+              { "first" => [ 1, 2 ] },
+              { "second" => [ 3, 4 ] }
+            ]
+          })
+        end
+      end
+
+      context "when the criteria uses a Key instance" do
+        let(:selection) do
+          query.none_of({ first: [ 1, 2 ] }, { :second.gt => 3 })
+        end
+
+        it "adds the $nor selector" do
+          expect(selection.selector).to eq({
+            "$nor" => [
+              { "first" => [ 1, 2 ] },
+              { "second" => { "$gt" => 3 }}
+            ]
+          })
+        end
+
+        it_behaves_like 'returns a cloned query'
+      end
+
+      context 'when criteria are simple and handled via Key' do
+        shared_examples_for 'adds conditions with $nor' do
+          it "adds conditions with $nor" do
+            expect(selection.selector).to eq({
+              '$nor' => [
+                {'field' => 3},
+                {'field' => {'$lt' => 5}},
+              ],
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        shared_examples_for 'combines conditions with $eq' do
+          it "combines conditions with $eq" do
+            expect(selection.selector).to eq({
+              '$nor' => [ { 'field' => { '$eq' => 3, '$lt' => 5 } } ]
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        shared_examples_for 'combines conditions with $regex' do
+          it 'combines conditions with $regex' do
+            expect(selection.selector).to eq({
+              '$nor' => [ { 'field' => { '$regex' => /t/, '$lt' => 5 } } ]
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        context 'criteria are provided in the same hash' do
+          context 'non-regexp argument' do
+            let(:selection) { query.none_of(:field => 3, :field.lt => 5) }
+            it_behaves_like 'combines conditions with $eq'
+          end
+
+          context 'regexp argument' do
+            let(:selection) { query.none_of(:field => /t/, :field.lt => 5) }
+            it_behaves_like 'combines conditions with $regex'
+          end
+        end
+
+        context 'criteria are provided in separate hashes' do
+          let(:selection) { query.none_of({:field => 3}, {:field.lt => 5}) }
+          it_behaves_like 'adds conditions with $nor'
+        end
+
+        context 'when the criterion is wrapped in an array' do
+          let(:selection) { query.none_of([:field => 3], [:field.lt => 5]) }
+          it_behaves_like 'adds conditions with $nor'
+        end
+      end
+
+      context 'when criteria are handled via Key and simple' do
+        shared_examples_for 'adds conditions with $nor' do
+          it 'adds conditions with $nor' do
+            expect(selection.selector).to eq({
+              '$nor' => [
+                { 'field' => { '$gt' => 3 } },
+                { 'field' => 5 },
+              ],
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        shared_examples_for 'combines conditions with $eq' do
+          it 'combines conditions with $eq' do
+            expect(selection.selector).to eq(
+              '$nor' => [ { 'field' => {'$gt' => 3, '$eq' => 5} } ],
+            )
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        shared_examples_for 'combines conditions with $regex' do
+          it 'combines conditions with $regex' do
+            expect(selection.selector).to eq(
+              '$nor' => [ { 'field' => {'$gt' => 3, '$regex' => /t/} } ],
+            )
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        context 'criteria are provided in the same hash' do
+          context 'non-regexp argument' do
+            let(:selection) { query.none_of(:field.gt => 3, :field => 5) }
+            it_behaves_like 'combines conditions with $eq'
+          end
+
+          context 'regexp argument' do
+            let(:selection) { query.none_of(:field.gt => 3, :field => /t/) }
+            it_behaves_like 'combines conditions with $regex'
+          end
+        end
+
+        context 'criteria are provided in separate hashes' do
+          let(:selection) { query.none_of({:field.gt => 3}, {:field => 5}) }
+          it_behaves_like 'adds conditions with $nor'
+        end
+
+        context 'when the criterion is wrapped in an array' do
+          let(:selection) { query.none_of([:field.gt => 3], [:field => 5]) }
+          it_behaves_like 'adds conditions with $nor'
+        end
+      end
+
+      context 'when a criterion has an aliased field' do
+        let(:selection) { query.none_of({ id: 1 }) }
+        
+        it 'adds the $nor selector and aliases the field' do
+          expect(selection.selector).to eq('$nor' => [{ '_id' => 1 }])
+        end
+
+        it_behaves_like 'returns a cloned query'
+      end
+
+      context 'when a criterion is wrapped in an array' do
+        let(:selection) do
+          query.none_of([{ first: [ 1, 2 ] }, { :second.gt => 3 }])
+        end
+
+        it_behaves_like 'returns a cloned query'
+
+        it 'adds the $ nor selector' do
+          expect(selection.selector).to eq({
+            '$nor' => [
+              { 'first' => [ 1, 2 ] },
+              { 'second' => { '$gt' => 3 }}
+            ]
+          })
+        end
+      end
+
+      context "when the criteria are on the same field" do
+        let(:selection) do
+          query.none_of({ first: [ 1, 2 ] }, { first: [ 3, 4 ] })
+        end
+
+        it_behaves_like 'returns a cloned query'
+
+        it 'appends both $nor expressions' do
+          expect(selection.selector).to eq({
+            "$nor" => [
+              { "first" => [ 1, 2 ] },
+              { "first" => [ 3, 4 ] }
+            ]
+          })
+        end
+      end
+    end
+
+    context 'when chaining the criteria' do
+      context 'when the criteria are for different fields' do
+        let(:selection) do
+          query.none_of(first: [ 1, 2 ]).none_of(second: [ 3, 4 ])
+        end
+
+        it_behaves_like 'returns a cloned query'
+
+        it 'adds the conditions separately' do
+          expect(selection.selector).to eq(
+            '$nor' => [ { 'first' => [ 1, 2 ] } ],
+            '$and' => [ { '$nor' => [ { 'second' => [ 3, 4 ] } ] } ],
+          )
+        end
+      end
+
+      context "when the criteria are on the same field" do
+        let(:selection) do
+          query.none_of(first: [ 1, 2 ]).none_of(first: [ 3, 4 ])
+        end
+
+        it_behaves_like 'returns a cloned query'
+
+        it 'adds the conditions separately' do
+          expect(selection.selector).to eq(
+            '$nor' => [ { 'first' => [ 1, 2 ] } ],
+            '$and' => [ { '$nor' => [ { 'first' => [ 3, 4 ] } ] } ]
+          )
+        end
+      end
+    end
+
+    context 'when using multiple criteria and symbol operators' do
+      context 'when using fields that meaningfully evolve values' do
+        let(:query) do
+          Dictionary.none_of({a: 1}, :published.gt => Date.new(2020, 2, 3))
+        end
+
+        it 'generates the expected query' do
+          query.selector.should == {'$nor' => [
+            {'a' => 1},
+            # Date instance is converted to a Time instance in local time,
+            # because we are querying on a Time field and dates are interpreted
+            # in local time when assigning to Time fields
+            {'published' => {'$gt' => Time.local(2020, 2, 3) } },
+          ] }
+        end
+      end
+
+      context 'when using fields that do not meaningfully evolve values' do
+        let(:query) do
+          Dictionary.none_of({a: 1}, :submitted_on.gt => Date.new(2020, 2, 3))
+        end
+
+        it 'generates the expected query' do
+          query.selector.should == {'$nor' => [
+            {'a' => 1},
+            # Date instance is converted to a Time instance in UTC,
+            # because we are querying on a Date field and dates are interpreted
+            # in UTC when persisted as dates by Mongoid
+            {'submitted_on' => {'$gt' => Time.utc(2020, 2, 3)}},
+          ]}
+        end
+      end
+    end
+  end
 end

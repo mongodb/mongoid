@@ -178,8 +178,6 @@ describe 'embedded associations' do
         let(:parent) { EomParent.create! }
 
         it 'updates' do
-          pending 'https://jira.mongodb.org/browse/MONGOID-3252'
-
           first_updated_at = parent.updated_at
 
           parent.child = EomChild.new
@@ -193,8 +191,6 @@ describe 'embedded associations' do
         let(:parent) { EmmCongress.create! }
 
         it 'updates' do
-          pending 'https://jira.mongodb.org/browse/MONGOID-3252'
-
           first_updated_at = parent.updated_at
 
           parent.legislators << EmmLegislator.new
@@ -238,8 +234,6 @@ describe 'embedded associations' do
         let(:parent) { EomParent.create!(child: EomChild.new) }
 
         it 'updates' do
-          pending 'https://jira.mongodb.org/browse/MONGOID-3252'
-
           first_updated_at = parent.updated_at
 
           parent.child = nil
