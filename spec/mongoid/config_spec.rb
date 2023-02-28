@@ -911,4 +911,56 @@ describe Mongoid::Config do
       end
     end
   end
+
+  context '#field_type' do
+    around do |example|
+      klass = Mongoid::Fields::FieldTypes
+      klass.instance_variable_set(:@mapping, klass::DEFAULT_MAPPING.dup)
+      example.run
+      klass.instance_variable_set(:@mapping, klass::DEFAULT_MAPPING.dup)
+    end
+
+    it 'can define a custom type' do
+      Mongoid.configure do |config|
+        config.field_type :my_type, Integer
+      end
+
+      expect(Mongoid::Fields::FieldTypes.get(:my_type)).to eq Integer
+    end
+
+    it 'can override and existing type' do
+      Mongoid.configure do |config|
+        config.field_type :integer, String
+      end
+
+      expect(Mongoid::Fields::FieldTypes.get(:integer)).to eq String
+    end
+  end
+
+  context '#field_option method' do
+    after do
+      Mongoid::Fields.instance_variable_set(:@options, {})
+    end
+
+    it 'can define a custom field option' do
+      Mongoid.configure do |config|
+        config.field_option :my_required do |model, field, value|
+          model.validates_presence_of field.name if value
+        end
+      end
+
+      klass = Class.new do
+        include Mongoid::Document
+        field :my_field, my_required: true
+
+        def self.model_name
+          OpenStruct.new(human: 'Klass')
+        end
+      end
+
+      instance = klass.new
+      expect(instance.valid?).to eq false
+      expect(instance.errors.full_messages).to eq ["My field can't be blank"]
+    end
+  end
 end

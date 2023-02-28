@@ -1057,6 +1057,17 @@ can use in our model class as follows:
     field :location, type: Point
   end
 
+You may optionally declare a mapping for the new field type in an initializer:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid_custom_fields.rb
+
+  Mongoid.configure do |config|
+    config.field_type :point, Point
+  end
+
+
 Then make a Ruby class to represent the type. This class must define methods
 used for MongoDB serialization and deserialization as follows:
 
@@ -1235,8 +1246,10 @@ specifiying its handler function as a block:
 
   # in /config/initializers/mongoid_custom_fields.rb
 
-  Mongoid::Fields.option :max_length do |model, field, value|
-    model.validates_length_of field.name, maximum: value
+  Mongoid.configure do |config|
+    config.field_option :max_length do |model, field, value|
+      model.validates_length_of field.name, maximum: value
+    end
   end
 
 Then, use it your model class:

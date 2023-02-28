@@ -241,6 +241,67 @@ defaults to ``true``.
 When set to false, the older, inconsistent behavior is restored.
 
 
+Support for Defining Custom Field Type Values
+---------------------------------------------
+
+Mongoid 9.0 adds the ability to define custom ``field :type`` Symbol values as follows:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid.rb
+
+  Mongoid.configure do |config|
+    config.field_type :point, Point
+  end
+
+Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
+
+
+Rename error InvalidFieldType to UnknownFieldType
+-------------------------------------------------
+
+The error class InvalidFieldType has been renamed to UnknownFieldType
+to improve clarity. This error occurs when attempting using the
+``field`` macro in a Document definition with a ``:type`` Symbol that
+does not correspond to any built-in or custom-defined field type.
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :name, type: :bogus
+    #=> raises Mongoid::Errors::UnknownFieldType
+  end
+
+
+Support for Defining Custom Field Options via Top-Level Config
+--------------------------------------------------------------
+
+Mongoid 9.0 adds the ability to define custom ``field`` options as follows:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid.rb
+
+  Mongoid.configure do |config|
+    config.field_option :max_length do |model, field, value|
+      model.validates_length_of field.name, maximum: value
+    end
+  end
+
+In Mongoid 8, this was possible with the following legacy syntax. Users are
+recommended to migrate to the Mongoid 9.0 syntax above.
+
+.. code-block:: ruby
+
+  Mongoid::Fields.option :max_length do |model, field, value|
+    model.validates_length_of field.name, maximum: value
+  end
+
+Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-options>` for details.
+
+
 Bug Fixes and Improvements
 --------------------------
 

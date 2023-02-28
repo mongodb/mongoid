@@ -4,6 +4,7 @@ require "mongoid/fields/standard"
 require "mongoid/fields/foreign_key"
 require "mongoid/fields/localized"
 require "mongoid/fields/validators"
+require "mongoid/fields/field_types"
 
 module Mongoid
 
@@ -14,26 +15,8 @@ module Mongoid
     StringifiedSymbol = Mongoid::StringifiedSymbol
     Boolean = Mongoid::Boolean
 
-    # For fields defined with symbols use the correct class.
-    TYPE_MAPPINGS = {
-      array: Array,
-      big_decimal: BigDecimal,
-      binary: BSON::Binary,
-      boolean: Mongoid::Boolean,
-      date: Date,
-      date_time: DateTime,
-      float: Float,
-      hash: Hash,
-      integer: Integer,
-      object_id: BSON::ObjectId,
-      range: Range,
-      regexp: Regexp,
-      set: Set,
-      string: String,
-      stringified_symbol: StringifiedSymbol,
-      symbol: Symbol,
-      time: Time
-    }.with_indifferent_access
+    # @deprecated
+    TYPE_MAPPINGS = ::Mongoid::Fields::FieldTypes::DEFAULT_MAPPING
 
     # Constant for all names of the _id field in a document.
     #
@@ -45,7 +28,7 @@ module Mongoid
     # BSON classes that are not supported as field types
     #
     # @api private
-    INVALID_BSON_CLASSES = [ BSON::Decimal128, BSON::Int32, BSON::Int64 ].freeze
+    UNSUPPORTED_BSON_TYPES = [ BSON::Decimal128, BSON::Int32, BSON::Int64 ].freeze
 
     module ClassMethods
       # Returns the list of id fields for this model class, as both strings
@@ -283,7 +266,7 @@ module Mongoid
       #
       # @example
       #   Mongoid::Fields.option :required do |model, field, value|
-      #     model.validates_presence_of field if value
+      #     model.validates_presence_of field.name if value
       #   end
       #
       # @param [ Symbol ] option_name the option name to match against
@@ -807,48 +790,37 @@ module Mongoid
 
       # Get the class for the given type.
       #
-      # @param [ Symbol ] name The name of the field.
-      # @param [ Symbol | Class ] type The type of the field.
+      # @param [ Symbol ] field_name The name of the field.
+      # @param [ Symbol | Class ] raw_type The type of the field.
       #
       # @return [ Class ] The type of the field.
       #
-      # @raises [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
+      # @raises [ Mongoid::Errors::UnknownFieldType ] if given an invalid field
       #   type.
       #
       # @api private
-      def retrieve_and_validate_type(name, type)
-        type_mapping = TYPE_MAPPINGS[type]
-        result = type_mapping || unmapped_type(type)
-        if !result.is_a?(Class)
-          raise Errors::InvalidFieldType.new(self, name, type)
-        else
-          if INVALID_BSON_CLASSES.include?(result)
-            warn_message = "Using #{result} as the field type is not supported. "
-            if result == BSON::Decimal128
-              warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
-            else
-              warn_message += "Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type."
-            end
-            Mongoid.logger.warn(warn_message)
-          end
-        end
-        result
+      def get_field_type(field_name, raw_type)
+        type = raw_type ? Fields::FieldTypes.get(raw_type) : Object
+        raise Mongoid::Errors::UnknownFieldType.new(self.name, field_name, raw_type) unless type
+        warn_if_unsupported_bson_type(type)
+        type
       end
 
-      # Returns the type of the field if the type was not in the TYPE_MAPPINGS
-      # hash.
+      # Logs a warning message if the given type cannot be represented
+      # by BSON.
       #
-      # @param [ Symbol | Class ] type The type of the field.
-      #
-      # @return [ Class ] The type of the field.
+      # @param [ Class ] type The type of the field.
       #
       # @api private
-      def unmapped_type(type)
-        if "Boolean" == type.to_s
-          Mongoid::Boolean
+      def warn_if_unsupported_bson_type(type)
+        return unless UNSUPPORTED_BSON_TYPES.include?(type)
+        warn_message = "Using #{type} as the field type is not supported. "
+        if type == BSON::Decimal128
+          warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
         else
-          type || Object
+          warn_message += "Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type."
         end
+        Mongoid.logger.warn(warn_message)
       end
     end
   end
