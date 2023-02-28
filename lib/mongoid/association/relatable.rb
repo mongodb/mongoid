@@ -113,7 +113,7 @@ module Mongoid
       # @param [ Object ] other The other model class or model object to use when
       #   determining inverses.
       #
-      # @return [ Association ] The inverse's association metadata.
+      # @return [ Mongoid::Association::Relatable ] The inverse's association metadata.
       def inverse_association(other = nil)
         (other || relation_class).relations[inverse(other)]
       end

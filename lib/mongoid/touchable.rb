@@ -139,7 +139,7 @@ module Mongoid
     # @example Add the touchable.
     #   Model.define_touchable!(assoc)
     #
-    # @param [ Association ] association The association metadata.
+    # @param [ Mongoid::Association::Relatable ] association The association metadata.
     #
     # @return [ Class ] The model class.
     def define_touchable!(association)
@@ -200,7 +200,7 @@ module Mongoid
     #   Model.define_relation_touch_method(:band, :band_updated_at)
     #
     # @param [ Symbol ] name The name of the association.
-    # @param [ Association ] association The association metadata.
+    # @param [ Mongoid::Association::Relatable ] association The association metadata.
     #
     # @return [ Symbol ] The method name.
     def define_relation_touch_method(name, association)

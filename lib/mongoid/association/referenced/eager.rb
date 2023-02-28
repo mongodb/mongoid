@@ -13,8 +13,9 @@ module Mongoid
           # @example Create the new belongs to eager load preloader.
           #   BelongsTo.new(association, parent_docs)
           #
-          # @param [ Array<Association> ] associations Associations to eager load
-          # @param [ Array<Document> ] docs Documents to preload the associations
+          # @param [ Array<Mongoid::Association::Relatable> ] associations
+          #   Associations to eager load.
+          # @param [ Array<Document> ] docs Documents to preload the associations.
           #
           # @return [ Base ] The eager load preloader
           def initialize(associations, docs)
@@ -152,7 +153,7 @@ module Mongoid
           # @example Shift the current association.
           #   loader.shift_association
           #
-          # @return [ Association ] The association object.
+          # @return [ Mongoid::Association::Relatable ] The association metadata.
           def shift_association
             @association = @associations.shift
           end

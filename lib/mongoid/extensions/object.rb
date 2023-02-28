@@ -206,7 +206,7 @@ module Mongoid
         # @example Convert the object to a fk.
         #   Object.__mongoize_fk__(association, object)
         #
-        # @param [ Association ] association The association metadata.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         # @param [ Object ] object The object to convert.
         #
         # @return [ Object ] The converted object.
