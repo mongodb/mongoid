@@ -5,8 +5,12 @@ module Mongoid
     module Referenced
       class HasOne
 
-        # This class defines the behavior for all associations that are a
-        # one-to-one between documents in different collections.
+        # Transparent proxy for has_one associations.
+        # An instance of this class is returned when calling the
+        # association getter method on the subject document. This class
+        # inherits from Mongoid::Association::Proxy and forwards most of
+        # its methods to the target of the association, i.e. the
+        # document on the opposite-side collection which must be loaded.
         class Proxy < Association::One
 
           # Instantiate a new references_one association. Will set the foreign key
@@ -86,6 +90,15 @@ module Mongoid
 
           class << self
 
+            # Get the Eager object for this type of association.
+            #
+            # @example Get the eager loader object
+            #
+            # @param [ Association ] association The association object.
+            # @param [ Array<Document> ] docs The array of documents.
+            #
+            # @return [ Mongoid::Association::Referenced::HasOne::Eager ]
+            #   The eager loader.
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end

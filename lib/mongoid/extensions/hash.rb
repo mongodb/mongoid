@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Hash class.
     module Hash
 
       # Evolves each value in the hash to an object id if it is convertable.

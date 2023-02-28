@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# Deprecated patch for BSON::ObjectId which adds
+# legacy support for #as_json method behavior.
+#
+# @deprecated
 class BSON::ObjectId
   alias :bson_ruby_as_json :as_json
 

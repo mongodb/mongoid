@@ -2,6 +2,10 @@
 
 module Mongoid
   class Criteria
+
+    # Mixin module included in Mongoid::Criteria which adds
+    # functionality related to default query scopes and named
+    # scopes.
     module Scopable
 
       # Applies the default scope to the criteria.

@@ -4,6 +4,8 @@ require "rails/generators/mongoid_generator"
 
 module Mongoid
   module Generators
+
+    # Generator class for Mongoid model files.
     class ModelGenerator < Base
 
       desc "Creates a Mongoid model"
@@ -15,6 +17,7 @@ module Mongoid
       class_option :parent,     type: :string, desc: "The parent class for the generated model"
       class_option :collection, type: :string, desc: "The collection for storing model's documents"
 
+      # Creates a model file from a template.
       def create_model_file
         template "model.rb.tt", File.join("app/models", class_path, "#{file_name}.rb")
       end

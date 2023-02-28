@@ -5,8 +5,13 @@ module Mongoid
     module Referenced
       class HasAndBelongsToMany
 
-        # This class defines the behavior for all associations that are a
-        # many-to-many between documents in different collections.
+        # Transparent proxy for has_and_belongs_to_many associations.
+        # An instance of this class is returned when calling
+        # the association getter method on the subject document.
+        # This class inherits from Mongoid::Association::Proxy and
+        # forwards most of its methods to the target of the association,
+        # i.e. the array of documents on the opposite-side collection
+        # which must be loaded.
         class Proxy < Referenced::HasMany::Proxy
 
           # Appends a document or array of documents to the association. Will set
@@ -323,6 +328,9 @@ module Mongoid
             #
             # @param [ Mongoid::Association::Relatable ] association The association metadata.
             # @param [ Array<Document> ] docs The array of documents.
+            #
+            # @return [ Mongoid::Association::Referenced::HasAndBelongsToMany::Eager ]
+            #   The eager loader.
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end

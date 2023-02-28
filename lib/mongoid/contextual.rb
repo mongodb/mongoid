@@ -6,6 +6,9 @@ require "mongoid/contextual/memory"
 require "mongoid/contextual/none"
 
 module Mongoid
+
+  # Parent mixin module which adds aggregation (#sum, #avg, etc.) and
+  # atomic (#set, #unset, #push, etc.) behavior to Mongoid::Criteria.
   module Contextual
     extend Forwardable
 

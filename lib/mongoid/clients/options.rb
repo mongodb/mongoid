@@ -2,6 +2,12 @@
 
 module Mongoid
   module Clients
+
+    # Mixin module included into Mongoid::Document which gives
+    # the ability to manage the database context for persistence
+    # and query operations. For example, this includes saving
+    # documents to different collections, and reading documents
+    # from secondary instances.
     module Options
       extend ActiveSupport::Concern
 
@@ -27,18 +33,52 @@ module Mongoid
         clear_persistence_context(original_cluster, original_context)
       end
 
+      # Get the collection for the document's current persistence context.
+      #
+      # @example Get the collection for the current persistence context.
+      #   document.collection
+      #
+      # @param [ Object ] parent The parent object whose collection name is used
+      #   instead of the current persistence context's collection name.
+      #
+      # @return [ Mongo::Collection ] The collection for the current persistence
+      #   context.
       def collection(parent = nil)
         persistence_context.collection(parent)
       end
 
+      # Get the collection name for the document's current persistence context.
+      #
+      # @example Get the collection name for the current persistence context.
+      #   document.collection_name
+      #
+      # @return [ String ] The collection name for the current persistence
+      #   context.
       def collection_name
         persistence_context.collection_name
       end
 
+      # Get the database client for the document's current persistence context.
+      #
+      # @example Get the client for the current persistence context.
+      #   document.mongo_client
+      #
+      # @return [ Mongo::Client ] The client for the current persistence
+      #   context.
       def mongo_client
         persistence_context.client
       end
 
+      # Get the document's current persistence context.
+      #
+      # @note For embedded documents, the persistence context of the
+      #   root parent document is returned.
+      #
+      # @example Get the current persistence context.
+      #   document.persistence_context
+      #
+      # @return [ Mongoid::PersistenceContent ] The current persistence
+      #   context.
       def persistence_context
         if embedded? && !_root?
           _root.persistence_context
@@ -49,6 +89,16 @@ module Mongoid
         end
       end
 
+      # Returns whether a persistence context is set for the document
+      # or the document's class.
+      #
+      # @note For embedded documents, the persistence context of the
+      #   root parent document is used.
+      #
+      # @example Get the current persistence context.
+      #   document.persistence_context?
+      #
+      # @return [ true | false ] Whether a persistence context is set.
       def persistence_context?
         if embedded? && !_root?
           _root.persistence_context?
@@ -69,22 +119,62 @@ module Mongoid
 
       module ClassMethods
 
+        # Get the database client name for the current persistence context
+        # of the document class.
+        #
+        # @example Get the client name for the current persistence context.
+        #   Model.client_name
+        #
+        # @return [ String ] The database client name for the current
+        #   persistence context.
         def client_name
           persistence_context.client_name
         end
 
+        # Get the collection name for the current persistence context of the
+        # document class.
+        #
+        # @example Get the collection name for the current persistence context.
+        #   Model.collection_name
+        #
+        # @return [ String ] The collection name for the current persistence
+        #   context.
         def collection_name
           persistence_context.collection_name
         end
 
+        # Get the database name for the current persistence context of the
+        # document class.
+        #
+        # @example Get the database name for the current persistence context.
+        #   Model.database_name
+        #
+        # @return [ String ] The database name for the current persistence
+        #   context.
         def database_name
           persistence_context.database_name
         end
 
+        # Get the collection for the current persistence context of the
+        # document class.
+        #
+        # @example Get the collection for the current persistence context.
+        #   Model.collection
+        #
+        # @return [ Mongo::Collection ] The collection for the current
+        #   persistence context.
         def collection
           persistence_context.collection
         end
 
+        # Get the client for the current persistence context of the
+        # document class.
+        #
+        # @example Get the client for the current persistence context.
+        #   Model.mongo_client
+        #
+        # @return [ Mongo::Client ] The client for the current persistence
+        #   context.
         def mongo_client
           persistence_context.client
         end
@@ -110,6 +200,15 @@ module Mongoid
           PersistenceContext.clear(self, original_cluster, original_context)
         end
 
+        # Get the current persistence context of the document class.
+        # If a persistence context is not set, a new one will be
+        # initialized and returned.
+        #
+        # @example Get the current persistence context.
+        #   Model.persistence_context
+        #
+        # @return [ Mongoid::PersistenceContent ] The current persistence
+        #   context.
         def persistence_context
           PersistenceContext.get(self) || PersistenceContext.new(self)
         end

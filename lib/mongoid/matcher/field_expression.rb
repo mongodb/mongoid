@@ -1,8 +1,22 @@
 module Mongoid
   module Matcher
 
+    # Singleton module used for evaluating whether a given
+    # value in-memory matches an MSQL query expression related
+    # to a specific field.
+    #
     # @api private
     module FieldExpression
+
+      # Returns whether a value satisfies a condition.
+      #
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Hash | Object ] condition The condition predicate.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         if condition.is_a?(Hash)
           condition.all? do |k, cond_v|

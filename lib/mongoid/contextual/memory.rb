@@ -5,6 +5,11 @@ require "mongoid/association/eager_loadable"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on documents which have been loaded into application
+    # memory. The method interface of this class is consistent with
+    # Mongoid::Contextual::Mongo.
     class Memory
       include Enumerable
       include Aggregable::Memory

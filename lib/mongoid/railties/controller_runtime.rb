@@ -46,9 +46,7 @@ module Mongoid
             messages << ("MongoDB: %.1fms" % mongoid_runtime.to_f) if mongoid_runtime
             messages
           end
-
         end
-
       end
 
       # The Collector of MongoDB runtime metric, that subscribes to Mongo
@@ -59,30 +57,47 @@ module Mongoid
 
         VARIABLE_NAME = "Mongoid.controller_runtime".freeze
 
+        # Call when event started. Does nothing.
+        #
+        # @return [ nil ] Nil.
         def started _; end
 
+        # Call when event completed. Updates the runtime value.
+        #
+        # @param [ Mongo::Event::Base ] e The monitoring event.
+        #
+        # @return [ Integer ] The current runtime value.
         def _completed e
           Collector.runtime += e.duration * 1000
         end
         alias :succeeded :_completed
         alias :failed :_completed
 
+        # Get the runtime value on the current thread.
+        #
+        # @return [ Integer ] The runtime value.
         def self.runtime
           Thread.current[VARIABLE_NAME] ||= 0
         end
 
+        # Set the runtime value on the current thread.
+        #
+        # @param [ Integer ] value The runtime value.
+        #
+        # @return [ Integer ] The runtime value.
         def self.runtime= value
           Thread.current[VARIABLE_NAME] = value
         end
 
+        # Reset the runtime value to zero the current thread.
+        #
+        # @return [ Integer ] The previous runtime value.
         def self.reset_runtime
           to_now = runtime
           self.runtime = 0
           to_now
         end
-
       end
-
     end
   end
 end

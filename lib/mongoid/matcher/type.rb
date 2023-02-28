@@ -1,10 +1,23 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $type expression.
+    #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/type/
     #
     # @api private
     module Type
+
+      # Returns whether a value satisfies a $type expression.
+      #
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Integer | Array<Integer> ] condition The $type condition
+      #   predicate which corresponds to the BSON type enumeration.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         conditions = case condition
         when Array
@@ -22,6 +35,17 @@ module Mongoid
         false
       end
 
+      # Returns whether a value satisfies a single $type expression
+      # value.
+      #
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Integer ] condition The $type condition predicate
+      #   which corresponds to the BSON type enumeration.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def one_matches?(exists, value, condition)
         case condition
         when 1

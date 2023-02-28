@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Range class.
     module Range
 
       # Get the range as arguments for a find.

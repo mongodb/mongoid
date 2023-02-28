@@ -2,6 +2,8 @@
 
 module Mongoid
   module Contextual
+
+    # Represents a $geoNear database command instruction.
     class GeoNear
       extend Forwardable
       include Enumerable

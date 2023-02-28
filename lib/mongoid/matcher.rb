@@ -1,5 +1,8 @@
 module Mongoid
 
+  # Utility module containing methods which assist in performing
+  # in-memory matching of documents with MQL query expressions.
+  #
   # @api private
   module Matcher
 

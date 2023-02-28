@@ -4,6 +4,8 @@ module Mongoid
   module Association
     module Referenced
       module NestedAttributes
+
+        # Dead-wood class. To be removed in MONGOID-5567.
         class One < NestedBuilder
 
           attr_accessor :destroy

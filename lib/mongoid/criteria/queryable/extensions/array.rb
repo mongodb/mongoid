@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # The array module adds custom behavior for Origin onto the Array class.
+        # Adds query type-casting behavior to Array class.
         module Array
 
           # Combine the two objects using the add strategy.

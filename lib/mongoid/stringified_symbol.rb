@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-# A class which sends values to the database as Strings but returns them to the user as Symbols.
 module Mongoid
+
+  # A class which sends values to the database as Strings but returns
+  # them to the user as Symbols.
   class StringifiedSymbol
 
     class << self
@@ -9,7 +11,7 @@ module Mongoid
       # Convert the object from its mongo friendly ruby type to this type.
       #
       # @example Demongoize the object.
-      #   Mongoid::StringifiedSymbol.demongoize(object)
+      #   Mongoid::StringifiedSymbol.demongoize('hedgehog')
       #
       # @param [ Object ] object The object to demongoize.
       #
@@ -24,15 +26,15 @@ module Mongoid
         end
       end
 
-      # Turn the object from the ruby type we deal with to a Mongo friendly
-      # type.
+      # Turn the object from the Ruby type into the type
+      # type used for MongoDB persistence.
       #
       # @example Mongoize the object.
-      #   Mongoid::StringifiedSymbol.mongoize("123.11")
+      #   Mongoid::StringifiedSymbol.mongoize(:hedgehog)
       #
       # @param [ Object ] object The object to mongoize.
       #
-      # @return [ Symbol ] The object mongoized.
+      # @return [ String ] The object mongoized.
       #
       # @api private
       def mongoize(object)
@@ -43,6 +45,16 @@ module Mongoid
          end
       end
 
+      # Turn the object from the Ruby type into the type
+      # type used in MQL queries.
+      #
+      # @example Evolve the object.
+      #   Mongoid::StringifiedSymbol.evolve(:hedgehog)
+      #
+      # @param [ Object ] object The object to evolve.
+      #
+      # @return [ String ] The object evolved.
+      #
       # @api private
       def evolve(object)
         mongoize(object)

@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to FalseClass.
     module FalseClass
 
       # Get the value of the object as a mongo friendly sort value.

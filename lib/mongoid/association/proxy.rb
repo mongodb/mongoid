@@ -119,10 +119,16 @@ module Mongoid
       #
       # @param [ String | Symbol ] name The name of the method.
       # @param [ Object... ] *args The arguments passed to the method.
+      # @param &block Optional block to pass.
       ruby2_keywords def method_missing(name, *args, &block)
         _target.send(name, *args, &block)
       end
 
+      # Whether the proxy can forward the method to the target.
+      #
+      # @param [ String | Symbol ] name The name of the method.
+      # @param [ Object... ] *args The +respond_to?+ arguments.
+      #
       # @api private
       ruby2_keywords def respond_to_missing?(name, *args)
         _target.respond_to?(name, *args)

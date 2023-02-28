@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains extensions for boolean selection.
+        # Adds query type-casting behavior to Mongoid::Boolean class.
         module Boolean
           module ClassMethods
 

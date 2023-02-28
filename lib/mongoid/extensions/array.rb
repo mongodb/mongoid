@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Array class.
     module Array
 
       # Evolve the array into an array of object ids.

@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Time class.
     module DateTime
 
       # Mongoize the date time into a time.

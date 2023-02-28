@@ -9,6 +9,13 @@ module Mongoid
   module Warnings
 
     class << self
+
+      # Define a warning message method for the given id.
+      #
+      # @param [ Symbol ] id The warning identifier.
+      # @param [ String ] message The warning message.
+      #
+      # @api private
       def warning(id, message)
         singleton_class.class_eval do
           define_method("warn_#{id}") do

@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Symbol class.
     module Symbol
 
       # Is the symbol a valid value for a Mongoid id?

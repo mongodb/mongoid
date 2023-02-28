@@ -1,8 +1,22 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $gt expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/gt/
+    #
     # @api private
     module Gt
+
+      # Returns whether a value satisfies a $gt expression.
+      #
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Object ] condition The $gt condition predicate.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         case condition
         when Range

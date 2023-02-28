@@ -3,6 +3,9 @@
 module Mongoid
   module Association
     module Nested
+
+      # Builder class used to perform #accepts_nested_attributes_for
+      # attribute assignment on many-to-n associations.
       class Many
         include Buildable
 

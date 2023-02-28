@@ -36,8 +36,8 @@ module Mongoid
     # hash. This is used recursively so that embedded associations are cloned
     # safely.
     #
-    # @param klass [ Class ] The class of the document to create.
-    # @param attrs [ Hash ] The hash of the attributes.
+    # @param [ Class ] klass The class of the document to create.
+    # @param [ Hash ] attrs The hash of the attributes.
     #
     # @return [ Document ] The new document.
     def self.clone_with_hash(klass, attrs)

@@ -2,6 +2,9 @@
 
 module Mongoid
   class Criteria
+
+    # Mixin module included in Mongoid::Criteria which adds the ability
+    # to find document by id.
     module Findable
 
       # Execute the criteria or raise an error if no documents found.

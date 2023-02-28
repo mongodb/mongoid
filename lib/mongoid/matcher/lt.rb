@@ -1,8 +1,22 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $lt expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/lt/
+    #
     # @api private
     module Lt
+
+      # Returns whether a value satisfies a $lt expression.
+      #
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Object ] condition The $lt condition predicate.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         case condition
         when Range

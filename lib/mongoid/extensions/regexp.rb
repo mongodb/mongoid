@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Regexp class.
     module Regexp
 
       module ClassMethods

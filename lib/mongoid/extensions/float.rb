@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Float class.
     module Float
 
       # Converts the float into a time as the number of seconds since the epoch.

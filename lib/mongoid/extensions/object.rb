@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Object class.
     module Object
 
       # Evolve a plain object into an object id.

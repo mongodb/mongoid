@@ -1,8 +1,20 @@
 module Mongoid
   module Matcher
 
+    # Base singleton module used for evaluating whether a given
+    # document in-memory matches an MSQL query expression.
+    #
     # @api private
     module Expression
+
+      # Returns whether a document satisfies a query expression.
+      #
+      # @param [ Mongoid::Document ] document The document.
+      # @param [ Hash ] expr The expression.
+      #
+      # @return [ true | false ] Whether the document matches.
+      #
+      # @api private
       module_function def matches?(document, expr)
         if expr.nil?
           raise Errors::InvalidQuery, "Nil condition in expression context"

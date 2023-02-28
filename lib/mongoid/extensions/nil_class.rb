@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to NilClass.
     module NilClass
 
       # Try to form a setter from this object.

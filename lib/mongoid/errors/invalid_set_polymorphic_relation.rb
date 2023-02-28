@@ -24,7 +24,6 @@ module Mongoid
     #   eye = Eye.new
     #   face = Face.new
     #   eye.eyeable = face # Raises error
-
     class InvalidSetPolymorphicRelation < MongoidError
 
       # Create the new invalid set polymorphic association error.

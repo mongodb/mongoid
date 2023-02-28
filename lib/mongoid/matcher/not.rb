@@ -1,8 +1,23 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $not expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/not/
+    #
     # @api private
     module Not
+
+      # Returns whether a value satisfies an $not expression.
+      #
+      # @param [ true | false ] exists Whether the value exists.
+      # @param [ Object ] value The value to check.
+      # @param [ Hash | Regexp | BSON::Regexp::Raw ] condition
+      #   The $not condition predicate.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         case condition
         when ::Regexp, BSON::Regexp::Raw

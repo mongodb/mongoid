@@ -2,6 +2,12 @@
 
 module Mongoid
   module Contextual
+
+    # Mixin module included in Mongoid::Criteria which provides a
+    # direct method interface to MongoDB's Update Operators ($set,
+    # $pull, $inc, etc.) These operators can be applied to update
+    # all documents in the database within the criteria scope,
+    # without loading each document into Mongoid's memory.
     module Atomic
 
       # Execute an atomic $addToSet on the matching documents.

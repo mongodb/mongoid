@@ -51,6 +51,9 @@ module Mongoid
       # @option options [ true | false ] :suppress Whether to update
       #   the parent document in-memory when deleting an embedded document.
       #
+      # @raises [ Mongoid::Errors::DocumentNotDestroyed ] Raised if
+      #   the document was not destroyed.
+      #
       # @return [ true ] Always true.
       def destroy!(options = {})
         destroy(options) || raise(Errors::DocumentNotDestroyed.new(_id, self.class))

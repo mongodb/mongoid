@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Mongoid
+
+  # Adds type-casting behavior to Mongoid::Boolean class.
   class Boolean
 
     class << self

@@ -1,8 +1,22 @@
 module Mongoid
   module Matcher
 
+    # In-memory matcher for $elemMatch expression.
+    #
+    # @see https://www.mongodb.com/docs/manual/reference/operator/query/elemMatch/
+    #
     # @api private
     module ElemMatch
+
+      # Returns whether a value satisfies an $elemMatch expression.
+      #
+      # @param [ true | false ] exists Not used.
+      # @param [ Object | Array<Object> ] value The value to check.
+      # @param [ Hash ] expr The $elemMatch condition predicate.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       module_function def matches?(exists, value, condition)
         unless Hash === condition
           raise Errors::InvalidQuery, "$elemMatch requires a Hash operand: #{Errors::InvalidQuery.truncate_expr(condition)}"

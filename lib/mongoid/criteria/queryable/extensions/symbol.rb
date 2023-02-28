@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional symbol behavior.
+        # Adds query type-casting behavior to Symbol class.
         module Symbol
 
           # Get the symbol as a specification.

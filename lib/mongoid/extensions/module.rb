@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Module class.
     module Module
 
       # Redefine the method. Will undef the method if it exists or simply

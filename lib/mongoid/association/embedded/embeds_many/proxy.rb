@@ -7,6 +7,12 @@ module Mongoid
     module Embedded
       class EmbedsMany
 
+        # Transparent proxy for embeds_many associations.
+        # An instance of this class is returned when calling the
+        # association getter method on the parent document. This
+        # class inherits from Mongoid::Association::Proxy and forwards
+        # most of its methods to the target of the association, i.e.
+        # the array of child documents.
         class Proxy < Association::Many
           include Batchable
 

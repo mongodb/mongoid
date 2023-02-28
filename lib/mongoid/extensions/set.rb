@@ -2,6 +2,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Set class.
     module Set
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
