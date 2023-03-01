@@ -95,7 +95,7 @@ Setup Mongoid
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file 
+This generator will create the ``config/mongoid.yml`` configuration file
 (used to configure the connection to the MongoDB deployment) and the
 ``config/initializers/mongoid.rb`` initializer file (which may be used for
 other Mongoid-related configuration). Note that as we are not using
@@ -334,7 +334,7 @@ Generate the default Mongoid configuration:
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file 
+This generator will create the ``config/mongoid.yml`` configuration file
 (used to configure the connection to the MongoDB deployment) and the
 ``config/initializers/mongoid.rb`` initializer file (which may be used for
 other Mongoid-related configuration). In general, it is recommended to use

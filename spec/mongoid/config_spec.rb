@@ -419,6 +419,13 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the legacy_readonly option in the config' do
+    let(:option) { :legacy_readonly }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
   describe "#load!" do
 
     let(:file) do
@@ -907,6 +914,49 @@ describe Mongoid::Config do
           expect(House.count).to eq(1)
           Mongoid.truncate!
           expect(House.count).to eq(0)
+        end
+      end
+    end
+  end
+
+  describe 'deprecations' do
+    { use_activesupport_time_zone: true,
+      broken_aggregables: false,
+      broken_alias_handling: false,
+      broken_and: false,
+      broken_scoping: false,
+      broken_updates: false,
+      compare_time_by_ms: true,
+      legacy_attributes: false,
+      legacy_pluck_distinct: false,
+      legacy_triple_equals: false,
+      object_id_as_json_oid: false,
+      overwrite_chained_operators: false }.each do |option, default|
+
+      context ":#{option} option" do
+
+        before do
+          Mongoid::Warnings.class_eval do
+            instance_variable_set(:"@#{option}_deprecated", false)
+          end
+        end
+
+        let(:matcher) do
+          /Config option :#{option}.+\. It will always be #{default} beginning in Mongoid 9\.0\./
+        end
+
+        context 'when set to true' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", true)
+          end
+        end
+
+        context 'when set to false' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", false)
+          end
         end
       end
     end
