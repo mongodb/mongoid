@@ -241,6 +241,29 @@ defaults to ``true``.
 When set to false, the older, inconsistent behavior is restored.
 
 
+Support Field Aliases on Index Options
+--------------------------------------
+
+Support has been added to use aliased field names in the following options
+of the ``index`` macro: ``partial_filter_expression``, ``weights``,
+``wildcard_projection``.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+    field :a, as: :age
+    index({ age: 1 }, { partial_filter_expression: { age: { '$gte' => 20 } })
+  end
+
+.. note::
+
+  The expansion of field name aliases in index options such as
+  ``partial_filter_expression`` is performed according to the behavior of MongoDB
+  server 6.0. Future server versions may change how they interpret these options,
+  and Mongoid's functionality may not support such changes.
+
+
 Bug Fixes and Improvements
 --------------------------
 
