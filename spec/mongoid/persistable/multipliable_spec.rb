@@ -4,7 +4,7 @@ require "spec_helper"
 
 describe Mongoid::Persistable::Multipliable do
 
-  describe "#set_mul" do
+  describe "#mul" do
 
     context "when the document is a root document" do
 
@@ -50,7 +50,7 @@ describe Mongoid::Persistable::Multipliable do
       context "when providing string fields" do
 
         let!(:op) do
-          person.set_mul("age" => 5, "score" => -5, "inte" => 30)
+          person.mul("age" => 5, "score" => -5, "inte" => 30)
         end
 
         it_behaves_like "a multipliable root document"
@@ -59,7 +59,7 @@ describe Mongoid::Persistable::Multipliable do
       context "when providing symbol fields" do
 
         let!(:op) do
-          person.set_mul(age: 5, score: -5, inte: 30)
+          person.mul(age: 5, score: -5, inte: 30)
         end
 
         it_behaves_like "a multipliable root document"
@@ -80,7 +80,7 @@ describe Mongoid::Persistable::Multipliable do
         end
 
         let!(:op) do
-          person.set_mul(age: positive, score: negative, inte: dynamic)
+          person.mul(age: positive, score: negative, inte: dynamic)
         end
 
         it_behaves_like "a multipliable root document"
@@ -135,7 +135,7 @@ describe Mongoid::Persistable::Multipliable do
       context "when providing string fields" do
 
         let!(:op) do
-          address.set_mul("number" => 5, "no" => -5, "house" => 30)
+          address.mul("number" => 5, "no" => -5, "house" => 30)
         end
 
         it_behaves_like "a multipliable embedded document"
@@ -144,7 +144,7 @@ describe Mongoid::Persistable::Multipliable do
       context "when providing symbol fields" do
 
         let!(:op) do
-          address.set_mul(number: 5, no: -5, house: 30)
+          address.mul(number: 5, no: -5, house: 30)
         end
 
         it_behaves_like "a multipliable embedded document"
@@ -165,7 +165,7 @@ describe Mongoid::Persistable::Multipliable do
         end
 
         let!(:op) do
-          address.set_mul(number: positive, no: negative, house: dynamic)
+          address.mul(number: positive, no: negative, house: dynamic)
         end
 
         it_behaves_like "a multipliable embedded document"
@@ -180,7 +180,7 @@ describe Mongoid::Persistable::Multipliable do
 
       it "marks a dirty change for the multiplied fields" do
         person.atomically do
-          person.set_mul age: 15, score: 2
+          person.mul age: 15, score: 2
           expect(person.changes).to eq({"age" => [10, 150], "score" => [100, 200]})
         end
       end
@@ -201,7 +201,7 @@ describe Mongoid::Persistable::Multipliable do
 
         it "persists the changes" do
           expect(person).to be_readonly
-          person.set_mul(age: 15, score: 2)
+          person.mul(age: 15, score: 2)
           expect(person.age).to eq(150)
           expect(person.score).to eq(200)
         end
@@ -217,7 +217,7 @@ describe Mongoid::Persistable::Multipliable do
         it "raises a ReadonlyDocument error" do
           expect(person).to be_readonly
           expect do
-            person.set_mul(age: 15, score: 2)
+            person.mul(age: 15, score: 2)
           end.to raise_error(Mongoid::Errors::ReadonlyDocument)
         end
       end
