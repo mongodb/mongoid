@@ -26,6 +26,8 @@ class Address
   field :s, type: String, as: :suite
   field :name, localize: true
 
+  alias_attribute :n, :name
+
   embeds_many :locations, validate: false
   embeds_one :code, validate: false
   embeds_one :target, as: :targetable, validate: false

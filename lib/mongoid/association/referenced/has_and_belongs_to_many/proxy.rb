@@ -321,7 +321,7 @@ module Mongoid
             #
             # @example Get the eager loader object
             #
-            # @param [ Association ] association The association object.
+            # @param [ Mongoid::Association::Relatable ] association The association metadata.
             # @param [ Array<Document> ] docs The array of documents.
             def eager_loader(association, docs)
               Eager.new(association, docs)
