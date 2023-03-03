@@ -90,10 +90,6 @@ module Mongoid
     # nil instead of the parent scope for backwards compatibility.
     option :broken_scoping, default: false
 
-    # Maintain broken `and' behavior when using the same operator on the same
-    # field multiple times for backwards compatibility.
-    option :broken_and, default: false
-
     # Use millisecond precision when comparing Time objects with the _matches?
     # function.
     option :compare_time_by_ms, default: true
@@ -387,8 +383,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ broken_and
-                    broken_scoping
+      OPTIONS = %i[ broken_scoping
                     broken_updates
                     compare_time_by_ms
                     legacy_attributes
