@@ -49,31 +49,6 @@ describe Date do
         expect(evolved).to eq(expected_time)
       end
     end
-
-    context "when not using ActiveSupport's time zone" do
-      include_context 'not using AS time zone'
-
-      let(:date) do
-        Date.new(2010, 1, 1)
-      end
-
-      let(:expected_time) do
-        Time.local(2010, 1, 1, 0, 0, 0, 0)
-      end
-
-      let(:evolved) do
-        date.__evolve_time__
-      end
-
-      it 'is a Time' do
-        expect(evolved.class).to eq(Time)
-      end
-
-      it 'is equal to expected time' do
-        expect(expected_time).to be_a(Time)
-        expect(evolved).to eq(expected_time)
-      end
-    end
   end
 
   describe ".evolve" do

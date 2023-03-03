@@ -92,6 +92,15 @@ For all of the new methods there are also shorter forms created dynamically, e.g
 and ``will_save_change_to_attribute?(:name)`` is equivalent to ``will_save_change_to_name?``.
 
 
+Deprecated ``use_activesupport_time_zone`` config option
+--------------------------------------------------------
+
+The config option ``use_activesupport_time_zone`` has been deprecated.
+Beginning in Mongoid 9.0, it will be ignored and always behave as true.
+Since ``use_activesupport_time_zone`` currently defaults to true, it is
+safe to remove from your config file at this time.
+
+
 Configuration DSL No Longer Requires an Argument to its Block
 -------------------------------------------------------------
 
@@ -378,7 +387,7 @@ Added ``none_of`` Query Method
 ------------------------------
 
 With the addition of ``none_of``, Mongoid 8.1 allows queries to exclude
-conditions in bulk. The emitted query will encapsulate the specified 
+conditions in bulk. The emitted query will encapsulate the specified
 criteria in a ``$nor`` operation. For example:
 
 .. code:: ruby
