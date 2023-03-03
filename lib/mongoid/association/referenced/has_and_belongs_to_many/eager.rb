@@ -6,7 +6,7 @@ module Mongoid
       class HasAndBelongsToMany
 
         # Eager class for has_and_belongs_to_many associations.
-        class Eager < Association::Referenced::Eager::Base
+        class Eager < Association::Eager
 
           private
 

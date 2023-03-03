@@ -6,7 +6,7 @@ module Mongoid
       class HasMany
 
         # Eager class for has_many associations.
-        class Eager < Association::Referenced::Eager::Base
+        class Eager < Association::Eager
 
           private
 
