@@ -12,7 +12,6 @@ describe Mongoid::Config::Defaults do
 
     shared_examples "uses settings for 7.3" do
       it "uses settings for 7.3" do
-        expect(Mongoid.broken_alias_handling).to be true
         expect(Mongoid.broken_and).to be true
         expect(Mongoid.broken_scoping).to be true
         expect(Mongoid.broken_updates).to be true
@@ -25,7 +24,6 @@ describe Mongoid::Config::Defaults do
 
     shared_examples "does not use settings for 7.3" do
       it "does not use settings for 7.3" do
-        expect(Mongoid.broken_alias_handling).to be false
         expect(Mongoid.broken_and).to be false
         expect(Mongoid.broken_scoping).to be false
         expect(Mongoid.broken_updates).to be false

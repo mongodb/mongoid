@@ -90,10 +90,6 @@ module Mongoid
     # nil instead of the parent scope for backwards compatibility.
     option :broken_scoping, default: false
 
-    # Ignore aliased fields in embedded documents when performing pluck and
-    # distinct operations, for backwards compatibility.
-    option :broken_alias_handling, default: false
-
     # Maintain broken `and' behavior when using the same operator on the same
     # field multiple times for backwards compatibility.
     option :broken_and, default: false
@@ -391,8 +387,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ broken_alias_handling
-                    broken_and
+      OPTIONS = %i[ broken_and
                     broken_scoping
                     broken_updates
                     compare_time_by_ms
