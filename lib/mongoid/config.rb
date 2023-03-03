@@ -82,10 +82,6 @@ module Mongoid
     # return false.
     option :legacy_triple_equals, default: false
 
-    # Use millisecond precision when comparing Time objects with the _matches?
-    # function.
-    option :compare_time_by_ms, default: true
-
     # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
     # the one monkey-patched into Mongoid.
     option :object_id_as_json_oid, default: false
@@ -375,8 +371,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ compare_time_by_ms
-                    legacy_attributes
+      OPTIONS = %i[ legacy_attributes
                     legacy_pluck_distinct
                     legacy_triple_equals
                     object_id_as_json_oid

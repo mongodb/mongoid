@@ -342,13 +342,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the compare_time_by_ms option in the config' do
-    let(:option) { :compare_time_by_ms }
-    let(:default) { true }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the object_id_as_json_oid option in the config' do
     let(:option) { :object_id_as_json_oid }
     let(:default) { false }
@@ -877,8 +870,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { compare_time_by_ms: true,
-      legacy_attributes: false,
+    { legacy_attributes: false,
       legacy_pluck_distinct: false,
       legacy_triple_equals: false,
       object_id_as_json_oid: false,

@@ -26,7 +26,6 @@ module Mongoid
         case version.to_s
         when "7.3"
           # flags introduced in 7.4 - old functionality
-          self.compare_time_by_ms = false
           self.legacy_pluck_distinct = true
           self.legacy_triple_equals = true
           self.object_id_as_json_oid = true

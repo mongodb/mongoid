@@ -25,7 +25,6 @@ module Mongoid
     warning :as_json_compact_deprecated, '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
     warning :symbol_type_deprecated, 'The BSON Symbol type is deprecated by MongoDB. Please use String or StringifiedSymbol field types instead of the Symbol field type.'
     warning :legacy_readonly, 'The readonly! method will only mark the document readonly when the legacy_readonly feature flag is switched off.'
-    warning :compare_time_by_ms_deprecated, 'Config option :compare_time_by_ms is deprecated. It will always be true beginning in Mongoid 9.0. Please use load_defaults for Mongoid 8.0 or later, then remove it from your config.'
     warning :legacy_attributes_deprecated, 'Config option :legacy_attributes is deprecated. It will always be false beginning in Mongoid 9.0. Please use load_defaults for Mongoid 8.0 or later, then remove it from your config.'
     warning :legacy_pluck_distinct_deprecated, 'Config option :legacy_pluck_distinct is deprecated. It will always be false beginning in Mongoid 9.0. Please use load_defaults for Mongoid 8.0 or later, then remove it from your config.'
     warning :legacy_triple_equals_deprecated, 'Config option :legacy_triple_equals is deprecated. It will always be false beginning in Mongoid 9.0. Please use load_defaults for Mongoid 8.0 or later, then remove it from your config.'
