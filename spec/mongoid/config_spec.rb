@@ -518,10 +518,6 @@ describe Mongoid::Config do
         expect(described_class.raise_not_found_error).to be true
       end
 
-      it "sets the use activesupport time zone option" do
-        expect(described_class.use_activesupport_time_zone).to be true
-      end
-
       it "sets the use utc option" do
         expect(described_class.use_utc).to be false
       end
@@ -600,10 +596,6 @@ describe Mongoid::Config do
 
         it "sets the raise not found error option" do
           expect(described_class.raise_not_found_error).to be true
-        end
-
-        it "sets the use activesupport time zone option" do
-          expect(described_class.use_activesupport_time_zone).to be true
         end
 
         it "sets the use utc option" do
@@ -920,8 +912,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { use_activesupport_time_zone: true,
-      broken_aggregables: false,
+    { broken_aggregables: false,
       broken_alias_handling: false,
       broken_and: false,
       broken_scoping: false,
