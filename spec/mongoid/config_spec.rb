@@ -335,13 +335,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the broken_updates option in the config' do
-    let(:option) { :broken_updates }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the legacy_triple_equals option in the config' do
     let(:option) { :legacy_triple_equals }
     let(:default) { false }
@@ -884,8 +877,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { broken_updates: false,
-      compare_time_by_ms: true,
+    { compare_time_by_ms: true,
       legacy_attributes: false,
       legacy_pluck_distinct: false,
       legacy_triple_equals: false,

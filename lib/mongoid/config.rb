@@ -77,10 +77,6 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
-    # Update embedded documents correctly when setting it, unsetting it
-    # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
-    option :broken_updates, default: false
-
     # Maintain legacy behavior of === on Mongoid documents, which returns
     # true in a number of cases where Ruby's === implementation would
     # return false.
@@ -379,8 +375,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ broken_updates
-                    compare_time_by_ms
+      OPTIONS = %i[ compare_time_by_ms
                     legacy_attributes
                     legacy_pluck_distinct
                     legacy_triple_equals

@@ -290,103 +290,47 @@ describe Mongoid::Reloadable do
 
     context "when embedded documents are unasssigned and reassigned" do
 
-      context "when broken_updates feature flag is not set" do
-        config_override :broken_updates, false
-
-        let(:palette) do
-          Palette.new
-        end
-
-        let(:canvas) do
-          Canvas.create!
-        end
-
-        before do
-          canvas.palette = palette
-          canvas.palette = nil
-          canvas.palette = palette
-          canvas.save!
-          canvas.reload
-        end
-
-        it "reloads the embedded document correctly" do
-          expect(canvas.palette).to eq(palette)
-        end
+      let(:palette) do
+        Palette.new
       end
 
-      context "when broken_updates feature flag is set" do
-        config_override :broken_updates, true
+      let(:canvas) do
+        Canvas.create!
+      end
 
-        let(:palette) do
-          Palette.new
-        end
+      before do
+        canvas.palette = palette
+        canvas.palette = nil
+        canvas.palette = palette
+        canvas.save!
+        canvas.reload
+      end
 
-        let(:canvas) do
-          Canvas.create!
-        end
-
-        before do
-          canvas.palette = palette
-          canvas.palette = nil
-          canvas.palette = palette
-          canvas.save!
-          canvas.reload
-        end
-
-        it "does not reload the embedded document correctly" do
-          expect(canvas.palette).to be_nil
-        end
+      it "reloads the embedded document correctly" do
+        expect(canvas.palette).to eq(palette)
       end
     end
 
     context "when embeds_many documents are cleared and reassigned" do
 
-      context "when broken_updates feature flag is not set" do
-        config_override :broken_updates, false
-
-        let(:contractor) do
-          Contractor.new(name: 'contractor')
-        end
-
-        let(:building) do
-          Building.create!
-        end
-
-        it "persists an embedded document correctly the second time" do
-          building.contractors << contractor
-          expect(building.contractors).to eq([contractor])
-
-          building.contractors.clear
-          expect(building.contractors).to eq([])
-
-          building.contractors << contractor
-          building.reload
-          expect(building.contractors).to eq([contractor])
-        end
+      let(:contractor) do
+        Contractor.new(name: 'contractor')
       end
 
-      context "when broken_updates feature flag is set" do
-        config_override :broken_updates, true
+      let(:building) do
+        Building.create!
+      end
 
-        let(:contractor) do
-          Contractor.new(name: 'contractor')
-        end
+      it "persists an embedded document correctly the second time" do
+        building.contractors << contractor
+        expect(building.contractors).to eq([contractor])
 
-        let(:building) do
-          Building.create!
-        end
+        building.contractors.clear
+        expect(building.contractors).to eq([])
 
-        it "doesn't persist the embedded document correctly the second time" do
-          building.contractors << contractor
-          expect(building.contractors).to eq([contractor])
-
-          building.contractors.clear
-          expect(building.contractors).to eq([])
-
-          building.contractors << contractor
-          building.reload
-          expect(building.contractors).to eq([])
-        end
+        building.contractors << contractor
+        building.reload
+        expect(building.contractors).to eq([contractor])
       end
     end
 

@@ -55,30 +55,28 @@ module Mongoid
                 # run the callbacks and state-changing code by passing persist: false in that case.
                 _target.destroy(persist: !replacement) if persistable?
 
-                unless Mongoid.broken_updates
-                  # A little explanation on why this is needed... Say we have three assignments:
-                  #
-                  # canvas.palette = palette
-                  # canvas.palette = nil
-                  # canvas.palette = palette
-                  # Where canvas embeds_one palette.
-                  #
-                  # Previously, what was happening was, on the first assignment,
-                  # palette was considered a "new record" (new_record?=true) and
-                  # thus palette was being inserted into the database. However,
-                  # on the third assignment, we're trying to reassign the palette,
-                  # palette is no longer considered a new record, because it had
-                  # been inserted previously. This is not exactly accurate,
-                  # because the second assignment ultimately removed the palette
-                  # from the database, so it needs to be reinserted. Since the
-                  # palette's new_record is false, Mongoid ends up "updating" the
-                  # document, which doesn't reinsert it into the database.
-                  #
-                  # The change I introduce here, respecifies palette as a "new
-                  # record" when it gets removed from the database, so if it is
-                  # reassigned, it will be reinserted into the database.
-                  _target.new_record = true
-                end
+                # A little explanation on why this is needed... Say we have three assignments:
+                #
+                # canvas.palette = palette
+                # canvas.palette = nil
+                # canvas.palette = palette
+                # Where canvas embeds_one palette.
+                #
+                # Previously, what was happening was, on the first assignment,
+                # palette was considered a "new record" (new_record?=true) and
+                # thus palette was being inserted into the database. However,
+                # on the third assignment, we're trying to reassign the palette,
+                # palette is no longer considered a new record, because it had
+                # been inserted previously. This is not exactly accurate,
+                # because the second assignment ultimately removed the palette
+                # from the database, so it needs to be reinserted. Since the
+                # palette's new_record is false, Mongoid ends up "updating" the
+                # document, which doesn't reinsert it into the database.
+                #
+                # The change I introduce here, respecifies palette as a "new
+                # record" when it gets removed from the database, so if it is
+                # reassigned, it will be reinserted into the database.
+                _target.new_record = true
               end
               unbind_one
               unless replacement
