@@ -356,13 +356,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the broken_aggregables option in the config' do
-    let(:option) { :broken_aggregables }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the broken_alias_handling option in the config' do
     let(:option) { :broken_alias_handling }
     let(:default) { false }
@@ -912,8 +905,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { broken_aggregables: false,
-      broken_alias_handling: false,
+    { broken_alias_handling: false,
       broken_and: false,
       broken_scoping: false,
       broken_updates: false,

@@ -90,10 +90,6 @@ module Mongoid
     # nil instead of the parent scope for backwards compatibility.
     option :broken_scoping, default: false
 
-    # Maintain broken behavior of sum over empty result sets for backwards
-    # compatibility.
-    option :broken_aggregables, default: false
-
     # Ignore aliased fields in embedded documents when performing pluck and
     # distinct operations, for backwards compatibility.
     option :broken_alias_handling, default: false
@@ -395,8 +391,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ broken_aggregables
-                    broken_alias_handling
+      OPTIONS = %i[ broken_alias_handling
                     broken_and
                     broken_scoping
                     broken_updates

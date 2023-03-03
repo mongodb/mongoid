@@ -26,7 +26,6 @@ module Mongoid
         case version.to_s
         when "7.3"
           # flags introduced in 7.4 - old functionality
-          self.broken_aggregables = true
           self.broken_alias_handling = true
           self.broken_and = true
           self.broken_scoping = true
