@@ -349,13 +349,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the broken_scoping option in the config' do
-    let(:option) { :broken_scoping }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the compare_time_by_ms option in the config' do
     let(:option) { :compare_time_by_ms }
     let(:default) { true }
@@ -891,8 +884,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { broken_scoping: false,
-      broken_updates: false,
+    { broken_updates: false,
       compare_time_by_ms: true,
       legacy_attributes: false,
       legacy_pluck_distinct: false,

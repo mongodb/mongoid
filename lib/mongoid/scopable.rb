@@ -211,11 +211,7 @@ module Mongoid
         begin
           yield criteria
         ensure
-          if Mongoid.broken_scoping
-            Threaded.set_current_scope(nil, self)
-          else
-            Threaded.set_current_scope(previous, self)
-          end
+          Threaded.set_current_scope(previous, self)
         end
       end
 

@@ -86,10 +86,6 @@ module Mongoid
     # return false.
     option :legacy_triple_equals, default: false
 
-    # When exiting a nested `with_scope' block, set the current scope to
-    # nil instead of the parent scope for backwards compatibility.
-    option :broken_scoping, default: false
-
     # Use millisecond precision when comparing Time objects with the _matches?
     # function.
     option :compare_time_by_ms, default: true
@@ -383,8 +379,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ broken_scoping
-                    broken_updates
+      OPTIONS = %i[ broken_updates
                     compare_time_by_ms
                     legacy_attributes
                     legacy_pluck_distinct
