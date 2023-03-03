@@ -23,7 +23,7 @@ module Mongoid
       #   person.set_created_at
       def set_created_at
         if !timeless? && !created_at
-          time = Time.configured.now
+          time = Time.zone.now
           self.updated_at = time if is_a?(Updated) && !updated_at_changed?
           self.created_at = time
         end

@@ -9,9 +9,9 @@ module Mongoid
       # @example Convert the float into a time.
       #   1335532685.117847.__mongoize_time__
       #
-      # @return [ Time | ActiveSupport::TimeWithZone ] The time.
+      # @return [ ActiveSupport::TimeWithZone ] The time.
       def __mongoize_time__
-        ::Time.configured.at(self)
+        ::Time.zone.at(self)
       end
 
       # Is the float a number?

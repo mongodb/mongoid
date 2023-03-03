@@ -29,6 +29,21 @@ of each option.
 - ``:use_activesupport_time_zone``
 
 
+``Time.zone`` now required and ``Time.configured`` method removed
+-----------------------------------------------------------------
+
+**Breaking change:** Mongoid 9.0 now requires ``Time.zone`` to be set
+in your application. Please consult the :ref:`time zone configuration docs
+<time-zones>` for more details.
+
+In addition, the previously deprecated ``Time.configured`` method has been
+removed. If you were using this method, you may replace all usages with ``Time.zone``.
+
+As an intended consequence of these changes, Mongoid fields with ``type: Time`` will
+now uniformly return instances of ``ActiveSupport::TimeWithZone`` instead of ``Time``.
+(This was already generally the case in prior Mongoid versions under normal settings.)
+
+
 ``touch`` method now clears changed state
 -----------------------------------------
 

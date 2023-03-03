@@ -44,11 +44,11 @@ module Mongoid
       #   [ 2010, 1, 1 ].__mongoize_time__
       #   # => 2010-01-01 00:00:00 -0500
       #
-      # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
+      # @return [ ActiveSupport::TimeWithZone ] Local time in the
       #   configured default time zone corresponding to date/time components
       #   in this array.
       def __mongoize_time__
-        ::Time.configured.local(*self)
+        ::Time.zone.local(*self)
       end
 
       # Checks whether conditions given in this array are known to be
