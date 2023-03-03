@@ -48,8 +48,7 @@ describe Mongoid::Extensions::TimeWithZone do
         end
       end
 
-      context "when using the ActiveSupport time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting the ActiveSupport time zone" do
         time_zone_override "Stockholm"
 
         it "returns an ActiveSupport::TimeWithZone" do
@@ -104,8 +103,7 @@ describe Mongoid::Extensions::TimeWithZone do
         expect(ActiveSupport::TimeWithZone.demongoize(time.dup.utc).utc_offset).to eq(0)
       end
 
-      context "when using the ActiveSupport time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting the ActiveSupport time zone" do
         time_zone_override "Stockholm"
 
         let(:time) do
@@ -187,9 +185,7 @@ describe Mongoid::Extensions::TimeWithZone do
         end
       end
 
-      context "when using the ActiveSupport time zone" do
-        config_override :use_activesupport_time_zone, true
-        # if this is actually your time zone, the following tests are useless
+      context "when setting the ActiveSupport time zone" do
         time_zone_override "Stockholm"
 
         context "when the local time is not observing daylight saving" do
@@ -224,8 +220,7 @@ describe Mongoid::Extensions::TimeWithZone do
         )
       end
 
-      context "when using the ActiveSupport time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting the ActiveSupport time zone" do
         time_zone_override "Stockholm"
 
         let(:datetime) do
@@ -286,8 +281,7 @@ describe Mongoid::Extensions::TimeWithZone do
         expect(ActiveSupport::TimeWithZone.mongoize(date).utc_offset).to eq(0)
       end
 
-      context "when using the ActiveSupport time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting the ActiveSupport time zone" do
         time_zone_override "Stockholm"
 
         let(:date) do
@@ -310,8 +304,7 @@ describe Mongoid::Extensions::TimeWithZone do
         expect(ActiveSupport::TimeWithZone.mongoize(array)).to eq(Time.local(*array))
       end
 
-      context "when using the ActiveSupport time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting the ActiveSupport time zone" do
         time_zone_override "Stockholm"
 
         it "assumes the given time is local" do
@@ -360,13 +353,6 @@ describe Mongoid::Extensions::TimeWithZone do
 
     context "when using active support's time zone" do
       include_context 'using AS time zone'
-
-      it_behaves_like 'mongoizes to AS::TimeWithZone'
-      it_behaves_like 'maintains precision when mongoized'
-    end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
 
       it_behaves_like 'mongoizes to AS::TimeWithZone'
       it_behaves_like 'maintains precision when mongoized'

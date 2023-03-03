@@ -71,8 +71,7 @@ describe String do
 
     context "when the string without timezone" do
 
-      context "when using active support's time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting active support's time zone" do
         time_zone_override "Tokyo"
 
         let(:date) do
@@ -88,8 +87,7 @@ describe String do
         end
       end
 
-      context "when not using active support's time zone" do
-        config_override :use_activesupport_time_zone, false
+      context "when not setting active support's time zone" do
         time_zone_override nil
 
         let(:date) do

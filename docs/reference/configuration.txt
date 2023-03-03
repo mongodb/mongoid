@@ -456,11 +456,6 @@ for details on driver options.
       # existing method. (default: false)
       scope_overwrite_exception: false
 
-      # Use ActiveSupport's time zone in time operations instead of
-      # the Ruby default time zone. See the time zone section below for
-      # further information. (default: true)
-      use_activesupport_time_zone: true
-
       # Return stored times as UTC. See the time zone section below for
       # further information. Most applications should not use this option.
       # (default: false)
@@ -469,6 +464,7 @@ for details on driver options.
       # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
       # indexes in the background by default. (default: false)
       background_indexing: false
+
     # Configure driver-specific options. (optional)
     driver_options:
       # When this flag is turned off, inline options will be correctly
@@ -726,10 +722,10 @@ To set the driver logger to be the same as the Mongoid logger:
 Time Zones
 ==========
 
-Ruby has limited time zone support in the standard library. ActiveSupport
-(which Mongoid depends on) offers more comprehensive time zone support.
-Importantly, Ruby and ActiveSupport may be configured with different default
-time zones.
+Mongoid uses ActiveSupport's time zone functionality, which is far
+more robust than Ruby's standard library. Importantly, ActiveSupport
+allows configuration of ``Time.zone``, a thread-global variable which
+provides context for working with date and time values.
 
 While a thorough treatment of time zones in Ruby is outside the scope
 of this tutorial, the easiest and most reliable way of achieving correct
@@ -741,7 +737,7 @@ time zone handling is as follows:
 
   cp /usr/share/zoneinfo/UTC /etc/localtime
 
-2. Set ActiveSupport's time zone to UTC:
+2. Set your application default time zone to UTC:
 
 .. code-block:: ruby
 
@@ -753,69 +749,74 @@ time zone handling is as follows:
   # If not using Rails:
   Time.zone = 'UTC'
 
-3. Store and persist all times in UTC. Perform all calculations on times
-   in UTC.
-4. When working with user input in local time, convert such user input to UTC
-   times as soon as possible, and then work with the UTC times.
-5. When rendering or otherwise presenting times, convert them to local time
-   after performing all calculations, when actually rendering.
-6. Date to time (for example, the time when a particular day starts or ends)
-   conversions are a common source of errors. Such conversions should generally
-   be performed while explicitly specifying the time zone in which the date
-   is understood to be.
+3. In each controller and job class, set the appropriate time zone in a
+   ``before_filter`` at the earliest possible stage. As an example,
+   if each user of your application can set their own time zone,
+   you may wish to do:
 
-Applications using Mongoid should generally configure ActiveSupport's
-time zone as described above, and then use ``Time.zone`` rather than ``Time``
-(for example, ``Time.zone.now`` instead of ``Time.now``) to invoke the
-ActiveSupport time zone machinery. This also helps achieve correct results
-when the system time zone is not UTC, as is common in development environments.
+.. code-block:: ruby
 
-Note that MongoDB stores all times in UTC without time zone information.
+  class ApplicationController < ActionController::Base
+    before_filter :fetch_user,
+                  :set_time_zone
 
-Mongoid offers the following time zone-related configuration options:
+    def set_time_zone
+      Time.zone = @user.time_zone
+    end
+  end
 
-- ``use_activesupport_time_zone``: If true, prefer to work with times using
-  ``ActiveSupport::TimeWithZone``. Values in fields of type ``Time``
-  will be returned as instances of ``ActiveSupport::TimeWithZone``.
-  When parsing times without time zone information (such as when
-  mongoizing strings or arrays to time), assume the times are specified
-  in ActiveSupport's time zone. This is the default.
+4. From here, you may work with times naturally in the local time zone.
+   For example, in a view:
 
-  If false, prefer to work with times using Ruby standard library ``Time`` class.
-  Values in fields of type ``Time`` will be returned as ``Time`` instances.
-  When parsing times without time zone information, assume the times
-  are specified in the Ruby time zone.
+.. code-block:: ruby
 
-  Note that the ``use_activesupport_time_zone`` setting does not affect
-  fields of types ``Date`` or ``DateTime``, which use ``Date`` and
-  ``DateTime`` classes for their values, respectively.
+  Turned into a pumpkin after <%= cinderella.updated_at.seconds_after_midnight %> seconds!
 
-  Also note that Mongoid may still utilize both ``Time`` and
-  ``ActiveSupport::TimeWithZone`` classes internally, as appropriate,
-  regardless of the ``use_activesupport_time_zone`` setting.
-- ``use_utc``:
-  If true, times stored in MongoDB will be returned in UTC.
-  If false, times stored in MongoDB will be returned in local time
-  (as instances of either ``Time`` or ``ActiveSupport::TimeWithZone``,
-  respectively in the Ruby default time zone or the ActiveSupport time zone,
-  based on the value of ``use_activesupport_time_zone`` setting).
-  The default is false.
+5. Use ActiveSupport methods instead of the Ruby standard library.
 
-  The ``use_utc`` setting does not affect how times are parsed - parsing
-  is always done in local time when the input being parsed does not
-  include time zone information. To parse dates in UTC, set the
-  system/Ruby or ActiveSupport time zone to UTC (as mentioned above,
-  setting all three to UTC leads to the fewest headaches).
+   - ``Time.zone.now`` or ``Time.current` instead of ``Time.now``
+   - ``Date.current`` instead of ``Date.today``
 
-  Setting ``use_activesupport_time_zone`` to true and ``Time.zone`` to
-  UTC (and using ActiveSupport time machinery for all time-related
-  operations) is recommended over setting ``use_utc`` to true.
+   Critically, note that the latter Ruby standard library methods reference
+   your system time zone (e.g. UTC) and not the value of ``Time.zone``.
+   As it is very easy to mistake these similarly named methods, we recommended to
+   use `Rubocop's Rails/TimeZone cop
+   <https://docs.rubocop.org/rubocop-rails/cops_rails.html#railstimezone>`_ in your CI.
 
-Note that ``use_activesupport_time_zone`` and ``use_utc`` options do not
-throw away time zone information when it is available. For example, a Time
-instance does have an associated time zone, and this time zone will be used
-even if it is different from ActiveSupport's configured time zone when
-``use_activesupport_time_zone`` is true.
+Setting time zone on data loaded from MongoDB
+---------------------------------------------
+
+MongoDB stores all times in UTC without time zone information.
+Mongoid models load and returns time values as instances of
+``ActiveSupport::TimeWithZone``. You may set the ``use_utc`` option
+to control how Mongoid sets the time zone when loading from the database:
+
+- If false (default), Mongoid will use ``Time.zone`` to set the time
+  zone of time values are loaded from database.
+- If true, Mongoid will always set the time zone as UTC on loaded
+  time values.
+
+``use_utc`` only affects how data is loaded, and does not affect
+how data is persisted. For example, if you assign a ``Time`` or
+``ActiveSupport::TimeWithZone`` instance to a time field, the time
+zone information of the assigned instance always will be used
+irrespective of the ``use_utc`` setting. Alternatively, if you
+assign a string value to a time field, any time zone information
+in the string will be used if present. If the string does not include
+time zone information it will be parsed according to ``Time.zone``.
+To illustrate:
+
+.. code-block:: ruby
+
+  Time.use_zone("Asia/Kolkata") do
+
+    # String does not include time zone, so "Asia/Kolkata" will be used
+    ghandi.born_at = "1869-10-02 7:10 PM"
+
+    # Time zone in string (-0600) will be used
+    amelia.born_at = "1897-07-24 11:30 -0600"
+  end
+
 
 Configuring ``SSLContext``
 ==========================

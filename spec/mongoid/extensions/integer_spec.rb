@@ -25,12 +25,6 @@ describe Mongoid::Extensions::Integer do
 
       it_behaves_like 'mongoizes to AS::TimeWithZone'
     end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
-
-      it_behaves_like 'mongoizes to Time'
-    end
   end
 
   [ :mongoize, :demongoize ].each do |method|

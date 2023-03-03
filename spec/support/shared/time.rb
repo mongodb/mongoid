@@ -2,23 +2,10 @@
 
 shared_context 'using AS time zone' do
   before do
-    Mongoid.use_activesupport_time_zone = true
     Time.zone = "Tokyo"
   end
 
   after do
-    Time.zone = nil
-  end
-end
-
-shared_context 'not using AS time zone' do
-  before do
-    Mongoid.use_activesupport_time_zone = false
-    Time.zone = 'Tokyo'
-  end
-
-  after do
-    Mongoid.use_activesupport_time_zone = true
     Time.zone = nil
   end
 end

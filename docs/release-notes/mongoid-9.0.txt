@@ -17,6 +17,18 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Deprecated options removed
+--------------------------
+
+**Breaking change:** The following options are removed in Mongoid 9.0.
+Please ensure you have removed any references to these from your app and configs.
+If you were using ``config.load_defaults 8.1`` prior to upgrading, you will not
+experience any behavior change. Refer to earlier release notes for the meaning
+of each option.
+
+- ``:use_activesupport_time_zone``
+
+
 ``touch`` method now clears changed state
 -----------------------------------------
 
@@ -128,12 +140,9 @@ Use configured time zone to typecast Date to Time in queries
 -------------------------------------------------------------
 
 When querying for a Time field using a Date value, Mongoid now correctly
-considers the ``Mongoid.use_activesupport_time_zone`` configuration option
-to perform type conversion.
+considers ``Time.zone`` to perform type conversion.
 
 .. code-block:: ruby
-
-  Mongoid.use_activesupport_time_zone = true
 
   class Magazine
     include Mongoid::Document
@@ -147,14 +156,12 @@ to perform type conversion.
   #=> will return all results on or after Sept 26th, 2022
   #   at 0:00 in Asia/Tokyo time zone.
 
-In prior Mongoid versions, the above code would ignore the
-``Mongoid.use_activesupport_time_zone`` setting and behave as if
-it were false, i.e. always using the system time zone to perform
-the type conversion.
+In prior Mongoid versions, the above code would ignore the ``Time.zone``
+(irrespective of the now-removed ``:use_activesupport_time_zone``
+setting) and always using the system time zone to perform the type conversion.
 
 Note that in prior Mongoid versions, typecasting Date to Time during
-persistence operations was already correctly using the
-``Mongoid.use_activesupport_time_zone`` setting.
+persistence operations was already correctly using time zone.
 
 
 ```#touch`` method on embedded documents correctly handles ``touch: false`` option

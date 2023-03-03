@@ -23,24 +23,6 @@ describe Mongoid::Extensions::Date do
 
       it_behaves_like 'mongoizes to AS::TimeWithZone'
     end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
-
-      let(:date) do
-        Date.new(2010, 1, 1)
-      end
-
-      let(:expected_time) do
-        Time.local(2010, 1, 1, 0, 0, 0, 0)
-      end
-
-      let(:mongoized) do
-        date.__mongoize_time__
-      end
-
-      it_behaves_like 'mongoizes to Time'
-    end
   end
 
   describe ".demongoize" do

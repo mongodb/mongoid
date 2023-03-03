@@ -3,7 +3,6 @@
 require "spec_helper"
 
 describe Mongoid::Fields do
-  config_override :use_activesupport_time_zone, false
 
   describe "#\{field}_translations" do
 
@@ -1074,7 +1073,7 @@ describe Mongoid::Fields do
     context "when the field is a time" do
 
       let!(:time) do
-        Time.now
+        Time.find_zone('UTC').parse('2023-03-03 10:30:53')
       end
 
       let!(:person) do
@@ -1082,10 +1081,11 @@ describe Mongoid::Fields do
       end
 
       context "when reading the field" do
-        time_zone_override "Berlin"
+        time_zone_override 'Europe/Berlin'
 
         it "performs the necessary time conversions" do
-          expect(person.lunch_time.to_s).to eq(time.getlocal.to_s)
+          expect(person.lunch_time.to_s).to eq('2023-03-03 11:30:53 +0100')
+          expect(person.lunch_time.time_zone.name).to eq('Europe/Berlin')
         end
       end
     end

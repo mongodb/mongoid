@@ -375,16 +375,6 @@ describe Mongoid::Extensions::Array do
       it_behaves_like 'mongoizes to AS::TimeWithZone'
       it_behaves_like 'maintains precision when mongoized'
     end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
-
-      # In Ruby time zone (could be different from AS time zone)
-      let(:expected_time) { ::Time.local(*array).in_time_zone }
-
-      it_behaves_like 'mongoizes to Time'
-      it_behaves_like 'maintains precision when mongoized'
-    end
   end
 
   describe "#blank_criteria?" do

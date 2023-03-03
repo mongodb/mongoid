@@ -26,13 +26,6 @@ describe Mongoid::Extensions::Float do
       it_behaves_like 'mongoizes to AS::TimeWithZone'
       it_behaves_like 'maintains precision when mongoized'
     end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
-
-      it_behaves_like 'mongoizes to Time'
-      it_behaves_like 'maintains precision when mongoized'
-    end
   end
 
   [ :mongoize, :demongoize ].each do |method|

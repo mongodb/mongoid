@@ -71,10 +71,6 @@ module Mongoid
     # existing method.
     option :scope_overwrite_exception, default: false
 
-    # Use ActiveSupport's time zone in time operations instead of the
-    # Ruby default time zone.
-    option :use_activesupport_time_zone, default: true
-
     # Return stored times as UTC.
     option :use_utc, default: false
 
