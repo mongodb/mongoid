@@ -33,7 +33,6 @@ module Mongoid
           load_defaults "7.4"
         when "7.4"
           # flags introduced in 7.5 - old functionality
-          self.legacy_attributes = true
           self.overwrite_chained_operators = true
 
           load_defaults "7.5"

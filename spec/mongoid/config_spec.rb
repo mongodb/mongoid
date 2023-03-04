@@ -363,20 +363,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the legacy_attributes option in the config' do
-    let(:option) { :legacy_attributes }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_attributes option in the config' do
-    let(:option) { :legacy_readonly }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the legacy_readonly option in the config' do
     let(:option) { :legacy_readonly }
     let(:default) { false }
@@ -870,8 +856,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { legacy_attributes: false,
-      legacy_pluck_distinct: false,
+    { legacy_pluck_distinct: false,
       legacy_triple_equals: false,
       object_id_as_json_oid: false,
       overwrite_chained_operators: false }.each do |option, default|

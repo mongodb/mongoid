@@ -94,12 +94,6 @@ module Mongoid
     # using and's instead of overwriting them.
     option :overwrite_chained_operators, default: false
 
-    # When this flag is true, the attributes method on a document will return
-    # a BSON::Document when that document is retrieved from the database, and
-    # a Hash otherwise. When this flag is false, the attributes method will
-    # always return a Hash.
-    option :legacy_attributes, default: false
-
     # Sets the async_query_executor for the application. By default the thread pool executor
     #   is set to `:immediate. Options are:
     #
@@ -371,8 +365,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ legacy_attributes
-                    legacy_pluck_distinct
+      OPTIONS = %i[ legacy_pluck_distinct
                     legacy_triple_equals
                     object_id_as_json_oid
                     overwrite_chained_operators ]

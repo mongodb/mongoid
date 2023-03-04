@@ -27,14 +27,12 @@ describe Mongoid::Config::Defaults do
 
     shared_examples "uses settings for 7.4" do
       it "uses settings for 7.4" do
-        expect(Mongoid.legacy_attributes).to be true
         expect(Mongoid.overwrite_chained_operators).to be true
       end
     end
 
     shared_examples "does not use settings for 7.4" do
       it "does not use settings for 7.4" do
-        expect(Mongoid.legacy_attributes).to be false
         expect(Mongoid.overwrite_chained_operators).to be false
       end
     end
