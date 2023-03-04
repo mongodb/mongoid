@@ -504,12 +504,6 @@ describe Mongoid::Extensions::Hash do
     end
   end
 
-  describe "#blank_criteria?" do
-    let(:meth) { :blank_criteria? }
-
-    it_behaves_like 'unsatisfiable criteria method'
-  end
-
   describe "#_mongoid_unsatisfiable_criteria?" do
     let(:meth) { :_mongoid_unsatisfiable_criteria? }
 

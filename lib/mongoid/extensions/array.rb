@@ -51,26 +51,6 @@ module Mongoid
         ::Time.configured.local(*self)
       end
 
-      # Checks whether conditions given in this array are known to be
-      # unsatisfiable, i.e., querying with this array will always return no
-      # documents.
-      #
-      # This method used to assume that the array is the list of criteria
-      # to be used with an $and operator. This assumption is no longer made;
-      # therefore, since the interpretation of conditions in the array differs
-      # between $and, $or and $nor operators, this method now always returns
-      # false.
-      #
-      # This method is deprecated. Mongoid now uses
-      # +_mongoid_unsatisfiable_criteria?+ internally; this method is retained
-      # for backwards compatibility only. It always returns false.
-      #
-      # @return [ false ] Always false.
-      # @deprecated
-      def blank_criteria?
-        false
-      end
-
       # Is the array a set of multiple arguments in a method?
       #
       # @example Is this multi args?
