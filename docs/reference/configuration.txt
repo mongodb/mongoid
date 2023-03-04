@@ -286,88 +286,6 @@ for details on driver options.
       # error. (default: true)
       belongs_to_required_by_default: true
 
-      # (Deprecated) Maintain broken behavior of sum over empty result sets for backwards
-      # compatibility. When calculating a sum on a field with a null context,
-      # for example:
-      #
-      # Product.none.sum(:price)
-      #
-      # ... return field name (`:price') instead of 0.
-      #
-      # When calculating a sum via a database query with an empty result set,
-      # for example:
-      #
-      # Product.where(impossible_condition: true).sum(:price)
-      #
-      # ... return nil instead of 0.
-      # (default: false)
-      #broken_aggregables: true
-
-      # (Deprecated) Ignore aliased fields in embedded documents when performing pluck and
-      # distinct operations, for backwards compatibility.
-      # (default: false)
-      #broken_alias_handling: true
-
-      # (Deprecated) Maintain broken `and' method behavior that existed in Mongoid 7.3
-      # and earlier for backwards compatibility: in some situations, conditions
-      # already present in a Criteria object would be replaced by newer
-      # conditions when `and' method is used instead of the new conditions
-      # being added to the existing conditions. This would happen when using
-      # the same operator on the same field multiple times. For example:
-      #
-      # Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
-      #
-      # yields the following criteria:
-      #
-      # <Mongoid::Criteria
-      # selector: {"_id"=>1, "year"=>{"$in"=>[2020]}, "$and"=>[{"_id"=>2}]}
-      # options:  {}
-      # class:    Band
-      # embedded: false>
-      #
-      # This is obviously incorrect as the {"$in"=>[2021]} clause is lost.
-      # Notice that the clause is only lost when both clauses are added using
-      # the #and method.
-      # (default: false)
-      #broken_and: true
-
-      # (Deprecated) When exiting a nested `with_scope' block, set the current scope to
-      # nil instead of the parent scope for backwards compatibility.
-      # (default: false)
-      #broken_scoping: true
-
-      # (Deprecated) Maintain broken update behavior in some cases for backwards
-      # compatibility.
-      #
-      # In Mongoid 7.3 and earlier, when assigning a value to an embedded
-      # document, then setting it to nil, then assigning the original value
-      # to it again, the second update would not work and the value for the
-      # embedded document would remain nil. Take this case:
-      #
-      # canvas.palette = palette
-      # canvas.palette = nil
-      # canvas.palette = palette
-      #
-      # ... where canvas embeds_one palette.
-      #
-      # In Mongoid 7.3 and earlier, canvas.palette would be nil when we would
-      # expect it to be palette. Set this option to true to keep this behavior,
-      # set the option to false to perform the second update correctly.
-      # (default: false)
-      #broken_updates: true
-
-      # (Deprecated) Time objects in Ruby have nanosecond precision, whereas MongoDB server
-      # can only store times with millisecond precision. Set this option to
-      # true to truncate times to millisecond precision when performing
-      # queries on already loaded embedded associations (this is also called
-      # "embedded matching" and is done completely in Ruby), to obtain the
-      # same query results when performing time comparisons regardless of
-      # which documents are being queried. Setting this option to false will
-      # produce different results for queries on embedded associations that
-      # are already loaded into memory vs queries on unloaded associations and
-      # top-level models. (default: true)
-      #compare_time_by_ms: false
-
       # Set the global discriminator key. (default: "_type")
       discriminator_key: "_type"
 
@@ -389,21 +307,6 @@ for details on driver options.
       # to parent contexts by default. (default: false)
       join_contexts: false
 
-      # (Deprecated) When this flag is true, the attributes method on a document will return
-      # a BSON::Document when that document is retrieved from the database, and
-      # a Hash otherwise. When this flag is false, the attributes method will
-      # always return a Hash. (default: false)
-      #legacy_attributes: true
-
-      # (Deprecated) Maintain legacy behavior of pluck and distinct, which does not demongoize
-      # values on returning them. Setting this option to false will cause
-      # pluck and distinct to return demongoized values. Setting this option to
-      # false will also allow retrieving *_translations fields from pluck and
-      # distinct and will return embedded values themselves (i.e. without
-      # putting them in a hash).
-      # (default: false)
-      #legacy_pluck_distinct: true
-
       # When this flag is false, a document will become read-only only once the
       # #readonly! method is called, and an error will be raised on attempting
       # to save or update such documents, instead of just on delete. When this
@@ -415,15 +318,6 @@ for details on driver options.
       # (default: false)
       #legacy_readonly: true
 
-      # (Deprecated) Maintain legacy behavior of === on Mongoid document classes, which
-      # returns true in a number of cases where Ruby's === implementation would
-      # return false. Note that the behavior of === on Mongoid document
-      # instances differs from both the behavior of === on document classes
-      # and from Ruby's behavior of === on simple object instances regardless
-      # of the value of this option.
-      # (default: false)
-      #legacy_triple_equals: true
-
       # Set the Mongoid and Ruby driver log levels when Mongoid is not using
       # Ruby on Rails logger instance. (default: :info)
       log_level: :info
@@ -431,18 +325,6 @@ for details on driver options.
       # When using the BigDecimal field type, store the value in the database
       # as a BSON::Decimal128 instead of a string. (default: true)
       #map_big_decimal_to_decimal128: true
-
-      # (Deprecated) Force ``BSON::ObjectId#as_json`` method to return the hash
-      # { "$oid" => id.to_s }. When this option is false, and bson-ruby 5
-      # is used, the return value will be the hexadecimal ObjectId string only.
-      # (default: false)
-      #object_id_as_json_oid: true
-
-      # (Deprecated) When chaining the same operators that use the same field, setting this
-      # feature flag to false will cause those operators to be combined using an
-      # and. Setting this feature flag to true will cause the later chained
-      # operators to overwrite the earlier ones. (default: false)
-      #overwrite_chained_operators: false
 
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
@@ -506,11 +388,12 @@ This way, when upgrading to a new version of Mongoid, your code will run with
 the configuration options from the previous version of Mongoid. Then,
 one-by-one, you can change the feature flags for the new version, and test that
 your code still acts as expected. Once all of the new feature flags have been
-accounted for, the call to ``load_defaults`` can be changed to take in the *new*
-version, and all of the changed feature flags can be removed. For example, say
-we're upgrading from 7.5 to 8.0. Between these two versions, only two feature
-flags were added: ``legacy_attributes`` and ``map_big_decimal_to_decimal128``.
-Before upgrading to Mongoid 8, the following line can be added:
+accounted for, the call to ``load_defaults`` may be changed to take in the *new*
+version, and all of the changed feature flags may be removed.
+
+For example, suppose we're upgrading from 7.5 to 8.0. Between these two versions,
+two feature flags were added: ``legacy_attributes`` and ``map_big_decimal_to_decimal128``.
+Before upgrading to Mongoid 8, add the following to your ``Mongoid::Config``:
 
 .. code:: ruby
 
@@ -518,10 +401,10 @@ Before upgrading to Mongoid 8, the following line can be added:
     config.load_defaults 7.5
   end
 
-Now, after upgrading, those two feature flags will default to their 7.5
-functionality (``legacy_attributes: true, map_big_decimal_to_decimal128: false``).
-Now you can set these feature flags one-by-one and flip them to their 8.0
-behavior:
+After upgrading to Mongoid 8.0 in your ``Gemfile``, any feature flags will
+remain set to their 7.5 default behavior: ``legacy_attributes: true,
+map_big_decimal_to_decimal128: false``. You may then flip these feature flags
+one-by-one to their 8.0 behavior:
 
 .. code:: ruby
 
@@ -531,8 +414,8 @@ behavior:
     # config.map_big_decimal_to_decimal128 = true
   end
 
-It is advised to do these one at a time, so I have left the second flag
-commented out. After verifying your code works as expected with the
+We recommend do these one at a time, so in the example above we leave the
+second flag commented out. After verifying your code works as expected with the
 ``legacy_attributes`` flag turned off, the ``map_big_decimal_to_decimal128``
 setting can be uncommented. Once that functionality is verified as well, both
 of those lines can be removed and the ``load_defaults`` replaced with:

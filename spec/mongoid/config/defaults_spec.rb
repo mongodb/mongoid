@@ -10,38 +10,6 @@ describe Mongoid::Config::Defaults do
 
   describe ".load_defaults" do
 
-    shared_examples "uses settings for 7.3" do
-      it "uses settings for 7.3" do
-      end
-    end
-
-    shared_examples "does not use settings for 7.3" do
-      it "does not use settings for 7.3" do
-      end
-    end
-
-    shared_examples "uses settings for 7.4" do
-      it "uses settings for 7.4" do
-      end
-    end
-
-    shared_examples "does not use settings for 7.4" do
-      it "does not use settings for 7.4" do
-      end
-    end
-
-    shared_examples "uses settings for 7.5" do
-      it "uses settings for 7.5" do
-        expect(Mongoid.map_big_decimal_to_decimal128).to be false
-      end
-    end
-
-    shared_examples "does not use settings for 7.5" do
-      it "does not use settings for 7.5" do
-        expect(Mongoid.map_big_decimal_to_decimal128).to be true
-      end
-    end
-
     shared_examples "uses settings for 8.0" do
       it "uses settings for 8.0" do
         expect(Mongoid.legacy_readonly).to be true
@@ -76,46 +44,10 @@ describe Mongoid::Config::Defaults do
         Mongoid::Config.reset
       end
 
-      context "when the given version is 7.3" do
-
-        let(:version) { 7.3 }
-
-        it_behaves_like "uses settings for 7.3"
-        it_behaves_like "uses settings for 7.4"
-        it_behaves_like "uses settings for 7.5"
-        it_behaves_like "uses settings for 8.0"
-        it_behaves_like "uses settings for 8.1"
-      end
-
-      context "when the given version is 7.4" do
-
-        let(:version) { 7.4 }
-
-        it_behaves_like "does not use settings for 7.3"
-        it_behaves_like "uses settings for 7.4"
-        it_behaves_like "uses settings for 7.5"
-        it_behaves_like "uses settings for 8.0"
-        it_behaves_like "uses settings for 8.1"
-      end
-
-      context "when the given version is 7.5" do
-
-        let(:version) { 7.5 }
-
-        it_behaves_like "does not use settings for 7.3"
-        it_behaves_like "does not use settings for 7.4"
-        it_behaves_like "uses settings for 7.5"
-        it_behaves_like "uses settings for 8.0"
-        it_behaves_like "uses settings for 8.1"
-      end
-
       context "when the given version is 8.0" do
 
         let(:version) { 8.0 }
 
-        it_behaves_like "does not use settings for 7.3"
-        it_behaves_like "does not use settings for 7.4"
-        it_behaves_like "does not use settings for 7.5"
         it_behaves_like "uses settings for 8.0"
         it_behaves_like "uses settings for 8.1"
       end
@@ -124,9 +56,6 @@ describe Mongoid::Config::Defaults do
 
         let(:version) { 8.1 }
 
-        it_behaves_like "does not use settings for 7.3"
-        it_behaves_like "does not use settings for 7.4"
-        it_behaves_like "does not use settings for 7.5"
         it_behaves_like "does not use settings for 8.0"
         it_behaves_like "uses settings for 8.1"
       end
@@ -135,11 +64,18 @@ describe Mongoid::Config::Defaults do
 
         let(:version) { 9.0 }
 
-        it_behaves_like "does not use settings for 7.3"
-        it_behaves_like "does not use settings for 7.4"
-        it_behaves_like "does not use settings for 7.5"
         it_behaves_like "does not use settings for 8.0"
         it_behaves_like "does not use settings for 8.1"
+      end
+    end
+
+    context "when given version a version which is no longer supported" do
+      let(:version) { 7.5 }
+
+      it "raises an error" do
+        expect do
+          config.load_defaults(version)
+        end.to raise_error(ArgumentError, 'Version no longer supported: 7.5')
       end
     end
 
@@ -149,7 +85,7 @@ describe Mongoid::Config::Defaults do
       it "raises an error" do
         expect do
           config.load_defaults(version)
-        end.to raise_error(ArgumentError, /Unknown version: 4.2/)
+        end.to raise_error(ArgumentError, 'Unknown version: 4.2')
       end
     end
   end

@@ -828,7 +828,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { }.each do |option, default|
+    {}.each do |option, default|
 
       context ":#{option} option" do
 

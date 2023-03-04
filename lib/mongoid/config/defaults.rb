@@ -24,15 +24,8 @@ module Mongoid
         # in the other direction (towards earlier versions).
 
         case version.to_s
-        when "7.3"
-          load_defaults "7.4"
-        when "7.4"
-          load_defaults "7.5"
-        when "7.5"
-          # flags introduced in 8.0 - old functionality
-          self.map_big_decimal_to_decimal128 = false
-          
-          load_defaults "8.0"
+        when "7.3", "7.4", "7.5"
+          raise ArgumentError, "Version no longer supported: #{version}"
         when "8.0"
           self.legacy_readonly = true
 

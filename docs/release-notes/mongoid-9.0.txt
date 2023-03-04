@@ -20,13 +20,27 @@ the complete list of issues fixed in each release, including bug fixes.
 Deprecated options removed
 --------------------------
 
-**Breaking change:** The following options are removed in Mongoid 9.0.
-Please ensure you have removed any references to these from your app and configs.
+**Breaking change:** The following config options are removed in Mongoid 9.0.
+Please ensure you have removed all references to these from your app.
 If you were using ``config.load_defaults 8.1`` prior to upgrading, you will not
 experience any behavior change. Refer to earlier release notes for the meaning
 of each option.
 
 - ``:use_activesupport_time_zone``
+- ``:broken_aggregables``
+- ``:broken_alias_handling``
+- ``:broken_and``
+- ``:broken_scoping``
+- ``:broken_updates``
+- ``:compare_time_by_ms``
+- ``:legacy_attributes``
+- ``:legacy_pluck_distinct``
+- ``:legacy_triple_equals``
+- ``:object_id_as_json_oid``
+- ``:overwrite_chained_operators``
+
+In addition, support for ``config.load_defaults`` versions 7.5 and
+prior has been dropped (you must use a minimum of version 8.0.)
 
 
 ``touch`` method now clears changed state
