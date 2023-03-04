@@ -908,22 +908,7 @@ describe Mongoid::Findable do
       end
     end
 
-    context 'when distinct does not demongoize' do
-      config_override :legacy_pluck_distinct, true
-
-      let(:distinct) do
-        User.distinct(:last_login).first
-      end
-
-      it 'uses activesupport time zone' do
-        distinct.should be_a(ActiveSupport::TimeWithZone)
-        expect(distinct.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
-      end
-    end
-
     context 'when distinct demongoizes' do
-      config_override :legacy_pluck_distinct, false
-
       let(:distinct) do
         User.distinct(:last_login).first
       end

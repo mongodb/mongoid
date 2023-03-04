@@ -86,10 +86,6 @@ module Mongoid
     # the one monkey-patched into Mongoid.
     option :object_id_as_json_oid, default: false
 
-    # Maintain legacy behavior of pluck and distinct, which does not
-    # demongoize the values on returning them.
-    option :legacy_pluck_distinct, default: false
-
     # Combine chained operators, which use the same field and operator,
     # using and's instead of overwriting them.
     option :overwrite_chained_operators, default: false
@@ -365,8 +361,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ legacy_pluck_distinct
-                    legacy_triple_equals
+      OPTIONS = %i[ legacy_triple_equals
                     object_id_as_json_oid
                     overwrite_chained_operators ]
 

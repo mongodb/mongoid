@@ -349,13 +349,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the legacy_pluck_distinct option in the config' do
-    let(:option) { :legacy_pluck_distinct }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the overwrite_chained_operators option in the config' do
     let(:option) { :overwrite_chained_operators }
     let(:default) { false }
@@ -856,8 +849,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { legacy_pluck_distinct: false,
-      legacy_triple_equals: false,
+    { legacy_triple_equals: false,
       object_id_as_json_oid: false,
       overwrite_chained_operators: false }.each do |option, default|
 
