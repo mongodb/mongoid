@@ -77,10 +77,6 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
-    # Combine chained operators, which use the same field and operator,
-    # using and's instead of overwriting them.
-    option :overwrite_chained_operators, default: false
-
     # Sets the async_query_executor for the application. By default the thread pool executor
     #   is set to `:immediate. Options are:
     #
@@ -352,7 +348,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ overwrite_chained_operators ]
+      OPTIONS = %i[]
 
       OPTIONS.each do |option|
         define_method(:"#{option}=") do |value|

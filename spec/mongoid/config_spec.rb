@@ -335,13 +335,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the overwrite_chained_operators option in the config' do
-    let(:option) { :overwrite_chained_operators }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the legacy_readonly option in the config' do
     let(:option) { :legacy_readonly }
     let(:default) { false }
@@ -835,7 +828,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { overwrite_chained_operators: false }.each do |option, default|
+    { }.each do |option, default|
 
       context ":#{option} option" do
 
