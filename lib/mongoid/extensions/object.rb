@@ -36,7 +36,6 @@ module Mongoid
       #   object.__mongoize_time__
       #
       # @return [ Object ] self.
-      # @deprecated
       def __mongoize_time__
         self
       end
