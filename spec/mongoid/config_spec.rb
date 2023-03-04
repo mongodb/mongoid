@@ -335,13 +335,6 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the legacy_triple_equals option in the config' do
-    let(:option) { :legacy_triple_equals }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
   context 'when setting the object_id_as_json_oid option in the config' do
     let(:option) { :object_id_as_json_oid }
     let(:default) { false }
@@ -849,8 +842,7 @@ describe Mongoid::Config do
   end
 
   describe 'deprecations' do
-    { legacy_triple_equals: false,
-      object_id_as_json_oid: false,
+    { object_id_as_json_oid: false,
       overwrite_chained_operators: false }.each do |option, default|
 
       context ":#{option} option" do

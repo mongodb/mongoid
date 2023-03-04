@@ -77,11 +77,6 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
-    # Maintain legacy behavior of === on Mongoid documents, which returns
-    # true in a number of cases where Ruby's === implementation would
-    # return false.
-    option :legacy_triple_equals, default: false
-
     # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
     # the one monkey-patched into Mongoid.
     option :object_id_as_json_oid, default: false
@@ -361,8 +356,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ legacy_triple_equals
-                    object_id_as_json_oid
+      OPTIONS = %i[ object_id_as_json_oid
                     overwrite_chained_operators ]
 
       OPTIONS.each do |option|
