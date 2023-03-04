@@ -12,7 +12,6 @@ describe Mongoid::Config::Defaults do
 
     shared_examples "uses settings for 7.3" do
       it "uses settings for 7.3" do
-        expect(Mongoid.object_id_as_json_oid).to be true
       end
     end
 

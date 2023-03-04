@@ -25,9 +25,6 @@ module Mongoid
 
         case version.to_s
         when "7.3"
-          # flags introduced in 7.4 - old functionality
-          self.object_id_as_json_oid = true
-
           load_defaults "7.4"
         when "7.4"
           # flags introduced in 7.5 - old functionality

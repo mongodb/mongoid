@@ -77,10 +77,6 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
-    # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
-    # the one monkey-patched into Mongoid.
-    option :object_id_as_json_oid, default: false
-
     # Combine chained operators, which use the same field and operator,
     # using and's instead of overwriting them.
     option :overwrite_chained_operators, default: false
@@ -356,8 +352,7 @@ module Mongoid
     end
 
     module DeprecatedOptions
-      OPTIONS = %i[ object_id_as_json_oid
-                    overwrite_chained_operators ]
+      OPTIONS = %i[ overwrite_chained_operators ]
 
       OPTIONS.each do |option|
         define_method(:"#{option}=") do |value|
