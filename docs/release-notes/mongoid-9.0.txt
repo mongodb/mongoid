@@ -297,6 +297,8 @@ Removal of Deprecated Functionality
 
 The following deprecated functionality is now removed:
 
+- ``Mongoid::Errors::InvalidStorageParent`` class is removed. It is no
+  longer raised.
 - ``Object#blank_criteria?`` method is removed. Any usages can be replaced
   with ``Hash#_mongoid_unsatisfiable_criteria?`` (if Hash object)
   otherwise with ``false``.
