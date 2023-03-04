@@ -257,12 +257,54 @@ Previously, an error was raised if this was done. See the section on
 for more details.
 
 
-Added ``readonly!`` method and ``legacy_readonly`` feature flag
----------------------------------------------------------------
+Added ``readonly!``, etc. methods and ``legacy_readonly`` feature flag
+----------------------------------------------------------------------
 
-Mongoid 8.1 changes the meaning of read-only documents. In Mongoid 8.1 with
-this feature flag turned off, a document becomes read-only when calling the
-``readonly!`` method:
+Mongoid 8.1 overhauls read-only document functionality. This includes the
+capability to mark documents, queries, and model classes as read-only.
+The following are now possible:
+
+.. code:: ruby
+
+  band = Band.first
+  band.readonly? # => false
+
+  # Mark a document as read-only
+  band.readonly!
+  band.readonly? # => true
+  band.save # => raises ReadonlyDocument error
+
+  # Unmark a document's read-only status
+  band.write_safe!
+  band.readonly? # => false
+
+  # Load all documents in a query as read-only
+  bands = Band.all.readonly.limit(3).to_a
+  bands.map(&:readonly?) # => [true, true, true]
+
+  # Load all documents in a projected query without read-only
+  bands = Band.only(:name).write_safe.limit(3).to_a
+  bands.map(&:readonly?) # => [false, false, false]
+
+  # Declare a model class to be read-only by default
+  class Llama
+    include Mongoid::Document
+
+    readonly
+  end
+
+  llama = Llama.first
+  llama.readonly? # => true
+  llama.write_safe!
+  llama.readonly? # => false
+
+See the section on :ref:`Read-only Documents <read-only-documents>`
+for more details.
+
+Mongoid 8.1 introduces a ``legacy_readonly`` feature flag which affects
+which actions are prevented in read-only status. When this flag is false
+(new Mongoid 8.1 default), read-only status prevents both saving and
+destroying documents by raising a ``ReadonlyDocument`` error.
 
 .. code:: ruby
 
@@ -273,28 +315,15 @@ this feature flag turned off, a document becomes read-only when calling the
   band.name = "The Rolling Stones"
   band.save # => raises ReadonlyDocument error
 
-With this feature flag turned off, a ``ReadonlyDocument`` error will be
-raised when destroying or deleting, as well as when saving or updating.
-
-Prior to Mongoid 8.1 and in 8.1 with the ``legacy_readonly`` feature flag
-turned on, documents become read-only when they are projected (i.e. using
-``#only`` or ``#without``).
+In Mongoid 8.0 and prior, and when ``legacy_readonly`` feature flag is true,
+read-only status only prevents destroying documents, but saving is still permitted.
 
 .. code:: ruby
 
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-    field :genre, type: String
-  end
-
-  band = Band.only(:name).first
+  band = Band.first
+  band.readonly!
   band.readonly? # => true
-  band.destroy # => raises ReadonlyDocument error
-
-Note that with this feature flag on, a ``ReadonlyDocument`` error will only be
-raised when destroying or deleting, and not on saving or updating. See the
-section on :ref:`Read-only Documents <readonly-documents>` for more details.
+  band.save # => true
 
 
 Added method parameters to ``#exists?``
