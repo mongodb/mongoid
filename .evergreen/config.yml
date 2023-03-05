@@ -763,16 +763,15 @@ buildvariants:
   tasks:
      - name: "test"
 
-# https://jira.mongodb.org/browse/MONGOID-5549
-# - matrix_name: app-tests-jruby
-#   matrix_spec:
-#     jruby: ["jruby-9.3"]
-#     driver: ["current"]
-#     mongodb-version: '5.0'
-#     topology: standalone
-#     app-tests: yes
-#     rails: ['6.0']
-#     os: ubuntu-18.04
-#   display_name: "app tests ${driver}, ${jruby}"
-#   tasks:
-#      - name: "test"
+- matrix_name: app-tests-jruby
+  matrix_spec:
+    jruby: ["jruby-9.3"]
+    driver: ["current"]
+    mongodb-version: '5.0'
+    topology: standalone
+    app-tests: yes
+    rails: ['6.0']
+    os: ubuntu-18.04
+  display_name: "app tests ${driver}, ${jruby}"
+  tasks:
+     - name: "test"

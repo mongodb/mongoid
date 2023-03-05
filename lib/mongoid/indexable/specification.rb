@@ -44,9 +44,9 @@ module Mongoid
         options = opts || {}
         Validators::Options.validate(klass, key, options)
         @klass = klass
-        @key = normalize_key(key)
+        @key = normalize_aliases!(key.dup)
         @fields = @key.keys
-        @options = normalize_options(options.dup)
+        @options = normalize_options!(options.deep_dup)
       end
 
       # Get the index name, generated using the index key.
@@ -63,39 +63,74 @@ module Mongoid
 
       private
 
-      # Normalize the spec, in case aliased fields are provided.
+      # Normalize the spec in-place, in case aliased fields are provided.
       #
       # @api private
       #
-      # @example Normalize the spec.
-      #   specification.normalize_key(name: 1)
+      # @example Normalize the spec in-place.
+      #   specification.normalize_aliases!(name: 1)
       #
-      # @param [ Hash ] key The index key(s).
+      # @param [ Hash ] spec The index specification.
       #
       # @return [ Hash ] The normalized specification.
-      def normalize_key(key)
-        normalized = {}
-        key.each_pair do |name, direction|
-          normalized[klass.database_field_name(name).to_sym] = direction
+      def normalize_aliases!(spec)
+        return unless spec.is_a?(Hash)
+
+        spec.transform_keys! do |name|
+          klass.database_field_name(name).to_sym
         end
-        normalized
       end
 
-      # Normalize the index options, if any are provided.
+      # Normalize the index options in-place. Performs deep normalization
+      # on options which have a fields hash value.
       #
       # @api private
       #
-      # @example Normalize the index options.
-      #   specification.normalize_options(unique: true)
+      # @example Normalize the index options in-place.
+      #   specification.normalize_options!(unique: true)
       #
-      # @param [ Hash ] opts The index options.
+      # @param [ Hash ] options The index options.
       #
       # @return [ Hash ] The normalized options.
-      def normalize_options(opts)
-        options = {}
-        opts.each_pair do |option, value|
-          options[MAPPINGS[option] || option] = value
+      def normalize_options!(options)
+
+        options.transform_keys! do |option|
+          option = option.to_sym
+          MAPPINGS[option] || option
         end
+
+        %i[partial_filter_expression weights wildcard_projection].each do |key|
+          recursive_normalize_conditionals!(options[key])
+        end
+
+        options
+      end
+
+      # Recursively normalizes the nested elements of an options hash in-place,
+      # to account for $and operator (and other potential $-prefixed operators
+      # which may be supported by MongoDB in the future.)
+      #
+      # @api private
+      #
+      # @example Recursively normalize the index options in-place.
+      #   opts = { '$and' => [{ name: { '$eq' => 'Bob' } },
+      #                       { age: { '$gte' => 20 } }] }
+      #   specification.recursive_normalize_conditionals!(opts)
+      #
+      # @param [ Hash | Array | Object ] options The index options.
+      #
+      # @return [ Hash | Array | Object ] The normalized options.
+      def recursive_normalize_conditionals!(options)
+        case options
+        when Hash
+          normalize_aliases!(options)
+          options.keys.select { |key| key.to_s.start_with?('$') }.each do |key|
+            recursive_normalize_conditionals!(options[key])
+          end
+        when Array
+          options.each { |opt| recursive_normalize_conditionals!(opt) }
+        end
+
         options
       end
     end

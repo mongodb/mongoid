@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "mongoid/association/referenced/eager"
+require "mongoid/association/eager"
 
 module Mongoid
   module Association
