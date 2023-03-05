@@ -6,7 +6,7 @@ module Mongoid
 
       class HasOne
 
-        class Eager < Association::Referenced::Eager::Base
+        class Eager < Association::Eager
 
           private
 

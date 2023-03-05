@@ -90,7 +90,12 @@ describe 'Mongoid application tests' do
     end
 
     # Exit should be either success or SIGTERM
-    expect([0, 15, 128 + 15]).to include(status)
+    allowed_statuses = [0, 15, 128 + 15]
+    if RUBY_PLATFORM == 'java'
+      # Puma on JRuby exits with status 1 when it receives a TERM signal.
+      allowed_statuses << 1
+    end
+    expect(allowed_statuses).to include(status)
 
     rv
   end

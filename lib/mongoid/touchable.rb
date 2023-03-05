@@ -2,8 +2,28 @@
 
 module Mongoid
   module Touchable
-
     module InstanceMethods
+
+      # Suppresses the invocation of touch callbacks, for the class that
+      # includes this module, for the duration of the block.
+      #
+      # @example Suppress touch callbacks on Person documents:
+      #   person.suppress_touch_callbacks { ... }
+      #
+      # @api private
+      def suppress_touch_callbacks
+        Touchable.suppress_touch_callbacks(self.class.name) { yield }
+      end
+
+      # Queries whether touch callbacks are being suppressed for the class
+      # that includes this module.
+      #
+      # @return [ true | false ] Whether touch callbacks are suppressed.
+      #
+      # @api private
+      def touch_callbacks_suppressed?
+        Touchable.touch_callbacks_suppressed?(self.class.name)
+      end
 
       # Touch the document, in effect updating its updated_at timestamp and
       # optionally the provided field to the current time. If any belongs_to
@@ -45,7 +65,10 @@ module Mongoid
       #
       # @api private
       def _gather_touch_updates(now, field = nil)
+        return if touch_callbacks_suppressed?
+
         field = database_field_name(field)
+
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
         write_attribute(field, now) if field
 
@@ -71,6 +94,7 @@ module Mongoid
       #
       # @api private
       def _run_touch_callbacks_from_root
+        return if touch_callbacks_suppressed?
         _parent._run_touch_callbacks_from_root if _touchable_parent?
         run_callbacks(:touch)
       end
@@ -115,7 +139,7 @@ module Mongoid
     # @example Add the touchable.
     #   Model.define_touchable!(assoc)
     #
-    # @param [ Association ] association The association metadata.
+    # @param [ Mongoid::Association::Relatable ] association The association metadata.
     #
     # @return [ Class ] The model class.
     def define_touchable!(association)
@@ -131,7 +155,40 @@ module Mongoid
       end
     end
 
+    # Suppresses touch callbacks for the named class, for the duration of
+    # the associated block.
+    #
+    # @api private
+    def suppress_touch_callbacks(name)
+      save, touch_callback_statuses[name] = touch_callback_statuses[name], true
+      yield
+    ensure
+      touch_callback_statuses[name] = save
+    end
+
+    # Queries whether touch callbacks are being suppressed for the named
+    # class.
+    #
+    # @return [ true | false ] Whether touch callbacks are suppressed.
+    #
+    # @api private
+    def touch_callbacks_suppressed?(name)
+      touch_callback_statuses[name]
+    end
+
     private
+
+    # The key to use to store the active touch callback suppression statuses
+    SUPPRESS_TOUCH_CALLBACKS_KEY = "[mongoid]:suppress-touch-callbacks"
+
+    # Returns a hash to be used to store and query the various touch callback
+    # suppression statuses for different classes.
+    #
+    # @return [ Hash ] The hash that contains touch callback suppression
+    #   statuses
+    def touch_callback_statuses
+      Thread.current[SUPPRESS_TOUCH_CALLBACKS_KEY] ||= {}
+    end
 
     # Define the method that will get called for touching belongs_to
     # associations.
@@ -143,7 +200,7 @@ module Mongoid
     #   Model.define_relation_touch_method(:band, :band_updated_at)
     #
     # @param [ Symbol ] name The name of the association.
-    # @param [ Association ] association The association metadata.
+    # @param [ Mongoid::Association::Relatable ] association The association metadata.
     #
     # @return [ Symbol ] The method name.
     def define_relation_touch_method(name, association)
@@ -153,12 +210,11 @@ module Mongoid
                            [ association.relation_class ]
                          end
 
-      relation_classes.each { |c| c.send(:include, InstanceMethods) }
       method_name = "touch_#{name}_after_create_or_destroy"
       association.inverse_class.class_eval do
         define_method(method_name) do
           without_autobuild do
-            if relation = __send__(name)
+            if !touch_callbacks_suppressed? && relation = __send__(name)
               # This looks up touch_field at runtime, rather than at method definition time.
               # If touch_field is nil, it will only touch the default field (updated_at).
               relation.touch(association.touch_field)
