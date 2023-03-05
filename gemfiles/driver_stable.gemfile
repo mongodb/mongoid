@@ -2,7 +2,8 @@ source "https://rubygems.org"
 
 gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.18-stable'
 
-gem 'actionpack'
+gem 'actionpack', '>= 6.0'
+gem 'activemodel', '>= 6.0'
 
 gemspec path: '..'
 

@@ -6,7 +6,7 @@ set -o errexit  # Exit the script with error if any of the commands fail
 # Supported/used environment variables:
 #       MONGODB_URI             Set the suggested connection MONGODB_URI (including credentials and topology info)
 #       RVM_RUBY                Define the Ruby version to test with, using its RVM identifier.
-#                               For example: "ruby-3.0" or "jruby-9.2"
+#                               For example: "ruby-3.0" or "jruby-9.4"
 
 . `dirname "$0"`/../spec/shared/shlib/distro.sh
 . `dirname "$0"`/../spec/shared/shlib/set_env.sh
@@ -85,9 +85,6 @@ elif test "$RAILS" = "master-jruby"; then
 elif test -n "$RAILS" && test "$RAILS" != 6.1; then
   bundle install --gemfile=gemfiles/rails-"$RAILS".gemfile
   BUNDLE_GEMFILE=gemfiles/rails-"$RAILS".gemfile
-elif test "$I18N" = "1.0"; then
-  bundle install --gemfile=gemfiles/i18n-1.0.gemfile
-  BUNDLE_GEMFILE=gemfiles/i18n-1.0.gemfile
 else
   bundle install
 fi

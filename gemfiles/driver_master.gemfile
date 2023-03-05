@@ -3,7 +3,8 @@ source "https://rubygems.org"
 gem 'bson', git: "https://github.com/mongodb/bson-ruby", branch: '4-stable'
 gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver"
 
-gem 'actionpack'
+gem 'actionpack', '>= 6.0'
+gem 'activemodel', '>= 6.0'
 
 gemspec path: '..'
 

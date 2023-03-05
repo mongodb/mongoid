@@ -287,23 +287,8 @@ describe Mongoid::Criteria do
       Band.where(name: "Depeche Mode")
     end
 
-    # as_json changed in rails 6 to call as_json on serializable_hash.
-    # https://github.com/rails/rails/commit/2e5cb980a448e7f4ab00df6e9ad4c1cc456616aa
-
-    context 'rails < 6' do
-      max_rails_version '5.2'
-
-      it "returns the criteria as a json hash" do
-        expect(criteria.as_json).to eq([ band.serializable_hash ])
-      end
-    end
-
-    context 'rails >= 6' do
-      min_rails_version '6.0'
-
-      it "returns the criteria as a json hash" do
-        expect(criteria.as_json).to eq([ band.serializable_hash.as_json ])
-      end
+    it "returns the criteria as a json hash" do
+      expect(criteria.as_json).to eq([ band.serializable_hash.as_json ])
     end
   end
 

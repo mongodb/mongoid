@@ -17,6 +17,42 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+
+Support for MongoDB Server, Ruby, JRuby, and Rails Versions Dropped
+-------------------------------------------------------------------
+
+Mongoid 9 drops support for:
+- MongoDB Server 3.6 and 4.0
+- Ruby 2.6
+- JRuby 9.3
+- Rails 5.2
+
+Mongoid 9 requires minimum versions as follows:
+- MongoDB Server 4.2 or newer
+- Ruby 2.7 or newer
+- JRuby 9.5 or newer
+- Rails 6.0 or newer
+
+In addition, Mongoid 9 deprecates support for the following versions.
+Users are encouraged to upgrade to newer versions after upgrading
+to Mongoid 9.
+- MongoDB Server 4.2 and 4.4
+- Ruby 2.7
+- Rails 6.0
+
+Consider using `MongoDB Atlas <https://www.mongodb.com/atlas/database>`_
+to automate your MongoDB server upgrades.
+
+
+Removal of Deprecated Functionality
+-----------------------------------
+
+The following deprecated functionality is now removed:
+
+- ``Document#as_json :compact`` option is removed. Please call ```#compact``
+  on the returned ``Hash`` object instead.
+
+
 ``touch`` method now clears changed state
 -----------------------------------------
 

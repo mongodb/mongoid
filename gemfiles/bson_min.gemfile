@@ -4,7 +4,8 @@ gemspec path: '..'
 gem 'bson', '4.14.0'
 gem 'mongo'
 
-gem 'actionpack'
+gem 'actionpack', '>= 6.0'
+gem 'activemodel', '>= 6.0'
 
 gemspec path: '..'
 

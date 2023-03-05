@@ -5,9 +5,8 @@ source "https://rubygems.org"
 # bson with JRuby, just test the driver then
 gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.18-stable'
 
-gem 'actionpack'
-# https://github.com/jruby/jruby/issues/6573
-gem 'i18n', '~> 1.0', '< 1.8.8'
+gem 'actionpack', '>= 6.0'
+gem 'activemodel', '>= 6.0'
 
 gemspec path: '..'
 

@@ -7,9 +7,8 @@ source "https://rubygems.org"
 # This gemfile only specifies driver git source.
 gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver"
 
-gem 'actionpack'
-# https://github.com/jruby/jruby/issues/6573
-gem 'i18n', '~> 1.0', '< 1.8.8'
+gem 'actionpack', '>= 6.0'
+gem 'activemodel', '>= 6.0'
 
 gemspec path: '..'
 
