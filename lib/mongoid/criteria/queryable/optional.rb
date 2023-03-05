@@ -92,6 +92,8 @@ module Mongoid
         # @param [ Integer ] value The max number of documents to scan.
         #
         # @return [ Optional ] The cloned optional.
+        #
+        # @deprecated
         def max_scan(value = nil)
           option(value) { |options| options.store(:max_scan, value) }
         end

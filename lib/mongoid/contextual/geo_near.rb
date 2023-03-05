@@ -2,6 +2,7 @@
 
 module Mongoid
   module Contextual
+    # @deprecated
     class GeoNear
       extend Forwardable
       include Enumerable

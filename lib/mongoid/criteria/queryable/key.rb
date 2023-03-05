@@ -91,7 +91,7 @@ module Mongoid
 
         # Calculate the hash code for a key.
         #
-        # @return [ Fixnum ] The hash code for the key.
+        # @return [ Integer ] The hash code for the key.
         def hash
           [name, operator, expanded].hash
         end

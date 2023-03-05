@@ -75,8 +75,8 @@ module Mongoid
       def log_level
         if level = settings[:log_level]
           unless level.is_a?(Integer)
-            level = level.upcase.to_s
-            level = "Logger::#{level}".constantize
+            # JRuby String#constantize does not work here.
+            level = Logger.const_get(level.upcase.to_s)
           end
           level
         end
