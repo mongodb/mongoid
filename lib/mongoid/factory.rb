@@ -97,7 +97,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
+    ruby2_keywords def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
