@@ -83,19 +83,6 @@ module Mongoid
           end
         end
 
-        # Adds the option to limit the number of documents scanned in the
-        # collection.
-        #
-        # @example Add the max scan limit.
-        #   optional.max_scan(1000)
-        #
-        # @param [ Integer ] value The max number of documents to scan.
-        #
-        # @return [ Optional ] The cloned optional.
-        def max_scan(value = nil)
-          option(value) { |options| options.store(:max_scan, value) }
-        end
-
         # Adds a cumulative time limit in milliseconds for processing operations on a cursor.
         #
         # @example Add the max time ms option.

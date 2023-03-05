@@ -238,6 +238,30 @@ and will be removed in a next version.
      - MongoDB 3.0
      - MongoDB 2.6
 
+   * - 9.0
+     - |checkmark|
+     - |checkmark|
+     - D
+     - D
+     -
+     -
+     -
+     -
+     -
+     -
+
+   * - 8.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     - D
+     -
+     -
+     -
+     -
+
    * - 8.0
      - |checkmark|
      - |checkmark|
@@ -250,7 +274,7 @@ and will be removed in a next version.
      -
      -
 
-   * - 7.5
+   * - 7.4 thru 7.5
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -262,67 +286,7 @@ and will be removed in a next version.
      - D
      - D
 
-   * - 7.4
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.3
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.2
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.1
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.0
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 6.4
+   * - 6.4 thru 7.3
      -
      - |checkmark|
      - |checkmark|

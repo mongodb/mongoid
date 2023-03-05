@@ -2814,7 +2814,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       end
 
       context 'when providing a collation' do
-        min_server_version '3.4'
 
         let(:preferences) do
           person.preferences.where(name: "FIRST").collation(locale: 'en_US', strength: 2).to_a

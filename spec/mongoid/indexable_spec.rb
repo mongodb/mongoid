@@ -54,7 +54,7 @@ describe Mongoid::Indexable do
           include Mongoid::Document
           store_in collection: "test_db_remove"
           index({ test: 1 }, { database: "mongoid_optional" })
-          index({ name: 1 }, { background: true })
+          index({ name: 1 }, { sparse: true })
         end
       end
 
@@ -77,13 +77,13 @@ describe Mongoid::Indexable do
 
   describe ".create_indexes" do
 
-    context "when no database options are specified" do
+    context "when options are specified" do
 
       let(:klass) do
         Class.new do
           include Mongoid::Document
           store_in collection: "test_class"
-          index({ _type: 1 }, unique: false, background: true)
+          index({ _type: 1 }, unique: true)
         end
       end
 
@@ -91,58 +91,13 @@ describe Mongoid::Indexable do
         klass.create_indexes
       end
 
-      it "creates the indexes by using specified background option" do
+      it "creates the indexes" do
         index = klass.collection.indexes.get(_type: 1)
-        expect(index[:background]).to eq(true)
-      end
-    end
-
-    context "when database options are specified" do
-
-      let(:klass) do
-        Class.new do
-          include Mongoid::Document
-          store_in collection: "test_db_indexes"
-          index({ _type: 1 }, { database: "mongoid_optional" })
-        end
-      end
-
-      after do
-        klass.remove_indexes
-      end
-
-      let(:indexes) do
-        klass.with(database: "mongoid_optional") do |klass|
-          klass.collection.indexes
-        end
-      end
-
-      context "when the background_indexing option is false" do
-        config_override :background_indexing, false
-
-        it "creates the indexes correctly" do
-          klass.create_indexes
-
-          index = indexes.get(_type: 1)
-          expect(index[:background]).to be false
-        end
-      end
-
-      context "when the background_indexing option is true" do
-        config_override :background_indexing, true
-
-        it "creates the indexes correctly" do
-
-          klass.create_indexes
-
-          index = indexes.get(_type: 1)
-          expect(index[:background]).to be true
-        end
+        expect(index[:unique]).to eq(true)
       end
     end
 
     context "when a collation option is specified" do
-      min_server_version '3.4'
 
       let(:klass) do
         Class.new do
@@ -193,7 +148,7 @@ describe Mongoid::Indexable do
       end
 
       it "adds the _type index" do
-        expect(spec.options).to eq(unique: false, background: true)
+        expect(spec.options).to eq(unique: false)
       end
     end
 
@@ -218,7 +173,7 @@ describe Mongoid::Indexable do
         end
 
         it "adds the _type index" do
-          expect(spec.options).to eq(unique: false, background: true)
+          expect(spec.options).to eq(unique: false)
         end
       end
     end
@@ -320,7 +275,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when providing database options" do
+    context "when providing database option" do
 
       before do
         klass.index({ name: 1 }, database: "mongoid_index_alt")
@@ -330,28 +285,12 @@ describe Mongoid::Indexable do
         klass.index_specification(name: 1).options
       end
 
-      it "sets the index with background options" do
+      it "sets the index with database option" do
         expect(options).to eq(database: "mongoid_index_alt")
       end
     end
 
-    context "when providing a background option" do
-
-      before do
-        klass.index({ name: 1 }, background: true)
-      end
-
-      let(:options) do
-        klass.index_specification(name: 1).options
-      end
-
-      it "sets the index with background options" do
-        expect(options).to eq(background: true)
-      end
-    end
-
     context "when providing a collation option" do
-      min_server_version '3.4'
 
       before do
         klass.index({ name: 1 }, collation: { locale: 'en_US', strength: 2 })

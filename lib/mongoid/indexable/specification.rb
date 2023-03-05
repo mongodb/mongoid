@@ -35,7 +35,7 @@ module Mongoid
       # Instantiate a new index specification.
       #
       # @example Create the new specification.
-      #   Specification.new(Band, { name: 1 }, background: true)
+      #   Specification.new(Band, { name: 1 })
       #
       # @param [ Class ] klass The class the index is defined on.
       # @param [ Hash ] key The hash of name/direction pairs.

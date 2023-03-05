@@ -79,30 +79,6 @@ describe Mongoid::Config do
     end
   end
 
-  context 'when background_indexing option' do
-    context 'is not set in the config' do
-      it 'sets the value to false by default' do
-        Mongoid::Config.reset
-        configuration = CONFIG.merge(options: {})
-
-        Mongoid.configure { |config| config.load_configuration(configuration) }
-
-        expect(Mongoid::Config.background_indexing).to be(false)
-      end
-    end
-
-    context 'is set in the config' do
-      it 'sets the value' do
-        Mongoid::Config.reset
-        configuration = CONFIG.merge(options: {background_indexing: true})
-
-        Mongoid.configure { |config| config.load_configuration(configuration) }
-
-        expect(Mongoid::Config.background_indexing).to be(true)
-      end
-    end
-  end
-
   context 'when the belongs_to_required_by_default option is not set in the config' do
 
     before do

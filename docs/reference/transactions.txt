@@ -12,8 +12,8 @@ Transactions
    :depth: 2
    :class: singlecol
 
-Version 4.0 of the MongoDB server introduces
-`multi-document transactions <https://mongodb.com/docs/manual/core/transactions/>`_.
+MongoDB supports `multi-document transactions
+<https://mongodb.com/docs/manual/core/transactions/>`_.
 (Updates to multiple fields within a single document are atomic in all
 versions of MongoDB). Transactions require a non-standalone MongoDB topology
 and Ruby driver version 2.6 or higher. A higher level transaction API requires

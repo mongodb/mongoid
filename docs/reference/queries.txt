@@ -1425,8 +1425,7 @@ Mongoid also has some helpful methods on criteria.
        *Find documents for a provided JavaScript expression, optionally with
        the specified variables added to the evaluation scope. The scope
        argument is supported in MongoDB 4.2 and lower.*
-       *In MongoDB 3.6 and higher, prefer* :manual:`$expr
-       </reference/operator/query/expr/>` *over* ``for_js``.
+       *Prefer* :manual:`$expr </reference/operator/query/expr/>` *over* ``for_js``.
 
      -
         .. code-block:: ruby

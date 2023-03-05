@@ -79,7 +79,7 @@ Indexes can be scoped to a specific database:
     class Person
       include Mongoid::Document
       field :ssn
-      index({ ssn: 1 }, { database: "users", unique: true, background: true })
+      index({ ssn: 1 }, { database: "users", unique: true })
     end
 
 You may use aliased field names in index definitions. Field aliases
@@ -111,24 +111,6 @@ This only works on the association macro that the foreign key is stored on:
       belongs_to :post, index: true
       has_and_belongs_to_many :preferences, index: true
     end
-
-*Deprecated:* In MongoDB 4.0 and earlier, users could control whether to build indexes
-in the foreground (blocking) or background (non-blocking, but less efficient) using the
-``background`` option.
-
-.. code-block:: ruby
-
-    class Person
-      include Mongoid::Document
-      field :ssn
-      index({ ssn: 1 }, { unique: true, background: true })
-    end
-
-The default value of ``background`` is controlled by Mongoid's
-``background_indexing`` :ref:`configuration option <configuration-options>`.
-
-The ``background`` option has `no effect as of MongoDB 4.2
-<https://www.mongodb.com/docs/manual/core/index-creation/#comparison-to-foreground-and-background-builds>`_.
 
 
 Index Management Rake Tasks

@@ -137,7 +137,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when a collation is specified' do
-      min_server_version '3.4'
 
       let(:context) do
         described_class.new(criteria)
@@ -294,7 +293,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -399,7 +397,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -524,7 +521,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when a collation is specified' do
-        min_server_version '3.4'
 
         before do
           Band.create!(name: 'DEPECHE MODE')
@@ -1259,7 +1255,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let(:criteria) do
         Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1707,7 +1702,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when a collation is specified on the criteria' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1861,7 +1855,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when a collation is specified on the criteria' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1936,7 +1929,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when a collation is specified on the criteria' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2013,7 +2005,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2186,7 +2177,6 @@ describe Mongoid::Contextual::Mongo do
           end
 
           context 'when the criteria has a collation' do
-            min_server_version '3.4'
 
             let(:criteria) do
               Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2359,7 +2349,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when the criteria has a collation' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2532,7 +2521,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -3581,7 +3569,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when provided array filters' do
-      min_server_version '3.6'
 
       before do
         Band.delete_all
@@ -3754,7 +3741,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when provided array filters' do
-      min_server_version '3.6'
 
       before do
         Band.delete_all

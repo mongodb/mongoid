@@ -3220,7 +3220,6 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       context 'when providing a collation' do
-        min_server_version '3.4'
 
         let(:posts) do
           person.posts.where(title: "FIRST").collation(locale: 'en_US', strength: 2)

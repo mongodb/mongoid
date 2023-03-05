@@ -345,45 +345,6 @@ describe Mongoid::Clients::Sessions do
       end
     end
 
-    context 'when sessions are supported but transactions are not' do
-      min_server_version '3.6'
-      # Could also test 4.0 in sharded cluster
-      max_server_version '3.6.99'
-
-      shared_examples 'it raises a transactions not supported error' do
-        it do
-          expect(Person.count).to eq(0)
-          expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
-        end
-      end
-
-      context 'using #with_session' do
-        let!(:error) do
-          capture_exception do
-            Person.with_session do |s|
-              s.start_transaction
-              Person.create!
-              s.commit_transaction
-            end
-          end
-        end
-
-        include_examples 'it raises a transactions not supported error'
-      end
-
-      context 'using #transaction' do
-        let!(:error) do
-          capture_exception do
-            Person.transaction do
-              Person.create!
-            end
-          end
-        end
-
-        include_examples 'it raises a transactions not supported error'
-      end
-    end
-
     context 'when transactions are not supported' do
       require_topology :single
 
@@ -621,60 +582,6 @@ describe Mongoid::Clients::Sessions do
         it 'aborts the transaction' do
           expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(1)
           expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(0)
-        end
-      end
-    end
-
-    context 'when sessions are supported but transactions are not' do
-      min_server_version '3.6'
-      # Could also test 4.0 in sharded cluster
-      max_server_version '3.6.99'
-
-      around do |example|
-        Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
-        Mongoid::Clients.with_name(:other).command(create: :people)
-
-        begin
-          subscriber.clear_events!
-          person.with(client: :other) do
-            example.run
-          end
-        ensure
-          Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
-        end
-      end
-
-      context 'using #with_session' do
-        let!(:error) do
-          capture_exception do
-            person.with_session do |s|
-              s.start_transaction
-              person.username = 'Emily'
-              person.save!
-              s.commit_transaction
-            end
-          end
-        end
-
-        it 'raises a transactions not supported error' do
-          expect(person.reload.username).not_to be('Emily')
-          expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
-        end
-      end
-
-      context 'using #transaction' do
-        let!(:error) do
-          capture_exception do
-            person.transaction do
-              person.username = 'Emily'
-              person.save!
-            end
-          end
-        end
-
-        it 'raises a transactions not supported error' do
-          expect(person.reload.username).not_to be('Emily')
-          expect(error).to be_a(Mongoid::Errors::TransactionsNotSupported)
         end
       end
     end

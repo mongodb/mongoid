@@ -121,27 +121,11 @@ describe 'Sharding helpers' do
         shard_collections.should == []
       end
 
-      context 'pre-4.2' do
-        max_server_version '4.0'
+      it 'does not shards collection' do
+        shard_collections
 
-        it 'does not shards collection' do
-          shard_collections
-
-          lambda do
-            model_cls.collection.database.command(collStats: model_cls.collection.name).first
-          end.should raise_error(Mongo::Error::OperationFailure, /Collection.*not found/)
-        end
-      end
-
-      context '4.2+' do
-        min_server_version '4.2'
-
-        it 'does not shards collection' do
-          shard_collections
-
-          stats = model_cls.collection.database.command(collStats: model_cls.collection.name).first
-          stats[:sharded].should be false
-        end
+        stats = model_cls.collection.database.command(collStats: model_cls.collection.name).first
+        stats[:sharded].should be false
       end
     end
   end

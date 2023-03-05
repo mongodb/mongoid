@@ -337,7 +337,7 @@ module Mongoid
       end
 
       def setup_index!
-        @owner_class.index(index_spec, background: true) if indexed?
+        @owner_class.index(index_spec) if indexed?
       end
 
       def define_touchable!
