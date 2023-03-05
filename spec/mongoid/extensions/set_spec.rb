@@ -112,7 +112,7 @@ describe Mongoid::Extensions::Set do
       end
 
       before do
-        expect(BigDecimal).to receive(:mongoize).exactly(4).times.and_wrap_original do |m, *args|
+        expect(BigDecimal).to receive(:mongoize).exactly(4).times.and_wrap_original do |m, *args, **kwargs|
           1
         end
       end
