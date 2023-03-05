@@ -128,7 +128,9 @@ module Mongoid
           unless updates.empty?
             coll = collection(_root)
             selector = atomic_selector
+            puts 'AAA'
             coll.find(selector).update_one(positionally(selector, updates), session: _session)
+            puts 'BBB'
 
             # The following code applies updates which would cause
             # path conflicts in MongoDB, for example when changing attributes

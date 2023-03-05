@@ -892,8 +892,12 @@ module Mongoid
           end
         else
           return view unless eager_loadable?
+          puts 'CCC'
           docs = view.map do |doc|
-            Factory.from_db(klass, doc, criteria)
+            puts 'DDD'
+            ret = Factory.from_db(klass, doc, criteria)
+            puts 'EEE'
+            ret
           end
           eager_load(docs)
         end

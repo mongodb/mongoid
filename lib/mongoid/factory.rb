@@ -76,7 +76,10 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
-      execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
+      puts 'FFF'
+      ret = execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
+      puts 'GGG'
+      ret
     end
 
     # Execute from_db.
@@ -97,37 +100,50 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    ruby2_keywords def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
+    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
+      puts 'HHH'
       if criteria
+        puts 'III'
         selected_fields ||= criteria.options[:fields]
+        puts 'JJJ'
       end
       type = (attributes || {})[klass.discriminator_key]
       if type.blank?
+        puts 'KKK'
         obj = klass.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
         if criteria && criteria.association && criteria.parent_document
+          puts 'LLL'
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
+          puts 'MMM'
         end
         obj
       else
+        puts 'NNN'
         constantized = klass.get_discriminator_mapping(type)
 
+        puts 'OOO'
         unless constantized
           camelized = type.camelize
 
           # Check if the class exists
           begin
+            puts 'PPP'
             constantized = camelized.constantize
           rescue NameError
             raise Errors::UnknownModel.new(camelized, type)
           end
         end
 
+        puts 'QQQ'
         # Check if the class is a Document class
         if !constantized.respond_to?(:instantiate)
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
+        puts 'RRR'
+        ret = constantized.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
+        puts 'SSS'
+        ret
       end
     end
   end
