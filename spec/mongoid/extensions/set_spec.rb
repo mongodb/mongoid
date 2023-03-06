@@ -112,9 +112,7 @@ describe Mongoid::Extensions::Set do
       end
 
       before do
-        expect(BigDecimal).to receive(:mongoize).exactly(4).times.and_wrap_original do |m, *args|
-          1
-        end
+        expect(BigDecimal).to receive(:mongoize).exactly(4).times.and_return(1)
       end
 
       context "when the input is a set" do
