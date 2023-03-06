@@ -412,10 +412,25 @@ module Mongoid
                     object_id_as_json_oid
                     overwrite_chained_operators ]
 
-      OPTIONS.each do |option|
-        define_method(:"#{option}=") do |value|
-          Mongoid::Warnings.send(:"warn_#{option}_deprecated")
-          super(value)
+      if RUBY_VERSION < '3.0'
+        def self.prepended(klass)
+          klass.class_eval do
+            OPTIONS.each do |option|
+              alias_method :"#{option}_without_deprecation=", :"#{option}="
+
+              define_method(:"#{option}=") do |value|
+                Mongoid::Warnings.send(:"warn_#{option}_deprecated")
+                send(:"#{option}_without_deprecation=", value)
+              end
+            end
+          end
+        end
+      else
+        OPTIONS.each do |option|
+          define_method(:"#{option}=") do |value|
+            Mongoid::Warnings.send(:"warn_#{option}_deprecated")
+            super(value)
+          end
         end
       end
     end
