@@ -399,41 +399,35 @@ module Mongoid
       #
       # @param [ String | Symbol ] name The name to get.
       # @param [ Hash ] relations The associations.
-      # @param [ Hash ] alaiased_fields The aliased fields.
-      # @param [ Hash ] alaiased_associations The aliased associations.
+      # @param [ Hash ] aliased_fields The aliased fields.
+      # @param [ Hash ] aliased_associations The aliased associations.
       #
       # @return [ String ] The name of the field as stored in the database.
       #
       # @api private
       def database_field_name(name, relations, aliased_fields, aliased_associations)
-        if Mongoid.broken_alias_handling
-          return nil unless name
-          normalized = name.to_s
-          aliased_fields[normalized] || normalized
+        return nil unless name.present?
+        key = name.to_s
+        segment, remaining = key.split('.', 2)
+
+        # Don't get the alias for the field when a belongs_to association
+        # is not the last item. Therefore, get the alias when one of the
+        # following is true:
+        # 1. This is the last item, i.e. there is no remaining.
+        # 2. It is not an association.
+        # 3. It is not a belongs association
+        if !remaining || !relations.key?(segment) || !relations[segment].is_a?(Association::Referenced::BelongsTo)
+          segment = aliased_fields[segment]&.dup || segment
+        end
+
+        return segment unless remaining
+
+        relation = relations[aliased_associations[segment] || segment]
+        if relation
+          k = relation.klass
+          "#{segment}.#{database_field_name(remaining, k.relations, k.aliased_fields, k.aliased_associations)}"
         else
-          return nil unless name.present?
-          key = name.to_s
-          segment, remaining = key.split('.', 2)
-
-          # Don't get the alias for the field when a belongs_to association
-          # is not the last item. Therefore, get the alias when one of the
-          # following is true:
-          # 1. This is the last item, i.e. there is no remaining.
-          # 2. It is not an association.
-          # 3. It is not a belongs association
-          if !remaining || !relations.key?(segment) || !relations[segment].is_a?(Association::Referenced::BelongsTo)
-            segment = aliased_fields[segment]&.dup || segment
-          end
-
-          return segment unless remaining
-
-          relation = relations[aliased_associations[segment] || segment]
-          if relation
-            k = relation.klass
-            "#{segment}.#{database_field_name(remaining, k.relations, k.aliased_fields, k.aliased_associations)}"
-          else
-            "#{segment}.#{remaining}"
-          end
+          "#{segment}.#{remaining}"
         end
       end
     end
