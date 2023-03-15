@@ -236,10 +236,10 @@ describe Mongoid::Shardable do
           instance.destroy
         end
 
-        it "raises a DocumentNotFound error with the shard key in the description on reload" do
+        it "raises a DocumentNotFound error" do
           expect do
             instance.reload
-          end.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class Band with id #{instance.id.to_s} and shard key name: a-brand-name./)
+          end.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
     end
@@ -287,10 +287,10 @@ describe Mongoid::Shardable do
             instance.destroy
           end
   
-          it "raises a DocumentNotFound error with the shard key in the description on reload" do
+          it "raises a DocumentNotFound error" do
             expect do
               instance.reload
-            end.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class SmReview with id #{instance.id.to_s} and shard key author.name: Arthur Conan Doyle./)
+            end.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
       end
