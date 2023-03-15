@@ -243,8 +243,6 @@ describe Mongoid::Shardable do
         end
       end
     end
-<<<<<<< HEAD
-=======
 
     context 'when key is an embedded attribute' do
       let(:klass) { SmReview }
@@ -297,6 +295,5 @@ describe Mongoid::Shardable do
         end
       end
     end
->>>>>>> 966edfe82 (Correctly interpret shard keys in embedded documents)
   end
 end
