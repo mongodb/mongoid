@@ -346,8 +346,6 @@ describe 'Queries with Range criteria' do
       end
     end
 
-    config_override :broken_alias_handling, false
-
     it 'returns objects within the range' do
       expect(Person.where("passport.passport_pages.num_stamps" => 10..18).to_a).to eq [person]
     end

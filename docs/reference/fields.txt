@@ -355,7 +355,6 @@ returned is defined by the :ref:`configured time zone settings <time-zones>`.
      field :opened_at, type: DateTime
    end
 
-   Mongoid.use_activesupport_time_zone = true
    Time.zone = 'Berlin'
 
    ticket = Ticket.create!(opened_at: '2018-02-18 07:00:08 -0500')

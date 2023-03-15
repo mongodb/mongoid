@@ -120,19 +120,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        name = if Mongoid.legacy_pluck_distinct
-          klass.database_field_name(field)
-        else
-          klass.cleanse_localized_field_names(field)
-        end
+        name = klass.cleanse_localized_field_names(field)
 
         view.distinct(name).map do |value|
-          if Mongoid.legacy_pluck_distinct
-            value.class.demongoize(value)
-          else
-            is_translation = "#{name}_translations" == field.to_s
-            recursive_demongoize(name, value, is_translation)
-          end
+          is_translation = "#{name}_translations" == field.to_s
+          recursive_demongoize(name, value, is_translation)
         end
       end
 
@@ -359,22 +351,13 @@ module Mongoid
         normalized_select = fields.inject({}) do |hash, f|
           db_fn = klass.database_field_name(f)
           normalized_field_names.push(db_fn)
-
-          if Mongoid.legacy_pluck_distinct
-            hash[db_fn] = true
-          else
-            hash[klass.cleanse_localized_field_names(f)] = true
-          end
+          hash[klass.cleanse_localized_field_names(f)] = true
           hash
         end
 
         view.projection(normalized_select).reduce([]) do |plucked, doc|
           values = normalized_field_names.map do |n|
-            if Mongoid.legacy_pluck_distinct
-              n.include?('.') ? doc[n.partition('.')[0]] : doc[n]
-            else
-              extract_value(doc, n)
-            end
+            extract_value(doc, n)
           end
           plucked << (values.size == 1 ? values.first : values)
         end

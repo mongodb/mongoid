@@ -34,22 +34,6 @@ module Mongoid
           attributes["_id"] == other.attributes["_id"]
     end
 
-    # Performs class equality checking.
-    #
-    # @example Compare the classes.
-    #   document === other
-    #
-    # @param [ Document | Object ] other The other object to compare with.
-    #
-    # @return [ true | false ] True if the classes are equal, false if not.
-    def ===(other)
-      if Mongoid.legacy_triple_equals
-        other.class == Class ? self.class === other : self == other
-      else
-        super
-      end
-    end
-
     # Delegates to ==. Used when needing checks in hashes.
     #
     # @example Perform equality checking.
@@ -72,11 +56,7 @@ module Mongoid
       #
       # @return [ true | false ] True if the classes are equal, false if not.
       def ===(other)
-        if Mongoid.legacy_triple_equals
-          other.class == Class ? self <= other : other.is_a?(self)
-        else
-          other.is_a?(self)
-        end
+        other.is_a?(self)
       end
     end
   end

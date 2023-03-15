@@ -283,19 +283,12 @@ module Mongoid
       #
       # @api private
       def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
-        attributes = if Mongoid.legacy_attributes
-          attrs
-        else
-          attrs&.to_h
-        end || {}
+        attributes = attrs&.to_h || {}
 
         doc = allocate
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
-        # TODO: remove the to_h when the legacy_attributes flag is removed.
-        # The to_h ensures that we don't accidentally make attributes_before_type_cast
-        # a BSON::Document.
-        doc.instance_variable_set(:@attributes_before_type_cast, attributes&.to_h.dup)
+        doc.instance_variable_set(:@attributes_before_type_cast, attributes.dup)
 
         if execute_callbacks
           doc.apply_defaults
