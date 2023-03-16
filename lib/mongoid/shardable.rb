@@ -47,8 +47,14 @@ module Mongoid
       self.class.shard_key_fields
     end
 
-    # Returns the selector that would match the current version of this
-    # document.
+    # Returns the selector that would match the defined shard keys. If
+    # `prefer_persisted` is false (the default), it uses the current values
+    # of the specified shard keys, otherwise, it will try to use whatever value
+    # was most recently persisted.
+    #
+    # @param [ true | false ] prefer_persisted Whether to use the current
+    #   value of the shard key fields, or to use their most recently persisted
+    #   values.
     #
     # @return [ Hash ] The shard key selector.
     #
@@ -84,6 +90,8 @@ module Mongoid
     #   persisted value over the current value.
     #
     # @return [ Object ] The value of the named field.
+    #
+    # @api private
     def shard_key_field_value(field, prefer_persisted:)
       if field.include?(".")
         relation, remaining = field.split(".", 2)
