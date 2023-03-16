@@ -118,7 +118,10 @@ module Mongoid
           clone.tap { |query| query.options.store(:timeout, false) }
         end
 
-        # Limits the results to only contain the fields provided.
+        # Limits the results to only contain the fields provided. Specifying
+        # this option will mark all documents returned by the query as
+        # read-only, to prevent accidental data corruption that might be
+        # caused by evaluating a partial result set. (See MONGOID-5577.)
         #
         # @example Limit the results to the provided fields.
         #   optional.only(:name, :dob)
@@ -241,6 +244,9 @@ module Mongoid
         end
 
         # Limits the results to only contain the fields not provided.
+        # Specifying this option will mark all documents returned by the
+        # query as read-only, to prevent accidental data corruption that might
+        # be caused by evaluating a partial result set. (See MONGOID-5577.)
         #
         # @example Limit the results to the fields not provided.
         #   optional.without(:name, :dob)

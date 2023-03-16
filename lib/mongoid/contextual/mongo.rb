@@ -895,6 +895,7 @@ module Mongoid
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
+        flag_as_readonly_if_projected(doc)
         yield(doc)
       end
 
@@ -1027,7 +1028,9 @@ module Mongoid
       #   single document.
       def process_raw_docs(raw_docs, limit)
         docs = raw_docs.map do |d|
-          Factory.from_db(klass, d, criteria)
+          Factory.from_db(klass, d, criteria).tap do |doc|
+            flag_as_readonly_if_projected(doc)
+          end
         end
         docs = eager_load(docs)
         limit ? docs : docs.first
@@ -1059,6 +1062,17 @@ module Mongoid
         v = v.skip(n) if n > 0
         raw_docs = v.to_a.reverse
         process_raw_docs(raw_docs, limit)
+      end
+
+      # Flags the given document as readonly if the criteria applied
+      # a projection to the query (e.g. via #only or #without).
+      #
+      # @param [ Mongoid::Document ] doc The document to possibly
+      #   make readonly
+      def flag_as_readonly_if_projected(doc)
+        if criteria.options[:fields]
+          doc.readonly!
+        end
       end
     end
   end

@@ -1260,6 +1260,22 @@ describe Mongoid::Contextual::Mongo do
         expect(persons.uniq.size).to eq(1)
       end
     end
+
+    context 'when #only has been specified' do
+      let(:restricted_criteria) { criteria.only(:name) }
+
+      it 'should mark the documents readonly' do
+        expect(restricted_criteria.all?(&:readonly?)).to be true
+      end
+    end
+
+    context 'when #without has been specified' do
+      let(:restricted_criteria) { criteria.without(:name) }
+
+      it 'should mark the documents readonly' do
+        expect(restricted_criteria.all?(&:readonly?)).to be true
+      end
+    end
   end
 
   describe "#eager_load" do
@@ -2205,6 +2221,14 @@ describe Mongoid::Contextual::Mongo do
               expect(docs).to eq([rolling_stones])
             end
           end
+        end
+      end
+
+      context 'when called with #only' do
+        let(:criteria) { Band.only(:name) }
+
+        it 'should flag the result as readonly' do
+          expect(criteria.send(method).readonly?).to be true
         end
       end
     end

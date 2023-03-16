@@ -280,7 +280,8 @@ module Mongoid
       !!@none
     end
 
-    # Overriden to include _type in the fields.
+    # Overriden to include _type in the fields. See additional comments
+    # at Mongoid::Criteria::Optional#only.
     #
     # @example Limit the fields returned from the database.
     #   Band.only(:name)
@@ -314,7 +315,8 @@ module Mongoid
       end
     end
 
-    # Overriden to exclude _id from the fields.
+    # Overriden to exclude _id from the fields. See additional comments
+    # at Mongoid::Criteria::Optional#without.
     #
     # @example Exclude fields returned from the database.
     #   Band.without(:name)
