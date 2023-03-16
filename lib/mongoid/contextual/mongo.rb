@@ -202,9 +202,7 @@ module Mongoid
       #
       # @return [ Document ] The result of the command.
       def find_one_and_update(update, options = {})
-        if doc = view.find_one_and_update(update, options)
-          Factory.from_db(klass, doc)
-        end
+        reify_document(view.find_one_and_update(update, options))
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -222,9 +220,7 @@ module Mongoid
       #
       # @return [ Document ] The result of the command.
       def find_one_and_replace(replacement, options = {})
-        if doc = view.find_one_and_replace(replacement, options)
-          Factory.from_db(klass, doc)
-        end
+        reify_document(view.find_one_and_replace(replacement, options))
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -235,17 +231,14 @@ module Mongoid
       #
       # @return [ Document ] The result of the command.
       def find_one_and_delete
-        if doc = view.find_one_and_delete
-          Factory.from_db(klass, doc)
-        end
+        reify_document(view.find_one_and_delete)
       end
 
       # Return the first result without applying sort
       #
       # @api private
       def find_first
-        if raw_doc = view.first
-          doc = Factory.from_db(klass, raw_doc, criteria)
+        if doc = reify_document(view.first, with_criteria: true)
           eager_load([doc]).first
         end
       end
@@ -875,9 +868,7 @@ module Mongoid
           end
         else
           return view unless eager_loadable?
-          docs = view.map do |doc|
-            Factory.from_db(klass, doc, criteria)
-          end
+          docs = reify_documents(view, with_criteria: true)
           eager_load(docs)
         end
       end
@@ -893,9 +884,7 @@ module Mongoid
       #
       # @param [ Document ] document The document to yield to.
       def yield_document(document, &block)
-        doc = document.respond_to?(:_id) ?
-            document : Factory.from_db(klass, document, criteria)
-        flag_as_readonly_if_projected(doc)
+        doc = reify_document(document, with_criteria: true)
         yield(doc)
       end
 
@@ -1027,11 +1016,7 @@ module Mongoid
       # @return [ Array<Document> | Document ] The list of documents or a
       #   single document.
       def process_raw_docs(raw_docs, limit)
-        docs = raw_docs.map do |d|
-          Factory.from_db(klass, d, criteria).tap do |doc|
-            flag_as_readonly_if_projected(doc)
-          end
-        end
+        docs = reify_documents(raw_docs, with_criteria: true)
         docs = eager_load(docs)
         limit ? docs : docs.first
       end
@@ -1067,11 +1052,48 @@ module Mongoid
       # Flags the given document as readonly if the criteria applied
       # a projection to the query (e.g. via #only or #without).
       #
-      # @param [ Mongoid::Document ] doc The document to possibly
+      # @param [ nil | Mongoid::Document ] doc The document to possibly
       #   make readonly
       def flag_as_readonly_if_projected(doc)
-        if criteria.options[:fields]
+        if doc && criteria.options[:fields]
           doc.readonly!
+        end
+      end
+
+      # If `doc_or_attrs` is a Hash, it will be realized as a Mongoid::Document
+      # and returned; otherwise `doc` is returned as-is. If `doc_or_attrs` is
+      # `nil`, nothing is done, and `nil` is returned.
+      #
+      # @param [ nil | Hash | Mongoid::Document ] doc_or_attrs The document, or
+      #   its attributes, to reify.
+      # @param [ true | false ] with_criteria Whether or not the criteria
+      #   instance should be used to instantiate the new document.
+      #
+      # @return [ nil | Mongoid::Document ] The reified document
+      def reify_document(doc_or_attrs, with_criteria: false)
+        case doc_or_attrs
+        when nil then
+          nil
+        when Hash then
+          Factory.from_db(klass, doc_or_attrs, with_criteria ? criteria : nil)
+        else
+          doc_or_attrs
+        end.tap do |doc|
+          flag_as_readonly_if_projected(doc)
+        end
+      end
+
+      # Attempts to reify the list of `docs`.
+      #
+      # @param [ Enumerable ] docs The list of documents to reify.
+      # @param [ true | false ] with_criteria Whether or not the criteria
+      #   instance should be used when instantiating new documents.
+      #
+      # @return [ Array<nil | Mongoid::Document> ] The list of reified
+      #   documents.
+      def reify_documents(docs, with_criteria: false)
+        docs.map do |doc|
+          reify_document(doc, with_criteria: with_criteria)
         end
       end
     end

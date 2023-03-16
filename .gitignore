@@ -14,6 +14,7 @@ DONATE
 SPECS.txt
 .yardoc/*
 doc/*
+data/*
 yard-docs
 *.swp
 *.un~
