@@ -67,62 +67,11 @@ module Mongoid
     # existing method.
     option :scope_overwrite_exception, default: false
 
-    # Use ActiveSupport's time zone in time operations instead of the
-    # Ruby default time zone.
-    option :use_activesupport_time_zone, default: true
-
     # Return stored times as UTC.
     option :use_utc, default: false
 
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
-
-    # Update embedded documents correctly when setting it, unsetting it
-    # and resetting it. See MONGOID-5206 and MONGOID-5240 for more details.
-    option :broken_updates, default: false
-
-    # Maintain legacy behavior of === on Mongoid documents, which returns
-    # true in a number of cases where Ruby's === implementation would
-    # return false.
-    option :legacy_triple_equals, default: false
-
-    # When exiting a nested `with_scope' block, set the current scope to
-    # nil instead of the parent scope for backwards compatibility.
-    option :broken_scoping, default: false
-
-    # Maintain broken behavior of sum over empty result sets for backwards
-    # compatibility.
-    option :broken_aggregables, default: false
-
-    # Ignore aliased fields in embedded documents when performing pluck and
-    # distinct operations, for backwards compatibility.
-    option :broken_alias_handling, default: false
-
-    # Maintain broken `and' behavior when using the same operator on the same
-    # field multiple times for backwards compatibility.
-    option :broken_and, default: false
-
-    # Use millisecond precision when comparing Time objects with the _matches?
-    # function.
-    option :compare_time_by_ms, default: true
-
-    # Use bson-ruby's implementation of as_json for BSON::ObjectId instead of
-    # the one monkey-patched into Mongoid.
-    option :object_id_as_json_oid, default: false
-
-    # Maintain legacy behavior of pluck and distinct, which does not
-    # demongoize the values on returning them.
-    option :legacy_pluck_distinct, default: false
-
-    # Combine chained operators, which use the same field and operator,
-    # using and's instead of overwriting them.
-    option :overwrite_chained_operators, default: false
-
-    # When this flag is true, the attributes method on a document will return
-    # a BSON::Document when that document is retrieved from the database, and
-    # a Hash otherwise. When this flag is false, the attributes method will
-    # always return a Hash.
-    option :legacy_attributes, default: false
 
     # Sets the async_query_executor for the application. By default the thread pool executor
     #   is set to `:immediate. Options are:
@@ -393,5 +342,33 @@ module Mongoid
         client
       end
     end
+
+    module DeprecatedOptions
+      OPTIONS = %i[]
+
+      if RUBY_VERSION < '3.0'
+        def self.prepended(klass)
+          klass.class_eval do
+            OPTIONS.each do |option|
+              alias_method :"#{option}_without_deprecation=", :"#{option}="
+
+              define_method(:"#{option}=") do |value|
+                Mongoid::Warnings.send(:"warn_#{option}_deprecated")
+                send(:"#{option}_without_deprecation=", value)
+              end
+            end
+          end
+        end
+      else
+        OPTIONS.each do |option|
+          define_method(:"#{option}=") do |value|
+            Mongoid::Warnings.send(:"warn_#{option}_deprecated")
+            super(value)
+          end
+        end
+      end
+    end
+
+    prepend DeprecatedOptions
   end
 end

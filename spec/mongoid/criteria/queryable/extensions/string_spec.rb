@@ -71,8 +71,7 @@ describe String do
 
     context "when the string without timezone" do
 
-      context "when using active support's time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting ActiveSupport time zone" do
         time_zone_override "Tokyo"
 
         let(:date) do
@@ -85,23 +84,6 @@ describe String do
 
         it "parses string using active support's time zone" do
           expect(evolved).to eq(Time.zone.parse(date).utc)
-        end
-      end
-
-      context "when not using active support's time zone" do
-        config_override :use_activesupport_time_zone, false
-        time_zone_override nil
-
-        let(:date) do
-          "2010-01-01 5:00:00"
-        end
-
-        let(:evolved) do
-          date.__evolve_time__
-        end
-
-        it "parses string using system time zone" do
-          expect(evolved).to eq(Time.parse(date).utc)
         end
       end
     end

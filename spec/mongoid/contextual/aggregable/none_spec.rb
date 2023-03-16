@@ -23,20 +23,8 @@ describe Mongoid::Contextual::Aggregable::None do
       expect(context.sum).to eq(0)
     end
 
-    context "when broken_aggregables feature flag is not set" do
-      config_override :broken_aggregables, false
-
-      it "returns zero when arg given" do
-        expect(context.sum(:likes)).to eq(0)
-      end
-    end
-
-    context "when broken_aggregables feature flag is set" do
-      config_override :broken_aggregables, true
-
-      it "returns the input when arg given" do
-        expect(context.sum(:likes)).to eq(:likes)
-      end
+    it "returns zero when arg given" do
+      expect(context.sum(:likes)).to eq(0)
     end
   end
 

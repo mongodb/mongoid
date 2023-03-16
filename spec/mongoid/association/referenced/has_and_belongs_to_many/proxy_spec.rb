@@ -3792,8 +3792,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   # a BSON::Document, which applies a transformation to the array before
   # storing it.
   context "when executing concat on foreign key array from the db" do
-    config_override :legacy_attributes, false
-
     before do
       HabtmmContract.create!
       HabtmmSignature.create!

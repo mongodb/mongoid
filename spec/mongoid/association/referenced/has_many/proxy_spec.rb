@@ -4098,8 +4098,6 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   end
 
   context "when executing concat on foreign key array from the db" do
-    config_override :legacy_attributes, false
-
     before do
       Agent.create!
       Basic.create!

@@ -26,34 +26,15 @@ describe 'Criteria logical operations' do
       expect(bands.to_a).to eq([sp])
     end
 
-    context "when broken_and feature flag is not set" do
-      config_override :broken_and, false
-
-      it 'combines existing `$and` clause in query and `where` condition' do
-        bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
-        expect(bands.selector).to eq(
-          {
-            "_id"=>1,
-            "year"=>{"$in"=>[2020]},
-            "$and"=>[{"year"=>{"$in"=>[2021]}}, {"_id"=>2}]
-          }
-        )
-      end
-    end
-
-    context "when broken_and feature flag is set" do
-      config_override :broken_and, true
-
-      it 'combines existing `$and` clause in query and `where` condition' do
-        bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
-        expect(bands.selector).to eq(
-          {
-            "_id"=>1,
-            "year"=>{"$in"=>[2020]},
-            "$and"=>[{"_id"=>2}]
-          }
-        )
-      end
+    it 'combines existing `$and` clause in query and `where` condition' do
+      bands = Band.where(id: 1).and({year: {'$in' => [2020]}}, {year: {'$in' => [2021]}}).where(id: 2)
+      expect(bands.selector).to eq(
+        {
+          "_id"=>1,
+          "year"=>{"$in"=>[2020]},
+          "$and"=>[{"year"=>{"$in"=>[2021]}}, {"_id"=>2}]
+        }
+      )
     end
   end
 
