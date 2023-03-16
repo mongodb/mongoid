@@ -74,9 +74,6 @@ describe Mongoid::Shardable do
           expect(SmDriver.shard_key_fields).to be == %i(age agency_id)
         end
       end
-
-      context 'when passed subdocument fields' do
-      end
     end
 
     context 'when shorthand syntax is used' do
