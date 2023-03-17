@@ -47,18 +47,22 @@ module Mongoid
       self.class.shard_key_fields
     end
 
-    # Returns the selector that would match the current version of this
-    # document.
+    # Returns the selector that would match the defined shard keys. If
+    # `prefer_persisted` is false (the default), it uses the current values
+    # of the specified shard keys, otherwise, it will try to use whatever value
+    # was most recently persisted.
+    #
+    # @param [ true | false ] prefer_persisted Whether to use the current
+    #   value of the shard key fields, or to use their most recently persisted
+    #   values.
     #
     # @return [ Hash ] The shard key selector.
     #
     # @api private
-    def shard_key_selector
-      selector = {}
-      shard_key_fields.each do |field|
-        selector[field.to_s] = send(field)
+    def shard_key_selector(prefer_persisted: false)
+      shard_key_fields.each_with_object({}) do |field, selector|
+        selector[field.to_s] = shard_key_field_value(field.to_s, prefer_persisted: prefer_persisted)
       end
-      selector
     end
 
     # Returns the selector that would match the existing version of this
@@ -72,11 +76,31 @@ module Mongoid
     #
     # @api private
     def shard_key_selector_in_db
-      selector = {}
-      shard_key_fields.each do |field|
-        selector[field.to_s] = new_record? ? send(field) : attribute_was(field)
+      shard_key_selector(prefer_persisted: true)
+    end
+
+    # Returns the value for the named shard key. If the field identifies
+    # an embedded document, the key will be parsed and recursively evaluated.
+    # If `prefer_persisted` is true, the value last persisted to the database
+    # will be returned, regardless of what the current value of the attribute
+    # may be.
+    #
+    # @param [String] field The name of the field to evaluate
+    # @param [ true|false ] prefer_persisted Whether or not to prefer the
+    #   persisted value over the current value.
+    #
+    # @return [ Object ] The value of the named field.
+    #
+    # @api private
+    def shard_key_field_value(field, prefer_persisted:)
+      if field.include?(".")
+        relation, remaining = field.split(".", 2)
+        send(relation)&.shard_key_field_value(remaining, prefer_persisted: prefer_persisted)
+      elsif prefer_persisted && !new_record?
+        attribute_was(field)
+      else
+        send(field)
       end
-      selector
     end
 
     module ClassMethods
