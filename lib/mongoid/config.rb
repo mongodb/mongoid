@@ -5,6 +5,7 @@ require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
 require "mongoid/config/introspection"
+require "mongoid/config/encryption"
 
 module Mongoid
 
@@ -14,6 +15,7 @@ module Mongoid
     extend Forwardable
     extend Options
     extend Defaults
+    extend Encryption
     extend self
 
     def_delegators ::Mongoid, :logger, :logger=

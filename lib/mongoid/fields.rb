@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "mongoid/fields/standard"
+require "mongoid/fields/encrypted"
 require "mongoid/fields/foreign_key"
 require "mongoid/fields/localized"
 require "mongoid/fields/validators"
@@ -796,6 +797,7 @@ module Mongoid
         opts[:type] = retrieve_and_validate_type(name, options[:type])
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
+        return Fields::Encrypted.new(name, opts) if options[:encrypt]
         Fields::Standard.new(name, opts)
       end
 
