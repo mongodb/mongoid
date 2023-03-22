@@ -17,11 +17,11 @@ module Mongoid
       # @param [ Array<Mongoid::Document> ] models The models to generate the schema map for.
       #   Defaults to all models in the application.
       # @return [ Hash ] The encryption schema map.
-      def encryption_schema_map(models = ::Mongoid.models)
+      def encryption_schema_map(database, models = ::Mongoid.models)
         models.each_with_object({}) do |model, map|
           next if model.embedded?
 
-          key = "#{model.persistence_context.database_name}.#{model.persistence_context.collection_name}"
+          key = "#{database}.#{model.collection_name}"
           props = metadata_for(model).merge(properties_for(model))
           map[key] = props unless props.empty?
         end
@@ -149,10 +149,10 @@ module Mongoid
         end
       end
 
-      def key_id_for(key_id_base64)
-        return nil unless key_id_base64
+      def key_id_for(key_id)
+        return nil if key_id.nil?
 
-        [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
+        [ BSON::Binary.new(Base64.decode64(key_id), :uuid) ]
       end
     end
   end

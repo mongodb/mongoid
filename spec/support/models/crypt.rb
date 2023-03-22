@@ -1,6 +1,8 @@
-module Config
+module Crypt
   class Patient
     include Mongoid::Document
+
+    store_in client: :encrypted
 
     encrypt_with key_id: "grolrnFVSSW9Gq04Q87R9Q=="
 
@@ -8,18 +10,20 @@ module Config
     field :blood_type, type: String, encrypt: { deterministic: false }
     field :ssn, type: Integer, encrypt: { deterministic: true }
 
-    embeds_one :insurance, class_name: "Config::Insurance"
+    embeds_one :insurance, class_name: "Crypt::Insurance"
   end
 
   class Insurance
     include Mongoid::Document
 
     field :policy_number, type: Integer, encrypt: { deterministic: true }
-    embedded_in :patient, class_name: "Config::Patient"
+    embedded_in :patient, class_name: "Crypt::Patient"
   end
 
   class User
     include Mongoid::Document
+
+    store_in client: :encrypted
 
     field :name, type: String, encrypt: {
       key_id: "grolrnFVSSW9Gq04Q87R9Q==",
@@ -33,6 +37,8 @@ module Config
 
   class Car
     include Mongoid::Document
+
+    store_in client: :encrypted
 
     encrypt_with key_id: "grolrnFVSSW9Gq04Q87R9Q==", deterministic: true
 
