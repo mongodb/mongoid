@@ -17,12 +17,16 @@ module Mongoid
       # @param [ Array<Mongoid::Document> ] models The models to generate the schema map for.
       #   Defaults to all models in the application.
       # @return [ Hash ] The encryption schema map.
-      def encryption_schema_map(models = ::Mongoid.models)
+      def encryption_schema_map(database, models = ::Mongoid.models)
+        visited = Set.new
         models.each_with_object({}) do |model, map|
+          next if visited.include?(model)
+          visited << model
           next if model.embedded?
+          next unless model.encrypted?
 
-          key = "#{model.persistence_context.database_name}.#{model.persistence_context.collection_name}"
-          props = metadata_for(model).merge(properties_for(model))
+          key = "#{database}.#{model.collection_name}"
+          props = metadata_for(model).merge(properties_for(model, visited))
           map[key] = props unless props.empty?
         end
       end
@@ -91,9 +95,10 @@ module Mongoid
       # are marked as encrypted.
       #
       # @param [ Mongoid::Document ] model The model to generate the properties for.
+      # @param [ Set<Mongoid::Document> ] visited The set of models that have already been visited.
       # @return [ Hash ] The encryption properties.
-      def properties_for(model)
-        result = properties_for_fields(model).merge(properties_for_relations(model))
+      def properties_for(model, visited)
+        result = properties_for_fields(model).merge(properties_for_relations(model, visited))
         if result.empty?
           {}
         else
@@ -119,15 +124,18 @@ module Mongoid
         end
       end
 
-      def properties_for_relations(model)
+      def properties_for_relations(model, visited)
         model.relations.each_with_object({}) do |(name, relation), props|
+          next if visited.include?(relation.relation_class)
+          visited << relation.relation_class
           next unless relation.is_a?(Association::Embedded::EmbedsMany) ||
                       relation.is_a?(Association::Embedded::EmbedsOne)
+          next unless relation.relation_class.encrypted?
 
           metadata_for(
             relation.relation_class
           ).merge(
-            properties_for(relation.relation_class)
+            properties_for(relation.relation_class, visited)
           ).tap do |properties|
             props[name] = { 'bsonType' => 'object' }.merge(properties) unless properties.empty?
           end
@@ -149,10 +157,10 @@ module Mongoid
         end
       end
 
-      def key_id_for(key_id_base64)
-        return nil unless key_id_base64
+      def key_id_for(key_id)
+        return nil if key_id.nil?
 
-        [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
+        [ BSON::Binary.new(Base64.decode64(key_id), :uuid) ]
       end
     end
   end

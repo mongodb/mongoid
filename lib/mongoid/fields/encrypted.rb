@@ -24,6 +24,18 @@ module Mongoid
       def key_id
         @encryption_options[:key_id]
       end
+
+      # Override the key_id for the field.
+      #
+      # This method is solely for testing purposes and should not be used in
+      # the application code. The schema_map is generated very early in the
+      # application lifecycle, and overriding the key_id after that will not
+      # have any effect.
+      #
+      # @api private
+      def set_key_id(key_id)
+        @encryption_options[:key_id] = key_id
+      end
     end
   end
 end
