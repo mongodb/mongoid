@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "support/crypt/models"
 
 describe Mongoid::Config::Encryption do
+  after(:all) do
+    Crypt.cleanup
+  end
+
   describe ".encryption_schema_map" do
 
     let(:encryption_schema_map) do

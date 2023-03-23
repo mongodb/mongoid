@@ -1,8 +1,15 @@
 require 'spec_helper'
+require 'support/crypt/models'
 
 describe 'Encryption' do
+  require_enterprise
+  require_libmongocrypt
   include_context 'with encryption'
   restore_config_clients
+
+  after(:all) do
+    Crypt.cleanup
+  end
 
   let(:config) do
     {

@@ -1,4 +1,12 @@
 module Crypt
+
+  def self.cleanup
+    [Crypt::Patient, Crypt::User, Crypt::Car].each do |klass|
+      Mongoid.deregister_model(klass)
+      Crypt.send(:remove_const, klass.name.split("::").last)
+    end
+  end
+
   class Patient
     include Mongoid::Document
 

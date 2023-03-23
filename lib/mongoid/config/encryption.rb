@@ -14,8 +14,10 @@ module Mongoid
 
       # Generate the encryption schema map for the provided models.
       #
+      # @param [ String ] database The database name.
       # @param [ Array<Mongoid::Document> ] models The models to generate the schema map for.
       #   Defaults to all models in the application.
+      #
       # @return [ Hash ] The encryption schema map.
       def encryption_schema_map(database, models = ::Mongoid.models)
         visited = Set.new
