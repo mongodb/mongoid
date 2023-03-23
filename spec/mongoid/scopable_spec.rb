@@ -1063,6 +1063,22 @@ describe Mongoid::Scopable do
         end
       end
     end
+
+    context "when chained with a scope that has no conditions" do
+      class ThingWithDefaultScopeAndProjectionScope
+        include Mongoid::Document
+
+        default_scope -> { where(foo: 1) }
+        scope :no_condition, -> { without(:bar) }
+      end
+
+      let(:criteria) { ThingWithDefaultScopeAndProjectionScope.unscoped.no_condition }
+
+      it "removes all scoping" do
+        puts "querying selector"
+        expect(criteria.selector).to be_empty
+      end
+    end
   end
 
   describe ".with_default_scope" do
