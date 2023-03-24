@@ -7,10 +7,6 @@ describe 'Encryption' do
   include_context 'with encryption'
   restore_config_clients
 
-  after(:all) do
-    Crypt.cleanup
-  end
-
   let(:config) do
     {
       default: { hosts: SpecConfig.instance.addresses, database: database_id },
@@ -38,9 +34,11 @@ describe 'Encryption' do
     existing_key_id = Crypt::Patient.encrypt_metadata[:key_id]
     Crypt::Patient.set_key_id(data_key_id)
     Mongoid::Config.send(:clients=, config)
+    Crypt::Patient.store_in(client: :encrypted)
 
     example.run
 
+    Crypt::Patient.reset_storage_options!
     Crypt::Patient.set_key_id(existing_key_id)
   end
 

@@ -1,16 +1,6 @@
 module Crypt
-
-  def self.cleanup
-    [Crypt::Patient, Crypt::User, Crypt::Car].each do |klass|
-      Mongoid.deregister_model(klass)
-      Crypt.send(:remove_const, klass.name.split("::").last)
-    end
-  end
-
   class Patient
     include Mongoid::Document
-
-    store_in client: :encrypted
 
     encrypt_with key_id: "grolrnFVSSW9Gq04Q87R9Q=="
 
@@ -32,8 +22,6 @@ module Crypt
   class User
     include Mongoid::Document
 
-    store_in client: :encrypted
-
     field :name, type: String, encrypt: {
       key_id: "grolrnFVSSW9Gq04Q87R9Q==",
       deterministic: false
@@ -46,8 +34,6 @@ module Crypt
 
   class Car
     include Mongoid::Document
-
-    store_in client: :encrypted
 
     encrypt_with key_id: "grolrnFVSSW9Gq04Q87R9Q==", deterministic: true
 
