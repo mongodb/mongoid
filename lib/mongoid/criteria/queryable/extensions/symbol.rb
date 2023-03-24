@@ -21,16 +21,6 @@ module Mongoid
             ::String.__expr_part__(self, value, negating)
           end
 
-          # Get the symbol as a sort direction.
-          #
-          # @example Get the symbol as a sort direction.
-          #   "1".to_direction
-          #
-          # @return [ Integer ] The direction.
-          def to_direction
-            to_s.to_direction
-          end
-
           module ClassMethods
 
             # Adds a method on symbol as a convenience for the MongoDB operator.
