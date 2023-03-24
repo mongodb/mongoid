@@ -247,6 +247,8 @@ describe Mongoid::Clients::Factory do
       end
 
       context 'when auto_encryption_options are provided' do
+        require_enterprise
+        require_libmongocrypt
         restore_config_clients
         include_context 'with encryption'
 
