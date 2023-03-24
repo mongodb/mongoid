@@ -105,7 +105,7 @@ module Mongoid
           #
           # @return [ Hash ] The field/direction pair.
           def __sort_pair__
-            { first => last.to_direction }
+            { first => Mongoid::Criteria::Translator.to_direction(last) }
           end
 
           private
