@@ -179,6 +179,16 @@ module Mongoid
         criteria
       end
 
+      # Get the hash as a sort direction.
+      #
+      # @example Get the hash as a sort direction.
+      #   { score: { "$meta": "textScore" } }.to_direction
+      #
+      # @return [ Hash ] The direction.
+      def to_direction
+        self
+      end
+
       private
 
       # Mongoize for the klass, key and value.
