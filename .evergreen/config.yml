@@ -282,6 +282,7 @@ functions:
             DRIVER="${DRIVER}" \
             I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
+            FLE="${FLE}" \
             ./egos .evergreen/run-tests-docker.sh
 
   "fix absolute paths":
@@ -553,6 +554,18 @@ axes:
         display_name: Yes
         variables:
           APP_TESTS: yes
+
+  - id: "fle"
+    display_name: FLE
+    values:
+      - id: "helper"
+        display_name: via LMC helper
+        variables:
+          FLE: helper
+      - id: "path"
+        display_name: via LMC path
+        variables:
+          FLE: path
 buildvariants:
 - matrix_name: "ruby-3.1"
   matrix_spec:
@@ -775,3 +788,16 @@ buildvariants:
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
+
+- matrix_name: "auto-encryption"
+  matrix_spec:
+    ruby: ruby-3.1
+    driver: current
+    topology: replica-set
+    mongodb-version: ['6.0']
+    os: ubuntu-20.04
+    rails: ['7.0']
+    fle: helper
+  display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
+  tasks:
+    - name: "test"

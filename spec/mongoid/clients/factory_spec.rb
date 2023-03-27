@@ -245,6 +245,51 @@ describe Mongoid::Clients::Factory do
           }.to raise_error(Mongoid::Errors::NoClientConfig)
         end
       end
+
+      context 'when auto_encryption_options are provided' do
+        require_enterprise
+        require_libmongocrypt
+        restore_config_clients
+        include_context 'with encryption'
+
+        let(:config) do
+          {
+            default: { hosts: SpecConfig.instance.addresses, database: database_id },
+            encrypted: {
+              hosts: SpecConfig.instance.addresses,
+              database: database_id,
+              options: {
+                auto_encryption_options: {
+                  kms_providers: kms_providers,
+                  key_vault_namespace: key_vault_namespace,
+                  extra_options: extra_options
+                }
+              }
+            }
+          }
+        end
+
+        before do
+          Mongoid::Config.send(:clients=, config)
+          key_vault_client[key_vault_collection].drop
+        end
+
+        after do
+          client.close
+        end
+
+        let(:client) do
+          described_class.create(:encrypted)
+        end
+
+        it "returns a client" do
+          expect(client).to be_a(Mongo::Client)
+        end
+
+        it 'sets schema_map for the client' do
+          expect(client.options[:auto_encryption_options][:schema_map]).not_to be_nil
+        end
+      end
     end
 
     context "when no name is provided" do

@@ -1,20 +1,21 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative './config_spec_models'
+require "support/crypt/models"
 
 describe Mongoid::Config::Encryption do
+
   describe ".encryption_schema_map" do
 
     let(:encryption_schema_map) do
-      Mongoid.config.encryption_schema_map(models)
+      Mongoid.config.encryption_schema_map(database_id, models)
     end
 
     context "when a model has encrypted fields" do
       context 'when model has encrypt_metadata' do
         let(:expected_schema_map) do
           {
-            "mongoid_test.config_patients" => {
+            "mongoid_test.crypt_patients" => {
               "bsonType" => "object",
               "encryptMetadata" => {
                 "keyId" => [BSON::Binary.new(Base64.decode64("grolrnFVSSW9Gq04Q87R9Q=="), :uuid)]
@@ -55,7 +56,7 @@ describe Mongoid::Config::Encryption do
         end
 
         let(:models) do
-          [ Config::Patient ]
+          [ Crypt::Patient ]
         end
 
         it "returns a map of encryption schemas" do
@@ -64,7 +65,7 @@ describe Mongoid::Config::Encryption do
 
         context "when models are related" do
           let(:models) do
-            [ Config::Patient, Config::Insurance ]
+            [ Crypt::Patient, Crypt::Insurance ]
           end
 
           it "returns a map of encryption schemas" do
@@ -74,12 +75,12 @@ describe Mongoid::Config::Encryption do
 
         context 'and fields do not have encryption options' do
           let(:models) do
-            [ Config::Car ]
+            [ Crypt::Car ]
           end
 
           let(:expected_schema_map) do
             {
-              "mongoid_test.config_cars" => {
+              "mongoid_test.crypt_cars" => {
                 "bsonType" => "object",
                 "encryptMetadata" => {
                   "keyId" => [BSON::Binary.new(Base64.decode64("grolrnFVSSW9Gq04Q87R9Q=="), :uuid)],
@@ -105,7 +106,7 @@ describe Mongoid::Config::Encryption do
       context 'when model does not have encrypt_metadata' do
         let(:expected_schema_map) do
           {
-            "mongoid_test.config_users" => {
+            "mongoid_test.crypt_users" => {
               "properties" => {
                 "name" => {
                   "encrypt" => {
@@ -127,7 +128,7 @@ describe Mongoid::Config::Encryption do
         end
 
         let(:models) do
-          [ Config::User ]
+          [ Crypt::User ]
         end
 
         it "returns a map of encryption schemas" do

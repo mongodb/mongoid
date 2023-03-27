@@ -58,6 +58,16 @@ module Mongoid
         database = config.delete(:database)
         hosts = config.delete(:hosts)
         opts = config.delete(:options) || {}
+        if opts[:auto_encryption_options]
+          if opts[:auto_encryption_options].key?(:schema_map)
+            Mongoid.logger.warn(
+              'The :schema_map is configured in the :auto_encryption_options for the client;' +
+              ' encryption setting in Mongoid documents will be ignored.'
+            )
+          else
+            opts[:auto_encryption_options][:schema_map] = Mongoid.config.encryption_schema_map(database)
+          end
+        end
         unless config.empty?
           default_logger.warn("Unknown config options detected: #{config}.")
         end
