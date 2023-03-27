@@ -67,6 +67,7 @@ module Mongoid
       # Generate the encryptMetadata object for the provided model.
       #
       # @param [ Mongoid::Document ] model The model to generate the metadata for.
+      #
       # @return [ Hash ] The encryptMetadata object.
       def metadata_for(model)
         metadata = {}.tap do |metadata|
@@ -98,6 +99,7 @@ module Mongoid
       #
       # @param [ Mongoid::Document ] model The model to generate the properties for.
       # @param [ Set<Mongoid::Document> ] visited The set of models that have already been visited.
+      #
       # @return [ Hash ] The encryption properties.
       def properties_for(model, visited)
         result = properties_for_fields(model).merge(properties_for_relations(model, visited))
@@ -108,6 +110,11 @@ module Mongoid
         end
       end
 
+      # Generate encryption properties for the fields of the provided model.
+      #
+      # @param [ Mongoid::Document ] model The model to generate the properties for.
+      #
+      # @return [ Hash ] The encryption properties.
       def properties_for_fields(model)
         model.fields.each_with_object({}) do |(name, field), props|
           next unless field.is_a?(Mongoid::Fields::Encrypted)
@@ -126,6 +133,15 @@ module Mongoid
         end
       end
 
+      # Generate encryption properties for the relations of the provided model.
+      #
+      # This method generates the properties for the embedded relations that
+      # are configured to be encrypted.
+      #
+      # @param [ Mongoid::Document ] model The model to generate the properties for.
+      # @param [ Set<Mongoid::Document> ] visited The set of models that have already been visited.
+      #
+      # @return [ Hash ] The encryption properties.
       def properties_for_relations(model, visited)
         model.relations.each_with_object({}) do |(name, relation), props|
           next if visited.include?(relation.relation_class)
@@ -144,10 +160,21 @@ module Mongoid
         end
       end
 
+      # Get the BSON type identifier for the provided field according to the
+      # https://www.mongodb.com/docs/manual/reference/bson-types/#std-label-bson-types
+      #
+      # @param [ Mongoid::Field ] field The field to get the BSON type identifier for.
+      #
+      # @return [ String ] The BSON type identifier.
       def bson_type_for(field)
         TYPE_MAPPINGS[field.type]
       end
 
+      # Get the encryption algorithm to use for the provided field.
+      #
+      # @param [ Mongoid::Field ] field The field to get the algorithm for.
+      #
+      # @return [ String ] The algorithm.
       def algorithm_for(field)
         case field.deterministic?
         when true
@@ -159,10 +186,17 @@ module Mongoid
         end
       end
 
-      def key_id_for(key_id)
-        return nil if key_id.nil?
+      # Get the keyId encryption schema field for the base64 encrypted
+      # key id.
+      #
+      # @param [ String | nil ] key_id_base64 The base64 encoded key id.
+      #
+      # @return [ Array<BSON::Binary> | nil ] The keyId encryption schema field,
+      #   or nil if the key id is nil.
+      def key_id_for(key_id_base64)
+        return nil if key_id_base64.nil?
 
-        [ BSON::Binary.new(Base64.decode64(key_id), :uuid) ]
+        [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
       end
     end
   end
