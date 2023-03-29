@@ -83,6 +83,21 @@ configured in the association as the field name:
     index country: 1
   end
 
+The shard key may also reference a field in an embedded document, by using
+the "." character to delimit the field names:
+
+.. code-block:: ruby
+
+  shard_key "location.x" => 1, "location.y" => 1
+
+  shard_key "location.x", "location.y"
+
+.. note::
+
+  Because the "." character is used to delimit fields in embedded documents,
+  Mongoid does not currently support shard key fields that themselves
+  literally contain the "." character.
+
 .. note::
 
   If a model declares a shard key, Mongoid expects the respective collection
