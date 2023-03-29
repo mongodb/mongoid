@@ -3,6 +3,8 @@ pkg/*
 scratch_directory/*
 sandbox/*
 tmp/*
+data/*
+branches/*
 *.gem
 .bundle
 Gemfile.lock

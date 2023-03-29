@@ -45,16 +45,28 @@ describe "Mongoid::Tasks::Encryption" do
 
       context 'when all parameters are provided' do
         it 'creates a data key' do
-          encoded_key_id = Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'local', client_name: :encrypted)
-          expect(encoded_key_id).to eq(Base64.strict_encode64(data_key_id.data))
+          result = Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'local', client_name: :encrypted)
+          expect(result).to eq(
+            {
+              key_id: Base64.strict_encode64(data_key_id.data),
+              key_vault_namespace: key_vault_namespace,
+              kms_provider: 'local'
+            }
+          )
         end
       end
 
       context 'when kms_provider_name is not provided' do
         context 'and there is only one kms provider' do
           it 'creates a data key' do
-            encoded_key_id = Mongoid::Tasks::Encryption.create_data_key(client_name: :encrypted)
-            expect(encoded_key_id).to eq(Base64.strict_encode64(data_key_id.data))
+            result = Mongoid::Tasks::Encryption.create_data_key(client_name: :encrypted)
+            expect(result).to eq(
+              {
+                key_id: Base64.strict_encode64(data_key_id.data),
+                key_vault_namespace: key_vault_namespace,
+                kms_provider: 'local'
+              }
+            )
           end
         end
       end

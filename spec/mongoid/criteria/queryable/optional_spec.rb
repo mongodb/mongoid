@@ -741,6 +741,21 @@ describe Mongoid::Criteria::Queryable::Optional do
 
             it_behaves_like "a cloning option"
           end
+
+          context "when the hash has hash values" do
+
+            let(:selection) do
+              query.send("#{method}", score: { "$meta" => "textScore"})
+            end
+
+            it "adds the sorting criteria" do
+              expect(selection.options).to eq(
+                { sort: { "score" => { "$meta" => "textScore" } }}
+              )
+            end
+
+            it_behaves_like "a cloning option"
+          end
         end
 
         context "when provided an array" do
