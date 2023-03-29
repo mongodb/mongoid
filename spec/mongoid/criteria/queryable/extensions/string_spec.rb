@@ -253,65 +253,6 @@ describe String do
     end
   end
 
-  describe "#to_direction" do
-
-    context "when ascending" do
-
-      it "returns 1" do
-        expect("ascending".to_direction).to eq(1)
-      end
-    end
-
-    context "when asc" do
-
-      it "returns 1" do
-        expect("asc".to_direction).to eq(1)
-      end
-    end
-
-    context "when ASCENDING" do
-
-      it "returns 1" do
-        expect("ASCENDING".to_direction).to eq(1)
-      end
-    end
-
-    context "when ASC" do
-
-      it "returns 1" do
-        expect("ASC".to_direction).to eq(1)
-      end
-    end
-
-    context "when descending" do
-
-      it "returns -1" do
-        expect("descending".to_direction).to eq(-1)
-      end
-    end
-
-    context "when desc" do
-
-      it "returns -1" do
-        expect("desc".to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESCENDING" do
-
-      it "returns -1" do
-        expect("DESCENDING".to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESC" do
-
-      it "returns -1" do
-        expect("DESC".to_direction).to eq(-1)
-      end
-    end
-  end
-
   describe ".evolve" do
 
     context "when provided a regex" do

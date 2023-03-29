@@ -8,6 +8,7 @@ require "mongoid/criteria/modifiable"
 require "mongoid/criteria/queryable"
 require "mongoid/criteria/scopable"
 require "mongoid/criteria/options"
+require "mongoid/criteria/translator"
 
 module Mongoid
 
