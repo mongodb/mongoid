@@ -11,35 +11,15 @@ describe Mongoid::Persistable::Destroyable do
     end
 
     context "when destroying a readonly document" do
-
-      context "when legacy_attributes is true" do
-        config_override :legacy_readonly, true
-
-        let(:from_db) do
-          Person.only(:_id).first
-        end
-
-        it "raises an error" do
-          expect(from_db.readonly?).to be true
-          expect {
-            from_db.destroy
-          }.to raise_error(Mongoid::Errors::ReadonlyDocument)
-        end
+      let(:from_db) do
+        Person.first.tap(&:readonly!)
       end
 
-      context "when legacy_attributes is false" do
-        config_override :legacy_readonly, false
-
-        let(:from_db) do
-          Person.first.tap(&:readonly!)
-        end
-
-        it "raises an error" do
-          expect(from_db.readonly?).to be true
-          expect {
-            from_db.destroy
-          }.to raise_error(Mongoid::Errors::ReadonlyDocument)
-        end
+      it "raises an error" do
+        expect(from_db.readonly?).to be true
+        expect {
+          from_db.destroy
+        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
       end
     end
 

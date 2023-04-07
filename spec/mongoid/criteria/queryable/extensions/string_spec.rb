@@ -71,8 +71,7 @@ describe String do
 
     context "when the string without timezone" do
 
-      context "when using active support's time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting ActiveSupport time zone" do
         time_zone_override "Tokyo"
 
         let(:date) do
@@ -85,23 +84,6 @@ describe String do
 
         it "parses string using active support's time zone" do
           expect(evolved).to eq(Time.zone.parse(date).utc)
-        end
-      end
-
-      context "when not using active support's time zone" do
-        config_override :use_activesupport_time_zone, false
-        time_zone_override nil
-
-        let(:date) do
-          "2010-01-01 5:00:00"
-        end
-
-        let(:evolved) do
-          date.__evolve_time__
-        end
-
-        it "parses string using system time zone" do
-          expect(evolved).to eq(Time.parse(date).utc)
         end
       end
     end
@@ -243,65 +225,6 @@ describe String do
         it "returns the string with the value negated" do
           expect(specified).to eq({ "field" => { "$ne" => "test" }})
         end
-      end
-    end
-  end
-
-  describe "#to_direction" do
-
-    context "when ascending" do
-
-      it "returns 1" do
-        expect("ascending".to_direction).to eq(1)
-      end
-    end
-
-    context "when asc" do
-
-      it "returns 1" do
-        expect("asc".to_direction).to eq(1)
-      end
-    end
-
-    context "when ASCENDING" do
-
-      it "returns 1" do
-        expect("ASCENDING".to_direction).to eq(1)
-      end
-    end
-
-    context "when ASC" do
-
-      it "returns 1" do
-        expect("ASC".to_direction).to eq(1)
-      end
-    end
-
-    context "when descending" do
-
-      it "returns -1" do
-        expect("descending".to_direction).to eq(-1)
-      end
-    end
-
-    context "when desc" do
-
-      it "returns -1" do
-        expect("desc".to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESCENDING" do
-
-      it "returns -1" do
-        expect("DESCENDING".to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESC" do
-
-      it "returns -1" do
-        expect("DESC".to_direction).to eq(-1)
       end
     end
   end

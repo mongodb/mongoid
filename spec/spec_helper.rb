@@ -48,6 +48,7 @@ require 'support/expectations'
 require 'support/helpers'
 require 'support/macros'
 require 'support/constraints'
+require 'support/crypt'
 
 # Give MongoDB servers time to start up in CI environments
 if SpecConfig.instance.ci?

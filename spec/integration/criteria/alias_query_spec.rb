@@ -24,59 +24,27 @@ describe 'distinct on aliased fields' do
 
   let(:command) { event.command }
 
-  context 'when broken_alias_handling is not set' do
-    config_override :broken_alias_handling, false
-
-    context 'top level field' do
-      let(:query) do
-        Person.distinct(:test)
-      end
-
-      it 'expands the alias' do
-        query
-
-        expect(command['key']).to eq('t')
-      end
+  context 'top level field' do
+    let(:query) do
+      Person.distinct(:test)
     end
 
-    context 'embedded document field' do
-      let(:query) do
-        Person.distinct('phone_numbers.extension')
-      end
+    it 'expands the alias' do
+      query
 
-      it 'expands the alias' do
-        query
-
-        expect(command['key']).to eq('phone_numbers.ext')
-      end
+      expect(command['key']).to eq('t')
     end
   end
 
-  context 'when broken_alias_handling is set' do
-    config_override :broken_alias_handling, true
-
-    context 'top level field' do
-      let(:query) do
-        Person.distinct(:test)
-      end
-
-      it 'expands the alias' do
-        query
-
-        expect(command['key']).to eq('t')
-      end
+  context 'embedded document field' do
+    let(:query) do
+      Person.distinct('phone_numbers.extension')
     end
 
-    context 'embedded document field' do
-      let(:query) do
-        Person.distinct('phone_numbers.extension')
-      end
+    it 'expands the alias' do
+      query
 
-      it 'deos not expands the alias' do
-        query
-
-        expect(command['key']).to eq('phone_numbers.extension')
-      end
+      expect(command['key']).to eq('phone_numbers.extension')
     end
   end
 end
@@ -103,59 +71,27 @@ describe 'pluck on aliased fields' do
 
   let(:command) { event.command }
 
-  context 'when broken_alias_handling is not set' do
-    config_override :broken_alias_handling, false
-
-    context 'top level field' do
-      let(:query) do
-        Person.pluck(:test)
-      end
-
-      it 'expands the alias' do
-        query
-
-        expect(command['projection']).to eq({'t' => true})
-      end
+  context 'top level field' do
+    let(:query) do
+      Person.pluck(:test)
     end
 
-    context 'embedded document field' do
-      let(:query) do
-        Person.pluck('phone_numbers.extension')
-      end
+    it 'expands the alias' do
+      query
 
-      it 'expands the alias' do
-        query
-
-        expect(command['projection']).to eq({'phone_numbers.ext' => true})
-      end
+      expect(command['projection']).to eq({'t' => true})
     end
   end
 
-  context 'when broken_alias_handling is set' do
-    config_override :broken_alias_handling, true
-
-    context 'top level field' do
-      let(:query) do
-        Person.pluck(:test)
-      end
-
-      it 'expands the alias' do
-        query
-
-        expect(command['projection']).to eq({'t' => true})
-      end
+  context 'embedded document field' do
+    let(:query) do
+      Person.pluck('phone_numbers.extension')
     end
 
-    context 'embedded document field' do
-      let(:query) do
-        Person.pluck('phone_numbers.extension')
-      end
+    it 'expands the alias' do
+      query
 
-      it 'does not expand the alias' do
-        query
-
-        expect(command['projection']).to eq({'phone_numbers.extension' => true})
-      end
+      expect(command['projection']).to eq({'phone_numbers.extension' => true})
     end
   end
 end

@@ -1255,39 +1255,19 @@ describe Mongoid::Scopable do
       let(:c1) { Band.where(active: true) }
       let(:c2) { Band.where(active: false) }
 
-      context "when the broken_scoping is not set" do
-        config_override :broken_scoping, false
-
-        it 'restores previous scope' do
-          Band.with_scope(c1) do |crit|
-            Band.with_scope(c2) do |crit2|
-              expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
-                'active' => true,
-                '$and' => ['active' => false],
-              })
-            end
-
+      it 'restores previous scope' do
+        Band.with_scope(c1) do |crit|
+          Band.with_scope(c2) do |crit2|
+          
             expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
               'active' => true,
+              '$and' => ['active' => false],
             })
           end
-        end
-      end
 
-      context "when the broken_scoping is set" do
-        config_override :broken_scoping, true
-
-        it 'does not restore previous scope' do
-          Band.with_scope(c1) do |crit|
-            Band.with_scope(c2) do |crit2|
-              expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
-                'active' => true,
-                '$and' => ['active' => false],
-              })
-            end
-
-            expect(Mongoid::Threaded.current_scope(Band)).to be_nil
-          end
+          expect(Mongoid::Threaded.current_scope(Band).selector).to eq({
+            'active' => true,
+          })
         end
       end
     end
