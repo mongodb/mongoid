@@ -38,6 +38,16 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
+      # Run an explain on the criteria.
+      #
+      # @example Explain the criteria.
+      #   Band.where(name: "Depeche Mode").explain
+      #
+      # @param [ Hash ] options customizable options (See Mongo::Collection::View::Explainable)
+      #
+      # @return [ Hash ] The explain result.
+      def_delegator :view, :explain
+
       attr_reader :documents_loader
 
       # Get the number of documents matching the query.
@@ -175,16 +185,6 @@ module Mongoid
         when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
         else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
         end
-      end
-
-      # Run an explain on the criteria.
-      #
-      # @example Explain the criteria.
-      #   Band.where(name: "Depeche Mode").explain
-      #
-      # @return [ Hash ] The explain result.
-      def explain
-        view.explain
       end
 
       # Execute the find and modify command, used for MongoDB's
