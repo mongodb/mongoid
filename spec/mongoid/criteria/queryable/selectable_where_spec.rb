@@ -202,6 +202,28 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
       end
+
+      context 'when the values is an array' do
+        context 'when the array contains only one element' do
+          let(:selection) do
+            query.where(name: ['Syd'])
+          end
+
+          it 'uses the value of the array' do
+            expect(selection.selector).to eq({ "name" => "Syd" })
+          end
+        end
+
+        context 'when the array contains more than one element' do
+          let(:selection) do
+            query.where(name: ['Syd', 'Mick'])
+          end
+
+          it 'uses the array' do
+            expect(selection.selector).to eq({ "name" => ["Syd", "Mick"] })
+          end
+        end
+      end
     end
 
     context "when provided complex criterion" do
