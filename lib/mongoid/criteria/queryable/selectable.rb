@@ -865,7 +865,7 @@ module Mongoid
                 query.add_operator_expression(field_s, value)
               else
                 if value.is_a?(Array) && value.size == 1 && !value.first.is_a?(Hash)
-                  query.add_field_expression(field, value)
+                  query.add_field_expression(field, value.first)
                 else
                   query.add_field_expression(field, value)
                 end
