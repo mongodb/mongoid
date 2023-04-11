@@ -1564,7 +1564,16 @@ describe Mongoid::Contextual::Mongo do
     end
 
     it "returns the criteria explain path" do
-      expect(context.explain).to_not be_empty
+      explain = context.explain
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "executionStats", "serverInfo")
+    end
+
+    it "respects options passed to explain" do
+      explain = context.explain(verbosity: :query_planner)
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "serverInfo")
+      expect(explain.keys).not_to include("executionStats")
     end
   end
 
