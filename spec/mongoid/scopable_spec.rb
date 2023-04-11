@@ -342,7 +342,6 @@ describe Mongoid::Scopable do
     context "when provided a criteria" do
 
       context 'when a collation is defined on the criteria' do
-        min_server_version '3.4'
 
         before do
           Band.scope(:tests, ->{ Band.where(name: 'TESTING').collation(locale: 'en_US', strength: 2) })
@@ -352,25 +351,6 @@ describe Mongoid::Scopable do
         it 'applies the collation' do
           expect(Band.tests.first['name']).to eq('testing')
         end
-      end
-
-      context "when the lambda includes a geo_near query" do
-
-        before do
-          Bar.scope(:near_by, lambda{ |location| geo_near(location) })
-        end
-
-        after do
-          class << Bar
-            undef_method :near_by
-          end
-          Bar._declared_scopes.clear
-        end
-
-        it "allows the scope to be defined" do
-          expect(Bar.near_by([ 51.545099, -0.0106 ])).to be_a(Mongoid::Contextual::GeoNear)
-        end
-
       end
 
       context "when a block is provided" do

@@ -1044,26 +1044,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#geo_near" do
-    max_server_version '4.0'
-
-    before do
-      Bar.create_indexes
-    end
-
-    let!(:match) do
-      Bar.create!(location: [ 52.30, 13.25 ])
-    end
-
-    let(:criteria) do
-      Bar.geo_near([ 52, 13 ]).max_distance(10).spherical
-    end
-
-    it "returns the matching documents" do
-      expect(criteria).to eq([ match ])
-    end
-  end
-
   describe "#eq" do
 
     let!(:match) do
@@ -2287,26 +2267,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#max_scan" do
-    max_server_version '4.0'
-
-    let!(:band) do
-      Band.create!(name: "Depeche Mode")
-    end
-
-    let!(:band2) do
-      Band.create!(name: "Tool")
-    end
-
-    let(:criteria) do
-      Band.where({}).max_scan(1)
-    end
-
-    it "executes the criteria while properly giving the max scan to Mongo" do
-      expect(criteria.to_ary).to eq [band]
-    end
-  end
-
   describe "#to_criteria" do
 
     let(:criteria) do
@@ -2633,7 +2593,6 @@ describe Mongoid::Criteria do
       end
 
       context "when querying on a BSON::Decimal128" do
-        min_server_version '3.4'
 
         let(:decimal) do
           BSON::Decimal128.new("0.0005")

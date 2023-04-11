@@ -466,56 +466,6 @@ describe Mongoid::Criteria::Queryable::Optional do
     end
   end
 
-  describe "#max_scan" do
-
-    context "when provided no options" do
-
-      let(:selection) do
-        query.max_scan
-      end
-
-      it "does not add any options" do
-        expect(selection.options).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like "a cloning option"
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.max_scan(nil)
-      end
-
-      it "does not add any options" do
-        expect(selection.options).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like "a cloning option"
-    end
-
-    context "when provided arguments" do
-
-      let(:selection) do
-        query.max_scan(500)
-      end
-
-      it "adds the field options" do
-        expect(selection.options).to eq({ max_scan: 500 })
-      end
-
-      it_behaves_like "a cloning option"
-    end
-  end
-
   describe "#max_time_ms" do
 
     context "when provided no options" do

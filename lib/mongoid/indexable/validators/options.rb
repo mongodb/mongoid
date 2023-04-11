@@ -9,7 +9,6 @@ module Mongoid
         extend self
 
         VALID_OPTIONS = [
-          :background,
           :database,
           :default_language,
           :language_override,

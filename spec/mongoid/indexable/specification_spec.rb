@@ -86,7 +86,7 @@ describe Mongoid::Indexable::Specification do
         described_class.new(
           Band,
           { name: 1, title: 1, years: -1 },
-          background: true,
+          sparse: true,
           unique: true
         )
       end
@@ -100,7 +100,7 @@ describe Mongoid::Indexable::Specification do
       end
 
       it "normalizes the options" do
-        expect(spec.options).to eq(background: true, unique: true)
+        expect(spec.options).to eq(sparse: true, unique: true)
       end
     end
 

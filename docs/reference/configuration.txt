@@ -173,11 +173,12 @@ for details on driver options.
           roles:
             - 'dbOwner'
 
-          # Change the default authentication mechanism. Please see the
-          # driver documentation linked above for details on how to configure
-          # authentication. Valid options are :aws, :gssapi, :mongodb_cr,
-          # :mongodb_x509, :plain, :scram and :scram256 (default on 3.0
-          # and higher servers is :scram, default on 2.6 servers is :plain)
+          # Change the default authentication mechanism. Valid options are:
+          # :scram, :scram256, :mongodb_x509, :gssapi, :aws, and :plain.
+          # Default on MongoDB is :scram, which will use "SCRAM-SHA-256" if available,
+          # otherwise fallback to "SCRAM-SHA-1"; :scram256 will always use "SCRAM-SHA-256".
+          # This setting is handled by the MongoDB Ruby Driver. Please refer to:
+          # https://mongodb.com/docs/ruby-driver/current/reference/authentication/
           auth_mech: :scram
 
           # Specify the auth source, i.e. the database or other source which
@@ -266,9 +267,9 @@ for details on driver options.
     # Configure Mongoid-specific options. (optional)
     options:
       # Application name that is printed to the MongoDB logs upon establishing
-      # a connection in server versions 3.4 or greater. Note that the name
-      # cannot exceed 128 bytes in length. It is also used as the database name
-      # if the database name is not explicitly defined. (default: nil)
+      # a connection. Note that the name cannot exceed 128 bytes in length.
+      # It is also used as the database name if the database name is not
+      # explicitly defined. (default: nil)
       app_name: MyApplicationName
 
       # Type of executor for queries scheduled using ``load_async`` method.
@@ -342,10 +343,6 @@ for details on driver options.
       # further information. Most applications should not use this option.
       # (default: false)
       use_utc: false
-
-      # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
-      # indexes in the background by default. (default: false)
-      background_indexing: false
 
     # Configure driver-specific options. (optional)
     driver_options:

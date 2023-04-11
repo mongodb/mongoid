@@ -7,7 +7,6 @@
     number:
       $type: 19
   matches: true
-  min_server_version: 3.4
 
 - name: Decimal128 field - matches
   document:
@@ -18,7 +17,6 @@
     decimal128_field:
       $type: 19
   matches: true
-  min_server_version: 3.4
 
 - name: existing field - does not match decimal
   document:
@@ -27,7 +25,6 @@
     name:
       $type: 19
   matches: false
-  min_server_version: 3.4
 
 # Requires :map_big_decimal_to_decimal128 option to be true.
 - name: BigDecimal field - matches
@@ -38,4 +35,3 @@
     big_decimal_field:
       $type: 19
   matches: true
-  min_server_version: 3.4

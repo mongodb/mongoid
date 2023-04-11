@@ -12,11 +12,10 @@ Sessions
    :depth: 2
    :class: singlecol
 
-Versions 3.6 and higher of the MongoDB server support sessions. You can use sessions with Mongoid in a similar way
-that you would execute a transaction in ActiveRecord. Namely, you can call a method, ``#with_session`` on a model class
-or on an instance of a model and execute some operations in a block. All operations in the block will be
-executed in the context of single session. Please see the MongoDB Ruby driver documentation for what session options
-are available.
+You can use sessions with Mongoid in a similar way that you would execute a transaction in ActiveRecord.
+Namely, you can call a method, ``#with_session`` on a model class or on an instance of a model and execute
+some operations in a block. All operations in the block will be executed in the context of single session.
+Please see the MongoDB Ruby driver documentation for what session options are available.
 
 Please note the following limitations of sessions:
 
@@ -25,8 +24,6 @@ Please note the following limitations of sessions:
 - Sessions cannot be nested. You cannot called ``#with_session`` on a model class or a model instance within the block passed to the ``#with_session`` method on another model class or model instance.
 
 - All model classes and instances used within the session block must use the same driver client. For example, if you have specified different ``storage_options`` for another model used in the block than that of the model class or instance on which ``#with_session`` is called, you will get an error.
-
-- All connected MongoDB servers must be version 3.6 or higher.
 
 Using a Session via Model#with_session
 ======================================

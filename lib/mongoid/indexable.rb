@@ -26,10 +26,8 @@ module Mongoid
       def create_indexes
         return unless index_specifications
 
-        default_options = {background: Config.background_indexing}
-
         index_specifications.each do |spec|
-          key, options = spec.key, default_options.merge(spec.options)
+          key, options = spec.key, spec.options
           if database = options[:database]
             with(database: database) do |klass|
               klass.collection.indexes(session: _session).create_one(key, options.except(:database))
@@ -74,7 +72,7 @@ module Mongoid
       # @return [ true ] If the operation succeeded.
       def add_indexes
         if hereditary? && !index_keys.include?(self.discriminator_key.to_sym => 1)
-          index({ self.discriminator_key.to_sym => 1 }, unique: false, background: true)
+          index({ self.discriminator_key.to_sym => 1 }, unique: false)
         end
         true
       end
@@ -85,7 +83,7 @@ module Mongoid
       #   class Person
       #     include Mongoid::Document
       #     field :name, type: String
-      #     index({ name: 1 }, { background: true })
+      #     index({ name: 1 }, { unique: true })
       #   end
       #
       # @param [ Hash ] spec The index spec.

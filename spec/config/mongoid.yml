@@ -37,7 +37,6 @@ test:
     log_level: :warn
     belongs_to_required_by_default: false
     app_name: 'testing'
-    background_indexing: false
     join_contexts: false
   driver_options:
     broken_view_options: false

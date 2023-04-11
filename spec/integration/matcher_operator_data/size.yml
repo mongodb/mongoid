@@ -86,7 +86,6 @@
     position:
       $size: foo
   error: true
-  min_server_version: 3.4
 
 - name: floating point argument
   document:
@@ -95,7 +94,6 @@
     position:
       $size: 2.5
   error: true
-  min_server_version: 3.4
 
 - name: negative integer argument
   document:
@@ -104,7 +102,6 @@
     position:
       $size: -2
   error: true
-  min_server_version: 3.4
 
 - name: empty array field value
   document:

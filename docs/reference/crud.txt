@@ -573,8 +573,7 @@ Atomic operations described in this section apply to one document at a time,
 therefore nesting ``#atomically`` blocks invoked on multiple documents does
 not make changes to the different documents be persisted atomically together.
 However, MongoDB offers :ref:`multi-document transactions <transactions>`
-as of server version 4.0 which provide atomic persistence across multiple
-documents.
+which provide atomic persistence across multiple documents.
 
 
 Reloading

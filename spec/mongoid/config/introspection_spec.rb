@@ -20,7 +20,9 @@ describe Mongoid::Config::Introspection do
     # deprecated option is eventually removed, the "exclude" spec will break.
     # At that time, update the `:option_name` helper to reference a different
     # deprecated option (if any), or else skip the specs in this context.
-    context "with deprecated options" do
+    #
+    # TODO: Currently no options are deprecated
+    xcontext "with deprecated options" do
       let(:option_name) { "background_indexing" }
 
       it "should exclude deprecated options by default" do

@@ -17,6 +17,17 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Support for MongoDB 4.0 and earlier servers dropped
+---------------------------------------------------
+
+Mongoid 9 requires MongoDB 4.2 or newer. Earlier server versions are not
+supported. In addition, support for versions 4.2 and 4.4 are now deprecated
+and will be removed in Mongoid 10. Users are encouraged to upgrade to at
+least MongoDB 5.0 for best feature availability and performance. Consider using
+`MongoDB Atlas <https://www.mongodb.com/atlas/database>`_ to automate your server
+version upgrades.
+
+
 Deprecated options removed
 --------------------------
 
@@ -41,6 +52,26 @@ of each option.
 
 In addition, support for ``config.load_defaults`` versions 7.5 and
 prior has been dropped (you must use a minimum of version 8.0.)
+
+
+Deprecated functionality removed
+--------------------------------
+
+The following previously deprecated functionality is now removed:
+
+- ``Criteria#geo_near`` is removed as MongoDB server versions 4.2
+  and later no longer support the ``$geoNear`` command. Please use the
+  `$geoNear stage of the aggregation pipeline
+  <https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/>`_
+  instead.
+- ``Criteria#max_scan`` is removed as MongoDB server versions 4.2
+  and later no longer support the ``maxScan`` query option. Please use
+  ``Criteria#max_time_ms`` instead.
+- The ``:background_indexing`` global option and ``:background`` index
+  specification argument have been removed. These options do not have any effect
+  in MongoDB server versions 4.2 and later. You may safely remove
+  ``:background_indexing`` from your config ``:background`` from any index
+  definitions without replacement.
 
 
 ``touch`` method now clears changed state
