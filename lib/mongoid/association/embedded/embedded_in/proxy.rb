@@ -14,7 +14,7 @@ module Mongoid
           #
           # @param [ Document ] base The document the association hangs off of.
           # @param [ Document ] target The target (parent) of the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           #
           # @return [ In ] The proxy.
           def initialize(base, target, association)
@@ -30,7 +30,7 @@ module Mongoid
           # @example Substitute the new document.
           #   person.name.substitute(new_name)
           #
-          # @param [ Document ] replacement A document to replace the target.
+          # @param [ Document | Hash ] replacement A document to replace the target.
           #
           # @return [ Document | nil ] The association or nil.
           def substitute(replacement)
@@ -40,6 +40,7 @@ module Mongoid
               return nil
             end
             _base.new_record = true
+            replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
             self._target = replacement
             bind_one
             self
@@ -80,6 +81,18 @@ module Mongoid
           end
 
           class << self
+            # Returns the eager loader for this association.
+            #
+            # @param [ Array<Mongoid::Association> ] associations The
+            #   associations to be eager loaded
+            # @param [ Array<Mongoid::Document> ] docs The parent documents
+            #   that possess the given associations, which ought to be
+            #   populated by the eager-loaded documents.
+            # 
+            # @return [ Mongoid::Association::Embedded::Eager ]
+            def eager_loader(associations, docs)
+              Eager.new(associations, docs)
+            end
 
             # Returns true if the association is an embedded one. In this case
             # always true.

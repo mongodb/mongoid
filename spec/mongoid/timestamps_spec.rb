@@ -17,12 +17,7 @@ describe Mongoid::Timestamps do
 
     let(:time_zone) { "Pacific Time (US & Canada)" }
 
-    around do |ex|
-      z = Time.zone
-      Time.zone = time_zone
-      ex.run
-      Time.zone = z
-    end
+    time_zone_override "Pacific Time (US & Canada)"
 
     before do
       document.run_callbacks(:create)
@@ -77,17 +72,20 @@ describe Mongoid::Timestamps do
   context "when the document has changed with updated_at specified" do
 
     let(:document) do
-      Dokument.new(created_at: Time.now.utc)
+      Dokument.create(created_at: Time.now.utc)
+    end
+
+    let(:expected_updated_at) do
+      DateTime.parse("2001-06-12")
     end
 
     before do
-      document.new_record = false
-      document.updated_at = DateTime.parse("2001-06-12")
+      document.updated_at = expected_updated_at
     end
 
     it "does not set updated at" do
-      expect(document).to receive(:updated_at=).never
       document.save!
+      expect(document.reload.updated_at).to be == expected_updated_at
     end
   end
 

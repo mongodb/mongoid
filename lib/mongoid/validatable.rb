@@ -44,6 +44,8 @@ module Mongoid
     #
     # @param [ Hash ] options The options to check.
     #
+    # @option options [ true | false ] :validate Whether or not to validate.
+    #
     # @return [ true | false ] If we are validating.
     def performing_validations?(options = {})
       options[:validate].nil? ? true : options[:validate]
@@ -116,7 +118,7 @@ module Mongoid
       # @example Set up validation.
       #   Person.validates_relation(association)
       #
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       def validates_relation(association)
         if association.validate?
           validates_associated(association.name)

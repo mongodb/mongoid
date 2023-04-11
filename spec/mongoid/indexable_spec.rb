@@ -109,7 +109,6 @@ describe Mongoid::Indexable do
 
       after do
         klass.remove_indexes
-        Mongoid::Config.background_indexing = false
       end
 
       let(:indexes) do
@@ -118,20 +117,27 @@ describe Mongoid::Indexable do
         end
       end
 
-      it "creates the indexes by using default background_indexing option" do
-        klass.create_indexes
+      context "when the background_indexing option is false" do
+        config_override :background_indexing, false
 
-        index = indexes.get(_type: 1)
-        expect(index[:background]).to eq(Mongoid::Config.background_indexing)
+        it "creates the indexes correctly" do
+          klass.create_indexes
+
+          index = indexes.get(_type: 1)
+          expect(index[:background]).to be false
+        end
       end
 
-      it "creates the indexes by using specified background_indexing option" do
-        Mongoid::Config.background_indexing = true
+      context "when the background_indexing option is true" do
+        config_override :background_indexing, true
 
-        klass.create_indexes
+        it "creates the indexes correctly" do
 
-        index = indexes.get(_type: 1)
-        expect(index[:background]).to eq(true)
+          klass.create_indexes
+
+          index = indexes.get(_type: 1)
+          expect(index[:background]).to be true
+        end
       end
     end
 
@@ -228,6 +234,10 @@ describe Mongoid::Indexable do
 
         field :a, as: :authentication_token
         field :username
+
+        alias_attribute :u, :username
+
+        embeds_many :addresses, store_as: :adrs
       end
     end
 
@@ -243,6 +253,21 @@ describe Mongoid::Indexable do
 
       let(:options) do
         klass.index_specification(a: 1).options
+      end
+
+      it "sets the index with unique options" do
+        expect(options).to eq(unique: true)
+      end
+    end
+
+    context "when indexing a field that is embedded" do
+
+      before do
+        klass.index({ 'addresses.house' => 1 }, unique: true)
+      end
+
+      let(:options) do
+        klass.index_specification('adrs.h': 1).options
       end
 
       it "sets the index with unique options" do
@@ -591,22 +616,316 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when using a wildcard index" do
+    context "when using partial_filter_expression option" do
 
-      before do
-        klass.index({ '$**': 1 }, wildcard_projection: { _id: 1, username: 0 })
+      context 'when not using an alias' do
+
+        before do
+          klass.index({ authentication_token: 1 }, partial_filter_expression: { username: { '$exists' => true } })
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        it "sets the index with correct options" do
+          expect(options).to eq(partial_filter_expression: { username: { '$exists' => true } })
+        end
       end
 
-      let(:spec) do
-        klass.index_specification('$**': 1)
+      context 'when using an alias via field :as option' do
+
+        before do
+          klass.index({ authentication_token: 1 }, partial_filter_expression: { authentication_token: { '$exists' => true } })
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        it "sets the index with correct options" do
+          expect(options).to eq(partial_filter_expression: { a: { '$exists' => true } })
+        end
       end
 
-      it "creates the index" do
-        expect(spec).to be_a(Mongoid::Indexable::Specification)
+      context 'when using an alias via alias_attribute' do
+
+        before do
+          klass.index({ u: 1 }, partial_filter_expression: { u: { '$exists' => true } })
+        end
+
+        let(:options) do
+          klass.index_specification(username: 1).options
+        end
+
+        it "sets the index with correct options" do
+          expect(options).to eq(partial_filter_expression: { username: { '$exists' => true } })
+        end
       end
 
-      it "sets the index with correct options" do
-        expect(spec.options).to eq(wildcard_projection: { _id: 1, username: 0 })
+      context 'when using an embedded field' do
+
+        before do
+          klass.index({ authentication_token: 1 }, partial_filter_expression: { 'addresses.house' => { '$exists' => true } })
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        it "sets the index with correct options" do
+          expect(options).to eq(partial_filter_expression: { 'adrs.h': { '$exists' => true } })
+        end
+      end
+
+      context 'when using nested $and operator' do
+        let(:partial_filter_expression) do
+          {
+            '$and' => [
+              { 'authentication_token' => { '$gte' => 0 } },
+              { 'authentication_token' => { '$type' => 16 } }
+            ]
+          }
+        end
+
+        before do
+          klass.index({ authentication_token: 1 }, partial_filter_expression: partial_filter_expression)
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        let(:expected) do
+          {
+            '$and': [
+              { 'a': { '$gte' => 0 } },
+              { 'a': { '$type' => 16 } }
+            ]
+          }
+        end
+
+        it "resolves alias on $and option" do
+          expect(options[:partial_filter_expression]).to eq(expected)
+        end
+      end
+
+      context 'when using nested operators other than $and' do
+        let(:partial_filter_expression) do
+          {
+            'username' => { '$eq' => 'authentication_token' },
+            'addresses.house' => { '$exists' => true }
+          }
+        end
+
+        before do
+          klass.index({ authentication_token: 1 }, partial_filter_expression: partial_filter_expression)
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        let(:expected) do
+          {
+            username: { '$eq' => 'authentication_token' },
+            'adrs.h': { '$exists' => true }
+          }
+        end
+
+        it "preserves other operators" do
+          expect(options[:partial_filter_expression]).to eq(expected)
+        end
+      end
+
+      context 'when using mixed nested operators' do
+        let(:partial_filter_expression) do
+          {
+            'username' => { '$eq' => 'authentication_token' },
+            'addresses.house' => { '$exists' => true },
+            '$and' => [
+              { 'authentication_token' => { '$gte' => 0 } },
+              { 'authentication_token' => { '$type' => 16 } }
+            ]
+          }
+        end
+
+        before do
+          klass.index({ authentication_token: 1 }, partial_filter_expression: partial_filter_expression)
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        let(:expected) do
+          {
+            username: { '$eq' => 'authentication_token' },
+            'adrs.h': { '$exists' => true },
+            '$and': [
+              { 'a': { '$gte' => 0 } },
+              { 'a': { '$type' => 16 } }
+            ]
+          }
+        end
+
+        it "resolves aliases on $ operators" do
+          expect(options[:partial_filter_expression]).to eq(expected)
+        end
+      end
+
+      context 'when using multiple levels of nonsensical nested operators' do
+        let(:partial_filter_expression) do
+          {
+            '$foo' => {
+              '$eq' => [{
+                '$bar' => {
+                  '$and' => [
+                    { 'authentication_token' => { '$gte' => { 'aliased_timestamp' => 16 } } },
+                    { 'authentication_token' => { 'aliased_timestamp' => 16 } },
+                    { 'addresses.house' => { 'authentication_token' => [{ 'aliased_timestamp' => 16 }] } }
+                  ]
+                }
+              }]
+            }
+          }
+        end
+
+        before do
+          klass.index({ authentication_token: 1 }, partial_filter_expression: partial_filter_expression)
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        let(:expected) do
+          {
+            '$foo': {
+              '$eq': [{
+                '$bar': {
+                  '$and': [
+                    { a: { '$gte' => { 'aliased_timestamp' => 16 } } },
+                    { a: { 'aliased_timestamp' => 16 } },
+                    { 'adrs.h': { 'authentication_token' => [{ 'aliased_timestamp' => 16 }] } }
+                  ]
+                }
+              }]
+            }
+          }
+        end
+
+        it "resolves aliases recursively only on $ operators" do
+          expect(options[:partial_filter_expression]).to eq(expected)
+        end
+      end
+    end
+
+    context "when using weights option" do
+
+      context 'when not using aliases' do
+
+        before do
+          klass.index({ authentication_token: 1 }, weights: { a: 1, username: 2 })
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        it "sets the index with correct options" do
+          expect(options).to eq(weights: { a: 1, username: 2 })
+        end
+      end
+
+      context 'when using aliases via field :as option' do
+
+        before do
+          klass.index({ authentication_token: 1 }, weights: { 'addresses.house' => 1, authentication_token: 2 })
+        end
+
+        let(:options) do
+          klass.index_specification(a: 1).options
+        end
+
+        it "sets the index with correct options" do
+          expect(options).to eq(weights: { 'adrs.h': 1, a: 2 })
+        end
+      end
+
+      context 'when using aliases via alias_attribute' do
+
+        before do
+          klass.index({ u: 1 }, weights: { 'addresses.n' => 1, u: 2 })
+        end
+
+        let(:options) do
+          klass.index_specification(username: 1).options
+        end
+
+        it "sets the index with correct options" do
+          expect(options).to eq(weights: { 'adrs.name': 1, username: 2 })
+        end
+      end
+    end
+
+    context "when using wildcard indexes" do
+
+      context 'when not using an alias' do
+
+        before do
+          klass.index({ '$**': 1 }, wildcard_projection: { _id: 1, username: 0 })
+        end
+
+        let(:spec) do
+          klass.index_specification('$**': 1)
+        end
+
+        it "creates the index" do
+          expect(spec).to be_a(Mongoid::Indexable::Specification)
+        end
+
+        it "sets the index with correct options" do
+          expect(spec.options).to eq(wildcard_projection: { _id: 1, username: 0 })
+        end
+      end
+
+      context 'when using an alias via field :as option' do
+
+        before do
+          klass.index({ 'addresses.$**': 1 }, wildcard_projection: { 'addresses.house' => 1 })
+        end
+
+        let(:spec) do
+          klass.index_specification('adrs.$**': 1)
+        end
+
+        it "creates the index" do
+          expect(spec).to be_a(Mongoid::Indexable::Specification)
+        end
+
+        it "sets the index with correct options" do
+          expect(spec.options).to eq(wildcard_projection: { 'adrs.h': 1 })
+        end
+      end
+
+      context 'when using aliases via alias_attribute' do
+
+        before do
+          klass.index({ 'addresses.$**': 1 }, wildcard_projection: { 'addresses.n' => 1 })
+        end
+
+        let(:spec) do
+          klass.index_specification('adrs.$**': 1)
+        end
+
+        it "creates the index" do
+          expect(spec).to be_a(Mongoid::Indexable::Specification)
+        end
+
+        it "sets the index with correct options" do
+          expect(spec.options).to eq(wildcard_projection: { 'adrs.name': 1 })
+        end
       end
     end
 

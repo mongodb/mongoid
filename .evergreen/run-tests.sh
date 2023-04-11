@@ -26,7 +26,7 @@ fi
 
 prepare_server $arch
 
-install_mlaunch_virtualenv
+install_mlaunch_venv
 
 # Launching mongod under $MONGO_ORCHESTRATION_HOME
 # makes its log available through log collecting machinery
@@ -105,7 +105,7 @@ elif test -n "$APP_TESTS"; then
   if test -z "$DOCKER_PRELOAD"; then
     ./spec/shared/bin/install-node
   fi
-  
+
   bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake ci

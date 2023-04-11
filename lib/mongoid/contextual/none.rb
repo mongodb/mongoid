@@ -6,32 +6,10 @@ module Mongoid
   module Contextual
     class None
       include Enumerable
-      alias :old_sum :sum
-
       include Aggregable::None
       include Queryable
 
       attr_reader :criteria, :klass
-
-      alias :new_sum :sum
-
-      # Get the sum in the null context.
-      #
-      # @example Get the sum of null context.
-      #     context.sum(_field)
-      #
-      # @param [ Symbol ] _field The field to sum.
-      #
-      # @return [ Integer | Symbol ] If Mongoid.broken_aggregables is
-      #   set to false, this will always be zero. Otherwise, it will return the
-      #   field name as a symbol.
-      def sum(_field = nil)
-        if Mongoid.broken_aggregables
-          old_sum(_field)
-        else
-          new_sum(_field)
-        end
-      end
 
       # Check if the context is equal to the other object.
       #
@@ -80,8 +58,17 @@ module Mongoid
       # @example Do any documents exist in the null context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
+      # @param [ Hash | Object | false ] id_or_conditions an _id to
+      #   search for, a hash of conditions, nil or false.
+      #
       # @return [ false ] Always false.
-      def exists?; false; end
+      def exists?(id_or_conditions = :none); false; end
 
       # Pluck the field values in null context.
       #
@@ -322,7 +309,7 @@ module Mongoid
       #
       # @return [ Integer ] Always zero.
       def length
-        Mongoid.broken_aggregables ? 0 : entries.length
+        entries.length
       end
       alias :size :length
 

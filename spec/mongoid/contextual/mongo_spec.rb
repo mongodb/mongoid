@@ -477,74 +477,72 @@ describe Mongoid::Contextual::Mongo do
       Band.create!(name: "10,000 Maniacs", years: 20, sales: "1E2")
     end
 
-    with_config_values :legacy_pluck_distinct, true, false do
-      context "when limiting the result set" do
+    context "when limiting the result set" do
 
-        let(:criteria) do
-          Band.where(name: "Depeche Mode")
-        end
-
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns the distinct matching fields" do
-          expect(context.distinct(:name)).to eq([ "Depeche Mode" ])
-        end
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
       end
 
-      context "when not limiting the result set" do
-
-        let(:criteria) do
-          Band.criteria
-        end
-
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns the distinct field values" do
-          expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
-        end
+      let(:context) do
+        described_class.new(criteria)
       end
 
-      context "when providing an aliased field" do
+      it "returns the distinct matching fields" do
+        expect(context.distinct(:name)).to eq([ "Depeche Mode" ])
+      end
+    end
 
-        let(:criteria) do
-          Band.criteria
-        end
+    context "when not limiting the result set" do
 
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns the distinct field values" do
-          expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
-        end
+      let(:criteria) do
+        Band.criteria
       end
 
-      context 'when a collation is specified' do
-        min_server_version '3.4'
+      let(:context) do
+        described_class.new(criteria)
+      end
 
-        before do
-          Band.create!(name: 'DEPECHE MODE')
-        end
+      it "returns the distinct field values" do
+        expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
+      end
+    end
 
-        let(:context) do
-          described_class.new(criteria)
-        end
+    context "when providing an aliased field" do
 
-        let(:expected_results) do
-          ["10,000 Maniacs", "Depeche Mode", "New Order"]
-        end
+      let(:criteria) do
+        Band.criteria
+      end
 
-        let(:criteria) do
-          Band.where({}).collation(locale: 'en_US', strength: 2)
-        end
+      let(:context) do
+        described_class.new(criteria)
+      end
 
-        it 'applies the collation' do
-          expect(context.distinct(:name).sort).to eq(expected_results.sort)
-        end
+      it "returns the distinct field values" do
+        expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
+      end
+    end
+
+    context 'when a collation is specified' do
+      min_server_version '3.4'
+
+      before do
+        Band.create!(name: 'DEPECHE MODE')
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:expected_results) do
+        ["10,000 Maniacs", "Depeche Mode", "New Order"]
+      end
+
+      let(:criteria) do
+        Band.where({}).collation(locale: 'en_US', strength: 2)
+      end
+
+      it 'applies the collation' do
+        expect(context.distinct(:name).sort).to eq(expected_results.sort)
       end
     end
 
@@ -557,34 +555,8 @@ describe Mongoid::Contextual::Mongo do
         described_class.new(criteria)
       end
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
-
-        context 'when storing BigDecimal as string' do
-          config_override :map_big_decimal_to_decimal128, false
-
-          it "returns the non-demongoized distinct field values" do
-            expect(context.distinct(:sales).sort).to eq([ "1E2", "2E3" ])
-          end
-        end
-
-        context 'when storing BigDecimal as decimal128' do
-          config_override :map_big_decimal_to_decimal128, true
-          min_bson_version '4.15.0'
-          max_bson_version '4.99.99'
-
-          it "returns the non-demongoized distinct field values" do
-            expect(context.distinct(:sales).sort).to eq([ BSON::Decimal128.new("1E2"), BSON::Decimal128.new("2E3") ])
-          end
-        end
-      end
-
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
-
-        it "returns the non-demongoized distinct field values" do
-          expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
-        end
+      it "returns the non-demongoized distinct field values" do
+        expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
       end
     end
 
@@ -608,38 +580,14 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context "when getting the field without _translations" do
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "gets the full hash" do
-            expect(context.distinct(:description)).to eq([{ "de" => "deutsch-text", "en" => "english-text" }])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it "gets the demongoized localized field" do
-            expect(context.distinct(:description)).to eq([ 'deutsch-text' ])
-          end
+        it "gets the demongoized localized field" do
+          expect(context.distinct(:description)).to eq([ 'deutsch-text' ])
         end
       end
 
       context "when getting the field with _translations" do
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "gets an empty list" do
-            expect(context.distinct(:description_translations)).to eq([])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it "gets the full hash" do
-            expect(context.distinct(:description_translations)).to eq([ { "de" => "deutsch-text", "en" => "english-text" } ])
-          end
+        it "gets the full hash" do
+          expect(context.distinct(:description_translations)).to eq([ { "de" => "deutsch-text", "en" => "english-text" } ])
         end
       end
 
@@ -649,20 +597,8 @@ describe Mongoid::Contextual::Mongo do
           context.distinct(:'description.de')
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it 'returns the specific translation' do
-            expect(distinct).to eq([ 'deutsch-text' ])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it 'returns the specific translation' do
-            expect(distinct).to eq([ "deutsch-text" ])
-          end
+        it 'returns the specific translation' do
+          expect(distinct).to eq([ "deutsch-text" ])
         end
       end
 
@@ -672,20 +608,8 @@ describe Mongoid::Contextual::Mongo do
           context.distinct(:'description_translations.de')
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it 'returns the empty list' do
-            expect(distinct).to eq([])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it 'returns the specific translations' do
-            expect(distinct).to eq(['deutsch-text'])
-          end
+        it 'returns the specific translations' do
+          expect(distinct).to eq(['deutsch-text'])
         end
       end
 
@@ -701,23 +625,11 @@ describe Mongoid::Contextual::Mongo do
           context.distinct(:description).first
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "does not correctly use the fallback" do
-            distinct.should == {"de"=>"deutsch-text", "en"=>"english-text"}
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it "correctly uses the fallback" do
-            I18n.locale = :en
-            Dictionary.create!(description: 'english-text')
-            I18n.locale = :he
-            distinct.should == "english-text"
-          end
+        it "correctly uses the fallback" do
+          I18n.locale = :en
+          Dictionary.create!(description: 'english-text')
+          I18n.locale = :he
+          distinct.should == "english-text"
         end
       end
 
@@ -754,36 +666,16 @@ describe Mongoid::Contextual::Mongo do
           context.distinct("pass.name_translations.en").first
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "returns the full hash" do
-            expect(distinct).to eq({ "en" => "Neil", "he" => "Nissim" })
-          end
-
-          it "returns the empty hash" do
-            expect(distinct_translations).to eq(nil)
-          end
-
-          it "returns the empty hash" do
-            expect(distinct_translations_field).to eq(nil)
-          end
+        it "returns the translation for the current locale" do
+          expect(distinct).to eq("Nissim")
         end
 
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
+        it "returns the full _translation hash" do
+          expect(distinct_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+        end
 
-          it "returns the translation for the current locale" do
-            expect(distinct).to eq("Nissim")
-          end
-
-          it "returns the full _translation hash" do
-            expect(distinct_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
-          end
-
-          it "returns the translation for the requested locale" do
-            expect(distinct_translations_field).to eq("Neil")
-          end
+        it "returns the translation for the requested locale" do
+          expect(distinct_translations_field).to eq("Neil")
         end
       end
     end
@@ -795,21 +687,8 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(_id: band.id) }
       let(:context) { described_class.new(criteria) }
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
-        config_override :map_big_decimal_to_decimal128, true
-        max_bson_version '4.99.99'
-
-        it "returns the distinct matching fields" do
-          expect(context.distinct("label.sales")).to eq([ BSON::Decimal128.new('1E+2') ])
-        end
-      end
-
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
-        it "returns the distinct matching fields" do
-          expect(context.distinct("label.sales")).to eq([ BigDecimal("1E2") ])
-        end
+      it "returns the distinct matching fields" do
+        expect(context.distinct("label.sales")).to eq([ BigDecimal("1E2") ])
       end
     end
   end
@@ -1408,62 +1287,175 @@ describe Mongoid::Contextual::Mongo do
 
   describe "#exists?" do
 
-    before do
-      Band.create!(name: "Depeche Mode")
+    let!(:band) do
+      Band.create!(name: "Depeche Mode", active: true)
     end
 
-    context "when the count is zero" do
+    context "when not passing options" do
 
-      let(:criteria) do
-        Band.where(name: "New Order")
-      end
+      context "when the count is zero" do
 
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns false" do
-        expect(context).to_not be_exists
-      end
-    end
-
-    context "when the count is greater than zero" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns true" do
-        expect(context).to be_exists
-      end
-    end
-
-    context "when caching is not enabled" do
-
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      context "when exists? already called and query cache is enabled" do
-        query_cache_enabled
-
-        before do
-          context.exists?
+        let(:criteria) do
+          Band.where(name: "New Order")
         end
 
-        it "does not hit the database again" do
-          expect_no_queries do
-            expect(context).to be_exists
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns false" do
+          expect(context).to_not be_exists
+        end
+      end
+
+      context "when the count is greater than zero" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns true" do
+          expect(context).to be_exists
+        end
+      end
+
+      context "when caching is not enabled" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when exists? already called and query cache is enabled" do
+          query_cache_enabled
+
+          before do
+            context.exists?
+          end
+
+          it "does not hit the database again" do
+            expect_no_queries do
+              expect(context).to be_exists
+            end
           end
         end
+      end
+    end
+
+    context "when passing an _id" do
+
+      context "when its of type BSON::ObjectId" do
+
+        context "when calling it on the class" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that includes the object" do
+
+          it "returns true" do
+            expect(Band.where(name: band.name).exists?(band._id)).to be true
+          end
+        end
+
+        context "when calling it on a criteria that does not include the object" do
+
+          it "returns false" do
+            expect(Band.where(name: "bogus").exists?(band._id)).to be false
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new)).to be false
+          end
+        end
+      end
+
+      context "when its of type String" do
+
+        context "when the id exists" do
+
+          it "returns true" do
+            expect(Band.exists?(band._id.to_s)).to be true
+          end
+        end
+
+        context "when the id does not exist" do
+
+          it "returns false" do
+            expect(Band.exists?(BSON::ObjectId.new.to_s)).to be false
+          end
+        end
+      end
+    end
+
+    context "when passing a hash" do
+
+      context "when calling it on the class" do
+
+        it "returns true" do
+          expect(Band.exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that includes the object" do
+
+        it "returns true" do
+          expect(Band.where(active: true).exists?(name: band.name)).to be true
+        end
+      end
+
+      context "when calling it on a criteria that does not include the object" do
+
+        it "returns false" do
+          expect(Band.where(active: false).exists?(name: band.name)).to be false
+        end
+      end
+
+      context "when the conditions don't match" do
+
+        it "returns false" do
+          expect(Band.exists?(name: "bogus")).to be false
+        end
+      end
+    end
+
+    context "when passing false" do
+
+      it "returns false" do
+        expect(Band.exists?(false)).to be false
+      end
+    end
+
+    context "when passing nil" do
+
+      it "returns false" do
+        expect(Band.exists?(nil)).to be false
+      end
+    end
+
+    context "when the limit is 0" do
+
+      it "returns false" do
+        expect(Band.limit(0).exists?).to be false
+      end
+    end
+
+    context "when the criteria limit is 0" do
+
+      it "returns false" do
+        expect(Band.criteria.limit(0).exists?).to be false
       end
     end
   end
@@ -1479,7 +1471,16 @@ describe Mongoid::Contextual::Mongo do
     end
 
     it "returns the criteria explain path" do
-      expect(context.explain).to_not be_empty
+      explain = context.explain
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "executionStats", "serverInfo")
+    end
+
+    it "respects options passed to explain" do
+      explain = context.explain(verbosity: :query_planner)
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "serverInfo")
+      expect(explain.keys).not_to include("executionStats")
     end
   end
 
@@ -4470,6 +4471,72 @@ describe Mongoid::Contextual::Mongo do
         expect do
           context.third_to_last!
         end.to raise_error(Mongoid::Errors::DocumentNotFound, /Could not find a document of class Band./)
+      end
+    end
+  end
+
+  describe '#load_async' do
+    let!(:band) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context 'with global thread pool async query executor' do
+      config_override :async_query_executor, :global_thread_pool
+
+      it 'preloads the documents' do
+        context.load_async
+        context.documents_loader.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.documents_loader.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
+      end
+    end
+
+    context 'with immediate thread pool async query executor' do
+      config_override :async_query_executor, :immediate
+
+      it 'preloads the documents' do
+        context.load_async
+        context.documents_loader.wait
+
+        expect(context.view).not_to receive(:map)
+        expect(context.to_a).to eq([band])
+      end
+
+      it 're-raises exception during preload' do
+        expect_any_instance_of(Mongoid::Contextual::Mongo::DocumentsLoader)
+          .to receive(:execute)
+          .at_least(:once)
+          .and_raise(Mongo::Error::OperationFailure)
+
+        context.load_async
+        context.documents_loader.wait
+
+        expect do
+          context.to_a
+        end.to raise_error(Mongo::Error::OperationFailure)
       end
     end
   end

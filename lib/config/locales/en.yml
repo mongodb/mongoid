@@ -118,7 +118,14 @@ en:
           message: "Empty configuration file: %{path}."
           summary: "Your mongoid.yml configuration file appears to be empty."
           resolution: "Ensure your configuration file contains the correct contents.
-            Refer to: https://docs.mongodb.com/mongoid/current/reference/configuration/"
+            Refer to: https://www.mongodb.com/docs/mongoid/current/reference/configuration/"
+        immutable_attribute:
+          message: "Attempted to change the immutable attribute '%{name}' with
+            the value: %{value}."
+          summary: "Immutable attributes can only have values set when the
+            document is a new record."
+          resolution: "Do not attempt to update the value of '%{name}' after
+            the document is persisted."
         invalid_collection:
           message: "Access to the collection for %{klass} is not allowed."
           summary: "%{klass}.collection was called, and %{klass} is an embedded
@@ -133,12 +140,37 @@ en:
             A collation option is only supported if the query is executed on a MongoDB server
             with version >= 3.4."
           resolution: "Remove the collation option from the query."
+        invalid_async_query_executor:
+          message: "Invalid async_query_executor option: %{executor}."
+          summary: "A invalid async query executor was specified.
+            The valid options are: %{options}."
+          resolution: "Pick an allowed option or fix the typo. If you were
+            expecting the option to be there, please consult the following page
+            with respect to Mongoid's configuration:\n\n
+            \_\_https://www.mongodb.com/docs/mongoid/current/reference/configuration/#mongoid-configuration-options"
+        invalid_auto_encryption_configuration:
+          message: "Invalid automatic encryption configuration for client %{client}."
+          summary: "Automatic encryption options for client %{client} are
+            incomplete or invalid."
+          resolution: "Please consult the following page with respect to
+            automatic encryption configuration:\n\n
+            \_\_https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/#auto-encryption-options"
+        invalid_auto_encryption_configuration_for_kms_provider:
+          message: "Automatic encryption configuration for client %{client} does
+            not include options for kms_provider %{kms_provider}"
+          summary: "Automatic encryption configuration for client %{client} does
+            not include options for kms_provider %{kms_provider} in :kms_providers
+            hash."
+          resolution: "Check kms_provider name and :kms_providers options.
+            Please consult the following page with respect to
+            automatic encryption configuration:\n\n
+            \_\_https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/#auto-encryption-options"
         invalid_config_file:
           message: "Invalid configuration file: %{path}."
           summary: "Your mongoid.yml configuration file does not contain the
             correct file structure."
           resolution: "Ensure your configuration file contains the correct contents.
-            Refer to: https://docs.mongodb.com/mongoid/current/reference/configuration/"
+            Refer to: https://www.mongodb.com/docs/mongoid/current/reference/configuration/"
         invalid_config_option:
           message: "Invalid configuration option: %{name}."
           summary: "A invalid configuration option was provided in your
@@ -230,14 +262,21 @@ en:
             \_\_\_\_field :%{name}, %{option}: true\n
             \_\_end\n\n
             Refer to:
-            https://docs.mongodb.com/mongoid/current/reference/fields/#custom-field-options"
+            https://www.mongodb.com/docs/mongoid/current/reference/fields/#custom-field-options"
         invalid_field_type:
           message: "Invalid field type %{type_inspection} for field '%{field}' on model '%{klass}'."
           summary: "Model '%{klass}' defines a field '%{field}' with an unknown type value
             %{type_inspection}."
           resolution: "Please provide a valid type value for the field.
             Refer to:
-            https://docs.mongodb.com/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
+            https://www.mongodb.com/docs/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
+        invalid_global_executor_concurrency:
+          message: "Invalid global_executor_concurrency option."
+          summary: "You set global_executor_concurrency while async_query_executor
+            option is not set to :global_thread_pool. The global_executor_concurrency is
+            allowed only for the global thread pool executor."
+          resolution: "Set global_executor_concurrency option to :global_thread_pool
+            or remove global_executor_concurrency option."
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
@@ -342,9 +381,9 @@ en:
             in the session block share the same driver client. For example, a model may have a different
             client specified in its 'store_in' options.\n\n"
         invalid_session_nesting:
-          message: "A session was started while another session was being used."
-          summary: "Sessions cannot be nested. Only one session can be used in a thread at once."
-          resolution: "Only use one session at a time; sessions cannot be nested."
+          message: "A session was started while another session was being used on this client."
+          summary: "Sessions cannot be nested. Only one session can be used in a thread per client."
+          resolution: "Only use one session per client at a time; sessions cannot be nested."
         invalid_storage_options:
           message: "Invalid options passed to %{klass}.store_in: %{options}."
           summary: "The :store_in macro takes only a hash of parameters with
@@ -366,6 +405,10 @@ en:
             for Date, DateTime, and Time objects. When this is a String it needs
             to be valid for Time.parse. Other objects must be valid to pass to
             Time.local."
+        invalid_transaction_nesting:
+          message: "A transaction was started while another transaction was being used on this client."
+          summary: "Transactions cannot be nested. Only one transaction can be used in a thread per client."
+          resolution: "Only use one transaction per client at a time; transactions cannot be nested."
         inverse_not_found:
           message: "When adding a(n) %{klass} to %{base}#%{name}, Mongoid could
             not determine the inverse foreign key to set. The attempted key was
@@ -602,6 +645,19 @@ en:
             accepts_nested_attributes_for :%{association}, limit: %{limit}.
             Consider raising this limit or making sure no more are sent than
             the set value."
+        transactions_not_supported:
+          message: "Transactions are not supported by the connected server(s)."
+          summary: "A session was attempted to be used with a MongoDB server version
+            that doesn't support transactions. Transactions are supported in MongoDB
+            server versions 3.6 and higher."
+          resolution: "Verify that all servers in your deployment are at least
+            version 3.6 or don't attempt to use transactions with older server versions."
+        transaction_error:
+          message: "Transaction failed with the following error: %{error}."
+          summary: "The transaction failed because MongoDB server or MongoDB driver
+            raised an unexpected error."
+          resolution: "Consult with Ruby driver documentation
+            and MongoDB documentation."
         unknown_attribute:
           message: "Attempted to set a value for '%{name}' which is not
             allowed on the model %{klass}."

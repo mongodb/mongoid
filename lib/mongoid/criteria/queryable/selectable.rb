@@ -155,7 +155,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :elem_match
           end
 
-          and_or_override(criterion, "$elemMatch")
+          and_with_operator(criterion, "$elemMatch")
         end
         key :elem_match, :override, "$elemMatch"
 
@@ -200,7 +200,7 @@ module Mongoid
         #   the upper right (north east) as the second argument.
         #   Important: When latitude and longitude are passed, longitude is
         #   expected as the first element of the coordinate pair.
-        #   Source: https://docs.mongodb.com/manual/reference/operator/query/box/
+        #   Source: https://www.mongodb.com/docs/manual/reference/operator/query/box/
         #
         # @example Add a geo intersect criterion for a line.
         #   query.geo_spatial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
@@ -258,7 +258,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :eq
           end
 
-          and_or_override(criterion, "$eq")
+          and_with_operator(criterion, "$eq")
         end
         key :eq, :override, "$eq"
 
@@ -278,7 +278,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :gt
           end
 
-          and_or_override(criterion, "$gt")
+          and_with_operator(criterion, "$gt")
         end
         key :gt, :override, "$gt"
 
@@ -298,7 +298,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :gte
           end
 
-          and_or_override(criterion, "$gte")
+          and_with_operator(criterion, "$gte")
         end
         key :gte, :override, "$gte"
 
@@ -354,7 +354,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :lt
           end
 
-          and_or_override(criterion, "$lt")
+          and_with_operator(criterion, "$lt")
         end
         key :lt, :override, "$lt"
 
@@ -374,7 +374,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :lte
           end
 
-          and_or_override(criterion, "$lte")
+          and_with_operator(criterion, "$lte")
         end
         key :lte, :override, "$lte"
 
@@ -411,7 +411,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :mod
           end
 
-          and_or_override(criterion, "$mod")
+          and_with_operator(criterion, "$mod")
         end
         key :mod, :override, "$mod"
 
@@ -431,7 +431,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :ne
           end
 
-          and_or_override(criterion, "$ne")
+          and_with_operator(criterion, "$ne")
         end
         alias :excludes :ne
         key :ne, :override, "$ne"
@@ -452,7 +452,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :near
           end
 
-          and_or_override(criterion, "$near")
+          and_with_operator(criterion, "$near")
         end
         key :near, :override, "$near"
 
@@ -472,7 +472,7 @@ module Mongoid
             raise Errors::CriteriaArgumentRequired, :near_sphere
           end
 
-          and_or_override(criterion, "$nearSphere")
+          and_with_operator(criterion, "$nearSphere")
         end
         key :near_sphere, :override, "$nearSphere"
 
@@ -580,6 +580,35 @@ module Mongoid
           end
         end
         key :not, :override, "$not"
+
+        # Negate the arguments, constraining the query to only those documents
+        # that do NOT match the arguments.
+        #
+        # @example Exclude a single criterion.
+        #   selectable.none_of(name: /Bob/)
+        #
+        # @example Exclude multiple criteria.
+        #   selectable.none_of(name: /Bob/, country: "USA")
+        #
+        # @example Exclude multiple criteria as an array.
+        #   selectable.none_of([{ name: /Bob/ }, { country: "USA" }])
+        #
+        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
+        #   matches or Criteria objects to negate.
+        #
+        # @return [ Selectable ] The new selectable.
+        def none_of(*criteria)
+          criteria = _mongoid_flatten_arrays(criteria)
+          return dup if criteria.empty?
+
+          exprs = criteria.map do |criterion|
+            _mongoid_expand_keys(
+                criterion.is_a?(Selectable) ?
+                  criterion.selector : criterion)
+          end
+
+          self.and('$nor' => exprs)
+        end
 
         # Creates a disjunction using $or from the existing criteria in the
         # receiver and the provided arguments.
@@ -732,7 +761,7 @@ module Mongoid
         # @example Construct a text search selector with options.
         #   selectable.text_search("testing", :$language => "fr")
         #
-        # @note Per https://docs.mongodb.com/manual/reference/operator/query/text/
+        # @note Per https://www.mongodb.com/docs/manual/reference/operator/query/text/
         #   it is not currently possible to supply multiple text search
         #   conditions in a query. Mongoid will build such a query but the
         #   server will return an error when trying to execute it.
@@ -752,7 +781,7 @@ module Mongoid
             criterion = {'$text' => { '$search' => terms }}
             criterion['$text'].merge!(opts) if opts
             if query.selector['$text']
-              # Per https://docs.mongodb.com/manual/reference/operator/query/text/
+              # Per https://www.mongodb.com/docs/manual/reference/operator/query/text/
               # multiple $text expressions are not currently supported by
               # MongoDB server, but build the query correctly instead of
               # overwriting previous text search condition with the currently
@@ -901,22 +930,6 @@ module Mongoid
               end
             end
             query.reset_strategies!
-          end
-        end
-
-        # Combine operator expessions onto a Criteria using either
-        # an override or ands depending on the status of the
-        # Mongoid.overwrite_chained_operators feature flag.
-        #
-        # @param [ Hash ] The criterion to add to the criteria.
-        # @param [ String ] operator The MongoDB operator.
-        #
-        # @return [ Criteria ] The resulting criteria.
-        def and_or_override(criterion, operator)
-          if Mongoid.overwrite_chained_operators
-            __override__(criterion, operator)
-          else
-            and_with_operator(criterion, operator)
           end
         end
 

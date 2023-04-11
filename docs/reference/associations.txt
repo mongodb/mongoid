@@ -592,7 +592,7 @@ help of MongoDB projection operation:
   Band.where(started_on: {'$gt' => Time.now - 1.year}).only(:label).map(&:label).compact.uniq
 
 Setting Stale Values on Referenced Associations
-``````````````````````````````````````````````
+```````````````````````````````````````````````
 
 Setting a stale value to a referenced association can sometimes result in
 a ``nil`` value being persisted to the database. Take the following case:
@@ -744,14 +744,14 @@ The following deviations are known:
 
   As of this writing, the known cases of such deviation are:
 
-   - 3.2 and earlier servers not validating ``$size`` arguments as strictly as newer versions do.
-   - 4.0 and earlier servers not validating ``$type`` arguments as strictly as newer versions
-     do (allowing invalid arguments like 0, for example).
-   - 3.2 and earlier servers not supporting ``Decimal128`` for ``$type``, as well as allowing invalid
-     arguments such as negative numbers (smaller than -1) and numbers that are greater than 19
-     (not including 127, the argument for the ``MaxKey`` type).
-   - 3.4 and earlier servers not supporting arrays for ``$type``.
-   - 3.0 and earlier servers not supporting bitwise operators.
+  - 3.2 and earlier servers not validating ``$size`` arguments as strictly as newer versions do.
+  - 4.0 and earlier servers not validating ``$type`` arguments as strictly as newer versions
+    do (allowing invalid arguments like 0, for example).
+  - 3.2 and earlier servers not supporting ``Decimal128`` for ``$type``, as well as allowing invalid
+    arguments such as negative numbers (smaller than -1) and numbers that are greater than 19
+    (not including 127, the argument for the ``MaxKey`` type).
+  - 3.4 and earlier servers not supporting arrays for ``$type``.
+  - 3.0 and earlier servers not supporting bitwise operators.
 
 
 - Mongoid DSL expands ``Range`` arguments to hashes with ``$gte`` and ``$lte``
@@ -873,6 +873,38 @@ documents that exist in the application:
 
   band = Band.find(...)
   band.tours.destroy_all
+
+
+.. _hash-assignment:
+
+Hash Assignment
+---------------
+
+Embedded associations allow the user to assign a ``Hash`` instead of a document
+to an association. On assignment, this hash is coerced into a document of the
+class of the association that it's being assigned to. Take the following
+example:
+
+.. code:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    field :name, type: String
+    embedded_in :band
+  end
+
+  band = Band.create!
+  band.albums = [ { name: "Narrow Stairs" }, { name: "Transatlanticism" } ]
+  p band.albums
+  # => [ #<Album _id: 633c71e93282a4357bb608e5, name: "Narrow Stairs">, #<Album _id: 633c71e93282a4357bb608e6, name: "Transatlanticism"> ]
+
+This works for ``embeds_one``, ``embeds_many``, and ``embedded_in`` associations.
+Note that you cannot assign hashes to referenced associations.
 
 
 Common Behavior
@@ -1396,19 +1428,21 @@ Mongoid to instantiate a new document when the association is accessed and it is
 
 Touching
 --------
-
 Any ``belongs_to`` association can take an optional ``:touch`` option which
-will cause the parent document be touched whenever the child document is
-touched:
+will cause the parent document to be touched whenever the child document is
+updated:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+    field :name
     belongs_to :label, touch: true
   end
 
   band = Band.first
+  band.name = "The Rolling Stones"
+  band.save! # Calls touch on the parent label.
   band.touch # Calls touch on the parent label.
 
 ``:touch`` can also take a string or symbol argument specifying a field to

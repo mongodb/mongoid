@@ -12,19 +12,24 @@ require "active_support/inflector"
 require "active_support/time_with_zone"
 require "active_model"
 
+require 'concurrent-ruby'
+
 require "mongo"
-require 'mongo/active_support'
+require "mongo/active_support"
 
 require "mongoid/version"
 require "mongoid/deprecable"
 require "mongoid/config"
 require "mongoid/persistence_context"
+require "mongoid/loadable"
 require "mongoid/loggable"
 require "mongoid/clients"
 require "mongoid/document"
 require "mongoid/tasks/database"
+require "mongoid/tasks/encryption"
 require "mongoid/query_cache"
 require "mongoid/warnings"
+require "mongoid/utils"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
@@ -38,7 +43,9 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 module Mongoid
   extend Forwardable
   extend Loggable
+  extend Loadable
   extend self
+  extend Clients::Sessions::ClassMethods
 
   # A string added to the platform details of Ruby driver client handshake documents.
   PLATFORM_DETAILS = "mongoid-#{VERSION}".freeze
@@ -110,6 +117,21 @@ module Mongoid
   #   Mongoid.database = Mongo::Connection.new.db("test")
   def_delegators Config, *(Config.public_instance_methods(false) - [ :logger=, :logger ])
 
+  # Define persistence context that is used when a transaction method is called
+  # on Mongoid module.
+  #
+  # @api private
+  def persistence_context
+    PersistenceContext.get(Mongoid) || PersistenceContext.new(Mongoid)
+  end
+
+  # Define client that is used when a transaction method is called
+  # on Mongoid module. This MUST be the default client.
+  #
+  # @api private
+  def storage_options
+    { client: :default }
+  end
 
   # Module used to prepend the discriminator key assignment function to change
   # the value assigned to the discriminator key to a string.

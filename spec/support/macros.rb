@@ -79,6 +79,38 @@ module Mongoid
       end
     end
 
+    def override_query_cache(enabled)
+      around do |example|
+        cache_enabled = Mongoid::QueryCache.enabled?
+        Mongoid::QueryCache.enabled = enabled
+        example.run
+        Mongoid::QueryCache.enabled = cache_enabled
+      end
+    end
+
+    # Override the global persistence context.
+    #
+    # @param [ :client, :database ] component The component to override.
+    # @param [ Object ] value The value to override to.
+    def persistence_context_override(component, value)
+      around do |example|
+        meth = "#{component}_override"
+        old_value = Mongoid::Threaded.send(meth)
+        Mongoid::Threaded.send("#{meth}=", value)
+        example.run
+        Mongoid::Threaded.send("#{meth}=", old_value)
+      end
+    end
+
+    def time_zone_override(tz)
+      around do |example|
+        old_tz = Time.zone
+        Time.zone = tz
+        example.run
+        Time.zone = old_tz
+      end
+    end
+
     def with_default_i18n_configs
       around do |example|
         I18n.locale = :en

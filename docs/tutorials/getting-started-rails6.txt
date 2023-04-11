@@ -1,6 +1,6 @@
-***********************
-Getting Started (Rails)
-***********************
+*************************
+Getting Started (Rails 6)
+*************************
 
 .. default-domain:: mongodb
 
@@ -9,6 +9,11 @@ Getting Started (Rails)
    :backlinks: none
    :depth: 2
    :class: singlecol
+
+.. note::
+
+  This tutorial is for Ruby on Rails 6. If this is not the version you're using choose
+  the appropriate tutorial for your Rails version from the navigation menu.
 
 New Application
 ===============
@@ -100,7 +105,6 @@ Add Mongoid
 `mongoid <https://rubygems.org/gems/mongoid/>`_ gem:
 
 .. code-block:: ruby
-  :name: Gemfile
   :caption: Gemfile
 
     gem 'mongoid', '~> 7.0.5'
@@ -121,11 +125,14 @@ Add Mongoid
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file,
-which is used to configure the connection to the MongoDB deployment.
-Note that as we are not using ActiveRecord we will not have a ``database.yml``
-file.
+This generator will create the ``config/mongoid.yml`` configuration file 
+(used to configure the connection to the MongoDB deployment) and the
+``config/initializers/mongoid.rb`` initializer file (which may be used for
+other Mongoid-related configuration). Note that as we are not using
+ActiveRecord we will not have a ``database.yml`` file.
 
+
+.. _run-locally:
 
 Run MongoDB Locally
 -------------------
@@ -151,6 +158,8 @@ like this:
           options:
             server_selection_timeout: 1
 
+
+.. _use-atlas:
 
 Use MongoDB Atlas
 -----------------
@@ -242,7 +251,6 @@ Open the ``Post`` model file, ``app/models/post.rb``, and add a ``has_many``
 association for the comments:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
     class Post
@@ -254,27 +262,29 @@ association for the comments:
       has_many :comments, dependent: :destroy
     end
 
-Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
-generated ``embedded_in`` association to ``belongs_to``:
+.. note::
+  *The following is only required if using a version of Mongoid < 7.0.8 or 7.1.2 (see*
+  `MONGOID-4885 <https://jira.mongodb.org/browse/MONGOID-4885>`_ *for details)*
 
-.. code-block:: ruby
-  :name: app/models/comment.rb
-  :caption: app/models/comment.rb
+  Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
+  generated ``embedded_in`` association to ``belongs_to``:
 
-    class Comment
-      include Mongoid::Document
+  .. code-block:: ruby
+    :caption: app/models/comment.rb
 
-      field :name, type: String
-      field :message, type: String
+      class Comment
+        include Mongoid::Document
 
-      belongs_to :post
-    end
+        field :name, type: String
+        field :message, type: String
+
+        belongs_to :post
+      end
 
 Open the post show view file, ``app/views/posts/show.html.erb``, and add
 a section rendering existing comments and prompting to leave a new comment:
 
 .. code-block:: html
-  :name: app/views/posts/show.html.erb
   :caption: app/views/posts/show.html.erb
 
   <section class="section comments">
@@ -297,7 +307,6 @@ from ``text_field`` to ``text_area``, as well as the type of field for
 should look like this:
 
 .. code-block:: html
-  :name: app/views/comments/_form.html.erb
   :caption: app/views/comments/_form.html.erb
 
   <%= form_with(model: comment, local: true) do |form| %>
@@ -332,11 +341,10 @@ should look like this:
     </div>
   <% end %>
 
-Create a partial for the comment view, ``app/view/comments/_comment.html.erb``
+Create a partial for the comment view, ``app/views/comments/_comment.html.erb``
 with the following contents:
 
 .. code-block:: html
-  :name: app/views/comments/_comment.html.erb
   :caption: app/views/comments/_comment.html.erb
 
   <p>
@@ -368,7 +376,6 @@ Remove or comment out any RDBMS libraries like ``sqlite``, ``pg`` etc.
 mentioned in ``Gemfile``, and add ``mongoid``:
 
 .. code-block:: ruby
-  :name: Gemfile
   :caption: Gemfile
 
     gem 'mongoid', '~> 7.0.5'
@@ -390,7 +397,6 @@ Examine ``config/application.rb``. If it is requiring all components of Rails
 via ``require 'rails/all'``, change it to require individual frameworks:
 
 .. code-block:: ruby
-  :name: config/application.rb
   :caption: config/application.rb
 
   # Remove or comment out
@@ -460,12 +466,15 @@ Generate the default Mongoid configuration:
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file,
-which is used to configure the connection to the MongoDB deployment.
+This generator will create the ``config/mongoid.yml`` configuration file 
+(used to configure the connection to the MongoDB deployment) and the
+``config/initializers/mongoid.rb`` initializer file (which may be used for
+other Mongoid-related configuration). In general, it is recommended to use
+``mongoid.yml`` for all Mongoid configuration.
 
-Review the sections `Run MongoDB Locally`_ and `Use MongoDB Atlas`_
-to decide how you would like to deploy MongoDB, and adjust Mongoid
-configuration (``config/mongoid.yml``) to match.
+Review the sections :ref:`Run MongoDB Locally <run-locally>` and
+:ref:`Use MongoDB Atlas <use-atlas>` to decide how you would like to deploy
+MongoDB, and adjust Mongoid configuration (``config/mongoid.yml``) to match.
 
 Adjust Models
 -------------
@@ -482,7 +491,6 @@ explicit field definitions).
 For example, a bare-bones Post model may look like this in ActiveRecord:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post < ApplicationRecord
@@ -492,7 +500,6 @@ For example, a bare-bones Post model may look like this in ActiveRecord:
 The same model may look like this in Mongoid:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post
@@ -507,7 +514,6 @@ The same model may look like this in Mongoid:
 Or like this with dynamic fields:
 
 .. code-block:: ruby
-  :name: app/models/post.rb
   :caption: app/models/post.rb
 
   class Post
@@ -546,5 +552,5 @@ as when creating a regular application, with the only change being the
 Mongoid follows the same process described above for regular Rails applications.
 
 A complete Rails API application similar to the one described in this tutorial
-can be found in the `mongoid-demo GitHub repository
+can be found in `the mongoid-demo GitHub repository
 <https://github.com/mongoid/mongoid-demo/tree/master/rails-api>`_.

@@ -38,13 +38,11 @@ module Mongoid
               positionally(selector, "$unset" => { path => true }),
               session: _session
             )
-            unless Mongoid.broken_updates
-              # This solves the case in which a user sets, clears and resets an
-              # embedded document. Previously, since the embedded document was
-              # already marked not a "new_record", it wouldn't be persisted to
-              # the second time. This change fixes that and allows it to be persisted.
-              docs.each { |doc| doc.new_record = true }
-            end
+            # This solves the case in which a user sets, clears and resets an
+            # embedded document. Previously, since the embedded document was
+            # already marked not a "new_record", it wouldn't be persisted to
+            # the second time. This change fixes that and allows it to be persisted.
+            docs.each { |doc| doc.new_record = true }
             post_process_batch_remove(docs, :delete)
           end
           _unscoped.clear
@@ -97,7 +95,7 @@ module Mongoid
         # @example Batch replace the documents.
         #   batchable.batch_replace([ doc_one, doc_two ])
         #
-        # @param [ Array<Document> ] docs The docs to replace with.
+        # @param [ Array<Document> | Array<Hash> ] docs The docs to replace with.
         #
         # @return [ Array<Hash> ] The inserts.
         def batch_replace(docs)
@@ -235,7 +233,7 @@ module Mongoid
         # @example Normalize the docs.
         #   batchable.normalize_docs(docs)
         #
-        # @param [ Array<Hash | Document> ] docs The docs to normalize.
+        # @param [ Array<Document> | Array<Hash> ] docs The docs to normalize.
         #
         # @return [ Array<Document> ] The docs.
         def normalize_docs(docs)

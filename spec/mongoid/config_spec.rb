@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "support/feature_sandbox"
 
 describe Mongoid::Config do
-
-  after(:all) do
-    if defined?(RailsTemp)
-      Rails = RailsTemp
-    end
-  end
 
   after do
     Mongoid.configure do |config|
@@ -70,11 +65,6 @@ describe Mongoid::Config do
   context "when the log level is not set in the configuration" do
 
     before do
-      if defined?(Rails)
-        RailsTemp = Rails unless defined?(RailsTemp)
-        Object.send(:remove_const, :Rails)
-      end
-
       Mongoid.configure do |config|
         config.load_configuration(CONFIG)
       end
@@ -224,6 +214,79 @@ describe Mongoid::Config do
     end
   end
 
+  context 'async_query_executor option' do
+    let(:option) { :async_query_executor }
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to eq(:immediate)
+      end
+    end
+
+    context 'when the value is :immediate' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => :immediate })
+      end
+
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(:immediate)
+      end
+    end
+
+    context 'when the value is :global_thread_pool' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => :global_thread_pool })
+      end
+
+      it "is set to false" do
+        expect(Mongoid.send(option)).to be(:global_thread_pool)
+      end
+    end
+  end
+
+  context 'global_executor_concurrency option' do
+    let(:option) { :global_executor_concurrency }
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context "when it is not set in the config" do
+
+      let(:conf) { CONFIG }
+
+      it "it is set to its default" do
+        expect(Mongoid.send(option)).to eq(nil)
+      end
+    end
+
+    context 'when the value is set to a number' do
+
+      let(:conf) do
+        CONFIG.merge(options: { option => 5 })
+      end
+
+      it "is set to the number" do
+        expect(Mongoid.send(option)).to be(5)
+      end
+    end
+  end
+
   shared_examples "a config option" do
 
     before do
@@ -272,84 +335,7 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the broken_updates option in the config' do
-    let(:option) { :broken_updates }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_triple_equals option in the config' do
-    let(:option) { :legacy_triple_equals }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_scoping option in the config' do
-    let(:option) { :broken_scoping }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_aggregables option in the config' do
-    let(:option) { :broken_aggregables }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_alias_handling option in the config' do
-    let(:option) { :broken_alias_handling }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_and option in the config' do
-    let(:option) { :broken_and }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the compare_time_by_ms option in the config' do
-    let(:option) { :compare_time_by_ms }
-    let(:default) { true }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the object_id_as_json_oid option in the config' do
-    let(:option) { :object_id_as_json_oid }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_pluck_distinct option in the config' do
-    let(:option) { :legacy_pluck_distinct }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the overwrite_chained_operators option in the config' do
-    let(:option) { :overwrite_chained_operators }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_attributes option in the config' do
-    let(:option) { :legacy_attributes }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_attributes option in the config' do
+  context 'when setting the legacy_readonly option in the config' do
     let(:option) { :legacy_readonly }
     let(:default) { false }
 
@@ -357,13 +343,6 @@ describe Mongoid::Config do
   end
 
   describe "#load!" do
-
-    before(:all) do
-      if defined?(Rails)
-        RailsTemp = Rails
-        Object.send(:remove_const, :Rails)
-      end
-    end
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -405,20 +384,12 @@ describe Mongoid::Config do
 
       context "when in a Rails environment" do
 
-        before do
-          module Rails
-            def self.logger
-              ::Logger.new($stdout)
-            end
-          end
-          Mongoid.logger = Rails.logger
-          described_class.load!(file, :test)
-        end
-
-        after do
-          if defined?(Rails)
-            RailsTemp = Rails unless defined?(RailsTemp)
-            Object.send(:remove_const, :Rails)
+        around do |example|
+          FeatureSandbox.quarantine do
+            require "support/rails_mock"
+            Mongoid.logger = Rails.logger
+            described_class.load!(file, :test)
+            example.run
           end
         end
 
@@ -461,10 +432,6 @@ describe Mongoid::Config do
 
       it "sets the raise not found error option" do
         expect(described_class.raise_not_found_error).to be true
-      end
-
-      it "sets the use activesupport time zone option" do
-        expect(described_class.use_activesupport_time_zone).to be true
       end
 
       it "sets the use utc option" do
@@ -545,10 +512,6 @@ describe Mongoid::Config do
 
         it "sets the raise not found error option" do
           expect(described_class.raise_not_found_error).to be true
-        end
-
-        it "sets the use activesupport time zone option" do
-          expect(described_class.use_activesupport_time_zone).to be true
         end
 
         it "sets the use utc option" do
@@ -650,6 +613,17 @@ describe Mongoid::Config do
         expect {
           described_class.options = { bad_option: true }
         }.to raise_error(Mongoid::Errors::InvalidConfigOption)
+      end
+    end
+
+    context 'when invalid global_executor_concurrency option provided' do
+      it "raises an error" do
+        expect do
+          described_class.options = {
+            async_query_executor: :immediate,
+            global_executor_concurrency: 5
+          }
+        end.to raise_error(Mongoid::Errors::InvalidGlobalExecutorConcurrency)
       end
     end
   end
@@ -848,6 +822,38 @@ describe Mongoid::Config do
           expect(House.count).to eq(1)
           Mongoid.truncate!
           expect(House.count).to eq(0)
+        end
+      end
+    end
+  end
+
+  describe 'deprecations' do
+    {}.each do |option, default|
+
+      context ":#{option} option" do
+
+        before do
+          Mongoid::Warnings.class_eval do
+            instance_variable_set(:"@#{option}_deprecated", false)
+          end
+        end
+
+        let(:matcher) do
+          /Config option :#{option}.+\. It will always be #{default} beginning in Mongoid 9\.0\./
+        end
+
+        context 'when set to true' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", true)
+          end
+        end
+
+        context 'when set to false' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", false)
+          end
         end
       end
     end

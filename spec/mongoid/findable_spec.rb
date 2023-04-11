@@ -75,12 +75,7 @@ describe Mongoid::Findable do
       context "when the document is not found" do
 
         context "when raising a not found error" do
-
-          let!(:raise_option) { Mongoid.raise_not_found_error }
-
-          before { Mongoid.raise_not_found_error = true }
-
-          after { Mongoid.raise_not_found_error = raise_option }
+          config_override :raise_not_found_error, true
 
           it "raises an error" do
             expect {
@@ -90,12 +85,7 @@ describe Mongoid::Findable do
         end
 
         context "when raising no error" do
-
-          let!(:raise_option) { Mongoid.raise_not_found_error }
-
-          before { Mongoid.raise_not_found_error = false }
-
-          after { Mongoid.raise_not_found_error = raise_option }
+          config_override :raise_not_found_error, false
 
           it "returns nil" do
             expect(person.messages.find_by(body: 'bar')).to be_nil
@@ -134,12 +124,7 @@ describe Mongoid::Findable do
     context "when the document is not found" do
 
       context "when raising a not found error" do
-
-        let!(:raise_option) { Mongoid.raise_not_found_error }
-
-        before { Mongoid.raise_not_found_error = true }
-
-        after { Mongoid.raise_not_found_error = raise_option }
+        config_override :raise_not_found_error, true
 
         it "raises an error" do
           expect {
@@ -149,12 +134,7 @@ describe Mongoid::Findable do
       end
 
       context "when raising no error" do
-
-        let!(:raise_option) { Mongoid.raise_not_found_error }
-
-        before { Mongoid.raise_not_found_error = false }
-
-        after { Mongoid.raise_not_found_error = raise_option }
+        config_override :raise_not_found_error, false
 
         context "when no block is provided" do
 
@@ -920,11 +900,7 @@ describe Mongoid::Findable do
 
   context 'when Mongoid is configured to use activesupport time zone' do
     config_override :use_utc, false
-    config_override :use_activesupport_time_zone, true
-
-    before do
-      Time.zone = "Asia/Kolkata"
-    end
+    time_zone_override "Asia/Kolkata"
 
     let!(:time) do
       Time.zone.now.tap do |t|
@@ -932,22 +908,7 @@ describe Mongoid::Findable do
       end
     end
 
-    context 'when distinct does not demongoize' do
-      config_override :legacy_pluck_distinct, true
-
-      let(:distinct) do
-        User.distinct(:last_login).first
-      end
-
-      it 'uses activesupport time zone' do
-        distinct.should be_a(ActiveSupport::TimeWithZone)
-        expect(distinct.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
-      end
-    end
-
     context 'when distinct demongoizes' do
-      config_override :legacy_pluck_distinct, false
-
       let(:distinct) do
         User.distinct(:last_login).first
       end
@@ -958,50 +919,6 @@ describe Mongoid::Findable do
         # 2022-03-16T21:12:32+00:00
         # 2022-03-16 21:12:32 UTC
         expect(distinct.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_datetime.to_s)
-      end
-    end
-
-    it 'loads other fields accurately' do
-      expect(User.distinct(:name)).to match_array(['Tom'])
-    end
-  end
-
-  context 'when Mongoid is not configured to use activesupport time zone' do
-    config_override :use_utc, true
-    config_override :use_activesupport_time_zone, false
-
-    let!(:time) do
-      Time.now.tap do |t|
-        User.create!(last_login: t, name: 'Tom')
-      end
-    end
-
-    context 'when distinct does not demongoize' do
-      config_override :legacy_pluck_distinct, true
-
-      let(:distinct) do
-        User.distinct(:last_login).first
-      end
-
-      it 'uses utc' do
-        distinct.should be_a(Time)
-        expect(distinct.to_s).to eql(time.utc.to_s)
-      end
-    end
-
-    context 'when distinct demongoizes' do
-      config_override :legacy_pluck_distinct, false
-
-      let(:distinct) do
-        User.distinct(:last_login).first
-      end
-
-      it 'uses utc' do
-        distinct.should be_a(DateTime)
-        # Time and DateTime have different stringifications:
-        # 2022-03-16T21:12:32+00:00
-        # 2022-03-16 21:12:32 UTC
-        expect(distinct.to_s).to eql(time.utc.to_datetime.to_s)
       end
     end
 

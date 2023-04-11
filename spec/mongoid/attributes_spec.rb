@@ -393,11 +393,10 @@ describe Mongoid::Attributes do
         end
 
         context "when reloaded" do
+          config_override :raise_not_found_error, false
 
           before do
-            Mongoid.raise_not_found_error = false
             person.reload
-            Mongoid.raise_not_found_error = true
           end
 
           it "returns the default value" do
@@ -1030,14 +1029,13 @@ describe Mongoid::Attributes do
       end
 
       context "when the attribute does not exist" do
+        config_override :raise_not_found_error, false
 
         before do
           person.collection
             .find({ _id: person.id })
             .update_one({ "$unset" => { age: 1 }})
-          Mongoid.raise_not_found_error = false
           person.reload
-          Mongoid.raise_not_found_error = true
         end
 
         it "returns the default value" do
@@ -1161,14 +1159,13 @@ describe Mongoid::Attributes do
       end
 
       context "when the attribute does not exist" do
+        config_override :raise_not_found_error, false
 
         before do
           person.collection
             .find({ _id: person.id })
             .update_one({ "$unset" => { age: 1 }})
-          Mongoid.raise_not_found_error = false
           person.reload
-          Mongoid.raise_not_found_error = true
         end
 
         it "returns true" do
@@ -1675,8 +1672,6 @@ describe Mongoid::Attributes do
     end
 
     context "when comparing the object_ids of the written value" do
-      config_override :legacy_attributes, false
-
       before do
         Person.create!
       end

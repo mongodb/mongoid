@@ -30,14 +30,6 @@ module Mongoid
             ::Time.at(self).utc
           end
 
-          # Get the integer as a sort direction.
-          #
-          # @example Get the integer as a sort direction.
-          #   1.to_direction
-          #
-          # @return [ Integer ] self.
-          def to_direction; self; end
-
           module ClassMethods
 
             # Get the object as a numeric.

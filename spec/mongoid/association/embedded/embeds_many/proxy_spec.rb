@@ -2352,10 +2352,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context "when the id does not match" do
 
         context "when config set to raise error" do
-
-          before do
-            Mongoid.raise_not_found_error = true
-          end
+          config_override :raise_not_found_error, true
 
           it "raises an error" do
             expect {
@@ -2365,17 +2362,10 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         context "when config set not to raise error" do
+          config_override :raise_not_found_error, false
 
           let(:address) do
             person.addresses.find(BSON::ObjectId.new)
-          end
-
-          before do
-            Mongoid.raise_not_found_error = false
-          end
-
-          after do
-            Mongoid.raise_not_found_error = true
           end
 
           it "returns nil" do
@@ -2401,10 +2391,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       context "when the ids do not match" do
 
         context "when config set to raise error" do
-
-          before do
-            Mongoid.raise_not_found_error = true
-          end
+          config_override :raise_not_found_error, true
 
           it "raises an error" do
             expect {
@@ -2414,17 +2401,10 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         context "when config set not to raise error" do
+          config_override :raise_not_found_error, false
 
           let(:addresses) do
             person.addresses.find([ BSON::ObjectId.new ])
-          end
-
-          before do
-            Mongoid.raise_not_found_error = false
-          end
-
-          after do
-            Mongoid.raise_not_found_error = true
           end
 
           it "returns an empty array" do
@@ -4586,7 +4566,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     before do
       band.collection.
           find(_id: band.id).
-          update_one("$set" => { records: [{ name: "Moderat" }]})
+          update_one("$set" => { records: [{ _id: BSON::ObjectId.new, name: "Moderat" }]})
     end
 
     context "when loading the documents" do
@@ -4858,6 +4838,21 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     it "persists the associations correctly" do
       expect(from_db.user_tags.size).to eq(2)
       expect(from_db.company_tags.size).to eq(2)
+    end
+  end
+
+  context "when assigning hashes" do
+    let(:user) { EmmUser.create! }
+
+    before do
+      user.orders = [ { sku: 1 }, { sku: 2 } ]
+    end
+
+    it "creates the objects correctly" do
+      expect(user.orders.first).to be_a(EmmOrder)
+      expect(user.orders.last).to be_a(EmmOrder)
+
+      expect(user.orders.map(&:sku).sort).to eq([ 1, 2 ])
     end
   end
 end

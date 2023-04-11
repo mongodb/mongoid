@@ -101,9 +101,19 @@ module Mongoid
     # @example Do any documents exist for the conditions?
     #   Person.exists?
     #
+    # @example Do any documents exist for given _id.
+    #   Person.exists?(BSON::ObjectId(...))
+    #
+    # @example Do any documents exist for given conditions.
+    #   Person.exists?(name: "...")
+    #
+    # @param [ Hash | Object | false ] id_or_conditions an _id to
+    #   search for, a hash of conditions, nil or false.
+    #
     # @return [ true | false ] If any documents exist for the conditions.
-    def exists?
-      with_default_scope.exists?
+    #   Always false if passed nil or false.
+    def exists?(id_or_conditions = :none)
+      with_default_scope.exists?(id_or_conditions)
     end
 
     # Finds a +Document+ or multiple documents by their _id values.

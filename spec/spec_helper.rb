@@ -48,6 +48,7 @@ require 'support/expectations'
 require 'support/helpers'
 require 'support/macros'
 require 'support/constraints'
+require 'support/crypt'
 
 # Give MongoDB servers time to start up in CI environments
 if SpecConfig.instance.ci?
@@ -99,16 +100,6 @@ end
 Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
   name = File.basename(file, ".rb")
   autoload name.camelize.to_sym, name
-end
-
-module Rails
-  class Application
-  end
-end
-
-module MyApp
-  class Application < Rails::Application
-  end
 end
 
 module Mongoid

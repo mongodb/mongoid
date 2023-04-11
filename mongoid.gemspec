@@ -9,7 +9,8 @@ Gem::Specification.new do |s|
   s.name        = "mongoid"
   s.version     = Mongoid::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Durran Jordan"]
+  s.authors     = ["The MongoDB Ruby Team"]
+  s.email       = "dbx-ruby@mongodb.com"
   s.homepage    = "https://mongoid.org"
   s.summary     = "Elegant Persistence in Ruby for MongoDB."
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
@@ -18,7 +19,7 @@ Gem::Specification.new do |s|
   s.metadata = {
     'bug_tracker_uri' => 'https://jira.mongodb.org/projects/MONGOID',
     'changelog_uri' => 'https://github.com/mongodb/mongoid/releases',
-    'documentation_uri' => 'https://docs.mongodb.com/mongoid/',
+    'documentation_uri' => 'https://www.mongodb.com/docs/mongoid/',
     'homepage_uri' => 'https://mongoid.org/',
     'source_code_uri' => 'https://github.com/mongodb/mongoid',
   }
@@ -38,6 +39,7 @@ Gem::Specification.new do |s|
   # See: https://github.com/rails/rails/pull/43951
   s.add_dependency("activemodel", ['>=5.1', '<7.1', '!= 7.0.0'])
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
+  s.add_dependency("concurrent-ruby", ['>= 1.0.5', '< 2.0'])
 
   # The ruby2_keywords gem is recommended for handling argument delegation issues,
   # especially if support for 2.6 or prior is required.

@@ -78,11 +78,7 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        if Mongoid.legacy_pluck_distinct
-          documents.map{ |doc| doc.send(field) }.uniq
-        else
-          pluck(field).uniq
-        end
+        pluck(field).uniq
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -110,9 +106,24 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
+      # @param [ Hash | Object | false ] id_or_conditions an _id to
+      #   search for, a hash of conditions, nil or false.
+      #
       # @return [ true | false ] If the count is more than zero.
-      def exists?
-        any?
+      #   Always false if passed nil or false.
+      def exists?(id_or_conditions = :none)
+        case id_or_conditions
+        when :none then any?
+        when nil, false then false
+        when Hash then Memory.new(criteria.where(id_or_conditions)).exists?
+        else Memory.new(criteria.where(_id: id_or_conditions)).exists?
+        end
       end
 
       # Get the first document in the database for the criteria's selector.
@@ -241,12 +252,8 @@ module Mongoid
       #
       # @return [ Array<Object> | Array<Array<Object>> ] The plucked values.
       def pluck(*fields)
-        if Mongoid.legacy_pluck_distinct
-          documents.pluck(*fields)
-        else
-          documents.map do |doc|
-            pluck_from_doc(doc, *fields)
-          end
+        documents.map do |doc|
+          pluck_from_doc(doc, *fields)
         end
       end
 

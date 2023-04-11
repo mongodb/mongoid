@@ -2,11 +2,7 @@
 
 require "rake"
 require "spec_helper"
-
-unless defined?(Rails)
-  module Rails
-  end
-end
+require "support/feature_sandbox"
 
 shared_context "rake task" do
   let(:task_name) { self.class.top_level_description }
@@ -56,10 +52,11 @@ end
 shared_context "rails rake task" do
   let(:task_file) { "mongoid/railties/database" }
 
-  let(:application) do
-    app = double("application")
-    allow(app).to receive(:eager_load!)
-    app
+  around do |example|
+    FeatureSandbox.quarantine do
+      require "support/rails_mock"
+      example.run
+    end
   end
 end
 
@@ -98,7 +95,6 @@ describe "db:seed" do
   end
 
   it "works" do
-    expect(Rails).to receive(:root).and_return(".")
     task.invoke
   end
 end
@@ -123,19 +119,11 @@ describe "db:setup" do
     expect(task.prerequisites).to include("db:seed")
   end
 
-  it_behaves_like "create_indexes" do
-
-    before do
-      expect(Rails).to receive(:root).and_return(".")
-      expect(Rails).to receive(:application).and_return(application)
-    end
-  end
+  it_behaves_like "create_indexes"
 
   it "works" do
     expect(Mongoid::Tasks::Database).to receive(:create_indexes)
     expect(Mongoid::Tasks::Database).to receive(:create_collections)
-    expect(Rails).to receive(:root).and_return(".")
-    expect(Rails).to receive(:application).and_return(application)
     task.invoke
   end
 end
@@ -153,7 +141,6 @@ describe "db:reset" do
   end
 
   it "works" do
-    expect(Rails).to receive(:root).and_return(".")
     task.invoke
   end
 end
@@ -180,11 +167,7 @@ describe "db:test:prepare" do
   include_context "rake task"
   include_context "rails rake task"
 
-  it_behaves_like "create_indexes" do
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
-  end
+  it_behaves_like "create_indexes"
 
   it "calls mongoid:create_indexes" do
     expect(task.prerequisites).to include("mongoid:create_indexes")
@@ -195,7 +178,6 @@ describe "db:test:prepare" do
   end
 
   it "works" do
-    expect(Rails).to receive(:application).and_return(application)
     expect(Mongoid::Tasks::Database).to receive(:create_indexes)
     expect(Mongoid::Tasks::Database).to receive(:create_collections)
     task.invoke
@@ -218,10 +200,6 @@ describe "db:mongoid:create_indexes" do
   context "when using rails task" do
     include_context "rails rake task"
 
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
-
     it_behaves_like "create_indexes"
   end
 end
@@ -241,10 +219,6 @@ describe "db:mongoid:create_collections" do
 
   context "when using rails task" do
     include_context "rails rake task"
-
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
 
     it_behaves_like "create_collections"
   end
@@ -266,10 +240,6 @@ describe "db:mongoid:create_collections:force" do
   context "when using rails task" do
     include_context "rails rake task"
 
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
-
     it_behaves_like "force create_collections"
   end
 end
@@ -288,10 +258,6 @@ describe "db:mongoid:remove_undefined_indexes" do
 
   context "when using rails task" do
     include_context "rails rake task"
-
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
 
     it "receives remove_undefined_indexes" do
       expect(Mongoid::Tasks::Database).to receive(:remove_undefined_indexes)
@@ -314,10 +280,6 @@ describe "db:mongoid:remove_indexes" do
 
   context "when using rails task" do
     include_context "rails rake task"
-
-    before do
-      expect(Rails).to receive(:application).and_return(application)
-    end
 
     it "receives remove_indexes" do
       expect(Mongoid::Tasks::Database).to receive(:remove_indexes)
@@ -355,6 +317,53 @@ describe "db:mongoid:purge" do
 
     it "receives a purge" do
       expect(Mongoid).to receive(:purge!)
+      task.invoke
+    end
+  end
+end
+
+describe "db:mongoid:encryption:create_data_key" do
+  require_enterprise
+  require_libmongocrypt
+  include_context 'with encryption'
+  restore_config_clients
+  include_context "rake task"
+
+  let(:task_file) { "mongoid/tasks/encryption" }
+
+  let(:config) do
+    {
+      default: {
+        hosts: SpecConfig.instance.addresses,
+        database: database_id,
+        options: {
+          auto_encryption_options: {
+            kms_providers: kms_providers,
+            key_vault_namespace: key_vault_namespace,
+            extra_options: extra_options
+          }
+        }
+      }
+    }
+  end
+
+  before do
+    Mongoid::Config.send(:clients=, config)
+
+    expect_any_instance_of(Mongo::ClientEncryption)
+      .to receive(:create_data_key)
+      .with('local')
+      .and_call_original
+  end
+
+  it "creates the key" do
+    task.invoke
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    it "creates the key" do
       task.invoke
     end
   end

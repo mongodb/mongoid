@@ -82,6 +82,25 @@ Indexes can be scoped to a specific database:
       index({ ssn: 1 }, { database: "users", unique: true, background: true })
     end
 
+You may use aliased field names in index definitions. Field aliases
+will also be resolved on the following options: ``partial_filter_expression``,
+``weights``, ``wildcard_projection``.
+
+.. code-block:: ruby
+
+    class Person
+      include Mongoid::Document
+      field :a, as: :age
+      index({ age: 1 }, { partial_filter_expression: { age: { '$gte' => 20 } })
+    end
+
+.. note::
+
+  The expansion of field name aliases in index options such as
+  ``partial_filter_expression`` is performed according to the behavior of MongoDB
+  server 6.0. Future server versions may change how they interpret these options,
+  and Mongoid's functionality may not support such changes.
+
 Mongoid can define indexes on "foreign key" fields for associations.
 This only works on the association macro that the foreign key is stored on:
 
@@ -143,13 +162,42 @@ in Rails console:
     # Remove indexes for Model
     Model.remove_indexes
 
+Telling Mongoid Where to Look For Models
+----------------------------------------
+
+For non-Rails applications, Mongoid's rake tasks will look for models in
+``./app/models`` and ``./lib/models``. For Rails, Mongoid will look in
+``./app/models`` (or wherever you've configured Rails to look for models). If
+your models are in another location, you will need to tell Mongoid where to
+look for them with ``Mongoid.model_paths=``. You can do this by setting it
+in your application's Rakefile:
+
+.. code-block:: ruby
+
+    # Rakefile
+
+    # keep the defaults, but add more paths to look for models
+    Mongoid.model_paths += [ "./src/models", "./lib/documents" ]
+
+    # or, override the defaults entirely
+    Mongoid.model_paths = [ "./src/models", "./lib/documents" ]
+
+Make sure that these paths are in your application's load path, as well. For
+example:
+
+.. code-block:: ruby
+
+    # Rakefile
+
+    $LOAD_PATHS.concat [ "./src/models", "./lib/documents" ]
+
+
 Using Rake Tasks With Non-Rails Applications
 --------------------------------------------
 
 Mongoid's Rake tasks are automatically loaded in Rails applications using
 Mongoid. When using Mongoid with a non-Rails application, these tasks must
-be loaded manually. This can be achieved by loading them in the Rakefile and
-providing an ``:environment`` task to load your application's models:
+be loaded manually:
 
 .. code-block:: ruby
 
@@ -157,10 +205,6 @@ providing an ``:environment`` task to load your application's models:
 
     require 'mongoid'
     load 'mongoid/tasks/database.rake'
-
-    task :environment do
-      # Require/load your application's models here
-    end
 
 If your application uses Bundler, you can require ``bundler/setup`` instead of
 explicitly requiring ``mongoid``:
@@ -171,7 +215,3 @@ explicitly requiring ``mongoid``:
 
     require 'bundler/setup'
     load 'mongoid/tasks/database.rake'
-
-    task :environment do
-      # Require/load your application's models here
-    end

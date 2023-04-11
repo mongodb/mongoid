@@ -1,48 +1,40 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "support/feature_sandbox"
 
 describe "Rails::Mongoid" do
+  let(:model_root) do
+    File.absolute_path(
+      File.join(
+        File.dirname(__FILE__),
+        "../support/models/sandbox"
+      ))
+  end
 
-  before(:all) do
-    require "rails/mongoid"
-    ::Mongoid.models.delete_if do |model|
-      ![ User, Account, Address, AddressNumber ].include?(model)
+  around :each do |example|
+    FeatureSandbox.quarantine do
+      require "rails/mongoid"
+      $LOAD_PATH.push(model_root)
+      example.run
     end
   end
 
   describe ".preload_models" do
+    let(:app) { double(config: config) }
+    let(:config) { double(paths: paths) }
+    let(:paths) { { "app/models" => path } }
+    let(:path) { double(expanded: [ model_root ]) }
 
-    let(:app) do
-      double(config: config)
-    end
-
-    let(:config) do
-      double(paths: paths)
-    end
-
-    let(:paths) do
-      double('[]' => path)
-    end
-
-    let(:path) do
-      double(expanded: [ "/rails/root/app/models" ])
-    end
+    before { Rails::Mongoid.preload_models(app) }
 
     context "when preload models config is false" do
       config_override :preload_models, false
 
-      let(:files) do
-        [
-          "/rails/root/app/models/user.rb",
-          "/rails/root/app/models/address.rb"
-        ]
-      end
-
       it "does not load any models" do
-        allow(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        expect(Rails::Mongoid).to receive(:load_model).never
-        Rails::Mongoid.preload_models(app)
+        expect(defined?(SandboxMessage)).to be_nil
+        expect(defined?(SandboxUser)).to be_nil
+        expect(defined?(SandboxComment)).to be_nil
       end
     end
 
@@ -50,95 +42,11 @@ describe "Rails::Mongoid" do
       config_override :preload_models, true
 
       context "when all models are in the models directory" do
-
-        let(:files) do
-          [
-            "/rails/root/app/models/user.rb",
-            "/rails/root/app/models/address.rb"
-          ]
+        it "requires the models" do
+          expect(SandboxMessage.ancestors).to include(Mongoid::Document)
+          expect(SandboxUser.ancestors).to include(Mongoid::Document)
+          expect(SandboxComment.ancestors).to include(Mongoid::Document)
         end
-
-        before do
-          expect(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        end
-
-        it "requires the models by basename" do
-          expect(Rails::Mongoid).to receive(:load_model).with("address")
-          expect(Rails::Mongoid).to receive(:load_model).with("user")
-          Rails::Mongoid.preload_models(app)
-        end
-      end
-
-      context "when models exist in subdirectories" do
-
-        let(:files) do
-          [ "/rails/root/app/models/mongoid/behavior.rb" ]
-        end
-
-        before do
-          expect(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        end
-
-        it "requires the models by subdirectory and basename" do
-          expect(Rails::Mongoid).to receive(:load_model).with("mongoid/behavior")
-          Rails::Mongoid.preload_models(app)
-        end
-      end
-    end
-  end
-
-  describe ".load_models" do
-
-    let(:app) do
-      double(config: config)
-    end
-
-    let(:config) do
-      double(paths: paths)
-    end
-
-    let(:paths) do
-      double('[]' => path)
-    end
-
-    let(:path) do
-      double(expanded: [ "/rails/root/app/models" ])
-    end
-
-    context "even when preload models config is false" do
-      config_override :preload_models, false
-
-      let(:files) do
-        [
-          "/rails/root/app/models/user.rb",
-          "/rails/root/app/models/address.rb"
-        ]
-      end
-
-      it "loads all models" do
-        allow(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        expect(Rails::Mongoid).to receive(:load_model).with("address")
-        expect(Rails::Mongoid).to receive(:load_model).with("user")
-        Rails::Mongoid.load_models(app)
-      end
-    end
-
-    context "when list of models to load was configured" do
-      config_override :preload_models, %w(user AddressNumber)
-
-      let(:files) do
-        [
-          "/rails/root/app/models/user.rb",
-          "/rails/root/app/models/address.rb"
-        ]
-      end
-
-      it "loads selected models only" do
-        allow(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        expect(Rails::Mongoid).to receive(:load_model).with("user")
-        expect(Rails::Mongoid).to receive(:load_model).with("address_number")
-        expect(Rails::Mongoid).to receive(:load_model).with("address").never
-        Rails::Mongoid.load_models(app)
       end
     end
   end

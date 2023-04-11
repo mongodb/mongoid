@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "mongoid/contextual/mongo/documents_loader"
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
@@ -36,6 +37,18 @@ module Mongoid
 
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
+
+      # Run an explain on the criteria.
+      #
+      # @example Explain the criteria.
+      #   Band.where(name: "Depeche Mode").explain
+      #
+      # @param [ Hash ] options customizable options (See Mongo::Collection::View::Explainable)
+      #
+      # @return [ Hash ] The explain result.
+      def_delegator :view, :explain
+
+      attr_reader :documents_loader
 
       # Get the number of documents matching the query.
       #
@@ -117,19 +130,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        name = if Mongoid.legacy_pluck_distinct
-          klass.database_field_name(field)
-        else
-          klass.cleanse_localized_field_names(field)
-        end
+        name = klass.cleanse_localized_field_names(field)
 
         view.distinct(name).map do |value|
-          if Mongoid.legacy_pluck_distinct
-            value.class.demongoize(value)
-          else
-            is_translation = "#{name}_translations" == field.to_s
-            recursive_demongoize(name, value, is_translation)
-          end
+          is_translation = "#{name}_translations" == field.to_s
+          recursive_demongoize(name, value, is_translation)
         end
       end
 
@@ -158,22 +163,28 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
+      # @example Do any documents exist for given _id.
+      #   context.exists?(BSON::ObjectId(...))
+      #
+      # @example Do any documents exist for given conditions.
+      #   context.exists?(name: "...")
+      #
       # @note We don't use count here since Mongo does not use counted
       #   b-tree indexes.
       #
+      # @param [ Hash | Object | false ] id_or_conditions an _id to
+      #   search for, a hash of conditions, nil or false.
+      #
       # @return [ true | false ] If the count is more than zero.
-      def exists?
-        !!(view.projection(_id: 1).limit(1).first)
-      end
-
-      # Run an explain on the criteria.
-      #
-      # @example Explain the criteria.
-      #   Band.where(name: "Depeche Mode").explain
-      #
-      # @return [ Hash ] The explain result.
-      def explain
-        view.explain
+      #   Always false if passed nil or false.
+      def exists?(id_or_conditions = :none)
+        return false if self.view.limit == 0
+        case id_or_conditions
+        when :none then !!(view.projection(_id: 1).limit(1).first)
+        when nil, false then false
+        when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
+        else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
+        end
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -340,22 +351,13 @@ module Mongoid
         normalized_select = fields.inject({}) do |hash, f|
           db_fn = klass.database_field_name(f)
           normalized_field_names.push(db_fn)
-
-          if Mongoid.legacy_pluck_distinct
-            hash[db_fn] = true
-          else
-            hash[klass.cleanse_localized_field_names(f)] = true
-          end
+          hash[klass.cleanse_localized_field_names(f)] = true
           hash
         end
 
         view.projection(normalized_select).reduce([]) do |plucked, doc|
           values = normalized_field_names.map do |n|
-            if Mongoid.legacy_pluck_distinct
-              n.include?('.') ? doc[n.partition('.')[0]] : doc[n]
-            else
-              extract_value(doc, n)
-            end
+            extract_value(doc, n)
           end
           plucked << (values.size == 1 ? values.first : values)
         end
@@ -777,6 +779,17 @@ module Mongoid
         third_to_last || raise_document_not_found_error
       end
 
+      # Schedule a task to load documents for the context.
+      #
+      # Depending on the Mongoid configuration, the scheduled task can be executed
+      # immediately on the caller's thread, or can be scheduled for an
+      # asynchronous execution.
+      #
+      # @api private
+      def load_async
+        @documents_loader ||= DocumentsLoader.new(view, klass, criteria)
+      end
+
       private
 
       # Update the documents for the provided method.
@@ -844,24 +857,29 @@ module Mongoid
         Hash[sort.map{|k, v| [k, -1*v]}]
       end
 
-      # Get the documents the context should iterate. This follows 3 rules:
+      # Get the documents the context should iterate.
       #
-      # 1. If the query is cached, and we already have documents loaded, use
-      #   them.
-      # 2. If we are eager loading, then eager load the documents and use
-      #   those.
-      # 3. Use the query.
-      #
-      # @api private
-      #
-      # @example Get the documents for iteration.
-      #   context.documents_for_iteration
+      # If the documents have been already preloaded by `Document::Loader`
+      # instance, they will be used.
       #
       # @return [ Array<Document> | Mongo::Collection::View ] The docs to iterate.
+      #
+      # @api private
       def documents_for_iteration
-        return view unless eager_loadable?
-        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
-        eager_load(docs)
+        if @documents_loader
+          if @documents_loader.started?
+            @documents_loader.value!
+          else
+            @documents_loader.unschedule
+            @documents_loader.execute
+          end
+        else
+          return view unless eager_loadable?
+          docs = view.map do |doc|
+            Factory.from_db(klass, doc, criteria)
+          end
+          eager_load(docs)
+        end
       end
 
       # Yield to the document.

@@ -4,14 +4,12 @@ require "spec_helper"
 require_relative "../has_and_belongs_to_many_models"
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
+  config_override :raise_not_found_error, true
 
   around(:each) do |example|
-    original_raise_not_found_error = Mongoid.raise_not_found_error
     original_preferences_association = Person.relations["preferences"]
-    Mongoid.raise_not_found_error = true
     Person.has_and_belongs_to_many :preferences, autosave: true
     example.run
-    Mongoid.raise_not_found_error = original_raise_not_found_error
     Person.relations["preferences"] = original_preferences_association
   end
 
@@ -2523,10 +2521,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the id does not match" do
 
           context "when config set to raise error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             it "raises an error" do
               expect {
@@ -2536,17 +2531,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           end
 
           context "when config set not to raise error" do
+            config_override :raise_not_found_error, false
 
             let(:preference) do
               person.preferences.find(BSON::ObjectId.new)
-            end
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
             end
 
             it "returns nil" do
@@ -2587,10 +2575,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         context "when the ids do not match" do
 
           context "when config set to raise error" do
-
-            before do
-              Mongoid.raise_not_found_error = true
-            end
+            config_override :raise_not_found_error, true
 
             it "raises an error" do
               expect {
@@ -2600,17 +2585,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           end
 
           context "when config set not to raise error" do
+            config_override :raise_not_found_error, false
 
             let(:preferences) do
               person.preferences.find([ BSON::ObjectId.new ])
-            end
-
-            before do
-              Mongoid.raise_not_found_error = false
-            end
-
-            after do
-              Mongoid.raise_not_found_error = true
             end
 
             it "returns an empty array" do
@@ -3815,8 +3793,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   # a BSON::Document, which applies a transformation to the array before
   # storing it.
   context "when executing concat on foreign key array from the db" do
-    config_override :legacy_attributes, false
-
     before do
       HabtmmContract.create!
       HabtmmSignature.create!

@@ -25,7 +25,7 @@ module Mongoid
           #
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Document ] target The child document in the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def initialize(base, target, association)
             init(base, target, association) do
               characterize_one(_target)
@@ -43,7 +43,7 @@ module Mongoid
           # @example Substitute the new document.
           #   person.name.substitute(new_name)
           #
-          # @param [ Document ] replacement A document to replace the target.
+          # @param [ Document | Hash ] replacement A document to replace the target.
           #
           # @return [ Document | nil ] The association or nil.
           def substitute(replacement)
@@ -55,34 +55,41 @@ module Mongoid
                 # run the callbacks and state-changing code by passing persist: false in that case.
                 _target.destroy(persist: !replacement) if persistable?
 
-                unless Mongoid.broken_updates
-                  # A little explanation on why this is needed... Say we have three assignments:
-                  #
-                  # canvas.palette = palette
-                  # canvas.palette = nil
-                  # canvas.palette = palette
-                  # Where canvas embeds_one palette.
-                  #
-                  # Previously, what was happening was, on the first assignment,
-                  # palette was considered a "new record" (new_record?=true) and
-                  # thus palette was being inserted into the database. However,
-                  # on the third assignment, we're trying to reassign the palette,
-                  # palette is no longer considered a new record, because it had
-                  # been inserted previously. This is not exactly accurate,
-                  # because the second assignment ultimately removed the palette
-                  # from the database, so it needs to be reinserted. Since the
-                  # palette's new_record is false, Mongoid ends up "updating" the
-                  # document, which doesn't reinsert it into the database.
-                  #
-                  # The change I introduce here, respecifies palette as a "new
-                  # record" when it gets removed from the database, so if it is
-                  # reassigned, it will be reinserted into the database.
-                  _target.new_record = true
-                end
+                # A little explanation on why this is needed... Say we have three assignments:
+                #
+                # canvas.palette = palette
+                # canvas.palette = nil
+                # canvas.palette = palette
+                # Where canvas embeds_one palette.
+                #
+                # Previously, what was happening was, on the first assignment,
+                # palette was considered a "new record" (new_record?=true) and
+                # thus palette was being inserted into the database. However,
+                # on the third assignment, we're trying to reassign the palette,
+                # palette is no longer considered a new record, because it had
+                # been inserted previously. This is not exactly accurate,
+                # because the second assignment ultimately removed the palette
+                # from the database, so it needs to be reinserted. Since the
+                # palette's new_record is false, Mongoid ends up "updating" the
+                # document, which doesn't reinsert it into the database.
+                #
+                # The change I introduce here, respecifies palette as a "new
+                # record" when it gets removed from the database, so if it is
+                # reassigned, it will be reinserted into the database.
+                _target.new_record = true
               end
               unbind_one
               unless replacement
                 update_attributes_hash(replacement)
+
+                # when `touch: true` is the default (see MONGOID-5016), creating
+                # an embedded document will touch the parent, and will cause the
+                # _descendants list to be initialized and memoized. If the object
+                # is then deleted, we need to make sure and un-memoize that list,
+                # otherwise when the update happens, the memoized _descendants list
+                # gets used and the "deleted" subdocument gets added again.
+                _reset_memoized_descendants!
+
                 return nil
               end
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
@@ -132,6 +139,18 @@ module Mongoid
           end
 
           class << self
+            # Returns the eager loader for this association.
+            #
+            # @param [ Array<Mongoid::Association> ] associations The
+            #   associations to be eager loaded
+            # @param [ Array<Mongoid::Document> ] docs The parent documents
+            #   that possess the given associations, which ought to be
+            #   populated by the eager-loaded documents.
+            #
+            # @return [ Mongoid::Association::Embedded::Eager ]
+            def eager_loader(associations, docs)
+              Eager.new(associations, docs)
+            end
 
             # Returns true if the association is an embedded one. In this case
             # always true.

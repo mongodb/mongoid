@@ -1,3 +1,5 @@
+.. _nested-attributes:
+
 *****************
 Nested Attributes
 *****************

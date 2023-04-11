@@ -2,8 +2,28 @@
 
 module Mongoid
   module Touchable
-
     module InstanceMethods
+
+      # Suppresses the invocation of touch callbacks, for the class that
+      # includes this module, for the duration of the block.
+      #
+      # @example Suppress touch callbacks on Person documents:
+      #   person.suppress_touch_callbacks { ... }
+      #
+      # @api private
+      def suppress_touch_callbacks
+        Touchable.suppress_touch_callbacks(self.class.name) { yield }
+      end
+
+      # Queries whether touch callbacks are being suppressed for the class
+      # that includes this module.
+      #
+      # @return [ true | false ] Whether touch callbacks are suppressed.
+      #
+      # @api private
+      def touch_callbacks_suppressed?
+        Touchable.touch_callbacks_suppressed?(self.class.name)
+      end
 
       # Touch the document, in effect updating its updated_at timestamp and
       # optionally the provided field to the current time. If any belongs_to
@@ -22,46 +42,92 @@ module Mongoid
       # @return [ true/false ] false if document is new_record otherwise true.
       def touch(field = nil)
         return false if _root.new_record?
-        current = Time.configured.now
-        field = database_field_name(field)
-        write_attribute(:updated_at, current) if respond_to?("updated_at=")
-        write_attribute(field, current) if field
 
-        # If the document being touched is embedded, touch its parents
-        # all the way through the composition hierarchy to the root object,
-        # because when an embedded document is changed the write is actually
-        # performed by the composition root. See MONGOID-3468.
-        if _parent
-          # This will persist updated_at on this document as well as parents.
-          # TODO support passing the field name to the parent's touch method;
-          # I believe it should be read out of
-          # _association.inverse_association.options but inverse_association
-          # seems to not always/ever be set here. See MONGOID-5014.
-          _parent.touch
-
-          if field
-            # If we are told to also touch a field, perform a separate write
-            # for that field. See MONGOID-5136.
-            # In theory we should combine the writes, which would require
-            # passing the fields to be updated to the parents - MONGOID-5142.
-            sets = set_field_atomic_updates(field)
-            selector = atomic_selector
-            _root.collection.find(selector).update_one(positionally(selector, sets), session: _session)
-          end
-        else
-          # If the current document is not embedded, it is composition root
-          # and we need to persist the write here.
-          touches = touch_atomic_updates(field)
-          unless touches["$set"].blank?
-            selector = atomic_selector
-            _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
-          end
+        begin
+          touches = _gather_touch_updates(Time.configured.now, field)
+          _root.send(:persist_atomic_operations, '$set' => touches) if touches.present?
+          _run_touch_callbacks_from_root
+        ensure
+          _clear_touch_updates(field)
         end
 
-        # Callbacks are invoked on the composition root first and on the
-        # leaf-most embedded document last.
-        run_callbacks(:touch)
         true
+      end
+
+      # Recursively sets touchable fields on the current document and each of its
+      # parents, including the root node. Returns the combined atomic $set
+      # operations to be performed on the root document.
+      #
+      # @param [ Time ] now The timestamp used for synchronizing the touched time.
+      # @param [ Symbol ] field The name of an additional field to update.
+      #
+      # @return [ Hash<String, Time> ] The touch operations to perform as an atomic $set.
+      #
+      # @api private
+      def _gather_touch_updates(now, field = nil)
+        return if touch_callbacks_suppressed?
+
+        field = database_field_name(field)
+
+        write_attribute(:updated_at, now) if respond_to?("updated_at=")
+        write_attribute(field, now) if field
+
+        touches = _extract_touches_from_atomic_sets(field) || {}
+        touches.merge!(_parent._gather_touch_updates(now) || {}) if _touchable_parent?
+        touches
+      end
+
+      # Clears changes for the model caused by touch operation.
+      #
+      # @param [ Symbol ] field The name of an additional field to update.
+      #
+      # @api private
+      def _clear_touch_updates(field = nil)
+        remove_change(:updated_at)
+        remove_change(field) if field
+        _parent._clear_touch_updates if _touchable_parent?
+      end
+
+      # Recursively runs :touch callbacks for the document and its parents,
+      # beginning with the root document and cascading through each successive
+      # child document.
+      #
+      # @api private
+      def _run_touch_callbacks_from_root
+        return if touch_callbacks_suppressed?
+        _parent._run_touch_callbacks_from_root if _touchable_parent?
+        run_callbacks(:touch)
+      end
+
+      # Indicates whether the parent exists and is touchable.
+      #
+      # @api private
+      def _touchable_parent?
+        _parent && _association&.inverse_association&.touchable?
+      end
+
+      private
+
+      # Extract and remove the atomic updates for the touch operation(s)
+      # from the currently enqueued atomic $set operations.
+      #
+      # @param [ Symbol ] field The optional field.
+      #
+      # @return [ Hash ] The field-value pairs to update atomically.
+      #
+      # @api private
+      def _extract_touches_from_atomic_sets(field = nil)
+        updates = atomic_updates['$set']
+        return {} unless updates
+
+        touchable_keys = Set['updated_at', 'u_at']
+        touchable_keys << field.to_s if field.present?
+
+        updates.keys.each_with_object({}) do |key, touches|
+          if touchable_keys.include?(key.split('.').last)
+            touches[key] = updates.delete(key)
+          end
+        end
       end
     end
 
@@ -73,7 +139,7 @@ module Mongoid
     # @example Add the touchable.
     #   Model.define_touchable!(assoc)
     #
-    # @param [ Association ] association The association metadata.
+    # @param [ Mongoid::Association::Relatable ] association The association metadata.
     #
     # @return [ Class ] The model class.
     def define_touchable!(association)
@@ -82,11 +148,47 @@ module Mongoid
       association.inverse_class.tap do |klass|
         klass.after_save method_name
         klass.after_destroy method_name
-        klass.after_touch method_name
+
+        # Embedded docs handle touch updates recursively within
+        # the #touch method itself
+        klass.after_touch method_name unless association.embedded?
       end
     end
 
+    # Suppresses touch callbacks for the named class, for the duration of
+    # the associated block.
+    #
+    # @api private
+    def suppress_touch_callbacks(name)
+      save, touch_callback_statuses[name] = touch_callback_statuses[name], true
+      yield
+    ensure
+      touch_callback_statuses[name] = save
+    end
+
+    # Queries whether touch callbacks are being suppressed for the named
+    # class.
+    #
+    # @return [ true | false ] Whether touch callbacks are suppressed.
+    #
+    # @api private
+    def touch_callbacks_suppressed?(name)
+      touch_callback_statuses[name]
+    end
+
     private
+
+    # The key to use to store the active touch callback suppression statuses
+    SUPPRESS_TOUCH_CALLBACKS_KEY = "[mongoid]:suppress-touch-callbacks"
+
+    # Returns a hash to be used to store and query the various touch callback
+    # suppression statuses for different classes.
+    #
+    # @return [ Hash ] The hash that contains touch callback suppression
+    #   statuses
+    def touch_callback_statuses
+      Thread.current[SUPPRESS_TOUCH_CALLBACKS_KEY] ||= {}
+    end
 
     # Define the method that will get called for touching belongs_to
     # associations.
@@ -98,7 +200,7 @@ module Mongoid
     #   Model.define_relation_touch_method(:band, :band_updated_at)
     #
     # @param [ Symbol ] name The name of the association.
-    # @param [ Association ] association The association metadata.
+    # @param [ Mongoid::Association::Relatable ] association The association metadata.
     #
     # @return [ Symbol ] The method name.
     def define_relation_touch_method(name, association)
@@ -108,19 +210,14 @@ module Mongoid
                            [ association.relation_class ]
                          end
 
-      relation_classes.each { |c| c.send(:include, InstanceMethods) }
       method_name = "touch_#{name}_after_create_or_destroy"
       association.inverse_class.class_eval do
         define_method(method_name) do
           without_autobuild do
-            if relation = __send__(name)
-              if association.touch_field
-                # Note that this looks up touch_field at runtime, rather than
-                # at method definition time.
-                relation.touch association.touch_field
-              else
-                relation.touch
-              end
+            if !touch_callbacks_suppressed? && relation = __send__(name)
+              # This looks up touch_field at runtime, rather than at method definition time.
+              # If touch_field is nil, it will only touch the default field (updated_at).
+              relation.touch(association.touch_field)
             end
           end
         end

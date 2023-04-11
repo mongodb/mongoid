@@ -3,7 +3,6 @@
 require "spec_helper"
 
 describe Mongoid::Fields do
-  config_override :use_activesupport_time_zone, false
 
   describe "#\{field}_translations" do
 
@@ -1074,7 +1073,7 @@ describe Mongoid::Fields do
     context "when the field is a time" do
 
       let!(:time) do
-        Time.now
+        Time.find_zone('UTC').parse('2023-03-03 10:30:53')
       end
 
       let!(:person) do
@@ -1082,17 +1081,11 @@ describe Mongoid::Fields do
       end
 
       context "when reading the field" do
-
-        before do
-          Time.zone = "Berlin"
-        end
-
-        after do
-          Time.zone = nil
-        end
+        time_zone_override 'Europe/Berlin'
 
         it "performs the necessary time conversions" do
-          expect(person.lunch_time.to_s).to eq(time.getlocal.to_s)
+          expect(person.lunch_time.to_s).to eq('2023-03-03 11:30:53 +0100')
+          expect(person.lunch_time.time_zone.name).to eq('Europe/Berlin')
         end
       end
     end
@@ -1832,77 +1825,45 @@ describe Mongoid::Fields do
       end
     end
 
-    context "when the broken_alias_handling is not set" do
-      config_override :broken_alias_handling, false
-
-      context 'given nil' do
-        subject { Person.database_field_name(nil) }
-        it { is_expected.to eq nil }
-      end
-
-      context 'given an empty String' do
-        subject { Person.database_field_name('') }
-        it { is_expected.to eq nil }
-      end
-
-      context 'given a String' do
-        subject { Person.database_field_name(key.to_s) }
-        it_behaves_like 'database_field_name'
-      end
-
-      context 'given a Symbol' do
-        subject { Person.database_field_name(key.to_sym) }
-        it_behaves_like 'database_field_name'
-      end
+    context 'given nil' do
+      subject { Person.database_field_name(nil) }
+      it { is_expected.to eq nil }
     end
 
-    context "when the broken_alias_handling is set" do
-      config_override :broken_alias_handling, true
+    context 'given an empty String' do
+      subject { Person.database_field_name('') }
+      it { is_expected.to eq nil }
+    end
 
-      context 'given nil' do
-        subject { Person.database_field_name(nil) }
-        it { is_expected.to eq nil }
-      end
+    context 'given a String' do
+      subject { Person.database_field_name(key.to_s) }
+      it_behaves_like 'database_field_name'
+    end
 
-      context 'given an empty String' do
-        subject { Person.database_field_name('') }
-        it { is_expected.to eq "" }
-      end
-
-      context 'given a String' do
-        subject { Person.database_field_name(key.to_s) }
-        it_behaves_like 'pre-fix database_field_name'
-      end
-
-      context 'given a Symbol' do
-        subject { Person.database_field_name(key.to_sym) }
-        it_behaves_like 'pre-fix database_field_name'
-      end
+    context 'given a Symbol' do
+      subject { Person.database_field_name(key.to_sym) }
+      it_behaves_like 'database_field_name'
     end
 
     context 'when getting the database field name of a belongs_to associations' do
-      # These tests only apply when the flag is not set
-      config_override :broken_alias_handling, false
 
-      context "when the broken_alias_handling is not set" do
-        context "when the association is the last item" do
-          let(:name) do
-            Game.database_field_name("person")
-          end
-
-          it "gets the alias" do
-            expect(name).to eq("person_id")
-          end
+      context "when the association is the last item" do
+        let(:name) do
+          Game.database_field_name("person")
         end
 
-        context "when the association is not the last item" do
-          let(:name) do
-            Game.database_field_name("person.name")
-          end
+        it "gets the alias" do
+          expect(name).to eq("person_id")
+        end
+      end
 
-          it "gets the alias" do
-            expect(name).to eq("person.name")
-          end
+      context "when the association is not the last item" do
+        let(:name) do
+          Game.database_field_name("person.name")
+        end
+
+        it "gets the alias" do
+          expect(name).to eq("person.name")
         end
       end
     end
@@ -1949,7 +1910,6 @@ describe Mongoid::Fields do
     end
 
     context "when cleansing dotted translation field" do
-      config_override :broken_alias_handling, false
       let(:field_name) { "passport.name_translations.asd" }
       it "returns the correct field name" do
         expect(field).to eq("pass.name.asd")
@@ -1957,7 +1917,6 @@ describe Mongoid::Fields do
     end
 
     context "when cleansing dotted translation field as a symbol" do
-      config_override :broken_alias_handling, false
       let(:field_name) { "passport.name_translations.asd".to_sym }
       it "returns the correct field name" do
         expect(field).to eq("pass.name.asd")
@@ -1965,7 +1924,6 @@ describe Mongoid::Fields do
     end
 
     context "when cleansing dotted existing translation field" do
-      config_override :broken_alias_handling, false
       let(:field_name) { "passport.localized_translations.asd" }
       it "returns the correct field name" do
         expect(field).to eq("pass.localized_translations.asd")

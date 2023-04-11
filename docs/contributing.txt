@@ -10,3 +10,4 @@ Contributing
   :titlesonly:
 
   contributing/code-documentation
+  contributing/contributing-guidelines

@@ -303,4 +303,41 @@ describe Mongoid::Threaded do
       end
     end
   end
+
+  describe "#get_session" do
+    let(:session) do
+      double('session')
+    end
+
+    context "without client specified" do
+      before do
+        described_class.set_session(session)
+      end
+
+      it 'returns session' do
+        expect(described_class.get_session).to be(session)
+      end
+    end
+
+    context 'with client' do
+      let(:client) do
+        double('client')
+      end
+
+      let(:client_session) do
+        double('client_session')
+      end
+
+      before do
+        # Set a 'global' thread session (deprecated)
+        described_class.set_session(session)
+        # Set a session for a client
+        described_class.set_session(client_session, client: client)
+      end
+
+      it 'returns session' do
+        expect(described_class.get_session(client: client)).to be(client_session)
+      end
+    end
+  end
 end
