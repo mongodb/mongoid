@@ -121,19 +121,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        name = if Mongoid.legacy_pluck_distinct
-          klass.database_field_name(field)
-        else
-          klass.cleanse_localized_field_names(field)
-        end
+        name = klass.cleanse_localized_field_names(field)
 
         view.distinct(name).map do |value|
-          if Mongoid.legacy_pluck_distinct
-            value.class.demongoize(value)
-          else
-            is_translation = "#{name}_translations" == field.to_s
-            recursive_demongoize(name, value, is_translation)
-          end
+          is_translation = "#{name}_translations" == field.to_s
+          recursive_demongoize(name, value, is_translation)
         end
       end
 
@@ -369,8 +361,8 @@ module Mongoid
       # @param [ Proc ] &block The block to call once for each plucked
       #   result.
       #
-      # @return [ Enumerator | Mongo ] The enumerator, or the context
-      #   if a block was given.
+      # @return [ Enumerator | Mongoid::Contextual::Mongo ] The enumerator,
+      #   or the context if a block was given.
       def pluck_each(*fields, &block)
         enum = PluckEnumerator.new(klass, view, fields).each(&block)
         block_given? ? self : enum

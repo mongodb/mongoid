@@ -59,21 +59,11 @@ module Mongoid
         end
 
         def normalized_field_names
-          @normalized_field_names ||= if Mongoid.legacy_pluck_distinct
-            database_field_names
-          else
-            @fields.map {|f| @klass.cleanse_localized_field_names(f) }
-          end
+          @normalized_field_names ||= @fields.map {|f| @klass.cleanse_localized_field_names(f) }
         end
 
         def yield_result(doc)
-          values = database_field_names.map do |n|
-            if Mongoid.legacy_pluck_distinct
-              n.include?('.') ? doc[n.partition('.')[0]] : doc[n]
-            else
-              extract_value(doc, n)
-            end
-          end
+          values = database_field_names.map {|n| extract_value(doc, n) }
           yield(values.size == 1 ? values.first : values)
         end
 

@@ -49,4 +49,8 @@ def standard_dependencies
       gem 'timeout-interrupt'
     end
   end
+
+  if ENV['FLE'] == 'helper'
+    gem 'libmongocrypt-helper', '~> 1.7.0'
+  end
 end

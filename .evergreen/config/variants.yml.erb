@@ -220,3 +220,16 @@ buildvariants:
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
+
+- matrix_name: "auto-encryption"
+  matrix_spec:
+    ruby: ruby-3.1
+    driver: current
+    topology: replica-set
+    mongodb-version: ['6.0']
+    os: ubuntu-20.04
+    rails: ['7.0']
+    fle: helper
+  display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
+  tasks:
+    - name: "test"

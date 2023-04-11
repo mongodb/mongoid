@@ -165,22 +165,9 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           expect(aggregates["min"]).to be_nil
         end
 
-        context "when broken_aggregables feature flag is not set" do
-          config_override :broken_aggregables, false
-
-          it "returns a sum" do
-            expect(aggregates["sum"]).to eq 0
-          end
+        it "returns a sum" do
+          expect(aggregates["sum"]).to eq 0
         end
-
-        context "when broken_aggregables feature flag is set" do
-          config_override :broken_aggregables, true
-
-          it "returns nil" do
-            expect(aggregates["sum"]).to be_nil
-          end
-        end
-
       end
 
       context "when the field sometimes exists" do
@@ -251,20 +238,8 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           context.aggregates(:non_existent)
         end
 
-        context "when broken_aggregables feature flag is not set" do
-          config_override :broken_aggregables, false
-
-          it "returns empty result" do
-            expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => nil, "min" => nil, "max" => nil })
-          end
-        end
-
-        context "when broken_aggregables feature flag is set" do
-          config_override :broken_aggregables, true
-
-          it "returns empty result" do
-            expect(aggregates).to eq({ "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil })
-          end
+        it "returns empty result" do
+          expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => nil, "min" => nil, "max" => nil })
         end
       end
     end

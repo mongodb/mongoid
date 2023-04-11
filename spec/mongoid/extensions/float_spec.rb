@@ -20,17 +20,10 @@ describe Mongoid::Extensions::Float do
 
     let(:expected_time) { Time.at(float).in_time_zone }
 
-    context "when using active support's time zone" do
-      include_context 'using AS time zone'
+    context "when setting ActiveSupport time zone" do
+      include_context 'setting ActiveSupport time zone'
 
       it_behaves_like 'mongoizes to AS::TimeWithZone'
-      it_behaves_like 'maintains precision when mongoized'
-    end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
-
-      it_behaves_like 'mongoizes to Time'
       it_behaves_like 'maintains precision when mongoized'
     end
   end
