@@ -139,7 +139,7 @@
     airports: [EWR, SFO]
   query:
     airports: [EWR]
-  matches: false
+  matches: true # Because array of a single scalar element is expanded
 
 - name: exact array match with empty array
   document:

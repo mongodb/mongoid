@@ -864,8 +864,8 @@ module Mongoid
                 # Query expression-level operator, like $and or $where
                 query.add_operator_expression(field_s, value)
               else
-                if value.is_a?(Array) && value.size == 1
-                  query.add_field_expression(field, value.first)
+                if value.is_a?(Array) && value.size == 1 && !value.first.is_a?(Hash)
+                  query.add_field_expression(field, value)
                 else
                   query.add_field_expression(field, value)
                 end
