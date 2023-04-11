@@ -826,45 +826,45 @@ describe Mongoid::QueryCache do
 
   describe 'deprecation warnings' do
 
-    context '#cached' do
+    context '#cache' do
       it 'should raise a warning' do
-        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache_warned)
-        Mongoid::QueryCache.cached {}
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
+        Mongoid::QueryCache.cache {}
       end
     end
 
     context '#uncached' do
       it 'should raise a warning' do
-        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache_warned)
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
         Mongoid::QueryCache.uncached {}
       end
     end
 
     context '#clear_cache' do
       it 'should raise a warning' do
-        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_clear_cache_warned)
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache_clear)
         Mongoid::QueryCache.clear_cache
       end
     end
 
-    context '#enabled' do
+    context '#enabled?' do
       it 'should raise a warning' do
-        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_clear_cache_warned)
-        Mongoid::QueryCache.enabled
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
+        Mongoid::QueryCache.enabled?
       end
     end
 
     context '#enabled=' do
       it 'should raise a warning' do
         old_enabled = Mongoid::QueryCache.enabled?
-        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_clear_cache_warned)
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
         Mongoid::QueryCache.enabled = old_enabled
       end
     end
 
     context '#enabled=' do
       it 'should raise a warning' do
-        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_clear_cache_warned)
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
         Mongoid::QueryCache.enabled = true
       end
     end
