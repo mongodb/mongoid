@@ -861,12 +861,5 @@ describe Mongoid::QueryCache do
         Mongoid::QueryCache.enabled = old_enabled
       end
     end
-
-    context '#enabled=' do
-      it 'should raise a warning' do
-        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
-        Mongoid::QueryCache.enabled = true
-      end
-    end
   end
 end
