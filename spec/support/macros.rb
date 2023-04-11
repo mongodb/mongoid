@@ -81,10 +81,10 @@ module Mongoid
 
     def override_query_cache(enabled)
       around do |example|
-        cache_enabled = Mongoid::QueryCache.enabled?
-        Mongoid::QueryCache.enabled = enabled
+        cache_enabled = Mongo::QueryCache.enabled?
+        Mongo::QueryCache.enabled = enabled
         example.run
-        Mongoid::QueryCache.enabled = cache_enabled
+        Mongo::QueryCache.enabled = cache_enabled
       end
     end
 

@@ -18,6 +18,15 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Deprecated ``Mongoid::QueryCache``
+----------------------------------
+
+The config option ``Mongoid::QueryCache`` has been deprecated.
+Please replace it 1-for-1 with `Mongo::QueryCache`.
+Note the method `Mongoid::QueryCache#clear_cache` should be replaced with `Mongo::QueryCache#clear`.
+All other methods and submodules are identically named.
+
+
 Deprecated ``use_activesupport_time_zone`` config option
 --------------------------------------------------------
 

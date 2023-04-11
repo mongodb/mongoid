@@ -38,5 +38,7 @@ module Mongoid
     warning :object_id_as_json_oid_deprecated, 'Config option :object_id_as_json_oid is deprecated. It will always be false beginning in Mongoid 9.0. Please use load_defaults for Mongoid 8.0 or later, then remove it from your config.'
     warning :overwrite_chained_operators_deprecated, 'Config option :overwrite_chained_operators is deprecated. It will always be false beginning in Mongoid 9.0. Please use load_defaults for Mongoid 8.0 or later, then remove it from your config.'
     warning :mutable_ids, 'In Mongoid 9.0 the _id field will be immutable. In earlier versions of 8.x, mutating the _id field was supported inconsistently. Prepare your code for 9.0 by setting Mongoid::Config.immutable_ids to true.'
+    warning :mongoid_query_cache, 'In Mongoid 9.0, Mongoid::QueryCache will be removed. Please replace it with Mongo::QueryCache.'
+    warning :mongoid_query_cache_clear, 'In Mongoid 9.0, Mongoid::QueryCache#clear_cache should be replaced it with Mongo::QueryCache#clear.'
   end
 end
