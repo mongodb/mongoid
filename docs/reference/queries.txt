@@ -2353,19 +2353,17 @@ The query cache may be enabled by using the driver's namespace or Mongoid's
 namespace.
 
 
-.. _enabling-query-cache-via-middleware:
+.. _enabling-query-cache-automatically:
 
-Enabling Query Cache Via Middleware
------------------------------------
+Enabling Query Cache Automatically
+----------------------------------
 
-Applications that utilize a Rack-based web framework (Rails, etc.) can
-take advantage of the Rack middleware provided by Mongoid to automatically
-enable the query cache for each web request, and clear the query cache after
-each request completes. Please see the :ref:`Query Cache Rack Middleware
+The MongoDB Ruby Driver provides middleware to automatically enable the query cache for
+Rack web requests and ActiveJob job runs. Please see the :ref:`Query Cache Rack Middleware
 <query-cache-middleware>` section on the configuration page for instructions.
 
-Note that the Query Cache Middleware does not apply to code executed
-outside web requests.
+Note that the Query Cache Middleware does not apply to code executed outside web requests
+and/or jobs.
 
 
 .. _enabling-query-cache-manually:
@@ -2377,7 +2375,7 @@ To enable the Query Cache manually for a code segment, use:
 
 .. code-block:: ruby
 
-  Mongoid::QueryCache.cache do
+  Mongo::QueryCache.cache do
     # ...
   end
 
@@ -2386,50 +2384,11 @@ recommend to use the block form described above:
 
 .. code-block:: ruby
 
-  Mongoid::QueryCache.enabled = true
-
-  # ...
-
-  Mongoid::QueryCache.enabled = false
-
-Alternatively, you can reference the driver's query cache module directly:
-
-.. code-block:: ruby
-
-  Mongo::QueryCache.cache do
+  begin
+    Mongo::QueryCache.enabled = true
     # ...
-  end
-
-  Mongo::QueryCache.enabled = true
-
-  Mongo::QueryCache.enabled = true
-
-
-Query Cache Shared With Driver
-------------------------------
-
-When Mongoid delegates to the driver's query cache, the same cache is used
-by both Mongoid and the driver. For example, the following two queries
-are implemented via the same server query and only the first of them
-would be sent to the server:
-
-.. code-block:: ruby
-
-  Mongoid::QueryCache.cache do
-    Band.first
-    Band.collection.find.sort(_id: 1).first
-  end
-
-Similarly, write operations that clear the cache would do so when the read
-is performed by the driver and write by Mongoid, or vice versa:
-
-.. code-block:: ruby
-
-  Mongoid::QueryCache.cache do
-    Band.first
-    Band.collection.insert_one({})
-    # Queries again
-    Band.first
+  ensure
+    Mongo::QueryCache.enabled = false
   end
 
 

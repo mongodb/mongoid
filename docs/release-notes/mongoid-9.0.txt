@@ -43,6 +43,14 @@ In addition, support for ``config.load_defaults`` versions 7.5 and
 prior has been dropped (you must use a minimum of version 8.0.)
 
 
+Deprecated functionality removed
+--------------------------------
+
+- The `Mongoid::QueryCache` module has been removed. Please replace it 1-for-1 with `Mongo::QueryCache`.
+  The method `Mongoid::QueryCache#clear_cache` should be replaced with `Mongo::QueryCache#clear`.
+  All other methods and submodules are identically named.
+
+
 ``touch`` method now clears changed state
 -----------------------------------------
 
