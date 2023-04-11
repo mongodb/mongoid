@@ -27,7 +27,6 @@ require "mongoid/clients"
 require "mongoid/document"
 require "mongoid/tasks/database"
 require "mongoid/tasks/encryption"
-require "mongoid/query_cache"
 require "mongoid/warnings"
 require "mongoid/utils"
 
