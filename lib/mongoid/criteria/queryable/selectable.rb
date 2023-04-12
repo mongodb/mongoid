@@ -864,14 +864,28 @@ module Mongoid
                 # Query expression-level operator, like $and or $where
                 query.add_operator_expression(field_s, value)
               else
-                if value.is_a?(Array) && value.size == 1 && !value.first.is_a?(Hash)
-                  query.add_field_expression(field, value.first)
-                else
-                  query.add_field_expression(field, value)
-                end
+                query.add_field_expression(field, maybe_convert_field_value(value))
               end
             end
             query.reset_strategies!
+          end
+        end
+
+        # Converts a value provided by the user to a value that should be added
+        # to the query.
+        #
+        # @param [ Object ] value The value as provided by the user when
+        #   constructing the query.
+        #
+        # @return [ Object ] The value to be added.
+        def maybe_convert_field_value(value)
+          return value unless value.is_a?(Array)
+          return value unless value.size == 1
+
+          if Mongoid.expand_single_element_arrays_in_query
+            value.first
+          else
+            value
           end
         end
 

@@ -32,6 +32,7 @@ module Mongoid
           load_defaults "8.1"
         when "8.1"
           self.immutable_ids = false
+          self.expand_single_element_arrays_in_query = false
 
           load_defaults "9.0"
         when "9.0"

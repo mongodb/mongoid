@@ -109,6 +109,14 @@ module Mongoid
     # document might be ignored, or it might work, depending on the situation.
     option :immutable_ids, default: true
 
+    # When this flag is true, database queries that contain a single element
+    # array will be expanded to a query with a single element.
+    # For example, the query `Band.where(name: ['The Beatles'])` will
+    # produce the criteria `{"name" => "The Beatles"}`.
+    # This is the default in 9.0. Setting this flag to false restores the
+    # pre-9.0 behavior, where the query will be sent as is.
+    option :expand_single_element_arrays_in_query, default: true
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.

@@ -209,8 +209,20 @@ describe Mongoid::Criteria::Queryable::Selectable do
             query.where(name: ['Syd'])
           end
 
-          it 'uses the value of the array' do
-            expect(selection.selector).to eq({ "name" => "Syd" })
+          context 'when expand_single_element_arrays_in_query is true' do
+            config_override :expand_single_element_arrays_in_query, true
+
+            it 'uses the value of the array' do
+              expect(selection.selector).to eq({ "name" => "Syd" })
+            end
+          end
+
+          context 'when expand_single_element_arrays_in_query is false' do
+            config_override :expand_single_element_arrays_in_query, false
+
+            it 'uses the value of the array' do
+              expect(selection.selector).to eq({ "name" => ["Syd"] })
+            end
           end
         end
 

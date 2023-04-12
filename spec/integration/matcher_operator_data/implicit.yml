@@ -134,13 +134,6 @@
     airports: [SFO, EWR]
   matches: false
 
-# - name: array query with subset of elements
-#   document:
-#     airports: [EWR, SFO]
-#   query:
-#     airports: [EWR]
-#   matches: true
-
 - name: exact array match with empty array
   document:
     airports: []
