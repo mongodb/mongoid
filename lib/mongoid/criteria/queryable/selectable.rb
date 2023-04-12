@@ -881,6 +881,7 @@ module Mongoid
         def maybe_convert_field_value(value)
           return value unless value.is_a?(Array)
           return value unless value.size == 1
+          return value if value.first.is_a?(Hash)
 
           if Mongoid.expand_single_element_arrays_in_query
             value.first
