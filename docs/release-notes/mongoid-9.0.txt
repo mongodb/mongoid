@@ -17,6 +17,31 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Arrays containing a single element are now expanded in queries
+--------------------------------------------------------------
+
+**Breaking change** In Mongoid 8.1 and older if a query includes an array as
+a value, it is used in the criteria without changes:
+
+.. code-block:: ruby
+
+  # Mongoid 8.x behaviour
+  Person.where(name: ['Kate']).selector # { 'name' => [ 'Kate' ] }
+  Person.where(name: ['Kate', 'Anna']).selector # { 'name' => [ 'Kate', 'Anna' ] }
+
+In Mongoid 9.0 we change this behavior to bring it in accordance with
+ActiveRecord:
+
+.. code-block:: ruby
+
+  # Mongoid 9.x behaviour
+  Person.where(name: ['Kate']).selector # { 'name' => 'Kate' }
+  Person.where(name: ['Kate', 'Anna']).selector # { 'name' => [ 'Kate', 'Anna' ] }
+
+You can return to the old behavior by setting
+``expand_single_element_arrays_in_query`` to ``false`` in your
+``config/mongoid.yml`` file.
+
 Deprecated options removed
 --------------------------
 
