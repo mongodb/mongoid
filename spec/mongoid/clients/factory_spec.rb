@@ -252,23 +252,6 @@ describe Mongoid::Clients::Factory do
         restore_config_clients
         include_context 'with encryption'
 
-        let(:config) do
-          {
-            default: { hosts: SpecConfig.instance.addresses, database: database_id },
-            encrypted: {
-              hosts: SpecConfig.instance.addresses,
-              database: database_id,
-              options: {
-                auto_encryption_options: {
-                  kms_providers: kms_providers,
-                  key_vault_namespace: key_vault_namespace,
-                  extra_options: extra_options
-                }
-              }
-            }
-          }
-        end
-
         before do
           Mongoid::Config.send(:clients=, config)
           key_vault_client[key_vault_collection].drop
@@ -282,12 +265,60 @@ describe Mongoid::Clients::Factory do
           described_class.create(:encrypted)
         end
 
-        it "returns a client" do
-          expect(client).to be_a(Mongo::Client)
+        context 'when no key vault client is provided' do
+          let(:config) do
+            {
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              encrypted: {
+                hosts: SpecConfig.instance.addresses,
+                database: database_id,
+                options: {
+                  auto_encryption_options: {
+                    kms_providers: kms_providers,
+                    key_vault_namespace: key_vault_namespace,
+                    extra_options: extra_options
+                  }
+                }
+              }
+            }
+          end
+
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
+          end
+
+          it 'sets schema_map for the client' do
+            expect(client.options[:auto_encryption_options][:schema_map]).not_to be_nil
+          end
         end
 
-        it 'sets schema_map for the client' do
-          expect(client.options[:auto_encryption_options][:schema_map]).not_to be_nil
+        context 'when a key vault client is provided' do
+          let(:config) do
+            {
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              key_vault: { hosts: SpecConfig.instance.addresses, database: database_id },
+              encrypted: {
+                hosts: SpecConfig.instance.addresses,
+                database: database_id,
+                options: {
+                  auto_encryption_options: {
+                    key_vault_client: :key_vault,
+                    kms_providers: kms_providers,
+                    key_vault_namespace: key_vault_namespace,
+                    extra_options: extra_options
+                  }
+                }
+              }
+            }
+          end
+
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
+          end
+
+          it 'sets schema_map for the client' do
+            expect(client.options[:auto_encryption_options][:key_vault_client]).to eq(Mongoid::Clients.with_name(:key_vault))
+          end
         end
       end
     end

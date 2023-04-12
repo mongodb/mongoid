@@ -58,15 +58,8 @@ module Mongoid
         database = config.delete(:database)
         hosts = config.delete(:hosts)
         opts = config.delete(:options) || {}
-        if opts[:auto_encryption_options]
-          if opts[:auto_encryption_options].key?(:schema_map)
-            Mongoid.logger.warn(
-              'The :schema_map is configured in the :auto_encryption_options for the client;' +
-              ' encryption setting in Mongoid documents will be ignored.'
-            )
-          else
-            opts[:auto_encryption_options][:schema_map] = Mongoid.config.encryption_schema_map(database)
-          end
+        if opts.key?(:auto_encryption_options)
+          opts[:auto_encryption_options] = build_auto_encryption_options(opts, database)
         end
         unless config.empty?
           default_logger.warn("Unknown config options detected: #{config}.")
@@ -78,6 +71,36 @@ module Mongoid
             hosts,
             options(opts).merge(database: database)
           )
+        end
+      end
+
+      # Build auto encryption options for the client based on the options
+      # provided in the Mongoid client configuration and the encryption
+      # schema map for the database.
+      #
+      # @param [ Hash ] opts Options from the Mongoid client configuration.
+      # @param [ String ] database Database name to use for encryption schema map.
+      #
+      # @return [ Hash | nil ] Auto encryption options for the client.
+      #
+      # @api private
+      def build_auto_encryption_options(opts, database)
+        return nil unless opts[:auto_encryption_options]
+
+        opts[:auto_encryption_options].dup.tap do |auto_encryption_options|
+          if auto_encryption_options.key?(:schema_map)
+            default_logger.warn(
+              'The :schema_map is configured in the :auto_encryption_options for the client;' +
+              ' encryption setting in Mongoid documents will be ignored.'
+            )
+          else
+            auto_encryption_options[:schema_map] = Mongoid.config.encryption_schema_map(database)
+          end
+          if auto_encryption_options.key?(:key_vault_client)
+            auto_encryption_options[:key_vault_client] = Mongoid::Clients.with_name(
+              auto_encryption_options[:key_vault_client]
+            )
+          end
         end
       end
 
