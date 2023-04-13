@@ -109,7 +109,7 @@ module Mongoid
       end
 
       true
-    rescue Exception => e
+    rescue StandardError => e
       _mongoid_reset_atomic_context_changes! if has_own_context
       raise e
     ensure
