@@ -309,7 +309,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         it 'loads all associations eagerly' do
-          loaded = expect_query(4) do
+          expect_query(4, skip_if_sharded: true) do
             eager
           end
 

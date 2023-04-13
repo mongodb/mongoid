@@ -4,6 +4,7 @@ require "spec_helper"
 require 'mongoid/association/referenced/has_many_models'
 
 describe Mongoid::QueryCache do
+  require_no_multi_shard
 
   around do |spec|
     Mongoid::QueryCache.clear_cache

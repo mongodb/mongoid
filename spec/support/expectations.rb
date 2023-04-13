@@ -4,15 +4,14 @@ module Mongoid
   module Expectations
 
     def connection_class
-      if defined?(Mongo::Server::ConnectionBase)
-        Mongo::Server::ConnectionBase
-      else
-        # Pre-2.8 drivers
-        Mongo::Server::Connection
-      end
+      Mongo::Server::ConnectionBase
     end
 
-    def expect_query(number)
+    def expect_query(number, skip_if_sharded: false)
+      if skip_if_sharded && number > 0 && ClusterConfig.instance.topology == :sharded
+        skip 'MONGOID-5599: Sharded clusters do extra read queries, causing expect_query to fail.'
+      end
+
       rv = nil
       RSpec::Mocks.with_temporary_scope do
         if number > 0

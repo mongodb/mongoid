@@ -194,7 +194,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "the results are not cached" do
-        expect_query(2) do
+        expect_query(2, skip_if_sharded: true) do
           2.times do
             context.estimated_count
           end
