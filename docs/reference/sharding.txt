@@ -84,7 +84,7 @@ configured in the association as the field name:
   end
 
 The shard key may also reference a field in an embedded document, by using
-the "." character to delimit the field names:
+the ``.`` (dot) character to delimit the field names:
 
 .. code-block:: ruby
 
@@ -94,9 +94,8 @@ the "." character to delimit the field names:
 
 .. note::
 
-  Because the "." character is used to delimit fields in embedded documents,
-  Mongoid does not currently support shard key fields that themselves
-  literally contain the "." character.
+  MongoDB `does not currently support <https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/>`_
+  shard key fields that themselves literally contain the ``.`` character.
 
 .. note::
 
