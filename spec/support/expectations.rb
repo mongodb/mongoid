@@ -9,7 +9,7 @@ module Mongoid
 
     def expect_query(number, skip_if_sharded: false)
       if skip_if_sharded && number > 0 && ClusterConfig.instance.topology == :sharded
-        skip 'MONGOID-5599: Sharded clusters do extra read queries, causing expect_query to fail.'
+        skip 'MONGOID-5599: Skipping expect_query test since it fails on sharded clusters.'
       end
 
       rv = nil
