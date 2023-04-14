@@ -15,6 +15,15 @@ module Mongoid
     def inspect
       inspection = []
       inspection.concat(inspect_fields).concat(inspect_dynamic_fields)
+
+      # move created_at and updated_at fields to the end.
+      [/^created_at: /, /^c_at: /, /^updated_at: /, /^u_at: /].each do |regexp|
+        next unless index = inspection.find_index {|s| s.match(regexp) }
+
+        s = inspection.delete_at(index)
+        inspection.push(s)
+      end
+
       "\n#<#{self.class.name}\n _id: #{_id},\n #{inspection * ",\n "}>"
     end
 
