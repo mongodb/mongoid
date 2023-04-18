@@ -816,14 +816,14 @@ the ``before_fork`` hook to close clients in the parent process
 .. code-block:: ruby
 
   on_worker_boot do
-    Mongoid::Clients.clients.each do |name, client|
+    ::Mongoid::Clients.clients.each do |name, client|
       client.close
       client.reconnect
     end
   end
 
   before_fork do
-    Mongoid.disconnect_clients
+    ::Mongoid.disconnect_clients
   end
 
 Unicorn
@@ -836,14 +836,14 @@ the ``before_fork`` hook to close clients in the parent process
 .. code-block:: ruby
 
   after_fork do |server, worker|
-    Mongoid::Clients.clients.each do |name, client|
+    ::Mongoid::Clients.clients.each do |name, client|
       client.close
       client.reconnect
     end
   end
 
   before_fork do |server, worker|
-    Mongoid.disconnect_clients
+    ::Mongoid.disconnect_clients
   end
 
 Passenger
@@ -859,7 +859,7 @@ before the workers are forked.
 
   if defined?(PhusionPassenger)
     PhusionPassenger.on_event(:starting_worker_process) do |forked|
-      Mongoid::Clients.clients.each do |name, client|
+      ::Mongoid::Clients.clients.each do |name, client|
         client.close
         client.reconnect
       end
