@@ -316,7 +316,7 @@ describe Mongoid::Clients::Factory do
             expect(client).to be_a(Mongo::Client)
           end
 
-          it 'sets schema_map for the client' do
+          it 'sets key_vault_client option for the client' do
             expect(client.options[:auto_encryption_options][:key_vault_client]).to eq(Mongoid::Clients.with_name(:key_vault))
           end
         end
