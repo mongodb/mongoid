@@ -1,3 +1,4 @@
+# rubocop:todo all
 source "https://rubygems.org"
 
 gem 'bson', git: "https://github.com/mongodb/bson-ruby", branch: '4-stable'

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)

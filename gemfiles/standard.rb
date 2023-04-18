@@ -1,3 +1,4 @@
+# rubocop:todo all
 def standard_dependencies
   gem 'rake'
 

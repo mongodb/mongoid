@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 load 'mongoid/tasks/database.rake'
 load "mongoid/tasks/encryption.rake"

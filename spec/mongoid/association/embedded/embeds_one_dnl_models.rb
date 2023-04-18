@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 # This file is added as an autoload target, but should never be actually
 # processed.

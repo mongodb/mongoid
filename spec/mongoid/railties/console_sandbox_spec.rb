@@ -1,3 +1,4 @@
+# rubocop:todo all
 require 'spec_helper'
 require 'mongoid/railties/console_sandbox'
 

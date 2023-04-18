@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Constraints
   RAILS_VERSION = ActiveSupport.version.to_s.split('.')[0..1].join('.').freeze
