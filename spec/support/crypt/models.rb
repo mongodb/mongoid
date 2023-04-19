@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Crypt
   class Patient
     include Mongoid::Document

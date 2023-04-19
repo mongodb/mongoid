@@ -1,3 +1,4 @@
+# rubocop:todo all
 class Galaxy
   include Mongoid::Document
   include Mongoid::Timestamps

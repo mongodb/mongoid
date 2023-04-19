@@ -1,5 +1,3 @@
-inherit_from: .rubocop_todo.yml
-
 require:
   - rubocop-performance
   - rubocop-rails
@@ -10,46 +8,48 @@ AllCops:
   TargetRubyVersion: 2.6
   NewCops: enable
   Exclude:
-    - 'spec/shared/lib/mrss/**/*'
+    - 'spec/shared/**/*'
     - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'test-apps/**/*'
 
 # -----------------------------------
 # TODO: Enable and fix the cops below
 # -----------------------------------
 
 Gemspec:
-  Enabled: false
+  Enabled: true
 
 Layout:
-  Enabled: false
+  Enabled: true
 
 Lint:
-  Enabled: false
+  Enabled: true
 
 Metrics:
-  Enabled: false
+  Enabled: true
 
 Naming:
-  Enabled: false
+  Enabled: true
 
 Performance:
-  Enabled: false
+  Enabled: true
 
 Rake:
-  Enabled: false
+  Enabled: true
 
 Rails:
-  Enabled: false
+  Enabled: true
 
 RSpec:
-  Enabled: false
+  Enabled: true
 
 Security:
   Exclude:
     - 'spec/**/*'
 
 Style:
-  Enabled: false
+  Enabled: true
 
 # --------------------------------------
 # Cops below this line set intentionally
