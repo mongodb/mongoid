@@ -72,3 +72,5 @@ end
 
 ::Float.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Numeric)
 ::Float.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods)
+
+::BigDecimal.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Numeric)
