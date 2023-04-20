@@ -11,7 +11,7 @@ module Mongoid
         class Proxy < Association::Many
           extend Forwardable
 
-          def_delegator :criteria, :count
+          def_delegators :criteria, :count, :exists?
           def_delegators :_target, :first, :in_memory, :last, :reset, :uniq
 
           # Appends a document or array of documents to the association. Will set
@@ -155,26 +155,6 @@ module Mongoid
             else
               to_enum
             end
-          end
-
-          # Determine if any documents in this association exist in the database.
-          #
-          # If the association contains documents but all of the documents
-          # exist only in the application, i.e. have not been persisted to the
-          # database, this method returns false.
-          #
-          # This method queries the database on each invocation even if the
-          # association is already loaded into memory.
-          #
-          # @example Are there persisted documents?
-          #   person.posts.exists?
-          #
-          # @param [ Hash | Object | false ] id_or_conditions an _id to
-          #   search for, a hash of conditions, nil or false.
-          #
-          # @return [ true | false ] True is persisted documents exist, false if not.
-          def exists?(id_or_conditions = :none)
-            criteria.exists?(id_or_conditions)
           end
 
           # Find the matching document on the association, either based on id or
