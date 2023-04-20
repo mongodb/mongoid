@@ -211,9 +211,25 @@ module Mongoid
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
+          # @example Is a document with the given id persisted?
+          #   context.exists?(BSON::ObjectId(...))
+          #
+          # @example Are there persisted documents with the given title?
+          #   person.posts.exists?({ title: "50 Ways to Leave Your Lover" })
+          #
+          # @example Always return false.
+          #   person.posts.exists?(false)
+          #
+          # @param [ :none | Hash | BSON::ObjectId | nil | false ] id_or_conditions
+          #   May optionally supply search conditions as a hash or an object id.
+          #   Will always return false when given nil or false. The symbol :none is
+          #   the default when argument is not supplied.
+          #
           # @return [ true | false ] True is persisted documents exist, false if not.
-          def exists?
-            _target.any? { |doc| doc.persisted? }
+          def exists?(id_or_conditions = :none)
+            return _target.any?(&:persisted?) if id_or_conditions == :none
+
+            criteria.exists?(id_or_conditions)
           end
 
           # Finds a document in this association through several different

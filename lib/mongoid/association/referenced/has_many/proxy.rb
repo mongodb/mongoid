@@ -169,9 +169,12 @@ module Mongoid
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
+          # @param [ Hash | Object | false ] id_or_conditions an _id to
+          #   search for, a hash of conditions, nil or false.
+          #
           # @return [ true | false ] True is persisted documents exist, false if not.
-          def exists?
-            criteria.exists?
+          def exists?(id_or_conditions = :none)
+            criteria.exists?(id_or_conditions)
           end
 
           # Find the matching document on the association, either based on id or
