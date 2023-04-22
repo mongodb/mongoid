@@ -1,7 +1,9 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/changeable"
 require "mongoid/collection_configurable"
+require "mongoid/encryptable"
 require "mongoid/findable"
 require "mongoid/indexable"
 require "mongoid/inspectable"
@@ -59,6 +61,7 @@ module Mongoid
     include Interceptable
     include Copyable
     include Equality
+    include Encryptable
 
     MODULES = [
       Atomic,

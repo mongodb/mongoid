@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "active_model/attribute_methods"
 require "mongoid/attributes/dynamic"

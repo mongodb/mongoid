@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -40,7 +41,7 @@ module Mongoid
         # @example Initialize the builder.
         #   Many.new(association, attributes, options)
         #
-        # @param [ Association ] association The association metadata.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
         def initialize(association, attributes, options = {})

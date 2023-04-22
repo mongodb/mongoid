@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Config
@@ -24,33 +25,16 @@ module Mongoid
         # in the other direction (towards earlier versions).
 
         case version.to_s
-        when "7.3"
-          # flags introduced in 7.4 - old functionality
-          self.broken_aggregables = true
-          self.broken_alias_handling = true
-          self.broken_and = true
-          self.broken_scoping = true
-          self.broken_updates = true
-          self.compare_time_by_ms = false
-          self.legacy_pluck_distinct = true
-          self.legacy_triple_equals = true
-          self.object_id_as_json_oid = true
-
-          load_defaults "7.4"
-        when "7.4"
-          # flags introduced in 7.5 - old functionality
-          self.legacy_attributes = true
-          self.overwrite_chained_operators = true
-
-          load_defaults "7.5"
-        when "7.5"
-          # flags introduced in 8.0 - old functionality
-          self.map_big_decimal_to_decimal128 = false
+        when "7.3", "7.4", "7.5"
+          raise ArgumentError, "Version no longer supported: #{version}"
         when "8.0"
-          # All flag defaults currently reflect 8.0 behavior.
           self.legacy_readonly = true
+
+          load_defaults "8.1"
         when "8.1"
-          # All flag defaults currently reflect 8.1 behavior.
+          self.immutable_ids = false
+
+          load_defaults "9.0"
         when "9.0"
           # All flag defaults currently reflect 9.0 behavior.
         else

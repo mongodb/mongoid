@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -15,7 +16,7 @@ module Mongoid
       #
       # @param [ String | Symbol ] name The name of the association to find.
       #
-      # @return [ Association ] The matching association metadata.
+      # @return [ Mongoid::Association::Relatable ] The matching association metadata.
       def reflect_on_association(name)
         self.class.reflect_on_association(name)
       end
@@ -27,7 +28,7 @@ module Mongoid
       #
       # @param [ Symbol... ] *macros The association macros.
       #
-      # @return [ Array<Association> ] The matching association metadata.
+      # @return [ Array<Mongoid::Association::Relatable> ] The matching association metadata.
       def reflect_on_all_association(*macros)
         self.class.reflect_on_all_associations(*macros)
       end
@@ -41,7 +42,7 @@ module Mongoid
         #
         # @param [ String | Symbol ] name The name of the association to find.
         #
-        # @return [ Association ] The matching association metadata.
+        # @return [ Mongoid::Association::Relatable ] The matching association metadata.
         def reflect_on_association(name)
           relations[name.to_s]
         end
@@ -53,7 +54,7 @@ module Mongoid
         #
         # @param [ Symbol... ] *macros The association macros.
         #
-        # @return [ Array<Association> ] The matching association metadata.
+        # @return [ Array<Mongoid::Association::Relatable> ] The matching association metadata.
         def reflect_on_all_associations(*macros)
           all_associations = relations.values
           unless macros.empty?

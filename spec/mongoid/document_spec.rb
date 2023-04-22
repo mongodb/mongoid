@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -183,20 +184,8 @@ describe Mongoid::Document do
 
       let(:from_db) { Person.first }
 
-      context "when legacy_attributes is false" do
-        config_override :legacy_attributes, false
-
-        it "returns a Hash" do
-          expect(from_db.attributes.class).to eq(Hash)
-        end
-      end
-
-      context "when legacy_attributes is true" do
-        config_override :legacy_attributes, true
-
-        it "returns a BSON::Document" do
-          expect(from_db.attributes.class).to eq(BSON::Document)
-        end
+      it "returns a Hash" do
+        expect(from_db.attributes.class).to eq(Hash)
       end
     end
   end

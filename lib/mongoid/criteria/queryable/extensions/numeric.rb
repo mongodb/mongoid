@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -29,14 +30,6 @@ module Mongoid
           def __evolve_time__
             ::Time.at(self).utc
           end
-
-          # Get the integer as a sort direction.
-          #
-          # @example Get the integer as a sort direction.
-          #   1.to_direction
-          #
-          # @return [ Integer ] self.
-          def to_direction; self; end
 
           module ClassMethods
 

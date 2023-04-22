@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './attributes/nested_spec_models'
@@ -1672,8 +1673,6 @@ describe Mongoid::Attributes do
     end
 
     context "when comparing the object_ids of the written value" do
-      config_override :legacy_attributes, false
-
       before do
         Person.create!
       end

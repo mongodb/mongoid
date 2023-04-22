@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -49,7 +50,7 @@ module Mongoid
             split(/,/).inject({}) do |hash, spec|
               hash.tap do |_hash|
                 field, direction = spec.strip.split(/\s/)
-                _hash[field.to_sym] = direction.to_direction
+                _hash[field.to_sym] = Mongoid::Criteria::Translator.to_direction(direction)
               end
             end
           end
@@ -65,16 +66,6 @@ module Mongoid
           # @return [ Hash ] The selection.
           def __expr_part__(value, negating = false)
             ::String.__expr_part__(self, value, negating)
-          end
-
-          # Get the string as a sort direction.
-          #
-          # @example Get the string as a sort direction.
-          #   "1".to_direction
-          #
-          # @return [ Integer ] The direction.
-          def to_direction
-            self =~ /desc/i ? -1 : 1
           end
 
           module ClassMethods

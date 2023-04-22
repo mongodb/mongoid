@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -1349,20 +1350,10 @@ describe Mongoid::Changeable do
 
       context "when the document is embedded" do
 
-        let(:person) do
-          Person.instantiate(title: "Grand Poobah")
-        end
+        let(:person) { Person.create(title: "Grand Poobah") }
+        let(:address) { person.addresses.create(street: "Oxford St") }
 
-        let(:address) do
-          Address.instantiate(street: "Oxford St")
-        end
-
-        before do
-          person.addresses << address
-          person.instance_variable_set(:@new_record, false)
-          address.instance_variable_set(:@new_record, false)
-          address.street = "Bond St"
-        end
+        before { address.street = "Bond St" }
 
         it "returns a hash of field names and new values" do
           expect(address.setters).to eq(
@@ -1371,17 +1362,9 @@ describe Mongoid::Changeable do
         end
 
         context "when the document is embedded multiple levels" do
-
-          let(:location) do
-            Location.new(name: "Home")
-          end
-
-          before do
-            location.instance_variable_set(:@new_record, false)
-            address.locations << location
-            location.name = "Work"
-          end
-
+          let(:location) { address.locations.create(name: "Home") }
+          before { location.name = "Work" }
+          
           it "returns the proper hash with locations" do
             expect(location.setters).to eq(
               { "addresses.0.locations.0.name" => "Work" }

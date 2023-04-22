@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 # A class which sends values to the database as Strings but returns them to the user as Symbols.
 module Mongoid

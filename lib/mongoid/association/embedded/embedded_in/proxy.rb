@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -14,7 +15,7 @@ module Mongoid
           #
           # @param [ Document ] base The document the association hangs off of.
           # @param [ Document ] target The target (parent) of the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           #
           # @return [ In ] The proxy.
           def initialize(base, target, association)
@@ -81,6 +82,18 @@ module Mongoid
           end
 
           class << self
+            # Returns the eager loader for this association.
+            #
+            # @param [ Array<Mongoid::Association> ] associations The
+            #   associations to be eager loaded
+            # @param [ Array<Mongoid::Document> ] docs The parent documents
+            #   that possess the given associations, which ought to be
+            #   populated by the eager-loaded documents.
+            # 
+            # @return [ Mongoid::Association::Embedded::Eager ]
+            def eager_loader(associations, docs)
+              Eager.new(associations, docs)
+            end
 
             # Returns true if the association is an embedded one. In this case
             # always true.

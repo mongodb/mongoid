@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Attributes
@@ -116,6 +117,7 @@ module Mongoid
       def process_pending
         process_nested and process_relations
         pending_nested.clear and pending_relations.clear
+        _reset_memoized_descendants!
       end
 
       # Process all the pending associations that needed to wait until ids were set

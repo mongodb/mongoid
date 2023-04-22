@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -32,16 +33,16 @@ module Mongoid
 
       # Get a list of criteria that are to be executed for eager loading.
       #
-      # @return [ Array<Association> ] The inclusions.
+      # @return [ Array<Mongoid::Association::Relatable> ] The inclusions.
       def inclusions
         @inclusions ||= []
       end
 
       # Set the inclusions for the criteria.
       #
-      # @param [ Array<Association> ] value The inclusions.
+      # @param [ Array<Mongoid::Association::Relatable> ] value The inclusions.
       #
-      # @return [ Array<Association> ] The new inclusions.
+      # @return [ Array<Mongoid::Association::Relatable> ] The new inclusions.
       def inclusions=(value)
         @inclusions = value
       end
@@ -50,7 +51,7 @@ module Mongoid
 
       # Add an inclusion definition to the list of inclusions for the criteria.
       #
-      # @param [ Association ] association The association.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       # @param [ String ] parent The name of the association above this one in
       #   the inclusion tree, if it is a nested inclusion.
       def add_inclusion(association, parent = nil)

@@ -1,0 +1,20 @@
+---
+name: Rubocop
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      TESTOPTS: "-v"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby 3.0
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+          bundler-cache: true
+      - name: Run RuboCop
+        run: bundle exec rubocop --parallel

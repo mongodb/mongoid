@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './timestamps_spec_models'
@@ -72,17 +73,20 @@ describe Mongoid::Timestamps do
   context "when the document has changed with updated_at specified" do
 
     let(:document) do
-      Dokument.new(created_at: Time.now.utc)
+      Dokument.create(created_at: Time.now.utc)
+    end
+
+    let(:expected_updated_at) do
+      DateTime.parse("2001-06-12")
     end
 
     before do
-      document.new_record = false
-      document.updated_at = DateTime.parse("2001-06-12")
+      document.updated_at = expected_updated_at
     end
 
     it "does not set updated at" do
-      expect(document).to receive(:updated_at=).never
       document.save!
+      expect(document.reload.updated_at).to be == expected_updated_at
     end
   end
 

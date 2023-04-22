@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
-require "mongoid/association/referenced/eager"
+require "mongoid/association/eager"
 
 module Mongoid
   module Association
@@ -24,7 +25,8 @@ module Mongoid
       # recursively to load the associations of the given documents'
       # subdocuments.
       #
-      # @param [ Array<Association> ] associations The associations to load.
+      # @param [ Array<Mongoid::Association::Relatable> ] associations
+      #   The associations to load.
       # @param [ Array<Document> ] document The documents.
       def preload(associations, docs)
         assoc_map = associations.group_by(&:inverse_class_name)

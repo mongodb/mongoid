@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -168,32 +169,14 @@ describe Mongoid::Association::Accessors do
       end
 
       context "when the association is set to nil first" do
-        context "when broken_updates feature flag is not set" do
-          config_override :broken_updates, false
-
-          let!(:name) do
-            person.build_name
-          end
-
-          it "returns true" do
-            person.name = nil
-            person.name = name
-            expect(person).to have_name
-          end
+        let!(:name) do
+          person.build_name
         end
 
-        context "when broken_updates feature flag is set" do
-          config_override :broken_updates, true
-
-          let!(:name) do
-            person.build_name
-          end
-
-          it "returns true" do
-            person.name = nil
-            person.name = name
-            expect(person).to have_name
-          end
+        it "returns true" do
+          person.name = nil
+          person.name = name
+          expect(person).to have_name
         end
       end
     end

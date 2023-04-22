@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -1163,7 +1164,7 @@ describe Mongoid::Clients do
         Band.create!(name: 'Led Zeppelin')
       end
 
-      it 'does not create extra symbols symbols' do
+      it 'does not create extra symbols' do
         first_band.with(write: { w: 0, j: false }) do |band|
           band.set(active: false)
         end
@@ -1171,7 +1172,7 @@ describe Mongoid::Clients do
         second_band.with(write: { w: 0, j: false }) do |band|
           band.set(active: false)
         end
-        expect(Symbol.all_symbols.size).to eq(initial_symbols_count)
+        expect(Symbol.all_symbols.size).to be <= initial_symbols_count
       end
 
     end

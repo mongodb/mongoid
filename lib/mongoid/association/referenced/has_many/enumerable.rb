@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -45,11 +46,7 @@ module Mongoid
           # @return [ true | false ] If the objects are equal in a case.
           def ===(other)
             return false unless other.respond_to?(:entries)
-            if Mongoid.legacy_triple_equals
-              other.class == Class ? (Array == other || Enumerable == other) : self == other
-            else
-              entries === other.entries
-            end
+            entries === other.entries
           end
 
           # Append a document to the enumerable.

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 class EomParent
   include Mongoid::Document
@@ -50,7 +51,11 @@ class EomDnlChild
   include Mongoid::Document
 
   embedded_in :parent, class_name: 'EomDnlParent'
-  embedded_in :missing_parent, class_name: 'EomDnlMissingParent'
+
+  # `touch: false` is necessary here because Touchable tries to reference the
+  # associated class when it adds the callbacks for touching. See MONGOID-5016
+  # re: `touch: true` as the default for embedded_in associations.
+  embedded_in :missing_parent, touch: false, class_name: 'EomDnlMissingParent'
 end
 
 class EomAddress

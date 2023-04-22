@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -70,8 +71,8 @@ describe Mongoid::Extensions::String do
 
   describe "#__mongoize_time__" do
 
-    context "when using active support's time zone" do
-      include_context 'using AS time zone'
+    context "when setting ActiveSupport time zone" do
+      include_context 'setting ActiveSupport time zone'
 
       context "when the string is a valid time with time zone" do
 
@@ -131,86 +132,6 @@ describe Mongoid::Extensions::String do
         end
 
         it_behaves_like 'mongoizes to AS::TimeWithZone'
-      end
-
-      context "when the string is an invalid time" do
-
-        let(:string) do
-          "shitty string"
-        end
-
-        it "raises an error" do
-          expect {
-            string.__mongoize_time__
-          }.to raise_error(ArgumentError)
-        end
-      end
-    end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
-
-      context "when the string is a valid time with time zone" do
-
-        let(:string) do
-          "2010-11-19 00:24:49.123457 +1100"
-        end
-
-        let(:expected_time) { Time.parse("2010-11-18 13:24:49.123457 +0000").in_time_zone }
-
-        let(:mongoized) do
-          string.__mongoize_time__
-        end
-
-        it_behaves_like 'mongoizes to Time'
-        it_behaves_like 'maintains precision when mongoized'
-      end
-
-      context "when the string is a valid time without time zone" do
-
-        let(:string) do
-          "2010-11-19 00:24:49.123457"
-        end
-
-        let(:utc_offset) do
-          Time.now.utc_offset
-        end
-
-        let(:expected_time) { Time.parse("2010-11-19 00:24:49.123457 +0000") - Time.parse(string).utc_offset }
-
-        let(:mongoized) do
-          string.__mongoize_time__
-        end
-
-        it 'test operates in multiple time zones' do
-          expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
-        end
-
-        it_behaves_like 'mongoizes to Time'
-        it_behaves_like 'maintains precision when mongoized'
-      end
-
-      context "when the string is a valid time without time" do
-
-        let(:string) do
-          "2010-11-19"
-        end
-
-        let(:mongoized) do
-          string.__mongoize_time__
-        end
-
-        let(:utc_offset) do
-          Time.now.utc_offset
-        end
-
-        let(:expected_time) { Time.parse("2010-11-19 00:00:00 +0000") - Time.parse(string).utc_offset }
-
-        it 'test operates in multiple time zones' do
-          expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
-        end
-
-        it_behaves_like 'mongoizes to Time'
       end
 
       context "when the string is an invalid time" do

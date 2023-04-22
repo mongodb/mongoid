@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -43,7 +44,7 @@ module Mongoid
         # @example Define the autosave method:
         #   Association::Referenced::Autosave.define_autosave!(association)
         #
-        # @param [ Association ] association The association for which autosaving is enabled.
+        # @param [ Mongoid::Association::Relatable ] association The association for which autosaving is enabled.
         #
         # @return [ Class ] The association's owner class.
         def self.define_autosave!(association)

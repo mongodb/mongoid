@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -67,41 +68,18 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
-      context "when broken_and feature flag is not set" do
-        config_override :broken_and, false
-
-        context '$and to query with $and onto query whose first one is not $and' do
-          let(:query) do
-            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
-          end
-
-          let(:modified) do
-            query.send(query_method, '$and', [{'foo' => 'bar'}])
-          end
-
-          it 'adds to existing $and' do
-            modified.selector.should == {
-              '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
-          end
+      context '$and to query with $and onto query whose first one is not $and' do
+        let(:query) do
+          Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
         end
-      end
 
-      context "when broken_and feature flag is set" do
-        config_override :broken_and, true
+        let(:modified) do
+          query.send(query_method, '$and', [{'foo' => 'bar'}])
+        end
 
-        context '$and to query with $and onto query whose first one is not $and' do
-          let(:query) do
-            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
-          end
-
-          let(:modified) do
-            query.send(query_method, '$and', [{'foo' => 'bar'}])
-          end
-
-          it 'does not add to existing $and' do
-            modified.selector.should == {
-              '$and' => [{'foo' => 'bar'}], 'foo' => 'baz'}
-          end
+        it 'adds to existing $and' do
+          modified.selector.should == {
+            '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
         end
       end
     end

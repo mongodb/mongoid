@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -123,7 +124,7 @@ module Mongoid
           elsif operator == '$and' || selector.empty?
             # $and can always be added to top level and it will be combined
             # with whatever other conditions exist.
-            if !Mongoid.broken_and && current_value = selector[operator]
+            if current_value = selector[operator]
               new_value = current_value + op_expr
               selector.store(operator, new_value)
             else

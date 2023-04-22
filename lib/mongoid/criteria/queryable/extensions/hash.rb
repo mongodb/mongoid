@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -115,7 +116,7 @@ module Mongoid
           def __sort_option__
             tap do |hash|
               hash.each_pair do |key, value|
-                hash.store(key, value.to_direction)
+                hash.store(key, Mongoid::Criteria::Translator.to_direction(value))
               end
             end
           end

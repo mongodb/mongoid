@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -39,7 +40,7 @@ module Mongoid
       # @example
       #   Person.define_builder!(association)
       #
-      # @param [ Association ] association The association metadata for the association.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       #
       # @return [ Class ] The class being set up.
       def self.define_builder!(association)
@@ -63,7 +64,7 @@ module Mongoid
       # @example
       #   Person.define_creator!(association)
       #
-      # @param [ Association ] association The association metadata for the association.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       #
       # @return [ Class ] The class being set up.
       def self.define_creator!(association)

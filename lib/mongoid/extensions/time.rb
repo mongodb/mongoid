@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Extensions
@@ -34,8 +35,10 @@ module Mongoid
         #   ::Time.configured
         #
         # @return [ Time ] The configured time.
+        #
+        # @deprecated
         def configured
-          Mongoid.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
+          ::Time.zone || ::Time
         end
 
         # Convert the object from its mongo friendly ruby type to this type.
@@ -64,11 +67,7 @@ module Mongoid
 
           return if time.nil?
 
-          if Mongoid::Config.use_activesupport_time_zone?
-            time.in_time_zone(Mongoid.time_zone)
-          else
-            time
-          end
+          time.in_time_zone(Mongoid.time_zone)
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

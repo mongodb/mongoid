@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "rake"
 require "spec_helper"
@@ -317,6 +318,53 @@ describe "db:mongoid:purge" do
 
     it "receives a purge" do
       expect(Mongoid).to receive(:purge!)
+      task.invoke
+    end
+  end
+end
+
+describe "db:mongoid:encryption:create_data_key" do
+  require_enterprise
+  require_libmongocrypt
+  include_context 'with encryption'
+  restore_config_clients
+  include_context "rake task"
+
+  let(:task_file) { "mongoid/tasks/encryption" }
+
+  let(:config) do
+    {
+      default: {
+        hosts: SpecConfig.instance.addresses,
+        database: database_id,
+        options: {
+          auto_encryption_options: {
+            kms_providers: kms_providers,
+            key_vault_namespace: key_vault_namespace,
+            extra_options: extra_options
+          }
+        }
+      }
+    }
+  end
+
+  before do
+    Mongoid::Config.send(:clients=, config)
+
+    expect_any_instance_of(Mongo::ClientEncryption)
+      .to receive(:create_data_key)
+      .with('local')
+      .and_call_original
+  end
+
+  it "creates the key" do
+    task.invoke
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    it "creates the key" do
       task.invoke
     end
   end

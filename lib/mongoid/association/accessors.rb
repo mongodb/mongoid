@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -17,7 +18,7 @@ module Mongoid
       #
       # @param [ String | Symbol ] name The name of the association.
       # @param [ Hash | BSON::ObjectId ] object The id or attributes to use.
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
       #   If selected_fields is specified, fields not listed in it will not be
       #   accessible in the built document.
@@ -34,7 +35,7 @@ module Mongoid
       #   person.create_relation(document, association)
       #
       # @param [ Document | Array<Document> ] object The association target.
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
       #   If selected_fields is specified, fields not listed in it will not be
       #   accessible in the created association document.
@@ -99,7 +100,7 @@ module Mongoid
       #   document.get_relation(:name, association)
       #
       # @param [ Symbol ] name The name of the association.
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       # @param [ Object ] object The object used to build the association.
       # @param [ true | false ] reload If the association is to be reloaded.
       #
@@ -268,7 +269,7 @@ module Mongoid
       #   person.has_game?
       #   person.game?
       #
-      # @param [ Association ] association The association.
+      # @param [ Mongoid::Association::Relatable ] association The association.
       #
       # @return [ Class ] The model being set up.
       def self.define_existence_check!(association)
@@ -290,7 +291,7 @@ module Mongoid
       # @example Set up the getter for the association.
       #   Person.define_getter!(association)
       #
-      # @param [ Association ] association The association metadata for the association.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       def self.define_getter!(association)
@@ -312,7 +313,7 @@ module Mongoid
       # @example Set up the ids getter for the association.
       #   Person.define_ids_getter!(association)
       #
-      # @param [ Association ] association The association metadata for the association.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       def self.define_ids_getter!(association)
@@ -332,7 +333,7 @@ module Mongoid
       # @example Set up the setter for the association.
       #   Person.define_setter!(association)
       #
-      # @param [ Association ] association The association metadata for the association.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       def self.define_setter!(association)
@@ -341,12 +342,11 @@ module Mongoid
           klass.re_define_method("#{name}=") do |object|
             without_autobuild do
               if value = get_relation(name, association, object)
-                if value.respond_to?(:substitute)
-                  set_relation(name, value.substitute(object.substitutable))
-                else
-                  value = __build__(name, value, association)
-                  set_relation(name, value.substitute(object.substitutable))
+                if !value.respond_to?(:substitute)
+                  value = __build__(name, value, association) 
                 end
+
+                set_relation(name, value.substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, association)
               end
@@ -364,7 +364,7 @@ module Mongoid
       # @example Set up the id_setter for the association.
       #   Person.define_ids_setter!(association)
       #
-      #  @param [ Association ] association The association for the association.
+      #  @param [ Mongoid::Association::Relatable ] association The association for the association.
       #
       #  @return [ Class ] The class being set up.
       def self.define_ids_setter!(association)
@@ -383,7 +383,7 @@ module Mongoid
       # @example
       #   Person.define_builder!(association)
       #
-      # @param [ Association ] association The association for the association.
+      # @param [ Mongoid::Association::Relatable ] association The association for the association.
       #
       # @return [ Class ] The class being set up.
       def self.define_builder!(association)
@@ -408,7 +408,7 @@ module Mongoid
       # @example
       #   Person.define_creator!(association)
       #
-      # @param [ Association ] association The association for the association.
+      # @param [ Mongoid::Association::Relatable ] association The association for the association.
       #
       # @return [ Class ] The class being set up.
       def self.define_creator!(association)

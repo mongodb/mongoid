@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/association/marshalable"
 
@@ -49,7 +50,7 @@ module Mongoid
       #
       # @param [ Document ] base The base document on the proxy.
       # @param [ Document | Array<Document> ] target The target of the proxy.
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       def init(base, target, association)
         @_base, @_target, @_association = base, target, association
         yield(self) if block_given?
@@ -188,7 +189,7 @@ module Mongoid
         #   Proxy.apply_ordering(criteria, association)
         #
         # @param [ Criteria ] criteria The criteria to modify.
-        # @param [ Association ] association The association metadata.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         #
         # @return [ Criteria ] The ordered criteria.
         def apply_ordering(criteria, association)

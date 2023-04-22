@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -17,7 +18,7 @@ module Mongoid
           #
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Document ] target The target (child) of the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def initialize(base, target, association)
             init(base, target, association) do
               raise_mixed if klass.embedded? && !klass.cyclic?

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './touchable_spec_models'
@@ -170,11 +171,6 @@ describe Mongoid::Touchable do
     end
 
     context "when no relations have touch options" do
-
-      before do
-        Person.send(:include, Mongoid::Touchable::InstanceMethods)
-        Agent.send(:include, Mongoid::Touchable::InstanceMethods)
-      end
 
       context "when no updated at is defined" do
 
@@ -395,11 +391,6 @@ describe Mongoid::Touchable do
 
       context "when the relation is a parent of an embedded doc" do
 
-        before do
-          Page.send(:include, Mongoid::Touchable::InstanceMethods)
-          Edit.send(:include, Mongoid::Touchable::InstanceMethods)
-        end
-
         let(:page) do
           WikiPage.create!(title: "test")
         end
@@ -419,10 +410,6 @@ describe Mongoid::Touchable do
       end
 
       context "when the parent of embedded doc has cascade callbacks" do
-
-        before do
-          Band.send(:include, Mongoid::Touchable::InstanceMethods)
-        end
 
         let!(:book) do
           Book.new

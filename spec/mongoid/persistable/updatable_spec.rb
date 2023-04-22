@@ -1,8 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
+require "support/immutable_ids"
 
 describe Mongoid::Persistable::Updatable do
+  extend Mongoid::ImmutableIds
+  immutable_id_examples_as "persisted _ids are immutable"
 
   describe "#update_attribute" do
 
@@ -446,6 +450,14 @@ describe Mongoid::Persistable::Updatable do
         end
       end
     end
+
+    context 'when the field is _id' do
+      def invoke_operation!
+        object.update_attribute "_id", new_id_value
+      end
+
+      it_behaves_like "persisted _ids are immutable"
+    end
   end
 
   [:update_attributes, :update].each do |method|
@@ -463,29 +475,6 @@ describe Mongoid::Persistable::Updatable do
           expect {
             person.update_attributes!(map: { "$bad.key" => "value" })
           }.to raise_error(Mongo::Error::OperationFailure)
-        end
-      end
-
-      context "when validation passes" do
-
-        let(:person) do
-          Person.create!
-        end
-
-        let!(:saved) do
-          person.update_attributes!(pets: false)
-        end
-
-        let(:from_db) do
-          Person.find(person.id)
-        end
-
-        it "returns true" do
-          expect(saved).to be true
-        end
-
-        it "saves the attributes" do
-          expect(from_db.pets).to be false
         end
       end
 
@@ -716,6 +705,14 @@ describe Mongoid::Persistable::Updatable do
             end
           end
         end
+      end
+
+      context 'when the _id is one of the fields' do
+        def invoke_operation!
+          object.update_attributes _id: new_id_value
+        end
+  
+        it_behaves_like "persisted _ids are immutable"
       end
     end
   end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -44,7 +45,7 @@ module Mongoid
       # @example Set up cascading information
       #   Mongoid::Association::Depending.define_dependency!(association)
       #
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       #
       # @return [ Class ] The class of the document.
       def self.define_dependency!(association)
