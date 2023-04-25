@@ -118,6 +118,15 @@ module Rails
             ::Mongoid::Railties::ControllerRuntime::Collector.new
       end
 
+      # Adds custom serializers to ActiveJob.
+      initializer "mongoid.active_job.custom_serializers" do
+        require "mongoid/railties/active_job_serializers/bson_object_id_serializer"
+
+        config.after_initialize do
+          serializers = ::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer
+          ActiveJob::Serializers.add_serializers serializers
+        end
+      end
     end
   end
 end
