@@ -28,6 +28,7 @@ Starting from version 9.0 Mongoid supports automatic CSFLE feature. This tutoria
 walks you through the process of setting up and using CSFLE in Mongoid.
 
 .. note::
+  This tutorial does not cover all CSLFE features.
   You can find more information about MongoDB CSFLE in
   `the server documentation. <https://www.mongodb.com/docs/manual/core/csfle/>`_
 
@@ -79,7 +80,7 @@ available as ``CUSTOMER_MASTER_KEY`` environment variable.
   in the MongoDB Client-Side Encryption documentation.
 
   For more information about creating a master key, see the
-  `Create a Master Key <https://www.mongodb.com/docs/manual/core/csfle/#a.-create-a-master-key>`_
+  `Create a Customer Master Key <https://www.mongodb.com/docs/manual/core/csfle/quick-start/#create-a-customer-master-key>`_
   section of the MongoDB manual.
 
 Configure Clients
@@ -145,20 +146,20 @@ Now we can tell Mongoid what should be encrypted:
     # This field is not encrypted.
     field :category, type: String
 
-    # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic
-    # algorithm.
-    field :policy_number, type: Integer, encrypt: {
-        deterministic: true
-    }
     # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Random
     # algorithm.
-    field :blood_type, type: String, encrypt: {
+    field :passport_id, type: String, encrypt: {
         deterministic: false
     }
     # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic
+    # algorithm.
+    field :blood_type, type: String, encrypt: {
+        deterministic: true
+    }
+    # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Random
     # algorithm and using  a different data key.
     field :ssn, type: Integer, encrypt: {
-        deterministic: true, data_key_id: 'Vxr5m+5cQISjDOruzZgE0w=='
+        deterministic: false, key_id: 'Vxr5m+5cQISjDOruzZgE0w=='
     }
 
     embeds_one :insurance
@@ -169,43 +170,181 @@ Now we can tell Mongoid what should be encrypted:
 
     field :insurer, type: String
 
-    # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic
+    # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Random
     # algorithm using the same data key as Patient class attributes.
     field :policy_number, type: Integer, encrypt: {
-        deterministic: true
+        deterministic: false
     }
 
     embedded_in :patient
   end
 
-The configuration is complete. Now we can work with documents as usual:
+Working with Data
+=================
+
+Automatic CSFLE usage is transparent in many situations.
+
+.. note::
+  In code examples below we assume that there is a variable ``unencrypted_client``
+  that is a Mongo client connected to the same database but without encryption.
+  We use this client to demonstrate what is actually persisted in the database.
+
+Documents can be created as usual, fields will be encrypted and decrypted according to the
+configuration:
 
 .. code-block:: ruby
 
   Patient.create!(
     category: 'ER',
-    policy_number: '123456',
+    passport_id: '123456',
     blood_type: 'AB+',
-    ssn: '98765',
-    insurance: Insurance.new(insurer: 'TK', policy_number: '123456')
+    ssn: 98765,
+    insurance: Insurance.new(insurer: 'TK', policy_number: 123456)
   )
-  # => #<Patient _id: 6446a0f746ebfd701f9f4290, category: "ER", policy_number: 123456, blood_type: "AB+", ssn: 98765>
 
-  # Fields are encrypted automatically
-  Patient.first!
-  # => #<Patient _id: 6446a0f746ebfd701f9f4290, category: "ER", policy_number: 123456, blood_type: "AB+", ssn: 98765>
-
-  # We can find documents by deterministically encrypted fields.
-  Patient.where(ssn: '98765').to_a
-  # => [#<Patient _id: 6446a1d046ebfd701f9f4292, category: "ER", policy_number: 123456, blood_type: "AB+", ssn: 98765>]
-
-  # However, the actual content in the database is encrypted.
-  unencrypted_client = Mongo::Client.new('mongodb://localhost:27017/crypto_development')
+  # Fields are encrypted in the database
   unencrypted_client['patients'].find.first
   # =>
   # {"_id"=>BSON::ObjectId('6446a1d046ebfd701f9f4292'),
   # "category"=>"ER",
-  # "policy_number"=><BSON::Binary:0x404080 type=ciphertext data=0x012889b2cb0b1341...>,
+  # "passport_id"=><BSON::Binary:0x404080 type=ciphertext data=0x012889b2cb0b1341...>,
   # "blood_type"=><BSON::Binary:0x404560 type=ciphertext data=0x022889b2cb0b1341...>,
   # "ssn"=><BSON::Binary:0x405040 type=ciphertext data=0x012889b2cb0b1341...>,
   # "insurance"=>{"_id"=>BSON::ObjectId('6446a1d046ebfd701f9f4293'), "insurer"=>"TK", "policy_number"=><BSON::Binary:0x405920 type=ciphertext data=0x012889b2cb0b1341...>}}
+
+Fields encrypted using deterministic algorithm can be queried. Only exact match
+queries are supported. For more details please consult `the server documentation
+<https://www.mongodb.com/docs/manual/core/csfle/reference/supported-operations/#std-label-csfle-reference-automatic-encryption-supported-operations>`_.
+
+.. code-block:: ruby
+
+  # We can find documents by deterministically encrypted fields.
+  Patient.where(blood_type: "AB+").to_a
+  # => [#<Patient _id: 6447e34d46ebfd3debdd9c39, category: "ER", passport_id: "123456", blood_type: "AB+", ssn: 98765>]
+
+Encryption Key Management
+=========================
+
+Customer Master Keys
+~~~~~~~~~~~~~~~~~~~~
+
+Your Customer Master Key is the key you use to encrypt your Data Encryption Keys.
+MongoDB automatically encrypts Data Encryption Keys using the specified CMK during Data Encryption Key creation.
+
+The CMK is the most sensitive key in CSFLE. If your CMK is compromised, all of your encrypted data can be decrypted.
+
+.. important::
+  Ensure you store your Customer Master Key (CMK) on a remote KMS.
+
+  To learn more about why you should use a remote KMS, see `Reasons to Use a Remote KMS. <https://www.mongodb.com/docs/manual/core/csfle/fundamentals/manage-keys/#std-label-csfle-reasons-to-use-remote-kms>`_
+
+  To view a list of all supported KMS providers, see the `KMS Providers <https://www.mongodb.com/docs/manual/core/csfle/reference/kms-providers/#std-label-csfle-reference-kms-providers>`_ page.
+
+CSFLEncryption supports the following Key Management System (KMS) providers:
+  * Amazon Web Services KMS
+  * Azure Key Vault
+  * Google Cloud Platform KMS
+  * Any KMIP Compliant Key Management System
+  * Local Key Provider (for testing only)
+
+Data Encryption Keys
+~~~~~~~~~~~~~~~~~~~~
+
+Data Encryption Keys can be created using ``db:mongoid:encryption:create_data_key``
+Rake task. By default they are stored on the same cluster as the database.
+However, it might be a good idea to store the keys separately. This can be
+done by specifying a key vault client in ``mongoid.yml``:
+
+.. code-block:: yaml
+
+  development:
+    clients:
+      key_vault:
+        uri: mongodb+srv://user:pass@anothercluster.mongodb.net/blog_development?retryWrites=true&w=majority
+      default:
+        uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog_development?retryWrites=true&w=majority
+        options:
+          auto_encryption_options:
+            key_vault_client: :key_vault # Client to connect to key vault
+            # ...
+
+Encryption Keys Rotation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can rotate encryption keys using the ``rewrap_many_data_key`` method
+of the Ruby driver. This method automatically decrypts multiple data encryption
+keys and re-encrypts them using a specified customer master key. It then updates
+the rotated keys in the key vault collection. This method allows you to rotate
+encryption keys based on two optional arguments:
+
+* A filter used to specify which keys to rotate. If no data key matches the
+  given filter, no keys will be rotated. Omit the filter to rotate all keys in
+  your key vault collection.
+* An object that represents a new CMK. Omit this object to rotate the data
+  keys using their current CMKs.
+
+Here is an example of rotating keys using AWS KMS:
+
+.. code-block:: ruby
+
+  # Create a key vault client
+  key_vault_client = Mongo::Client.new('mongodb+srv://user:pass@yourcluster.mongodb.net')
+  # Or, if you declared the key value client in mongoid.yml, use it
+  key_vault_client = Mongoid.client(:key_vault)
+
+  # Create the encryption object
+  encryption = Mongo::ClientEncryption.new(
+    key_vault_client,
+    key_vault_namespace: 'encryption.__keyVault',
+    kms_providers: {
+      aws: {
+        "accessKeyId": "<IAM User Access Key ID>",
+        "secretAccessKey": "<IAM User Secret Access Key>"
+      }
+    }
+  )
+
+  encryption.rewrap_many_data_key(
+    {}, # We want to rewrap all keys
+    {
+      provider: 'aws',
+      master_key: {
+        region: 'us-east-2',
+        key: 'arn:aws:kms:us-east-2:...'
+      }
+    }
+  )
+
+Adding Automatic Encryption To Existing Project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MongoDB automatic CSFLE supports encryption in place. You can enable encryption
+for your existing database, and you are still able to read unencrypted data.
+All data written to the database will be encrypted. However, as soon as the
+encryption is enabled, all query operations will use encrypted data:
+
+.. code-block:: ruby
+
+  # We assume that there are two documents in the database, one created without
+  # encryption enabled, and one with encryption.
+
+  # We can still read both.
+  Patient.all.to_a
+  # =>
+  # [#<Patient _id: 644937ac46ebfd02468e58c8, category: "ER", passport_id: "DE-1257", blood_type: "AB+", ssn: 123456>,
+  # #<Patient _id: 644937c946ebfd029309b912, category: "ER", passport_id: "AT-1545", blood_type: "AB+", ssn: 987654>]
+
+  # But when we query, we can see only the latter one.
+  Patient.where(blood_type: 'AB+').to_a
+  # => [#<Patient _id: 644937c946ebfd029309b912, category: "ER", passport_id: "AT-1545", blood_type: "AB+", ssn: 987654>]
+
+If you want to encrypt the existing database, it can be achieved by reading
+and writing back all data, even without any changes. If you decide to do so,
+please keep in mind the following:
+
+* Validate the integrity of existing data for consistent fidelity. CSFLE is
+  type sensitive, you cannot store, say, integers in a field that is declared
+  as string.
+* For strings, make sure that empty values are always empty strings or just
+  not set, but not Null (CSFLE doesn't support native null).
+* This operation requires application downtime.
