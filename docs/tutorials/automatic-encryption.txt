@@ -116,19 +116,18 @@ A Data Encryption Key (DEK) is the key you use to encrypt the fields in your
 MongoDB documents. You store your Data Encryption Key in your Key Vault
 collection encrypted with your CMK.
 
-To create a DEK in Mongoid you can use ``db:mongoid:encryption:create_data_key``
-Rake task:
+To create a DEK in Mongoid you can use the ``db:mongoid:encryption:create_data_key`` ``Rake`` task:
 
 .. code-block:: sh
 
-  % db:mongoid:encryption:create_data_key
+  % rake db:mongoid:encryption:create_data_key
   Created data key with id: 'KImyywsTQWi1+cFYIHdtlA==' for kms provider: 'local' in key vault: 'encryption.__keyVault'.
 
 You can create multiple DEKs, if necessary.
 
 .. code-block:: sh
 
-  % db:mongoid:encryption:create_data_key
+  % rake db:mongoid:encryption:create_data_key
   Created data key with id: 'Vxr5m+5cQISjDOruzZgE0w==' for kms provider: 'local' in key vault: 'encryption.__keyVault'.
 
 
