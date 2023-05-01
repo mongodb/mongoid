@@ -12,22 +12,24 @@ Automatic Client-Side Field Level Encryption
 
 
 Since version 4.2 MongoDB supports `Client-Side Field Level Encryption
-(CSFLE) <https://www.mongodb.com/docs/manual/core/csfle/>`_. This is a feature that enables you to encrypt data in your application
-before you send it over the network to MongoDB. With CSFLE enabled, no MongoDB
-product has access to your data in an unencrypted form.
+(CSFLE) <https://www.mongodb.com/docs/manual/core/csfle/>`_. This is a feature
+that enables you to encrypt data in your application before you send it over the
+network to MongoDB. With CSFLE enabled, no MongoDB product has access to your
+data in an unencrypted form.
 
 You can set up CSFLE using the following mechanisms:
 
 * `Automatic Encryption <https://www.mongodb.com/docs/manual/core/csfle/fundamentals/automatic-encryption/>`_:
-  Enables you to perform encrypted read and write operations without you having to write code to
-  specify how to encrypt fields.
+  Enables you to perform encrypted read and write operations without you having
+  to write code to specify how to encrypt fields.
 * `Explicit Encryption <https://www.mongodb.com/docs/manual/core/csfle/fundamentals/manual-encryption/>`_:
-  Enables you to perform encrypted read and write operations through your MongoDB driver's
-  encryption library. You must specify the logic for encryption with this library throughout your
-  application.
+  Enables you to perform encrypted read and write operations through your
+  MongoDB driver's encryption library. You must specify the logic for encryption
+  with this library throughout your application.
 
-Starting with version 9.0, Mongoid supports CSFLE's Automatic Encryption feature. This tutorial
-walks you through the process of setting up and using CSFLE in Mongoid.
+Starting with version 9.0, Mongoid supports CSFLE's Automatic Encryption
+feature. This tutorial walks you through the process of setting up and using
+CSFLE in Mongoid.
 
 .. note::
   This tutorial does not cover all CSLFE features.
@@ -42,21 +44,21 @@ walks you through the process of setting up and using CSFLE in Mongoid.
 Installation
 ============
 
-You can find the detailed description of how to install the necessary dependencies
-in `the driver documentation. <https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/#installation>`_
+You can find the detailed description of how to install the necessary
+dependencies in `the driver documentation. <https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/#installation>`_
 
 Here we provide a brief summary of the required steps to:
 
 * Install ``libmongocrypt`` - either add `libmongocrypt-helper gem <https://github.com/mongodb/libmongocrypt-helper-ruby>`_ to
   your ``Gemfile``, or download ``libmongocrypt`` release `here <https://s3.amazonaws.com/mciuploads/libmongocrypt/all/master/latest/libmongocrypt-all.tar.gz>`_,
-  extract the version that matches your operating system, and set ``LIBMONGOCRYPT_PATH``
-  environment variable accordingly.
-* If you use the Ruby driver (version 2.19 and above) - install the automatic encryption shared
-  library. For installation instructions, see
+  extract the version that matches your operating system, and
+  set ``LIBMONGOCRYPT_PATH`` environment variable accordingly.
+* If you use the Ruby driver (version 2.19 and above) - install the automatic
+  encryption shared library. For installation instructions, see
   `the MongoDB manual <https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`_.
 * If you use an older version of the Ruby driver - install ``mongocryptd``.
-  Mongocryptd comes pre-packaged with enterprise builds of the MongoDB server (versions 4.2 and
-  newer). For installation instructions, see the
+  Mongocryptd comes pre-packaged with enterprise builds of the MongoDB server
+  (versions 4.2 and newer). For installation instructions, see the
   `MongoDB manual <https://mongodb.com/docs/manual/reference/security-client-side-encryption-appendix/#installation>`_.
 
 Create a Customer Master Key
@@ -77,9 +79,9 @@ available as ``CUSTOMER_MASTER_KEY`` environment variable.
 
 .. warning::
 
-  Using a local master key is insecure. It is recommended that you use a remote Key Management Service to create and
-  store your master key. To do so, follow steps of the
-  `"Set up a Remote Master Key" <https://www.mongodb.com/docs/manual/core/csfle/tutorials/#set-up-a-remote-master-key>`_
+  Using a local master key is insecure. It is recommended that you use a remote
+  Key Management Service to create and store your master key. To do so, follow
+  steps of the `"Set up a Remote Master Key" <https://www.mongodb.com/docs/manual/core/csfle/tutorials/#set-up-a-remote-master-key>`_
   in the MongoDB Client-Side Encryption documentation.
 
   For more information about creating a master key, see the
@@ -116,7 +118,8 @@ A Data Encryption Key (DEK) is the key you use to encrypt the fields in your
 MongoDB documents. You store your Data Encryption Key in your Key Vault
 collection encrypted with your CMK.
 
-To create a DEK in Mongoid you can use the ``db:mongoid:encryption:create_data_key`` ``Rake`` task:
+To create a DEK in Mongoid you can use the
+``db:mongoid:encryption:create_data_key`` ``Rake`` task:
 
 .. code-block:: sh
 
@@ -193,8 +196,8 @@ Automatic CSFLE usage is transparent in many situations.
   that is a Mongo client connected to the same database but without encryption.
   We use this client to demonstrate what is actually persisted in the database.
 
-Documents can be created as usual, fields will be encrypted and decrypted according to the
-configuration:
+Documents can be created as usual, fields will be encrypted and decrypted
+according to the configuration:
 
 .. code-block:: ruby
 
@@ -233,9 +236,11 @@ Customer Master Keys
 ~~~~~~~~~~~~~~~~~~~~
 
 Your Customer Master Key is the key you use to encrypt your Data Encryption Keys.
-MongoDB automatically encrypts Data Encryption Keys using the specified CMK during Data Encryption Key creation.
+MongoDB automatically encrypts Data Encryption Keys using the specified CMK
+during Data Encryption Key creation.
 
-The CMK is the most sensitive key in CSFLE. If your CMK is compromised, all of your encrypted data can be decrypted.
+The CMK is the most sensitive key in CSFLE. If your CMK is compromised, all of
+your encrypted data can be decrypted.
 
 .. important::
   Ensure you store your Customer Master Key (CMK) on a remote KMS.
