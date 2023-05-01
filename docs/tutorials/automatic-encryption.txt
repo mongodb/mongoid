@@ -140,6 +140,7 @@ Now we can tell Mongoid what should be encrypted:
 
   class Patient
     include Mongoid::Document
+    include Mongoid::Timestamps
 
     # Tells Mongoid what DEK should be used to encrypt fields of the document
     # and its embedded documents.
@@ -169,6 +170,7 @@ Now we can tell Mongoid what should be encrypted:
 
   class Insurance
     include Mongoid::Document
+    include Mongoid::Timestamps
 
     field :insurer, type: String
 
