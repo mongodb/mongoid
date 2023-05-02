@@ -578,12 +578,12 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "mongodb-5.3"
+- matrix_name: "mongodb-latest"
   matrix_spec:
     ruby: ["ruby-3.1"]
     driver: ["current"]
     topology: '*'
-    mongodb-version: ['5.3']
+    mongodb-version: ['latest']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -628,7 +628,7 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set']
     mongodb-version: ['4.0']
-    os: ubuntu-16.04
+    os: ubuntu-18.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -661,7 +661,7 @@ buildvariants:
     ruby: ["ruby-2.6"]
     mongodb-version: "3.6"
     topology: "standalone"
-    os: ubuntu-16.04
+    os: ubuntu-18.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
