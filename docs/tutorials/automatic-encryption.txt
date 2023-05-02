@@ -59,7 +59,7 @@ This can be done one of two ways.
   extract the version that matches your operating system, and set the
   ``LIBMONGOCRYPT_PATH`` environment variable accordingly.
 
-**Install the automatic encryption shared library (Ruby driver 2.19+)
+**Install the automatic encryption shared library (Ruby driver 2.19+)**
 If you use the Ruby driver (version 2.19 and above) the automatic encryption
 shared library should be installed by following the instructions in the
 `MongoDB manual <https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`_.
@@ -72,6 +72,19 @@ The steps required are as follows:
 4. In the Package dropdown, select ``crypt_shared``.
 5. Click Download.
 
+Once extracted, ensure the full path to the library is configured within your
+``mongoid.yml`` as follows:
+
+.. code-block:: yaml
+
+  development:
+    clients:
+      default:
+        options:
+          auto_encryption_options:
+            extra_options:
+              crypt_shared_lib_path: '/path/to/mongo_crypt_v1.so'
+
 **Install the ``mongocryptd`` (Ruby driver 2.18 or older)**
 If you are using an older version of the Ruby driver ``mongocryptd`` will
 need to be installed manually. ``mongocryptd`` comes pre-packaged with
@@ -81,9 +94,9 @@ For installation instructions, see the `MongoDB manual <https://mongodb.com/docs
 Create a Customer Master Key
 ============================
 
-A Customer Master Key (CMK) used to encrypt Data Encryption Keys. The easiest
-way is to use a locally stored 96-bytes key. You can generate such a key
-using the following Ruby code:
+A Customer Master Key (CMK) is used to encrypt Data Encryption Keys.
+The easiest way is to use a locally stored 96-bytes key. You can generate such
+a key using the following Ruby code:
 
 .. code-block:: ruby
 
@@ -91,8 +104,8 @@ using the following Ruby code:
 
   SecureRandom.hex(48) # => "f54ab...."
 
-Later in this tutorial we assume that the Customer Master Key content is
-available as ``CUSTOMER_MASTER_KEY`` environment variable.
+Later in this tutorial we assume that the Customer Master Key is
+available from the ``CUSTOMER_MASTER_KEY`` environment variable.
 
 .. warning::
 
@@ -125,7 +138,7 @@ add the following to your ``mongoid.yml``:
               local: # We use the local key in this tutorial
                 key: "<%= ENV['CUSTOMER_MASTER_KEY'] %>" # Key that we generated earlier
             extra_options:
-                crypt_shared_lib_path: '/path/to/mongo_crypt_v1.so' # Only if you use the library
+              crypt_shared_lib_path: '/path/to/mongo_crypt_v1.so' # Only if you use the library
 
 
 Create a Data Encryption Key
@@ -210,7 +223,7 @@ Automatic CSFLE usage is transparent in many situations.
 
 .. note::
   In code examples below we assume that there is a variable ``unencrypted_client``
-  that is a Mongo client connected to the same database but without encryption.
+  that is a ``MongoClient`` connected to the same database but without encryption.
   We use this client to demonstrate what is actually persisted in the database.
 
 Documents can be created as usual, fields will be encrypted and decrypted
@@ -236,9 +249,9 @@ according to the configuration:
   # "ssn"=><BSON::Binary:0x405040 type=ciphertext data=0x012889b2cb0b1341...>,
   # "insurance"=>{"_id"=>BSON::ObjectId('6446a1d046ebfd701f9f4293'), "insurer"=>"TK", "policy_number"=><BSON::Binary:0x405920 type=ciphertext data=0x012889b2cb0b1341...>}}
 
-Fields encrypted using deterministic algorithm can be queried. Only exact match
+Fields encrypted using a deterministic algorithm can be queried. Only exact match
 queries are supported. For more details please consult `the server documentation
-<https://www.mongodb.com/docs/manual/core/csfle/reference/supported-operations/#std-label-csfle-reference-automatic-encryption-supported-operations>`_.
+<https://www.mongodb.com/docs/manual/core/csfle/reference/supported-operations/#supported-query-operators>`_.
 
 .. code-block:: ruby
 
@@ -266,18 +279,19 @@ your encrypted data can be decrypted.
 
   To view a list of all supported KMS providers, see the `KMS Providers <https://www.mongodb.com/docs/manual/core/csfle/reference/kms-providers/#std-label-csfle-reference-kms-providers>`_ page.
 
-CSFLEncryption supports the following Key Management System (KMS) providers:
-  * Amazon Web Services KMS
-  * Azure Key Vault
-  * Google Cloud Platform KMS
+MongoDB CSFLE supports the following Key Management System (KMS) providers:
+  * `Amazon Web Services KMS <https://aws.amazon.com/kms/>`_
+  * `Azure Key Vault <https://azure.microsoft.com/en-us/products/key-vault>`_
+  * `Google Cloud Platform KMS <https://cloud.google.com/security-key-management>`_
   * Any KMIP Compliant Key Management System
   * Local Key Provider (for testing only)
 
 Data Encryption Keys
 ~~~~~~~~~~~~~~~~~~~~
 
-Data Encryption Keys can be created using ``db:mongoid:encryption:create_data_key``
-Rake task. By default they are stored on the same cluster as the database.
+Data Encryption Keys can be created using the
+``db:mongoid:encryption:create_data_key`` ``Rake`` task. By default they are
+stored on the same cluster as the database.
 However, it might be a good idea to store the keys separately. This can be
 done by specifying a key vault client in ``mongoid.yml``:
 
@@ -299,7 +313,7 @@ Encryption Keys Rotation
 
 You can rotate encryption keys using the ``rewrap_many_data_key`` method
 of the Ruby driver. This method automatically decrypts multiple data encryption
-keys and re-encrypts them using a specified customer master key. It then updates
+keys and re-encrypts them using a specified CMK. It then updates
 the rotated keys in the key vault collection. This method allows you to rotate
 encryption keys based on two optional arguments:
 
@@ -345,7 +359,7 @@ Adding Automatic Encryption To Existing Project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 MongoDB automatic CSFLE supports encryption in place. You can enable encryption
-for your existing database, and you are still able to read unencrypted data.
+for your existing database, and will still able to read unencrypted data.
 All data written to the database will be encrypted. However, as soon as the
 encryption is enabled, all query operations will use encrypted data:
 
@@ -366,11 +380,11 @@ encryption is enabled, all query operations will use encrypted data:
 
 If you want to encrypt the existing database, it can be achieved by reading
 and writing back all data, even without any changes. If you decide to do so,
-please keep in mind the following:
+please keep the following in mind:
 
 * Validate the integrity of existing data for consistent fidelity. CSFLE is
-  type sensitive, you cannot store, say, integers in a field that is declared
-  as string.
+  type sensitive - for example you cannot store integers in a field that is
+  declared as ``String``.
 * For strings, make sure that empty values are always empty strings or just
-  not set, but not Null (CSFLE doesn't support native null).
+  not set, but not ``nil`` (CSFLE doesn't support native ``null``).
 * This operation requires application downtime.
