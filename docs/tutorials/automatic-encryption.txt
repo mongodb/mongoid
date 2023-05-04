@@ -50,7 +50,9 @@ dependencies in `the driver documentation. <https://www.mongodb.com/docs/ruby-dr
 Note the version of the Ruby driver being used in your application and select
 the appropriate steps below:
 
-**Install ``libmongocrypt``**
+Install ``libmongocrypt``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
 This can be done one of two ways.
 
 * Add the `libmongocrypt-helper gem <https://github.com/mongodb/libmongocrypt-helper-ruby>`_ to
@@ -59,8 +61,10 @@ This can be done one of two ways.
   extract the version that matches your operating system, and set the
   ``LIBMONGOCRYPT_PATH`` environment variable accordingly.
 
-**Install the automatic encryption shared library (Ruby driver 2.19+)**
-If you use the Ruby driver (version 2.19 and above) the automatic encryption
+Install the automatic encryption shared library (Ruby driver 2.19+)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you use the Ruby driver version 2.19 and above the automatic encryption
 shared library should be installed by following the instructions in the
 `MongoDB manual <https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`_.
 
@@ -85,7 +89,9 @@ Once extracted, ensure the full path to the library is configured within your
             extra_options:
               crypt_shared_lib_path: '/path/to/mongo_crypt_v1.so'
 
-**Install the ``mongocryptd`` (Ruby driver 2.18 or older)**
+Install the ``mongocryptd`` (Ruby driver 2.18 or older)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you are using an older version of the Ruby driver ``mongocryptd`` will
 need to be installed manually. ``mongocryptd`` comes pre-packaged with
 enterprise builds of the MongoDB server (versions 4.2 and newer).
