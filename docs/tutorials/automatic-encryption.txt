@@ -101,9 +101,9 @@ For installation instructions, see the `MongoDB manual <https://mongodb.com/docs
 Add ``ffi`` to your Gemfile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mongo Ruby driver uses `ffi gem <https://github.com/ffi/ffi>`_ to call
-functions from ``libmongocrypt``. However, this gem is not a dependency of
-the driver, so you need to add it to your Gemfile:
+The MongoDB Ruby driver uses the `ffi gem <https://github.com/ffi/ffi>`_ to call
+functions from ``libmongocrypt``. As this gem is not a dependency of
+the driver, it will need to be manually added to your ``Gemfile``:
 
 .. code-block:: ruby
 
