@@ -57,6 +57,9 @@ module Mongoid
         config = configuration.dup
         uri = config.delete(:uri)
         database = config.delete(:database)
+        if database.nil?
+          database = Mongo::URI.get(uri).database
+        end
         hosts = config.delete(:hosts)
         opts = config.delete(:options) || {}
         if opts.key?(:auto_encryption_options)
