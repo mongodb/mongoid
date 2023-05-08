@@ -33,16 +33,20 @@ describe 'Encryption' do
 
   around do |example|
     Mongoid.default_client[Crypt::Patient.collection_name].drop
+    Mongoid.default_client[Crypt::Car.collection_name].drop
     existing_key_id = Crypt::Patient.encrypt_metadata[:key_id]
     Crypt::Patient.set_key_id(data_key_id)
+    Crypt::Car.set_key_id(data_key_id)
     Mongoid::Config.send(:clients=, config)
     Mongoid::Clients.with_name(:key_vault)[key_vault_collection].drop
     Crypt::Patient.store_in(client: :encrypted)
+    Crypt::Car.store_in(client: :encrypted, database: Crypt::Car.storage_options[:database])
 
     example.run
 
     Crypt::Patient.reset_storage_options!
     Crypt::Patient.set_key_id(existing_key_id)
+    Crypt::Car.set_key_id(existing_key_id)
   end
 
   it 'encrypts and decrypts fields' do
@@ -77,6 +81,16 @@ describe 'Encryption' do
       end
       expect(doc['insurance']['policy_number']).to be_a(BSON::Binary)
       expect(doc['code']).to eq('12345')
+    end
+  end
+
+  it 'stores data encrypted in the non-default database' do
+    car = Crypt::Car.create!(vin: 'VA1234')
+    unencrypted_client
+      .use(Crypt::Car.storage_options[:database])[Crypt::Car.collection.name]
+      .find(_id: car.id).first.tap do |doc|
+        expect(doc[:vin]).to be_a(BSON::Binary)
+        expect(doc[:vin].type).to eq(:ciphertext)
     end
   end
 

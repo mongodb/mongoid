@@ -81,7 +81,7 @@ describe Mongoid::Config::Encryption do
 
           let(:expected_schema_map) do
             {
-              "mongoid_test.crypt_cars" => {
+              "vehicles.crypt_cars" => {
                 "bsonType" => "object",
                 "encryptMetadata" => {
                   "keyId" => [BSON::Binary.new(Base64.decode64("grolrnFVSSW9Gq04Q87R9Q=="), :uuid)],

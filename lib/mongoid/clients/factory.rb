@@ -56,7 +56,7 @@ module Mongoid
         raise Errors::NoClientsConfig.new unless configuration
         config = configuration.dup
         uri = config.delete(:uri)
-        database = config.delete(:database)
+        database = config.delete(:database) || Mongo::URI.get(uri).database
         hosts = config.delete(:hosts)
         opts = config.delete(:options) || {}
         if opts.key?(:auto_encryption_options)

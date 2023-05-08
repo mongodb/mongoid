@@ -15,12 +15,12 @@ module Mongoid
 
       # Generate the encryption schema map for the provided models.
       #
-      # @param [ String ] database The database name.
+      # @param [ String ] default_database The default database name.
       # @param [ Array<Mongoid::Document> ] models The models to generate the schema map for.
       #   Defaults to all models in the application.
       #
       # @return [ Hash ] The encryption schema map.
-      def encryption_schema_map(database, models = ::Mongoid.models)
+      def encryption_schema_map(default_database, models = ::Mongoid.models)
         visited = Set.new
         models.each_with_object({}) do |model, map|
           next if visited.include?(model)
@@ -28,6 +28,7 @@ module Mongoid
           next if model.embedded?
           next unless model.encrypted?
 
+          database = model.storage_options.fetch(:database) { default_database }
           key = "#{database}.#{model.collection_name}"
           props = metadata_for(model).merge(properties_for(model, visited))
           map[key] = props unless props.empty?
