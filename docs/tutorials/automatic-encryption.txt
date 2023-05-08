@@ -48,7 +48,8 @@ You can find the detailed description of how to install the necessary
 dependencies in `the driver documentation. <https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/#installation>`_
 
 Note the version of the Ruby driver being used in your application and select
-the appropriate steps below:
+the appropriate steps below.
+
 
 Install ``libmongocrypt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,6 +97,17 @@ If you are using an older version of the Ruby driver ``mongocryptd`` will
 need to be installed manually. ``mongocryptd`` comes pre-packaged with
 enterprise builds of the MongoDB server (versions 4.2 and newer).
 For installation instructions, see the `MongoDB manual <https://mongodb.com/docs/manual/reference/security-client-side-encryption-appendix/#installation>`_.
+
+Add ``ffi`` to your Gemfile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The MongoDB Ruby driver uses the `ffi gem <https://github.com/ffi/ffi>`_ to call
+functions from ``libmongocrypt``. As this gem is not a dependency of
+the driver, it will need to be manually added to your ``Gemfile``:
+
+.. code-block:: ruby
+
+  gem 'ffi'
 
 Create a Customer Master Key
 ============================
