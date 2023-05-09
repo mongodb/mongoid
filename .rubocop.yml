@@ -77,6 +77,9 @@ Style/Documentation:
   Exclude:
     - 'spec/**/*'
 
+Style/ModuleFunction:
+  EnforcedStyle: extend_self
+
 Style/ParallelAssignment:
   Enabled: false
 
