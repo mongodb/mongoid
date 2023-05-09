@@ -1,41 +1,38 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/threaded/lifecycle"
+require 'mongoid/threaded/lifecycle'
 
 module Mongoid
-
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
-
-    DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
+    DATABASE_OVERRIDE_KEY = '[mongoid]:db-override'
 
     # Constant for the key to store clients.
-    CLIENTS_KEY = "[mongoid]:clients"
+    CLIENTS_KEY = '[mongoid]:clients'
 
     # The key to override the client.
-    CLIENT_OVERRIDE_KEY = "[mongoid]:client-override"
+    CLIENT_OVERRIDE_KEY = '[mongoid]:client-override'
 
     # The key for the current thread's scope stack.
-    CURRENT_SCOPE_KEY = "[mongoid]:current-scope"
+    CURRENT_SCOPE_KEY = '[mongoid]:current-scope'
 
-    AUTOSAVES_KEY = "[mongoid]:autosaves"
-    VALIDATIONS_KEY = "[mongoid]:validations"
+    AUTOSAVES_KEY = '[mongoid]:autosaves'
+    VALIDATIONS_KEY = '[mongoid]:validations'
 
     STACK_KEYS = Hash.new do |hash, key|
       hash[key] = "[mongoid]:#{key}-stack"
     end
 
     # The key for the current thread's sessions.
-    SESSIONS_KEY="[mongoid]:sessions"
+    SESSIONS_KEY = '[mongoid]:sessions'
 
     # The key for storing documents modified inside transactions.
-    MODIFIED_DOCUMENTS_KEY="[mongoid]:modified-documents"
+    MODIFIED_DOCUMENTS_KEY = '[mongoid]:modified-documents'
 
     # The key storing the default value for whether or not callbacks are
     # executed on documents.
-    EXECUTE_CALLBACKS = "[mongoid]:execute-callbacks"
+    EXECUTE_CALLBACKS = '[mongoid]:execute-callbacks'
 
     extend self
 
@@ -314,6 +311,7 @@ module Mongoid
     def autosaves_for(klass)
       autosaves[klass] ||= []
     end
+
     # Get all validations on the current thread for the class.
     #
     # @example Get all validations.
@@ -334,7 +332,7 @@ module Mongoid
     # @param [ Mongo::Session ] session The session to save.
     # @param [ Mongo::Client | nil ] client The client to cache the session for.
     def set_session(session, client: nil)
-      sessions[client.object_id] = session
+      sessions[client] = session
     end
 
     # Get the cached session for this thread for a client.
@@ -346,7 +344,7 @@ module Mongoid
     #
     # @return [ Mongo::Session | nil ] The session cached on this thread or nil.
     def get_session(client: nil)
-      sessions[client.object_id]
+      sessions[client]
     end
 
     # Clear the cached session for this thread for a client.
@@ -358,7 +356,7 @@ module Mongoid
     #
     # @return [ nil ]
     def clear_session(client: nil)
-      sessions.delete(client.object_id)&.end_session
+      sessions.delete(client)&.end_session
     end
 
     # Store a reference to the document that was modified inside a transaction
@@ -368,9 +366,9 @@ module Mongoid
     #   was modified.
     # @param [ Mongoid::Document ] document Mongoid document that was modified.
     def add_modified_document(session, document)
-      if session&.in_transaction?
-        modified_documents[session] << document
-      end
+      return unless session&.in_transaction?
+
+      modified_documents[session] << document
     end
 
     # Clears the set of modified documents for the given session, and return the
@@ -414,7 +412,7 @@ module Mongoid
 
     # @api private
     def sessions
-      Thread.current[SESSIONS_KEY] ||= {}
+      Thread.current[SESSIONS_KEY] ||= {}.compare_by_identity
     end
 
     # @api private
