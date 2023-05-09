@@ -72,7 +72,19 @@ Metrics/AbcSize:
 
 Metrics/MethodLength:
   Max: 20
-  
+
+RSpec/BeforeAfterAll:
+  Enabled: false
+
+RSpec/ImplicitExpect:
+  EnforcedStyle: is_expected
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
 Style/Documentation:
   Exclude:
     - 'spec/**/*'

@@ -128,6 +128,8 @@ module Mongoid
 
           # Check if the class is a Document class
           raise Errors::UnknownModel.new(camelized, type) unless constantized.respond_to?(:instantiate)
+
+          constantized
         end
       end
     end
@@ -227,7 +229,7 @@ module Mongoid
                         selected_fields = nil,
                         execute_callbacks: Threaded.execute_callbacks?)
       Instantiator.new(klass, attributes, criteria, selected_fields)
-                  .instance(execute_callbacks)
+                  .instance(execute_callbacks: execute_callbacks)
     end
   end
 end

@@ -404,7 +404,7 @@ module Mongoid
       #
       # @api private
       def _mongoid_clear_types
-        @_type = nil
+        @_types = nil
         superclass._mongoid_clear_types if hereditary?
       end
 
