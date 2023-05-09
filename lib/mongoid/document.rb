@@ -1,26 +1,24 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/positional"
-require "mongoid/evolvable"
-require "mongoid/extensions"
-require "mongoid/errors"
-require "mongoid/threaded"
-require "mongoid/atomic"
-require "mongoid/attributes"
-require "mongoid/contextual"
-require "mongoid/copyable"
-require "mongoid/equality"
-require "mongoid/criteria"
-require "mongoid/factory"
-require "mongoid/fields"
-require "mongoid/timestamps"
-require "mongoid/association"
-require "mongoid/composable"
-require "mongoid/touchable"
+require 'mongoid/positional'
+require 'mongoid/evolvable'
+require 'mongoid/extensions'
+require 'mongoid/errors'
+require 'mongoid/threaded'
+require 'mongoid/atomic'
+require 'mongoid/attributes'
+require 'mongoid/contextual'
+require 'mongoid/copyable'
+require 'mongoid/equality'
+require 'mongoid/criteria'
+require 'mongoid/factory'
+require 'mongoid/fields'
+require 'mongoid/timestamps'
+require 'mongoid/association'
+require 'mongoid/composable'
+require 'mongoid/touchable'
 
 module Mongoid
-
   # This is the base module for all domain objects that need to be persisted to
   # the database as documents.
   module Document
@@ -85,7 +83,7 @@ module Mongoid
     #
     # @return [ Array ] An array containing [document.class, document._id]
     def identity
-      [ self.class, self._id ]
+      [ self.class, _id ]
     end
 
     # Instantiate a new +Document+, setting the Document's attributes if
@@ -96,7 +94,7 @@ module Mongoid
     # otherwise it will be set to a fresh +BSON::ObjectId+ string.
     #
     # @example Create a new document.
-    #   Person.new(:title => "Sir")
+    #   Person.new(:title => 'Sir')
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
     #
@@ -142,7 +140,7 @@ module Mongoid
     # @note Rails 6 changes return value of as_json for non-primitive types
     #   such as BSON::ObjectId. In Rails <= 5, as_json returned these as
     #   instances of the class. In Rails 6, these are returned serialized to
-    #   primitive types (e.g. {"$oid"=>"5bcfc40bde340b37feda98e9"}).
+    #   primitive types (e.g. {'$oid'=>'5bcfc40bde340b37feda98e9'}).
     #   See https://github.com/rails/rails/commit/2e5cb980a448e7f4ab00df6e9ad4c1cc456616aa
     #   for more information.
     #
@@ -177,31 +175,53 @@ module Mongoid
     # @return [ Document ] An instance of the specified class.
     def becomes(klass)
       unless klass.include?(Mongoid::Document)
-        raise ArgumentError, "A class which includes Mongoid::Document is expected"
+        raise ArgumentError, 'A class which includes Mongoid::Document is expected'
       end
 
       became = klass.new(clone_document)
-      became._id = _id
-      became.instance_variable_set(:@changed_attributes, changed_attributes)
-      new_errors = ActiveModel::Errors.new(became)
-      new_errors.copy!(errors)
-      became.instance_variable_set(:@errors, new_errors)
-      became.instance_variable_set(:@new_record, new_record?)
-      became.instance_variable_set(:@destroyed, destroyed?)
+      became.set_internal_state(
+        id: _id,
+        changed_attributes: changed_attributes,
+        errors: ActiveModel::Errors.new(became).tap { |e| e.copy!(errors) },
+        new_record: new_record?,
+        destroyed: destroyed?
+      )
+
       became.changed_attributes[klass.discriminator_key] = self.class.discriminator_value
       became[klass.discriminator_key] = klass.discriminator_value
 
+      became
+    end
+
+    # Sets the internal state of this document. Used only by #becomes to
+    # help initialize a retyped document.
+    #
+    # @params id [Object] the value to use for the record's _id
+    # @params changed_attributes [Hash] the hash to use for the changed
+    #   attributes
+    # @params errors [ActiveModel::Errors] the errors object to use
+    # @params new_record [ true | false ] whether or not the record is
+    #   unpersisted
+    # @params destroyed [ true | false ] whether or not the record has been
+    #   destroyed
+    #
+    # @api private
+    def set_internal_state(id:, changed_attributes:, errors:, new_record:, destroyed:)
+      self._id = id
+      @changed_attributes = changed_attributes
+      @errors = errors
+      @new_record = new_record
+      @destroyed = destroyed
+
       # mark embedded docs as persisted
-      embedded_relations.each_pair do |name, meta|
+      embedded_relations.each_pair do |name, _meta|
         without_autobuild do
-          relation = became.__send__(name)
+          relation = __send__(name)
           Array.wrap(relation).each do |r|
-            r.instance_variable_set(:@new_record, new_record?)
+            r.instance_variable_set(:@new_record, new_record)
           end
         end
       end
-
-      became
     end
 
     private
@@ -252,7 +272,7 @@ module Mongoid
     #
     # @return [ String ] The model key.
     def model_key
-      @model_cache_key ||= self.class.model_name.cache_key
+      @model_key ||= self.class.model_name.cache_key
     end
 
     # Returns a hash of the attributes.
@@ -265,14 +285,15 @@ module Mongoid
     # @return [ Hash ] The attributes hash.
     def as_attributes
       return attributes if frozen?
+
       embedded_relations.each_pair do |name, meta|
         without_autobuild do
           relation, stored = send(name), meta.store_as
           if attributes.key?(stored) || !relation.blank?
-            if !relation.nil?
-              attributes[stored] = relation.send(:as_attributes)
-            else
+            if relation.nil?
               attributes.delete(stored)
+            else
+              attributes[stored] = relation.send(:as_attributes)
             end
           end
         end
@@ -280,20 +301,29 @@ module Mongoid
       attributes
     end
 
+    # Class-level methods for Document objects.
     module ClassMethods
-
-      def suppress_callbacks
-        saved, Threaded.execute_callbacks = Threaded.execute_callbacks?, false
+      # Suppress callbacks (by default) for documents within the associated
+      # block. Callbacks may still be explicitly invoked by passing
+      # `execute_callbacks: true` where available.
+      #
+      # @params execute_callbacks [ true | false ] Whether callbacks should be
+      #   suppressed or not.
+      # rubocop:disable Style/OptionalBooleanParameter
+      def suppress_callbacks(execute_callbacks = false)
+        saved, Threaded.execute_callbacks =
+          Threaded.execute_callbacks?, execute_callbacks
         yield
       ensure
         Threaded.execute_callbacks = saved
       end
+      # rubocop:enable Style/OptionalBooleanParameter
 
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #
       # @example Create the document.
-      #   Person.instantiate(:title => "Sir", :age => 30)
+      #   Person.instantiate(:title => 'Sir', :age => 30)
       #
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
       # @param [ Integer ] selected_fields The selected fields from the
@@ -303,8 +333,11 @@ module Mongoid
       #
       # @return [ Document ] A new document.
       def instantiate(attrs = nil, selected_fields = nil, &block)
-        instantiate_document(attrs, selected_fields,
-          execute_callbacks: Threaded.execute_callbacks?, &block)
+        instantiate_document(
+          attrs, selected_fields,
+          execute_callbacks: Threaded.execute_callbacks?,
+          &block
+        )
       end
 
       # Instantiate the document.
@@ -326,14 +359,15 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
         doc.instance_variable_set(:@attributes_before_type_cast, attributes.dup)
 
+        doc.apply_defaults if execute_callbacks
+
+        yield(doc) if block_given?
+
         if execute_callbacks
-          doc.apply_defaults
-          yield(doc) if block_given?
-          doc.run_callbacks(:find) unless doc._find_callbacks.empty?
-          doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
+          doc.run_callbacks(:find)
+          doc.run_callbacks(:initialize)
         else
-          yield(doc) if block_given?
-          doc.pending_callbacks += [:apply_defaults, :find, :initialize]
+          doc.pending_callbacks += %i[ apply_defaults find initialize ]
         end
 
         doc
@@ -349,11 +383,7 @@ module Mongoid
       #
       # @api private
       def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
-        if !execute_callbacks
-          suppress_callbacks { new(attrs) }
-        else
-          new(attrs)
-        end
+        suppress_callbacks(execute_callbacks) { new(attrs) }
       end
 
       # Returns all types to query for when using this class as the base.
@@ -363,7 +393,7 @@ module Mongoid
       #
       # @return [ Array<Class> ] All subclasses of the current document.
       def _types
-        @_type ||= (descendants + [ self ]).uniq.map(&:discriminator_value)
+        @_types ||= (descendants + [ self ]).uniq.map(&:discriminator_value)
       end
 
       # Clear the @_type cache. This is generally called when changing the discriminator
