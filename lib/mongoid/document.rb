@@ -102,7 +102,7 @@ module Mongoid
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, &block)
-      construct_document(attrs, execute_callbacks: true, &block)
+      construct_document(attrs, execute_callbacks: Threaded.execute_callbacks?, &block)
     end
 
     # Return the model name of the document.
@@ -215,7 +215,7 @@ module Mongoid
     # @return [ Document ] A new document.
     #
     # @api private
-    def construct_document(attrs = nil, execute_callbacks: true)
+    def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
       @__parent = nil
       _building do
         @new_record = true
@@ -282,6 +282,13 @@ module Mongoid
 
     module ClassMethods
 
+      def suppress_callbacks
+        saved, Threaded.execute_callbacks = Threaded.execute_callbacks?, false
+        yield
+      ensure
+        Threaded.execute_callbacks = saved
+      end
+
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #
@@ -296,7 +303,8 @@ module Mongoid
       #
       # @return [ Document ] A new document.
       def instantiate(attrs = nil, selected_fields = nil, &block)
-        instantiate_document(attrs, selected_fields, execute_callbacks: true, &block)
+        instantiate_document(attrs, selected_fields,
+          execute_callbacks: Threaded.execute_callbacks?, &block)
       end
 
       # Instantiate the document.
@@ -310,7 +318,7 @@ module Mongoid
       # @return [ Document ] A new document.
       #
       # @api private
-      def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
+      def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: Threaded.execute_callbacks?)
         attributes = attrs&.to_h || {}
 
         doc = allocate
@@ -340,9 +348,12 @@ module Mongoid
       # @return [ Document ] A new document.
       #
       # @api private
-      def construct_document(attrs = nil, execute_callbacks: true)
-        doc = allocate
-        doc.send(:construct_document, attrs, execute_callbacks: execute_callbacks)
+      def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
+        if !execute_callbacks
+          suppress_callbacks { new(attrs) }
+        else
+          new(attrs)
+        end
       end
 
       # Returns all types to query for when using this class as the base.

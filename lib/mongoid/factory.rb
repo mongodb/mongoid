@@ -26,7 +26,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      execute_build(klass, attributes, execute_callbacks: true)
+      execute_build(klass, attributes)
     end
 
     # Execute the build.
@@ -39,7 +39,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_build(klass, attributes = nil, execute_callbacks: true)
+    def execute_build(klass, attributes = nil, execute_callbacks: Threaded.execute_callbacks?)
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
@@ -77,7 +77,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
-      execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
+      execute_from_db(klass, attributes, criteria, selected_fields)
     end
 
     # Execute from_db.
@@ -98,7 +98,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
+    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: Threaded.execute_callbacks?)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end

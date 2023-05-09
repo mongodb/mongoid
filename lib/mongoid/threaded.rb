@@ -33,6 +33,10 @@ module Mongoid
     # The key for storing documents modified inside transactions.
     MODIFIED_DOCUMENTS_KEY="[mongoid]:modified-documents"
 
+    # The key storing the default value for whether or not callbacks are
+    # executed on documents.
+    EXECUTE_CALLBACKS = "[mongoid]:execute-callbacks"
+
     extend self
 
     # Begin entry into a named thread local stack.
@@ -380,6 +384,32 @@ module Mongoid
       modified_documents[session].dup
     ensure
       modified_documents[session].clear
+    end
+
+    # Queries whether document callbacks should be executed by default for the
+    # current thread.
+    #
+    # Unless otherwise indicated (by #execute_callbacks=), this will return
+    # true.
+    #
+    # @return [ true | false ] Whether or not document callbacks should be
+    #   executed by default.
+    def execute_callbacks?
+      if Thread.current.key?(EXECUTE_CALLBACKS)
+        Thread.current[EXECUTE_CALLBACKS]
+      else
+        true
+      end
+    end
+
+    # Indicates whether document callbacks should be invoked by default for
+    # the current thread. Individual documents may further override the
+    # callback behavior, but this will be used for the default behavior.
+    #
+    # @param flag [ true | false ] Whether or not document callbacks should be
+    #   executed by default.
+    def execute_callbacks=(flag)
+      Thread.current[EXECUTE_CALLBACKS] = flag
     end
 
     # @api private

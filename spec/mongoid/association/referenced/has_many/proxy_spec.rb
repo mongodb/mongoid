@@ -3,6 +3,26 @@
 
 require "spec_helper"
 
+module RefHasManySpec
+  module OverrideInitialize
+    class Parent
+      include Mongoid::Document
+      has_many :children, inverse_of: :parent
+    end
+
+    class Child
+      include Mongoid::Document
+      belongs_to :parent
+      field :name, type: String
+
+      def initialize(...)
+        super
+        self.name ||= "default"
+      end
+    end
+  end
+end
+
 describe Mongoid::Association::Referenced::HasMany::Proxy do
   config_override :raise_not_found_error, true
 
@@ -877,6 +897,14 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   [ :build, :new ].each do |method|
 
     describe "##{method}" do
+      context 'when model has #initialize' do
+        let(:parent) { RefHasManySpec::OverrideInitialize::Parent.create }
+        let(:child)  { parent.children.send(method) }
+
+        it 'should call #initialize' do
+          expect(child.name).to be == "default"
+        end
+      end
 
       context "when the association is not polymorphic" do
 
