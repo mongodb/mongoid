@@ -66,10 +66,6 @@ Layout/SpaceInsidePercentLiteralDelimiters:
 Metrics/ModuleLength:
   Enabled: false
 
-# We should learn more about this one and re-enable at some point...
-# Metrics/AbcSize:
-#   Enabled: false
-
 Metrics/MethodLength:
   Max: 20
 
