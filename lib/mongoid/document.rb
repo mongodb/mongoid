@@ -102,7 +102,7 @@ module Mongoid
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, &block)
-      construct_document(attrs, execute_callbacks: Threaded.execute_callbacks?, &block)
+      construct_document(attrs, &block)
     end
 
     # Return the model name of the document.
@@ -303,8 +303,7 @@ module Mongoid
       #
       # @return [ Document ] A new document.
       def instantiate(attrs = nil, selected_fields = nil, &block)
-        instantiate_document(attrs, selected_fields,
-          execute_callbacks: Threaded.execute_callbacks?, &block)
+        instantiate_document(attrs, selected_fields, &block)
       end
 
       # Instantiate the document.
