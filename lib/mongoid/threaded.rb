@@ -234,10 +234,7 @@ module Mongoid
     # @return [ Criteria ] The scope.
     def set_current_scope(scope, klass)
       if scope.nil?
-        if Thread.current[CURRENT_SCOPE_KEY]
-          Thread.current[CURRENT_SCOPE_KEY].delete(klass)
-          Thread.current[CURRENT_SCOPE_KEY] = nil if Thread.current[CURRENT_SCOPE_KEY].empty?
-        end
+        unset_current_scope(klass)
       else
         Thread.current[CURRENT_SCOPE_KEY] ||= {}
         Thread.current[CURRENT_SCOPE_KEY][klass] = scope
@@ -420,6 +417,19 @@ module Mongoid
       Thread.current[MODIFIED_DOCUMENTS_KEY] ||= Hash.new do |h, k|
         h[k] = Set.new
       end
+    end
+
+    private
+
+    # Removes the given klass from the current scope, and tidies the current
+    # scope list.
+    #
+    # @param klass [ Class ] the class to remove from the current scope.
+    def unset_current_scope(klass)
+      return unless Thread.current[CURRENT_SCOPE_KEY]
+
+      Thread.current[CURRENT_SCOPE_KEY].delete(klass)
+      Thread.current[CURRENT_SCOPE_KEY] = nil if Thread.current[CURRENT_SCOPE_KEY].empty?
     end
   end
 end

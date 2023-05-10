@@ -182,18 +182,10 @@ module Mongoid
     #
     # @return [ Document ] An instance of the specified class.
     def becomes(klass)
-      unless klass.include?(Mongoid::Document)
-        raise ArgumentError, 'A class which includes Mongoid::Document is expected'
-      end
+      mongoid_document_check!(klass)
 
       became = klass.new(clone_document)
-      became.set_internal_state(
-        id: _id,
-        changed_attributes: changed_attributes,
-        errors: ActiveModel::Errors.new(became).tap { |e| e.copy!(errors) },
-        new_record: new_record?,
-        destroyed: destroyed?
-      )
+      became.internal_state = internal_state
 
       became.changed_attributes[klass.discriminator_key] = self.class.discriminator_value
       became[klass.discriminator_key] = klass.discriminator_value
@@ -204,24 +196,24 @@ module Mongoid
     # Sets the internal state of this document. Used only by #becomes to
     # help initialize a retyped document.
     #
-    # @params id [Object] the value to use for the record's _id
-    # @params changed_attributes [Hash] the hash to use for the changed
-    #   attributes
-    # @params errors [ActiveModel::Errors] the errors object to use
-    # @params new_record [ true | false ] whether or not the record is
-    #   unpersisted
-    # @params destroyed [ true | false ] whether or not the record has been
-    #   destroyed
+    # @params state [ Hash ] The map of internal state values.
     #
     # @api private
-    def set_internal_state(id:, changed_attributes:, errors:, new_record:, destroyed:)
-      self._id = id
-      @changed_attributes = changed_attributes
-      @errors = errors
-      @new_record = new_record
-      @destroyed = destroyed
+    def internal_state=(state)
+      self._id = state[:id]
+      @changed_attributes = state[:changed_attributes]
+      @errors = ActiveModel::Errors.new(self).tap { |e| e.copy!(state[:errors]) }
+      @new_record = state[:new_record]
+      @destroyed = state[:destroyed]
 
-      # mark embedded docs as persisted
+      mark_persisted_state_for_embedded_documents(state[:new_record])
+    end
+
+    # Marks all embedded documents with the given "new_record" state.
+    #
+    # @params new_record [ true | false ] whether or not the embedded records
+    #   should be flagged as new records or not.
+    def mark_persisted_state_for_embedded_documents(new_record)
       embedded_relations.each_pair do |name, _meta|
         without_autobuild do
           relation = __send__(name)
@@ -241,15 +233,11 @@ module Mongoid
     #   should be run.
     #
     # @return [ Document ] A new document.
-    #
-    # @api private
     def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
       @__parent = nil
       _building do
-        @new_record = true
-        @attributes ||= {}
-        apply_pre_processed_defaults
-        apply_default_scoping
+        prepare_to_process_attributes
+
         process_attributes(attrs) do
           yield(self) if block_given?
         end
@@ -264,6 +252,15 @@ module Mongoid
         end
       end
       self
+    end
+
+    # Initializes the object state prior to attribute processing; this is
+    # called only from #construct_document.
+    def prepare_to_process_attributes
+      @new_record = true
+      @attributes ||= {}
+      apply_pre_processed_defaults
+      apply_default_scoping
     end
 
     # Returns the logger
@@ -296,17 +293,52 @@ module Mongoid
 
       embedded_relations.each_pair do |name, meta|
         without_autobuild do
-          relation, stored = send(name), meta.store_as
-          if attributes.key?(stored) || !relation.blank?
-            if relation.nil?
-              attributes.delete(stored)
-            else
-              attributes[stored] = relation.send(:as_attributes)
-            end
-          end
+          add_attributes_for_relation(name, meta)
         end
       end
+
       attributes
+    end
+
+    # Adds the attributes for the given relation to the document's attributes.
+    #
+    # @param name [ String | Symbol ] the name of the relation to add
+    # @param meta [ Mongoid::Assocation::Relatable ] the relation object
+    def add_attributes_for_relation(name, meta)
+      relation, stored = send(name), meta.store_as
+      return unless attributes.key?(stored) || !relation.blank?
+
+      if relation.nil?
+        attributes.delete(stored)
+      else
+        attributes[stored] = relation.send(:as_attributes)
+      end
+    end
+
+    # Checks that the given argument is an instance of `Mongoid::Document`.
+    #
+    # @param klass [ Class ] The class to test.
+    #
+    # @raise [ ArgumentError ] if the class does not include
+    #   Mongoid::Document.
+    def mongoid_document_check!(klass)
+      return if klass.include?(Mongoid::Document)
+
+      raise ArgumentError, 'A class which includes Mongoid::Document is expected'
+    end
+
+    # Constructs a hash representing the internal state of this object,
+    # suitable for passing to #internal_state=.
+    #
+    # @return [ Hash ] the map of internal state values
+    def internal_state
+      {
+        id: _id,
+        changed_attributes: changed_attributes,
+        errors: errors,
+        new_record: new_record?,
+        destroyed: destroyed?
+      }
     end
 
     # Class-level methods for Document objects.
