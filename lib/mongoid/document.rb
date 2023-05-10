@@ -102,7 +102,13 @@ module Mongoid
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, &block)
-      construct_document(attrs, &block)
+      # A bug in Ruby 2.x (including 2.7.7) causes the attrs hash to be
+      # interpreted as keyword arguments, because construct_document accepts
+      # a keyword argument. Forcing an empty set of keyword arguments works
+      # around the bug. Once Ruby 2.x support is dropped, this hack can be
+      # removed.
+      # See https://bugs.ruby-lang.org/issues/15753
+      construct_document(attrs, **{}, &block)
     end
 
     # Return the model name of the document.
