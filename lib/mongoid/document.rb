@@ -288,8 +288,15 @@ module Mongoid
 
     module ClassMethods
 
-      def suppress_callbacks
-        saved, Threaded.execute_callbacks = Threaded.execute_callbacks?, false
+      # Suppress callbacks (by default) for documents within the associated
+      # block. Callbacks may still be explicitly invoked by passing
+      # `execute_callbacks: true` where available.
+      #
+      # @params execute_callbacks [ true | false ] Whether callbacks should be
+      #   suppressed or not.
+      def suppress_callbacks(execute_callbacks = false)
+        saved, Threaded.execute_callbacks =
+          Threaded.execute_callbacks?, execute_callbacks
         yield
       ensure
         Threaded.execute_callbacks = saved
@@ -354,11 +361,7 @@ module Mongoid
       #
       # @api private
       def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
-        if !execute_callbacks
-          suppress_callbacks { new(attrs) }
-        else
-          new(attrs)
-        end
+        suppress_callbacks(execute_callbacks) { new(attrs) }
       end
 
       # Returns all types to query for when using this class as the base.
