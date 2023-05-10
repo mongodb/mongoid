@@ -356,7 +356,6 @@ module Mongoid
       ensure
         Threaded.execute_callbacks = saved
       end
-      # rubocop:enable Style/OptionalBooleanParameter
 
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
