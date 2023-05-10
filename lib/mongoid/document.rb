@@ -106,7 +106,9 @@ module Mongoid
       # around the bug. Once Ruby 2.x support is dropped, this hack can be
       # removed.
       # See https://bugs.ruby-lang.org/issues/15753
-      construct_document(attrs, **(;{}), &block)
+      # rubocop:disable Style/RedundantParentheses
+      construct_document(attrs, **(; {}), &block)
+      # rubocop:enable Style/RedundantParentheses
     end
 
     # Return the model name of the document.

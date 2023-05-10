@@ -159,7 +159,9 @@ module Mongoid
       # around the bug. Once Ruby 2.x support is dropped, this hack can be
       # removed.
       # See https://bugs.ruby-lang.org/issues/15753
-      execute_build(klass, attributes, **(;{}))
+      # rubocop:disable Style/RedundantParentheses
+      execute_build(klass, attributes, **(; {}))
+      # rubocop:enable Style/RedundantParentheses
     end
 
     # Execute the build.

@@ -3030,14 +3030,14 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context 'without errors' do
       describe '#delete' do
         it 'executes the callback' do
-          expect { artist.albums.delete album }.not_to raise_error(StandardError)
+          expect { artist.albums.delete album }.not_to raise_error
           expect(artist.after_remove_referenced_called).to be true
         end
       end
 
       describe '#clear' do
         it 'executes the callback' do
-          expect { artist.albums.clear }.not_to raise_error(StandardError)
+          expect { artist.albums.clear }.not_to raise_error
           expect(artist.after_remove_referenced_called).to be true
         end
       end
