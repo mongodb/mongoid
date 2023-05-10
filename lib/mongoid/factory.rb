@@ -32,7 +32,7 @@ module Mongoid
       # around the bug. Once Ruby 2.x support is dropped, this hack can be
       # removed.
       # See https://bugs.ruby-lang.org/issues/15753
-      execute_build(klass, attributes, **{})
+      execute_build(klass, attributes, **(;{}))
     end
 
     # Execute the build.

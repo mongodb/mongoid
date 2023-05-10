@@ -15,7 +15,7 @@ module RefHasManySpec
       belongs_to :parent
       field :name, type: String
 
-      def initialize(...)
+      def initialize(*args)
         super
         self.name ||= "default"
       end
