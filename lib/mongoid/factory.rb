@@ -113,24 +113,29 @@ module Mongoid
       # @return [ Mongoid::Document ] the requested Document model
       def constantized_type
         @constantized_type ||= begin
-          constantized = klass.get_discriminator_mapping(type)
-
-          unless constantized
-            camelized = type.camelize
-
-            # Check if the class exists
-            begin
-              constantized = camelized.constantize
-            rescue NameError
-              raise Errors::UnknownModel.new(camelized, type)
-            end
-          end
+          constantized = klass.get_discriminator_mapping(type) || constantize(type)
 
           # Check if the class is a Document class
           raise Errors::UnknownModel.new(camelized, type) unless constantized.respond_to?(:instantiate)
 
           constantized
         end
+      end
+
+      # Attempts to convert the argument into a Class object by camelizing
+      # it and treating the result as the name of a constant.
+      #
+      # @param type [ String ] The name of the type to constantize
+      #
+      # @raise [ Errors::UnknownModel ] if the argument does not correspond to
+      #   an existing constant.
+      #
+      # @return [ Class ] the Class that the type resolves to
+      def constantize(type)
+        camelized = type.camelize
+        camelized.constantize
+      rescue NameError
+        raise Errors::UnknownModel.new(camelized, type)
       end
     end
 

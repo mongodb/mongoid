@@ -187,9 +187,6 @@ module Mongoid
       became = klass.new(clone_document)
       became.internal_state = internal_state
 
-      became.changed_attributes[klass.discriminator_key] = self.class.discriminator_value
-      became[klass.discriminator_key] = klass.discriminator_value
-
       became
     end
 
@@ -206,21 +203,28 @@ module Mongoid
       @new_record = state[:new_record]
       @destroyed = state[:destroyed]
 
+      update_discriminator(state[:discriminator_key_was])
+
       mark_persisted_state_for_embedded_documents(state[:new_record])
     end
 
-    # Marks all embedded documents with the given "new_record" state.
+    # Handles the setup and execution of callbacks, if callbacks are to
+    # be executed; otherwise, adds the appropriate callbacks to the pending
+    # callbacks list.
     #
-    # @params new_record [ true | false ] whether or not the embedded records
-    #   should be flagged as new records or not.
-    def mark_persisted_state_for_embedded_documents(new_record)
-      embedded_relations.each_pair do |name, _meta|
-        without_autobuild do
-          relation = __send__(name)
-          Array.wrap(relation).each do |r|
-            r.instance_variable_set(:@new_record, new_record)
-          end
-        end
+    # @param execute_callbacks [ true | false ] Whether callbacks should be
+    #   executed or not.
+    #
+    # @api private
+    def _handle_callbacks_after_instantiation(execute_callbacks)
+      if execute_callbacks
+        apply_defaults
+        yield self if block_given?
+        run_callbacks(:find) unless _find_callbacks.empty?
+        run_callbacks(:initialize) unless _initialize_callbacks.empty?
+      else
+        yield self if block_given?
+        self.pending_callbacks += %i[ apply_defaults find initialize ]
       end
     end
 
@@ -337,8 +341,33 @@ module Mongoid
         changed_attributes: changed_attributes,
         errors: errors,
         new_record: new_record?,
-        destroyed: destroyed?
+        destroyed: destroyed?,
+        discriminator_key_was: self.class.discriminator_value
       }
+    end
+
+    # Updates the value of the discriminator_key for this object, setting its
+    # previous value to `key_was`.
+    #
+    # @param key_was [ String ] the previous value of the discriminator key.
+    def update_discriminator(key_was)
+      changed_attributes[self.class.discriminator_key] = key_was
+      self[self.class.discriminator_key] = self.class.discriminator_value
+    end
+
+    # Marks all embedded documents with the given "new_record" state.
+    #
+    # @params new_record [ true | false ] whether or not the embedded records
+    #   should be flagged as new records or not.
+    def mark_persisted_state_for_embedded_documents(new_record)
+      embedded_relations.each_pair do |name, _meta|
+        without_autobuild do
+          relation = __send__(name)
+          Array.wrap(relation).each do |r|
+            r.instance_variable_set(:@new_record, new_record)
+          end
+        end
+      end
     end
 
     # Class-level methods for Document objects.
@@ -382,10 +411,15 @@ module Mongoid
       # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
       #   should be run.
       #
+      # @yield [ Mongoid::Document ] If a block is given, yields the newly
+      #   instantiated document to it.
+      #
       # @return [ Document ] A new document.
       #
       # @api private
-      def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: Threaded.execute_callbacks?)
+      def instantiate_document(attrs = nil, selected_fields = nil,
+                               execute_callbacks: Threaded.execute_callbacks?,
+                               &block)
         attributes = attrs&.to_h || {}
 
         doc = allocate
@@ -393,16 +427,7 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
         doc.instance_variable_set(:@attributes_before_type_cast, attributes.dup)
 
-        doc.apply_defaults if execute_callbacks
-
-        yield(doc) if block_given?
-
-        if execute_callbacks
-          doc.run_callbacks(:find)
-          doc.run_callbacks(:initialize)
-        else
-          doc.pending_callbacks += %i[ apply_defaults find initialize ]
-        end
+        doc._handle_callbacks_after_instantiation(execute_callbacks, &block)
 
         doc
       end
