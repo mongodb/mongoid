@@ -101,7 +101,13 @@ module Mongoid
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, &block)
-      construct_document(attrs, execute_callbacks: true, &block)
+      # A bug in Ruby 2.x (including 2.7.7) causes the attrs hash to be
+      # interpreted as keyword arguments, because construct_document accepts
+      # a keyword argument. Forcing an empty set of keyword arguments works
+      # around the bug. Once Ruby 2.x support is dropped, this hack can be
+      # removed.
+      # See https://bugs.ruby-lang.org/issues/15753
+      construct_document(attrs, **(;{}), &block)
     end
 
     # Return the model name of the document.
@@ -214,7 +220,7 @@ module Mongoid
     # @return [ Document ] A new document.
     #
     # @api private
-    def construct_document(attrs = nil, execute_callbacks: true)
+    def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
       @__parent = nil
       _building do
         @new_record = true
@@ -281,6 +287,20 @@ module Mongoid
 
     module ClassMethods
 
+      # Indicate whether callbacks should be invoked by default or not,
+      # within the block. Callbacks may always be explicitly invoked by passing
+      # `execute_callbacks: true` where available.
+      #
+      # @params execute_callbacks [ true | false ] Whether callbacks should be
+      #   suppressed or not.
+      def with_callbacks(execute_callbacks)
+        saved, Threaded.execute_callbacks =
+          Threaded.execute_callbacks?, execute_callbacks
+        yield
+      ensure
+        Threaded.execute_callbacks = saved
+      end
+
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #
@@ -295,7 +315,7 @@ module Mongoid
       #
       # @return [ Document ] A new document.
       def instantiate(attrs = nil, selected_fields = nil, &block)
-        instantiate_document(attrs, selected_fields, execute_callbacks: true, &block)
+        instantiate_document(attrs, selected_fields, &block)
       end
 
       # Instantiate the document.
@@ -309,7 +329,7 @@ module Mongoid
       # @return [ Document ] A new document.
       #
       # @api private
-      def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
+      def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: Threaded.execute_callbacks?)
         attributes = if Mongoid.legacy_attributes
           attrs
         else
@@ -346,9 +366,8 @@ module Mongoid
       # @return [ Document ] A new document.
       #
       # @api private
-      def construct_document(attrs = nil, execute_callbacks: true)
-        doc = allocate
-        doc.send(:construct_document, attrs, execute_callbacks: execute_callbacks)
+      def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
+        with_callbacks(execute_callbacks) { new(attrs) }
       end
 
       # Returns all types to query for when using this class as the base.
