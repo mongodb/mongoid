@@ -386,6 +386,20 @@ module Mongoid
         Threaded.execute_callbacks = saved
       end
 
+      # Indicate whether callbacks should be invoked by default or not,
+      # within the block. Callbacks may always be explicitly invoked by passing
+      # `execute_callbacks: true` where available.
+      #
+      # @params execute_callbacks [ true | false ] Whether callbacks should be
+      #   suppressed or not.
+      def with_callbacks(execute_callbacks)
+        saved, Threaded.execute_callbacks =
+          Threaded.execute_callbacks?, execute_callbacks
+        yield
+      ensure
+        Threaded.execute_callbacks = saved
+      end
+
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #

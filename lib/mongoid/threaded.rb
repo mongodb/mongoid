@@ -34,6 +34,10 @@ module Mongoid
     # executed on documents.
     EXECUTE_CALLBACKS = '[mongoid]:execute-callbacks'
 
+    # The key storing the default value for whether or not callbacks are
+    # executed on documents.
+    EXECUTE_CALLBACKS = "[mongoid]:execute-callbacks"
+
     extend self
 
     # Begin entry into a named thread local stack.

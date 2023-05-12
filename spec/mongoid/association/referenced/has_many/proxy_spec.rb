@@ -22,6 +22,26 @@ module RefHasManySpec
   end
 end
 
+module RefHasManySpec
+  module OverrideInitialize
+    class Parent
+      include Mongoid::Document
+      has_many :children, inverse_of: :parent
+    end
+
+    class Child
+      include Mongoid::Document
+      belongs_to :parent
+      field :name, type: String
+
+      def initialize(*args)
+        super
+        self.name ||= "default"
+      end
+    end
+  end
+end
+
 describe Mongoid::Association::Referenced::HasMany::Proxy do
   config_override :raise_not_found_error, true
 
