@@ -26,7 +26,13 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      execute_build(klass, attributes, execute_callbacks: true)
+      # A bug in Ruby 2.x (including 2.7.7) causes the attributes hash to be
+      # interpreted as keyword arguments, because execute_build accepts
+      # a keyword argument. Forcing an empty set of keyword arguments works
+      # around the bug. Once Ruby 2.x support is dropped, this hack can be
+      # removed.
+      # See https://bugs.ruby-lang.org/issues/15753
+      execute_build(klass, attributes, **(;{}))
     end
 
     # Execute the build.
@@ -39,7 +45,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_build(klass, attributes = nil, execute_callbacks: true)
+    def execute_build(klass, attributes = nil, execute_callbacks: Threaded.execute_callbacks?)
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
@@ -77,7 +83,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
-      execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
+      execute_from_db(klass, attributes, criteria, selected_fields)
     end
 
     # Execute from_db.
@@ -98,7 +104,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
+    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: Threaded.execute_callbacks?)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
