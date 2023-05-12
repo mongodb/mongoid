@@ -36,7 +36,7 @@ module Mongoid
 
     # The key storing the default value for whether or not callbacks are
     # executed on documents.
-    EXECUTE_CALLBACKS = "[mongoid]:execute-callbacks"
+    EXECUTE_CALLBACKS = '[mongoid]:execute-callbacks'
 
     extend self
 
