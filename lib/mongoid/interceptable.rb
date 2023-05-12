@@ -151,11 +151,11 @@ module Mongoid
     def _mongoid_run_child_callbacks(kind, children: nil, &block)
       child, *tail = (children || cascadable_children(kind))
       if child.nil?
-        return block&.call
+        block&.call
       elsif tail.empty?
-        return child.run_callbacks(child_callback_type(kind, child), &block)
+        child.run_callbacks(child_callback_type(kind, child), with_children: false, &block)
       else
-        return child.run_callbacks(child_callback_type(kind, child)) do
+        child.run_callbacks(child_callback_type(kind, child), with_children: false) do
           _mongoid_run_child_callbacks(kind, children: tail, &block)
         end
       end
