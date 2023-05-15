@@ -100,15 +100,7 @@ module Mongoid
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, &block)
-      # A bug in Ruby 2.x (including 2.7.7) causes the attrs hash to be
-      # interpreted as keyword arguments, because construct_document accepts
-      # a keyword argument. Forcing an empty set of keyword arguments works
-      # around the bug. Once Ruby 2.x support is dropped, this hack can be
-      # removed.
-      # See https://bugs.ruby-lang.org/issues/15753
-      # rubocop:disable Style/RedundantParentheses
-      construct_document(attrs, **(; {}), &block)
-      # rubocop:enable Style/RedundantParentheses
+      construct_document(attrs, &block)
     end
 
     # Return the model name of the document.
@@ -233,11 +225,22 @@ module Mongoid
     # Does the construction of a document.
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
-    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-    #   should be run.
+    # @param [ Hash ] options The options to use.
+    #
+    # @option options [ true | false ] :execute_callbacks Flag specifies
+    #   whether callbacks should be run.
     #
     # @return [ Document ] A new document.
-    def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
+    #
+    # @note A Ruby 2.x bug prevents the options hash from being keyword
+    #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+    #   the options hash as keyword arguments.
+    #   See https://bugs.ruby-lang.org/issues/15753
+    #
+    # @api private
+    def construct_document(attrs = nil, options = {})
+      execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
+
       @__parent = nil
       _building do
         prepare_to_process_attributes
@@ -408,18 +411,23 @@ module Mongoid
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
       # @param [ Integer ] selected_fields The selected fields from the
       #   criteria.
-      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-      #   should be run.
+      # @param [ Hash ] options The options to use.
+      #
+      # @option options [ true | false ] :execute_callbacks Flag specifies
+      #   whether callbacks should be run.
       #
       # @yield [ Mongoid::Document ] If a block is given, yields the newly
       #   instantiated document to it.
       #
       # @return [ Document ] A new document.
       #
+      # @note A Ruby 2.x bug prevents the options hash from being keyword
+      #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+      #   the options hash as keyword arguments.
+      #
       # @api private
-      def instantiate_document(attrs = nil, selected_fields = nil,
-                               execute_callbacks: Threaded.execute_callbacks?,
-                               &block)
+      def instantiate_document(attrs = nil, selected_fields = nil, options = {}, &block)
+        execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
         attributes = attrs&.to_h || {}
 
         doc = allocate
@@ -435,13 +443,21 @@ module Mongoid
       # Allocates and constructs a document.
       #
       # @param [ Hash ] attrs The attributes to set up the document with.
-      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-      #   should be run.
+      # @param [ Hash ] options The options to use.
+      #
+      # @option options [ true | false ] :execute_callbacks Flag specifies
+      #   whether callbacks should be run.
+      #
+      # @note A Ruby 2.x bug prevents the options hash from being keyword
+      #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+      #   the options hash as keyword arguments.
+      #   See https://bugs.ruby-lang.org/issues/15753
       #
       # @return [ Document ] A new document.
       #
       # @api private
-      def construct_document(attrs = nil, execute_callbacks: Threaded.execute_callbacks?)
+      def construct_document(attrs = nil, options = {})
+        execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
         with_callbacks(execute_callbacks) { new(attrs) }
       end
 
