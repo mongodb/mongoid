@@ -110,6 +110,11 @@ module Mongoid
     # document might be ignored, or it might work, depending on the situation.
     option :immutable_ids, default: true
 
+    # When this flag is true, callbacks for every embedded document will be
+    # called only once, even if the embedded document is embedded in multiple
+    #
+    options :prevent_multiple_calls_of_embedded_callbacks, default: true
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.
