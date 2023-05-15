@@ -32,27 +32,34 @@ module Mongoid
       # around the bug. Once Ruby 2.x support is dropped, this hack can be
       # removed.
       # See https://bugs.ruby-lang.org/issues/15753
-      execute_build(klass, attributes, **(;{}))
+      execute_build(klass, attributes)
     end
 
     # Execute the build.
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
-    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-    #   should be run.
+    # @param [ Hash ] options The options to use.
+    #
+    # @option options [ true | false ] :execute_callbacks Flag specifies
+    #   whether callbacks should be run.
+    #
+    # @note A Ruby 2.x bug prevents the options hash from being keyword
+    #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+    #   the options hash as keyword arguments.
+    #   See https://bugs.ruby-lang.org/issues/15753
     #
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_build(klass, attributes = nil, execute_callbacks: Threaded.execute_callbacks?)
+    def execute_build(klass, attributes = nil, options = {})
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
       if type
-        type.construct_document(attributes, execute_callbacks: execute_callbacks)
+        type.construct_document(attributes, options)
       else
-        klass.construct_document(attributes, execute_callbacks: execute_callbacks)
+        klass.construct_document(attributes, options)
       end
     end
 
