@@ -338,7 +338,7 @@ module Mongoid
       #   the options hash as keyword arguments.
       #
       # @api private
-      def instantiate_document(attrs = nil, selected_fields = nil, , options = {})
+      def instantiate_document(attrs = nil, selected_fields = nil, options = {})
         execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
         attributes = if Mongoid.legacy_attributes
           attrs
