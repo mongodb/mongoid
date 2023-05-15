@@ -250,13 +250,7 @@ module Mongoid
         end
         @attributes_before_type_cast = @attributes.merge(attributes_before_type_cast)
 
-        if execute_callbacks
-          apply_post_processed_defaults
-          run_callbacks(:initialize) unless _initialize_callbacks.empty?
-        else
-          pending_callbacks << :apply_post_processed_defaults
-          pending_callbacks << :initialize
-        end
+        resolve_post_construction_callbacks(execute_callbacks)
       end
       self
     end
@@ -370,6 +364,20 @@ module Mongoid
             r.instance_variable_set(:@new_record, new_record)
           end
         end
+      end
+    end
+
+    # Either executes or enqueues the post-construction callbacks.
+    #
+    # @params execute_callbacks [ true | false ] whether the callbacks
+    #   should be executed (true) or enqueued (false)
+    def resolve_post_construction_callbacks(execute_callbacks)
+      if execute_callbacks
+        apply_post_processed_defaults
+        run_callbacks(:initialize) unless _initialize_callbacks.empty?
+      else
+        pending_callbacks << :apply_post_processed_defaults
+        pending_callbacks << :initialize
       end
     end
 
