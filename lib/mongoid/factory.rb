@@ -25,27 +25,40 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      execute_build(klass, attributes, execute_callbacks: true)
+      # A bug in Ruby 2.x (including 2.7.7) causes the attributes hash to be
+      # interpreted as keyword arguments, because execute_build accepts
+      # a keyword argument. Forcing an empty set of keyword arguments works
+      # around the bug. Once Ruby 2.x support is dropped, this hack can be
+      # removed.
+      # See https://bugs.ruby-lang.org/issues/15753
+      execute_build(klass, attributes)
     end
 
     # Execute the build.
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
-    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-    #   should be run.
+    # @param [ Hash ] options The options to use.
+    #
+    # @option options [ true | false ] :execute_callbacks Flag specifies
+    #   whether callbacks should be run.
+    #
+    # @note A Ruby 2.x bug prevents the options hash from being keyword
+    #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+    #   the options hash as keyword arguments.
+    #   See https://bugs.ruby-lang.org/issues/15753
     #
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_build(klass, attributes = nil, execute_callbacks: true)
+    def execute_build(klass, attributes = nil, options = {})
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
       if type
-        type.construct_document(attributes, execute_callbacks: execute_callbacks)
+        type.construct_document(attributes, options)
       else
-        klass.construct_document(attributes, execute_callbacks: execute_callbacks)
+        klass.construct_document(attributes, options)
       end
     end
 
@@ -76,7 +89,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
-      execute_from_db(klass, attributes, criteria, selected_fields, execute_callbacks: true)
+      execute_from_db(klass, attributes, criteria, selected_fields)
     end
 
     # Execute from_db.
@@ -97,7 +110,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: true)
+    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: Threaded.execute_callbacks?)
       if criteria
         selected_fields ||= criteria.options[:fields]
       end
