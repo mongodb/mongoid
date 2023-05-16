@@ -1,11 +1,143 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Instantiates documents that came from the database.
   module Factory
     extend self
+
+    # A helper class for instantiating a model using either it's type
+    # class directly, or via a type class specified via a discriminator
+    # key.
+    #
+    # @api private
+    class Instantiator
+      # @return [ Mongoid::Document ] The primary model class being referenced
+      attr_reader :klass
+
+      # @return [ Hash | nil ] The Hash of attributes to use when
+      #   instantiating the model.
+      attr_reader :attributes
+
+      # @return [ Mongoid::Criteria | nil ] The criteria object to
+      #   use as a secondary source for the selected fields; also used when
+      #   setting the inverse association.
+      attr_reader :criteria
+
+      # @return [ Array | nil ] The list of field names that should
+      #   be explicitly (and exclusively) included in the new record.
+      attr_reader :selected_fields
+
+      # @return [ String | nil ] The identifier of the class that
+      #   should be loaded and instantiated, in the case of a polymorphic
+      #   class specification.
+      attr_reader :type
+
+      # Creates a new Factory::Initiator.
+      #
+      # @param klass [ Mongoid::Document ] The primary class to reference when
+      #   instantiating the model.
+      # @param attributes [ Hash | nil ] (Optional) The hash of attributes to
+      #   use when instantiating the model.
+      # @param criteria [ Mongoid::Criteria | nil ] (Optional) The criteria
+      #   object to use as a secondary source for the selected fields; also
+      #   used when setting the inverse association.
+      # @param selected_fields [ Array | nil ] The list of field names that
+      #   should be explicitly (and exclusively) included in the new record.
+      def initialize(klass, attributes, criteria, selected_fields)
+        @klass = klass
+        @attributes = attributes
+        @criteria = criteria
+        @selected_fields = selected_fields ||
+                           (criteria && criteria.options[:fields])
+        @type = attributes && attributes[klass.discriminator_key]
+      end
+
+      # Builds and returns a new instance of the requested class.
+      #
+      # @param execute_callbacks [ true | false ] Whether or not the Document
+      #   callbacks should be invoked with the new instance.
+      #
+      # @raise [ Errors::UnknownModel ] when the requested type does not exist,
+      #   or if it does not respond to the `instantiate` method.
+      #
+      # @return [ Mongoid::Document ] The new document instance.
+      def instance(execute_callbacks: Threaded.execute_callbacks?)
+        if type.blank?
+          instantiate_without_type(execute_callbacks)
+        else
+          instantiate_with_type(execute_callbacks)
+        end
+      end
+
+      private
+
+      # Instantiate the given class without any given subclass.
+      #
+      # @param [ true | false ] execute_callbacks Whether this method should
+      #   invoke document callbacks.
+      #
+      # @return [ Document ] The instantiated document.
+      def instantiate_without_type(execute_callbacks)
+        klass.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks).tap do |obj|
+          if criteria&.association && criteria&.parent_document
+            obj.set_relation(criteria.association.inverse, criteria.parent_document)
+          end
+        end
+      end
+
+      # Instantiate the given `type`, which must map to another Mongoid::Document
+      # model.
+      #
+      # @param [ true | false ] execute_callbacks Whether this method should
+      #   invoke document callbacks.
+      #
+      # @return [ Document ] The instantiated document.
+      def instantiate_with_type(execute_callbacks)
+        constantized_type.instantiate_document(
+          attributes, selected_fields,
+          execute_callbacks: execute_callbacks
+        )
+      end
+
+      # Retreive the `Class` instance of the requested type, either by finding it
+      # in the given `klass`'s discriminator mapping, or by otherwise finding a
+      # Document model with the given name.
+      #
+      # @param klass [ Mongoid::Document ] The Document model to use first when
+      #   trying to look up the requested type.
+      # @param type [ String ] the name of the requested class to look up.
+      #
+      # @raise [ Errors::UnknownModel ] when the requested type does not exist,
+      #   or if it does not respond to the `instantiate` method.
+      #
+      # @return [ Mongoid::Document ] the requested Document model
+      def constantized_type
+        @constantized_type ||= begin
+          constantized = klass.get_discriminator_mapping(type) || constantize(type)
+
+          # Check if the class is a Document class
+          raise Errors::UnknownModel.new(camelized, type) unless constantized.respond_to?(:instantiate)
+
+          constantized
+        end
+      end
+
+      # Attempts to convert the argument into a Class object by camelizing
+      # it and treating the result as the name of a constant.
+      #
+      # @param type [ String ] The name of the type to constantize
+      #
+      # @raise [ Errors::UnknownModel ] if the argument does not correspond to
+      #   an existing constant.
+      #
+      # @return [ Class ] the Class that the type resolves to
+      def constantize(type)
+        camelized = type.camelize
+        camelized.constantize
+      rescue NameError
+        raise Errors::UnknownModel.new(camelized, type)
+      end
+    end
 
     # Builds a new +Document+ from the supplied attributes.
     #
@@ -26,12 +158,6 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      # A bug in Ruby 2.x (including 2.7.7) causes the attributes hash to be
-      # interpreted as keyword arguments, because execute_build accepts
-      # a keyword argument. Forcing an empty set of keyword arguments works
-      # around the bug. Once Ruby 2.x support is dropped, this hack can be
-      # removed.
-      # See https://bugs.ruby-lang.org/issues/15753
       execute_build(klass, attributes)
     end
 
@@ -111,38 +237,11 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     #
     # @api private
-    def execute_from_db(klass, attributes = nil, criteria = nil, selected_fields = nil, execute_callbacks: Threaded.execute_callbacks?)
-      if criteria
-        selected_fields ||= criteria.options[:fields]
-      end
-      type = (attributes || {})[klass.discriminator_key]
-      if type.blank?
-        obj = klass.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
-        if criteria && criteria.association && criteria.parent_document
-          obj.set_relation(criteria.association.inverse, criteria.parent_document)
-        end
-        obj
-      else
-        constantized = klass.get_discriminator_mapping(type)
-
-        unless constantized
-          camelized = type.camelize
-
-          # Check if the class exists
-          begin
-            constantized = camelized.constantize
-          rescue NameError
-            raise Errors::UnknownModel.new(camelized, type)
-          end
-        end
-
-        # Check if the class is a Document class
-        if !constantized.respond_to?(:instantiate)
-          raise Errors::UnknownModel.new(camelized, type)
-        end
-
-        constantized.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks)
-      end
+    def execute_from_db(klass, attributes = nil, criteria = nil,
+                        selected_fields = nil,
+                        execute_callbacks: Threaded.execute_callbacks?)
+      Instantiator.new(klass, attributes, criteria, selected_fields)
+                  .instance(execute_callbacks: execute_callbacks)
     end
   end
 end
