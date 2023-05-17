@@ -581,10 +581,22 @@ describe Mongoid::Interceptable do
         end
 
         context "when saving the root" do
+          context 'with prevent_multiple_calls_of_embedded_callbacks enabled' do
+            config_override :prevent_multiple_calls_of_embedded_callbacks, true
 
-          it "only executes the callbacks once for each embed" do
-            expect(note).to receive(:update_saved).twice
-            band.save!
+            it "executes the callbacks only once for each document" do
+              expect(note).to receive(:update_saved).once
+              band.save!
+            end
+          end
+
+          context 'with prevent_multiple_calls_of_embedded_callbacks disabled' do
+            config_override :prevent_multiple_calls_of_embedded_callbacks, false
+
+            it "executes the callbacks once for each ember" do
+              expect(note).to receive(:update_saved).twice
+              band.save!
+            end
           end
         end
       end

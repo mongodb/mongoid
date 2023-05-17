@@ -150,12 +150,13 @@ module Mongoid
     # @api private
     def _mongoid_run_child_callbacks(kind, children: nil, &block)
       child, *tail = (children || cascadable_children(kind))
+      with_children = !Mongoid::Config.prevent_multiple_calls_of_embedded_callbacks
       if child.nil?
-        return block&.call
+        block&.call
       elsif tail.empty?
-        return child.run_callbacks(child_callback_type(kind, child), &block)
+        child.run_callbacks(child_callback_type(kind, child), with_children: with_children, &block)
       else
-        return child.run_callbacks(child_callback_type(kind, child)) do
+        child.run_callbacks(child_callback_type(kind, child), with_children: with_children) do
           _mongoid_run_child_callbacks(kind, children: tail, &block)
         end
       end
