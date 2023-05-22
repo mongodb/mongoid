@@ -392,6 +392,8 @@ describe Mongoid::Interceptable do
     context 'with embedded grandchildren' do
       IS = InterceptableSpec
 
+      config_override :prevent_multiple_calls_of_embedded_callbacks, true
+
       context 'when creating' do
         let(:registry) { IS::CallbackRegistry.new(only: %i[ before_save ]) }
 
@@ -655,6 +657,26 @@ describe Mongoid::Interceptable do
         before do
           band.notes.push(note)
           record.notes.push(note)
+        end
+
+        context "when saving the root" do
+          context 'with prevent_multiple_calls_of_embedded_callbacks enabled' do
+            config_override :prevent_multiple_calls_of_embedded_callbacks, true
+
+            it "executes the callbacks only once for each document" do
+              expect(note).to receive(:update_saved).once
+              band.save!
+            end
+          end
+
+          context 'with prevent_multiple_calls_of_embedded_callbacks disabled' do
+            config_override :prevent_multiple_calls_of_embedded_callbacks, false
+
+            it "executes the callbacks once for each ember" do
+              expect(note).to receive(:update_saved).twice
+              band.save!
+            end
+          end
         end
       end
     end
