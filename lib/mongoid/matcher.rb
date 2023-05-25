@@ -3,6 +3,7 @@ module Mongoid
 
   # @api private
   module Matcher
+    @attributes_as_bson_doc = true
 
     # Extracts field values in the document at the specified key.
     #
@@ -42,7 +43,7 @@ module Mongoid
     #
     # @return [ Object | Array ] Field value or values.
     module_function def extract_attribute(document, key)
-      if document.respond_to?(:as_attributes, true)
+      if @attributes_as_bson_doc && document.respond_to?(:as_attributes, true)
         # If a document has hash fields, as_attributes would keep those fields
         # as Hash instances which do not offer indifferent access.
         # Convert to BSON::Document to get indifferent access on hash fields.
@@ -56,8 +57,14 @@ module Mongoid
         current.each do |doc|
           case doc
           when Hash
-            if doc.key?(field)
-              new << doc[field]
+            if @attributes_as_bson_doc
+              if doc.key?(field)
+                new << doc[field]
+              end
+            else
+              if indifferent_key?(doc, field)
+                new << indifferent_hash_fetch(doc, field)
+              end
             end
           when Array
             if (index = field.to_i).to_s == field
@@ -67,8 +74,14 @@ module Mongoid
             end
             doc.each do |subdoc|
               if Hash === subdoc
-                if subdoc.key?(field)
-                  new << subdoc[field]
+                if @attributes_as_bson_doc
+                  if subdoc.key?(field)
+                    new << subdoc[field]
+                  end
+                else
+                  if indifferent_key?(subdoc, field)
+                    new << indifferent_hash_fetch(subdoc, field)
+                  end
                 end
               end
             end
@@ -79,6 +92,16 @@ module Mongoid
       end
 
       current
+    end
+
+    module_function def indifferent_key?(hash, key)
+      hash.key?(key.to_s) || hash.key?(key.to_sym)
+    end
+
+    module_function def indifferent_hash_fetch(hash, key)
+      hash.fetch(key.to_s) do
+        hash.fetch(key.to_sym, nil)
+      end
     end
   end
 end
