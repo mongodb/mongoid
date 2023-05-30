@@ -42,7 +42,15 @@ module Mongoid
       end
 
       module_function def apply_comparison_operator(operator, left, right)
-        left.send(operator, right)
+        if left.is_a?(Numeric) && right.is_a?(Numeric)
+          left.send(operator, right)
+        elsif (left.is_a?(Date) || left.is_a?(Time)) && (right.is_a?(Date) || right.is_a?(Time))
+          left.send(operator, right)
+        elsif left.is_a?(String) && right.is_a?(String)
+          left.send(operator, right)
+        else
+          false
+        end
       rescue ArgumentError, NoMethodError, TypeError
         # We silence bogus comparison attempts, e.g. number to string
         # comparisons.
