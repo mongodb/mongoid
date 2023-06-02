@@ -12,11 +12,27 @@ module Mongoid
       extend Forwardable
 
       class <<self
+        # Adds the given methods to an internal "do not forward" list. Any
+        # attempt to forward one of these methods (via `method_missing`) will
+        # fail with a `NoMethodError`.
+        #
+        # @param [ Array<String | Symbol> ] method_names the method names to
+        #   forbid
+        #
+        # @api private
         def forbid_forwarding(*method_names)
           @do_not_forward ||= []
           @do_not_forward.concat(method_names.map(&:to_sym))
         end
 
+        # Queries whether the given method name can be forwarded (via
+        # method_missing) or not.
+        #
+        # @param [ String | Symbol ] method_name the name of the method to
+        #   query
+        #
+        # @return [ true | false ] if the method can be forwarded or not.
+        # @api private
         def allow_forward?(method_name)
           return false if (@do_not_forward || []).include?(method_name.to_sym)
           return superclass.allow_forward?(method_name) if superclass.respond_to?(:allow_forward?)
