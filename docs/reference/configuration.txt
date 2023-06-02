@@ -821,6 +821,8 @@ the ``before_fork`` hook to close clients in the parent process
         client.close
         client.reconnect
       end
+    else
+      raise "Mongoid is not loaded. You might forget to enable app preloading."
     end
   end
 
@@ -845,6 +847,8 @@ the ``before_fork`` hook to close clients in the parent process
         client.close
         client.reconnect
       end
+    else
+      raise "Mongoid is not loaded. You might forget to enable app preloading."
     end
   end
 
@@ -867,7 +871,7 @@ before the workers are forked.
 
   if defined?(PhusionPassenger)
     PhusionPassenger.on_event(:starting_worker_process) do |forked|
-      if defined?(Mongoid)
+      if forked
         Mongoid::Clients.clients.each do |name, client|
           client.close
           client.reconnect
