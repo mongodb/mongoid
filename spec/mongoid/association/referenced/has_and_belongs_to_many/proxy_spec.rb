@@ -3008,15 +3008,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
 
     Array.public_instance_methods.sort.each do |method|
-
       context "when checking Array##{method}" do
+        allowed = described_class.allow_forward?(method)
 
-        before do
-          expect([].respond_to?(method)).to be true
-        end
-
-        it "returns true" do
-          expect(preferences.respond_to?(method)).to be true
+        it "returns #{allowed}" do
+          expect(preferences.respond_to?(method)).to be allowed
         end
       end
     end

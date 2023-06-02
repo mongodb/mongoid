@@ -2699,18 +2699,14 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     let(:person) { Person.new }
     let(:posts) { person.posts }
 
-    Array.public_instance_methods.each do |method|
-      context "when checking #{method}" do
-        it 'returns true' do
-          expect(posts.respond_to?(method)).to be true
-        end
-      end
-    end
+    [ Array, described_class ].each do |klass|
+      klass.public_instance_methods.each do |method|
+        context "when checking #{klass}##{method}" do
+          allowed = described_class.allow_forward?(method)
 
-    described_class.public_instance_methods.each do |method|
-      context "when checking #{method}" do
-        it 'returns true' do
-          expect(posts.respond_to?(method)).to be true
+          it "returns #{allowed}" do
+            expect(posts.respond_to?(method)).to be allowed
+          end
         end
       end
     end

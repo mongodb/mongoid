@@ -28,18 +28,6 @@ module Mongoid
         [ _target ]
       end
 
-      # Since method_missing is overridden we should override this as well.
-      #
-      # @example Does the proxy respond to the method?
-      #   relation.respond_to?(:name)
-      #
-      # @param [ Symbol ] name The method name.
-      #
-      # @return [ true | false ] If the proxy responds to the method.
-      def respond_to?(name, include_private = false)
-        _target.respond_to?(name, include_private) || super
-      end
-
       # Evolve the proxy document into an object id.
       #
       # @example Evolve the proxy document.

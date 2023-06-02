@@ -437,6 +437,7 @@ module Mongoid
           #
           # @return [ Criteria | Object ] A Criteria or return value from the target.
           ruby2_keywords def method_missing(name, *args, &block)
+            enforce_forwarding_list!(name)
             return super if _target.respond_to?(name)
             klass.send(:with_scope, criteria) do
               criteria.public_send(name, *args, &block)

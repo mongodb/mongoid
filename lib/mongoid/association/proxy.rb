@@ -11,7 +11,22 @@ module Mongoid
     class Proxy
       extend Forwardable
 
+      class <<self
+        def forbid_forwarding(*method_names)
+          @do_not_forward ||= []
+          @do_not_forward.concat(method_names.map(&:to_sym))
+        end
+
+        def allow_forward?(method_name)
+          return false if (@do_not_forward || []).include?(method_name.to_sym)
+          return superclass.allow_forward?(method_name) if superclass.respond_to?(:allow_forward?)
+
+          true
+        end
+      end
+
       alias :extend_proxy :extend
+      alias :__class__ :class
 
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
@@ -92,7 +107,7 @@ module Mongoid
         _target
       end
 
-      protected
+      private
 
       # Get the collection from the root of the hierarchy.
       #
@@ -121,12 +136,26 @@ module Mongoid
       # @param [ String | Symbol ] name The name of the method.
       # @param [ Object... ] *args The arguments passed to the method.
       ruby2_keywords def method_missing(name, *args, &block)
+        enforce_forwarding_list!(name)
         _target.send(name, *args, &block)
       end
 
       # @api private
       ruby2_keywords def respond_to_missing?(name, *args)
+        return false unless self.__class__.allow_forward?(name)
         _target.respond_to?(name, *args)
+      end
+
+      # Enforces the forwarding list by checking if the given method
+      # name exists in the `forbid_forwarding` list. If it does, raise
+      # an exception.
+      #
+      # @param [ String | Symbol ] name the method name
+      #
+      # @raise [ NoMethodError ] if forwarding is forbidden for the named
+      #   method.
+      def enforce_forwarding_list!(name)
+        raise NoMethodError, "undefined method `#{name}' for proxy class of #{self}" unless self.__class__.allow_forward?(name)
       end
 
       # When the base document illegally references an embedded document this

@@ -3121,22 +3121,14 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       person.addresses
     end
 
-    Array.public_instance_methods.each do |method|
+    [ Array, described_class ].each do |klass|
+      klass.public_instance_methods.each do |method|
+        context "when checking #{klass}##{method}" do
+          allowed = described_class.allow_forward?(method)
 
-      context "when checking #{method}" do
-
-        it "returns true" do
-          expect(addresses.respond_to?(method)).to be true
-        end
-      end
-    end
-
-    Mongoid::Association::Embedded::EmbedsMany::Proxy.public_instance_methods.each do |method|
-
-      context "when checking #{method}" do
-
-        it "returns true" do
-          expect(addresses.respond_to?(method)).to be true
+          it "returns #{allowed}" do
+            expect(addresses.respond_to?(method)).to be allowed
+          end
         end
       end
     end

@@ -10,6 +10,10 @@ module Mongoid
       extend Forwardable
       include ::Enumerable
 
+      # `delete_one` is added to Array by Mongoid, but does not make sense
+      # for associations.
+      forbid_forwarding :delete_one
+
       def_delegators :criteria, :avg, :max, :min, :sum
       def_delegators :_target, :length, :size, :any?
 
@@ -134,9 +138,9 @@ module Mongoid
       # @param [ true | false ] include_private Whether to include private methods.
       #
       # @return [ true | false ] If the proxy responds to the method.
-      def respond_to?(name, include_private = false)
-        [].respond_to?(name, include_private) ||
-          klass.respond_to?(name, include_private) || super
+      def respond_to_missing?(name, include_private = false)
+        return false unless self.__class__.allow_forward?(name)
+        klass.respond_to?(name, include_private) || super
       end
 
       # This is public access to the association's criteria.
