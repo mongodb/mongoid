@@ -1665,110 +1665,112 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
   end
 
-  describe '#delete' do
-    let!(:person) { Person.create!(username: 'arthurnn') }
+  %i[ delete delete_one ].each do |method|
+    describe "\##{method}" do
+      let!(:person) { Person.create!(username: 'arthurnn') }
 
-    context 'when the document is found' do
-      context 'when no dependent option is set' do
-        context 'when we are assigning attributes' do
-          let!(:drug) { person.drugs.create! }
-          let(:deleted) { person.drugs.delete(drug) }
+      context 'when the document is found' do
+        context 'when no dependent option is set' do
+          context 'when we are assigning attributes' do
+            let!(:drug) { person.drugs.create! }
+            let(:deleted) { person.drugs.send(method, drug) }
 
-          before do
-            Mongoid::Threaded.begin_execution(:assign)
+            before do
+              Mongoid::Threaded.begin_execution(:assign)
+            end
+
+            after do
+              Mongoid::Threaded.exit_execution(:assign)
+            end
+
+            it 'does not cascade' do
+              expect(deleted.changes.keys).to eq([ 'person_id' ])
+            end
           end
 
-          after do
-            Mongoid::Threaded.exit_execution(:assign)
+          context 'when the document is loaded' do
+            let!(:drug) { person.drugs.create! }
+            let!(:deleted) { person.drugs.send(method, drug) }
+
+            it 'returns the document' do
+              expect(deleted).to eq(drug)
+            end
+
+            it 'deletes the foreign key' do
+              expect(drug.person_id).to be_nil
+            end
+
+            it 'removes the document from the association' do
+              expect(person.drugs).not_to include(drug)
+            end
           end
 
-          it 'does not cascade' do
-            expect(deleted.changes.keys).to eq([ 'person_id' ])
+          context 'when the document is not loaded' do
+            let!(:drug) { Drug.create!(person_id: person.username) }
+            let!(:deleted) { person.drugs.send(method, drug) }
+
+            it 'returns the document' do
+              expect(deleted).to eq(drug)
+            end
+
+            it 'deletes the foreign key' do
+              expect(drug.person_id).to be_nil
+            end
+
+            it 'removes the document from the association' do
+              expect(person.drugs).not_to include(drug)
+            end
           end
         end
 
-        context 'when the document is loaded' do
-          let!(:drug) { person.drugs.create! }
-          let!(:deleted) { person.drugs.delete(drug) }
+        context 'when dependent is delete' do
+          context 'when the document is loaded' do
+            let!(:post) { person.posts.create!(title: 'test') }
+            let!(:deleted) { person.posts.send(method, post) }
 
-          it 'returns the document' do
-            expect(deleted).to eq(drug)
+            it 'returns the document' do
+              expect(deleted).to eq(post)
+            end
+
+            it 'deletes the document' do
+              expect(post).to be_destroyed
+            end
+
+            it 'removes the document from the association' do
+              expect(person.posts).not_to include(post)
+            end
           end
 
-          it 'deletes the foreign key' do
-            expect(drug.person_id).to be_nil
-          end
+          context 'when the document is not loaded' do
+            let!(:post) { Post.create!(title: 'foo', person_id: person.id) }
+            let!(:deleted) { person.posts.send(method, post) }
 
-          it 'removes the document from the association' do
-            expect(person.drugs).not_to include(drug)
-          end
-        end
+            it 'returns the document' do
+              expect(deleted).to eq(post)
+            end
 
-        context 'when the document is not loaded' do
-          let!(:drug) { Drug.create!(person_id: person.username) }
-          let!(:deleted) { person.drugs.delete(drug) }
+            it 'deletes the document' do
+              expect(post).to be_destroyed
+            end
 
-          it 'returns the document' do
-            expect(deleted).to eq(drug)
-          end
-
-          it 'deletes the foreign key' do
-            expect(drug.person_id).to be_nil
-          end
-
-          it 'removes the document from the association' do
-            expect(person.drugs).not_to include(drug)
+            it 'removes the document from the association' do
+              expect(person.posts).not_to include(post)
+            end
           end
         end
       end
 
-      context 'when dependent is delete' do
-        context 'when the document is loaded' do
-          let!(:post) { person.posts.create!(title: 'test') }
-          let!(:deleted) { person.posts.delete(post) }
+      context 'when the document is not found' do
+        let!(:post) { Post.create!(title: 'foo') }
+        let!(:deleted) { person.posts.send(method, post) }
 
-          it 'returns the document' do
-            expect(deleted).to eq(post)
-          end
-
-          it 'deletes the document' do
-            expect(post).to be_destroyed
-          end
-
-          it 'removes the document from the association' do
-            expect(person.posts).not_to include(post)
-          end
+        it 'returns nil' do
+          expect(deleted).to be_nil
         end
 
-        context 'when the document is not loaded' do
-          let!(:post) { Post.create!(title: 'foo', person_id: person.id) }
-          let!(:deleted) { person.posts.delete(post) }
-
-          it 'returns the document' do
-            expect(deleted).to eq(post)
-          end
-
-          it 'deletes the document' do
-            expect(post).to be_destroyed
-          end
-
-          it 'removes the document from the association' do
-            expect(person.posts).not_to include(post)
-          end
+        it 'does not delete the document' do
+          expect(post).to be_persisted
         end
-      end
-    end
-
-    context 'when the document is not found' do
-      let!(:post) { Post.create!(title: 'foo') }
-      let!(:deleted) { person.posts.delete(post) }
-
-      it 'returns nil' do
-        expect(deleted).to be_nil
-      end
-
-      it 'does not delete the document' do
-        expect(post).to be_persisted
       end
     end
   end
