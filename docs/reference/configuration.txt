@@ -822,7 +822,7 @@ the ``before_fork`` hook to close clients in the parent process
         client.reconnect
       end
     else
-      raise "Mongoid is not loaded. You might forget to enable app preloading."
+      raise "Mongoid is not loaded. You may have forgotten to enable app preloading."
     end
   end
 
@@ -848,7 +848,7 @@ the ``before_fork`` hook to close clients in the parent process
         client.reconnect
       end
     else
-      raise "Mongoid is not loaded. You might forget to enable app preloading."
+      raise "Mongoid is not loaded. You may have forgotten to enable app preloading."
     end
   end
 
