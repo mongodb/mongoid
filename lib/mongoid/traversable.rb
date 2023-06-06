@@ -1,30 +1,68 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/fields/validators/macro"
+require 'mongoid/fields/validators/macro'
 
 module Mongoid
-
   # Provides behavior around traversing the document graph.
   module Traversable
     extend ActiveSupport::Concern
 
-    def _parent
-      @__parent ||= nil
+    # Class-level methods for the Traversable behavior.
+    module ClassMethods
+      # Determines if the document is a subclass of another document.
+      #
+      # @example Check if the document is a subclass.
+      #   Square.hereditary?
+      #
+      # @return [ true | false ] True if hereditary, false if not.
+      def hereditary?
+        !!(superclass < Mongoid::Document)
+      end
+
+      # When inheriting, we want to copy the fields from the parent class and
+      # set the on the child to start, mimicking the behavior of the old
+      # class_inheritable_accessor that was deprecated in Rails edge.
+      #
+      # @example Inherit from this class.
+      #   Person.inherited(Doctor)
+      #
+      # @param [ Class ] subclass The inheriting class.
+      #
+      # rubocop:disable Metrics/AbcSize
+      def inherited(subclass)
+        super
+        @_type = nil
+        subclass.aliased_fields = aliased_fields.dup
+        subclass.localized_fields = localized_fields.dup
+        subclass.fields = fields.dup
+        subclass.pre_processed_defaults = pre_processed_defaults.dup
+        subclass.post_processed_defaults = post_processed_defaults.dup
+        subclass._declared_scopes = Hash.new { |_hash, key| _declared_scopes[key] }
+        subclass.discriminator_value = subclass.name
+
+        # We need to do this here because the discriminator_value method is
+        # overridden in the subclass above.
+        subclass.include DiscriminatorRetrieval
+
+        # We only need the _type field if inheritance is in play, but need to
+        # add to the root class as well for backwards compatibility.
+        return if fields.key?(discriminator_key)
+
+        default_proc = -> { self.class.discriminator_value }
+        field(discriminator_key, default: default_proc, type: String)
+      end
+      # rubocop:enable Metrics/AbcSize
     end
 
-    def _parent=(p)
-      @__parent = p
-    end
+    attr_accessor :_parent
 
     # Module used for prepending to the various discriminator_*= methods
     #
     # @api private
     module DiscriminatorAssignment
+      # rubocop:disable Metrics/AbcSize
       def discriminator_key=(value)
-        if hereditary?
-          raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
-        end
+        raise Errors::InvalidDiscriminatorKeyTarget.new(self, superclass) if hereditary?
 
         _mongoid_clear_types
 
@@ -45,14 +83,15 @@ module Mongoid
         # an existing field.
         # This condition also checks if the class has any descendants, because
         # if it doesn't then it doesn't need a discriminator key.
-        if !fields.has_key?(self.discriminator_key) && !descendants.empty?
-          default_proc = lambda { self.class.discriminator_value }
-          field(self.discriminator_key, default: default_proc, type: String)
-        end
+        return unless !fields.key?(discriminator_key) && !descendants.empty?
+
+        default_proc = -> { self.class.discriminator_value }
+        field(discriminator_key, default: default_proc, type: String)
       end
+      # rubocop:enable Metrics/AbcSize
 
       def discriminator_value=(value)
-        value ||= self.name
+        value ||= name
         _mongoid_clear_types
         add_discriminator_mapping(value)
         @discriminator_value = value
@@ -68,10 +107,9 @@ module Mongoid
     #
     # @api private
     module DiscriminatorRetrieval
-
       # Get the name on the reading side if the discriminator_value is nil
       def discriminator_value
-        @discriminator_value || self.name
+        @discriminator_value || name
       end
     end
 
@@ -96,7 +134,7 @@ module Mongoid
       # @param [ Class ] The class the discriminator_value was set on
       #
       # @api private
-      def self.add_discriminator_mapping(value, klass=self)
+      def self.add_discriminator_mapping(value, klass = self)
         self.discriminator_mapping ||= {}
         self.discriminator_mapping[value] = klass
         superclass.add_discriminator_mapping(value, klass) if hereditary?
@@ -122,7 +160,7 @@ module Mongoid
     #
     # @api private
     def _children
-      @__children ||= collect_children
+      @_children ||= collect_children
     end
 
     # Get all descendant +Documents+ of this +Document+ recursively.
@@ -136,7 +174,7 @@ module Mongoid
     #
     # @api private
     def _descendants
-      @__descendants ||= collect_descendants
+      @_descendants ||= collect_descendants
     end
 
     # Collect all the children of this document.
@@ -145,16 +183,14 @@ module Mongoid
     #
     # @api private
     def collect_children
-      children = []
-      embedded_relations.each_pair do |name, association|
-        without_autobuild do
-          child = send(name)
-          if child
-            children += Array.wrap(child)
+      [].tap do |children|
+        embedded_relations.each_pair do |name, _association|
+          without_autobuild do
+            child = send(name)
+            children.concat(Array.wrap(child)) if child
           end
         end
       end
-      children
     end
 
     # Collect all the descendants of this document.
@@ -164,21 +200,15 @@ module Mongoid
     # @api private
     def collect_descendants
       children = []
-      to_expand = []
+      to_expand = _children
       expanded = {}
-      embedded_relations.each_pair do |name, association|
-        without_autobuild do
-          child = send(name)
-          if child
-            to_expand += Array.wrap(child)
-          end
-        end
-      end
+
       until to_expand.empty?
         expanding = to_expand
         to_expand = []
         expanding.each do |child|
           next if expanded[child]
+
           # Don't mark expanded if _id is nil, since documents are compared by
           # their _ids, multiple embedded documents with nil ids will compare
           # equally, and some documents will not be expanded.
@@ -187,6 +217,7 @@ module Mongoid
           to_expand += child._children
         end
       end
+
       children
     end
 
@@ -234,7 +265,7 @@ module Mongoid
     def remove_child(child)
       name = child.association_name
       if child.embedded_one?
-        self.attributes.delete(child._association.store_as)
+        attributes.delete(child._association.store_as)
         remove_ivar(name)
       else
         relation = send(name)
@@ -261,7 +292,7 @@ module Mongoid
     #
     # @api private
     def _reset_memoized_descendants!
-      _parent._reset_memoized_descendants! if _parent
+      _parent&._reset_memoized_descendants!
       @__children = nil
       @__descendants = nil
     end
@@ -275,7 +306,7 @@ module Mongoid
     # @return [ Document ] The root document in the hierarchy.
     def _root
       object = self
-      while (object._parent) do object = object._parent; end
+      object = object._parent while object._parent
       object
     end
 
@@ -287,52 +318,6 @@ module Mongoid
     # @return [ true | false ] If the document is the root.
     def _root?
       _parent ? false : true
-    end
-
-    module ClassMethods
-
-      # Determines if the document is a subclass of another document.
-      #
-      # @example Check if the document is a subclass.
-      #   Square.hereditary?
-      #
-      # @return [ true | false ] True if hereditary, false if not.
-      def hereditary?
-        !!(Mongoid::Document > superclass)
-      end
-
-      # When inheriting, we want to copy the fields from the parent class and
-      # set the on the child to start, mimicking the behavior of the old
-      # class_inheritable_accessor that was deprecated in Rails edge.
-      #
-      # @example Inherit from this class.
-      #   Person.inherited(Doctor)
-      #
-      # @param [ Class ] subclass The inheriting class.
-      def inherited(subclass)
-        super
-        @_type = nil
-        subclass.aliased_fields = aliased_fields.dup
-        subclass.localized_fields = localized_fields.dup
-        subclass.fields = fields.dup
-        subclass.pre_processed_defaults = pre_processed_defaults.dup
-        subclass.post_processed_defaults = post_processed_defaults.dup
-        subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
-        subclass.discriminator_value = subclass.name
-
-        # We need to do this here because the discriminator_value method is
-        # overridden in the subclass above.
-        class << subclass
-          include DiscriminatorRetrieval
-        end
-
-        # We only need the _type field if inheritance is in play, but need to
-        # add to the root class as well for backwards compatibility.
-        unless fields.has_key?(self.discriminator_key)
-          default_proc = lambda { self.class.discriminator_value }
-          field(self.discriminator_key, default: default_proc, type: String)
-        end
-      end
     end
   end
 end

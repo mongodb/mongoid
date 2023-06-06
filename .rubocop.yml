@@ -63,6 +63,9 @@ Layout/SpaceInsideArrayLiteralBrackets:
 Layout/SpaceInsidePercentLiteralDelimiters:
   Enabled: false
 
+Metrics/ClassLength:
+  Max: 200
+
 Metrics/ModuleLength:
   Enabled: false
 

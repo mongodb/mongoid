@@ -1,14 +1,37 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
       class HasAndBelongsToMany
-
         # This class defines the behavior for all associations that are a
         # many-to-many between documents in different collections.
         class Proxy < Referenced::HasMany::Proxy
+          # class-level methods for HasAndBelongsToMany::Proxy
+          module ClassMethods
+            # Get the Eager object for this type of association.
+            #
+            # @example Get the eager loader object
+            #
+            # @param [ Mongoid::Association::Relatable ] association The association metadata.
+            # @param [ Array<Document> ] docs The array of documents.
+            def eager_loader(association, docs)
+              Eager.new(association, docs)
+            end
+
+            # Returns true if the association is an embedded one. In this case
+            # always false.
+            #
+            # @example Is this association embedded?
+            #   Referenced::ManyToMany.embedded?
+            #
+            # @return [ false ] Always false.
+            def embedded?
+              false
+            end
+          end
+
+          extend ClassMethods
 
           # Appends a document or array of documents to the association. Will set
           # the parent and update the index in the process.
@@ -25,10 +48,13 @@ module Mongoid
           # @param [ Document... ] *args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
+          #
+          # rubocop:disable Metrics/AbcSize
           def <<(*args)
             docs = args.flatten
             return concat(docs) if docs.size > 1
-            if doc = docs.first
+
+            if (doc = docs.first)
               append(doc) do
                 # We ignore the changes to the value for the foreign key in the
                 # changed_attributes hash in this block of code for two reasons:
@@ -51,18 +77,16 @@ module Mongoid
                 #    See MONGOID-4843 for a longer discussion about this.
                 reset_foreign_key_changes do
                   _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
-
-                  if child_persistable?(doc)
-                    doc.save
-                  end
+                  doc.save if child_persistable?(doc)
                   reset_unloaded
                 end
               end
             end
             unsynced(_base, foreign_key) and self
           end
+          # rubocop:enable Metrics/AbcSize
 
-          alias :push :<<
+          alias push <<
 
           # Appends an array of documents to the association. Performs a batch
           # insert of the documents instead of persisting one at a time.
@@ -75,22 +99,8 @@ module Mongoid
           # @return [ Array<Document> ] The documents.
           def concat(documents)
             ids, docs, inserts = {}, [], []
-            documents.each do |doc|
-              next unless doc
-              append(doc)
-              if persistable? || _creating?
-                ids[doc.public_send(_association.primary_key)] = true
-                save_or_delay(doc, docs, inserts)
-              else
-                existing = _base.public_send(foreign_key)
-                unless existing.include?(doc.public_send(_association.primary_key))
-                  existing.push(doc.public_send(_association.primary_key)) and unsynced(_base, foreign_key)
-                end
-              end
-            end
-            if persistable? || _creating?
-              _base.push(foreign_key => ids.keys)
-            end
+            documents.each { |doc| append_document(doc, ids, docs, inserts) }
+            _base.push(foreign_key => ids.keys) if persistable? || _creating?
             persist_delayed(docs, inserts)
             self
           end
@@ -116,7 +126,7 @@ module Mongoid
             doc
           end
 
-          alias :new :build
+          alias new build
 
           # Delete the document from the association. This will set the foreign key
           # on the document to nil. If the dependent options on the association are
@@ -151,46 +161,15 @@ module Mongoid
           #
           # @param [ Array<Document> ] replacement The replacement documents.
           def nullify(replacement = [])
-            _target.each do |doc|
-              execute_callback :before_remove, doc
-            end
-            unless _association.forced_nil_inverse?
-              if field = _association.options[:inverse_primary_key]
-                ipk = _base.public_send(field)
-              else
-                ipk = _base._id
-              end
-              if replacement
-                objects_to_clear = _base.public_send(foreign_key) - replacement.collect do |object|
-                  object.public_send(_association.primary_key)
-                end
-                criteria(objects_to_clear).pull(inverse_foreign_key => ipk)
-              else
-                criteria.pull(inverse_foreign_key => ipk)
-              end
-            end
-            if persistable?
-              _base.set(foreign_key => _base.public_send(foreign_key).clear)
-            end
-            after_remove_error = nil
-            many_to_many = _target.clear do |doc|
-              unbind_one(doc)
-              unless _association.forced_nil_inverse?
-                doc.changed_attributes.delete(inverse_foreign_key)
-              end
-              begin
-                execute_callback :after_remove, doc
-              rescue => e
-                after_remove_error = e
-              end
-            end
-            raise after_remove_error if after_remove_error
-            many_to_many
+            _target.each { |doc| execute_callback :before_remove, doc }
+            cleanup_inverse_for(replacement) unless _association.forced_nil_inverse?
+            _base.set(foreign_key => _base.public_send(foreign_key).clear) if persistable?
+            clear_target_for_nullify
           end
 
-          alias :nullify_all :nullify
-          alias :clear :nullify
-          alias :purge :nullify
+          alias nullify_all nullify
+          alias clear nullify
+          alias purge nullify
 
           # Substitutes the supplied target documents for the existing documents
           # in the association. If the new target is nil, perform the necessary
@@ -204,11 +183,11 @@ module Mongoid
           # @return [ Many ] The association.
           def substitute(replacement)
             purge(replacement)
-            unless replacement.blank?
-              push(replacement.compact.uniq)
-            else
+            if replacement.blank?
               reset_unloaded
               clear_foreign_key_changes
+            else
+              push(replacement.compact.uniq)
             end
             self
           end
@@ -242,14 +221,11 @@ module Mongoid
           #
           # @api private
           def reset_foreign_key_changes
-            if _base.changed_attributes.key?(foreign_key)
-              fk = _base.changed_attributes[foreign_key].dup
-              yield if block_given?
-              _base.changed_attributes[foreign_key] = fk
-            else
-              yield if block_given?
-              clear_foreign_key_changes
-            end
+            prior_fk_change = _base.changed_attributes.key?(foreign_key)
+            fk = _base.changed_attributes[foreign_key].dup
+            yield if block_given?
+            _base.changed_attributes[foreign_key] = fk
+            clear_foreign_key_changes unless prior_fk_change
           end
 
           # Appends the document to the target array, updating the index on the
@@ -290,7 +266,7 @@ module Mongoid
           # @return [ true | false ] If the document can be persisted.
           def child_persistable?(doc)
             (persistable? || _creating?) &&
-                !(doc.persisted? && _association.forced_nil_inverse?)
+              !(doc.persisted? && _association.forced_nil_inverse?)
           end
 
           # Returns the criteria object for the target class with its documents set
@@ -320,29 +296,85 @@ module Mongoid
             true
           end
 
-          class << self
-
-            # Get the Eager object for this type of association.
-            #
-            # @example Get the eager loader object
-            #
-            # @param [ Mongoid::Association::Relatable ] association The association metadata.
-            # @param [ Array<Document> ] docs The array of documents.
-            def eager_loader(association, docs)
-              Eager.new(association, docs)
-            end
-
-            # Returns true if the association is an embedded one. In this case
-            # always false.
-            #
-            # @example Is this association embedded?
-            #   Referenced::ManyToMany.embedded?
-            #
-            # @return [ false ] Always false.
-            def embedded?
-              false
+          # Does the cleanup for the inverse of the association when
+          # replacing the relation with another list of documents.
+          #
+          # @param [ Array<Document> | nil ] replacement the list of documents
+          #   that will replace the current list.
+          def cleanup_inverse_for(replacement)
+            if replacement
+              new_ids = replacement.collect { |doc| doc.public_send(_association.primary_key) }
+              objects_to_clear = _base.public_send(foreign_key) - new_ids
+              criteria(objects_to_clear).pull(inverse_foreign_key => inverse_primary_key)
+            else
+              criteria.pull(inverse_foreign_key => inverse_primary_key)
             end
           end
+
+          # The inverse primary key
+          #
+          # @return [ Object ] the inverse primary key
+          def inverse_primary_key
+            if (field = _association.options[:inverse_primary_key])
+              _base.public_send(field)
+            else
+              _base._id
+            end
+          end
+
+          # Clears the _target list and executes callbacks for each document.
+          # If an exception occurs in an after_remove hook, the exception is
+          # saved, the processing completes, and *then* the exception is
+          # re-raised.
+          #
+          # @return [ Array<Document> ] the replacement documents
+          def clear_target_for_nullify
+            after_remove_error = nil
+            many_to_many = _target.clear do |doc|
+              unbind_one(doc)
+              doc.changed_attributes.delete(inverse_foreign_key) unless _association.forced_nil_inverse?
+
+              begin
+                execute_callback :after_remove, doc
+              rescue StandardError => e
+                after_remove_error = e
+              end
+            end
+
+            raise after_remove_error if after_remove_error
+
+            many_to_many
+          end
+
+          # Processes a single document as part of a ``concat`` command.
+          #
+          # @param [ Mongoid::Document ] doc the document to append
+          # @param [ Hash ] ids the mapping of primary keys that have been
+          #   visited
+          # @param [ Array ] docs the list of new docs to be inserted later,
+          #   in bulk
+          # @param [ Array ] inserts the list of Hashes of attributes that will
+          #   be inserted (corresponding to the ``docs`` list)
+          #
+          # rubocop:disable Metrics/AbcSize
+          def append_document(doc, ids, docs, inserts)
+            return unless doc
+
+            append(doc)
+
+            pk = doc.public_send(_association.primary_key)
+            if persistable? || _creating?
+              ids[pk] = true
+              save_or_delay(doc, docs, inserts)
+            else
+              existing = _base.public_send(foreign_key)
+              return if existing.include?(pk)
+
+              existing.push(pk)
+              unsynced(_base, foreign_key)
+            end
+          end
+          # rubocop:enable Metrics/AbcSize
         end
       end
     end
