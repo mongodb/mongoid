@@ -159,6 +159,19 @@ module Mongoid
           # to make sure that method behaves reasonably on proxies, too.
           alias delete_one delete
 
+          # Removes a single document from the collection *in memory only*.
+          # It will *not* persist the change.
+          #
+          # @param [ Document ] document The document to delete.
+          #
+          # @api private
+          def _remove(document)
+            _target.delete_one(document)
+            _unscoped.delete_one(document)
+            update_attributes_hash
+            reindex
+          end
+
           # Delete all the documents in the association without running callbacks.
           #
           # @example Delete all documents from the association.
