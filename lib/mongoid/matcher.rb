@@ -3,7 +3,7 @@ module Mongoid
 
   # @api private
   module Matcher
-    @attributes_as_bson_doc = true
+    @attributes_as_bson_doc = false
 
     # Extracts field values in the document at the specified key.
     #
