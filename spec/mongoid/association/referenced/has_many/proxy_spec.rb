@@ -1666,7 +1666,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
   end
 
   %i[ delete delete_one ].each do |method|
-    describe "\##{method}" do
+    describe "##{method}" do
       let!(:person) { Person.create!(username: 'arthurnn') }
 
       context 'when the document is found' do
