@@ -43,11 +43,14 @@ module Mongoid
     #
     # @return [ Object | Array ] Field value or values.
     module_function def extract_attribute(document, key)
-      if @attributes_as_bson_doc && document.respond_to?(:as_attributes, true)
+      if document.respond_to?(:as_attributes, true)
         # If a document has hash fields, as_attributes would keep those fields
         # as Hash instances which do not offer indifferent access.
         # Convert to BSON::Document to get indifferent access on hash fields.
-        document = BSON::Document.new(document.send(:as_attributes))
+        document = document.send(:as_attributes)
+        if @attributes_as_bson_doc
+          document = BSON::Document.new(document)
+        end
       end
 
       current = [document]
