@@ -54,7 +54,30 @@ module Mongoid
       # rubocop:enable Metrics/AbcSize
     end
 
-    attr_accessor :_parent
+    # `_parent` is intentionally not implemented via attr_accessor because
+    # of the need to use a double underscore for the instance variable.
+    # Associations automatically create backing variables prefixed with a
+    # single underscore, which would conflict with this accessor if a model
+    # were to declare a `parent` association.
+
+    # Retrieves the parent document of this document.
+    #
+    # @return [ Mongoid::Document | nil ] the parent document
+    #
+    # @api private
+    def _parent
+      @__parent || nil
+    end
+
+    # Sets the parent document of this document.
+    #
+    # @param [ Mongoid::Document | nil ] document the document to set as
+    #   the parent document.
+    #
+    # @api private
+    def _parent=(document)
+      @__parent = document
+    end
 
     # Module used for prepending to the various discriminator_*= methods
     #
@@ -159,8 +182,17 @@ module Mongoid
     # @return [ Array<Document> ] All child documents in the hierarchy.
     #
     # @api private
-    def _children
-      @_children ||= collect_children
+    def _children(reset: false)
+      # See discussion above for the `_parent` method, as to why the variable
+      # here needs to have two underscores.
+      #
+      # rubocop:disable Naming/MemoizedInstanceVariableName
+      if reset
+        @__children = nil
+      else
+        @__children ||= collect_children
+      end
+      # rubocop:enable Naming/MemoizedInstanceVariableName
     end
 
     # Get all descendant +Documents+ of this +Document+ recursively.
@@ -173,8 +205,17 @@ module Mongoid
     # @return [ Array<Document> ] All descendant documents in the hierarchy.
     #
     # @api private
-    def _descendants
-      @_descendants ||= collect_descendants
+    def _descendants(reset: false)
+      # See discussion above for the `_parent` method, as to why the variable
+      # here needs to have two underscores.
+      #
+      # rubocop:disable Naming/MemoizedInstanceVariableName
+      if reset
+        @__descendants = nil
+      else
+        @__descendants ||= collect_descendants
+      end
+      # rubocop:enable Naming/MemoizedInstanceVariableName
     end
 
     # Collect all the children of this document.
@@ -293,8 +334,8 @@ module Mongoid
     # @api private
     def _reset_memoized_descendants!
       _parent&._reset_memoized_descendants!
-      @__children = nil
-      @__descendants = nil
+      _children reset: true
+      _descendants reset: true
     end
 
     # Return the root document in the object graph. If the current document
