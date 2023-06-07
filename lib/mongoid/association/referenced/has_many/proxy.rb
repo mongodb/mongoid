@@ -106,6 +106,10 @@ module Mongoid
             end
           end
 
+          # Mongoid::Extensions::Array defines Array#delete_one, so we need
+          # to make sure that method behaves reasonably on proxies, too.
+          alias delete_one delete
+
           # Deletes all related documents from the database given the supplied
           # conditions.
           #

@@ -138,6 +138,10 @@ module Mongoid
             doc
           end
 
+          # Mongoid::Extensions::Array defines Array#delete_one, so we need
+          # to make sure that method behaves reasonably on proxies, too.
+          alias delete_one delete
+
           # Removes all associations between the base document and the target
           # documents by deleting the foreign keys and the references, orphaning
           # the target documents in the process.

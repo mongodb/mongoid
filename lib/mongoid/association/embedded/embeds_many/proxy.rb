@@ -155,6 +155,23 @@ module Mongoid
             end
           end
 
+          # Mongoid::Extensions::Array defines Array#delete_one, so we need
+          # to make sure that method behaves reasonably on proxies, too.
+          alias delete_one delete
+
+          # Removes a single document from the collection *in memory only*.
+          # It will *not* persist the change.
+          #
+          # @param [ Document ] document The document to delete.
+          #
+          # @api private
+          def _remove(document)
+            _target.delete_one(document)
+            _unscoped.delete_one(document)
+            update_attributes_hash
+            reindex
+          end
+
           # Delete all the documents in the association without running callbacks.
           #
           # @example Delete all documents from the association.
@@ -397,21 +414,6 @@ module Mongoid
           # @return [ Criteria ] A new criteria.
           def criteria
             _association.criteria(_base, _target)
-          end
-
-          # Deletes one document from the target and unscoped.
-          #
-          # @api private
-          #
-          # @example Delete one document.
-          #   relation.delete_one(doc)
-          #
-          # @param [ Document ] document The document to delete.
-          def delete_one(document)
-            _target.delete_one(document)
-            _unscoped.delete_one(document)
-            update_attributes_hash
-            reindex
           end
 
           # Integrate the document into the association. will set its metadata and

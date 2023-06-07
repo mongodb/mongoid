@@ -1863,51 +1863,56 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
-  describe "#delete" do
+  %i[ delete delete_one ].each do |method|
+    describe "\##{method}" do
+      let(:address_one) { Address.new(street: "first") }
+      let(:address_two) { Address.new(street: "second") }
 
-    let(:person) do
-      Person.new
-    end
-
-    let(:address_one) do
-      Address.new(street: "first")
-    end
-
-    let(:address_two) do
-      Address.new(street: "second")
-    end
-
-    before do
-      person.addresses << [ address_one, address_two ]
-    end
-
-    context "when the document exists in the relation" do
-
-      let!(:deleted) do
-        person.addresses.delete(address_one)
+      before do
+        person.addresses << [ address_one, address_two ]
       end
 
-      it "deletes the document" do
-        expect(person.addresses).to eq([ address_two ])
+      shared_examples_for 'deleting from the collection' do
+        context 'when the document exists in the relation' do
+          let!(:deleted) do
+            person.addresses.send(method, address_one)
+          end
+
+          it 'deletes the document' do
+            expect(person.addresses).to eq([ address_two ])
+            expect(person.reload.addresses).to eq([ address_two ]) if person.persisted?
+          end
+
+          it 'deletes the document from the unscoped' do
+            expect(person.addresses.send(:_unscoped)).to eq([ address_two ])
+          end
+
+          it 'reindexes the relation' do
+            expect(address_two._index).to eq(0)
+          end
+
+          it 'returns the document' do
+            expect(deleted).to eq(address_one)
+          end
+        end
+
+        context 'when the document does not exist' do
+          it 'returns nil' do
+            expect(person.addresses.send(method, Address.new)).to be_nil
+          end
+        end
       end
 
-      it "deletes the document from the unscoped" do
-        expect(person.addresses.send(:_unscoped)).to eq([ address_two ])
+      context 'when the root document is unpersisted' do
+        let(:person) { Person.new }
+
+        it_behaves_like 'deleting from the collection'
       end
 
-      it "reindexes the relation" do
-        expect(address_two._index).to eq(0)
-      end
+      context 'when the root document is persisted' do
+        let(:person) { Person.create }
 
-      it "returns the document" do
-        expect(deleted).to eq(address_one)
-      end
-    end
-
-    context "when the document does not exist" do
-
-      it "returns nil" do
-        expect(person.addresses.delete(Address.new)).to be_nil
+        it_behaves_like 'deleting from the collection'
       end
     end
   end
