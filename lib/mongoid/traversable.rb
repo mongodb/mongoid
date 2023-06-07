@@ -237,7 +237,7 @@ module Mongoid
         remove_ivar(name)
       else
         relation = send(name)
-        relation.send(:delete_one, child)
+        relation._remove(child)
       end
     end
 
