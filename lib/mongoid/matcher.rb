@@ -65,8 +65,9 @@ module Mongoid
                 new << doc[field]
               end
             else
-              if indifferent_key?(doc, field)
-                new << indifferent_hash_fetch(doc, field)
+              actual_key = find_exact_key(doc, field)
+              if !actual_key.nil?
+                new << doc[actual_key]
               end
             end
           when Array
@@ -82,8 +83,9 @@ module Mongoid
                     new << subdoc[field]
                   end
                 else
-                  if indifferent_key?(subdoc, field)
-                    new << indifferent_hash_fetch(subdoc, field)
+                  actual_key = find_exact_key(subdoc, field)
+                  if !actual_key.nil?
+                    new << subdoc[actual_key]
                   end
                 end
               end
@@ -97,14 +99,12 @@ module Mongoid
       current
     end
 
-    module_function def indifferent_key?(hash, key)
-      hash.key?(key.to_s) || hash.key?(key.to_sym)
-    end
+    module_function def find_exact_key(hash, key)
+      key_s = key.to_s
+      return key_s if hash.key?(key_s)
 
-    module_function def indifferent_hash_fetch(hash, key)
-      hash.fetch(key.to_s) do
-        hash.fetch(key.to_sym, nil)
-      end
+      key_sym = key.to_sym
+      hash.key?(key_sym) ? key_sym : nil
     end
   end
 end
