@@ -3,8 +3,6 @@ module Mongoid
 
   # @api private
   module Matcher
-    @attributes_as_bson_doc = false
-
     # Extracts field values in the document at the specified key.
     #
     # The document can be a Hash or a model instance.
@@ -48,9 +46,6 @@ module Mongoid
         # as Hash instances which do not offer indifferent access.
         # Convert to BSON::Document to get indifferent access on hash fields.
         document = document.send(:as_attributes)
-        if @attributes_as_bson_doc
-          document = BSON::Document.new(document)
-        end
       end
 
       current = [document]
@@ -60,15 +55,9 @@ module Mongoid
         current.each do |doc|
           case doc
           when Hash
-            if @attributes_as_bson_doc
-              if doc.key?(field)
-                new << doc[field]
-              end
-            else
-              actual_key = find_exact_key(doc, field)
-              if !actual_key.nil?
-                new << doc[actual_key]
-              end
+            actual_key = find_exact_key(doc, field)
+            if !actual_key.nil?
+              new << doc[actual_key]
             end
           when Array
             if (index = field.to_i).to_s == field
@@ -78,15 +67,9 @@ module Mongoid
             end
             doc.each do |subdoc|
               if Hash === subdoc
-                if @attributes_as_bson_doc
-                  if subdoc.key?(field)
-                    new << subdoc[field]
-                  end
-                else
-                  actual_key = find_exact_key(subdoc, field)
-                  if !actual_key.nil?
-                    new << subdoc[actual_key]
-                  end
+                actual_key = find_exact_key(subdoc, field)
+                if !actual_key.nil?
+                  new << subdoc[actual_key]
                 end
               end
             end
