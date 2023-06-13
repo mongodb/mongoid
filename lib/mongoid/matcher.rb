@@ -99,6 +99,12 @@ module Mongoid
       current
     end
 
+    # Indifferent string or symbol key lookup, returning the exact key.
+    #
+    # @param [ Hash ] hash The input hash.
+    # @param [ String | Symbol ] key The key to perform indifferent lookups with.
+    #
+    # @return [ String | Symbol | nil ] The exact key (with the correct type) that exists in the hash, or nil if the key does not exist.
     module_function def find_exact_key(hash, key)
       key_s = key.to_s
       return key_s if hash.key?(key_s)
