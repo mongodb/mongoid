@@ -241,7 +241,7 @@ module Mongoid
     def construct_document(attrs = nil, options = {})
       execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
 
-      @__parent = nil
+      self._parent = nil
       _building do
         prepare_to_process_attributes
 

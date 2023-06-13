@@ -1,13 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Embedded
       class EmbeddedIn
-
+        # Proxy class for representing :embedded_in associations.
         class Proxy < Association::One
-
           # Instantiate a new embedded_in association.
           #
           # @example Create the new association.
@@ -19,7 +17,7 @@ module Mongoid
           #
           # @return [ In ] The proxy.
           def initialize(base, target, association)
-            init(base, target, association) do
+            super do
               characterize_one(_target)
               bind_one
             end
@@ -66,9 +64,7 @@ module Mongoid
           #
           # @param [ Document ] document The document to set the association metadata on.
           def characterize_one(document)
-            unless _base._association
-              _base._association = _association.inverse_association(document)
-            end
+            _base._association ||= _association.inverse_association(document)
           end
 
           # Are we able to persist this association?
@@ -89,7 +85,7 @@ module Mongoid
             # @param [ Array<Mongoid::Document> ] docs The parent documents
             #   that possess the given associations, which ought to be
             #   populated by the eager-loaded documents.
-            # 
+            #
             # @return [ Mongoid::Association::Embedded::Eager ]
             def eager_loader(associations, docs)
               Eager.new(associations, docs)
