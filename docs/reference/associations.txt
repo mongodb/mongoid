@@ -1291,7 +1291,7 @@ The child may become orphaned if it is ordinarily only referenced via the parent
    label.bands.push(Band.first)
    label.delete # Raises an error since bands is not empty.
 
-   Band.first.delete # Will delete all associated albums.
+   Band.first.destroy # Will delete all associated albums.
 
 
 Autosaving
