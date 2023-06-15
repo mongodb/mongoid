@@ -685,9 +685,6 @@ as the following example demonstrates:
     class:    Band
     embedded: false>
 
-This wrapping behavior is deprecated and should not be relied on. It may be
-removed in a future release of Mongoid.
-
 
 Query Methods
 =============
