@@ -93,6 +93,7 @@ is deprecated.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Ruby 3.2
      - Ruby 3.1
      - Ruby 3.0
      - Ruby 2.7
@@ -109,6 +110,7 @@ is deprecated.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
      -
      -
      -
@@ -118,6 +120,7 @@ is deprecated.
 
 
    * - 8.0
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -130,6 +133,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.5
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -142,6 +146,7 @@ is deprecated.
      - |checkmark|
 
    * - 7.4
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -154,6 +159,7 @@ is deprecated.
      -
 
    * - 7.3
+     -
      - |checkmark| [#mongoid-7.3-ruby-3.0]_
      - |checkmark| [#mongoid-7.3-ruby-3.0]_
      - |checkmark|
@@ -166,6 +172,7 @@ is deprecated.
      -
 
    * - 7.2
+     -
      - |checkmark| [#mongoid-7.2-ruby-3.0]_
      - |checkmark| [#mongoid-7.2-ruby-3.0]_
      - |checkmark|
@@ -178,6 +185,7 @@ is deprecated.
      -
 
    * - 7.1
+     -
      - |checkmark| [#mongoid-7.1-ruby-3.0]_
      - |checkmark| [#mongoid-7.1-ruby-3.0]_
      - |checkmark|
@@ -192,6 +200,7 @@ is deprecated.
    * - 7.0
      -
      -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -202,6 +211,7 @@ is deprecated.
      -
 
    * - 6.4
+     -
      -
      -
      -
