@@ -30,9 +30,14 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.18
+     - Driver 2.19-2.18
      - Driver 2.17-2.10
      - Driver 2.9-2.7
+
+   * - 8.1
+     - |checkmark|
+     -
+     -
 
    * - 8.0
      - |checkmark|
@@ -98,6 +103,19 @@ is deprecated.
      - Ruby 2.2
      - JRuby 9.2
      - JRuby 9.3
+
+   * - 8.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+     -
+     -
+     -
+     - |checkmark|
+
 
    * - 8.0
      - |checkmark|
@@ -227,6 +245,7 @@ and will be removed in a next version.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - MongoDB 7.0
      - MongoDB 6.0
      - MongoDB 5.0
      - MongoDB 4.4
@@ -238,7 +257,21 @@ and will be removed in a next version.
      - MongoDB 3.0
      - MongoDB 2.6
 
+   * - 8.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+     -
+     -
+
    * - 8.0
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -257,12 +290,14 @@ and will be removed in a next version.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
      - D
      - D
      - D
      - D
 
    * - 7.4
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -276,6 +311,7 @@ and will be removed in a next version.
 
    * - 7.3
      -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -287,6 +323,7 @@ and will be removed in a next version.
      - D
 
    * - 7.2
+     -
      -
      - |checkmark|
      - |checkmark|
@@ -300,6 +337,7 @@ and will be removed in a next version.
 
    * - 7.1
      -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -312,6 +350,7 @@ and will be removed in a next version.
 
    * - 7.0
      -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -323,6 +362,7 @@ and will be removed in a next version.
      - D
 
    * - 6.4
+     -
      -
      - |checkmark|
      - |checkmark|
@@ -354,6 +394,13 @@ are supported by Mongoid.
      - Rails 6.0
      - Rails 5.2
      - Rails 5.1
+
+   * - 8.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     -
 
    * - 8.0
      - |checkmark|
