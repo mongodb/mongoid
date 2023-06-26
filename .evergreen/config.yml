@@ -38,16 +38,6 @@ functions:
 
           git submodule update --init --recursive
 
-  "fetch egos":
-    - command: shell.exec
-      params:
-        working_dir: "src"
-        script: |
-          set -ex
-
-          curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
-          chmod +x ./egos
-
   "create expansions":
     # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
@@ -282,7 +272,8 @@ functions:
             DRIVER="${DRIVER}" \
             I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
-            ./egos .evergreen/run-tests-docker.sh
+            FLE="${FLE}" \
+            .evergreen/run-tests-docker.sh
 
   "fix absolute paths":
     - command: shell.exec
@@ -305,7 +296,6 @@ functions:
 
 pre:
   - func: "fetch source"
-  - func: "fetch egos"
   - func: "create expansions"
   - func: "fix absolute paths"
   - func: "install dependencies"
