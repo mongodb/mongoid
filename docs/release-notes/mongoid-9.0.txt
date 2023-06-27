@@ -17,6 +17,15 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+
+``Mongoid::QueryCache`` removed
+-------------------------------
+
+The ``Mongoid::QueryCache`` module has been deprecated in Mongoid 8.1.
+It is removed in Mongoid 9.0. Please use the query cache provided by the MongoDB Ruby driver
+instead. Please review the `driver query cache documentation
+<https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
+
 Deprecated options removed
 --------------------------
 

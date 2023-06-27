@@ -900,9 +900,9 @@ how to enable the Query Cache Middleware in a Ruby on Rails application:
 
   # config/application.rb
 
-  # Add Mongoid::QueryCache::Middleware at the bottom of the middleware stack
+  # Add Mongo::QueryCache::Middleware at the bottom of the middleware stack
   # or before other middleware that queries MongoDB.
-  config.middleware.use Mongoid::QueryCache::Middleware
+  config.middleware.use Mongo::QueryCache::Middleware
 
 Please refer to the `Rails on Rack guide
 <https://guides.rubyonrails.org/rails_on_rack.html#configuring-middleware-stack>`_
