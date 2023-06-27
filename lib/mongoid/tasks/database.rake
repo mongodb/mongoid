@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 namespace :db do
   namespace :mongoid do

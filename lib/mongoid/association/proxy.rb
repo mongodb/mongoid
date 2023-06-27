@@ -1,21 +1,32 @@
 # frozen_string_literal: true
 
-require "mongoid/association/marshalable"
+require 'mongoid/association/marshalable'
 
 module Mongoid
   module Association
-
     # This class is the superclass for all association proxy objects, and contains
     # common behavior for all of them.
     class Proxy
       extend Forwardable
 
-      alias :extend_proxy :extend
+      alias extend_proxy extend
+
+      # specific methods to prevent from being undefined
+      KEEPER_METHODS = %i[
+        send
+        object_id
+        equal?
+        respond_to?
+        respond_to_missing?
+        tap
+        public_send
+        extend_proxy
+        extend_proxies
+      ].freeze
 
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
-        undef_method(method) unless
-          method =~ /\A(?:__.*|send|object_id|equal\?|respond_to\?|respond_to_missing\?|tap|public_send|extend_proxy|extend_proxies)\z/
+        undef_method(method) unless method.start_with?('__') || KEEPER_METHODS.include?(method)
       end
 
       include Threaded::Lifecycle
@@ -41,16 +52,12 @@ module Mongoid
       def_delegators :binding, :bind_one, :unbind_one
       def_delegator :_base, :collection_name
 
-      # Convenience for setting the target and the association metadata properties since
-      # all proxies will need to do this.
-      #
-      # @example Initialize the proxy.
-      #   proxy.init(person, name, association)
+      # Sets the target and the association metadata properties.
       #
       # @param [ Document ] base The base document on the proxy.
       # @param [ Document | Array<Document> ] target The target of the proxy.
       # @param [ Mongoid::Association::Relatable ] association The association metadata.
-      def init(base, target, association)
+      def initialize(base, target, association)
         @_base, @_target, @_association = base, target, association
         yield(self) if block_given?
         extend_proxies(association.extension) if association.extension
@@ -58,7 +65,7 @@ module Mongoid
 
       # Allow extension to be an array and extend each module
       def extend_proxies(*extension)
-        extension.flatten.each {|ext| extend_proxy(ext) }
+        extension.flatten.each { |ext| extend_proxy(ext) }
       end
 
       # Get the class from the association, or return nil if no association present.
@@ -68,7 +75,7 @@ module Mongoid
       #
       # @return [ Class ] The association class.
       def klass
-        _association ? _association.klass : nil
+        _association&.klass
       end
 
       # Resets the criteria inside the association proxy. Used by many to many
@@ -174,14 +181,13 @@ module Mongoid
       #
       # @return [ Object ] The result of the given block
       def execute_callbacks_around(name, doc)
-        execute_callback :"before_#{name.to_s}", doc
+        execute_callback :"before_#{name}", doc
         yield.tap do
-          execute_callback :"after_#{name.to_s}", doc
+          execute_callback :"after_#{name}", doc
         end
       end
 
       class << self
-
         # Apply ordering to the criteria if it was defined on the association.
         #
         # @example Apply the ordering.

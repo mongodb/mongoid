@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Mongoid
   # This module is used to extend Mongoid::Document
   # to add encryption functionality.

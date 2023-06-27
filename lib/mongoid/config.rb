@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/config/defaults"
 require "mongoid/config/environment"
@@ -108,6 +109,16 @@ module Mongoid
     # pre-9.0 behavior, where changing the _id of a persisted
     # document might be ignored, or it might work, depending on the situation.
     option :immutable_ids, default: true
+
+    # When this flag is true, callbacks for every embedded document will be
+    # called only once, even if the embedded document is embedded in multiple
+    # documents in the root document's dependencies graph.
+    # This is the default in 9.0. Setting this flag to false restores the
+    # pre-9.0 behavior, where callbacks are called for every occurrence of an
+    # embedded document. The pre-9.0 behavior leads to a problem that for multi
+    # level nested documents callbacks are called multiple times.
+    # See https://jira.mongodb.org/browse/MONGOID-5542
+    option :prevent_multiple_calls_of_embedded_callbacks, default: true
 
     # Returns the Config singleton, for use in the configure DSL.
     #

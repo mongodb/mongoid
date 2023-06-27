@@ -1,3 +1,4 @@
+# rubocop:todo all
 module InterceptableSpec
   class CallbackRegistry
     def initialize

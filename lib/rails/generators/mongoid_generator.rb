@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "rails/generators/named_base"
 require "rails/generators/active_model"

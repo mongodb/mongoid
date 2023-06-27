@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './attributes/nested_spec_models'
@@ -2494,7 +2495,7 @@ describe Mongoid::Attributes do
         end
       end
 
-      context "when doing delete_one" do
+      context "when doing _remove" do
         let(:doc) { NestedBook.create! }
         let(:page) { NestedPage.new }
         before do
@@ -2502,7 +2503,7 @@ describe Mongoid::Attributes do
           doc.pages << NestedPage.new
           doc.pages << NestedPage.new
 
-          doc.pages.send(:delete_one, page)
+          doc.pages._remove(page)
         end
 
         it "updates the attributes" do

@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
         - mongodb: '6.0'
-          ruby: ruby-3.1
+          ruby: ruby-3.2
           topology: replica_set
           os: ubuntu-20.04
           task: test

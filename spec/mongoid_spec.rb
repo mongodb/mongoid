@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -75,6 +76,8 @@ describe Mongoid do
     end
 
     it "disconnects from all active clients" do
+      pending 'https://jira.mongodb.org/browse/MONGOID-5621'
+
       clients.each do |client|
         expect(client.cluster).to receive(:disconnect!).and_call_original
       end

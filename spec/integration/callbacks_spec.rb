@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'spec_helper'
 require_relative './callbacks_models'
@@ -552,6 +553,33 @@ describe 'callbacks integration tests' do
           :age => [false, true, false]
         }
       )
+    end
+  end
+
+  context 'nested embedded documents' do
+    config_override :prevent_multiple_calls_of_embedded_callbacks, true
+
+    let(:logger) { Array.new }
+
+    let(:root) do
+      Root.new(
+        embedded_once: [
+          EmbeddedOnce.new(
+            embedded_twice: [EmbeddedTwice.new]
+          )
+        ]
+      )
+    end
+
+    before(:each) do
+      root.logger = logger
+      root.embedded_once.first.logger = logger
+      root.embedded_once.first.embedded_twice.first.logger = logger
+    end
+
+    it 'runs callbacks in the correct order' do
+      root.save!
+      expect(logger).to eq(%i[embedded_twice embedded_once root])
     end
   end
 end

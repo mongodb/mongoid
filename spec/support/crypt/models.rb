@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Crypt
   class Patient
     include Mongoid::Document
@@ -34,6 +35,8 @@ module Crypt
 
   class Car
     include Mongoid::Document
+
+    store_in database: 'vehicles'
 
     encrypt_with key_id: "grolrnFVSSW9Gq04Q87R9Q==", deterministic: true
 
