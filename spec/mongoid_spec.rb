@@ -51,8 +51,14 @@ describe Mongoid do
     end
 
     it "disconnects from all active clients" do
+      method_name = if Gem::Version.new(Mongo::VERSION) >= Gem::Version.new('2.19.0')
+                      :close
+                    else
+                      :disconnect!
+                    end
+
       clients.each do |client|
-        expect(client.cluster).to receive(:disconnect!).and_call_original
+        expect(client.cluster).to receive(method_name).and_call_original
       end
       Mongoid.disconnect_clients
     end

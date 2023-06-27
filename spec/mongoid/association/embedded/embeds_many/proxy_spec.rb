@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../embeds_many_models.rb'
 
 describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
@@ -4647,6 +4648,26 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           expect(zone.soa.delete).to be true
         end
       end
+    end
+  end
+
+  context "when using assign_attributes with an already populated array" do
+    let(:post) { EmmPost.create! }
+
+    before do
+      post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'a'}],
+        user_tags: [{id: BSON::ObjectId.new, title: 'b'}])
+      post.save!
+      post.reload
+      post.assign_attributes(company_tags: [{id: BSON::ObjectId.new, title: 'c'}],
+        user_tags: [])
+      post.save!
+      post.reload
+    end
+
+    it "has the correct embedded documents" do
+      expect(post.company_tags.length).to eq(1)
+      expect(post.company_tags.first.title).to eq("c")
     end
   end
 end

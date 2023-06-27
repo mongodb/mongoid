@@ -34,6 +34,25 @@ module Mongoid
             locator = document.new_record? ? "" : ".#{document._index}"
             "#{pos}#{"." unless pos.blank?}#{document._association.store_as}#{locator}"
           end
+
+          class << self
+
+            # Get the position of where the document would go for the given
+            # association. The use case for this function is when trying to
+            # persist an empty list for an embedded association. All of the
+            # existing functions for getting the position to store a document
+            # require passing in a document to store, which we don't have when
+            # trying to store the empty list.
+            #
+            # @param [ Document ] parent The parent document to store in.
+            # @param [ Association ] association The association.
+            #
+            # @return [ String ] The position string.
+            def position_without_document(parent, association)
+              pos = parent.atomic_position
+              "#{pos}#{"." unless pos.blank?}#{association.store_as}"
+            end
+          end
         end
       end
     end
