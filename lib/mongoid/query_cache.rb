@@ -3,8 +3,13 @@
 module Mongoid
 
   # A cache of database queries on a per-request basis.
-  module QueryCache
-
+  #
+  # The current implementation is a simple wrapper around the Mongo Ruby driver's
+  # query cache. It is deprecated and will be removed in a future version of
+  # Mongoid. Please use the Mongo Ruby driver's query cache instead.
+  #
+  # @deprecated
+  module QueryCacheDeprecated
     class << self
 
       # Clear the query cache.
@@ -58,7 +63,14 @@ module Mongoid
       end
     end
 
+    # @deprecated
     Middleware = Mongo::QueryCache::Middleware
   end
 end
 
+Mongoid::QueryCache = Mongoid::Deprecation::DeprecatedConstantProxy.new(
+  'Mongoid::QueryCacheDeprecated',
+  'Mongoid::QueryCacheDeprecated',
+  message: 'Mongoid::QueryCache is deprecated and will be removed in Mongoid 9.0. ' \
+           'Please use Mongo::QueryCache instead.'
+)

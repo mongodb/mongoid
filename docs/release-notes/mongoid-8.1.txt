@@ -27,6 +27,19 @@ Since ``use_activesupport_time_zone`` currently defaults to true, it is
 safe to remove from your config file at this time.
 
 
+``Mongoid::QueryCache`` is now deprecated.
+------------------------------------------
+
+The ``Mongoid::QueryCache`` module is now deprecated. It will be removed in
+Mongoid 9.0. Please use the query cache provided by the MongoDB Ruby driver
+instead.
+
+When Mongoid is used with driver version 2.14.0 or later, Mongoid delegates
+all work to the driver's query cache implementation; therefore, code that uses
+``Mongoid::QueryCache`` will continue to work as before when using
+``Mongo::QueryCache``.
+
+
 Added ``load_async`` method on ``Criteria`` to asynchronously load documents
 ----------------------------------------------------------------------------
 
