@@ -29,7 +29,7 @@ fi
 
 prepare_server $arch
 
-install_mlaunch_virtualenv
+install_mlaunch_venv
 
 # Launching mongod under $MONGO_ORCHESTRATION_HOME
 # makes its log available through log collecting machinery
