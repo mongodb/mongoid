@@ -22,9 +22,9 @@ module Mongoid
             if value.is_a?(Hash) && self[key.to_s].is_a?(Hash)
               value = self[key.to_s].merge(value) do |_key, old_val, new_val|
                 case _key
-                when '$in'
+                when  /\$in/
                   new_val & old_val
-                when '$nin'
+                when  /\$nin/
                   (old_val + new_val).uniq
                 else
                   new_val
