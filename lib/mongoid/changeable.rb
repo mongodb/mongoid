@@ -70,9 +70,7 @@ module Mongoid
     def move_changes
       @previous_changes = changes
       @previous_attributes = attributes.dup
-      Atomic::UPDATES.each do |update|
-        send(update).clear
-      end
+      reset_atomic_updates!
       changed_attributes.clear
     end
 
