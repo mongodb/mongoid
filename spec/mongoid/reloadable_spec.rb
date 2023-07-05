@@ -395,7 +395,7 @@ describe Mongoid::Reloadable do
       let(:contractor2) { Contractor.new(name: 'c') }
 
       let(:building) do
-        Building.create!(name: 'a', contractors: [ contractor1 ])
+        Building.create!(contractors: [ contractor1 ])
       end
 
       let(:more_contractors) { building.contractors + [ contractor2 ] }
