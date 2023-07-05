@@ -311,6 +311,13 @@ module Mongoid
 
     private
 
+    # Clears all pending atomic updates.
+    def reset_atomic_updates!
+      Atomic::UPDATES.each do |update|
+        send(update).clear
+      end
+    end
+
     # Generates the atomic updates in the correct order.
     #
     # @example Generate the updates.
