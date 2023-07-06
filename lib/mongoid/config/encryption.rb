@@ -73,7 +73,7 @@ module Mongoid
       # @return [ Hash ] The encryptMetadata object.
       def metadata_for(model)
         metadata = {}.tap do |metadata|
-          if (key_id = key_id_for(model.encrypt_metadata[:key_id]))
+          if (key_id = key_id_for(model.encrypt_metadata[:key_id], model.encrypt_metadata[:key_name_field]))
             metadata['keyId'] = key_id
           end
           if model.encrypt_metadata.key?(:deterministic)
@@ -129,7 +129,7 @@ module Mongoid
           if (algorithm = algorithm_for(field))
             props[name]['encrypt']['algorithm'] = algorithm
           end
-          if (key_id = key_id_for(field.key_id))
+          if (key_id = key_id_for(field.key_id, field.key_name_field))
             props[name]['encrypt']['keyId'] = key_id
           end
         end
@@ -192,13 +192,20 @@ module Mongoid
       # key id.
       #
       # @param [ String | nil ] key_id_base64 The base64 encoded key id.
+      # @param [ String | nil ] key_name_field The name of the key name field.
       #
-      # @return [ Array<BSON::Binary> | nil ] The keyId encryption schema field,
-      #   or nil if the key id is nil.
-      def key_id_for(key_id_base64)
-        return nil if key_id_base64.nil?
+      # @return [ Array<BSON::Binary> | String | nil ] The keyId encryption schema field,
+      #   JSON pointer to the field that contains keyAltName,
+      #   or nil if both key_id_base64 and key_name_field are nil.
+      def key_id_for(key_id_base64, key_name_field)
+        return nil if key_id_base64.nil? && key_name_field.nil?
+        raise ArgumentError, 'FIXME' if !key_id_base64.nil? && !key_name_field.nil?
 
-        [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
+        if !key_id_base64.nil?
+          [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
+        else
+          "/#{key_name_field}"
+        end
       end
     end
   end

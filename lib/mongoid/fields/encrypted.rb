@@ -26,6 +26,10 @@ module Mongoid
         @encryption_options[:key_id]
       end
 
+      def key_name_field
+        @encryption_options[:key_name_field]
+      end
+
       # Override the key_id for the field.
       #
       # This method is solely for testing purposes and should not be used in
