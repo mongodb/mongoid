@@ -48,7 +48,7 @@ module Mongoid
             if value.is_a?(Hash) && selector[field].is_a?(Hash) &&
               value.keys.all? { |key|
                 key_s = key.to_s
-                key_s.start_with?('$') && !selector[field].key?(key_s)
+                key_s.start_with?('$') && !selector[field].keys.map(&:to_s).include?(key_s)
               }
             then
               # Multiple operators can be combined on the same field by
