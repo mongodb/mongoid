@@ -336,6 +336,15 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the allow_bson_decimal128 option in the config' do
+    min_bson_version '5.0'
+
+    let(:option) { :allow_bson_decimal128 }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
   context 'when setting the legacy_readonly option in the config' do
     let(:option) { :legacy_readonly }
     let(:default) { false }

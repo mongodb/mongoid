@@ -80,6 +80,23 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
+    # Allow BSON::Decimal128 to be parsed and returned directly in
+    # field values. When BSON 5 is present and the this option is set to false
+    # (the default), BSON::Decimal128 values in the database will be returned
+    # as BigDecimal.
+    #
+    # @note this option only has effect when BSON 5+ is present. Otherwise,
+    #   the setting is ignored.
+    option :allow_bson_decimal128, default: false, on_change: -> (allow) do
+        if BSON::VERSION >= '5.0.0'
+          if allow
+            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)
+          else
+            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BigDecimal)
+          end
+        end
+      end
+
     # Sets the async_query_executor for the application. By default the thread pool executor
     #   is set to `:immediate. Options are:
     #
