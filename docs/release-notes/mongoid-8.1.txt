@@ -324,7 +324,7 @@ Added ``:replace`` option to ``#upsert``
 ----------------------------------------
 
 Mongoid 8.1 adds the ``:replace`` option to the ``#upsert`` method. This option
-is ``false`` by default.
+is ``true`` by default.
 
 In Mongoid 8 and earlier, and in Mongoid 8.1 when passing ``replace: true``
 (the default) the upserted document will overwrite the current document in the
@@ -396,7 +396,7 @@ Added ``none_of`` Query Method
 ------------------------------
 
 With the addition of ``none_of``, Mongoid 8.1 allows queries to exclude
-conditions in bulk. The emitted query will encapsulate the specified 
+conditions in bulk. The emitted query will encapsulate the specified
 criteria in a ``$nor`` operation. For example:
 
 .. code:: ruby
