@@ -587,17 +587,17 @@ describe Mongoid::Fields do
       context 'when BSON version >= 5' do
         min_bson_version '5.0.0'
 
-        context 'when allow_bson_decimal128 is false' do
-          config_override :allow_bson_decimal128, false
+        context 'when allow_bson5_decimal128 is false' do
+          config_override :allow_bson5_decimal128, false
           it_behaves_like 'BSON::Decimal128 is BigDecimal'
         end
 
-        context 'when allow_bson_decimal128 is true' do
-          config_override :allow_bson_decimal128, true
+        context 'when allow_bson5_decimal128 is true' do
+          config_override :allow_bson5_decimal128, true
           it_behaves_like 'BSON::Decimal128 is BSON::Decimal128'
         end
 
-        context 'when allow_bson_decimal128 is default' do
+        context 'when allow_bson5_decimal128 is default' do
           it_behaves_like 'BSON::Decimal128 is BigDecimal'
         end
       end

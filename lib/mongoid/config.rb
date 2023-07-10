@@ -87,7 +87,7 @@ module Mongoid
     #
     # @note this option only has effect when BSON 5+ is present. Otherwise,
     #   the setting is ignored.
-    option :allow_bson_decimal128, default: false, on_change: -> (allow) do
+    option :allow_bson5_decimal128, default: false, on_change: -> (allow) do
         if BSON::VERSION >= '5.0.0'
           if allow
             BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)

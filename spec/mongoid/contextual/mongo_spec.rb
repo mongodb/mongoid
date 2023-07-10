@@ -1126,7 +1126,7 @@ describe Mongoid::Contextual::Mongo do
 
       context '>= BSON 5 with decimal128 allowed' do
         min_bson_version "5.0"
-        config_override :allow_bson_decimal128, true
+        config_override :allow_bson5_decimal128, true
 
         it "stores the correct types in the database" do
           expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw

@@ -322,12 +322,12 @@ Mongoid to allow literal BSON::Decimal128 fields:
 
   Model.first.decimal_field.class #=> BigDecimal
 
-  Mongoid.allow_bson_decimal128 = true
+  Mongoid.allow_bson5_decimal128 = true
   Model.first.decimal_field.class #=> BSON::Decimal128
 
 .. note::
 
-  The ``allow_bson_decimal128`` option only has any effect under
+  The ``allow_bson5_decimal128`` option only has any effect under
   BSON 5 and later. BSON 4 and earlier ignore the setting entirely.
 
 
