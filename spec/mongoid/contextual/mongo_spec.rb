@@ -1092,33 +1092,49 @@ describe Mongoid::Contextual::Mongo do
       let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
       let(:tally) { Person.tally("ssn") }
 
+      let(:tallied_classes) do
+        tally.keys.map(&:class).sort do |a, b|
+          a.to_s.casecmp(b.to_s)
+        end
+      end
+
       context "< BSON 5" do
         max_bson_version '4.99.99'
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
-          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+          expect(Person.find(person1.id).attributes["ssn"]).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).attributes["ssn"]).to be_a BSON::Decimal128
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
 
-      context ">= BSON 5" do
+      context '>= BSON 5' do
         min_bson_version "5.0"
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
-          Person.find(person2.id).ssn.should be_a BigDeimal
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BigDecimal
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BigDecimal, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BigDecimal, BSON::Regexp::Raw ]
+        end
+      end
+
+      context '>= BSON 5 with decimal128 allowed' do
+        min_bson_version "5.0"
+        config_override :allow_bson5_decimal128, true
+
+        it "stores the correct types in the database" do
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BSON::Decimal128
+        end
+
+        it "tallies the correct type" do
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
     end
