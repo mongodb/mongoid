@@ -21,7 +21,7 @@ module Mongoid
       # @return [ Hash ] A hash containing the key id as :key_id,
       #   kms provider name as :kms_provider, and key vault namespace as
       #   :key_vault_namespace.
-      def create_data_key(kms_provider_name: nil, client_name: nil, key_alt_name: nil)
+      def create_data_key(client_name: nil, kms_provider_name: nil, key_alt_name: nil)
         kms_provider_name, kms_providers, key_vault_namespace = prepare_arguments(
           kms_provider_name,
           client_name
