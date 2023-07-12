@@ -798,11 +798,11 @@ module Mongoid
         result
       end
 
-      def unmapped_type(options)
-        if "Boolean" == options[:type].to_s
+      def unmapped_type(type)
+        if "Boolean" == type.to_s
           Mongoid::Boolean
         else
-          options[:type] || Object
+          type || Object
         end
       end
 
