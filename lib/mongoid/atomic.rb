@@ -1,28 +1,25 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/atomic/modifiers"
-require "mongoid/atomic/paths"
+require 'mongoid/atomic/modifiers'
+require 'mongoid/atomic/paths'
 
 module Mongoid
-
   # This module contains the logic for supporting atomic operations against the
   # database.
   module Atomic
     extend ActiveSupport::Concern
 
-    UPDATES = [
-      :atomic_array_pushes,
-      :atomic_array_pulls,
-      :atomic_array_add_to_sets,
-      :atomic_pulls,
-      :delayed_atomic_sets,
-      :delayed_atomic_pulls,
-      :delayed_atomic_unsets
-    ]
+    UPDATES = %i[
+      atomic_array_pushes
+      atomic_array_pulls
+      atomic_array_add_to_sets
+      atomic_pulls
+      delayed_atomic_sets
+      delayed_atomic_pulls
+      delayed_atomic_unsets
+    ].freeze
 
     included do
-
       # When MongoDB finally fully implements the positional operator, we can
       # get rid of all indexing related code in Mongoid.
       attr_accessor :_index
@@ -117,6 +114,8 @@ module Mongoid
     #   person.atomic_updates(children)
     #
     # @return [ Hash ] The updates and their modifiers.
+    #
+    # rubocop:disable Style/OptionalBooleanParameter
     def atomic_updates(_use_indexes = false)
       process_flagged_destroys
       mods = Modifiers.new
@@ -127,7 +126,8 @@ module Mongoid
       end
       mods
     end
-    alias :_updates :atomic_updates
+    alias _updates atomic_updates
+    # rubocop:enable Style/OptionalBooleanParameter
 
     # Get the removal modifier for the document. Will be nil on root
     # documents, $unset on embeds_one, $set on embeds_many.
@@ -179,13 +179,11 @@ module Mongoid
     #
     # @return [ Object ] The associated path.
     def atomic_paths
-      @atomic_paths ||= begin
-        if _association
-          _association.path(self)
-        else
-          Atomic::Paths::Root.new(self)
-        end
-      end
+      @atomic_paths ||= if _association
+                          _association.path(self)
+                        else
+                          Atomic::Paths::Root.new(self)
+                        end
     end
 
     # Get all the attributes that need to be pulled.
@@ -202,7 +200,7 @@ module Mongoid
           path ||= doc.flag_as_destroyed
           doc._id
         end
-        pulls[path] = { "_id" => { "$in" => ids }} and path = nil
+        pulls[path] = { '_id' => { '$in' => ids } } and path = nil
       end
       pulls
     end
@@ -224,7 +222,13 @@ module Mongoid
     #
     # @return [ Hash ] The $set operations.
     def atomic_sets
-      updateable? ? setters : settable? ? { atomic_path => as_attributes } : {}
+      if updateable?
+        setters
+      elsif settable?
+        { atomic_path => as_attributes }
+      else
+        {}
+      end
     end
 
     # Get all the attributes that need to be unset.
