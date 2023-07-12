@@ -235,7 +235,8 @@ Now we can tell Mongoid what should be encrypted:
     field :insurer, type: String
 
     # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Random
-    # algorithm using the same data key as Patient class attributes.
+    # algorithm using the key which alternate name is stored in the
+    # policy_number_key field.
     field :policy_number, type: Integer, encrypt: {
         deterministic: false,
         key_field_name: :policy_number_key
