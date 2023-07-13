@@ -147,11 +147,10 @@ module Mongoid
       def properties_for_relations(model, visited)
         model.relations.each_with_object({}) do |(name, relation), props|
           next if visited.include?(relation.relation_class)
-          visited << relation.relation_class
-          next unless relation.is_a?(Association::Embedded::EmbedsMany) ||
-                      relation.is_a?(Association::Embedded::EmbedsOne)
+          next unless relation.is_a?(Association::Embedded::EmbedsOne)
           next unless relation.relation_class.encrypted?
 
+          visited << relation.relation_class
           metadata_for(
             relation.relation_class
           ).merge(
