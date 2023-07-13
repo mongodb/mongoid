@@ -54,6 +54,7 @@ describe 'Encryption' do
       code: '12345',
       medical_records: ['one', 'two', 'three'],
       blood_type: 'A+',
+      blood_type_key_name: key_alt_name,
       ssn: 123456789,
       insurance: Crypt::Insurance.new(policy_number: 123456789)
     )
@@ -71,6 +72,7 @@ describe 'Encryption' do
       code: '12345',
       medical_records: ['one', 'two', 'three'],
       blood_type: 'A+',
+      blood_type_key_name: key_alt_name,
       ssn: 123456789,
       insurance: Crypt::Insurance.new(policy_number: 123456789)
     )
