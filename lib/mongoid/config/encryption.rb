@@ -199,12 +199,14 @@ module Mongoid
       #   or nil if both key_id_base64 and key_name_field are nil.
       def key_id_for(key_id_base64, key_name_field)
         return nil if key_id_base64.nil? && key_name_field.nil?
-        raise ArgumentError, 'FIXME' if !key_id_base64.nil? && !key_name_field.nil?
+        if !key_id_base64.nil? && !key_name_field.nil?
+          raise ArgumentError, 'Specifying both key_id and key_name_field is not allowed'
+        end
 
-        if !key_id_base64.nil?
-          [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
-        else
+        if key_id_base64.nil?
           "/#{key_name_field}"
+        else
+          [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
         end
       end
     end
