@@ -125,6 +125,23 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
+    # Allow BSON::Decimal128 to be parsed and returned directly in
+    # field values. When BSON 5 is present and the this option is set to false
+    # (the default), BSON::Decimal128 values in the database will be returned
+    # as BigDecimal.
+    #
+    # @note this option only has effect when BSON 5+ is present. Otherwise,
+    #   the setting is ignored.
+    option :allow_bson5_decimal128, default: false, on_change: -> (allow) do
+      if BSON::VERSION >= '5.0.0'
+        if allow
+          BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)
+        else
+          BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BigDecimal)
+        end
+      end
+    end
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
