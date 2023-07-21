@@ -3576,6 +3576,20 @@ describe Mongoid::Contextual::Mongo do
           end
         end
 
+        context 'when using aliased field names' do
+          before do
+            context.update_all('$set' => { years: 100 })
+          end
+
+          it "updates the first matching document" do
+            expect(depeche_mode.reload.years).to eq(100)
+          end
+
+          it "updates the last matching document" do
+            expect(new_order.reload.years).to eq(100)
+          end
+        end
+
         context "when the attributes must be mongoized" do
 
           before do
