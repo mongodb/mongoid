@@ -26,7 +26,7 @@ module Mongoid
 
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
-        undef_method(method) unless method.start_with?('__') || KEEPER_METHODS.include?(method)
+        undef_method(method) unless method.to_s.start_with?('__') || KEEPER_METHODS.include?(method)
       end
 
       include Threaded::Lifecycle
