@@ -50,7 +50,6 @@ dependencies in `the driver documentation. <https://www.mongodb.com/docs/ruby-dr
 Note the version of the Ruby driver being used in your application and select
 the appropriate steps below.
 
-
 Install ``libmongocrypt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -239,11 +238,28 @@ Now we can tell Mongoid what should be encrypted:
     # policy_number_key field.
     field :policy_number, type: Integer, encrypt: {
         deterministic: false,
-        key_field_name: :policy_number_key
+        key_name_field: :policy_number_key
     }
 
     embedded_in :patient
   end
+
+.. note::
+  If you are developing a Rails application, it is recommended to set
+  ``preload_models`` to ``true`` in ``mongoid.yml``. This will ensure that
+  Mongoid loads all models before the application starts, and the encryption
+  schema is configured before any data is read or written.
+
+Known Limitations
+~~~~~~~~~~~~~~~~~
+
+* MongoDB CSFLE has some limitations that are described in
+  `the server documentation. <https://www.mongodb.com/docs/manual/core/csfle/reference/limitations/>`_
+  These limitations also apply to Mongoid.
+* Mongoid does not support encryption of ``embeds_many`` relations.
+* If you use ``:key_name_field`` option, the field must be encrypted using
+  non-deterministic algorithm. To encrypt your field deterministically, you must
+  specify ``:key_id`` option instead.
 
 Working with Data
 =================

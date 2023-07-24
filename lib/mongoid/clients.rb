@@ -60,6 +60,9 @@ module Mongoid
         name_as_symbol = name.to_sym
         return clients[name_as_symbol] if clients[name_as_symbol]
         CREATE_LOCK.synchronize do
+          if (key_vault_client = Mongoid.clients.dig(name_as_symbol, :options, :auto_encryption_options, :key_vault_client))
+            clients[key_vault_client.to_sym] ||= Clients::Factory.create(key_vault_client)
+          end
           clients[name_as_symbol] ||= Clients::Factory.create(name)
         end
       end
