@@ -2707,4 +2707,12 @@ describe Mongoid::Attributes do
       catalog.set_field.should == Set.new([ 1, 2 ])
     end
   end
+
+  context "when en embedded field has a capitalized store_as name" do
+    let(:person) { Person.new(Purse: { brand: "Gucci" }) }
+
+    it "saves successfully" do
+      expect(person.save!).to eq(true)
+    end
+  end
 end
