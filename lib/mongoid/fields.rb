@@ -809,7 +809,7 @@ module Mongoid
       #
       # @return [ Class ] The type of the field.
       #
-      # @raises [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
+      # @raise [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
       #   type.
       #
       # @api private

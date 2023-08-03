@@ -11,7 +11,7 @@ module Mongoid
       # Note that this method will load the *new* functionality introduced in
       # the given Mongoid version.
       #
-      # @param [ String | Float ] The version number as X.y.
+      # @param [ String | Float ] version The version number as X.y.
       #
       # raises [ ArgumentError ] if an invalid version is given.
       def load_defaults(version)

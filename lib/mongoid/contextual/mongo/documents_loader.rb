@@ -82,9 +82,9 @@ module Mongoid
         # @param [ Class ] klass Mongoid model class to instantiate documents.
         #   All records obtained from the database will be converted to an
         #   instance of this class, if possible.
-        # @param [ Mongoid::Criteria ] criteria. Criteria that specifies which
+        # @param [ Mongoid::Criteria ] criteria Criteria that specifies which
         #   documents should be loaded.
-        # @param [ Concurrent::AbstractExecutorService ] executor. Executor that
+        # @param [ Concurrent::AbstractExecutorService ] executor Executor that
         #   is capable of running `Concurrent::Promises::Future` instances.
         def initialize(view, klass, criteria, executor: self.class.executor)
           @view = view
