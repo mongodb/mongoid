@@ -231,7 +231,6 @@ module Mongoid
         end
 
         def create_foreign_key_field!
-          inverse_class.aliased_associations[foreign_key] = name.to_s
           @owner_class.field(
               foreign_key,
               type: FOREIGN_KEY_FIELD_TYPE,

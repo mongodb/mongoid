@@ -1141,15 +1141,6 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     end
   end
 
-  context "when there is a foreign key in the aliased associations" do
-    it "has the correct aliases" do
-      # Instances of Driver do not respond to vehicle_id.
-      expect(Driver.aliased_associations.key?("vehicle_id")).to be false
-      expect(Vehicle.aliased_associations.key?("driver_id")).to be false
-      expect(Vehicle.aliased_fields["driver"]).to eq("driver_id")
-    end
-  end
-
   context "when the document is not persisted and the association is invalid" do
 
     before do

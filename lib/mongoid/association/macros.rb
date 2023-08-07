@@ -16,20 +16,7 @@ module Mongoid
 
         # A hash that maps aliases to their associations. This hash maps the
         # associations "in database name" to its "in code" name. This is used when
-        # associations specify the `store_as` option, or on a referenced association.
-        # On a referenced association, this is used to map the foreign key to
-        # the association's name. For example, if we had the following
-        # relationship:
-        #
-        #   User has_many Accounts
-        #
-        # User will have an entry in the aliased associations hash:
-        #
-        #   account_ids => accounts
-        #
-        # Note that on the belongs_to associations, the mapping from
-        # foreign key => name is not in the aliased_associations hash, but a
-        # mapping from name => foreign key is in the aliased_fields hash.
+        # associations specify the `store_as` option.
         #
         # @return [ Hash<String, String> ] The aliased associations hash.
         #

@@ -3723,13 +3723,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
   end
 
-  context "when there is a foreign key in the aliased associations" do
-    it "has the correct aliases" do
-      expect(Dog.aliased_associations["breed_ids"]).to eq("breeds")
-      expect(Breed.aliased_associations["dog_ids"]).to eq("dogs")
-    end
-  end
-
   # This test is for MONGOID-5344 which tests that the initial call to
   # signature_ids refers to the same array as subsequent calls to signature_ids.
   # Prior to the change in that ticket, this test broke because the array
