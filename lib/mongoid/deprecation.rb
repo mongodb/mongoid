@@ -14,7 +14,7 @@ module Mongoid
     # Overrides default ActiveSupport::Deprecation behavior
     # to use Mongoid's logger.
     #
-    # @return Array<Proc> The deprecation behavior.
+    # @return [ Array<Proc> ] The deprecation behavior.
     def behavior
       @behavior ||= Array(->(message, callstack, _deprecation_horizon, _gem_name) {
         logger = Mongoid.logger
