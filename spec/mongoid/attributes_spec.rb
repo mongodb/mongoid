@@ -2708,11 +2708,20 @@ describe Mongoid::Attributes do
     end
   end
 
-  context "when en embedded field has a capitalized store_as name" do
-    let(:person) { Person.new(Purse: { brand: "Gucci" }) }
+  context 'when en embedded field has a capitalized store_as name' do
+    let(:person) { Person.new(Purse: { brand: 'Gucci' }) }
 
-    it "saves successfully" do
+    it 'sets the value' do
+      expect(person.purse.brand).to eq('Gucci')
+    end
+
+    it 'saves successfully' do
       expect(person.save!).to eq(true)
+    end
+
+    it 'persists the value' do
+      person.save!
+      expect(person.reload.purse.brand).to eq('Gucci')
     end
   end
 end
