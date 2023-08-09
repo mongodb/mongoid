@@ -1383,8 +1383,6 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
     end
 
     it "uses the correct explicit id" do
-      pending "https://jira.mongodb.org/browse/MONGOID-5089"
-
       expect(article.comments.first.article_id).to eq(1)
     end
   end
