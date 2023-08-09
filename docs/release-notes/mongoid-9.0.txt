@@ -17,6 +17,42 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+
+Deprecated options removed
+--------------------------
+
+**Breaking change:** The following config options are removed in Mongoid 9.0.
+Please ensure you have removed all references to these from your app.
+If you were using ``config.load_defaults 8.1`` prior to upgrading, you will not
+experience any behavior change. Refer to earlier release notes for the meaning
+of each option.
+
+- ``:use_activesupport_time_zone``
+- ``:broken_aggregables``
+- ``:broken_alias_handling``
+- ``:broken_and``
+- ``:broken_scoping``
+- ``:broken_updates``
+- ``:compare_time_by_ms``
+- ``:legacy_attributes``
+- ``:legacy_pluck_distinct``
+- ``:legacy_triple_equals``
+- ``:object_id_as_json_oid``
+- ``:overwrite_chained_operators``
+
+In addition, support for ``config.load_defaults`` versions 7.5 and
+prior has been dropped (you must use a minimum of version 8.0.)
+
+
+Deprecated functionality removed
+--------------------------------
+
+- The ``Mongoid::QueryCache`` module has been removed. Please replace any usages 1-for-1 with ``Mongo::QueryCache``.
+  The method ``Mongoid::QueryCache#clear_cache`` should be replaced with ``Mongo::QueryCache#clear``.
+  All other methods and submodules are identically named. Refer to the `driver query cache documentation
+  <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
+
+
 ``touch`` method now clears changed state
 -----------------------------------------
 
@@ -128,12 +164,9 @@ Use configured time zone to typecast Date to Time in queries
 -------------------------------------------------------------
 
 When querying for a Time field using a Date value, Mongoid now correctly
-considers the ``Mongoid.use_activesupport_time_zone`` configuration option
-to perform type conversion.
+considers ``Time.zone`` to perform type conversion.
 
 .. code-block:: ruby
-
-  Mongoid.use_activesupport_time_zone = true
 
   class Magazine
     include Mongoid::Document
@@ -147,14 +180,12 @@ to perform type conversion.
   #=> will return all results on or after Sept 26th, 2022
   #   at 0:00 in Asia/Tokyo time zone.
 
-In prior Mongoid versions, the above code would ignore the
-``Mongoid.use_activesupport_time_zone`` setting and behave as if
-it were false, i.e. always using the system time zone to perform
-the type conversion.
+In prior Mongoid versions, the above code would ignore the ``Time.zone``
+(irrespective of the now-removed ``:use_activesupport_time_zone``
+setting) and always using the system time zone to perform the type conversion.
 
 Note that in prior Mongoid versions, typecasting Date to Time during
-persistence operations was already correctly using the
-``Mongoid.use_activesupport_time_zone`` setting.
+persistence operations was already correctly using time zone.
 
 
 ```#touch`` method on embedded documents correctly handles ``touch: false`` option
@@ -239,6 +270,66 @@ defaults to ``true``.
   Mongoid::Config.immutable_ids = true
 
 When set to false, the older, inconsistent behavior is restored.
+
+
+Support Field Aliases on Index Options
+--------------------------------------
+
+Support has been added to use aliased field names in the following options
+of the ``index`` macro: ``partial_filter_expression``, ``weights``,
+``wildcard_projection``.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+    field :a, as: :age
+    index({ age: 1 }, { partial_filter_expression: { age: { '$gte' => 20 } })
+  end
+
+.. note::
+
+  The expansion of field name aliases in index options such as
+  ``partial_filter_expression`` is performed according to the behavior of MongoDB
+  server 6.0. Future server versions may change how they interpret these options,
+  and Mongoid's functionality may not support such changes.
+
+
+BSON 5 and BSON::Decimal128 Fields
+----------------------------------
+
+When BSON 4 or earlier is present, any field declared as BSON::Decimal128 will
+return a BSON::Decimal128 value. When BSON 5 is present, however, any field
+declared as BSON::Decimal128 will return a BigDecimal value by default.
+
+.. code-block:: ruby
+
+  class Model
+    include Mongoid::Document
+
+    field :decimal_field, type: BSON::Decimal128
+  end
+
+  # under BSON <= 4
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+  # under BSON >= 5
+  Model.first.decimal_field.class #=> BigDecimal
+
+If you need literal BSON::Decimal128 values with BSON 5, you may instruct
+Mongoid to allow literal BSON::Decimal128 fields:
+
+.. code-block:: ruby
+
+  Model.first.decimal_field.class #=> BigDecimal
+
+  Mongoid.allow_bson5_decimal128 = true
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+.. note::
+
+  The ``allow_bson5_decimal128`` option only has any effect under
+  BSON 5 and later. BSON 4 and earlier ignore the setting entirely.
 
 
 Bug Fixes and Improvements

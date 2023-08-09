@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "forwardable"
 require "time"
@@ -26,7 +27,7 @@ require "mongoid/loggable"
 require "mongoid/clients"
 require "mongoid/document"
 require "mongoid/tasks/database"
-require "mongoid/query_cache"
+require "mongoid/tasks/encryption"
 require "mongoid/warnings"
 require "mongoid/utils"
 

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 load 'mongoid/tasks/database.rake'
+load "mongoid/tasks/encryption.rake"
 
 namespace :db do
 
@@ -77,6 +79,11 @@ namespace :db do
   unless Rake::Task.task_defined?("db:shard_collections")
     desc "Shard collections with shard keys specified in Mongoid models"
     task :shard_collections => "mongoid:shard_collections"
+  end
+
+  namespace :encryption do
+    desc "Create encryption key"
+    task :create_data_key =>  "mongoid:encryption:create_data_key"
   end
 
   namespace :mongoid do

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/indexable/specification"
 require "mongoid/indexable/validators/options"

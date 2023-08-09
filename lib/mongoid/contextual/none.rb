@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/contextual/aggregable/none"
 
@@ -10,32 +11,10 @@ module Mongoid
     # is consistent with Mongoid::Contextual::Mongo.
     class None
       include Enumerable
-      alias :old_sum :sum
-
       include Aggregable::None
       include Queryable
 
       attr_reader :criteria, :klass
-
-      alias :new_sum :sum
-
-      # Get the sum in the null context.
-      #
-      # @example Get the sum of null context.
-      #     context.sum(_field)
-      #
-      # @param [ Symbol ] _field The field to sum.
-      #
-      # @return [ Integer | Symbol ] If Mongoid.broken_aggregables is
-      #   set to false, this will always be zero. Otherwise, it will return the
-      #   field name as a symbol.
-      def sum(_field = nil)
-        if Mongoid.broken_aggregables
-          old_sum(_field)
-        else
-          new_sum(_field)
-        end
-      end
 
       # Check if the context is equal to the other object.
       #
@@ -159,7 +138,7 @@ module Mongoid
       # @example Get the first document in null context.
       #   context.first!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def first!
         raise_document_not_found_error
       end
@@ -181,7 +160,7 @@ module Mongoid
       # @example Get the last document in null context.
       #   context.last!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def last!
         raise_document_not_found_error
       end
@@ -203,7 +182,7 @@ module Mongoid
       # @example Take a document in null context.
       #   context.take!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def take!
         raise_document_not_found_error
       end
@@ -223,7 +202,7 @@ module Mongoid
       # @example Get the second document in null context.
       #   context.second!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def second!
         raise_document_not_found_error
       end
@@ -243,7 +222,7 @@ module Mongoid
       # @example Get the third document in null context.
       #   context.third!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def third!
         raise_document_not_found_error
       end
@@ -263,7 +242,7 @@ module Mongoid
       # @example Get the fourth document in null context.
       #   context.fourth!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def fourth!
         raise_document_not_found_error
       end
@@ -283,7 +262,7 @@ module Mongoid
       # @example Get the fifth document in null context.
       #   context.fifth!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def fifth!
         raise_document_not_found_error
       end
@@ -303,7 +282,7 @@ module Mongoid
       # @example Get the second to last document in null context.
       #   context.second_to_last!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def second_to_last!
         raise_document_not_found_error
       end
@@ -323,7 +302,7 @@ module Mongoid
       # @example Get the third to last document in null context.
       #   context.third_to_last!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def third_to_last!
         raise_document_not_found_error
       end
@@ -335,7 +314,7 @@ module Mongoid
       #
       # @return [ Integer ] Always zero.
       def length
-        Mongoid.broken_aggregables ? 0 : entries.length
+        entries.length
       end
       alias :size :length
 

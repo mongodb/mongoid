@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
-require "mongoid/association/referenced/eager"
+require "mongoid/association/eager"
 
 module Mongoid
   module Association

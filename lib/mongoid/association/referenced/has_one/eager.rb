@@ -1,12 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
       class HasOne
-
         # Eager class for has_one associations.
-        class Eager < Association::Referenced::Eager::Base
+        class Eager < Association::Eager
 
           private
 

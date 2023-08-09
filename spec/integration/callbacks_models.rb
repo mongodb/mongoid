@@ -1,3 +1,4 @@
+# rubocop:todo all
 class Galaxy
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -152,4 +153,41 @@ class Building
   include Mongoid::Document
 
   has_and_belongs_to_many :architects, dependent: :nullify
+end
+
+class Root
+  include Mongoid::Document
+  embeds_many :embedded_once, cascade_callbacks: true
+  after_save :trace
+
+  attr_accessor :logger
+
+  def trace
+    logger << :root
+  end
+end
+
+class EmbeddedOnce
+  include Mongoid::Document
+  embeds_many :embedded_twice, cascade_callbacks: true
+  embedded_in :root
+  after_save :trace
+
+  attr_accessor :logger
+
+  def trace
+    logger << :embedded_once
+  end
+end
+
+class EmbeddedTwice
+  include Mongoid::Document
+  embedded_in :embedded_once
+  after_save :trace
+
+  attr_accessor :logger
+
+  def trace
+    logger << :embedded_twice
+  end
 end

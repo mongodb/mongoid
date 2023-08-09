@@ -1,8 +1,5 @@
-inherit_from: .rubocop_todo.yml
-
 require:
   - rubocop-performance
-  - rubocop-rails
   - rubocop-rake
   - rubocop-rspec
 
@@ -10,46 +7,45 @@ AllCops:
   TargetRubyVersion: 2.6
   NewCops: enable
   Exclude:
-    - 'spec/shared/lib/mrss/**/*'
+    - 'spec/shared/**/*'
     - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'test-apps/**/*'
 
 # -----------------------------------
 # TODO: Enable and fix the cops below
 # -----------------------------------
 
 Gemspec:
-  Enabled: false
+  Enabled: true
 
 Layout:
-  Enabled: false
+  Enabled: true
 
 Lint:
-  Enabled: false
+  Enabled: true
 
 Metrics:
-  Enabled: false
+  Enabled: true
 
 Naming:
-  Enabled: false
+  Enabled: true
 
 Performance:
-  Enabled: false
+  Enabled: true
 
 Rake:
-  Enabled: false
-
-Rails:
-  Enabled: false
+  Enabled: true
 
 RSpec:
-  Enabled: false
+  Enabled: true
 
 Security:
   Exclude:
     - 'spec/**/*'
 
 Style:
-  Enabled: false
+  Enabled: true
 
 # --------------------------------------
 # Cops below this line set intentionally
@@ -61,10 +57,42 @@ Bundler/OrderedGems:
 Gemspec/OrderedDependencies:
   Enabled: false
 
-# Not used by Mongoid
-Rails/RedundantPresenceValidationOnBelongsTo:
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: space
+
+Layout/SpaceInsidePercentLiteralDelimiters:
+  Enabled: false
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 20
+
+RSpec/BeforeAfterAll:
+  Enabled: false
+
+RSpec/ImplicitExpect:
+  EnforcedStyle: is_expected
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
   Enabled: false
 
 Style/Documentation:
   Exclude:
     - 'spec/**/*'
+
+Style/ModuleFunction:
+  EnforcedStyle: extend_self
+
+Style/ParallelAssignment:
+  Enabled: false
+
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex

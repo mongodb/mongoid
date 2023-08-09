@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Contextual
@@ -61,12 +62,12 @@ module Mongoid
       # Perform an atomic $mul operation on the matching documents.
       #
       # @example Perform the atomic multiplication.
-      #   context.set_mul(likes: 10)
+      #   context.mul(likes: 10)
       #
       # @param [ Hash ] factors The operations.
       #
       # @return [ nil ] Nil.
-      def set_mul(factors)
+      def mul(factors)
         view.update_many("$mul" => collect_operations(factors))
       end
 

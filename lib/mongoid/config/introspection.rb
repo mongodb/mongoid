@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Config
@@ -121,7 +122,8 @@ module Mongoid
           ((?:^\s*\#.*\n)+)  # match one or more lines of comments
           ^\s+option\s+      # followed immediately by a line declaring an option
           :(\w+),\s+         # match the option's name, followed by a comma
-          default:\s+(.*)    # match the default value for the option
+          default:\s+(.*?)   # match the default value for the option
+          (?:,.*?)?          # skip any other configuration
         \n)                  # end with a newline
       }x
 

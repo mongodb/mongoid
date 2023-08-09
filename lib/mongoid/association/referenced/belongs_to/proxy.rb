@@ -25,7 +25,7 @@ module Mongoid
           #   association.
           # @param [ Mongoid::Association::Relatable ] association The association object.
           def initialize(base, target, association)
-            init(base, target, association) do
+            super do
               characterize_one(_target)
               bind_one
             end
@@ -53,11 +53,11 @@ module Mongoid
           # @return [ self | nil ] The association or nil.
           def substitute(replacement)
             unbind_one
-            if replacement
-              self._target = normalize(replacement)
-              bind_one
-              self
-            end
+            return unless replacement
+
+            self._target = normalize(replacement)
+            bind_one
+            self
           end
 
           private
@@ -84,6 +84,7 @@ module Mongoid
           # @return [ Document ] The document.
           def normalize(replacement)
             return replacement if replacement.is_a?(Document)
+
             _association.build(klass, replacement)
           end
 
@@ -98,7 +99,6 @@ module Mongoid
           end
 
           class << self
-
             # Get the Eager object for this type of association.
             #
             # @example Get the eager loader object

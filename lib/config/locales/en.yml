@@ -148,6 +148,23 @@ en:
             expecting the option to be there, please consult the following page
             with respect to Mongoid's configuration:\n\n
             \_\_https://www.mongodb.com/docs/mongoid/current/reference/configuration/#mongoid-configuration-options"
+        invalid_auto_encryption_configuration:
+          message: "Invalid automatic encryption configuration for client %{client}."
+          summary: "Automatic encryption options for client %{client} are
+            incomplete or invalid."
+          resolution: "Please consult the following page with respect to
+            automatic encryption configuration:\n\n
+            \_\_https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/#auto-encryption-options"
+        invalid_auto_encryption_configuration_for_kms_provider:
+          message: "Automatic encryption configuration for client %{client} does
+            not include options for kms_provider %{kms_provider}"
+          summary: "Automatic encryption configuration for client %{client} does
+            not include options for kms_provider %{kms_provider} in :kms_providers
+            hash."
+          resolution: "Check kms_provider name and :kms_providers options.
+            Please consult the following page with respect to
+            automatic encryption configuration:\n\n
+            \_\_https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/#auto-encryption-options"
         invalid_config_file:
           message: "Invalid configuration file: %{path}."
           summary: "Your mongoid.yml configuration file does not contain the

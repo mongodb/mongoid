@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'spec_helper'
 
@@ -345,8 +346,6 @@ describe 'Queries with Range criteria' do
         b.passport.passport_pages.create!(num_stamps: 16)
       end
     end
-
-    config_override :broken_alias_handling, false
 
     it 'returns objects within the range' do
       expect(Person.where("passport.passport_pages.num_stamps" => 10..18).to_a).to eq [person]

@@ -1,27 +1,5 @@
 # frozen_string_literal: true
-
-# Deprecated patch for BSON::ObjectId which adds
-# legacy support for #as_json method behavior.
-#
-# @deprecated
-class BSON::ObjectId
-  alias :bson_ruby_as_json :as_json
-
-  # Return a string representation of the object id for use in
-  # application-level JSON serialization.
-  #
-  # @example Get the object id as a JSON-serializable object.
-  #   object_id.as_json
-  #
-  # @return [ String ] The object id as a string.
-  def as_json(*args)
-    if Mongoid.object_id_as_json_oid
-      { "$oid" => to_s }
-    else
-      bson_ruby_as_json(*args)
-    end
-  end
-end
+# rubocop:todo all
 
 require "mongoid/extensions/array"
 require "mongoid/extensions/big_decimal"

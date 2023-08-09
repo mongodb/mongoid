@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -477,74 +478,72 @@ describe Mongoid::Contextual::Mongo do
       Band.create!(name: "10,000 Maniacs", years: 20, sales: "1E2")
     end
 
-    with_config_values :legacy_pluck_distinct, true, false do
-      context "when limiting the result set" do
+    context "when limiting the result set" do
 
-        let(:criteria) do
-          Band.where(name: "Depeche Mode")
-        end
-
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns the distinct matching fields" do
-          expect(context.distinct(:name)).to eq([ "Depeche Mode" ])
-        end
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
       end
 
-      context "when not limiting the result set" do
-
-        let(:criteria) do
-          Band.criteria
-        end
-
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns the distinct field values" do
-          expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
-        end
+      let(:context) do
+        described_class.new(criteria)
       end
 
-      context "when providing an aliased field" do
+      it "returns the distinct matching fields" do
+        expect(context.distinct(:name)).to eq([ "Depeche Mode" ])
+      end
+    end
 
-        let(:criteria) do
-          Band.criteria
-        end
+    context "when not limiting the result set" do
 
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns the distinct field values" do
-          expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
-        end
+      let(:criteria) do
+        Band.criteria
       end
 
-      context 'when a collation is specified' do
-        min_server_version '3.4'
+      let(:context) do
+        described_class.new(criteria)
+      end
 
-        before do
-          Band.create!(name: 'DEPECHE MODE')
-        end
+      it "returns the distinct field values" do
+        expect(context.distinct(:name).sort).to eq([ "10,000 Maniacs", "Depeche Mode", "New Order" ].sort)
+      end
+    end
 
-        let(:context) do
-          described_class.new(criteria)
-        end
+    context "when providing an aliased field" do
 
-        let(:expected_results) do
-          ["10,000 Maniacs", "Depeche Mode", "New Order"]
-        end
+      let(:criteria) do
+        Band.criteria
+      end
 
-        let(:criteria) do
-          Band.where({}).collation(locale: 'en_US', strength: 2)
-        end
+      let(:context) do
+        described_class.new(criteria)
+      end
 
-        it 'applies the collation' do
-          expect(context.distinct(:name).sort).to eq(expected_results.sort)
-        end
+      it "returns the distinct field values" do
+        expect(context.distinct(:years).sort).to eq([ 20, 25, 30 ])
+      end
+    end
+
+    context 'when a collation is specified' do
+      min_server_version '3.4'
+
+      before do
+        Band.create!(name: 'DEPECHE MODE')
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:expected_results) do
+        ["10,000 Maniacs", "Depeche Mode", "New Order"]
+      end
+
+      let(:criteria) do
+        Band.where({}).collation(locale: 'en_US', strength: 2)
+      end
+
+      it 'applies the collation' do
+        expect(context.distinct(:name).sort).to eq(expected_results.sort)
       end
     end
 
@@ -557,34 +556,8 @@ describe Mongoid::Contextual::Mongo do
         described_class.new(criteria)
       end
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
-
-        context 'when storing BigDecimal as string' do
-          config_override :map_big_decimal_to_decimal128, false
-
-          it "returns the non-demongoized distinct field values" do
-            expect(context.distinct(:sales).sort).to eq([ "1E2", "2E3" ])
-          end
-        end
-
-        context 'when storing BigDecimal as decimal128' do
-          config_override :map_big_decimal_to_decimal128, true
-          min_bson_version '4.15.0'
-          max_bson_version '4.99.99'
-
-          it "returns the non-demongoized distinct field values" do
-            expect(context.distinct(:sales).sort).to eq([ BSON::Decimal128.new("1E2"), BSON::Decimal128.new("2E3") ])
-          end
-        end
-      end
-
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
-
-        it "returns the non-demongoized distinct field values" do
-          expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
-        end
+      it "returns the non-demongoized distinct field values" do
+        expect(context.distinct(:sales).sort).to eq([ BigDecimal("1E2"), BigDecimal("2E3") ])
       end
     end
 
@@ -608,38 +581,14 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context "when getting the field without _translations" do
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "gets the full hash" do
-            expect(context.distinct(:description)).to eq([{ "de" => "deutsch-text", "en" => "english-text" }])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it "gets the demongoized localized field" do
-            expect(context.distinct(:description)).to eq([ 'deutsch-text' ])
-          end
+        it "gets the demongoized localized field" do
+          expect(context.distinct(:description)).to eq([ 'deutsch-text' ])
         end
       end
 
       context "when getting the field with _translations" do
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "gets an empty list" do
-            expect(context.distinct(:description_translations)).to eq([])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it "gets the full hash" do
-            expect(context.distinct(:description_translations)).to eq([ { "de" => "deutsch-text", "en" => "english-text" } ])
-          end
+        it "gets the full hash" do
+          expect(context.distinct(:description_translations)).to eq([ { "de" => "deutsch-text", "en" => "english-text" } ])
         end
       end
 
@@ -649,20 +598,8 @@ describe Mongoid::Contextual::Mongo do
           context.distinct(:'description.de')
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it 'returns the specific translation' do
-            expect(distinct).to eq([ 'deutsch-text' ])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it 'returns the specific translation' do
-            expect(distinct).to eq([ "deutsch-text" ])
-          end
+        it 'returns the specific translation' do
+          expect(distinct).to eq([ "deutsch-text" ])
         end
       end
 
@@ -672,20 +609,8 @@ describe Mongoid::Contextual::Mongo do
           context.distinct(:'description_translations.de')
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it 'returns the empty list' do
-            expect(distinct).to eq([])
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it 'returns the specific translations' do
-            expect(distinct).to eq(['deutsch-text'])
-          end
+        it 'returns the specific translations' do
+          expect(distinct).to eq(['deutsch-text'])
         end
       end
 
@@ -701,23 +626,11 @@ describe Mongoid::Contextual::Mongo do
           context.distinct(:description).first
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "does not correctly use the fallback" do
-            distinct.should == {"de"=>"deutsch-text", "en"=>"english-text"}
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it "correctly uses the fallback" do
-            I18n.locale = :en
-            Dictionary.create!(description: 'english-text')
-            I18n.locale = :he
-            distinct.should == "english-text"
-          end
+        it "correctly uses the fallback" do
+          I18n.locale = :en
+          Dictionary.create!(description: 'english-text')
+          I18n.locale = :he
+          distinct.should == "english-text"
         end
       end
 
@@ -754,36 +667,16 @@ describe Mongoid::Contextual::Mongo do
           context.distinct("pass.name_translations.en").first
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "returns the full hash" do
-            expect(distinct).to eq({ "en" => "Neil", "he" => "Nissim" })
-          end
-
-          it "returns the empty hash" do
-            expect(distinct_translations).to eq(nil)
-          end
-
-          it "returns the empty hash" do
-            expect(distinct_translations_field).to eq(nil)
-          end
+        it "returns the translation for the current locale" do
+          expect(distinct).to eq("Nissim")
         end
 
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
+        it "returns the full _translation hash" do
+          expect(distinct_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+        end
 
-          it "returns the translation for the current locale" do
-            expect(distinct).to eq("Nissim")
-          end
-
-          it "returns the full _translation hash" do
-            expect(distinct_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
-          end
-
-          it "returns the translation for the requested locale" do
-            expect(distinct_translations_field).to eq("Neil")
-          end
+        it "returns the translation for the requested locale" do
+          expect(distinct_translations_field).to eq("Neil")
         end
       end
     end
@@ -795,21 +688,8 @@ describe Mongoid::Contextual::Mongo do
       let(:criteria) { Band.where(_id: band.id) }
       let(:context) { described_class.new(criteria) }
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
-        config_override :map_big_decimal_to_decimal128, true
-        max_bson_version '4.99.99'
-
-        it "returns the distinct matching fields" do
-          expect(context.distinct("label.sales")).to eq([ BSON::Decimal128.new('1E+2') ])
-        end
-      end
-
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
-        it "returns the distinct matching fields" do
-          expect(context.distinct("label.sales")).to eq([ BigDecimal("1E2") ])
-        end
+      it "returns the distinct matching fields" do
+        expect(context.distinct("label.sales")).to eq([ BigDecimal("1E2") ])
       end
     end
   end
@@ -1212,33 +1092,49 @@ describe Mongoid::Contextual::Mongo do
       let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
       let(:tally) { Person.tally("ssn") }
 
+      let(:tallied_classes) do
+        tally.keys.map(&:class).sort do |a, b|
+          a.to_s.casecmp(b.to_s)
+        end
+      end
+
       context "< BSON 5" do
         max_bson_version '4.99.99'
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
-          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+          expect(Person.find(person1.id).attributes["ssn"]).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).attributes["ssn"]).to be_a BSON::Decimal128
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
 
-      context ">= BSON 5" do
+      context '>= BSON 5' do
         min_bson_version "5.0"
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
-          Person.find(person2.id).ssn.should be_a BigDeimal
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BigDecimal
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BigDecimal, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BigDecimal, BSON::Regexp::Raw ]
+        end
+      end
+
+      context '>= BSON 5 with decimal128 allowed' do
+        min_bson_version "5.0"
+        config_override :allow_bson5_decimal128, true
+
+        it "stores the correct types in the database" do
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BSON::Decimal128
+        end
+
+        it "tallies the correct type" do
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
     end
@@ -1592,7 +1488,16 @@ describe Mongoid::Contextual::Mongo do
     end
 
     it "returns the criteria explain path" do
-      expect(context.explain).to_not be_empty
+      explain = context.explain
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "executionStats", "serverInfo")
+    end
+
+    it "respects options passed to explain" do
+      explain = context.explain(verbosity: :query_planner)
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "serverInfo")
+      expect(explain.keys).not_to include("executionStats")
     end
   end
 
@@ -3703,6 +3608,20 @@ describe Mongoid::Contextual::Mongo do
 
           it "updates the last matching document" do
             expect(new_order.reload.name).to eq("Smiths")
+          end
+        end
+
+        context 'when using aliased field names' do
+          before do
+            context.update_all('$set' => { years: 100 })
+          end
+
+          it "updates the first matching document" do
+            expect(depeche_mode.reload.years).to eq(100)
+          end
+
+          it "updates the last matching document" do
+            expect(new_order.reload.years).to eq(100)
           end
         end
 

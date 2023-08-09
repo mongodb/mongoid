@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Mongoid
   module Matcher
 
@@ -25,8 +26,7 @@ module Mongoid
         when ::BSON::Regexp::Raw
           value =~ condition.compile
         else
-          if Mongoid.compare_time_by_ms &&
-            value.kind_of?(Time) && condition.kind_of?(Time)
+          if value.kind_of?(Time) && condition.kind_of?(Time)
             EqImpl.time_eq?(value, condition)
           else
             value == condition

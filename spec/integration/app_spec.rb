@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'spec_helper'
 
@@ -90,7 +91,12 @@ describe 'Mongoid application tests' do
     end
 
     # Exit should be either success or SIGTERM
-    [0, 15, 128 + 15].should include(status)
+    allowed_statuses = [0, 15, 128 + 15]
+    if RUBY_PLATFORM == 'java'
+      # Puma on JRuby exits with status 1 when it receives a TERM signal.
+      allowed_statuses << 1
+    end
+    allowed_statuses.should include(status)
 
     rv
   end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -362,8 +363,8 @@ describe Mongoid::Extensions::Array do
       array.__mongoize_time__
     end
 
-    context "when using active support's time zone" do
-      include_context 'using AS time zone'
+    context "when setting ActiveSupport time zone" do
+      include_context 'setting ActiveSupport time zone'
 
       # In AS time zone (could be different from Ruby time zone)
       let(:expected_time) { ::Time.zone.local(*array).in_time_zone }
@@ -373,16 +374,6 @@ describe Mongoid::Extensions::Array do
       end
 
       it_behaves_like 'mongoizes to AS::TimeWithZone'
-      it_behaves_like 'maintains precision when mongoized'
-    end
-
-    context "when not using active support's time zone" do
-      include_context 'not using AS time zone'
-
-      # In Ruby time zone (could be different from AS time zone)
-      let(:expected_time) { ::Time.local(*array).in_time_zone }
-
-      it_behaves_like 'mongoizes to Time'
       it_behaves_like 'maintains precision when mongoized'
     end
   end

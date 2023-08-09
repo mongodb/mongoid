@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/contextual/mongo/documents_loader"
 require "mongoid/contextual/atomic"
@@ -41,6 +42,16 @@ module Mongoid
 
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
+
+      # Run an explain on the criteria.
+      #
+      # @example Explain the criteria.
+      #   Band.where(name: "Depeche Mode").explain
+      #
+      # @param [ Hash ] options customizable options (See Mongo::Collection::View::Explainable)
+      #
+      # @return [ Hash ] The explain result.
+      def_delegator :view, :explain
 
       attr_reader :documents_loader
 
@@ -124,19 +135,11 @@ module Mongoid
       #
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
-        name = if Mongoid.legacy_pluck_distinct
-          klass.database_field_name(field)
-        else
-          klass.cleanse_localized_field_names(field)
-        end
+        name = klass.cleanse_localized_field_names(field)
 
         view.distinct(name).map do |value|
-          if Mongoid.legacy_pluck_distinct
-            value.class.demongoize(value)
-          else
-            is_translation = "#{name}_translations" == field.to_s
-            recursive_demongoize(name, value, is_translation)
-          end
+          is_translation = "#{name}_translations" == field.to_s
+          recursive_demongoize(name, value, is_translation)
         end
       end
 
@@ -187,16 +190,6 @@ module Mongoid
         when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
         else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
         end
-      end
-
-      # Run an explain on the criteria.
-      #
-      # @example Explain the criteria.
-      #   Band.where(name: "Depeche Mode").explain
-      #
-      # @return [ Hash ] The explain result.
-      def explain
-        view.explain
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -363,22 +356,13 @@ module Mongoid
         normalized_select = fields.inject({}) do |hash, f|
           db_fn = klass.database_field_name(f)
           normalized_field_names.push(db_fn)
-
-          if Mongoid.legacy_pluck_distinct
-            hash[db_fn] = true
-          else
-            hash[klass.cleanse_localized_field_names(f)] = true
-          end
+          hash[klass.cleanse_localized_field_names(f)] = true
           hash
         end
 
         view.projection(normalized_select).reduce([]) do |plucked, doc|
           values = normalized_field_names.map do |n|
-            if Mongoid.legacy_pluck_distinct
-              n.include?('.') ? doc[n.partition('.')[0]] : doc[n]
-            else
-              extract_value(doc, n)
-            end
+            extract_value(doc, n)
           end
           plucked << (values.size == 1 ? values.first : values)
         end
@@ -422,7 +406,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def take!
         # Do to_a first so that the Mongo#first method is not used and the
@@ -604,7 +588,7 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def first!
         first || raise_document_not_found_error
@@ -646,7 +630,7 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def last!
         last || raise_document_not_found_error
@@ -670,7 +654,7 @@ module Mongoid
       #
       # @return [ Document ] The second document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second!
         second || raise_document_not_found_error
@@ -694,7 +678,7 @@ module Mongoid
       #
       # @return [ Document ] The third document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third!
         third || raise_document_not_found_error
@@ -718,7 +702,7 @@ module Mongoid
       #
       # @return [ Document ] The fourth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fourth!
         fourth || raise_document_not_found_error
@@ -742,7 +726,7 @@ module Mongoid
       #
       # @return [ Document ] The fifth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fifth!
         fifth || raise_document_not_found_error
@@ -768,7 +752,7 @@ module Mongoid
       #
       # @return [ Document ] The second to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second_to_last!
         second_to_last || raise_document_not_found_error
@@ -794,7 +778,7 @@ module Mongoid
       #
       # @return [ Document ] The third to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third_to_last!
         third_to_last || raise_document_not_found_error

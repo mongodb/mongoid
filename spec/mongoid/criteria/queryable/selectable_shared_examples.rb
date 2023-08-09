@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 shared_examples_for "returns a cloned query" do
 

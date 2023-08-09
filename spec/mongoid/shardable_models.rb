@@ -1,3 +1,4 @@
+# rubocop:todo all
 class SmMovie
   include Mongoid::Document
 
@@ -58,4 +59,18 @@ end
 
 class SmNotSharded
   include Mongoid::Document
+end
+
+class SmReviewAuthor
+  include Mongoid::Document
+  embedded_in :review, class_name: "SmReview", touch: false
+  field :name, type: String
+end
+
+class SmReview
+  include Mongoid::Document
+
+  embeds_one :author, class_name: "SmReviewAuthor"
+
+  shard_key "author.name" => 1
 end

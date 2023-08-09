@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -243,6 +244,82 @@ describe Mongoid::Clients::Factory do
           expect {
             described_class.create(:unknown)
           }.to raise_error(Mongoid::Errors::NoClientConfig)
+        end
+      end
+
+      context 'when auto_encryption_options are provided' do
+        require_enterprise
+        require_libmongocrypt
+        restore_config_clients
+        include_context 'with encryption'
+
+        before do
+          Mongoid::Config.send(:clients=, config)
+          key_vault_client[key_vault_collection].drop
+        end
+
+        after do
+          client.close
+        end
+
+        let(:client) do
+          described_class.create(:encrypted)
+        end
+
+        context 'when no key vault client is provided' do
+          let(:config) do
+            {
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              encrypted: {
+                hosts: SpecConfig.instance.addresses,
+                database: database_id,
+                options: {
+                  auto_encryption_options: {
+                    kms_providers: kms_providers,
+                    key_vault_namespace: key_vault_namespace,
+                    extra_options: extra_options
+                  }
+                }
+              }
+            }
+          end
+
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
+          end
+
+          it 'sets schema_map for the client' do
+            expect(client.options[:auto_encryption_options][:schema_map]).not_to be_nil
+          end
+        end
+
+        context 'when a key vault client is provided' do
+          let(:config) do
+            {
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              key_vault: { hosts: SpecConfig.instance.addresses, database: database_id },
+              encrypted: {
+                hosts: SpecConfig.instance.addresses,
+                database: database_id,
+                options: {
+                  auto_encryption_options: {
+                    key_vault_client: :key_vault,
+                    kms_providers: kms_providers,
+                    key_vault_namespace: key_vault_namespace,
+                    extra_options: extra_options
+                  }
+                }
+              }
+            }
+          end
+
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
+          end
+
+          it 'sets key_vault_client option for the client' do
+            expect(client.options[:auto_encryption_options][:key_vault_client]).to eq(Mongoid::Clients.with_name(:key_vault))
+          end
         end
       end
     end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -27,7 +28,7 @@ describe Mongoid::Extensions::Date do
 
     context "when provided a string" do
       # This also configures a non-UTC time zone for AS which we want
-      include_context 'using AS time zone'
+      include_context 'setting ActiveSupport time zone'
 
       context "when the string is a valid date" do
 
@@ -120,7 +121,7 @@ describe Mongoid::Extensions::Date do
     end
 
     context "when provided a float" do
-      include_context 'using AS time zone'
+      include_context 'setting ActiveSupport time zone'
 
       let(:float) do
         time.to_f
@@ -160,7 +161,7 @@ describe Mongoid::Extensions::Date do
     end
 
     context "when provided an integer" do
-      include_context 'using AS time zone'
+      include_context 'setting ActiveSupport time zone'
 
       let(:integer) do
         time.to_i
@@ -200,7 +201,7 @@ describe Mongoid::Extensions::Date do
     end
 
     context "when provided a time" do
-      include_context 'using AS time zone'
+      include_context 'setting ActiveSupport time zone'
 
       let(:mongoized) do
         Date.mongoize(time)
@@ -236,7 +237,7 @@ describe Mongoid::Extensions::Date do
     end
 
     context "when provided an AS::TimeWithZone" do
-      include_context 'using AS time zone'
+      include_context 'setting ActiveSupport time zone'
 
       let(:mongoized) do
         Date.mongoize(time)
@@ -273,7 +274,7 @@ describe Mongoid::Extensions::Date do
     end
 
     context "when provided a DateTime" do
-      include_context 'using AS time zone'
+      include_context 'setting ActiveSupport time zone'
 
       let(:mongoized) do
         Date.mongoize(date_time)
@@ -310,7 +311,7 @@ describe Mongoid::Extensions::Date do
     end
 
     context "when provided an array" do
-      include_context 'using AS time zone'
+      include_context 'setting ActiveSupport time zone'
 
       let(:expected) do
         Time.utc(2010, 1, 1, 0, 0, 0)
