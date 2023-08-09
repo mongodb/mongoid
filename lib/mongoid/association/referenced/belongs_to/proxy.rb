@@ -4,7 +4,6 @@ module Mongoid
   module Association
     module Referenced
       class BelongsTo
-
         # Transparent proxy for belong_to associations.
         # An instance of this class is returned when calling the
         # association getter method on the subject document.

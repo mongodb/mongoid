@@ -7,7 +7,6 @@ module Mongoid
   module Association
     module Referenced
       class HasMany
-
         # Transparent proxy for has_many associations.
         # An instance of this class is returned when calling the
         # association getter method on the subject document. This class

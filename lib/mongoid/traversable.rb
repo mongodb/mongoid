@@ -3,7 +3,6 @@
 require 'mongoid/fields/validators/macro'
 
 module Mongoid
-
   # Mixin module included in Mongoid::Document to provide behavior
   # around traversing the document graph.
   module Traversable
@@ -87,7 +86,6 @@ module Mongoid
     #
     # @api private
     module DiscriminatorAssignment
-
       # Sets the discriminator key.
       #
       # @param [ String ] value The discriminator key to set.

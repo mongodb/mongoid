@@ -4,7 +4,6 @@ module Mongoid
   module Association
     module Referenced
       class HasAndBelongsToMany
-
         # Transparent proxy for has_and_belongs_to_many associations.
         # An instance of this class is returned when calling
         # the association getter method on the subject document.
