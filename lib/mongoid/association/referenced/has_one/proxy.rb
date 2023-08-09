@@ -4,8 +4,12 @@ module Mongoid
   module Association
     module Referenced
       class HasOne
-        # This class defines the behavior for all associations that are a
-        # one-to-one between documents in different collections.
+        # Transparent proxy for has_one associations.
+        # An instance of this class is returned when calling the
+        # association getter method on the subject document. This class
+        # inherits from Mongoid::Association::Proxy and forwards most of
+        # its methods to the target of the association, i.e. the
+        # document on the opposite-side collection which must be loaded.
         class Proxy < Association::One
           # class-level methods for the HasOne::Proxy
           module ClassMethods

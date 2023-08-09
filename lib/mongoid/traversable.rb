@@ -3,7 +3,8 @@
 require 'mongoid/fields/validators/macro'
 
 module Mongoid
-  # Provides behavior around traversing the document graph.
+  # Mixin module included in Mongoid::Document to provide behavior
+  # around traversing the document graph.
   module Traversable
     extend ActiveSupport::Concern
 
@@ -74,6 +75,8 @@ module Mongoid
     # @param [ Mongoid::Document | nil ] document the document to set as
     #   the parent document.
     #
+    # @returns [ Mongoid::Document ] The parent document.
+    #
     # @api private
     def _parent=(document)
       @__parent = document
@@ -83,6 +86,11 @@ module Mongoid
     #
     # @api private
     module DiscriminatorAssignment
+      # Sets the discriminator key.
+      #
+      # @param [ String ] value The discriminator key to set.
+      #
+      # @api private
       # rubocop:disable Metrics/AbcSize
       def discriminator_key=(value)
         raise Errors::InvalidDiscriminatorKeyTarget.new(self, superclass) if hereditary?
@@ -113,6 +121,11 @@ module Mongoid
       end
       # rubocop:enable Metrics/AbcSize
 
+      # Returns the discriminator key.
+      #
+      # @return [ String ] The discriminator key.
+      #
+      # @api private
       def discriminator_value=(value)
         value ||= name
         _mongoid_clear_types

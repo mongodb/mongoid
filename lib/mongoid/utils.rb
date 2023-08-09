@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Mongoid
+  # Utility functions for Mongoid.
+  #
   # @api private
   module Utils
     extend self
@@ -44,6 +46,8 @@ module Mongoid
     # @see https://blog.dnsimple.com/2018/03/elapsed-time-with-ruby-the-right-way/
     #
     # @return [Float] seconds according to monotonic clock
+    #
+    # @api private
     def monotonic_time
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end

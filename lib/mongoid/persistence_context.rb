@@ -69,7 +69,7 @@ module Mongoid
     #   context.collection_name
     #
     # @return [ String ] The collection name for this persistence
-    #  context.
+    #   context.
     def collection_name
       @collection_name ||= (__evaluate__(options[:collection] ||
                              storage_options[:collection]))
@@ -81,7 +81,7 @@ module Mongoid
     #   context.database_name
     #
     # @return [ String ] The database name for this persistence
-    #  context.
+    #   context.
     def database_name
       __evaluate__(database_name_option) || client.database.name
     end
@@ -92,7 +92,7 @@ module Mongoid
     #   context.client
     #
     # @return [ Mongo::Client ] The client for this persistence
-    #  context.
+    #   context.
     def client
       @client ||= begin
         client = Clients.with_name(client_name)
@@ -106,6 +106,13 @@ module Mongoid
       end
     end
 
+    # Get the client name for this persistence context.
+    #
+    # @example Get the client name for this persistence context.
+    #   context.client_name
+    #
+    # @return [ Symbol ] The client name for this persistence
+    #   context.
     def client_name
       @client_name ||= options[:client] ||
                          Threaded.client_override ||

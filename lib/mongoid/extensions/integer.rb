@@ -3,6 +3,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Integer class.
     module Integer
 
       # Converts the integer into a time as the number of seconds since the epoch.

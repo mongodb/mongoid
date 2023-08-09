@@ -3,6 +3,8 @@
 
 module Mongoid
   module Clients
+
+    # Factory used to create database clients.
     module Factory
       extend self
       extend Loggable

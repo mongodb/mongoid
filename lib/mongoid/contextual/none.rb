@@ -5,6 +5,10 @@ require "mongoid/contextual/aggregable/none"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on a null set. The method interface of this class
+    # is consistent with Mongoid::Contextual::Mongo.
     class None
       include Enumerable
       include Aggregable::None

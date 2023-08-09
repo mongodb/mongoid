@@ -3,6 +3,8 @@
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to BigDecimal class.
     module BigDecimal
 
       # Convert the big decimal to an $inc-able value.
