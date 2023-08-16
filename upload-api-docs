@@ -107,9 +107,11 @@ def generate_docs(options)
     '--exclude', './.evergreen',
     '--exclude', './.mod',
     '--exclude', './examples',
+    '--exclude', './perf',
     '--exclude', './profile',
     '--exclude', './release',
     '--exclude', './spec',
+    '--exclude', './test-apps',
     '--readme', './README.md',
     '-o', options[:docs_path]
   )
@@ -118,4 +120,3 @@ end
 options = Options.new
 generate_docs(options)
 FileUploader.new(options).upload_docs
-return
