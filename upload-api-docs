@@ -54,7 +54,7 @@ class FileUploader
     {
       '.html' => 'text/html',
       '.css' => 'text/css',
-      '.js' => 'application/javascript',
+      '.js' => 'application/javascript'
     }.fetch(File.extname(file))
   end
 end
