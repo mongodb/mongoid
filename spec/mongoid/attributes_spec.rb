@@ -2711,4 +2711,31 @@ describe Mongoid::Attributes do
       catalog.set_field.should == Set.new([ 1, 2 ])
     end
   end
+
+  context 'when an embedded field has a capitalized store_as name' do
+    let(:person) { Person.new(Purse: { brand: 'Gucci' }) }
+
+    it 'sets the value' do
+      expect(person.purse.brand).to eq('Gucci')
+    end
+
+    it 'saves successfully' do
+      expect(person.save!).to eq(true)
+    end
+
+    context 'when persisted' do
+      before do
+        person.save!
+        person.reload
+      end
+
+      it 'persists the value' do
+        expect(person.reload.purse.brand).to eq('Gucci')
+      end
+
+      it 'uses the correct key in the database' do
+        expect(person.collection.find(_id: person.id).first['Purse']['_id']).to eq(person.purse.id)
+      end
+    end
+  end
 end
