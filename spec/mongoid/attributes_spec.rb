@@ -2708,7 +2708,7 @@ describe Mongoid::Attributes do
     end
   end
 
-  context 'when en embedded field has a capitalized store_as name' do
+  context 'when an embedded field has a capitalized store_as name' do
     let(:person) { Person.new(Purse: { brand: 'Gucci' }) }
 
     it 'sets the value' do
@@ -2719,9 +2719,19 @@ describe Mongoid::Attributes do
       expect(person.save!).to eq(true)
     end
 
-    it 'persists the value' do
-      person.save!
-      expect(person.reload.purse.brand).to eq('Gucci')
+    context 'when persisted' do
+      before do
+        person.save!
+        person.reload
+      end
+
+      it 'persists the value' do
+        expect(person.reload.purse.brand).to eq('Gucci')
+      end
+
+      it 'uses the correct key in the database' do
+        expect(person.collection.find(_id: person.id).first['Purse']['_id']).to eq(person.purse.id)
+      end
     end
   end
 end

@@ -73,7 +73,7 @@ module Mongoid
         end
       end
 
-      # Set value of the pensing nested attribute.
+      # Set value of the pending nested attribute.
       #
       # @param [ Symbol ] name The name of the nested attribute.
       # @param [ Symbol ] aliased The aliased name of the nested attribute.
