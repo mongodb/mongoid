@@ -70,6 +70,7 @@ class Person
   embeds_many :messages, validate: false
 
   embeds_one :passport, autobuild: true, store_as: :pass, validate: false
+  embeds_one :purse, store_as: "Purse"
   embeds_one :pet, class_name: "Animal", validate: false
   embeds_one :name, as: :namable, validate: false do
     def extension
