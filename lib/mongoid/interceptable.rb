@@ -150,29 +150,36 @@ module Mongoid
     # @api private
     def _mongoid_run_child_callbacks(kind, children: nil, &block)
       child, *tail = (children || cascadable_children(kind))
+      with_children = !Mongoid::Config.prevent_multiple_calls_of_embedded_callbacks
       if child.nil?
-        return block&.call
+        block&.call
       elsif tail.empty?
-        return child.run_callbacks(child_callback_type(kind, child), &block)
+        child.run_callbacks(child_callback_type(kind, child), with_children: with_children, &block)
       else
-        return child.run_callbacks(child_callback_type(kind, child)) do
+        child.run_callbacks(child_callback_type(kind, child), with_children: with_children) do
           _mongoid_run_child_callbacks(kind, children: tail, &block)
         end
       end
     end
 
-    # This is used to store callbacks to be executed later. A good use case for
-    # this is delaying the after_find and after_initialize callbacks until the
-    # associations are set on the document. This can also be used to delay
-    # applying the defaults on a document.
+    # Returns the stored callbacks to be executed later.
     #
-    # @return [ Array<Symbol> ] an array of symbols that represent the pending callbacks.
+    # @return [ Array<Symbol> ] Method symbols of the stored pending callbacks.
     #
     # @api private
     def pending_callbacks
       @pending_callbacks ||= [].to_set
     end
 
+    # Stores callbacks to be executed later. A good use case for
+    # this is delaying the after_find and after_initialize callbacks until the
+    # associations are set on the document. This can also be used to delay
+    # applying the defaults on a document.
+    #
+    # @param [ Array<Symbol> ] value Method symbols of the pending callbacks to store.
+    #
+    # @return [ Array<Symbol> ] Method symbols of the stored pending callbacks.
+    #
     # @api private
     def pending_callbacks=(value)
       @pending_callbacks = value

@@ -3,6 +3,9 @@
 
 module Mongoid
   module Tasks
+
+    # Utility module to manage database collections, indexes, sharding, etc.
+    # Invoked from Rake tasks.
     module Database
       extend self
 

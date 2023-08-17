@@ -9,10 +9,19 @@ module Mongoid
     # This module defines the eager loading behavior for criteria.
     module EagerLoadable
 
+      # Indicates whether the criteria has association
+      # inclusions which should be eager loaded.
+      #
+      # @return [ true | false ] Whether to eager load.
       def eager_loadable?
         !criteria.inclusions.empty?
       end
 
+      # Load the associations for the given documents.
+      #
+      # @param [ Array<Mongoid::Document> ] docs The documents.
+      #
+      # @return [ Array<Mongoid::Document> ] The given documents.
       def eager_load(docs)
         docs.tap do |d|
           if eager_loadable?
@@ -23,11 +32,11 @@ module Mongoid
 
       # Load the associations for the given documents. This will be done
       # recursively to load the associations of the given documents'
-      # subdocuments.
+      # associated documents.
       #
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   The associations to load.
-      # @param [ Array<Document> ] document The documents.
+      # @param [ Array<Mongoid::Document> ] docs The documents.
       def preload(associations, docs)
         assoc_map = associations.group_by(&:inverse_class_name)
         docs_map = {}

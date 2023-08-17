@@ -353,7 +353,7 @@ describe "db:mongoid:encryption:create_data_key" do
 
     expect_any_instance_of(Mongo::ClientEncryption)
       .to receive(:create_data_key)
-      .with('local')
+      .with('local', {})
       .and_call_original
   end
 

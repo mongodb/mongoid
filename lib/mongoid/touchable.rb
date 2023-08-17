@@ -2,7 +2,14 @@
 # rubocop:todo all
 
 module Mongoid
+
+  # Mixin module which is included in Mongoid::Document to add "touch"
+  # functionality to update a document's timestamp(s) atomically.
   module Touchable
+
+    # Used to provide mixin functionality.
+    #
+    # @todo Refactor using ActiveSupport::Concern
     module InstanceMethods
 
       # Suppresses the invocation of touch callbacks, for the class that

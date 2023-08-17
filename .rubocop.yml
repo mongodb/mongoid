@@ -1,6 +1,5 @@
 require:
   - rubocop-performance
-  - rubocop-rails
   - rubocop-rake
   - rubocop-rspec
 
@@ -38,9 +37,6 @@ Performance:
 Rake:
   Enabled: true
 
-Rails:
-  Enabled: true
-
 RSpec:
   Enabled: true
 
@@ -61,10 +57,42 @@ Bundler/OrderedGems:
 Gemspec/OrderedDependencies:
   Enabled: false
 
-# Not used by Mongoid
-Rails/RedundantPresenceValidationOnBelongsTo:
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: space
+
+Layout/SpaceInsidePercentLiteralDelimiters:
+  Enabled: false
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 20
+
+RSpec/BeforeAfterAll:
+  Enabled: false
+
+RSpec/ImplicitExpect:
+  EnforcedStyle: is_expected
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
   Enabled: false
 
 Style/Documentation:
   Exclude:
     - 'spec/**/*'
+
+Style/ModuleFunction:
+  EnforcedStyle: extend_self
+
+Style/ParallelAssignment:
+  Enabled: false
+
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex

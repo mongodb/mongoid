@@ -6,6 +6,11 @@ require "mongoid/association/eager_loadable"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on documents which have been loaded into application
+    # memory. The method interface of this class is consistent with
+    # Mongoid::Contextual::Mongo.
     class Memory
       include Enumerable
       include Aggregable::Memory
@@ -158,7 +163,7 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def first!
         first || raise_document_not_found_error
@@ -219,7 +224,7 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def last!
         last || raise_document_not_found_error
@@ -317,7 +322,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def take!
         take || raise_document_not_found_error
@@ -378,8 +383,6 @@ module Mongoid
       # @example Get the second document.
       #   context.second
       #
-      # @param [ Integer ] limit The number of documents to return.
-      #
       # @return [ Document ] The second document.
       def second
         eager_load([documents.second]).first
@@ -393,7 +396,7 @@ module Mongoid
       #
       # @return [ Document ] The second document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def second!
         second || raise_document_not_found_error
@@ -403,8 +406,6 @@ module Mongoid
       #
       # @example Get the third document.
       #   context.third
-      #
-      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The third document.
       def third
@@ -419,7 +420,7 @@ module Mongoid
       #
       # @return [ Document ] The third document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def third!
         third || raise_document_not_found_error
@@ -429,8 +430,6 @@ module Mongoid
       #
       # @example Get the fourth document.
       #   context.fourth
-      #
-      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The fourth document.
       def fourth
@@ -445,7 +444,7 @@ module Mongoid
       #
       # @return [ Document ] The fourth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def fourth!
         fourth || raise_document_not_found_error
@@ -455,8 +454,6 @@ module Mongoid
       #
       # @example Get the fifth document.
       #   context.fifth
-      #
-      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The fifth document.
       def fifth
@@ -471,7 +468,7 @@ module Mongoid
       #
       # @return [ Document ] The fifth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def fifth!
         fifth || raise_document_not_found_error
@@ -481,8 +478,6 @@ module Mongoid
       #
       # @example Get the second to last document.
       #   context.second_to_last
-      #
-      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The second to last document.
       def second_to_last
@@ -497,7 +492,7 @@ module Mongoid
       #
       # @return [ Document ] The second to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def second_to_last!
         second_to_last || raise_document_not_found_error
@@ -507,8 +502,6 @@ module Mongoid
       #
       # @example Get the third to last document.
       #   context.third_to_last
-      #
-      # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The third to last document.
       def third_to_last
@@ -523,7 +516,7 @@ module Mongoid
       #
       # @return [ Document ] The third to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def third_to_last!
         third_to_last || raise_document_not_found_error

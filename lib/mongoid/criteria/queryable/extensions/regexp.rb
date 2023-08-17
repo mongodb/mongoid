@@ -6,7 +6,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional regex behavior.
+        # Adds query type-casting behavior to Regexp class.
         module Regexp
 
           # Is the object a regexp?
@@ -34,6 +34,7 @@ module Mongoid
             end
           end
 
+          # Adds query type-casting behavior to BSON::Regexp::Raw class.
           module Raw_
 
             # Is the object a regexp?

@@ -2,6 +2,8 @@
 # rubocop:todo all
 
 module Rails
+
+  # Mongoid utilities for Rails
   module Mongoid
     extend self
 

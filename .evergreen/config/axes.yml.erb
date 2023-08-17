@@ -2,10 +2,18 @@ axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
+      - id: "latest"
+        display_name: "MongoDB Latest"
+        variables:
+           VERSION: "latest"
+      - id: "7.0"
+        display_name: "MongoDB 7.0"
+        variables:
+           VERSION: "7.0"
       - id: "6.0"
         display_name: "MongoDB 6.0"
         variables:
-           VERSION: "5.0"
+           VERSION: "6.0"
       - id: "5.3"
         display_name: "MongoDB 5.3"
         variables:
@@ -91,6 +99,10 @@ axes:
         display_name: ruby-3.1
         variables:
           RVM_RUBY: "ruby-3.1"
+      - id: "ruby-3.2"
+        display_name: ruby-3.2
+        variables:
+          RVM_RUBY: "ruby-3.2"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -107,29 +119,24 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: ubuntu-16.04
-        display_name: "Ubuntu 16.04"
-        run_on: ubuntu1604-small
-        variables:
-          DOCKER_DISTRO: ubuntu1604
       - id: ubuntu-18.04
         display_name: "Ubuntu 18.04"
-        run_on: ubuntu1804-small
+        run_on: ubuntu2004-small
         variables:
           DOCKER_DISTRO: ubuntu1804
-      - id: ubuntu-20.04
+      - id: ubuntu-22.04
         display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
         variables:
-          DOCKER_DISTRO: ubuntu2004
-      - id: rhel70
-        display_name: "RHEL 7.0"
-        run_on: rhel70-small
+          DOCKER_DISTRO: ubuntu2204
+      - id: debian11
+        display_name: "Debian 11"
+        run_on: ubuntu2004-small
         variables:
-          DOCKER_DISTRO: rhel70
+          DOCKER_DISTRO: debian11
       - id: rhel80
         display_name: "RHEL 8.0"
-        run_on: rhel80-small
+        run_on: ubuntu2004-small
         variables:
           DOCKER_DISTRO: rhel80
 

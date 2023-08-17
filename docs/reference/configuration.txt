@@ -816,14 +816,20 @@ the ``before_fork`` hook to close clients in the parent process
 .. code-block:: ruby
 
   on_worker_boot do
-    Mongoid::Clients.clients.each do |name, client|
-      client.close
-      client.reconnect
+    if defined?(Mongoid)
+      Mongoid::Clients.clients.each do |name, client|
+        client.close
+        client.reconnect
+      end
+    else
+      raise "Mongoid is not loaded. You may have forgotten to enable app preloading."
     end
   end
 
   before_fork do
-    Mongoid.disconnect_clients
+    if defined?(Mongoid)
+      Mongoid.disconnect_clients
+    end
   end
 
 Unicorn
@@ -836,14 +842,20 @@ the ``before_fork`` hook to close clients in the parent process
 .. code-block:: ruby
 
   after_fork do |server, worker|
-    Mongoid::Clients.clients.each do |name, client|
-      client.close
-      client.reconnect
+    if defined?(Mongoid)
+      Mongoid::Clients.clients.each do |name, client|
+        client.close
+        client.reconnect
+      end
+    else
+      raise "Mongoid is not loaded. You may have forgotten to enable app preloading."
     end
   end
 
   before_fork do |server, worker|
-    Mongoid.disconnect_clients
+    if defined?(Mongoid)
+      Mongoid.disconnect_clients
+    end
   end
 
 Passenger
@@ -859,9 +871,11 @@ before the workers are forked.
 
   if defined?(PhusionPassenger)
     PhusionPassenger.on_event(:starting_worker_process) do |forked|
-      Mongoid::Clients.clients.each do |name, client|
-        client.close
-        client.reconnect
+      if forked
+        Mongoid::Clients.clients.each do |name, client|
+          client.close
+          client.reconnect
+        end
       end
     end
   end
@@ -872,13 +886,10 @@ before the workers are forked.
 Query Cache Middleware
 ======================
 
-.. note::
+Enabling Query Cache for Rack Web Requests
+------------------------------------------
 
-  When used with Ruby driver version 2.15 or newer, Mongoid's Query Cache
-  Middleware delegates to `the driver's Query Cache Middleware
-  <https://www.mongodb.com/docs/ruby-driver/current/reference/query-cache/index.html#query-cache-middleware>`_.
-
-Mongoid provides a Rack middleware which enables the :ref:`Query Cache
+The MongoDB Ruby Driver provides a Rack middleware which enables the :ref:`Query Cache
 <query-cache>` for the duration of each web request. Below is an example of
 how to enable the Query Cache Middleware in a Ruby on Rails application:
 
@@ -886,13 +897,36 @@ how to enable the Query Cache Middleware in a Ruby on Rails application:
 
   # config/application.rb
 
-  # Add Mongoid::QueryCache::Middleware at the bottom of the middleware stack
+  # Add Mongo::QueryCache::Middleware at the bottom of the middleware stack
   # or before other middleware that queries MongoDB.
-  config.middleware.use Mongoid::QueryCache::Middleware
+  config.middleware.use Mongo::QueryCache::Middleware
 
 Please refer to the `Rails on Rack guide
 <https://guides.rubyonrails.org/rails_on_rack.html#configuring-middleware-stack>`_
 for more information about using Rack middleware in Rails applications.
+
+Enabling Query Cache for ActiveJob
+----------------------------------
+
+The MongoDB Ruby Driver also provides Query Cache middleware for ActiveJob.
+You may enable it for all jobs in an initializer:
+
+.. code-block:: ruby
+
+  # config/initializers/active_job.rb
+
+  # Enable Mongo driver query cache for ActiveJob
+  ActiveSupport.on_load(:active_job) do
+    include Mongo::QueryCache::Middleware::ActiveJob
+  end
+
+Or for a specific job class:
+
+.. code-block:: ruby
+
+  class MyJob < ActiveJob::Base
+    include Mongo::QueryCache::Middleware::ActiveJob
+  end
 
 
 Development Configuration

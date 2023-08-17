@@ -11,6 +11,10 @@ require "mongoid/association/eager_loadable"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on documents which are persisted in the database and
+    # have not been loaded into application memory.
     class Mongo
       extend Forwardable
       include Enumerable
@@ -407,7 +411,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def take!
         # Do to_a first so that the Mongo#first method is not used and the
@@ -589,7 +593,7 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def first!
         first || raise_document_not_found_error
@@ -631,7 +635,7 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def last!
         last || raise_document_not_found_error
@@ -655,7 +659,7 @@ module Mongoid
       #
       # @return [ Document ] The second document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second!
         second || raise_document_not_found_error
@@ -679,7 +683,7 @@ module Mongoid
       #
       # @return [ Document ] The third document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third!
         third || raise_document_not_found_error
@@ -703,7 +707,7 @@ module Mongoid
       #
       # @return [ Document ] The fourth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fourth!
         fourth || raise_document_not_found_error
@@ -727,7 +731,7 @@ module Mongoid
       #
       # @return [ Document ] The fifth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fifth!
         fifth || raise_document_not_found_error
@@ -753,7 +757,7 @@ module Mongoid
       #
       # @return [ Document ] The second to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second_to_last!
         second_to_last || raise_document_not_found_error
@@ -779,7 +783,7 @@ module Mongoid
       #
       # @return [ Document ] The third to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third_to_last!
         third_to_last || raise_document_not_found_error

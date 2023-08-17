@@ -17,6 +17,7 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+
 Deprecated options removed
 --------------------------
 
@@ -41,6 +42,15 @@ of each option.
 
 In addition, support for ``config.load_defaults`` versions 7.5 and
 prior has been dropped (you must use a minimum of version 8.0.)
+
+
+Deprecated functionality removed
+--------------------------------
+
+- The ``Mongoid::QueryCache`` module has been removed. Please replace any usages 1-for-1 with ``Mongo::QueryCache``.
+  The method ``Mongoid::QueryCache#clear_cache`` should be replaced with ``Mongo::QueryCache#clear``.
+  All other methods and submodules are identically named. Refer to the `driver query cache documentation
+  <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
 
 
 ``touch`` method now clears changed state
@@ -285,6 +295,43 @@ of the ``index`` macro: ``partial_filter_expression``, ``weights``,
   and Mongoid's functionality may not support such changes.
 
 
+BSON 5 and BSON::Decimal128 Fields
+----------------------------------
+
+When BSON 4 or earlier is present, any field declared as BSON::Decimal128 will
+return a BSON::Decimal128 value. When BSON 5 is present, however, any field
+declared as BSON::Decimal128 will return a BigDecimal value by default.
+
+.. code-block:: ruby
+
+  class Model
+    include Mongoid::Document
+
+    field :decimal_field, type: BSON::Decimal128
+  end
+
+  # under BSON <= 4
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+  # under BSON >= 5
+  Model.first.decimal_field.class #=> BigDecimal
+
+If you need literal BSON::Decimal128 values with BSON 5, you may instruct
+Mongoid to allow literal BSON::Decimal128 fields:
+
+.. code-block:: ruby
+
+  Model.first.decimal_field.class #=> BigDecimal
+
+  Mongoid.allow_bson5_decimal128 = true
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+.. note::
+
+  The ``allow_bson5_decimal128`` option only has any effect under
+  BSON 5 and later. BSON 4 and earlier ignore the setting entirely.
+
+
 Bug Fixes and Improvements
 --------------------------
 
@@ -311,3 +358,6 @@ This section will be for smaller bug fixes and improvements:
   a non-numeric, non-string value that implements ``:to_d`` will return a string
   rather than a ``BigDecimal``
   `MONGOID-5507 <https://jira.mongodb.org/browse/MONGOID-5507>`_.
+- Added support for serializing and deserializing BSON::ObjectId values
+  when passed as ActiveJob arguments
+  `MONGOID-5611 <https://jira.mongodb.org/browse/MONGOID-5611>`_.
