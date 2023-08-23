@@ -442,24 +442,19 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: ubuntu-18.04
-        display_name: "Ubuntu 18.04"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: ubuntu1804
       - id: ubuntu-22.04
-        display_name: "Ubuntu 20.04"
-        run_on: ubuntu2004-small
+        display_name: "Ubuntu 22.04"
+        run_on: ubuntu2204-small
         variables:
           DOCKER_DISTRO: ubuntu2204
       - id: debian11
         display_name: "Debian 11"
-        run_on: ubuntu2004-small
+        run_on: debian11-small
         variables:
           DOCKER_DISTRO: debian11
       - id: rhel80
         display_name: "RHEL 8.0"
-        run_on: ubuntu2004-small
+        run_on: rhel80-small
         variables:
           DOCKER_DISTRO: rhel80
 
@@ -801,7 +796,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-18.04
+    os: ubuntu-22.04
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
