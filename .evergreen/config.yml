@@ -38,6 +38,16 @@ functions:
 
           git submodule update --init --recursive
 
+  "fetch egos":
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+
+          curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
+          chmod +x ./egos
+
   "create expansions":
     # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
@@ -272,8 +282,7 @@ functions:
             DRIVER="${DRIVER}" \
             I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
-            FLE="${FLE}" \
-            .evergreen/run-tests-docker.sh
+            .evergreen/run-tests.sh
 
   "fix absolute paths":
     - command: shell.exec
@@ -296,6 +305,7 @@ functions:
 
 pre:
   - func: "fetch source"
+  - func: "fetch egos"
   - func: "create expansions"
   - func: "fix absolute paths"
   - func: "install dependencies"
@@ -432,24 +442,19 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: ubuntu-18.04
-        display_name: "Ubuntu 18.04"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: ubuntu1804
       - id: ubuntu-22.04
-        display_name: "Ubuntu 20.04"
-        run_on: ubuntu2004-small
+        display_name: "Ubuntu 22.04"
+        run_on: ubuntu2204-small
         variables:
           DOCKER_DISTRO: ubuntu2204
       - id: debian11
         display_name: "Debian 11"
-        run_on: ubuntu2004-small
+        run_on: debian11-small
         variables:
           DOCKER_DISTRO: debian11
       - id: rhel80
         display_name: "RHEL 8.0"
-        run_on: ubuntu2004-small
+        run_on: rhel80-small
         variables:
           DOCKER_DISTRO: rhel80
 
@@ -791,7 +796,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-18.04
+    os: ubuntu-22.04
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
