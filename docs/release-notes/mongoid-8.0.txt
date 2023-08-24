@@ -767,3 +767,40 @@ Support for individually caching criteria objects has been dropped in Mongoid 8.
 
 In order to get caching functionality, enable the Mongoid Query Cache. See the
 section on :ref:`Query Cache <query-cache>` for more details.
+
+
+BSON 5 and BSON::Decimal128 Fields
+----------------------------------
+
+When BSON 4 or earlier is present, any field declared as BSON::Decimal128 will
+return a BSON::Decimal128 value. When BSON 5 is present, however, any field
+declared as BSON::Decimal128 will return a BigDecimal value by default.
+
+.. code-block:: ruby
+
+  class Model
+    include Mongoid::Document
+
+    field :decimal_field, type: BSON::Decimal128
+  end
+
+  # under BSON <= 4
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+  # under BSON >= 5
+  Model.first.decimal_field.class #=> BigDecimal
+
+If you need literal BSON::Decimal128 values with BSON 5, you may instruct
+Mongoid to allow literal BSON::Decimal128 fields:
+
+.. code-block:: ruby
+
+  Model.first.decimal_field.class #=> BigDecimal
+
+  Mongoid.allow_bson5_decimal128 = true
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+.. note::
+
+  The ``allow_bson5_decimal128`` option only has any effect under
+  BSON 5 and later. BSON 4 and earlier ignore the setting entirely.
