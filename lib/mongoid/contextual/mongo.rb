@@ -811,7 +811,7 @@ module Mongoid
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        view.send(method, attributes.__consolidate__(klass), opts)
+        view.send(method, prepare_atomic_updates(klass, attributes), opts)
       end
 
       # Apply the field limitations.
@@ -1064,6 +1064,48 @@ module Mongoid
         v = v.skip(n) if n > 0
         raw_docs = v.to_a.reverse
         process_raw_docs(raw_docs, limit)
+      end
+
+      # Convert the key/values in the attributes into a hash of atomic updates.
+      # Non-operator keys are assumed to use $set operation.
+      #
+      # @param [ Class ] klass The model class.
+      # @param [ Hash ] The attributes to convert.
+      #
+      # @return [ Hash ] The prepared atomic updates.
+      def prepare_atomic_updates(klass, attributes)
+        attributes.each_pair.with_object({}) do |(key, value), atomic_updates|
+          if key.to_s.start_with?('$')
+            value = value.each_with_object({}) do |(key2, value2), hash|
+              key2 = klass.database_field_name(key2)
+              hash[key2] = key == '$rename' ? value2.to_s : mongoize_for_atomic_update(klass, key, key2, value2)
+            end
+            atomic_updates[key] ||= {}
+            atomic_updates[key].update(value)
+          else
+            atomic_updates['$set'] ||= {}
+            atomic_updates['$set'][key] = mongoize_for_atomic_update(klass, key, key, value)
+          end
+        end
+      end
+
+      # Mongoize a value for an atomic update for the given klass, operator, and field.
+      #
+      # @param [ Class ] klass The model class.
+      # @param [ String ] operator The operator.
+      # @param [ String | Symbol ] field_name The field key.
+      # @param [ Object ] value The value to mongoize.
+      #
+      # @return [ Object ] The mongoized value.
+      def mongoize_for_atomic_update(klass, operator, field_name, value)
+        field = klass.fields[field_name.to_s]
+        return value unless field
+
+        value = field.mongoize(value)
+        if Mongoid::Persistable::LIST_OPERATIONS.include?(operator) && field.resizable? && !value.is_a?(Array)
+          value = value.first
+        end
+        value
       end
     end
   end

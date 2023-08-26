@@ -4571,4 +4571,52 @@ describe Mongoid::Contextual::Mongo do
       end
     end
   end
+
+  describe '#prepare_atomic_updates' do
+    let(:instance) { described_class.new(Band.where(name: 'Depeche Mode')) }
+
+    subject { instance.send(:prepare_atomic_updates, Band, hash) }
+
+    context 'when the hash already contains the key' do
+
+      context 'when the $set is first' do
+        let(:hash) do
+          { '$set' => { name: 'Tool' }, likes: 10, '$inc' => { plays: 1 } }
+        end
+
+        it 'moves the non hash values under the provided key' do
+          expect(subject).to eq({
+                                  '$set' => { 'name' => 'Tool', likes: 10 },
+                                  '$inc' => { 'plays' => 1 }
+                                })
+        end
+      end
+
+      context 'when the $set is not first' do
+        let(:hash) do
+          { likes: 10, '$inc' => { plays: 1 }, '$set' => { name: 'Tool' } }
+        end
+
+        it 'moves the non hash values under the provided key' do
+          expect(updates).to eq({
+                                  '$set' => { likes: 10, 'name' => 'Tool' },
+                                  '$inc' => { 'plays' => 1 }
+                                })
+        end
+      end
+    end
+
+    context 'when the hash does not contain the key' do
+      let(:hash) do
+        { likes: 10, '$inc' => { plays: 1 }, name: 'Tool' }
+      end
+
+      it 'moves the non hash values under the provided key' do
+        expect(updates).to eq({
+                                '$set' => { likes: 10, name: 'Tool' },
+                                '$inc' => { 'plays' => 1 }
+                              })
+      end
+    end
+  end
 end
