@@ -1,0 +1,30 @@
+*********
+Mongoid 6
+*********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 6 releases.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Upgrading to Mongoid 6
+======================
+
+Mongoid 6 is compatible with Rails 5 and requires Ruby 2.2.2 or higher.
+
+Please see the list of behavior changes for version
+`6.0.0.rc0 <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.rc0>`_
+and version
+`6.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.beta>`_
+for specific changes that might be required in your code.
