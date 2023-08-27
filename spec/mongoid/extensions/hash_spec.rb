@@ -220,68 +220,6 @@ describe Mongoid::Extensions::Hash do
     end
   end
 
-  context "when the hash key is a string" do
-
-    let(:hash) do
-      { "100" => { "name" => "hundred" } }
-    end
-
-    let(:nested) do
-      hash.__nested__("100.name")
-    end
-
-    it "should retrieve a nested value under the provided key" do
-      expect(nested).to eq "hundred"
-    end
-
-    context 'and the value is falsey' do
-      let(:hash) do
-        { "100" => { "name" => false } }
-      end
-      it "should retrieve the falsey nested value under the provided key" do
-        expect(nested).to eq false
-      end
-    end
-
-    context 'and the value is nil' do
-      let(:hash) do
-        { "100" => { 0 => "Please don't return this value!" } }
-      end
-      it "should retrieve the nil nested value under the provided key" do
-        expect(nested).to eq nil
-      end
-    end
-  end
-
-  context "when the hash key is an integer" do
-    let(:hash) do
-      { 100 => { "name" => "hundred" } }
-    end
-
-    let(:nested) do
-      hash.__nested__("100.name")
-    end
-
-    it "should retrieve a nested value under the provided key" do
-      expect(nested).to eq("hundred")
-    end
-  end
-
-  context "when the parent key is not present" do
-
-    let(:hash) do
-      { "101" => { "name" => "hundred and one" } }
-    end
-
-    let(:nested) do
-      hash.__nested__("100.name")
-    end
-
-    it "should return nil" do
-      expect(nested).to eq(nil)
-    end
-  end
-
   describe ".demongoize" do
 
     let(:hash) do

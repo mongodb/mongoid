@@ -22,20 +22,6 @@ module Mongoid
       value == PLACEHOLDER
     end
 
-    # If value can be coerced to an integer, return it as an integer.
-    # Otherwise, return the value itself.
-    #
-    # @param [ String ] value the string to possibly coerce.
-    #
-    # @return [ String | Integer ] the result of the coercion.
-    def maybe_integer(value)
-      if value.match?(/^\d/)
-        value.to_i
-      else
-        value
-      end
-    end
-
     # This function should be used if you need to measure time.
     # @example Calculate elapsed time.
     #   starting = Utils.monotonic_time
