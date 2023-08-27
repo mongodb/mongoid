@@ -2,7 +2,6 @@
 
 module Mongoid
   module Attributes
-
     # Utility module for working with embedded attributes.
     module Embedded
       extend self
