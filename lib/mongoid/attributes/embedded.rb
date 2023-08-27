@@ -23,7 +23,7 @@ module Mongoid
 
           attributes = if attributes.try(:key?, key)
                          attributes[key]
-                       elsif key.match?(/\A\d+\z/) && attributes.respond_to?(:each)
+                       elsif attributes.respond_to?(:each) && key.match?(/\A\d+\z/)
                          attributes[key.to_i]
                        end
         end
