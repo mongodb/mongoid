@@ -1102,11 +1102,11 @@ module Mongoid
         field = klass.fields[field_name.to_s]
         return value unless field
 
-        value = field.mongoize(value)
+        mongoized = field.mongoize(value)
         if Mongoid::Persistable::LIST_OPERATIONS.include?(operator) && field.resizable? && !value.is_a?(Array)
-          value = value.first
+          mongoized = mongoized.first
         end
-        value
+        mongoized
       end
     end
   end
