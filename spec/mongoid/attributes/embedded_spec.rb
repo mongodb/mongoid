@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe Mongoid::Attributes::Embedded do
-
   describe '.traverse' do
     subject(:embedded) { described_class.traverse(attributes, path) }
 
