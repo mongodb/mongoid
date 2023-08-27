@@ -334,7 +334,8 @@ describe "db:mongoid:encryption:create_data_key" do
 
   let(:config) do
     {
-      default: {
+      default: { hosts: SpecConfig.instance.addresses, database: database_id },
+      encrypted: {
         hosts: SpecConfig.instance.addresses,
         database: database_id,
         options: {
@@ -355,6 +356,9 @@ describe "db:mongoid:encryption:create_data_key" do
       .to receive(:create_data_key)
       .with('local', {})
       .and_call_original
+
+    # OptionParser incorrectly handles RSpec's options such as --pattern
+    allow_any_instance_of(OptionParser).to receive(:order!).and_return({})
   end
 
   it "creates the key" do

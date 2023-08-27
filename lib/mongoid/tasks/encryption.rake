@@ -20,9 +20,8 @@ namespace :db do
             options[:key_alt_name] = v
           end
         end
-        # rubocop:disable Lint/EmptyBlock
-        parser.parse!(parser.order!(ARGV) {})
-        # rubocop:enable Lint/EmptyBlock
+        parser.parse!(parser.order!(ARGV) {}) # rubocop:disable Lint/EmptyBlock
+
         result = Mongoid::Tasks::Encryption.create_data_key(
           client_name: options[:client_name],
           kms_provider_name: options[:kms_provider_name],
