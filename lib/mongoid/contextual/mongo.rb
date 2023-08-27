@@ -810,6 +810,7 @@ module Mongoid
       # @return [ true | false ] If the update succeeded.
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
+
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
         view.send(method, prepare_atomic_updates(klass, attributes), opts)
       end
