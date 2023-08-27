@@ -4598,7 +4598,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it 'moves the non hash values under the provided key' do
-          expect(updates).to eq({
+          expect(subject).to eq({
                                   '$set' => { likes: 10, 'name' => 'Tool' },
                                   '$inc' => { 'plays' => 1 }
                                 })
@@ -4612,7 +4612,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it 'moves the non hash values under the provided key' do
-        expect(updates).to eq({
+        expect(subject).to eq({
                                 '$set' => { likes: 10, name: 'Tool' },
                                 '$inc' => { 'plays' => 1 }
                               })
