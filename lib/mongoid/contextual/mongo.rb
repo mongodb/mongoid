@@ -811,7 +811,6 @@ module Mongoid
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
 
-        attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
         view.send(method, prepare_atomic_updates(klass, attributes), opts)
       end
 
@@ -1076,6 +1075,7 @@ module Mongoid
       # @return [ Hash ] The prepared atomic updates.
       def prepare_atomic_updates(klass, attributes)
         attributes.each_pair.with_object({}) do |(key, value), atomic_updates|
+          key = klass.database_field_name(key)
           if key.to_s.start_with?('$')
             value = value.each_with_object({}) do |(key2, value2), hash|
               key2 = klass.database_field_name(key2)

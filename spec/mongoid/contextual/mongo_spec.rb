@@ -4573,9 +4573,9 @@ describe Mongoid::Contextual::Mongo do
   end
 
   describe '#prepare_atomic_updates' do
-    let(:instance) { described_class.new(Band.where(name: 'Depeche Mode')) }
+    subject(:updates) { instance.send(:prepare_atomic_updates, Band, hash) }
 
-    subject { instance.send(:prepare_atomic_updates, Band, hash) }
+    let(:instance) { described_class.new(Band.where(name: 'Depeche Mode')) }
 
     context 'when the hash already contains the key' do
 
@@ -4585,10 +4585,10 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it 'moves the non hash values under the provided key' do
-          expect(subject).to eq({
-                                  '$set' => { 'name' => 'Tool', likes: 10 },
-                                  '$inc' => { 'plays' => 1 }
-                                })
+          expect(updates).to eq({
+            '$set' => { 'name' => 'Tool', 'likes' => 10 },
+            '$inc' => { 'plays' => 1 }
+          })
         end
       end
 
@@ -4598,10 +4598,10 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it 'moves the non hash values under the provided key' do
-          expect(subject).to eq({
-                                  '$set' => { likes: 10, 'name' => 'Tool' },
-                                  '$inc' => { 'plays' => 1 }
-                                })
+          expect(updates).to eq({
+            '$set' => { 'likes' => 10, 'name' => 'Tool' },
+            '$inc' => { 'plays' => 1 }
+          })
         end
       end
     end
@@ -4612,10 +4612,10 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it 'moves the non hash values under the provided key' do
-        expect(subject).to eq({
-                                '$set' => { likes: 10, name: 'Tool' },
-                                '$inc' => { 'plays' => 1 }
-                              })
+        expect(updates).to eq({
+          '$set' => { 'likes' => 10, 'name' => 'Tool' },
+          '$inc' => { 'plays' => 1 }
+        })
       end
     end
   end
