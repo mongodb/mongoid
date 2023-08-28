@@ -1070,7 +1070,7 @@ module Mongoid
       # Non-operator keys are assumed to use $set operation.
       #
       # @param [ Class ] klass The model class.
-      # @param [ Hash ] The attributes to convert.
+      # @param [ Hash ] attributes The attributes to convert.
       #
       # @return [ Hash ] The prepared atomic updates.
       def prepare_atomic_updates(klass, attributes)
