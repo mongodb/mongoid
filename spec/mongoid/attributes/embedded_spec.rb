@@ -26,7 +26,7 @@ describe Mongoid::Attributes::Embedded do
       context 'when the value does not exist' do
         let(:attributes) { { '100' => { 0 => 'Please do not return this value!' } } }
 
-        it 'retrieves the nil embedded value under the provided key' do
+        it 'returns nil' do
           expect(embedded).to be_nil
         end
       end
@@ -40,7 +40,7 @@ describe Mongoid::Attributes::Embedded do
       end
     end
 
-    context 'when the attribute key is nil' do
+    context 'when the attribute value is nil' do
       let(:attributes) { { 100 => { 'name' => nil } } }
 
       it 'returns nil' do
