@@ -159,6 +159,16 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context 'when for_js is present' do
+      let(:context) do
+        Band.for_js('this.name == "Depeche Mode"')
+      end
+
+      it 'counts the expected records' do
+        expect(context.count).to eq(1)
+      end
+    end
   end
 
   describe "#estimated_count" do

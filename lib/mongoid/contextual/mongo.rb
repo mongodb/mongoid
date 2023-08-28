@@ -74,7 +74,12 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        view.count_documents(options)
+
+        if valid_for_count_documents?
+          view.count_documents(options)
+        else
+          view.count(options)
+        end
       end
 
       # Get the estimated number of documents matching the query.
@@ -1036,6 +1041,16 @@ module Mongoid
         end
         docs = eager_load(docs)
         limit ? docs : docs.first
+      end
+
+      # Queries whether the current context is valid for use with
+      # the #count_documents? predicate. A context is valid if it
+      # does not include a `$where` operator.
+      #
+      # @return [ true | false ] whether or not the current context
+      #   includes a `$where` operator.
+      def valid_for_count_documents?
+        view.filter.keys.none? { |k| k == '$where' }
       end
 
       def raise_document_not_found_error
