@@ -1048,9 +1048,17 @@ module Mongoid
       # does not include a `$where` operator.
       #
       # @return [ true | false ] whether or not the current context
-      #   includes a `$where` operator.
-      def valid_for_count_documents?
-        view.filter.keys.none? { |k| k == '$where' }
+      #   excludes a `$where` operator.
+      def valid_for_count_documents?(hash = view.filter)
+        # Note that `view.filter` is a BSON::Document, and all keys in a
+        # BSON::Document are strings; we don't need to worry about symbol
+        # representations of `$where`.
+        hash.keys.each do |key|
+          return false if key == '$where'
+          return false if hash[key].is_a?(Hash) && !valid_for_count_documents(hash[key])
+        end
+
+        true
       end
 
       def raise_document_not_found_error
