@@ -1055,7 +1055,7 @@ module Mongoid
         # representations of `$where`.
         hash.keys.each do |key|
           return false if key == '$where'
-          return false if hash[key].is_a?(Hash) && !valid_for_count_documents(hash[key])
+          return false if hash[key].is_a?(Hash) && !valid_for_count_documents?(hash[key])
         end
 
         true
