@@ -738,6 +738,55 @@ For more information about TLS context hooks, including best practices for
 assigning and removing them, see `the Ruby driver documentation <https://mongodb.com/docs/ruby-driver/current/reference/create-client/#modifying-sslcontext>`_.
 
 
+Network Compression
+===================
+
+Mongoid supports compression of messages to and from MongoDB servers. This functionality is provided by
+the Ruby driver, which implements the three algorithms that are supported by MongoDB servers:
+
+- `Snappy <https://google.github.io/snappy/>`_: ``snappy`` compression
+  can be used when connecting to MongoDB servers starting with the 3.4 release,
+  and requires the `snappy <https://rubygems.org/gems/snappy>`_ library to be
+  installed.
+- `Zlib <https://zlib.net/>`_: ``zlib`` compression can be used when
+  connecting to MongoDB servers starting with the 3.6 release.
+- `Zstandard <https://facebook.github.io/zstd/>`_: ``zstd`` compression can be
+  used when connecting to MongoDB servers starting with the 4.2 release, and
+  requires the `zstd-ruby <https://rubygems.org/gems/zstd-ruby>`_ library to
+  be installed.
+
+To use wire protocol compression, at least one compressor must be explicitly requested
+using either the `compressors URI option <https://www.mongodb.com/docs/manual/reference/connection-string/#mongodb-urioption-urioption.compressors>`_,
+or directly within the  ``mongoid.yml``:
+
+.. code-block:: yaml
+
+  development:
+    # Configure available database clients. (required)
+    clients:
+      # Define the default client. (required)
+      default:
+        # ...
+        options:
+          # These options are Ruby driver options, documented in
+          # https://mongodb.com/docs/ruby-driver/current/reference/create-client/
+          # ...
+          # Compressors to use. (default is to not use compression)
+          # Valid values are zstd, zlib or snappy - or any combination of the three
+          compressors: ["zstd", "snappy"]
+
+If no compressors are explicitly requested, the driver will not use compression,
+even if the required dependencies for one or more compressors are present on the
+system.
+
+The driver chooses the first compressor of the ones requested that is also supported
+by the server. The ``zstd`` compressor is recommended as it produces the highest
+compression at the same CPU consumption compared to the other compressors.
+
+For maximum server compatibility all three compressors can be specified, e.g.
+as ``compressors: ["zstd", "snappy", "zlib"]``.
+
+
 Client-Side Encryption
 ======================
 
