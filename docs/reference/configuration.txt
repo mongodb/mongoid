@@ -755,7 +755,7 @@ the Ruby driver, which implements the three algorithms that are supported by Mon
   requires the `zstd-ruby <https://rubygems.org/gems/zstd-ruby>`_ library to
   be installed.
 
-To use wire protocol compression, configure the Ruby driver options within the ``mongoid.yml``:
+To use wire protocol compression, configure the Ruby driver options within ``mongoid.yml``:
 
 .. code-block:: yaml
 
