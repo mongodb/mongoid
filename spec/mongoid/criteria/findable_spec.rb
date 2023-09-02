@@ -1130,4 +1130,72 @@ describe Mongoid::Criteria::Findable do
       end
     end
   end
+
+  describe "#multiple_args?" do
+    let(:criteria) { Mongoid::Criteria.new(Band) }
+    subject { criteria.send(:multiple_args?, args) }
+
+    context "when there are multiple elements" do
+      let(:args) do
+        [ 1, 2, 3 ]
+      end
+
+      it "returns true" do
+        expect(subject).to be true
+      end
+    end
+
+    context "when there is one element" do
+
+      context "when the element is a non enumerable" do
+        let(:args) do
+          [ 1 ]
+        end
+
+        it "returns false" do
+          expect(subject).to be false
+        end
+      end
+
+      context "when the element is resizable Hash instance" do
+        let(:args) do
+          [{'key' => 'value'}]
+        end
+
+        it "returns false" do
+          expect(subject).to be false
+        end
+      end
+
+      context "when the element is args of resizable Hash instances" do
+        let(:args) do
+          [[{'key1' => 'value2'},{'key1' => 'value2'}]]
+        end
+
+        it "returns true" do
+          expect(subject).to be true
+        end
+      end
+
+      context "when the element is an array" do
+        let(:args) do
+          [[ 1 ]]
+        end
+
+        it "returns true" do
+          expect(subject).to be true
+        end
+      end
+
+      context "when the element is a range" do
+        let(:args) do
+          [ 1..2 ]
+        end
+
+        it "returns true" do
+          expect(subject).to be true
+        end
+      end
+    end
+  end
 end

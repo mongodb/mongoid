@@ -42,7 +42,7 @@ module Mongoid
       def find(*args)
         ids = args.__find_args__
         raise_invalid if ids.any?(&:nil?)
-        for_ids(ids).execute_or_raise(ids, args.multi_arged?)
+        for_ids(ids).execute_or_raise(ids, multiple_args?(args))
       end
 
       # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
@@ -131,6 +131,18 @@ module Mongoid
           id = id[:_id] if id.respond_to?(:keys) && id[:_id]
           klass.fields["_id"].mongoize(id)
         end
+      end
+
+      # Is the given array a set of multiple arguments?
+      #
+      # @example Is this array multiple args?
+      #   multiple_args?([ 1, 2, 3 ]) #=> true
+      #
+      # @param [ Array ] args The arguments.
+      #
+      # @return [ true | false ] If the array is multiple arguments.
+      def multiple_args?(args)
+        args.size > 1 || !args.first.is_a?(Hash) && args.first.resizable?
       end
 
       # Convenience method of raising an invalid options error.

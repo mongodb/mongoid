@@ -74,16 +74,6 @@ module Mongoid
         false
       end
 
-      # Is the array a set of multiple arguments in a method?
-      #
-      # @example Is this multi args?
-      #   [ 1, 2, 3 ].multi_arged?
-      #
-      # @return [ true | false ] If the array is multi args.
-      def multi_arged?
-        !first.is_a?(Hash) && first.resizable? || size > 1
-      end
-
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #

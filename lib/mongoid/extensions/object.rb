@@ -130,16 +130,6 @@ module Mongoid
         self
       end
 
-      # Is the object multi args.
-      #
-      # @example Is the object multi args?
-      #   object.multi_arged?
-      #
-      # @return [ false ] false.
-      def multi_arged?
-        false
-      end
-
       # Is the object a number?
       #
       # @example Is the object a number?.
