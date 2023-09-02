@@ -478,10 +478,47 @@ module Mongoid
           end
 
           def unloaded_documents
-            if _unloaded.selector._mongoid_unsatisfiable_criteria?
+            if unsatisfiable_criteria?(_unloaded.selector)
               []
             else
               _unloaded
+            end
+          end
+
+          # Checks whether conditions given in this hash are known to be
+          # unsatisfiable, i.e. querying with this hash will always return no
+          # documents.
+          #
+          # This method only handles condition shapes that Mongoid itself uses when
+          # it builds association queries. It does not guarantee that a false
+          # return value means the condition can produce a non-empty document set -
+          # only that if the return value is true, the condition always produces
+          # an empty document set.
+          #
+          # @example Unsatisfiable conditions
+          #   unsatisfiable_criteria?({'_id' => {'$in' => []}})
+          #   # => true
+          #
+          # @example Conditions which could be satisfiable
+          #   unsatisfiable_criteria?({'_id' => '123'})
+          #   # => false
+          #
+          # @example Conditions which are unsatisfiable that this method does not handle
+          #   unsatisfiable_criteria?({'foo' => {'$in' => []}})
+          #   # => false
+          #
+          # @param [ Hash ] selector The conditions to check.
+          #
+          # @return [ true | false ] Whether hash contains known unsatisfiable
+          #   conditions.
+          def unsatisfiable_criteria?(selector)
+            unsatisfiable_criteria = { '_id' => { '$in' => [] } }
+            return true if selector == unsatisfiable_criteria
+            return false unless selector.length == 1 && selector.keys == %w[$and]
+
+            value = selector.values.first
+            value.is_a?(Array) && value.any? do |sub_value|
+              sub_value.is_a?(Hash) && unsatisfiable_criteria?(sub_value)
             end
           end
         end

@@ -378,34 +378,6 @@ describe Mongoid::Extensions::Array do
     end
   end
 
-  describe "#blank_criteria?" do
-
-    context "when the array has an empty _id criteria" do
-
-      context "when only the id criteria is in the array" do
-
-        let(:array) do
-          [{ "_id" => { "$in" => [] }}]
-        end
-
-        it "is false" do
-          expect(array.blank_criteria?).to be false
-        end
-      end
-
-      context "when the id criteria is in the array with others" do
-
-        let(:array) do
-          [{ "_id" => "test" }, { "_id" => { "$in" => [] }}]
-        end
-
-        it "is false" do
-          expect(array.blank_criteria?).to be false
-        end
-      end
-    end
-  end
-
   describe "#delete_one" do
 
     context "when the object doesn't exist" do
