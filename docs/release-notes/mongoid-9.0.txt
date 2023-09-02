@@ -51,7 +51,7 @@ Deprecated functionality removed
   The method ``Mongoid::QueryCache#clear_cache`` should be replaced with ``Mongo::QueryCache#clear``.
   All other methods and submodules are identically named. Refer to the `driver query cache documentation
   <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
-- ``Mongoid::Errors::InvalidStorageParent`` class is removed. It was previously not raised.
+- ``Mongoid::Errors::InvalidStorageParent`` class is removed. It was previously deprecated and not raised.
 
 
 ``touch`` method now clears changed state
