@@ -91,26 +91,10 @@ module Mongoid
     #
     # @return [ Hash ] The reloaded attributes.
     def reload_embedded_document
-      extract_embedded_attributes(
-        collection(_root).find(_root.atomic_selector, session: _session).read(mode: :primary).first
+      Mongoid::Attributes::Embedded.traverse(
+        collection(_root).find(_root.atomic_selector, session: _session).read(mode: :primary).first,
+        atomic_position
       )
-    end
-
-    # Extract only the desired embedded document from the attributes.
-    #
-    # @example Extract the embedded document.
-    #   document.extract_embedded_attributes(attributes)
-    #
-    # @param [ Hash ] attributes The document in the db.
-    #
-    # @return [ Hash | nil ] The document's extracted attributes or nil if the
-    #   document doesn't exist.
-    def extract_embedded_attributes(attributes)
-      # rubocop:disable Lint/UnmodifiedReduceAccumulator
-      atomic_position.split('.').inject(attributes) do |attrs, part|
-        attrs[Utils.maybe_integer(part)]
-      end
-      # rubocop:enable Lint/UnmodifiedReduceAccumulator
     end
   end
 end
