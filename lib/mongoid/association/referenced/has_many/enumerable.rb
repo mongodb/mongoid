@@ -485,21 +485,20 @@ module Mongoid
             end
           end
 
-          # Checks whether conditions given in this hash are known to be
+          # Checks whether conditions in the given hash are known to be
           # unsatisfiable, i.e. querying with this hash will always return no
           # documents.
           #
           # This method only handles condition shapes that Mongoid itself uses when
-          # it builds association queries. It does not guarantee that a false
-          # return value means the condition can produce a non-empty document set -
-          # only that if the return value is true, the condition always produces
-          # an empty document set.
+          # it builds association queries. Return value true indicates the condition
+          # always produces an empty document set. Note however that return value false
+          # is not a guarantee that the condition won't produce an empty document set.
           #
           # @example Unsatisfiable conditions
           #   unsatisfiable_criteria?({'_id' => {'$in' => []}})
           #   # => true
           #
-          # @example Conditions which could be satisfiable
+          # @example Conditions which may be satisfiable
           #   unsatisfiable_criteria?({'_id' => '123'})
           #   # => false
           #
