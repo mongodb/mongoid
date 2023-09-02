@@ -25,6 +25,8 @@ module Mongoid
       # @param [ Hash ] options Extras for the option.
       #
       # @option options [ Object ] :default The default value.
+      # @option options [ Proc | nil ] :on_change The callback to invoke when the
+      #   setter is invoked.
       def option(name, options = {})
         defaults[name] = settings[name] = options[:default]
 
@@ -38,6 +40,7 @@ module Mongoid
 
           define_method("#{name}=") do |value|
             settings[name] = value
+            options[:on_change]&.call(value)
           end
 
           define_method("#{name}?") do

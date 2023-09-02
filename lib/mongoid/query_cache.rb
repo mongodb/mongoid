@@ -14,6 +14,7 @@ module Mongoid
       #
       # @return [ nil ] Always nil.
       def clear_cache
+        Mongoid::Warnings.warn_mongoid_query_cache_clear
         Mongo::QueryCache.clear
       end
 
@@ -24,6 +25,7 @@ module Mongoid
       #
       # @param [ true | false ] value The enabled value.
       def enabled=(value)
+        Mongoid::Warnings.warn_mongoid_query_cache
         Mongo::QueryCache.enabled = value
       end
 
@@ -34,6 +36,7 @@ module Mongoid
       #
       # @return [ true | false ] If the cache is enabled.
       def enabled?
+        Mongoid::Warnings.warn_mongoid_query_cache
         Mongo::QueryCache.enabled?
       end
 
@@ -44,6 +47,7 @@ module Mongoid
       #
       # @return [ Object ] The result of the block.
       def cache(&block)
+        Mongoid::Warnings.warn_mongoid_query_cache
         Mongo::QueryCache.cache(&block)
       end
 
@@ -54,6 +58,7 @@ module Mongoid
       #
       # @return [ Object ] The result of the block.
       def uncached(&block)
+        Mongoid::Warnings.warn_mongoid_query_cache
         Mongo::QueryCache.uncached(&block)
       end
     end
@@ -61,4 +66,3 @@ module Mongoid
     Middleware = Mongo::QueryCache::Middleware
   end
 end
-

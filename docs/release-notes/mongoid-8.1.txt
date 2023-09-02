@@ -38,6 +38,14 @@ Mongoid 9 will require:
 - Rails 6.0 or newer
 
 
+Deprecated ``Mongoid::QueryCache`` module
+-----------------------------------------
+
+The ``Mongoid::QueryCache`` module has been deprecated. Please replace any usages 1-for-1 with ``Mongo::QueryCache``.
+Note the method ``Mongoid::QueryCache#clear_cache`` should be replaced with ``Mongo::QueryCache#clear``.
+All other methods and submodules are identically named.
+
+
 Deprecated ``use_activesupport_time_zone`` config option
 --------------------------------------------------------
 
@@ -281,7 +289,7 @@ Added ``readonly!`` method and ``legacy_readonly`` feature flag
 ---------------------------------------------------------------
 
 Mongoid 8.1 changes the meaning of read-only documents. In Mongoid 8.1 with
-this feature flag turned off, a document becomes read-only when calling the
+this feature flag turned off (``false``), a document becomes read-only when calling the
 ``readonly!`` method:
 
 .. code:: ruby
@@ -297,7 +305,7 @@ With this feature flag turned off, a ``ReadonlyDocument`` error will be
 raised when destroying or deleting, as well as when saving or updating.
 
 Prior to Mongoid 8.1 and in 8.1 with the ``legacy_readonly`` feature flag
-turned on, documents become read-only when they are projected (i.e. using
+turned on (``true``), documents become read-only when they are projected (i.e. using
 ``#only`` or ``#without``).
 
 .. code:: ruby
@@ -336,7 +344,7 @@ Added ``:replace`` option to ``#upsert``
 ----------------------------------------
 
 Mongoid 8.1 adds the ``:replace`` option to the ``#upsert`` method. This option
-is ``false`` by default.
+is ``true`` by default.
 
 In Mongoid 8 and earlier, and in Mongoid 8.1 when passing ``replace: true``
 (the default) the upserted document will overwrite the current document in the
@@ -408,7 +416,7 @@ Added ``none_of`` Query Method
 ------------------------------
 
 With the addition of ``none_of``, Mongoid 8.1 allows queries to exclude
-conditions in bulk. The emitted query will encapsulate the specified 
+conditions in bulk. The emitted query will encapsulate the specified
 criteria in a ``$nor`` operation. For example:
 
 .. code:: ruby
@@ -448,3 +456,40 @@ attempts to mutate the ``_id`` of a document will raise an exception.
 
   # The default in Mongoid 9.0
   Mongoid::Config.immutable_ids = true
+
+
+BSON 5 and BSON::Decimal128 Fields
+----------------------------------
+
+When BSON 4 or earlier is present, any field declared as BSON::Decimal128 will
+return a BSON::Decimal128 value. When BSON 5 is present, however, any field
+declared as BSON::Decimal128 will return a BigDecimal value by default.
+
+.. code-block:: ruby
+
+  class Model
+    include Mongoid::Document
+
+    field :decimal_field, type: BSON::Decimal128
+  end
+
+  # under BSON <= 4
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+  # under BSON >= 5
+  Model.first.decimal_field.class #=> BigDecimal
+
+If you need literal BSON::Decimal128 values with BSON 5, you may instruct
+Mongoid to allow literal BSON::Decimal128 fields:
+
+.. code-block:: ruby
+
+  Model.first.decimal_field.class #=> BigDecimal
+
+  Mongoid.allow_bson5_decimal128 = true
+  Model.first.decimal_field.class #=> BSON::Decimal128
+
+.. note::
+
+  The ``allow_bson5_decimal128`` option only has any effect under
+  BSON 5 and later. BSON 4 and earlier ignore the setting entirely.

@@ -18,7 +18,7 @@ def standard_dependencies
   end
 
   group :development, :test do
-    gem 'rspec-core', '~> 3.10'
+    gem 'rspec', '~> 3.12'
 
     platform :mri do
       gem 'byebug'

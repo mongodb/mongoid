@@ -2496,7 +2496,7 @@ describe Mongoid::Attributes do
         end
       end
 
-      context "when doing delete_one" do
+      context "when doing _remove" do
         let(:doc) { NestedBook.create! }
         let(:page) { NestedPage.new }
         before do
@@ -2504,7 +2504,7 @@ describe Mongoid::Attributes do
           doc.pages << NestedPage.new
           doc.pages << NestedPage.new
 
-          doc.pages.send(:delete_one, page)
+          doc.pages._remove(page)
         end
 
         it "updates the attributes" do
@@ -2706,6 +2706,33 @@ describe Mongoid::Attributes do
     it "persists the updated hash" do
       pending "MONGOID-2951"
       catalog.set_field.should == Set.new([ 1, 2 ])
+    end
+  end
+
+  context 'when an embedded field has a capitalized store_as name' do
+    let(:person) { Person.new(Purse: { brand: 'Gucci' }) }
+
+    it 'sets the value' do
+      expect(person.purse.brand).to eq('Gucci')
+    end
+
+    it 'saves successfully' do
+      expect(person.save!).to eq(true)
+    end
+
+    context 'when persisted' do
+      before do
+        person.save!
+        person.reload
+      end
+
+      it 'persists the value' do
+        expect(person.reload.purse.brand).to eq('Gucci')
+      end
+
+      it 'uses the correct key in the database' do
+        expect(person.collection.find(_id: person.id).first['Purse']['_id']).to eq(person.purse.id)
+      end
     end
   end
 end

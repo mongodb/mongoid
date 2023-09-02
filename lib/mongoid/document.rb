@@ -101,7 +101,7 @@ module Mongoid
     #
     # @return [ Document ] A new document.
     def initialize(attrs = nil, &block)
-      construct_document(attrs, execute_callbacks: true, &block)
+      construct_document(attrs, &block)
     end
 
     # Return the model name of the document.
@@ -208,13 +208,22 @@ module Mongoid
     # Does the construction of a document.
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
-    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-    #   should be run.
+    # @param [ Hash ] options The options to use.
+    #
+    # @option options [ true | false ] :execute_callbacks Flag specifies
+    #   whether callbacks should be run.
     #
     # @return [ Document ] A new document.
     #
+    # @note A Ruby 2.x bug prevents the options hash from being keyword
+    #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+    #   the options hash as keyword arguments.
+    #   See https://bugs.ruby-lang.org/issues/15753
+    #
     # @api private
-    def construct_document(attrs = nil, execute_callbacks: true)
+    def construct_document(attrs = nil, options = {})
+      execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
+
       @__parent = nil
       _building do
         @new_record = true
@@ -281,6 +290,20 @@ module Mongoid
 
     module ClassMethods
 
+      # Indicate whether callbacks should be invoked by default or not,
+      # within the block. Callbacks may always be explicitly invoked by passing
+      # `execute_callbacks: true` where available.
+      #
+      # @params execute_callbacks [ true | false ] Whether callbacks should be
+      #   suppressed or not.
+      def with_callbacks(execute_callbacks)
+        saved, Threaded.execute_callbacks =
+          Threaded.execute_callbacks?, execute_callbacks
+        yield
+      ensure
+        Threaded.execute_callbacks = saved
+      end
+
       # Instantiate a new object, only when loaded from the database or when
       # the attributes have already been typecast.
       #
@@ -295,7 +318,7 @@ module Mongoid
       #
       # @return [ Document ] A new document.
       def instantiate(attrs = nil, selected_fields = nil, &block)
-        instantiate_document(attrs, selected_fields, execute_callbacks: true, &block)
+        instantiate_document(attrs, selected_fields, &block)
       end
 
       # Instantiate the document.
@@ -303,13 +326,20 @@ module Mongoid
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
       # @param [ Integer ] selected_fields The selected fields from the
       #   criteria.
-      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-      #   should be run.
+      # @param [ Hash ] options The options to use.
+      #
+      # @option options [ true | false ] :execute_callbacks Flag specifies
+      #   whether callbacks should be run.
       #
       # @return [ Document ] A new document.
       #
+      # @note A Ruby 2.x bug prevents the options hash from being keyword
+      #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+      #   the options hash as keyword arguments.
+      #
       # @api private
-      def instantiate_document(attrs = nil, selected_fields = nil, execute_callbacks: true)
+      def instantiate_document(attrs = nil, selected_fields = nil, options = {})
+        execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
         attributes = if Mongoid.legacy_attributes
           attrs
         else
@@ -340,15 +370,22 @@ module Mongoid
       # Allocates and constructs a document.
       #
       # @param [ Hash ] attrs The attributes to set up the document with.
-      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-      #   should be run.
+      # @param [ Hash ] options The options to use.
+      #
+      # @option options [ true | false ] :execute_callbacks Flag specifies
+      #   whether callbacks should be run.
+      #
+      # @note A Ruby 2.x bug prevents the options hash from being keyword
+      #   arguments. Once we drop support for Ruby 2.x, we can reimplement
+      #   the options hash as keyword arguments.
+      #   See https://bugs.ruby-lang.org/issues/15753
       #
       # @return [ Document ] A new document.
       #
       # @api private
-      def construct_document(attrs = nil, execute_callbacks: true)
-        doc = allocate
-        doc.send(:construct_document, attrs, execute_callbacks: execute_callbacks)
+      def construct_document(attrs = nil, options = {})
+        execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
+        with_callbacks(execute_callbacks) { new(attrs) }
       end
 
       # Returns all types to query for when using this class as the base.

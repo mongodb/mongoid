@@ -38,6 +38,16 @@ module Mongoid
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
+      # Run an explain on the criteria.
+      #
+      # @example Explain the criteria.
+      #   Band.where(name: "Depeche Mode").explain
+      #
+      # @param [ Hash ] options customizable options (See Mongo::Collection::View::Explainable)
+      #
+      # @return [ Hash ] The explain result.
+      def_delegator :view, :explain
+
       attr_reader :documents_loader
 
       # Get the number of documents matching the query.
@@ -59,7 +69,12 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        view.count_documents(options)
+
+        if valid_for_count_documents?
+          view.count_documents(options)
+        else
+          view.count(options)
+        end
       end
 
       # Get the estimated number of documents matching the query.
@@ -179,16 +194,6 @@ module Mongoid
         when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
         else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
         end
-      end
-
-      # Run an explain on the criteria.
-      #
-      # @example Explain the criteria.
-      #   Band.where(name: "Depeche Mode").explain
-      #
-      # @return [ Hash ] The explain result.
-      def explain
-        view.explain
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -1044,6 +1049,24 @@ module Mongoid
         end
         docs = eager_load(docs)
         limit ? docs : docs.first
+      end
+
+      # Queries whether the current context is valid for use with
+      # the #count_documents? predicate. A context is valid if it
+      # does not include a `$where` operator.
+      #
+      # @return [ true | false ] whether or not the current context
+      #   excludes a `$where` operator.
+      def valid_for_count_documents?(hash = view.filter)
+        # Note that `view.filter` is a BSON::Document, and all keys in a
+        # BSON::Document are strings; we don't need to worry about symbol
+        # representations of `$where`.
+        hash.keys.each do |key|
+          return false if key == '$where'
+          return false if hash[key].is_a?(Hash) && !valid_for_count_documents?(hash[key])
+        end
+
+        true
       end
 
       def raise_document_not_found_error

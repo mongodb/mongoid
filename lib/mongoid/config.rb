@@ -128,6 +128,23 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: false
 
+    # Allow BSON::Decimal128 to be parsed and returned directly in
+    # field values. When BSON 5 is present and the this option is set to false
+    # (the default), BSON::Decimal128 values in the database will be returned
+    # as BigDecimal.
+    #
+    # @note this option only has effect when BSON 5+ is present. Otherwise,
+    #   the setting is ignored.
+    option :allow_bson5_decimal128, default: false, on_change: -> (allow) do
+      if BSON::VERSION >= '5.0.0'
+        if allow
+          BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)
+        else
+          BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BigDecimal)
+        end
+      end
+    end
+
     # Sets the async_query_executor for the application. By default the thread pool executor
     #   is set to `:immediate. Options are:
     #
@@ -157,6 +174,16 @@ module Mongoid
     # in 8.x), changing the _id of a persisted document might be ignored,
     # or it might work, depending on the situation.
     option :immutable_ids, default: false
+
+    # When this flag is true, callbacks for every embedded document will be
+    # called only once, even if the embedded document is embedded in multiple
+    # documents in the root document's dependencies graph.
+    # This will be the default in 9.0. Setting this flag to false restores the
+    # pre-9.0 behavior, where callbacks are called for every occurrence of an
+    # embedded document. The pre-9.0 behavior leads to a problem that for multi
+    # level nested documents callbacks are called multiple times.
+    # See https://jira.mongodb.org/browse/MONGOID-5542
+    option :prevent_multiple_calls_of_embedded_callbacks, default: false
 
     # Returns the Config singleton, for use in the configure DSL.
     #

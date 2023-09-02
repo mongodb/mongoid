@@ -178,7 +178,7 @@ describe Mongoid::Extensions::Hash do
 
         it "moves the non hash values under the provided key" do
           expect(consolidated).to eq({
-            "$set" => { name: "Tool", likes: 10 }, "$inc" => { plays: 1 }
+            "$set" => { 'name' => "Tool", likes: 10 }, "$inc" => { 'plays' => 1 }
           })
         end
       end
@@ -195,7 +195,7 @@ describe Mongoid::Extensions::Hash do
 
         it "moves the non hash values under the provided key" do
           expect(consolidated).to eq({
-            "$set" => { likes: 10, name: "Tool" }, "$inc" => { plays: 1 }
+            "$set" => { likes: 10, 'name' => "Tool" }, "$inc" => { 'plays' => 1 }
           })
         end
       end
@@ -213,7 +213,7 @@ describe Mongoid::Extensions::Hash do
 
       it "moves the non hash values under the provided key" do
         expect(consolidated).to eq({
-          "$set" => { likes: 10, name: "Tool" }, "$inc" => { plays: 1 }
+          "$set" => { likes: 10, name: "Tool" }, "$inc" => { 'plays' => 1 }
         })
       end
     end

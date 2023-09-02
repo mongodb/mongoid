@@ -24,15 +24,8 @@ describe Mongoid::QueryCache do
     Mrss::SessionRegistry.instance.verify_sessions_ended!
   end
 
-  let(:reset_legacy_qc_warning) do
-    begin
-      Mongoid::QueryCache.remove_instance_variable('@legacy_query_cache_warned')
-    rescue NameError
-      # raised if the instance variable wasn't set
-    end
-  end
-
   describe '#cache' do
+
     context 'with driver query cache' do
 
       context 'when query cache is not enabled' do
@@ -80,6 +73,7 @@ describe Mongoid::QueryCache do
   end
 
   describe '#uncached' do
+
     context 'with driver query cache' do
 
       context 'when query cache is not enabled' do
@@ -827,6 +821,45 @@ describe Mongoid::QueryCache do
 
     it 'returns all children for the association' do
       school.students.to_a.length.should == 5
+    end
+  end
+
+  describe 'deprecation warnings' do
+
+    context '#cache' do
+      it 'should raise a warning' do
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
+        Mongoid::QueryCache.cache {}
+      end
+    end
+
+    context '#uncached' do
+      it 'should raise a warning' do
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
+        Mongoid::QueryCache.uncached {}
+      end
+    end
+
+    context '#clear_cache' do
+      it 'should raise a warning' do
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache_clear)
+        Mongoid::QueryCache.clear_cache
+      end
+    end
+
+    context '#enabled?' do
+      it 'should raise a warning' do
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
+        Mongoid::QueryCache.enabled?
+      end
+    end
+
+    context '#enabled=' do
+      it 'should raise a warning' do
+        old_enabled = Mongoid::QueryCache.enabled?
+        expect(Mongoid::Warnings).to receive(:warn_mongoid_query_cache)
+        Mongoid::QueryCache.enabled = old_enabled
+      end
     end
   end
 end

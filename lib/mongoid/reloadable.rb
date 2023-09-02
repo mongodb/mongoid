@@ -16,16 +16,14 @@ module Mongoid
     #
     # @return [ Document ] The document, reloaded.
     def reload
-      if @atomic_selector
-        # Clear atomic_selector cache for sharded clusters. MONGOID-5076
-        remove_instance_variable('@atomic_selector')
-      end
-
       reloaded = _reload
       if Mongoid.raise_not_found_error && (reloaded.nil? || reloaded.empty?)
         shard_keys = atomic_selector.with_indifferent_access.slice(*shard_key_fields, :_id)
         raise Errors::DocumentNotFound.new(self.class, _id, shard_keys)
       end
+
+      reset_atomic_updates!
+
       @attributes = reloaded
       @attributes_before_type_cast = @attributes.dup
       @changed_attributes = {}
