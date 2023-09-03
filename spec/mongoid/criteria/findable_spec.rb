@@ -1131,9 +1131,9 @@ describe Mongoid::Criteria::Findable do
     end
   end
 
-  describe "#multiple_args?" do
+  describe "#multi_args?" do
     let(:criteria) { Mongoid::Criteria.new(Band) }
-    subject { criteria.send(:multiple_args?, args) }
+    subject { criteria.send(:multi_args?, args) }
 
     context "when there are multiple elements" do
       let(:args) do

@@ -14,7 +14,8 @@ module Mongoid
       #   criteria.execute_or_raise(id)
       #
       # @param [ Object ] ids The arguments passed.
-      # @param [ true | false ] multi Whether there arguments were a list.
+      # @param [ true | false ] multi Whether there arguments were a list,
+      #   and therefore the return value should be an array.
       #
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #
@@ -42,7 +43,7 @@ module Mongoid
       def find(*args)
         ids = args.__find_args__
         raise_invalid if ids.any?(&:nil?)
-        for_ids(ids).execute_or_raise(ids, multiple_args?(args))
+        for_ids(ids).execute_or_raise(ids, multi_args?(args))
       end
 
       # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
@@ -133,15 +134,17 @@ module Mongoid
         end
       end
 
-      # Is the given array a set of multiple arguments?
+      # Indicates whether the given arguments array is a list of values.
+      # Used by the +find+ method to determine whether to return an array
+      # or single value.
       #
-      # @example Is this array multiple args?
-      #   multiple_args?([ 1, 2, 3 ]) #=> true
+      # @example Are these arguments a list of values?
+      #   multi_args?([ 1, 2, 3 ]) #=> true
       #
       # @param [ Array ] args The arguments.
       #
-      # @return [ true | false ] If the array is multiple arguments.
-      def multiple_args?(args)
+      # @return [ true | false ] Whether the arguments are a list.
+      def multi_args?(args)
         args.size > 1 || !args.first.is_a?(Hash) && args.first.resizable?
       end
 
