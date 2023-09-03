@@ -612,7 +612,7 @@ describe Mongoid::Extensions::Array do
     end
   end
 
-  describe "#resiable?" do
+  describe "#resizable?" do
 
     it "returns true" do
       expect([]).to be_resizable

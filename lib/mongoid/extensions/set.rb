@@ -18,6 +18,16 @@ module Mongoid
         ::Set.mongoize(self)
       end
 
+      # Returns whether the object's size can be changed.
+      #
+      # @example Is the object resizable?
+      #   object.resizable?
+      #
+      # @return [ true ] true.
+      def resizable?
+        true
+      end
+
       module ClassMethods
 
         # Convert the object from its mongo friendly ruby type to this type.
@@ -50,6 +60,16 @@ module Mongoid
           when ::Set then ::Array.mongoize(object.to_a).uniq
           when ::Array then ::Array.mongoize(object).uniq
           end
+        end
+
+        # Returns whether the object's size can be changed.
+        #
+        # @example Is the object resizable?
+        #   et.resizable?
+        #
+        # @return [ true ] true.
+        def resizable?
+          true
         end
       end
     end
