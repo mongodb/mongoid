@@ -65,7 +65,7 @@ module Mongoid
         # Returns whether the object's size can be changed.
         #
         # @example Is the object resizable?
-        #   et.resizable?
+        #   Set.resizable?
         #
         # @return [ true ] true.
         def resizable?
