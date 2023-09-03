@@ -1193,6 +1193,8 @@ describe Mongoid::Criteria::Findable do
         end
 
         it "returns true" do
+          pending 'https://jira.mongodb.org/browse/MONGOID-5666'
+
           expect(subject).to be true
         end
       end
