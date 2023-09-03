@@ -7,16 +7,6 @@ module Mongoid
     # Adds type-casting behavior to FalseClass.
     module FalseClass
 
-      # Get the value of the object as a mongo friendly sort value.
-      #
-      # @example Get the object as sort criteria.
-      #   object.__sortable__
-      #
-      # @return [ Integer ] 0.
-      def __sortable__
-        0
-      end
-
       # Is the passed value a boolean?
       #
       # @example Is the value a boolean type?

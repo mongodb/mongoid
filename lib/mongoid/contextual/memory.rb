@@ -627,7 +627,8 @@ module Mongoid
         end
       end
 
-      # Compare two values, checking for nil.
+      # Compare two values, handling the cases when
+      # either value is nil.
       #
       # @api private
       #
@@ -635,14 +636,33 @@ module Mongoid
       #   context.compare(a, b)
       #
       # @param [ Object ] a The first object.
-      # @param [ Object ] b The first object.
+      # @param [ Object ] b The second object.
       #
       # @return [ Integer ] The comparison value.
       def compare(a, b)
-        case
-        when a.nil? then b.nil? ? 0 : 1
-        when b.nil? then -1
-        else a <=> b
+        return 0 if a.nil? && b.nil?
+        return 1 if a.nil?
+        return -1 if b.nil?
+
+        compare_operand(a) <=> compare_operand(b)
+      end
+
+      # Get the operand value to be used in comparison.
+      # Adds capability to sort boolean values.
+      #
+      # @api private
+      #
+      # @example Get the comparison operand.
+      #   compare_operand(true) #=> 1
+      #
+      # @param [ Object ] value The value to be used in comparison.
+      #
+      # @return [ Integer | Object ] The comparison operand.
+      def compare_operand(value)
+        case value
+        when TrueClass then 1
+        when FalseClass then 0
+        else value
         end
       end
 
@@ -655,9 +675,8 @@ module Mongoid
       def in_place_sort(values)
         documents.sort! do |a, b|
           values.map do |field, direction|
-            a_value, b_value = a[field], b[field]
-            direction * compare(a_value.__sortable__, b_value.__sortable__)
-          end.find { |value| !value.zero? } || 0
+            direction * compare(a[field], b[field])
+          end.detect { |value| !value.zero? } || 0
         end
       end
 

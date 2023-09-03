@@ -54,16 +54,6 @@ module Mongoid
         "#{self}="
       end
 
-      # Get the value of the object as a mongo friendly sort value.
-      #
-      # @example Get the object as sort criteria.
-      #   object.__sortable__
-      #
-      # @return [ Object ] self.
-      def __sortable__
-        self
-      end
-
       # Conversion of an object to an $inc-able value.
       #
       # @example Convert the object.
