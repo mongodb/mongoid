@@ -1169,7 +1169,7 @@ describe Mongoid::Criteria::Findable do
 
       context "when the element is args of resizable Hash instances" do
         let(:args) do
-          [[{'key1' => 'value2'},{'key1' => 'value2'}]]
+          [[{ 'key1' => 'value2' }, { 'key1' => 'value2' }]]
         end
 
         it "returns true" do
@@ -1177,7 +1177,7 @@ describe Mongoid::Criteria::Findable do
         end
       end
 
-      context "when the element is an array" do
+      context "when the element is an Array" do
         let(:args) do
           [[ 1 ]]
         end
@@ -1187,7 +1187,17 @@ describe Mongoid::Criteria::Findable do
         end
       end
 
-      context "when the element is a range" do
+      context "when the element is a Set" do
+        let(:args) do
+          [Set[ 1 ]]
+        end
+
+        it "returns true" do
+          expect(subject).to be true
+        end
+      end
+
+      context "when the element is a Range" do
         let(:args) do
           [ 1..2 ]
         end
