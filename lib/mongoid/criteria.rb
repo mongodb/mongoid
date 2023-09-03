@@ -160,7 +160,7 @@ module Mongoid
     #
     # @return [ Object ] The id.
     def extract_id
-      selector.extract_id
+      selector['_id'] || selector[:_id] || selector['id'] || selector[:id]
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options
@@ -223,7 +223,7 @@ module Mongoid
     # may be desired.
     #
     # @example Merge the criteria with another criteria.
-    #   criteri.merge(other_criteria)
+    #   criteria.merge(other_criteria)
     #
     # @example Merge the criteria with a hash. The hash must contain a klass
     #   key and the key/value pairs correspond to method names/args.
