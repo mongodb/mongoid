@@ -86,46 +86,6 @@ module Mongoid
         (self =~ /\A(?:NaN|-?Infinity)\z/) == 0
       end
 
-      # Get the string as a getter string.
-      #
-      # @example Get the reader/getter
-      #   "model=".reader
-      #
-      # @return [ String ] The string stripped of "=".
-      def reader
-        delete("=").sub(/\_before\_type\_cast\z/, '')
-      end
-
-      # Is this string a writer?
-      #
-      # @example Is the string a setter method?
-      #   "model=".writer?
-      #
-      # @return [ true | false ] If the string contains "=".
-      def writer?
-        include?("=")
-      end
-
-      # Is this string a valid_method_name?
-      #
-      # @example Is the string a valid Ruby identifier for use as a method name
-      #   "model=".valid_method_name?
-      #
-      # @return [ true | false ] If the string contains a valid Ruby identifier.
-      def valid_method_name?
-        /[@$"-]/ !~ self
-      end
-
-      # Does the string end with _before_type_cast?
-      #
-      # @example Is the string a setter method?
-      #   "price_before_type_cast".before_type_cast?
-      #
-      # @return [ true | false ] If the string ends with "_before_type_cast"
-      def before_type_cast?
-        ends_with?("_before_type_cast")
-      end
-
       # Is the object not to be converted to bson on criteria creation?
       #
       # @example Is the object unconvertable?

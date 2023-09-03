@@ -20,7 +20,7 @@ module Mongoid
       def respond_to?(name, include_private = false)
         super || (
           attributes &&
-          attributes.has_key?(name.to_s.reader)
+          attributes.has_key?(__dynamic_reader(name))
         )
       end
 
@@ -33,7 +33,7 @@ module Mongoid
       #
       # @param [ String ] name The name of the field.
       def define_dynamic_reader(name)
-        return unless name.valid_method_name?
+        return unless valid_method_name?(name)
 
         class_eval do
           define_method(name) do
@@ -69,7 +69,7 @@ module Mongoid
       #
       # @param [ String ] name The name of the field.
       def define_dynamic_writer(name)
-        return unless name.valid_method_name?
+        return unless valid_method_name?(name)
 
         class_eval do
           define_method("#{name}=") do |value|
@@ -120,22 +120,52 @@ module Mongoid
       #
       # @return [ Object ] The result of the method call.
       def method_missing(name, *args)
-        attr = name.to_s
-        return super unless attributes.has_key?(attr.reader)
-        if attr.writer?
-          getter = attr.reader
-          define_dynamic_writer(getter)
-          write_attribute(getter, args.first)
-        elsif attr.before_type_cast?
-          define_dynamic_before_type_cast_reader(attr.reader)
-          attribute_will_change!(attr.reader)
-          read_attribute_before_type_cast(attr.reader)
+        reader = __dynamic_reader(name)
+        return super unless attributes.has_key?(reader)
+        if __dynamic_writer?(name)
+          define_dynamic_writer(reader)
+          write_attribute(reader, args.first)
+        elsif name.to_s.ends_with?('_before_type_cast')
+          define_dynamic_before_type_cast_reader(reader)
+          attribute_will_change!(reader)
+          read_attribute_before_type_cast(reader)
         else
-          getter = attr.reader
-          define_dynamic_reader(getter)
-          attribute_will_change!(attr.reader)
-          read_raw_attribute(getter)
+          define_dynamic_reader(reader)
+          attribute_will_change!(reader)
+          read_raw_attribute(reader)
         end
+      end
+
+      private
+
+      # Get the string as a getter string.
+      #
+      # @example Get the reader/getter
+      #   "model=".reader
+      #
+      # @return [ String ] The string stripped of "=".
+      def __dynamic_reader(method)
+        method.to_s.delete("=").sub(/_before_type_cast\z/, '')
+      end
+
+      # Is this string a writer?
+      #
+      # @example Is the string a setter method?
+      #   "model=".writer?
+      #
+      # @return [ true | false ] If the string contains "=".
+      def __dynamic_writer?(method)
+        method.to_s.include?("=")
+      end
+
+      # Is this string a valid_method_name?
+      #
+      # @example Is the string a valid Ruby identifier for use as a method name
+      #   "model=".valid_method_name?
+      #
+      # @return [ true | false ] If the string contains a valid Ruby identifier.
+      def valid_method_name?(method)
+        !method.to_s.match?(/[@$"-]/)
       end
     end
   end
