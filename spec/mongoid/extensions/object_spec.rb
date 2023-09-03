@@ -16,13 +16,6 @@ describe Mongoid::Extensions::Object do
     end
   end
 
-  describe "#__find_args__" do
-
-    it "returns self" do
-      expect(object.__find_args__).to eq(object)
-    end
-  end
-
   describe "#__mongoize_object_id__" do
 
     it "returns self" do

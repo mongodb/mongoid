@@ -18,16 +18,6 @@ module Mongoid
       end
       alias :__mongoize_object_id__ :__evolve_object_id__
 
-      # Convert the object to args for a find query.
-      #
-      # @example Convert the object to args.
-      #   object.__find_args__
-      #
-      # @return [ Object ] self.
-      def __find_args__
-        self
-      end
-
       # Mongoize a plain object into a time.
       #
       # @note This method should not be used, because it does not

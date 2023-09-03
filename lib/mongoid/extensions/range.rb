@@ -7,16 +7,6 @@ module Mongoid
     # Adds type-casting behavior to Range class.
     module Range
 
-      # Get the range as arguments for a find.
-      #
-      # @example Get the range as find args.
-      #   range.__find_args__
-      #
-      # @return [ Array ] The range as an array.
-      def __find_args__
-        to_a
-      end
-
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
