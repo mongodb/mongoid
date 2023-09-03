@@ -7,9 +7,6 @@ module Mongoid
     # Adds type-casting behavior to String class.
     module String
 
-      # @attribute [rw] unconvertable_to_bson If the document is unconvertable.
-      attr_accessor :unconvertable_to_bson
-
       # Evolve the string into an object id if possible.
       #
       # @example Evolve the string.
