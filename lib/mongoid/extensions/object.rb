@@ -44,16 +44,6 @@ module Mongoid
         self
       end
 
-      # Try to form a setter from this object.
-      #
-      # @example Try to form a setter.
-      #   object.__setter__
-      #
-      # @return [ String ] The object as a string plus =.
-      def __setter__
-        "#{self}="
-      end
-
       # Get the value of the object as a mongo friendly sort value.
       #
       # @example Get the object as sort criteria.
