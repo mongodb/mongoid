@@ -7,16 +7,6 @@ module Mongoid
     # Adds type-casting behavior to BigDecimal class.
     module BigDecimal
 
-      # Convert the big decimal to an $inc-able value.
-      #
-      # @example Convert the big decimal.
-      #   bd.__to_inc__
-      #
-      # @return [ Float ] The big decimal as a float.
-      def __to_inc__
-        to_f
-      end
-
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #

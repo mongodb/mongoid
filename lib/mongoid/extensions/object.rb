@@ -64,16 +64,6 @@ module Mongoid
         self
       end
 
-      # Conversion of an object to an $inc-able value.
-      #
-      # @example Convert the object.
-      #   1.__to_inc__
-      #
-      # @return [ Object ] The object.
-      def __to_inc__
-        self
-      end
-
       # Checks whether conditions given in this object are known to be
       # unsatisfiable, i.e., querying with this object will always return no
       # documents.
