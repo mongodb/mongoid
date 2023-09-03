@@ -260,6 +260,68 @@ describe Mongoid::Criteria::Findable do
         end
       end
 
+      context "when providing nested arrays of ids" do
+
+        let!(:band_two) do
+          Band.create!(name: "Tool")
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find([ [ band.id ], [ [ band_two.id ] ] ])
+          end
+
+          it "contains the first match" do
+            expect(found).to include(band)
+          end
+
+          it "contains the second match" do
+            expect(found).to include(band_two)
+          end
+
+          context "when ids are duplicates" do
+
+            let(:found) do
+              Band.find([ [ band.id ], [ [ band.id ] ] ])
+            end
+
+            it "contains only the first match" do
+              expect(found).to eq([band])
+            end
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+            config_override :raise_not_found_error, true
+
+            let(:found) do
+              Band.find([ [ band.id ], [ [ BSON::ObjectId.new ] ] ])
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Band with id\(s\)/)
+            end
+          end
+
+          context "when raising no error" do
+            config_override :raise_not_found_error, false
+
+            let(:found) do
+              Band.find([ [ band.id ], [ [ BSON::ObjectId.new ] ] ])
+            end
+
+            it "returns only the matching documents" do
+              expect(found).to eq([ band ])
+            end
+          end
+        end
+      end
+
       context "when providing a Set of ids" do
 
         let!(:band_two) do
