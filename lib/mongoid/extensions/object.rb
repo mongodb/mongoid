@@ -18,16 +18,6 @@ module Mongoid
       end
       alias :__mongoize_object_id__ :__evolve_object_id__
 
-      # Convert the object to args for a find query.
-      #
-      # @example Convert the object to args.
-      #   object.__find_args__
-      #
-      # @return [ Object ] self.
-      def __find_args__
-        self
-      end
-
       # Mongoize a plain object into a time.
       #
       # @note This method should not be used, because it does not
@@ -41,36 +31,6 @@ module Mongoid
       # @return [ Object ] self.
       # @deprecated
       def __mongoize_time__
-        self
-      end
-
-      # Try to form a setter from this object.
-      #
-      # @example Try to form a setter.
-      #   object.__setter__
-      #
-      # @return [ String ] The object as a string plus =.
-      def __setter__
-        "#{self}="
-      end
-
-      # Get the value of the object as a mongo friendly sort value.
-      #
-      # @example Get the object as sort criteria.
-      #   object.__sortable__
-      #
-      # @return [ Object ] self.
-      def __sortable__
-        self
-      end
-
-      # Conversion of an object to an $inc-able value.
-      #
-      # @example Convert the object.
-      #   1.__to_inc__
-      #
-      # @return [ Object ] The object.
-      def __to_inc__
         self
       end
 

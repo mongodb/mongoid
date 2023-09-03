@@ -51,6 +51,11 @@ Deprecated functionality removed
   The method ``Mongoid::QueryCache#clear_cache`` should be replaced with ``Mongo::QueryCache#clear``.
   All other methods and submodules are identically named. Refer to the `driver query cache documentation
   <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
+- Removed various monkey-patch methods:
+  - ``Object#__find_args__`` (not used)
+  - ``Object#__setter__`` (not used)
+  - ``Object#__sortable__`` (not used)
+  - ``Object#__to_inc__`` (not used)
 
 
 ``touch`` method now clears changed state
