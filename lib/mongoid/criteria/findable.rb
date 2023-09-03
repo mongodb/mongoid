@@ -142,7 +142,16 @@ module Mongoid
       #
       # @return [ Array ] The array of ids.
       def prepare_ids_for_find(args)
-        args.flat_map {|a| a.is_a?(Set) ? a.to_a : a }.uniq(&:to_s)
+        args.flat_map do |arg|
+          case arg
+          when Array, Set
+            prepare_ids_for_find(arg)
+          when Range
+            arg.begin&.numeric? && arg.end&.numeric? ? arg.to_a : arg
+          else
+            arg
+          end
+        end.uniq(&:to_s)
       end
 
       # Convenience method of raising an invalid options error.
