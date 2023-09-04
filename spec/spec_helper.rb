@@ -114,8 +114,9 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
 
-I18n.config.enforce_available_locales = false
+Time.zone = 'UTC'
 
+I18n.config.enforce_available_locales = false
 
 if %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
   require "i18n/backend/fallbacks"
