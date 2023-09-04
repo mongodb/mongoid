@@ -124,8 +124,7 @@ module Mongoid
 
       private
 
-      # Convert the provided object to a foreign key, given the type
-      # and metadata key constraint.
+      # Convert the provided object to a Mongo-friendly foreign key.
       #
       # @example Convert the object to a foreign key.
       #   mongoize_foreign_key(object)
