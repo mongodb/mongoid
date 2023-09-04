@@ -134,7 +134,7 @@ module Mongoid
       #
       # @return [ Object ] The converted object.
       def mongoize_foreign_key(object)
-        if type == Array
+        if type == Array || type == Set
           if object.resizable?
             object.blank? ? object : association.convert_to_foreign_key(object)
           else
