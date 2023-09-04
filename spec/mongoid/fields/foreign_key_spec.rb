@@ -718,9 +718,9 @@ describe Mongoid::Fields::ForeignKey do
   end
 
   describe "#mongoize_foreign_key" do
-    let(:field) { described_class.new(:vals, type: Object, default: []) }
+    let(:field) { described_class.new(:vals, type: type, association: association) }
     let(:association) { Person.relations['preferences'] }
-    subject(:mongoized) { field.send(:mongoize_foreign_key, type, association, object) }
+    subject(:mongoized) { field.send(:mongoize_foreign_key, object) }
 
     context 'type is Array' do
       let(:type) { Array }

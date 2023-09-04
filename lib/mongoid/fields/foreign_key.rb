@@ -14,7 +14,7 @@ module Mongoid
       # @example Add the atomic changes.
       #   field.add_atomic_changes(doc, "key", {}, [], [])
       #
-      # @todo: Durran: Refactor, big time.
+      # @todo: Refactor, big time.
       #
       # @param [ Document ] document The document to add to.
       # @param [ String ] name The name of the field.
@@ -95,7 +95,7 @@ module Mongoid
       # @return [ Object ] The mongoized object.
       def mongoize(object)
         if type.resizable? || object_id_field?
-          mongoize_foreign_key(type, association, object)
+          mongoize_foreign_key(object)
         else
           related_id_field.mongoize(object)
         end
@@ -127,15 +127,13 @@ module Mongoid
       # Convert the provided object to a foreign key, given the type
       # and metadata key constraint.
       #
-      # @example Convert the object to a fk.
-      #   mongoize_foreign_key(Array, association, object)
+      # @example Convert the object to a foreign key.
+      #   mongoize_foreign_key(object)
       #
-      # @param [ Class ] type The association metadata.
-      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       # @param [ Object ] object The object to convert.
       #
       # @return [ Object ] The converted object.
-      def mongoize_foreign_key(type, association, object)
+      def mongoize_foreign_key(object)
         if type == Array
           if object.resizable?
             object.blank? ? object : association.convert_to_foreign_key(object)
