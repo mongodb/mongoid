@@ -214,24 +214,6 @@ describe Mongoid::Extensions::Object do
     end
   end
 
-  describe "#you_must" do
-
-    context "when the object is frozen" do
-
-      let(:person) do
-        Person.new.tap { |peep| peep.freeze }
-      end
-
-      let(:result) do
-        person.you_must(:aliases=, [])
-      end
-
-      it "returns nil" do
-        expect(result).to be_nil
-      end
-    end
-  end
-
   describe "#remove_ivar" do
 
     context "when the instance variable is defined" do

@@ -88,20 +88,6 @@ module Mongoid
         false
       end
 
-      # Do or do not, there is no try. -- Yoda.
-      #
-      # @example Do or do not.
-      #   object.do_or_do_not(:use, "The Force")
-      #
-      # @param [ String | Symbol ] name The method name.
-      # @param [ Object... ] *args The arguments.
-      #
-      # @return [ Object | nil ] The result of the method call or nil if the
-      #   method does not exist.
-      def do_or_do_not(name, *args)
-        send(name, *args) if name && respond_to?(name)
-      end
-
       # Get the value for an instance variable or false if it doesn't exist.
       #
       # @example Get the value for an instance var.
@@ -185,20 +171,6 @@ module Mongoid
       # @return [ Object ] self.
       def substitutable
         self
-      end
-
-      # You must unlearn what you have learned. -- Yoda
-      #
-      # @example You must perform this execution.
-      #   object.you_must(:use, "The Force")
-      #
-      # @param [ String | Symbol ] name The method name.
-      # @param [ Object... ] *args The arguments.
-      #
-      # @return [ Object | nil ] The result of the method call or nil if the
-      #   method does not exist. Nil if the object is frozen.
-      def you_must(name, *args)
-        frozen? ? nil : do_or_do_not(name, *args)
       end
 
       module ClassMethods
