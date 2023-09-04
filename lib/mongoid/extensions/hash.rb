@@ -148,22 +148,6 @@ module Mongoid
         true
       end
 
-      # Convert this hash to a criteria. Will iterate over each keys in the
-      # hash which must correspond to method on a criteria object. The hash
-      # must also include a "klass" key.
-      #
-      # @example Convert the hash to a criteria.
-      #   { klass: Band, where: { name: "Depeche Mode" }.to_criteria
-      #
-      # @return [ Criteria ] The criteria.
-      def to_criteria
-        criteria = Criteria.new(delete(:klass) || delete("klass"))
-        each_pair do |method, args|
-          criteria = criteria.__send__(method, args)
-        end
-        criteria
-      end
-
       private
 
       # Mongoize for the klass, key and value.
