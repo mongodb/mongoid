@@ -716,4 +716,146 @@ describe Mongoid::Fields::ForeignKey do
       end
     end
   end
+
+  describe "#mongoize_foreign_key" do
+    let(:field) { described_class.new(:vals, type: Object, default: []) }
+    let(:association) { Person.relations['preferences'] }
+    subject(:mongoized) { field.send(:mongoize_foreign_key, type, association, object) }
+
+    context 'type is Array' do
+      let(:type) { Array }
+
+      context 'when the object is a BSON::ObjectId' do
+        let(:object) { BSON::ObjectId.new }
+
+        it 'returns the object id as an array' do
+          expect(mongoized).to eq([object])
+        end
+      end
+
+      context 'when the object is an Array of BSON::ObjectId' do
+        let(:object) { [BSON::ObjectId.new] }
+
+        it 'returns the object ids' do
+          expect(mongoized).to eq(object)
+        end
+      end
+
+      context 'when the object is a String which is a legal object id' do
+        let(:object) { BSON::ObjectId.new.to_s }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq([BSON::ObjectId.from_string(object)])
+        end
+      end
+
+      context 'when the object is a String which is not a legal object id' do
+        let(:object) { 'blah' }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq(%w[blah])
+        end
+      end
+
+      context 'when the object is a blank String' do
+        let(:object) { '' }
+
+        it 'returns an empty array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is nil' do
+        let(:object) { nil }
+
+        it 'returns an empty array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is Array of Strings which are legal object ids' do
+        let(:object) { [BSON::ObjectId.new.to_s] }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq([BSON::ObjectId.from_string(object.first)])
+        end
+      end
+
+      context 'when the object is Array of Strings which are not legal object ids' do
+        let(:object) { %w[blah] }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq(%w[blah])
+        end
+      end
+
+      context 'when the object is Array of Strings which are blank' do
+        let(:object) { ['', ''] }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is Array of nils' do
+          let(:object) { [nil, nil, nil] }
+
+          it 'returns the object id in an array' do
+            expect(mongoized).to eq([])
+          end
+        end
+    end
+
+    context 'type is not Array' do
+      let(:type) { Object }
+
+      context 'when the object is a BSON::ObjectId' do
+        let(:object) { BSON::ObjectId.new }
+
+        it 'returns the object id' do
+          expect(mongoized).to eq(object)
+        end
+      end
+
+      context 'when the object is a String which is a legal object id' do
+        let(:object) { BSON::ObjectId.new.to_s }
+
+        it 'returns the object id' do
+          expect(mongoized).to eq(BSON::ObjectId.from_string(object))
+        end
+      end
+
+      context 'when the object is a String which is not a legal object id' do
+        let(:object) { 'blah' }
+
+        it 'returns the string' do
+          expect(mongoized).to eq('blah')
+        end
+      end
+
+      context 'when the String is blank' do
+        let(:object) { '' }
+
+        it 'returns nil' do
+          expect(mongoized).to be_nil
+        end
+        end
+
+      context 'when the object is nil' do
+        let(:object) { '' }
+
+        it 'returns nil' do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context 'when object is an empty Array' do
+        let(:object) { [] }
+
+        it 'returns an empty array' do
+          expect(mongoized).to eq([])
+        end
+      end
+    end
+  end
 end

@@ -95,7 +95,7 @@ module Mongoid
       # @return [ Object ] The mongoized object.
       def mongoize(object)
         if type.resizable? || object_id_field?
-          type.__mongoize_fk__(association, object)
+          mongoize_foreign_key(type, association, object)
         else
           related_id_field.mongoize(object)
         end
@@ -123,6 +123,29 @@ module Mongoid
       end
 
       private
+
+      # Convert the provided object to a foreign key, given the type
+      # and metadata key constraint.
+      #
+      # @example Convert the object to a fk.
+      #   mongoize_foreign_key(Array, association, object)
+      #
+      # @param [ Class ] type The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
+      # @param [ Object ] object The object to convert.
+      #
+      # @return [ Object ] The converted object.
+      def mongoize_foreign_key(type, association, object)
+        if type == Array
+          if object.resizable?
+            object.blank? ? object : association.convert_to_foreign_key(object)
+          else
+            object.blank? ? [] : association.convert_to_foreign_key(Array(object))
+          end
+        elsif !(object.nil? || object == '')
+          association.convert_to_foreign_key(object)
+        end
+      end
 
       # Evaluate the default proc. In some cases we need to instance exec,
       # in others we don't.

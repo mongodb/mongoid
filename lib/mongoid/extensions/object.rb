@@ -203,21 +203,6 @@ module Mongoid
 
       module ClassMethods
 
-        # Convert the provided object to a foreign key, given the metadata key
-        # contstraint.
-        #
-        # @example Convert the object to a fk.
-        #   Object.__mongoize_fk__(association, object)
-        #
-        # @param [ Mongoid::Association::Relatable ] association The association metadata.
-        # @param [ Object ] object The object to convert.
-        #
-        # @return [ Object ] The converted object.
-        def __mongoize_fk__(association, object)
-          return nil if !object || object == ""
-          association.convert_to_foreign_key(object)
-        end
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
