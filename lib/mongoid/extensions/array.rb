@@ -51,7 +51,7 @@ module Mongoid
       #   configured default time zone corresponding to date/time components
       #   in this array.
       def __mongoize_time__
-        ::Time.configured.local(*self)
+        ::Time.zone.local(*self)
       end
 
       # Checks whether conditions given in this array are known to be
