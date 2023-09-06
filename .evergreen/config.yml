@@ -681,6 +681,7 @@ buildvariants:
     topology: "standalone"
     rails: ['7.0']
     os: debian11
+    fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
     - name: "test"
@@ -716,6 +717,7 @@ buildvariants:
     topology: "standalone"
     rails: ['6.0', '6.1']
     os: rhel80
+    fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
@@ -728,6 +730,7 @@ buildvariants:
     topology: "standalone"
     rails: ['5.2']
     os: rhel80
+    fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
