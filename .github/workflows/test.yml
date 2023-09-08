@@ -75,6 +75,7 @@ jobs:
           task: test
           driver: current
           rails: '7.0'
+          fle: helper
           i18n:
           gemfile: gemfiles/rails-7.0.gemfile
           experimental: false
@@ -85,6 +86,7 @@ jobs:
           task: test
           driver: current
           rails: '6.1'
+          fle: helper
           i18n:
           gemfile: gemfiles/rails-6.1.gemfile
           experimental: false
@@ -95,6 +97,7 @@ jobs:
           task: test
           driver: current
           rails: '7.0'
+          fle: helper
           i18n:
           gemfile: gemfiles/rails-7.0.gemfile
           experimental: false
@@ -105,6 +108,7 @@ jobs:
           task: test
           driver: current
           rails: '6.1'
+          fle: helper
           i18n:
           gemfile: gemfiles/rails-6.1.gemfile
           experimental: false
@@ -115,6 +119,7 @@ jobs:
           task: test
           driver: current
           rails: '6.0'
+          fle: helper
           i18n:
           gemfile: gemfiles/rails-6.0.gemfile
           experimental: false
@@ -125,6 +130,7 @@ jobs:
           task: test
           driver: current
           rails: '5.2'
+          fle: helper
           i18n:
           gemfile: gemfiles/rails-5.2.gemfile
           experimental: false
@@ -135,6 +141,7 @@ jobs:
           task: test
           driver: current
           rails: '6.0'
+          fle: helper
           i18n:
           gemfile: gemfiles/rails-6.0.gemfile
           experimental: false
@@ -193,6 +200,7 @@ jobs:
     - name: load ruby
       uses: ruby/setup-ruby@v1
       env:
+        FLE: "${{matrix.fle}}"
         BUNDLE_GEMFILE: "${{matrix.gemfile}}"
       with:
         ruby-version: "${{matrix.ruby}}"
@@ -200,6 +208,7 @@ jobs:
     - name: bundle
       run: bundle install --jobs 4 --retry 3
       env:
+        FLE: "${{matrix.fle}}"
         BUNDLE_GEMFILE: "${{matrix.gemfile}}"
     - name: test
       timeout-minutes: 60
@@ -207,4 +216,5 @@ jobs:
       run: bundle exec rake spec
       env:
         BUNDLE_GEMFILE: "${{matrix.gemfile}}"
+        FLE: "${{matrix.fle}}"
         MONGODB_URI: "${{ steps.start-mongodb.outputs.cluster-uri }}"
