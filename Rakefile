@@ -89,7 +89,7 @@ desc "Generate all documentation"
 task :docs => 'docs:yard'
 
 namespace :docs do
-  desc "Generate yard documention"
+  desc "Generate yard documentation"
   task :yard do
     out = File.join('yard-docs', Mongoid::VERSION)
     FileUtils.rm_rf(out)
