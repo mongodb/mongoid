@@ -7,8 +7,8 @@ name: Run Mongoid Tests
 - pull_request
 jobs:
   build:
-    name: "${{matrix.ruby}} driver-${{matrix.driver}} mongodb-${{matrix.mongodb}}
-      ${{matrix.topology}}"
+    name: "${{matrix.ruby}} drv:${{matrix.driver}} db:${{matrix.mongodb}}
+      rails:${{matrix.rails}} fle:${{matrix.fle}} ${{matrix.topology}}"
     env:
       CI: true
       TESTOPTS: "-v"
@@ -24,8 +24,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails:
-          i18n:
           gemfile: Gemfile
           experimental: false
         - mongodb: '6.0'
@@ -34,8 +32,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails:
-          i18n:
           gemfile: Gemfile
           experimental: false
         - mongodb: '6.0'
@@ -44,8 +40,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails:
-          i18n:
           gemfile: Gemfile
           experimental: false
         - mongodb: '6.0'
@@ -54,8 +48,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: master
-          rails:
-          i18n:
           gemfile: gemfiles/driver_master.gemfile
           experimental: true
         - mongodb: '6.0'
@@ -64,8 +56,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: stable
-          rails:
-          i18n:
           gemfile: gemfiles/driver_stable.gemfile
           experimental: false
         - mongodb: '6.0'
@@ -76,7 +66,6 @@ jobs:
           driver: current
           rails: '7.0'
           fle: helper
-          i18n:
           gemfile: gemfiles/rails-7.0.gemfile
           experimental: false
         - mongodb: '6.0'
@@ -87,7 +76,6 @@ jobs:
           driver: current
           rails: '6.1'
           fle: helper
-          i18n:
           gemfile: gemfiles/rails-6.1.gemfile
           experimental: false
         - mongodb: '6.0'
@@ -98,7 +86,6 @@ jobs:
           driver: current
           rails: '7.0'
           fle: helper
-          i18n:
           gemfile: gemfiles/rails-7.0.gemfile
           experimental: false
         - mongodb: '6.0'
@@ -109,7 +96,6 @@ jobs:
           driver: current
           rails: '6.1'
           fle: helper
-          i18n:
           gemfile: gemfiles/rails-6.1.gemfile
           experimental: false
         - mongodb: '6.0'
@@ -120,7 +106,6 @@ jobs:
           driver: current
           rails: '6.0'
           fle: helper
-          i18n:
           gemfile: gemfiles/rails-6.0.gemfile
           experimental: false
         - mongodb: '6.0'
@@ -131,7 +116,6 @@ jobs:
           driver: current
           rails: '5.2'
           fle: helper
-          i18n:
           gemfile: gemfiles/rails-5.2.gemfile
           experimental: false
         - mongodb: '6.0'
@@ -142,7 +126,6 @@ jobs:
           driver: current
           rails: '6.0'
           fle: helper
-          i18n:
           gemfile: gemfiles/rails-6.0.gemfile
           experimental: false
         - mongodb: '5.0'
@@ -151,8 +134,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails:
-          i18n:
           gemfile: Gemfile
           experimental: false
         - mongodb: '4.4'
@@ -161,8 +142,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails:
-          i18n:
           gemfile: Gemfile
           experimental: false
         - mongodb: '4.0'
@@ -171,8 +150,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails:
-          i18n:
           gemfile: Gemfile
           experimental: false
         - mongodb: '3.6'
@@ -181,8 +158,6 @@ jobs:
           os: ubuntu-20.04
           task: test
           driver: current
-          rails:
-          i18n:
           gemfile: Gemfile
           experimental: false
 
