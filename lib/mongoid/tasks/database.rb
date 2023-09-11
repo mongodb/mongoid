@@ -26,6 +26,9 @@ module Mongoid
           else
             logger.info("MONGOID: collection options ignored on: #{model}, please define in the root model.")
           end
+        rescue Mongoid::Error
+          puts "error while creating collection for #{model}"
+          raise
         end
       end
 
