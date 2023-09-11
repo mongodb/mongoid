@@ -213,7 +213,7 @@ jobs:
     - name: test
       timeout-minutes: 60
       continue-on-error: "${{matrix.experimental}}"
-      run: bundle exec rake spec
+      run: bundle exec rake ci
       env:
         BUNDLE_GEMFILE: "${{matrix.gemfile}}"
         FLE: "${{matrix.fle}}"
