@@ -11,9 +11,7 @@ shared_context "rake task" do
   let(:task_file) { "mongoid/tasks/database" }
 
   let(:logger) do
-    double("logger").tap do |log|
-      allow(log).to receive(:info)
-    end
+    Logger.new(STDOUT, level: :error, formatter: ->(_sev, _dt, _prog, msg) { msg })
   end
 
   before do

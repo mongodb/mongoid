@@ -27,7 +27,7 @@ module Mongoid
             logger.info("MONGOID: collection options ignored on: #{model}, please define in the root model.")
           end
         rescue Exception
-          puts "error while creating collection for #{model}"
+          logger.error "error while creating collection for #{model}"
           raise
         end
       end
