@@ -6,10 +6,13 @@ module Mongoid
   # Utility class for logging deprecation warnings.
   class Deprecation < ::ActiveSupport::Deprecation
 
-    @gem_name = 'Mongoid'
+    def initialize
+      # Per change policy, deprecations will be removed in the next major version.
+      deprecation_horizon = "#{Mongoid::VERSION.split('.').first.to_i + 1}.0".freeze
+      gem_name = 'Mongoid'
+      super(deprecation_horizon, gem_name)
+    end
 
-    # Per change policy, deprecations will be removed in the next major version.
-    @deprecation_horizon = "#{Mongoid::VERSION.split('.').first.to_i + 1}.0".freeze
 
     # Overrides default ActiveSupport::Deprecation behavior
     # to use Mongoid's logger.

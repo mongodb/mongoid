@@ -78,6 +78,8 @@ module Mongoid
         if valid_for_count_documents?
           view.count_documents(options)
         else
+          # TODO: Remove this when we remove the deprecated for_js API.
+          # https://jira.mongodb.org/browse/MONGOID-5681
           view.count(options)
         end
       end
@@ -1049,6 +1051,9 @@ module Mongoid
       #
       # @return [ true | false ] whether or not the current context
       #   excludes a `$where` operator.
+      #
+      # TODO: Remove this method when we remove the deprecated for_js API.
+      # https://jira.mongodb.org/browse/MONGOID-5681
       def valid_for_count_documents?(hash = view.filter)
         # Note that `view.filter` is a BSON::Document, and all keys in a
         # BSON::Document are strings; we don't need to worry about symbol
