@@ -680,7 +680,8 @@ buildvariants:
     mongodb-version: "6.0"
     topology: "standalone"
     rails: ['7.0']
-    os: debian11
+    os: ubuntu-22.04
+    fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
     - name: "test"
