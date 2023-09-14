@@ -18,6 +18,12 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+``for_js`` method is deprecated
+-------------------------------
+
+The ``for_js`` method is deprecated and will be removed in Mongoid 10.0.
+
+
 Deprecated options removed
 --------------------------
 
