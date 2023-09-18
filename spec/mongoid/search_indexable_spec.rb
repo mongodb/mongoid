@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
 class SearchIndexHelper
   attr_reader :model
@@ -104,6 +104,7 @@ describe Mongoid::SearchIndexable do
 
     describe '.search_indexes' do
       before { actual_definitions } # wait for the indices to be created
+
       let(:queried_definitions) { SearchablePerson.search_indexes.map { |i| i['latestDefinition'] } }
 
       it 'queries the available search indexes' do

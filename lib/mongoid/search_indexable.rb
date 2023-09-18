@@ -29,8 +29,11 @@ module Mongoid
       end
 
       def remove_search_index(name: nil, id: nil)
-        logger.info("MONGOID: Removing search index '#{name || id}' " \
-          "on collection '#{self.collection.name}'.")
+        logger.info(
+          "MONGOID: Removing search index '#{name || id}' " \
+          "on collection '#{collection.name}'."
+        )
+
         collection.search_indexes.drop_one(name: name, id: id)
       end
 
