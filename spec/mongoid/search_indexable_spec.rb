@@ -61,6 +61,7 @@ class SearchIndexHelper
   end
 end
 
+# rubocop:disable RSpec/MultipleMemoizedHelpers
 describe Mongoid::SearchIndexable do
   before do
     skip "#{described_class} requires at Atlas environment (set ATLAS_URI)" if ENV['ATLAS_URI'].nil?
@@ -143,3 +144,4 @@ describe Mongoid::SearchIndexable do
     end
   end
 end
+# rubocop:enable RSpec/MultipleMemoizedHelpers
