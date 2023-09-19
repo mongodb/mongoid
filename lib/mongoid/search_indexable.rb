@@ -65,14 +65,14 @@ module Mongoid
       #     search_index :name_of_index, { ... }
       #   end
       #
-      # @param [ Symbol | String ] name_or_defn Either the name of the index to
+      # @param [ Symbol | String | Hash ] name_or_defn Either the name of the index to
       #    define, or the index definition.
       # @param [ Hash ] defn The search index definition.
       def search_index(name_or_defn, defn = nil)
         name = name_or_defn
         name, defn = nil, name if name.is_a?(Hash)
 
-        spec = { definition: defn }.tap { |s| s[:name] = name if name }
+        spec = { definition: defn }.tap { |s| s[:name] = name.to_s if name }
         search_index_specs.push(spec)
       end
     end

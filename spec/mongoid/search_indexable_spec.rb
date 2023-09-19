@@ -7,6 +7,7 @@ class SearchIndexHelper
 
   def initialize(model)
     @model = model
+    model.collection.drop
     model.collection.create
   end
 
@@ -60,19 +61,22 @@ class SearchIndexHelper
   end
 end
 
-class SearchablePerson
-  include Mongoid::Document
-
-  search_index mappings: { dynamic: false }
-  search_index :with_dynamic_mappings, mappings: { dynamic: true }
-end
-
 describe Mongoid::SearchIndexable do
   before do
     skip "#{described_class} requires at Atlas environment (set ATLAS_URI)" if ENV['ATLAS_URI'].nil?
   end
 
-  let(:helper) { SearchIndexHelper.new(Person) }
+  let(:model) do
+    Class.new do
+      include Mongoid::Document
+      store_in collection: BSON::ObjectId.new.to_s
+
+      search_index mappings: { dynamic: false }
+      search_index :with_dynamic_mappings, mappings: { dynamic: true }
+    end
+  end
+
+  let(:helper) { SearchIndexHelper.new(model) }
 
   describe '.search_index_specs' do
     context 'when no search indexes have been defined' do
@@ -83,18 +87,19 @@ describe Mongoid::SearchIndexable do
 
     context 'when search indexes have been defined' do
       it 'has search index specs' do
-        expect(SearchablePerson.search_index_specs).to be == [
-          { definition: { dynamic: false } },
-          { name: :with_dynamic_mappings, definition: { dynamic: true } }
+        expect(model.search_index_specs).to be == [
+          { definition: { mappings: { dynamic: false } } },
+          { name: 'with_dynamic_mappings', definition: { mappings: { dynamic: true } } }
         ]
       end
     end
   end
 
   context 'when needing to first create search indexes' do
-    let(:requested_definitions) { SearchablePerson.search_index_specs.map { |spec| spec[:definition] } }
-    let(:index_names) { SearchablePerson.create_search_indexes }
-    let(:actual_definitions) { helper.wait_for(*index_names) }
+    let(:requested_definitions) { model.search_index_specs.map { |spec| spec[:definition].with_indifferent_access } }
+    let(:index_names) { model.create_search_indexes }
+    let(:actual_indexes) { helper.wait_for(*index_names) }
+    let(:actual_definitions) { actual_indexes.map { |i| i['latestDefinition'] } }
 
     describe '.create_search_indexes' do
       it 'creates the indexes' do
@@ -103,9 +108,9 @@ describe Mongoid::SearchIndexable do
     end
 
     describe '.search_indexes' do
-      before { actual_definitions } # wait for the indices to be created
+      before { actual_indexes } # wait for the indices to be created
 
-      let(:queried_definitions) { SearchablePerson.search_indexes.map { |i| i['latestDefinition'] } }
+      let(:queried_definitions) { model.search_indexes.map { |i| i['latestDefinition'] } }
 
       it 'queries the available search indexes' do
         expect(queried_definitions).to be == requested_definitions
@@ -113,27 +118,27 @@ describe Mongoid::SearchIndexable do
     end
 
     describe '.remove_search_index' do
-      let(:target_index) { actual_definitions.first }
+      let(:target_index) { actual_indexes.first }
 
       before do
-        SearchablePerson.remove_search_index id: target_index['id']
+        model.remove_search_index id: target_index['id']
         helper.wait_for_absense_of target_index['name']
       end
 
       it 'removes the requested index' do
-        expect(SearchablePerson.search_indexes(id: target_index['id'])).to be_empty
+        expect(model.search_indexes(id: target_index['id'])).to be_empty
       end
     end
 
     describe '.remove_search_indexes' do
       before do
-        actual_definitions # wait for the indexes to be created
-        Person.remove_search_indexes
-        helper.wait_for_absense_of(actual_definitions.map { |i| i['name'] })
+        actual_indexes # wait for the indexes to be created
+        model.remove_search_indexes
+        helper.wait_for_absense_of(actual_indexes.map { |i| i['name'] })
       end
 
       it 'removes the indexes' do
-        expect(SearchablePerson.search_indexes).to be_empty
+        expect(model.search_indexes).to be_empty
       end
     end
   end

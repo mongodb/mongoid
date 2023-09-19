@@ -10,7 +10,8 @@ set_env_vars
 set_env_python
 set_env_ruby
 
-bundle_install
+export BUNDLE_GEMFILE=gemfiles/driver_master.gemfile
+bundle install
 
 ATLAS_URI=$MONGODB_URI \
   EXAMPLE_TIMEOUT=600 \

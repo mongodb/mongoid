@@ -51,6 +51,28 @@ else
   TimeoutInterrupt = Timeout
 end
 
+STANDARD_TIMEOUTS = {
+  app: 500, # App tests under JRuby take a REALLY long time (over 5 minutes per test).
+  default: 30,
+}.freeze
+
+def timeout_type
+  if ENV['EXAMPLE_TIMEOUT'].to_i > 0
+    :custom
+  elsif SpecConfig.instance.app_tests?
+    :app
+  else
+    :default
+  end
+end
+
+def example_timeout_seconds
+  STANDARD_TIMEOUTS.fetch(
+    timeout_type,
+    (ENV['EXAMPLE_TIMEOUT'] || STANDARD_TIMEOUTS[:default]).to_i
+  )
+end
+
 RSpec.configure do |config|
   config.expect_with(:rspec) do |c|
     c.syntax = [:should, :expect]
@@ -61,17 +83,8 @@ RSpec.configure do |config|
   end
 
   if SpecConfig.instance.ci? && !%w(1 true yes).include?(ENV['INTERACTIVE']&.downcase)
-    timeout = if SpecConfig.instance.app_tests?
-      # App tests under JRuby take a REALLY long time (over 5 minutes per test).
-      500
-    else
-      # Allow a max of 30 seconds per test.
-      # Tests should take under 10 seconds ideally but it seems
-      # we have some that run for more than 10 seconds in CI.
-      30
-    end
     config.around(:each) do |example|
-      TimeoutInterrupt.timeout(timeout) do
+      TimeoutInterrupt.timeout(example_timeout_seconds) do
         example.run
       end
     end
