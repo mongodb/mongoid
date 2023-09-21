@@ -149,6 +149,14 @@ module Mongoid
     #
     # @api private
     def _mongoid_run_child_callbacks(kind, children: nil, &block)
+      if Mongoid::Config.around_callbacks_for_embeds
+        _mongoid_run_child_callbacks_with_around(kind, children: children, &block)
+      else
+        _mongoid_run_child_callbacks_without_around(kind, children: children, &block)
+      end
+    end
+
+    def _mongoid_run_child_callbacks_with_around(kind, children: nil, &block)
       child, *tail = (children || cascadable_children(kind))
       with_children = !Mongoid::Config.prevent_multiple_calls_of_embedded_callbacks
       if child.nil?
@@ -160,6 +168,33 @@ module Mongoid
           _mongoid_run_child_callbacks(kind, children: tail, &block)
         end
       end
+    end
+
+    def _mondoid_run_child_before_callbacks(kind, children: [], callback_kinds: {})
+      children.each do |child|
+        callback_kinds[child] = child_callback_type(kind, child)
+        child.run_before_callbacks(callback_kinds[child])
+        if (grandchildren = child.send(:cascadable_children, kind))
+          _mondoid_run_child_before_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds)
+        end
+      end
+    end
+
+    def _mondoid_run_child_after_callbacks(kind, children: [], callback_kinds: {})
+      children.reverse_each do |child|
+        child.run_after_callbacks(callback_kinds[child])
+        if (grandchildren = child.send(:cascadable_children, kind))
+          _mondoid_run_child_after_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds)
+        end
+      end
+    end
+
+    def _mongoid_run_child_callbacks_without_around(kind, children: nil, &block)
+      children = (children || cascadable_children(kind))
+      callback_kinds = {}
+      _mondoid_run_child_before_callbacks(kind, children: children, callback_kinds: callback_kinds)
+      block&.call
+      _mondoid_run_child_after_callbacks(kind, children: children, callback_kinds: callback_kinds)
     end
 
     # Returns the stored callbacks to be executed later.

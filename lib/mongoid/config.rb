@@ -137,6 +137,8 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5542
     option :prevent_multiple_calls_of_embedded_callbacks, default: true
 
+    option :around_callbacks_for_embeds, default: false
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.

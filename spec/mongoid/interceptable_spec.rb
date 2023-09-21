@@ -592,6 +592,7 @@ describe Mongoid::Interceptable do
 
           context 'with prevent_multiple_calls_of_embedded_callbacks disabled' do
             config_override :prevent_multiple_calls_of_embedded_callbacks, false
+            config_override :around_callbacks_for_embeds, true
 
             it "executes the callbacks once for each ember" do
               expect(note).to receive(:update_saved).twice
@@ -1784,40 +1785,80 @@ describe Mongoid::Interceptable do
       end
     end
 
-    let(:expected) do
-      [
-        [InterceptableSpec::CbCascadedChild, :before_validation],
-        [InterceptableSpec::CbCascadedChild, :after_validation],
-        [InterceptableSpec::CbParent, :before_validation],
-        [InterceptableSpec::CbCascadedChild, :before_validation],
-        [InterceptableSpec::CbCascadedChild, :after_validation],
+    context 'with around callbacks' do
+      config_override :around_callbacks_for_embeds, true
 
-        [InterceptableSpec::CbParent, :after_validation],
-        [InterceptableSpec::CbParent, :before_save],
-        [InterceptableSpec::CbParent, :around_save_open],
-        [InterceptableSpec::CbParent, :before_create],
-        [InterceptableSpec::CbParent, :around_create_open],
+      let(:expected) do
+        [
+          [InterceptableSpec::CbCascadedChild, :before_validation],
+          [InterceptableSpec::CbCascadedChild, :after_validation],
+          [InterceptableSpec::CbParent, :before_validation],
+          [InterceptableSpec::CbCascadedChild, :before_validation],
+          [InterceptableSpec::CbCascadedChild, :after_validation],
 
-        [InterceptableSpec::CbCascadedChild, :before_save],
-        [InterceptableSpec::CbCascadedChild, :around_save_open],
-        [InterceptableSpec::CbCascadedChild, :before_create],
-        [InterceptableSpec::CbCascadedChild, :around_create_open],
+          [InterceptableSpec::CbParent, :after_validation],
+          [InterceptableSpec::CbParent, :before_save],
+          [InterceptableSpec::CbParent, :around_save_open],
+          [InterceptableSpec::CbParent, :before_create],
+          [InterceptableSpec::CbParent, :around_create_open],
 
-        [InterceptableSpec::CbCascadedChild, :around_create_close],
-        [InterceptableSpec::CbCascadedChild, :after_create],
-        [InterceptableSpec::CbCascadedChild, :around_save_close],
-        [InterceptableSpec::CbCascadedChild, :after_save],
+          [InterceptableSpec::CbCascadedChild, :before_save],
+          [InterceptableSpec::CbCascadedChild, :around_save_open],
+          [InterceptableSpec::CbCascadedChild, :before_create],
+          [InterceptableSpec::CbCascadedChild, :around_create_open],
 
-        [InterceptableSpec::CbParent, :around_create_close],
-        [InterceptableSpec::CbParent, :after_create],
-        [InterceptableSpec::CbParent, :around_save_close],
-        [InterceptableSpec::CbParent, :after_save]
-      ]
+          [InterceptableSpec::CbCascadedChild, :around_create_close],
+          [InterceptableSpec::CbCascadedChild, :after_create],
+          [InterceptableSpec::CbCascadedChild, :around_save_close],
+          [InterceptableSpec::CbCascadedChild, :after_save],
+
+          [InterceptableSpec::CbParent, :around_create_close],
+          [InterceptableSpec::CbParent, :after_create],
+          [InterceptableSpec::CbParent, :around_save_close],
+          [InterceptableSpec::CbParent, :after_save]
+        ]
+      end
+
+      it 'calls callbacks in the right order' do
+        parent.save!
+        expect(registry.calls).to eq expected
+      end
     end
 
-    it 'calls callbacks in the right order' do
-      parent.save!
-      expect(registry.calls).to eq expected
+    context 'without around callbacks' do
+      config_override :around_callbacks_for_embeds, false
+
+      let(:expected) do
+        [
+          [InterceptableSpec::CbCascadedChild, :before_validation],
+          [InterceptableSpec::CbCascadedChild, :after_validation],
+          [InterceptableSpec::CbParent, :before_validation],
+          [InterceptableSpec::CbCascadedChild, :before_validation],
+          [InterceptableSpec::CbCascadedChild, :after_validation],
+
+          [InterceptableSpec::CbParent, :after_validation],
+          [InterceptableSpec::CbParent, :before_save],
+          [InterceptableSpec::CbParent, :around_save_open],
+          [InterceptableSpec::CbParent, :before_create],
+          [InterceptableSpec::CbParent, :around_create_open],
+
+          [InterceptableSpec::CbCascadedChild, :before_save],
+          [InterceptableSpec::CbCascadedChild, :before_create],
+
+          [InterceptableSpec::CbCascadedChild, :after_create],
+          [InterceptableSpec::CbCascadedChild, :after_save],
+
+          [InterceptableSpec::CbParent, :around_create_close],
+          [InterceptableSpec::CbParent, :after_create],
+          [InterceptableSpec::CbParent, :around_save_close],
+          [InterceptableSpec::CbParent, :after_save]
+        ]
+      end
+
+      it 'calls callbacks in the right order' do
+        parent.save!
+        expect(registry.calls).to eq expected
+      end
     end
   end
 
@@ -1880,89 +1921,180 @@ describe Mongoid::Interceptable do
       end
 
       context "create" do
-        let(:expected) do
-          [
-            [InterceptableSpec::CbEmbedsOneChild, :before_validation],
-            [InterceptableSpec::CbEmbedsOneChild, :after_validation],
-            [InterceptableSpec::CbEmbedsOneParent, :before_validation],
-            [InterceptableSpec::CbEmbedsOneChild, :before_validation],
-            [InterceptableSpec::CbEmbedsOneChild, :after_validation],
-            [InterceptableSpec::CbEmbedsOneParent, :after_validation],
+        context "with around callbacks" do
+          config_override :around_callbacks_for_embeds, true
 
-            [InterceptableSpec::CbEmbedsOneParent, :before_save],
-            [InterceptableSpec::CbEmbedsOneParent, :around_save_open],
-            [InterceptableSpec::CbEmbedsOneParent, :before_create],
-            [InterceptableSpec::CbEmbedsOneParent, :around_create_open],
+          let(:expected) do
+            [
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :after_validation],
 
-            [InterceptableSpec::CbEmbedsOneChild, :before_save],
-            [InterceptableSpec::CbEmbedsOneChild, :around_save_open],
-            [InterceptableSpec::CbEmbedsOneChild, :before_create],
-            [InterceptableSpec::CbEmbedsOneChild, :around_create_open],
+              [InterceptableSpec::CbEmbedsOneParent, :before_save],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_open],
+              [InterceptableSpec::CbEmbedsOneParent, :before_create],
+              [InterceptableSpec::CbEmbedsOneParent, :around_create_open],
 
-            [InterceptableSpec::CbEmbedsOneParent, :insert_into_database],
+              [InterceptableSpec::CbEmbedsOneChild, :before_save],
+              [InterceptableSpec::CbEmbedsOneChild, :around_save_open],
+              [InterceptableSpec::CbEmbedsOneChild, :before_create],
+              [InterceptableSpec::CbEmbedsOneChild, :around_create_open],
 
-            [InterceptableSpec::CbEmbedsOneChild, :around_create_close],
-            [InterceptableSpec::CbEmbedsOneChild, :after_create],
-            [InterceptableSpec::CbEmbedsOneChild, :around_save_close],
-            [InterceptableSpec::CbEmbedsOneChild, :after_save],
+              [InterceptableSpec::CbEmbedsOneParent, :insert_into_database],
 
-            [InterceptableSpec::CbEmbedsOneParent, :around_create_close],
-            [InterceptableSpec::CbEmbedsOneParent, :after_create],
-            [InterceptableSpec::CbEmbedsOneParent, :around_save_close],
-            [InterceptableSpec::CbEmbedsOneParent, :after_save]
-          ]
+              [InterceptableSpec::CbEmbedsOneChild, :around_create_close],
+              [InterceptableSpec::CbEmbedsOneChild, :after_create],
+              [InterceptableSpec::CbEmbedsOneChild, :around_save_close],
+              [InterceptableSpec::CbEmbedsOneChild, :after_save],
+
+              [InterceptableSpec::CbEmbedsOneParent, :around_create_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_create],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_save]
+            ]
+          end
+
+          it 'calls callbacks in the right order' do
+            parent.save!
+            expect(registry.calls).to eq expected
+          end
         end
 
-        it 'calls callbacks in the right order' do
-          parent.save!
-          expect(registry.calls).to eq expected
+        context "without around callbacks" do
+          config_override :around_callbacks_for_embeds, false
+
+          let(:expected) do
+            [
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :after_validation],
+
+              [InterceptableSpec::CbEmbedsOneParent, :before_save],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_open],
+              [InterceptableSpec::CbEmbedsOneParent, :before_create],
+              [InterceptableSpec::CbEmbedsOneParent, :around_create_open],
+
+              [InterceptableSpec::CbEmbedsOneChild, :before_save],
+              [InterceptableSpec::CbEmbedsOneChild, :before_create],
+
+              [InterceptableSpec::CbEmbedsOneParent, :insert_into_database],
+
+              [InterceptableSpec::CbEmbedsOneChild, :after_create],
+              [InterceptableSpec::CbEmbedsOneChild, :after_save],
+
+              [InterceptableSpec::CbEmbedsOneParent, :around_create_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_create],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_save]
+            ]
+          end
+
+          it 'calls callbacks in the right order' do
+            parent.save!
+            expect(registry.calls).to eq expected
+          end
         end
       end
 
       context "update" do
-        let(:expected) do
-          [
-            [InterceptableSpec::CbEmbedsOneChild, :before_validation],
-            [InterceptableSpec::CbEmbedsOneChild, :after_validation],
-            [InterceptableSpec::CbEmbedsOneParent, :before_validation],
-            [InterceptableSpec::CbEmbedsOneChild, :before_validation],
-            [InterceptableSpec::CbEmbedsOneChild, :after_validation],
-            [InterceptableSpec::CbEmbedsOneParent, :after_validation],
+        context "with around callbacks" do
+          config_override :around_callbacks_for_embeds, true
 
-            [InterceptableSpec::CbEmbedsOneParent, :before_save],
-            [InterceptableSpec::CbEmbedsOneParent, :around_save_open],
-            [InterceptableSpec::CbEmbedsOneParent, :before_update],
-            [InterceptableSpec::CbEmbedsOneParent, :around_update_open],
+          let(:expected) do
+            [
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :after_validation],
 
-            [InterceptableSpec::CbEmbedsOneChild, :before_save],
-            [InterceptableSpec::CbEmbedsOneChild, :around_save_open],
-            [InterceptableSpec::CbEmbedsOneChild, :before_update],
-            [InterceptableSpec::CbEmbedsOneChild, :around_update_open],
+              [InterceptableSpec::CbEmbedsOneParent, :before_save],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_open],
+              [InterceptableSpec::CbEmbedsOneParent, :before_update],
+              [InterceptableSpec::CbEmbedsOneParent, :around_update_open],
 
-            [InterceptableSpec::CbEmbedsOneChild, :around_update_close],
-            [InterceptableSpec::CbEmbedsOneChild, :after_update],
-            [InterceptableSpec::CbEmbedsOneChild, :around_save_close],
-            [InterceptableSpec::CbEmbedsOneChild, :after_save],
+              [InterceptableSpec::CbEmbedsOneChild, :before_save],
+              [InterceptableSpec::CbEmbedsOneChild, :around_save_open],
+              [InterceptableSpec::CbEmbedsOneChild, :before_update],
+              [InterceptableSpec::CbEmbedsOneChild, :around_update_open],
 
-            [InterceptableSpec::CbEmbedsOneParent, :around_update_close],
-            [InterceptableSpec::CbEmbedsOneParent, :after_update],
-            [InterceptableSpec::CbEmbedsOneParent, :around_save_close],
-            [InterceptableSpec::CbEmbedsOneParent, :after_save]
-          ]
+              [InterceptableSpec::CbEmbedsOneChild, :around_update_close],
+              [InterceptableSpec::CbEmbedsOneChild, :after_update],
+              [InterceptableSpec::CbEmbedsOneChild, :around_save_close],
+              [InterceptableSpec::CbEmbedsOneChild, :after_save],
+
+              [InterceptableSpec::CbEmbedsOneParent, :around_update_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_update],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_save]
+            ]
+          end
+
+          it 'calls callbacks in the right order' do
+            parent.callback_registry = nil
+            parent.child.callback_registry = nil
+            parent.save!
+
+            parent.callback_registry = registry
+            parent.child.callback_registry = registry
+            parent.name = "name"
+            parent.child.age = 10
+
+            parent.save!
+            expect(registry.calls).to eq expected
+          end
         end
 
-        it 'calls callbacks in the right order' do
-          parent.callback_registry = nil
-          parent.child.callback_registry = nil
-          parent.save!
+        context "without around callbacks" do
+          config_override :around_callbacks_for_embeds, false
 
-          parent.callback_registry = registry
-          parent.child.callback_registry = registry
-          parent.name = "name"
-          parent.child.age = 10
+          let(:expected) do
+            [
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :before_validation],
+              [InterceptableSpec::CbEmbedsOneChild, :after_validation],
+              [InterceptableSpec::CbEmbedsOneParent, :after_validation],
 
-          parent.save!
-          expect(registry.calls).to eq expected
+              [InterceptableSpec::CbEmbedsOneParent, :before_save],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_open],
+              [InterceptableSpec::CbEmbedsOneParent, :before_update],
+              [InterceptableSpec::CbEmbedsOneParent, :around_update_open],
+
+              [InterceptableSpec::CbEmbedsOneChild, :before_save],
+              [InterceptableSpec::CbEmbedsOneChild, :before_update],
+
+              [InterceptableSpec::CbEmbedsOneChild, :after_update],
+              [InterceptableSpec::CbEmbedsOneChild, :after_save],
+
+              [InterceptableSpec::CbEmbedsOneParent, :around_update_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_update],
+              [InterceptableSpec::CbEmbedsOneParent, :around_save_close],
+              [InterceptableSpec::CbEmbedsOneParent, :after_save]
+            ]
+          end
+
+          it 'calls callbacks in the right order' do
+            parent.callback_registry = nil
+            parent.child.callback_registry = nil
+            parent.save!
+
+            parent.callback_registry = registry
+            parent.child.callback_registry = registry
+            parent.name = "name"
+            parent.child.age = 10
+
+            parent.save!
+            expect(registry.calls).to eq expected
+          end
         end
       end
     end
@@ -2042,59 +2174,114 @@ describe Mongoid::Interceptable do
         end
       end
 
-      let(:expected) do
-        [
-          [InterceptableSpec::CbEmbedsManyChild, :before_validation],
-          [InterceptableSpec::CbEmbedsManyChild, :after_validation],
-          [InterceptableSpec::CbEmbedsManyChild, :before_validation],
-          [InterceptableSpec::CbEmbedsManyChild, :after_validation],
-          [InterceptableSpec::CbEmbedsManyParent, :before_validation],
-          [InterceptableSpec::CbEmbedsManyChild, :before_validation],
-          [InterceptableSpec::CbEmbedsManyChild, :after_validation],
-          [InterceptableSpec::CbEmbedsManyChild, :before_validation],
-          [InterceptableSpec::CbEmbedsManyChild, :after_validation],
-          [InterceptableSpec::CbEmbedsManyParent, :after_validation],
+      context "with around callbacks" do
+        config_override:around_callbacks_for_embeds, true
 
-          [InterceptableSpec::CbEmbedsManyParent, :before_save],
-          [InterceptableSpec::CbEmbedsManyParent, :around_save_open],
-          [InterceptableSpec::CbEmbedsManyParent, :before_create],
-          [InterceptableSpec::CbEmbedsManyParent, :around_create_open],
+        let(:expected) do
+          [
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyParent, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyParent, :after_validation],
 
-          [InterceptableSpec::CbEmbedsManyChild, :before_save],
-          [InterceptableSpec::CbEmbedsManyChild, :around_save_open],
-          [InterceptableSpec::CbEmbedsManyChild, :before_save],
+            [InterceptableSpec::CbEmbedsManyParent, :before_save],
+            [InterceptableSpec::CbEmbedsManyParent, :around_save_open],
+            [InterceptableSpec::CbEmbedsManyParent, :before_create],
+            [InterceptableSpec::CbEmbedsManyParent, :around_create_open],
 
-          [InterceptableSpec::CbEmbedsManyChild, :around_save_open],
-          [InterceptableSpec::CbEmbedsManyChild, :before_create],
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
+            [InterceptableSpec::CbEmbedsManyChild, :before_save],
+            [InterceptableSpec::CbEmbedsManyChild, :around_save_open],
+            [InterceptableSpec::CbEmbedsManyChild, :before_save],
 
-          [InterceptableSpec::CbEmbedsManyChild, :before_create],
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
+            [InterceptableSpec::CbEmbedsManyChild, :around_save_open],
+            [InterceptableSpec::CbEmbedsManyChild, :before_create],
+            [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
 
-          [InterceptableSpec::CbEmbedsManyParent, :insert_into_database],
+            [InterceptableSpec::CbEmbedsManyChild, :before_create],
+            [InterceptableSpec::CbEmbedsManyChild, :around_create_open],
 
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
-          [InterceptableSpec::CbEmbedsManyChild, :after_create],
+            [InterceptableSpec::CbEmbedsManyParent, :insert_into_database],
 
-          [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
-          [InterceptableSpec::CbEmbedsManyChild, :after_create],
+            [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
+            [InterceptableSpec::CbEmbedsManyChild, :after_create],
 
-          [InterceptableSpec::CbEmbedsManyChild, :around_save_close],
-          [InterceptableSpec::CbEmbedsManyChild, :after_save],
+            [InterceptableSpec::CbEmbedsManyChild, :around_create_close],
+            [InterceptableSpec::CbEmbedsManyChild, :after_create],
 
-          [InterceptableSpec::CbEmbedsManyChild, :around_save_close],
-          [InterceptableSpec::CbEmbedsManyChild, :after_save],
+            [InterceptableSpec::CbEmbedsManyChild, :around_save_close],
+            [InterceptableSpec::CbEmbedsManyChild, :after_save],
 
-          [InterceptableSpec::CbEmbedsManyParent, :around_create_close],
-          [InterceptableSpec::CbEmbedsManyParent, :after_create],
-          [InterceptableSpec::CbEmbedsManyParent, :around_save_close],
-          [InterceptableSpec::CbEmbedsManyParent, :after_save]
-        ]
+            [InterceptableSpec::CbEmbedsManyChild, :around_save_close],
+            [InterceptableSpec::CbEmbedsManyChild, :after_save],
+
+            [InterceptableSpec::CbEmbedsManyParent, :around_create_close],
+            [InterceptableSpec::CbEmbedsManyParent, :after_create],
+            [InterceptableSpec::CbEmbedsManyParent, :around_save_close],
+            [InterceptableSpec::CbEmbedsManyParent, :after_save]
+          ]
+        end
+
+        it 'calls callbacks in the right order' do
+          parent.save!
+          expect(registry.calls).to eq expected
+        end
       end
 
-      it 'calls callbacks in the right order' do
-        parent.save!
-        expect(registry.calls).to eq expected
+      context "without around callbacks" do
+        config_override:around_callbacks_for_embeds, false
+
+        let(:expected) do
+          [
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyParent, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :before_validation],
+            [InterceptableSpec::CbEmbedsManyChild, :after_validation],
+            [InterceptableSpec::CbEmbedsManyParent, :after_validation],
+
+            [InterceptableSpec::CbEmbedsManyParent, :before_save],
+            [InterceptableSpec::CbEmbedsManyParent, :around_save_open],
+            [InterceptableSpec::CbEmbedsManyParent, :before_create],
+            [InterceptableSpec::CbEmbedsManyParent, :around_create_open],
+
+            [InterceptableSpec::CbEmbedsManyChild, :before_save],
+            [InterceptableSpec::CbEmbedsManyChild, :before_save],
+
+            [InterceptableSpec::CbEmbedsManyChild, :before_create],
+
+            [InterceptableSpec::CbEmbedsManyChild, :before_create],
+
+            [InterceptableSpec::CbEmbedsManyParent, :insert_into_database],
+
+            [InterceptableSpec::CbEmbedsManyChild, :after_create],
+
+            [InterceptableSpec::CbEmbedsManyChild, :after_create],
+
+            [InterceptableSpec::CbEmbedsManyChild, :after_save],
+
+            [InterceptableSpec::CbEmbedsManyChild, :after_save],
+
+            [InterceptableSpec::CbEmbedsManyParent, :around_create_close],
+            [InterceptableSpec::CbEmbedsManyParent, :after_create],
+            [InterceptableSpec::CbEmbedsManyParent, :around_save_close],
+            [InterceptableSpec::CbEmbedsManyParent, :after_save]
+          ]
+        end
+
+        it 'calls callbacks in the right order' do
+          parent.save!
+          expect(registry.calls).to eq expected
+        end
       end
     end
   end
