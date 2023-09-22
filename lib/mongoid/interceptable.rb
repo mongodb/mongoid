@@ -173,28 +173,31 @@ module Mongoid
     def _mondoid_run_child_before_callbacks(kind, children: [], callback_kinds: {})
       children.each do |child|
         callback_kinds[child] = child_callback_type(kind, child)
-        child.run_before_callbacks(callback_kinds[child])
+        return false if child.run_before_callbacks(callback_kinds[child]) == false
         if (grandchildren = child.send(:cascadable_children, kind))
-          _mondoid_run_child_before_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds)
+          return false if _mondoid_run_child_before_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds) == false
         end
       end
+      true
     end
 
     def _mondoid_run_child_after_callbacks(kind, children: [], callback_kinds: {})
       children.reverse_each do |child|
-        child.run_after_callbacks(callback_kinds[child])
+        return false if child.run_after_callbacks(callback_kinds[child]) == false
         if (grandchildren = child.send(:cascadable_children, kind))
-          _mondoid_run_child_after_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds)
+          return false if _mondoid_run_child_after_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds) == false
         end
       end
+      true
     end
 
     def _mongoid_run_child_callbacks_without_around(kind, children: nil, &block)
       children = (children || cascadable_children(kind))
       callback_kinds = {}
-      _mondoid_run_child_before_callbacks(kind, children: children, callback_kinds: callback_kinds)
-      block&.call
-      _mondoid_run_child_after_callbacks(kind, children: children, callback_kinds: callback_kinds)
+      return false if _mondoid_run_child_before_callbacks(kind, children: children, callback_kinds: callback_kinds) == false
+      value = block&.call
+      return false if _mondoid_run_child_after_callbacks(kind, children: children, callback_kinds: callback_kinds) == false
+      value
     end
 
     # Returns the stored callbacks to be executed later.
