@@ -170,33 +170,39 @@ module Mongoid
       end
     end
 
-    def _mondoid_run_child_before_callbacks(kind, children: [], callback_kinds: {})
+    def _mondoid_run_child_before_callbacks(kind, children: [], callback_list: [])
       children.each do |child|
-        callback_kinds[child] = child_callback_type(kind, child)
-        return false if child.run_before_callbacks(callback_kinds[child]) == false
+        callbacks = child.__callbacks[child_callback_type(kind, child)]
+        env = ActiveSupport::Callbacks::Filters::Environment.new(child, false, nil)
+        next_sequence = callbacks.compile
+        next_sequence.invoke_before(env)
+        return false if env.halted
+        env.value = !env.halted
+        callback_list << [next_sequence, env]
         if (grandchildren = child.send(:cascadable_children, kind))
-          return false if _mondoid_run_child_before_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds) == false
+          _mondoid_run_child_before_callbacks(kind, children: grandchildren, callback_list: callback_list)
         end
       end
-      true
+      callback_list
     end
 
-    def _mondoid_run_child_after_callbacks(kind, children: [], callback_kinds: {})
-      children.reverse_each do |child|
-        return false if child.run_after_callbacks(callback_kinds[child]) == false
-        if (grandchildren = child.send(:cascadable_children, kind))
-          return false if _mondoid_run_child_after_callbacks(kind, children: grandchildren, callback_kinds: callback_kinds) == false
-        end
+    def _mondoid_run_child_after_callbacks(callback_list: [])
+      callback_list.reverse_each do |next_sequence, env|
+        next_sequence.invoke_after(env)
+        return false if env.halted
       end
-      true
     end
 
     def _mongoid_run_child_callbacks_without_around(kind, children: nil, &block)
       children = (children || cascadable_children(kind))
-      callback_kinds = {}
-      return false if _mondoid_run_child_before_callbacks(kind, children: children, callback_kinds: callback_kinds) == false
+      callback_list = _mondoid_run_child_before_callbacks(kind, children: children)
+      return false if callback_list == false
       value = block&.call
-      return false if _mondoid_run_child_after_callbacks(kind, children: children, callback_kinds: callback_kinds) == false
+      callback_list.each do |_next_sequence, env|
+        env.value &&= value
+      end
+      return false if _mondoid_run_child_after_callbacks(callback_list: callback_list) == false
+
       value
     end
 
