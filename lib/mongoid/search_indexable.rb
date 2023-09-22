@@ -94,11 +94,8 @@ module Mongoid
       # @option options [ String ] :name The name of the specific index to query (optional)
       # @option options [ Hash ] :aggregate The options hash to pass to the
       #    aggregate command (optional)
-      #
-      # @return [ self ] the model class
       def search_indexes(options = {})
         collection.search_indexes(options)
-        self
       end
 
       # Removes the search index specified by the given name or id. Either
