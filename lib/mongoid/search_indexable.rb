@@ -6,6 +6,50 @@ module Mongoid
   module SearchIndexable
     extend ActiveSupport::Concern
 
+    # Represents the status of the indexes returned by a search_indexes
+    # call.
+    #
+    # @api private
+    class Status
+      # @return [ Array<Hash> ] the raw index documents
+      attr_reader :indexes
+
+      # Create a new Status object.
+      #
+      # @param [ Array<Hash> ] indexes the raw index documents
+      def initialize(indexes)
+        @indexes = indexes
+      end
+
+      # Returns the subset of indexes that have status == 'READY'
+      #
+      # @return [ Array<Hash> ] index documents for "ready" indices
+      def ready
+        indexes.select { |i| i['status'] == 'READY' }
+      end
+
+      # Returns the subset of indexes that have status == 'PENDING'
+      #
+      # @return [ Array<Hash> ] index documents for "pending" indices
+      def pending
+        indexes.select { |i| i['status'] == 'PENDING' }
+      end
+
+      # Returns the subset of indexes that are marked 'queryable'
+      #
+      # @return [ Array<Hash> ] index documents for 'queryable' indices
+      def queryable
+        indexes.select { |i| i['queryable'] }
+      end
+
+      # Returns true if all the given indexes are 'ready' and 'queryable'.
+      #
+      # @return [ true | false ] ready status of all indexes
+      def ready?
+        indexes.all? { |i| i['status'] == 'READY' && i['queryable'] }
+      end
+    end
+
     included do
       cattr_accessor :search_index_specs
       self.search_index_specs = []
@@ -24,10 +68,45 @@ module Mongoid
         collection.search_indexes.create_many(search_index_specs)
       end
 
-      def search_indexes(options = {})
-        collection.search_indexes(options)
+      # Waits for the named search indexes to be created.
+      #
+      # @param [ Integer ] interval the number of seconds to wait before
+      #   polling again (only used when a progress callback is given).
+      # @param [ Proc ] progress an optional callback for reporting the
+      #   status of the new indexes.
+      #
+      # @yield [ SearchIndexable::Status ] the status object
+      def wait_for_search_indexes(names, interval: 5, &progress)
+        loop do
+          status = Status.new(get_indexes(names))
+          progress.call(status)
+          break if status.ready?
+          sleep interval
+        end
       end
 
+      # A convenience method for querying the search indexes available on the
+      # current model's collection.
+      #
+      # @param [ Hash ] options the options to pass through to the search
+      #   index query.
+      #
+      # @option options [ String ] :id The id of the specific index to query (optional)
+      # @option options [ String ] :name The name of the specific index to query (optional)
+      # @option options [ Hash ] :aggregate The options hash to pass to the
+      #    aggregate command (optional)
+      #
+      # @return [ self ] the model class
+      def search_indexes(options = {})
+        collection.search_indexes(options)
+        self
+      end
+
+      # Removes the search index specified by the given name or id. Either
+      # name OR id must be given, but not both.
+      #
+      # @param [ String | nil ] name the name of the index to remove
+      # @param [ String | nil ] id the id of the index to remove
       def remove_search_index(name: nil, id: nil)
         logger.info(
           "MONGOID: Removing search index '#{name || id}' " \
@@ -37,17 +116,17 @@ module Mongoid
         collection.search_indexes.drop_one(name: name, id: id)
       end
 
-      # Request the removal of all registered search indices. Note
+      # Request the removal of all registered search indexes. Note
       # that the search indexes are removed asynchronously, and may take
       # several minutes to be fully deleted.
       #
-      # @note It would be nice if this could remove ONLY the search indices
+      # @note It would be nice if this could remove ONLY the search indexes
       # that have been declared on the model, but because the model may not
       # name the index, we can't guarantee that we'll know the name or id of
-      # the corresponding indices. It is not unreasonable to assume, though,
+      # the corresponding indexes. It is not unreasonable to assume, though,
       # that the intention is for the model to declare, one-to-one, all
-      # desired search indices, so removing all search indices ought to suffice.
-      # If a specific index or set of indices needs to be removed instead,
+      # desired search indexes, so removing all search indexes ought to suffice.
+      # If a specific index or set of indexes needs to be removed instead,
       # consider using search_indexes.each with remove_search_index.
       def remove_search_indexes
         search_indexes.each do |spec|
@@ -74,6 +153,17 @@ module Mongoid
 
         spec = { definition: defn }.tap { |s| s[:name] = name.to_s if name }
         search_index_specs.push(spec)
+      end
+
+      private
+
+      # Retrieves the index records for the indexes with the given names.
+      #
+      # @param [ Array<String> ] names the index names to query
+      #
+      # @return [ Array<Hash> ] the raw index documents
+      def get_indexes(names)
+        collection.search_indexes.select { |i| names.include?(i['name']) }
       end
     end
   end

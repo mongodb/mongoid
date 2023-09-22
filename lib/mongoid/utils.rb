@@ -37,5 +37,16 @@ module Mongoid
     def monotonic_time
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
+
+    # Returns true if the string is any of the following values: "1",
+    # "yes", "true", "on". Anything else is assumed to be false. Case is
+    # ignored, as are leading or trailing spaces.
+    #
+    # @param [ String ] string the string value to consider
+    #
+    # @return [ true | false ]
+    def truthy_string?(string)
+      %w( 1 yes true on ).include?(string.strip.downcase)
+    end
   end
 end

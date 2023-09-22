@@ -90,6 +90,18 @@ RSpec.configure do |config|
     end
   end
 
+  def local_env(env = nil, &block)
+    around do |example|
+      env ||= block.call
+      saved_env = ENV.to_h
+      ENV.update(env)
+
+      example.run
+    ensure
+      ENV.replace(saved_env) if saved_env
+    end
+  end
+
   config.extend(Mrss::LiteConstraints)
 end
 
