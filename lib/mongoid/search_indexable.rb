@@ -72,15 +72,14 @@ module Mongoid
       #
       # @param [ Integer ] interval the number of seconds to wait before
       #   polling again (only used when a progress callback is given).
-      # @param [ Proc ] progress an optional callback for reporting the
-      #   status of the new indexes.
       #
       # @yield [ SearchIndexable::Status ] the status object
-      def wait_for_search_indexes(names, interval: 5, &progress)
+      def wait_for_search_indexes(names, interval: 5)
         loop do
           status = Status.new(get_indexes(names))
-          progress.call(status)
+          yield status if block_given?
           break if status.ready?
+
           sleep interval
         end
       end
