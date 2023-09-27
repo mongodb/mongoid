@@ -70,6 +70,7 @@ module Mongoid
 
       # Waits for the named search indexes to be created.
       #
+      # @param [ Array<String> ] names the list of index names to wait for
       # @param [ Integer ] interval the number of seconds to wait before
       #   polling again (only used when a progress callback is given).
       #
