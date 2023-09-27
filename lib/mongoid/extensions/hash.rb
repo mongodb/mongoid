@@ -179,7 +179,7 @@ module Mongoid
       def value_for(operator, klass, key, value)
         case operator
         when "$rename" then value.to_s
-        when "$addToSet", "$push" then value
+        when "$addToSet", "$push" then value.mongoize
         else mongoize_for(operator, klass, operator, value)
         end
       end
