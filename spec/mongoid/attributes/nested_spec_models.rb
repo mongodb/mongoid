@@ -16,6 +16,12 @@ class NestedComment
   belongs_to :post, class_name: "NestedPost"
 end
 
+class NestedLike
+  include Mongoid::Document
+
+  belongs_to :post, class_name: "NestedPost"
+end
+
 class NestedPost
   include Mongoid::Document
 
@@ -23,6 +29,8 @@ class NestedPost
   belongs_to :author, class_name: "NestedAuthor"
   has_many :comments, class_name: "NestedComment"
   accepts_nested_attributes_for :comments
+  has_many :likes, class_name: "NestedLike", autosave: false
+  accepts_nested_attributes_for :likes, autosave: true
 end
 
 class NestedBook

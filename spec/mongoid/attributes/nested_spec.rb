@@ -66,6 +66,36 @@ describe Mongoid::Attributes::Nested do
         expect(association).to_not be_autosave
       end
     end
+
+    context "when autosave is explicitly false in association" do
+      context "when autosave is true as nested attributes" do
+
+        let(:post) do
+          NestedPost.new
+        end
+
+        before do
+          NestedPost.accepts_nested_attributes_for :likes, autosave: true
+        end
+
+        after do
+          NestedPost.send(:undef_method, :likes_attributes=)
+          NestedPost.nested_attributes.clear
+        end
+
+        let(:association) do
+          NestedPost.reflect_on_association(:likes)
+        end
+
+        it "sets autosave to true" do
+          expect(association).to be_autosave
+        end
+
+        it "autosaves if the association is not embedded" do
+          expect(post).to respond_to(:autosave_documents_for_likes)
+        end
+      end
+    end
   end
 
   describe "#initialize" do
