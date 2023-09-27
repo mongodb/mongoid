@@ -44,50 +44,56 @@ functions:
       params:
         working_dir: "src"
         script: |
-           # Get the current unique version of this checkout
-           if [ "${is_patch}" = "true" ]; then
-              CURRENT_VERSION=$(git describe)-patch-${version_id}
-           else
-              CURRENT_VERSION=latest
-           fi
+          # Get the current unique version of this checkout
+          if [ "${is_patch}" = "true" ]; then
+            CURRENT_VERSION=$(git describe)-patch-${version_id}
+          else
+            CURRENT_VERSION=latest
+          fi
 
-           export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
+          export DRIVERS_TOOLS="$(pwd)/.mod/drivers-evergreen-tools"
 
-           export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
-           export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
-           export UPLOAD_BUCKET="${project}"
-           export PROJECT_DIRECTORY="$(pwd)"
+          export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
+          export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
+          export UPLOAD_BUCKET="${project}"
+          export PROJECT_DIRECTORY="$(pwd)"
 
-           cat <<EOT > expansion.yml
-           CURRENT_VERSION: "$CURRENT_VERSION"
-           DRIVERS_TOOLS: "$DRIVERS_TOOLS"
-           MONGO_ORCHESTRATION_HOME: "$MONGO_ORCHESTRATION_HOME"
-           MONGODB_BINARIES: "$MONGODB_BINARIES"
-           UPLOAD_BUCKET: "$UPLOAD_BUCKET"
-           PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
-           PREPARE_SHELL: |
-              set -o errexit
-              set -o xtrace
-              export DRIVERS_TOOLS="$DRIVERS_TOOLS"
-              export MONGO_ORCHESTRATION_HOME="$MONGO_ORCHESTRATION_HOME"
-              export MONGODB_BINARIES="$MONGODB_BINARIES"
-              export UPLOAD_BUCKET="$UPLOAD_BUCKET"
-              export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
+          cat <<EOT > expansion.yml
+          CURRENT_VERSION: "$CURRENT_VERSION"
+          DRIVERS_TOOLS: "$DRIVERS_TOOLS"
+          MONGO_ORCHESTRATION_HOME: "$MONGO_ORCHESTRATION_HOME"
+          MONGODB_BINARIES: "$MONGODB_BINARIES"
+          UPLOAD_BUCKET: "$UPLOAD_BUCKET"
+          PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
+          PREPARE_SHELL: |
+            set -o errexit
+            set -o xtrace
+            export DRIVERS_TOOLS="$DRIVERS_TOOLS"
+            export MONGO_ORCHESTRATION_HOME="$MONGO_ORCHESTRATION_HOME"
+            export MONGODB_BINARIES="$MONGODB_BINARIES"
+            export UPLOAD_BUCKET="$UPLOAD_BUCKET"
+            export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
 
-              export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
-              export PATH="$MONGODB_BINARIES:$PATH"
-              export PROJECT="${project}"
+            export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
+            export PATH="$MONGODB_BINARIES:$PATH"
+            export PROJECT="${project}"
 
-              export MONGODB_VERSION=${VERSION}
-              export TOPOLOGY=${TOPOLOGY}
-              export SINGLE_MONGOS=${SINGLE_MONGOS}
-              export AUTH=${AUTH}
-              export SSL=${SSL}
-              export APP_TESTS=${APP_TESTS}
-              export DOCKER_DISTRO=${DOCKER_DISTRO}
-           EOT
-           # See what we've done
-           cat expansion.yml
+            export MONGODB_VERSION="${VERSION}"
+            export TOPOLOGY="${TOPOLOGY}"
+            export SINGLE_MONGOS="${SINGLE_MONGOS}"
+            export AUTH="${AUTH}"
+            export SSL="${SSL}"
+            export APP_TESTS="${APP_TESTS}"
+            export DOCKER_DISTRO="${DOCKER_DISTRO}"
+            export RVM_RUBY="${RVM_RUBY}"
+            export RAILS="${RAILS}"
+            export DRIVER="${DRIVER}"
+            export I18N="${I18N}"
+            export TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}"
+            export FLE="${FLE}"
+          EOT
+          # See what we've done
+          cat expansion.yml
 
     # Load the expansion file to make an evergreen variable with the current unique version
     - command: expansions.update
@@ -266,7 +272,7 @@ functions:
           ${PREPARE_SHELL}
           env \
             MONGODB_URI="${MONGODB_URI}" \
-            TOPOLOGY=${TOPOLOGY} \
+            TOPOLOGY="${TOPOLOGY}" \
             RVM_RUBY="${RVM_RUBY}" \
             RAILS="${RAILS}" \
             DRIVER="${DRIVER}" \
@@ -307,10 +313,66 @@ post:
   #- func: "upload test results"
   - func: "upload test results to s3"
 
+task_groups:
+  - name: testatlas_task_group
+    setup_group_can_fail_task: true
+    setup_group_timeout_secs: 1800 # 30 minutes
+    setup_group:
+      - func: fetch source
+      - func: create expansions
+      - command: shell.exec
+        params:
+          shell: "bash"
+          working_dir: "src"
+          script: |
+            ${PREPARE_SHELL}
+
+            DRIVERS_ATLAS_PUBLIC_API_KEY="${DRIVERS_ATLAS_PUBLIC_API_KEY}" \
+              DRIVERS_ATLAS_PRIVATE_API_KEY="${DRIVERS_ATLAS_PRIVATE_API_KEY}" \
+              DRIVERS_ATLAS_GROUP_ID="${DRIVERS_ATLAS_GROUP_ID}" \
+              DRIVERS_ATLAS_LAMBDA_USER="${DRIVERS_ATLAS_LAMBDA_USER}" \
+              DRIVERS_ATLAS_LAMBDA_PASSWORD="${DRIVERS_ATLAS_LAMBDA_PASSWORD}" \
+              LAMBDA_STACK_NAME="dbx-ruby-lambda" \
+              MONGODB_VERSION="7.0" \
+              task_id="${task_id}" \
+              execution="${execution}" \
+              $DRIVERS_TOOLS/.evergreen/atlas/setup-atlas-cluster.sh
+      - command: expansions.update
+        params:
+          file: src/atlas-expansion.yml
+    teardown_group:
+      - command: shell.exec
+        params:
+          shell: "bash"
+          working_dir: "src"
+          script: |
+            ${PREPARE_SHELL}
+
+            DRIVERS_ATLAS_PUBLIC_API_KEY="${DRIVERS_ATLAS_PUBLIC_API_KEY}" \
+              DRIVERS_ATLAS_PRIVATE_API_KEY="${DRIVERS_ATLAS_PRIVATE_API_KEY}" \
+              DRIVERS_ATLAS_GROUP_ID="${DRIVERS_ATLAS_GROUP_ID}" \
+              LAMBDA_STACK_NAME="dbx-ruby-lambda" \
+              task_id="${task_id}" \
+              execution="${execution}" \
+              $DRIVERS_TOOLS/.evergreen/atlas/teardown-atlas-cluster.sh
+    tasks:
+      - test-full-atlas-task
+
 tasks:
     - name: "test"
       commands:
         - func: "run tests"
+    - name: "test-full-atlas-task"
+      commands:
+        - command: shell.exec
+          type: test
+          params:
+            working_dir: "src"
+            shell: "bash"
+            script: |
+              ${PREPARE_SHELL}
+              MONGODB_URI="${MONGODB_URI}" \
+                .evergreen/run-tests-atlas-full.sh
 axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
@@ -432,13 +494,16 @@ axes:
   - id: "os"
     display_name: OS
     values:
+      - id: actual-ubuntu-22.04
+        display_name: "Ubuntu 22.04"
+        run_on: ubuntu2204-small
       - id: ubuntu-18.04
         display_name: "Ubuntu 18.04"
         run_on: ubuntu2004-small
         variables:
           DOCKER_DISTRO: ubuntu1804
       - id: ubuntu-22.04
-        display_name: "Ubuntu 20.04"
+        display_name: "Ubuntu 22.04"
         run_on: ubuntu2004-small
         variables:
           DOCKER_DISTRO: ubuntu2204
@@ -682,7 +747,7 @@ buildvariants:
     rails: ['7.0']
     os: ubuntu-22.04
     fle: helper
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
   tasks:
     - name: "test"
 
@@ -809,3 +874,13 @@ buildvariants:
   display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
   tasks:
     - name: "test"
+
+- matrix_name: atlas-full
+  matrix_spec:
+    ruby: ruby-3.2
+    os: actual-ubuntu-22.04
+    auth: auth
+    ssl: ssl
+  display_name: "Atlas (Full)"
+  tasks:
+    - name: testatlas_task_group
