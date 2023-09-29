@@ -46,7 +46,7 @@ module Mongoid
               real_key = klass.database_field_name(key2)
 
               value.delete(key2) if real_key != key2
-              value[real_key] = (key == "$rename") ? value2.to_s : mongoize_for(key, klass, real_key, value2)
+              value[real_key] = value_for(key, klass, real_key, value2)
             end
             consolidated[key] ||= {}
             consolidated[key].update(value)
@@ -165,6 +165,24 @@ module Mongoid
       end
 
       private
+
+      # Get the value for the provided operator, klass, key and value.
+      #
+      # This is necessary for special cases like $rename, $addToSet and $push.
+      #
+      # @param [ String ] operator The operator.
+      # @param [ Class ] klass The model class.
+      # @param [ String | Symbol ] key The field key.
+      # @param [ Object ] value The original value.
+      #
+      # @return [ Object ] Value prepared for the provided operator.
+      def value_for(operator, klass, key, value)
+        case operator
+        when "$rename" then value.to_s
+        when "$addToSet", "$push" then value.mongoize
+        else mongoize_for(operator, klass, operator, value)
+        end
+      end
 
       # Mongoize for the klass, key and value.
       #
