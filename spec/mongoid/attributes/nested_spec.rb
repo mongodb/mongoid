@@ -91,8 +91,14 @@ describe Mongoid::Attributes::Nested do
           expect(association).to be_autosave
         end
 
-        it "autosaves if the association is not embedded" do
+        it "defines autosave_documents_for_likes" do
           expect(post).to respond_to(:autosave_documents_for_likes)
+        end
+
+        it "saves associated NestedLike documents" do
+          like = NestedLike.new
+          post = NestedPost.new(likes: [like])
+          expect { post.save }.to change(NestedLike, :count).by(1)
         end
       end
     end
