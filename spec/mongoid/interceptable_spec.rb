@@ -583,6 +583,7 @@ describe Mongoid::Interceptable do
         context "when saving the root" do
           context 'with prevent_multiple_calls_of_embedded_callbacks enabled' do
             config_override :prevent_multiple_calls_of_embedded_callbacks, true
+            config_override :around_callbacks_for_embeds, true
 
             it "executes the callbacks only once for each document" do
               expect(note).to receive(:update_saved).once

@@ -558,6 +558,7 @@ describe 'callbacks integration tests' do
 
   context 'nested embedded documents' do
     config_override :prevent_multiple_calls_of_embedded_callbacks, true
+    config_override :around_callbacks_for_embeds, true
 
     let(:logger) { Array.new }
 
