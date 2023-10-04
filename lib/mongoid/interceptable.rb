@@ -175,6 +175,10 @@ module Mongoid
         callbacks = child.__callbacks[child_callback_type(kind, child)]
         env = ActiveSupport::Callbacks::Filters::Environment.new(child, false, nil)
         next_sequence = callbacks.compile
+        unless next_sequence.final?
+          Mongoid.logger.warn("Around callbacks are disabled for embedded documents. Skipping around callbacks for #{child.class.name}.")
+          Mongoid.logger.warn("To enable around callbacks for embedded documents, set Mongoid::Config.around_callbacks_for_embeds to true.")
+        end
         next_sequence.invoke_before(env)
         return false if env.halted
         env.value = !env.halted

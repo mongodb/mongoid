@@ -2176,7 +2176,7 @@ describe Mongoid::Interceptable do
       end
 
       context "with around callbacks" do
-        config_override:around_callbacks_for_embeds, true
+        config_override :around_callbacks_for_embeds, true
 
         let(:expected) do
           [
@@ -2235,7 +2235,7 @@ describe Mongoid::Interceptable do
       end
 
       context "without around callbacks" do
-        config_override:around_callbacks_for_embeds, false
+        config_override :around_callbacks_for_embeds, false
 
         let(:expected) do
           [
@@ -2569,6 +2569,29 @@ describe Mongoid::Interceptable do
       expect do
         user.save!
       end.to_not raise_error(Mongoid::Errors::AttributeNotLoaded)
+    end
+  end
+
+  context "when around callbacks for embedded are disabled" do
+    config_override :around_callbacks_for_embeds, false
+
+    context "when around callback is defined" do
+      let(:registry) { InterceptableSpec::CallbackRegistry.new }
+
+      let(:parent) do
+        InterceptableSpec::CbEmbedsOneParent.new(registry).tap do |parent|
+          parent.child = InterceptableSpec::CbEmbedsOneChild.new(registry)
+        end
+      end
+
+      before do
+        expect(Mongoid.logger).to receive(:warn).with(/Around callbacks are disabled for embedded documents/).twice.and_call_original
+        expect(Mongoid.logger).to receive(:warn).with(/To enable around callbacks for embedded documents/).twice.and_call_original
+      end
+
+      it "logs a warning" do
+        parent.save!
+      end
     end
   end
 end
