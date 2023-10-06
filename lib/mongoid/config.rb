@@ -137,10 +137,10 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5542
     option :prevent_multiple_calls_of_embedded_callbacks, default: true
 
-    # When this flag is true, callbacks for embedded documents will not be
+    # When this flag is false, callbacks for embedded documents will not be
     # called. This is the default in 9.0.
     #
-    # Setting this flag to false restores the pre-9.0 behavior, where callbacks
+    # Setting this flag to true restores the pre-9.0 behavior, where callbacks
     # for embedded documents are called. This may lead to stack overflow errors
     # if there are more than cicrca 1000 embedded documents in the root
     # document's dependencies graph.

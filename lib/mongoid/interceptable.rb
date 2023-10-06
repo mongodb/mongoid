@@ -156,6 +156,20 @@ module Mongoid
       end
     end
 
+    # Execute the callbacks of given kind for embedded documents including
+    # around callbacks.
+    #
+    # @note This method is prone to stack overflow errors if the document
+    #   has a large number of embedded documents. It is recommended to avoid
+    #   using around callbacks for embedded documents until a proper solution
+    #   is implemented.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    #  nil, callbacks will be executed on all cascadable children of
+    #  the document.
+    #
+    #  @api private
     def _mongoid_run_child_callbacks_with_around(kind, children: nil, &block)
       child, *tail = (children || cascadable_children(kind))
       with_children = !Mongoid::Config.prevent_multiple_calls_of_embedded_callbacks
@@ -165,12 +179,43 @@ module Mongoid
         child.run_callbacks(child_callback_type(kind, child), with_children: with_children, &block)
       else
         child.run_callbacks(child_callback_type(kind, child), with_children: with_children) do
-          _mongoid_run_child_callbacks(kind, children: tail, &block)
+          _mongoid_run_child_callbacks_with_around(kind, children: tail, &block)
         end
       end
     end
 
-    def _mondoid_run_child_before_callbacks(kind, children: [], callback_list: [])
+    # Execute the callbacks of given kind for embedded documents without
+    # around callbacks.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    #   nil, callbacks will be executed on all cascadable children of
+    #   the document.
+    #
+    # @api private
+    def _mongoid_run_child_callbacks_without_around(kind, children: nil, &block)
+      children = (children || cascadable_children(kind))
+      callback_list = _mongoid_run_child_before_callbacks(kind, children: children)
+      return false if callback_list == false
+      value = block&.call
+      callback_list.each do |_next_sequence, env|
+        env.value &&= value
+      end
+      return false if _mongoid_run_child_after_callbacks(callback_list: callback_list) == false
+
+      value
+    end
+
+    # Execute the before callbacks of given kind for embedded documents.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to execute callbacks on.
+    # @param [ Array<ActiveSupport::Callbacks::CallbackSequence, ActiveSupport::Callbacks::Filters::Environment> ] callback_list List of
+    #   pairs of callback sequence and environment. This list will be later used
+    #   to execute after callbacks in reverse order.
+    #
+    # @api private
+    def _mongoid_run_child_before_callbacks(kind, children: [], callback_list: [])
       children.each do |child|
         callbacks = child.__callbacks[child_callback_type(kind, child)]
         env = ActiveSupport::Callbacks::Filters::Environment.new(child, false, nil)
@@ -184,30 +229,21 @@ module Mongoid
         env.value = !env.halted
         callback_list << [next_sequence, env]
         if (grandchildren = child.send(:cascadable_children, kind))
-          _mondoid_run_child_before_callbacks(kind, children: grandchildren, callback_list: callback_list)
+          _mongoid_run_child_before_callbacks(kind, children: grandchildren, callback_list: callback_list)
         end
       end
       callback_list
     end
 
-    def _mondoid_run_child_after_callbacks(callback_list: [])
+    # Execute the after callbacks.
+    #
+    # @param [ Array<ActiveSupport::Callbacks::CallbackSequence, ActiveSupport::Callbacks::Filters::Environment> ] callback_list List of
+    #   pairs of callback sequence and environment.
+    def _mongoid_run_child_after_callbacks(callback_list: [])
       callback_list.reverse_each do |next_sequence, env|
         next_sequence.invoke_after(env)
         return false if env.halted
       end
-    end
-
-    def _mongoid_run_child_callbacks_without_around(kind, children: nil, &block)
-      children = (children || cascadable_children(kind))
-      callback_list = _mondoid_run_child_before_callbacks(kind, children: children)
-      return false if callback_list == false
-      value = block&.call
-      callback_list.each do |_next_sequence, env|
-        env.value &&= value
-      end
-      return false if _mondoid_run_child_after_callbacks(callback_list: callback_list) == false
-
-      value
     end
 
     # Returns the stored callbacks to be executed later.
