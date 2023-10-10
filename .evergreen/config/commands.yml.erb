@@ -256,7 +256,9 @@ functions:
             DRIVER="${DRIVER}" \
             I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
-            ./egos .evergreen/run-tests.sh
+            FLE="${FLE}" \
+            APP_TESTS="${APP_TESTS}" \
+            .evergreen/run-tests-docker.sh
 
   "fix absolute paths":
     - command: shell.exec

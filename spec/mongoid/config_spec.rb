@@ -608,7 +608,7 @@ describe Mongoid::Config do
 
       it 'passes uuid to driver' do
         Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
-          auto_encryption_options: {
+          { auto_encryption_options: {
             'key_vault_namespace' => 'admin.datakeys',
             'kms_providers' => {'local' => {'key' => 'z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U'}},
             'schema_map' => {'blog_development.comments' => {
@@ -625,7 +625,7 @@ describe Mongoid::Config do
           platform: "mongoid-#{Mongoid::VERSION}",
           wrapping_libraries: [
             {'name' => 'Mongoid', 'version' => Mongoid::VERSION},
-          ],
+          ]},
         )
 
         client

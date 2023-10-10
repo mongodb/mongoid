@@ -298,7 +298,13 @@ module Mongoid
         end
         self.class.send :define_method, name do
           env = ActiveSupport::Callbacks::Filters::Environment.new(self, false, nil)
-          sequence = chain.compile
+          sequence = if chain.method(:compile).arity == 0
+                       # ActiveSupport < 7.1
+                       chain.compile
+                     else
+                       # ActiveSupport >= 7.1
+                       chain.compile(nil)
+                     end
           sequence.invoke_before(env)
           env.value = !env.halted
           sequence.invoke_after(env)
