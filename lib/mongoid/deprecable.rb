@@ -27,7 +27,8 @@ module Mongoid
     # @param [ [ Symbol | Hash<Symbol, [ Symbol | String ]> ]... ] *method_descriptors
     #   The methods to deprecate, with optional replacement instructions.
     def deprecate(target_module, *method_descriptors)
-      Mongoid::Deprecation.deprecate_methods(target_module, *method_descriptors)
+      @_deprecator ||= Mongoid::Deprecation.new
+      @_deprecator.deprecate_methods(target_module, *method_descriptors)
     end
   end
 end
