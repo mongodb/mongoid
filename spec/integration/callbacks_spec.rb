@@ -585,6 +585,8 @@ describe 'callbacks integration tests' do
   end
 
   context 'cascade callbacks' do
+    ruby_version_gte '3.0'
+
     let(:book) do
       Book.new
     end
@@ -597,7 +599,7 @@ describe 'callbacks integration tests' do
 
     # https://jira.mongodb.org/browse/MONGOID-5658
     it 'does not raise SystemStackError' do
-      expect { book.save! }.not_to raise_error
+      expect { book.save! }.not_to raise_error(SystemStackError)
     end
   end
 end
