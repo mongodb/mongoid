@@ -217,9 +217,9 @@ module Mongoid
     # @api private
     def _mongoid_run_child_before_callbacks(kind, children: [], callback_list: [])
       children.each do |child|
-        callbacks = child.__callbacks[child_callback_type(kind, child)]
+        chain = child.__callbacks[child_callback_type(kind, child)]
         env = ActiveSupport::Callbacks::Filters::Environment.new(child, false, nil)
-        next_sequence = callbacks.compile
+        next_sequence = compile_callbacks(chain)
         unless next_sequence.final?
           Mongoid.logger.warn("Around callbacks are disabled for embedded documents. Skipping around callbacks for #{child.class.name}.")
           Mongoid.logger.warn("To enable around callbacks for embedded documents, set Mongoid::Config.around_callbacks_for_embeds to true.")
@@ -398,13 +398,7 @@ module Mongoid
         end
         self.class.send :define_method, name do
           env = ActiveSupport::Callbacks::Filters::Environment.new(self, false, nil)
-          sequence = if chain.method(:compile).arity == 0
-                       # ActiveSupport < 7.1
-                       chain.compile
-                     else
-                       # ActiveSupport >= 7.1
-                       chain.compile(nil)
-                     end
+          sequence = compile_callbacks(chain)
           sequence.invoke_before(env)
           env.value = !env.halted
           sequence.invoke_after(env)
@@ -413,6 +407,25 @@ module Mongoid
         self.class.send :protected, name
       end
       send(name)
+    end
+
+    # Compile the callback chain.
+    #
+    # This method hides the differences between ActiveSupport implementations
+    # before and after 7.1.
+    #
+    # @param [ ActiveSupport::Callbacks::CallbackChain ] chain The callback chain.
+    # @param [ Symbol | nil ] type The type of callback chain to compile.
+    #
+    # @return [ ActiveSupport::Callbacks::CallbackSequence ] The compiled callback sequence.
+    def compile_callbacks(chain, type = nil)
+      if chain.method(:compile).arity == 0
+        # ActiveSupport < 7.1
+        chain.compile
+      else
+        # ActiveSupport >= 7.1
+        chain.compile(type)
+      end
     end
   end
 end
