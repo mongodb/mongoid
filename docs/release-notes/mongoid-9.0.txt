@@ -18,6 +18,23 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+``around_*`` callbacks for embedded documents are now ignored
+-------------------------------------------------------------
+
+Mongoid 8.x and older allows user to define ``around_*`` callbacks for embedded
+documents. Starting from 9.0 these callbacks are ignored and will not be executed.
+A warning will be printed to the console if such callbacks are defined.
+
+If you want to restore the old behavior, you can set
+``Mongoid.around_embedded_document_callbacks`` to true in your application.
+
+.. note::
+  Enabling ``around_*`` callbacks for embedded documents is not recommended
+  as it may cause ``SystemStackError`` exceptions when a document has many
+  embedded documents. See `MONGOID-5658 <https://jira.mongodb.org/browse/MONGOID-5658>`_
+  for more details.
+
+
 ``for_js`` method is deprecated
 -------------------------------
 
