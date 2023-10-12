@@ -583,4 +583,21 @@ describe 'callbacks integration tests' do
       expect(logger).to eq(%i[embedded_twice embedded_once root])
     end
   end
+
+  context 'cascade callbacks' do
+    let(:book) do
+      Book.new
+    end
+
+    before do
+      1500.times do
+        book.pages.build
+      end
+    end
+
+    # https://jira.mongodb.org/browse/MONGOID-5658
+    it 'does not raise SystemStackError' do
+      expect { book.save! }.not_to raise_error
+    end
+  end
 end
