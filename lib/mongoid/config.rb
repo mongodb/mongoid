@@ -185,6 +185,19 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5542
     option :prevent_multiple_calls_of_embedded_callbacks, default: false
 
+    # When this flag is true, callbacks for embedded documents will not be
+    # called. This is the default in 8.x, but will be changed to false in 9.0.
+    #
+    # Setting this flag to true (as it is in 8.x) may lead to stack
+    # overflow errors if there are more than cicrca 1000 embedded
+    # documents in the root document's dependencies graph.
+    #
+    # It is strongly recommended to set this flag to false in 8.x, if you
+    # are not using around callbacks for embedded documents.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
+    option :around_callbacks_for_embeds, default: true
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.

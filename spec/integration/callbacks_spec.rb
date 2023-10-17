@@ -557,6 +557,7 @@ describe 'callbacks integration tests' do
 
   context 'nested embedded documents' do
     config_override :prevent_multiple_calls_of_embedded_callbacks, true
+    config_override :around_callbacks_for_embeds, true
 
     let(:logger) { Array.new }
 
@@ -579,6 +580,26 @@ describe 'callbacks integration tests' do
     it 'runs callbacks in the correct order' do
       root.save!
       expect(logger).to eq(%i[embedded_twice embedded_once root])
+    end
+  end
+
+  context 'cascade callbacks' do
+    ruby_version_gte '3.0'
+    config_override :around_callbacks_for_embeds, false
+
+    let(:book) do
+      Book.new
+    end
+
+    before do
+      1500.times do
+        book.pages.build
+      end
+    end
+
+    # https://jira.mongodb.org/browse/MONGOID-5658
+    it 'does not raise SystemStackError' do
+      expect { book.save! }.not_to raise_error(SystemStackError)
     end
   end
 end
