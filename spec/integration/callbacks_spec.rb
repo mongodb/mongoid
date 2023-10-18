@@ -447,4 +447,24 @@ describe 'callbacks integration tests' do
       expect(saved_person.previously_persisted_value).to be_truthy
     end
   end
+
+  context 'cascade callbacks' do
+    ruby_version_gte '3.0'
+    config_override :around_callbacks_for_embeds, false
+
+    let(:book) do
+      Book.new
+    end
+
+    before do
+      1500.times do
+        book.pages.build
+      end
+    end
+
+    # https://jira.mongodb.org/browse/MONGOID-5658
+    it 'does not raise SystemStackError' do
+      expect { book.save! }.not_to raise_error(SystemStackError)
+    end
+  end
 end

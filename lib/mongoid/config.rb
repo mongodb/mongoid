@@ -142,6 +142,19 @@ module Mongoid
       end
     end
 
+    # When this flag is true, callbacks for embedded documents will not be
+    # called. This is the default in 8.x, but will be changed to false in 9.0.
+    #
+    # Setting this flag to true (as it is in 8.x) may lead to stack
+    # overflow errors if there are more than cicrca 1000 embedded
+    # documents in the root document's dependencies graph.
+    #
+    # It is strongly recommended to set this flag to false in 8.x, if you
+    # are not using around callbacks for embedded documents.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
+    option :around_callbacks_for_embeds, default: true
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #
