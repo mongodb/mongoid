@@ -2314,6 +2314,20 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       it "returns true" do
         expect(person.addresses.exists?).to be true
       end
+
+      context 'when given specifying conditions' do
+        context 'when the record exists in the association' do
+          it 'returns true' do
+            expect(person.addresses.exists?(street: 'Bond St')).to be true
+          end
+        end
+
+        context 'when the record does not exist in the association' do
+          it 'returns false' do
+            expect(person.addresses.exists?(street: 'Garfield Ave')).to be false
+          end
+        end
+      end
     end
 
     context "when no documents exist in the database" do
@@ -2324,6 +2338,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
       it "returns false" do
         expect(person.addresses.exists?).to be false
+      end
+
+      context 'when given specifying conditions' do
+        it 'returns false' do
+          expect(person.addresses.exists?(street: 'Hyde Park Dr')).to be false
+          expect(person.addresses.exists?(street: 'Garfield Ave')).to be false
+        end
       end
     end
   end
