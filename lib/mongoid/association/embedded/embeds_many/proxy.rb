@@ -308,7 +308,7 @@ module Mongoid
             when :none then _target.any?(&:persisted?)
             when nil, false then false
             when Hash then where(id_or_conditions).any?(&:persisted?)
-            else where(_id: id_or_conditions).any?(:persisted?)
+            else where(_id: id_or_conditions).any?(&:persisted?)
             end
           end
 
