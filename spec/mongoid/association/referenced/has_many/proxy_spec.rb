@@ -2395,6 +2395,42 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           end
         end
       end
+
+      context 'when invoked with specifying conditions' do
+        let(:other_person) { Person.create! }
+        let(:post) { person.posts.first }
+
+        before do
+          person.posts.create title: 'bumfuzzle'
+          other_person.posts.create title: 'bumbershoot'
+        end
+
+        context 'when the conditions match an associated record' do
+          it 'detects its existence by condition' do
+            expect(person.posts.exists?(title: 'bumfuzzle')).to be true
+            expect(other_person.posts.exists?(title: 'bumbershoot')).to be true
+          end
+
+          it 'detects its existence by id' do
+            expect(person.posts.exists?(post._id)).to be true
+          end
+
+          it 'returns false when given false' do
+            expect(person.posts.exists?(false)).to be false
+          end
+
+          it 'returns false when given nil' do
+            expect(person.posts.exists?(nil)).to be false
+          end
+        end
+
+        context 'when the conditions match an unassociated record' do
+          it 'does not detect its existence' do
+            expect(person.posts.exists?(title: 'bumbershoot')).to be false
+            expect(other_person.posts.exists?(title: 'bumfuzzle')).to be false
+          end
+        end
+      end
     end
 
     context "when documents exist in application but not in database" do
@@ -2463,6 +2499,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect_query(1) do
             person.posts.exists?.should be false
           end
+        end
+      end
+
+      context 'when invoked with specifying conditions' do
+        it 'returns false' do
+          expect(person.posts.exists?(title: 'hullaballoo')).to be false
         end
       end
     end
