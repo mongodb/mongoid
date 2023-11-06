@@ -52,9 +52,11 @@ module Mongoid
       #   object.__setter__
       #
       # @return [ String ] The object as a string plus =.
+      # @deprecated
       def __setter__
         "#{self}="
       end
+      Mongoid.deprecate(self, :__setter__)
 
       # Get the value of the object as a mongo friendly sort value.
       #
@@ -62,9 +64,11 @@ module Mongoid
       #   object.__sortable__
       #
       # @return [ Object ] self.
+      # @deprecated
       def __sortable__
         self
       end
+      Mongoid.deprecate(self, :__sortable__)
 
       # Conversion of an object to an $inc-able value.
       #
@@ -138,9 +142,11 @@ module Mongoid
       #   object.multi_arged?
       #
       # @return [ false ] false.
+      # @deprecated
       def multi_arged?
         false
       end
+      Mongoid.deprecate(self, :multi_arged?)
 
       # Is the object a number?
       #

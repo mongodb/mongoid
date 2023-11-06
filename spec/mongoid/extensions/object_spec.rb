@@ -121,13 +121,6 @@ describe Mongoid::Extensions::Object do
     end
   end
 
-  describe "#__sortable__" do
-
-    it "returns self" do
-      expect(object.__sortable__).to eq(object)
-    end
-  end
-
   describe ".demongoize" do
 
     let(:object) do
