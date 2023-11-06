@@ -24,9 +24,11 @@ module Mongoid
       #   object.__find_args__
       #
       # @return [ Object ] self.
+      # @deprecated
       def __find_args__
         self
       end
+      Mongoid.deprecate(self, :__find_args__)
 
       # Mongoize a plain object into a time.
       #

@@ -41,7 +41,7 @@ module Mongoid
       #
       # @return [ Document | Array<Document> ] The matching document(s).
       def find(*args)
-        ids = args.__find_args__
+        ids = prepare_ids_for_find(args)
         raise_invalid if ids.any?(&:nil?)
         for_ids(ids).execute_or_raise(ids, multi_args?(args))
       end
@@ -132,6 +132,27 @@ module Mongoid
           id = id[:_id] if id.respond_to?(:keys) && id[:_id]
           klass.fields["_id"].mongoize(id)
         end
+      end
+
+      # Convert args to the +#find+ method into a flat array of ids.
+      #
+      # @example Get the ids.
+      #   prepare_ids_for_find([ 1, [ 2, 3 ] ])
+      #
+      # @param [ Array<Object> ] args The arguments.
+      #
+      # @return [ Array ] The array of ids.
+      def prepare_ids_for_find(args)
+        args.flat_map do |arg|
+          case arg
+          when Array, Set
+            prepare_ids_for_find(arg)
+          when Range
+            arg.begin&.numeric? && arg.end&.numeric? ? arg.to_a : arg
+          else
+            arg
+          end
+        end.uniq(&:to_s)
       end
 
       # Indicates whether the given arguments array is a list of values.
