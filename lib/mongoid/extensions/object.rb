@@ -60,9 +60,11 @@ module Mongoid
       #   object.__sortable__
       #
       # @return [ Object ] self.
+      # @deprecated
       def __sortable__
         self
       end
+      Mongoid.deprecate(self, :__sortable__)
 
       # Conversion of an object to an $inc-able value.
       #
