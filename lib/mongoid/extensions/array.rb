@@ -18,6 +18,18 @@ module Mongoid
         self
       end
 
+      # Get the array of args as arguments for a find query.
+      #
+      # @example Get the array as find args.
+      #   [ 1, 2, 3 ].__find_args__
+      #
+      # @return [ Array ] The array of args.
+      # @deprecated
+      def __find_args__
+        flat_map{ |a| a.__find_args__ }.uniq{ |a| a.to_s }
+      end
+      Mongoid.deprecate(self, :__find_args__)
+
       # Mongoize the array into an array of object ids.
       #
       # @example Evolve the array to object ids.
