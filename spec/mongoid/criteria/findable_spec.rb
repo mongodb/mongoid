@@ -334,14 +334,10 @@ describe Mongoid::Criteria::Findable do
           end
 
           it "contains the first match" do
-            pending 'https://github.com/mongodb/mongoid/pull/5702 - removal of multi_arged? monkey patch'
-
             expect(found).to include(band)
           end
 
           it "contains the second match" do
-            pending 'https://github.com/mongodb/mongoid/pull/5702 - removal of multi_arged? monkey patch'
-
             expect(found).to include(band_two)
           end
         end
@@ -370,8 +366,6 @@ describe Mongoid::Criteria::Findable do
             end
 
             it "returns only the matching documents" do
-              pending 'https://github.com/mongodb/mongoid/pull/5702 - removal of multi_arged? monkey patch'
-
               expect(found).to eq([ band ])
             end
           end

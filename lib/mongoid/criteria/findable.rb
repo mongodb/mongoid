@@ -137,7 +137,7 @@ module Mongoid
       # Convert args to the +#find+ method into a flat array of ids.
       #
       # @example Get the ids.
-      #   find_args([ 1, [ 2, 3 ] ])
+      #   prepare_ids_for_find([ 1, [ 2, 3 ] ])
       #
       # @param [ Array<Object> ] args The arguments.
       #
