@@ -109,7 +109,7 @@ module Mongoid
         from_database_selector(ids).entries
       end
 
-      private def from_database_selector(ids)
+      def from_database_selector(ids)
         if ids.size > 1
           any_in(_id: ids)
         else

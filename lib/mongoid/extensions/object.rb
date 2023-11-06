@@ -130,6 +130,18 @@ module Mongoid
         self
       end
 
+      # Is the object multi args.
+      #
+      # @example Is the object multi args?
+      #   object.multi_arged?
+      #
+      # @return [ false ] false.
+      # @deprecated
+      def multi_arged?
+        false
+      end
+      Mongoid.deprecate(self, :multi_arged?)
+
       # Is the object a number?
       #
       # @example Is the object a number?.
