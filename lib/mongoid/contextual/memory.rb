@@ -647,25 +647,6 @@ module Mongoid
         compare_operand(a) <=> compare_operand(b)
       end
 
-      # Get the operand value to be used in comparison.
-      # Adds capability to sort boolean values.
-      #
-      # @api private
-      #
-      # @example Get the comparison operand.
-      #   compare_operand(true) #=> 1
-      #
-      # @param [ Object ] value The value to be used in comparison.
-      #
-      # @return [ Integer | Object ] The comparison operand.
-      def compare_operand(value)
-        case value
-        when TrueClass then 1
-        when FalseClass then 0
-        else value
-        end
-      end
-
       # Sort the documents in place.
       #
       # @example Sort the documents.
@@ -700,6 +681,23 @@ module Mongoid
 
       def _session
         @criteria.send(:_session)
+      end
+
+      # Get the operand value to be used in comparison.
+      # Adds capability to sort boolean values.
+      #
+      # @example Get the comparison operand.
+      #   compare_operand(true) #=> 1
+      #
+      # @param [ Object ] value The value to be used in comparison.
+      #
+      # @return [ Integer | Object ] The comparison operand.
+      def compare_operand(value)
+        case value
+        when TrueClass then 1
+        when FalseClass then 0
+        else value
+        end
       end
 
       # Retrieve the value for the current document at the given field path.

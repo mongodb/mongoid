@@ -54,6 +54,18 @@ module Mongoid
         "#{self}="
       end
 
+      # Get the value of the object as a mongo friendly sort value.
+      #
+      # @example Get the object as sort criteria.
+      #   object.__sortable__
+      #
+      # @return [ Object ] self.
+      # @deprecated
+      def __sortable__
+        self
+      end
+      Mongoid.deprecate(self, :__sortable__)
+
       # Conversion of an object to an $inc-able value.
       #
       # @example Convert the object.
