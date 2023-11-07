@@ -265,11 +265,4 @@ describe Mongoid::Extensions::Object do
       expect(object.numeric?).to eq(false)
     end
   end
-
-  describe "#blank_criteria?" do
-
-    it "is false" do
-      expect(object.blank_criteria?).to be false
-    end
-  end
 end

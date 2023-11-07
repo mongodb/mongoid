@@ -84,21 +84,6 @@ module Mongoid
       end
       Mongoid.deprecate(self, :__to_inc__)
 
-      # Checks whether conditions given in this object are known to be
-      # unsatisfiable, i.e., querying with this object will always return no
-      # documents.
-      #
-      # This method is deprecated. Mongoid now uses
-      # +_mongoid_unsatisfiable_criteria?+ internally; this method is retained
-      # for backwards compatibility only. It always returns false.
-      #
-      # @return [ false ] Always false.
-      # @deprecated
-      def blank_criteria?
-        false
-      end
-      Mongoid.deprecate(self, :blank_criteria?)
-
       # Do or do not, there is no try. -- Yoda.
       #
       # @example Do or do not.
