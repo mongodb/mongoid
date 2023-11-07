@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 # rubocop:todo all
 
+require 'mongoid/atomic_update_preparer'
 require "mongoid/contextual/mongo/documents_loader"
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
@@ -817,8 +818,8 @@ module Mongoid
       # @return [ true | false ] If the update succeeded.
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
-        attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        view.send(method, attributes.__consolidate__(klass), opts)
+
+        view.send(method, AtomicUpdatePreparer.prepare(attributes, klass), opts)
       end
 
       # Apply the field limitations.
