@@ -71,9 +71,11 @@ module Mongoid
       #   "_id".mongoid_id?
       #
       # @return [ true | false ] If the string is id or _id.
+      # @deprecated
       def mongoid_id?
         self =~ /\A(|_)id\z/
       end
+      Mongoid.deprecate(self, :mongoid_id?)
 
       # Is the string a number? The literals "NaN", "Infinity", and "-Infinity"
       # are counted as numbers.
