@@ -3,9 +3,11 @@
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Object class.
     module Object
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
 
       # Evolve a plain object into an object id.
       #
@@ -24,9 +26,11 @@ module Mongoid
       #   object.__find_args__
       #
       # @return [ Object ] self.
+      # @deprecated
       def __find_args__
         self
       end
+      Mongoid.deprecate(self, :__find_args__)
 
       # Mongoize a plain object into a time.
       #
@@ -50,9 +54,11 @@ module Mongoid
       #   object.__setter__
       #
       # @return [ String ] The object as a string plus =.
+      # @deprecated
       def __setter__
         "#{self}="
       end
+      Mongoid.deprecate(self, :__setter__)
 
       # Get the value of the object as a mongo friendly sort value.
       #
@@ -60,9 +66,11 @@ module Mongoid
       #   object.__sortable__
       #
       # @return [ Object ] self.
+      # @deprecated
       def __sortable__
         self
       end
+      Mongoid.deprecate(self, :__sortable__)
 
       # Conversion of an object to an $inc-able value.
       #
@@ -70,9 +78,11 @@ module Mongoid
       #   1.__to_inc__
       #
       # @return [ Object ] The object.
+      # @deprecated
       def __to_inc__
         self
       end
+      Mongoid.deprecate(self, :__to_inc__)
 
       # Checks whether conditions given in this object are known to be
       # unsatisfiable, i.e., querying with this object will always return no
@@ -87,6 +97,7 @@ module Mongoid
       def blank_criteria?
         false
       end
+      Mongoid.deprecate(self, :blank_criteria?)
 
       # Do or do not, there is no try. -- Yoda.
       #
@@ -136,9 +147,11 @@ module Mongoid
       #   object.multi_arged?
       #
       # @return [ false ] false.
+      # @deprecated
       def multi_arged?
         false
       end
+      Mongoid.deprecate(self, :multi_arged?)
 
       # Is the object a number?
       #
@@ -202,7 +215,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the provided object to a foreign key, given the metadata key
         # contstraint.
         #
@@ -247,7 +259,4 @@ module Mongoid
   end
 end
 
-::Object.__send__(:include, Mongoid::Extensions::Object)
-::Object.extend(Mongoid::Extensions::Object::ClassMethods)
-
-::Mongoid.deprecate(Object, :blank_criteria)
+Object.include Mongoid::Extensions::Object

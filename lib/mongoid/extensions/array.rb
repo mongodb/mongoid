@@ -3,7 +3,6 @@
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Array class.
     module Array
 
@@ -24,9 +23,11 @@ module Mongoid
       #   [ 1, 2, 3 ].__find_args__
       #
       # @return [ Array ] The array of args.
+      # @deprecated
       def __find_args__
         flat_map{ |a| a.__find_args__ }.uniq{ |a| a.to_s }
       end
+      Mongoid.deprecate(self, :__find_args__)
 
       # Mongoize the array into an array of object ids.
       #
@@ -80,9 +81,11 @@ module Mongoid
       #   [ 1, 2, 3 ].multi_arged?
       #
       # @return [ true | false ] If the array is multi args.
+      # @deprecated
       def multi_arged?
         !first.is_a?(Hash) && first.resizable? || size > 1
       end
+      Mongoid.deprecate(self, :multi_arged?)
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
