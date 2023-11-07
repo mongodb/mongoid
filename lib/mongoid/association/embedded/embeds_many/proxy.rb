@@ -311,7 +311,7 @@ module Mongoid
           #   queries for the existence of persisted documents in the
           #   association with a matching _id.
           #
-          # @return [ true | false ] True is persisted documents exist, false if not.
+          # @return [ true | false ] True if persisted documents exist, false if not.
           def exists?(id_or_conditions = :none)
             return _target.any?(&:persisted?) if id_or_conditions == :none
 
