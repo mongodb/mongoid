@@ -66,11 +66,6 @@ module Mongoid
 
       # Mongoize for the klass, key and value.
       #
-      # @api private
-      #
-      # @example Mongoize for the klass, field and value.
-      #   {}.mongoize_for("$push", Band, "name", "test")
-      #
       # @param [ String ] operator The operator.
       # @param [ Class ] klass The model class.
       # @param [ String | Symbol ] key The field key.
