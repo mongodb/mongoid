@@ -14,7 +14,7 @@ describe Mongoid::AtomicUpdatePreparer do
 
         it 'moves the non hash values under the provided key' do
           expect(prepared).to eq(
-            '$set' => { 'name' => 'Tool', likes: 10 },
+            '$set' => { 'name' => 'Tool', 'likes' => 10 },
             '$inc' => { 'plays' => 1 }
           )
         end
@@ -27,7 +27,7 @@ describe Mongoid::AtomicUpdatePreparer do
 
         it 'moves the non hash values under the provided key' do
           expect(prepared).to eq(
-            '$set' => { likes: 10, 'name' => 'Tool' },
+            '$set' => { 'likes' => 10, 'name' => 'Tool' },
             '$inc' => { 'plays' => 1 }
           )
         end
@@ -41,7 +41,7 @@ describe Mongoid::AtomicUpdatePreparer do
 
       it 'moves the non hash values under the provided key' do
         expect(prepared).to eq(
-          '$set' => { likes: 10, name: 'Tool' },
+          '$set' => { 'likes' => 10, 'name' => 'Tool' },
           '$inc' => { 'plays' => 1 }
         )
       end
@@ -52,7 +52,7 @@ describe Mongoid::AtomicUpdatePreparer do
 
       it 'preserves the $rename operator' do
         expect(prepared).to eq(
-          '$set' => { likes: 10 },
+          '$set' => { 'likes' => 10 },
           '$rename' => { 'old' => 'new' }
         )
       end
@@ -63,7 +63,7 @@ describe Mongoid::AtomicUpdatePreparer do
 
       it 'preserves the $addToSet operator' do
         expect(prepared).to eq(
-          '$set' => { likes: 10 },
+          '$set' => { 'likes' => 10 },
           '$addToSet' => { 'list' => 'new' }
         )
       end
@@ -74,7 +74,7 @@ describe Mongoid::AtomicUpdatePreparer do
 
       it 'preserves the $push operator' do
         expect(prepared).to eq(
-          '$set' => { likes: 10 },
+          '$set' => { 'likes' => 10 },
           '$push' => { 'list' => 14 }
         )
       end
