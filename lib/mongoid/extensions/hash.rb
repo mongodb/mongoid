@@ -106,6 +106,31 @@ module Mongoid
       # @deprecated
       alias :blank_criteria? :_mongoid_unsatisfiable_criteria?
 
+      # Deletes an id value from the hash.
+      #
+      # @example Delete an id value.
+      #   {}.delete_id
+      #
+      # @return [ Object ] The deleted value, or nil.
+      # @deprecated
+      def delete_id
+        delete("_id") || delete(:_id) || delete("id") || delete(:id)
+      end
+      Mongoid.deprecate(self, :delete_id)
+
+      # Get the id attribute from this hash, whether it's prefixed with an
+      # underscore or is a symbol.
+      #
+      # @example Extract the id.
+      #   { :_id => 1 }.extract_id
+      #
+      # @return [ Object ] The value of the id.
+      # @deprecated
+      def extract_id
+        self["_id"] || self[:_id] || self["id"] || self[:id]
+      end
+      Mongoid.deprecate(self, :extract_id)
+
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
