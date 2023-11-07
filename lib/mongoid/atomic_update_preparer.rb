@@ -20,6 +20,8 @@ module Mongoid
       # @return [ Hash ] The prepared atomic updates.
       def prepare(attributes, klass)
         attributes.each_pair.with_object({}) do |(key, value), atomic_updates|
+          key = klass.database_field_name(key.to_s)
+
           if key.to_s.start_with?('$')
             (atomic_updates[key] ||= {}).update(prepare_operation(klass, key, value))
           else
