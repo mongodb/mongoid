@@ -3,9 +3,11 @@
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Object class.
     module Object
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
 
       # Evolve a plain object into an object id.
       #
@@ -76,9 +78,11 @@ module Mongoid
       #   1.__to_inc__
       #
       # @return [ Object ] The object.
+      # @deprecated
       def __to_inc__
         self
       end
+      Mongoid.deprecate(self, :__to_inc__)
 
       # Checks whether conditions given in this object are known to be
       # unsatisfiable, i.e., querying with this object will always return no
@@ -93,6 +97,7 @@ module Mongoid
       def blank_criteria?
         false
       end
+      Mongoid.deprecate(self, :blank_criteria?)
 
       # Do or do not, there is no try. -- Yoda.
       #
@@ -210,7 +215,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the provided object to a foreign key, given the metadata key
         # contstraint.
         #
@@ -255,7 +259,4 @@ module Mongoid
   end
 end
 
-::Object.__send__(:include, Mongoid::Extensions::Object)
-::Object.extend(Mongoid::Extensions::Object::ClassMethods)
-
-::Mongoid.deprecate(Object, :blank_criteria)
+Object.include Mongoid::Extensions::Object
