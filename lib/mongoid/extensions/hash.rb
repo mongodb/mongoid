@@ -32,31 +32,20 @@ module Mongoid
       end
 
       # Consolidate the key/values in the hash under an atomic $set.
+      # DEPRECATED. This was never intended to be a public API and
+      # the functionality will no longer be exposed once this method
+      # is eventually removed.
       #
       # @example Consolidate the hash.
       #   { name: "Placebo" }.__consolidate__
       #
       # @return [ Hash ] A new consolidated hash.
+      #
+      # @deprecated
       def __consolidate__(klass)
-        consolidated = {}
-        each_pair do |key, value|
-          if key =~ /\$/
-            value.keys.each do |key2|
-              value2 = value[key2]
-              real_key = klass.database_field_name(key2)
-
-              value.delete(key2) if real_key != key2
-              value[real_key] = (key == "$rename") ? value2.to_s : mongoize_for(key, klass, real_key, value2)
-            end
-            consolidated[key] ||= {}
-            consolidated[key].update(value)
-          else
-            consolidated["$set"] ||= {}
-            consolidated["$set"].update(key => mongoize_for(key, klass, key, value))
-          end
-        end
-        consolidated
+        Mongoid::AtomicUpdatePreparer.prepare(self, klass)
       end
+      Mongoid.deprecate(self, :__consolidate__)
 
       # Deletes an id value from the hash.
       #
@@ -117,32 +106,6 @@ module Mongoid
       end
 
       private
-
-      # Mongoize for the klass, key and value.
-      #
-      # @api private
-      #
-      # @example Mongoize for the klass, field and value.
-      #   {}.mongoize_for("$push", Band, "name", "test")
-      #
-      # @param [ String ] operator The operator.
-      # @param [ Class ] klass The model class.
-      # @param [ String | Symbol ] key The field key.
-      # @param [ Object ] value The value to mongoize.
-      #
-      # @return [ Object ] The mongoized value.
-      def mongoize_for(operator, klass, key, value)
-        field = klass.fields[key.to_s]
-        if field
-          val = field.mongoize(value)
-          if Mongoid::Persistable::LIST_OPERATIONS.include?(operator) && field.resizable?
-            val = val.first if !value.is_a?(Array)
-          end
-          val
-        else
-          value
-        end
-      end
 
       module ClassMethods
 
