@@ -63,6 +63,18 @@ module Mongoid
         tableize.gsub("/", "_")
       end
 
+      # Is the string a valid value for a Mongoid id?
+      #
+      # @example Is the string an id value?
+      #   "_id".mongoid_id?
+      #
+      # @return [ true | false ] If the string is id or _id.
+      # @deprecated
+      def mongoid_id?
+        self =~ /\A(|_)id\z/
+      end
+      Mongoid.deprecate(self, :mongoid_id?)
+
       # Is the string a number? The literals "NaN", "Infinity", and "-Infinity"
       # are counted as numbers.
       #
