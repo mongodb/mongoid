@@ -75,7 +75,6 @@ Deprecated functionality removed
   All other methods and submodules are identically named. Refer to the `driver query cache documentation
   <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
 - ``Object#blank_criteria?`` method is removed (was previously deprecated.)
-- ``Hash#_mongoid_unsatisfiable_criteria?`` method is removed (was previously marked @api private.)
 
 
 ``touch`` method now clears changed state
