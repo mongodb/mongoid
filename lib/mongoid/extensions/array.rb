@@ -105,6 +105,25 @@ module Mongoid
 
       module ClassMethods
 
+        # Convert the provided object to a proper array of foreign keys.
+        #
+        # @example Mongoize the object.
+        #   Array.__mongoize_fk__(constraint, object)
+        #
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
+        # @param [ Object ] object The object to convert.
+        #
+        # @return [ Array ] The array of ids.
+        # @deprecated
+        def __mongoize_fk__(association, object)
+          if object.resizable?
+            object.blank? ? object : association.convert_to_foreign_key(object)
+          else
+            object.blank? ? [] : association.convert_to_foreign_key(Array(object))
+          end
+        end
+        Mongoid.deprecate(self, :__mongoize_fk__)
+
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
         #

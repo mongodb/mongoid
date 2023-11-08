@@ -215,10 +215,12 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ Object ] The converted object.
+        # @deprecated
         def __mongoize_fk__(association, object)
           return nil if !object || object == ""
           association.convert_to_foreign_key(object)
         end
+        Mongoid.deprecate(self, :__mongoize_fk__)
 
         # Convert the object from its mongo friendly ruby type to this type.
         #
