@@ -5,13 +5,6 @@ require "spec_helper"
 
 describe Mongoid::Extensions::FalseClass do
 
-  describe "#__sortable__" do
-
-    it "returns 0" do
-      expect(false.__sortable__).to eq(0)
-    end
-  end
-
   describe "#is_a?" do
 
     context "when provided a Boolean" do

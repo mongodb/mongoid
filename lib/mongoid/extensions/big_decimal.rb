@@ -3,9 +3,16 @@
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to BigDecimal class.
     module BigDecimal
+      # Behavior to be invoked when the module is included.
+      #
+      # @param [ Module ] base the class or module doing the including
+      #
+      # @api private
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
 
       # Convert the big decimal to an $inc-able value.
       #
@@ -13,9 +20,11 @@ module Mongoid
       #   bd.__to_inc__
       #
       # @return [ Float ] The big decimal as a float.
+      # @deprecated
       def __to_inc__
         to_f
       end
+      Mongoid.deprecate(self, :__to_inc__)
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
@@ -39,7 +48,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @param [ Object ] object The object to demongoize.
@@ -89,5 +97,4 @@ module Mongoid
   end
 end
 
-::BigDecimal.__send__(:include, Mongoid::Extensions::BigDecimal)
-::BigDecimal.extend(Mongoid::Extensions::BigDecimal::ClassMethods)
+BigDecimal.include Mongoid::Extensions::BigDecimal

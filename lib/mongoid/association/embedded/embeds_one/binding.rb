@@ -22,7 +22,7 @@ module Mongoid
           def bind_one
             _target.parentize(_base)
             binding do
-              _target.do_or_do_not(_association.inverse_setter(_target), _base)
+              try_method(_target, _association.inverse_setter(_target), _base)
             end
           end
 
@@ -34,7 +34,7 @@ module Mongoid
           #   person.name = nil
           def unbind_one
             binding do
-              _target.do_or_do_not(_association.inverse_setter(_target), nil)
+              try_method(_target, _association.inverse_setter(_target), nil)
             end
           end
         end

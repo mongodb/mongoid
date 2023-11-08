@@ -8,7 +8,9 @@ module Mongoid
     module String
 
       # @attribute [rw] unconvertable_to_bson If the document is unconvertable.
+      # @deprecated
       attr_accessor :unconvertable_to_bson
+      Mongoid.deprecate(self, :unconvertable_to_bson, :unconvertable_to_bson=)
 
       # Evolve the string into an object id if possible.
       #
@@ -67,9 +69,11 @@ module Mongoid
       #   "_id".mongoid_id?
       #
       # @return [ true | false ] If the string is id or _id.
+      # @deprecated
       def mongoid_id?
         self =~ /\A(|_)id\z/
       end
+      Mongoid.deprecate(self, :mongoid_id?)
 
       # Is the string a number? The literals "NaN", "Infinity", and "-Infinity"
       # are counted as numbers.
@@ -124,15 +128,18 @@ module Mongoid
         ends_with?("_before_type_cast")
       end
 
+
       # Is the object not to be converted to bson on criteria creation?
       #
       # @example Is the object unconvertable?
       #   object.unconvertable_to_bson?
       #
       # @return [ true | false ] If the object is unconvertable.
+      # @deprecated
       def unconvertable_to_bson?
         @unconvertable_to_bson ||= false
       end
+      Mongoid.deprecate(self, :unconvertable_to_bson?)
 
       private
 
