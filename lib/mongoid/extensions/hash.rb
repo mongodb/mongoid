@@ -93,6 +93,20 @@ module Mongoid
         true
       end
 
+      # Convert this hash to a criteria. Will iterate over each keys in the
+      # hash which must correspond to method on a criteria object. The hash
+      # must also include a "klass" key.
+      #
+      # @example Convert the hash to a criteria.
+      #   { klass: Band, where: { name: "Depeche Mode" }.to_criteria
+      #
+      # @return [ Criteria ] The criteria.
+      # @deprecated
+      def to_criteria
+        Criteria.from_hash(self)
+      end
+      Mongoid.deprecate(self, :to_criteria)
+
       private
 
       module ClassMethods
