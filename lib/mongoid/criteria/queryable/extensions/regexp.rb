@@ -9,6 +9,16 @@ module Mongoid
         # Adds query type-casting behavior to Regexp class.
         module Regexp
 
+          # Is the object a regexp?
+          #
+          # @example Is the object a regex?
+          #   /\A[123]/.regexp?
+          #
+          # @return [ true ] Always true.
+          # @deprecated
+          def regexp?; true; end
+          Mongoid.deprecate(self, :regexp?)
+
           module ClassMethods
 
             # Evolve the object into a regex.
@@ -28,6 +38,16 @@ module Mongoid
 
           # Adds query type-casting behavior to BSON::Regexp::Raw class.
           module Raw_
+
+            # Is the object a regexp?
+            #
+            # @example Is the object a regex?
+            #   bson_raw_regexp.regexp?
+            #
+            # @return [ true ] Always true.
+            # @deprecated
+            def regexp?; true; end
+            Mongoid.deprecate(self, :regexp?)
 
             module ClassMethods
 
