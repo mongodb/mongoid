@@ -228,34 +228,6 @@ describe Mongoid::Extensions::Array do
     end
   end
 
-  describe "#blank_criteria?" do
-
-    context "when the array has an empty _id criteria" do
-
-      context "when only the id criteria is in the array" do
-
-        let(:array) do
-          [{ "_id" => { "$in" => [] }}]
-        end
-
-        it "is false" do
-          expect(array.blank_criteria?).to be false
-        end
-      end
-
-      context "when the id criteria is in the array with others" do
-
-        let(:array) do
-          [{ "_id" => "test" }, { "_id" => { "$in" => [] }}]
-        end
-
-        it "is false" do
-          expect(array.blank_criteria?).to be false
-        end
-      end
-    end
-  end
-
   describe "#delete_one" do
 
     context "when the object doesn't exist" do
@@ -380,78 +352,6 @@ describe Mongoid::Extensions::Array do
 
     it "converts the elements properly" do
       expect(mongoized.first).to eq(Time.utc(2012, 1, 1, 0, 0, 0))
-    end
-  end
-
-  describe "#multi_arged?" do
-
-    context "when there are multiple elements" do
-
-      let(:array) do
-        [ 1, 2, 3 ]
-      end
-
-      it "returns true" do
-        expect(array).to be_multi_arged
-      end
-    end
-
-    context "when there is one element" do
-
-      context "when the element is a non enumerable" do
-
-        let(:array) do
-          [ 1 ]
-        end
-
-        it "returns false" do
-          expect(array).to_not be_multi_arged
-        end
-      end
-
-      context "when the element is resizable Hash instance" do
-
-        let(:array) do
-          [{'key' => 'value'}]
-        end
-
-        it "returns false" do
-          expect(array).to_not be_multi_arged
-        end
-      end
-
-      context "when the element is array of resizable Hash instances" do
-
-        let(:array) do
-          [[{'key1' => 'value2'},{'key1' => 'value2'}]]
-        end
-
-        it "returns true" do
-          expect(array).to be_multi_arged
-        end
-      end
-
-      context "when the element is an array" do
-
-        let(:array) do
-          [[ 1 ]]
-        end
-
-        it "returns true" do
-          expect(array).to be_multi_arged
-        end
-      end
-
-      context "when the element is a range" do
-
-        let(:array) do
-          [ 1..2 ]
-        end
-
-        it "returns true" do
-          expect(array).to be_multi_arged
-        end
-      end
     end
   end
 
