@@ -19,11 +19,11 @@ module Mongoid
           # @param [ Document ] doc The single document to bind.
           def bind_one(doc)
             binding do
-              inverse_keys = doc.you_must(_association.inverse_foreign_key)
+              inverse_keys = try_method(doc, _association.inverse_foreign_key) unless doc.frozen?
               if inverse_keys
                 record_id = inverse_record_id(doc)
                 unless inverse_keys.include?(record_id)
-                  doc.you_must(_association.inverse_foreign_key_setter, inverse_keys.push(record_id))
+                  try_method(doc, _association.inverse_foreign_key_setter, inverse_keys.push(record_id))
                 end
                 doc.reset_relation_criteria(_association.inverse)
               end
@@ -39,7 +39,7 @@ module Mongoid
           def unbind_one(doc)
             binding do
               _base.send(_association.foreign_key).delete_one(record_id(doc))
-              inverse_keys = doc.you_must(_association.inverse_foreign_key)
+              inverse_keys = try_method(doc, _association.inverse_foreign_key) unless doc.frozen?
               if inverse_keys
                 inverse_keys.delete_one(inverse_record_id(doc))
                 doc.reset_relation_criteria(_association.inverse)

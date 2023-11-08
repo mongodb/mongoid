@@ -30,19 +30,6 @@ module Mongoid
 
       module ClassMethods
 
-        # Get the configured time to use when converting - either the time zone
-        # or the time.
-        #
-        # @example Get the configured time.
-        #   ::Time.configured
-        #
-        # @return [ Time ] The configured time.
-        #
-        # @deprecated
-        def configured
-          ::Time.zone || ::Time
-        end
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.

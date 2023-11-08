@@ -2982,6 +2982,12 @@ describe Mongoid::Criteria do
       Band.create!(name: "Depeche Mode")
     end
 
+    it 'is deprecated' do
+      expect(Mongoid.logger).to receive(:warn).with(/for_js is deprecated/).and_call_original
+
+      Band.for_js("this.name == 'Depeche Mode'")
+    end
+
     context "when the code has no scope" do
 
       let(:criteria) do

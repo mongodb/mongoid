@@ -14,7 +14,8 @@ module Mongoid
       #   criteria.execute_or_raise(id)
       #
       # @param [ Object ] ids The arguments passed.
-      # @param [ true | false ] multi Whether there arguments were a list.
+      # @param [ true | false ] multi Whether there arguments were a list,
+      #   and therefore the return value should be an array.
       #
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #
@@ -40,9 +41,9 @@ module Mongoid
       #
       # @return [ Document | Array<Document> ] The matching document(s).
       def find(*args)
-        ids = args.__find_args__
+        ids = prepare_ids_for_find(args)
         raise_invalid if ids.any?(&:nil?)
-        for_ids(ids).execute_or_raise(ids, args.multi_arged?)
+        for_ids(ids).execute_or_raise(ids, multi_args?(args))
       end
 
       # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
@@ -108,7 +109,7 @@ module Mongoid
         from_database_selector(ids).entries
       end
 
-      private def from_database_selector(ids)
+      def from_database_selector(ids)
         if ids.size > 1
           any_in(_id: ids)
         else
@@ -131,6 +132,41 @@ module Mongoid
           id = id[:_id] if id.respond_to?(:keys) && id[:_id]
           klass.fields["_id"].mongoize(id)
         end
+      end
+
+      # Convert args to the +#find+ method into a flat array of ids.
+      #
+      # @example Get the ids.
+      #   prepare_ids_for_find([ 1, [ 2, 3 ] ])
+      #
+      # @param [ Array<Object> ] args The arguments.
+      #
+      # @return [ Array ] The array of ids.
+      def prepare_ids_for_find(args)
+        args.flat_map do |arg|
+          case arg
+          when Array, Set
+            prepare_ids_for_find(arg)
+          when Range
+            arg.begin&.numeric? && arg.end&.numeric? ? arg.to_a : arg
+          else
+            arg
+          end
+        end.uniq(&:to_s)
+      end
+
+      # Indicates whether the given arguments array is a list of values.
+      # Used by the +find+ method to determine whether to return an array
+      # or single value.
+      #
+      # @example Are these arguments a list of values?
+      #   multi_args?([ 1, 2, 3 ]) #=> true
+      #
+      # @param [ Array ] args The arguments.
+      #
+      # @return [ true | false ] Whether the arguments are a list.
+      def multi_args?(args)
+        args.size > 1 || !args.first.is_a?(Hash) && args.first.resizable?
       end
 
       # Convenience method of raising an invalid options error.
