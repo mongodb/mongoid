@@ -403,6 +403,46 @@ There are also rake tasks available, for convenience:
   $ rake mongoid:db:remove_search_indexes
 
 
+``Time.configured`` has been removed
+------------------------------------
+
+``Time.configured`` returned either the time object wrapping the configured
+time zone, or the standard Ruby ``Time`` class. This allowed you to query
+a time value even if no time zone had been configured.
+
+Mongoid now requires that you set a time zone if you intend to do
+anything with time values (including using timestamps in your documents).
+Any uses of ``Time.configured`` must be replaced with ``Time.zone``.
+
+... code-block:: ruby
+
+  # before:
+  puts Time.configured.now
+
+  # after:
+  puts Time.zone.now
+
+  # or, better for finding the current Time specifically:
+  puts Time.current
+
+If you do not set a time zone, you will see errors in your code related
+to ``nil`` values. If you are using Rails, the default time zone is already
+set to UTC. If you are not using Rails, you may set a time zone at the start
+of your program like this:
+
+... code-block:: ruby
+
+  Time.zone = 'UTC'
+
+This will set the time zone to UTC. You can see all available time zone names
+by running the following command:
+
+... code-block:: bash
+
+$ ruby -ractive_support/values/time_zone \
+  -e 'puts ActiveSupport::TimeZone::MAPPING.keys'
+
+
 Bug Fixes and Improvements
 --------------------------
 
