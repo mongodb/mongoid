@@ -41,6 +41,8 @@ module Mongoid
     include Clients::Sessions
     include Options
 
+    Mongoid.deprecate(self, :for_js)
+
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
     CHECK = []
@@ -160,7 +162,7 @@ module Mongoid
     #
     # @return [ Object ] The id.
     def extract_id
-      selector.extract_id
+      selector['_id'] || selector[:_id] || selector['id'] || selector[:id]
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options
@@ -223,7 +225,7 @@ module Mongoid
     # may be desired.
     #
     # @example Merge the criteria with another criteria.
-    #   criteri.merge(other_criteria)
+    #   criteria.merge(other_criteria)
     #
     # @example Merge the criteria with a hash. The hash must contain a klass
     #   key and the key/value pairs correspond to method names/args.
@@ -439,6 +441,8 @@ module Mongoid
     # @param [ Hash ] scope The scope for the code.
     #
     # @return [ Criteria ] The criteria.
+    #
+    # @deprecated
     def for_js(javascript, scope = {})
       code = if scope.empty?
         # CodeWithScope is not supported for $where as of MongoDB 4.4
