@@ -41,7 +41,25 @@ module Mongoid
     include Clients::Sessions
     include Options
 
-    Mongoid.deprecate(self, :for_js)
+    class << self
+      # Convert the given hash to a criteria. Will iterate over each keys in the
+      # hash which must correspond to method on a criteria object. The hash
+      # must also include a "klass" key.
+      #
+      # @example Convert the hash to a criteria.
+      #   Criteria.from_hash({ klass: Band, where: { name: "Depeche Mode" })
+      #
+      # @param [ Hash ] hash The hash to convert.
+      #
+      # @return [ Criteria ] The criteria.
+      def from_hash(hash)
+        criteria = Criteria.new(hash.delete(:klass) || hash.delete('klass'))
+        hash.each_pair do |method, args|
+          criteria = criteria.__send__(method, args)
+        end
+        criteria
+      end
+    end
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
@@ -250,16 +268,16 @@ module Mongoid
     # @example Merge another criteria into this criteria.
     #   criteria.merge(Person.where(name: "bob"))
     #
-    # @param [ Criteria ] other The criteria to merge in.
+    # @param [ Criteria | Hash ] other The criteria to merge in.
     #
     # @return [ Criteria ] The merged criteria.
     def merge!(other)
-      criteria = other.to_criteria
-      selector.merge!(criteria.selector)
-      options.merge!(criteria.options)
-      self.documents = criteria.documents.dup unless criteria.documents.empty?
-      self.scoping_options = criteria.scoping_options
-      self.inclusions = (inclusions + criteria.inclusions).uniq
+      other = self.class.from_hash(other) if other.is_a?(Hash)
+      selector.merge!(other.selector)
+      options.merge!(other.options)
+      self.documents = other.documents.dup unless other.documents.empty?
+      self.scoping_options = other.scoping_options
+      self.inclusions = (inclusions + other.inclusions).uniq
       self
     end
 
@@ -352,9 +370,11 @@ module Mongoid
     #   criteria.to_criteria
     #
     # @return [ Criteria ] self.
+    # @deprecated
     def to_criteria
       self
     end
+    Mongoid.deprecate(self, :to_criteria)
 
     # Convert the criteria to a proc.
     #
@@ -452,6 +472,7 @@ module Mongoid
       end
       js_query(code)
     end
+    Mongoid.deprecate(self, :for_js)
 
     private
 

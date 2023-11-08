@@ -101,13 +101,11 @@ module Mongoid
       #   { klass: Band, where: { name: "Depeche Mode" }.to_criteria
       #
       # @return [ Criteria ] The criteria.
+      # @deprecated
       def to_criteria
-        criteria = Criteria.new(delete(:klass) || delete("klass"))
-        each_pair do |method, args|
-          criteria = criteria.__send__(method, args)
-        end
-        criteria
+        Criteria.from_hash(self)
       end
+      Mongoid.deprecate(self, :to_criteria)
 
       private
 
