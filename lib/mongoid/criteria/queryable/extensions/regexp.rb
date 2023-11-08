@@ -15,7 +15,9 @@ module Mongoid
           #   /\A[123]/.regexp?
           #
           # @return [ true ] Always true.
+          # @deprecated
           def regexp?; true; end
+          Mongoid.deprecate(self, :regexp?)
 
           module ClassMethods
 
@@ -43,7 +45,9 @@ module Mongoid
             #   bson_raw_regexp.regexp?
             #
             # @return [ true ] Always true.
+            # @deprecated
             def regexp?; true; end
+            Mongoid.deprecate(self, :regexp?)
 
             module ClassMethods
 
