@@ -84,6 +84,7 @@ module Mongoid
       end
       Mongoid.deprecate(self, :__to_inc__)
 
+
       # Do or do not, there is no try. -- Yoda.
       #
       # @example Do or do not.
@@ -94,9 +95,11 @@ module Mongoid
       #
       # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist.
+      # @deprecated
       def do_or_do_not(name, *args)
         send(name, *args) if name && respond_to?(name)
       end
+      Mongoid.deprecate(self, :do_or_do_not)
 
       # Get the value for an instance variable or false if it doesn't exist.
       #
@@ -195,9 +198,11 @@ module Mongoid
       #
       # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist. Nil if the object is frozen.
+      # @deprecated
       def you_must(name, *args)
         frozen? ? nil : do_or_do_not(name, *args)
       end
+      Mongoid.deprecate(self, :you_must)
 
       module ClassMethods
         # Convert the provided object to a foreign key, given the metadata key
