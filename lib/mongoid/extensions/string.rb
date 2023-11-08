@@ -40,19 +40,17 @@ module Mongoid
       #   "2012-01-01".__mongoize_time__
       #   # => 2012-01-01 00:00:00 -0500
       #
+      # @raise [ ArgumentError ] The string is not a valid time string.
+      #
       # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
       #   configured default time zone corresponding to this string.
       def __mongoize_time__
-        # This extra parse from Time is because ActiveSupport::TimeZone
-        # either returns nil or Time.now if the string is empty or invalid,
-        # which is a regression from pre-3.0 and also does not agree with
-        # the core Time API.
-        parsed = ::Time.parse(self)
-        if ::Time == ::Time.configured
-          parsed
-        else
-          ::Time.configured.parse(self)
-        end
+        # This extra Time.parse is required to raise an error if the string
+        # is not a valid time string. ActiveSupport::TimeZone does not
+        # perform this check.
+        ::Time.parse(self)
+
+        ::Time.zone.parse(self)
       end
 
       # Convert the string to a collection friendly name.

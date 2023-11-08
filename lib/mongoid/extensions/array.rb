@@ -52,7 +52,7 @@ module Mongoid
       #   configured default time zone corresponding to date/time components
       #   in this array.
       def __mongoize_time__
-        ::Time.configured.local(*self)
+        ::Time.zone.local(*self)
       end
 
       # Is the array a set of multiple arguments in a method?

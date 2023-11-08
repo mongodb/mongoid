@@ -52,7 +52,7 @@ module Mongoid
         return false if _root.new_record?
 
         begin
-          touches = _gather_touch_updates(Time.configured.now, field)
+          touches = _gather_touch_updates(Time.current, field)
           _root.send(:persist_atomic_operations, '$set' => touches) if touches.present?
           _run_touch_callbacks_from_root
         ensure
