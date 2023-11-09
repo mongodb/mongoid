@@ -43,8 +43,6 @@ module Mongoid
       # @api private
       define_model_callbacks :persist_parent
 
-      define_model_callbacks :commit, :rollback, only: :after
-
       attr_accessor :before_callback_halted
     end
 
