@@ -159,6 +159,16 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context 'when for_js is present' do
+      let(:context) do
+        Band.for_js('this.name == "Depeche Mode"')
+      end
+
+      it 'counts the expected records' do
+        expect(context.count).to eq(1)
+      end
+    end
   end
 
   describe "#estimated_count" do
@@ -3598,16 +3608,51 @@ describe Mongoid::Contextual::Mongo do
 
         context "when the attributes are in the correct type" do
 
-          before do
-            context.update_all("$set" => { name: "Smiths" })
+          context "when operation is $set" do
+
+            before do
+              context.update_all("$set" => { name: "Smiths" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.name).to eq("Smiths")
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.name).to eq("Smiths")
+            end
           end
 
-          it "updates the first matching document" do
-            expect(depeche_mode.reload.name).to eq("Smiths")
+          context "when operation is $push" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["electronic"])
+              new_order.update_attribute(:genres, ["electronic"])
+              context.update_all("$push" => { genres: "pop" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["electronic", "pop"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["electronic", "pop"])
+            end
           end
 
-          it "updates the last matching document" do
-            expect(new_order.reload.name).to eq("Smiths")
+          context "when operation is $addToSet" do
+
+            before do
+              context.update_all("$addToSet" => { genres: "electronic" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["electronic"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["electronic"])
+            end
           end
         end
 

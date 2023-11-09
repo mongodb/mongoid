@@ -4,7 +4,7 @@
 module Mongoid
   module Attributes
 
-    # Defines behavior around that lovel Rails feature nested attributes.
+    # Defines behavior for the Rails nested attributes feature.
     module Nested
       extend ActiveSupport::Concern
 

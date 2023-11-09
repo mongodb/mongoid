@@ -101,7 +101,8 @@ module Mongoid
         # @param [ Hash ] attrs The single document attributes to process.
         def process_attributes(parent, attrs)
           return if reject?(parent, attrs)
-          if id = attrs.extract_id
+
+          if (id = extract_id(attrs))
             update_nested_relation(parent, id, attrs)
           else
             existing.push(Factory.build(@class_name, attrs)) unless destroyable?(attrs)
@@ -153,7 +154,7 @@ module Mongoid
         # @param [ Document ] doc The document to update.
         # @param [ Hash ] attrs The attributes.
         def update_document(doc, attrs)
-          attrs.delete_id
+          delete_id(attrs)
           if association.embedded?
             doc.assign_attributes(attrs)
           else

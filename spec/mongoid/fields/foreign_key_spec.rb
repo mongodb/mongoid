@@ -497,181 +497,343 @@ describe Mongoid::Fields::ForeignKey do
     end
   end
 
-  describe "#mongoize" do
+  describe '#mongoize' do
+    let(:field) do
+      described_class.new(
+        :vals,
+        type: type,
+        default: [],
+        identity: true,
+        association: association,
+        overwrite: true
+      )
+    end
+    let(:association) { Game.relations['person'] }
+    subject(:mongoized) { field.mongoize(object) }
 
-    context "when the type is array" do
+    context 'type is Array' do
+      let(:type) { Array }
 
-      context "when the array is object ids" do
+      context 'when the object is a BSON::ObjectId' do
+        let(:object) { BSON::ObjectId.new }
 
-        let(:association) do
-          Game.relations["person"]
+        it 'returns the object id as an array' do
+          expect(mongoized).to eq([object])
+        end
+      end
+
+      context 'when the object is an Array of BSON::ObjectId' do
+        let(:object) { [BSON::ObjectId.new] }
+
+        it 'returns the object ids' do
+          expect(mongoized).to eq(object)
+        end
+      end
+
+      context 'when the object is a String which is a legal object id' do
+        let(:object) { BSON::ObjectId.new.to_s }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq([BSON::ObjectId.from_string(object)])
+        end
+      end
+
+      context 'when the object is a String which is not a legal object id' do
+        let(:object) { 'blah' }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq(%w[blah])
+        end
+      end
+
+      context 'when the object is a blank String' do
+        let(:object) { '' }
+
+        it 'returns an empty array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is nil' do
+        let(:object) { nil }
+
+        it 'returns an empty array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is Array of Strings which are legal object ids' do
+        let(:object) { [BSON::ObjectId.new.to_s] }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq([BSON::ObjectId.from_string(object.first)])
+        end
+      end
+
+      context 'when the object is Array of Strings which are not legal object ids' do
+        let(:object) { %w[blah] }
+
+        it 'returns the Array' do
+          expect(mongoized).to eq(%w[blah])
+        end
+      end
+
+      context 'when the object is Array of Strings which are blank' do
+        let(:object) { ['', ''] }
+
+        it 'returns an empty Array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is Array of nils' do
+        let(:object) { [nil, nil, nil] }
+
+        it 'returns an empty Array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is an empty Array' do
+        let(:object) { [] }
+
+        it 'returns an empty Array' do
+          expect(mongoized).to eq([])
         end
 
-        let(:field) do
-          described_class.new(
-            :vals,
-            type: Array,
-            default: [],
-            identity: true,
-            association: association,
+        it 'returns the same instance' do
+          expect(mongoized).to equal(object)
+        end
+      end
+
+      context 'when the object is a Set' do
+        let(:object) { Set['blah'] }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq(%w[blah])
+        end
+      end
+
+      context 'when foreign key is a String' do
+        before do
+          Person.field(:_id, type: String, overwrite: true)
+        end
+
+        after do
+          Person.field(
+            :_id,
+            type: BSON::ObjectId,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new },
             overwrite: true
           )
         end
 
-        context "when provided nil" do
+        context 'when the object is a String' do
+          let(:object) { %w[1] }
 
-          it "returns an empty array" do
-            expect(field.mongoize(nil)).to be_empty
+          it 'returns String' do
+            expect(mongoized).to eq(object)
           end
         end
 
-        context "when provided an empty array" do
+        context 'when the object is a BSON::ObjectId' do
+          let(:object) { [BSON::ObjectId.new] }
 
-          let(:array) do
-            []
-          end
-
-          it "returns an empty array" do
-            expect(field.mongoize(array)).to eq(array)
-          end
-
-          it "returns the same instance" do
-            expect(field.mongoize(array)).to equal(array)
+          it 'converts to String' do
+            expect(mongoized).to eq([object.first.to_s])
           end
         end
 
-        context "when using object ids" do
+        context 'when the object is an Integer' do
+          let(:object) { [1] }
 
-          let(:object_id) do
-            BSON::ObjectId.new
+          it 'converts to String' do
+            expect(mongoized).to eq(%w[1])
           end
+        end
+      end
 
-          it "performs conversion on the ids if strings" do
-            expect(field.mongoize([object_id.to_s])).to eq([object_id])
+      context 'when foreign key is an Integer' do
+        before do
+          Person.field(:_id, type: Integer, overwrite: true)
+        end
+
+        after do
+          Person.field(
+            :_id,
+            type: BSON::ObjectId,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new },
+            overwrite: true
+          )
+        end
+
+        context 'when the object is a String' do
+          let(:object) { %w[1] }
+
+          it 'converts to Integer' do
+            expect(mongoized).to eq([1])
           end
         end
 
-        context "when not using object ids" do
+        context 'when the object is an Integer' do
+          let(:object) { [1] }
 
-          let(:object_id) do
-            BSON::ObjectId.new
-          end
-
-          before do
-            Person.field(
-              :_id,
-              type: String,
-              pre_processed: true,
-              default: ->{ BSON::ObjectId.new.to_s },
-              overwrite: true
-            )
-          end
-
-          after do
-            Person.field(
-              :_id,
-              type: BSON::ObjectId,
-              pre_processed: true,
-              default: ->{ BSON::ObjectId.new },
-              overwrite: true
-            )
-          end
-
-          it "does not convert" do
-            expect(field.mongoize([object_id.to_s])).to eq([object_id.to_s])
+          it 'returns Integer' do
+            expect(mongoized).to eq([1])
           end
         end
       end
     end
 
-    context "when the type is object" do
+    context 'type is Set' do
+      let(:type) { Set }
 
-      context "when the array is object ids" do
+      context 'when the object is an Array of BSON::ObjectId' do
+        let(:object) { [BSON::ObjectId.new] }
 
-        let(:association) do
-          Game.relations['person']
+        it 'returns the object ids' do
+          expect(mongoized).to eq(object)
+        end
+      end
+
+      context 'when the object is a Set of BSON::ObjectId' do
+        let(:object) { Set[BSON::ObjectId.new] }
+
+        it 'returns the object id in an array' do
+          expect(mongoized).to eq([object.first])
+        end
+      end
+    end
+
+    context 'type is Object' do
+      let(:type) { Object }
+
+      context 'when the object is a BSON::ObjectId' do
+        let(:object) { BSON::ObjectId.new }
+
+        it 'returns the object id' do
+          expect(mongoized).to eq(object)
+        end
+      end
+
+      context 'when the object is a String which is a legal object id' do
+        let(:object) { BSON::ObjectId.new.to_s }
+
+        it 'returns the object id' do
+          expect(mongoized).to eq(BSON::ObjectId.from_string(object))
+        end
+      end
+
+      context 'when the object is a String which is not a legal object id' do
+        let(:object) { 'blah' }
+
+        it 'returns the string' do
+          expect(mongoized).to eq('blah')
+        end
+      end
+
+      context 'when the String is blank' do
+        let(:object) { '' }
+
+        it 'returns nil' do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context 'when the object is nil' do
+        let(:object) { '' }
+
+        it 'returns nil' do
+          expect(mongoized).to be_nil
+        end
+      end
+
+      context 'when object is an empty Array' do
+        let(:object) { [] }
+
+        it 'returns an empty array' do
+          expect(mongoized).to eq([])
+        end
+      end
+
+      context 'when the object is a Set' do
+        let(:object) { Set['blah'] }
+
+        it 'returns the set' do
+          expect(mongoized).to eq(Set['blah'])
+        end
+      end
+
+      context 'when foreign key is a String' do
+        before do
+          Person.field(:_id, type: String, overwrite: true)
         end
 
-        let(:field) do
-          described_class.new(
-            :vals,
-            type: Object,
-            default: nil,
-            identity: true,
-            association: association,
+        after do
+          Person.field(
+            :_id,
+            type: BSON::ObjectId,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new },
             overwrite: true
           )
         end
 
-        context "when using object ids" do
+        context 'when the object is a String' do
+          let(:object) { '1' }
 
-          let(:object_id) do
-            BSON::ObjectId.new
-          end
-
-          it "performs conversion on the ids if strings" do
-            expect(field.mongoize(object_id.to_s)).to eq(object_id)
+          it 'returns String' do
+            expect(mongoized).to eq(object)
           end
         end
 
-        context "when not using object ids" do
+        context 'when the object is a BSON::ObjectId' do
+          let(:object) { BSON::ObjectId.new }
 
-          context "when using strings" do
-
-            context "when provided a string" do
-
-              let(:object_id) do
-                BSON::ObjectId.new
-              end
-
-              before do
-                Person.field(
-                  :_id,
-                  type: String,
-                  pre_processed: true,
-                  default: ->{ BSON::ObjectId.new.to_s },
-                  overwrite: true
-                )
-              end
-
-              after do
-                Person.field(
-                  :_id,
-                  type: BSON::ObjectId,
-                  pre_processed: true,
-                  default: ->{ BSON::ObjectId.new },
-                  overwrite: true
-                )
-              end
-
-              it "does not convert" do
-                expect(field.mongoize(object_id.to_s)).to eq(object_id.to_s)
-              end
-            end
+          it 'converts to String' do
+            expect(mongoized).to eq(object.to_s)
           end
+        end
 
-          context "when using integers" do
+        context 'when the object is an Integer' do
+          let(:object) { 1 }
 
-            context "when provided a string" do
+          it 'converts to String' do
+            expect(mongoized).to eq('1')
+          end
+        end
+      end
 
-              before do
-                Person.field(:_id, type: Integer, overwrite: true)
-              end
+      context 'when foreign key is an Integer' do
+        before do
+          Person.field(:_id, type: Integer, overwrite: true)
+        end
 
-              after do
-                Person.field(
-                  :_id,
-                  type: BSON::ObjectId,
-                  pre_processed: true,
-                  default: ->{ BSON::ObjectId.new },
-                  overwrite: true
-                )
-              end
+        after do
+          Person.field(
+            :_id,
+            type: BSON::ObjectId,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new },
+            overwrite: true
+          )
+        end
 
-              it "converts the string to an integer" do
-                expect(field.mongoize("1")).to eq(1)
-              end
-            end
+        context 'when the object is a String' do
+          let(:object) { '1' }
+
+          it 'converts to Integer' do
+            expect(mongoized).to eq(1)
+          end
+        end
+
+        context 'when the object is an Integer' do
+          let(:object) { 1 }
+
+          it 'returns Integer' do
+            expect(mongoized).to eq(object)
           end
         end
       end
