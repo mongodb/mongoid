@@ -38,8 +38,16 @@ module Mongoid
       #
       # @return [ true | false ] True if validation passed, false if not.
       def update(attributes = {})
-        assign_attributes(attributes)
-        save
+        self.class.with_session do |session|
+          session.with_transaction do
+            assign_attributes(attributes)
+            save.tap do |result|
+              session.abort_transaction unless result
+            end
+          end
+        end
+      rescue StandardError => e
+        false
       end
       alias :update_attributes :update
 

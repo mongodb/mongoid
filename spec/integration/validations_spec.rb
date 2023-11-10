@@ -16,7 +16,8 @@ describe 'validations' do
       end
 
       it 'does not persist the changes' do
-        expect { client.update!(companies: []) rescue nil }.not_to change { client.reload.companies }
+        client.update!(companies: []) rescue nil
+        expect(client.reload.companies).not_to be_empty
       end
     end
   end
@@ -32,7 +33,8 @@ describe 'validations' do
       end
 
       it 'does not persist the changes' do
-        expect { building.update!(apartments: []) rescue nil }.not_to change { building.reload.apartments }
+        building.update!(apartments: []) rescue nil
+        expect(building.reload.apartments).not_to be_empty
       end
     end
   end
