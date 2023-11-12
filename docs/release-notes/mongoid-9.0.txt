@@ -77,6 +77,33 @@ Deprecated functionality removed
 - ``Object#blank_criteria?`` method is removed (was previously deprecated.)
 
 
+Deprecated kernel monkey patch methods removed
+----------------------------------------------
+
+The following kernel monkey patch methods are removed. These were previously deprecated and were intended
+for internal Mongoid use only, so please refer to the Mongoid 8.x codebase for the implementation if
+you were using them.
+
+- ``Object#__sortable__``
+- ``Object#__find_args__``
+- ``Object#__setter__``
+- ``Object#__to_inc__``
+- ``Object#do_or_do_not``
+- ``Object#you_must``
+- ``Object#multi_arged?``
+- ``Object#regexp?``
+- ``Object.__mongoize_fk__``
+- ``Hash#__consolidate__``
+- ``Hash#delete_id``
+- ``Hash#extract_id``
+- ``Hash#to_criteria``
+- ``Mongoid::Criteria#to_criteria``
+- ``Integer#unconvertable_to_bson?``
+- ``String#unconvertable_to_bson?``
+- ``String#mongoid_id?``
+- ``Symbol#mongoid_id?``
+
+
 ``touch`` method now clears changed state
 -----------------------------------------
 

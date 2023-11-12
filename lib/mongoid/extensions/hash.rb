@@ -31,47 +31,6 @@ module Mongoid
         end
       end
 
-      # Consolidate the key/values in the hash under an atomic $set.
-      # DEPRECATED. This was never intended to be a public API and
-      # the functionality will no longer be exposed once this method
-      # is eventually removed.
-      #
-      # @example Consolidate the hash.
-      #   { name: "Placebo" }.__consolidate__
-      #
-      # @return [ Hash ] A new consolidated hash.
-      #
-      # @deprecated
-      def __consolidate__(klass)
-        Mongoid::AtomicUpdatePreparer.prepare(self, klass)
-      end
-      Mongoid.deprecate(self, :__consolidate__)
-
-      # Deletes an id value from the hash.
-      #
-      # @example Delete an id value.
-      #   {}.delete_id
-      #
-      # @return [ Object ] The deleted value, or nil.
-      # @deprecated
-      def delete_id
-        delete("_id") || delete(:_id) || delete("id") || delete(:id)
-      end
-      Mongoid.deprecate(self, :delete_id)
-
-      # Get the id attribute from this hash, whether it's prefixed with an
-      # underscore or is a symbol.
-      #
-      # @example Extract the id.
-      #   { :_id => 1 }.extract_id
-      #
-      # @return [ Object ] The value of the id.
-      # @deprecated
-      def extract_id
-        self["_id"] || self[:_id] || self["id"] || self[:id]
-      end
-      Mongoid.deprecate(self, :extract_id)
-
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
@@ -92,20 +51,6 @@ module Mongoid
       def resizable?
         true
       end
-
-      # Convert this hash to a criteria. Will iterate over each keys in the
-      # hash which must correspond to method on a criteria object. The hash
-      # must also include a "klass" key.
-      #
-      # @example Convert the hash to a criteria.
-      #   { klass: Band, where: { name: "Depeche Mode" }.to_criteria
-      #
-      # @return [ Criteria ] The criteria.
-      # @deprecated
-      def to_criteria
-        Criteria.from_hash(self)
-      end
-      Mongoid.deprecate(self, :to_criteria)
 
       private
 

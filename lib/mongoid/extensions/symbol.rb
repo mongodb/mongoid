@@ -7,18 +7,6 @@ module Mongoid
     # Adds type-casting behavior to Symbol class.
     module Symbol
 
-      # Is the symbol a valid value for a Mongoid id?
-      #
-      # @example Is the string an id value?
-      #   :_id.mongoid_id?
-      #
-      # @return [ true | false ] If the symbol is :id or :_id.
-      # @deprecated
-      def mongoid_id?
-        to_s.mongoid_id?
-      end
-      Mongoid.deprecate(self, :mongoid_id?)
-
       module ClassMethods
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
