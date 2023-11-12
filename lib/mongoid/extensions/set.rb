@@ -6,7 +6,6 @@ module Mongoid
 
     # Adds type-casting behavior to Set class.
     module Set
-
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
@@ -29,7 +28,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.

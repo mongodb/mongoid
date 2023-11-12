@@ -18,6 +18,29 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+``around_*`` callbacks for embedded documents are now ignored
+-------------------------------------------------------------
+
+Mongoid 8.x and older allows user to define ``around_*`` callbacks for embedded
+documents. Starting from 9.0 these callbacks are ignored and will not be executed.
+A warning will be printed to the console if such callbacks are defined.
+
+If you want to restore the old behavior, you can set
+``Mongoid.around_embedded_document_callbacks`` to true in your application.
+
+.. note::
+  Enabling ``around_*`` callbacks for embedded documents is not recommended
+  as it may cause ``SystemStackError`` exceptions when a document has many
+  embedded documents. See `MONGOID-5658 <https://jira.mongodb.org/browse/MONGOID-5658>`_
+  for more details.
+
+
+``for_js`` method is deprecated
+-------------------------------
+
+The ``for_js`` method is deprecated and will be removed in Mongoid 10.0.
+
+
 Deprecated options removed
 --------------------------
 
@@ -51,6 +74,7 @@ Deprecated functionality removed
   The method ``Mongoid::QueryCache#clear_cache`` should be replaced with ``Mongo::QueryCache#clear``.
   All other methods and submodules are identically named. Refer to the `driver query cache documentation
   <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
+- ``Object#blank_criteria?`` method is removed (was previously deprecated.)
 
 
 ``touch`` method now clears changed state
@@ -330,6 +354,93 @@ Mongoid to allow literal BSON::Decimal128 fields:
 
   The ``allow_bson5_decimal128`` option only has any effect under
   BSON 5 and later. BSON 4 and earlier ignore the setting entirely.
+
+
+Search Index Management with MongoDB Atlas
+------------------------------------------
+
+When connected to MongoDB Atlas, Mongoid now supports creating and removing
+search indexes. You may do so programmatically, via the Mongoid::SearchIndexable
+API:
+
+.. code-block:: ruby
+
+  class SearchablePerson
+    include Mongoid::Document
+
+    search_index { ... } # define the search index here
+  end
+
+  # create the declared search indexes; this returns immediately, but the
+  # search indexes may take several minutes before they are available.
+  SearchablePerson.create_search_indexes
+
+  # query the available search indexes
+  SearchablePerson.search_indexes.each do |index|
+    # ...
+  end
+
+  # remove all search indexes from the model's collection
+  SearchablePerson.remove_search_indexes
+
+If you are not connected to MongoDB Atlas, the search index definitions are
+ignored. Trying to create, enumerate, or remove search indexes will result in
+an error.
+
+There are also rake tasks available, for convenience:
+
+.. code-block:: bash
+
+  # create search indexes for all models; waits for indexes to be created
+  # and shows progress on the terminal.
+  $ rake mongoid:db:create_search_indexes
+
+  # as above, but returns immediately and lets the indexes be created in the
+  # background
+  $ rake WAIT_FOR_SEARCH_INDEXES=0 mongoid:db:create_search_indexes
+
+  # removes search indexes from all models
+  $ rake mongoid:db:remove_search_indexes
+
+
+``Time.configured`` has been removed
+------------------------------------
+
+``Time.configured`` returned either the time object wrapping the configured
+time zone, or the standard Ruby ``Time`` class. This allowed you to query
+a time value even if no time zone had been configured.
+
+Mongoid now requires that you set a time zone if you intend to do
+anything with time values (including using timestamps in your documents).
+Any uses of ``Time.configured`` must be replaced with ``Time.zone``.
+
+... code-block:: ruby
+
+  # before:
+  puts Time.configured.now
+
+  # after:
+  puts Time.zone.now
+
+  # or, better for finding the current Time specifically:
+  puts Time.current
+
+If you do not set a time zone, you will see errors in your code related
+to ``nil`` values. If you are using Rails, the default time zone is already
+set to UTC. If you are not using Rails, you may set a time zone at the start
+of your program like this:
+
+... code-block:: ruby
+
+  Time.zone = 'UTC'
+
+This will set the time zone to UTC. You can see all available time zone names
+by running the following command:
+
+... code-block:: bash
+
+$ ruby -ractive_support/values/time_zone \
+  -e 'puts ActiveSupport::TimeZone::MAPPING.keys'
 
 
 Bug Fixes and Improvements
