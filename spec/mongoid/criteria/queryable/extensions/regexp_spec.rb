@@ -79,15 +79,4 @@ describe Mongoid::Criteria::Queryable::Extensions::Regexp do
       end
     end
   end
-
-  describe "#regexp?" do
-
-    let(:regexp) do
-      /\A[123]/
-    end
-
-    it "returns true" do
-      expect(regexp).to be_regexp
-    end
-  end
 end

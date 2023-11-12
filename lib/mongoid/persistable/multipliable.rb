@@ -21,7 +21,7 @@ module Mongoid
       def mul(factors)
         prepare_atomic_operation do |ops|
           process_atomic_operations(factors) do |field, value|
-            factor = value.__to_inc__
+            factor = value.is_a?(BigDecimal) ? value.to_f : value
             current = attributes[field]
             new_value = (current || 0) * factor
             process_attribute field, new_value if executing_atomically?

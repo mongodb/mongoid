@@ -13,9 +13,11 @@ module Mongoid
       #   :_id.mongoid_id?
       #
       # @return [ true | false ] If the symbol is :id or :_id.
+      # @deprecated
       def mongoid_id?
         to_s.mongoid_id?
       end
+      Mongoid.deprecate(self, :mongoid_id?)
 
       module ClassMethods
 
