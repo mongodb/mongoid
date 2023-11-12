@@ -4,7 +4,7 @@ require 'spec_helper'
 
 # @note This test ensures that we do not inadvertently introduce new monkey patches
 # to Mongoid. Existing monkey patch methods which are marked with +Mongoid.deprecated+
-# should not be listed in this test.
+# are excluded from this test.
 RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeClass
   classes = [
     Object,
