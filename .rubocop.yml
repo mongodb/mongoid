@@ -58,9 +58,7 @@ Gemspec/OrderedDependencies:
   Enabled: false
 
 Layout/EmptyLinesAroundBlockBody:
-  Exclude:
-    - '**/*.rake'
-    - 'spec/**/*'
+  Enabled: false
 
 Layout/EmptyLinesAroundClassBody:
   Enabled: false
