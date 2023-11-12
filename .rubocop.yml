@@ -57,6 +57,17 @@ Bundler/OrderedGems:
 Gemspec/OrderedDependencies:
   Enabled: false
 
+Layout/EmptyLinesAroundBlockBody:
+  Exclude:
+    - '**/*.rake'
+    - 'spec/**/*'
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: false
+
 Layout/SpaceInsideArrayLiteralBrackets:
   EnforcedStyle: space
 
