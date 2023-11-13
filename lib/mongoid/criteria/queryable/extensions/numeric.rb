@@ -33,20 +33,6 @@ module Mongoid
 
           module ClassMethods
 
-            # Get the object as a numeric.
-            #
-            # @api private
-            #
-            # @example Get the object as numeric.
-            #   Object.__numeric__("1.442")
-            #
-            # @param [ Object ] object The object to convert.
-            #
-            # @return [ Object ] The converted number.
-            def __numeric__(object)
-              object.to_s.match?(/\A[-+]?[0-9]*[0-9.]0*\z/) ? object.to_i : Float(object)
-            end
-
             # Evolve the object to an integer.
             #
             # @example Evolve to integers.
@@ -57,7 +43,9 @@ module Mongoid
             # @return [ Integer ] The evolved object.
             def evolve(object)
               __evolve__(object) do |obj|
-                __numeric__(obj) rescue obj
+                obj.to_s.match?(/\A[-+]?[0-9]*[0-9.]0*\z/) ? obj.to_i : Float(obj)
+              rescue
+                obj
               end
             end
           end

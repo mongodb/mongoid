@@ -7,12 +7,12 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
 
   let(:host) do
     Class.new do
-      include Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods
-    end.new
+      extend Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods
+    end
   end
 
-  describe "#__numeric__" do
-    let(:actual) { host.__numeric__(str) }
+  describe ".evolve" do
+    let(:actual) { host.evolve(str) }
 
     context "when the string is a whole number" do
       let(:str) { '123' }
@@ -80,40 +80,40 @@ describe Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods do
     context "when the string is non-numeric" do
       let(:str) { 'foo' }
 
-      it "raises ArgumentError" do
-        expect { actual }.to raise_error(ArgumentError)
+      it "returns the string" do
+        expect(actual).to eq(str)
       end
     end
 
     context "when the string is non-numeric with leading dot" do
       let(:str) { '.foo' }
 
-      it "raises ArgumentError" do
-        expect { actual }.to raise_error(ArgumentError)
+      it "returns the string" do
+        expect(actual).to eq(str)
       end
     end
 
     context "when the string is non-numeric with trailing dot" do
       let(:str) { 'foo.' }
 
-      it "raises ArgumentError" do
-        expect { actual }.to raise_error(ArgumentError)
+      it "returns the string" do
+        expect(actual).to eq(str)
       end
     end
 
     context "when the string is non-numeric with trailing dot and zeroes" do
       let(:str) { 'foo.000' }
 
-      it "raises ArgumentError" do
-        expect { actual }.to raise_error(ArgumentError)
+      it "returns the string" do
+        expect(actual).to eq(str)
       end
     end
 
     context "when the string is empty" do
       let(:str) { '' }
 
-      it "raises ArgumentError" do
-        expect { actual }.to raise_error(ArgumentError)
+      it "returns the string" do
+        expect(actual).to eq(str)
       end
     end
   end
