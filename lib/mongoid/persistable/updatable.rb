@@ -128,6 +128,9 @@ module Mongoid
           unless updates.empty?
             coll = collection(_root)
             selector = atomic_selector
+
+            # TODO: DRIVERS-716: If a new "Bulk Write" API is introduced, it may
+            # become possible to handle the writes for conflicts in the following call.
             coll.find(selector).update_one(positionally(selector, updates), session: _session)
 
             # The following code applies updates which would cause
