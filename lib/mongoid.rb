@@ -31,6 +31,9 @@ require "mongoid/tasks/encryption"
 require "mongoid/warnings"
 require "mongoid/utils"
 
+# @todo Extract this to a separate gem.
+require "mongoid_symbol_query_macros/symbol_query_macros"
+
 # If we are using Rails then we will include the Mongoid railtie.
 # This configures initializers required to integrate Mongoid with Rails.
 if defined?(Rails)

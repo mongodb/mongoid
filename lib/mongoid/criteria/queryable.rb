@@ -4,7 +4,6 @@
 require "mongoid/criteria/queryable/expandable"
 require "mongoid/criteria/queryable/extensions"
 require "mongoid/criteria/queryable/key"
-require "mongoid/criteria/queryable/macroable"
 require "mongoid/criteria/queryable/mergeable"
 require "mongoid/criteria/queryable/smash"
 require "mongoid/criteria/queryable/aggregable"

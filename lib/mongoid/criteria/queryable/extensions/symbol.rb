@@ -24,22 +24,6 @@ module Mongoid
 
           module ClassMethods
 
-            # Adds a method on symbol as a convenience for the MongoDB operator.
-            #
-            # @example Add the $in method.
-            #   Symbol.add_key(:in, "$in")
-            #
-            # @param [ Symbol ] name The name of the method.
-            # @param [ Symbol ] strategy The name of the merge strategy.
-            # @param [ String ] operator The MongoDB operator.
-            # @param [ String ] additional The additional MongoDB operator.
-            def add_key(name, strategy, operator, additional = nil, &block)
-              define_method(name) do
-                method = "__#{strategy}__".to_sym
-                Key.new(self, method, operator, additional, &block)
-              end
-            end
-
             # Evolves the symbol into a MongoDB friendly value - in this case
             # a symbol.
             #

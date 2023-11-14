@@ -8,7 +8,6 @@ module Mongoid
       # The optional module includes all behavior that has to do with extra
       # options surrounding queries, like skip, limit, sorting, etc.
       module Optional
-        extend Macroable
 
         # @attribute [rw] options The query options.
         attr_accessor :options
@@ -25,8 +24,6 @@ module Mongoid
           sort_with_list(*fields, 1)
         end
         alias :asc :ascending
-        key :asc, :override, 1
-        key :ascending, :override, 1
 
         # Adds the option for telling MongoDB how many documents to retrieve in
         # it's batching.
@@ -53,8 +50,6 @@ module Mongoid
           sort_with_list(*fields, -1)
         end
         alias :desc :descending
-        key :desc, :override, -1
-        key :descending, :override, -1
 
         # Add an index hint to the query options.
         #

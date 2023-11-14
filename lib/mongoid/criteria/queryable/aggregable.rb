@@ -7,7 +7,6 @@ module Mongoid
 
       # Provides a DSL around crafting aggregation framework commands.
       module Aggregable
-        extend Macroable
 
         # @attribute [r] pipeline The aggregation pipeline.
         attr_reader :pipeline
@@ -42,14 +41,6 @@ module Mongoid
             pipeline.group(operation)
           end
         end
-        key :avg, :override, "$avg"
-        key :max, :override, "$max"
-        key :min, :override, "$min"
-        key :sum, :override, "$sum"
-        key :last, :override, "$last"
-        key :push, :override, "$push"
-        key :first, :override, "$first"
-        key :add_to_set, :override, "$addToSet"
 
         # Add a projection ($project) to the aggregation pipeline.
         #

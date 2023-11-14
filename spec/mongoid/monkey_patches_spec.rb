@@ -111,40 +111,6 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
     ],
     Symbol => %i[
       __expr_part__
-      add_to_set
-      all
-      asc
-      ascending
-      avg
-      desc
-      descending
-      elem_match
-      eq
-      exists
-      first
-      gt
-      gte
-      in
-      intersects_line
-      intersects_point
-      intersects_polygon
-      last
-      lt
-      lte
-      max
-      min
-      mod
-      ne
-      near
-      near_sphere
-      nin
-      not
-      push
-      sum
-      with_size
-      with_type
-      within_box
-      within_polygon
     ],
     TrueClass => %i[is_a?],
     Time => %i[
@@ -169,8 +135,7 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
     ],
     Float => %i[__numeric__],
     Integer => %i[__numeric__],
-    String => %i[__expr_part__],
-    Symbol => %i[add_key]
+    String => %i[__expr_part__]
   }.each_value(&:sort!)
 
   def mongoid_method?(method)
