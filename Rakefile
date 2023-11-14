@@ -67,6 +67,20 @@ namespace :eg do
   end
 end
 
+namespace :generate do
+  desc 'Generates a mongoid.yml from the template'
+  task :config do
+    require 'mongoid'
+    require 'erb'
+
+    template_path = 'lib/rails/generators/mongoid/config/templates/mongoid.yml'
+    database_name = ENV['DATABASE_NAME'] || 'my_db'
+
+    config = ERB.new(File.read(template_path), trim_mode: '-').result(binding)
+    File.write('mongoid.yml', config)
+  end
+end
+
 CLASSIFIERS = [
   [%r,^mongoid/attribute,, :attributes],
   [%r,^mongoid/association/[or],, :associations_referenced],
