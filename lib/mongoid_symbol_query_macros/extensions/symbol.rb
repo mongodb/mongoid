@@ -18,8 +18,7 @@ module Mongoid
           # @param [ String ] additional The additional MongoDB operator.
           def add_key(name, strategy, operator, additional = nil, &block)
             define_method(name) do
-              method = "__#{strategy}__".to_sym
-              Key.new(self, method, operator, additional, &block)
+              Key.new(self, :"__#{strategy}__", operator, additional, &block)
             end
           end
         end
