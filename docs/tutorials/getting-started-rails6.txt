@@ -107,7 +107,7 @@ Add Mongoid
 .. code-block:: ruby
   :caption: Gemfile
 
-    gem 'mongoid', '~> 7.0'
+    gem 'mongoid'
 
 .. note::
 
@@ -378,7 +378,7 @@ mentioned in ``Gemfile``, and add ``mongoid``:
 .. code-block:: ruby
   :caption: Gemfile
 
-    gem 'mongoid', '~> 7.0'
+    gem 'mongoid'
 
 .. note::
 
