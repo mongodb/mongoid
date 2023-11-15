@@ -174,7 +174,7 @@ for details on driver options.
           # Change the default authentication mechanism. Valid options are: :scram,
           # :mongodb_cr, :mongodb_x509, and :plain. Note that all authentication
           # mechanisms require username and password, with the exception of :mongodb_x509.
-          # Default on mongoDB 3.0 is :scram, default on 2.4 and 2.6 is :plain.
+          # Default is :scram since MongoDB 3.0; earlier versions defaulted to :plain.
           # auth_mech: :scram
 
           # The database or source to authenticate the user against.
