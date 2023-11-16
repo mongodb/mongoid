@@ -293,13 +293,14 @@ module Mongoid
           #   person.posts.exists?
           #
           # @example Is a document with the given id persisted?
-          #   context.exists?(BSON::ObjectId(...))
+          #   person.posts.exists?(BSON::ObjectId(...))
           #
           # @example Are there persisted documents with the given title?
           #   person.posts.exists?({ title: "50 Ways to Leave Your Lover" })
           #
-          # @example Always return false.
-          #   person.posts.exists?(false)
+          # @example Return false if nil is given.
+          #   missing_post = nil
+          #   person.posts.exists?(missing_post&._id) #=> false
           #
           # @param [ :none | nil | false | Hash | Object ] id_or_conditions
           #   When :none (the default), returns true if any persisted
