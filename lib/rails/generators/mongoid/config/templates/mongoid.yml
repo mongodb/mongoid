@@ -93,6 +93,11 @@ development:
         # not belong to this replica set will be ignored.
         # replica_set: name
 
+        # Compressors to use for wire protocol compression. (default is to not use compression)
+        # "zstd" requires zstd-ruby gem. "snappy" requires snappy gem.
+        # Refer to: https://www.mongodb.com/docs/ruby-driver/current/reference/create-client/#compression
+        # compressors: ["zstd", "snappy", "zlib"]
+
         # Whether to connect to the servers via ssl. (default: false)
         # ssl: true
 

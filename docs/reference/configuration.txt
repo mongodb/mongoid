@@ -239,6 +239,9 @@ for details on driver options.
           # not belong to this replica set will be ignored.
           replica_set: my_replica_set
 
+          # Compressors to use for wire protocol compression. (default is to not use compression)
+          compressors: ["zstd", "snappy", "zlib"]
+
           # Whether to connect to the servers via ssl. (default: false)
           ssl: true
 
@@ -259,9 +262,6 @@ for details on driver options.
           # The file containing a set of concatenated certification authority certifications
           # used to validate certs passed from the other end of the connection.
           ssl_ca_cert: /path/to/ca.cert
-
-          # Compressors to use. (default is to not use compression)
-          compressors: [zlib]
 
     # Configure Mongoid-specific options. (optional)
     options:
@@ -755,9 +755,7 @@ the Ruby driver, which implements the three algorithms that are supported by Mon
   requires the `zstd-ruby <https://rubygems.org/gems/zstd-ruby>`_ library to
   be installed.
 
-To use wire protocol compression, at least one compressor must be explicitly requested
-using either the `compressors URI option <https://www.mongodb.com/docs/manual/reference/connection-string/#mongodb-urioption-urioption.compressors>`_,
-or directly within the  ``mongoid.yml``:
+To use wire protocol compression, configure the Ruby driver options within ``mongoid.yml``:
 
 .. code-block:: yaml
 

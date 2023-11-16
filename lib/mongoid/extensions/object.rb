@@ -84,20 +84,6 @@ module Mongoid
       end
       Mongoid.deprecate(self, :__to_inc__)
 
-      # Checks whether conditions given in this object are known to be
-      # unsatisfiable, i.e., querying with this object will always return no
-      # documents.
-      #
-      # This method is deprecated. Mongoid now uses
-      # +_mongoid_unsatisfiable_criteria?+ internally; this method is retained
-      # for backwards compatibility only. It always returns false.
-      #
-      # @return [ false ] Always false.
-      # @deprecated
-      def blank_criteria?
-        false
-      end
-      Mongoid.deprecate(self, :blank_criteria?)
 
       # Do or do not, there is no try. -- Yoda.
       #
@@ -109,9 +95,11 @@ module Mongoid
       #
       # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist.
+      # @deprecated
       def do_or_do_not(name, *args)
         send(name, *args) if name && respond_to?(name)
       end
+      Mongoid.deprecate(self, :do_or_do_not)
 
       # Get the value for an instance variable or false if it doesn't exist.
       #
@@ -210,9 +198,11 @@ module Mongoid
       #
       # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist. Nil if the object is frozen.
+      # @deprecated
       def you_must(name, *args)
         frozen? ? nil : do_or_do_not(name, *args)
       end
+      Mongoid.deprecate(self, :you_must)
 
       module ClassMethods
         # Convert the provided object to a foreign key, given the metadata key
@@ -225,10 +215,12 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ Object ] The converted object.
+        # @deprecated
         def __mongoize_fk__(association, object)
           return nil if !object || object == ""
           association.convert_to_foreign_key(object)
         end
+        Mongoid.deprecate(self, :__mongoize_fk__)
 
         # Convert the object from its mongo friendly ruby type to this type.
         #
