@@ -84,6 +84,7 @@ module Mongoid
       # @return [ true ] true.
       def post_process_insert
         self.new_record = false
+        self.default_persistence_context = persistence_context
         flag_descendants_persisted
         true
       end

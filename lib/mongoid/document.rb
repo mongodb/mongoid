@@ -443,6 +443,7 @@ module Mongoid
 
         doc._handle_callbacks_after_instantiation(execute_callbacks, &block)
 
+        doc.default_persistence_context = doc.persistence_context
         doc
       end
 

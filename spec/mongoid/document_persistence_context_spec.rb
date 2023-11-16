@@ -30,4 +30,34 @@ describe Mongoid::Document do
       Person.collection_name.should == :people
     end
   end
+
+  context 'when loaded with an overridden persistence context' do
+    let(:options) { { collection: 'extra_people' } }
+    let(:person) { Person.with(options) { Person.create username: 'zyg14' } }
+    let(:context) { Mongoid::PersistenceContext.get(person) }
+
+    it 'remembers its persistence context' do
+      expect(person.collection_name).to be == :extra_people
+    end
+
+    it 'can be reloaded without specifying the context' do
+      expect { person.reload }.not_to raise_error
+    end
+
+    it 'remembers its context when queried specifically' do
+      person_by_id = Person.with(options) { Person.find(_id: person._id) }
+      expect(person_by_id.collection_name).to be == :extra_people
+    end
+
+    it 'remembers its context when queried generally' do
+      person # force the person to be created
+      person_generally = Person.with(options) { Person.all[0] }
+      expect(person_generally.collection_name).to be == :extra_people
+    end
+
+    it 'can be updated without specifying the context' do
+      person.update username: 'zyg15'
+      expect(Person.with(options) { Person.first.username }).to be == 'zyg15'
+    end
+  end
 end

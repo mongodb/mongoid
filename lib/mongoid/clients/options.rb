@@ -12,6 +12,24 @@ module Mongoid
     module Options
       extend ActiveSupport::Concern
 
+      # Returns the default persistence context that was used either when
+      # this document was first instantiated (created, or queried).
+      #
+      # @note This shouldn't be stored using PersistenceContext.set, because
+      # document objects are inherently transient--coming and going, and
+      # being unloaded from memory (potentially) frequently, whereas
+      # PersistenceContext.set will effectively remember them for the
+      # lifetime of the process. Instead, each object will remember the
+      # context used at its creation, allowing that context to be garbage
+      # collected when the object is.
+      #
+      # @return [ Mongoid::PersistenceContext | nil ] the persistence context
+      #   in use when the document was instantiated, or nil if there was no
+      #   specific context in use.
+      #
+      # @api private
+      attr_accessor :default_persistence_context
+
       # Change the persistence context for this object during the block.
       #
       # @example Save the current document to a different collection.
@@ -78,15 +96,16 @@ module Mongoid
       # @example Get the current persistence context.
       #   document.persistence_context
       #
-      # @return [ Mongoid::PersistenceContent ] The current persistence
+      # @return [ Mongoid::PersistenceContext ] The current persistence
       #   context.
       def persistence_context
         if embedded? && !_root?
           _root.persistence_context
         else
           PersistenceContext.get(self) ||
-              PersistenceContext.get(self.class) ||
-              PersistenceContext.new(self.class)
+            PersistenceContext.get(self.class) ||
+            default_persistence_context ||
+            PersistenceContext.new(self.class)
         end
       end
 
@@ -104,7 +123,9 @@ module Mongoid
         if embedded? && !_root?
           _root.persistence_context?
         else
-          !!(PersistenceContext.get(self) || PersistenceContext.get(self.class))
+          default_persistence_context.present? ||
+            PersistenceContext.get(self).present? ||
+            PersistenceContext.get(self.class).present?
         end
       end
 
