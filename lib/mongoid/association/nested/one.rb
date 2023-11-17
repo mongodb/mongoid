@@ -29,7 +29,7 @@ module Mongoid
           return if reject?(parent, attributes)
           @existing = parent.send(association.name)
           if update?
-            attributes.delete_id
+            delete_id(attributes)
             existing.assign_attributes(attributes)
           elsif replace?
             parent.send(association.setter, Factory.build(@class_name, attributes))

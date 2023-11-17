@@ -18,7 +18,7 @@ development:
         # Note that all options listed below are Ruby driver client options (the mongo gem).
         # Please refer to the driver documentation of the version of the mongo gem you are using
         # for the most up-to-date list of options.
-        #
+
         # Change the default write concern. (default = { w: 1 })
         # write:
         #   w: 1
@@ -44,7 +44,7 @@ development:
         # Change the default authentication mechanism. Valid options are: :scram,
         # :mongodb_cr, :mongodb_x509, and :plain. Note that all authentication
         # mechanisms require username and password, with the exception of :mongodb_x509.
-        # Default on mongoDB 3.0 is :scram, default on 2.4 and 2.6 is :plain.
+        # Default is :scram since MongoDB 3.0; earlier versions defaulted to :plain.
         # auth_mech: :scram
 
         # The database or source to authenticate the user against.
@@ -93,6 +93,11 @@ development:
         # not belong to this replica set will be ignored.
         # replica_set: name
 
+        # Compressors to use for wire protocol compression. (default is to not use compression)
+        # "zstd" requires zstd-ruby gem. "snappy" requires snappy gem.
+        # Refer to: https://www.mongodb.com/docs/ruby-driver/current/reference/create-client/#compression
+        # compressors: ["zstd", "snappy", "zlib"]
+
         # Whether to connect to the servers via ssl. (default: false)
         # ssl: true
 
@@ -113,17 +118,32 @@ development:
         # The file containing concatenated certificate authority certificates
         # used to validate certs passed from the other end of the connection.
         # ssl_ca_cert: /path/to/ca.cert
-        
+
         # Whether to truncate long log lines. (default: true)
         # truncate_logs: true
 
-  # Configure Mongoid specific options. (optional)
+  # Configure Mongoid-specific options. (optional)
   options:
 <%- Mongoid::Config::Introspection.options.each do |opt| -%>
     <%= opt.indented_comment(indent: 4) %>
     # <%= opt.name %>: <%= opt.default %>
 
 <%- end -%>
+  # Configure Driver-specific options. (optional)
+  driver_options:
+    # When this flag is off, an aggregation done on a view will be executed over
+    # the documents included in that view, instead of all documents in the
+    # collection. When this flag is on, the view fiter is ignored.
+    # broken_view_aggregate: true
+
+    # When this flag is set to false, the view options will be correctly
+    # propagated to readable methods.
+    # broken_view_options: true
+
+    # When this flag is set to true, the update and replace methods will
+    # validate the paramters and raise an error if they are invalid.
+    # validate_update_replace: false
+
 
 test:
   clients:
