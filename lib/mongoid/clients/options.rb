@@ -12,7 +12,7 @@ module Mongoid
     module Options
       extend ActiveSupport::Concern
 
-      # Returns the default persistence context that was used either when
+      # Returns the default persistence context that was used when
       # this document was first instantiated (created, or queried).
       #
       # @note This shouldn't be stored using PersistenceContext.set, because
@@ -29,6 +29,16 @@ module Mongoid
       #
       # @api private
       attr_accessor :default_persistence_context
+
+      # Implements the Mongoid.legacy_legacy_persistence_context_behavior
+      # flag, by always setting the default persistence context to nil
+      # if the flag is true. Once the flag is retired (when Mongoid 8.x
+      # is no longer supported), we can remove this method.
+      #
+      # @api private
+      def default_persistence_context=(context)
+        @default_persistence_context = Mongoid.legacy_persistence_context_behavior ? nil : context
+      end
 
       # Change the persistence context for this object during the block.
       #

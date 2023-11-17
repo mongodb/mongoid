@@ -120,6 +120,30 @@ module Mongoid
     # reload, but when it is turned off, it won't be.
     option :legacy_readonly, default: false
 
+    # When this flag is false (the default as of Mongoid 9.0), a document that
+    # is created or loaded will remember the persistence context in which it
+    # was loaded, and will use that same context by default when saving or
+    # reloading itself.
+    #
+    # When this flag is true you'll get pre-9.0 behavior, where a document will
+    # not remember the persistence context in which it was loaded/created, and
+    # subsequent updates will need to explicitly set up that context each time.
+    #
+    # For example:
+    #
+    #    record = Model.with(collection: 'other_collection') { Model.first }
+    #
+    # This will try to load the first document from 'other_collection' and
+    # instantiate it as a Model instance. Pre-9.0, the record object would
+    # not remember that it came from 'other_collection', and attempts to
+    # update it or reload it would fail unless you first remembered to set
+    # up that persistence context each time.
+    #
+    # As of Mongoid 9.0, the record will remember that it came from
+    # 'other_collection', and updates and reloads will automatically default
+    # to that collection, for that record object.
+    option :legacy_persistence_context_behavior, default: false
+
     # When this flag is true, any attempt to change the _id of a persisted
     # document will raise an exception (`Errors::ImmutableAttribute`).
     # This is the default in 9.0. Setting this flag to false restores the
