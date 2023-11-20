@@ -491,3 +491,58 @@ are supported by Mongoid.
   8.0 and 8.1 stable branches.
 
 .. include:: /includes/unicode-checkmark.rst
+.. include:: /includes/unicode-ballot-x.rst
+
+Rails Frameworks Support
+------------------------
+
+Ruby on Rails is comprised of a number of frameworks, which Mongoid attempts to
+provided compatibility with wherever possible.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Rails Framework
+     - Supported?
+
+   * - ``ActionCable``
+     - |checkmark| [#rails-actioncable-dependency]_
+
+   * - ``ActionMailbox``
+     - |x| [#rails-activerecord-dependency]_
+
+   * - ``ActionMailer``
+     - |checkmark|
+
+   * - ``ActionPack``
+     - |checkmark|
+
+   * - ``ActionText``
+     - |x| [#rails-activerecord-dependency]_
+
+   * - ``ActionView``
+     - |checkmark|
+
+   * - ``ActiveJob``
+     - |checkmark| [#rails-activejob-dependency]_
+
+   * - ``ActiveModel``
+     - |checkmark|
+
+   * - ``ActiveRecord``
+     - |x|
+
+   * - ``ActiveStorage``
+     - |x| [#rails-activerecord-dependency]_
+
+.. [#rails-activerecord-dependency] Depends on ``ActiveRecord``
+
+.. [#rails-activejob-dependency] Serialization of BSON & Mongoid objects is
+   fraught, works best if you explicitly send ``ObjectId``'s as strings, and
+   reconstitute them in the job
+
+.. [#rails-actioncable-dependency] not all subscription adapters are compatible
+   with Mongoid (e.g. the PostgreSQL adapter) but most if not all other adapters
+   are compatible.
