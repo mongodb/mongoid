@@ -454,15 +454,16 @@ Consider the following code:
   record.update(field: 'value')
 
 Prior to Mongoid 9.0, this could would silently fail to execute the update,
-because the "persistence context" (here, the specification of an alternate
+because the storage options (here, the specification of an alternate
 collection for the model) would not be remembered by the record. Thus, the
 record would be loaded from "other_collection", but when updated, would attempt
 to look for and update the document in the default collection for Model. To
-make this work, you would have had to specify the persistence context for
+make this work, you would have had to specify the collection explicitly for
 every update.
 
-As of Mongoid 9.0, records that are created or loaded under a custom persistence
-context, will remember that context.
+As of Mongoid 9.0, records that are created or loaded under explicit storage
+options, will remember those options (including a named client,
+a different database, or a different collection).
 
 If you need the legacy (pre-9.0) behavior, you can enable it with the following
 flag:

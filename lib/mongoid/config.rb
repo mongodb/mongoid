@@ -121,13 +121,13 @@ module Mongoid
     option :legacy_readonly, default: false
 
     # When this flag is false (the default as of Mongoid 9.0), a document that
-    # is created or loaded will remember the persistence context in which it
-    # was loaded, and will use that same context by default when saving or
-    # reloading itself.
+    # is created or loaded will remember the storage options that were active
+    # when it was loaded, and will use those same options by default when
+    # saving or reloading itself.
     #
     # When this flag is true you'll get pre-9.0 behavior, where a document will
-    # not remember the persistence context in which it was loaded/created, and
-    # subsequent updates will need to explicitly set up that context each time.
+    # not remember the storage options from when it was loaded/created, and
+    # subsequent updates will need to explicitly set up those options each time.
     #
     # For example:
     #
@@ -136,8 +136,8 @@ module Mongoid
     # This will try to load the first document from 'other_collection' and
     # instantiate it as a Model instance. Pre-9.0, the record object would
     # not remember that it came from 'other_collection', and attempts to
-    # update it or reload it would fail unless you first remembered to set
-    # up that persistence context each time.
+    # update it or reload it would fail unless you first remembered to
+    # explicitly specify the collection every time.
     #
     # As of Mongoid 9.0, the record will remember that it came from
     # 'other_collection', and updates and reloads will automatically default
