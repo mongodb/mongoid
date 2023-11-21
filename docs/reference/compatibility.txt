@@ -497,7 +497,7 @@ Rails Frameworks Support
 ------------------------
 
 Ruby on Rails is comprised of a number of frameworks, which Mongoid attempts to
-provided compatibility with wherever possible.
+provide compatibility with wherever possible.
 
 Though Mongoid attempts to offer API compatibility with `Active Record <https://guides.rubyonrails.org/active_record_basics.html>`_,
 libraries that depend directly on Active Record may not work as expected when
