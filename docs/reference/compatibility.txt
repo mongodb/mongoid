@@ -505,8 +505,7 @@ Mongoid is used as a drop-in replacement.
 
 .. note::
 
-  Mongoid can be used alongside other Active Record within the same
-  application without issue.
+  Mongoid can be used alongside Active Record within the same application without issue.
 
 .. list-table::
    :header-rows: 1
