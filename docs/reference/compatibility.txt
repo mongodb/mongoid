@@ -544,8 +544,8 @@ Mongoid is used as a drop-in replacement.
      - |x| [#rails-activerecord-dependency]_
 
 .. [#rails-actioncable-dependency] There is currently no MongoDB adapter for
-   ``ActionCable``, however any existing adapter (such as Redis) can be used
-   successfully in conjunction with Mongoid models
+   ``ActionCable``, however any existing adapter (such as `Redis <https://guides.rubyonrails.org/action_cable_overview.html#redis-adapter>`_)
+   can be used successfully in conjunction with Mongoid models
 
 .. [#rails-activerecord-dependency] Depends directly on ``ActiveRecord``
 
