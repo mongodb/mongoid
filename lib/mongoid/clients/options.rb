@@ -12,34 +12,6 @@ module Mongoid
     module Options
       extend ActiveSupport::Concern
 
-      # Returns the default persistence context that was used when
-      # this document was first instantiated (created, or queried).
-      #
-      # @note This shouldn't be stored using PersistenceContext.set, because
-      # document objects are inherently transient--coming and going, and
-      # being unloaded from memory (potentially) frequently, whereas
-      # PersistenceContext.set will effectively remember them for the
-      # lifetime of the process. Instead, each object will remember the
-      # context used at its creation, allowing that context to be garbage
-      # collected when the object is.
-      #
-      # @return [ Mongoid::PersistenceContext | nil ] the persistence context
-      #   in use when the document was instantiated, or nil if there was no
-      #   specific context in use.
-      #
-      # @api private
-      attr_accessor :default_persistence_context
-
-      # Implements the Mongoid.legacy_legacy_persistence_context_behavior
-      # flag, by always setting the default persistence context to nil
-      # if the flag is true. Once the flag is retired (when Mongoid 8.x
-      # is no longer supported), we can remove this method.
-      #
-      # @api private
-      def default_persistence_context=(context)
-        @default_persistence_context = Mongoid.legacy_persistence_context_behavior ? nil : context
-      end
-
       # Change the persistence context for this object during the block.
       #
       # @example Save the current document to a different collection.
@@ -114,8 +86,7 @@ module Mongoid
         else
           PersistenceContext.get(self) ||
             PersistenceContext.get(self.class) ||
-            default_persistence_context ||
-            PersistenceContext.new(self.class)
+            PersistenceContext.new(self.class, storage_options)
         end
       end
 
@@ -133,7 +104,7 @@ module Mongoid
         if embedded? && !_root?
           _root.persistence_context?
         else
-          default_persistence_context.present? ||
+          remembered_storage_options.any? ||
             PersistenceContext.get(self).present? ||
             PersistenceContext.get(self.class).present?
         end
