@@ -558,6 +558,7 @@ Mongoid is used as a drop-in replacement.
 
     class MyJob < ApplicationJob
       def perform(id_as_string)
-        record = Model.find(id_as_string) # ...
+        record = Model.find(id_as_string)
+        # ...
       end
     end
