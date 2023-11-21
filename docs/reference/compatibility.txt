@@ -499,6 +499,15 @@ Rails Frameworks Support
 Ruby on Rails is comprised of a number of frameworks, which Mongoid attempts to
 provided compatibility with wherever possible.
 
+Though Mongoid attempts to offer API compatibility with `Active Record <https://guides.rubyonrails.org/active_record_basics.html>`_,
+frameworks that depend directly on Active Record may not work as expected when
+Mongoid is used as a drop-in replacement.
+
+.. note::
+
+  Mongoid can be used alongside other Active Record adapters within the same
+  application with no issue.
+
 .. list-table::
    :header-rows: 1
    :stub-columns: 1
@@ -531,18 +540,26 @@ provided compatibility with wherever possible.
    * - ``ActiveModel``
      - |checkmark|
 
-   * - ``ActiveRecord``
-     - |x|
-
    * - ``ActiveStorage``
      - |x| [#rails-activerecord-dependency]_
 
-.. [#rails-activerecord-dependency] Depends on ``ActiveRecord``
+.. [#rails-actioncable-dependency] There is currently no MongoDB adapter for
+   ``ActionCable``, however any existing adapter can be used successfully in conjunction
+   with Mongoid models
 
-.. [#rails-activejob-dependency] Serialization of BSON & Mongoid objects is
-   fraught, works best if you explicitly send ``ObjectId``'s as strings, and
-   reconstitute them in the job
+.. [#rails-activerecord-dependency] Depends directly on ``ActiveRecord``
 
-.. [#rails-actioncable-dependency] not all subscription adapters are compatible
-   with Mongoid (e.g. the PostgreSQL adapter) but most if not all other adapters
-   are compatible.
+.. [#rails-activejob-dependency] Serialization of BSON & Mongoid objects  works best
+   if you explicitly send ``ObjectId``'s as strings, and reconstitute them in the job:
+
+   .. code-block:: ruby
+
+    record = Model.find(...)
+    MyJob.perform_later(record._id.to_s)
+
+    class MyJob < ApplicationJob
+      def perform(id_as_string)
+        id = BSON::ObjectId.from_string(id_as_string)
+        record = Model.find(id) # ...
+      end
+    end
