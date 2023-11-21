@@ -104,7 +104,7 @@ module Mongoid
         if embedded? && !_root?
           _root.persistence_context?
         else
-          remembered_storage_options.any? ||
+          remembered_storage_options&.any? ||
             PersistenceContext.get(self).present? ||
             PersistenceContext.get(self.class).present?
         end
