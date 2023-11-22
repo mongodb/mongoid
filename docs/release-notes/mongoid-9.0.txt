@@ -17,6 +17,11 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Deprecated class ``Mongoid::Errors::InvalidStorageParent`` removed
+------------------------------------------------------------------
+
+The deprecated class ``Mongoid::Errors::InvalidStorageParent`` has been removed.
+
 
 ``around_*`` callbacks for embedded documents are now ignored
 -------------------------------------------------------------
