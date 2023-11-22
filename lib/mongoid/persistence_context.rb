@@ -66,10 +66,9 @@ module Mongoid
     #
     # @api private
     def for_child(document)
-      case document
-      when Class
+      if document.is_a?(Class)
         return self if document == (@object.is_a?(Class) ? @object : @object.class)
-      when Mongoid::Document
+      elsif document.is_a?(Mongoid::Document)
         return self if document.class == (@object.is_a?(Class) ? @object : @object.class)
       else
         raise ArgumentError, 'must specify a class or a document instance'
