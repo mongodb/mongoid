@@ -60,13 +60,21 @@ module Mongoid
     # Returns a new persistence context that is consistent with the given
     # child document, inheriting most appropriate settings.
     #
-    # @param [ Mongoid::Document ] document the child document
+    # @param [ Mongoid::Document | Class ] document the child document
     #
     # @return [ PersistenceContext ] the new persistence context
     #
     # @api private
     def for_child(document)
-      return self if document.class == @object.class
+      case document
+      when Class
+        return self if document == (@object.is_a?(Class) ? @object : @object.class)
+      when Mongoid::Document
+        return self if document.class == (@object.is_a?(Class) ? @object : @object.class)
+      else
+        raise ArgumentError, 'must specify a class or a document instance'
+      end
+
       PersistenceContext.new(document, options.merge(document.storage_options))
     end
 
