@@ -63,6 +63,18 @@ describe Mongoid::Document do
         person.update username: 'zyg15'
         expect(Person.with(options) { Person.first.username }).to be == 'zyg15'
       end
+
+      it 'an explicit context takes precedence over a remembered context when persisting' do
+        person.username = 'bob'
+        # should not actually save -- the person does not exist in the
+        # `other` collection and so cannot be updated.
+        Person.with(collection: 'other') { person.save! }
+        expect(person.reload.username).to eq 'zyg14'
+      end
+
+      it 'an explicit context takes precedence over a remembered context when reloading' do
+        expect { Person.with(collection: 'other') { person.reload } }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
     end
 
     # pre-9.0 default persistence behavior

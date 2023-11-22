@@ -14,6 +14,14 @@ module Mongoid
         class_attribute :storage_options, instance_accessor: false, default: storage_options_defaults
       end
 
+      # Remembers the storage options that were active when the current object
+      # was instantiated/created.
+      #
+      # @return [ Hash | nil ] the storage options that have been cached for
+      #   this object instance (or nil if no storage options have been
+      #   cached).
+      #
+      # @api private
       attr_accessor :remembered_storage_options
 
       # The storage options that apply to this record, consisting of both
