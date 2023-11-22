@@ -57,6 +57,19 @@ module Mongoid
       PersistenceContext.new(@object, options.merge(opts))
     end
 
+    # Returns a new persistence context that is consistent with the given
+    # child document, inheriting most appropriate settings.
+    #
+    # @param [ Mongoid::Document ] document the child document
+    #
+    # @return [ PersistenceContext ] the new persistence context
+    #
+    # @api private
+    def for_child(document)
+      return self if document.class == @object.class
+      PersistenceContext.new(document, options.merge(document.storage_options))
+    end
+
     # Get the collection for this persistence context.
     #
     # @example Get the collection for this persistence context.
