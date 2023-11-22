@@ -47,16 +47,6 @@ module Mongoid
       set_options!(opts)
     end
 
-    # Returns a new persistence context that merges the given options
-    # with the current context.
-    #
-    # @param [ Hash ] opts the options hash to merge
-    #
-    # @return [ PersistenceContext ] the new context
-    def merge(opts)
-      PersistenceContext.new(@object, options.merge(opts))
-    end
-
     # Returns a new persistence context that is consistent with the given
     # child document, inheriting most appropriate settings.
     #
