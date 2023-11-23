@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -76,17 +77,6 @@ describe Mongoid::Criteria::Queryable::Extensions::Regexp do
           expect(evolved).to eq([ /\A[123]/ ])
         end
       end
-    end
-  end
-
-  describe "#regexp?" do
-
-    let(:regexp) do
-      /\A[123]/
-    end
-
-    it "returns true" do
-      expect(regexp).to be_regexp
     end
   end
 end

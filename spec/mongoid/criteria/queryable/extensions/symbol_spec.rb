@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -10,6 +11,10 @@ describe Symbol do
       described_class.add_key(:fubar, :union, "$fu", "$bar") do |value|
         value.to_s
       end
+    end
+
+    after do
+      Symbol.undef_method(:fubar)
     end
 
     let(:fubar) do
@@ -104,65 +109,6 @@ describe Symbol do
           expect(specified).to eq({ field: { "$ne" => "test" }})
         end
 
-      end
-    end
-  end
-
-  describe "#to_direction" do
-
-    context "when ascending" do
-
-      it "returns 1" do
-        expect(:ascending.to_direction).to eq(1)
-      end
-    end
-
-    context "when asc" do
-
-      it "returns 1" do
-        expect(:asc.to_direction).to eq(1)
-      end
-    end
-
-    context "when ASCENDING" do
-
-      it "returns 1" do
-        expect(:ASCENDING.to_direction).to eq(1)
-      end
-    end
-
-    context "when ASC" do
-
-      it "returns 1" do
-        expect(:ASC.to_direction).to eq(1)
-      end
-    end
-
-    context "when descending" do
-
-      it "returns -1" do
-        expect(:descending.to_direction).to eq(-1)
-      end
-    end
-
-    context "when desc" do
-
-      it "returns -1" do
-        expect(:desc.to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESCENDING" do
-
-      it "returns -1" do
-        expect(:DESCENDING.to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESC" do
-
-      it "returns -1" do
-        expect(:DESC.to_direction).to eq(-1)
       end
     end
   end

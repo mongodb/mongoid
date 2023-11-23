@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
@@ -35,7 +36,7 @@ Gem::Specification.new do |s|
 
   # activemodel 7.0.0 cannot be used due to Class#descendants issue
   # See: https://github.com/rails/rails/pull/43951
-  s.add_dependency("activemodel", ['>= 6.0', '< 7.1', '!= 7.0.0'])
+  s.add_dependency("activemodel", ['>= 6.0', '< 7.2', '!= 7.0.0'])
   s.add_dependency("mongo", ['>= 2.18.0', '< 3.0.0'])
   s.add_dependency("concurrent-ruby", ['>= 1.0.5', '< 2.0'])
 

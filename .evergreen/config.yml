@@ -38,66 +38,62 @@ functions:
 
           git submodule update --init --recursive
 
-  "fetch egos":
-    - command: shell.exec
-      params:
-        working_dir: "src"
-        script: |
-          set -ex
-
-          curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
-          chmod +x ./egos
-
   "create expansions":
     # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
       params:
         working_dir: "src"
         script: |
-           # Get the current unique version of this checkout
-           if [ "${is_patch}" = "true" ]; then
-              CURRENT_VERSION=$(git describe)-patch-${version_id}
-           else
-              CURRENT_VERSION=latest
-           fi
+          # Get the current unique version of this checkout
+          if [ "${is_patch}" = "true" ]; then
+            CURRENT_VERSION=$(git describe)-patch-${version_id}
+          else
+            CURRENT_VERSION=latest
+          fi
 
-           export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
+          export DRIVERS_TOOLS="$(pwd)/.mod/drivers-evergreen-tools"
 
-           export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
-           export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
-           export UPLOAD_BUCKET="${project}"
-           export PROJECT_DIRECTORY="$(pwd)"
+          export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
+          export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
+          export UPLOAD_BUCKET="${project}"
+          export PROJECT_DIRECTORY="$(pwd)"
 
-           cat <<EOT > expansion.yml
-           CURRENT_VERSION: "$CURRENT_VERSION"
-           DRIVERS_TOOLS: "$DRIVERS_TOOLS"
-           MONGO_ORCHESTRATION_HOME: "$MONGO_ORCHESTRATION_HOME"
-           MONGODB_BINARIES: "$MONGODB_BINARIES"
-           UPLOAD_BUCKET: "$UPLOAD_BUCKET"
-           PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
-           PREPARE_SHELL: |
-              set -o errexit
-              set -o xtrace
-              export DRIVERS_TOOLS="$DRIVERS_TOOLS"
-              export MONGO_ORCHESTRATION_HOME="$MONGO_ORCHESTRATION_HOME"
-              export MONGODB_BINARIES="$MONGODB_BINARIES"
-              export UPLOAD_BUCKET="$UPLOAD_BUCKET"
-              export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
+          cat <<EOT > expansion.yml
+          CURRENT_VERSION: "$CURRENT_VERSION"
+          DRIVERS_TOOLS: "$DRIVERS_TOOLS"
+          MONGO_ORCHESTRATION_HOME: "$MONGO_ORCHESTRATION_HOME"
+          MONGODB_BINARIES: "$MONGODB_BINARIES"
+          UPLOAD_BUCKET: "$UPLOAD_BUCKET"
+          PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
+          PREPARE_SHELL: |
+            set -o errexit
+            set -o xtrace
+            export DRIVERS_TOOLS="$DRIVERS_TOOLS"
+            export MONGO_ORCHESTRATION_HOME="$MONGO_ORCHESTRATION_HOME"
+            export MONGODB_BINARIES="$MONGODB_BINARIES"
+            export UPLOAD_BUCKET="$UPLOAD_BUCKET"
+            export PROJECT_DIRECTORY="$PROJECT_DIRECTORY"
 
-              export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
-              export PATH="$MONGODB_BINARIES:$PATH"
-              export PROJECT="${project}"
+            export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
+            export PATH="$MONGODB_BINARIES:$PATH"
+            export PROJECT="${project}"
 
-              export MONGODB_VERSION=${VERSION}
-              export TOPOLOGY=${TOPOLOGY}
-              export SINGLE_MONGOS=${SINGLE_MONGOS}
-              export AUTH=${AUTH}
-              export SSL=${SSL}
-              export APP_TESTS=${APP_TESTS}
-              export DOCKER_DISTRO=${DOCKER_DISTRO}
-           EOT
-           # See what we've done
-           cat expansion.yml
+            export MONGODB_VERSION="${VERSION}"
+            export TOPOLOGY="${TOPOLOGY}"
+            export SINGLE_MONGOS="${SINGLE_MONGOS}"
+            export AUTH="${AUTH}"
+            export SSL="${SSL}"
+            export APP_TESTS="${APP_TESTS}"
+            export DOCKER_DISTRO="${DOCKER_DISTRO}"
+            export RVM_RUBY="${RVM_RUBY}"
+            export RAILS="${RAILS}"
+            export DRIVER="${DRIVER}"
+            export I18N="${I18N}"
+            export TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}"
+            export FLE="${FLE}"
+          EOT
+          # See what we've done
+          cat expansion.yml
 
     # Load the expansion file to make an evergreen variable with the current unique version
     - command: expansions.update
@@ -276,12 +272,13 @@ functions:
           ${PREPARE_SHELL}
           env \
             MONGODB_URI="${MONGODB_URI}" \
-            TOPOLOGY=${TOPOLOGY} \
+            TOPOLOGY="${TOPOLOGY}" \
             RVM_RUBY="${RVM_RUBY}" \
             RAILS="${RAILS}" \
             DRIVER="${DRIVER}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
-            ./egos .evergreen/run-tests-docker.sh
+            FLE="${FLE}" \
+            .evergreen/run-tests-docker.sh
 
   "fix absolute paths":
     - command: shell.exec
@@ -304,7 +301,6 @@ functions:
 
 pre:
   - func: "fetch source"
-  - func: "fetch egos"
   - func: "create expansions"
   - func: "fix absolute paths"
   - func: "install dependencies"
@@ -316,18 +312,82 @@ post:
   #- func: "upload test results"
   - func: "upload test results to s3"
 
+task_groups:
+  - name: testatlas_task_group
+    setup_group_can_fail_task: true
+    setup_group_timeout_secs: 1800 # 30 minutes
+    setup_group:
+      - func: fetch source
+      - func: create expansions
+      - command: shell.exec
+        params:
+          shell: "bash"
+          working_dir: "src"
+          script: |
+            ${PREPARE_SHELL}
+
+            DRIVERS_ATLAS_PUBLIC_API_KEY="${DRIVERS_ATLAS_PUBLIC_API_KEY}" \
+              DRIVERS_ATLAS_PRIVATE_API_KEY="${DRIVERS_ATLAS_PRIVATE_API_KEY}" \
+              DRIVERS_ATLAS_GROUP_ID="${DRIVERS_ATLAS_GROUP_ID}" \
+              DRIVERS_ATLAS_LAMBDA_USER="${DRIVERS_ATLAS_LAMBDA_USER}" \
+              DRIVERS_ATLAS_LAMBDA_PASSWORD="${DRIVERS_ATLAS_LAMBDA_PASSWORD}" \
+              LAMBDA_STACK_NAME="dbx-ruby-lambda" \
+              MONGODB_VERSION="7.0" \
+              task_id="${task_id}" \
+              execution="${execution}" \
+              $DRIVERS_TOOLS/.evergreen/atlas/setup-atlas-cluster.sh
+      - command: expansions.update
+        params:
+          file: src/atlas-expansion.yml
+    teardown_group:
+      - command: shell.exec
+        params:
+          shell: "bash"
+          working_dir: "src"
+          script: |
+            ${PREPARE_SHELL}
+
+            DRIVERS_ATLAS_PUBLIC_API_KEY="${DRIVERS_ATLAS_PUBLIC_API_KEY}" \
+              DRIVERS_ATLAS_PRIVATE_API_KEY="${DRIVERS_ATLAS_PRIVATE_API_KEY}" \
+              DRIVERS_ATLAS_GROUP_ID="${DRIVERS_ATLAS_GROUP_ID}" \
+              LAMBDA_STACK_NAME="dbx-ruby-lambda" \
+              task_id="${task_id}" \
+              execution="${execution}" \
+              $DRIVERS_TOOLS/.evergreen/atlas/teardown-atlas-cluster.sh
+    tasks:
+      - test-full-atlas-task
+
 tasks:
     - name: "test"
       commands:
         - func: "run tests"
+    - name: "test-full-atlas-task"
+      commands:
+        - command: shell.exec
+          type: test
+          params:
+            working_dir: "src"
+            shell: "bash"
+            script: |
+              ${PREPARE_SHELL}
+              MONGODB_URI="${MONGODB_URI}" \
+                .evergreen/run-tests-atlas-full.sh
 axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
+      - id: "latest"
+        display_name: "MongoDB Latest"
+        variables:
+           VERSION: "latest"
+      - id: "7.0"
+        display_name: "MongoDB 7.0"
+        variables:
+           VERSION: "7.0"
       - id: "6.0"
         display_name: "MongoDB 6.0"
         variables:
-           VERSION: "5.0"
+           VERSION: "6.0"
       - id: "5.3"
         display_name: "MongoDB 5.3"
         variables:
@@ -413,6 +473,10 @@ axes:
         display_name: ruby-3.1
         variables:
           RVM_RUBY: "ruby-3.1"
+      - id: "ruby-3.2"
+        display_name: ruby-3.2
+        variables:
+          RVM_RUBY: "ruby-3.2"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -429,29 +493,27 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: ubuntu-16.04
-        display_name: "Ubuntu 16.04"
-        run_on: ubuntu1604-small
-        variables:
-          DOCKER_DISTRO: ubuntu1604
+      - id: actual-ubuntu-22.04
+        display_name: "Ubuntu 22.04"
+        run_on: ubuntu2204-small
       - id: ubuntu-18.04
         display_name: "Ubuntu 18.04"
-        run_on: ubuntu1804-small
-        variables:
-          DOCKER_DISTRO: ubuntu1804
-      - id: ubuntu-20.04
-        display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
         variables:
-          DOCKER_DISTRO: ubuntu2004
-      - id: rhel70
-        display_name: "RHEL 7.0"
-        run_on: rhel70-small
+          DOCKER_DISTRO: ubuntu1804
+      - id: ubuntu-22.04
+        display_name: "Ubuntu 22.04"
+        run_on: ubuntu2004-small
         variables:
-          DOCKER_DISTRO: rhel70
+          DOCKER_DISTRO: ubuntu2204
+      - id: debian11
+        display_name: "Debian 11"
+        run_on: ubuntu2004-small
+        variables:
+          DOCKER_DISTRO: debian11
       - id: rhel80
         display_name: "RHEL 8.0"
-        run_on: rhel80-small
+        run_on: ubuntu2004-small
         variables:
           DOCKER_DISTRO: rhel80
 
@@ -522,6 +584,10 @@ axes:
         display_name: "Rails 7.0"
         variables:
           RAILS: "7.0"
+      - id: "7.1"
+        display_name: "Rails 7.1"
+        variables:
+          RAILS: "7.1"
 
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
@@ -538,25 +604,48 @@ axes:
         display_name: Yes
         variables:
           APP_TESTS: yes
+
+  - id: "fle"
+    display_name: FLE
+    values:
+      - id: "helper"
+        display_name: via LMC helper
+        variables:
+          FLE: helper
+      - id: "path"
+        display_name: via LMC path
+        variables:
+          FLE: path
 buildvariants:
+- matrix_name: "ruby-3.2"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    topology: '*'
+    mongodb-version: ['6.0']
+    os: debian11
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tasks:
+    - name: "test"
+
+- matrix_name: "mongodb-latest"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    topology: '*'
+    mongodb-version: ['latest']
+    os: debian11
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tasks:
+    - name: "test"
+
 - matrix_name: "ruby-3.1"
   matrix_spec:
     ruby: ["ruby-3.1"]
     driver: ["current"]
     topology: '*'
     mongodb-version: ['6.0']
-    os: ubuntu-20.04
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
-- matrix_name: "mongodb-5.3"
-  matrix_spec:
-    ruby: ["ruby-3.1"]
-    driver: ["current"]
-    topology: '*'
-    mongodb-version: ['5.3']
-    os: ubuntu-20.04
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -567,7 +656,7 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set']
     mongodb-version: ['5.0']
-    os: ubuntu-20.04
+    os: rhel80
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -578,7 +667,7 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
-    os: ubuntu-18.04
+    os: rhel80
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -589,7 +678,7 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['4.4']
-    os: ubuntu-18.04
+    os: rhel80
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -600,7 +689,7 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set']
     mongodb-version: ['4.0']
-    os: ubuntu-16.04
+    os: rhel80
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -608,10 +697,10 @@ buildvariants:
 - matrix_name: "driver-upcoming"
   matrix_spec:
     driver: [master, stable]
-    ruby: ["ruby-3.1"]
-    mongodb-version: "5.0"
+    ruby: ["ruby-3.2"]
+    mongodb-version: "6.0"
     topology: ['replica-set', 'sharded-cluster']
-    os: ubuntu-20.04
+    os: debian11
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
@@ -622,7 +711,7 @@ buildvariants:
     ruby: ["ruby-2.6"]
     mongodb-version: "4.0"
     topology: ['replica-set', 'sharded-cluster']
-    os: ubuntu-18.04
+    os: rhel80
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
@@ -633,20 +722,21 @@ buildvariants:
     ruby: ["ruby-2.6"]
     mongodb-version: "3.6"
     topology: "standalone"
-    os: ubuntu-16.04
+    os: rhel80
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
 
 - matrix_name: "rails-7"
   matrix_spec:
-    ruby: ["ruby-3.0"]
+    ruby: ["ruby-3.2"]
     driver: ["current"]
-    mongodb-version: "5.0"
+    mongodb-version: "6.0"
     topology: "standalone"
-    rails: ['7.0']
-    os: ubuntu-20.04
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
+    rails: ['7.0', '7.1']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
   tasks:
     - name: "test"
 
@@ -656,7 +746,7 @@ buildvariants:
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
     topology: "standalone"
-    os: ubuntu-18.04
+    os: rhel80
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -667,7 +757,7 @@ buildvariants:
     ruby: ["ruby-3.0"]
     mongodb-version: "5.0"
     topology: "standalone"
-    os: ubuntu-18.04
+    os: rhel80
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -677,10 +767,10 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.0"]
     driver: ["current"]
-    mongodb-version: "5.0"
+    mongodb-version: "6.0"
     topology: "standalone"
     rails: ['6.0', '6.1']
-    os: ubuntu-20.04
+    os: rhel80
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
@@ -704,20 +794,20 @@ buildvariants:
     mongodb-version: "4.2"
     topology: "standalone"
     test-i18n-fallbacks: yes
-    os: ubuntu-18.04
-  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
+    os: rhel80
+  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
   tasks:
      - name: "test"
 
 - matrix_name: app-tests-ruby-3
   matrix_spec:
-    ruby: ["ruby-3.0", "ruby-3.1"]
+    ruby: ["ruby-3.0", "ruby-3.1", "ruby-3.2"]
     driver: ["current"]
-    mongodb-version: '5.0'
+    mongodb-version: '6.0'
     topology: standalone
     app-tests: yes
-    rails: ['6.0', '6.1', '7.0']
-    os: ubuntu-20.04
+    rails: ['6.0', '6.1', '7.0', '7.1']
+    os: rhel80
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
     - name: "test"
@@ -730,7 +820,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-18.04
+    os: rhel80
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
      - name: "test"
@@ -747,3 +837,26 @@ buildvariants:
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
+
+- matrix_name: "auto-encryption"
+  matrix_spec:
+    ruby: ruby-3.1
+    driver: current
+    topology: replica-set
+    mongodb-version: ['6.0']
+    os: ubuntu-22.04
+    rails: ['7.0']
+    fle: helper
+  display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
+  tasks:
+    - name: "test"
+
+- matrix_name: atlas-full
+  matrix_spec:
+    ruby: ruby-3.2
+    os: actual-ubuntu-22.04
+    auth: auth
+    ssl: ssl
+  display_name: "Atlas (Full)"
+  tasks:
+    - name: testatlas_task_group

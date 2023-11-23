@@ -1,6 +1,8 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 load 'mongoid/tasks/database.rake'
+load "mongoid/tasks/encryption.rake"
 
 namespace :db do
 
@@ -69,6 +71,11 @@ namespace :db do
     task :create_indexes => "mongoid:create_indexes"
   end
 
+  unless Rake::Task.task_defined?("db:create_search_indexes")
+    desc "Create search indexes specified in Mongoid models"
+    task :create_search_indexes => "mongoid:create_search_indexes"
+  end
+
   unless Rake::Task.task_defined?("db:remove_indexes")
     desc "Remove indexes specified in Mongoid models"
     task :remove_indexes => "mongoid:remove_indexes"
@@ -77,6 +84,11 @@ namespace :db do
   unless Rake::Task.task_defined?("db:shard_collections")
     desc "Shard collections with shard keys specified in Mongoid models"
     task :shard_collections => "mongoid:shard_collections"
+  end
+
+  namespace :encryption do
+    desc "Create encryption key"
+    task :create_data_key =>  "mongoid:encryption:create_data_key"
   end
 
   namespace :mongoid do

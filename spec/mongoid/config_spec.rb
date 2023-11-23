@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require "support/feature_sandbox"
@@ -331,6 +332,15 @@ describe Mongoid::Config do
   context 'when setting the map_big_decimal_to_decimal128 option in the config' do
     let(:option) { :map_big_decimal_to_decimal128 }
     let(:default) { true }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the allow_bson5_decimal128 option in the config' do
+    min_bson_version '5.0'
+
+    let(:option) { :allow_bson5_decimal128 }
+    let(:default) { false }
 
     it_behaves_like "a config option"
   end

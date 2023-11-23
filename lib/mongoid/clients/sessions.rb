@@ -1,10 +1,15 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Clients
 
     # Encapsulates behavior for using sessions and transactions.
     module Sessions
+
+      # Add class method mixin functionality.
+      #
+      # @todo Replace with ActiveSupport::Concern
       def self.included(base)
         base.include(ClassMethods)
       end

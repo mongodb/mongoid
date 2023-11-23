@@ -1,8 +1,9 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
-describe "Mongoid::Tasks::Database" do
+describe Mongoid::Tasks::Database do
 
   before(:all) do
     module DatabaseSpec
@@ -208,6 +209,64 @@ describe "Mongoid::Tasks::Database" do
       it "creates the indexes for the models" do
         expect(klass).to receive(:create_indexes).once
         indexes
+      end
+    end
+  end
+
+  describe '.create_search_indexes' do
+    let(:searchable_model) do
+      Class.new do
+        include Mongoid::Document
+        store_in collection: BSON::ObjectId.new.to_s
+
+        search_index mappings: { dynamic: true }
+      end
+    end
+
+    let(:index_names) { %w[ name1 name2 ] }
+    let(:searchable_model_spy) do
+      class_spy(searchable_model,
+                create_search_indexes: index_names,
+                search_index_specs: [ { mappings: { dynamic: true } } ])
+    end
+
+    context 'when wait is true' do
+      before do
+        allow(described_class).to receive(:wait_for_search_indexes)
+        described_class.create_search_indexes([ searchable_model_spy ], wait: true)
+      end
+
+      it 'invokes both create_search_indexes and wait_for_search_indexes' do
+        expect(searchable_model_spy).to have_received(:create_search_indexes)
+        expect(described_class).to have_received(:wait_for_search_indexes).with(searchable_model_spy => index_names)
+      end
+    end
+
+    context 'when wait is false' do
+      before do
+        allow(described_class).to receive(:wait_for_search_indexes)
+        described_class.create_search_indexes([ searchable_model_spy ], wait: false)
+      end
+
+      it 'invokes only create_search_indexes' do
+        expect(searchable_model_spy).to have_received(:create_search_indexes)
+        expect(described_class).not_to have_received(:wait_for_search_indexes)
+      end
+    end
+  end
+
+  describe '.remove_search_indexes' do
+    before do
+      models.each do |model|
+        allow(model).to receive(:remove_search_indexes) unless model.embedded?
+      end
+
+      described_class.remove_search_indexes(models)
+    end
+
+    it 'calls remove_search_indexes on all non-embedded models' do
+      models.each do |model|
+        expect(model).to have_received(:remove_search_indexes) unless model.embedded?
       end
     end
   end

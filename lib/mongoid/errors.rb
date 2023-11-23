@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/errors/mongoid_error"
 require "mongoid/errors/ambiguous_relationship"
@@ -11,6 +12,7 @@ require "mongoid/errors/document_not_found"
 require "mongoid/errors/empty_config_file"
 require "mongoid/errors/immutable_attribute"
 require "mongoid/errors/in_memory_collation_not_supported"
+require "mongoid/errors/invalid_auto_encryption_configuration"
 require "mongoid/errors/invalid_async_query_executor"
 require "mongoid/errors/invalid_collection"
 require "mongoid/errors/invalid_config_file"

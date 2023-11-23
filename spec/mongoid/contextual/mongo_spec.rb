@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -156,6 +157,16 @@ describe Mongoid::Contextual::Mongo do
         it 'applies the collation' do
           expect(count).to eq(1)
         end
+      end
+    end
+
+    context 'when for_js is present' do
+      let(:context) do
+        Band.for_js('this.name == "Depeche Mode"')
+      end
+
+      it 'counts the expected records' do
+        expect(context.count).to eq(1)
       end
     end
   end
@@ -1091,33 +1102,49 @@ describe Mongoid::Contextual::Mongo do
       let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
       let(:tally) { Person.tally("ssn") }
 
+      let(:tallied_classes) do
+        tally.keys.map(&:class).sort do |a, b|
+          a.to_s.casecmp(b.to_s)
+        end
+      end
+
       context "< BSON 5" do
         max_bson_version '4.99.99'
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
-          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+          expect(Person.find(person1.id).attributes["ssn"]).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).attributes["ssn"]).to be_a BSON::Decimal128
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
 
-      context ">= BSON 5" do
+      context '>= BSON 5' do
         min_bson_version "5.0"
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
-          Person.find(person2.id).ssn.should be_a BigDeimal
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BigDecimal
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BigDecimal, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BigDecimal, BSON::Regexp::Raw ]
+        end
+      end
+
+      context '>= BSON 5 with decimal128 allowed' do
+        min_bson_version "5.0"
+        config_override :allow_bson5_decimal128, true
+
+        it "stores the correct types in the database" do
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BSON::Decimal128
+        end
+
+        it "tallies the correct type" do
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
     end
@@ -1471,7 +1498,16 @@ describe Mongoid::Contextual::Mongo do
     end
 
     it "returns the criteria explain path" do
-      expect(context.explain).to_not be_empty
+      explain = context.explain
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "executionStats", "serverInfo")
+    end
+
+    it "respects options passed to explain" do
+      explain = context.explain(verbosity: :query_planner)
+      expect(explain).to_not be_empty
+      expect(explain.keys).to include("queryPlanner", "serverInfo")
+      expect(explain.keys).not_to include("executionStats")
     end
   end
 
@@ -3572,16 +3608,65 @@ describe Mongoid::Contextual::Mongo do
 
         context "when the attributes are in the correct type" do
 
+          context "when operation is $set" do
+
+            before do
+              context.update_all("$set" => { name: "Smiths" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.name).to eq("Smiths")
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.name).to eq("Smiths")
+            end
+          end
+
+          context "when operation is $push" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["electronic"])
+              new_order.update_attribute(:genres, ["electronic"])
+              context.update_all("$push" => { genres: "pop" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["electronic", "pop"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["electronic", "pop"])
+            end
+          end
+
+          context "when operation is $addToSet" do
+
+            before do
+              context.update_all("$addToSet" => { genres: "electronic" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["electronic"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["electronic"])
+            end
+          end
+        end
+
+        context 'when using aliased field names' do
           before do
-            context.update_all("$set" => { name: "Smiths" })
+            context.update_all('$set' => { years: 100 })
           end
 
           it "updates the first matching document" do
-            expect(depeche_mode.reload.name).to eq("Smiths")
+            expect(depeche_mode.reload.years).to eq(100)
           end
 
           it "updates the last matching document" do
-            expect(new_order.reload.name).to eq("Smiths")
+            expect(new_order.reload.years).to eq(100)
           end
         end
 

@@ -1,7 +1,11 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
+
+    # Mixin module for Mongoid::Criteria which adds custom
+    # Marshal.dump functionality.
     module Marshalable
 
       # Provides the data needed to Marshal.dump a criteria.

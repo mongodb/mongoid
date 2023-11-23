@@ -30,7 +30,7 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.18
+     - Driver 2.19-2.18
      - Driver 2.17-2.10
      - Driver 2.9-2.7
 
@@ -76,32 +76,17 @@ is deprecated.
      - JRuby 9.3
      - JRuby 9.2
 
-   * - 9.0
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     -
-     -
-     -
-     -
-     -
-     - |checkmark|
-     -
-     -
-
    * - 8.1
      - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - D
+     - |checkmark|
      -
      -
      -
      -
      - |checkmark|
-     - D
      -
 
    * - 8.0
@@ -110,7 +95,6 @@ is deprecated.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     -
      -
      -
      -
@@ -128,7 +112,6 @@ is deprecated.
      -
      -
      -
-     -
      - |checkmark|
      - D
 
@@ -143,24 +126,9 @@ is deprecated.
      -
      -
      -
-     -
      - |checkmark|
 
-   * - 7.3
-     -
-     - |checkmark| [#mongoid-7.3-ruby-3.0]_
-     - |checkmark| [#mongoid-7.3-ruby-3.0]_
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     -
-     -
-     -
-     - |checkmark|
-
-   * - 7.2
+   * - 7.2 thru 7.3
      -
      - |checkmark| [#mongoid-7.2-ruby-3.0]_
      - |checkmark| [#mongoid-7.2-ruby-3.0]_
@@ -169,7 +137,6 @@ is deprecated.
      - |checkmark|
      - D
      - D
-     -
      -
      -
      - |checkmark|
@@ -185,7 +152,6 @@ is deprecated.
      - |checkmark|
      -
      -
-     -
      - |checkmark|
 
    * - 7.0
@@ -199,7 +165,6 @@ is deprecated.
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
      -
-     -
      - |checkmark|
 
    * - 6.4
@@ -212,7 +177,6 @@ is deprecated.
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
-     -
      -
      - |checkmark|
 
@@ -248,6 +212,7 @@ and will be removed in a next version.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - MongoDB 7.0
      - MongoDB 6.0
      - MongoDB 5.0
      - MongoDB 4.4
@@ -259,31 +224,8 @@ and will be removed in a next version.
      - MongoDB 3.0
      - MongoDB 2.6
 
-   * - 9.0
+   * - 8.0 thru 8.1
      - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     -
-     -
-     -
-     -
-     -
-     -
-
-   * - 8.1
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     -
-     -
-     -
-     -
-
-   * - 8.0
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -302,12 +244,27 @@ and will be removed in a next version.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
      - D
      - D
      - D
      - D
 
-   * - 6.4 thru 7.3
+   * - 7.0 thru 7.3
+     -
+     -
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     - D
+     - D
+     - D
+
+   * - 6.4
+     -
      -
      - |checkmark|
      - |checkmark|
@@ -334,6 +291,7 @@ are supported by Mongoid.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Rails 7.1
      - Rails 7.0
      - Rails 6.1
      - Rails 6.0
@@ -343,18 +301,29 @@ are supported by Mongoid.
    * - 9.0
      - |checkmark|
      - |checkmark|
-     - D
+     - |checkmark|
+     - |checkmark|
      -
      -
 
-   * - 8.1
+   * - 8.2
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
      - D [#rails-5-ruby-3.0]_
      -
 
+   * - 8.0 thru 8.1
+     - |checkmark| [#rails-7.1]_
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#rails-5-ruby-3.0]_
+     -
+
    * - 8.0
+     - |checkmark| [#rails-7.1]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -362,6 +331,7 @@ are supported by Mongoid.
      -
 
    * - 7.5
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -369,6 +339,7 @@ are supported by Mongoid.
      - D
 
    * - 7.4
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -376,6 +347,7 @@ are supported by Mongoid.
      - |checkmark| [#rails-5-ruby-3.0]_
 
    * - 7.3
+     -
      - |checkmark| [#rails-7-Mongoid-7.3]_
      - |checkmark|
      - |checkmark|
@@ -384,12 +356,14 @@ are supported by Mongoid.
 
    * - 7.2
      -
+     -
      - |checkmark| [#rails-6.1]_
      - |checkmark|
      - |checkmark| [#rails-5-ruby-3.0]_
      - |checkmark| [#rails-5-ruby-3.0]_
 
    * - 7.1
+     -
      -
      - |checkmark| [#rails-6.1]_
      - |checkmark|
@@ -398,12 +372,14 @@ are supported by Mongoid.
 
    * - 7.0
      -
+     -
      - |checkmark| [#rails-6.1]_
      - |checkmark| [#rails-6]_
      - |checkmark|
      - |checkmark|
 
    * - 6.4
+     -
      -
      -
      -
@@ -418,5 +394,8 @@ are supported by Mongoid.
   respective 7.0, 7.1 and 7.2 stable branches.
 
 .. [#rails-7-Mongoid-7.3] Rails 7.x requires Mongoid 7.3.4 or later.
+
+.. [#rails-7.1] Rails 7.1 requires Mongoid 8.0.7 or 8.1.3 in the respective
+  8.0 and 8.1 stable branches.
 
 .. include:: /includes/unicode-checkmark.rst

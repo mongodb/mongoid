@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require "support/immutable_ids"
@@ -294,11 +295,6 @@ describe Mongoid::Persistable::Savable do
           expect(truck.crates[0].toys[0].name).to eq "Teddy bear"
           expect(truck.crates[1].volume).to eq 0.8
           expect(truck.crates[1].toys.size).to eq 0
-
-          # TODO: MONGOID-5026: combine the updates so that there are
-          # no conflicts.
-          #expect(truck.atomic_updates[:conflicts]).to eq nil
-
           expect { truck.save! }.not_to raise_error
 
           _truck = Truck.find(truck.id)

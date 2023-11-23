@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'mongoid/association/embedded/embedded_in/binding'
 require 'mongoid/association/embedded/embedded_in/buildable'

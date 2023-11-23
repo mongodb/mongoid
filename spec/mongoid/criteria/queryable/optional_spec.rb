@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -736,6 +737,21 @@ describe Mongoid::Criteria::Queryable::Optional do
             it "adds the sorting criteria" do
               expect(selection.options).to eq(
                 { sort: { "field_one" => 1, "field_two" => -1 }}
+              )
+            end
+
+            it_behaves_like "a cloning option"
+          end
+
+          context "when the hash has hash values" do
+
+            let(:selection) do
+              query.send("#{method}", score: { "$meta" => "textScore"})
+            end
+
+            it "adds the sorting criteria" do
+              expect(selection.options).to eq(
+                { sort: { "score" => { "$meta" => "textScore" } }}
               )
             end
 

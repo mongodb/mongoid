@@ -1,3 +1,4 @@
+# rubocop:todo all
 class TransactionsSpecCounter
   def initialize
     @called = 0

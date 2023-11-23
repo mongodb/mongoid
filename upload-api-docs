@@ -1,0 +1,122 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/inline'
+
+gemfile true do
+  source 'https://rubygems.org'
+  gem 'nokogiri'
+  gem 'aws-sdk-s3'
+  gem 'yard'
+end
+
+require 'aws-sdk-s3'
+require 'optparse'
+require 'yard'
+
+# This class contains logic for uploading API docs to S3.
+class FileUploader
+  def initialize(options)
+    Aws.config.update({
+                        region: options[:region],
+                        credentials: Aws::Credentials.new(options[:access_key], options[:secret_key])
+                      })
+    Aws.use_bundled_cert!
+    @s3 = Aws::S3::Client.new
+    @bucket = options[:bucket]
+    @prefix = options[:prefix]
+    @docs_path = options[:docs_path]
+  end
+
+  def upload_docs
+    Dir.glob("#{@docs_path}/**/*").each do |file|
+      next if File.directory?(file)
+
+      upload_file(file, key(file))
+      print '.'
+      $stdout.flush
+    end
+    puts "\nDone!"
+  end
+
+  private
+
+  def key(file)
+    File.join(@prefix, file.gsub("#{@docs_path}/", ''))
+  end
+
+  def upload_file(file, key)
+    mime_type = mime_type(file)
+    @s3.put_object(bucket: @bucket, key: key, body: File.read(file), content_type: mime_type)
+  end
+
+  def mime_type(file)
+    {
+      '.html' => 'text/html',
+      '.css' => 'text/css',
+      '.js' => 'application/javascript'
+    }.fetch(File.extname(file))
+  end
+end
+
+# This class contains logic for parsing CLI and ENV options.
+class Options
+  def initialize
+    @options = {}
+    parse_cli_options!
+    parse_env_options!
+    @options[:prefix] = 'docs/mongoid/master/api'
+    @options[:docs_path] = 'build/public/master/api'
+  end
+
+  def [](key)
+    @options[key]
+  end
+
+  private
+
+  def parse_cli_options!
+    OptionParser.new do |opts|
+      opts.banner = 'Usage: upload-api-docs [options]'
+
+      opts.on('-b BUCKET', '--bucket=BUCKET', 'S3 Bucket to upload') do |b|
+        @options[:bucket] = b
+      end
+      opts.on('-r REGION', '--region=REGION', 'AWS region') do |r|
+        @options[:region] = r
+      end
+    end.parse!
+    %i[bucket region].each do |opt|
+      raise OptionParser::MissingArgument, "Option --#{opt} is required" unless @options[opt]
+    end
+  end
+
+  def parse_env_options!
+    @options[:access_key] = ENV.fetch('DOCS_AWS_ACCESS_KEY_ID') do
+      raise ArgumentError, 'Please provide aws access key via DOCS_AWS_ACCESS_KEY_ID env variable'
+    end
+    @options[:secret_key] = ENV.fetch('DOCS_AWS_SECRET_ACCESS_KEY') do
+      raise ArgumentError, 'Please provide aws secret key via DOCS_AWS_SECRET_ACCESS_KEY env variable'
+    end
+  end
+end
+
+def generate_docs(options)
+  YARD::CLI::Yardoc.run(
+    '.',
+    '--exclude', './.evergreen',
+    '--exclude', './.mod',
+    '--exclude', './examples',
+    '--exclude', './perf',
+    '--exclude', './profile',
+    '--exclude', './release',
+    '--exclude', './spec',
+    '--exclude', './test-apps',
+    '--readme', './README.md',
+    '-o', options[:docs_path]
+  )
+end
+
+options = Options.new
+generate_docs(options)
+FileUploader.new(options).upload_docs

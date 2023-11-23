@@ -1,6 +1,9 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
+
+  # Adds type-casting behavior to Mongoid::Boolean class.
   class Boolean
 
     class << self

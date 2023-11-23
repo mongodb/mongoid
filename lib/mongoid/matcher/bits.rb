@@ -1,8 +1,22 @@
+# rubocop:todo all
 module Mongoid
   module Matcher
 
+    # Mixin module included in bitwise expression matchers.
+    #
     # @api private
     module Bits
+
+      # Returns whether a value satisfies a bitwise expression.
+      #
+      # @param [ true | false ] exists Not used.
+      # @param [ Object ] value The value to check.
+      # @param [ Numeric | Array<Numeric> ] condition The expression
+      #   predicate as a bitmask or position list.
+      #
+      # @return [ true | false ] Whether the value matches.
+      #
+      # @api private
       def matches?(exists, value, condition)
         case value
         when BSON::Binary
@@ -33,6 +47,11 @@ module Mongoid
         end
       end
 
+      # Returns the name of the expression operator.
+      #
+      # @return [ String ] The operator name.
+      #
+      # @api private
       module_function def operator_name
         name.sub(/.*::/, '').sub(/\A(.)/) { |l| l.downcase }
       end

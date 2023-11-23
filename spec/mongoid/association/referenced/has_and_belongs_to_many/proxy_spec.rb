@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative "../has_and_belongs_to_many_models"
@@ -2085,283 +2086,229 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
   end
 
-  describe "#delete" do
+  %i[ delete delete_one ].each do |method|
+    describe "\##{method}" do
+      let(:person) { Person.create! }
+      let(:preference_one) { Preference.create!(name: "Testing") }
+      let(:preference_two) { Preference.create!(name: "Test") }
 
-    let(:person) do
-      Person.create!
-    end
-
-    let(:preference_one) do
-      Preference.create!(name: "Testing")
-    end
-
-    let(:preference_two) do
-      Preference.create!(name: "Test")
-    end
-
-    before do
-      person.preferences << [ preference_one, preference_two ]
-    end
-
-    context "when the document exists" do
-
-      let!(:deleted) do
-        person.preferences.delete(preference_one)
+      before do
+        person.preferences << [ preference_one, preference_two ]
       end
 
-      it "removes the document from the relation" do
-        expect(person.preferences).to eq([ preference_two ])
-      end
-
-      it "returns the document" do
-        expect(deleted).to eq(preference_one)
-      end
-
-      it "removes the document key from the foreign key" do
-        expect(person.preference_ids).to eq([ preference_two.id ])
-      end
-
-      it "removes the inverse reference" do
-        expect(deleted.reload.people).to be_empty
-      end
-
-      it "removes the base id from the inverse keys" do
-        expect(deleted.reload.person_ids).to be_empty
-      end
-
-      context "and person and preferences are reloaded" do
-
-        before do
-          person.reload
-          preference_one.reload
-          preference_two.reload
+      context 'when the document exists' do
+        let!(:deleted) do
+          person.preferences.send(method, preference_one)
         end
 
-        it "nullifies the deleted preference" do
+        it 'removes the document from the relation' do
           expect(person.preferences).to eq([ preference_two ])
         end
 
-        it "retains the ids for one preference" do
+        it 'returns the document' do
+          expect(deleted).to eq(preference_one)
+        end
+
+        it 'removes the document key from the foreign key' do
           expect(person.preference_ids).to eq([ preference_two.id ])
         end
-      end
-    end
 
-    context "when the document does not exist" do
-
-      let!(:deleted) do
-        person.preferences.delete(Preference.new)
-      end
-
-      it "returns nil" do
-        expect(deleted).to be_nil
-      end
-
-      it "does not modify the relation" do
-        expect(person.preferences).to eq([ preference_one, preference_two ])
-      end
-
-      it "does not modify the keys" do
-        expect(person.preference_ids).to eq([ preference_one.id, preference_two.id ])
-      end
-    end
-
-    context "when :dependent => :nullify is set" do
-
-      context "when :inverse_of is set" do
-
-        let(:event) do
-          Event.create!
+        it 'removes the inverse reference' do
+          expect(deleted.reload.people).to be_empty
         end
+
+        it 'removes the base id from the inverse keys' do
+          expect(deleted.reload.person_ids).to be_empty
+        end
+
+        context 'and person and preferences are reloaded' do
+          before do
+            person.reload
+            preference_one.reload
+            preference_two.reload
+          end
+
+          it 'nullifies the deleted preference' do
+            expect(person.preferences).to eq([ preference_two ])
+          end
+
+          it 'retains the ids for one preference' do
+            expect(person.preference_ids).to eq([ preference_two.id ])
+          end
+        end
+      end
+
+      context 'when the document does not exist' do
+        let!(:deleted) do
+          person.preferences.send(method, Preference.new)
+        end
+
+        it 'returns nil' do
+          expect(deleted).to be_nil
+        end
+
+        it 'does not modify the relation' do
+          expect(person.preferences).to eq([ preference_one, preference_two ])
+        end
+
+        it 'does not modify the keys' do
+          expect(person.preference_ids).to eq([ preference_one.id, preference_two.id ])
+        end
+      end
+
+      context 'when :dependent => :nullify is set' do
+        context 'when :inverse_of is set' do
+          let(:event) { Event.create! }
+
+          before do
+            person.administrated_events << [ event ]
+          end
+
+          it 'deletes the document' do
+            expect(event.delete).to be true
+          end
+        end
+      end
+
+      context 'when the relationships are self referencing' do
+        let(:tag_one) { Tag.create!(text: "one") }
+        let(:tag_two) { Tag.create!(text: "two") }
 
         before do
-          person.administrated_events << [ event ]
+          tag_one.related << tag_two
         end
 
-        it "deletes the document" do
-          expect(event.delete).to be true
-        end
-      end
-    end
+        context 'when deleting without reloading' do
+          let!(:deleted) { tag_one.related.send(method, tag_two) }
 
-    context "when the relationships are self referencing" do
-
-      let(:tag_one) do
-        Tag.create!(text: "one")
-      end
-
-      let(:tag_two) do
-        Tag.create!(text: "two")
-      end
-
-      before do
-        tag_one.related << tag_two
-      end
-
-      context "when deleting without reloading" do
-
-        let!(:deleted) do
-          tag_one.related.delete(tag_two)
-        end
-
-        it "deletes the document from the relation" do
-          expect(tag_one.related).to be_empty
-        end
-
-        it "deletes the foreign key from the relation" do
-          expect(tag_one.related_ids).to be_empty
-        end
-
-        it "removes the reference from the inverse" do
-          expect(deleted.related).to be_empty
-        end
-
-        it "removes the foreign keys from the inverse" do
-          expect(deleted.related_ids).to be_empty
-        end
-      end
-
-      context "when deleting with reloading" do
-
-        context "when deleting from the front side" do
-
-          let(:reloaded) do
-            tag_one.reload
+          it 'deletes the document from the relation' do
+            expect(tag_one.related).to be_empty
           end
 
-          let!(:deleted) do
-            reloaded.related.delete(tag_two)
+          it 'deletes the foreign key from the relation' do
+            expect(tag_one.related_ids).to be_empty
           end
 
-          it "deletes the document from the relation" do
-            expect(reloaded.related).to be_empty
-          end
-
-          it "deletes the foreign key from the relation" do
-            expect(reloaded.related_ids).to be_empty
-          end
-
-          it "removes the reference from the inverse" do
+          it 'removes the reference from the inverse' do
             expect(deleted.related).to be_empty
           end
 
-          it "removes the foreign keys from the inverse" do
+          it 'removes the foreign keys from the inverse' do
             expect(deleted.related_ids).to be_empty
           end
         end
 
-        context "when deleting from the inverse side" do
+        context 'when deleting with reloading' do
+          context "when deleting from the front side" do
+            let(:reloaded) { tag_one.reload }
+            let!(:deleted) { reloaded.related.send(method, tag_two) }
 
-          let(:reloaded) do
-            tag_two.reload
+            it 'deletes the document from the relation' do
+              expect(reloaded.related).to be_empty
+            end
+
+            it 'deletes the foreign key from the relation' do
+              expect(reloaded.related_ids).to be_empty
+            end
+
+            it 'removes the reference from the inverse' do
+              expect(deleted.related).to be_empty
+            end
+
+            it 'removes the foreign keys from the inverse' do
+              expect(deleted.related_ids).to be_empty
+            end
           end
 
-          let!(:deleted) do
-            reloaded.related.delete(tag_one)
-          end
+          context 'when deleting from the inverse side' do
+            let(:reloaded) { tag_two.reload }
+            let!(:deleted) { reloaded.related.send(method, tag_one) }
 
-          it "deletes the document from the relation" do
-            expect(reloaded.related).to be_empty
-          end
+            it 'deletes the document from the relation' do
+              expect(reloaded.related).to be_empty
+            end
 
-          it "deletes the foreign key from the relation" do
-            expect(reloaded.related_ids).to be_empty
-          end
+            it 'deletes the foreign key from the relation' do
+              expect(reloaded.related_ids).to be_empty
+            end
 
-          it "removes the foreign keys from the inverse" do
-            expect(deleted.related_ids).to be_empty
-          end
-        end
-      end
-    end
-
-    context "when the association has callbacks" do
-
-      let(:post) do
-        Post.new
-      end
-
-      let(:tag) do
-        Tag.new
-      end
-
-      before do
-        post.tags << tag
-      end
-
-      context "when the callback is a before_remove" do
-
-        context "when there are no errors" do
-
-          before do
-            post.tags.delete tag
-          end
-
-          it "executes the callback" do
-            expect(post.before_remove_called).to be true
-          end
-
-          it "removes the document from the relation" do
-            expect(post.tags).to be_empty
-          end
-        end
-
-        context "when errors are raised" do
-
-          before do
-            expect(post).to receive(:before_remove_tag).and_raise
-            begin; post.tags.delete(tag); rescue; end
-          end
-
-          it "does not remove the document from the relation" do
-            expect(post.tags).to eq([ tag ])
+            it 'removes the foreign keys from the inverse' do
+              expect(deleted.related_ids).to be_empty
+            end
           end
         end
       end
 
-      context "when the callback is an after_remove" do
+      context 'when the association has callbacks' do
+        let(:post) { Post.new }
+        let(:tag) { Tag.new }
 
-        context "when no errors are raised" do
+        before do
+          post.tags << tag
+        end
 
-          before do
-            post.tags.delete(tag)
+        context 'when the callback is a before_remove' do
+          context 'when there are no errors' do
+            before do
+              post.tags.send(method, tag)
+            end
+
+            it 'executes the callback' do
+              expect(post.before_remove_called).to be true
+            end
+
+            it 'removes the document from the relation' do
+              expect(post.tags).to be_empty
+            end
           end
 
-          it "executes the callback" do
-            expect(post.after_remove_called).to be true
-          end
+          context "when errors are raised" do
+            before do
+              expect(post).to receive(:before_remove_tag).and_raise
+              begin; post.tags.send(method, tag); rescue; end
+            end
 
-          it "removes the document from the relation" do
-            expect(post.tags).to be_empty
+            it 'does not remove the document from the relation' do
+              expect(post.tags).to eq([ tag ])
+            end
           end
         end
 
-        context "when errors are raised" do
+        context 'when the callback is an after_remove' do
+          context 'when no errors are raised' do
+            before do
+              post.tags.send(method, tag)
+            end
 
-          before do
-            expect(post).to receive(:after_remove_tag).and_raise
-            begin; post.tags.delete(tag); rescue; end
+            it 'executes the callback' do
+              expect(post.after_remove_called).to be true
+            end
+
+            it 'removes the document from the relation' do
+              expect(post.tags).to be_empty
+            end
           end
 
-          it "removes the document from the relation" do
-            expect(post.tags).to be_empty
+          context 'when errors are raised' do
+            before do
+              expect(post).to receive(:after_remove_tag).and_raise
+              begin; post.tags.send(method, tag); rescue; end
+            end
+
+            it 'removes the document from the relation' do
+              expect(post.tags).to be_empty
+            end
           end
         end
       end
     end
   end
 
-  [ :delete_all, :destroy_all ].each do |method|
-
-    describe "##{method}" do
-
-      context "when the relation is not polymorphic" do
-
-        context "when conditions are provided" do
-
-          let(:person) do
-            Person.create!
-          end
+  %i[ delete_all destroy_all ].each do |method|
+    describe "\##{method}" do
+      context 'when the relation is not polymorphic' do
+        context 'when conditions are provided' do
+          let(:person) { Person.create! }
 
           let!(:preference_one) do
             person.preferences.create!(name: "Testing")

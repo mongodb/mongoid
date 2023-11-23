@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 # Set up a root user so we can set up authentication on a database level.
 MONGOID_ROOT_USER = Mongo::Auth::User.new(

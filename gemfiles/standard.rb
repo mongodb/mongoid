@@ -1,3 +1,4 @@
+# rubocop:todo all
 def standard_dependencies
   gem 'rake'
 
@@ -15,13 +16,12 @@ def standard_dependencies
     # Evergreen configuration generation
     gem 'erubi'
     gem 'tilt'
-    gem 'solargraph'
+    gem 'solargraph', platform: :mri
   end
 
   group :development, :test do
     gem 'rubocop', '~> 1.45.1'
     gem 'rubocop-performance', '~> 1.16.0'
-    gem 'rubocop-rails', '~> 2.17.4'
     gem 'rubocop-rake', '~> 0.6.0'
     gem 'rubocop-rspec', '~> 2.18.1'
 
@@ -35,7 +35,8 @@ def standard_dependencies
   end
 
   group :test do
-    gem 'rspec', '~> 3.10'
+    gem 'rspec', '~> 3.12'
+    gem 'activejob'
     gem 'timecop'
     gem 'rspec-retry'
     gem 'benchmark-ips'
@@ -46,5 +47,9 @@ def standard_dependencies
     platform :mri do
       gem 'timeout-interrupt'
     end
+  end
+
+  if ENV['FLE'] == 'helper'
+    gem 'libmongocrypt-helper', '~> 1.8.0'
   end
 end
