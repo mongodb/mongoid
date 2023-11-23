@@ -497,11 +497,11 @@ axes:
       - id: actual-ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2204-small
-      - id: ubuntu-18.04
-        display_name: "Ubuntu 18.04"
+      - id: ubuntu-20.04
+        display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
         variables:
-          DOCKER_DISTRO: ubuntu1804
+          DOCKER_DISTRO: ubuntu2004
       - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2004-small
@@ -821,7 +821,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-18.04
+    os: ubuntu-20.04
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
