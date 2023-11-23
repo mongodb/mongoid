@@ -458,10 +458,6 @@ axes:
   - id: "ruby"
     display_name: Ruby Version
     values:
-      - id: "ruby-2.6"
-        display_name: ruby-2.6
-        variables:
-           RVM_RUBY: "ruby-2.6"
       - id: "ruby-2.7"
         display_name: ruby-2.7
         variables:
@@ -490,6 +486,10 @@ axes:
         display_name: jruby-9.3
         variables:
            RVM_RUBY: "jruby-9.3"
+      - id: "jruby-9.4"
+        display_name: jruby-9.4
+        variables:
+           RVM_RUBY: "jruby-9.4"
 
   - id: "os"
     display_name: OS
@@ -573,10 +573,6 @@ axes:
         display_name: "Rails master"
         variables:
           RAILS: "master"
-      - id: "5.2"
-        display_name: "Rails 5.2"
-        variables:
-          RAILS: "5.2"
       - id: "6.0"
         display_name: "Rails 6.0"
         variables:
@@ -678,7 +674,7 @@ buildvariants:
 
 - matrix_name: "jruby"
   matrix_spec:
-    jruby: ["jruby-9.3"]
+    jruby: ["jruby-9.3", "jruby-9.4"]
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
@@ -698,22 +694,11 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-2.6"
-  matrix_spec:
-    ruby: ["ruby-2.6"]
-    driver: ["current"]
-    topology: ['replica-set']
-    mongodb-version: ['4.0']
-    os: rhel80
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
 - matrix_name: "driver-upcoming"
   matrix_spec:
     driver: [master, stable]
     ruby: ["ruby-3.2"]
-    mongodb-version: "6.0"
+    mongodb-version: "7.0"
     topology: ['replica-set', 'sharded-cluster']
     os: debian11
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -723,7 +708,7 @@ buildvariants:
 - matrix_name: "driver-oldstable"
   matrix_spec:
     driver: [oldstable, min]
-    ruby: ["ruby-2.6"]
+    ruby: ["ruby-2.7"]
     mongodb-version: "4.0"
     topology: ['replica-set', 'sharded-cluster']
     os: rhel80
@@ -734,7 +719,7 @@ buildvariants:
 - matrix_name: "driver-min"
   matrix_spec:
     driver: [min]
-    ruby: ["ruby-2.6"]
+    ruby: ["ruby-2.7"]
     mongodb-version: "3.6"
     topology: "standalone"
     os: rhel80
@@ -790,21 +775,9 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "rails-5"
-  matrix_spec:
-    ruby: ["ruby-2.7"]
-    driver: ["current"]
-    mongodb-version: "4.0"
-    topology: "standalone"
-    rails: ['5.2']
-    os: rhel80
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
 - matrix_name: "i18n-1.0"
   matrix_spec:
-    ruby: "ruby-2.6"
+    ruby: "ruby-2.7"
     driver: ["current"]
     mongodb-version: "4.4"
     topology: "standalone"
@@ -816,7 +789,7 @@ buildvariants:
 
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
-    ruby: "ruby-2.6"
+    ruby: "ruby-2.7"
     driver: ["current"]
     mongodb-version: "4.2"
     topology: "standalone"
@@ -827,9 +800,9 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: app-tests-ruby-3
+- matrix_name: app-tests-ruby
   matrix_spec:
-    ruby: ["ruby-3.0", "ruby-3.1", "ruby-3.2"]
+    ruby: ["ruby-2.7", "ruby-3.0", "ruby-3.1", "ruby-3.2"]
     driver: ["current"]
     mongodb-version: '6.0'
     topology: standalone
@@ -839,19 +812,6 @@ buildvariants:
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
     - name: "test"
-
-- matrix_name: app-tests-ruby-2.7
-  matrix_spec:
-    ruby: ruby-2.7
-    driver: ["current"]
-    mongodb-version: '5.0'
-    topology: standalone
-    app-tests: yes
-    rails: ['5.2']
-    os: rhel80
-  display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  tasks:
-     - name: "test"
 
 - matrix_name: app-tests-jruby
   matrix_spec:
