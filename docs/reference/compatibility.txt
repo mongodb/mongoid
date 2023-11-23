@@ -554,9 +554,10 @@ Mongoid is used as a drop-in replacement.
 .. [#rails-activemodel-dependency] ``Mongoid::Document`` includes ``ActiveModel::Model``
    and leverages ``ActiveModel::Validations`` for validations
 
-.. [#rails-activesupport-dependency] ``Mongoid::Document`` extends ``ActiveSupport::Concern``. Mongoid
-   also uses ``ActiveSupport`` extensions such as ``ActiveSupport::TimeWithZone``, ``ActiveSupport::Duration``
-   and others.
+.. [#rails-activesupport-dependency] ``Mongoid`` requires ``ActiveSupport`` and
+   uses it extensively, including ``ActiveSupport::TimeWithZone`` for time handling.
+
+
 
 .. [#rails-activejob-dependency] Serialization of BSON & Mongoid objects works best
    if you explicitly send ``BSON::ObjectId``'s as strings, and reconstitute them in the job:
