@@ -537,10 +537,13 @@ Mongoid is used as a drop-in replacement.
      - |checkmark| [#rails-activejob-dependency]_
 
    * - ``ActiveModel``
-     - |checkmark|
+     - |checkmark| [#rails-activemodel-dependency]_
 
    * - ``ActiveStorage``
      - |x| [#rails-activerecord-dependency]_
+
+   * - ``ActiveSupport``
+     - |checkmark| [#rails-activesupport-dependency]_
 
 .. [#rails-actioncable-dependency] There is currently no MongoDB adapter for
    ``ActionCable``, however any existing adapter (such as `Redis <https://guides.rubyonrails.org/action_cable_overview.html#redis-adapter>`_)
@@ -548,8 +551,15 @@ Mongoid is used as a drop-in replacement.
 
 .. [#rails-activerecord-dependency] Depends directly on ``ActiveRecord``
 
-.. [#rails-activejob-dependency] Serialization of BSON & Mongoid objects  works best
-   if you explicitly send ``ObjectId``'s as strings, and reconstitute them in the job:
+.. [#rails-activemodel-dependency] ``Mongoid::Document`` includes ``ActiveModel::Model``
+   and leverages ``ActiveModel::Validations`` for validations
+
+.. [#rails-activesupport-dependency] ``Mongoid::Document`` extends ``ActiveSupport::Concern``. Mongoid
+   also uses ``ActiveSupport`` extensions such as ``ActiveSupport::TimeWithZone``, ``ActiveSupport::Duration``
+   and others.
+
+.. [#rails-activejob-dependency] Serialization of BSON & Mongoid objects works best
+   if you explicitly send ``BSON::ObjectId``'s as strings, and reconstitute them in the job:
 
    .. code-block:: ruby
 
