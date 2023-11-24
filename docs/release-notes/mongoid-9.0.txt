@@ -477,3 +477,17 @@ This section will be for smaller bug fixes and improvements:
 - Added support for serializing and deserializing BSON::ObjectId values
   when passed as ActiveJob arguments
   `MONGOID-5611 <https://jira.mongodb.org/browse/MONGOID-5611>`_.
+
+
+Newly deprecated functionality
+------------------------------
+
+The following functionality is deprecated and will be removed in a future
+Mongoid major version release:
+
+- The ``GeoNear`` class, which was `removed in MongoDB Server 4.2
+  <https://www.mongodb.com/docs/manual/release-notes/4.2-compatibility/#remove-support-for-the-geonear-command>`_.
+  Use the $geoNear aggregation pipeline stage instead.
+- The ``Criteria#max_scan` method, which was `removed in MongoDB Server 4.2
+  <https://www.mongodb.com/docs/manual/release-notes/4.2-compatibility/#remove-maxscan>`_.
+  Use the ``Criteria#max_time_ms`` method instead.
