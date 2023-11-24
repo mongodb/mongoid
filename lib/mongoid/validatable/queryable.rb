@@ -21,7 +21,7 @@ module Mongoid
       #     #...
       #   end
       #
-      # @param [ Document ] document The document being validated.
+      # @param [ Mongoid::Document ] document The document being validated.
       #
       # @return [ Object ] The result of the yield.
       def with_query(document)

@@ -16,7 +16,7 @@ module Mongoid
       #
       # @param [ Hash ] adds The field/value pairs to add.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def add_to_set(adds)
         prepare_atomic_operation do |ops|
           process_atomic_operations(adds) do |field, value|
@@ -47,7 +47,7 @@ module Mongoid
       #
       # @param [ Hash ] pushes The $push operations.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def push(pushes)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pushes) do |field, value|

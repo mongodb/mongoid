@@ -16,7 +16,7 @@ module Mongoid
         # @example Create the root path util.
         #   Root.new(document)
         #
-        # @param [ Document ] document The document to generate the paths for.
+        # @param [ Mongoid::Document ] document The document to generate the paths for.
         def initialize(document)
           @document, @path, @position = document, "", ""
         end

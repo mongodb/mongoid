@@ -16,7 +16,7 @@ module Mongoid
           # @example Create the path util.
           #   One.new(document)
           #
-          # @param [ Document ] document The document to generate the paths for.
+          # @param [ Mongoid::Document ] document The document to generate the paths for.
           def initialize(document)
             @document, @parent = document, document._parent
             @insert_modifier, @delete_modifier ="$set", "$unset"

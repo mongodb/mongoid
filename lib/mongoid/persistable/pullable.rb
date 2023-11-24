@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Hash ] pulls The field/value pull pairs.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def pull(pulls)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pulls) do |field, value|
@@ -35,7 +35,7 @@ module Mongoid
       #
       # @param [ Hash ] pulls The pull all operations.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def pull_all(pulls)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pulls) do |field, value|

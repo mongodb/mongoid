@@ -16,7 +16,7 @@ module Mongoid
       #
       # @todo: Refactor, big time.
       #
-      # @param [ Document ] document The document to add to.
+      # @param [ Mongoid::Document ] document The document to add to.
       # @param [ String ] name The name of the field.
       # @param [ String ] key The atomic location of the field.
       # @param [ Hash ] mods The current modifications.
@@ -152,7 +152,7 @@ module Mongoid
       # @example Eval the default proc.
       #   field.evaluate_default_proc(band)
       #
-      # @param [ Document ] doc The document.
+      # @param [ Mongoid::Document ] doc The document.
       #
       # @return [ Object ] The called proc.
       def evaluate_default_proc(doc)

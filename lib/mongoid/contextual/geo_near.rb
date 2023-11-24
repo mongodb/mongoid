@@ -64,7 +64,7 @@ module Mongoid
       #
       # @param [ Mongo::Collection ] collection The collection to run the
       #   operation on.
-      # @param [ Criteria ] criteria The Mongoid criteria.
+      # @param [ Mongoid::Criteria ] criteria The Mongoid criteria.
       # @param [ String ] near
       def initialize(collection, criteria, near)
         @collection, @criteria = collection, criteria

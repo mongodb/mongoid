@@ -70,7 +70,7 @@ module Mongoid
         # @example Add the criterion.
         #   selectable.and({ field: value }, { other: value })
         #
-        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        # @param [ [ Hash | Mongoid::Criteria | Array<Hash | Mongoid::Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects that all must
         #   match to return results.
         #
@@ -518,7 +518,7 @@ module Mongoid
         # @example Add the $nor selection.
         #   selectable.nor(field: 1, field: 2)
         #
-        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        # @param [ [ Hash | Mongoid::Criteria | Array<Hash | Mongoid::Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects.
         #
         # @return [ Selectable ] The new selectable.
@@ -547,7 +547,7 @@ module Mongoid
         # @example Execute a $not in a where query.
         #   selectable.where(:field.not => /Bob/)
         #
-        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
+        # @param [ [ Hash | Mongoid::Criteria ]... ] *criteria The key/value pair
         #   matches or Criteria objects to negate.
         #
         # @return [ Selectable ] The new selectable.
@@ -594,7 +594,7 @@ module Mongoid
         # @example Exclude multiple criteria as an array.
         #   selectable.none_of([{ name: /Bob/ }, { country: "USA" }])
         #
-        # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
+        # @param [ [ Hash | Mongoid::Criteria ]... ] *criteria The key/value pair
         #   matches or Criteria objects to negate.
         #
         # @return [ Selectable ] The new selectable.
@@ -636,7 +636,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.or([{field: 1}], [{field: 2}])
         #
-        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        # @param [ [ Hash | Mongoid::Criteria | Array<Hash | Mongoid::Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #
@@ -666,7 +666,7 @@ module Mongoid
         # @example Same as previous example, also deprecated.
         #   selectable.any_of([{field: 1}], [{field: 2}])
         #
-        # @param [ [ Hash | Criteria | Array<Hash | Criteria> ]... ] *criteria
+        # @param [ [ Hash | Mongoid::Criteria | Array<Hash | Mongoid::Criteria> ]... ] *criteria
         #   Multiple key/value pair matches or Criteria objects, or arrays
         #   thereof. Passing arrays is deprecated.
         #

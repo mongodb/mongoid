@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Hash ] renames The rename pairs of old name/new name.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def rename(renames)
         prepare_atomic_operation do |ops|
           process_atomic_operations(renames) do |old_field, new_field|

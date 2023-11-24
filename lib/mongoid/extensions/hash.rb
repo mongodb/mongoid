@@ -100,7 +100,8 @@ module Mongoid
       # @example Convert the hash to a criteria.
       #   { klass: Band, where: { name: "Depeche Mode" }.to_criteria
       #
-      # @return [ Criteria ] The criteria.
+      # @return [ Mongoid::Criteria ] The criteria.
+      #
       # @deprecated
       def to_criteria
         Criteria.from_hash(self)

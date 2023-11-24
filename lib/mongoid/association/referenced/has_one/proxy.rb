@@ -37,8 +37,8 @@ module Mongoid
           # @example Create the new association.
           #   Referenced::One.new(base, target, association)
           #
-          # @param [ Document ] base The document this association hangs off of.
-          # @param [ Document ] target The target (child) of the association.
+          # @param [ Mongoid::Document ] base The document this association hangs off of.
+          # @param [ Mongoid::Document ] target The target (child) of the association.
           # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def initialize(base, target, association)
             super do
@@ -67,7 +67,7 @@ module Mongoid
           # @example Replace the association.
           #   person.game.substitute(new_game)
           #
-          # @param [ Array<Document> ] replacement The replacement target.
+          # @param [ Array<Mongoid::Document> ] replacement The replacement target.
           #
           # @return [ One ] The association.
           def substitute(replacement)

@@ -75,7 +75,7 @@ module Mongoid
       #     default_scope ->{ where(active: true) }
       #   end
       #
-      # @param [ Proc | Criteria ] value The default scope.
+      # @param [ Proc | Mongoid::Criteria ] value The default scope.
       #
       # @raise [ Errors::InvalidScope ] If the scope is not a proc or criteria.
       #
@@ -103,7 +103,7 @@ module Mongoid
       # @example Get a queryable.
       #   Model.queryable
       #
-      # @return [ Criteria ] The queryable.
+      # @return [ Mongoid::Criteria ] The queryable.
       def queryable
         crit = Threaded.current_scope(self) || Criteria.new(self)
         crit.embedded = true if (crit.klass.embedded? && !crit.klass.cyclic?)
@@ -154,7 +154,7 @@ module Mongoid
       #   limit.
       # @option options [ Array ] :sort Optional sorting options.
       #
-      # @return [ Criteria ] A scoped criteria.
+      # @return [ Mongoid::Criteria ] A scoped criteria.
       def scoped(options = nil)
         queryable.scoped(options)
       end
@@ -172,7 +172,7 @@ module Mongoid
       # @note This will force the default scope, as well as any scope applied
       #   using ``.with_scope``, to be removed.
       #
-      # @return [ Criteria | Object ] The unscoped criteria or result of the
+      # @return [ Mongoid::Criteria | Object ] The unscoped criteria or result of the
       #   block.
       def unscoped
         if block_given?
@@ -191,7 +191,7 @@ module Mongoid
       # @example Get a criteria with the default scope.
       #   Model.with_default_scope
       #
-      # @return [ Criteria ] The criteria.
+      # @return [ Mongoid::Criteria ] The criteria.
       def with_default_scope
         queryable.with_default_scope
       end
@@ -203,9 +203,9 @@ module Mongoid
       # @example Yield to the criteria.
       #   Person.with_scope(criteria)
       #
-      # @param [ Criteria ] criteria The criteria to apply.
+      # @param [ Mongoid::Criteria ] criteria The criteria to apply.
       #
-      # @return [ Criteria ] The yielded criteria.
+      # @return [ Mongoid::Criteria ] The yielded criteria.
       def with_scope(criteria)
         previous = Threaded.current_scope(self)
         Threaded.set_current_scope(criteria, self)
@@ -311,7 +311,7 @@ module Mongoid
       # @example Process the default scope.
       #   Model.process_default_scope(value)
       #
-      # @param [ Criteria | Proc ] value The default scope value.
+      # @param [ Mongoid::Criteria | Proc ] value The default scope value.
       def process_default_scope(value)
         if existing = default_scoping
           ->{ existing.call.merge(value.to_proc.call) }

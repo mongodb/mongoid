@@ -20,7 +20,7 @@ module Mongoid
     # @example Clone the document.
     #   document.clone
     #
-    # @return [ Document ] The new document.
+    # @return [ Mongoid::Document ] The new document.
     def clone
       # @note This next line is here to address #2704, even though having an
       # _id and id field in the document would cause problems with Mongoid
@@ -40,7 +40,7 @@ module Mongoid
     # @param [ Class ] klass The class of the document to create.
     # @param [ Hash ] attrs The hash of the attributes.
     #
-    # @return [ Document ] The new document.
+    # @return [ Mongoid::Document ] The new document.
     def self.clone_with_hash(klass, attrs)
       dynamic_attrs = {}
       _attribute_names = klass.attribute_names

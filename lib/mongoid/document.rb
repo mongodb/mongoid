@@ -45,7 +45,7 @@ module Mongoid
     # @example Freeze the document
     #   document.freeze
     #
-    # @return [ Document ] The document.
+    # @return [ Mongoid::Document ] The document.
     def freeze
       as_attributes.freeze and self
     end
@@ -98,7 +98,7 @@ module Mongoid
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
     #
-    # @return [ Document ] A new document.
+    # @return [ Mongoid::Document ] A new document.
     def initialize(attrs = nil, &block)
       construct_document(attrs, &block)
     end
@@ -172,7 +172,7 @@ module Mongoid
     #
     # @param [ Class ] klass The class to become.
     #
-    # @return [ Document ] An instance of the specified class.
+    # @return [ Mongoid::Document ] An instance of the specified class.
     def becomes(klass)
       mongoid_document_check!(klass)
 
@@ -230,7 +230,7 @@ module Mongoid
     # @option options [ true | false ] :execute_callbacks Flag specifies
     #   whether callbacks should be run.
     #
-    # @return [ Document ] A new document.
+    # @return [ Mongoid::Document ] A new document.
     #
     # @note A Ruby 2.x bug prevents the options hash from being keyword
     #   arguments. Once we drop support for Ruby 2.x, we can reimplement
@@ -407,7 +407,7 @@ module Mongoid
       # @param [ Integer ] selected_fields The selected fields from the
       #   criteria.
       #
-      # @return [ Document ] A new document.
+      # @return [ Mongoid::Document ] A new document.
       def instantiate(attrs = nil, selected_fields = nil, &block)
         instantiate_document(attrs, selected_fields, &block)
       end
@@ -425,7 +425,7 @@ module Mongoid
       # @yield [ Mongoid::Document ] If a block is given, yields the newly
       #   instantiated document to it.
       #
-      # @return [ Document ] A new document.
+      # @return [ Mongoid::Document ] A new document.
       #
       # @note A Ruby 2.x bug prevents the options hash from being keyword
       #   arguments. Once we drop support for Ruby 2.x, we can reimplement
@@ -459,7 +459,7 @@ module Mongoid
       #   the options hash as keyword arguments.
       #   See https://bugs.ruby-lang.org/issues/15753
       #
-      # @return [ Document ] A new document.
+      # @return [ Mongoid::Document ] A new document.
       #
       # @api private
       def construct_document(attrs = nil, options = {})

@@ -25,7 +25,7 @@ module Mongoid
       # @example Validate the association.
       #   validator.validate_each(document, :name, name)
       #
-      # @param [ Document ] document The document to validate.
+      # @param [ Mongoid::Document ] document The document to validate.
       # @param [ Symbol ] attribute The association to validate.
       # @param [ Object ] value The value of the association.
       def validate_each(document, attribute, value)

@@ -44,7 +44,7 @@ module Mongoid
       #
       # @param [ Hash ] setters The field/value pairs to set.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def set(setters)
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|

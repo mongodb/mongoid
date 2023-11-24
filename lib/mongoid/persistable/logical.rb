@@ -16,7 +16,7 @@ module Mongoid
       #
       # @param [ Hash ] operations The bitwise operations.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def bit(operations)
         prepare_atomic_operation do |ops|
           process_atomic_operations(operations) do |field, values|

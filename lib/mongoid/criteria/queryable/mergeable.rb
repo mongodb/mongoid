@@ -46,7 +46,7 @@ module Mongoid
         # @example Reset the strategies.
         #   mergeable.reset_strategies!
         #
-        # @return [ Criteria ] self.
+        # @return [ Mongoid::Criteria ] self.
         def reset_strategies!
           self.strategy = nil
           self.negating = nil
@@ -58,7 +58,7 @@ module Mongoid
         # @param [ Hash ] criterion The criterion to add to the criteria.
         # @param [ String ] operator The MongoDB operator.
         #
-        # @return [ Criteria ] The resulting criteria.
+        # @return [ Mongoid::Criteria ] The resulting criteria.
         def and_with_operator(criterion, operator)
           crit = self
           if criterion
@@ -152,7 +152,7 @@ module Mongoid
         # @example Add the criterion.
         #   mergeable.__multi__([ 1, 2 ], "$in")
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        # @param [ Array<Hash | Mongoid::Criteria> ] criteria Multiple key/value pair
         #   matches or Criteria objects.
         # @param [ String ] operator The MongoDB operator.
         #
@@ -336,7 +336,7 @@ module Mongoid
         # @example Add the criterion.
         #   mergeable.__override__([ 1, 2 ], "$in")
         #
-        # @param [ Hash | Criteria ] criterion The criteria.
+        # @param [ Hash | Mongoid::Criteria ] criterion The criteria.
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.

@@ -18,7 +18,7 @@ module Mongoid
       # @param [ Hash<Symbol | String, Comparable> ] fields The fields to
       #   set, with corresponding minimum values.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def set_max(fields)
         prepare_atomic_operation do |ops|
           process_atomic_operations(fields) do |field, value|

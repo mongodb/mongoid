@@ -80,7 +80,7 @@ module Mongoid
       # @example Handle copy initialization.
       #   queryable.initialize_copy(criteria)
       #
-      # @param [ Queryable ] other The original copy.
+      # @param [ Mongoid::Criteria::Queryable ] other The original copy.
       def initialize_copy(other)
         @options = other.options.__deep_copy__
         @selector = other.selector.__deep_copy__

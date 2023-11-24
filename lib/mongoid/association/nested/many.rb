@@ -20,7 +20,7 @@ module Mongoid
         # @example Build the nested attrs.
         #   many.build(person)
         #
-        # @param [ Document ] parent The parent document of the association.
+        # @param [ Mongoid::Document ] parent The parent document of the association.
         # @param [ Hash ] options The options.
         #
         # @return [ Array ] The attributes.
@@ -97,7 +97,7 @@ module Mongoid
         # @example Process the attributes
         #   builder.process_attributes({ "id" => 1, "street" => "Bond" })
         #
-        # @param [ Document ] parent The parent document.
+        # @param [ Mongoid::Document ] parent The parent document.
         # @param [ Hash ] attrs The single document attributes to process.
         def process_attributes(parent, attrs)
           return if reject?(parent, attrs)
@@ -117,9 +117,9 @@ module Mongoid
         # @example Destroy the child.
         #   builder.destroy(parent, relation, doc)
         #
-        # @param [ Document ] parent The parent document.
-        # @param [ Proxy ] relation The association proxy.
-        # @param [ Document ] doc The doc to destroy.
+        # @param [ Mongoid::Document ] parent The parent document.
+        # @param [ Mongoid::Association::Proxy ] relation The association proxy.
+        # @param [ Mongoid::Document ] doc The doc to destroy.
         def destroy(parent, relation, doc)
           doc.flagged_for_destroy = true
           if !doc.embedded? || parent.new_record?
@@ -136,8 +136,8 @@ module Mongoid
         # @example Destroy the document.
         #   builder.destroy_document(relation, doc)
         #
-        # @param [ Proxy ] relation The association proxy.
-        # @param [ Document ] doc The document to delete.
+        # @param [ Mongoid::Association::Proxy ] relation The association proxy.
+        # @param [ Mongoid::Document ] doc The document to delete.
         def destroy_document(relation, doc)
           res = doc.destroy unless doc.embedded? || doc.destroyed?
           relation.delete(doc)
@@ -151,7 +151,7 @@ module Mongoid
         # @example Update the document.
         #   builder.update_document(doc, {}, options)
         #
-        # @param [ Document ] doc The document to update.
+        # @param [ Mongoid::Document ] doc The document to update.
         # @param [ Hash ] attrs The attributes.
         def update_document(doc, attrs)
           delete_id(attrs)
@@ -169,7 +169,7 @@ module Mongoid
         # @example Update nested association.
         #   builder.update_nested_relation(parent, id, attrs)
         #
-        # @param [ Document ] parent The parent document.
+        # @param [ Mongoid::Document ] parent The parent document.
         # @param [ String | BSON::ObjectId ] id of the related document.
         # @param [ Hash ] attrs The single document attributes to process.
         def update_nested_relation(parent, id, attrs)

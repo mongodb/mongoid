@@ -33,7 +33,7 @@ module Mongoid
       # @example Validate the document.
       #   validate_each(person, :title, "Sir")
       #
-      # @param [ Document ] document The document to validate.
+      # @param [ Mongoid::Document ] document The document to validate.
       # @param [ Symbol ] attribute The field to validate on.
       # @param [ Object ] value The value of the field.
       #
@@ -59,7 +59,7 @@ module Mongoid
       # @example Add the error.
       #   validator.add_error(doc, :name, "test")
       #
-      # @param [ Document ] document The document to validate.
+      # @param [ Mongoid::Document ] document The document to validate.
       # @param [ Symbol ] attribute The name of the attribute.
       # @param [ Object ] value The value of the object.
       def add_error(document, attribute, value)
@@ -88,11 +88,11 @@ module Mongoid
       #   validator.create_criteria(User, user, :name, "syd")
       #
       # @param [ Class | Proxy ] base The base to execute the criteria from.
-      # @param [ Document ] document The document to validate.
+      # @param [ Mongoid::Document ] document The document to validate.
       # @param [ Symbol ] attribute The name of the attribute.
       # @param [ Object ] value The value of the object.
       #
-      # @return [ Criteria ] The criteria.
+      # @return [ Mongoid::Criteria ] The criteria.
       def create_criteria(base, document, attribute, value)
         criteria = scope(base.unscoped, document, attribute)
         field = document.fields[document.database_field_name(attribute)]
@@ -120,11 +120,11 @@ module Mongoid
       # @example Get the criteria.
       #   validator.criterion(person, :title, "Sir")
       #
-      # @param [ Document ] document The document to validate.
+      # @param [ Mongoid::Document ] document The document to validate.
       # @param [ Symbol ] attribute The name of the attribute.
       # @param [ Object ] value The value of the object.
       #
-      # @return [ Criteria ] The uniqueness criteria.
+      # @return [ Mongoid::Criteria ] The uniqueness criteria.
       def criterion(document, attribute, value)
         field = document.database_field_name(attribute)
 
@@ -162,10 +162,10 @@ module Mongoid
       # @example Scope the criteria.
       #   validator.scope(criteria, document)
       #
-      # @param [ Criteria ] criteria The criteria to scope.
-      # @param [ Document ] document The document being validated.
+      # @param [ Mongoid::Criteria ] criteria The criteria to scope.
+      # @param [ Mongoid::Document ] document The document being validated.
       #
-      # @return [ Criteria ] The scoped criteria.
+      # @return [ Mongoid::Criteria ] The scoped criteria.
       def scope(criteria, document, _attribute)
         Array.wrap(options[:scope]).each do |item|
           name = document.database_field_name(item)
@@ -181,7 +181,7 @@ module Mongoid
       # @example Should the validation be skipped?
       #   validator.skip_validation?(doc)
       #
-      # @param [ Document ] document The embedded document.
+      # @param [ Mongoid::Document ] document The embedded document.
       #
       # @return [ true | false ] If the validation should be skipped.
       def skip_validation?(document)
@@ -195,7 +195,7 @@ module Mongoid
       # @example Has scope reference changed?
       #   validator.scope_value_changed?(doc)
       #
-      # @param [ Document ] document The embedded document.
+      # @param [ Mongoid::Document ] document The embedded document.
       #
       # @return [ true | false ] If the scope reference has changed.
       def scope_value_changed?(document)
@@ -214,7 +214,7 @@ module Mongoid
       # @example Get the name and key to validate.
       #   validator.to_validate(doc, :parent, Parent.new)
       #
-      # @param [ Document ] document The doc getting validated.
+      # @param [ Mongoid::Document ] document The doc getting validated.
       # @param [ Symbol ] attribute The attribute getting validated.
       # @param [ Object ] value The value of the attribute.
       #
@@ -235,7 +235,7 @@ module Mongoid
       # @example Validate the embedded document.
       #   validator.validate_embedded(doc, :name, "test")
       #
-      # @param [ Document ] document The document.
+      # @param [ Mongoid::Document ] document The document.
       # @param [ Symbol ] attribute The attribute name.
       # @param [ Object ] value The value.
       def validate_embedded(document, attribute, value)
@@ -254,7 +254,7 @@ module Mongoid
       # @example Validate the root document.
       #   validator.validate_root(doc, :name, "test")
       #
-      # @param [ Document ] document The document.
+      # @param [ Mongoid::Document ] document The document.
       # @param [ Symbol ] attribute The attribute name.
       # @param [ Object ] value The value.
       def validate_root(document, attribute, value)
@@ -276,7 +276,7 @@ module Mongoid
       # @example Is validation needed?
       #   validator.validation_required?(doc, :field)
       #
-      # @param [ Document ] document The document getting validated.
+      # @param [ Mongoid::Document ] document The document getting validated.
       # @param [ Symbol ] attribute The attribute to validate.
       #
       # @return [ true | false ] If we need to validate.
@@ -293,7 +293,7 @@ module Mongoid
       # @example Is the attribute localized?
       #   validator.localized?(doc, :field)
       #
-      # @param [ Document ] document The document getting validated.
+      # @param [ Mongoid::Document ] document The document getting validated.
       # @param [ Symbol ] attribute The attribute to validate.
       #
       # @return [ true | false ] If the attribute is localized.

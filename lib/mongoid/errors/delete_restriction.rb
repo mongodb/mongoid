@@ -10,7 +10,7 @@ module Mongoid
 
       # Create the new callbacks error.
       #
-      # @param [ Document ] document The document that was attempted to be
+      # @param [ Mongoid::Document ] document The document that was attempted to be
       #   destroyed.
       # @param [ Symbol ] association_name The name of the dependent
       #   association that prevents the document from being deleted.
