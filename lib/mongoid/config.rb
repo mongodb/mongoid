@@ -23,10 +23,10 @@ module Mongoid
 
     LOCK = Mutex.new
 
-    # Application name that is printed to the mongodb logs upon establishing
-    # a connection in server versions >= 3.4. Note that the name cannot
-    # exceed 128 bytes. It is also used as the database name if the
-    # database name is not explicitly defined.
+    # Application name that is printed to the MongoDB logs upon establishing
+    # a connection. Note that the name cannot exceed 128 bytes in length.
+    # It is also used as the database name if the database name is not
+    # explicitly defined.
     option :app_name, default: nil
 
     # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
