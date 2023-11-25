@@ -2578,7 +2578,6 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       context 'when providing a collation' do
-
         let(:posts) { person.posts.where(title: 'FIRST').collation(locale: 'en_US', strength: 2) }
 
         it 'applies the collation option to the query' do
