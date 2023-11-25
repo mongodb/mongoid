@@ -6,7 +6,8 @@ module Mongoid
 
     # Represents a $geoNear database command instruction.
     #
-    # @deprecated
+    # @deprecated GeoNear is removed as of MongoDB Server 4.2. Please use the
+    #   $geoNear aggregation pipeline stage instead.
     class GeoNear
       extend Forwardable
       include Enumerable
