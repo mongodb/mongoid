@@ -88,7 +88,6 @@ functions:
             export RVM_RUBY="${RVM_RUBY}"
             export RAILS="${RAILS}"
             export DRIVER="${DRIVER}"
-            export I18N="${I18N}"
             export TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}"
             export FLE="${FLE}"
           EOT
@@ -276,7 +275,6 @@ functions:
             RVM_RUBY="${RVM_RUBY}" \
             RAILS="${RAILS}" \
             DRIVER="${DRIVER}" \
-            I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             FLE="${FLE}" \
             .evergreen/run-tests-docker.sh
@@ -594,16 +592,6 @@ axes:
         variables:
           RAILS: "7.1"
 
-  - id: "i18n"
-    display_name: I18n version
-    values:
-      - id: '1.0'
-        display_name: "i18n-1.0"
-        variables:
-           I18N: "1.0"
-      - id: current
-        display_name: "i18n-current"
-
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
     values:
@@ -802,25 +790,12 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "i18n-1.0"
-  matrix_spec:
-    ruby: "ruby-2.6"
-    driver: ["current"]
-    mongodb-version: "4.4"
-    topology: "standalone"
-    i18n: '1.0'
-    os: rhel80
-  display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
     ruby: "ruby-2.6"
     driver: ["current"]
     mongodb-version: "4.2"
     topology: "standalone"
-    i18n: '*'
     test-i18n-fallbacks: yes
     os: rhel80
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
