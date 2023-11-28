@@ -175,7 +175,6 @@ buildvariants:
     driver: ["current"]
     mongodb-version: "4.4"
     topology: "standalone"
-    i18n: '1.0'
     os: rhel80
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
   tasks:
@@ -187,10 +186,9 @@ buildvariants:
     driver: ["current"]
     mongodb-version: "4.2"
     topology: "standalone"
-    i18n: '*'
     test-i18n-fallbacks: yes
     os: rhel80
-  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
+  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
 
