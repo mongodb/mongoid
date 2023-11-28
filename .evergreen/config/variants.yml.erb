@@ -45,7 +45,7 @@ buildvariants:
 
 - matrix_name: "jruby"
   matrix_spec:
-    jruby: ["jruby-9.3"]
+    jruby: ["jruby-9.4", "jruby-9.3"]
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
@@ -169,17 +169,6 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "i18n-1.0"
-  matrix_spec:
-    ruby: "ruby-2.6"
-    driver: ["current"]
-    mongodb-version: "4.4"
-    topology: "standalone"
-    os: rhel80
-  display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
     ruby: "ruby-2.6"
@@ -220,13 +209,13 @@ buildvariants:
 
 - matrix_name: app-tests-jruby
   matrix_spec:
-    jruby: ["jruby-9.3"]
+    jruby: ["jruby-9.4", "jruby-9.3"]
     driver: ["current"]
     mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-18.04
+    os: ubuntu-20.04
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
