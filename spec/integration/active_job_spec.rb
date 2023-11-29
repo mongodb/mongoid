@@ -2,10 +2,13 @@
 # rubocop:todo all
 
 require 'spec_helper'
-require 'active_job'
-require 'mongoid/railties/bson_object_id_serializer'
 
 describe 'ActiveJob Serialization' do
+  min_rails_version '6.0'
+
+  require 'active_job'
+  require 'mongoid/railties/bson_object_id_serializer'
+
   skip unless defined?(ActiveJob)
 
   class TestBsonObjectIdSerializerJob < ActiveJob::Base
