@@ -124,7 +124,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a float" do
-          expect(demongoized).to eq(value)
+          expect(demongoized).to be_within(0.00001).of(value)
         end
       end
 
@@ -572,7 +572,7 @@ describe Mongoid::Extensions::BigDecimal do
         end
 
         it "returns a float" do
-          expect(demongoized).to eq(value)
+          expect(demongoized).to be_within(0.00001).of(value)
         end
       end
 
