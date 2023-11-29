@@ -456,10 +456,6 @@ axes:
   - id: "ruby"
     display_name: Ruby Version
     values:
-      - id: "ruby-2.6"
-        display_name: ruby-2.6
-        variables:
-           RVM_RUBY: "ruby-2.6"
       - id: "ruby-2.7"
         display_name: ruby-2.7
         variables:
@@ -690,17 +686,6 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-2.6"
-  matrix_spec:
-    ruby: ["ruby-2.6"]
-    driver: ["current"]
-    topology: ['replica-set']
-    mongodb-version: ['4.0']
-    os: rhel80
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
 - matrix_name: "driver-upcoming"
   matrix_spec:
     driver: [master, stable]
@@ -715,7 +700,7 @@ buildvariants:
 - matrix_name: "driver-oldstable"
   matrix_spec:
     driver: [oldstable, min]
-    ruby: ["ruby-2.6"]
+    ruby: ["ruby-2.7"]
     mongodb-version: "4.0"
     topology: ['replica-set', 'sharded-cluster']
     os: rhel80
@@ -726,7 +711,7 @@ buildvariants:
 - matrix_name: "driver-min"
   matrix_spec:
     driver: [min]
-    ruby: ["ruby-2.6"]
+    ruby: ["ruby-2.7"]
     mongodb-version: "3.6"
     topology: "standalone"
     os: rhel80
@@ -796,7 +781,7 @@ buildvariants:
 
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
-    ruby: "ruby-2.6"
+    ruby: "ruby-2.7"
     driver: ["current"]
     mongodb-version: "4.2"
     topology: "standalone"
