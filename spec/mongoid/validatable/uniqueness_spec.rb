@@ -2533,9 +2533,7 @@ describe Mongoid::Validatable::UniquenessValidator do
       end
 
       after do
-        # i18n 1.0 requires +send+ because +translations+ aren't public.
-        # Newer i18n versions have it as public.
-        I18n.backend.send(:translations).delete(:fr)
+        I18n.backend.translations.delete(:fr)
       end
 
       it "correctly translates the error message" do
