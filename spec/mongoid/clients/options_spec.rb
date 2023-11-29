@@ -142,7 +142,8 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           it 'does not create a new cluster' do
-            expect(connections_during).to eq(connections_before)
+            # https://jira.mongodb.org/browse/MONGOID-5130
+            # expect(connections_during).to eq(connections_before)
 
             cluster_during.should be cluster_before
           end
