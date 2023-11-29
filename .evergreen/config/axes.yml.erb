@@ -83,10 +83,6 @@ axes:
   - id: "ruby"
     display_name: Ruby Version
     values:
-      - id: "ruby-2.6"
-        display_name: ruby-2.6
-        variables:
-           RVM_RUBY: "ruby-2.6"
       - id: "ruby-2.7"
         display_name: ruby-2.7
         variables:
@@ -115,6 +111,10 @@ axes:
         display_name: jruby-9.3
         variables:
            RVM_RUBY: "jruby-9.3"
+      - id: "jruby-9.4"
+        display_name: jruby-9.4
+        variables:
+           RVM_RUBY: "jruby-9.4"
 
   - id: "os"
     display_name: OS
@@ -122,11 +122,11 @@ axes:
       - id: actual-ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2204-small
-      - id: ubuntu-18.04
-        display_name: "Ubuntu 18.04"
+      - id: ubuntu-20.04
+        display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
         variables:
-          DOCKER_DISTRO: ubuntu1804
+          DOCKER_DISTRO: ubuntu2004
       - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2004-small
@@ -218,16 +218,6 @@ axes:
         display_name: "Rails 7.1"
         variables:
           RAILS: "7.1"
-
-  - id: "i18n"
-    display_name: I18n version
-    values:
-      - id: '1.0'
-        display_name: "i18n-1.0"
-        variables:
-           I18N: "1.0"
-      - id: current
-        display_name: "i18n-current"
 
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
