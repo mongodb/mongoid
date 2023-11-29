@@ -45,7 +45,7 @@ buildvariants:
 
 - matrix_name: "jruby"
   matrix_spec:
-    jruby: ["jruby-9.3"]
+    jruby: ["jruby-9.4", "jruby-9.3"]
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
@@ -65,17 +65,6 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-2.6"
-  matrix_spec:
-    ruby: ["ruby-2.6"]
-    driver: ["current"]
-    topology: ['replica-set']
-    mongodb-version: ['4.0']
-    os: rhel80
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
 - matrix_name: "driver-upcoming"
   matrix_spec:
     driver: [master, stable]
@@ -90,7 +79,7 @@ buildvariants:
 - matrix_name: "driver-oldstable"
   matrix_spec:
     driver: [oldstable, min]
-    ruby: ["ruby-2.6"]
+    ruby: ["ruby-2.7"]
     mongodb-version: "4.0"
     topology: ['replica-set', 'sharded-cluster']
     os: rhel80
@@ -101,7 +90,7 @@ buildvariants:
 - matrix_name: "driver-min"
   matrix_spec:
     driver: [min]
-    ruby: ["ruby-2.6"]
+    ruby: ["ruby-2.7"]
     mongodb-version: "3.6"
     topology: "standalone"
     os: rhel80
@@ -169,28 +158,15 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "i18n-1.0"
-  matrix_spec:
-    ruby: "ruby-2.6"
-    driver: ["current"]
-    mongodb-version: "4.4"
-    topology: "standalone"
-    i18n: '1.0'
-    os: rhel80
-  display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
-    ruby: "ruby-2.6"
+    ruby: "ruby-2.7"
     driver: ["current"]
     mongodb-version: "4.2"
     topology: "standalone"
-    i18n: '*'
     test-i18n-fallbacks: yes
     os: rhel80
-  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
+  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
 
@@ -222,13 +198,13 @@ buildvariants:
 
 - matrix_name: app-tests-jruby
   matrix_spec:
-    jruby: ["jruby-9.3"]
+    jruby: ["jruby-9.4", "jruby-9.3"]
     driver: ["current"]
     mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-18.04
+    os: ubuntu-20.04
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"

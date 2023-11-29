@@ -1411,10 +1411,12 @@ Mongoid permits dynamic field names to include spaces and punctuation:
   # => "MDB"
 
 
+.. _localized-fields:
+
 Localized Fields
 ================
 
-Mongoid supports localized fields via `i18n <https://github.com/ruby-i18n/i18n>`_.
+Mongoid supports localized fields via the `I18n gem <https://github.com/ruby-i18n/i18n>`_.
 
 .. code-block:: ruby
 
