@@ -146,18 +146,6 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "rails-5"
-  matrix_spec:
-    ruby: ["ruby-2.7"]
-    driver: ["current"]
-    mongodb-version: "4.0"
-    topology: "standalone"
-    rails: ['5.2']
-    os: rhel80
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
     ruby: "ruby-2.7"

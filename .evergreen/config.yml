@@ -571,10 +571,6 @@ axes:
         display_name: "Rails master"
         variables:
           RAILS: "master"
-      - id: "5.2"
-        display_name: "Rails 5.2"
-        variables:
-          RAILS: "5.2"
       - id: "6.0"
         display_name: "Rails 6.0"
         variables:
@@ -762,18 +758,6 @@ buildvariants:
     mongodb-version: "6.0"
     topology: "standalone"
     rails: ['6.0', '6.1']
-    os: rhel80
-  display_name: "${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
-- matrix_name: "rails-5"
-  matrix_spec:
-    ruby: ["ruby-2.7"]
-    driver: ["current"]
-    mongodb-version: "4.0"
-    topology: "standalone"
-    rails: ['5.2']
     os: rhel80
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
