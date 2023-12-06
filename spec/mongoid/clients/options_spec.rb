@@ -344,7 +344,7 @@ describe Mongoid::Clients::Options, retry: 3 do
 
         it 'clears the persistence context' do
           begin; persistence_context; rescue Mongoid::Errors::InvalidPersistenceOption; end
-          expect(test_model.persistence_context).to eq(Mongoid::PersistenceContext.new(test_model))
+          expect(test_model.persistence_context).to eq(Mongoid::PersistenceContext.new(test_model, test_model.storage_options))
         end
       end
 
