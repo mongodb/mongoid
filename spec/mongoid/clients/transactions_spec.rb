@@ -801,6 +801,18 @@ describe Mongoid::Clients::Sessions do
           end
 
           it_behaves_like 'commit callbacks are called'
+
+          context 'when callback has on option' do
+            let!(:subject) do
+              person = nil
+              TransactionsSpecPersoniWithOnSave.transaction do
+                person = TransactionsSpecPersonWithOnSave.create!(name: 'James Bond')
+              end
+              person
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
         end
 
         context 'save' do

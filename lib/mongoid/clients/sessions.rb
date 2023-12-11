@@ -101,6 +101,12 @@ module Mongoid
           end
         end
 
+        def after_commit(*args, &block)
+          byebug
+          set_options_for_callbacks!(args)
+          set_callback(:commit, :after, *args, &block)
+        end
+
         private
 
         # @return [ Mongo::Session ] Session for the current client.
@@ -143,6 +149,20 @@ module Mongoid
           session.abort_transaction
           Threaded.clear_modified_documents(session).each do |doc|
             doc.run_after_callbacks(:rollback)
+          end
+        end
+
+        def set_options_for_callbacks!(args, enforced_options = {})
+          options = args.extract_options!.merge!(enforced_options)
+          args << options
+
+          if options[:on]
+            fire_on = Array(options[:on])
+            assert_valid_transaction_action(fire_on)
+            options[:if] = [
+              -> { transaction_include_any_action?(fire_on) },
+              *options[:if]
+            ]
           end
         end
       end

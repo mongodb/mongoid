@@ -50,6 +50,21 @@ class TransactionsSpecPerson
   end
 end
 
+class TransactionsSpecPersonWithOnSave
+  include Mongoid::Document
+  include TransactionsSpecCountable
+
+  field :name, type: String
+
+  after_commit on: :save do
+    after_commit_counter.inc
+  end
+
+  after_rollback on: :save do
+    after_rollback_counter.inc
+  end
+end
+
 class TransactionSpecRaisesBeforeSave
   include Mongoid::Document
   include TransactionsSpecCountable
