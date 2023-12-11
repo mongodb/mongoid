@@ -57,7 +57,11 @@ module Mongoid
       #
       # @return [ Hash ] The defaults.
       def reset
-        settings.replace(defaults)
+        # do this via the setter for each option, so that any defined on_change
+        # handlers can be invoked.
+        defaults.each do |setting, default|
+          send(:"#{setting}=", default)
+        end
       end
 
       # Get the settings or initialize a new empty hash.
