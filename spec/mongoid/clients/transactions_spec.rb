@@ -805,8 +805,8 @@ describe Mongoid::Clients::Sessions do
           context 'when callback has on option' do
             let!(:subject) do
               person = nil
-              TransactionsSpecPersoniWithOnSave.transaction do
-                person = TransactionsSpecPersonWithOnSave.create!(name: 'James Bond')
+              TransactionsSpecPersonWithOnCreate.transaction do
+                person = TransactionsSpecPersonWithOnCreate.create!(name: 'James Bond')
               end
               person
             end
@@ -849,20 +849,36 @@ describe Mongoid::Clients::Sessions do
         end
 
         context 'update_attributes' do
-          let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
-              subject.after_commit_counter.reset
-              subject.after_rollback_counter.reset
+          context 'without :on option' do
+            let(:subject) do
+              TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
+                subject.after_commit_counter.reset
+                subject.after_rollback_counter.reset
+              end
             end
+
+            before do
+              subject.transaction do
+                subject.update_attributes!(name: 'Austin Powers')
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
           end
 
-          before do
-            subject.transaction do
-              subject.update_attributes!(name: 'Austin Powers')
+          context 'when callback has on option' do
+            let(:subject) do
+              TransactionsSpecPersonWithOnUpdate.create!(name: 'Jason Bourne')
             end
-          end
 
-          it_behaves_like 'commit callbacks are called'
+            before do
+              TransactionsSpecPersonWithOnUpdate.transaction do
+                subject.update_attributes!(name: 'Foma Kiniaev')
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
         end
 
         context 'destroy' do

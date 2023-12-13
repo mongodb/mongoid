@@ -16,6 +16,10 @@ module Mongoid
 
       module ClassMethods
 
+        # Actions that can be used to trigger transactional callbacks.
+        # @api private
+        CALLBACK_ACTIONS = [:create, :destroy, :update]
+
         # Execute a block within the context of a session.
         #
         # @example Execute some operations in the context of a session.
@@ -101,10 +105,47 @@ module Mongoid
           end
         end
 
+        # Sets up a callback is called after a commit of a transaction.
+        # The callback is called only if the document is created, updated, or destroyed
+        # in the transaction.
+        #
+        # See +ActiveSupport::Callbacks::ClassMethods::set_callback+ for more
+        # information about method parameters and possible options.
         def after_commit(*args, &block)
-          byebug
           set_options_for_callbacks!(args)
           set_callback(:commit, :after, *args, &block)
+        end
+
+        # Shortcut for +after_commit :hook, on: [ :create, :update ]+
+        def after_save_commit(*args, &block)
+          set_options_for_callbacks!(args, on: [ :create, :update ])
+          set_callback(:commit, :after, *args, &block)
+        end
+
+        # Shortcut for +after_commit :hook, on: :create+.
+        def after_create_commit(*args, &block)
+          set_options_for_callbacks!(args, on: :create)
+          set_callback(:commit, :after, *args, &block)
+        end
+
+        # Shortcut for +after_commit :hook, on: :update+.
+        def after_update_commit(*args, &block)
+          set_options_for_callbacks!(args, on: :update)
+          set_callback(:commit, :after, *args, &block)
+        end
+
+        # Shortcut for +after_commit :hook, on: :destroy+.
+        def after_destroy_commit(*args, &block)
+          set_options_for_callbacks!(args, on: :destroy)
+          set_callback(:commit, :after, *args, &block)
+        end
+
+        # This callback is called after a create, update, or destroy are rolled back.
+        #
+        # Please check the documentation of +after_commit+ for options.
+        def after_rollback(*args, &block)
+          set_options_for_callbacks!(args)
+          set_callback(:rollback, :after, *args, &block)
         end
 
         private
@@ -152,8 +193,10 @@ module Mongoid
           end
         end
 
-        def set_options_for_callbacks!(args, enforced_options = {})
-          options = args.extract_options!.merge!(enforced_options)
+        # Transforms custom options for after_commit and after_rollback callbacks
+        # into options for +set_callback+.
+        def set_options_for_callbacks!(args)
+          options = args.extract_options!
           args << options
 
           if options[:on]
@@ -163,6 +206,30 @@ module Mongoid
               -> { transaction_include_any_action?(fire_on) },
               *options[:if]
             ]
+          end
+        end
+
+        # Asserts that the given actions are valid for after_commit
+        # and after_rollback callbacks.
+        #
+        # @param [ Array<Symbol> ] actions Actions to be checked.
+        # @raise [ ArgumentError ] If any of the actions is not valid.
+        def assert_valid_transaction_action(actions)
+          if (actions - CALLBACK_ACTIONS).any?
+            raise ArgumentError, ":on conditions for after_commit and after_rollback callbacks have to be one of #{CALLBACK_ACTIONS}"
+          end
+        end
+
+        def transaction_include_any_action?(actions)
+          actions.any? do |action|
+            case action
+            when :create
+              persisted? && previously_new_record?
+            when :update
+              !(previously_new_record? || destroyed?)
+            when :destroy
+              destroyed?
+            end
           end
         end
       end

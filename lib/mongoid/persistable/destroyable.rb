@@ -23,17 +23,15 @@ module Mongoid
       def destroy(options = nil)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         self.flagged_for_destroy = true
-        result = run_callbacks(:commit, skip_if: -> { in_transaction? }) do
-          run_callbacks(:destroy) do
-            if catch(:abort) { apply_destroy_dependencies! }
-              delete(options || {}).tap do |res|
-                if res && in_transaction?
-                  Threaded.add_modified_document(_session, self)
-                end
+        result = run_callbacks(:destroy) do
+          if catch(:abort) { apply_destroy_dependencies! }
+            delete(options || {}).tap do |res|
+              if res && in_transaction?
+                Threaded.add_modified_document(_session, self)
               end
-            else
-              false
             end
+          else
+            false
           end
         end
         self.flagged_for_destroy = false
