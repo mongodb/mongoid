@@ -786,6 +786,9 @@ describe Mongoid::Clients::Sessions do
       before do
         Mongoid::Clients.with_name(:default).database.collections.each(&:drop)
         TransactionsSpecPerson.collection.create
+        TransactionsSpecPersonWithOnCreate.collection.create
+        TransactionsSpecPersonWithOnUpdate.collection.create
+        TransactionsSpecPersonWithOnDestroy.collection.create
         TransactionSpecRaisesBeforeSave.collection.create
         TransactionSpecRaisesAfterSave.collection.create
       end
