@@ -5,8 +5,9 @@ require 'spec_helper'
 require 'active_job'
 require 'mongoid/railties/bson_object_id_serializer'
 
-describe Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer do
-  let(:serializer) { described_class.instance }
+describe 'Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer' do
+
+  let(:serializer) { Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer.instance }
   let(:object_id) { BSON::ObjectId.new }
 
   describe '#serialize' do
