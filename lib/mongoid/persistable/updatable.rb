@@ -213,17 +213,19 @@ module Mongoid
       # @param [ Array<Document> ] update_children The children that the
       #   :update callbacks will be executed on.
       def run_all_callbacks_for_update(update_children)
-        run_callbacks(:save, with_children: false) do
-          run_callbacks(:update, with_children: false) do
-            run_callbacks(:persist_parent, with_children: false) do
-              _mongoid_run_child_callbacks(:save) do
-                _mongoid_run_child_callbacks(:update, children: update_children) do
-                  yield
-                end # _mongoid_run_child_callbacks :update
-              end # _mongoid_run_child_callbacks :save
-            end # :persist_parent
-          end # :update
-        end # :save
+        run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
+          run_callbacks(:save, with_children: false) do
+            run_callbacks(:update, with_children: false) do
+              run_callbacks(:persist_parent, with_children: false) do
+                _mongoid_run_child_callbacks(:save) do
+                  _mongoid_run_child_callbacks(:update, children: update_children) do
+                    yield
+                  end # _mongoid_run_child_callbacks :update
+                end # _mongoid_run_child_callbacks :save
+              end # :persist_parent
+            end # :update
+          end # :save
+        end # :commit
       end
 
     end

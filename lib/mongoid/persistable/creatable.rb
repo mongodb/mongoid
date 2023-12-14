@@ -105,15 +105,17 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self if performing_validations?(options) &&
           invalid?(options[:context] || :create)
-        run_callbacks(:save, with_children: false) do
-          run_callbacks(:create, with_children: false) do
-            run_callbacks(:persist_parent, with_children: false) do
-              _mongoid_run_child_callbacks(:save) do
-                _mongoid_run_child_callbacks(:create) do
-                  result = yield(self)
-                  if !result.is_a?(Document) || result.errors.empty?
-                    post_process_insert
-                    post_process_persist(result, options)
+        run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
+          run_callbacks(:save, with_children: false) do
+            run_callbacks(:create, with_children: false) do
+              run_callbacks(:persist_parent, with_children: false) do
+                _mongoid_run_child_callbacks(:save) do
+                  _mongoid_run_child_callbacks(:create) do
+                    result = yield(self)
+                    if !result.is_a?(Document) || result.errors.empty?
+                      post_process_insert
+                      post_process_persist(result, options)
+                    end
                   end
                 end
               end
