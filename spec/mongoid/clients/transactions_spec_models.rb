@@ -80,6 +80,20 @@ class TransactionsSpecPersonWithOnUpdate
   end
 end
 
+class TransactionsSpecPersonWithOnDestroy
+  include Mongoid::Document
+  include TransactionsSpecCountable
+
+  field :name, type: String
+
+  after_commit on: :destroy do
+    after_commit_counter.inc
+  end
+
+  after_rollback on: :destroy do
+    after_rollback_counter.inc
+  end
+end
 class TransactionSpecRaisesBeforeSave
   include Mongoid::Document
   include TransactionsSpecCountable
