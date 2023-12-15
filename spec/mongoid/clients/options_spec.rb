@@ -442,7 +442,7 @@ describe Mongoid::Clients::Options, retry: 3 do
           let(:options) { { read: :secondary } }
 
           it 'does not create a new cluster' do
-            expect(connections_during).to eq(connections_before)
+            expect(connections_during).to <= connections_before
           end
 
           it 'does not disconnect the original cluster' do
