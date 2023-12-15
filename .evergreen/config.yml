@@ -480,10 +480,6 @@ axes:
   - id: "jruby"
     display_name: JRuby Version
     values:
-      - id: "jruby-9.3"
-        display_name: jruby-9.3
-        variables:
-           RVM_RUBY: "jruby-9.3"
       - id: "jruby-9.4"
         display_name: jruby-9.4
         variables:
@@ -662,7 +658,7 @@ buildvariants:
 
 - matrix_name: "jruby"
   matrix_spec:
-    jruby: ["jruby-9.4", "jruby-9.3"]
+    jruby: ["jruby-9.4"]
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
@@ -798,19 +794,6 @@ buildvariants:
     rails: ['6.0']
     os: rhel80
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  tasks:
-     - name: "test"
-
-- matrix_name: app-tests-jruby-9-3
-  matrix_spec:
-    jruby: ["jruby-9.3"]
-    driver: ["current"]
-    mongodb-version: '5.0'
-    topology: standalone
-    app-tests: yes
-    rails: ['6.1']
-    os: ubuntu-20.04
-  display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"
 

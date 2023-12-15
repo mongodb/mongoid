@@ -109,7 +109,7 @@ jobs:
           gemfile: gemfiles/rails-6.0.gemfile
           experimental: false
         - mongodb: '6.0'
-          ruby: jruby-9.3
+          ruby: jruby-9.4
           topology: server
           os: ubuntu-20.04
           task: test
