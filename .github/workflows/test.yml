@@ -47,7 +47,6 @@ jobs:
           topology: replica_set
           os: ubuntu-20.04
           task: test
-          driver: master
           gemfile: gemfiles/driver_master.gemfile
           experimental: true
         - mongodb: '6.0'
