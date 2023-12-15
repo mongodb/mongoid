@@ -43,13 +43,6 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          gemfile: gemfiles/driver_master.gemfile
-          experimental: true
-        - mongodb: '6.0'
           ruby: ruby-3.0
           topology: replica_set
           os: ubuntu-20.04
