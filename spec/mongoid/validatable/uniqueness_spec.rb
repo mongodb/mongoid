@@ -20,8 +20,8 @@ describe Mongoid::Validatable::UniquenessValidator do
         end
 
         it "reads from the primary" do
-          expect_any_instance_of(Mongoid::Criteria).to receive(:read).once.and_wrap_original do |m, *args|
-            crit = m.call(*args)
+          expect_any_instance_of(Mongoid::Criteria).to receive(:read).once.and_wrap_original do |m, *args, **kwargs|
+            crit = m.call(*args, **kwargs)
             expect(crit.view.options["read"]).to eq({ "mode" => :primary })
             crit
           end
@@ -1670,8 +1670,8 @@ describe Mongoid::Validatable::UniquenessValidator do
         let(:word) { Word.create! }
 
         it "reads from the primary" do
-          expect_any_instance_of(Mongoid::Criteria).to receive(:read).once.and_wrap_original do |m, *args|
-            crit = m.call(*args)
+          expect_any_instance_of(Mongoid::Criteria).to receive(:read).once.and_wrap_original do |m, *args, **kwargs|
+            crit = m.call(*args, **kwargs)
             expect(crit.options[:read]).to eq({ mode: :primary })
             crit
           end
