@@ -87,7 +87,7 @@ is deprecated.
      -
      -
      - |checkmark|
-     - |checkmark|
+     -
      -
 
    * - 8.1
