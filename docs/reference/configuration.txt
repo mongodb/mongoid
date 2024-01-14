@@ -269,7 +269,7 @@ for details on driver options.
       # a connection. Note that the name cannot exceed 128 bytes in length.
       # It is also used as the database name if the database name is not
       # explicitly defined. (default: nil)
-      app_name: MyApplicationName
+      # app_name: nil
 
       # When this flag is false, callbacks for embedded documents will not be
       # called. This is the default in 9.0.
@@ -282,7 +282,7 @@ for details on driver options.
       # around_callbacks_for_embeds: false
 
       # Sets the async_query_executor for the application. By default the thread pool executor
-      #   is set to `:immediate. Options are:
+      # is set to `:immediate`. Options are:
       #
       #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
       #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
