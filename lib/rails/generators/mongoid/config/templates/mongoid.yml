@@ -53,8 +53,8 @@ development:
         # (default: the database specified above or admin)
         # auth_source: admin
 
-        # Force a the driver cluster to behave in a certain manner instead of auto-
-        # discovering. Can be one of: :direct, :replica_set, :sharded. Set to :direct
+        # Force the driver cluster to behave in a certain manner instead of auto-discovering.
+        # Can be one of: :direct, :replica_set, :sharded. Set to :direct
         # when connecting to hidden members of a replica set.
         # connect: :direct
 

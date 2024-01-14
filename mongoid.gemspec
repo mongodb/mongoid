@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
     warn "[#{s.name}] Warning: No private key present, creating unsigned gem."
   end
 
-  s.required_ruby_version     = ">= 2.6"
+  s.required_ruby_version     = ">= 2.7"
   s.required_rubygems_version = ">= 1.3.6"
 
   # Ruby 3.0 requires ActiveModel 6.0 or higher.
