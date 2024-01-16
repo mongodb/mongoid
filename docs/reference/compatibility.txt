@@ -34,52 +34,17 @@ specified Mongoid versions.
      - Driver 2.17-2.10
      - Driver 2.9-2.7
 
-   * - 9.0
+   * - 8.0 thru 9.0
      - |checkmark|
      -
      -
 
-   * - 8.1
-     - |checkmark|
-     -
-     -
-
-   * - 8.0
-     - |checkmark|
-     -
-     -
-
-   * - 7.5
+   * - 7.2 thru 7.5
      - |checkmark|
      - |checkmark|
      -
 
-   * - 7.4
-     - |checkmark|
-     - |checkmark|
-     -
-
-   * - 7.3
-     - |checkmark|
-     - |checkmark|
-     -
-
-   * - 7.2
-     - |checkmark|
-     - |checkmark|
-     -
-
-   * - 7.1
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-
-   * - 7.0
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-
-   * - 6.4
+   * - 7.0 thru 7.1
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -107,9 +72,9 @@ is deprecated.
      - Ruby 2.4
      - Ruby 2.3
      - Ruby 2.2
-     - JRuby 9.2
-     - JRuby 9.3
      - JRuby 9.4
+     - JRuby 9.3
+     - JRuby 9.2
 
    * - 9.0
      - |checkmark|
@@ -121,9 +86,9 @@ is deprecated.
      -
      -
      -
-     -
-     -
      - |checkmark|
+     -
+     -
 
    * - 8.1
      - |checkmark|
@@ -138,7 +103,6 @@ is deprecated.
      -
      - |checkmark|
      -
-
 
    * - 8.0
      -
@@ -164,9 +128,9 @@ is deprecated.
      -
      -
      -
-     - D
-     - |checkmark|
      -
+     - |checkmark|
+     - D
 
    * - 7.4
      -
@@ -178,9 +142,9 @@ is deprecated.
      -
      -
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.3
      -
@@ -192,9 +156,9 @@ is deprecated.
      - D
      - D
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.2
      -
@@ -206,9 +170,9 @@ is deprecated.
      - D
      - D
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.1
      -
@@ -220,9 +184,9 @@ is deprecated.
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.0
      -
@@ -234,23 +198,9 @@ is deprecated.
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
-     - |checkmark|
-     -
-     -
-
-   * - 6.4
-     -
-     -
      -
      -
      - |checkmark|
-     - |checkmark|
-     - |checkmark| [#ruby-2.4]_
-     - |checkmark|
-     - |checkmark| [#ruby-2.2]_
-     - |checkmark|
-     -
-     -
 
 .. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.2 or higher is required.
 
@@ -296,7 +246,7 @@ and will be removed in a next version.
      - MongoDB 3.0
      - MongoDB 2.6
 
-   * - 9.0
+   * - 8.0 thru 9.0
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -309,33 +259,7 @@ and will be removed in a next version.
      -
      -
 
-   * - 8.1
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     -
-     -
-     -
-     -
-
-   * - 8.0
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     -
-     -
-     -
-     -
-
-   * - 7.5
+   * - 7.4 thru 7.5
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -348,72 +272,7 @@ and will be removed in a next version.
      - D
      - D
 
-   * - 7.4
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.3
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.2
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.1
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.0
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 6.4
+   * - 7.0 thru 7.3
      -
      -
      - |checkmark|
@@ -456,15 +315,7 @@ are supported by Mongoid.
      -
      -
 
-   * - 8.1
-     - |checkmark| [#rails-7.1]_
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark| [#rails-5-ruby-3.0]_
-     -
-
-   * - 8.0
+   * - 8.0 thru 8.1
      - |checkmark| [#rails-7.1]_
      - |checkmark|
      - |checkmark|
@@ -517,14 +368,6 @@ are supported by Mongoid.
      -
      - |checkmark| [#rails-6.1]_
      - |checkmark| [#rails-6]_
-     - |checkmark|
-     - |checkmark|
-
-   * - 6.4
-     -
-     -
-     -
-     -
      - |checkmark|
      - |checkmark|
 
