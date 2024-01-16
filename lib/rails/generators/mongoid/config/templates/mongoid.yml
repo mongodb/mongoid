@@ -41,10 +41,12 @@ development:
         # roles:
         #   - 'dbOwner'
 
-        # Change the default authentication mechanism. Valid options are: :scram,
-        # :mongodb_cr, :mongodb_x509, and :plain. Note that all authentication
-        # mechanisms require username and password, with the exception of :mongodb_x509.
-        # Default is :scram since MongoDB 3.0; earlier versions defaulted to :plain.
+        # Change the default authentication mechanism. Valid options include:
+        # :scram, :scram256, :mongodb_cr, :mongodb_x509, :gssapi, :aws, :plain.
+        # MongoDB Server defaults to :scram, which will use "SCRAM-SHA-256" if available,
+        # otherwise fallback to "SCRAM-SHA-1" (:scram256 will always use "SCRAM-SHA-256".)
+        # This setting is handled by the MongoDB Ruby Driver. Please refer to:
+        # https://mongodb.com/docs/ruby-driver/current/reference/authentication/
         # auth_mech: :scram
 
         # The database or source to authenticate the user against.
