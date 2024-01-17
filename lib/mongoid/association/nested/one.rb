@@ -1,13 +1,16 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
+
+      # Builder class used to perform #accepts_nested_attributes_for
+      # attribute assignment on one-to-n associations.
       class One
         include Buildable
 
         attr_accessor :destroy
-
 
         # Builds the association depending on the attributes and the options
         # passed to the macro.
@@ -26,7 +29,7 @@ module Mongoid
           return if reject?(parent, attributes)
           @existing = parent.send(association.name)
           if update?
-            attributes.delete_id
+            delete_id(attributes)
             existing.assign_attributes(attributes)
           elsif replace?
             parent.send(association.setter, Factory.build(@class_name, attributes))

@@ -1,7 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Validatable
+
+    # Mixin module included in Mongoid::Document which adds various
+    # validation macro methods, such as +validates_presence_of+ and
+    # +validates_uniqueness_of+.
     module Macros
       extend ActiveSupport::Concern
 

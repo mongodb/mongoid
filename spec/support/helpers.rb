@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Helpers
   # Reloads the specified model class.
   #

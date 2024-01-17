@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional nil behavior.
+        # Adds query type-casting behavior to NilClass.
         module NilClass
 
           # Add this object to nil.

@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to BSON::ObjectId.
     module ObjectId
 
       # Evolve the object id.

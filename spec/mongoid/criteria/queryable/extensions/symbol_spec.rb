@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -10,6 +11,10 @@ describe Symbol do
       described_class.add_key(:fubar, :union, "$fu", "$bar") do |value|
         value.to_s
       end
+    end
+
+    after do
+      Symbol.undef_method(:fubar)
     end
 
     let(:fubar) do

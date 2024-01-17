@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Persistable
@@ -83,6 +84,7 @@ module Mongoid
       # @return [ true ] true.
       def post_process_insert
         self.new_record = false
+        remember_storage_options!
         flag_descendants_persisted
         true
       end

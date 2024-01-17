@@ -1,3 +1,4 @@
+# rubocop:todo all
 # A simplistic mock object to stand in for Rails, instead of adding an
 # otherwise unnecessary dependency on Rails itself.
 

@@ -1,9 +1,14 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/contextual/aggregable/none"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on a null set. The method interface of this class
+    # is consistent with Mongoid::Contextual::Mongo.
     class None
       include Enumerable
       include Aggregable::None
@@ -149,7 +154,7 @@ module Mongoid
       # @example Get the first document in null context.
       #   context.first!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def first!
         raise_document_not_found_error
       end
@@ -171,7 +176,7 @@ module Mongoid
       # @example Get the last document in null context.
       #   context.last!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def last!
         raise_document_not_found_error
       end
@@ -193,7 +198,7 @@ module Mongoid
       # @example Take a document in null context.
       #   context.take!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def take!
         raise_document_not_found_error
       end
@@ -213,7 +218,7 @@ module Mongoid
       # @example Get the second document in null context.
       #   context.second!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def second!
         raise_document_not_found_error
       end
@@ -233,7 +238,7 @@ module Mongoid
       # @example Get the third document in null context.
       #   context.third!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def third!
         raise_document_not_found_error
       end
@@ -253,7 +258,7 @@ module Mongoid
       # @example Get the fourth document in null context.
       #   context.fourth!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def fourth!
         raise_document_not_found_error
       end
@@ -273,7 +278,7 @@ module Mongoid
       # @example Get the fifth document in null context.
       #   context.fifth!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def fifth!
         raise_document_not_found_error
       end
@@ -293,7 +298,7 @@ module Mongoid
       # @example Get the second to last document in null context.
       #   context.second_to_last!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def second_to_last!
         raise_document_not_found_error
       end
@@ -313,7 +318,7 @@ module Mongoid
       # @example Get the third to last document in null context.
       #   context.third_to_last!
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] always raises.
+      # @raise [ Mongoid::Errors::DocumentNotFound ] always raises.
       def third_to_last!
         raise_document_not_found_error
       end

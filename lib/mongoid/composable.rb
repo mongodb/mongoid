@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/changeable"
 require "mongoid/collection_configurable"
@@ -11,6 +12,7 @@ require "mongoid/matcher"
 require "mongoid/matchable"
 require "mongoid/persistable"
 require "mongoid/reloadable"
+require 'mongoid/search_indexable'
 require "mongoid/selectable"
 require "mongoid/scopable"
 require "mongoid/serializable"
@@ -49,6 +51,7 @@ module Mongoid
     include Association
     include Reloadable
     include Scopable
+    include SearchIndexable
     include Selectable
     include Serializable
     include Shardable
