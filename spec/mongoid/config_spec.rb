@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require "support/feature_sandbox"
@@ -335,8 +336,24 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
+  context 'when setting the allow_bson5_decimal128 option in the config' do
+    min_bson_version '5.0'
+
+    let(:option) { :allow_bson5_decimal128 }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
   context 'when setting the legacy_readonly option in the config' do
     let(:option) { :legacy_readonly }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the legacy_persistence_context_behavior option in the config' do
+    let(:option) { :legacy_persistence_context_behavior }
     let(:default) { false }
 
     it_behaves_like "a config option"
@@ -569,24 +586,26 @@ describe Mongoid::Config do
 
       it 'passes uuid to driver' do
         Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
-          auto_encryption_options: {
-            'key_vault_namespace' => 'admin.datakeys',
-            'kms_providers' => {'local' => {'key' => 'z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U'}},
-            'schema_map' => {'blog_development.comments' => {
-              'bsonType' => 'object',
-              'properties' => {
-                'message' => {'encrypt' => {
-                  'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
-                  'bsonType' => 'string',
-                  'keyId' => [BSON::Binary.new("G\xF0 5\xCC@HX\xA2%b\x97\xA9a\xA8\xE7", :uuid)],
-                }},
-              },
-            }}},
-          database: 'mongoid_test',
-          platform: "mongoid-#{Mongoid::VERSION}",
-          wrapping_libraries: [
-            {'name' => 'Mongoid', 'version' => Mongoid::VERSION},
-          ],
+          {
+            auto_encryption_options: {
+              'key_vault_namespace' => 'admin.datakeys',
+              'kms_providers' => {'local' => {'key' => 'z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U'}},
+              'schema_map' => {'blog_development.comments' => {
+                'bsonType' => 'object',
+                'properties' => {
+                  'message' => {'encrypt' => {
+                    'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+                    'bsonType' => 'string',
+                    'keyId' => [BSON::Binary.new("G\xF0 5\xCC@HX\xA2%b\x97\xA9a\xA8\xE7", :uuid)],
+                  }},
+                },
+              }}},
+            database: 'mongoid_test',
+            platform: "mongoid-#{Mongoid::VERSION}",
+            wrapping_libraries: [
+              {'name' => 'Mongoid', 'version' => Mongoid::VERSION},
+            ]
+          }
         )
 
         client

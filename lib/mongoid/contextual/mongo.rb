@@ -1,5 +1,7 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
+require 'mongoid/atomic_update_preparer'
 require "mongoid/contextual/mongo/documents_loader"
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
@@ -10,6 +12,10 @@ require "mongoid/association/eager_loadable"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on documents which are persisted in the database and
+    # have not been loaded into application memory.
     class Mongo
       extend Forwardable
       include Enumerable
@@ -69,7 +75,14 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        view.count_documents(options)
+
+        if valid_for_count_documents?
+          view.count_documents(options)
+        else
+          # TODO: Remove this when we remove the deprecated for_js API.
+          # https://jira.mongodb.org/browse/MONGOID-5681
+          view.count(options)
+        end
       end
 
       # Get the estimated number of documents matching the query.
@@ -401,7 +414,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def take!
         # Do to_a first so that the Mongo#first method is not used and the
@@ -583,7 +596,7 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def first!
         first || raise_document_not_found_error
@@ -625,7 +638,7 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def last!
         last || raise_document_not_found_error
@@ -649,7 +662,7 @@ module Mongoid
       #
       # @return [ Document ] The second document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second!
         second || raise_document_not_found_error
@@ -673,7 +686,7 @@ module Mongoid
       #
       # @return [ Document ] The third document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third!
         third || raise_document_not_found_error
@@ -697,7 +710,7 @@ module Mongoid
       #
       # @return [ Document ] The fourth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fourth!
         fourth || raise_document_not_found_error
@@ -721,7 +734,7 @@ module Mongoid
       #
       # @return [ Document ] The fifth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fifth!
         fifth || raise_document_not_found_error
@@ -747,7 +760,7 @@ module Mongoid
       #
       # @return [ Document ] The second to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second_to_last!
         second_to_last || raise_document_not_found_error
@@ -773,7 +786,7 @@ module Mongoid
       #
       # @return [ Document ] The third to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third_to_last!
         third_to_last || raise_document_not_found_error
@@ -805,8 +818,8 @@ module Mongoid
       # @return [ true | false ] If the update succeeded.
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
-        attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        view.send(method, attributes.__consolidate__(klass), opts)
+
+        view.send(method, AtomicUpdatePreparer.prepare(attributes, klass), opts)
       end
 
       # Apply the field limitations.
@@ -1031,6 +1044,27 @@ module Mongoid
         end
         docs = eager_load(docs)
         limit ? docs : docs.first
+      end
+
+      # Queries whether the current context is valid for use with
+      # the #count_documents? predicate. A context is valid if it
+      # does not include a `$where` operator.
+      #
+      # @return [ true | false ] whether or not the current context
+      #   excludes a `$where` operator.
+      #
+      # TODO: Remove this method when we remove the deprecated for_js API.
+      # https://jira.mongodb.org/browse/MONGOID-5681
+      def valid_for_count_documents?(hash = view.filter)
+        # Note that `view.filter` is a BSON::Document, and all keys in a
+        # BSON::Document are strings; we don't need to worry about symbol
+        # representations of `$where`.
+        hash.keys.each do |key|
+          return false if key == '$where'
+          return false if hash[key].is_a?(Hash) && !valid_for_count_documents?(hash[key])
+        end
+
+        true
       end
 
       def raise_document_not_found_error

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/criteria/findable"
 require "mongoid/criteria/includable"
@@ -39,6 +40,26 @@ module Mongoid
     include Clients::Options
     include Clients::Sessions
     include Options
+
+    class << self
+      # Convert the given hash to a criteria. Will iterate over each keys in the
+      # hash which must correspond to method on a criteria object. The hash
+      # must also include a "klass" key.
+      #
+      # @example Convert the hash to a criteria.
+      #   Criteria.from_hash({ klass: Band, where: { name: "Depeche Mode" })
+      #
+      # @param [ Hash ] hash The hash to convert.
+      #
+      # @return [ Criteria ] The criteria.
+      def from_hash(hash)
+        criteria = Criteria.new(hash.delete(:klass) || hash.delete('klass'))
+        hash.each_pair do |method, args|
+          criteria = criteria.__send__(method, args)
+        end
+        criteria
+      end
+    end
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
@@ -159,7 +180,7 @@ module Mongoid
     #
     # @return [ Object ] The id.
     def extract_id
-      selector.extract_id
+      selector['_id'] || selector[:_id] || selector['id'] || selector[:id]
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options
@@ -222,7 +243,7 @@ module Mongoid
     # may be desired.
     #
     # @example Merge the criteria with another criteria.
-    #   criteri.merge(other_criteria)
+    #   criteria.merge(other_criteria)
     #
     # @example Merge the criteria with a hash. The hash must contain a klass
     #   key and the key/value pairs correspond to method names/args.
@@ -247,16 +268,16 @@ module Mongoid
     # @example Merge another criteria into this criteria.
     #   criteria.merge(Person.where(name: "bob"))
     #
-    # @param [ Criteria ] other The criteria to merge in.
+    # @param [ Criteria | Hash ] other The criteria to merge in.
     #
     # @return [ Criteria ] The merged criteria.
     def merge!(other)
-      criteria = other.to_criteria
-      selector.merge!(criteria.selector)
-      options.merge!(criteria.options)
-      self.documents = criteria.documents.dup unless criteria.documents.empty?
-      self.scoping_options = criteria.scoping_options
-      self.inclusions = (inclusions + criteria.inclusions).uniq
+      other = self.class.from_hash(other) if other.is_a?(Hash)
+      selector.merge!(other.selector)
+      options.merge!(other.options)
+      self.documents = other.documents.dup unless other.documents.empty?
+      self.scoping_options = other.scoping_options
+      self.inclusions = (inclusions + other.inclusions).uniq
       self
     end
 
@@ -349,9 +370,11 @@ module Mongoid
     #   criteria.to_criteria
     #
     # @return [ Criteria ] self.
+    # @deprecated
     def to_criteria
       self
     end
+    Mongoid.deprecate(self, :to_criteria)
 
     # Convert the criteria to a proc.
     #
@@ -438,6 +461,8 @@ module Mongoid
     # @param [ Hash ] scope The scope for the code.
     #
     # @return [ Criteria ] The criteria.
+    #
+    # @deprecated
     def for_js(javascript, scope = {})
       code = if scope.empty?
         # CodeWithScope is not supported for $where as of MongoDB 4.4
@@ -447,6 +472,7 @@ module Mongoid
       end
       js_query(code)
     end
+    Mongoid.deprecate(self, :for_js)
 
     private
 

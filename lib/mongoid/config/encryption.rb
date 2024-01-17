@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'mongoid/extensions/boolean'
 require 'mongoid/stringified_symbol'
@@ -14,12 +15,12 @@ module Mongoid
 
       # Generate the encryption schema map for the provided models.
       #
-      # @param [ String ] database The database name.
+      # @param [ String ] default_database The default database name.
       # @param [ Array<Mongoid::Document> ] models The models to generate the schema map for.
       #   Defaults to all models in the application.
       #
       # @return [ Hash ] The encryption schema map.
-      def encryption_schema_map(database, models = ::Mongoid.models)
+      def encryption_schema_map(default_database, models = ::Mongoid.models)
         visited = Set.new
         models.each_with_object({}) do |model, map|
           next if visited.include?(model)
@@ -27,6 +28,7 @@ module Mongoid
           next if model.embedded?
           next unless model.encrypted?
 
+          database = model.storage_options.fetch(:database) { default_database }
           key = "#{database}.#{model.collection_name}"
           props = metadata_for(model).merge(properties_for(model, visited))
           map[key] = props unless props.empty?
@@ -71,7 +73,7 @@ module Mongoid
       # @return [ Hash ] The encryptMetadata object.
       def metadata_for(model)
         metadata = {}.tap do |metadata|
-          if (key_id = key_id_for(model.encrypt_metadata[:key_id]))
+          if (key_id = key_id_for(model.encrypt_metadata[:key_id], model.encrypt_metadata[:key_name_field]))
             metadata['keyId'] = key_id
           end
           if model.encrypt_metadata.key?(:deterministic)
@@ -127,7 +129,7 @@ module Mongoid
           if (algorithm = algorithm_for(field))
             props[name]['encrypt']['algorithm'] = algorithm
           end
-          if (key_id = key_id_for(field.key_id))
+          if (key_id = key_id_for(field.key_id, field.key_name_field))
             props[name]['encrypt']['keyId'] = key_id
           end
         end
@@ -145,11 +147,10 @@ module Mongoid
       def properties_for_relations(model, visited)
         model.relations.each_with_object({}) do |(name, relation), props|
           next if visited.include?(relation.relation_class)
-          visited << relation.relation_class
-          next unless relation.is_a?(Association::Embedded::EmbedsMany) ||
-                      relation.is_a?(Association::Embedded::EmbedsOne)
+          next unless relation.is_a?(Association::Embedded::EmbedsOne)
           next unless relation.relation_class.encrypted?
 
+          visited << relation.relation_class
           metadata_for(
             relation.relation_class
           ).merge(
@@ -190,13 +191,22 @@ module Mongoid
       # key id.
       #
       # @param [ String | nil ] key_id_base64 The base64 encoded key id.
+      # @param [ String | nil ] key_name_field The name of the key name field.
       #
-      # @return [ Array<BSON::Binary> | nil ] The keyId encryption schema field,
-      #   or nil if the key id is nil.
-      def key_id_for(key_id_base64)
-        return nil if key_id_base64.nil?
+      # @return [ Array<BSON::Binary> | String | nil ] The keyId encryption schema field,
+      #   JSON pointer to the field that contains keyAltName,
+      #   or nil if both key_id_base64 and key_name_field are nil.
+      def key_id_for(key_id_base64, key_name_field)
+        return nil if key_id_base64.nil? && key_name_field.nil?
+        if !key_id_base64.nil? && !key_name_field.nil?
+          raise ArgumentError, 'Specifying both key_id and key_name_field is not allowed'
+        end
 
-        [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
+        if key_id_base64.nil?
+          "/#{key_name_field}"
+        else
+          [ BSON::Binary.new(Base64.decode64(key_id_base64), :uuid) ]
+        end
       end
     end
   end

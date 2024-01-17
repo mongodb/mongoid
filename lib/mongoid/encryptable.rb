@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Mongoid
   # This module is used to extend Mongoid::Document
   # to add encryption functionality.
@@ -17,7 +18,10 @@ module Mongoid
       #
       # @param [ Hash ] options The encryption metadata.
       # @option options [ String ] :key_id The base64-encoded UUID of the key
-      #   used to encrypt fields.
+      #   used to encrypt fields. Mutually exclusive with :key_name_field option.
+      # @option options [ String ] :key_name_field The name of the field that
+      #   contains the key alt name to use for encryption. Mutually exclusive
+      #   with :key_id option.
       # @option options [ true | false ] :deterministic Whether the encryption
       # is deterministic or not.
       def encrypt_with(options = {})

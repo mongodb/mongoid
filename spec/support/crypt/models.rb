@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Crypt
   class Patient
     include Mongoid::Document
@@ -6,8 +7,12 @@ module Crypt
 
     field :code, type: String
     field :medical_records, type: Array, encrypt: { deterministic: false}
-    field :blood_type, type: String, encrypt: { deterministic: false }
+    field :blood_type, type: String, encrypt: {
+      deterministic: false,
+      key_name_field: :blood_type_key_name
+    }
     field :ssn, type: Integer, encrypt: { deterministic: true }
+    field :blood_type_key_name, type: String
 
     embeds_one :insurance, class_name: "Crypt::Insurance"
   end
@@ -34,6 +39,8 @@ module Crypt
 
   class Car
     include Mongoid::Document
+
+    store_in database: 'vehicles'
 
     encrypt_with key_id: "grolrnFVSSW9Gq04Q87R9Q==", deterministic: true
 

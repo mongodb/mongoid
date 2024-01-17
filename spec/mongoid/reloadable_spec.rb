@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -331,6 +332,30 @@ describe Mongoid::Reloadable do
         building.contractors << contractor
         building.reload
         expect(building.contractors).to eq([contractor])
+      end
+    end
+
+    context 'when embeds_many is modified' do
+      let(:contractor1) { Contractor.new(name: 'b') }
+      let(:contractor2) { Contractor.new(name: 'c') }
+
+      let(:building) do
+        Building.create!(name: 'a', contractors: [ contractor1 ])
+      end
+
+      let(:more_contractors) { building.contractors + [ contractor2 ] }
+
+      let(:modified_building) do
+        building.tap do
+          building.assign_attributes contractors: more_contractors
+        end
+      end
+
+      let(:reloaded_building) { modified_building.reload }
+
+      it 'resets delayed_atomic_sets' do
+        expect(modified_building.delayed_atomic_sets).not_to be_empty
+        expect(reloaded_building.delayed_atomic_sets).to be_empty
       end
     end
 

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 class Dragon
   include Mongoid::Document

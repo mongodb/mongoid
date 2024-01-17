@@ -1,7 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
+
+    # Mixin module for Mongoid::Criteria which adds strong
+    # parameters validation when using ActionController::Parameters
+    # objects as arguments to condition methods.
     module Permission
 
       [:all,

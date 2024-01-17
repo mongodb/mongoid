@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Config
@@ -25,6 +26,8 @@ module Mongoid
       # @param [ Hash ] options Extras for the option.
       #
       # @option options [ Object ] :default The default value.
+      # @option options [ Proc | nil ] :on_change The callback to invoke when the
+      #   setter is invoked.
       def option(name, options = {})
         defaults[name] = settings[name] = options[:default]
 
@@ -38,6 +41,7 @@ module Mongoid
 
           define_method("#{name}=") do |value|
             settings[name] = value
+            options[:on_change]&.call(value)
           end
 
           define_method("#{name}?") do
@@ -53,7 +57,11 @@ module Mongoid
       #
       # @return [ Hash ] The defaults.
       def reset
-        settings.replace(defaults)
+        # do this via the setter for each option, so that any defined on_change
+        # handlers can be invoked.
+        defaults.each do |setting, default|
+          send(:"#{setting}=", default)
+        end
       end
 
       # Get the settings or initialize a new empty hash.
@@ -75,8 +83,8 @@ module Mongoid
       def log_level
         if level = settings[:log_level]
           unless level.is_a?(Integer)
-            level = level.upcase.to_s
-            level = "Logger::#{level}".constantize
+            # JRuby String#constantize does not work here.
+            level = Logger.const_get(level.upcase.to_s)
           end
           level
         end

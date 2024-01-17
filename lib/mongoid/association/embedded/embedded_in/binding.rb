@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -24,10 +25,10 @@ module Mongoid
               _base._association = _association.inverse_association(_target) unless _base._association
               _base.parentize(_target)
               if _base.embedded_many?
-                _target.do_or_do_not(_association.inverse(_target)).push(_base)
+                _target.send(_association.inverse(_target)).push(_base)
               else
                 remove_associated(_target)
-                _target.do_or_do_not(_association.inverse_setter(_target), _base)
+                try_method(_target, _association.inverse_setter(_target), _base)
               end
             end
           end
@@ -41,9 +42,9 @@ module Mongoid
           def unbind_one
             binding do
               if _base.embedded_many?
-                _target.do_or_do_not(_association.inverse(_target)).delete(_base)
+                _target.send(_association.inverse(_target)).delete(_base)
               else
-                _target.do_or_do_not(_association.inverse_setter(_target), nil)
+                try_method(_target, _association.inverse_setter(_target), nil)
               end
             end
           end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "forwardable"
 require "time"
@@ -27,19 +28,19 @@ require "mongoid/clients"
 require "mongoid/document"
 require "mongoid/tasks/database"
 require "mongoid/tasks/encryption"
-require "mongoid/query_cache"
 require "mongoid/warnings"
 require "mongoid/utils"
 
-# If we are using Rails then we will include the Mongoid railtie. This has all
-# the nifty initializers that Mongoid needs.
+# If we are using Rails then we will include the Mongoid railtie.
+# This configures initializers required to integrate Mongoid with Rails.
 if defined?(Rails)
   require "mongoid/railtie"
 end
 
-# add english load path by default
+# Add English locale config to load path by default.
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
+# Top-level module for project.
 module Mongoid
   extend Forwardable
   extend Loggable
@@ -138,12 +139,16 @@ module Mongoid
   #
   # @api private
   module GlobalDiscriminatorKeyAssignment
+
     # This class is used for obtaining the method definition location for
     # Mongoid methods.
     class InvalidFieldHost
       include Mongoid::Document
     end
 
+    # Sets the global discriminator key name.
+    #
+    # @param [ String | Symbol ] value The new discriminator key name.
     def discriminator_key=(value)
       Mongoid::Fields::Validators::Macro.validate_field_name(InvalidFieldHost, value)
       value = value.to_s

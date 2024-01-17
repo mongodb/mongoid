@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -30,27 +31,35 @@ describe "Mongoid::Tasks::Encryption" do
       BSON::Binary.new('data_key_id', :uuid)
     end
 
+    let(:key_alt_name) do
+      'mongoid_test_alt_name'
+    end
+
     before do
       key_vault_client[key_vault_collection].drop
       Mongoid::Config.send(:clients=, config)
     end
 
     context 'when all parameters are correct' do
-      before do
-        expect_any_instance_of(Mongo::ClientEncryption)
-          .to receive(:create_data_key)
-          .with('local')
-          .and_return(data_key_id)
-      end
-
       context 'when all parameters are provided' do
+        before do
+          expect_any_instance_of(Mongo::ClientEncryption)
+            .to receive(:create_data_key)
+                  .with('local', { key_alt_names: [key_alt_name] })
+                  .and_return(data_key_id)
+        end
         it 'creates a data key' do
-          result = Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'local', client_name: :encrypted)
+          result = Mongoid::Tasks::Encryption.create_data_key(
+            kms_provider_name: 'local',
+            client_name: :encrypted,
+            key_alt_name: key_alt_name
+          )
           expect(result).to eq(
             {
               key_id: Base64.strict_encode64(data_key_id.data),
               key_vault_namespace: key_vault_namespace,
-              kms_provider: 'local'
+              kms_provider: 'local',
+              key_alt_name: key_alt_name
             }
           )
         end
@@ -58,15 +67,46 @@ describe "Mongoid::Tasks::Encryption" do
 
       context 'when kms_provider_name is not provided' do
         context 'and there is only one kms provider' do
-          it 'creates a data key' do
-            result = Mongoid::Tasks::Encryption.create_data_key(client_name: :encrypted)
-            expect(result).to eq(
-              {
-                key_id: Base64.strict_encode64(data_key_id.data),
-                key_vault_namespace: key_vault_namespace,
-                kms_provider: 'local'
-              }
-            )
+          context 'without key_alt_name' do
+            before do
+              expect_any_instance_of(Mongo::ClientEncryption)
+                .to receive(:create_data_key)
+                      .with('local', {})
+                      .and_return(data_key_id)
+            end
+            it 'creates a data key' do
+              result = Mongoid::Tasks::Encryption.create_data_key(client_name: :encrypted)
+              expect(result).to eq(
+                {
+                  key_id: Base64.strict_encode64(data_key_id.data),
+                  key_vault_namespace: key_vault_namespace,
+                  kms_provider: 'local'
+                }
+              )
+            end
+          end
+
+          context 'with key_alt_name' do
+            before do
+              expect_any_instance_of(Mongo::ClientEncryption)
+                .to receive(:create_data_key)
+                      .with('local', {key_alt_names: [key_alt_name]})
+                      .and_return(data_key_id)
+            end
+            it 'creates a data key' do
+              result = Mongoid::Tasks::Encryption.create_data_key(
+                client_name: :encrypted,
+                key_alt_name: key_alt_name
+              )
+              expect(result).to eq(
+                {
+                  key_id: Base64.strict_encode64(data_key_id.data),
+                  key_vault_namespace: key_vault_namespace,
+                  kms_provider: 'local',
+                  key_alt_name: key_alt_name
+                }
+              )
+            end
           end
         end
       end

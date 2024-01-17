@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional datetime behavior.
+        # Adds query type-casting behavior to DateTime class.
         module DateTime
 
           # Evolve the date time into a mongo friendly UTC time.
