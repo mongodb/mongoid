@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Time class.
     module DateTime
 
       # Mongoize the date time into a time.
@@ -11,12 +14,7 @@ module Mongoid
       #
       # @return [ Time | ActiveSupport::TimeWithZone ] The mongoized time.
       def __mongoize_time__
-        if Mongoid.use_activesupport_time_zone?
-          in_time_zone(::Time.zone)
-        else
-          time = to_time
-          time.respond_to?(:getlocal) ? time.getlocal : time
-        end
+        in_time_zone(::Time.zone)
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly

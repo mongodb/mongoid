@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'mongoid/association/referenced/has_and_belongs_to_many/binding'
 require 'mongoid/association/referenced/has_and_belongs_to_many/buildable'
@@ -53,7 +54,7 @@ module Mongoid
 
         # The list of association complements.
         #
-        # @return [ Array<Association> ] The association complements.
+        # @return [ Array<Mongoid::Association::Relatable> ] The association complements.
         def relation_complements
           @relation_complements ||= [ self.class ].freeze
         end

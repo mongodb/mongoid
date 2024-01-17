@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "set"
 
@@ -7,7 +8,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional object behavior.
+        # Adds query type-casting behavior to Set class.
         module Set
           module ClassMethods
 

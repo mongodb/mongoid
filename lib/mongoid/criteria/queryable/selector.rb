@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -20,7 +21,7 @@ module Mongoid
           other.each_pair do |key, value|
             if value.is_a?(Hash) && self[key.to_s].is_a?(Hash)
               value = self[key.to_s].merge(value) do |_key, old_val, new_val|
-                case _key
+                case _key.to_s
                 when '$in'
                   new_val & old_val
                 when '$nin'
@@ -75,7 +76,7 @@ module Mongoid
 
         # Get the store name and store value. If the value is of type range,
         # we need may need to change the store_name as well as the store_value,
-        # therefore, we cannot just use the evole method.
+        # therefore, we cannot just use the evolve method.
         #
         # @param [ String ] name The name of the field.
         # @param [ Object ] serializer The optional serializer for the field.
@@ -151,6 +152,8 @@ module Mongoid
         # @return [ Object ] The serialized object.
         def evolve(serializer, value)
           case value
+          when Mongoid::RawValue
+            value.raw_value
           when Hash
             evolve_hash(serializer, value)
           when Array
@@ -228,7 +231,7 @@ module Mongoid
         #
         # @api private
         #
-        # @param [ String ] key The to store the range for.
+        # @param [ String ] key The key at which to store the range.
         # @param [ Object ] serializer The optional serializer for the field.
         # @param [ Range ] value The Range to serialize.
         #

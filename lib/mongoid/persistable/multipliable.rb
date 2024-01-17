@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Persistable
@@ -12,15 +13,15 @@ module Mongoid
       # be set to zero.
       #
       # @example Multiply the fields.
-      #   document.set_mul(score: 10, place: 1, lives: -10)
+      #   document.mul(score: 10, place: 1, lives: -10)
       #
       # @param [ Hash ] factors The field/factor multiplier pairs.
       #
       # @return [ Document ] The document.
-      def set_mul(factors)
+      def mul(factors)
         prepare_atomic_operation do |ops|
           process_atomic_operations(factors) do |field, value|
-            factor = value.__to_inc__
+            factor = value.is_a?(BigDecimal) ? value.to_f : value
             current = attributes[field]
             new_value = (current || 0) * factor
             process_attribute field, new_value if executing_atomically?

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -77,7 +78,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let(:criteria) do
         Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
@@ -174,7 +174,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let(:criteria) do
         Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
@@ -246,7 +245,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave" ], likes: 60)
@@ -326,7 +324,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave" ])
@@ -350,7 +347,7 @@ describe Mongoid::Contextual::Atomic do
     end
   end
 
-  describe "#set_mul" do
+  describe "#mul" do
 
     let!(:depeche_mode) { Band.create!(likes: 60) }
     let!(:smiths) { Band.create! }
@@ -359,7 +356,7 @@ describe Mongoid::Contextual::Atomic do
     let(:criteria) { Band.all }
     let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
 
-    before { context.set_mul(likes: 10) }
+    before { context.mul(likes: 10) }
 
     context "when the field exists" do
 
@@ -378,7 +375,7 @@ describe Mongoid::Contextual::Atomic do
     context "when using the alias" do
 
       before do
-        context.set_mul(years: 2)
+        context.mul(years: 2)
       end
 
       it "muls the value and read from alias" do
@@ -391,7 +388,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) { Band.create!(members: [ "Dave" ], years: 3) }
       let(:criteria) do
@@ -400,7 +396,7 @@ describe Mongoid::Contextual::Atomic do
 
       let(:context) { Mongoid::Contextual::Mongo.new(criteria) }
 
-      before { context.set_mul(years: 2) }
+      before { context.mul(years: 2) }
 
       it "muls the value" do
         expect(depeche_mode.reload.years).to eq(6)
@@ -457,7 +453,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave" ])
@@ -512,7 +507,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave" ])
@@ -570,7 +564,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave", "Alan", "Fletch" ])
@@ -628,7 +621,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave" ])
@@ -694,7 +686,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave" ])
@@ -756,7 +747,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(members: [ "Dave" ])
@@ -966,7 +956,6 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let!(:depeche_mode) do
         Band.create!(name: "Depeche Mode", years: 10)

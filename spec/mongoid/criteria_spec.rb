@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -287,23 +288,9 @@ describe Mongoid::Criteria do
       Band.where(name: "Depeche Mode")
     end
 
-    # as_json changed in rails 6 to call as_json on serializable_hash.
-    # https://github.com/rails/rails/commit/2e5cb980a448e7f4ab00df6e9ad4c1cc456616aa
 
-    context 'rails < 6' do
-      max_rails_version '5.2'
-
-      it "returns the criteria as a json hash" do
-        expect(criteria.as_json).to eq([ band.serializable_hash ])
-      end
-    end
-
-    context 'rails >= 6' do
-      min_rails_version '6.0'
-
-      it "returns the criteria as a json hash" do
-        expect(criteria.as_json).to eq([ band.serializable_hash.as_json ])
-      end
+    it "returns the criteria as a json hash" do
+      expect(criteria.as_json).to eq([ band.serializable_hash.as_json ])
     end
   end
 
@@ -1460,52 +1447,68 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#merge!" do
+  describe '#merge!' do
+    let(:band) { Band.new }
+    let(:criteria) { Band.scoped.where(name: 'Depeche Mode').asc(:name) }
+    let(:association) { Band.relations['records'] }
+    subject(:merged) { criteria.merge!(other) }
 
-    let(:band) do
-      Band.new
-    end
+    context 'when merging a Criteria' do
+      let(:other) do
+        { klass: Band, includes: [:records] }
+      end
 
-    let(:criteria) do
-      Band.scoped.where(name: "Depeche Mode").asc(:name)
-    end
+      it 'merges the selector' do
+        expect(merged.selector).to eq({ 'name' => 'Depeche Mode' })
+      end
 
-    let(:mergeable) do
-      Band.includes(:records).tap do |crit|
-        crit.documents = [ band ]
+      it 'merges the options' do
+        expect(merged.options).to eq({ sort: { 'name' => 1 }})
+      end
+
+      it 'merges the scoping options' do
+        expect(merged.scoping_options).to eq([ nil, nil ])
+      end
+
+      it 'merges the inclusions' do
+        expect(merged.inclusions).to eq([ association ])
+      end
+
+      it 'returns the same criteria' do
+        expect(merged).to equal(criteria)
       end
     end
 
-    let(:association) do
-      Band.relations["records"]
-    end
+    context 'when merging a Hash' do
+      let(:other) do
+        Band.includes(:records).tap do |crit|
+          crit.documents = [ band ]
+        end
+      end
 
-    let(:merged) do
-      criteria.merge!(mergeable)
-    end
+      it 'merges the selector' do
+        expect(merged.selector).to eq({ 'name' => 'Depeche Mode' })
+      end
 
-    it "merges the selector" do
-      expect(merged.selector).to eq({ "name" => "Depeche Mode" })
-    end
+      it 'merges the options' do
+        expect(merged.options).to eq({ sort: { 'name' => 1 }})
+      end
 
-    it "merges the options" do
-      expect(merged.options).to eq({ sort: { "name" => 1 }})
-    end
+      it 'merges the documents' do
+        expect(merged.documents).to eq([ band ])
+      end
 
-    it "merges the documents" do
-      expect(merged.documents).to eq([ band ])
-    end
+      it 'merges the scoping options' do
+        expect(merged.scoping_options).to eq([ nil, nil ])
+      end
 
-    it "merges the scoping options" do
-      expect(merged.scoping_options).to eq([ nil, nil ])
-    end
+      it 'merges the inclusions' do
+        expect(merged.inclusions).to eq([ association ])
+      end
 
-    it "merges the inclusions" do
-      expect(merged.inclusions).to eq([ association ])
-    end
-
-    it "returns the same criteria" do
-      expect(merged).to equal(criteria)
+      it 'returns the same criteria' do
+        expect(merged).to equal(criteria)
+      end
     end
   end
 
@@ -1735,10 +1738,8 @@ describe Mongoid::Criteria do
           Product.pluck(:price)
         end
 
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "uses the aliases" do
-            expect(plucked).to eq([ 100000, 1 ])
-          end
+        it "uses the aliases" do
+          expect(plucked).to eq([ 100000, 1 ])
         end
       end
     end
@@ -1755,18 +1756,13 @@ describe Mongoid::Criteria do
           criteria.pluck(:name)
         end
 
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "returns the values" do
-            expect(plucked).to contain_exactly("Depeche Mode", "Tool", "Photek")
-          end
+        it "returns the values" do
+          expect(plucked).to contain_exactly("Depeche Mode", "Tool", "Photek")
         end
 
         context "when subsequently executing the criteria without a pluck" do
-
-          with_config_values :legacy_pluck_distinct, true, false do
-            it "does not limit the fields" do
-              expect(criteria.first.likes).to eq(3)
-            end
+          it "does not limit the fields" do
+            expect(criteria.first.likes).to eq(3)
           end
         end
 
@@ -1786,32 +1782,15 @@ describe Mongoid::Criteria do
               criteria.pluck(:name, 'records.name')
             end
 
-            context "when legacy_pluck_distinct is set" do
-              config_override :legacy_pluck_distinct, true
-              let(:expected) do
-                [
-                  ["FKA Twigs", nil],
-                  ['FKA Twigs', [{ "name" => "LP1" }]]
-                ]
-              end
-
-              it 'returns the list of top-level field and subdocument values' do
-                expect(embedded_pluck).to eq(expected)
-              end
+            let(:expected) do
+              [
+                ["FKA Twigs", nil],
+                ['FKA Twigs', ["LP1"]]
+              ]
             end
 
-            context "when legacy_pluck_distinct is not set" do
-              config_override :legacy_pluck_distinct, false
-              let(:expected) do
-                [
-                  ["FKA Twigs", nil],
-                  ['FKA Twigs', ["LP1"]]
-                ]
-              end
-
-              it 'returns the list of top-level field and subdocument values' do
-                expect(embedded_pluck).to eq(expected)
-              end
+            it 'returns the list of top-level field and subdocument values' do
+              expect(embedded_pluck).to eq(expected)
             end
           end
 
@@ -1826,32 +1805,15 @@ describe Mongoid::Criteria do
               criteria.pluck('records.name')
             end
 
-            context "when legacy_pluck_distinct is set" do
-              config_override :legacy_pluck_distinct, true
-              let(:expected) do
-                [
-                  nil,
-                  [{ "name" => "LP1" }]
-                ]
-              end
-
-              it 'returns the list of subdocument values' do
-                expect(embedded_pluck).to eq(expected)
-              end
+            let(:expected) do
+              [
+                nil,
+                ["LP1"]
+              ]
             end
 
-            context "when legacy_pluck_distinct is not set" do
-              config_override :legacy_pluck_distinct, false
-              let(:expected) do
-                [
-                  nil,
-                  ["LP1"]
-                ]
-              end
-
-              it 'returns the list of subdocument values' do
-                expect(embedded_pluck).to eq(expected)
-              end
+            it 'returns the list of subdocument values' do
+              expect(embedded_pluck).to eq(expected)
             end
           end
         end
@@ -1863,10 +1825,8 @@ describe Mongoid::Criteria do
           Band.where(:name.exists => true).pluck(:name, :likes)
         end
 
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "returns the values" do
-            expect(plucked).to contain_exactly(["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
-          end
+        it "returns the values" do
+          expect(plucked).to contain_exactly(["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
         end
       end
 
@@ -1876,10 +1836,8 @@ describe Mongoid::Criteria do
           Band.where(:name.exists => true).pluck(:likes)
         end
 
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "returns the duplicates" do
-            expect(plucked).to contain_exactly(3, 3, 1)
-          end
+        it "returns the duplicates" do
+          expect(plucked).to contain_exactly(3, 3, 1)
         end
       end
     end
@@ -1890,10 +1848,8 @@ describe Mongoid::Criteria do
         Band.where(name: "New Order").pluck(:_id)
       end
 
-      with_config_values :legacy_pluck_distinct, true, false do
-        it "returns an empty array" do
-          expect(plucked).to be_empty
-        end
+      it "returns an empty array" do
+        expect(plucked).to be_empty
       end
     end
 
@@ -1903,10 +1859,8 @@ describe Mongoid::Criteria do
         Band.all.pluck(:id)
       end
 
-      with_config_values :legacy_pluck_distinct, true, false do
-        it "returns the field values" do
-          expect(plucked).to eq([ depeche.id, tool.id, photek.id ])
-        end
+      it "returns the field values" do
+        expect(plucked).to eq([ depeche.id, tool.id, photek.id ])
       end
     end
 
@@ -1916,10 +1870,8 @@ describe Mongoid::Criteria do
         Band.all.pluck(:id, :fooz)
       end
 
-      with_config_values :legacy_pluck_distinct, true, false do
-        it "returns nil for the field that doesnt exist" do
-          expect(plucked).to eq([[depeche.id, nil], [tool.id, nil], [photek.id, nil] ])
-        end
+      it "returns nil for the field that doesnt exist" do
+        expect(plucked).to eq([[depeche.id, nil], [tool.id, nil], [photek.id, nil] ])
       end
     end
 
@@ -1931,10 +1883,8 @@ describe Mongoid::Criteria do
           Band.all.pluck(:foo)
         end
 
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "returns an array with nil values" do
-            expect(plucked).to eq([nil, nil, nil])
-          end
+        it "returns an array with nil values" do
+          expect(plucked).to eq([nil, nil, nil])
         end
       end
 
@@ -1944,10 +1894,8 @@ describe Mongoid::Criteria do
           Band.all.pluck(:foo, :bar)
         end
 
-        with_config_values :legacy_pluck_distinct, true, false do
-          it "returns an array of arrays with nil values" do
-            expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
-          end
+        it "returns an array of arrays with nil values" do
+          expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
         end
       end
     end
@@ -1976,36 +1924,16 @@ describe Mongoid::Criteria do
           Dictionary.all.pluck(:description_translations, :description)
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it 'returns the non-demongoized translations' do
-            expect(plucked.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
-          end
-
-          it 'returns nil' do
-            expect(plucked_translations.first).to eq(nil)
-          end
-
-          it 'returns nil for _translations' do
-            expect(plucked_translations_both.first).to eq([nil, {"de"=>"deutsch-text", "en"=>"english-text"}])
-          end
+        it 'returns the demongoized translations' do
+          expect(plucked.first).to eq('deutsch-text')
         end
 
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
+        it 'returns the full translations hash to _translations' do
+          expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
+        end
 
-          it 'returns the demongoized translations' do
-            expect(plucked.first).to eq('deutsch-text')
-          end
-
-          it 'returns the full translations hash to _translations' do
-            expect(plucked_translations.first).to eq({"de"=>"deutsch-text", "en"=>"english-text"})
-          end
-
-          it 'returns both' do
-            expect(plucked_translations_both.first).to eq([{"de"=>"deutsch-text", "en"=>"english-text"}, "deutsch-text"])
-          end
+        it 'returns both' do
+          expect(plucked_translations_both.first).to eq([{"de"=>"deutsch-text", "en"=>"english-text"}, "deutsch-text"])
         end
       end
 
@@ -2015,20 +1943,8 @@ describe Mongoid::Criteria do
           Dictionary.all.pluck(:'description.de')
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it 'returns the specific translations' do
-            expect(plucked.first).to eq({'de' => 'deutsch-text'})
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it 'returns the specific translations' do
-            expect(plucked.first).to eq('deutsch-text')
-          end
+        it 'returns the specific translations' do
+          expect(plucked.first).to eq('deutsch-text')
         end
       end
 
@@ -2038,20 +1954,8 @@ describe Mongoid::Criteria do
           Dictionary.all.pluck(:'description_translations.de')
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it 'returns the specific translations' do
-            expect(plucked.first).to eq(nil)
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it 'returns the specific translations' do
-            expect(plucked.first).to eq('deutsch-text')
-          end
+        it 'returns the specific translations' do
+          expect(plucked.first).to eq('deutsch-text')
         end
       end
 
@@ -2066,23 +1970,11 @@ describe Mongoid::Criteria do
           Dictionary.all.pluck(:description).first
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "does not correctly use the fallback" do
-            plucked.should == {"de"=>"deutsch-text", "en"=>"english-text"}
-          end
-        end
-
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
-
-          it "correctly uses the fallback" do
-            I18n.locale = :en
-            d = Dictionary.create!(description: 'english-text')
-            I18n.locale = :he
-            plucked.should == "english-text"
-          end
+        it "correctly uses the fallback" do
+          I18n.locale = :en
+          d = Dictionary.create!(description: 'english-text')
+          I18n.locale = :he
+          plucked.should == "english-text"
         end
       end
 
@@ -2111,36 +2003,16 @@ describe Mongoid::Criteria do
           Person.where(employer_id: 12345).pluck("pass.name_translations.en").first
         end
 
-        context "when legacy_pluck_distinct is set" do
-          config_override :legacy_pluck_distinct, true
-
-          it "returns the full hash embedded" do
-            expect(plucked).to eq({ "name" => { "en" => "Neil", "he" => "Nissim" } })
-          end
-
-          it "returns the empty hash" do
-            expect(plucked_translations).to eq({})
-          end
-
-          it "returns the empty hash" do
-            expect(plucked_translations_field).to eq({})
-          end
+        it "returns the translation for the current locale" do
+          expect(plucked).to eq("Nissim")
         end
 
-        context "when legacy_pluck_distinct is not set" do
-          config_override :legacy_pluck_distinct, false
+        it "returns the full _translation hash" do
+          expect(plucked_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
+        end
 
-          it "returns the translation for the current locale" do
-            expect(plucked).to eq("Nissim")
-          end
-
-          it "returns the full _translation hash" do
-            expect(plucked_translations).to eq({ "en" => "Neil", "he" => "Nissim" })
-          end
-
-          it "returns the translation for the requested locale" do
-            expect(plucked_translations_field).to eq("Neil")
-          end
+        it "returns the translation for the requested locale" do
+          expect(plucked_translations_field).to eq("Neil")
         end
       end
     end
@@ -2151,48 +2023,21 @@ describe Mongoid::Criteria do
         Band.where(name: maniacs.name).pluck(:sales)
       end
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
+      context 'when value is stored as string' do
+        config_override :map_big_decimal_to_decimal128, false
 
-        context 'when value is stored as string' do
-          config_override :map_big_decimal_to_decimal128, false
-
-          it "does not demongoize the field" do
-            expect(plucked.first).to be_a(String)
-            expect(plucked.first).to eq("1E2")
-          end
-        end
-
-        context 'when value is stored as decimal128' do
-          config_override :map_big_decimal_to_decimal128, true
-          max_bson_version '4.99.99'
-
-          it "does not demongoize the field" do
-            expect(plucked.first).to be_a(BSON::Decimal128)
-            expect(plucked.first).to eq(BSON::Decimal128.new("1E2"))
-          end
+        it "demongoizes the field" do
+          expect(plucked.first).to be_a(BigDecimal)
+          expect(plucked.first).to eq(BigDecimal("1E2"))
         end
       end
 
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
+      context 'when value is stored as decimal128' do
+        config_override :map_big_decimal_to_decimal128, true
 
-        context 'when value is stored as string' do
-          config_override :map_big_decimal_to_decimal128, false
-
-          it "demongoizes the field" do
-            expect(plucked.first).to be_a(BigDecimal)
-            expect(plucked.first).to eq(BigDecimal("1E2"))
-          end
-        end
-
-        context 'when value is stored as decimal128' do
-          config_override :map_big_decimal_to_decimal128, true
-
-          it "demongoizes the field" do
-            expect(plucked.first).to be_a(BigDecimal)
-            expect(plucked.first).to eq(BigDecimal("1E2"))
-          end
+        it "demongoizes the field" do
+          expect(plucked.first).to be_a(BigDecimal)
+          expect(plucked.first).to eq(BigDecimal("1E2"))
         end
       end
     end
@@ -2203,22 +2048,8 @@ describe Mongoid::Criteria do
 
       let(:plucked) { Band.where(_id: band.id).pluck("label.sales") }
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
-        config_override :map_big_decimal_to_decimal128, true
-        max_bson_version '4.99.99'
-
-        it "returns a hash with a non-demongoized field" do
-          expect(plucked.first).to eq({ 'sales' => BSON::Decimal128.new('1E+2') })
-        end
-      end
-
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
-
-        it "demongoizes the field" do
-          expect(plucked).to eq([ BigDecimal("1E2") ])
-        end
+      it "demongoizes the field" do
+        expect(plucked).to eq([ BigDecimal("1E2") ])
       end
     end
 
@@ -2228,22 +2059,8 @@ describe Mongoid::Criteria do
 
       let(:plucked) { Band.where(_id: band.id).pluck("labels.sales") }
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
-        config_override :map_big_decimal_to_decimal128, true
-        max_bson_version '4.99.99'
-
-        it "returns a hash with a non-demongoized field" do
-          expect(plucked.first).to eq([{ 'sales' => BSON::Decimal128.new('1E+2') }])
-        end
-      end
-
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
-
-        it "demongoizes the field" do
-          expect(plucked.first).to eq([ BigDecimal("1E2") ])
-        end
+      it "demongoizes the field" do
+        expect(plucked.first).to eq([ BigDecimal("1E2") ])
       end
     end
 
@@ -2253,20 +2070,8 @@ describe Mongoid::Criteria do
 
       let(:plucked) { Band.where(_id: band.id).pluck("label.qwerty") }
 
-      context "when legacy_pluck_distinct is set" do
-        config_override :legacy_pluck_distinct, true
-
-        it "returns an empty hash" do
-          expect(plucked.first).to eq({})
-        end
-      end
-
-      context "when legacy_pluck_distinct is not set" do
-        config_override :legacy_pluck_distinct, false
-
-        it "returns nil" do
-          expect(plucked.first).to eq(nil)
-        end
+      it "returns nil" do
+        expect(plucked.first).to eq(nil)
       end
     end
 
@@ -2502,17 +2307,6 @@ describe Mongoid::Criteria do
 
     it "executes the criteria while properly giving the max scan to Mongo" do
       expect(criteria.to_ary).to eq [band]
-    end
-  end
-
-  describe "#to_criteria" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    it "returns self" do
-      expect(criteria.to_criteria).to eq(criteria)
     end
   end
 
@@ -2831,7 +2625,6 @@ describe Mongoid::Criteria do
       end
 
       context "when querying on a BSON::Decimal128" do
-        min_server_version '3.4'
 
         let(:decimal) do
           BSON::Decimal128.new("0.0005")
@@ -3174,6 +2967,12 @@ describe Mongoid::Criteria do
       Band.create!(name: "Depeche Mode")
     end
 
+    it 'is deprecated' do
+      expect(Mongoid.logger).to receive(:warn).with(/for_js is deprecated/).and_call_original
+
+      Band.for_js("this.name == 'Depeche Mode'")
+    end
+
     context "when the code has no scope" do
 
       let(:criteria) do
@@ -3222,11 +3021,11 @@ describe Mongoid::Criteria do
     context "when the method exists on the criteria" do
 
       before do
-        expect(criteria).to receive(:to_criteria).and_call_original
+        expect(criteria).to receive(:only).and_call_original
       end
 
       it "calls the method on the criteria" do
-        expect(criteria.to_criteria).to eq(criteria)
+        expect(criteria.only).to eq(criteria)
       end
     end
 
@@ -3430,6 +3229,46 @@ describe Mongoid::Criteria do
         it "does not use an $in query" do
           expect(selection).to eq({ dkey: { "$in" => [ "Firefox", "Browser" ]}})
         end
+      end
+    end
+  end
+
+  describe '.from_hash' do
+    subject(:criteria) { described_class.from_hash(hash) }
+
+    context 'when klass is specified' do
+      let(:hash) do
+        { klass: Band, where: { name: 'Songs Ohia' } }
+      end
+
+      it 'returns a criteria' do
+        expect(criteria).to be_a(Mongoid::Criteria)
+      end
+
+      it 'sets the klass' do
+        expect(criteria.klass).to eq(Band)
+      end
+
+      it 'sets the selector' do
+        expect(criteria.selector).to eq({ 'name' => 'Songs Ohia' })
+      end
+    end
+
+    context 'when klass is missing' do
+      let(:hash) do
+        { where: { name: 'Songs Ohia' } }
+      end
+
+      it 'returns a criteria' do
+        expect(criteria).to be_a(Mongoid::Criteria)
+      end
+
+      it 'has klass nil' do
+        expect(criteria.klass).to be_nil
+      end
+
+      it 'sets the selector' do
+        expect(criteria.selector).to eq({ 'name' => 'Songs Ohia' })
       end
     end
   end

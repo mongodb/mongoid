@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -14,7 +15,7 @@ module Mongoid
         # @example Are the foreign keys syncable?
         #   document._syncable?(association)
         #
-        # @param [ Association ] association The association metadata.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         #
         # @return [ true | false ] If we can sync.
         def _syncable?(association)
@@ -48,7 +49,7 @@ module Mongoid
         # @example Update the inverse keys.
         #   document.remove_inverse_keys(association)
         #
-        # @param [ Association ] association The association.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         #
         # @return [ Object ] The updated values.
         def remove_inverse_keys(association)
@@ -63,7 +64,7 @@ module Mongoid
         # @example Update the inverse keys
         #   document.update_inverse_keys(association)
         #
-        # @param [ Association ] association The document association.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         #
         # @return [ Object ] The updated values.
         def update_inverse_keys(association)
@@ -98,7 +99,7 @@ module Mongoid
           # @example Set up the syncing.
           #   Person._synced(association)
           #
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def _synced(association)
             unless association.forced_nil_inverse?
               synced_save(association)
@@ -117,7 +118,7 @@ module Mongoid
           # @example Set up the save syncing.
           #   Person.synced_save(association)
           #
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           #
           # @return [ Class ] The class getting set up.
           def synced_save(association)
@@ -136,7 +137,7 @@ module Mongoid
           # @example Set up the destroy syncing.
           #   Person.synced_destroy(association)
           #
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           #
           # @return [ Class ] The class getting set up.
           def synced_destroy(association)

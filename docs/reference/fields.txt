@@ -355,7 +355,6 @@ returned is defined by the :ref:`configured time zone settings <time-zones>`.
      field :opened_at, type: :date_time
    end
 
-   Mongoid.use_activesupport_time_zone = true
    Time.zone = 'Berlin'
 
    ticket = Ticket.create!(opened_at: '2018-02-18 07:00:08 -0500')
@@ -1383,10 +1382,12 @@ Mongoid permits dynamic field names to include spaces and punctuation:
   # => "MDB"
 
 
+.. _localized-fields:
+
 Localized Fields
 ================
 
-Mongoid supports localized fields via `i18n <https://github.com/ruby-i18n/i18n>`_.
+Mongoid supports localized fields via the `I18n gem <https://github.com/ruby-i18n/i18n>`_.
 
 .. code-block:: ruby
 

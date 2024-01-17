@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'mongoid/association/referenced/has_one/binding'
 require 'mongoid/association/referenced/has_one/buildable'
@@ -41,7 +42,7 @@ module Mongoid
 
         # The list of association complements.
         #
-        # @return [ Array<Association> ] The association complements.
+        # @return [ Array<Mongoid::Association::Relatable> ] The association complements.
         def relation_complements
           @relation_complements ||= [ Referenced::BelongsTo ].freeze
         end
@@ -116,6 +117,9 @@ module Mongoid
           forced_nil_inverse? || (!!inverse && doc.fields.keys.include?(foreign_key))
         end
 
+        # Does this association type store the foreign key?
+        #
+        # @return [ false ] Always false.
         def stores_foreign_key?; false; end
 
         # Get the path calculator for the supplied document.

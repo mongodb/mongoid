@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -38,7 +39,6 @@ describe Mongoid::Clients::Sessions do
   context 'when a session is used on a model class' do
 
     context 'when sessions are supported' do
-      min_server_version '3.6'
 
       around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
@@ -177,7 +177,6 @@ describe Mongoid::Clients::Sessions do
     end
 
     context 'when sessions are supported' do
-      min_server_version '3.6'
 
       around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)

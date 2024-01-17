@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -247,6 +248,55 @@ describe Mongoid::Association::EagerLoadable do
         expect(Mongoid::Association::Referenced::HasOne::Eager).to receive(:new).with([ book_association ], docs).once.and_call_original
         expect(Mongoid::Association::Referenced::HasOne::Eager).to receive(:new).with([ cat_association ], docs).once.and_call_original
         context.eager_load(docs)
+      end
+    end
+
+    context "when including an embedded_in relation" do
+      let!(:account) { Account.create(name: "home", memberships: memberships) }
+      let(:memberships) { [ Membership.new(name: "his"), Membership.new(name: "hers") ] }
+      let(:criteria) { Account.includes(memberships: :account) }
+
+      it "loads the parent document" do
+        result = criteria.find_by(name: "home")
+        expect(result).to eq(account)
+        expect(result.memberships.first.account).to eq(account)
+      end
+    end
+
+    context "when including an embeds_many relation" do
+      let!(:account) { Account.create(name: "home", memberships: memberships) }
+      let(:memberships) { [ Membership.new(name: "his"), Membership.new(name: "hers") ] }
+      let(:criteria) { Account.includes(:memberships) }
+
+      it "loads the subdocuments" do
+        result = criteria.find_by(name: "home")
+        expect(result).to eq(account)
+        expect(result.memberships.count).to eq(2)
+      end
+    end
+
+    context "when including an embeds_one relation" do
+      let!(:person) { Person.create(username: "test", pet: pet) }
+      let(:pet) { Animal.new(name: "fido") }
+      let(:criteria) { Person.includes(:pet) }
+
+      it "loads the subdocument" do
+        result = criteria.find_by(username: "test")
+        expect(result).to eq(person)
+        expect(result.pet).to eq(pet)
+      end
+    end
+
+    context "when chaining a referenced association from an embedded relation" do
+      let!(:person) { Person.create(username: "test", messages: [ message ]) }
+      let!(:post) { Post.create(title: "notice", posteable: message) }
+      let(:message) { Message.new(body: "hello") }
+      let(:criteria) { Person.includes(messages: :post) }
+
+      it "loads the referenced association" do
+        result = criteria.find_by(username: "test")
+        expect(result).to eq(person)
+        expect(result.messages.first.post).to eq(post)
       end
     end
   end

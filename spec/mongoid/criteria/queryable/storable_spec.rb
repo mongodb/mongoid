@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -67,41 +68,18 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
-      context "when broken_and feature flag is not set" do
-        config_override :broken_and, false
-
-        context '$and to query with $and onto query whose first one is not $and' do
-          let(:query) do
-            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
-          end
-
-          let(:modified) do
-            query.send(query_method, '$and', [{'foo' => 'bar'}])
-          end
-
-          it 'adds to existing $and' do
-            modified.selector.should == {
-              '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
-          end
+      context '$and to query with $and onto query whose first one is not $and' do
+        let(:query) do
+          Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
         end
-      end
 
-      context "when broken_and feature flag is set" do
-        config_override :broken_and, true
+        let(:modified) do
+          query.send(query_method, '$and', [{'foo' => 'bar'}])
+        end
 
-        context '$and to query with $and onto query whose first one is not $and' do
-          let(:query) do
-            Mongoid::Query.new.where({'foo' => 'baz'}).where('$and' => [{zoom: 'zoom'}])
-          end
-
-          let(:modified) do
-            query.send(query_method, '$and', [{'foo' => 'bar'}])
-          end
-
-          it 'does not add to existing $and' do
-            modified.selector.should == {
-              '$and' => [{'foo' => 'bar'}], 'foo' => 'baz'}
-          end
+        it 'adds to existing $and' do
+          modified.selector.should == {
+            '$and' => [{'zoom' => 'zoom'}, {'foo' => 'bar'}], 'foo' => 'baz'}
         end
       end
     end
@@ -210,7 +188,79 @@ describe Mongoid::Criteria::Queryable::Storable do
         }
       end
     end
+
+    context 'when value is a hash combine values with different operator keys' do
+      let(:base) do
+        query.add_field_expression('foo', {'$in' => ['bar']})
+      end
+
+      let(:modified) do
+        base.add_field_expression('foo', {'$nin' => ['zoom']})
+      end
+
+      it 'combines the conditions using $and' do
+        modified.selector.should == {
+          'foo' => {
+            '$in' => ['bar'],
+            '$nin' => ['zoom']
+          }
+        }
+      end
+    end
+
+    context 'when value is a hash with symbol operator key combine values with different operator keys' do
+      let(:base) do
+        query.add_field_expression('foo', {:$in => ['bar']})
+      end
+
+      let(:modified) do
+        base.add_field_expression('foo', {:$nin => ['zoom']})
+      end
+
+      it 'combines the conditions using $and' do
+        modified.selector.should == {
+          'foo' => {
+            :$in => ['bar'],
+            :$nin => ['zoom']
+          }
+        }
+      end
+    end
+
+    context 'when value is a hash add values with same operator keys using $and' do
+      let(:base) do
+        query.add_field_expression('foo', {'$in' => ['bar']})
+      end
+
+      let(:modified) do
+        base.add_field_expression('foo', {'$in' => ['zoom']})
+      end
+
+      it 'adds the new condition using $and' do
+        modified.selector.should == {
+          'foo' => {'$in' => ['bar']},
+          '$and' => ['foo' => {'$in' => ['zoom']}]
+        }
+      end
+    end
+
+  context 'when value is a hash with symbol operator key add values with same operator keys using $and' do
+    let(:base) do
+      query.add_field_expression('foo', {:$in => ['bar']})
+    end
+
+    let(:modified) do
+      base.add_field_expression('foo', {:$in => ['zoom']})
+    end
+
+    it 'adds the new condition using $and' do
+      modified.selector.should == {
+        'foo' => {:$in => ['bar']},
+        '$and' => ['foo' => {:$in => ['zoom']}]
+      }
+    end
   end
+end
 
   describe '#add_operator_expression' do
     let(:query_method) { :add_operator_expression }

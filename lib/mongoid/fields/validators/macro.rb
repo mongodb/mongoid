@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Fields
@@ -19,7 +20,8 @@ module Mongoid
           :pre_processed,
           :subtype,
           :type,
-          :overwrite
+          :overwrite,
+          :encrypt
         ]
 
         # Validate the field definition.

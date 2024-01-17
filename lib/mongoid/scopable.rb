@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
 
@@ -211,11 +212,7 @@ module Mongoid
         begin
           yield criteria
         ensure
-          if Mongoid.broken_scoping
-            Threaded.set_current_scope(nil, self)
-          else
-            Threaded.set_current_scope(previous, self)
-          end
+          Threaded.set_current_scope(previous, self)
         end
       end
 
@@ -293,9 +290,9 @@ module Mongoid
       def define_scope_method(name)
         singleton_class.class_eval do
           ruby2_keywords(
-            define_method(name) do |*args|
+            define_method(name) do |*args, **kwargs|
               scoping = _declared_scopes[name]
-              scope = instance_exec(*args, &scoping[:scope])
+              scope = instance_exec(*args, **kwargs, &scoping[:scope])
               extension = scoping[:extension]
               to_merge = scope || queryable
               criteria = to_merge.empty_and_chainable? ? to_merge : with_default_scope.merge(to_merge)

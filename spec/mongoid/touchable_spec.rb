@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './touchable_spec_models'
@@ -25,6 +26,11 @@ describe Mongoid::Touchable do
 
         updatable.touch
         expect(updatable.updated_at).to be > updated_at
+      end
+
+      it 'does not leave model in changed state' do
+        updatable.touch
+        expect(updatable).not_to be_changed
       end
     end
 
@@ -166,11 +172,6 @@ describe Mongoid::Touchable do
 
     context "when no relations have touch options" do
 
-      before do
-        Person.send(:include, Mongoid::Touchable::InstanceMethods)
-        Agent.send(:include, Mongoid::Touchable::InstanceMethods)
-      end
-
       context "when no updated at is defined" do
 
         let(:person) do
@@ -255,8 +256,8 @@ describe Mongoid::Touchable do
             expect(touched).to be true
           end
 
-          it "keeps changes for next callback" do
-            expect(agent.changes).to_not be_empty
+          it "clears changes" do
+            expect(agent.changes).to be_empty
           end
         end
 
@@ -290,8 +291,8 @@ describe Mongoid::Touchable do
             expect(touched).to be true
           end
 
-          it "keeps changes for next callback" do
-            expect(agent.changes).to_not be_empty
+          it "clears changes" do
+            expect(agent.changes).to be_empty
           end
         end
       end
@@ -390,11 +391,6 @@ describe Mongoid::Touchable do
 
       context "when the relation is a parent of an embedded doc" do
 
-        before do
-          Page.send(:include, Mongoid::Touchable::InstanceMethods)
-          Edit.send(:include, Mongoid::Touchable::InstanceMethods)
-        end
-
         let(:page) do
           WikiPage.create!(title: "test")
         end
@@ -414,10 +410,6 @@ describe Mongoid::Touchable do
       end
 
       context "when the parent of embedded doc has cascade callbacks" do
-
-        before do
-          Band.send(:include, Mongoid::Touchable::InstanceMethods)
-        end
 
         let!(:book) do
           Book.new
@@ -1317,6 +1309,95 @@ describe Mongoid::Touchable do
           include_examples "touches the children"
           include_examples "timeless is cleared"
         end
+      end
+    end
+  end
+
+  context 'when updated after touch' do
+    let(:touch_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+    let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 4) }
+
+    let!(:book) { Book.create! }
+
+    after do
+      Timecop.return
+    end
+
+    it 'updates updated_at' do
+      touch_time
+      book.touch
+      update_time
+      book.title = 'This book has no name'
+      book.save!
+      expect(book.updated_at).to eq(update_time)
+    end
+  end
+
+  context 'callbacks' do
+    class TouchableParent
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      attr_reader :before_touch_called, :after_touch_called
+
+      set_callback(:touch, :before) do
+        @before_touch_called = true
+      end
+
+      set_callback(:touch, :after) do
+        @after_touch_called = true
+      end
+
+      embeds_one :child, inverse_of: :parent, class_name: 'TouchableChild'
+    end
+
+    class TouchableChild
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      attr_reader :before_touch_called, :after_touch_called
+
+      set_callback(:touch, :before) do
+        @before_touch_called = true
+      end
+
+      set_callback(:touch, :after) do
+        @after_touch_called = true
+      end
+
+      embedded_in :parent, inverse_of: :child, class_name: 'TouchableParent', touch: true
+    end
+
+    let(:parent) do
+      TouchableParent.create!.tap do |parent|
+        parent.child = TouchableChild.create!(parent: parent)
+      end
+    end
+
+    let(:child) do
+      parent.child
+    end
+
+    it 'calls touch callbacks on parent' do
+      parent.touch
+      expect(parent.before_touch_called).to eq(true)
+      expect(parent.after_touch_called).to eq(true)
+    end
+
+    context 'when touch is calles on a child' do
+      before do
+        child.touch
+      end
+
+      it 'calls touch callbacks on parent' do
+        expect(parent.before_touch_called).to eq(true)
+        expect(parent.after_touch_called).to eq(true)
+      end
+
+      it 'calls touch callbacks on child' do
+        expect(child.before_touch_called).to eq(true)
+        expect(child.after_touch_called).to eq(true)
       end
     end
   end

@@ -18,7 +18,7 @@ development:
         # Note that all options listed below are Ruby driver client options (the mongo gem).
         # Please refer to the driver documentation of the version of the mongo gem you are using
         # for the most up-to-date list of options.
-        #
+
         # Change the default write concern. (default = { w: 1 })
         # write:
         #   w: 1
@@ -41,18 +41,20 @@ development:
         # roles:
         #   - 'dbOwner'
 
-        # Change the default authentication mechanism. Valid options are: :scram,
-        # :mongodb_cr, :mongodb_x509, and :plain. Note that all authentication
-        # mechanisms require username and password, with the exception of :mongodb_x509.
-        # Default on mongoDB 3.0 is :scram, default on 2.4 and 2.6 is :plain.
+        # Change the default authentication mechanism. Valid options include:
+        # :scram, :scram256, :mongodb_cr, :mongodb_x509, :gssapi, :aws, :plain.
+        # MongoDB Server defaults to :scram, which will use "SCRAM-SHA-256" if available,
+        # otherwise fallback to "SCRAM-SHA-1" (:scram256 will always use "SCRAM-SHA-256".)
+        # This setting is handled by the MongoDB Ruby Driver. Please refer to:
+        # https://mongodb.com/docs/ruby-driver/current/reference/authentication/
         # auth_mech: :scram
 
         # The database or source to authenticate the user against.
         # (default: the database specified above or admin)
         # auth_source: admin
 
-        # Force a the driver cluster to behave in a certain manner instead of auto-
-        # discovering. Can be one of: :direct, :replica_set, :sharded. Set to :direct
+        # Force the driver cluster to behave in a certain manner instead of auto-discovering.
+        # Can be one of: :direct, :replica_set, :sharded. Set to :direct
         # when connecting to hidden members of a replica set.
         # connect: :direct
 
@@ -93,6 +95,11 @@ development:
         # not belong to this replica set will be ignored.
         # replica_set: name
 
+        # Compressors to use for wire protocol compression. (default is to not use compression)
+        # "zstd" requires zstd-ruby gem. "snappy" requires snappy gem.
+        # Refer to: https://www.mongodb.com/docs/ruby-driver/current/reference/create-client/#compression
+        # compressors: ["zstd", "snappy", "zlib"]
+
         # Whether to connect to the servers via ssl. (default: false)
         # ssl: true
 
@@ -113,65 +120,32 @@ development:
         # The file containing concatenated certificate authority certificates
         # used to validate certs passed from the other end of the connection.
         # ssl_ca_cert: /path/to/ca.cert
-        
+
         # Whether to truncate long log lines. (default: true)
         # truncate_logs: true
 
-  # Configure Mongoid specific options. (optional)
+  # Configure Mongoid-specific options. (optional)
   options:
-    # Application name that is printed to the mongodb logs upon establishing
-    # a connection in server versions >= 3.4. Note that the name cannot
-    # exceed 128 bytes. It is also used as the database name if the
-    # database name is not explicitly defined. (default: nil)
-    # app_name: MyApplicationName
-    
-    # Mark belongs_to associations as required by default, so that saving a
-    # model with a missing belongs_to association will trigger a validation
-    # error. (default: true)
-    # belongs_to_required_by_default: true
-    
-    # Raise an exception when a field is redefined. (default: false)
-    # duplicate_fields_exception: false
-    
-    # Include the root model name in json serialization. (default: false)
-    # include_root_in_json: false
+<%- Mongoid::Config::Introspection.options.each do |opt| -%>
+    <%= opt.indented_comment(indent: 4) %>
+    # <%= opt.name %>: <%= opt.default %>
 
-    # Include the _type field in serialization. (default: false)
-    # include_type_for_serialization: false
+<%- end -%>
+  # Configure Driver-specific options. (optional)
+  driver_options:
+    # When this flag is off, an aggregation done on a view will be executed over
+    # the documents included in that view, instead of all documents in the
+    # collection. When this flag is on, the view fiter is ignored.
+    # broken_view_aggregate: true
 
-    # Whether to join nested persistence contexts for atomic operations
-    # to parent contexts by default. (default: false)
-    # join_contexts: false
+    # When this flag is set to false, the view options will be correctly
+    # propagated to readable methods.
+    # broken_view_options: true
 
-    # Set the Mongoid and Ruby driver log levels when Mongoid is not using
-    # Ruby on Rails logger instance. (default: :info)
-    # log_level: :info
-    
-    # Preload all models in development, needed when models use
-    # inheritance. (default: false)
-    # preload_models: false
+    # When this flag is set to true, the update and replace methods will
+    # validate the paramters and raise an error if they are invalid.
+    # validate_update_replace: false
 
-    # Raise an error when performing a #find and the document is not found.
-    # (default: true)
-    # raise_not_found_error: true
-
-    # Raise an error when defining a scope with the same name as an
-    # existing method. (default: false)
-    # scope_overwrite_exception: false
-
-    # Use ActiveSupport's time zone in time operations instead of
-    # the Ruby default time zone. See the time zone section below for
-    # further information. (default: true)
-    # use_activesupport_time_zone: true
-
-    # Return stored times as UTC. See the time zone section below for
-    # further information. Most applications should not use this option.
-    # (default: false)
-    # use_utc: false
-
-    # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
-    # indexes in the background by default. (default: false)
-    # background_indexing: false
 
 test:
   clients:

@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to Time class.
     module Time
 
       # Mongoizes a Time into a time.
@@ -26,17 +29,6 @@ module Mongoid
       end
 
       module ClassMethods
-
-        # Get the configured time to use when converting - either the time zone
-        # or the time.
-        #
-        # @example Get the configured time.
-        #   ::Time.configured
-        #
-        # @return [ Time ] The configured time.
-        def configured
-          Mongoid.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
-        end
 
         # Convert the object from its mongo friendly ruby type to this type.
         #
@@ -64,11 +56,7 @@ module Mongoid
 
           return if time.nil?
 
-          if Mongoid::Config.use_activesupport_time_zone?
-            time.in_time_zone(Mongoid.time_zone)
-          else
-            time
-          end
+          time.in_time_zone(Mongoid.time_zone)
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

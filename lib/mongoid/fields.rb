@@ -1,6 +1,8 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/fields/standard"
+require "mongoid/fields/encrypted"
 require "mongoid/fields/foreign_key"
 require "mongoid/fields/localized"
 require "mongoid/fields/validators"
@@ -403,41 +405,35 @@ module Mongoid
       #
       # @param [ String | Symbol ] name The name to get.
       # @param [ Hash ] relations The associations.
-      # @param [ Hash ] alaiased_fields The aliased fields.
-      # @param [ Hash ] alaiased_associations The aliased associations.
+      # @param [ Hash ] aliased_fields The aliased fields.
+      # @param [ Hash ] aliased_associations The aliased associations.
       #
       # @return [ String ] The name of the field as stored in the database.
       #
       # @api private
       def database_field_name(name, relations, aliased_fields, aliased_associations)
-        if Mongoid.broken_alias_handling
-          return nil unless name
-          normalized = name.to_s
-          aliased_fields[normalized] || normalized
+        return nil unless name.present?
+        key = name.to_s
+        segment, remaining = key.split('.', 2)
+
+        # Don't get the alias for the field when a belongs_to association
+        # is not the last item. Therefore, get the alias when one of the
+        # following is true:
+        # 1. This is the last item, i.e. there is no remaining.
+        # 2. It is not an association.
+        # 3. It is not a belongs association
+        if !remaining || !relations.key?(segment) || !relations[segment].is_a?(Association::Referenced::BelongsTo)
+          segment = aliased_fields[segment]&.dup || segment
+        end
+
+        return segment unless remaining
+
+        relation = relations[aliased_associations[segment] || segment]
+        if relation
+          k = relation.klass
+          "#{segment}.#{database_field_name(remaining, k.relations, k.aliased_fields, k.aliased_associations)}"
         else
-          return nil unless name.present?
-          key = name.to_s
-          segment, remaining = key.split('.', 2)
-
-          # Don't get the alias for the field when a belongs_to association
-          # is not the last item. Therefore, get the alias when one of the
-          # following is true:
-          # 1. This is the last item, i.e. there is no remaining.
-          # 2. It is not an association.
-          # 3. It is not a belongs association
-          if !remaining || !relations.key?(segment) || !relations[segment].is_a?(Association::Referenced::BelongsTo)
-            segment = aliased_fields[segment]&.dup || segment
-          end
-
-          return segment unless remaining
-
-          relation = relations[aliased_associations[segment] || segment]
-          if relation
-            k = relation.klass
-            "#{segment}.#{database_field_name(remaining, k.relations, k.aliased_fields, k.aliased_associations)}"
-          else
-            "#{segment}.#{remaining}"
-          end
+          "#{segment}.#{remaining}"
         end
       end
     end
@@ -806,6 +802,7 @@ module Mongoid
         opts[:type] = retrieve_and_validate_type(name, options[:type])
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
+        return Fields::Encrypted.new(name, opts) if options[:encrypt]
         Fields::Standard.new(name, opts)
       end
 
@@ -816,26 +813,24 @@ module Mongoid
       #
       # @return [ Class ] The type of the field.
       #
-      # @raises [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
+      # @raise [ Mongoid::Errors::InvalidFieldType ] if given an invalid field
       #   type.
       #
       # @api private
       def retrieve_and_validate_type(name, type)
-        type_mapping = TYPE_MAPPINGS[type]
-        result = type_mapping || unmapped_type(type)
-        if !result.is_a?(Class)
-          raise Errors::InvalidFieldType.new(self, name, type)
-        else
-          if INVALID_BSON_CLASSES.include?(result)
-            warn_message = "Using #{result} as the field type is not supported. "
-            if result == BSON::Decimal128
-              warn_message += "In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+."
-            else
-              warn_message += "Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type."
-            end
-            Mongoid.logger.warn(warn_message)
+        result = TYPE_MAPPINGS[type] || unmapped_type(type)
+        raise Errors::InvalidFieldType.new(self, name, type) if !result.is_a?(Class)
+
+        if unsupported_type?(result)
+          warn_message = "Using #{result} as the field type is not supported. "
+          if result == BSON::Decimal128
+            warn_message += 'In BSON <= 4, the BSON::Decimal128 type will work as expected for both storing and querying, but will return a BigDecimal on query in BSON 5+. To use literal BSON::Decimal128 fields with BSON 5, set Mongoid.allow_bson5_decimal128 to true.'
+          else
+            warn_message += 'Saving values of this type to the database will work as expected, however, querying them will return a value of the native Ruby Integer type.'
           end
+          Mongoid.logger.warn(warn_message)
         end
+
         result
       end
 
@@ -859,6 +854,19 @@ module Mongoid
         else
           type || Object
         end
+      end
+
+      # Queries whether or not the given type is permitted as a declared field
+      # type.
+      #
+      # @param [ Class ] type The type to query
+      #
+      # @return [ true | false ] whether or not the type is supported
+      #
+      # @api private
+      def unsupported_type?(type)
+        return !Mongoid::Config.allow_bson5_decimal128? if type == BSON::Decimal128
+        INVALID_BSON_CLASSES.include?(type)
       end
     end
   end

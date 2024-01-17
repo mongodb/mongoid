@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 class Address
   include Mongoid::Document
@@ -25,6 +26,8 @@ class Address
   field :end_date, type: Date
   field :s, type: String, as: :suite
   field :name, localize: true
+
+  alias_attribute :n, :name
 
   embeds_many :locations, validate: false
   embeds_one :code, validate: false

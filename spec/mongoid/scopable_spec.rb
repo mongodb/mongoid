@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -342,7 +343,6 @@ describe Mongoid::Scopable do
     context "when provided a criteria" do
 
       context 'when a collation is defined on the criteria' do
-        min_server_version '3.4'
 
         before do
           Band.scope(:tests, ->{ Band.where(name: 'TESTING').collation(locale: 'en_US', strength: 2) })
@@ -1255,39 +1255,18 @@ describe Mongoid::Scopable do
       let(:c1) { Band.where(active: true) }
       let(:c2) { Band.where(active: false) }
 
-      context "when the broken_scoping is not set" do
-        config_override :broken_scoping, false
-
-        it 'restores previous scope' do
-          Band.with_scope(c1) do |crit|
-            Band.with_scope(c2) do |crit2|
-              Mongoid::Threaded.current_scope(Band).selector.should == {
-                'active' => true,
-                '$and' => ['active' => false],
-              }
-            end
-
+      it 'restores previous scope' do
+        Band.with_scope(c1) do |crit|
+          Band.with_scope(c2) do |crit2|
             Mongoid::Threaded.current_scope(Band).selector.should == {
               'active' => true,
+              '$and' => ['active' => false],
             }
           end
-        end
-      end
 
-      context "when the broken_scoping is set" do
-        config_override :broken_scoping, true
-
-        it 'does not restore previous scope' do
-          Band.with_scope(c1) do |crit|
-            Band.with_scope(c2) do |crit2|
-              Mongoid::Threaded.current_scope(Band).selector.should == {
-                'active' => true,
-                '$and' => ['active' => false],
-              }
-            end
-
-            Mongoid::Threaded.current_scope(Band).should be_nil
-          end
+          Mongoid::Threaded.current_scope(Band).selector.should == {
+            'active' => true,
+          }
         end
       end
     end

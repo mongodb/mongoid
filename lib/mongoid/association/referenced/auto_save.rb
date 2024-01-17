@@ -1,9 +1,13 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
 
+      # Mixin module included into Mongoid::Document which adds
+      # the ability to automatically save opposite-side documents
+      # in referenced associations when saving the subject document.
       module AutoSave
         extend ActiveSupport::Concern
 
@@ -43,7 +47,7 @@ module Mongoid
         # @example Define the autosave method:
         #   Association::Referenced::Autosave.define_autosave!(association)
         #
-        # @param [ Association ] association The association for which autosaving is enabled.
+        # @param [ Mongoid::Association::Relatable ] association The association for which autosaving is enabled.
         #
         # @return [ Class ] The association's owner class.
         def self.define_autosave!(association)
@@ -56,7 +60,7 @@ module Mongoid
                 __autosaving__ do
                   if assoc_value = ivar(association.name)
                     Array(assoc_value).each do |doc|
-                      pc = doc.persistence_context? ? doc.persistence_context : persistence_context
+                      pc = doc.persistence_context? ? doc.persistence_context : persistence_context.for_child(doc)
                       doc.with(pc) do |d|
                         d.save
                       end

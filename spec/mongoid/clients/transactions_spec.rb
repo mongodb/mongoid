@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './transactions_spec_models'
@@ -785,111 +786,221 @@ describe Mongoid::Clients::Sessions do
       before do
         Mongoid::Clients.with_name(:default).database.collections.each(&:drop)
         TransactionsSpecPerson.collection.create
+        TransactionsSpecPersonWithOnCreate.collection.create
+        TransactionsSpecPersonWithOnUpdate.collection.create
+        TransactionsSpecPersonWithOnDestroy.collection.create
         TransactionSpecRaisesBeforeSave.collection.create
         TransactionSpecRaisesAfterSave.collection.create
       end
 
       context 'when commit the transaction' do
         context 'create' do
-          let!(:subject) do
-            person = nil
-            TransactionsSpecPerson.transaction do
-              person = TransactionsSpecPerson.create!(name: 'James Bond')
+          context 'without :on option' do
+            let!(:subject) do
+              person = nil
+              TransactionsSpecPerson.transaction do
+                person = TransactionsSpecPerson.create!(name: 'James Bond')
+              end
+              person
             end
-            person
+
+            it_behaves_like 'commit callbacks are called'
           end
 
-          it_behaves_like 'commit callbacks are called'
+          context 'when callback has :on option' do
+            let!(:subject) do
+              person = nil
+              TransactionsSpecPersonWithOnCreate.transaction do
+                person = TransactionsSpecPersonWithOnCreate.create!(name: 'James Bond')
+              end
+              person
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
         end
 
         context 'save' do
-          let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
-              subject.after_commit_counter.reset
-              subject.after_rollback_counter.reset
-            end
-          end
-
-          context 'when modified once' do
-            before do
-              subject.transaction do
-                subject.name = 'Austin Powers'
-                subject.save!
+          context 'without :on option' do
+            let(:subject) do
+              TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
+                subject.after_commit_counter.reset
+                subject.after_rollback_counter.reset
               end
             end
 
-            it_behaves_like 'commit callbacks are called'
+            context 'when modified once' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+
+            context 'when modified multiple times' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                  subject.name = 'Jason Bourne'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
           end
 
-          context 'when modified multiple times' do
-            before do
-              subject.transaction do
-                subject.name = 'Austin Powers'
-                subject.save!
-                subject.name = 'Jason Bourne'
-                subject.save!
+          context 'with :on option' do
+            let(:subject) do
+              TransactionsSpecPersonWithOnUpdate.create!(name: 'James Bond').tap do |subject|
+                subject.after_commit_counter.reset
+                subject.after_rollback_counter.reset
               end
             end
 
-            it_behaves_like 'commit callbacks are called'
+            context 'when modified once' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+
+            context 'when modified multiple times' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                  subject.name = 'Jason Bourne'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
           end
         end
 
         context 'update_attributes' do
-          let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
-              subject.after_commit_counter.reset
-              subject.after_rollback_counter.reset
+          context 'without :on option' do
+            let(:subject) do
+              TransactionsSpecPerson.create!(name: 'James Bond').tap do |subject|
+                subject.after_commit_counter.reset
+                subject.after_rollback_counter.reset
+              end
             end
+
+            before do
+              subject.transaction do
+                subject.update_attributes!(name: 'Austin Powers')
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
           end
 
-          before do
-            subject.transaction do
-              subject.update_attributes!(name: 'Austin Powers')
+          context 'when callback has on option' do
+            let(:subject) do
+              TransactionsSpecPersonWithOnUpdate.create!(name: 'Jason Bourne')
             end
-          end
 
-          it_behaves_like 'commit callbacks are called'
+            before do
+              TransactionsSpecPersonWithOnUpdate.transaction do
+                subject.update_attributes!(name: 'Foma Kiniaev')
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
         end
 
         context 'destroy' do
-          let(:after_commit_counter) do
-            TransactionsSpecCounter.new
-          end
-
-          let(:after_rollback_counter) do
-            TransactionsSpecCounter.new
-          end
-
-          let(:subject) do
-            TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
-              p.after_commit_counter = after_commit_counter
-              p.after_rollback_counter = after_rollback_counter
+          context 'without :on option' do
+            let(:after_commit_counter) do
+              TransactionsSpecCounter.new
             end
-          end
 
-          before do
-            subject.transaction do
-              subject.destroy
+            let(:after_rollback_counter) do
+              TransactionsSpecCounter.new
             end
+
+            let(:subject) do
+              TransactionsSpecPerson.create!(name: 'James Bond').tap do |p|
+                p.after_commit_counter = after_commit_counter
+                p.after_rollback_counter = after_rollback_counter
+              end
+            end
+
+            before do
+              subject.transaction do
+                subject.destroy
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
           end
 
-          it_behaves_like 'commit callbacks are called'
+          context 'with :on option' do
+            let(:after_commit_counter) do
+              TransactionsSpecCounter.new
+            end
+
+            let(:after_rollback_counter) do
+              TransactionsSpecCounter.new
+            end
+
+            let(:subject) do
+              TransactionsSpecPersonWithOnDestroy.create!(name: 'James Bond').tap do |p|
+                p.after_commit_counter = after_commit_counter
+                p.after_rollback_counter = after_rollback_counter
+              end
+            end
+
+            before do
+              subject.transaction do
+                subject.destroy
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
         end
       end
 
       context 'when rollback the transaction' do
         context 'create' do
-          let!(:subject) do
-            person = nil
-            TransactionsSpecPerson.transaction do
-              person = TransactionsSpecPerson.create!(name: 'James Bond')
-              raise Mongoid::Errors::Rollback
+          context 'without :on option' do
+            let!(:subject) do
+              person = nil
+              TransactionsSpecPerson.transaction do
+                person = TransactionsSpecPerson.create!(name: 'James Bond')
+                raise Mongoid::Errors::Rollback
+              end
+              person
             end
-            person
+
+            it_behaves_like 'rollback callbacks are called'
           end
 
-          it_behaves_like 'rollback callbacks are called'
+          context 'with :on option' do
+            let!(:subject) do
+              person = nil
+              TransactionsSpecPersonWithOnCreate.transaction do
+                person = TransactionsSpecPersonWithOnCreate.create!(name: 'James Bond')
+                raise Mongoid::Errors::Rollback
+              end
+              person
+            end
+
+            it_behaves_like 'rollback callbacks are called'
+          end
         end
 
         context 'save' do

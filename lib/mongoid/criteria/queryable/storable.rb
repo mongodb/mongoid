@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -47,7 +48,7 @@ module Mongoid
             if value.is_a?(Hash) && selector[field].is_a?(Hash) &&
               value.keys.all? { |key|
                 key_s = key.to_s
-                key_s.start_with?('$') && !selector[field].key?(key_s)
+                key_s.start_with?('$') && !selector[field].keys.map(&:to_s).include?(key_s)
               }
             then
               # Multiple operators can be combined on the same field by
@@ -82,7 +83,7 @@ module Mongoid
         #
         #     {'$or' => [{'hello' => 'world'}]}
         #
-        # ... and operator is '$or' and op_expr is `[{'test' => 123'}]`,
+        # ... and operator is '$or' and op_expr is +[{'test' => 123'}]+,
         # the resulting selector will be:
         #
         #     {'$or' => [{'hello' => 'world'}, {'test' => 123}]}
@@ -123,7 +124,7 @@ module Mongoid
           elsif operator == '$and' || selector.empty?
             # $and can always be added to top level and it will be combined
             # with whatever other conditions exist.
-            if !Mongoid.broken_and && current_value = selector[operator]
+            if current_value = selector[operator]
               new_value = current_value + op_expr
               selector.store(operator, new_value)
             else
@@ -158,7 +159,7 @@ module Mongoid
         #
         #     {'foo' => 'bar', '$or' => [{'hello' => 'world'}]}
         #
-        # ... and operator is '$or' and op_expr is `{'test' => 123'}`,
+        # ... and operator is '$or' and op_expr is +{'test' => 123'}+,
         # the resulting selector will be:
         #
         #     {'foo' => 'bar', '$or' => [{'hello' => 'world'}, {'test' => 123}]}

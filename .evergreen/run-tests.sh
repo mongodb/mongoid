@@ -52,6 +52,8 @@ if echo $RVM_RUBY |grep -q jruby && test "$DRIVER" = master-jruby; then
     gem install *.gem)
 fi
 
+git config --global --add safe.directory "*"
+
 if test "$DRIVER" = "master"; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_master.gemfile
@@ -85,9 +87,6 @@ elif test "$RAILS" = "master-jruby"; then
 elif test -n "$RAILS" && test "$RAILS" != 6.1; then
   bundle install --gemfile=gemfiles/rails-"$RAILS".gemfile
   BUNDLE_GEMFILE=gemfiles/rails-"$RAILS".gemfile
-elif test "$I18N" = "1.0"; then
-  bundle install --gemfile=gemfiles/i18n-1.0.gemfile
-  BUNDLE_GEMFILE=gemfiles/i18n-1.0.gemfile
 else
   bundle install
 fi

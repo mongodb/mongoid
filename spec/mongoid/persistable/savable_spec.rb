@@ -1,8 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
+require "support/immutable_ids"
 
 describe Mongoid::Persistable::Savable do
+  extend Mongoid::ImmutableIds
+  immutable_id_examples_as "persisted _ids are immutable"
 
   describe "#save" do
 
@@ -291,11 +295,6 @@ describe Mongoid::Persistable::Savable do
           expect(truck.crates[0].toys[0].name).to eq "Teddy bear"
           expect(truck.crates[1].volume).to eq 0.8
           expect(truck.crates[1].toys.size).to eq 0
-
-          # TODO: MONGOID-5026: combine the updates so that there are
-          # no conflicts.
-          #expect(truck.atomic_updates[:conflicts]).to eq nil
-
           expect { truck.save! }.not_to raise_error
 
           _truck = Truck.find(truck.id)
@@ -603,6 +602,15 @@ describe Mongoid::Persistable::Savable do
           end
         end
       end
+    end
+
+    context "when the _id has been modified" do
+      def invoke_operation!
+        object._id = new_id_value
+        object.save
+      end
+
+      it_behaves_like "persisted _ids are immutable"
     end
   end
 

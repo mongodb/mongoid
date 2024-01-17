@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -11,35 +12,15 @@ describe Mongoid::Persistable::Deletable do
     end
 
     context "when deleting a readonly document" do
-
-      context "when legacy_attributes is true" do
-        config_override :legacy_readonly, true
-
-        let(:from_db) do
-          Person.only(:_id).first
-        end
-
-        it "raises an error" do
-          expect(from_db.readonly?).to be true
-          expect {
-            from_db.delete
-          }.to raise_error(Mongoid::Errors::ReadonlyDocument)
-        end
+      let(:from_db) do
+        Person.first.tap(&:readonly!)
       end
 
-      context "when legacy_attributes is false" do
-        config_override :legacy_readonly, false
-
-        let(:from_db) do
-          Person.first.tap(&:readonly!)
-        end
-
-        it "raises an error" do
-          expect(from_db.readonly?).to be true
-          expect {
-            from_db.delete
-          }.to raise_error(Mongoid::Errors::ReadonlyDocument)
-        end
+      it "raises an error" do
+        expect(from_db.readonly?).to be true
+        expect {
+          from_db.delete
+        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
       end
     end
 
@@ -57,7 +38,7 @@ describe Mongoid::Persistable::Deletable do
       end
     end
 
-    context "when removing a root document" do
+    context "when deleting a root document" do
 
       let!(:deleted) do
         person.delete
@@ -76,9 +57,28 @@ describe Mongoid::Persistable::Deletable do
       it "resets the flagged for destroy flag" do
         expect(person).to_not be_flagged_for_destroy
       end
+
+      context 'when :persist option false' do
+
+        let!(:deleted) do
+          person.delete(persist: false)
+        end
+
+        it "does not delete the document from the collection" do
+          expect(Person.find(person.id)).to eq person
+        end
+
+        it "returns true" do
+          expect(deleted).to be true
+        end
+
+        it "does not set the flagged for destroy flag" do
+          expect(person).to_not be_flagged_for_destroy
+        end
+      end
     end
 
-    context "when removing an embedded document" do
+    context "when deleting an embedded document" do
 
       let(:address) do
         person.addresses.build(street: "Bond Street")
@@ -114,13 +114,60 @@ describe Mongoid::Persistable::Deletable do
           Person.find(person.id)
         end
 
-        it "removes the object from the parent and database" do
+        it "removes the object from the parent" do
+          expect(person.addresses).to be_empty
+        end
+
+        it "removes the object from the database" do
+          expect(from_db.addresses).to be_empty
+        end
+      end
+
+      context 'when :persist option false' do
+
+        before do
+          address.save!
+          address.delete(persist: false)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not remove the object from the parent" do
+          expect(person.addresses).to eq [address]
+          expect(person.addresses.first).to_not be_flagged_for_destroy
+        end
+
+        it "does not remove the object from the database" do
+          expect(from_db.addresses).to eq [address]
+          expect(from_db.addresses.first).to_not be_flagged_for_destroy
+        end
+      end
+
+      context 'when :suppress option true' do
+
+        before do
+          address.save!
+          address.delete(suppress: true)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "does not remove the object from the parent" do
+          expect(person.addresses).to eq [address]
+          expect(person.addresses.first).to_not be_flagged_for_destroy
+        end
+
+        it "removes the object from the database" do
           expect(from_db.addresses).to be_empty
         end
       end
     end
 
-    context "when removing deeply embedded documents" do
+    context "when deleting deeply embedded documents" do
 
       context "when the document has been saved" do
 

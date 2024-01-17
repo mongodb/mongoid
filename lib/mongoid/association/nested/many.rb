@@ -1,8 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
+
+      # Builder class used to perform #accepts_nested_attributes_for
+      # attribute assignment on many-to-n associations.
       class Many
         include Buildable
 
@@ -40,7 +44,7 @@ module Mongoid
         # @example Initialize the builder.
         #   Many.new(association, attributes, options)
         #
-        # @param [ Association ] association The association metadata.
+        # @param [ Mongoid::Association::Relatable ] association The association metadata.
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
         def initialize(association, attributes, options = {})
@@ -97,7 +101,8 @@ module Mongoid
         # @param [ Hash ] attrs The single document attributes to process.
         def process_attributes(parent, attrs)
           return if reject?(parent, attrs)
-          if id = attrs.extract_id
+
+          if (id = extract_id(attrs))
             update_nested_relation(parent, id, attrs)
           else
             existing.push(Factory.build(@class_name, attrs)) unless destroyable?(attrs)
@@ -149,7 +154,7 @@ module Mongoid
         # @param [ Document ] doc The document to update.
         # @param [ Hash ] attrs The attributes.
         def update_document(doc, attrs)
-          attrs.delete_id
+          delete_id(attrs)
           if association.embedded?
             doc.assign_attributes(attrs)
           else

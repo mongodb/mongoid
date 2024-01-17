@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/validatable/macros"
 require "mongoid/validatable/localizable"
@@ -67,7 +68,7 @@ module Mongoid
         begin_validate
         relation = without_autobuild { send(attr) }
         exit_validate
-        relation.do_or_do_not(:in_memory) || relation
+        relation.try(:in_memory) || relation
       elsif fields[attribute].try(:localized?)
         attributes[attribute]
       else
@@ -118,7 +119,7 @@ module Mongoid
       # @example Set up validation.
       #   Person.validates_relation(association)
       #
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       def validates_relation(association)
         if association.validate?
           validates_associated(association.name)

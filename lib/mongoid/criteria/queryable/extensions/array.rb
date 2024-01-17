@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # The array module adds custom behavior for Origin onto the Array class.
+        # Adds query type-casting behavior to Array class.
         module Array
 
           # Combine the two objects using the add strategy.
@@ -105,7 +106,7 @@ module Mongoid
           #
           # @return [ Hash ] The field/direction pair.
           def __sort_pair__
-            { first => last.to_direction }
+            { first => Mongoid::Criteria::Translator.to_direction(last) }
           end
 
           private

@@ -1,3 +1,4 @@
+# rubocop:todo all
 source "https://rubygems.org"
 
 # Due to https://github.com/jruby/jruby/issues/5292 /

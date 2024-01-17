@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'spec_helper'
 
@@ -28,87 +29,41 @@ describe 'Matcher operators' do
     context 'comparing millisecond precision' do
       let(:time_millis) {Time.utc(2021, 10, 25, 10, 30, 30, 581774)}
 
-      context "when compare_time_by_ms feature flag is set" do
-        config_override :compare_time_by_ms, true
+      context 'with exact match' do
+        let(:query) do
+          {'started_at' => time_millis}
+        end
 
-        context 'with exact match' do
-          let(:query) do
-            {'started_at' => time_millis}
+        it_behaves_like 'is true'
+
+        context 'and query has different timezone' do
+          let(:time_millis) do
+            Time.utc(2021, 10, 25, 10, 30, 30, 581345).in_time_zone("Stockholm")
           end
 
           it_behaves_like 'is true'
-
-          context 'and query has different timezone' do
-            let(:time_millis) do
-              Time.utc(2021, 10, 25, 10, 30, 30, 581345).in_time_zone("Stockholm")
-            end
-
-            it_behaves_like 'is true'
-          end
-        end
-
-        context 'with $in' do
-          let(:query) do
-            {'started_at' => {:$in => [time_millis]}}
-          end
-
-          it_behaves_like 'is true'
-        end
-
-        context 'when matching an element in an array' do
-          let(:document) do
-            Mop.new(:array_field => [time])
-          end
-
-          context 'with equals match' do
-            let(:query) do
-              {'array_field' => time_millis}
-            end
-
-            it_behaves_like 'is true'
-          end
         end
       end
 
-      context "when compare_time_by_ms feature flag is not set" do
-        config_override :compare_time_by_ms, false
-
-        context 'with exact match' do
-          let(:query) do
-            {'started_at' => time_millis}
-          end
-
-          it_behaves_like 'is false'
-
-          context 'and query has different timezone' do
-            let(:time_millis) do
-              Time.utc(2021, 10, 25, 10, 30, 30, 581345).in_time_zone("Stockholm")
-            end
-
-            it_behaves_like 'is true'
-          end
+      context 'with $in' do
+        let(:query) do
+          {'started_at' => {:$in => [time_millis]}}
         end
 
-        context 'with $in' do
-          let(:query) do
-            {'started_at' => {:$in => [time_millis]}}
-          end
+        it_behaves_like 'is true'
+      end
 
-          it_behaves_like 'is false'
+      context 'when matching an element in an array' do
+        let(:document) do
+          Mop.new(:array_field => [time])
         end
 
-        context 'when matching an element in an array' do
-          let(:document) do
-            Mop.new(:array_field => [time])
+        context 'with equals match' do
+          let(:query) do
+            {'array_field' => time_millis}
           end
 
-          context 'with equals match' do
-            let(:query) do
-              {'array_field' => time_millis}
-            end
-
-            it_behaves_like 'is false'
-          end
+          it_behaves_like 'is true'
         end
       end
     end

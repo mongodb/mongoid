@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './embeds_one_models'
@@ -156,20 +157,27 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
   describe '#touchable?' do
 
     context 'when :touch is in the options' do
-
-      let(:options) do
-        { touch: true}
+      shared_examples_for ':touch is in the options' do
+        it 'returns the value in the options' do
+          expect(association.send(:touchable?)).to be(options[:touch])
+        end
       end
 
-      it 'returns true' do
-        expect(association.send(:touchable?)).to be(true)
+      context 'when the option is true' do
+        let(:options) { { touch: true } }
+        it_behaves_like ':touch is in the options'
+      end
+
+      context 'when the option is false' do
+        let(:options) { { touch: false } }
+        it_behaves_like ':touch is in the options'
       end
     end
 
     context 'when :touch is not in the options' do
 
-      it 'return false' do
-        expect(association.send(:touchable?)).to be(false)
+      it 'return the default value' do
+        expect(association.send(:touchable?)).to be(true)
       end
     end
   end
@@ -582,7 +590,11 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
     context 'when the :class_name option is specified' do
 
       let(:options) do
-        { class_name: 'OtherContainer' }
+        # `touch: true` is the default (see MONGOID-5016), which means by
+        # default, callbacks are added to the referenced class. In this case,
+        # the class does not exist, so we must explicitly set `touch: false`
+        # to prevent Mongoid from attempting to load the bogus class.
+        { touch: false, class_name: 'OtherContainer' }
       end
 
       it 'returns the class name option' do

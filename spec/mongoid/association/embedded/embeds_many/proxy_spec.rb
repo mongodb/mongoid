@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative '../embeds_many_models.rb'
@@ -1862,51 +1863,56 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
-  describe "#delete" do
+  %i[ delete delete_one ].each do |method|
+    describe "\##{method}" do
+      let(:address_one) { Address.new(street: "first") }
+      let(:address_two) { Address.new(street: "second") }
 
-    let(:person) do
-      Person.new
-    end
-
-    let(:address_one) do
-      Address.new(street: "first")
-    end
-
-    let(:address_two) do
-      Address.new(street: "second")
-    end
-
-    before do
-      person.addresses << [ address_one, address_two ]
-    end
-
-    context "when the document exists in the relation" do
-
-      let!(:deleted) do
-        person.addresses.delete(address_one)
+      before do
+        person.addresses << [ address_one, address_two ]
       end
 
-      it "deletes the document" do
-        expect(person.addresses).to eq([ address_two ])
+      shared_examples_for 'deleting from the collection' do
+        context 'when the document exists in the relation' do
+          let!(:deleted) do
+            person.addresses.send(method, address_one)
+          end
+
+          it 'deletes the document' do
+            expect(person.addresses).to eq([ address_two ])
+            expect(person.reload.addresses).to eq([ address_two ]) if person.persisted?
+          end
+
+          it 'deletes the document from the unscoped' do
+            expect(person.addresses.send(:_unscoped)).to eq([ address_two ])
+          end
+
+          it 'reindexes the relation' do
+            expect(address_two._index).to eq(0)
+          end
+
+          it 'returns the document' do
+            expect(deleted).to eq(address_one)
+          end
+        end
+
+        context 'when the document does not exist' do
+          it 'returns nil' do
+            expect(person.addresses.send(method, Address.new)).to be_nil
+          end
+        end
       end
 
-      it "deletes the document from the unscoped" do
-        expect(person.addresses.send(:_unscoped)).to eq([ address_two ])
+      context 'when the root document is unpersisted' do
+        let(:person) { Person.new }
+
+        it_behaves_like 'deleting from the collection'
       end
 
-      it "reindexes the relation" do
-        expect(address_two._index).to eq(0)
-      end
+      context 'when the root document is persisted' do
+        let(:person) { Person.create }
 
-      it "returns the document" do
-        expect(deleted).to eq(address_one)
-      end
-    end
-
-    context "when the document does not exist" do
-
-      it "returns nil" do
-        expect(person.addresses.delete(Address.new)).to be_nil
+        it_behaves_like 'deleting from the collection'
       end
     end
   end
@@ -2305,8 +2311,36 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         person.addresses.create!(street: "Bond St")
       end
 
+      let(:address) { person.addresses.first }
+
       it "returns true" do
         expect(person.addresses.exists?).to be true
+      end
+
+      context 'when given specifying conditions' do
+        context 'when the record exists in the association' do
+          it 'returns true by condition' do
+            expect(person.addresses.exists?(street: 'Bond St')).to be true
+          end
+
+          it 'returns true by id' do
+            expect(person.addresses.exists?(address._id)).to be true
+          end
+
+          it 'returns false when given false' do
+            expect(person.addresses.exists?(false)).to be false
+          end
+
+          it 'returns false when given nil' do
+            expect(person.addresses.exists?(nil)).to be false
+          end
+        end
+
+        context 'when the record does not exist in the association' do
+          it 'returns false' do
+            expect(person.addresses.exists?(street: 'Garfield Ave')).to be false
+          end
+        end
       end
     end
 
@@ -2318,6 +2352,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
       it "returns false" do
         expect(person.addresses.exists?).to be false
+      end
+
+      context 'when given specifying conditions' do
+        it 'returns false' do
+          expect(person.addresses.exists?(street: 'Hyde Park Dr')).to be false
+          expect(person.addresses.exists?(street: 'Garfield Ave')).to be false
+        end
       end
     end
   end
@@ -4566,7 +4607,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     before do
       band.collection.
           find(_id: band.id).
-          update_one("$set" => { records: [{ name: "Moderat" }]})
+          update_one("$set" => { records: [{ _id: BSON::ObjectId.new, name: "Moderat" }]})
     end
 
     context "when loading the documents" do

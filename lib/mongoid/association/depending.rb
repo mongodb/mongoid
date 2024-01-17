@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -19,6 +20,12 @@ module Mongoid
       end
 
       class_methods do
+
+        # Returns all dependent association metadata objects.
+        #
+        # @return [ Array<Mongoid::Association::Relatable> ] The dependent
+        #   association metadata.
+        #
         # @api private
         def _all_dependents
           superclass_dependents = superclass.respond_to?(:_all_dependents) ? superclass._all_dependents : []
@@ -44,7 +51,7 @@ module Mongoid
       # @example Set up cascading information
       #   Mongoid::Association::Depending.define_dependency!(association)
       #
-      # @param [ Association ] association The association metadata.
+      # @param [ Mongoid::Association::Relatable ] association The association metadata.
       #
       # @return [ Class ] The class of the document.
       def self.define_dependency!(association)
@@ -61,6 +68,14 @@ module Mongoid
         end
       end
 
+      # Validates that an association's dependent strategy is
+      # within the allowed enumeration.
+      #
+      # @param [ Mongoid::Association::Relatable ] association
+      #   The association to validate.
+      #
+      # @raises [ Mongoid::Errors::InvalidDependentStrategy ]
+      #   Error if invalid.
       def self.validate!(association)
         unless STRATEGIES.include?(association.dependent)
           raise Errors::InvalidDependentStrategy.new(association,

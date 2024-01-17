@@ -92,6 +92,15 @@ For all of the new methods there are also shorter forms created dynamically, e.g
 and ``will_save_change_to_attribute?(:name)`` is equivalent to ``will_save_change_to_name?``.
 
 
+Deprecated ``use_activesupport_time_zone`` config option
+--------------------------------------------------------
+
+The config option ``use_activesupport_time_zone`` has been deprecated.
+Beginning in Mongoid 9.0, it will be ignored and always behave as true.
+Since ``use_activesupport_time_zone`` currently defaults to true, it is
+safe to remove from your config file at this time.
+
+
 Configuration DSL No Longer Requires an Argument to its Block
 -------------------------------------------------------------
 
@@ -251,7 +260,7 @@ Added ``readonly!`` method and ``legacy_readonly`` feature flag
 ---------------------------------------------------------------
 
 Mongoid 8.1 changes the meaning of read-only documents. In Mongoid 8.1 with
-this feature flag turned off, a document becomes read-only when calling the
+this feature flag turned off (``false``), a document becomes read-only when calling the
 ``readonly!`` method:
 
 .. code:: ruby
@@ -267,7 +276,7 @@ With this feature flag turned off, a ``ReadonlyDocument`` error will be
 raised when destroying or deleting, as well as when saving or updating.
 
 Prior to Mongoid 8.1 and in 8.1 with the ``legacy_readonly`` feature flag
-turned on, documents become read-only when they are projected (i.e. using
+turned on (``true``), documents become read-only when they are projected (i.e. using
 ``#only`` or ``#without``).
 
 .. code:: ruby
@@ -378,7 +387,7 @@ Added ``none_of`` Query Method
 ------------------------------
 
 With the addition of ``none_of``, Mongoid 8.1 allows queries to exclude
-conditions in bulk. The emitted query will encapsulate the specified 
+conditions in bulk. The emitted query will encapsulate the specified
 criteria in a ``$nor`` operation. For example:
 
 .. code:: ruby
@@ -398,3 +407,23 @@ criteria in a ``$nor`` operation. For example:
 
 This would query all buildings in Portland, excluding apartments, buildings less than
 100 units tall, and buildings with an occupancy greater than 2500 people.
+
+
+Added ``Mongoid::Config.immutable_ids``
+---------------------------------------
+
+Coming in Mongoid 9.0, the ``_id`` field will be immutable in both top-level
+and embedded documents. This addresses some inconsistency in how mutations
+to the ``_id`` field are treated currently. To prepare for this potentially
+breaking change, the ``Mongoid::Config.immutable_ids`` flag has been added. It
+defaults to ``false``, preserving the existing behavior, but you may set it to
+``true`` to prepare your apps for Mongoid 9.0. When this is set to ``true``,
+attempts to mutate the ``_id`` of a document will raise an exception.
+
+.. code:: ruby
+
+  # The default in Mongoid 8.1
+  Mongoid::Config.immutable_ids = false
+
+  # The default in Mongoid 9.0
+  Mongoid::Config.immutable_ids = true

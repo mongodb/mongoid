@@ -4,11 +4,13 @@ module Mongoid
   module Association
     module Referenced
       class BelongsTo
-
-        # This class handles all behavior for associations that are either
-        # one-to-many or one-to-one, where the foreign key is stored on this side
-        # of the association and the reference is to document(s) in another
-        # collection.
+        # Transparent proxy for belong_to associations.
+        # An instance of this class is returned when calling the
+        # association getter method on the subject document.
+        # This class inherits from Mongoid::Association::Proxy and
+        # forwards most of its methods to the target of the association,
+        # i.e. the document on the opposite-side collection which must
+        # be loaded.
         class Proxy < Association::One
           include Evolvable
 
@@ -20,9 +22,9 @@ module Mongoid
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Document | Array<Document> ] target The target (parent) of the
           #   association.
-          # @param [ Association ] association The association object.
+          # @param [ Mongoid::Association::Relatable ] association The association object.
           def initialize(base, target, association)
-            init(base, target, association) do
+            super do
               characterize_one(_target)
               bind_one
             end
@@ -50,11 +52,11 @@ module Mongoid
           # @return [ self | nil ] The association or nil.
           def substitute(replacement)
             unbind_one
-            if replacement
-              self._target = normalize(replacement)
-              bind_one
-              self
-            end
+            return unless replacement
+
+            self._target = normalize(replacement)
+            bind_one
+            self
           end
 
           private
@@ -81,6 +83,7 @@ module Mongoid
           # @return [ Document ] The document.
           def normalize(replacement)
             return replacement if replacement.is_a?(Document)
+
             _association.build(klass, replacement)
           end
 
@@ -95,13 +98,15 @@ module Mongoid
           end
 
           class << self
-
             # Get the Eager object for this type of association.
             #
             # @example Get the eager loader object
             #
-            # @param [ Association ] association The association object.
+            # @param [ Mongoid::Association::Relatable ] association The association object.
             # @param [ Array<Document> ] docs The array of documents.
+            #
+            # @return [ Mongoid::Association::Referenced::BelongsTo::Eager ]
+            #   The eager loader.
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end

@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional numeric behavior.
+        # Adds query type-casting behavior to Numeric module and its children.
         module Numeric
 
           # Evolve the numeric value into a mongo friendly date, aka UTC time at
@@ -29,14 +30,6 @@ module Mongoid
           def __evolve_time__
             ::Time.at(self).utc
           end
-
-          # Get the integer as a sort direction.
-          #
-          # @example Get the integer as a sort direction.
-          #   1.to_direction
-          #
-          # @return [ Integer ] self.
-          def to_direction; self; end
 
           module ClassMethods
 

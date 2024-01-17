@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional range behavior.
+        # Adds query type-casting behavior to Range class.
         module Range
 
           # Get the range as an array.

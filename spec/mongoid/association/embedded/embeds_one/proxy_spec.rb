@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -971,7 +972,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
     before do
       band.collection.
           find(_id: band.id).
-          update_one("$set" => { label: { name: "Mute" }})
+          update_one("$set" => { label: { _id: BSON::ObjectId.new, name: "Mute" }})
     end
 
     context "when loading the documents" do

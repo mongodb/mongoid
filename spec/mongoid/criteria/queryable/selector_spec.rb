@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -44,7 +45,7 @@ describe Mongoid::Criteria::Queryable::Selector do
       end
     end
 
-    context "when selector contains a $nin" do
+    context "when selector contains a $nin string" do
 
       let(:initial) do
         { "$nin" => ["foo"] }
@@ -72,7 +73,35 @@ describe Mongoid::Criteria::Queryable::Selector do
       end
     end
 
-    context "when selector contains a $in" do
+    context "when selector contains a $nin symbol" do
+
+      let(:initial) do
+        { :$nin => ["foo"] }
+      end
+
+      before do
+        selector["field"] = initial
+      end
+
+      context "when merging in a new $nin" do
+
+        let(:other) do
+          { "field" => { :$nin => ["bar"] } }
+        end
+
+        before do
+          selector.merge!(other)
+        end
+
+        it "combines the two $nin queries into one" do
+          expect(selector).to eq({
+            "field" => { :$nin => ["foo", "bar"] }
+          })
+        end
+      end
+    end
+
+    context "when selector contains a $in string" do
 
       let(:initial) do
         { "$in" => [1, 2] }
@@ -112,6 +141,51 @@ describe Mongoid::Criteria::Queryable::Selector do
         it "intersects the $in values" do
           expect(selector).to eq({
                                      "field" => { "$in" => [] }
+                                 })
+        end
+      end
+    end
+
+    context "when selector contains a $in symbol" do
+
+      let(:initial) do
+        { :$in => [1, 2] }
+      end
+
+      before do
+        selector["field"] = initial
+      end
+
+      context "when merging in a new $in with an intersecting value" do
+
+        let(:other) do
+          { "field" => { :$in => [1] } }
+        end
+
+        before do
+          selector.merge!(other)
+        end
+
+        it "intersects the $in values" do
+          expect(selector).to eq({
+                                     "field" => { :$in => [1] }
+                                 })
+        end
+      end
+
+      context "when merging in a new $in with no intersecting values" do
+
+        let(:other) do
+          { "field" => { :$in => [3] } }
+        end
+
+        before do
+          selector.merge!(other)
+        end
+
+        it "intersects the $in values" do
+          expect(selector).to eq({
+                                     "field" => { :$in => [] }
                                  })
         end
       end
@@ -403,6 +477,43 @@ describe Mongoid::Criteria::Queryable::Selector do
             end
           end
         end
+
+        context "when providing a Mongoid::RawValue" do
+
+          context "and raw_value is a string" do
+
+            before do
+              selector.send(method, "key", Mongoid::RawValue("Foo"))
+            end
+
+            it "returns the raw_value" do
+              expect(selector["key"]).to eq("Foo")
+            end
+          end
+
+          context "and raw_value cannot be converted by bson-ruby" do
+
+            before do
+              selector.send(method, "key", Mongoid::RawValue(4..5))
+            end
+
+            it "returns the raw_value without conversion" do
+              expect(selector["key"]).to eq(4..5)
+            end
+          end
+
+          context "and raw_value is a complex type" do
+            config_override :map_big_decimal_to_decimal128, true
+
+            before do
+              selector.send(method, "key", Mongoid::RawValue([{ foo: 1, "Bar" => [/baz/, BigDecimal('2'), 4..5] }, 3]))
+            end
+
+            it "returns the raw_value" do
+              expect(selector["key"]).to eq([{ foo: 1, "Bar" => [/baz/, BigDecimal('2'), 4..5] }, 3])
+            end
+          end
+        end
       end
 
       context "when serializers are provided" do
@@ -600,6 +711,64 @@ describe Mongoid::Criteria::Queryable::Selector do
                         end
                       end
                     end
+                  end
+                end
+              end
+
+              context "when the criterion is a Mongoid::RawValue" do
+
+                context "and raw_value is a serializable string" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue("1"))
+                  end
+
+                  it "returns the raw_value" do
+                    expect(selector["key"]).to eq("1")
+                  end
+                end
+
+                context "and raw_value is a serializable type" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue(BigDecimal('2')))
+                  end
+
+                  it "returns the raw_value" do
+                    expect(selector["key"]).to eq(BigDecimal('2'))
+                  end
+                end
+
+                context "and raw_value is a non-serializable string" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue("Foo"))
+                  end
+
+                  it "returns the raw_value" do
+                    expect(selector["key"]).to eq("Foo")
+                  end
+                end
+
+                context "and raw_value cannot be converted by bson-ruby" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue(4..5))
+                  end
+
+                  it "returns the raw_value without conversion" do
+                    expect(selector["key"]).to eq(4..5)
+                  end
+                end
+
+                context "and raw_value is a complex type" do
+
+                  before do
+                    selector.send(method, "key", Mongoid::RawValue([{ foo: "1", "Bar" => [/baz/, BigDecimal('2'), 4..5] }, 3]))
+                  end
+
+                  it "returns the raw_value" do
+                    expect(selector["key"]).to eq([{ foo: "1", "Bar" => [/baz/, BigDecimal('2'), 4..5] }, 3])
                   end
                 end
               end

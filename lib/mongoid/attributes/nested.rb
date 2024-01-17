@@ -1,9 +1,10 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Attributes
 
-    # Defines behavior around that lovel Rails feature nested attributes.
+    # Defines behavior for the Rails nested attributes feature.
     module Nested
       extend ActiveSupport::Concern
 
@@ -76,7 +77,7 @@ module Mongoid
         # @example Add the autosave if appropriate.
         #   Person.autosave_nested_attributes(metadata)
         #
-        # @param [ Association ] association The existing association metadata.
+        # @param [ Mongoid::Association::Relatable ] association The existing association metadata.
         def autosave_nested_attributes(association)
           # In order for the autosave functionality to work properly, the association needs to be
           # marked as autosave despite the fact that the option isn't present. Because the method

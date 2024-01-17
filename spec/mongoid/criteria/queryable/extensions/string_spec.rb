@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -71,8 +72,7 @@ describe String do
 
     context "when the string without timezone" do
 
-      context "when using active support's time zone" do
-        config_override :use_activesupport_time_zone, true
+      context "when setting ActiveSupport time zone" do
         time_zone_override "Tokyo"
 
         let(:date) do
@@ -85,23 +85,6 @@ describe String do
 
         it "parses string using active support's time zone" do
           expect(evolved).to eq(Time.zone.parse(date).utc)
-        end
-      end
-
-      context "when not using active support's time zone" do
-        config_override :use_activesupport_time_zone, false
-        time_zone_override nil
-
-        let(:date) do
-          "2010-01-01 5:00:00"
-        end
-
-        let(:evolved) do
-          date.__evolve_time__
-        end
-
-        it "parses string using system time zone" do
-          expect(evolved).to eq(Time.parse(date).utc)
         end
       end
     end
@@ -198,143 +181,83 @@ describe String do
     end
   end
 
-  describe "#__expr_part__" do
+  describe '#__expr_part__' do
+    subject(:specified) { 'field'.__expr_part__(value) }
+    let(:value) { 10 }
 
-    let(:specified) do
-      "field".__expr_part__(10)
+    it 'returns the expression with the value' do
+      expect(specified).to eq({ 'field' => 10 })
     end
 
-    it "returns the string with the value" do
-      expect(specified).to eq({ "field" => 10 })
+    context 'with a Regexp' do
+      let(:value) { /test/ }
+
+      it 'returns the expression with the value' do
+        expect(specified).to eq({ 'field' => /test/ })
+      end
     end
 
-    context "with a regexp" do
+    context 'with a BSON::Regexp::Raw' do
+      let(:value) { BSON::Regexp::Raw.new('^[123]') }
 
-      let(:specified) do
-        "field".__expr_part__(/test/)
+      it 'returns the expression with the value' do
+        expect(specified).to eq({ 'field' => BSON::Regexp::Raw.new('^[123]') })
       end
-
-      it "returns the symbol with the value" do
-        expect(specified).to eq({ "field" => /test/ })
-      end
-
     end
 
-    context "when negated" do
+    context 'when negated' do
+      subject(:specified) { 'field'.__expr_part__(value, true) }
 
-      context "with a regexp" do
+      context 'with a Regexp' do
+        let(:value) { /test/ }
 
-        let(:specified) do
-          "field".__expr_part__(/test/, true)
+        it 'returns the expression with the value negated' do
+          expect(specified).to eq({ 'field' => { '$not' => /test/ } })
         end
-
-        it "returns the string with the value negated" do
-          expect(specified).to eq({ "field" => { "$not" => /test/ } })
-        end
-
       end
 
-      context "with anything else" do
+      context 'with a BSON::Regexp::Raw' do
+        let(:value) { BSON::Regexp::Raw.new('^[123]') }
 
-        let(:specified) do
-          "field".__expr_part__('test', true)
+        it 'returns the expression with the value' do
+          expect(specified).to eq({ 'field' => { '$not' => BSON::Regexp::Raw.new('^[123]') } })
         end
+      end
 
-        it "returns the string with the value negated" do
-          expect(specified).to eq({ "field" => { "$ne" => "test" }})
+      context 'with anything else' do
+        let(:value) { 'test' }
+
+        it 'returns the expression with the value negated' do
+          expect(specified).to eq({ 'field' => { '$ne' => 'test' }})
         end
       end
     end
   end
 
-  describe "#to_direction" do
+  describe '.evolve' do
+    subject(:evolved) { described_class.evolve(object) }
 
-    context "when ascending" do
+    context 'when provided a Regexp' do
+      let(:object) { /\A[123]/.freeze }
 
-      it "returns 1" do
-        expect("ascending".to_direction).to eq(1)
+      it 'returns the regexp' do
+        expect(evolved).to eq(/\A[123]/)
       end
     end
 
-    context "when asc" do
+    context 'when provided a BSON::Regexp::Raw' do
+      let(:object) { BSON::Regexp::Raw.new('^[123]') }
 
-      it "returns 1" do
-        expect("asc".to_direction).to eq(1)
+      it 'returns the BSON::Regexp::Raw' do
+        expect(evolved).to eq(BSON::Regexp::Raw.new('^[123]'))
       end
     end
 
-    context "when ASCENDING" do
+    context 'when provided an object' do
+      let(:object) { 1234 }
 
-      it "returns 1" do
-        expect("ASCENDING".to_direction).to eq(1)
-      end
-    end
-
-    context "when ASC" do
-
-      it "returns 1" do
-        expect("ASC".to_direction).to eq(1)
-      end
-    end
-
-    context "when descending" do
-
-      it "returns -1" do
-        expect("descending".to_direction).to eq(-1)
-      end
-    end
-
-    context "when desc" do
-
-      it "returns -1" do
-        expect("desc".to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESCENDING" do
-
-      it "returns -1" do
-        expect("DESCENDING".to_direction).to eq(-1)
-      end
-    end
-
-    context "when DESC" do
-
-      it "returns -1" do
-        expect("DESC".to_direction).to eq(-1)
-      end
-    end
-  end
-
-  describe ".evolve" do
-
-    context "when provided a regex" do
-
-      let(:regex) do
-        /\A[123]/.freeze
-      end
-
-      let(:evolved) do
-        described_class.evolve(regex)
-      end
-
-      it "returns the regex" do
-        expect(evolved).to eq(regex)
-      end
-    end
-
-    context "when provided an object" do
-
-      let(:object) do
-        1234
-      end
-
-      let(:evolved) do
-        described_class.evolve(object)
-      end
-
-      it "returns the object as a string" do
-        expect(evolved).to eq("1234")
+      it 'returns the object as a string' do
+        expect(evolved).to eq('1234')
       end
     end
   end

@@ -4,10 +4,32 @@ module Mongoid
   module Association
     module Referenced
       class HasOne
-
-        # This class defines the behavior for all associations that are a
-        # one-to-one between documents in different collections.
+        # Transparent proxy for has_one associations.
+        # An instance of this class is returned when calling the
+        # association getter method on the subject document. This class
+        # inherits from Mongoid::Association::Proxy and forwards most of
+        # its methods to the target of the association, i.e. the
+        # document on the opposite-side collection which must be loaded.
         class Proxy < Association::One
+          # class-level methods for the HasOne::Proxy
+          module ClassMethods
+            def eager_loader(association, docs)
+              Eager.new(association, docs)
+            end
+
+            # Returns true if the association is an embedded one. In this case
+            # always false.
+            #
+            # @example Is this association embedded?
+            #   Referenced::One.embedded?
+            #
+            # @return [ false ] Always false.
+            def embedded?
+              false
+            end
+          end
+
+          extend ClassMethods
 
           # Instantiate a new references_one association. Will set the foreign key
           # and the base on the inverse object.
@@ -17,9 +39,9 @@ module Mongoid
           #
           # @param [ Document ] base The document this association hangs off of.
           # @param [ Document ] target The target (child) of the association.
-          # @param [ Association ] association The association metadata.
+          # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def initialize(base, target, association)
-            init(base, target, association) do
+            super do
               raise_mixed if klass.embedded? && !klass.cyclic?
               characterize_one(_target)
               bind_one
@@ -49,16 +71,7 @@ module Mongoid
           #
           # @return [ One ] The association.
           def substitute(replacement)
-            if self != replacement
-              unbind_one
-              if persistable?
-                if _association.destructive?
-                  send(_association.dependent)
-                else
-                  save if persisted?
-                end
-              end
-            end
+            prepare_for_replacement if self != replacement
             HasOne::Proxy.new(_base, replacement, _association) if replacement
           end
 
@@ -84,21 +97,17 @@ module Mongoid
             _base.persisted? && !_binding? && !_building?
           end
 
-          class << self
+          # Takes the necessary steps to prepare for the current document
+          # to be replaced by a non-nil substitute.
+          def prepare_for_replacement
+            unbind_one
 
-            def eager_loader(association, docs)
-              Eager.new(association, docs)
-            end
+            return unless persistable?
 
-            # Returns true if the association is an embedded one. In this case
-            # always false.
-            #
-            # @example Is this association embedded?
-            #   Referenced::One.embedded?
-            #
-            # @return [ false ] Always false.
-            def embedded?
-              false
+            if _association.destructive?
+              send(_association.dependent)
+            elsif persisted?
+              save
             end
           end
         end

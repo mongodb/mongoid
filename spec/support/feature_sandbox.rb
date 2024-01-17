@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 # A helper utility for allowing features to be loaded and constants defined
 # inside a sandbox, where they can be unloaded and undefined when finished.

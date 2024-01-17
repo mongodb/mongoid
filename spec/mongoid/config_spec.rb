@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require "support/feature_sandbox"
@@ -335,85 +336,24 @@ describe Mongoid::Config do
     it_behaves_like "a config option"
   end
 
-  context 'when setting the broken_updates option in the config' do
-    let(:option) { :broken_updates }
+  context 'when setting the allow_bson5_decimal128 option in the config' do
+    min_bson_version '5.0'
+
+    let(:option) { :allow_bson5_decimal128 }
     let(:default) { false }
 
     it_behaves_like "a config option"
   end
 
-  context 'when setting the legacy_triple_equals option in the config' do
-    let(:option) { :legacy_triple_equals }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_scoping option in the config' do
-    let(:option) { :broken_scoping }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_aggregables option in the config' do
-    let(:option) { :broken_aggregables }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_alias_handling option in the config' do
-    let(:option) { :broken_alias_handling }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the broken_and option in the config' do
-    let(:option) { :broken_and }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the compare_time_by_ms option in the config' do
-    let(:option) { :compare_time_by_ms }
-    let(:default) { true }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the object_id_as_json_oid option in the config' do
-    let(:option) { :object_id_as_json_oid }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_pluck_distinct option in the config' do
-    let(:option) { :legacy_pluck_distinct }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the overwrite_chained_operators option in the config' do
-    let(:option) { :overwrite_chained_operators }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_attributes option in the config' do
-    let(:option) { :legacy_attributes }
-    let(:default) { false }
-
-    it_behaves_like "a config option"
-  end
-
-  context 'when setting the legacy_attributes option in the config' do
+  context 'when setting the legacy_readonly option in the config' do
     let(:option) { :legacy_readonly }
+    let(:default) { false }
+
+    it_behaves_like "a config option"
+  end
+
+  context 'when setting the legacy_persistence_context_behavior option in the config' do
+    let(:option) { :legacy_persistence_context_behavior }
     let(:default) { false }
 
     it_behaves_like "a config option"
@@ -511,10 +451,6 @@ describe Mongoid::Config do
         expect(described_class.raise_not_found_error).to be true
       end
 
-      it "sets the use activesupport time zone option" do
-        expect(described_class.use_activesupport_time_zone).to be true
-      end
-
       it "sets the use utc option" do
         expect(described_class.use_utc).to be false
       end
@@ -595,10 +531,6 @@ describe Mongoid::Config do
           expect(described_class.raise_not_found_error).to be true
         end
 
-        it "sets the use activesupport time zone option" do
-          expect(described_class.use_activesupport_time_zone).to be true
-        end
-
         it "sets the use utc option" do
           expect(described_class.use_utc).to be false
         end
@@ -654,24 +586,26 @@ describe Mongoid::Config do
 
       it 'passes uuid to driver' do
         Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
-          auto_encryption_options: {
-            'key_vault_namespace' => 'admin.datakeys',
-            'kms_providers' => {'local' => {'key' => 'z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U'}},
-            'schema_map' => {'blog_development.comments' => {
-              'bsonType' => 'object',
-              'properties' => {
-                'message' => {'encrypt' => {
-                  'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
-                  'bsonType' => 'string',
-                  'keyId' => [BSON::Binary.new("G\xF0 5\xCC@HX\xA2%b\x97\xA9a\xA8\xE7", :uuid)],
-                }},
-              },
-            }}},
-          database: 'mongoid_test',
-          platform: "mongoid-#{Mongoid::VERSION}",
-          wrapping_libraries: [
-            {'name' => 'Mongoid', 'version' => Mongoid::VERSION},
-          ],
+          {
+            auto_encryption_options: {
+              'key_vault_namespace' => 'admin.datakeys',
+              'kms_providers' => {'local' => {'key' => 'z7iYiYKLuYymEWtk4kfny1ESBwwFdA58qMqff96A8ghiOcIK75lJGPUIocku8LOFjQuEgeIP4xlln3s7r93FV9J5sAE7zg8U'}},
+              'schema_map' => {'blog_development.comments' => {
+                'bsonType' => 'object',
+                'properties' => {
+                  'message' => {'encrypt' => {
+                    'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+                    'bsonType' => 'string',
+                    'keyId' => [BSON::Binary.new("G\xF0 5\xCC@HX\xA2%b\x97\xA9a\xA8\xE7", :uuid)],
+                  }},
+                },
+              }}},
+            database: 'mongoid_test',
+            platform: "mongoid-#{Mongoid::VERSION}",
+            wrapping_libraries: [
+              {'name' => 'Mongoid', 'version' => Mongoid::VERSION},
+            ]
+          }
         )
 
         client
@@ -907,6 +841,38 @@ describe Mongoid::Config do
           expect(House.count).to eq(1)
           Mongoid.truncate!
           expect(House.count).to eq(0)
+        end
+      end
+    end
+  end
+
+  describe 'deprecations' do
+    {}.each do |option, default|
+
+      context ":#{option} option" do
+
+        before do
+          Mongoid::Warnings.class_eval do
+            instance_variable_set(:"@#{option}_deprecated", false)
+          end
+        end
+
+        let(:matcher) do
+          /Config option :#{option}.+\. It will always be #{default} beginning in Mongoid 9\.0\./
+        end
+
+        context 'when set to true' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", true)
+          end
+        end
+
+        context 'when set to false' do
+          it 'gives a deprecation warning' do
+            expect(Mongoid.logger).to receive(:warn).with(matcher)
+            described_class.send(:"#{option}=", false)
+          end
         end
       end
     end

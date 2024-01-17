@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "rails"
 require "rails/mongoid"
@@ -51,7 +52,11 @@ module Rails
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
-      initializer "mongoid.load-config" do
+      #
+      # It runs after all config/initializers have loaded, so that the YAML
+      # options can override options specified in
+      # (e.g.) config/initializers/mongoid.rb.
+      initializer "mongoid.load-config", after: :load_config_initializers do
         config_file = Rails.root.join("config", "mongoid.yml")
         if config_file.file?
           begin
@@ -111,6 +116,17 @@ module Rails
 
         Mongo::Monitoring::Global.subscribe Mongo::Monitoring::COMMAND,
             ::Mongoid::Railties::ControllerRuntime::Collector.new
+      end
+
+      # Add custom serializers for BSON::ObjectId
+      initializer 'mongoid.active_job.custom_serializers' do
+        require 'mongoid/railties/bson_object_id_serializer'
+
+        config.after_initialize do
+          ActiveJob::Serializers.add_serializers(
+            [::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer]
+          )
+        end
       end
 
     end

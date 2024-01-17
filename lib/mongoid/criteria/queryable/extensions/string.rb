@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional object behavior.
+        # Adds query type-casting behavior to String class.
         module String
 
           # Evolve the string into a mongodb friendly date.
@@ -49,7 +50,7 @@ module Mongoid
             split(/,/).inject({}) do |hash, spec|
               hash.tap do |_hash|
                 field, direction = spec.strip.split(/\s/)
-                _hash[field.to_sym] = direction.to_direction
+                _hash[field.to_sym] = Mongoid::Criteria::Translator.to_direction(direction)
               end
             end
           end
@@ -67,16 +68,6 @@ module Mongoid
             ::String.__expr_part__(self, value, negating)
           end
 
-          # Get the string as a sort direction.
-          #
-          # @example Get the string as a sort direction.
-          #   "1".to_direction
-          #
-          # @return [ Integer ] The direction.
-          def to_direction
-            self =~ /desc/i ? -1 : 1
-          end
-
           module ClassMethods
 
             # Get the value as a expression.
@@ -91,7 +82,7 @@ module Mongoid
             # @return [ Hash ] The selection.
             def __expr_part__(key, value, negating = false)
               if negating
-                { key => { "$#{value.regexp? ? "not" : "ne"}" => value }}
+                { key => { "$#{__regexp?(value) ? "not" : "ne"}" => value }}
               else
                 { key => value }
               end
@@ -108,8 +99,19 @@ module Mongoid
             # @return [ String ] The value as a string.
             def evolve(object)
               __evolve__(object) do |obj|
-                obj.regexp? ? obj : obj.to_s
+                __regexp?(obj) ? obj : obj.to_s
               end
+            end
+
+            private
+
+            # Returns whether the object is Regexp-like.
+            #
+            # @param [ Object ] object The object to evaluate.
+            #
+            # @return [ Boolean ] Whether the object is Regexp-like.
+            def __regexp?(object)
+              object.is_a?(Regexp) || object.is_a?(BSON::Regexp::Raw)
             end
           end
         end
