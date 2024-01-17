@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/errors/mongoid_error"
 require "mongoid/errors/ambiguous_relationship"

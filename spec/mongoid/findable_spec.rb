@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -903,7 +904,7 @@ describe Mongoid::Findable do
     time_zone_override "Asia/Kolkata"
 
     let!(:time) do
-      Time.zone.now.tap do |t|
+      Time.current.tap do |t|
         User.create!(last_login: t, name: 'Tom')
       end
     end

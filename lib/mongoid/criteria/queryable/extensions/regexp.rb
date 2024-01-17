@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional regex behavior.
+        # Adds query type-casting behavior to Regexp class.
         module Regexp
 
           # Is the object a regexp?
@@ -14,7 +15,9 @@ module Mongoid
           #   /\A[123]/.regexp?
           #
           # @return [ true ] Always true.
+          # @deprecated
           def regexp?; true; end
+          Mongoid.deprecate(self, :regexp?)
 
           module ClassMethods
 
@@ -33,6 +36,7 @@ module Mongoid
             end
           end
 
+          # Adds query type-casting behavior to BSON::Regexp::Raw class.
           module Raw_
 
             # Is the object a regexp?
@@ -41,7 +45,9 @@ module Mongoid
             #   bson_raw_regexp.regexp?
             #
             # @return [ true ] Always true.
+            # @deprecated
             def regexp?; true; end
+            Mongoid.deprecate(self, :regexp?)
 
             module ClassMethods
 

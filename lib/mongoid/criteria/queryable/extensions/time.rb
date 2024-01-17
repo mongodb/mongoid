@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional time behavior.
+        # Adds query type-casting behavior to Time class.
         module Time
 
           # Evolve the time as a date, UTC midnight.

@@ -1,3 +1,4 @@
+# rubocop:todo all
 require 'singleton'
 
 class ClientRegistry

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'spec_helper'
 
 describe 'Queries with Mongoid::RawValue criteria' do
-  before { Time.zone = 'UTC'}
   let(:now_utc) { Time.utc(2020, 1, 1, 16, 0, 0, 0) }
   let(:today) { Date.new(2020, 1, 1) }
 

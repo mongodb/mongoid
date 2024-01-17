@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "rails"
 require "rails/mongoid"
@@ -115,6 +116,17 @@ module Rails
 
         Mongo::Monitoring::Global.subscribe Mongo::Monitoring::COMMAND,
             ::Mongoid::Railties::ControllerRuntime::Collector.new
+      end
+
+      # Add custom serializers for BSON::ObjectId
+      initializer 'mongoid.active_job.custom_serializers' do
+        require 'mongoid/railties/bson_object_id_serializer'
+
+        config.after_initialize do
+          ActiveJob::Serializers.add_serializers(
+            [::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer]
+          )
+        end
       end
 
     end

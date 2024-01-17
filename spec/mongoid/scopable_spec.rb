@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -342,7 +343,6 @@ describe Mongoid::Scopable do
     context "when provided a criteria" do
 
       context 'when a collation is defined on the criteria' do
-        min_server_version '3.4'
 
         before do
           Band.scope(:tests, ->{ Band.where(name: 'TESTING').collation(locale: 'en_US', strength: 2) })

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
@@ -31,13 +32,13 @@ Gem::Specification.new do |s|
     warn "[#{s.name}] Warning: No private key present, creating unsigned gem."
   end
 
-  s.required_ruby_version     = ">= 2.6"
+  s.required_ruby_version     = ">= 2.7"
   s.required_rubygems_version = ">= 1.3.6"
 
   # Ruby 3.0 requires ActiveModel 6.0 or higher.
   # activemodel 7.0.0 cannot be used due to Class#descendants issue
   # See: https://github.com/rails/rails/pull/43951
-  s.add_dependency("activemodel", ['>=5.1', '<7.1', '!= 7.0.0'])
+  s.add_dependency("activemodel", ['>=5.1', '<7.2', '!= 7.0.0'])
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
   s.add_dependency("concurrent-ruby", ['>= 1.0.5', '< 2.0'])
 

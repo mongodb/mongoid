@@ -30,3 +30,4 @@ examples
 .byebug_history
 .env
 .env.private*
+build

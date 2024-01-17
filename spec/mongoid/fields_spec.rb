@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -555,6 +556,49 @@ describe Mongoid::Fields do
 
         it "returns the current locale value" do
           expect(description).to eq("Cheaper drinks")
+        end
+      end
+    end
+
+    context 'when the field is declared as BSON::Decimal128' do
+      let(:document) { Mop.create!(decimal128_field: BSON::Decimal128.new(Math::PI.to_s)).reload }
+
+      shared_context 'BSON::Decimal128 is BigDecimal' do
+        it 'should return a BigDecimal' do
+          expect(document.decimal128_field).to be_a BigDecimal
+        end
+      end
+
+      shared_context 'BSON::Decimal128 is BSON::Decimal128' do
+        it 'should return a BSON::Decimal128' do
+          expect(document.decimal128_field).to be_a BSON::Decimal128
+        end
+      end
+
+      it 'is declared as BSON::Decimal128' do
+        expect(Mop.fields['decimal128_field'].type).to be == BSON::Decimal128
+      end
+
+      context 'when BSON version <= 4' do
+        max_bson_version '4.99.99'
+        it_behaves_like 'BSON::Decimal128 is BSON::Decimal128'
+      end
+
+      context 'when BSON version >= 5' do
+        min_bson_version '5.0.0'
+
+        context 'when allow_bson5_decimal128 is false' do
+          config_override :allow_bson5_decimal128, false
+          it_behaves_like 'BSON::Decimal128 is BigDecimal'
+        end
+
+        context 'when allow_bson5_decimal128 is true' do
+          config_override :allow_bson5_decimal128, true
+          it_behaves_like 'BSON::Decimal128 is BSON::Decimal128'
+        end
+
+        context 'when allow_bson5_decimal128 is default' do
+          it_behaves_like 'BSON::Decimal128 is BigDecimal'
         end
       end
     end

@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Contextual
+
+    # Represents a mapReduce database command instruction.
     class MapReduce
       extend Forwardable
       include Enumerable
@@ -212,6 +215,9 @@ module Mongoid
 }
       end
 
+      # Returns the selector of the command spec.
+      #
+      # @return [ Hash ] The selector.
       def command
         @map_reduce.send(:map_reduce_spec)[:selector]
       end
