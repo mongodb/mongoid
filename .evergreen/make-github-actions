@@ -55,11 +55,10 @@ class EvergreenConfig < YamlConfig
         # these will be later mapped to gemfile
         driver: spec[:driver],
         rails:  spec[:rails],
-        i18n:   spec[:i18n],
       }
 
       missing = node.map {|k, v| k if v.blank? }.compact
-      missing -= %i[driver rails i18n]
+      missing -= %i[driver rails]
 
       if missing.present?
         puts "Skipping invalid Evergreen buildvariant '#{name}'. Keys missing: #{missing}"
@@ -101,7 +100,7 @@ class GithubConfig < YamlConfig
 end
 
 class Transmogrifier
-  SPLATTABLE_FIELDS  = %i[mongodb topology ruby rails driver i18n]
+  SPLATTABLE_FIELDS  = %i[mongodb topology ruby rails driver]
   COMPACTABLE_FIELDS = %i[mongodb topology ruby gemfile]
 
   attr_reader :eg_config,
@@ -205,18 +204,16 @@ class Transmogrifier
   end
 
   def extract_gemfile!(node)
-    node[:gemfile] = get_gemfile(*node.values_at(:driver, :rails, :i18n))
+    node[:gemfile] = get_gemfile(*node.values_at(:driver, :rails))
   end
 
   # Ported from run-tests.sh
-  def get_gemfile(driver, rails, i18n)
-    driver, rails, i18n = [driver, rails, i18n].map {|v| v&.to_s }
+  def get_gemfile(driver, rails)
+    driver, rails = [driver, rails].map {|v| v&.to_s }
     if driver && driver != 'current'
       "gemfiles/driver_#{driver.underscore}.gemfile"
     elsif rails && rails != '6.1' # TODO: "6.1" should be renamed to "current" in Evergreen
       "gemfiles/rails-#{rails}.gemfile"
-    elsif i18n && i18n == '1.0'
-      'gemfiles/i18n-1.0.gemfile'
     else
       'Gemfile'
     end
