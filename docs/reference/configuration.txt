@@ -746,11 +746,11 @@ It may be desirable to further configure TLS options in your application, for
 example by enabling or disabling certain ciphers.
 
 This can be done by setting TLS context hooks on the Ruby driver -- TLS context
-hooks are user-provided ``Proc``s that will be invoked before any TLS socket
+hooks are user-provided ``Proc``\(s) that will be invoked before any TLS socket
 connection in the driver and can be used to modify the underlying
 ``OpenSSL::SSL::SSLContext`` object used by the socket.
 
-To set TLS context hooks, add ``Proc``s to the ``Mongo.tls_context_hooks``
+To set TLS context hooks, add ``Proc``\(s) to the ``Mongo.tls_context_hooks``
 array. This can be done in an initializer. The example below adds a hook
 that only enables the "AES256-SHA" cipher.
 
