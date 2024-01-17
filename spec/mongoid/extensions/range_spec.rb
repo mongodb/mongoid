@@ -5,17 +5,6 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Range do
 
-  describe "#__find_args__" do
-
-    let(:range) do
-      1..3
-    end
-
-    it "returns the range as an array" do
-      expect(range.__find_args__).to eq([ 1, 2, 3 ])
-    end
-  end
-
   describe ".demongoize" do
     subject { Range.demongoize(hash) }
 

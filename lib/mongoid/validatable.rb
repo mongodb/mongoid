@@ -68,7 +68,7 @@ module Mongoid
         begin_validate
         relation = without_autobuild { send(attr) }
         exit_validate
-        relation.do_or_do_not(:in_memory) || relation
+        relation.try(:in_memory) || relation
       elsif fields[attribute].try(:localized?)
         attributes[attribute]
       else

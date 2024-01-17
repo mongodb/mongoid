@@ -3,9 +3,11 @@
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Range class.
     module Range
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
 
       # Get the range as arguments for a find.
       #
@@ -13,9 +15,11 @@ module Mongoid
       #   range.__find_args__
       #
       # @return [ Array ] The range as an array.
+      # @deprecated
       def __find_args__
         to_a
       end
+      Mongoid.deprecate(self, :__find_args__)
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
@@ -39,7 +43,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
@@ -48,8 +51,6 @@ module Mongoid
         # @param [ Hash ] object The object to demongoize.
         #
         # @return [ Range | nil ] The range, or nil if object cannot be represented as range.
-        #
-        # @note Ruby 2.6 and lower do not support endless ranges that Ruby 2.7+ support.
         def demongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
@@ -59,7 +60,7 @@ module Mongoid
                 ::Range.new(hash["min"] || hash[:min],
                             hash["max"] || hash[:max],
                             hash["exclude_end"] || hash[:exclude_end])
-              rescue ArgumentError # can be removed when Ruby version >= 2.7
+              rescue ArgumentError
                 nil
               end
             end
@@ -107,5 +108,4 @@ module Mongoid
   end
 end
 
-::Range.__send__(:include, Mongoid::Extensions::Range)
-::Range.extend(Mongoid::Extensions::Range::ClassMethods)
+Range.include(Mongoid::Extensions::Range)

@@ -44,7 +44,7 @@ In order to do so, the first step is to install the ``rails`` gem:
 
 .. code-block:: sh
 
-    gem install rails -v '~> 6.0.0'
+    gem install rails -v '~> 6.0'
 
 
 Create New Application
@@ -107,7 +107,7 @@ Add Mongoid
 .. code-block:: ruby
   :caption: Gemfile
 
-    gem 'mongoid', '~> 7.0.5'
+    gem 'mongoid'
 
 .. note::
 
@@ -125,7 +125,7 @@ Add Mongoid
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file 
+This generator will create the ``config/mongoid.yml`` configuration file
 (used to configure the connection to the MongoDB deployment) and the
 ``config/initializers/mongoid.rb`` initializer file (which may be used for
 other Mongoid-related configuration). Note that as we are not using
@@ -378,7 +378,7 @@ mentioned in ``Gemfile``, and add ``mongoid``:
 .. code-block:: ruby
   :caption: Gemfile
 
-    gem 'mongoid', '~> 7.0.5'
+    gem 'mongoid'
 
 .. note::
 
@@ -466,7 +466,7 @@ Generate the default Mongoid configuration:
 
     bin/rails g mongoid:config
 
-This generator will create the ``config/mongoid.yml`` configuration file 
+This generator will create the ``config/mongoid.yml`` configuration file
 (used to configure the connection to the MongoDB deployment) and the
 ``config/initializers/mongoid.rb`` initializer file (which may be used for
 other Mongoid-related configuration). In general, it is recommended to use
