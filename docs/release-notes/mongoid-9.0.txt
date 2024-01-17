@@ -17,6 +17,20 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+
+Support for Ruby 2.6 and JRuby 9.3 Dropped
+-------------------------------------------
+
+Mongoid 9 requires Ruby 2.7 or newer or JRuby 9.4. Earlier Ruby and JRuby
+versions are not supported.
+
+
+Support for Rails 5 Dropped
+-----------------------------
+
+Mongoid 9 requires Rails 6.0 or newer. Earlier Rails versions are not supported.
+
+
 Deprecated class ``Mongoid::Errors::InvalidStorageParent`` removed
 ------------------------------------------------------------------
 
@@ -444,8 +458,40 @@ by running the following command:
 
 ... code-block:: bash
 
-$ ruby -ractive_support/values/time_zone \
-  -e 'puts ActiveSupport::TimeZone::MAPPING.keys'
+  $ ruby -ractive_support/values/time_zone \
+    -e 'puts ActiveSupport::TimeZone::MAPPING.keys'
+
+
+Records now remember the persistence context in which they were loaded/created
+------------------------------------------------------------------------------
+
+Consider the following code:
+
+... code-block:: ruby
+
+  record = Model.with(collection: 'other_collection') { Model.first }
+  record.update(field: 'value')
+
+Prior to Mongoid 9.0, this could would silently fail to execute the update,
+because the storage options (here, the specification of an alternate
+collection for the model) would not be remembered by the record. Thus, the
+record would be loaded from "other_collection", but when updated, would attempt
+to look for and update the document in the default collection for Model. To
+make this work, you would have had to specify the collection explicitly for
+every update.
+
+As of Mongoid 9.0, records that are created or loaded under explicit storage
+options, will remember those options (including a named client,
+a different database, or a different collection).
+
+If you need the legacy (pre-9.0) behavior, you can enable it with the following
+flag:
+
+... code-block:: ruby
+
+  Mongoid.legacy_persistence_context_behavior = true
+
+This flag defaults to false in Mongoid 9.
 
 
 Bug Fixes and Improvements

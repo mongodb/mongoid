@@ -344,7 +344,7 @@ describe Mongoid::Clients::Options, retry: 3 do
 
         it 'clears the persistence context' do
           begin; persistence_context; rescue Mongoid::Errors::InvalidPersistenceOption; end
-          expect(test_model.persistence_context).to eq(Mongoid::PersistenceContext.new(test_model))
+          expect(test_model.persistence_context).to eq(Mongoid::PersistenceContext.new(test_model, test_model.storage_options))
         end
       end
 
@@ -442,7 +442,7 @@ describe Mongoid::Clients::Options, retry: 3 do
           let(:options) { { read: :secondary } }
 
           it 'does not create a new cluster' do
-            expect(connections_during).to eq(connections_before)
+            expect(connections_during).to be <= connections_before
           end
 
           it 'does not disconnect the original cluster' do

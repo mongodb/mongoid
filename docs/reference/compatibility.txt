@@ -34,52 +34,17 @@ specified Mongoid versions.
      - Driver 2.17-2.10
      - Driver 2.9-2.7
 
-   * - 9.0
+   * - 8.0 thru 9.0
      - |checkmark|
      -
      -
 
-   * - 8.1
-     - |checkmark|
-     -
-     -
-
-   * - 8.0
-     - |checkmark|
-     -
-     -
-
-   * - 7.5
+   * - 7.2 thru 7.5
      - |checkmark|
      - |checkmark|
      -
 
-   * - 7.4
-     - |checkmark|
-     - |checkmark|
-     -
-
-   * - 7.3
-     - |checkmark|
-     - |checkmark|
-     -
-
-   * - 7.2
-     - |checkmark|
-     - |checkmark|
-     -
-
-   * - 7.1
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-
-   * - 7.0
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-
-   * - 6.4
+   * - 7.0 thru 7.1
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -107,9 +72,9 @@ is deprecated.
      - Ruby 2.4
      - Ruby 2.3
      - Ruby 2.2
-     - JRuby 9.2
-     - JRuby 9.3
      - JRuby 9.4
+     - JRuby 9.3
+     - JRuby 9.2
 
    * - 9.0
      - |checkmark|
@@ -121,9 +86,9 @@ is deprecated.
      -
      -
      -
+     - |checkmark|
      -
-     - |checkmark|
-     - |checkmark|
+     -
 
    * - 8.1
      - |checkmark|
@@ -138,7 +103,6 @@ is deprecated.
      -
      - |checkmark|
      -
-
 
    * - 8.0
      -
@@ -164,9 +128,9 @@ is deprecated.
      -
      -
      -
-     - D
-     - |checkmark|
      -
+     - |checkmark|
+     - D
 
    * - 7.4
      -
@@ -178,9 +142,9 @@ is deprecated.
      -
      -
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.3
      -
@@ -192,9 +156,9 @@ is deprecated.
      - D
      - D
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.2
      -
@@ -206,9 +170,9 @@ is deprecated.
      - D
      - D
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.1
      -
@@ -220,9 +184,9 @@ is deprecated.
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      -
+     -
+     -
      - |checkmark|
-     -
-     -
 
    * - 7.0
      -
@@ -234,23 +198,9 @@ is deprecated.
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
-     - |checkmark|
-     -
-     -
-
-   * - 6.4
-     -
-     -
      -
      -
      - |checkmark|
-     - |checkmark|
-     - |checkmark| [#ruby-2.4]_
-     - |checkmark|
-     - |checkmark| [#ruby-2.2]_
-     - |checkmark|
-     -
-     -
 
 .. [#mongoid-7.3-ruby-3.0] Mongoid version 7.3.2 or higher is required.
 
@@ -296,7 +246,7 @@ and will be removed in a next version.
      - MongoDB 3.0
      - MongoDB 2.6
 
-   * - 9.0
+   * - 8.0 thru 9.0
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -309,33 +259,7 @@ and will be removed in a next version.
      -
      -
 
-   * - 8.1
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     -
-     -
-     -
-     -
-
-   * - 8.0
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     -
-     -
-     -
-     -
-
-   * - 7.5
+   * - 7.4 thru 7.5
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -348,72 +272,7 @@ and will be removed in a next version.
      - D
      - D
 
-   * - 7.4
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.3
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.2
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.1
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 7.0
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - D
-     - D
-     - D
-     - D
-
-   * - 6.4
+   * - 7.0 thru 7.3
      -
      -
      - |checkmark|
@@ -456,15 +315,7 @@ are supported by Mongoid.
      -
      -
 
-   * - 8.1
-     - |checkmark| [#rails-7.1]_
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark| [#rails-5-ruby-3.0]_
-     -
-
-   * - 8.0
+   * - 8.0 thru 8.1
      - |checkmark| [#rails-7.1]_
      - |checkmark|
      - |checkmark|
@@ -520,14 +371,6 @@ are supported by Mongoid.
      - |checkmark|
      - |checkmark|
 
-   * - 6.4
-     -
-     -
-     -
-     -
-     - |checkmark|
-     - |checkmark|
-
 .. [#rails-5-ruby-3.0] Using Rails 5.x with Ruby 3 is not supported.
 
 .. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
@@ -541,3 +384,85 @@ are supported by Mongoid.
   8.0 and 8.1 stable branches.
 
 .. include:: /includes/unicode-checkmark.rst
+.. include:: /includes/unicode-ballot-x.rst
+
+Rails Frameworks Support
+------------------------
+
+Ruby on Rails is comprised of a number of frameworks, which Mongoid attempts to
+provide compatibility with wherever possible.
+
+Though Mongoid attempts to offer API compatibility with `Active Record <https://guides.rubyonrails.org/active_record_basics.html>`_,
+libraries that depend directly on Active Record may not work as expected when
+Mongoid is used as a drop-in replacement.
+
+.. note::
+
+  Mongoid can be used alongside Active Record within the same application without issue.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Rails Framework
+     - Supported?
+
+   * - ``ActionCable``
+     - |checkmark| [#rails-actioncable-dependency]_
+
+   * - ``ActionMailbox``
+     - |x| [#rails-activerecord-dependency]_
+
+   * - ``ActionMailer``
+     - |checkmark|
+
+   * - ``ActionPack``
+     - |checkmark|
+
+   * - ``ActionText``
+     - |x| [#rails-activerecord-dependency]_
+
+   * - ``ActionView``
+     - |checkmark|
+
+   * - ``ActiveJob``
+     - |checkmark| [#rails-activejob-dependency]_
+
+   * - ``ActiveModel``
+     - |checkmark| [#rails-activemodel-dependency]_
+
+   * - ``ActiveStorage``
+     - |x| [#rails-activerecord-dependency]_
+
+   * - ``ActiveSupport``
+     - |checkmark| [#rails-activesupport-dependency]_
+
+.. [#rails-actioncable-dependency] There is currently no MongoDB adapter for
+   ``ActionCable``, however any existing adapter (such as `Redis <https://guides.rubyonrails.org/action_cable_overview.html#redis-adapter>`_)
+   can be used successfully in conjunction with Mongoid models
+
+.. [#rails-activerecord-dependency] Depends directly on ``ActiveRecord``
+
+.. [#rails-activemodel-dependency] ``Mongoid::Document`` includes ``ActiveModel::Model``
+   and leverages ``ActiveModel::Validations`` for validations
+
+.. [#rails-activesupport-dependency] ``Mongoid`` requires ``ActiveSupport`` and
+   uses it extensively, including ``ActiveSupport::TimeWithZone`` for time handling.
+
+
+
+.. [#rails-activejob-dependency] Serialization of BSON & Mongoid objects works best
+   if you explicitly send ``BSON::ObjectId``'s as strings, and reconstitute them in the job:
+
+   .. code-block:: ruby
+
+    record = Model.find(...)
+    MyJob.perform_later(record._id.to_s)
+
+    class MyJob < ApplicationJob
+      def perform(id_as_string)
+        record = Model.find(id_as_string)
+        # ...
+      end
+    end
