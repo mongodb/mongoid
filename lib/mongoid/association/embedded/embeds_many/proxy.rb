@@ -347,8 +347,8 @@ module Mongoid
           # @yield [ Object ] Yields each enumerable element to the block.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
-          def find(*args, &block)
-            criteria.find(*args, &block)
+          def find(...)
+            criteria.find(...)
           end
 
           # Get all the documents in the association that are loaded into memory.

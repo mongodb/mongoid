@@ -6,7 +6,6 @@
     a:
       $bitsAllClear: 35
   matches: true
-  min_server_version: 3.2
 
 - name: existing field - does not match with int
   document:
@@ -16,7 +15,6 @@
     a:
       $bitsAllClear: 24
   matches: false
-  min_server_version: 3.2
 
 - name: existing field - matches with binData
   document:
@@ -29,7 +27,6 @@
           IW==
         type: :generic
   matches: true
-  min_server_version: 3.2
 
 - name: existing field - does not match with binData
   document:
@@ -42,7 +39,6 @@
           IW==
         type: :generic
   matches: false
-  min_server_version: 3.2
 
 - name: existing binData field matches
   document:
@@ -54,7 +50,6 @@
     a:
       $bitsAllClear: 20
   matches: true
-  min_server_version: 3.2
 
 - name: existing binData field does not match
   document:
@@ -66,7 +61,6 @@
     a:
       $bitsAllClear: 15
   matches: false
-  min_server_version: 3.2
 
 - name: existing field - matches with array
   document:
@@ -76,7 +70,6 @@
     a:
       $bitsAllClear: [0, 3]
   matches: true
-  min_server_version: 3.2
 
 - name: existing field - does not match with array
   document:
@@ -86,7 +79,6 @@
     a:
       $bitsAllClear: [0, 2]
   matches: false
-  min_server_version: 3.2
 
 - name: float condition representable as an integer
   document:
@@ -96,7 +88,6 @@
     a:
       $bitsAllClear: 35.0
   matches: true
-  min_server_version: 3.2
 
 - name: float condition not representable as an integer
   document:
@@ -106,7 +97,6 @@
     a:
       $bitsAllClear: 35.1
   error: true
-  min_server_version: 3.2
 
 - name: string condition
   document:
@@ -116,7 +106,6 @@
     a:
       $bitsAllClear: hello
   error: true
-  min_server_version: 3.2
 
 - name: empty array condition
   document:
@@ -126,7 +115,6 @@
     a:
       $bitsAllClear: []
   matches: true
-  min_server_version: 3.2
 
 - name: integer 0 condition
   document:
@@ -136,7 +124,6 @@
     a:
       $bitsAllClear: 0
   matches: true
-  min_server_version: 3.2
 
 - name: negative integer condition
   document:
@@ -146,7 +133,6 @@
     a:
       $bitsAllClear: -1
   error: true
-  min_server_version: 3.2
 
 - name: negative float condition
   document:
@@ -156,4 +142,3 @@
     a:
       $bitsAllClear: -1.0
   error: true
-  min_server_version: 3.2

@@ -108,7 +108,7 @@ module Mongoid
                 original, current = send("#{foreign_key}_previous_change")
 
                 unless original.nil?
-                  association.klass.with(persistence_context) do |_class|
+                  association.klass.with(persistence_context.for_child(association.klass)) do |_class|
                     _class.decrement_counter(cache_column, original)
                   end
                 end

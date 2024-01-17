@@ -5,7 +5,6 @@
     prices:
       $type: 4
   matches: true
-  min_server_version: 3.6
 
 - name: existing field - does not match array
   document:
