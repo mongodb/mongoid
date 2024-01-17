@@ -43,14 +43,6 @@ jobs:
           gemfile: Gemfile
           experimental: false
         - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: master
-          gemfile: gemfiles/driver_master.gemfile
-          experimental: true
-        - mongodb: '6.0'
           ruby: ruby-3.0
           topology: replica_set
           os: ubuntu-20.04
@@ -109,17 +101,7 @@ jobs:
           gemfile: gemfiles/rails-6.0.gemfile
           experimental: false
         - mongodb: '6.0'
-          ruby: ruby-2.7
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '5.2'
-          fle: helper
-          gemfile: gemfiles/rails-5.2.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: jruby-9.3
+          ruby: jruby-9.4
           topology: server
           os: ubuntu-20.04
           task: test
