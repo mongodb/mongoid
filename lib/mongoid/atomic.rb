@@ -179,12 +179,13 @@ module Mongoid
     #
     # @return [ Object ] The associated path.
     def atomic_paths
-      @atomic_paths ||= if _association
-                          _association.path(self)
-                        else
-                          Atomic::Paths::Root.new(self)
-                        end
+      if _association
+        _association.path(self)
+      else
+        Atomic::Paths::Root.new(self)
+      end
     end
+
 
     # Get all the attributes that need to be pulled.
     #
