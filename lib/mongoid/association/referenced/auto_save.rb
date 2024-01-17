@@ -60,7 +60,7 @@ module Mongoid
                 __autosaving__ do
                   if assoc_value = ivar(association.name)
                     Array(assoc_value).each do |doc|
-                      pc = doc.persistence_context? ? doc.persistence_context : persistence_context
+                      pc = doc.persistence_context? ? doc.persistence_context : persistence_context.for_child(doc)
                       doc.with(pc) do |d|
                         d.save
                       end

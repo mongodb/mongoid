@@ -129,16 +129,15 @@ module Mongoid
           unless updates.empty?
             coll = collection(_root)
             selector = atomic_selector
+
+            # TODO: DRIVERS-716: If a new "Bulk Write" API is introduced, it may
+            # become possible to handle the writes for conflicts in the following call.
             coll.find(selector).update_one(positionally(selector, updates), session: _session)
 
             # The following code applies updates which would cause
             # path conflicts in MongoDB, for example when changing attributes
             # of foo.0.bars while adding another foo. Each conflicting update
             # is applied using its own write.
-            #
-            # TODO: MONGOID-5026: reduce the number of writes performed by
-            # more intelligently combining the writes such that there are
-            # fewer conflicts.
             conflicts.each_pair do |modifier, changes|
 
               # Group the changes according to their root key which is

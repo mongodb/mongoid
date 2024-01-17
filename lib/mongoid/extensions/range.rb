@@ -39,8 +39,6 @@ module Mongoid
         # @param [ Hash ] object The object to demongoize.
         #
         # @return [ Range | nil ] The range, or nil if object cannot be represented as range.
-        #
-        # @note Ruby 2.6 and lower do not support endless ranges that Ruby 2.7+ support.
         def demongoize(object)
           return if object.nil?
           if object.is_a?(Hash)
@@ -50,7 +48,7 @@ module Mongoid
                 ::Range.new(hash["min"] || hash[:min],
                             hash["max"] || hash[:max],
                             hash["exclude_end"] || hash[:exclude_end])
-              rescue ArgumentError # can be removed when Ruby version >= 2.7
+              rescue ArgumentError
                 nil
               end
             end
