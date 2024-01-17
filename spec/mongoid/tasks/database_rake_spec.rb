@@ -11,9 +11,7 @@ shared_context "rake task" do
   let(:task_file) { "mongoid/tasks/database" }
 
   let(:logger) do
-    double("logger").tap do |log|
-      allow(log).to receive(:info)
-    end
+    Logger.new(STDOUT, level: :error, formatter: ->(_sev, _dt, _prog, msg) { msg })
   end
 
   before do
@@ -30,6 +28,34 @@ shared_context "rake task" do
     it "receives create_indexes" do
       expect(Mongoid::Tasks::Database).to receive(:create_indexes)
       task.invoke
+    end
+  end
+
+  shared_examples_for 'create_search_indexes' do
+    [ nil, *%w( 1 true yes on ) ].each do |truthy|
+      context "when WAIT_FOR_SEARCH_INDEXES is #{truthy.inspect}" do
+        local_env 'WAIT_FOR_SEARCH_INDEXES' => truthy
+
+        it 'receives create_search_indexes with wait: true' do
+          expect(Mongoid::Tasks::Database)
+            .to receive(:create_search_indexes)
+            .with(wait: true)
+          task.invoke
+        end
+      end
+    end
+
+    %w( 0 false no off bogus ).each do |falsey|
+      context "when WAIT_FOR_SEARCH_INDEXES is #{falsey.inspect}" do
+        local_env 'WAIT_FOR_SEARCH_INDEXES' => falsey
+
+        it 'receives create_search_indexes with wait: false' do
+          expect(Mongoid::Tasks::Database)
+            .to receive(:create_search_indexes)
+            .with(wait: false)
+          task.invoke
+        end
+      end
     end
   end
 
@@ -205,6 +231,26 @@ describe "db:mongoid:create_indexes" do
   end
 end
 
+describe 'db:mongoid:create_search_indexes' do
+  include_context 'rake task'
+
+  it_behaves_like 'create_search_indexes'
+
+  it 'calls load_models' do
+    expect(task.prerequisites).to include('load_models')
+  end
+
+  it 'calls environment' do
+    expect(task.prerequisites).to include('environment')
+  end
+
+  context 'when using rails task' do
+    include_context 'rails rake task'
+
+    it_behaves_like 'create_search_indexes'
+  end
+end
+
 describe "db:mongoid:create_collections" do
   include_context "rake task"
 
@@ -289,6 +335,28 @@ describe "db:mongoid:remove_indexes" do
   end
 end
 
+describe 'db:mongoid:remove_search_indexes' do
+  include_context 'rake task'
+
+  it 'receives remove_search_indexes' do
+    expect(Mongoid::Tasks::Database).to receive(:remove_search_indexes)
+    task.invoke
+  end
+
+  it 'calls environment' do
+    expect(task.prerequisites).to include('environment')
+  end
+
+  context 'when using rails task' do
+    include_context 'rails rake task'
+
+    it 'receives remove_search_indexes' do
+      expect(Mongoid::Tasks::Database).to receive(:remove_search_indexes)
+      task.invoke
+    end
+  end
+end
+
 describe "db:mongoid:drop" do
   include_context "rake task"
 
@@ -353,7 +421,7 @@ describe "db:mongoid:encryption:create_data_key" do
 
     expect_any_instance_of(Mongo::ClientEncryption)
       .to receive(:create_data_key)
-      .with('local')
+      .with('local', {})
       .and_call_original
   end
 

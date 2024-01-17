@@ -81,7 +81,7 @@ module Mongoid
       #
       # @return [ String ] The type setter method.
       def type_setter
-        @type_setter ||= type.__setter__
+        @type_setter ||= "#{type}=" if type
       end
 
       # Whether trying to bind an object using this association should raise
@@ -233,7 +233,7 @@ module Mongoid
       #
       # @return [ String ] The name of the setter.
       def inverse_type_setter
-        @inverse_type_setter ||= inverse_type.__setter__
+        @inverse_type_setter ||= "#{inverse_type}=" if inverse_type
       end
 
       # Get the name of the method to check if the foreign key has changed.
@@ -300,9 +300,14 @@ module Mongoid
                       end
       end
 
-      # @return [ Array<String> ] The associations above this one in the inclusion tree.
+      # The associations above this one in the inclusion tree.
+      #
+      # @return [ Array<String> ] The associations.
       attr_accessor :parent_inclusions
 
+      # The associations above this one in the inclusion tree.
+      #
+      # @return [ Array<String> ] The associations.
       def parent_inclusions
         @parent_inclusions ||= []
       end

@@ -26,6 +26,12 @@ module Mongoid
         @encryption_options[:key_id]
       end
 
+      # @return [ String | nil ] The name of the field that contains the
+      #   key alt name to use for encryption; if not specified, nil is returned.
+      def key_name_field
+        @encryption_options[:key_name_field]
+      end
+
       # Override the key_id for the field.
       #
       # This method is solely for testing purposes and should not be used in

@@ -3,6 +3,10 @@
 
 module Mongoid
   module Fields
+
+    # Represents a BSON document field definition which stores
+    # a foreign key that references the ID of another document.
+    # Used for association behavior.
     class ForeignKey < Standard
 
       # Adds the atomic changes for this type of resizable field.
@@ -10,7 +14,7 @@ module Mongoid
       # @example Add the atomic changes.
       #   field.add_atomic_changes(doc, "key", {}, [], [])
       #
-      # @todo: Durran: Refactor, big time.
+      # @todo: Refactor, big time.
       #
       # @param [ Document ] document The document to add to.
       # @param [ String ] name The name of the field.
@@ -91,7 +95,7 @@ module Mongoid
       # @return [ Object ] The mongoized object.
       def mongoize(object)
         if type.resizable? || object_id_field?
-          type.__mongoize_fk__(association, object)
+          mongoize_foreign_key(object)
         else
           related_id_field.mongoize(object)
         end
@@ -119,6 +123,28 @@ module Mongoid
       end
 
       private
+
+      # Convert the provided object to a Mongo-friendly foreign key.
+      #
+      # @example Convert the object to a foreign key.
+      #   mongoize_foreign_key(object)
+      #
+      # @param [ Object ] object The object to convert.
+      #
+      # @return [ Object ] The converted object.
+      def mongoize_foreign_key(object)
+        if type == Array || type == Set
+          object = object.to_a if type == Set || object.is_a?(Set)
+
+          if object.resizable?
+            object.blank? ? object : association.convert_to_foreign_key(object)
+          else
+            object.blank? ? [] : association.convert_to_foreign_key(Array(object))
+          end
+        elsif !(object.nil? || object == '')
+          association.convert_to_foreign_key(object)
+        end
+      end
 
       # Evaluate the default proc. In some cases we need to instance exec,
       # in others we don't.
@@ -148,7 +174,6 @@ module Mongoid
       def primary_key_field
         @primary_key_field ||= association.klass.fields[association.primary_key]
       end
-
 
       # This is used when default values need to be serialized. Most of the
       # time just return the object.

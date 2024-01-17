@@ -41,6 +41,46 @@ RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.pattern = "spec/**/*_spec.rb"
 end
 
+desc 'Build and validate the evergreen config'
+task eg: %w[ eg:build eg:validate ]
+
+# 'eg' == 'evergreen', but evergreen is too many letters for convenience
+namespace :eg do
+  desc 'Builds the .evergreen/config.yml file from the templates'
+  task :build do
+    ruby '.evergreen/update-evergreen-configs'
+  end
+
+  desc 'Validates the .evergreen/config.yml file'
+  task :validate do
+    system 'evergreen validate --project mongoid .evergreen/config.yml'
+  end
+
+  desc 'Updates the evergreen executable to the latest available version'
+  task :update do
+    system 'evergreen get-update --install'
+  end
+
+  desc 'Runs the current branch as an evergreen patch'
+  task :patch do
+    system 'evergreen patch --uncommitted --project mongoid --browse --auto-description --yes'
+  end
+end
+
+namespace :generate do
+  desc 'Generates a mongoid.yml from the template'
+  task :config do
+    require 'mongoid'
+    require 'erb'
+
+    template_path = 'lib/rails/generators/mongoid/config/templates/mongoid.yml'
+    database_name = ENV['DATABASE_NAME'] || 'my_db'
+
+    config = ERB.new(File.read(template_path), trim_mode: '-').result(binding)
+    File.write('mongoid.yml', config)
+  end
+end
+
 CLASSIFIERS = [
   [%r,^mongoid/attribute,, :attributes],
   [%r,^mongoid/association/[or],, :associations_referenced],
@@ -89,7 +129,7 @@ desc "Generate all documentation"
 task :docs => 'docs:yard'
 
 namespace :docs do
-  desc "Generate yard documention"
+  desc "Generate yard documentation"
   task :yard do
     out = File.join('yard-docs', Mongoid::VERSION)
     FileUtils.rm_rf(out)

@@ -16,11 +16,12 @@ module Mongoid
       # @param [ String | nil ] client_name The name of the client to take
       #   auto_encryption_options from. If not provided, the default client
       #   will be used.
+      # @param [ String | nil ] key_alt_name The alternate name of the key.
       #
       # @return [ Hash ] A hash containing the key id as :key_id,
       #   kms provider name as :kms_provider, and key vault namespace as
       #   :key_vault_namespace.
-      def create_data_key(kms_provider_name: nil, client_name: nil)
+      def create_data_key(client_name: nil, kms_provider_name: nil, key_alt_name: nil)
         kms_provider_name, kms_providers, key_vault_namespace = prepare_arguments(
           kms_provider_name,
           client_name
@@ -31,12 +32,16 @@ module Mongoid
           key_vault_namespace: key_vault_namespace,
           kms_providers: kms_providers
         )
-        data_key_id = client_encryption.create_data_key(kms_provider_name)
+        client_encryption_opts = {}.tap do |opts|
+          opts[:key_alt_names] = [key_alt_name] if key_alt_name
+        end
+        data_key_id = client_encryption.create_data_key(kms_provider_name, client_encryption_opts)
         {
           key_id: Base64.strict_encode64(data_key_id.data),
           kms_provider: kms_provider_name,
-          key_vault_namespace: key_vault_namespace
-        }
+          key_vault_namespace: key_vault_namespace,
+          key_alt_name: key_alt_name
+        }.compact
       end
 
       private
