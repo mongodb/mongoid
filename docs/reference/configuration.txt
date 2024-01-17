@@ -171,10 +171,12 @@ for details on driver options.
           # roles:
           #   - 'dbOwner'
 
-          # Change the default authentication mechanism. Valid options are: :scram,
-          # :mongodb_cr, :mongodb_x509, and :plain. Note that all authentication
-          # mechanisms require username and password, with the exception of :mongodb_x509.
-          # Default is :scram since MongoDB 3.0; earlier versions defaulted to :plain.
+          # Change the default authentication mechanism. Valid options include:
+          # :scram, :scram256, :mongodb_cr, :mongodb_x509, :gssapi, :aws, :plain.
+          # MongoDB Server defaults to :scram, which will use "SCRAM-SHA-256" if available,
+          # otherwise fallback to "SCRAM-SHA-1" (:scram256 will always use "SCRAM-SHA-256".)
+          # This setting is handled by the MongoDB Ruby Driver. Please refer to:
+          # https://mongodb.com/docs/ruby-driver/current/reference/authentication/
           # auth_mech: :scram
 
           # The database or source to authenticate the user against.
@@ -263,10 +265,10 @@ for details on driver options.
       #   the setting is ignored.
       # allow_bson5_decimal128: false
 
-      # Application name that is printed to the mongodb logs upon establishing
-      # a connection in server versions >= 3.4. Note that the name cannot
-      # exceed 128 bytes. It is also used as the database name if the
-      # database name is not explicitly defined.
+      # Application name that is printed to the MongoDB logs upon establishing
+      # a connection. Note that the name cannot exceed 128 bytes in length.
+      # It is also used as the database name if the database name is not
+      # explicitly defined. (default: nil)
       # app_name: nil
 
       # When this flag is false, callbacks for embedded documents will not be
@@ -280,7 +282,7 @@ for details on driver options.
       # around_callbacks_for_embeds: false
 
       # Sets the async_query_executor for the application. By default the thread pool executor
-      #   is set to `:immediate. Options are:
+      # is set to `:immediate`. Options are:
       #
       #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
       #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
@@ -319,6 +321,30 @@ for details on driver options.
       # Whether to join nested persistence contexts for atomic operations
       # to parent contexts by default.
       # join_contexts: false
+
+      # When this flag is false (the default as of Mongoid 9.0), a document that
+      # is created or loaded will remember the storage options that were active
+      # when it was loaded, and will use those same options by default when
+      # saving or reloading itself.
+      #
+      # When this flag is true you'll get pre-9.0 behavior, where a document will
+      # not remember the storage options from when it was loaded/created, and
+      # subsequent updates will need to explicitly set up those options each time.
+      #
+      # For example:
+      #
+      #    record = Model.with(collection: 'other_collection') { Model.first }
+      #
+      # This will try to load the first document from 'other_collection' and
+      # instantiate it as a Model instance. Pre-9.0, the record object would
+      # not remember that it came from 'other_collection', and attempts to
+      # update it or reload it would fail unless you first remembered to
+      # explicitly specify the collection every time.
+      #
+      # As of Mongoid 9.0, the record will remember that it came from
+      # 'other_collection', and updates and reloads will automatically default
+      # to that collection, for that record object.
+      # legacy_persistence_context_behavior: false
 
       # When this flag is false, a document will become read-only only once the
       # #readonly! method is called, and an error will be raised on attempting
