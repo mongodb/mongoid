@@ -238,7 +238,7 @@ describe Mongoid::Tasks::Database do
 
       it 'invokes both create_search_indexes and wait_for_search_indexes' do
         expect(searchable_model_spy).to have_received(:create_search_indexes)
-        expect(described_class).to have_received(:wait_for_search_indexes).with(searchable_model_spy => index_names)
+        expect(described_class).to have_received(:wait_for_search_indexes).with({ searchable_model_spy => index_names })
       end
     end
 
