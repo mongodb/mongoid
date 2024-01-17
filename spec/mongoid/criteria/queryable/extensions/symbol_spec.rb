@@ -13,6 +13,10 @@ describe Symbol do
       end
     end
 
+    after do
+      Symbol.undef_method(:fubar)
+    end
+
     let(:fubar) do
       :testing.fubar
     end

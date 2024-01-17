@@ -57,7 +57,11 @@ module Mongoid
       #
       # @return [ Hash ] The defaults.
       def reset
-        settings.replace(defaults)
+        # do this via the setter for each option, so that any defined on_change
+        # handlers can be invoked.
+        defaults.each do |setting, default|
+          send(:"#{setting}=", default)
+        end
       end
 
       # Get the settings or initialize a new empty hash.
@@ -79,8 +83,8 @@ module Mongoid
       def log_level
         if level = settings[:log_level]
           unless level.is_a?(Integer)
-            level = level.upcase.to_s
-            level = "Logger::#{level}".constantize
+            # JRuby String#constantize does not work here.
+            level = Logger.const_get(level.upcase.to_s)
           end
           level
         end
