@@ -11,7 +11,38 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :storage_options, instance_writer: false, default: storage_options_defaults
+        class_attribute :storage_options, instance_accessor: false, default: storage_options_defaults
+      end
+
+      # Remembers the storage options that were active when the current object
+      # was instantiated/created.
+      #
+      # @return [ Hash | nil ] the storage options that have been cached for
+      #   this object instance (or nil if no storage options have been
+      #   cached).
+      #
+      # @api private
+      attr_accessor :remembered_storage_options
+
+      # The storage options that apply to this record, consisting of both
+      # the class-level declared storage options (e.g. store_in) merged with
+      # any remembered storage options.
+      #
+      # @return [ Hash ] the storage options for the record
+      #
+      # @api private
+      def storage_options
+        self.class.storage_options.merge(remembered_storage_options || {})
+      end
+
+      # Saves the storage options from the current persistence context.
+      #
+      # @api private
+      def remember_storage_options!
+        return if Mongoid.legacy_persistence_context_behavior
+
+        opts = persistence_context.requested_storage_options
+        self.remembered_storage_options = opts if opts
       end
 
       module ClassMethods
