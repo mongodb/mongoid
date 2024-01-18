@@ -179,7 +179,7 @@ module Mongoid
     #
     # @return [ Object ] The associated path.
     def atomic_paths
-      if _association
+      @atomic_paths ||= if _association
         _association.path(self)
       else
         Atomic::Paths::Root.new(self)
