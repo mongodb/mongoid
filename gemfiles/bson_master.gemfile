@@ -1,6 +1,5 @@
 # rubocop:todo all
 source "https://rubygems.org"
-gemspec path: '..'
 
 gem 'bson', git: "https://github.com/mongodb/bson-ruby"
 gem 'mongo'
