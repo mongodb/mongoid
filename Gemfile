@@ -1,7 +1,7 @@
 # rubocop:todo all
 source 'https://rubygems.org'
 
-gemspec
+gemspec name: 'mongoid-odm'
 
 require_relative './gemfiles/standard'
 
