@@ -30,7 +30,7 @@ for variant in mri; do
   if test $variant = jruby; then
     docker cp $RELEASE_NAME-$variant:/app/pkg/$NAME-$VERSION-java.gem .
   else
-    docker cp $RELEASE_NAME-$variant:/app/pkg/$NAME-$VERSION.gem .
+    docker cp $RELEASE_NAME-$variant:/app/pkg/$NAME*.gem .
   fi
 
   docker kill $RELEASE_NAME-$variant
@@ -38,6 +38,7 @@ done
 
 echo
 echo Built: $NAME-$VERSION.gem
+echo Built: $NAME-odm-$VERSION.gem
 #echo Built: $NAME-$VERSION-java.gem
 echo
 
@@ -45,4 +46,5 @@ git tag -a v$VERSION -m "Tagging release: $VERSION"
 git push origin v$VERSION
 
 gem push $NAME-$VERSION.gem
+gem push $NAME-odm-$VERSION.gem
 #gem push $NAME-$VERSION-java.gem

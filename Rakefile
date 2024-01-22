@@ -2,7 +2,6 @@
 # rubocop:todo all
 
 require "bundler"
-require "bundler/gem_tasks"
 Bundler.setup
 
 ROOT = File.expand_path(File.join(File.dirname(__FILE__)))
@@ -16,12 +15,12 @@ require 'mrss/spec_organizer'
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
 
-tasks = Rake.application.instance_variable_get('@tasks')
-tasks['release:do'] = tasks.delete('release')
-
 task :gem => :build
+
+desc 'Build mongoid and mongoid-odm gems'
 task :build do
   system "gem build mongoid.gemspec"
+  system "gem build mongoid-odm.gemspec"
 end
 
 task :install => :build do
