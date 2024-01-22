@@ -6,7 +6,7 @@ gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver"
 
 gem 'actionpack'
 
-gemspec path: '..'
+gemspec path: '..', name: 'mongoid-odm'
 
 require_relative './standard'
 

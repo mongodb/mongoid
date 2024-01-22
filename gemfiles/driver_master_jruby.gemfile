@@ -12,7 +12,7 @@ gem 'actionpack'
 # https://github.com/jruby/jruby/issues/6573
 gem 'i18n', '~> 1.0', '< 1.8.8'
 
-gemspec path: '..'
+gemspec path: '..', name: 'mongoid-odm'
 
 require_relative './standard'
 
