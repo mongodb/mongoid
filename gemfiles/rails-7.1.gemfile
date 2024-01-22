@@ -1,8 +1,8 @@
 # rubocop:todo all
 source 'https://rubygems.org'
 
-gem 'actionpack', '~> 5.2'
-gem 'activemodel', '~> 5.2'
+gem 'actionpack', '~> 7.1'
+gem 'activemodel', '~> 7.1'
 
 gemspec path: '..'
 

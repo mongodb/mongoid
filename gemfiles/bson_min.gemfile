@@ -2,7 +2,7 @@
 source "https://rubygems.org"
 gemspec path: '..'
 
-gem 'bson', '4.14.0'
+gem 'bson', '4.14.1'
 gem 'mongo'
 
 gem 'actionpack'

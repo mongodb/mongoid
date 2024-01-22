@@ -52,6 +52,8 @@ if echo $RVM_RUBY |grep -q jruby && test "$DRIVER" = master-jruby; then
     gem install *.gem)
 fi
 
+git config --global --add safe.directory "*"
+
 if test "$DRIVER" = "master"; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_master.gemfile

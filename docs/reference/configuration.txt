@@ -171,10 +171,12 @@ for details on driver options.
           # roles:
           #   - 'dbOwner'
 
-          # Change the default authentication mechanism. Valid options are: :scram,
-          # :mongodb_cr, :mongodb_x509, and :plain. Note that all authentication
-          # mechanisms require username and password, with the exception of :mongodb_x509.
-          # Default is :scram since MongoDB 3.0; earlier versions defaulted to :plain.
+          # Change the default authentication mechanism. Valid options include:
+          # :scram, :scram256, :mongodb_cr, :mongodb_x509, :gssapi, :aws, :plain.
+          # MongoDB Server defaults to :scram, which will use "SCRAM-SHA-256" if available,
+          # otherwise fallback to "SCRAM-SHA-1" (:scram256 will always use "SCRAM-SHA-256".)
+          # This setting is handled by the MongoDB Ruby Driver. Please refer to:
+          # https://mongodb.com/docs/ruby-driver/current/reference/authentication/
           # auth_mech: :scram
 
           # The database or source to authenticate the user against.
@@ -263,10 +265,10 @@ for details on driver options.
       #   the setting is ignored.
       # allow_bson5_decimal128: false
 
-      # Application name that is printed to the mongodb logs upon establishing
-      # a connection in server versions >= 3.4. Note that the name cannot
-      # exceed 128 bytes. It is also used as the database name if the
-      # database name is not explicitly defined.
+      # Application name that is printed to the MongoDB logs upon establishing
+      # a connection. Note that the name cannot exceed 128 bytes in length.
+      # It is also used as the database name if the database name is not
+      # explicitly defined. (default: nil)
       # app_name: nil
 
       # When this flag is false, callbacks for embedded documents will not be
@@ -280,7 +282,7 @@ for details on driver options.
       # around_callbacks_for_embeds: false
 
       # Sets the async_query_executor for the application. By default the thread pool executor
-      #   is set to `:immediate. Options are:
+      # is set to `:immediate`. Options are:
       #
       #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
       #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
@@ -744,11 +746,11 @@ It may be desirable to further configure TLS options in your application, for
 example by enabling or disabling certain ciphers.
 
 This can be done by setting TLS context hooks on the Ruby driver -- TLS context
-hooks are user-provided ``Proc``s that will be invoked before any TLS socket
+hooks are user-provided ``Proc``\(s) that will be invoked before any TLS socket
 connection in the driver and can be used to modify the underlying
 ``OpenSSL::SSL::SSLContext`` object used by the socket.
 
-To set TLS context hooks, add ``Proc``s to the ``Mongo.tls_context_hooks``
+To set TLS context hooks, add ``Proc``\(s) to the ``Mongo.tls_context_hooks``
 array. This can be done in an initializer. The example below adds a hook
 that only enables the "AES256-SHA" cipher.
 
