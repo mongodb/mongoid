@@ -32,6 +32,9 @@ Gem::Specification.new do |s|
     warn "[#{s.name}] Warning: No private key present, creating unsigned gem."
   end
 
+  s.required_ruby_version     = ">= 2.7"
+  s.required_rubygems_version = ">= 1.3.6"
+
   s.add_dependency "mongoid-odm"
   s.add_dependency "railsmdb"
 
