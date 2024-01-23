@@ -17,6 +17,14 @@ The complete list of releases is available `on GitHub
 please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
+Aggregable API is deprecated
+----------------------------
+
+Mongoid 9 deprecated aggregable API in modules
+``Mongoid::Contextual::Aggregable::Memory``,
+``Mongoid::Contextual::Aggregable::Mongo``, and
+``Mongoid::Contextual::Aggregable::None``.
+
 
 Support for Ruby 2.6 and JRuby 9.3 Dropped
 -------------------------------------------
