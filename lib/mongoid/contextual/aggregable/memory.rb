@@ -31,7 +31,6 @@ module Mongoid
         # @param [ Symbol ] field The field to average.
         #
         # @return [ Numeric ] The average.
-        # @deprecated
         def avg(field)
           total = count { |doc| !doc.send(field).nil? }
           return nil unless total > 0
@@ -39,7 +38,6 @@ module Mongoid
           total = total.to_f if total.is_a?(Integer)
           sum(field) / total
         end
-        Mongoid.deprecate(self, :avg)
 
         # Get the max value of the provided field. If provided a block, will
         # return the Document with the greatest value for the field, in
@@ -57,13 +55,11 @@ module Mongoid
         #
         # @return [ Numeric | Document ] The max value or document with the max
         #   value.
-        # @deprecated
         def max(field = nil)
           return super() if block_given?
 
           aggregate_by(field, :max)
         end
-        Mongoid.deprecate(self, :max)
 
         # Get the min value of the provided field. If provided a block, will
         # return the Document with the smallest value for the field, in
@@ -81,13 +77,11 @@ module Mongoid
         #
         # @return [ Numeric | Document ] The min value or document with the min
         #   value.
-        # @deprecated
         def min(field = nil)
           return super() if block_given?
 
           aggregate_by(field, :min)
         end
-        Mongoid.deprecate(self, :min)
 
         # Get the sum value of the provided field. If provided a block, will
         # return the sum in accordance with Ruby's enumerable API.
@@ -101,13 +95,11 @@ module Mongoid
         # @param [ Symbol ] field The field to sum.
         #
         # @return [ Numeric ] The sum value.
-        # @deprecated
         def sum(field = nil)
           return super() if block_given?
 
           aggregate_by(field, :sum) || 0
         end
-        Mongoid.deprecate(self, :sum)
 
         private
 
