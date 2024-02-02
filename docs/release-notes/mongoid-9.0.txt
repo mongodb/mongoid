@@ -27,6 +27,58 @@ been made generally available!
 ``railsmdb`` makes it easier to work with MongoDB from the command line through
 common generators that Ruby on Rails developers are already familiar with.
 
+For example, you can use ``railsmdb`` to generate stubs for new Mongoid models:
+
+.. code-block:: sh
+
+    $ bin/railsmdb generate model person
+
+This will create a new model at ``app/models/person.rb``:
+
+.. code-block:: ruby
+
+    class Person
+      include Mongoid::Document
+      include Mongoid::Timestamp
+    end
+
+You can specify the fields of the model as well:
+
+.. code-block:: ruby
+
+    # bin/railsmdb generate model person name:string birth:date
+
+    class Person
+      include Mongoid::Document
+      include Mongoid::Timestamp
+      field :name, type: String
+      field :birth, type: Date
+    end
+
+You can instruct the generator to make the new model a subclass of another,
+by passing the ``--parent`` option:
+
+.. code-block:: ruby
+
+    # bin/railsmdb generate model student --parent=person
+
+    class Student < Person
+      include Mongoid::Timestamp
+    end
+
+And if you need to store your models in a different collection than can be
+inferred from the model name, you can specify ``--collection``:
+
+.. code-block:: ruby
+
+    # bin/railsmdb generate model course --collection=classes
+
+    class Course
+      include Mongoid::Document
+      include Mongoid::Timestamp
+      store_in collection: 'classes'
+    end
+
 For more information see the `GitHub Repository <https://github.com/mongodb/mongoid-railsmdb>`_.
 
 
