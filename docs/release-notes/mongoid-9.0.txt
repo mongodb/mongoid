@@ -20,10 +20,12 @@ the complete list of issues fixed in each release, including bug fixes.
 Railsmdb for Mongoid
 --------------------
 
-``railsmdb`` is a command-line utility for creating, updating, managing, and
-maintaining Rails applications that use Mongoid and MongoDB for data storage.
-It is an extension of (and supports all other functionality of) the ``rails``
-command from Ruby on Rails.
+To coincide with the release of Mongoid 9.0 a new command-line utility for creating,
+updating, managing, and maintaining Rails applications has also
+been made generally available!
+
+``railsmdb`` makes it easier to work with MongoDB from the command line through
+common generators that Ruby on Rails developers are already familiar with.
 
 For more information see the `GitHub Repository <https://github.com/mongodb/mongoid-railsmdb>`_.
 
