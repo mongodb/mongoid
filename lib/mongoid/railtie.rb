@@ -123,11 +123,9 @@ module Rails
         ActiveSupport.on_load :active_job do
           require 'mongoid/railties/bson_object_id_serializer'
 
-          config.after_initialize do
-            ActiveJob::Serializers.add_serializers(
-              [::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer]
-            )
-          end
+          ActiveJob::Serializers.add_serializers(
+            [::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer]
+          )
         end
       end
 
