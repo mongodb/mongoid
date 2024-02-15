@@ -22,6 +22,3 @@ the `railsmdb <https://github.com/mongodb/mongoid-railsmdb>`_ utility can be use
   contributing
   additional-resources
   ecosystem
-
-
-For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
