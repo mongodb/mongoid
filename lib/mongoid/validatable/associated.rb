@@ -16,32 +16,50 @@ module Mongoid
     #
     #     validates_associated :name, :addresses
     #   end
-    class AssociatedValidator < ActiveModel::EachValidator
+    class AssociatedValidator < ActiveModel::Validator
+      attr_reader :attributes
 
-      # Validates that the associations provided are either all nil or all
-      # valid. If neither is true then the appropriate errors will be added to
-      # the parent document.
+      def initialize(options)
+        @attributes = options[:attributes]
+      end
+
+      # Checks that the named associations of the given record
+      # (`attributes`) are valid. This does NOT load the associations
+      # from memory, and will only validate records that are dirty
+      # or unpersisted.
       #
-      # @example Validate the association.
-      #   validator.validate_each(document, :name, name)
+      # If anything is not valid, appropriate errors will be added to
+      # the `document` parameter.
+      #
+      # @param [ Mongoid::Document ] document the document with the
+      #   associations to validate.
+      def validate(document)
+        attributes.each do |attr_name|
+          relation = document.class.relations[attr_name]
+          validate_association(document, relation)
+        end
+      end
+
+      private
+
+      # Validates that the given association provided is either nil,
+      # persisted and unchanged, or invalid. Otherwise, the appropriate errors
+      # will be added to the parent document.
       #
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The association to validate.
-      # @param [ Object ] value The value of the association.
-      def validate_each(document, attribute, value)
-        begin
-          document.begin_validate
-          valid = Array.wrap(value).collect do |doc|
-            if doc.nil? || doc.flagged_for_destroy?
-              true
+      def validate_association(document, relation)
+        valid = document.validating do
+          Array(document.ivar(relation.name)).all? do |value|
+            if value && (!value.persisted? || value.changed?)
+              value.validated? ? true : value.valid?
             else
-              doc.validated? ? true : doc.valid?
+              true
             end
-          end.all?
-        ensure
-          document.exit_validate
+          end
         end
-        document.errors.add(attribute, :invalid, **options) unless valid
+
+        document.errors.add(attribute, :invalid) unless valid
       end
     end
   end
