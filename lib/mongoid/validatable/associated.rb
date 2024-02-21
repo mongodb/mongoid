@@ -35,8 +35,7 @@ module Mongoid
       #   associations to validate.
       def validate(document)
         attributes.each do |attr_name|
-          relation = document.class.relations[attr_name]
-          validate_association(document, relation)
+          validate_association(document, attr_name)
         end
       end
 
@@ -48,9 +47,9 @@ module Mongoid
       #
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The association to validate.
-      def validate_association(document, relation)
+      def validate_association(document, attribute)
         valid = document.validating do
-          Array(document.ivar(relation.name)).all? do |value|
+          Array(document.ivar(attribute)).all? do |value|
             if value && (!value.persisted? || value.changed?)
               value.validated? ? true : value.valid?
             else
