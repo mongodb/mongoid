@@ -50,7 +50,7 @@ module Mongoid
       def validate_association(document, attribute)
         valid = document.validating do
           Array(document.ivar(attribute)).all? do |value|
-            if value && (!value.persisted? || value.changed?)
+            if value && !value.flagged_for_destroy? && (!value.persisted? || value.changed?)
               value.validated? ? true : value.valid?
             else
               true
