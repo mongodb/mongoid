@@ -19,6 +19,13 @@ module Mongoid
     class AssociatedValidator < ActiveModel::Validator
       attr_reader :attributes
 
+      # Create a new validator with the given options.
+      #
+      # @params [ Hash ] options the options to use to
+      #   initialize the validator.
+      #
+      # @option options [ Array<Symbol> ] :attributes the list of
+      #   attributes to be validated by this validator.
       def initialize(options)
         @attributes = options[:attributes]
       end
@@ -84,6 +91,13 @@ module Mongoid
 
       private
 
+      # Examine the given target object and return an array of
+      # documents (possibly empty) that the target represents.
+      #
+      # @param [ Array | Mongoid::Document | Mongoid::Association::Proxy | HasMany::Enumerable ] target
+      #   the target object to examine.
+      #
+      # @return [ Array<Mongoid::Document> ] the list of documents
       def get_target_documents(target)
         if target.respond_to?(:_loaded?)
           get_target_documents_for_has_many(target)
@@ -92,10 +106,25 @@ module Mongoid
         end
       end
 
+      # Returns the list of all currently in-memory values held by
+      # the target. The target will not be loaded.
+      #
+      # @param [ HasMany::Enumerable ] target the target that will
+      #   be examined for in-memory documents.
+      #
+      # @return [ Array<Mongoid::Document> ] the in-memory documents
+      #   held by the target.
       def get_target_documents_for_has_many(target)
         [ *target._loaded.values, *target._added.values ]
       end
 
+      # Returns the target as an array. If the target represents a single
+      # value, it is wrapped in an array.
+      #
+      # @param [ Array | Mongoid::Document | Mongoid::Association::Proxy ] target
+      #   the target to return.
+      #
+      # @return [ Array<Mongoid::Document> ] the target, as an array.
       def get_target_documents_for_other(target)
         Array.wrap(target)
       end
