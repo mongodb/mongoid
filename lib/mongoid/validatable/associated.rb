@@ -17,19 +17,6 @@ module Mongoid
     #     validates_associated :name, :addresses
     #   end
     class AssociatedValidator < ActiveModel::Validator
-      attr_reader :attributes
-
-      # Create a new validator with the given options.
-      #
-      # @params [ Hash ] options the options to use to
-      #   initialize the validator.
-      #
-      # @option options [ Array<Symbol> ] :attributes the list of
-      #   attributes to be validated by this validator.
-      def initialize(options)
-        @attributes = options[:attributes]
-      end
-
       # Checks that the named associations of the given record
       # (`attributes`) are valid. This does NOT load the associations
       # from memory, and will only validate records that are dirty
@@ -41,7 +28,7 @@ module Mongoid
       # @param [ Mongoid::Document ] document the document with the
       #   associations to validate.
       def validate(document)
-        attributes.each do |attr_name|
+        options[:attributes].each do |attr_name|
           validate_association(document, attr_name)
         end
       end
