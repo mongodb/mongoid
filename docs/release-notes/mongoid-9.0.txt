@@ -506,7 +506,7 @@ Mongoid now requires that you set a time zone if you intend to do
 anything with time values (including using timestamps in your documents).
 Any uses of ``Time.configured`` must be replaced with ``Time.zone``.
 
-... code-block:: ruby
+.. code-block:: ruby
 
   # before:
   puts Time.configured.now
@@ -522,14 +522,14 @@ to ``nil`` values. If you are using Rails, the default time zone is already
 set to UTC. If you are not using Rails, you may set a time zone at the start
 of your program like this:
 
-... code-block:: ruby
+.. code-block:: ruby
 
   Time.zone = 'UTC'
 
 This will set the time zone to UTC. You can see all available time zone names
 by running the following command:
 
-... code-block:: bash
+.. code-block:: bash
 
   $ ruby -ractive_support/values/time_zone \
     -e 'puts ActiveSupport::TimeZone::MAPPING.keys'
@@ -540,7 +540,7 @@ Records now remember the persistence context in which they were loaded/created
 
 Consider the following code:
 
-... code-block:: ruby
+.. code-block:: ruby
 
   record = Model.with(collection: 'other_collection') { Model.first }
   record.update(field: 'value')
@@ -560,7 +560,7 @@ a different database, or a different collection).
 If you need the legacy (pre-9.0) behavior, you can enable it with the following
 flag:
 
-... code-block:: ruby
+.. code-block:: ruby
 
   Mongoid.legacy_persistence_context_behavior = true
 
