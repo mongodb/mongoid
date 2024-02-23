@@ -66,8 +66,8 @@ Install the automatic encryption shared library (Ruby driver 2.19+)
 
 If you use the Ruby driver version 2.19 and above, the automatic encryption
 shared library should be installed by following the instructions on the
-`Automatic Encryption Shared Library for Queryable Encryption 
-<https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`_
+:manual:`Automatic Encryption Shared Library for Queryable Encryption 
+</core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`
 page in the Server manual.
 
 The steps required are as follows:
@@ -256,7 +256,7 @@ Known Limitations
 ~~~~~~~~~~~~~~~~~
 
 * MongoDB CSFLE has some limitations that are described on the
-  `CSFLE Limitations <https://www.mongodb.com/docs/manual/core/csfle/reference/limitations/>`_
+  :manual:`CSFLE Limitations </core/csfle/reference/limitations/>`
   page in the Server manual. These limitations also apply to Mongoid.
 * Mongoid does not support encryption of ``embeds_many`` relations.
 * If you use ``:key_name_field`` option, the field must be encrypted using
