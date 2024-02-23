@@ -42,19 +42,6 @@ Gem::Specification.new do |s|
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
   s.add_dependency("concurrent-ruby", ['>= 1.0.5', '< 2.0'])
 
-  # The ruby2_keywords gem is recommended for handling argument delegation issues,
-  # especially if support for 2.6 or prior is required.
-  # See https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/#delegation
-  #
-  # We have a bunch of complex delegation logic, including various method_missings.
-  # If we try to fix them "right", it will add too much logic. We will have to
-  # handle different Ruby versions (including minor ones, Ruby 2.6 and 2.7
-  # behave differently), hash key types (strings vs symbols), ways of passing
-  # arguments (with curly braces vs without ones).
-  #
-  # Therefore, usage of this gem looks like a reasonable solution at the moment.
-  s.add_dependency("ruby2_keywords", "~> 0.0.5")
-
   s.add_development_dependency("bson", ['>=4.14.0', '<5.0.0'])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
