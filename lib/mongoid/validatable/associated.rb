@@ -17,6 +17,12 @@ module Mongoid
     #     validates_associated :name, :addresses
     #   end
     class AssociatedValidator < ActiveModel::Validator
+      # Required by `validates_with` so that the validator
+      # gets added to the correct attributes.
+      def attributes
+        options[:attributes]
+      end
+
       # Checks that the named associations of the given record
       # (`attributes`) are valid. This does NOT load the associations
       # from memory, and will only validate records that are dirty
