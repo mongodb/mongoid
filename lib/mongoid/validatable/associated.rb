@@ -25,7 +25,7 @@ module Mongoid
 
       # Checks that the named associations of the given record
       # (`attributes`) are valid. This does NOT load the associations
-      # from memory, and will only validate records that are dirty
+      # from the database, and will only validate records that are dirty
       # or unpersisted.
       #
       # If anything is not valid, appropriate errors will be added to
