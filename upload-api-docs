@@ -116,7 +116,11 @@ def generate_docs(options)
     '--readme', './README.md',
     '-o', options[:docs_path]
   )
-  File.delete(File.join(options[:docs_path], 'frames.html')) rescue nil
+  begin
+    File.delete(File.join(options[:docs_path], 'frames.html'))
+  rescue StandardError
+    nil
+  end
 end
 
 options = Options.new
