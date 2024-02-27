@@ -37,6 +37,14 @@ module Mongoid
       Threaded.exit_validate(self)
     end
 
+    # Perform a validation within the associated block.
+    def validating
+      begin_validate
+      yield
+    ensure
+      exit_validate
+    end
+
     # Given the provided options, are we performing validations?
     #
     # @example Are we performing validations?
