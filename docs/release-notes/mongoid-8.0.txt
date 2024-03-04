@@ -186,98 +186,144 @@ invocation for documents with associations.
 
 Referenced associations (``has_one`` and ``has_many``):
 
-+---------------------------------------+---------------------------------------+
-| Mongoid 8.0                           | Mongoid 7                             |
-+=======================================+=======================================+
-| Parent :before_save                   | Parent :before_save                   |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_open              | Parent :around_save_open              |
-+---------------------------------------+---------------------------------------+
-| Parent :before_create                 | Parent :before_create                 |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_open            | Parent :around_create_open            |
-+---------------------------------------+---------------------------------------+
-| **Parent persisted in MongoDB**       | **Parent persisted in MongoDB**       |
-+---------------------------------------+---------------------------------------+
-| Child :before_save                    | Parent :around_create_close           |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_open               | Parent :after_create                  |
-+---------------------------------------+---------------------------------------+
-| Child :before_create                  | Child :before_save                    |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_open             | Child :around_save_open               |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :before_create                  |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :around_create_open             |
-+---------------------------------------+---------------------------------------+
-| **Child persisted in MongoDB**        | **Child persisted in MongoDB**        |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_close            | Child :around_create_close            |
-+---------------------------------------+---------------------------------------+
-| Child :after_create                   | Child :after_create                   |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_close              | Child :around_save_close              |
-+---------------------------------------+---------------------------------------+
-| Child :after_save                     | Child :after_save                     |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_close           | Parent :around_save_close             |
-+---------------------------------------+---------------------------------------+
-| Parent :after_create                  | Parent :after_save                    |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_close             |                                       |
-+---------------------------------------+---------------------------------------+
-| Parent :after_save                    |                                       |
-+---------------------------------------+---------------------------------------+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
+
+   * - Mongoid 8.0
+     - Mongoid 7
+
+   * - | Parent :before_save
+     - | Parent :before_save
+
+   * - Parent :around_save_open
+     - Parent :around_save_open
+
+   * - | Parent :before_create
+     - | Parent :before_create
+
+   * - Parent :around_create_open
+     - Parent :around_create_open
+
+   * - | **Parent persisted in MongoDB** 
+     - | **Parent persisted in MongoDB** 
+
+   * - Child :before_save 
+     - Parent :around_create_close
+
+   * - | Child :around_save_open
+     - | Parent :after_create
+
+   * - Child :before_create 
+     - Child :before_save  
+
+   * - | Child :around_create_open
+     - | Child :around_save_open
+
+   * - 
+     - Child :before_create 
+
+   * - | 
+     - | Child :around_create_open 
+
+   * - **Child persisted in MongoDB** 
+     - **Child persisted in MongoDB**
+
+   * - | Child :around_create_close
+     - | Child :around_create_close
+
+   * - Child :after_create  
+     - Child :after_create   
+
+   * - | Child :around_save_close
+     - | Child :around_save_close
+
+   * - Child :after_save 
+     - Child :after_save  
+
+   * - | Parent :around_create_close
+     - | Parent :around_save_close 
+
+    * - Parent :after_create 
+     - Parent :after_save  
+
+   * - | Parent :around_save_close
+     - | 
+
+   * - Parent :after_save  
+     -  
 
 Embedded associations (``embeds_one`` and ``embeds_many``):
 
-+---------------------------------------+---------------------------------------+
-| Mongoid 8.0                           | Mongoid 7                             |
-+=======================================+=======================================+
-| Parent :before_save                   | Child :before_save                    |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_open              | Child :around_save_open               |
-+---------------------------------------+---------------------------------------+
-| Parent :before_create                 | Child :around_save_close              |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_open            | Child :after_save                     |
-+---------------------------------------+---------------------------------------+
-| Child :before_save                    | Parent :before_save                   |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_open               | Parent :around_save_open              |
-+---------------------------------------+---------------------------------------+
-| Child :before_create                  | Child :before_create                  |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_open             | Child :around_create_open             |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :around_create_close            |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :after_create                   |
-+---------------------------------------+---------------------------------------+
-|                                       | Parent :before_create                 |
-+---------------------------------------+---------------------------------------+
-|                                       | Parent :around_create_open            |
-+---------------------------------------+---------------------------------------+
-| **Document persisted in MongoDB**     | **Document persisted in MongoDB**     |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_close            |                                       |
-+---------------------------------------+---------------------------------------+
-| Child :after_create                   |                                       |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_close              |                                       |
-+---------------------------------------+---------------------------------------+
-| Child :after_save                     |                                       |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_close           | Parent :around_create_close           |
-+---------------------------------------+---------------------------------------+
-| Parent :after_create                  | Parent :after_create                  |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_close             | Parent :around_save_close             |
-+---------------------------------------+---------------------------------------+
-| Parent :after_save                    | Parent :after_save                    |
-+---------------------------------------+---------------------------------------+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
 
+   * - Mongoid 8.0
+     - Mongoid 7
+
+   * - | Parent :before_save
+     - | Child :before_save   
+
+   * - Parent :around_save_open
+     - Child :around_save_open
+
+   * - | Parent :before_create
+     - | Child :around_save_close 
+
+   * - Parent :around_create_open
+     - Child :after_save 
+
+   * - | Child :before_save
+     - | Parent :before_save
+
+   * - Child :around_save_open
+     - Parent :around_save_open 
+
+   * - | Child :before_create 
+     - | Child :before_create 
+
+   * - Child :around_create_open
+     - Child :around_create_open
+
+   * - | 
+     - | Child :around_create_close  
+
+   * - 
+     - Child :after_create
+
+   * - | 
+     - | Parent :before_create
+
+   * - 
+     -  Parent :around_create_open
+
+   * - | **Document persisted in MongoDB**
+     - | **Document persisted in MongoDB**
+
+   * - Child :around_create_close 
+     - 
+
+   * - | Child :after_create 
+     - | 
+
+   * - Child :around_save_close
+     - 
+
+   * - | Child :after_save
+     - | 
+
+   * - Parent :around_create_close
+     - Parent :around_create_close
+
+   * - | Parent :after_create
+     - | Parent :after_create
+
+   * - Parent :around_save_close
+     - Parent :around_save_close
+
+   * - | Parent :after_save
+     - | Parent :after_save
 
 ``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
 --------------------------------------------------------------------------
