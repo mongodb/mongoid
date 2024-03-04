@@ -7,7 +7,7 @@ gemfile true do
   source 'https://rubygems.org'
   gem 'nokogiri'
   gem 'aws-sdk-s3'
-  gem 'yard'
+  gem 'yard', '>= 0.9.35'
 end
 
 require 'aws-sdk-s3'
