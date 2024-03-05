@@ -244,7 +244,7 @@ Referenced associations (``has_one`` and ``has_many``):
    * - | Parent :around_create_close
      - | Parent :around_save_close 
 
-    * - Parent :after_create 
+   * - Parent :after_create 
      - Parent :after_save  
 
    * - | Parent :around_save_close
@@ -296,7 +296,7 @@ Embedded associations (``embeds_one`` and ``embeds_many``):
      - | Parent :before_create
 
    * - 
-     -  Parent :around_create_open
+     - Parent :around_create_open
 
    * - | **Document persisted in MongoDB**
      - | **Document persisted in MongoDB**
