@@ -134,7 +134,7 @@ perform consistently with rails and the other ``mongoize``, ``demongoize`` and
      - | return ``nil``
        
    * - Time/DateTime/Date
-     - When demongoizing a valid string: "2022-07-14 14:45:51-0400"
+     - When demongoizing a valid string: "2022-07-14 14:45:51 -0400"
      - raise ``NoMethodError`` Exception: undefined method ``getlocal`` for "2022-07-14 14:45:51 -0400":String
      - return a ``Time/DateTime/Date``
 
