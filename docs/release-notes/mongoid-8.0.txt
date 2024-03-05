@@ -123,7 +123,7 @@ perform consistently with rails and the other ``mongoize``, ``demongoize`` and
        
    * - Time/DateTime
      - When demongoizing a non-Time value: "bogus", ``Date.today``
-     - raise ``NoMethodError`` Exception: undefined method ``getlocal``for "bogus":String
+     - raise ``NoMethodError`` Exception: undefined method ``getlocal`` for "bogus":String
      - "bogus": return ``nil``
        
        ``Date.today``: return ``Time/DateTime``
