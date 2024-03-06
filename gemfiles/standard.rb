@@ -3,7 +3,7 @@ def standard_dependencies
   gem 'rake'
 
   group :development do
-    gem 'yard'
+    gem 'yard', '>= 0.9.35'
 
     platform :mri do
       # Debugger for VSCode.
