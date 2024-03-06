@@ -31,53 +31,53 @@ For example, you can use ``railsmdb`` to generate stubs for new Mongoid models:
 
 .. code-block:: sh
 
-    $ bin/railsmdb generate model person
+   $ bin/railsmdb generate model person
 
 This will create a new model at ``app/models/person.rb``:
 
 .. code-block:: ruby
 
-    class Person
-      include Mongoid::Document
-      include Mongoid::Timestamp
-    end
+   class Person
+     include Mongoid::Document
+     include Mongoid::Timestamp
+   end
 
 You can specify the fields of the model as well:
 
 .. code-block:: ruby
 
-    # bin/railsmdb generate model person name:string birth:date
+   # bin/railsmdb generate model person name:string birth:date
 
-    class Person
-      include Mongoid::Document
-      include Mongoid::Timestamp
-      field :name, type: String
-      field :birth, type: Date
-    end
+   class Person
+     include Mongoid::Document
+     include Mongoid::Timestamp
+     field :name, type: String
+     field :birth, type: Date
+   end
 
 You can instruct the generator to make the new model a subclass of another,
 by passing the ``--parent`` option:
 
 .. code-block:: ruby
 
-    # bin/railsmdb generate model student --parent=person
+   # bin/railsmdb generate model student --parent=person
 
-    class Student < Person
-      include Mongoid::Timestamp
-    end
+   class Student < Person
+     include Mongoid::Timestamp
+   end
 
 And if you need to store your models in a different collection than can be
 inferred from the model name, you can specify ``--collection``:
 
 .. code-block:: ruby
 
-    # bin/railsmdb generate model course --collection=classes
+   # bin/railsmdb generate model course --collection=classes
 
-    class Course
-      include Mongoid::Document
-      include Mongoid::Timestamp
-      store_in collection: 'classes'
-    end
+   class Course
+     include Mongoid::Document
+     include Mongoid::Timestamp
+     store_in collection: 'classes'
+   end
 
 For more information see the `GitHub Repository <https://github.com/mongodb/mongoid-railsmdb>`_.
 
@@ -121,10 +121,11 @@ If you want to restore the old behavior, you can set
 ``Mongoid.around_embedded_document_callbacks`` to true in your application.
 
 .. note::
-  Enabling ``around_*`` callbacks for embedded documents is not recommended
-  as it may cause ``SystemStackError`` exceptions when a document has many
-  embedded documents. See `MONGOID-5658 <https://jira.mongodb.org/browse/MONGOID-5658>`_
-  for more details.
+
+   Enabling ``around_*`` callbacks for embedded documents is not recommended
+   as it may cause ``SystemStackError`` exceptions when a document has many
+   embedded documents. See `MONGOID-5658 <https://jira.mongodb.org/browse/MONGOID-5658>`_
+   for more details.
 
 
 ``for_js`` method is deprecated
@@ -176,22 +177,22 @@ In Mongoid 8.x and older ``touch`` method leaves models in the changed state:
 
 .. code-block:: ruby
 
-  # Mongoid 8.x behaviour
-  band = Band.create!
-  band.touch
-  band.changed? # => true
-  band.changes # => {"updated_at"=>[2023-01-30 13:12:57.477191135 UTC, 2023-01-30 13:13:11.482975646 UTC]}
+   # Mongoid 8.x behaviour
+   band = Band.create!
+   band.touch
+   band.changed? # => true
+   band.changes # => {"updated_at"=>[2023-01-30 13:12:57.477191135 UTC, 2023-01-30 13:13:11.482975646 UTC]}
 
 Starting from 9.0 Mongoid now correctly clears changed state after using ``touch``
 method.
 
 .. code-block:: ruby
 
-  # Mongoid 9.0 behaviour
-  band = Band.create!
-  band.touch
-  band.changed? # => false
-  band.changes # => {}
+   # Mongoid 9.0 behaviour
+   band = Band.create!
+   band.touch
+   band.changed? # => false
+   band.changes # => {}
 
 Sandbox Mode for Rails Console
 ------------------------------
@@ -203,8 +204,9 @@ the commands executed in the console using the ``:default`` client won't
 be persisted in the database.
 
 .. note::
-  If you execute commands in the sandbox mode *using any other client than default*,
-  these changes will be persisted as usual.
+
+   If you execute commands in the sandbox mode *using any other client than default*,
+   these changes will be persisted as usual.
 
 New Transactions API
 --------------------
@@ -213,15 +215,15 @@ Mongoid 9.0 introduces new transactions API that is inspired by ActiveRecord:
 
 .. code-block:: ruby
 
-  Band.transaction do
-    Band.create(title: 'Led Zeppelin')
-  end
+   Band.transaction do
+     Band.create(title: 'Led Zeppelin')
+   end
 
-  band = Band.create(title: 'Deep Purple')
-  band.transaction do
-    band.active = false
-    band.save!
-  end
+   band = Band.create(title: 'Deep Purple')
+   band.transaction do
+     band.active = false
+     band.save!
+   end
 
 Please consult :ref:`transactions documentation <transactions>` for more details.
 
@@ -262,11 +264,11 @@ when the instance was loaded, Mongoid will now raise a
 
 .. code-block:: ruby
 
-  Band.only(:name).first.label
-  #=> raises Mongoid::Errors::AttributeNotLoaded
+   Band.only(:name).first.label
+   #=> raises Mongoid::Errors::AttributeNotLoaded
 
-  Band.without(:label).first.label = 'Sub Pop Records'
-  #=> raises Mongoid::Errors::AttributeNotLoaded
+   Band.without(:label).first.label = 'Sub Pop Records'
+   #=> raises Mongoid::Errors::AttributeNotLoaded
 
 In earlier Mongoid versions, the same conditions would raise an
 ``ActiveModel::MissingAttributeError``. Please check your code for
@@ -284,17 +286,17 @@ considers ``Time.zone`` to perform type conversion.
 
 .. code-block:: ruby
 
-  class Magazine
-    include Mongoid::Document
+   class Magazine
+     include Mongoid::Document
 
-    field :published_at, type: Time
-  end
+     field :published_at, type: Time
+   end
 
-  Time.zone = 'Asia/Tokyo'
+   Time.zone = 'Asia/Tokyo'
 
-  Magazine.gte(published_at: Date.parse('2022-09-26'))
-  #=> will return all results on or after Sept 26th, 2022
-  #   at 0:00 in Asia/Tokyo time zone.
+   Magazine.gte(published_at: Date.parse('2022-09-26'))
+   #=> will return all results on or after Sept 26th, 2022
+   #   at 0:00 in Asia/Tokyo time zone.
 
 In prior Mongoid versions, the above code would ignore the ``Time.zone``
 (irrespective of the now-removed ``:use_activesupport_time_zone``
@@ -313,25 +315,25 @@ invoke ``#touch`` on its parent document.
 
 .. code-block:: ruby
 
-  class Address
-    include Mongoid::Document
-    include Mongoid::Timestamps
+   class Address
+     include Mongoid::Document
+     include Mongoid::Timestamps
 
-    embedded_in :mall, touch: false
-  end
+     embedded_in :mall, touch: false
+   end
 
-  class Mall
-    include Mongoid::Document
-    include Mongoid::Timestamps
+   class Mall
+     include Mongoid::Document
+     include Mongoid::Timestamps
 
-    embeds_many :addresses
-  end
+     embeds_many :addresses
+   end
 
-  mall = Mall.create!
-  address = mall.addresses.create!
+   mall = Mall.create!
+   address = mall.addresses.create!
 
-  address.touch
-  #=> updates address.updated_at but not mall.updated_at
+   address.touch
+   #=> updates address.updated_at but not mall.updated_at
 
 In addition, the ``#touch`` method has been optimized to perform one
 persistence operation per parent document, even when using multiple
@@ -346,12 +348,12 @@ unless you explicitly set ``touch: false`` on the relation:
 
 .. code-block:: ruby
 
-  class Address
-    include Mongoid::Document
-    include Mongoid::Timestamps
+   class Address
+     include Mongoid::Document
+     include Mongoid::Timestamps
 
-    embedded_in :mall, touch: false
-  end
+     embedded_in :mall, touch: false
+   end
 
 For all other associations, the default remains ``touch: false``.
 
@@ -383,7 +385,7 @@ defaults to ``true``.
 
 .. code-block:: ruby
 
-  Mongoid::Config.immutable_ids = true
+   Mongoid::Config.immutable_ids = true
 
 When set to false, the older, inconsistent behavior is restored.
 
@@ -397,18 +399,18 @@ of the ``index`` macro: ``partial_filter_expression``, ``weights``,
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    field :a, as: :age
-    index({ age: 1 }, { partial_filter_expression: { age: { '$gte' => 20 } })
-  end
+   class Person
+     include Mongoid::Document
+     field :a, as: :age
+     index({ age: 1 }, { partial_filter_expression: { age: { '$gte' => 20 } })
+   end
 
 .. note::
 
-  The expansion of field name aliases in index options such as
-  ``partial_filter_expression`` is performed according to the behavior of MongoDB
-  server 6.0. Future server versions may change how they interpret these options,
-  and Mongoid's functionality may not support such changes.
+   The expansion of field name aliases in index options such as
+   ``partial_filter_expression`` is performed according to the behavior of MongoDB
+   server 6.0. Future server versions may change how they interpret these options,
+   and Mongoid's functionality may not support such changes.
 
 
 BSON 5 and BSON::Decimal128 Fields
@@ -420,32 +422,32 @@ declared as BSON::Decimal128 will return a BigDecimal value by default.
 
 .. code-block:: ruby
 
-  class Model
-    include Mongoid::Document
+   class Model
+     include Mongoid::Document
 
-    field :decimal_field, type: BSON::Decimal128
-  end
+     field :decimal_field, type: BSON::Decimal128
+   end
 
-  # under BSON <= 4
-  Model.first.decimal_field.class #=> BSON::Decimal128
+   # under BSON <= 4
+   Model.first.decimal_field.class #=> BSON::Decimal128
 
-  # under BSON >= 5
-  Model.first.decimal_field.class #=> BigDecimal
+   # under BSON >= 5
+   Model.first.decimal_field.class #=> BigDecimal
 
 If you need literal BSON::Decimal128 values with BSON 5, you may instruct
 Mongoid to allow literal BSON::Decimal128 fields:
 
 .. code-block:: ruby
 
-  Model.first.decimal_field.class #=> BigDecimal
+   Model.first.decimal_field.class #=> BigDecimal
 
-  Mongoid.allow_bson5_decimal128 = true
-  Model.first.decimal_field.class #=> BSON::Decimal128
+   Mongoid.allow_bson5_decimal128 = true
+   Model.first.decimal_field.class #=> BSON::Decimal128
 
 .. note::
 
-  The ``allow_bson5_decimal128`` option only has any effect under
-  BSON 5 and later. BSON 4 and earlier ignore the setting entirely.
+   The ``allow_bson5_decimal128`` option only has any effect under
+   BSON 5 and later. BSON 4 and earlier ignore the setting entirely.
 
 
 Search Index Management with MongoDB Atlas
@@ -457,23 +459,23 @@ API:
 
 .. code-block:: ruby
 
-  class SearchablePerson
-    include Mongoid::Document
+   class SearchablePerson
+     include Mongoid::Document
 
-    search_index { ... } # define the search index here
-  end
+     search_index { ... } # define the search index here
+   end
 
-  # create the declared search indexes; this returns immediately, but the
-  # search indexes may take several minutes before they are available.
-  SearchablePerson.create_search_indexes
+   # create the declared search indexes; this returns immediately, but the
+   # search indexes may take several minutes before they are available.
+   SearchablePerson.create_search_indexes
 
-  # query the available search indexes
-  SearchablePerson.search_indexes.each do |index|
-    # ...
-  end
+   # query the available search indexes
+   SearchablePerson.search_indexes.each do |index|
+     # ...
+   end
 
-  # remove all search indexes from the model's collection
-  SearchablePerson.remove_search_indexes
+   # remove all search indexes from the model's collection
+   SearchablePerson.remove_search_indexes
 
 If you are not connected to MongoDB Atlas, the search index definitions are
 ignored. Trying to create, enumerate, or remove search indexes will result in
@@ -483,16 +485,16 @@ There are also rake tasks available, for convenience:
 
 .. code-block:: bash
 
-  # create search indexes for all models; waits for indexes to be created
-  # and shows progress on the terminal.
-  $ rake mongoid:db:create_search_indexes
+   # create search indexes for all models; waits for indexes to be created
+   # and shows progress on the terminal.
+   $ rake mongoid:db:create_search_indexes
 
-  # as above, but returns immediately and lets the indexes be created in the
-  # background
-  $ rake WAIT_FOR_SEARCH_INDEXES=0 mongoid:db:create_search_indexes
+   # as above, but returns immediately and lets the indexes be created in the
+   # background
+   $ rake WAIT_FOR_SEARCH_INDEXES=0 mongoid:db:create_search_indexes
 
-  # removes search indexes from all models
-  $ rake mongoid:db:remove_search_indexes
+   # removes search indexes from all models
+   $ rake mongoid:db:remove_search_indexes
 
 
 ``Time.configured`` has been removed
@@ -506,33 +508,33 @@ Mongoid now requires that you set a time zone if you intend to do
 anything with time values (including using timestamps in your documents).
 Any uses of ``Time.configured`` must be replaced with ``Time.zone``.
 
-... code-block:: ruby
+.. code-block:: ruby
 
-  # before:
-  puts Time.configured.now
+   # before:
+   puts Time.configured.now
 
-  # after:
-  puts Time.zone.now
+   # after:
+   puts Time.zone.now
 
-  # or, better for finding the current Time specifically:
-  puts Time.current
+   # or, better for finding the current Time specifically:
+   puts Time.current
 
 If you do not set a time zone, you will see errors in your code related
 to ``nil`` values. If you are using Rails, the default time zone is already
 set to UTC. If you are not using Rails, you may set a time zone at the start
 of your program like this:
 
-... code-block:: ruby
+.. code-block:: ruby
 
-  Time.zone = 'UTC'
+   Time.zone = 'UTC'
 
 This will set the time zone to UTC. You can see all available time zone names
 by running the following command:
 
-... code-block:: bash
+.. code-block:: bash
 
-  $ ruby -ractive_support/values/time_zone \
-    -e 'puts ActiveSupport::TimeZone::MAPPING.keys'
+   $ ruby -ractive_support/values/time_zone \
+     -e 'puts ActiveSupport::TimeZone::MAPPING.keys'
 
 
 Records now remember the persistence context in which they were loaded/created
@@ -540,10 +542,10 @@ Records now remember the persistence context in which they were loaded/created
 
 Consider the following code:
 
-... code-block:: ruby
+.. code-block:: ruby
 
-  record = Model.with(collection: 'other_collection') { Model.first }
-  record.update(field: 'value')
+   record = Model.with(collection: 'other_collection') { Model.first }
+   record.update(field: 'value')
 
 Prior to Mongoid 9.0, this could would silently fail to execute the update,
 because the storage options (here, the specification of an alternate
@@ -560,9 +562,9 @@ a different database, or a different collection).
 If you need the legacy (pre-9.0) behavior, you can enable it with the following
 flag:
 
-... code-block:: ruby
+.. code-block:: ruby
 
-  Mongoid.legacy_persistence_context_behavior = true
+   Mongoid.legacy_persistence_context_behavior = true
 
 This flag defaults to false in Mongoid 9.
 

@@ -49,10 +49,10 @@ Before you Upgrade
 ------------------
 
 - *Test Coverage:* The best way to be sure that your application still works after upgrading
-is to have good test coverage before you start the process.
+  is to have good test coverage before you start the process.
 
 - *Upgrade Ruby and Rails:* See `"Upgrading Ruby on Rails" <https://guides.rubyonrails.org/upgrading_ruby_on_rails.html>`_
-for more information
+  for more information
 
 
 Upgrading Mongoid
