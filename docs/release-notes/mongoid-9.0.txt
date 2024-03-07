@@ -82,15 +82,6 @@ inferred from the model name, you can specify ``--collection``:
 For more information see the `GitHub Repository <https://github.com/mongodb/mongoid-railsmdb>`_.
 
 
-Aggregable API is deprecated
-----------------------------
-
-Mongoid 9 deprecated aggregable API in modules
-``Mongoid::Contextual::Aggregable::Memory``,
-``Mongoid::Contextual::Aggregable::Mongo``, and
-``Mongoid::Contextual::Aggregable::None``.
-
-
 Support for Ruby 2.6 and JRuby 9.3 Dropped
 -------------------------------------------
 

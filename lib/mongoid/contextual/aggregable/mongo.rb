@@ -26,7 +26,6 @@ module Mongoid
         # @return [ Hash ] A Hash containing the aggregate values.
         #   If no documents are found, then returned Hash will have
         #   count, sum of 0 and max, min, avg of nil.
-        # @deprecated
         def aggregates(field)
           result = collection.aggregate(pipeline(field), session: _session).to_a
           if result.empty?
@@ -35,7 +34,6 @@ module Mongoid
             result.first
           end
         end
-        Mongoid.deprecate(self, :aggregates)
 
         # Get the average value of the provided field.
         #
@@ -45,11 +43,9 @@ module Mongoid
         # @param [ Symbol ] field The field to average.
         #
         # @return [ Float ] The average.
-        # @deprecated
         def avg(field)
           aggregates(field)["avg"]
         end
-        Mongoid.deprecate(self, :avg)
 
         # Get the max value of the provided field. If provided a block, will
         # return the Document with the greatest value for the field, in
@@ -67,11 +63,9 @@ module Mongoid
         #
         # @return [ Float | Document ] The max value or document with the max
         #   value.
-        # @deprecated
         def max(field = nil)
           block_given? ? super() : aggregates(field)["max"]
         end
-        Mongoid.deprecate(self, :max)
 
         # Get the min value of the provided field. If provided a block, will
         # return the Document with the smallest value for the field, in
@@ -89,11 +83,9 @@ module Mongoid
         #
         # @return [ Float | Document ] The min value or document with the min
         #   value.
-        # @deprecated
         def min(field = nil)
           block_given? ? super() : aggregates(field)["min"]
         end
-        Mongoid.deprecate(self, :min)
 
         # Get the sum value of the provided field. If provided a block, will
         # return the sum in accordance with Ruby's enumerable API.
@@ -107,11 +99,9 @@ module Mongoid
         # @param [ Symbol ] field The field to sum.
         #
         # @return [ Float ] The sum value.
-        # @deprecated
         def sum(field = nil)
           block_given? ? super() : aggregates(field)["sum"] || 0
         end
-        Mongoid.deprecate(self, :sum)
 
         private
 
