@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
   s.add_dependency("concurrent-ruby", ['>= 1.0.5', '< 2.0'])
 
-  s.add_development_dependency("bson", ['>=4.14.0', '<5.0.0'])
+  s.add_development_dependency("bson", '>=4.14.0', '<6.0.0')
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.test_files   = Dir.glob("spec/**/*")
