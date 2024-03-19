@@ -17,7 +17,7 @@ module Mongoid
       # @param [ [ String | Symbol | Array<String | Symbol>]... ] *fields
       #   The names of the field(s) to unset.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def unset(*fields)
         prepare_atomic_operation do |ops|
           fields.flatten.each do |field|

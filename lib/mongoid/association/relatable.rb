@@ -87,7 +87,7 @@ module Mongoid
       # Whether trying to bind an object using this association should raise
       # an error.
       #
-      # @param [ Document ] doc The document to be bound.
+      # @param [ Mongoid::Document ] doc The document to be bound.
       #
       # @return [ true | false ] Whether the document can be bound.
       def bindable?(doc); false; end
@@ -248,11 +248,11 @@ module Mongoid
 
       # Create an association proxy object using the owner and target.
       #
-      # @param [ Document ] owner The document this association hangs off of.
-      # @param [ Document | Array<Document> ] target The target (parent) of the
-      #   association.
+      # @param [ Mongoid::Document ] owner The document this association hangs off of.
+      # @param [ Mongoid::Document | Array<Mongoid::Document> ] target The target (parent)
+      #   of the association.
       #
-      # @return [ Proxy ]
+      # @return [ Mongoid::Association::Proxy ]
       def create_relation(owner, target)
         relation.new(owner, target, self)
       end

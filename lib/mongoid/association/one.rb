@@ -23,7 +23,7 @@ module Mongoid
       # @example Get the in memory documents.
       #   relation.in_memory
       #
-      # @return [ Array<Document> ] The documents in memory.
+      # @return [ Array<Mongoid::Document> ] The documents in memory.
       def in_memory
         [ _target ]
       end

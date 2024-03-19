@@ -29,7 +29,7 @@ module Mongoid
       # @example Save a document but don't timestamp.
       #   person.timeless.save
       #
-      # @return [ Document ] The document this was called on.
+      # @return [ Mongoid::Document ] The document this was called on.
       def timeless
         self.class.timeless
         self

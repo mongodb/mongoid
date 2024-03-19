@@ -13,7 +13,7 @@ module Mongoid
       #
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   Associations to eager load
-      # @param [ Array<Document> ] docs Documents to preload the associations
+      # @param [ Array<Mongoid::Document> ] docs Documents to preload the associations
       #
       # @return [ Base ] The eager load preloader
       def initialize(associations, docs)
@@ -84,7 +84,7 @@ module Mongoid
       #   loader.set_on_parent("foo", docs)
       #
       # @param [ ObjectId ] id parent`s id
-      # @param [ Document | Array ] element to push into the parent
+      # @param [ Mongoid::Document | Array ] element to push into the parent
       def set_on_parent(id, element)
         grouped_docs[id].each do |d|
           set_relation(d, element)
@@ -138,8 +138,8 @@ module Mongoid
       # @example Set docs into parent using the current association name.
       #   loader.set_relation(doc, docs)
       #
-      # @param [ Document ] doc The object to set the association on
-      # @param [ Document | Array ] element to set into the parent
+      # @param [ Mongoid::Document ] doc The object to set the association on
+      # @param [ Mongoid::Document | Array ] element to set into the parent
       def set_relation(doc, element)
         doc.set_relation(@association.name, element) unless doc.blank?
       end

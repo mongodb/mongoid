@@ -22,7 +22,7 @@ module Mongoid
       # @example Validate the document.
       #   validator.validate_each(doc, :title, "")
       #
-      # @param [ Document ] document The document to validate.
+      # @param [ Mongoid::Document ] document The document to validate.
       # @param [ Symbol ] attribute The attribute name.
       # @param [ Object ] value The current value of the field.
       def validate_each(document, attribute, value)
@@ -53,7 +53,7 @@ module Mongoid
       # @example Check is the association or fk is blank.
       #   validator.relation_or_fk_missing(doc, :name, "")
       #
-      # @param [ Document ] doc The document.
+      # @param [ Mongoid::Document ] doc The document.
       # @param [ Symbol ] attr The attribute.
       # @param [ Object ] value The value.
       #

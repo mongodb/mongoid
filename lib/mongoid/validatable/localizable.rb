@@ -12,7 +12,7 @@ module Mongoid
       # @example Validate localized fields.
       #   validator.validate_each(model, :name, "value")
       #
-      # @param [ Document ] document The document.
+      # @param [ Mongoid::Document ] document The document.
       # @param [ Symbol | String ] attribute The attribute to validate.
       # @param [ Object ] value The attribute value.
       def validate_each(document, attribute, value)

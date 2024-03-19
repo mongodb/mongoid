@@ -145,7 +145,7 @@ module Mongoid
     # Run the callbacks for embedded documents.
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    # @param [ Array<Mongoid::Document> ] children Children to execute callbacks on. If
     #   nil, callbacks will be executed on all cascadable children of
     #   the document.
     #
@@ -167,7 +167,7 @@ module Mongoid
     #   is implemented.
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    # @param [ Array<Mongoid::Document> ] children Children to execute callbacks on. If
     #  nil, callbacks will be executed on all cascadable children of
     #  the document.
     #
@@ -190,7 +190,7 @@ module Mongoid
     # around callbacks.
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    # @param [ Array<Mongoid::Document> ] children Children to execute callbacks on. If
     #   nil, callbacks will be executed on all cascadable children of
     #   the document.
     #
@@ -211,7 +211,7 @@ module Mongoid
     # Execute the before callbacks of given kind for embedded documents.
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array<Document> ] children Children to execute callbacks on.
+    # @param [ Array<Mongoid::Document> ] children Children to execute callbacks on.
     # @param [ Array<ActiveSupport::Callbacks::CallbackSequence, ActiveSupport::Callbacks::Filters::Environment> ] callback_list List of
     #   pairs of callback sequence and environment. This list will be later used
     #   to execute after callbacks in reverse order.
@@ -309,7 +309,7 @@ module Mongoid
     #
     # @param [ Symbol ] kind The type of callback.
     #
-    # @return [ Array<Document> ] The children.
+    # @return [ Array<Mongoid::Document> ] The children.
     def cascadable_children(kind, children = Set.new)
       embedded_relations.each_pair do |name, association|
         next unless association.cascading_callbacks?
@@ -335,7 +335,7 @@ module Mongoid
     #   document.cascadable_child?(:update, doc)
     #
     # @param [ Symbol ] kind The type of callback.
-    # @param [ Document ] child The child document.
+    # @param [ Mongoid::Document ] child The child document.
     #
     # @return [ true | false ] If the child should fire the callback.
     def cascadable_child?(kind, child, association)
@@ -353,7 +353,7 @@ module Mongoid
     #   document.child_callback_type(:update, doc)
     #
     # @param [ Symbol ] kind The type of callback.
-    # @param [ Document ] child The child document
+    # @param [ Mongoid::Document ] child The child document
     #
     # @return [ Symbol ] The name of the callback.
     def child_callback_type(kind, child)

@@ -18,7 +18,7 @@ module Mongoid
           # @param [ String ] type The type of the association.
           # @param [ nil ] selected_fields Must be nil.
           #
-          # @return [ Document ] A single document.
+          # @return [ Mongoid::Document ] A single document.
           def build(base, object, type = nil, selected_fields = nil)
             if query?(object)
               if !base.new_record?

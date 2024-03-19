@@ -21,7 +21,7 @@ module Mongoid
       # @example Add the atomic changes.
       # field.add_atomic_changes(doc, "key", {}, [], [])
       #
-      # @param [ Document ] document The document to add to.
+      # @param [ Mongoid::Document ] document The document to add to.
       # @param [ String ] name The name of the field.
       # @param [ String ] key The atomic location of the field.
       # @param [ Hash ] mods The current modifications.
@@ -37,7 +37,7 @@ module Mongoid
       # @example Evaluate the default value.
       #   field.eval_default(document)
       #
-      # @param [ Document ] doc The document the field belongs to.
+      # @param [ Mongoid::Document ] doc The document the field belongs to.
       #
       # @return [ Object ] The serialized default value.
       def eval_default(doc)
@@ -203,7 +203,7 @@ module Mongoid
       # @example Get the evaluated default.
       #   field.evaluated_default.
       #
-      # @param [ Document ] doc The doc being applied to.
+      # @param [ Mongoid::Document ] doc The doc being applied to.
       #
       # @return [ Object ] The default value.
       def evaluated_default(doc)
@@ -220,7 +220,7 @@ module Mongoid
       # @example Eval the default proc.
       #   field.evaluate_default_proc(band)
       #
-      # @param [ Document ] doc The document.
+      # @param [ Mongoid::Document ] doc The document.
       #
       # @return [ Object ] The called proc.
       def evaluate_default_proc(doc)

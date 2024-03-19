@@ -22,9 +22,9 @@ module Mongoid
         #   the existing association, a replacement of the association with a new
         #   document, or a removal of the association.
         #
-        # @param [ Document ] parent The parent document.
+        # @param [ Mongoid::Document ] parent The parent document.
         #
-        # @return [ Document ] The built document.
+        # @return [ Mongoid::Document ] The built document.
         def build(parent)
           return if reject?(parent, attributes)
           @existing = parent.send(association.name)

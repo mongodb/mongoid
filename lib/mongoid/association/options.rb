@@ -23,7 +23,7 @@ module Mongoid
 
       # The custom sorting options on the association.
       #
-      # @return [ Criteria::Queryable::Key ] The custom sorting options.
+      # @return [ Mongoid::Criteria::Queryable::Key ] The custom sorting options.
       def order
         @options[:order]
       end

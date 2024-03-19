@@ -20,7 +20,7 @@ module Mongoid
           # @param [ String ] type The type of document to query for.
           # @param [ nil ] selected_fields Must be nil.
           #
-          # @return [ Document ] A single document.
+          # @return [ Mongoid::Document ] A single document.
           def build(base, object, type = nil, selected_fields = nil)
             return (object || []) unless query?(object)
             return [] if object.is_a?(Array)

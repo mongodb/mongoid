@@ -39,7 +39,7 @@ module Mongoid
     # from and behaves identically to association traversal for the purposes
     # of, for example, subsequent array element retrieval.
     #
-    # @param [ Document | Hash ] document The document to extract from.
+    # @param [ Mongoid::Document | Hash ] document The document to extract from.
     # @param [ String ] key The key path to extract.
     #
     # @return [ Object | Array ] Field value or values.

@@ -58,7 +58,7 @@ module Mongoid
           # @example Check for inverses errors.
           #   binding.check_inverses!(doc)
           #
-          # @param [ Document ] doc The document to check.
+          # @param [ Mongoid::Document ] doc The document to check.
           def check_polymorphic_inverses!(doc)
             if inverses = _association.inverses(doc)
               if inverses.length > 1

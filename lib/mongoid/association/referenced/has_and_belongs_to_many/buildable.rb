@@ -20,7 +20,7 @@ module Mongoid
           # @param [ String ] type Not used in this context.
           # @param [ nil ] selected_fields Must be nil.
           #
-          # @return [ Array<Document> ] The documents.
+          # @return [ Array<Mongoid::Document> ] The documents.
           def build(base, object, type = nil, selected_fields = nil)
             if query?(object)
               query_criteria(object)

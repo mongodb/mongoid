@@ -334,7 +334,7 @@ module Mongoid
         #
         # @param [ Object... ] *args The options.
         #
-        # @return [ Queryable ] The cloned queryable.
+        # @return [ Mongoid::Criteria::Queryable ] The cloned queryable.
         def option(*args)
           clone.tap do |query|
             unless args.compact.empty?

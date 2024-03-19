@@ -51,7 +51,7 @@ module Mongoid
       #
       # @param [ Hash ] hash The hash to convert.
       #
-      # @return [ Criteria ] The criteria.
+      # @return [ Mongoid::Criteria ] The criteria.
       def from_hash(hash)
         criteria = Criteria.new(hash.delete(:klass) || hash.delete('klass'))
         hash.each_pair do |method, args|
@@ -114,7 +114,7 @@ module Mongoid
     # @param &block Optional block to pass.
     # @yield [ Object ] Yields each enumerable element to the block.
     #
-    # @return [ Document | Array<Document> | nil ] A document or matching documents.
+    # @return [ Mongoid::Document | Array<Mongoid::Document> | nil ] A document or matching documents.
     #
     # @raise Errors::DocumentNotFound If the parameters were _id values and
     #   not all documents are found and the +raise_not_found_error+
@@ -146,7 +146,7 @@ module Mongoid
     # @example Get the documents.
     #   criteria.documents
     #
-    # @return [ Array<Document> ] The documents.
+    # @return [ Array<Mongoid::Document> ] The documents.
     def documents
       @documents ||= []
     end
@@ -155,9 +155,9 @@ module Mongoid
     #
     # @example Set the documents.
     #
-    # @param [ Array<Document> ] docs The embedded documents.
+    # @param [ Array<Mongoid::Document> ] docs The embedded documents.
     #
-    # @return [ Array<Document> ] The embedded documents.
+    # @return [ Array<Mongoid::Document> ] The embedded documents.
     def documents=(docs)
       @documents = docs
     end
@@ -191,7 +191,7 @@ module Mongoid
     #
     # @param [ Hash ] extras The extra driver options.
     #
-    # @return [ Criteria ] The cloned criteria.
+    # @return [ Mongoid::Criteria ] The cloned criteria.
     def extras(extras)
       crit = clone
       crit.options.merge!(extras)
@@ -219,7 +219,7 @@ module Mongoid
     # @example Freeze the criteria.
     #   criteria.freeze
     #
-    # @return [ Criteria ] The frozen criteria.
+    # @return [ Mongoid::Criteria ] The frozen criteria.
     def freeze
       context and inclusions and super
     end
@@ -254,9 +254,9 @@ module Mongoid
     #     order_by: { name: 1 }
     #   })
     #
-    # @param [ Criteria ] other The other criterion to merge with.
+    # @param [ Mongoid::Criteria ] other The other criterion to merge with.
     #
-    # @return [ Criteria ] A cloned self.
+    # @return [ Mongoid::Criteria ] A cloned self.
     def merge(other)
       crit = clone
       crit.merge!(other)
@@ -268,9 +268,9 @@ module Mongoid
     # @example Merge another criteria into this criteria.
     #   criteria.merge(Person.where(name: "bob"))
     #
-    # @param [ Criteria | Hash ] other The criteria to merge in.
+    # @param [ Mongoid::Criteria | Hash ] other The criteria to merge in.
     #
-    # @return [ Criteria ] The merged criteria.
+    # @return [ Mongoid::Criteria ] The merged criteria.
     def merge!(other)
       other = self.class.from_hash(other) if other.is_a?(Hash)
       selector.merge!(other.selector)
@@ -287,7 +287,7 @@ module Mongoid
     # @example Return a none criteria.
     #   criteria.none
     #
-    # @return [ Criteria ] The none criteria.
+    # @return [ Mongoid::Criteria ] The none criteria.
     def none
       @none = true and self
     end
@@ -309,7 +309,7 @@ module Mongoid
     #
     # @param [ [ Symbol | Array<Symbol> ]... ] *args The field name(s).
     #
-    # @return [ Criteria ] The cloned criteria.
+    # @return [ Mongoid::Criteria ] The cloned criteria.
     def only(*args)
       args = args.flatten
       return clone if args.empty?
@@ -329,7 +329,7 @@ module Mongoid
     #
     # @param [ Hash ] value The mode preference.
     #
-    # @return [ Criteria ] The cloned criteria.
+    # @return [ Mongoid::Criteria ] The cloned criteria.
     def read(value = nil)
       clone.tap do |criteria|
         criteria.options.merge!(read: value)
@@ -343,7 +343,7 @@ module Mongoid
     #
     # @param [ Symbol... ] *args The field name(s).
     #
-    # @return [ Criteria ] The cloned criteria.
+    # @return [ Mongoid::Criteria ] The cloned criteria.
     def without(*args)
       args -= id_fields
       super(*args)
@@ -369,7 +369,8 @@ module Mongoid
     # @example Convert to a criteria.
     #   criteria.to_criteria
     #
-    # @return [ Criteria ] self.
+    # @return [ Mongoid::Criteria ] self.
+    #
     # @deprecated
     def to_criteria
       self
@@ -395,7 +396,7 @@ module Mongoid
     #
     # @param [ Array<String> ] types The types to match against.
     #
-    # @return [ Criteria ] The cloned criteria.
+    # @return [ Mongoid::Criteria ] The cloned criteria.
     def type(types)
       any_in(self.discriminator_key.to_sym => Array(types))
     end
@@ -416,7 +417,7 @@ module Mongoid
     # @raise [ UnsupportedJavascript ] If provided a string and the criteria
     #   is embedded.
     #
-    # @return [ Criteria ] The cloned selectable.
+    # @return [ Mongoid::Criteria ] The cloned selectable.
     def where(*args)
       # Historically this method required exactly one argument.
       # As of https://jira.mongodb.org/browse/MONGOID-4804 it also accepts
@@ -442,7 +443,7 @@ module Mongoid
     # @example Get the criteria without options.
     #   criteria.without_options
     #
-    # @return [ Criteria ] The cloned criteria.
+    # @return [ Mongoid::Criteria ] The cloned criteria.
     def without_options
       crit = clone
       crit.options.clear
@@ -460,7 +461,7 @@ module Mongoid
     # @param [ String ] javascript The javascript to execute in the $where.
     # @param [ Hash ] scope The scope for the code.
     #
-    # @return [ Criteria ] The criteria.
+    # @return [ Mongoid::Criteria ] The criteria.
     #
     # @deprecated
     def for_js(javascript, scope = {})
@@ -484,7 +485,7 @@ module Mongoid
     # @example Check for missing documents.
     #   criteria.check_for_missing_documents!([], [ 1 ])
     #
-    # @param [ Array<Document> ] result The result.
+    # @param [ Array<Mongoid::Document> ] result The result.
     # @param [ Array<Object> ] ids The ids.
     #
     # @raise [ Errors::DocumentNotFound ] If none are found and raising an
@@ -506,7 +507,7 @@ module Mongoid
     # @example Dup a criteria.
     #   criteria.dup
     #
-    # @param [ Criteria ] other The criteria getting cloned.
+    # @param [ Mongoid::Criteria ] other The criteria getting cloned.
     #
     # @return [ nil ] nil.
     def initialize_copy(other)

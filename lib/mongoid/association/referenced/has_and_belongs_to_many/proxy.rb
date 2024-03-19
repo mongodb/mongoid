@@ -19,7 +19,7 @@ module Mongoid
             # @example Get the eager loader object
             #
             # @param [ Mongoid::Association::Relatable ] association The association metadata.
-            # @param [ Array<Document> ] docs The array of documents.
+            # @param [ Array<Mongoid::Document> ] docs The array of documents.
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end
@@ -50,9 +50,9 @@ module Mongoid
           # @example Concat with other documents.
           #   person.posts.concat([ post_one, post_two ])
           #
-          # @param [ Document... ] *args Any number of documents.
+          # @param [ Mongoid::Document... ] *args Any number of documents.
           #
-          # @return [ Array<Document> ] The loaded docs.
+          # @return [ Array<Mongoid::Document> ] The loaded docs.
           #
           # rubocop:disable Metrics/AbcSize
           def <<(*args)
@@ -99,9 +99,9 @@ module Mongoid
           # @example Concat with other documents.
           #   person.posts.concat([ post_one, post_two ])
           #
-          # @param [ Array<Document> ] documents The docs to add.
+          # @param [ Array<Mongoid::Document> ] documents The docs to add.
           #
-          # @return [ Array<Document> ] The documents.
+          # @return [ Array<Mongoid::Document> ] The documents.
           def concat(documents)
             ids, docs, inserts = {}, [], []
             documents.each { |doc| append_document(doc, ids, docs, inserts) }
@@ -119,7 +119,7 @@ module Mongoid
           # @param [ Hash ] attributes The attributes of the new document.
           # @param [ Class ] type The optional subclass to build.
           #
-          # @return [ Document ] The new document.
+          # @return [ Mongoid::Document ] The new document.
           def build(attributes = {}, type = nil)
             doc = Factory.execute_build(type || klass, attributes, execute_callbacks: false)
             append(doc)
@@ -140,9 +140,9 @@ module Mongoid
           # @example Delete the document.
           #   person.posts.delete(post)
           #
-          # @param [ Document ] document The document to remove.
+          # @param [ Mongoid::Document ] document The document to remove.
           #
-          # @return [ Document ] The matching document.
+          # @return [ Mongoid::Document ] The matching document.
           def delete(document)
             doc = super
             if doc && persistable?
@@ -164,7 +164,7 @@ module Mongoid
           # @example Nullify the association.
           #   person.preferences.nullify
           #
-          # @param [ Array<Document> ] replacement The replacement documents.
+          # @param [ Array<Mongoid::Document> ] replacement The replacement documents.
           def nullify(replacement = [])
             _target.each { |doc| execute_callback :before_remove, doc }
             cleanup_inverse_for(replacement) unless _association.forced_nil_inverse?
@@ -183,7 +183,7 @@ module Mongoid
           # @example Replace the association.
           # person.preferences.substitute([ new_post ])
           #
-          # @param [ Array<Document> ] replacement The replacement target.
+          # @param [ Array<Mongoid::Document> ] replacement The replacement target.
           #
           # @return [ Many ] The association.
           def substitute(replacement)
@@ -203,7 +203,7 @@ module Mongoid
           # @example Get the unscoped criteria.
           #   person.preferences.unscoped
           #
-          # @return [ Criteria ] The unscoped criteria.
+          # @return [ Mongoid::Criteria ] The unscoped criteria.
           def unscoped
             klass.unscoped.any_in(_id: _base.public_send(foreign_key))
           end
@@ -239,7 +239,7 @@ module Mongoid
           # @example Append the document to the association.
           #   relation.append(document)
           #
-          # @param [ Document ] document The document to append to the target.
+          # @param [ Mongoid::Document ] document The document to append to the target.
           def append(document)
             execute_callbacks_around(:add, document) do
               _target.push(document)
@@ -266,7 +266,7 @@ module Mongoid
           # @example Is the child persistable?
           #   relation.child_persistable?(doc)
           #
-          # @param [ Document ] doc The document.
+          # @param [ Mongoid::Document ] doc The document.
           #
           # @return [ true | false ] If the document can be persisted.
           def child_persistable?(doc)
@@ -280,7 +280,7 @@ module Mongoid
           # @example Get a criteria for the association.
           #   relation.criteria
           #
-          # @return [ Criteria ] A new criteria.
+          # @return [ Mongoid::Criteria ] A new criteria.
           def criteria(id_list = nil)
             _association.criteria(_base, id_list)
           end
@@ -292,7 +292,7 @@ module Mongoid
           # @example Flag as unsynced.
           #   relation.unsynced(doc, :preference_ids)
           #
-          # @param [ Document ] doc The document to flag.
+          # @param [ Mongoid::Document ] doc The document to flag.
           # @param [ Symbol ] key The key to flag on the document.
           #
           # @return [ true ] true.
@@ -304,7 +304,7 @@ module Mongoid
           # Does the cleanup for the inverse of the association when
           # replacing the relation with another list of documents.
           #
-          # @param [ Array<Document> | nil ] replacement the list of documents
+          # @param [ Array<Mongoid::Document> | nil ] replacement the list of documents
           #   that will replace the current list.
           def cleanup_inverse_for(replacement)
             if replacement
@@ -332,7 +332,7 @@ module Mongoid
           # saved, the processing completes, and *then* the exception is
           # re-raised.
           #
-          # @return [ Array<Document> ] the replacement documents
+          # @return [ Array<Mongoid::Document> ] the replacement documents
           def clear_target_for_nullify
             after_remove_error = nil
             many_to_many = _target.clear do |doc|

@@ -21,7 +21,7 @@ module Mongoid
       #
       # @param [ Hash ] pops The field/value pop operations.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def pop(pops)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pops) do |field, value|

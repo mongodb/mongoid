@@ -15,8 +15,8 @@ module Mongoid
       # @example Initialize a binding.
       #   Binding.new(base, target, association)
       #
-      # @param [ Document ] base The base of the binding.
-      # @param [ Document | Array<Document> ] target The target of the binding.
+      # @param [ Mongoid::Document ] base The base of the binding.
+      # @param [ Mongoid::Document | Array<Mongoid::Document> ] target The target of the binding.
       # @param [ Mongoid::Association::Relatable ] association The association metadata.
       def initialize(base, target, association)
         @_base, @_target, @_association = base, target, association
@@ -47,7 +47,7 @@ module Mongoid
       # @example Check the inverse definition.
       #   binding.check_inverse!(doc)
       #
-      # @param [ Document ] doc The document getting bound.
+      # @param [ Mongoid::Document ] doc The document getting bound.
       #
       # @raise [ Errors::InverseNotFound ] If no inverse found.
       def check_inverse!(doc)
@@ -63,7 +63,7 @@ module Mongoid
 
       # Remove the associated document from the inverse's association.
       #
-      # @param [ Document ] doc The document to remove.
+      # @param [ Mongoid::Document ] doc The document to remove.
       def remove_associated(doc)
         if inverse = _association.inverse(doc)
           if _association.many?
@@ -78,7 +78,7 @@ module Mongoid
       #
       # This method removes the associated on *_many relationships.
       #
-      # @param [ Document ] doc The document to remove.
+      # @param [ Mongoid::Document ] doc The document to remove.
       # @param [ Symbol ] inverse The name of the inverse.
       def remove_associated_many(doc, inverse)
         # We only want to remove the inverse association when the inverse
@@ -98,7 +98,7 @@ module Mongoid
       # This method removes associated on belongs_to and embedded_in
       # associations.
       #
-      # @param [ Document ] doc The document to remove.
+      # @param [ Mongoid::Document ] doc The document to remove.
       # @param [ Symbol ] inverse The name of the inverse.
       def remove_associated_in_to(doc, inverse)
         # We only want to remove the inverse association when the inverse
@@ -116,7 +116,7 @@ module Mongoid
       # @example Bind the foreign key.
       #   binding.bind_foreign_key(post, person._id)
       #
-      # @param [ Document ] keyed The document that stores the foreign key.
+      # @param [ Mongoid::Document ] keyed The document that stores the foreign key.
       # @param [ Object ] id The id of the bound document.
       def bind_foreign_key(keyed, id)
         unless keyed.frozen?
@@ -132,7 +132,7 @@ module Mongoid
       # @example Bind the polymorphic type.
       #   binding.bind_polymorphic_type(post, "Person")
       #
-      # @param [ Document ] typed The document that stores the type field.
+      # @param [ Mongoid::Document ] typed The document that stores the type field.
       # @param [ String ] name The name of the model.
       def bind_polymorphic_type(typed, name)
         if _association.type && !typed.frozen?
@@ -148,7 +148,7 @@ module Mongoid
       # @example Bind the polymorphic type.
       #   binding.bind_polymorphic_inverse_type(post, "Person")
       #
-      # @param [ Document ] typed The document that stores the type field.
+      # @param [ Mongoid::Document ] typed The document that stores the type field.
       # @param [ String ] name The name of the model.
       def bind_polymorphic_inverse_type(typed, name)
         if _association.inverse_type && !typed.frozen?
@@ -164,8 +164,8 @@ module Mongoid
       # @example Bind the inverse.
       #   binding.bind_inverse(post, person)
       #
-      # @param [ Document ] doc The base document.
-      # @param [ Document ] inverse The inverse document.
+      # @param [ Mongoid::Document ] doc The base document.
+      # @param [ Mongoid::Document ] inverse The inverse document.
       def bind_inverse(doc, inverse)
         if doc.respond_to?(_association.inverse_setter) && !doc.frozen?
           try_method(doc, _association.inverse_setter, inverse)
@@ -179,7 +179,7 @@ module Mongoid
       # @example Bind the document with the base.
       #   binding.bind_from_relational_parent(doc)
       #
-      # @param [ Document ] doc The document to bind.
+      # @param [ Mongoid::Document ] doc The document to bind.
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
         remove_associated(doc)
@@ -216,7 +216,7 @@ module Mongoid
       # @example Bind the document with the base.
       #   unbinding.unbind_from_relational_parent(doc)
       #
-      # @param [ Document ] doc The document to unbind.
+      # @param [ Mongoid::Document ] doc The document to unbind.
       def unbind_from_relational_parent(doc)
         check_inverse!(doc)
         bind_foreign_key(doc, nil)

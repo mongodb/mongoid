@@ -54,9 +54,9 @@ module Mongoid
           # @example Append the document.
           #   enumerable << document
           #
-          # @param [ Document ] document The document to append.
+          # @param [ Mongoid::Document ] document The document to append.
           #
-          # @return [ Document ] The document.
+          # @return [ Mongoid::Document ] The document.
           def <<(document)
             _added[document._id] = document
             self
@@ -75,7 +75,7 @@ module Mongoid
           #     doc.unbind
           #   end
           #
-          # @return [ Array<Document> ] The cleared out _added docs.
+          # @return [ Array<Mongoid::Document> ] The cleared out _added docs.
           def clear
             if block_given?
               in_memory { |doc| yield(doc) }
@@ -90,7 +90,7 @@ module Mongoid
           # @example Clone the enumerable.
           #   enumerable.clone
           #
-          # @return [ Array<Document> ] An array clone of the enumerable.
+          # @return [ Array<Mongoid::Document> ] An array clone of the enumerable.
           def clone
             collect { |doc| doc.clone }
           end
@@ -100,9 +100,9 @@ module Mongoid
           # @example Delete the document.
           #   enumerable.delete(document)
           #
-          # @param [ Document ] document The document to delete.
+          # @param [ Mongoid::Document ] document The document to delete.
           #
-          # @return [ Document ] The deleted document.
+          # @return [ Mongoid::Document ] The deleted document.
           def delete(document)
             doc = (_loaded.delete(document._id) || _added.delete(document._id))
             unless doc
@@ -125,7 +125,7 @@ module Mongoid
           #     dod._id == _id
           #   end
           #
-          # @return [ Array<Document> ] The remaining docs.
+          # @return [ Array<Mongoid::Document> ] The remaining docs.
           def delete_if(&block)
             load_all!
             deleted = in_memory.select(&block)
@@ -242,7 +242,7 @@ module Mongoid
           #
           # @param [ Integer ] limit The number of documents to return.
           #
-          # @return [ Document ] The first document found.
+          # @return [ Mongoid::Document ] The first document found.
           def first(limit = nil)
             _loaded.try(:values).try(:first) ||
                 _added[(ul = _unloaded.try(:first, limit)).try(:_id)] ||
@@ -258,7 +258,7 @@ module Mongoid
           # @example Initialize the enumerable with an array.
           #   Enumerable.new([ post ])
           #
-          # @param [ Criteria | Array<Document> ] target The wrapped object.
+          # @param [ Mongoid::Criteria | Array<Mongoid::Document> ] target The wrapped object.
           def initialize(target, base = nil, association = nil)
             @_base = base
             @_association = association
@@ -278,7 +278,7 @@ module Mongoid
           # @example Does the target include the document?
           #   enumerable.include?(document)
           #
-          # @param [ Document ] doc The document to check.
+          # @param [ Mongoid::Document ] doc The document to check.
           #
           # @return [ true | false ] If the document is in the target.
           def include?(doc)
@@ -305,7 +305,7 @@ module Mongoid
           # @example Get the in memory docs.
           #   enumerable.in_memory
           #
-          # @return [ Array<Document> ] The in memory docs.
+          # @return [ Array<Mongoid::Document> ] The in memory docs.
           def in_memory
             docs = (_loaded.values + _added.values)
             docs.each do |doc|
@@ -327,7 +327,7 @@ module Mongoid
           #
           # @param [ Integer ] limit The number of documents to return.
           #
-          # @return [ Document ] The last document found.
+          # @return [ Mongoid::Document ] The last document found.
           def last(limit = nil)
             _added.values.try(:last) ||
                 _loaded.try(:values).try(:last) ||
@@ -392,7 +392,7 @@ module Mongoid
           # @example Reset the unloaded documents.
           #   enumerable.reset_unloaded(criteria)
           #
-          # @param [ Criteria ] criteria The criteria to replace with.
+          # @param [ Mongoid::Criteria ] criteria The criteria to replace with.
           def reset_unloaded(criteria)
             @_unloaded = criteria if _unloaded.is_a?(Criteria)
           end
@@ -460,7 +460,7 @@ module Mongoid
           # @example Get all the unique documents.
           #   enumerable.uniq
           #
-          # @return [ Array<Document> ] The unique documents.
+          # @return [ Array<Mongoid::Document> ] The unique documents.
           def uniq
             entries.uniq
           end

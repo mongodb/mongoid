@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Hash ] increments The field/inc increment pairs.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def inc(increments)
         prepare_atomic_operation do |ops|
           process_atomic_operations(increments) do |field, value|

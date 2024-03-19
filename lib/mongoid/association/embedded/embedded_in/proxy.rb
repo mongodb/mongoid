@@ -16,8 +16,8 @@ module Mongoid
           # @example Create the new association.
           #   Association::Embedded::EmbeddedIn.new(person, address, association)
           #
-          # @param [ Document ] base The document the association hangs off of.
-          # @param [ Document ] target The target (parent) of the association.
+          # @param [ Mongoid::Document ] base The document the association hangs off of.
+          # @param [ Mongoid::Document ] target The target (parent) of the association.
           # @param [ Mongoid::Association::Relatable ] association The association metadata.
           #
           # @return [ In ] The proxy.
@@ -34,9 +34,9 @@ module Mongoid
           # @example Substitute the new document.
           #   person.name.substitute(new_name)
           #
-          # @param [ Document | Hash ] replacement A document to replace the target.
+          # @param [ Mongoid::Document | Hash ] replacement A document to replace the target.
           #
-          # @return [ Document | nil ] The association or nil.
+          # @return [ Mongoid::Document | nil ] The association or nil.
           def substitute(replacement)
             unbind_one
             unless replacement
@@ -67,7 +67,7 @@ module Mongoid
           # @example Set the base association.
           #   object.characterize_one(document)
           #
-          # @param [ Document ] document The document to set the association metadata on.
+          # @param [ Mongoid::Document ] document The document to set the association metadata on.
           def characterize_one(document)
             _base._association ||= _association.inverse_association(document)
           end
@@ -112,7 +112,7 @@ module Mongoid
             # @example Get the path calculator.
             #   Proxy.path(document)
             #
-            # @param [ Document ] document The document to calculate on.
+            # @param [ Mongoid::Document ] document The document to calculate on.
             #
             # @return [ Root ] The root atomic path calculator.
             def path(document)
