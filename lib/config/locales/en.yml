@@ -254,8 +254,10 @@ en:
           resolution: "When defining the field :%{name} on '%{klass}', please provide
             valid options for the field. These are currently: %{valid}. If you
             meant to define a custom field option, please do so first as follows:\n\n
-            \_\_Mongoid::Fields.option :%{option} do |model, field, value|\n
-            \_\_\_\_# Your logic here...\n
+            \_\_Mongoid::Fields.configure do\n
+            \_\_\_\_option :%{option} do |model, field, value|\n
+            \_\_\_\_\_\_# Your logic here...\n
+            \_\_\_\_end\n
             \_\_end\n
             \_\_class %{klass}\n
             \_\_\_\_include Mongoid::Document\n
@@ -264,12 +266,21 @@ en:
             Refer to:
             https://www.mongodb.com/docs/mongoid/current/reference/fields/#custom-field-options"
         invalid_field_type:
-          message: "Invalid field type %{type_inspection} for field '%{field}' on model '%{klass}'."
-          summary: "Model '%{klass}' defines a field '%{field}' with an unknown type value
-            %{type_inspection}."
-          resolution: "Please provide a valid type value for the field.
+          message: "Invalid field type %{type_inspection} for field :%{field} on model '%{klass}'."
+          summary: "Model '%{klass}' defines a field :%{field} with an unknown :type value
+            %{type_inspection}. This value is neither present in Mongoid's default type mapping,
+            nor defined in a custom field type mapping."
+          resolution: "Please provide a valid :type value for the field. If you
+            meant to define a custom field type, please do so first as follows:\n\n
+            \_\_Mongoid::Fields.configure do\n
+            \_\_\_\_type %{type_inspection}, YourTypeClass
+            \_\_end\n
+            \_\_class %{klass}\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_field :%{field}, type: %{type_inspection}\n
+            \_\_end\n\n
             Refer to:
-            https://www.mongodb.com/docs/mongoid/current/reference/fields/#using-symbols-or-strings-instead-of-classes"
+            https://www.mongodb.com/docs/mongoid/current/reference/fields/#custom-field-types"
         invalid_global_executor_concurrency:
           message: "Invalid global_executor_concurrency option."
           summary: "You set global_executor_concurrency while async_query_executor
