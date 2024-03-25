@@ -541,9 +541,8 @@ Place the following in one of environment configuration files, such as
 
 .. note::
 
-  The ``log_level`` Mongoid `configuration option <configuration-options>`_
-  is not used when Mongoid operates in a Rails application, because Mongoid
-  inherits Rails' log level in this case.
+  The ``log_level`` Mongoid configuration option is not used when Mongoid operates
+  in a Rails application, because Mongoid inherits Rails' log level in this case.
 
 To configure either Mongoid or driver logger differently from the Rails logger,
 use an initializer as follows:
@@ -590,8 +589,8 @@ Standalone
 ----------
 
 When not loaded in a Ruby on Rails application, Mongoid respects the
-``log_level`` top level `configuration option <configuration-options>`_.
-It can be given in the configuration file as follows:
+``log_level`` top level configuration option. It can be given in the
+configuration file as follows:
 
 .. code-block:: yaml
 
@@ -830,7 +829,7 @@ Client-Side Encryption
 When loading the configuration file, Mongoid permits the file to contain
 ``BSON::Binary`` instances which are used for specifying ``keyId`` in
 the schema map for `client-side encryption
-<https://www.mongodb.com/docs/ruby-driver/current/reference/client-side-encryption/>`_,
+<https://www.mongodb.com/docs/ruby-driver/current/reference/in-use-encryption/client-side-encryption/>`_,
 as the following example shows:
 
 .. code-block:: yaml
