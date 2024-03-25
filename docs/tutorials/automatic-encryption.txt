@@ -64,9 +64,11 @@ This can be done one of two ways.
 Install the automatic encryption shared library (Ruby driver 2.19+)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you use the Ruby driver version 2.19 and above the automatic encryption
-shared library should be installed by following the instructions in the
-`MongoDB manual <https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`_.
+If you use the Ruby driver version 2.19 and above, the automatic encryption
+shared library should be installed by following the instructions on the
+:manual:`Automatic Encryption Shared Library for Queryable Encryption 
+</core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`
+page in the Server manual.
 
 The steps required are as follows:
 
@@ -253,9 +255,9 @@ Now we can tell Mongoid what should be encrypted:
 Known Limitations
 ~~~~~~~~~~~~~~~~~
 
-* MongoDB CSFLE has some limitations that are described in
-  `the server documentation. <https://www.mongodb.com/docs/manual/core/csfle/reference/limitations/>`_
-  These limitations also apply to Mongoid.
+* MongoDB CSFLE has some limitations that are described on the
+  :manual:`CSFLE Limitations </core/csfle/reference/limitations/>`
+  page in the Server manual. These limitations also apply to Mongoid.
 * Mongoid does not support encryption of ``embeds_many`` relations.
 * If you use ``:key_name_field`` option, the field must be encrypted using
   non-deterministic algorithm. To encrypt your field deterministically, you must
