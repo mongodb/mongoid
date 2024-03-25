@@ -4,6 +4,16 @@
 require "spec_helper"
 
 describe Mongoid::Clients::Sessions do
+  let(:buffer) { StringIO.new }
+  let(:logger) { ::Logger.new(buffer, Logger::DEBUG) }
+
+  around do |example|
+    old_logger = Mongoid.logger
+    Mongoid.logger = logger
+    example.run
+  ensure
+    Mongoid.logger = old_logger
+  end
 
   before(:all) do
     CONFIG[:clients][:other] = CONFIG[:clients][:default].dup
@@ -232,6 +242,10 @@ describe Mongoid::Clients::Sessions do
             expect(insert_lsids_sent.uniq.size).to eq(1)
             expect(update_lsids_sent.uniq).to eq(insert_lsids_sent.uniq)
           end
+
+          it 'does not warn about a different client' do
+            expect(buffer.string).not_to include("used within another client's session")
+          end
         end
 
         context 'when the other class uses a different client' do
@@ -259,6 +273,10 @@ describe Mongoid::Clients::Sessions do
             expect(Post.count).to be(1)
             update_lsids_sent = update_events.collect { |event| event.command['lsid'] }
             expect(update_lsids_sent.size).to eq(2)
+          end
+
+          it 'warns about a different client' do
+            expect(buffer.string).to include("used within another client's session")
           end
         end
 
