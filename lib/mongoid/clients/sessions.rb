@@ -233,6 +233,42 @@ module Mongoid
           end
         end
       end
+
+      private
+
+      # If at least one session is active, this ensures that the
+      # current model's client is compatible with one of them.
+      #
+      # "Compatible" is defined to mean: the same client was used
+      # to open one of the active sessions.
+      #
+      # Currently emits a warning.
+      def ensure_client_compatibility!
+        # short circuit: if no sessions are active, there's nothing
+        # to check.
+        return unless Threaded.sessions.any?
+
+        # at this point, we know that at least one session is currently
+        # active. let's see if one of them was started with the model's
+        # client...
+        session = Threaded.get_session(client: persistence_context.client)
+
+        # if not, then we have a case of the programmer trying to use
+        # a model within a transaction, where the model is not itself
+        # controlled by that transaction. this is potentially a bug, so
+        # let's tell them about it.
+        if session.nil?
+          # This is hacky; we're hijacking Mongoid::Errors::MongoidError in
+          # order to get the spiffy error message translation. If we later
+          # decide to raise an error instead of just writing a message, we can
+          # subclass MongoidError and raise that exception here.
+          message = Errors::MongoidError.new.compose_message(
+            'client_session_mismatch',
+            model: self.class.name
+          )
+          logger.info(message)
+        end
+      end
     end
   end
 end
