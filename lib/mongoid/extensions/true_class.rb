@@ -5,17 +5,6 @@ module Mongoid
   module Extensions
     # Adds type-casting behavior to TrueClass
     module TrueClass
-      # Get the value of the object as a mongo friendly sort value.
-      #
-      # @example Get the object as sort criteria.
-      #   object.__sortable__
-      #
-      # @return [ Integer ] 1.
-      # @deprecated
-      def __sortable__
-        1
-      end
-      Mongoid.deprecate(self, :__sortable__)
 
       # Is the passed value a boolean?
       #
