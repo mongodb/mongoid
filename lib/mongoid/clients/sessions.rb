@@ -90,6 +90,8 @@ module Mongoid
               session.start_transaction(options)
               yield
               commit_transaction(session)
+            rescue Mongo::Error::TransactionsNotSupported
+              raise Mongoid::Errors::TransactionsNotSupported
             rescue Mongoid::Errors::Rollback
               abort_transaction(session)
             rescue Mongoid::Errors::InvalidSessionNesting
