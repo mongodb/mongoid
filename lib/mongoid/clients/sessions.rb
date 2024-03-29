@@ -59,6 +59,8 @@ module Mongoid
           else
             raise ex
           end
+        rescue *transactions_not_supported_exceptions
+          raise Mongoid::Errors::TransactionsNotSupported
         ensure
           Threaded.clear_session(client: persistence_context.client)
         end
