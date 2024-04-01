@@ -927,7 +927,7 @@ Reading Uncastable Values
 `````````````````````````
 
 When documents in the database contain values of different types than their
-represenations in Mongoid, if Mongoid cannot coerce them into the correct type,
+representations in Mongoid, if Mongoid cannot coerce them into the correct type,
 it will replace the value with ``nil``. Consider the following model and document in the
 database:
 
@@ -1105,7 +1105,7 @@ used for MongoDB serialization and deserialization as follows:
   end
 
 The instance method ``mongoize`` takes an instance of your custom type object, and
-converts it into a represenation of how it will be stored in the database, i.e. to pass
+converts it into a representation of how it will be stored in the database, i.e. to pass
 to the MongoDB Ruby driver. In our example above, we want to store our ``Point``
 object as an ``Array`` in the form ``[ x, y ]``.
 
@@ -1228,7 +1228,7 @@ which extend its behavior at the your time model classes are loaded.
 
 As an example, we will define a ``:max_length`` option which will add a length
 validator for the field. First, declare the new field option in an initializer,
-specifiying its handler function as a block:
+specifying its handler function as a block:
 
 .. code-block:: ruby
 
