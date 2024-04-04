@@ -892,7 +892,7 @@ Puma
 ----
 
 Use the ``on_worker_boot`` hook to reconnect clients in the workers and
-the ``before_fork`` and ``before_refork`` hooks to close clients in the
+the ``before_fork`` and ``on_refork`` hooks to close clients in the
 parent process (`Puma documentation <https://puma.io/puma/#clustered-mode>`_):
 
 .. code-block:: ruby
@@ -901,8 +901,8 @@ parent process (`Puma documentation <https://puma.io/puma/#clustered-mode>`_):
     Mongoid.disconnect_clients
   end
 
-  # before_refork is required when using Puma's fork_worker option.
-  before_refork do
+  # on_refork is required when using Puma's fork_worker option.
+  on_refork do
     Mongoid.disconnect_clients
   end
 
