@@ -47,9 +47,7 @@ module Mongoid
       #
       # @return [ Array<Mongo::Client> ] The driver clients.
       def disconnect
-        clients.values.each do |client|
-          client.close
-        end
+        clients.each_value(&:close)
       end
 
       # Reconnect all active clients.
@@ -59,9 +57,7 @@ module Mongoid
       #
       # @return [ Array<Mongo::Client> ] The driver clients.
       def reconnect
-        clients.values.each do |client|
-          client.reconnect
-        end
+        clients.each_value(&:reconnect)
       end
 
       # Get a stored client with the provided name. If no client exists
