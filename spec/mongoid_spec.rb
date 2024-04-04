@@ -81,6 +81,32 @@ describe Mongoid do
       end
       Mongoid.disconnect_clients
     end
+
+    it "returns the underlying driver clients" do
+      expect(Mongoid.disconnect_clients).to eq(clients)
+    end
+  end
+
+  describe ".reconnect_clients" do
+
+    let(:clients) do
+      Mongoid::Clients.clients.values
+    end
+
+    before do
+      Band.all.entries
+    end
+
+    it "reconnects all active clients" do
+      clients.each do |client|
+        expect(client).to receive(:reconnect).and_call_original
+      end
+      Mongoid.reconnect_clients
+    end
+
+    it "returns the underlying driver clients" do
+      expect(Mongoid.reconnect_clients).to eq(clients)
+    end
   end
 
   describe ".client" do

@@ -95,9 +95,19 @@ module Mongoid
   # @example Disconnect all active clients.
   #   Mongoid.disconnect_clients
   #
-  # @return [ true ] True.
+  # @return [ Array<Mongo::Client> ] The driver clients.
   def disconnect_clients
     Clients.disconnect
+  end
+
+  # Reconnect all active clients.
+  #
+  # @example Reconnect all active clients.
+  #   Mongoid.reconnect_clients
+  #
+  # @return [ Array<Mongo::Client> ] The driver clients.
+  def reconnect_clients
+    Clients.reconnect
   end
 
   # Convenience method for getting a named client.

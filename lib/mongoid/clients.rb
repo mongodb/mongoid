@@ -45,10 +45,22 @@ module Mongoid
       # @example Disconnect all active clients.
       #   Mongoid::Clients.disconnect
       #
-      # @return [ true ] True.
+      # @return [ Array<Mongo::Client> ] The driver clients.
       def disconnect
         clients.values.each do |client|
           client.close
+        end
+      end
+
+      # Reconnect all active clients.
+      #
+      # @example Reconnect all active clients.
+      #   Mongoid::Clients.reconnect
+      #
+      # @return [ Array<Mongo::Client> ] The driver clients.
+      def reconnect
+        clients.values.each do |client|
+          client.reconnect
         end
       end
 
