@@ -900,18 +900,18 @@ parent process (`Puma documentation <https://puma.io/puma/#clustered-mode>`_).
 
   # config/puma.rb
 
-  # Triggered in the Puma master process before it forks a child worker.
+  # Runs in the Puma master process before it forks a child worker.
   before_fork do
     Mongoid.disconnect_clients
   end
 
-  # Required when using Puma's fork_worker option. Triggered when
-  # child worker 0 before it forks granchild workers.
+  # Required when using Puma's fork_worker option. Runs in the
+  # child worker 0 process before it forks grandchild workers.
   on_refork do
     Mongoid.disconnect_clients
   end
 
-  # Triggered in each Puma child process after it forks from its parent.
+  # Runs in each Puma child process after it forks from its parent.
   on_worker_boot do
     Mongoid.reconnect_clients
   end
