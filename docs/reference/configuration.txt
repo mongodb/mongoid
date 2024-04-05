@@ -865,6 +865,7 @@ Usage with Forking Servers
 
 When using Mongoid with a forking web server such as Puma, or any application
 that otherwise forks to spawn child processes, special considerations apply.
+
 If possible, we recommend to not perform any MongoDB operations in the parent
 process prior to forking, which will avoid any forking-related pitfalls.
 
@@ -893,19 +894,24 @@ Puma
 
 Use the ``on_worker_boot`` hook to reconnect clients in the workers and
 the ``before_fork`` and ``on_refork`` hooks to close clients in the
-parent process (`Puma documentation <https://puma.io/puma/#clustered-mode>`_):
+parent process (`Puma documentation <https://puma.io/puma/#clustered-mode>`_).
 
 .. code-block:: ruby
 
+  # config/puma.rb
+
+  # Triggered in the Puma master process before it forks a child worker.
   before_fork do
     Mongoid.disconnect_clients
   end
 
-  # on_refork is required when using Puma's fork_worker option.
+  # Required when using Puma's fork_worker option. Triggered when
+  # child worker 0 before it forks granchild workers.
   on_refork do
     Mongoid.disconnect_clients
   end
 
+  # Triggered in each Puma child process after it forks from its parent.
   on_worker_boot do
     Mongoid.reconnect_clients
   end
@@ -918,6 +924,8 @@ the ``before_fork`` hook to close clients in the parent process
 (`Unicorn documentation <https://yhbt.net/unicorn/Unicorn/Configurator.html>`_):
 
 .. code-block:: ruby
+
+  # config/unicorn.rb
 
   before_fork do |_server, _worker|
     Mongoid.disconnect_clients
