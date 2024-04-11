@@ -19,6 +19,38 @@ module Mongoid
       "#<#{self.class.name} _id: #{_id}, #{inspection * ', '}>"
     end
 
+    # This pretty prints the same information as the inspect method. This is
+    # meant to be called by the default 'pp' gem.
+    #
+    # @param [ PP ] pretty_printer The pretty printer.
+    #
+    # @example Pretty print the document.
+    #   person.pretty_inspect
+    #
+    # @api private
+    def pretty_print(pretty_printer)
+      keys = fields.keys | attributes.keys
+      pretty_printer.group(1, "#<#{self.class.name}", '>') do
+        sep = lambda { pretty_printer.text(',') }
+        pretty_printer.seplist(keys, sep) do |key|
+          pretty_printer.breakable
+          as = if (field = fields[key])
+            field.options[:as]
+          end
+          pretty_printer.text("#{key}#{as ? "(#{as})" : nil}")
+          pretty_printer.text(':')
+          pretty_printer.group(1) do
+            pretty_printer.breakable
+            if key == "_id"
+              pretty_printer.text(_id.to_s)
+            else
+              pretty_printer.pp(@attributes[key])
+            end
+          end
+        end
+      end
+    end
+
     private
 
     # Get an array of inspected fields for the document.
