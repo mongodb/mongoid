@@ -96,7 +96,7 @@ the ``.`` (dot) character to delimit the field names:
 
   Because the ``.`` character in shard keys is reserved for referencing embedded document fields,
   MongoDB `does not currently support <https://www.mongodb.com/docs/manual/core/dot-dollar-considerations/>`_
-  using fields whose names literally contain the ``.`` character as shard keys.
+  using fields whose names contain the ``.`` character as shard keys.
 
 .. note::
 
