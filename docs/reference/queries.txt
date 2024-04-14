@@ -1151,7 +1151,7 @@ examples.
 If any of the ``_id`` values are not found in the database, the behavior of
 ``find`` depends on the value of the ``raise_not_found_error`` configuration
 option. If the option is set to ``true``, ``find`` raises
-``Mongoid::Errors::DocumentNotFound`` if any of the ``_id``s are not found.
+``Mongoid::Errors::DocumentNotFound`` if any of the ``_id``\s are not found.
 If the option is set to ``false`` and ``find`` is given a single ``_id`` to
 find and there is no matching document, ``find`` returns ``nil``. If the
 option is set to ``false`` and ``find`` is given an array of ids to find

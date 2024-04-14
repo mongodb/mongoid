@@ -59,6 +59,8 @@ module Mongoid
           else
             raise ex
           end
+        rescue *transactions_not_supported_exceptions
+          raise Mongoid::Errors::TransactionsNotSupported
         ensure
           Threaded.clear_session(client: persistence_context.client)
         end
@@ -90,6 +92,8 @@ module Mongoid
               session.start_transaction(options)
               yield
               commit_transaction(session)
+            rescue *transactions_not_supported_exceptions
+              raise Mongoid::Errors::TransactionsNotSupported
             rescue Mongoid::Errors::Rollback
               abort_transaction(session)
             rescue Mongoid::Errors::InvalidSessionNesting
@@ -149,6 +153,22 @@ module Mongoid
         end
 
         private
+
+        # Driver version 2.20 introduced a new exception for reporting that
+        # transactions are not supported. Prior to that, the condition was
+        # discovered by the rescue clause falling through to a different
+        # exception.
+        #
+        # This method ensures that Mongoid continues to work with older driver
+        # versions, by only returning the new exception.
+        #
+        # Once support is removed for all versions prior to 2.20.0, we can
+        # replace this method.
+        def transactions_not_supported_exceptions
+          return nil unless defined? Mongo::Error::TransactionsNotSupported
+
+          Mongo::Error::TransactionsNotSupported
+        end
 
         # @return [ Mongo::Session ] Session for the current client.
         def _session
@@ -231,6 +251,42 @@ module Mongoid
               destroyed?
             end
           end
+        end
+      end
+
+      private
+
+      # If at least one session is active, this ensures that the
+      # current model's client is compatible with one of them.
+      #
+      # "Compatible" is defined to mean: the same client was used
+      # to open one of the active sessions.
+      #
+      # Currently emits a warning.
+      def ensure_client_compatibility!
+        # short circuit: if no sessions are active, there's nothing
+        # to check.
+        return unless Threaded.sessions.any?
+
+        # at this point, we know that at least one session is currently
+        # active. let's see if one of them was started with the model's
+        # client...
+        session = Threaded.get_session(client: persistence_context.client)
+
+        # if not, then we have a case of the programmer trying to use
+        # a model within a transaction, where the model is not itself
+        # controlled by that transaction. this is potentially a bug, so
+        # let's tell them about it.
+        if session.nil?
+          # This is hacky; we're hijacking Mongoid::Errors::MongoidError in
+          # order to get the spiffy error message translation. If we later
+          # decide to raise an error instead of just writing a message, we can
+          # subclass MongoidError and raise that exception here.
+          message = Errors::MongoidError.new.compose_message(
+            'client_session_mismatch',
+            model: self.class.name
+          )
+          logger.info(message)
         end
       end
     end
