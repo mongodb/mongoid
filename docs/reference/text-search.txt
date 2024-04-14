@@ -35,8 +35,8 @@ To perform text search with Mongoid, follow these steps:
 Defining Text Search Index
 --------------------------
 
-Index definition through Mongoid is described in detail on the `indexes
-<indexes>`_ page. Text search indexes are described in detail
+Index definition through Mongoid is described in detail on the :ref:`indexes
+<indexes>` page. Text search indexes are described in detail
 under `text indexes <https://mongodb.com/docs/manual/core/index-text/>`_
 in the MongoDB manual. Below is an example definition of a Band model with
 a text index utilizing the description field:

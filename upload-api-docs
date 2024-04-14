@@ -7,7 +7,7 @@ gemfile true do
   source 'https://rubygems.org'
   gem 'nokogiri'
   gem 'aws-sdk-s3'
-  gem 'yard'
+  gem 'yard', '>= 0.9.35'
 end
 
 require 'aws-sdk-s3'
@@ -29,6 +29,7 @@ class FileUploader
   end
 
   def upload_docs
+    puts "Uploading to #{@bucket}"
     Dir.glob("#{@docs_path}/**/*").each do |file|
       next if File.directory?(file)
 
@@ -115,6 +116,11 @@ def generate_docs(options)
     '--readme', './README.md',
     '-o', options[:docs_path]
   )
+  begin
+    File.delete(File.join(options[:docs_path], 'frames.html'))
+  rescue StandardError
+    nil
+  end
 end
 
 options = Options.new
