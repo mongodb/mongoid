@@ -162,7 +162,7 @@ module Mongoid
     #
     # @param [ [ Object | Array<Object> ]... ] *args The id(s) to find.
     #
-    # @return [ Document | Array<Document> | nil ] A document or matching documents.
+    # @return [ Mongoid::Document | Array<Mongoid::Document> | nil ] A document or matching documents.
     #
     # @raise Errors::DocumentNotFound If not all documents are found and
     #   the +raise_not_found_error+ Mongoid configuration option is truthy.
@@ -188,7 +188,7 @@ module Mongoid
     # @raise [ Errors::DocumentNotFound ] If no document found
     # and Mongoid.raise_not_found_error is true.
     #
-    # @return [ Document | nil ] A matching document.
+    # @return [ Mongoid::Document | nil ] A matching document.
     def find_by(attrs = {})
       result = where(attrs).find_first
       if result.nil? && Mongoid.raise_not_found_error
@@ -208,7 +208,7 @@ module Mongoid
     #
     # @raise [ Errors::DocumentNotFound ] If no document found.
     #
-    # @return [ Document ] A matching document.
+    # @return [ Mongoid::Document ] A matching document.
     def find_by!(attrs = {})
       result = where(attrs).find_first
       raise(Errors::DocumentNotFound.new(self, attrs)) unless result
@@ -223,7 +223,7 @@ module Mongoid
     #
     # @param [ Integer ] limit The number of documents to return.
     #
-    # @return [ Document ] The first matching document.
+    # @return [ Mongoid::Document ] The first matching document.
     def first(limit = nil)
       with_default_scope.first(limit)
     end
@@ -236,7 +236,7 @@ module Mongoid
     #
     # @param [ Integer ] limit The number of documents to return.
     #
-    # @return [ Document ] The last matching document.
+    # @return [ Mongoid::Document ] The last matching document.
     def last(limit = nil)
       with_default_scope.last(limit)
     end

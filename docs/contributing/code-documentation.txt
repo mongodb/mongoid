@@ -149,6 +149,31 @@ Formatting
 Type Declaration
 ----------------
 
+- **Namespaces:** Always use fully-namespaced class/module names.
+  Do not use leading colons ``::``.
+
+  .. code-block:: ruby
+
+    # GOOD:
+    # @param [ ActiveSupport::TimeWithZone ] time Time for alarm.
+
+    # BAD:
+    # @param [ TimeWithZone ] time Time for alarm.
+    # @param [ ::ActiveSupport::TimeWithZone ] time Time for alarm.
+
+- **Module Types:** It is acceptable to reference types by a module
+  which they include.
+
+  .. code-block:: ruby
+
+    class Person
+      include ActiveModel::Model
+    end
+
+    # @param [ ActiveModel::Model ] model Any object whose class
+    #   includes ActiveModel::Model. An instance of Person would
+    #   be acceptable here.
+
 - **Type Unions:** Use pipe ``|`` to denote a union of allowed types.
 
   .. code-block:: ruby

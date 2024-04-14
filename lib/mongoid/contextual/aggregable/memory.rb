@@ -51,7 +51,7 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to max.
         #
-        # @return [ Numeric | Document ] The max value or document with the max
+        # @return [ Numeric | Mongoid::Document ] The max value or document with the max
         #   value.
         def max(field = nil)
           return super() if block_given?
@@ -73,7 +73,7 @@ module Mongoid
         #
         # @param [ Symbol ] field The field to min.
         #
-        # @return [ Numeric | Document ] The min value or document with the min
+        # @return [ Numeric | Mongoid::Document ] The min value or document with the min
         #   value.
         def min(field = nil)
           return super() if block_given?

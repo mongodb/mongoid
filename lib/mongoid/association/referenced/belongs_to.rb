@@ -125,7 +125,7 @@ module Mongoid
         # @example Get the path calculator.
         #   association.path(document)
         #
-        # @param [ Document ] document The document to calculate on.
+        # @param [ Mongoid::Document ] document The document to calculate on.
         #
         # @return [ Root ] The root atomic path calculator.
         def path(document)

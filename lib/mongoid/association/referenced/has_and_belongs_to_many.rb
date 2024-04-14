@@ -130,7 +130,7 @@ module Mongoid
         # Whether trying to bind an object using this association should raise
         # an error.
         #
-        # @param [ Document ] doc The document to be bound.
+        # @param [ Mongoid::Document ] doc The document to be bound.
         #
         # @return [ true | false ] Whether the document can be bound.
         def bindable?(doc)
@@ -160,7 +160,7 @@ module Mongoid
         # @example Get the path calculator.
         #   association.path(document)
         #
-        # @param [ Document ] document The document to calculate on.
+        # @param [ Mongoid::Document ] document The document to calculate on.
         #
         # @return [ Root ] The root atomic path calculator.
         def path(document)

@@ -16,7 +16,7 @@ module Mongoid
       #
       # @param [ Hash ] options Options to pass to insert.
       #
-      # @return [ Document ] The persisted document.
+      # @return [ Mongoid::Document ] The persisted document.
       def insert(options = {})
         prepare_insert(options) do
           if embedded?
@@ -48,7 +48,7 @@ module Mongoid
       # @example Insert the document as embedded.
       #   document.insert_as_embedded
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def insert_as_embedded
         raise Errors::NoParent.new(self.class.name) unless _parent
         if _parent.new_record?
@@ -68,7 +68,7 @@ module Mongoid
       # @example Insert the document as root.
       #   document.insert_as_root
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def insert_as_root
         collection.insert_one(as_attributes, session: _session)
       end
@@ -100,7 +100,7 @@ module Mongoid
       #
       # @param [ Hash ] options The options.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def prepare_insert(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self if performing_validations?(options) &&
@@ -141,7 +141,7 @@ module Mongoid
         # @param [ Hash | Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
         #
-        # @return [ Document | Array<Document> ] The newly created document(s).
+        # @return [ Mongoid::Document | Array<Mongoid::Document> ] The newly created document(s).
         def create(attributes = nil, &block)
           _creating do
             if attributes.is_a?(::Array)
@@ -168,7 +168,7 @@ module Mongoid
         # @param [ Hash | Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
         #
-        # @return [ Document | Array<Document> ] The newly created document(s).
+        # @return [ Mongoid::Document | Array<Mongoid::Document> ] The newly created document(s).
         def create!(attributes = nil, &block)
           _creating do
             if attributes.is_a?(::Array)

@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Hash ] factors The field/factor multiplier pairs.
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       def mul(factors)
         prepare_atomic_operation do |ops|
           process_atomic_operations(factors) do |field, value|

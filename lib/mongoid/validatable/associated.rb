@@ -45,7 +45,7 @@ module Mongoid
       # persisted and unchanged, or invalid. Otherwise, the appropriate errors
       # will be added to the parent document.
       #
-      # @param [ Document ] document The document to validate.
+      # @param [ Mongoid::Document ] document The document to validate.
       # @param [ Symbol ] attribute The association to validate.
       def validate_association(document, attribute)
         # grab the proxy from the instance variable directly; we don't want

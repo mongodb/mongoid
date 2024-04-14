@@ -16,7 +16,7 @@ module Mongoid
           # @example Create the path util.
           #   Many.new(document)
           #
-          # @param [ Document ] document The document to generate the paths for.
+          # @param [ Mongoid::Document ] document The document to generate the paths for.
           def initialize(document)
             @document, @parent = document, document._parent
             @insert_modifier, @delete_modifier ="$push", "$pull"
@@ -45,7 +45,7 @@ module Mongoid
             # require passing in a document to store, which we don't have when
             # trying to store the empty list.
             #
-            # @param [ Document ] parent The parent document to store in.
+            # @param [ Mongoid::Document ] parent The parent document to store in.
             # @param [ Mongoid::Association::Relatable ] association The association metadata.
             #
             # @return [ String ] The position string.

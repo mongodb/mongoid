@@ -71,7 +71,7 @@ module Mongoid
       # @example Initialize the new map/reduce.
       #   MapReduce.new(criteria, map, reduce)
       #
-      # @param [ Criteria ] criteria The Mongoid criteria.
+      # @param [ Mongoid::Criteria ] criteria The Mongoid criteria.
       # @param [ String ] map The map js function.
       # @param [ String ] reduce The reduce js function.
       def initialize(collection, criteria, map, reduce)

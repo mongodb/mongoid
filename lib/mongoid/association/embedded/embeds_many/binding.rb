@@ -16,7 +16,7 @@ module Mongoid
           # @example Bind one document.
           #   person.addresses.bind_one(address)
           #
-          # @param [ Document ] doc The single document to bind.
+          # @param [ Mongoid::Document ] doc The single document to bind.
           def bind_one(doc)
             doc.parentize(_base)
             binding do
@@ -30,7 +30,7 @@ module Mongoid
           # @example Unbind the document.
           #   person.addresses.unbind_one(document)
           #
-          # @param [ Document ] doc The single document to unbind.
+          # @param [ Mongoid::Document ] doc The single document to unbind.
           def unbind_one(doc)
             binding do
               try_method(doc, _association.inverse_setter(_target), nil)

@@ -30,7 +30,7 @@ module Mongoid
     # @example Add the atomic pull.
     #   person.add_atomic_pull(address)
     #
-    # @param [ Document ] document The embedded document to pull.
+    # @param [ Mongoid::Document ] document The embedded document to pull.
     def add_atomic_pull(document)
       document.flagged_for_destroy = true
       key = document.association_name.to_s
@@ -43,9 +43,9 @@ module Mongoid
     # @example Add an atomic unset.
     #   document.add_atomic_unset(doc)
     #
-    # @param [ Document ] document The child document.
+    # @param [ Mongoid::Document ] document The child document.
     #
-    # @return [ Array<Document> ] The children.
+    # @return [ Array<Mongoid::Document> ] The children.
     def add_atomic_unset(document)
       document.flagged_for_destroy = true
       key = document.association_name.to_s
@@ -333,7 +333,7 @@ module Mongoid
     #   model.generate_atomic_updates(mods, doc)
     #
     # @param [ Modifiers ] mods The atomic modifications.
-    # @param [ Document ] doc The document to update for.
+    # @param [ Mongoid::Document ] doc The document to update for.
     def generate_atomic_updates(mods, doc)
       mods.unset(doc.atomic_unsets)
       mods.pull(doc.atomic_pulls)

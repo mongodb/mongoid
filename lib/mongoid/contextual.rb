@@ -45,7 +45,7 @@ module Mongoid
     # Note that depending on the context and on the Mongoid configuration,
     # documents can be loaded synchronously on the caller's thread.
     #
-    # @return [ Criteria ] Returns self.
+    # @return [ Mongoid::Criteria ] Returns self.
     def load_async
       context.load_async if context.respond_to?(:load_async)
       self

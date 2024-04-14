@@ -23,7 +23,7 @@ module Mongoid
       #   If selected_fields is specified, fields not listed in it will not be
       #   accessible in the built document.
       #
-      # @return [ Proxy ] The association.
+      # @return [ Mongoid::Association::Proxy ] The association.
       def __build__(name, object, association, selected_fields = nil)
         relation = create_relation(object, association, selected_fields)
         set_relation(name, relation)
@@ -34,13 +34,13 @@ module Mongoid
       # @example Create the association.
       #   person.create_relation(document, association)
       #
-      # @param [ Document | Array<Document> ] object The association target.
+      # @param [ Mongoid::Document | Array<Mongoid::Document> ] object The association target.
       # @param [ Mongoid::Association::Relatable ] association The association metadata.
       # @param [ Hash ] selected_fields Fields which were retrieved via #only.
       #   If selected_fields is specified, fields not listed in it will not be
       #   accessible in the created association document.
       #
-      # @return [ Proxy ] The association.
+      # @return [ Mongoid::Association::Proxy ] The association.
       def create_relation(object, association, selected_fields = nil)
         type = @attributes[association.inverse_type]
         target = if t = association.build(self, object, type, selected_fields)
@@ -82,9 +82,9 @@ module Mongoid
       #   person.set(:addresses, addresses)
       #
       # @param [ String | Symbol ] name The name of the association.
-      # @param [ Proxy ] relation The association to set.
+      # @param [ Mongoid::Association::Proxy ] relation The association to set.
       #
-      # @return [ Proxy ] The association.
+      # @return [ Mongoid::Association::Proxy ] The association.
       def set_relation(name, relation)
         instance_variable_set("@_#{name}", relation)
       end
@@ -104,7 +104,7 @@ module Mongoid
       # @param [ Object ] object The object used to build the association.
       # @param [ true | false ] reload If the association is to be reloaded.
       #
-      # @return [ Proxy ] The association.
+      # @return [ Mongoid::Association::Proxy ] The association.
       def get_relation(name, association, object, reload = false)
         field_name = database_field_name(name)
 

@@ -27,7 +27,7 @@ module Mongoid
         # @example Is there a reject proc?
         #   builder.reject?
         #
-        # @param [ Document ] document The parent document of the association
+        # @param [ Mongoid::Document ] document The parent document of the association
         # @param [ Hash ] attrs The attributes to check for rejection.
         #
         # @return [ true | false ] True and call proc or method if rejectable, false if not.

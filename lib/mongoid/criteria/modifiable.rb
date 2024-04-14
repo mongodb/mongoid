@@ -22,7 +22,7 @@ module Mongoid
       # @example Build with selectors getting ignored.
       #   Person.where(:age.gt => 5).build
       #
-      # @return [ Document ] A non-persisted document.
+      # @return [ Mongoid::Document ] A non-persisted document.
       def build(attrs = {}, &block)
         create_document(:new, attrs, &block)
       end
@@ -37,7 +37,7 @@ module Mongoid
       # @example Create with selectors getting ignored.
       #   Person.where(:age.gt => 5).create
       #
-      # @return [ Document ] A newly created document.
+      # @return [ Mongoid::Document ] A newly created document.
       def create(attrs = {}, &block)
         create_document(:create, attrs, &block)
       end
@@ -54,7 +54,7 @@ module Mongoid
       #
       # @raise [ Errors::Validations ] on a validation error.
       #
-      # @return [ Document ] A newly created document.
+      # @return [ Mongoid::Document ] A newly created document.
       def create!(attrs = {}, &block)
         create_document(:create!, attrs, &block)
       end
@@ -83,7 +83,7 @@ module Mongoid
       #
       # @param [ Hash ] attrs The attributes to check.
       #
-      # @return [ Document ] A matching or newly created document.
+      # @return [ Mongoid::Document ] A matching or newly created document.
       def find_or_create_by(attrs = {}, &block)
         find_or(:create, attrs, &block)
       end
@@ -99,7 +99,7 @@ module Mongoid
       #
       # @raise [ Errors::Validations ] on validation error.
       #
-      # @return [ Document ] A matching or newly created document.
+      # @return [ Mongoid::Document ] A matching or newly created document.
       def find_or_create_by!(attrs = {}, &block)
         find_or(:create!, attrs, &block)
       end
@@ -112,7 +112,7 @@ module Mongoid
       #
       # @param [ Hash ] attrs The attributes to check.
       #
-      # @return [ Document ] A matching or newly initialized document.
+      # @return [ Mongoid::Document ] A matching or newly initialized document.
       def find_or_initialize_by(attrs = {}, &block)
         find_or(:new, attrs, &block)
       end
@@ -125,7 +125,7 @@ module Mongoid
       #
       # @param [ Hash ] attrs The additional attributes to add.
       #
-      # @return [ Document ] A matching or newly created document.
+      # @return [ Mongoid::Document ] A matching or newly created document.
       def first_or_create(attrs = nil, &block)
         first_or(:create, attrs, &block)
       end
@@ -139,7 +139,7 @@ module Mongoid
       #
       # @param [ Hash ] attrs The additional attributes to add.
       #
-      # @return [ Document ] A matching or newly created document.
+      # @return [ Mongoid::Document ] A matching or newly created document.
       def first_or_create!(attrs = nil, &block)
         first_or(:create!, attrs, &block)
       end
@@ -152,7 +152,7 @@ module Mongoid
       #
       # @param [ Hash ] attrs The additional attributes to add.
       #
-      # @return [ Document ] A matching or newly initialized document.
+      # @return [ Mongoid::Document ] A matching or newly initialized document.
       def first_or_initialize(attrs = nil, &block)
         first_or(:new, attrs, &block)
       end
@@ -170,7 +170,7 @@ module Mongoid
       # @param [ Symbol ] method Either :new or :create.
       # @param [ Hash ] attrs Additional attributes to use.
       #
-      # @return [ Document ] The new or saved document.
+      # @return [ Mongoid::Document ] The new or saved document.
       def create_document(method, attrs = nil, &block)
         attrs = (create_attrs || {}).merge(attrs || {})
         attributes = selector.reduce(attrs) do |hash, (key, value)|
@@ -200,7 +200,7 @@ module Mongoid
       # @param [ Symbol ] method The method to invoke.
       # @param [ Hash ] attrs The attributes to query or set.
       #
-      # @return [ Document ] The first or new document.
+      # @return [ Mongoid::Document ] The first or new document.
       def find_or(method, attrs = {}, &block)
         where(attrs).first || send(method, attrs, &block)
       end
@@ -215,7 +215,7 @@ module Mongoid
       # @param [ Symbol ] method The method to invoke.
       # @param [ Hash ] attrs The attributes to query or set.
       #
-      # @return [ Document ] The first or new document.
+      # @return [ Mongoid::Document ] The first or new document.
       def first_or(method, attrs = {}, &block)
         first || create_document(method, attrs, &block)
       end

@@ -168,7 +168,7 @@ module Mongoid
       # well. Note that timeless is cleared in the before_update callback.
       #
       # @param [ Hash ] options The options.
-      # @param [ Array<Document> ] children The children that the :update
+      # @param [ Array<Mongoid::Document> ] children The children that the :update
       #   callbacks will be executed on.
       #
       # @option options [ true | false ] :touch Whether or not the updated_at
@@ -211,7 +211,7 @@ module Mongoid
       # Consolidates all the callback invocations into a single place, to
       # avoid cluttering the logic in #prepare_update.
       #
-      # @param [ Array<Document> ] update_children The children that the
+      # @param [ Array<Mongoid::Document> ] update_children The children that the
       #   :update callbacks will be executed on.
       def run_all_callbacks_for_update(update_children)
         run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do

@@ -17,14 +17,14 @@ module Mongoid
           # @example Build the document.
           #   Builder.new(meta, attrs).build
           #
-          # @param [ Document ] base The document this association hangs off of.
-          # @param [ Document | Hash ] object The related document.
+          # @param [ Mongoid::Document ] base The document this association hangs off of.
+          # @param [ Mongoid::Document | Hash ] object The related document.
           # @param [ String ] _type Not used in this context.
           # @param [ Hash ] selected_fields Fields which were retrieved via
           #   #only. If selected_fields are specified, fields not listed in it
           #   will not be accessible in the built document.
           #
-          # @return [ Document ] A single document.
+          # @return [ Mongoid::Document ] A single document.
           def build(base, object, _type = nil, selected_fields = nil)
             if object.is_a?(Hash)
               if _loading? && base.persisted?

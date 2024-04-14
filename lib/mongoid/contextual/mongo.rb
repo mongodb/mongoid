@@ -213,7 +213,7 @@ module Mongoid
       #   from before or after update.
       # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
-      # @return [ Document ] The result of the command.
+      # @return [ Mongoid::Document ] The result of the command.
       def find_one_and_update(update, options = {})
         if doc = view.find_one_and_update(update, options)
           Factory.from_db(klass, doc)
@@ -233,7 +233,7 @@ module Mongoid
       #   from before or after update.
       # @option options [ true | false ] :upsert Create the document if it doesn't exist.
       #
-      # @return [ Document ] The result of the command.
+      # @return [ Mongoid::Document ] The result of the command.
       def find_one_and_replace(replacement, options = {})
         if doc = view.find_one_and_replace(replacement, options)
           Factory.from_db(klass, doc)
@@ -246,7 +246,7 @@ module Mongoid
       # @example Execute the command.
       #   context.find_one_and_delete
       #
-      # @return [ Document ] The result of the command.
+      # @return [ Mongoid::Document ] The result of the command.
       def find_one_and_delete
         if doc = view.find_one_and_delete
           Factory.from_db(klass, doc)
@@ -292,7 +292,7 @@ module Mongoid
       # @example Create the new context.
       #   Mongo.new(criteria)
       #
-      # @param [ Criteria ] criteria The criteria.
+      # @param [ Mongoid::Criteria ] criteria The criteria.
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
         @collection = @klass.collection
@@ -395,7 +395,7 @@ module Mongoid
       #
       # @param [ Integer | nil ] limit The number of documents to return or nil.
       #
-      # @return [ Document | Array<Document> ] The list of documents, or one
+      # @return [ Mongoid::Document | Array<Mongoid::Document> ] The list of documents, or one
       #   document if no value was given.
       def take(limit = nil)
         if limit
@@ -412,7 +412,7 @@ module Mongoid
       # @example Take a document
       #   context.take!
       #
-      # @return [ Document ] The document.
+      # @return [ Mongoid::Document ] The document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
@@ -572,7 +572,7 @@ module Mongoid
       #
       # @param [ Integer ] limit The number of documents to return.
       #
-      # @return [ Document | nil ] The first document or nil if none is found.
+      # @return [ Mongoid::Document | nil ] The first document or nil if none is found.
       def first(limit = nil)
         if limit.nil?
           retrieve_nth(0)
@@ -594,7 +594,7 @@ module Mongoid
       #   and have no sort defined on the criteria, use #take! instead.
       #   Be aware that #take! won't guarantee order.
       #
-      # @return [ Document ] The first document.
+      # @return [ Mongoid::Document ] The first document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -615,7 +615,7 @@ module Mongoid
       #
       # @param [ Integer ] limit The number of documents to return.
       #
-      # @return [ Document | nil ] The last document or nil if none is found.
+      # @return [ Mongoid::Document | nil ] The last document or nil if none is found.
       def last(limit = nil)
         if limit.nil?
           retrieve_nth_to_last(0)
@@ -636,7 +636,7 @@ module Mongoid
       #   and have no sort defined on the criteria, use #take! instead.
       #   Be aware that #take! won't guarantee order.
       #
-      # @return [ Document ] The last document.
+      # @return [ Mongoid::Document ] The last document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -649,7 +649,7 @@ module Mongoid
       # @example Get the second document.
       #   context.second
       #
-      # @return [ Document | nil ] The second document or nil if none is found.
+      # @return [ Mongoid::Document | nil ] The second document or nil if none is found.
       def second
         retrieve_nth(1)
       end
@@ -660,7 +660,7 @@ module Mongoid
       # @example Get the second document.
       #   context.second!
       #
-      # @return [ Document ] The second document.
+      # @return [ Mongoid::Document ] The second document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -673,7 +673,7 @@ module Mongoid
       # @example Get the third document.
       #   context.third
       #
-      # @return [ Document | nil ] The third document or nil if none is found.
+      # @return [ Mongoid::Document | nil ] The third document or nil if none is found.
       def third
         retrieve_nth(2)
       end
@@ -684,7 +684,7 @@ module Mongoid
       # @example Get the third document.
       #   context.third!
       #
-      # @return [ Document ] The third document.
+      # @return [ Mongoid::Document ] The third document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -697,7 +697,7 @@ module Mongoid
       # @example Get the fourth document.
       #   context.fourth
       #
-      # @return [ Document | nil ] The fourth document or nil if none is found.
+      # @return [ Mongoid::Document | nil ] The fourth document or nil if none is found.
       def fourth
         retrieve_nth(3)
       end
@@ -708,7 +708,7 @@ module Mongoid
       # @example Get the fourth document.
       #   context.fourth!
       #
-      # @return [ Document ] The fourth document.
+      # @return [ Mongoid::Document ] The fourth document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -721,7 +721,7 @@ module Mongoid
       # @example Get the fifth document.
       #   context.fifth
       #
-      # @return [ Document | nil ] The fifth document or nil if none is found.
+      # @return [ Mongoid::Document | nil ] The fifth document or nil if none is found.
       def fifth
         retrieve_nth(4)
       end
@@ -732,7 +732,7 @@ module Mongoid
       # @example Get the fifth document.
       #   context.fifth!
       #
-      # @return [ Document ] The fifth document.
+      # @return [ Mongoid::Document ] The fifth document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -746,7 +746,7 @@ module Mongoid
       # @example Get the second to last document.
       #   context.second_to_last
       #
-      # @return [ Document | nil ] The second to last document or nil if none
+      # @return [ Mongoid::Document | nil ] The second to last document or nil if none
       # is found.
       def second_to_last
         retrieve_nth_to_last(1)
@@ -758,7 +758,7 @@ module Mongoid
       # @example Get the second to last document.
       #   context.second_to_last!
       #
-      # @return [ Document ] The second to last document.
+      # @return [ Mongoid::Document ] The second to last document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -772,7 +772,7 @@ module Mongoid
       # @example Get the third to last document.
       #   context.third_to_last
       #
-      # @return [ Document | nil ] The third to last document or nil if none
+      # @return [ Mongoid::Document | nil ] The third to last document or nil if none
       # is found.
       def third_to_last
         retrieve_nth_to_last(2)
@@ -784,7 +784,7 @@ module Mongoid
       # @example Get the third to last document.
       #   context.third_to_last!
       #
-      # @return [ Document ] The third to last document.
+      # @return [ Mongoid::Document ] The third to last document.
       #
       # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
@@ -875,7 +875,7 @@ module Mongoid
       # If the documents have been already preloaded by `Document::Loader`
       # instance, they will be used.
       #
-      # @return [ Array<Document> | Mongo::Collection::View ] The docs to iterate.
+      # @return [ Array<Mongoid::Document> | Mongo::Collection::View ] The docs to iterate.
       #
       # @api private
       def documents_for_iteration
@@ -904,7 +904,7 @@ module Mongoid
       #     ...
       #   end
       #
-      # @param [ Document ] document The document to yield to.
+      # @param [ Mongoid::Document ] document The document to yield to.
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria)
@@ -1036,7 +1036,7 @@ module Mongoid
 
       # Process the raw documents retrieved for #first/#last.
       #
-      # @return [ Array<Document> | Document ] The list of documents or a
+      # @return [ Array<Mongoid::Document> | Mongoid::Document ] The list of documents or a
       #   single document.
       def process_raw_docs(raw_docs, limit)
         docs = raw_docs.map do |d|
