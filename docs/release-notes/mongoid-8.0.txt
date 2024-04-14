@@ -84,59 +84,69 @@ evolve an uncastable value, the inputted value is returned. See the section on
 
 Some ``mongoize``, ``demongoize`` and ``evolve`` methods were also changed to
 perform consistently with rails and the other ``mongoize``, ``demongoize`` and
-``evolve`` methods. The following is a table of the changes in functionality:
+``evolve`` methods. The following table shows the changes in functionality:
 
-+--------------+------------------------+------------------------+-----------------------+
-| Field Type   | Situation              | Previous Functionality | New Functionality     |
-+==============+========================+========================+=======================+
-| Boolean      | When a non-boolean     | return ``false``       | return ``nil``        |
-|              | string is assigned:    |                        |                       |
-|              | "bogus value"          |                        |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| Array/Hash   | When a value that is   | raise ``InvalidValue`` | return ``nil``        |
-|              | not an array or hash   | error                  |                       |
-|              | is assigned            |                        |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| Set          | When a value that is   | raise ``NoMethodError``| return ``nil``        |
-|              | not a set is assigned: | Exception: undefined   |                       |
-|              | 1                      | method ``to_a`` for    |                       |
-|              |                        | 1:Integer              |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| Regexp       | When persisting and    | return a               | return a              |
-|              | reading a Regexp from  | ``BSON::Regexp::Raw``  | ``Regexp``            |
-|              | the database           |                        |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| Time/DateTime| When assigning a       | raise ``NoMethodError``| return ``nil``        |
-|              | bogus value: ``:bogus``| Exception: undefined   |                       |
-|              |                        | method ``to_i``        |                       |
-|              |                        | for :bogus:Symbol      |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| Time/DateTime| When demongoizing a    | raise ``NoMethodError``| "bogus":              |
-|              | non-Time value:        | Exception: undefined   | return ``nil``        |
-|              | "bogus",               | method ``getlocal``    |                       |
-|              | ``Date.today``         | for "bogus":String     | ``Date.today``:       |
-|              |                        |                        | return a              |
-|              |                        |                        | ``Time/DateTime``     |
-+--------------+------------------------+------------------------+-----------------------+
-| Date         | When assigning or      | raise ``NoMethodError``| return ``nil``        |
-|              | demongoizing a bogus   | Exception: undefined   |                       |
-|              | value: :bogus          | method ``year``        |                       |
-|              |                        | for :bogus:Symbol      |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| Time/DateTime| When demongoizing a    | raise ``NoMethodError``| return a              |
-| /Date        | valid string:          | Exception: undefined   | ``Time/DateTime/Date``|
-|              | "2022-07-14 14:45:51   | method ``getlocal``    |                       |
-|              | -0400"                 | for "2022-07-14        |                       |
-|              |                        | 14:45:51 -0400":String |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| All Types    | When an uncastable     | undefined behavior,    | return ``nil``        |
-|              | value is assigned or   | occasionally raise     |                       |
-|              | demongoized            | ``NoMethodError``      |                       |
-+--------------+------------------------+------------------------+-----------------------+
-| All Types    | When an uncastable     | undefined behavior,    | return inputted value |
-|              | value is evolved       | occasionally raise     |                       |
-|              |                        | ``NoMethodError``      |                       |
-+--------------+------------------------+------------------------+-----------------------+
+.. list-table::
+   :widths: 1 2 2 2
+   :stub-columns: 1
+   :header-rows: 1
+
+   * - Field Type
+     - Situation
+     - Previous Functionality
+     - New Functionality
+
+   * - | Boolean
+     - | When a non-boolean string is assigned: "bogus value"
+     - | return ``false``
+     - | return ``nil``
+       
+   * - Array/Hash
+     - When a value that is not an array or hash is assigned
+     - raise ``InvalidValue`` error
+     - return ``nil``
+
+   * - | Set
+     - | When a value that is not a set is assigned: 1
+     - | raise ``NoMethodError`` Exception: undefined method ``to_a`` for 1:Integer
+     - | return ``nil``
+       
+   * - Regexp
+     - When persisting and reading a Regexp from the database
+     - return a ``BSON::Regexp::Raw``
+     - return a ``Regexp``
+
+   * - | Time/DateTime
+     - | When assigning a bogus value: ``:bogus``
+     - | raise ``NoMethodError`` Exception: undefined method ``to_i`` for :bogus:Symbol
+     - | return ``nil``
+       
+   * - Time/DateTime
+     - When demongoizing a non-Time value: "bogus", ``Date.today``
+     - raise ``NoMethodError`` Exception: undefined method ``getlocal`` for "bogus":String
+     - "bogus": return ``nil``
+       
+       ``Date.today``: return ``Time/DateTime``
+  
+   * - | Date
+     - | When assigning or demongoizing a bogus value: :bogus
+     - | raise ``NoMethodError`` Exception: undefined method ``year`` for :bogus:Symbol
+     - | return ``nil``
+       
+   * - Time/DateTime/Date
+     - When demongoizing a valid string: "2022-07-14 14:45:51 -0400"
+     - raise ``NoMethodError`` Exception: undefined method ``getlocal`` for "2022-07-14 14:45:51 -0400":String
+     - return a ``Time/DateTime/Date``
+
+   * - | All Types
+     - | When an uncastable value is assigned or demongoized
+     - | undefined behavior, occasionally raise ``NoMethodError``
+     - | return ``nil``
+
+   * - All Types
+     - When an uncastable value is evolved
+     - undefined behavior, occasionally raise ``NoMethodError``
+     - return inputted value
 
 .. note::
 
@@ -144,7 +154,6 @@ perform consistently with rails and the other ``mongoize``, ``demongoize`` and
   changed to prevent bugs when modifying and saving those objects. See
   https://jira.mongodb.org/browse/MONGOID-2951 for a longer discussion on these
   bugs.
-
 
 Changes to the ``attributes_before_type_cast`` Hash
 ---------------------------------------------------
@@ -177,98 +186,144 @@ invocation for documents with associations.
 
 Referenced associations (``has_one`` and ``has_many``):
 
-+---------------------------------------+---------------------------------------+
-| Mongoid 8.0                           | Mongoid 7                             |
-+=======================================+=======================================+
-| Parent :before_save                   | Parent :before_save                   |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_open              | Parent :around_save_open              |
-+---------------------------------------+---------------------------------------+
-| Parent :before_create                 | Parent :before_create                 |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_open            | Parent :around_create_open            |
-+---------------------------------------+---------------------------------------+
-| **Parent persisted in MongoDB**       | **Parent persisted in MongoDB**       |
-+---------------------------------------+---------------------------------------+
-| Child :before_save                    | Parent :around_create_close           |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_open               | Parent :after_create                  |
-+---------------------------------------+---------------------------------------+
-| Child :before_create                  | Child :before_save                    |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_open             | Child :around_save_open               |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :before_create                  |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :around_create_open             |
-+---------------------------------------+---------------------------------------+
-| **Child persisted in MongoDB**        | **Child persisted in MongoDB**        |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_close            | Child :around_create_close            |
-+---------------------------------------+---------------------------------------+
-| Child :after_create                   | Child :after_create                   |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_close              | Child :around_save_close              |
-+---------------------------------------+---------------------------------------+
-| Child :after_save                     | Child :after_save                     |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_close           | Parent :around_save_close             |
-+---------------------------------------+---------------------------------------+
-| Parent :after_create                  | Parent :after_save                    |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_close             |                                       |
-+---------------------------------------+---------------------------------------+
-| Parent :after_save                    |                                       |
-+---------------------------------------+---------------------------------------+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
+
+   * - Mongoid 8.0
+     - Mongoid 7
+
+   * - | Parent :before_save
+     - | Parent :before_save
+
+   * - Parent :around_save_open
+     - Parent :around_save_open
+
+   * - | Parent :before_create
+     - | Parent :before_create
+
+   * - Parent :around_create_open
+     - Parent :around_create_open
+
+   * - | **Parent persisted in MongoDB** 
+     - | **Parent persisted in MongoDB** 
+
+   * - Child :before_save 
+     - Parent :around_create_close
+
+   * - | Child :around_save_open
+     - | Parent :after_create
+
+   * - Child :before_create 
+     - Child :before_save  
+
+   * - | Child :around_create_open
+     - | Child :around_save_open
+
+   * - 
+     - Child :before_create 
+
+   * - | 
+     - | Child :around_create_open 
+
+   * - **Child persisted in MongoDB** 
+     - **Child persisted in MongoDB**
+
+   * - | Child :around_create_close
+     - | Child :around_create_close
+
+   * - Child :after_create  
+     - Child :after_create   
+
+   * - | Child :around_save_close
+     - | Child :around_save_close
+
+   * - Child :after_save 
+     - Child :after_save  
+
+   * - | Parent :around_create_close
+     - | Parent :around_save_close 
+
+   * - Parent :after_create 
+     - Parent :after_save  
+
+   * - | Parent :around_save_close
+     - | 
+
+   * - Parent :after_save  
+     -  
 
 Embedded associations (``embeds_one`` and ``embeds_many``):
 
-+---------------------------------------+---------------------------------------+
-| Mongoid 8.0                           | Mongoid 7                             |
-+=======================================+=======================================+
-| Parent :before_save                   | Child :before_save                    |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_open              | Child :around_save_open               |
-+---------------------------------------+---------------------------------------+
-| Parent :before_create                 | Child :around_save_close              |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_open            | Child :after_save                     |
-+---------------------------------------+---------------------------------------+
-| Child :before_save                    | Parent :before_save                   |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_open               | Parent :around_save_open              |
-+---------------------------------------+---------------------------------------+
-| Child :before_create                  | Child :before_create                  |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_open             | Child :around_create_open             |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :around_create_close            |
-+---------------------------------------+---------------------------------------+
-|                                       | Child :after_create                   |
-+---------------------------------------+---------------------------------------+
-|                                       | Parent :before_create                 |
-+---------------------------------------+---------------------------------------+
-|                                       | Parent :around_create_open            |
-+---------------------------------------+---------------------------------------+
-| **Document persisted in MongoDB**     | **Document persisted in MongoDB**     |
-+---------------------------------------+---------------------------------------+
-| Child :around_create_close            |                                       |
-+---------------------------------------+---------------------------------------+
-| Child :after_create                   |                                       |
-+---------------------------------------+---------------------------------------+
-| Child :around_save_close              |                                       |
-+---------------------------------------+---------------------------------------+
-| Child :after_save                     |                                       |
-+---------------------------------------+---------------------------------------+
-| Parent :around_create_close           | Parent :around_create_close           |
-+---------------------------------------+---------------------------------------+
-| Parent :after_create                  | Parent :after_create                  |
-+---------------------------------------+---------------------------------------+
-| Parent :around_save_close             | Parent :around_save_close             |
-+---------------------------------------+---------------------------------------+
-| Parent :after_save                    | Parent :after_save                    |
-+---------------------------------------+---------------------------------------+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
 
+   * - Mongoid 8.0
+     - Mongoid 7
+
+   * - | Parent :before_save
+     - | Child :before_save   
+
+   * - Parent :around_save_open
+     - Child :around_save_open
+
+   * - | Parent :before_create
+     - | Child :around_save_close 
+
+   * - Parent :around_create_open
+     - Child :after_save 
+
+   * - | Child :before_save
+     - | Parent :before_save
+
+   * - Child :around_save_open
+     - Parent :around_save_open 
+
+   * - | Child :before_create 
+     - | Child :before_create 
+
+   * - Child :around_create_open
+     - Child :around_create_open
+
+   * - | 
+     - | Child :around_create_close  
+
+   * - 
+     - Child :after_create
+
+   * - | 
+     - | Parent :before_create
+
+   * - 
+     - Parent :around_create_open
+
+   * - | **Document persisted in MongoDB**
+     - | **Document persisted in MongoDB**
+
+   * - Child :around_create_close 
+     - 
+
+   * - | Child :after_create 
+     - | 
+
+   * - Child :around_save_close
+     - 
+
+   * - | Child :after_save
+     - | 
+
+   * - Parent :around_create_close
+     - Parent :around_create_close
+
+   * - | Parent :after_create
+     - | Parent :after_create
+
+   * - Parent :around_save_close
+     - Parent :around_save_close
+
+   * - | Parent :after_save
+     - | Parent :after_save
 
 ``Changeable`` Module Behavior Made Compatible With ``ActiveModel::Dirty``
 --------------------------------------------------------------------------
