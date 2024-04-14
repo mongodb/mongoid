@@ -24,7 +24,7 @@ other Rails environment specific options by accessing config.mongoid. The
 ``mongoid:config`` generator will create an initializer in
 ``config/initializers/mongoid.rb`` which can also be used for configuring
 Mongoid. Note, though, that options set in your ``config/mongoid.yml`` will
-take precendence over options set elsewhere; it is recommended that whenever
+take precedence over options set elsewhere; it is recommended that whenever
 possible you use ``mongoid.yml`` as the default location for Mongoid
 configuration.
 

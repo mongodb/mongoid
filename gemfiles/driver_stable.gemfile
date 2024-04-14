@@ -1,7 +1,7 @@
 # rubocop:todo all
 source "https://rubygems.org"
 
-gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.18-stable'
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.19-stable'
 
 gem 'actionpack'
 
