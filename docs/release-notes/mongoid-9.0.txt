@@ -154,11 +154,16 @@ prior has been dropped (you must use a minimum of version 8.0.)
 Deprecated functionality removed
 --------------------------------
 
+**Breaking change:** The following deprecated functionality is now removed:
+
 - The ``Mongoid::QueryCache`` module has been removed. Please replace any usages 1-for-1 with ``Mongo::QueryCache``.
   The method ``Mongoid::QueryCache#clear_cache`` should be replaced with ``Mongo::QueryCache#clear``.
   All other methods and submodules are identically named. Refer to the `driver query cache documentation
   <https://mongodb.com/docs/ruby-driver/current/reference/query-cache/>`_ for more details.
 - ``Object#blank_criteria?`` method is removed (was previously deprecated.)
+- ``Document#as_json :compact`` option is removed. Please call ```#compact`` on the
+  returned ``Hash`` object instead.
+- The deprecated class ``Mongoid::Errors::InvalidStorageParent`` has been removed.
 
 
 ``touch`` method now clears changed state
