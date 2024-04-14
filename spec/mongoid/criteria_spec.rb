@@ -288,7 +288,6 @@ describe Mongoid::Criteria do
       Band.where(name: "Depeche Mode")
     end
 
-
     it "returns the criteria as a json hash" do
       expect(criteria.as_json).to eq([ band.serializable_hash.as_json ])
     end
