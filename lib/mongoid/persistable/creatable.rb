@@ -105,6 +105,7 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self if performing_validations?(options) &&
           invalid?(options[:context] || :create)
+        ensure_client_compatibility!
         run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
           run_callbacks(:save, with_children: false) do
             run_callbacks(:create, with_children: false) do
