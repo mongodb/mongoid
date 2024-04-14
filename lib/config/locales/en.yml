@@ -704,3 +704,14 @@ en:
             %{document} when the child '%{relation}' still has documents in it."
           resolution: "Don't attempt to delete the parent %{document} when
             it has children, or change the dependent option on the association."
+        client_session_mismatch:
+          message: "%{model} used within another client's session"
+          summary: >
+            Each model is associated with a client. Each session (transaction)
+            is also associated with a client. You've attempted to create or
+            update a model within a session associated with a different client.
+            This may be a bug in your code.
+          resolution: >
+            Either process the %{model} model outside the enclosing
+            transaction, or open a new transaction for that model before
+            performing the create/update.
