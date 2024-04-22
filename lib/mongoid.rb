@@ -100,6 +100,16 @@ module Mongoid
     Clients.disconnect
   end
 
+  # Reconnect all active clients.
+  #
+  # @example Reconnect all active clients.
+  #   Mongoid.reconnect_clients
+  #
+  # @return [ true ] True.
+  def reconnect_clients
+    Clients.reconnect
+  end
+
   # Convenience method for getting a named client.
   #
   # @example Get a named client.
