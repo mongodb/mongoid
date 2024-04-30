@@ -38,7 +38,6 @@ module Mongoid
       :for_js,
       :fourth,
       :fourth!,
-      :geo_near,
       :includes,
       :last!,
       :map_reduce,
