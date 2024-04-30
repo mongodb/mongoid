@@ -34,10 +34,9 @@ module Mongoid
         sep = lambda { pretty_printer.text(',') }
         pretty_printer.seplist(keys, sep) do |key|
           pretty_printer.breakable
-          as = if (field = fields[key])
-            field.options[:as]
-          end
-          pretty_printer.text("#{key}#{as ? "(#{as})" : nil}")
+          field = fields[key]
+          as = "(#{field.options[:as]})" if field && field.options[:as]
+          pretty_printer.text("#{key}#{as}")
           pretty_printer.text(':')
           pretty_printer.group(1) do
             pretty_printer.breakable
