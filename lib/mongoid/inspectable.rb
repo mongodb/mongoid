@@ -20,7 +20,7 @@ module Mongoid
     end
 
     # This pretty prints the same information as the inspect method. This is
-    # meant to be called by the default 'pp' gem.
+    # meant to be called by the standard 'pp' library.
     #
     # @param [ PP ] pretty_printer The pretty printer.
     #
