@@ -19,9 +19,9 @@ Compatibility
 
 Mongoid supports and is tested against:
 
-- MRI 2.7 - 3.1
+- MRI 2.7 - 3.2
 - JRuby 9.4
-- MongoDB server 3.6 - 6.0
+- MongoDB server 3.6 - 7.0
 
 Issues
 ------
