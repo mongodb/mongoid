@@ -354,25 +354,6 @@ describe Mongoid::Scopable do
         end
       end
 
-      context "when the lambda includes a geo_near query" do
-
-        before do
-          Bar.scope(:near_by, lambda{ |location| geo_near(location) })
-        end
-
-        after do
-          class << Bar
-            undef_method :near_by
-          end
-          Bar._declared_scopes.clear
-        end
-
-        it "allows the scope to be defined" do
-          expect(Bar.near_by([ 51.545099, -0.0106 ])).to be_a(Mongoid::Contextual::GeoNear)
-        end
-
-      end
-
       context "when a block is provided" do
 
         before do

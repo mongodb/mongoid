@@ -863,58 +863,57 @@ as the following example shows:
 Usage with Forking Servers
 ==========================
 
-When using Mongoid with a forking web server such as Puma, Unicorn or
-Passenger, it is recommended to not perform any operations on Mongoid models
-in the parent process prior to the fork.
+When using Mongoid with a forking web server such as Puma, or any application
+that otherwise forks to spawn child processes, special considerations apply.
 
-When a process forks, Ruby threads are not transferred to the child processes
-and the Ruby driver Client objects lose their background monitoring. The
-application will typically seem to work just fine until the deployment
-state changes (for example due to network errors, a maintenance event) at
-which point the application is likely to start getting ``NoServerAvailable``
-exception when performing MongoDB operations.
+If possible, we recommend to not perform any MongoDB operations in the parent
+process prior to forking, which will avoid any forking-related pitfalls.
 
-If the parent process needs to perform operations on the MongoDB database,
-reset all clients in the workers after they forked. How to do so depends
-on the web server being used.
+A detailed technical explanation of how the Mongo Ruby Driver handles forking
+is given in the `driver's "Usage with Forking Servers" documentation
+<https://www.mongodb.com/docs/ruby-driver/current/reference/create-client/#usage-with-forking-servers>`.
+In a nutshell, to avoid various connection errors such as ``Mongo::Error::SocketError``
+and ``Mongo::Error::NoServerAvailable``, you must do the following:
 
-If the parent process does not need to perform operations on the MongoDB
-database after child processes are forked, close the clients in the parent
-prior to forking children. If the parent process performs operations on a Mongo
-client and does not close it, the parent process will continue consuming a
-connection slot in the cluster and will continue monitoring the cluster for
-as long as the parent remains alive.
+1. Disconnect MongoDB clients in the parent Ruby process immediately *before*
+   forking using ``Mongoid.disconnect_clients``. This ensures the parent and child
+   process do not accidentally reuse the same sockets and have I/O conflicts.
+   Note that ``Mongoid.disconnect_clients`` does not disrupt any in-flight
+   MongoDB operations, and will automatically reconnect when you perform new
+   operations.
+2. Reconnect your MongoDB clients in the child Ruby process immediately *after*
+   forking using ``Mongoid.reconnect_clients``. This is required to respawn
+   the driver's monitoring threads in the child process.
 
-.. note::
-
-  The close/reconnect pattern described here should be used with Ruby driver
-  version 2.6.2 or higher. Previous driver versions did not recreate
-  monitoring threads when reconnecting.
+Most web servers provide hooks that can be used by applications to
+perform actions when the worker processes are forked. The following
+are configuration examples for several common Ruby web servers.
 
 Puma
 ----
 
 Use the ``on_worker_boot`` hook to reconnect clients in the workers and
-the ``before_fork`` hook to close clients in the parent process
-(`Puma documentation <https://puma.io/puma/>`_):
+the ``before_fork`` and ``on_refork`` hooks to close clients in the
+parent process (`Puma documentation <https://puma.io/puma/#clustered-mode>`_).
 
 .. code-block:: ruby
 
-  on_worker_boot do
-    if defined?(Mongoid)
-      Mongoid::Clients.clients.each do |name, client|
-        client.close
-        client.reconnect
-      end
-    else
-      raise "Mongoid is not loaded. You may have forgotten to enable app preloading."
-    end
+  # config/puma.rb
+
+  # Runs in the Puma master process before it forks a child worker.
+  before_fork do
+    Mongoid.disconnect_clients
   end
 
-  before_fork do
-    if defined?(Mongoid)
-      Mongoid.disconnect_clients
-    end
+  # Required when using Puma's fork_worker option. Runs in the
+  # child worker 0 process before it forks grandchild workers.
+  on_refork do
+    Mongoid.disconnect_clients
+  end
+
+  # Runs in each Puma child process after it forks from its parent.
+  on_worker_boot do
+    Mongoid.reconnect_clients
   end
 
 Unicorn
@@ -926,21 +925,14 @@ the ``before_fork`` hook to close clients in the parent process
 
 .. code-block:: ruby
 
-  after_fork do |server, worker|
-    if defined?(Mongoid)
-      Mongoid::Clients.clients.each do |name, client|
-        client.close
-        client.reconnect
-      end
-    else
-      raise "Mongoid is not loaded. You may have forgotten to enable app preloading."
-    end
+  # config/unicorn.rb
+
+  before_fork do |_server, _worker|
+    Mongoid.disconnect_clients
   end
 
-  before_fork do |server, worker|
-    if defined?(Mongoid)
-      Mongoid.disconnect_clients
-    end
+  after_fork do |_server, _worker|
+    Mongoid.reconnect_clients
   end
 
 Passenger
@@ -956,12 +948,7 @@ before the workers are forked.
 
   if defined?(PhusionPassenger)
     PhusionPassenger.on_event(:starting_worker_process) do |forked|
-      if forked
-        Mongoid::Clients.clients.each do |name, client|
-          client.close
-          client.reconnect
-        end
-      end
+      Mongoid.reconnect_clients if forked
     end
   end
 
