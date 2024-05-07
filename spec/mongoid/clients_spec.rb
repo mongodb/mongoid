@@ -1216,4 +1216,48 @@ describe Mongoid::Clients do
       end
     end
   end
+
+  context "#disconnect" do
+
+    let(:clients) do
+      Mongoid::Clients.clients.values
+    end
+
+    before do
+      Band.all.entries
+    end
+
+    it "disconnects from all active clients" do
+      clients.each do |client|
+        expect(client).to receive(:close).and_call_original
+      end
+      Mongoid::Clients.disconnect
+    end
+
+    it "returns true" do
+      expect(Mongoid::Clients.disconnect).to eq(true)
+    end
+  end
+
+  context "#reconnect" do
+
+    let(:clients) do
+      Mongoid::Clients.clients.values
+    end
+
+    before do
+      Band.all.entries
+    end
+
+    it "reconnects all active clients" do
+      clients.each do |client|
+        expect(client).to receive(:reconnect).and_call_original
+      end
+      Mongoid::Clients.reconnect
+    end
+
+    it "returns true" do
+      expect(Mongoid::Clients.reconnect).to eq(true)
+    end
+  end
 end

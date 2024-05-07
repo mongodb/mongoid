@@ -23,13 +23,6 @@ describe Mongoid::Extensions::Object do
     end
   end
 
-  describe "#__mongoize_time__" do
-
-    it "returns self" do
-      expect(object.__mongoize_time__).to eq(object)
-    end
-  end
-
   describe ".demongoize" do
 
     let(:object) do

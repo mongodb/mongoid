@@ -6,7 +6,6 @@ require "mongoid/contextual/mongo/documents_loader"
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
-require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
 require "mongoid/association/eager_loadable"
 
@@ -23,8 +22,6 @@ module Mongoid
       include Atomic
       include Association::EagerLoadable
       include Queryable
-
-      Mongoid.deprecate(self, :geo_near)
 
       # Options constant.
       OPTIONS = [ :hint,
@@ -266,29 +263,6 @@ module Mongoid
           doc = Factory.from_db(klass, raw_doc, criteria)
           eager_load([doc]).first
         end
-      end
-
-      # Execute a $geoNear command against the database.
-      #
-      # @example Find documents close to 10, 10.
-      #   context.geo_near([ 10, 10 ])
-      #
-      # @example Find with spherical distance.
-      #   context.geo_near([ 10, 10 ]).spherical
-      #
-      # @example Find with a max distance.
-      #   context.geo_near([ 10, 10 ]).max_distance(0.5)
-      #
-      # @example Provide a distance multiplier.
-      #   context.geo_near([ 10, 10 ]).distance_multiplier(1133)
-      #
-      # @param [ Array<Float> ] coordinates The coordinates.
-      #
-      # @return [ GeoNear ] The GeoNear command.
-      #
-      # @deprecated
-      def geo_near(coordinates)
-        GeoNear.new(collection, criteria, coordinates)
       end
 
       # Create the new Mongo context. This delegates operations to the
