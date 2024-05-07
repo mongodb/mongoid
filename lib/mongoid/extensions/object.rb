@@ -20,22 +20,6 @@ module Mongoid
       end
       alias :__mongoize_object_id__ :__evolve_object_id__
 
-      # Mongoize a plain object into a time.
-      #
-      # @note This method should not be used, because it does not
-      #   return correct results for non-Time objects. Override
-      #   __mongoize_time__ in classes that are time-like to return an
-      #   instance of Time or ActiveSupport::TimeWithZone.
-      #
-      # @example Mongoize the object.
-      #   object.__mongoize_time__
-      #
-      # @return [ Object ] self.
-      # @deprecated
-      def __mongoize_time__
-        self
-      end
-
       # Get the value for an instance variable or false if it doesn't exist.
       #
       # @example Get the value for an instance var.

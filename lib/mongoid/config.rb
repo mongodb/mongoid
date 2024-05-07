@@ -376,9 +376,13 @@ module Mongoid
     #   config.running_with_passenger?
     #
     # @return [ true | false ] If the app is deployed on Passenger.
+    #
+    # @deprecated
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end
+
+    Mongoid.deprecate(self, :running_with_passenger?)
 
     private
 
