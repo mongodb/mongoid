@@ -25,7 +25,7 @@ module Mongoid
           if key.to_s.start_with?('$')
             (atomic_updates[key] ||= {}).update(prepare_operation(klass, key, value))
           else
-            (atomic_updates['$set'] ||= {})[key] = mongoize_for(key, klass, key, value)
+            (atomic_updates['$set'] ||= {})[key] = mongoize_for('$set', klass, key, value)
           end
         end
       end
