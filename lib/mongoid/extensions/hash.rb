@@ -49,7 +49,7 @@ module Mongoid
             consolidated[key].update(value)
           else
             consolidated["$set"] ||= {}
-            consolidated["$set"].update(key => mongoize_for(key, klass, key, value))
+            consolidated["$set"].update(key => mongoize_for("$set", klass, key, value))
           end
         end
         consolidated
