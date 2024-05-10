@@ -15,4 +15,8 @@ class LatLng
   def mongoize
     [ lng, lat ]
   end
+
+  def ==(other)
+    lat == other.lat && lng == other.lng
+  end
 end
