@@ -53,6 +53,7 @@ module Mongoid
       #
       # @param [ String ] operator The operator.
       # @param [ Class ] klass The model class.
+      # @param [ String | Symbol ] key The field key.
       # @param [ Object ] value The original value.
       #
       # @return [ Object ] Value prepared for the provided operator.
