@@ -43,7 +43,7 @@ module Mongoid
       def prepare_operation(klass, key, value)
         value.each_with_object({}) do |(key2, value2), hash|
           key2 = klass.database_field_name(key2)
-          hash[key2] = value_for(key, klass, value2)
+          hash[key2] = value_for(key, klass, key2, value2)
         end
       end
 
@@ -56,11 +56,11 @@ module Mongoid
       # @param [ Object ] value The original value.
       #
       # @return [ Object ] Value prepared for the provided operator.
-      def value_for(operator, klass, value)
+      def value_for(operator, klass, key, value)
         case operator
         when '$rename' then value.to_s
         when '$addToSet', '$push' then value.mongoize
-        else mongoize_for(operator, klass, operator, value)
+        else mongoize_for(operator, klass, key, value)
         end
       end
 
