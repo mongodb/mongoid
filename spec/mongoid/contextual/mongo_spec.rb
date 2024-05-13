@@ -3765,15 +3765,15 @@ describe Mongoid::Contextual::Mongo do
         context "when the attributes must be mongoized" do
 
           before do
-            context.update_all("$set" => { member_count: "1" })
+            context.update_all("$set" => { location: LatLng.new(52.30, 13.25) })
           end
 
           it "updates the first matching document" do
-            expect(depeche_mode.reload.member_count).to eq(1)
+            expect(depeche_mode.reload.location).to eq(LatLng.new(52.30, 13.25))
           end
 
           it "updates the last matching document" do
-            expect(new_order.reload.member_count).to eq(1)
+            expect(new_order.reload.location).to eq(LatLng.new(52.30, 13.25))
           end
         end
       end

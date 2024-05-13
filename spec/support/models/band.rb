@@ -23,6 +23,7 @@ class Band
   field :mojo, type: Object
   field :tags, type: Hash
   field :fans
+  field :location, type: LatLng
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
