@@ -3663,7 +3663,7 @@ describe Mongoid::Contextual::Mongo do
               before do
                 depeche_mode.update_attribute(:genres, ["electronic", "pop", "dance"])
                 new_order.update_attribute(:genres, ["electronic", "pop", "dance"])
-                context.update_all("$pull" => { genres: {'$in' => ["electronic", "pop"] }})
+                context.update_all("$pull" => { genres: { '$in' => ["electronic", "pop"] } })
               end
 
               it "updates the first matching document" do
@@ -3679,7 +3679,7 @@ describe Mongoid::Contextual::Mongo do
           context "when operation is $pop" do
 
             before do
-              depeche_mode.update_attribute(:genres, ["pop", "electronic" ])
+              depeche_mode.update_attribute(:genres, ["pop", "electronic"])
             end
 
             it "removes first element in array" do
@@ -3696,7 +3696,7 @@ describe Mongoid::Contextual::Mongo do
           context "when operation is $pullAll" do
 
             before do
-              depeche_mode.update_attribute(:genres, ["pop", "electronic", "dance" ])
+              depeche_mode.update_attribute(:genres, ["pop", "electronic", "dance"])
               new_order.update_attribute(:genres, ["electronic", "pop", "dance"])
               context.update_all("$pullAll" => { genres: ["pop", "electronic"] })
             end
