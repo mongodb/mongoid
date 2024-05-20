@@ -50,7 +50,6 @@ dependencies in `the driver documentation. <https://www.mongodb.com/docs/ruby-dr
 Note the version of the Ruby driver being used in your application and select
 the appropriate steps below.
 
-
 Install ``libmongocrypt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -65,9 +64,11 @@ This can be done one of two ways.
 Install the automatic encryption shared library (Ruby driver 2.19+)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you use the Ruby driver version 2.19 and above the automatic encryption
-shared library should be installed by following the instructions in the
-`MongoDB manual <https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`_.
+If you use the Ruby driver version 2.19 and above, the automatic encryption
+shared library should be installed by following the instructions on the
+:manual:`Automatic Encryption Shared Library for Queryable Encryption 
+</core/queryable-encryption/reference/shared-library/#download-the-automatic-encryption-shared-library>`
+page in the Server manual.
 
 The steps required are as follows:
 
@@ -181,6 +182,15 @@ You can create multiple DEKs, if necessary.
   % rake db:mongoid:encryption:create_data_key
   Created data key with id: 'Vxr5m+5cQISjDOruzZgE0w==' for kms provider: 'local' in key vault: 'encryption.__keyVault'.
 
+You can also provide an alternate name for the DEK. This allows you to reference
+the DEK by name when configuring encryption for your fields. It also allows you
+to dynamically assign a DEK to a field at runtime.
+
+.. code-block:: sh
+
+  % rake db:mongoid:encryption:create_data_key -- --key-alt-name=my_data_key
+  Created data key with id: 'yjF8hKmKQsqGeFGXlB9Sow==' with key alt name: 'my_data_key' for kms provider: 'local' in key vault: 'encryption.__keyVault'.
+
 
 Configure Encryption Schema
 ===========================
@@ -226,13 +236,32 @@ Now we can tell Mongoid what should be encrypted:
     field :insurer, type: String
 
     # This field is encrypted using AEAD_AES_256_CBC_HMAC_SHA_512-Random
-    # algorithm using the same data key as Patient class attributes.
+    # algorithm using the key which alternate name is stored in the
+    # policy_number_key field.
     field :policy_number, type: Integer, encrypt: {
-        deterministic: false
+        deterministic: false,
+        key_name_field: :policy_number_key
     }
 
     embedded_in :patient
   end
+
+.. note::
+  If you are developing a Rails application, it is recommended to set
+  ``preload_models`` to ``true`` in ``mongoid.yml``. This will ensure that
+  Mongoid loads all models before the application starts, and the encryption
+  schema is configured before any data is read or written.
+
+Known Limitations
+~~~~~~~~~~~~~~~~~
+
+* MongoDB CSFLE has some limitations that are described on the
+  :manual:`CSFLE Limitations </core/csfle/reference/limitations/>`
+  page in the Server manual. These limitations also apply to Mongoid.
+* Mongoid does not support encryption of ``embeds_many`` relations.
+* If you use ``:key_name_field`` option, the field must be encrypted using
+  non-deterministic algorithm. To encrypt your field deterministically, you must
+  specify ``:key_id`` option instead.
 
 Working with Data
 =================
@@ -254,7 +283,7 @@ according to the configuration:
     passport_id: '123456',
     blood_type: 'AB+',
     ssn: 98765,
-    insurance: Insurance.new(insurer: 'TK', policy_number: 123456)
+    insurance: Insurance.new(insurer: 'TK', policy_number: 123456, policy_number_key: 'my_data_key')
   )
 
   # Fields are encrypted in the database
@@ -265,7 +294,7 @@ according to the configuration:
   # "passport_id"=><BSON::Binary:0x404080 type=ciphertext data=0x012889b2cb0b1341...>,
   # "blood_type"=><BSON::Binary:0x404560 type=ciphertext data=0x022889b2cb0b1341...>,
   # "ssn"=><BSON::Binary:0x405040 type=ciphertext data=0x012889b2cb0b1341...>,
-  # "insurance"=>{"_id"=>BSON::ObjectId('6446a1d046ebfd701f9f4293'), "insurer"=>"TK", "policy_number"=><BSON::Binary:0x405920 type=ciphertext data=0x012889b2cb0b1341...>}}
+  # "insurance"=>{"_id"=>BSON::ObjectId('6446a1d046ebfd701f9f4293'), "insurer"=>"TK", "policy_number"=><BSON::Binary:0x405920 type=ciphertext data=0x012889b2cb0b1341...>}, "policy_number_key"=>"my_data_key"}
 
 Fields encrypted using a deterministic algorithm can be queried. Only exact match
 queries are supported. For more details please consult `the server documentation

@@ -23,10 +23,10 @@ module Mongoid
 
     LOCK = Mutex.new
 
-    # Application name that is printed to the mongodb logs upon establishing
-    # a connection in server versions >= 3.4. Note that the name cannot
-    # exceed 128 bytes. It is also used as the database name if the
-    # database name is not explicitly defined.
+    # Application name that is printed to the MongoDB logs upon establishing
+    # a connection. Note that the name cannot exceed 128 bytes in length.
+    # It is also used as the database name if the database name is not
+    # explicitly defined.
     option :app_name, default: nil
 
     # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
@@ -80,6 +80,23 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
+    # Allow BSON::Decimal128 to be parsed and returned directly in
+    # field values. When BSON 5 is present and the this option is set to false
+    # (the default), BSON::Decimal128 values in the database will be returned
+    # as BigDecimal.
+    #
+    # @note this option only has effect when BSON 5+ is present. Otherwise,
+    #   the setting is ignored.
+    option :allow_bson5_decimal128, default: false, on_change: -> (allow) do
+        if BSON::VERSION >= '5.0.0'
+          if allow
+            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)
+          else
+            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BigDecimal)
+          end
+        end
+      end
+
     # Sets the async_query_executor for the application. By default the thread pool executor
     #   is set to `:immediate. Options are:
     #
@@ -103,6 +120,30 @@ module Mongoid
     # reload, but when it is turned off, it won't be.
     option :legacy_readonly, default: false
 
+    # When this flag is false (the default as of Mongoid 9.0), a document that
+    # is created or loaded will remember the storage options that were active
+    # when it was loaded, and will use those same options by default when
+    # saving or reloading itself.
+    #
+    # When this flag is true you'll get pre-9.0 behavior, where a document will
+    # not remember the storage options from when it was loaded/created, and
+    # subsequent updates will need to explicitly set up those options each time.
+    #
+    # For example:
+    #
+    #    record = Model.with(collection: 'other_collection') { Model.first }
+    #
+    # This will try to load the first document from 'other_collection' and
+    # instantiate it as a Model instance. Pre-9.0, the record object would
+    # not remember that it came from 'other_collection', and attempts to
+    # update it or reload it would fail unless you first remembered to
+    # explicitly specify the collection every time.
+    #
+    # As of Mongoid 9.0, the record will remember that it came from
+    # 'other_collection', and updates and reloads will automatically default
+    # to that collection, for that record object.
+    option :legacy_persistence_context_behavior, default: false
+
     # When this flag is true, any attempt to change the _id of a persisted
     # document will raise an exception (`Errors::ImmutableAttribute`).
     # This is the default in 9.0. Setting this flag to false restores the
@@ -119,6 +160,16 @@ module Mongoid
     # level nested documents callbacks are called multiple times.
     # See https://jira.mongodb.org/browse/MONGOID-5542
     option :prevent_multiple_calls_of_embedded_callbacks, default: true
+
+    # When this flag is false, callbacks for embedded documents will not be
+    # called. This is the default in 9.0.
+    #
+    # Setting this flag to true restores the pre-9.0 behavior, where callbacks
+    # for embedded documents are called. This may lead to stack overflow errors
+    # if there are more than cicrca 1000 embedded documents in the root
+    # document's dependencies graph.
+    # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
+    option :around_callbacks_for_embeds, default: false
 
     # Returns the Config singleton, for use in the configure DSL.
     #
@@ -325,9 +376,13 @@ module Mongoid
     #   config.running_with_passenger?
     #
     # @return [ true | false ] If the app is deployed on Passenger.
+    #
+    # @deprecated
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end
+
+    Mongoid.deprecate(self, :running_with_passenger?)
 
     private
 

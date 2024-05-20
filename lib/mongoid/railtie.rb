@@ -118,6 +118,17 @@ module Rails
             ::Mongoid::Railties::ControllerRuntime::Collector.new
       end
 
+      # Add custom serializers for BSON::ObjectId
+      initializer 'mongoid.active_job.custom_serializers' do
+        ActiveSupport.on_load :active_job do
+          require 'mongoid/railties/bson_object_id_serializer'
+
+          ActiveJob::Serializers.add_serializers(
+            [::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer]
+          )
+        end
+      end
+
     end
   end
 end

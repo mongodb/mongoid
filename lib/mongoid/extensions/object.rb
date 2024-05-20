@@ -3,7 +3,11 @@
 
 module Mongoid
   module Extensions
+    # Adds type-casting behavior to Object class.
     module Object
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
 
       # Evolve a plain object into an object id.
       #
@@ -22,25 +26,11 @@ module Mongoid
       #   object.__find_args__
       #
       # @return [ Object ] self.
+      # @deprecated
       def __find_args__
         self
       end
-
-      # Mongoize a plain object into a time.
-      #
-      # @note This method should not be used, because it does not
-      #   return correct results for non-Time objects. Override
-      #   __mongoize_time__ in classes that are time-like to return an
-      #   instance of Time or ActiveSupport::TimeWithZone.
-      #
-      # @example Mongoize the object.
-      #   object.__mongoize_time__
-      #
-      # @return [ Object ] self.
-      # @deprecated
-      def __mongoize_time__
-        self
-      end
+      Mongoid.deprecate(self, :__find_args__)
 
       # Try to form a setter from this object.
       #
@@ -48,9 +38,11 @@ module Mongoid
       #   object.__setter__
       #
       # @return [ String ] The object as a string plus =.
+      # @deprecated
       def __setter__
         "#{self}="
       end
+      Mongoid.deprecate(self, :__setter__)
 
       # Get the value of the object as a mongo friendly sort value.
       #
@@ -58,9 +50,11 @@ module Mongoid
       #   object.__sortable__
       #
       # @return [ Object ] self.
+      # @deprecated
       def __sortable__
         self
       end
+      Mongoid.deprecate(self, :__sortable__)
 
       # Conversion of an object to an $inc-able value.
       #
@@ -68,23 +62,12 @@ module Mongoid
       #   1.__to_inc__
       #
       # @return [ Object ] The object.
+      # @deprecated
       def __to_inc__
         self
       end
+      Mongoid.deprecate(self, :__to_inc__)
 
-      # Checks whether conditions given in this object are known to be
-      # unsatisfiable, i.e., querying with this object will always return no
-      # documents.
-      #
-      # This method is deprecated. Mongoid now uses
-      # +_mongoid_unsatisfiable_criteria?+ internally; this method is retained
-      # for backwards compatibility only. It always returns false.
-      #
-      # @return [ false ] Always false.
-      # @deprecated
-      def blank_criteria?
-        false
-      end
 
       # Do or do not, there is no try. -- Yoda.
       #
@@ -96,9 +79,11 @@ module Mongoid
       #
       # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist.
+      # @deprecated
       def do_or_do_not(name, *args)
         send(name, *args) if name && respond_to?(name)
       end
+      Mongoid.deprecate(self, :do_or_do_not)
 
       # Get the value for an instance variable or false if it doesn't exist.
       #
@@ -134,9 +119,11 @@ module Mongoid
       #   object.multi_arged?
       #
       # @return [ false ] false.
+      # @deprecated
       def multi_arged?
         false
       end
+      Mongoid.deprecate(self, :multi_arged?)
 
       # Is the object a number?
       #
@@ -195,12 +182,13 @@ module Mongoid
       #
       # @return [ Object | nil ] The result of the method call or nil if the
       #   method does not exist. Nil if the object is frozen.
+      # @deprecated
       def you_must(name, *args)
         frozen? ? nil : do_or_do_not(name, *args)
       end
+      Mongoid.deprecate(self, :you_must)
 
       module ClassMethods
-
         # Convert the provided object to a foreign key, given the metadata key
         # contstraint.
         #
@@ -211,10 +199,12 @@ module Mongoid
         # @param [ Object ] object The object to convert.
         #
         # @return [ Object ] The converted object.
+        # @deprecated
         def __mongoize_fk__(association, object)
           return nil if !object || object == ""
           association.convert_to_foreign_key(object)
         end
+        Mongoid.deprecate(self, :__mongoize_fk__)
 
         # Convert the object from its mongo friendly ruby type to this type.
         #
@@ -245,7 +235,4 @@ module Mongoid
   end
 end
 
-::Object.__send__(:include, Mongoid::Extensions::Object)
-::Object.extend(Mongoid::Extensions::Object::ClassMethods)
-
-::Mongoid.deprecate(Object, :blank_criteria)
+Object.include Mongoid::Extensions::Object

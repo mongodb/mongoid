@@ -76,12 +76,36 @@ describe Mongoid do
     end
 
     it "disconnects from all active clients" do
-      pending 'https://jira.mongodb.org/browse/MONGOID-5621'
-
       clients.each do |client|
-        expect(client.cluster).to receive(:disconnect!).and_call_original
+        expect(client).to receive(:close).and_call_original
       end
       Mongoid.disconnect_clients
+    end
+
+    it "returns true" do
+      expect(Mongoid.disconnect_clients).to eq(true)
+    end
+  end
+
+  describe ".reconnect_clients" do
+
+    let(:clients) do
+      Mongoid::Clients.clients.values
+    end
+
+    before do
+      Band.all.entries
+    end
+
+    it "reconnects all active clients" do
+      clients.each do |client|
+        expect(client).to receive(:reconnect).and_call_original
+      end
+      Mongoid.reconnect_clients
+    end
+
+    it "returns true" do
+      expect(Mongoid.reconnect_clients).to eq(true)
     end
   end
 

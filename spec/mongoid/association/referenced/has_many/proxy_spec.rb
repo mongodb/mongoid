@@ -1924,6 +1924,42 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect_query(1) { expect(person.posts.exists?).to be true }
         end
       end
+
+      context 'when invoked with specifying conditions' do
+        let(:other_person) { Person.create! }
+        let(:post) { person.posts.first }
+
+        before do
+          person.posts.create title: 'bumfuzzle'
+          other_person.posts.create title: 'bumbershoot'
+        end
+
+        context 'when the conditions match an associated record' do
+          it 'detects its existence by condition' do
+            expect(person.posts.exists?(title: 'bumfuzzle')).to be true
+            expect(other_person.posts.exists?(title: 'bumbershoot')).to be true
+          end
+
+          it 'detects its existence by id' do
+            expect(person.posts.exists?(post._id)).to be true
+          end
+
+          it 'returns false when given false' do
+            expect(person.posts.exists?(false)).to be false
+          end
+
+          it 'returns false when given nil' do
+            expect(person.posts.exists?(nil)).to be false
+          end
+        end
+
+        context 'when the conditions match an unassociated record' do
+          it 'does not detect its existence' do
+            expect(person.posts.exists?(title: 'bumbershoot')).to be false
+            expect(other_person.posts.exists?(title: 'bumfuzzle')).to be false
+          end
+        end
+      end
     end
 
     context 'when documents exist in application but not in database' do
@@ -1970,6 +2006,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts.to_a
 
           expect_query(1) { expect(person.posts.exists?).to be false }
+        end
+      end
+
+      context 'when invoked with specifying conditions' do
+        it 'returns false' do
+          expect(person.posts.exists?(title: 'hullaballoo')).to be false
         end
       end
     end
@@ -2536,8 +2578,6 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       context 'when providing a collation' do
-        min_server_version '3.4'
-
         let(:posts) { person.posts.where(title: 'FIRST').collation(locale: 'en_US', strength: 2) }
 
         it 'applies the collation option to the query' do

@@ -26,12 +26,18 @@ describe Mongoid::Config::Defaults do
     shared_examples "uses settings for 8.1" do
       it "uses settings for 8.1" do
         expect(Mongoid.immutable_ids).to be false
+        expect(Mongoid.legacy_persistence_context_behavior).to be true
+        expect(Mongoid.around_callbacks_for_embeds).to be true
+        expect(Mongoid.prevent_multiple_calls_of_embedded_callbacks).to be false
       end
     end
 
     shared_examples "does not use settings for 8.1" do
       it "does not use settings for 8.1" do
         expect(Mongoid.immutable_ids).to be true
+        expect(Mongoid.legacy_persistence_context_behavior).to be false
+        expect(Mongoid.around_callbacks_for_embeds).to be false
+        expect(Mongoid.prevent_multiple_calls_of_embedded_callbacks).to be true
       end
     end
 
@@ -81,12 +87,12 @@ describe Mongoid::Config::Defaults do
     end
 
     context "when given version an invalid version" do
-      let(:version) { 4.2 }
+      let(:version) { '4,2' }
 
       it "raises an error" do
         expect do
           config.load_defaults(version)
-        end.to raise_error(ArgumentError, 'Unknown version: 4.2')
+        end.to raise_error(ArgumentError, 'Unknown version: 4,2')
       end
     end
   end

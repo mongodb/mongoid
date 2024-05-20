@@ -3,6 +3,9 @@
 
 module Mongoid
   module Tasks
+
+    # Utility module to manage database collections, indexes, sharding, etc.
+    # Invoked from Rake tasks.
     module Database
       extend self
 
@@ -23,6 +26,9 @@ module Mongoid
           else
             logger.info("MONGOID: collection options ignored on: #{model}, please define in the root model.")
           end
+        rescue Exception
+          logger.error "error while creating collection for #{model}"
+          raise
         end
       end
 
@@ -48,6 +54,26 @@ module Mongoid
             nil
           end
         end.compact
+      end
+
+      # Submit requests for the search indexes to be created. This will happen
+      # asynchronously. If "wait" is true, the method will block while it
+      # waits for the indexes to be created.
+      #
+      # @param [ Array<Mongoid::Document> ] models the models to build search
+      #   indexes for.
+      # @param [ true | false ] wait whether to wait for the indexes to be
+      #   built.
+      def create_search_indexes(models = ::Mongoid.models, wait: true)
+        searchable = models.select { |m| m.search_index_specs.any? }
+
+        # queue up the search index creation requests
+        index_names_by_model = searchable.each_with_object({}) do |model, obj|
+          logger.info("MONGOID: Creating search indexes on #{model}...")
+          obj[model] = model.create_search_indexes
+        end
+
+        wait_for_search_indexes(index_names_by_model) if wait
       end
 
       # Return the list of indexes by model that exist in the database but aren't
@@ -120,6 +146,17 @@ module Mongoid
           end
           model
         end.compact
+      end
+
+      # Remove all search indexes from the given models.
+      #
+      # @params [ Array<Mongoid::Document> ] models the models to remove
+      #   search indexes from.
+      def remove_search_indexes(models = ::Mongoid.models)
+        models.each do |model|
+          next if model.embedded?
+          model.remove_search_indexes
+        end
       end
 
       # Shard collections for models that declare shard keys.
@@ -209,6 +246,31 @@ module Mongoid
 
       def logger
         Mongoid.logger
+      end
+
+      # Waits for the search indexes to be built on the given models.
+      #
+      # @param [ Hash<Mongoid::Document, Array<String>> ] models a mapping of
+      #   index names for each model
+      def wait_for_search_indexes(models)
+        logger.info('MONGOID: Waiting for search indexes to be created')
+        logger.info('MONGOID: Press ctrl-c to skip the wait and let the indexes be created in the background')
+
+        models.each do |model, names|
+          model.wait_for_search_indexes(names) do |status|
+            if status.ready?
+              puts
+              logger.info("MONGOID: Search indexes on #{model} are READY")
+            else
+              print '.'
+              $stdout.flush
+            end
+          end
+        end
+      rescue Interrupt
+        # ignore ctrl-C here; we assume it is meant only to skip
+        # the wait, and that subsequent tasks ought to continue.
+        logger.info('MONGOID: Skipping the wait for search indexes; they will be created in the background')
       end
     end
   end

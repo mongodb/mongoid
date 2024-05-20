@@ -135,33 +135,6 @@ module Mongoid
       BSON::Document.new(as_attributes)
     end
 
-    # Calls #as_json on the document with additional, Mongoid-specific options.
-    #
-    # @note Rails 6 changes return value of as_json for non-primitive types
-    #   such as BSON::ObjectId. In Rails <= 5, as_json returned these as
-    #   instances of the class. In Rails 6, these are returned serialized to
-    #   primitive types (e.g. {'$oid'=>'5bcfc40bde340b37feda98e9'}).
-    #   See https://github.com/rails/rails/commit/2e5cb980a448e7f4ab00df6e9ad4c1cc456616aa
-    #   for more information.
-    #
-    # @example Get the document as json.
-    #   document.as_json(compact: true)
-    #
-    # @param [ Hash ] options The options.
-    #
-    # @option options [ true | false ] :compact (Deprecated) Whether to include fields
-    #   with nil values in the json document.
-    #
-    # @return [ Hash ] The document as json.
-    def as_json(options = nil)
-      rv = super
-      if options && options[:compact]
-        Mongoid::Warnings.warn_as_json_compact_deprecated
-        rv = rv.compact
-      end
-      rv
-    end
-
     # Returns an instance of the specified class with the attributes,
     # errors, and embedded documents of the current document.
     #
@@ -185,7 +158,7 @@ module Mongoid
     # Sets the internal state of this document. Used only by #becomes to
     # help initialize a retyped document.
     #
-    # @params state [ Hash ] The map of internal state values.
+    # @param [ Hash ] state The map of internal state values.
     #
     # @api private
     def internal_state=(state)
@@ -354,7 +327,7 @@ module Mongoid
 
     # Marks all embedded documents with the given "new_record" state.
     #
-    # @params new_record [ true | false ] whether or not the embedded records
+    # @param [ true | false ] new_record  whether or not the embedded records
     #   should be flagged as new records or not.
     def mark_persisted_state_for_embedded_documents(new_record)
       embedded_relations.each_pair do |name, _meta|
@@ -369,7 +342,7 @@ module Mongoid
 
     # Either executes or enqueues the post-construction callbacks.
     #
-    # @params execute_callbacks [ true | false ] whether the callbacks
+    # @param [ true | false ] execute_callbacks whether the callbacks
     #   should be executed (true) or enqueued (false)
     def resolve_post_construction_callbacks(execute_callbacks)
       if execute_callbacks
@@ -387,7 +360,7 @@ module Mongoid
       # within the block. Callbacks may always be explicitly invoked by passing
       # `execute_callbacks: true` where available.
       #
-      # @params execute_callbacks [ true | false ] Whether callbacks should be
+      # @param [ true | false ] execute_callbacks Whether callbacks should be
       #   suppressed or not.
       def with_callbacks(execute_callbacks)
         saved, Threaded.execute_callbacks =
@@ -406,8 +379,6 @@ module Mongoid
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
       # @param [ Integer ] selected_fields The selected fields from the
       #   criteria.
-      # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
-      #   should be run.
       #
       # @return [ Document ] A new document.
       def instantiate(attrs = nil, selected_fields = nil, &block)
@@ -445,6 +416,7 @@ module Mongoid
 
         doc._handle_callbacks_after_instantiation(execute_callbacks, &block)
 
+        doc.remember_storage_options!
         doc
       end
 

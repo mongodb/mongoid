@@ -4,9 +4,8 @@
 module Mongoid
   module Association
     module Referenced
-
       class HasOne
-
+        # Eager class for has_one associations.
         class Eager < Association::Eager
 
           private

@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe "Mongoid::Tasks::Database" do
+describe Mongoid::Tasks::Database do
 
   before(:all) do
     module DatabaseSpec
@@ -210,6 +210,52 @@ describe "Mongoid::Tasks::Database" do
         expect(klass).to receive(:create_indexes).once
         indexes
       end
+    end
+  end
+
+  describe '.create_search_indexes' do
+    let(:searchable_model) do
+      Class.new do
+        include Mongoid::Document
+        store_in collection: BSON::ObjectId.new.to_s
+
+        search_index mappings: { dynamic: true }
+      end
+    end
+
+    let(:index_names) { %w[ name1 name2 ] }
+    let(:searchable_model_spy) do
+      class_spy(searchable_model,
+                create_search_indexes: index_names,
+                search_index_specs: [ { mappings: { dynamic: true } } ])
+    end
+
+    context 'when wait is true' do
+      it 'invokes both create_search_indexes and wait_for_search_indexes' do
+        expect(searchable_model_spy).to receive(:create_search_indexes)
+        expect(described_class).to receive(:wait_for_search_indexes).with({ searchable_model_spy => index_names })
+
+        described_class.create_search_indexes([searchable_model_spy], wait: true)
+      end
+    end
+
+    context 'when wait is false' do
+      it 'invokes only create_search_indexes' do
+        expect(searchable_model_spy).to receive(:create_search_indexes)
+        expect(described_class).to_not receive(:wait_for_search_indexes)
+
+        described_class.create_search_indexes([searchable_model_spy], wait: false)
+      end
+    end
+  end
+
+  describe '.remove_search_indexes' do
+    it 'calls remove_search_indexes on all non-embedded models' do
+      models.each do |model|
+        expect(model).to receive(:remove_search_indexes) unless model.embedded?
+      end
+
+      described_class.remove_search_indexes(models)
     end
   end
 

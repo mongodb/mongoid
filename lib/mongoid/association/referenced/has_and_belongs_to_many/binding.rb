@@ -19,11 +19,11 @@ module Mongoid
           # @param [ Document ] doc The single document to bind.
           def bind_one(doc)
             binding do
-              inverse_keys = doc.you_must(_association.inverse_foreign_key)
+              inverse_keys = try_method(doc, _association.inverse_foreign_key) unless doc.frozen?
               if inverse_keys
                 record_id = inverse_record_id(doc)
                 unless inverse_keys.include?(record_id)
-                  doc.you_must(_association.inverse_foreign_key_setter, inverse_keys.push(record_id))
+                  try_method(doc, _association.inverse_foreign_key_setter, inverse_keys.push(record_id))
                 end
                 doc.reset_relation_criteria(_association.inverse)
               end
@@ -39,7 +39,7 @@ module Mongoid
           def unbind_one(doc)
             binding do
               _base.send(_association.foreign_key).delete_one(record_id(doc))
-              inverse_keys = doc.you_must(_association.inverse_foreign_key)
+              inverse_keys = try_method(doc, _association.inverse_foreign_key) unless doc.frozen?
               if inverse_keys
                 inverse_keys.delete_one(inverse_record_id(doc))
                 doc.reset_relation_criteria(_association.inverse)
@@ -50,6 +50,11 @@ module Mongoid
           end
 
           # Find the inverse id referenced by inverse_keys
+          #
+          # @param [ Mongoid::Document ] doc The document for which
+          #   to determine the inverse id.
+          #
+          # @return [ BSON::ObjectId ] The inverse id.
           def inverse_record_id(doc)
             if pk = _association.options[:inverse_primary_key]
               _base.send(pk)
@@ -63,6 +68,12 @@ module Mongoid
             end
           end
 
+          # Find the inverse association given a document.
+          #
+          # @param [ Mongoid::Document ] doc The document for which
+          #   to determine the inverse association.
+          #
+          # @return [ Mongoid::Association::Relatable ] The inverse association.
           def determine_inverse_association(doc)
             doc.relations[_base.class.name.demodulize.underscore.pluralize]
           end

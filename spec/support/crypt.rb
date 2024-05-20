@@ -71,7 +71,7 @@ module Mongoid
         if (data_key = client_encryption.get_key_by_alt_name(key_alt_name))
           Base64.encode64(data_key['_id'].data)
         else
-          key_id = client_encryption.create_data_key('local', key_alt_name: key_alt_name)
+          key_id = client_encryption.create_data_key('local', key_alt_names: [key_alt_name])
           Base64.encode64(key_id.data).strip
         end
       end

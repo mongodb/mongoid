@@ -100,15 +100,8 @@ module Mongoid
       end
 
       # Retreive the `Class` instance of the requested type, either by finding it
-      # in the given `klass`'s discriminator mapping, or by otherwise finding a
+      # in the `klass` discriminator mapping, or by otherwise finding a
       # Document model with the given name.
-      #
-      # @param klass [ Mongoid::Document ] The Document model to use first when
-      #   trying to look up the requested type.
-      # @param type [ String ] the name of the requested class to look up.
-      #
-      # @raise [ Errors::UnknownModel ] when the requested type does not exist,
-      #   or if it does not respond to the `instantiate` method.
       #
       # @return [ Mongoid::Document ] the requested Document model
       def constantized_type
@@ -153,7 +146,8 @@ module Mongoid
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
-    # @param [ true | false ] execute_callbacks Flag specifies whether callbacks
+    #
+    # @option options [ true | false ] :execute_callbacks Flag specifies whether callbacks
     #   should be run.
     #
     # @return [ Document ] The instantiated document.

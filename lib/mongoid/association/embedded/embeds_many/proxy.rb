@@ -6,7 +6,12 @@ module Mongoid
   module Association
     module Embedded
       class EmbedsMany
-        # Proxy class for the :embeds_many association.
+        # Transparent proxy for embeds_many associations.
+        # An instance of this class is returned when calling the
+        # association getter method on the parent document. This
+        # class inherits from Mongoid::Association::Proxy and forwards
+        # most of its methods to the target of the association, i.e.
+        # the array of child documents.
         class Proxy < Association::Many
           include Batchable
 
@@ -287,9 +292,24 @@ module Mongoid
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
-          # @return [ true | false ] True is persisted documents exist, false if not.
-          def exists?
-            _target.any?(&:persisted?)
+          # @param [ :none | nil | false | Hash | Object ] id_or_conditions
+          #   When :none (the default), returns true if any persisted
+          #   documents exist in the association. When nil or false, this
+          #   will always return false. When a Hash is given, this queries
+          #   the documents in the association for those that match the given
+          #   conditions, and returns true if any match which have been
+          #   persisted. Any other argument is interpreted as an id, and
+          #   queries for the existence of persisted documents in the
+          #   association with a matching _id.
+          #
+          # @return [ true | false ] True if persisted documents exist, false if not.
+          def exists?(id_or_conditions = :none)
+            case id_or_conditions
+            when :none then _target.any?(&:persisted?)
+            when nil, false then false
+            when Hash then where(id_or_conditions).any?(&:persisted?)
+            else where(_id: id_or_conditions).any?(&:persisted?)
+            end
           end
 
           # Finds a document in this association through several different
@@ -317,8 +337,8 @@ module Mongoid
           # @yield [ Object ] Yields each enumerable element to the block.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
-          def find(*args, &block)
-            criteria.find(*args, &block)
+          def find(...)
+            criteria.find(...)
           end
 
           # Get all the documents in the association that are loaded into memory.

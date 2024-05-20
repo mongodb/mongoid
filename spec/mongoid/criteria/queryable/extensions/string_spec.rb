@@ -181,84 +181,83 @@ describe String do
     end
   end
 
-  describe "#__expr_part__" do
+  describe '#__expr_part__' do
+    subject(:specified) { 'field'.__expr_part__(value) }
+    let(:value) { 10 }
 
-    let(:specified) do
-      "field".__expr_part__(10)
+    it 'returns the expression with the value' do
+      expect(specified).to eq({ 'field' => 10 })
     end
 
-    it "returns the string with the value" do
-      expect(specified).to eq({ "field" => 10 })
+    context 'with a Regexp' do
+      let(:value) { /test/ }
+
+      it 'returns the expression with the value' do
+        expect(specified).to eq({ 'field' => /test/ })
+      end
     end
 
-    context "with a regexp" do
+    context 'with a BSON::Regexp::Raw' do
+      let(:value) { BSON::Regexp::Raw.new('^[123]') }
 
-      let(:specified) do
-        "field".__expr_part__(/test/)
+      it 'returns the expression with the value' do
+        expect(specified).to eq({ 'field' => BSON::Regexp::Raw.new('^[123]') })
       end
-
-      it "returns the symbol with the value" do
-        expect(specified).to eq({ "field" => /test/ })
-      end
-
     end
 
-    context "when negated" do
+    context 'when negated' do
+      subject(:specified) { 'field'.__expr_part__(value, true) }
 
-      context "with a regexp" do
+      context 'with a Regexp' do
+        let(:value) { /test/ }
 
-        let(:specified) do
-          "field".__expr_part__(/test/, true)
+        it 'returns the expression with the value negated' do
+          expect(specified).to eq({ 'field' => { '$not' => /test/ } })
         end
-
-        it "returns the string with the value negated" do
-          expect(specified).to eq({ "field" => { "$not" => /test/ } })
-        end
-
       end
 
-      context "with anything else" do
+      context 'with a BSON::Regexp::Raw' do
+        let(:value) { BSON::Regexp::Raw.new('^[123]') }
 
-        let(:specified) do
-          "field".__expr_part__('test', true)
+        it 'returns the expression with the value' do
+          expect(specified).to eq({ 'field' => { '$not' => BSON::Regexp::Raw.new('^[123]') } })
         end
+      end
 
-        it "returns the string with the value negated" do
-          expect(specified).to eq({ "field" => { "$ne" => "test" }})
+      context 'with anything else' do
+        let(:value) { 'test' }
+
+        it 'returns the expression with the value negated' do
+          expect(specified).to eq({ 'field' => { '$ne' => 'test' }})
         end
       end
     end
   end
 
-  describe ".evolve" do
+  describe '.evolve' do
+    subject(:evolved) { described_class.evolve(object) }
 
-    context "when provided a regex" do
+    context 'when provided a Regexp' do
+      let(:object) { /\A[123]/.freeze }
 
-      let(:regex) do
-        /\A[123]/.freeze
-      end
-
-      let(:evolved) do
-        described_class.evolve(regex)
-      end
-
-      it "returns the regex" do
-        expect(evolved).to eq(regex)
+      it 'returns the regexp' do
+        expect(evolved).to eq(/\A[123]/)
       end
     end
 
-    context "when provided an object" do
+    context 'when provided a BSON::Regexp::Raw' do
+      let(:object) { BSON::Regexp::Raw.new('^[123]') }
 
-      let(:object) do
-        1234
+      it 'returns the BSON::Regexp::Raw' do
+        expect(evolved).to eq(BSON::Regexp::Raw.new('^[123]'))
       end
+    end
 
-      let(:evolved) do
-        described_class.evolve(object)
-      end
+    context 'when provided an object' do
+      let(:object) { 1234 }
 
-      it "returns the object as a string" do
-        expect(evolved).to eq("1234")
+      it 'returns the object as a string' do
+        expect(evolved).to eq('1234')
       end
     end
   end

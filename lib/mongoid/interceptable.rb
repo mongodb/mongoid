@@ -44,7 +44,9 @@ module Mongoid
       # @api private
       define_model_callbacks :persist_parent
 
-      define_model_callbacks :commit, :rollback, only: :after
+      define_callbacks :commit, :rollback,
+                       only: :after,
+                       scope: [:kind, :name]
 
       attr_accessor :before_callback_halted
     end
@@ -149,6 +151,28 @@ module Mongoid
     #
     # @api private
     def _mongoid_run_child_callbacks(kind, children: nil, &block)
+      if Mongoid::Config.around_callbacks_for_embeds
+        _mongoid_run_child_callbacks_with_around(kind, children: children, &block)
+      else
+        _mongoid_run_child_callbacks_without_around(kind, children: children, &block)
+      end
+    end
+
+    # Execute the callbacks of given kind for embedded documents including
+    # around callbacks.
+    #
+    # @note This method is prone to stack overflow errors if the document
+    #   has a large number of embedded documents. It is recommended to avoid
+    #   using around callbacks for embedded documents until a proper solution
+    #   is implemented.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    #  nil, callbacks will be executed on all cascadable children of
+    #  the document.
+    #
+    #  @api private
+    def _mongoid_run_child_callbacks_with_around(kind, children: nil, &block)
       child, *tail = (children || cascadable_children(kind))
       with_children = !Mongoid::Config.prevent_multiple_calls_of_embedded_callbacks
       if child.nil?
@@ -157,23 +181,91 @@ module Mongoid
         child.run_callbacks(child_callback_type(kind, child), with_children: with_children, &block)
       else
         child.run_callbacks(child_callback_type(kind, child), with_children: with_children) do
-          _mongoid_run_child_callbacks(kind, children: tail, &block)
+          _mongoid_run_child_callbacks_with_around(kind, children: tail, &block)
         end
       end
     end
 
-    # This is used to store callbacks to be executed later. A good use case for
-    # this is delaying the after_find and after_initialize callbacks until the
-    # associations are set on the document. This can also be used to delay
-    # applying the defaults on a document.
+    # Execute the callbacks of given kind for embedded documents without
+    # around callbacks.
     #
-    # @return [ Array<Symbol> ] an array of symbols that represent the pending callbacks.
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    #   nil, callbacks will be executed on all cascadable children of
+    #   the document.
+    #
+    # @api private
+    def _mongoid_run_child_callbacks_without_around(kind, children: nil, &block)
+      children = (children || cascadable_children(kind))
+      callback_list = _mongoid_run_child_before_callbacks(kind, children: children)
+      return false if callback_list == false
+      value = block&.call
+      callback_list.each do |_next_sequence, env|
+        env.value &&= value
+      end
+      return false if _mongoid_run_child_after_callbacks(callback_list: callback_list) == false
+
+      value
+    end
+
+    # Execute the before callbacks of given kind for embedded documents.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to execute callbacks on.
+    # @param [ Array<ActiveSupport::Callbacks::CallbackSequence, ActiveSupport::Callbacks::Filters::Environment> ] callback_list List of
+    #   pairs of callback sequence and environment. This list will be later used
+    #   to execute after callbacks in reverse order.
+    #
+    # @api private
+    def _mongoid_run_child_before_callbacks(kind, children: [], callback_list: [])
+      children.each do |child|
+        chain = child.__callbacks[child_callback_type(kind, child)]
+        env = ActiveSupport::Callbacks::Filters::Environment.new(child, false, nil)
+        next_sequence = compile_callbacks(chain)
+        unless next_sequence.final?
+          Mongoid.logger.warn("Around callbacks are disabled for embedded documents. Skipping around callbacks for #{child.class.name}.")
+          Mongoid.logger.warn("To enable around callbacks for embedded documents, set Mongoid::Config.around_callbacks_for_embeds to true.")
+        end
+        next_sequence.invoke_before(env)
+        return false if env.halted
+        env.value = !env.halted
+        callback_list << [next_sequence, env]
+        if (grandchildren = child.send(:cascadable_children, kind))
+          _mongoid_run_child_before_callbacks(kind, children: grandchildren, callback_list: callback_list)
+        end
+      end
+      callback_list
+    end
+
+    # Execute the after callbacks.
+    #
+    # @param [ Array<ActiveSupport::Callbacks::CallbackSequence, ActiveSupport::Callbacks::Filters::Environment> ] callback_list List of
+    #   pairs of callback sequence and environment.
+    def _mongoid_run_child_after_callbacks(callback_list: [])
+      callback_list.reverse_each do |next_sequence, env|
+        next_sequence.invoke_after(env)
+        return false if env.halted
+      end
+    end
+
+    # Returns the stored callbacks to be executed later.
+    #
+    # @return [ Array<Symbol> ] Method symbols of the stored pending callbacks.
     #
     # @api private
     def pending_callbacks
       @pending_callbacks ||= [].to_set
     end
 
+    # Stores callbacks to be executed later. A good use case for
+    # this is delaying the after_find and after_initialize callbacks until the
+    # associations are set on the document. This can also be used to delay
+    # applying the defaults on a document.
+    #
+    # @param [ Array<Symbol> ] value Method symbols of the pending callbacks to store.
+    #
+    # @return [ Array<Symbol> ] Method symbols of the stored pending callbacks.
+    #
     # @api private
     def pending_callbacks=(value)
       @pending_callbacks = value
@@ -308,7 +400,7 @@ module Mongoid
         end
         self.class.send :define_method, name do
           env = ActiveSupport::Callbacks::Filters::Environment.new(self, false, nil)
-          sequence = chain.compile
+          sequence = compile_callbacks(chain)
           sequence.invoke_before(env)
           env.value = !env.halted
           sequence.invoke_after(env)
@@ -317,6 +409,25 @@ module Mongoid
         self.class.send :protected, name
       end
       send(name)
+    end
+
+    # Compile the callback chain.
+    #
+    # This method hides the differences between ActiveSupport implementations
+    # before and after 7.1.
+    #
+    # @param [ ActiveSupport::Callbacks::CallbackChain ] chain The callback chain.
+    # @param [ Symbol | nil ] type The type of callback chain to compile.
+    #
+    # @return [ ActiveSupport::Callbacks::CallbackSequence ] The compiled callback sequence.
+    def compile_callbacks(chain, type = nil)
+      if chain.method(:compile).arity == 0
+        # ActiveSupport < 7.1
+        chain.compile
+      else
+        # ActiveSupport >= 7.1
+        chain.compile(type)
+      end
     end
   end
 end

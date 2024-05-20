@@ -3,6 +3,8 @@
 
 module Mongoid
   module Clients
+
+    # Factory used to create database clients.
     module Factory
       extend self
       extend Loggable
@@ -98,7 +100,7 @@ module Mongoid
             auto_encryption_options[:schema_map] = Mongoid.config.encryption_schema_map(database)
           end
           if auto_encryption_options.key?(:key_vault_client)
-            auto_encryption_options[:key_vault_client] = Mongoid::Clients.with_name(
+            auto_encryption_options[:key_vault_client] = Mongoid.client(
               auto_encryption_options[:key_vault_client]
             )
           end
