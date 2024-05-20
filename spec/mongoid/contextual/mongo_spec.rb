@@ -3696,8 +3696,8 @@ describe Mongoid::Contextual::Mongo do
           context "when operation is $pullAll" do
 
             before do
-              depeche_mode.update_attribute(:genres, ["pop", "electronic", "dance"])
-              new_order.update_attribute(:genres, ["electronic", "pop", "dance"])
+              depeche_mode.update_attribute(:genres, ["pop", "electronic", "dance", "pop" ])
+              new_order.update_attribute(:genres, ["electronic", "pop", "electronic","dance"])
               context.update_all("$pullAll" => { genres: ["pop", "electronic"] })
             end
 
