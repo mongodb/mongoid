@@ -49,7 +49,7 @@ module Mongoid
 
       # Get the value for the provided operator, klass, key and value.
       #
-      # This is necessary for special cases like $rename, $addToSet and $push.
+      # This is necessary for special cases like $rename, $addToSet, $push, $pull and $pop.
       #
       # @param [ String ] operator The operator.
       # @param [ Class ] klass The model class.
@@ -60,7 +60,7 @@ module Mongoid
       def value_for(operator, klass, key, value)
         case operator
         when '$rename' then value.to_s
-        when '$addToSet', '$push' then value.mongoize
+        when '$addToSet', '$push', '$pull', '$pop' then value.mongoize
         else mongoize_for(operator, klass, key, value)
         end
       end
