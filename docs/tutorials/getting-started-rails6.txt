@@ -1,3 +1,5 @@
+.. _getting-started-6:
+
 *************************
 Getting Started (Rails 6)
 *************************

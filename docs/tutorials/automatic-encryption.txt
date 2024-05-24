@@ -1,3 +1,5 @@
+.. _automatic-encryption:
+
 ********************************************
 Automatic Client-Side Field Level Encryption
 ********************************************
