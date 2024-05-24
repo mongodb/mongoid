@@ -16,14 +16,14 @@ Tutorials
   tutorials/common-errors
   tutorials/automatic-encryption
 
-  Overview
-  --------
+Overview
+--------
 
-  See the following sections to learn more about working with Mongoid:
+See the following sections to learn more about working with Mongoid:
 
-  - :ref:`Getting Started (Sinatra) <getting-started-sinatra>`
-  - :ref:`Getting Started (Rails 7) <getting-started-7>`
-  - :ref:`Getting Started (Rails 6) <getting-started-6>`
-  - :ref:`Documents <documents>`
-  - :ref:`Common Errors <common-errors>`
-  - :ref:`Automatic Client-Side Field Level Encryption <automatic-encryption>`
+- :ref:`Getting Started (Sinatra) <getting-started-sinatra>`
+- :ref:`Getting Started (Rails 7) <getting-started-7>`
+- :ref:`Getting Started (Rails 6) <getting-started-6>`
+- :ref:`Documents <documents>`
+- :ref:`Common Errors <common-errors>`
+- :ref:`Automatic Client-Side Field Level Encryption <automatic-encryption>`
