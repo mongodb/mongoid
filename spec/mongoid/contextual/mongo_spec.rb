@@ -3640,6 +3640,75 @@ describe Mongoid::Contextual::Mongo do
               expect(new_order.reload.genres).to eq(["electronic"])
             end
           end
+
+          context "when operation is $pull" do
+            context "when pulling single element" do
+
+              before do
+                depeche_mode.update_attribute(:genres, ["electronic", "pop"])
+                new_order.update_attribute(:genres, ["electronic", "pop"])
+                context.update_all("$pull" => { genres: "electronic" })
+              end
+
+              it "updates the first matching document" do
+                expect(depeche_mode.reload.genres).to eq(["pop"])
+              end
+
+              it "updates the last matching document" do
+                expect(new_order.reload.genres).to eq(["pop"])
+              end
+            end
+
+            context "when pulling based on condition" do
+              before do
+                depeche_mode.update_attribute(:genres, ["electronic", "pop", "dance"])
+                new_order.update_attribute(:genres, ["electronic", "pop", "dance"])
+                context.update_all("$pull" => { genres: { '$in' => ["electronic", "pop"] } })
+              end
+
+              it "updates the first matching document" do
+                expect(depeche_mode.reload.genres).to eq(["dance"])
+              end
+
+              it "updates the last matching document" do
+                expect(new_order.reload.genres).to eq(["dance"])
+              end
+            end
+          end
+
+          context "when operation is $pop" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["pop", "electronic"])
+            end
+
+            it "removes first element in array" do
+              context.update_all("$pop" => { genres: -1 })
+              expect(depeche_mode.reload.genres).to eq(["electronic"])
+            end
+
+            it "removes last element in array" do
+              context.update_all("$pop" => { genres: 1 })
+              expect(depeche_mode.reload.genres).to eq(["pop"])
+            end
+          end
+
+          context "when operation is $pullAll" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["pop", "electronic", "dance", "pop" ])
+              new_order.update_attribute(:genres, ["electronic", "pop", "electronic", "dance"])
+              context.update_all("$pullAll" => { genres: ["pop", "electronic"] })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["dance"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["dance"])
+            end
+          end
         end
 
         context 'when using aliased field names' do
@@ -3659,15 +3728,15 @@ describe Mongoid::Contextual::Mongo do
         context "when the attributes must be mongoized" do
 
           before do
-            context.update_all("$set" => { member_count: "1" })
+            context.update_all("$set" => { location: LatLng.new(52.30, 13.25) })
           end
 
           it "updates the first matching document" do
-            expect(depeche_mode.reload.member_count).to eq(1)
+            expect(depeche_mode.reload.location).to eq(LatLng.new(52.30, 13.25))
           end
 
           it "updates the last matching document" do
-            expect(new_order.reload.member_count).to eq(1)
+            expect(new_order.reload.location).to eq(LatLng.new(52.30, 13.25))
           end
         end
       end

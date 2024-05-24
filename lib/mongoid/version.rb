@@ -2,5 +2,5 @@
 # rubocop:todo all
 
 module Mongoid
-  VERSION = "9.0.0.alpha"
+  VERSION = "9.0.0"
 end
