@@ -1,3 +1,5 @@
+.. _persistence:
+
 *************************
 Persistence Configuration
 *************************
