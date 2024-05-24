@@ -19,3 +19,19 @@ Working With Data
   reference/callbacks
   reference/sessions
   reference/transactions
+
+Overview
+--------
+
+See the following sections to learn more about working with data in Mongoid:
+
+- :ref:`CRUD Operations <crud>`
+- :ref:`Queries <queries>`
+- :ref:`Text Search <text-search>`
+- :ref:`Aggregation Pipeline <aggregation-pipeline>`
+- :ref:`Map/Reduce <map-reduce>`
+- :ref:`Persistence Configuration <persistence>`
+- :ref:`Nested Attributes <nested-attributes>`
+- :ref:`Callbacks <callbacks>`
+- :ref:`Sessions <sessions>`
+- :ref:`Transactions <transactions>`

@@ -13,3 +13,13 @@ Installation & Configuration
   reference/compatibility
   reference/configuration
   reference/rails-integration
+
+Overview
+--------
+
+Learn how to install and configure Mongoid in the following sections:
+
+- :ref:`Installation <installation>`
+- :ref:`Compatibility <compatibility>`
+- :ref:`Configuration <configuration>`
+- :ref:`Rails Integration <rails-integration>`
