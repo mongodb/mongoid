@@ -733,6 +733,44 @@ describe Mongoid::Touchable do
       end
     end
 
+    context 'when a custom field is specified' do
+      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+      let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+      after do 
+        Timecop.return 
+      end
+
+      let!(:label) do 
+        TouchableSpec::Referenced::Label.create!
+      end 
+    
+      let!(:band) do
+        TouchableSpec::Referenced::Band.create!(label: label)
+      end
+
+      before do
+        update_time
+        band.touch 
+      end
+
+      it "updates the specified field in the parent document" do
+        expect(label.bands_updated_at).to eq(update_time)
+        expect(label.reload.bands_updated_at).to eq(update_time)
+      end
+
+      it "updates the parent's timestamp" do
+        expect(label.updated_at).to eq(update_time)
+        expect(label.reload.updated_at).to eq(update_time)
+      end 
+
+      it "updates the child's timestamp" do
+        expect(band.updated_at).to eq(update_time)
+        expect(band.reload.updated_at).to eq(update_time)
+      end 
+
+    end
+
     context 'multi-level' do
 
       let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
