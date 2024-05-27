@@ -153,9 +153,16 @@ module TouchableSpec
 
     class Label
       include Mongoid::Document 
-      field :band_updated_at, type: DateTime 
+      field :bands_updated_at, type: DateTime 
       field :name, type: String 
       has_many :bands 
-    end 
+    end
+    
+    class Band
+      include Mongoid::Document 
+      field :name, type: String 
+      belongs_to :label, touch :bands_updated_at
+    end
+    
   end
 end
