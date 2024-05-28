@@ -1,3 +1,5 @@
+.. _collection-configuration:
+
 ************************
 Collection Configuration
 ************************

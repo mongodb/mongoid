@@ -14,3 +14,15 @@ Release Notes
   release-notes/mongoid-7.5
   release-notes/mongoid-7.4
   release-notes/mongoid-7.3
+
+Overview
+--------
+
+See the following sections to learn more about upgrading Mongoid:
+
+- :ref:`Upgrading Mongoid <upgrading>`
+- :ref:`Mongoid 8.1 <mongoid-8.1>`
+- :ref:`Mongoid 8.0 <mongoid-8.0>`
+- :ref:`Mongoid 7.5 <mongoid-7.5>`
+- :ref:`Mongoid 7.4 <mongoid-7.4>`
+- :ref:`Mongoid 7.3 <mongoid-7.3>`

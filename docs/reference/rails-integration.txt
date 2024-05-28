@@ -1,3 +1,5 @@
+.. _rails-integration:
+
 *****************
 Rails Integration
 *****************
