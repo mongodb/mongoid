@@ -754,14 +754,13 @@ describe Mongoid::Touchable do
         end
 
         before do
-          band
           update_time
           band.send(meth)
         end
 
         it "updates the child's timestamp" do
-          # expect(band.updated_at).to eq(update_time.utc)
-          expect(band.reload.updated_at).to eq(update_time.utc)
+          expect(band.updated_at).to eq(update_time)
+          expect(band.reload.updated_at).to eq(update_time)
         end
       end
 
