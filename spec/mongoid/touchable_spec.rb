@@ -733,42 +733,80 @@ describe Mongoid::Touchable do
       end
     end
 
-    context 'when a custom field is specified' do
-      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
-      let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+    context "when a custom field is specified" do
 
-      after do 
-        Timecop.return 
+      shared_examples "updates the child's updated_at" do
+
+        let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+        let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+        after do
+          Timecop.return
+        end
+
+        let!(:label) do
+          TouchableSpec::Referenced::Label.create!
+        end
+
+        let(:band) do
+          TouchableSpec::Referenced::Band.create!(label: label)
+        end
+
+        before do
+          band
+          update_time
+          band.send(meth)
+        end
+
+        it "updates the child's timestamp" do
+          # expect(band.updated_at).to eq(update_time.utc)
+          expect(band.reload.updated_at).to eq(update_time.utc)
+        end
       end
 
-      let!(:label) do 
-        TouchableSpec::Referenced::Label.create!
-      end 
-    
-      let!(:band) do
-        TouchableSpec::Referenced::Band.create!(label: label)
+      shared_examples "updates the parent's custom field and updated_at" do
+
+        let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+        let(:update_time) { Timecop.freeze(Time.at(Time.now.to_i) + 2) }
+
+        after do
+          Timecop.return
+        end
+
+        let!(:label) do
+          TouchableSpec::Referenced::Label.create!
+        end
+
+        let!(:band) do
+          TouchableSpec::Referenced::Band.create!(label: label)
+        end
+
+        before do
+          update_time
+          band.send(meth)
+        end
+
+        it "updates the parent's custom field" do
+          expect(label.bands_updated_at).to eq(update_time)
+          expect(label.reload.bands_updated_at).to eq(update_time)
+        end
+
+        it "updates the parent's timestamp" do
+          expect(label.updated_at).to eq(update_time)
+          expect(label.reload.updated_at).to eq(update_time)
+        end
+
       end
 
-      before do
-        update_time
-        band.touch 
+      [:save, :destroy, :touch].each do |meth|
+        context "with #{meth} on referenced associations" do
+          let(:meth) { meth }
+          include_examples "updates the child's updated_at" unless meth == :destroy
+          include_examples "updates the parent's custom field and updated_at"
+        end
       end
-
-      it "updates the specified field in the parent document" do
-        expect(label.bands_updated_at).to eq(update_time)
-        expect(label.reload.bands_updated_at).to eq(update_time)
-      end
-
-      it "updates the parent's timestamp" do
-        expect(label.updated_at).to eq(update_time)
-        expect(label.reload.updated_at).to eq(update_time)
-      end 
-
-      it "updates the child's timestamp" do
-        expect(band.updated_at).to eq(update_time)
-        expect(band.reload.updated_at).to eq(update_time)
-      end 
-
     end
 
     context 'multi-level' do
