@@ -263,6 +263,22 @@ module Mongoid
         end
       end
 
+      # Iterate through plucked field values in memory.
+      #
+      # @example Iterate through the values for null context.
+      #   context.pluck_each(:name) { |name| puts name }
+      #
+      # @param [ [ String | Symbol ]... ] *fields Field(s) to pluck.
+      # @param [ Proc ] &block The block to call once for each plucked
+      #   result.
+      #
+      # @return [ Enumerator | Memory ] An enumerator, or the context
+      #   if a block was given.
+      def pluck_each(*fields, &block)
+        enum = pluck(*fields).each(&block)
+        block_given? ? self : enum
+      end
+
       # Pick the field values in memory.
       #
       # @example Get the values in memory.
