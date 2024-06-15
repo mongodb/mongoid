@@ -94,7 +94,7 @@ module Mongoid
         #
         # @return [ Numeric ] The sum value.
         def sum(field = nil)
-          return super() if block_given?
+          return super(field || 0) if block_given?
 
           aggregate_by(field, :sum) || 0
         end

@@ -100,7 +100,9 @@ module Mongoid
         #
         # @return [ Float ] The sum value.
         def sum(field = nil)
-          block_given? ? super() : aggregates(field)["sum"] || 0
+          return super(field || 0) if block_given?
+
+          aggregates(field)["sum"] || 0
         end
 
         private
