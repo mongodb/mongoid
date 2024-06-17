@@ -171,6 +171,15 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
     option :around_callbacks_for_embeds, default: false
 
+    # When this flag is false, named scopes cannot unset a default scope.
+    # This is the traditional (and default) behavior in Mongoid 9 and earlier.
+    #
+    # Setting this flag to true will allow named scopes to unset the default
+    # scope. This will be the default in Mongoid 10.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5785 for more details.
+    option :allow_scopes_to_unset_default_scope, default: false
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.
