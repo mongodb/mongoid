@@ -294,7 +294,13 @@ module Mongoid
             scope = instance_exec(*args, **kwargs, &scoping[:scope])
             extension = scoping[:extension]
             to_merge = scope || queryable
-            criteria = to_merge.empty_and_chainable? ? to_merge : with_default_scope.merge(to_merge)
+
+            criteria = if Mongoid.allow_scopes_to_unset_default_scope
+                         to_merge
+                       else
+                         to_merge.empty_and_chainable? ? to_merge : with_default_scope.merge(to_merge)
+                       end
+
             criteria.extend(extension)
             criteria
           end
