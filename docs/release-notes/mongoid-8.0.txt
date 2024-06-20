@@ -398,6 +398,27 @@ as well as ActiveRecord-compatible ``previously_new_record?`` and
   user.previously_persisted?   # => true
 
 
+Setting Field Type as a Class is Deprecated
+-------------------------------------------
+
+Mongoid has historically supported defining the ``field :type`` option
+as either a Symbol or a Class. As of Mongoid 8.0, using a Class is deprecated
+and Symbol is preferred. Support for ``field :type`` as a Class will be
+removed in a future major version of Mongoid.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    # Deprecated; will log a warning message.
+    field :first_name, type: String
+
+    # Good
+    field :last_name, type: :string
+  end
+
+
 Unknown Field Type Symbols/Strings Prohibited
 ---------------------------------------------
 
@@ -427,6 +448,22 @@ Mongoid 7 behavior:
     # Equivalent to:
     field :name
   end
+
+
+Support for Defining Custom Field Type Values
+---------------------------------------------
+
+Mongoid 8.0 adds the ability to define custom ``field :type`` Symbol values as follows:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid_custom_fields.rb
+
+  Mongoid.configure do |config|
+    config.field_type :point, Point
+  end
+
+Refer to the :ref:`docs <http://docs.mongodb.org/manual/reference/fields/#custom-field-types>` for details.
 
 
 ``any_of`` Adds Multiple Arguments As Top-Level Conditions

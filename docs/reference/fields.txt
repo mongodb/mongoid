@@ -52,40 +52,40 @@ on a person by using the ``field`` macro.
 
    class Person
      include Mongoid::Document
-     field :name, type: String
-     field :date_of_birth, type: Date
-     field :weight, type: Float
+     field :name, type: :string
+     field :date_of_birth, type: :date
+     field :weight, type: :float
    end
 
 The valid types for fields are as follows:
 
-- ``Array``
-- ``BSON::Binary``
-- :ref:`BigDecimal <field-type-big-decimal>`
-- ``Mongoid::Boolean``, which may be specified simply as ``Boolean`` in the
-  scope of a class which included ``Mongoid::Document``.
-- :ref:`Date <field-type-date>`
-- :ref:`DateTime <field-type-date-time>`
-- ``Float``
-- :ref:`Hash <field-type-hash>`
-- ``Integer``
-- :ref:`Object <untyped-fields>`
-- ``BSON::ObjectId``
-- ``Range``
-- :ref:`Regexp <field-type-regexp>`
-- ``Set``
-- ``String``
-- :ref:`Mongoid::StringifiedSymbol <field-type-stringified-symbol>`,
-  which may be specified simply as ``StringifiedSymbol`` in the scope of a
-  class which included ``Mongoid::Document``.
-- :ref:`Symbol <field-type-stringified-symbol>`
-- :ref:`Time <field-type-time>`
-- ``ActiveSupport::TimeWithZone``
-
-Mongoid also recognizes the string ``"Boolean"`` as an alias for the
-``Mongoid::Boolean`` class.
+- :array
+- :ref:`:big_decimal <field-type-big-decimal>`
+- :binary (``BSON::Binary``)
+- :boolean
+- :ref:`date <field-type-date>`
+- :ref:`date_time <field-type-date-time>`
+- :decimal128 (``BSON::Decimal128``)
+- :float
+- :ref:`hash <field-type-hash>`
+- :integer
+- :ref:`object <untyped-fields>`
+- :object_id (``BSON::ObjectID``)
+- :range
+- :ref:`regexp <field-type-regexp>`
+- :set
+- :string
+- :ref:`stringified_symbol <field-type-stringified-symbol>`
+- :ref:`symbol <field-type-stringified-symbol>`
+- :ref:`time <field-type-time>`
+- :time_with_zone (``ActiveSupport::TimeWithZone``)
 
 To define custom field types, refer to :ref:`Custom Field Types <custom-field-types>` below.
+
+As of Mongoid 8.0, ``field :type`` should be specified as a ``Symbol``.
+Specifying as a ``Class`` is deprecated and will be no longer supported in a
+future major version of Mongoid. Unrecognized field type symbols will result
+in an `InvalidFieldType` error when the model class is loaded.
 
 .. note::
 
@@ -153,16 +153,16 @@ values of the following types should not be stored in untyped fields:
 
 .. _field-type-stringified-symbol:
 
-Field Type: StringifiedSymbol
------------------------------
+Field Type :stringified_symbol
+------------------------------
 
-The ``StringifiedSymbol`` field type is the recommended field type for storing
-values that should be exposed as symbols to Ruby applications. When using the ``Symbol`` field type,
+The ``:stringified_symbol`` field type is the recommended field type for storing
+values that should be exposed as symbols to Ruby applications. When using the ``:symbol`` field type,
 Mongoid defaults to storing values as BSON symbols. For more information on the
 BSON symbol type, see :ref:`here <field-type-symbol>`.
 However, the BSON symbol type is deprecated and is difficult to work with in programming languages
-without native symbol types, so the ``StringifiedSymbol`` type allows the use of symbols
-while ensuring interoperability with other drivers. The ``StringifiedSymbol`` type stores all data
+without native symbol types, so the ``:stringified_symbol`` type allows the use of symbols
+while ensuring interoperability with other drivers. The ``:stringified_symbol`` type stores all data
 on the database as strings, while exposing values to the application as symbols.
 
 An example usage is shown below:
@@ -207,15 +207,15 @@ migration from fields that currently store either strings or BSON symbols in the
 
 .. _field-type-symbol:
 
-Field Type: Symbol
+Field Type :symbol
 ------------------
 
-New applications should use the :ref:`StringifiedSymbol field type <field-type-stringified-symbol>`
-to store Ruby symbols in the database. The ``StringifiedSymbol`` field type
+New applications should use the :ref:`:stringified_symbol field type <field-type-stringified-symbol>`
+to store Ruby symbols in the database. The ``:stringified_symbol`` field type
 provides maximum compatibility with other applications and programming languages
 and has the same behavior in all circumstances.
 
-Mongoid also provides the deprecated ``Symbol`` field type for serializing
+Mongoid also provides the deprecated ``:symbol`` field type for serializing
 Ruby symbols to BSON symbols. Because the BSON specification deprecated the
 BSON symbol type, the ``bson`` gem will serialize Ruby symbols into BSON strings
 when used on its own. However, in order to maintain backwards compatibility
@@ -238,10 +238,10 @@ snippet in your project:
 
 .. _field-type-hash:
 
-Field Type: Hash
+Field Type :hash
 ----------------
 
-When using a field of type Hash, be wary of adhering to the
+When using a field of type ``:hash``, be wary of adhering to the
 `legal key names for mongoDB <https://www.mongodb.com/docs/manual/reference/limits/#naming-restrictions>`_,
 or else the values will not store properly.
 
@@ -250,7 +250,7 @@ or else the values will not store properly.
    class Person
      include Mongoid::Document
      field :first_name
-     field :url, type: Hash
+     field :url, type: :hash
 
      # will update the fields properly and save the values
      def set_vals
@@ -270,21 +270,21 @@ or else the values will not store properly.
 
 .. _field-type-time:
 
-Field Type: Time
+Field Type :time
 ----------------
 
-``Time`` fields store values as ``Time`` instances in the :ref:`configured
+``:time`` fields store values as ``Time`` instances in the :ref:`configured
 time zone <time-zones>`.
 
 ``Date`` and ``DateTime`` instances are converted to ``Time`` instances upon
-assignment to a ``Time`` field:
+assignment to a ``:time`` field:
 
 .. code-block:: ruby
 
   class Voter
     include Mongoid::Document
-
-    field :registered_at, type: Time
+    
+    field :registered_at, type: :time
   end
 
   Voter.new(registered_at: Date.today)
@@ -302,10 +302,10 @@ local time, because the application was not configured to use UTC times.
 
 .. _field-type-date:
 
-Field Type: Date
+Field Type :date
 ----------------
 
-Mongoid allows assignment of values of several types to ``Date`` fields:
+Mongoid allows assignment of values of several types to ``:date`` fields:
 
 - ``Date`` - the provided date is stored as is.
 - ``Time``, ``DateTime``, ``ActiveSupport::TimeWithZone`` - the date component
@@ -323,7 +323,7 @@ As a date & time to date conversion is lossy (it discards the time component),
 especially if an application operates with times in different time zones it is
 recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
-``Date``.
+``:date``.
 
 .. note::
 
@@ -335,15 +335,15 @@ objects to ``Date`` objects before assigning the values to fields of type
 
 .. _field-type-date-time:
 
-Field Type: DateTime
+Field Type :date_time
 ---------------------
 
 MongoDB stores all times as UTC timestamps. When assigning a value to a
-``DateTime`` field, or when querying a ``DateTime`` field, Mongoid
+``:date_time`` field, or when querying a ``:date_time`` field, Mongoid
 converts the passed in value to a UTC ``Time`` before sending it to the
 MongoDB server.
 
-``Time``, ``ActiveSupport::TimeWithZone`` and ``DateTime`` objects embed
+``Time``, ``ActiveSupport::TimeWithZone``, and ``DateTime`` objects embed
 time zone information, and the value persisted is the specified moment in
 time, in UTC. When the value is retrieved, the time zone in which it is
 returned is defined by the :ref:`configured time zone settings <time-zones>`.
@@ -352,7 +352,7 @@ returned is defined by the :ref:`configured time zone settings <time-zones>`.
 
    class Ticket
      include Mongoid::Document
-     field :opened_at, type: DateTime
+     field :opened_at, type: :date_time
    end
 
    Time.zone = 'Berlin'
@@ -381,7 +381,7 @@ doing so, the integers/floats are assumed to be Unix timestamps (in UTC):
     ticket.opened_at
     # => Fri, 14 Dec 2018 16:12:54 +0000
 
-If a string is used as a ``DateTime`` field value, the behavior depends on
+If a ``String`` is used as a ``:date_time`` field value, the behavior depends on
 whether the string includes a time zone. If no time zone is specified,
 the :ref:`default Mongoid time zone <time-zones>` is used:
 
@@ -409,7 +409,7 @@ If a time zone is specified, it is respected:
 
 .. _field-type-regexp:
 
-Field Type: Regexp
+Field Type :regexp
 ------------------
 
 MongoDB supports storing regular expressions in documents, and querying using
@@ -420,7 +420,7 @@ fork of `Oniguruma regular expression engine <https://github.com/kkos/oniguruma>
 The two regular expression implementations generally provide equivalent
 functionality but have several important syntax differences.
 
-When a field is declared to be of type Regexp, Mongoid converts Ruby regular
+When a field is declared to be of type ``:regexp``, Mongoid converts Ruby regular
 expressions to BSON regular expressions and stores the result in MongoDB.
 Retrieving the field from the database produces a ``BSON::Regexp::Raw``
 instance:
@@ -430,7 +430,7 @@ instance:
   class Token
     include Mongoid::Document
 
-    field :pattern, type: Regexp
+    field :pattern, type: :regexp
   end
 
   token = Token.create!(pattern: /hello.world/m)
@@ -573,46 +573,6 @@ you have three options:
 
    This query will find all values that are either a ``decimal128`` value or
    a string that match that value.
-
-
-Using Symbols Or Strings Instead Of Classes
--------------------------------------------
-
-Mongoid permits using symbols or strings instead of classes to specify the
-type of fields, for example:
-
-.. code-block:: ruby
-
-  class Order
-    include Mongoid::Document
-
-    field :state, type: :integer
-    # Equivalent to:
-    field :state, type: "integer"
-    # Equivalent to:
-    field :state, type: Integer
-  end
-
-Only standard field types as listed below can be specified using symbols or
-strings in this manner. Mongoid recognizes the following expansions:
-
-- ``:array`` => ``Array``
-- ``:big_decimal`` => ``BigDecimal``
-- ``:binary`` => ``BSON::Binary``
-- ``:boolean`` => ``Mongoid::Boolean``
-- ``:date`` => ``Date``
-- ``:date_time`` => ``DateTime``
-- ``:float`` => ``Float``
-- ``:hash`` => ``Hash``
-- ``:integer`` => ``Integer``
-- ``:object_id`` => ``BSON::ObjectId``
-- ``:range`` => ``Range``
-- ``:regexp`` => ``Regexp``
-- ``:set`` => ``Set``
-- ``:string`` => ``String``
-- ``:stringified_symbol`` => ``StringifiedSymbol``
-- ``:symbol`` => ``Symbol``
-- ``:time`` => ``Time``
 
 
 .. _field-default-values:
@@ -1053,8 +1013,19 @@ can use in our model class as follows:
 
   class Profile
     include Mongoid::Document
-    field :location, type: Point
+    field :location, type: :point
   end
+
+First, declare the new field type mapping in an initializer:
+
+.. code-block:: ruby
+
+  # in /config/initializers/mongoid_custom_fields.rb
+
+  Mongoid::Fields.configure do
+    type :point, Point
+  end
+
 
 Then make a Ruby class to represent the type. This class must define methods
 used for MongoDB serialization and deserialization as follows:

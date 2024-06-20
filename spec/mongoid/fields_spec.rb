@@ -327,75 +327,46 @@ describe Mongoid::Fields do
         end
       end
 
-      it "converts :array to Array" do
-        expect(klass.field(:test, type: :array).type).to be(Array)
-      end
+      {
+        array: Array,
+        bigdecimal: BigDecimal,
+        big_decimal: BigDecimal,
+        binary: BSON::Binary,
+        boolean: Mongoid::Boolean,
+        date: Date,
+        datetime: DateTime,
+        date_time: DateTime,
+        decimal128: BSON::Decimal128,
+        double: Float,
+        float: Float,
+        hash: Hash,
+        integer: Integer,
+        object: Object,
+        object_id: BSON::ObjectId,
+        range: Range,
+        regexp: Regexp,
+        set: Set,
+        string: String,
+        stringified_symbol: Mongoid::StringifiedSymbol,
+        symbol: Symbol,
+        time: Time,
+        time_with_zone: ActiveSupport::TimeWithZone
+      }.each do |field_type, field_klass|
 
-      it "converts :big_decimal to BigDecimal" do
-        expect(klass.field(:test, type: :big_decimal).type).to be(BigDecimal)
-      end
+        it "converts Symbol :#{field_type} to #{field_klass}" do
+          expect(klass.field(:test, type: field_type).type).to be(field_klass)
+        end
 
-      it "converts :binary to BSON::Binary" do
-        expect(klass.field(:test, type: :binary).type).to be(BSON::Binary)
-      end
-
-      it "converts :boolean to Mongoid::Boolean" do
-        expect(klass.field(:test, type: :boolean).type).to be(Mongoid::Boolean)
-      end
-
-      it "converts :date to Date" do
-        expect(klass.field(:test, type: :date).type).to be(Date)
-      end
-
-      it "converts :date_time to DateTime" do
-        expect(klass.field(:test, type: :date_time).type).to be(DateTime)
-      end
-
-      it "converts :float to Float" do
-        expect(klass.field(:test, type: :float).type).to be(Float)
-      end
-
-      it "converts :hash to Hash" do
-        expect(klass.field(:test, type: :hash).type).to be(Hash)
-      end
-
-      it "converts :integer to Integer" do
-        expect(klass.field(:test, type: :integer).type).to be(Integer)
-      end
-
-      it "converts :object_id to BSON::ObjectId" do
-        expect(klass.field(:test, type: :object_id).type).to be(BSON::ObjectId)
-      end
-
-      it "converts :range to Range" do
-        expect(klass.field(:test, type: :range).type).to be(Range)
-      end
-
-      it "converts :regexp to Rexegp" do
-        expect(klass.field(:test, type: :regexp).type).to be(Regexp)
-      end
-
-      it "converts :set to Set" do
-        expect(klass.field(:test, type: :set).type).to be(Set)
-      end
-
-      it "converts :string to String" do
-        expect(klass.field(:test, type: :string).type).to be(String)
-      end
-
-      it "converts :symbol to Symbol" do
-        expect(klass.field(:test, type: :symbol).type).to be(Symbol)
-      end
-
-      it "converts :time to Time" do
-        expect(klass.field(:test, type: :time).type).to be(Time)
+        it "converts String \"#{field_type}\" to #{field_klass}" do
+          expect(klass.field(:test, type: field_type.to_s).type).to be(field_klass)
+        end
       end
 
       context 'when using an unknown symbol' do
         it 'raises InvalidFieldType' do
           lambda do
             klass.field(:test, type:  :bogus)
-          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value :bogus/)
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field :test with an unknown :type value :bogus/)
         end
       end
 
@@ -403,7 +374,7 @@ describe Mongoid::Fields do
         it 'raises InvalidFieldType' do
           lambda do
             klass.field(:test, type:  'bogus')
-          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field 'test' with an unknown type value "bogus"/)
+          end.should raise_error(Mongoid::Errors::InvalidFieldType, /defines a field :test with an unknown :type value "bogus"/)
         end
       end
     end
@@ -1978,6 +1949,59 @@ describe Mongoid::Fields do
       let(:field_name) { "pass.name_translations.asd" }
       it "returns the correct field name" do
         expect(field).to eq("pass.name.asd")
+      end
+    end
+  end
+
+  describe '.configure DSL' do
+
+    context '.type method' do
+      after do
+        klass = Mongoid::Fields::FieldTypes
+        klass.instance_variable_set(:@mapping, klass::DEFAULT_MAPPING.dup)
+      end
+
+      it 'can define a custom type' do
+        described_class.configure do
+          type :my_type, Integer
+        end
+
+        expect(described_class::FieldTypes.get(:my_type)).to eq Integer
+      end
+
+      it 'can override and existing type' do
+        described_class.configure do
+          type :integer, String
+        end
+
+        expect(described_class::FieldTypes.get(:integer)).to eq String
+      end
+    end
+
+    context '.option method' do
+      after do
+        described_class.instance_variable_set(:@options, {})
+      end
+
+      it 'can define a custom field option' do
+        described_class.configure do
+          option :my_required do |model, field, value|
+            model.validates_presence_of field.name if value
+          end
+        end
+
+        klass = Class.new do
+          include Mongoid::Document
+          field :my_field, my_required: true
+
+          def self.model_name
+            OpenStruct.new(human: 'Klass')
+          end
+        end
+
+        instance = klass.new
+        expect(instance.valid?).to eq false
+        expect(instance.errors.full_messages).to eq ["My field can't be blank"]
       end
     end
   end
