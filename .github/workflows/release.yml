@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: "Run the publish action"
-        uses: mongodb-labs/drivers-github-tools/ruby/publish@v2
+        uses: mongodb-labs/drivers-github-tools/ruby/publish@fcaaff96e5b37fe4d4480546a69ded21680683be
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
