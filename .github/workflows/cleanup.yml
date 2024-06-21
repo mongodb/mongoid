@@ -1,0 +1,44 @@
+name: "Dry-Run Cleanup"
+run-name: "Dry Run Cleanup for ${{ github.ref }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Indicate whether you want this workflow to run (must be "true")
+        required: true
+        type: string
+      tag:
+        description: The name of the tag (and release) to clean up
+        required: true
+        type: string
+
+jobs:
+  release:
+    name: "Dry-Run Cleanup"
+    environment: release
+    runs-on: 'ubuntu-latest'
+    if: ${{ inputs.confirm == 'true' }}
+
+    permissions:
+      # required for all workflows
+      security-events: write
+
+      # required to fetch internal or private CodeQL packs
+      packages: read
+
+      # only required for workflows in private repositories
+      actions: read
+      contents: write
+
+      # required by the mongodb-labs/drivers-github-tools/setup@v2 step
+      # also required by `rubygems/release-gem`
+      id-token: write
+
+    steps:
+      - name: "Run the cleanup action"
+        uses: mongodb-labs/drivers-github-tools/ruby/cleanup@v2
+        with:
+          app_id: ${{ vars.APP_ID }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          tag: ${{ inputs.tag }}
