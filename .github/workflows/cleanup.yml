@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: "Run the cleanup action"
-        uses: mongodb-labs/drivers-github-tools/ruby/cleanup@fcaaff96e5b37fe4d4480546a69ded21680683be
+        uses: mongodb-labs/drivers-github-tools/ruby/cleanup@v2
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
