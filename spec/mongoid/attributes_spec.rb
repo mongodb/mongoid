@@ -289,6 +289,26 @@ describe Mongoid::Attributes do
         end
       end
 
+      context "when given nil" do
+
+        it "raises an error" do
+          expect {
+            person[nil]
+          }.to raise_error(Mongoid::Errors::UnknownAttribute)
+        end
+
+      end
+
+      context "when given an empty string" do
+
+        it "raises an error" do
+          expect {
+            person[""]
+          }.to raise_error(Mongoid::Errors::UnknownAttribute)
+        end
+
+      end
+
       context "when the field was not explicitly defined" do
 
         context "when excluding with only and the field was not excluded" do
