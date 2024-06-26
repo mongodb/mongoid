@@ -5,9 +5,10 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Whether this is a dry run or not ("false" to deploy)
+        description: Whether this is a dry run or not
         required: true
-        type: string
+        default: true
+        type: boolean
 
 env:
   SILK_ASSET_GROUP: mongoid
