@@ -291,20 +291,16 @@ describe Mongoid::Attributes do
 
       context "when given nil" do
 
-        it "raises an error" do
-          expect {
-            person[nil]
-          }.to raise_error(Mongoid::Errors::UnknownAttribute)
+        it "returns nil" do
+         expect(person[nil]).to be nil
         end
 
       end
 
       context "when given an empty string" do
 
-        it "raises an error" do
-          expect {
-            person[""]
-          }.to raise_error(Mongoid::Errors::UnknownAttribute)
+        it "returns nil" do
+         expect(person[""]).to be nil
         end
 
       end

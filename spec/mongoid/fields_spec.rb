@@ -1871,22 +1871,12 @@ describe Mongoid::Fields do
 
     context 'given nil' do
       subject { Person.database_field_name(nil) }
-
-      it "raises an UnknownAttribute error" do
-        expect {
-          subject
-        }.to raise_error(Mongoid::Errors::UnknownAttribute)
-      end
+      it { is_expected.to eq nil }
     end
 
     context 'given an empty String' do
       subject { Person.database_field_name('') }
-
-      it "raises an UnknownAttribute error" do
-        expect {
-          subject
-        }.to raise_error(Mongoid::Errors::UnknownAttribute)
-      end
+      it { is_expected.to eq nil }
     end
 
     context 'given a String' do
