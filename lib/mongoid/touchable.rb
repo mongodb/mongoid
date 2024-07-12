@@ -78,7 +78,7 @@ module Mongoid
         field = database_field_name(field)
 
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
-        write_attribute(field, now) if field
+        write_attribute(field, now) if field.present?
 
         touches = _extract_touches_from_atomic_sets(field) || {}
         touches.merge!(_parent._gather_touch_updates(now) || {}) if _touchable_parent?
