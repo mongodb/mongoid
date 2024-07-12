@@ -414,6 +414,7 @@ module Mongoid
       # @api private
       def database_field_name(name, relations, aliased_fields, aliased_associations)
         return "" unless name.present?
+
         key = name.to_s
         segment, remaining = key.split('.', 2)
 
