@@ -186,7 +186,15 @@ module Mongoid
       end
     end
 
-
+    # Execute the callbacks of given kind for embedded documents including
+    # around callbacks.
+    #
+    # @param [ Symbol ] kind The type of callback to execute.
+    # @param [ Array<Document> ] children Children to execute callbacks on. If
+    #  nil, callbacks will be executed on all cascadable children of
+    #  the document.
+    #
+    #  @api private
     def _mongoid_run_child_callbacks_with_around_fibers(kind, children: nil, &block)
       children = (children || cascadable_children(kind))
       with_children = !Mongoid::Config.prevent_multiple_calls_of_embedded_callbacks
