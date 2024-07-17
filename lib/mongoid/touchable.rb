@@ -78,7 +78,7 @@ module Mongoid
         field = database_field_name(field)
 
         write_attribute(:updated_at, now) if respond_to?("updated_at=")
-        write_attribute(field, now) if field
+        write_attribute(field, now) if field.present?
 
         touches = _extract_touches_from_atomic_sets(field) || {}
         touches.merge!(_parent._gather_touch_updates(now) || {}) if _touchable_parent?
@@ -212,12 +212,6 @@ module Mongoid
     #
     # @return [ Symbol ] The method name.
     def define_relation_touch_method(name, association)
-      relation_classes = if association.polymorphic?
-                           association.send(:inverse_association_classes)
-                         else
-                           [ association.relation_class ]
-                         end
-
       method_name = "touch_#{name}_after_create_or_destroy"
       association.inverse_class.class_eval do
         define_method(method_name) do
