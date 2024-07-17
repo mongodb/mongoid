@@ -187,8 +187,8 @@ module Mongoid
 
       fibers.reverse.each(&:resume)
 
-      rescue FiberError
-        raise Mongoid::Errors::InvalidAroundCallback
+    rescue FiberError
+      raise Mongoid::Errors::InvalidAroundCallback
     end
 
     # Execute the callbacks of given kind for embedded documents without
