@@ -185,13 +185,10 @@ module Mongoid
 
       block&.call
 
-      fibers.reverse.each do |fiber|
-        begin
-          fiber.resume
-        rescue FiberError
-          raise Mongoid::Errors::InvalidAroundCallback
-        end
-      end
+      fibers.reverse.each(&:resume)
+
+      rescue FiberError
+        raise Mongoid::Errors::InvalidAroundCallback
     end
 
     # Execute the callbacks of given kind for embedded documents without
