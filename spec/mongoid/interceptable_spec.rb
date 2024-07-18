@@ -2594,4 +2594,37 @@ describe Mongoid::Interceptable do
       end
     end
   end
+
+  context "when around callbacks for embedded children are enabled" do
+    config_override :around_callbacks_for_embeds, true
+
+    context "when around callback is defined without a yield" do
+      class Foo
+        include Mongoid::Document
+        embeds_many :bars, cascade_callbacks: true
+      end
+
+      class Bar
+        include Mongoid::Document
+        embedded_in :foo
+        field :flag_around_save, type: String
+        around_save :log_callback
+
+        private
+
+        def log_callback
+          flag_around_save = true
+        end
+      end
+
+      foo = Foo.create
+      2.times { foo.bars.build }
+
+      it "raises an InvalidAroundCallback error" do
+        expect do
+          foo.save
+        end.to raise_error(Mongoid::Errors::InvalidAroundCallback)
+      end
+    end
+  end
 end
