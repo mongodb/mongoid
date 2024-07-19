@@ -2613,7 +2613,7 @@ describe Mongoid::Interceptable do
         private
 
         def log_callback
-          flag_around_save = true
+          logger.debug('callback invoked')
         end
       end
 
