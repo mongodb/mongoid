@@ -2599,14 +2599,14 @@ describe Mongoid::Interceptable do
     config_override :around_callbacks_for_embeds, true
 
     context "when around callback is defined without a yield" do
-      class Foo_temp
+      class Mother
         include Mongoid::Document
-        embeds_many :bars, cascade_callbacks: true
+        embeds_many :daughters, cascade_callbacks: true
       end
 
-      class Bar_temp
+      class Daughter
         include Mongoid::Document
-        embedded_in :foo
+        embedded_in :mother
         field :flag_around_save, type: String
         around_save :log_callback
 
@@ -2617,12 +2617,12 @@ describe Mongoid::Interceptable do
         end
       end
 
-      foo = Foo.create
-      2.times { foo.bars.build }
+      mom = Mother.create
+      2.times { mom.daughters.build }
 
       it "raises an InvalidAroundCallback error" do
         expect do
-          foo.save
+          mom.save
         end.to raise_error(Mongoid::Errors::InvalidAroundCallback)
       end
     end
