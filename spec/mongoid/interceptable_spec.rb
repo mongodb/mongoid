@@ -2607,7 +2607,6 @@ describe Mongoid::Interceptable do
       class Daughter
         include Mongoid::Document
         embedded_in :mother
-        field :flag_around_save, type: String
         around_save :log_callback
 
         private
