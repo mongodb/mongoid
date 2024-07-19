@@ -2599,12 +2599,12 @@ describe Mongoid::Interceptable do
     config_override :around_callbacks_for_embeds, true
 
     context "when around callback is defined without a yield" do
-      class Foo
+      class Foo_temp
         include Mongoid::Document
         embeds_many :bars, cascade_callbacks: true
       end
 
-      class Bar
+      class Bar_temp
         include Mongoid::Document
         embedded_in :foo
         field :flag_around_save, type: String
