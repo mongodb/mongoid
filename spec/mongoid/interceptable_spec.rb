@@ -2617,8 +2617,7 @@ describe Mongoid::Interceptable do
         end
       end
 
-      mom = Mother.create
-      2.times { mom.daughters.build }
+      let(:mom) { Mother.create(daughters: [ Daughter.new, Daughter.new ]) }
 
       it "raises an InvalidAroundCallback error" do
         expect do
