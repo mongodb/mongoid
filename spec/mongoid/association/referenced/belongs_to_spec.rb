@@ -4,6 +4,10 @@
 require "spec_helper"
 require_relative './has_one_models'
 
+BELONGS_TO_RESOLVER_ID__ = :__belongs_to_resolver_id
+BELONGS_TO_RESOLVER = Mongoid::ModelResolver.new
+Mongoid::ModelResolver.register_resolver BELONGS_TO_RESOLVER, BELONGS_TO_RESOLVER_ID__
+
 describe Mongoid::Association::Referenced::BelongsTo do
 
   before do
@@ -199,17 +203,60 @@ describe Mongoid::Association::Referenced::BelongsTo do
 
       context 'when the polymorphic option is provided' do
 
-        context 'when the polymorphic option is true' do
+        [ true, :default ].each do |opt|
+          context "when the polymorphic option is #{opt.inspect}" do
+            let(:options) { { polymorphic: opt } }
+            before { association }
 
-          let(:options) do
-            {
-              polymorphic: true
-            }
+            it 'set the polymorphic attribute on the owner class' do
+              expect(belonging_class.polymorphic).to be(true)
+            end
+
+            it 'sets up a field for the inverse type' do
+              expect(belonging_class.fields.keys).to include(association.inverse_type)
+            end
+
+            it 'uses the default resolver' do
+              expect(association.resolver).to be == Mongoid::ModelResolver.instance
+            end
+          end
+        end
+
+        [ false, nil ].each do |opt|
+          context "when the polymorphic option is #{opt.inspect}" do
+            let(:options) { { polymorphic: opt } }
+
+            it 'does not set the polymorphic attribute on the owner class' do
+              expect(belonging_class.polymorphic).to be(false)
+            end
+
+            it 'does not set up a field for the inverse type' do
+              expect(belonging_class.fields.keys).not_to include(association.inverse_type)
+            end
+
+            it 'does not use a resolver' do
+              expect(association.resolver).to be_nil
+            end
+          end
+        end
+
+        context 'when the polymorphic option is set to an unregistered id' do
+          let(:options) { { polymorphic: :bogus } }
+
+          # This behavior is intentional, so that the resolver can be registered after the classes
+          # are loaded.
+          it 'does not immediately raise an exception' do
+            expect { association }.not_to raise_error
           end
 
-          before do
-            association
+          it 'raises error when resolver is accessed' do
+            expect { association.resolver }.to raise_error(KeyError)
           end
+        end
+
+        context 'when the polymorphic option is set to a registered id' do
+          let(:options) { { polymorphic: BELONGS_TO_RESOLVER_ID__ } }
+          before { association }
 
           it 'set the polymorphic attribute on the owner class' do
             expect(belonging_class.polymorphic).to be(true)
@@ -218,34 +265,24 @@ describe Mongoid::Association::Referenced::BelongsTo do
           it 'sets up a field for the inverse type' do
             expect(belonging_class.fields.keys).to include(association.inverse_type)
           end
-        end
 
-        context 'when the polymorphic option is false' do
-
-          let(:options) do
-            {
-              polymorphic: false
-            }
-          end
-
-          it 'does not set the polymorphic attribute on the owner class' do
-            expect(belonging_class.polymorphic).to be(false)
-          end
-
-          it 'does not set up a field for the inverse type' do
-            expect(belonging_class.fields.keys).not_to include(association.inverse_type)
+          it 'connects the association to the corresponding resolver' do
+            expect(association.resolver).to be == BELONGS_TO_RESOLVER
           end
         end
       end
 
       context 'when the polymorphic option is not provided' do
-
         it 'does not set the polymorphic attribute on the owner class' do
           expect(belonging_class.polymorphic).to be(false)
         end
 
         it 'does not set up a field for the inverse type' do
           expect(belonging_class.fields.keys).not_to include(association.inverse_type)
+        end
+
+        it 'does not use a resolver' do
+          expect(association.resolver).to be_nil
         end
       end
     end

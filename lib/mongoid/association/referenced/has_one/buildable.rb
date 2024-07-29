@@ -59,7 +59,18 @@ module Mongoid
 
           def with_polymorphic_criterion(criteria, base)
             if polymorphic?
-              criteria.where(type => base.class.name)
+              # 1. get the resolver for the inverse association
+              resolver = klass.reflect_on_association(as).resolver
+
+              # 2. look up the list of keys from the resolver, given base.class
+              keys = resolver.keys_for(base.class)
+
+              # 3. use equality if there is just one key, `in` if there are multiple
+              if keys.many?
+                criteria.where(type => { :$in => keys })
+              else
+                criteria.where(type => keys.first)
+              end
             else
               criteria
             end
