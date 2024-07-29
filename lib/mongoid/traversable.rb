@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'mongoid/fields/validators/macro'
+require 'mongoid/model_resolver'
 
 module Mongoid
   # Mixin module included in Mongoid::Document to provide behavior
@@ -32,6 +33,10 @@ module Mongoid
       # rubocop:disable Metrics/AbcSize
       def inherited(subclass)
         super
+
+        # Register the new subclass with the resolver subsystem
+        Mongoid::ModelResolver.register(subclass)
+
         @_type = nil
         subclass.aliased_fields = aliased_fields.dup
         subclass.localized_fields = localized_fields.dup
