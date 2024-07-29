@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'forwardable'
-require 'thread'
 
 module Mongoid
   # The default class for resolving model classes based on discriminant keys.
@@ -18,12 +17,12 @@ module Mongoid
     # @api private
     INSTANCE_MUTEX = Mutex.new
 
-    class <<self
+    class << self
       extend Forwardable
       def_delegators :instance, :register
 
       # Returns the default instance of the ModelResolver.
-      # 
+      #
       # @return [ Mongoid::ModelResolver ] the default ModelResolver instance.
       def instance
         @instance ||= INSTANCE_MUTEX.synchronize { @instance ||= new }
@@ -60,7 +59,7 @@ module Mongoid
       end
 
       # Register the given resolver under the given name.
-      # 
+      #
       # @param [ Mongoid::ModelResolver::Interface ] resolver the resolver to register.
       # @param [ String | Symbol ] name the identifier to use to register the resolver.
       def register_resolver(resolver, name)

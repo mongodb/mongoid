@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 # rubocop:todo all
 
+require 'mongoid/association/referenced/with_polymorphic_criteria'
+
 module Mongoid
   module Association
     module Referenced
@@ -8,6 +10,7 @@ module Mongoid
 
         # The Builder behavior for has_one associations.
         module Buildable
+          include WithPolymorphicCriteria
 
           # This method either takes an _id or an object and queries for the
           # inverse side using the id or sets the object after clearing the
@@ -55,25 +58,6 @@ module Mongoid
 
           def execute_query(object, base)
             query_criteria(object, base).take
-          end
-
-          def with_polymorphic_criterion(criteria, base)
-            if polymorphic?
-              # 1. get the resolver for the inverse association
-              resolver = klass.reflect_on_association(as).resolver
-
-              # 2. look up the list of keys from the resolver, given base.class
-              keys = resolver.keys_for(base.class)
-
-              # 3. use equality if there is just one key, `in` if there are multiple
-              if keys.many?
-                criteria.where(type => { :$in => keys })
-              else
-                criteria.where(type => keys.first)
-              end
-            else
-              criteria
-            end
           end
 
           def query?(object)

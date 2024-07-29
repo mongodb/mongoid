@@ -1,9 +1,18 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
+require 'support/feature_sandbox'
 
 MONGOID_MODEL_RESOLVER_KEY__ = :__separate_instance_spec_key
 Mongoid::ModelResolver.register_resolver Mongoid::ModelResolver.new, MONGOID_MODEL_RESOLVER_KEY__
+
+def quarantine(context)
+  FeatureSandbox.quarantine do
+    yield if block_given?
+
+    context.run
+  end
+end
 
 describe Mongoid::ModelResolver do
   shared_examples 'a resolver' do |**kwargs|
@@ -13,20 +22,20 @@ describe Mongoid::ModelResolver do
 
     if kwargs[:with_aliases].nil?
       it 'uses the class name as the default key for the given model' do
-        expect(resolver.default_key_for(model_class.new)).to be == model_class.name
+        expect(resolver.default_key_for(model_class.new)).to eq model_class.name
       end
     elsif kwargs[:with_aliases].is_a?(Array)
       it 'uses the first alias as the default key for the given model' do
-        expect(resolver.default_key_for(model_class.new)).to be == kwargs[:with_aliases].first
+        expect(resolver.default_key_for(model_class.new)).to eq kwargs[:with_aliases].first
       end
     else
       it 'uses the alias as the default key for the given model' do
-        expect(resolver.default_key_for(model_class.new)).to be == kwargs[:with_aliases]
+        expect(resolver.default_key_for(model_class.new)).to eq kwargs[:with_aliases]
       end
     end
 
     it 'returns the model class when queried with the class name' do
-      expect(resolver.model_for(model_class.name)).to be == model_class
+      expect(resolver.model_for(model_class.name)).to eq model_class
     end
 
     Array(kwargs[:with_aliases]).each do |model_alias|
@@ -35,54 +44,64 @@ describe Mongoid::ModelResolver do
       end
 
       it "returns the model class when queried with #{model_alias.inspect}" do
-        expect(resolver.model_for(model_alias)).to be == model_class
+        expect(resolver.model_for(model_alias)).to eq model_class
       end
     end
   end
 
   context 'when using the default instance' do
     let(:resolver) { described_class.instance }
-      
-    context 'when an alias is not specified' do
-      let(:model_class) do
-        module Mongoid::ModelResolver::DefaultInstance
-          class Vanilla
-            include Mongoid::Document
-          end
-        end
 
-        Mongoid::ModelResolver::DefaultInstance::Vanilla
+    context 'when an alias is not specified' do
+      around(:context) do |context|
+        quarantine(context) do
+          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            module Mongoid; module Specs; module DefaultInstance
+              class Vanilla; include Mongoid::Document; end
+            end; end; end
+          RUBY
+        end
       end
+
+      let(:model_class) { Mongoid::Specs::DefaultInstance::Vanilla }
 
       it_behaves_like 'a resolver'
     end
 
     context 'when one alias is specified' do
-      let(:model_class) do
-        module Mongoid::ModelResolver::DefaultInstance
-          class Aliased
-            include Mongoid::Document
-            identify_as 'aliased'
-          end
+      around(:context) do |context|
+        quarantine(context) do
+          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            module Mongoid; module Specs; module DefaultInstance
+              class Aliased
+                include Mongoid::Document
+                identify_as 'aliased'
+              end
+            end; end; end
+          RUBY
         end
-
-        Mongoid::ModelResolver::DefaultInstance::Aliased
       end
+
+      let(:model_class) { Mongoid::Specs::DefaultInstance::Aliased }
 
       it_behaves_like 'a resolver', with_aliases: 'aliased'
     end
 
     context 'when multiple aliases are specified' do
-      let(:model_class) do
-        module Mongoid::ModelResolver::DefaultInstance
-          class AliasedMultiple
-            include Mongoid::Document
-            identify_as 'aliased', 'alias2', 'alias3'
-          end
+      around(:context) do |context|
+        quarantine(context) do
+          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            module Mongoid; module Specs; module DefaultInstance
+              class AliasedMultiple
+                include Mongoid::Document
+                identify_as 'aliased', 'alias2', 'alias3'
+              end
+            end; end; end
+          RUBY
         end
-
-        Mongoid::ModelResolver::DefaultInstance::AliasedMultiple
       end
+
+      let(:model_class) { Mongoid::Specs::DefaultInstance::AliasedMultiple }
 
       it_behaves_like 'a resolver', with_aliases: %w[ aliased alias2 alias3 ]
     end
@@ -92,50 +111,62 @@ describe Mongoid::ModelResolver do
     let(:resolver) { described_class.resolver(MONGOID_MODEL_RESOLVER_KEY__) }
 
     it 'does not refer to the default instance' do
-      expect(resolver).not_to be == described_class.instance
+      expect(resolver).not_to eq described_class.instance
     end
 
     context 'when an alias is not specified' do
-      let(:model_class) do
-        module Mongoid::ModelResolver::SeparateInstance
-          class Vanilla
-            include Mongoid::Document
-            identify_as resolver: MONGOID_MODEL_RESOLVER_KEY__
-          end
+      around(:context) do |context|
+        quarantine(context) do
+          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            module Mongoid; module Specs; module SeparateInstance
+              class Vanilla
+                include Mongoid::Document
+                identify_as resolver: MONGOID_MODEL_RESOLVER_KEY__
+              end
+            end; end; end
+          RUBY
         end
-
-        Mongoid::ModelResolver::SeparateInstance::Vanilla
       end
+
+      let(:model_class) { Mongoid::Specs::SeparateInstance::Vanilla }
 
       it_behaves_like 'a resolver'
     end
 
     context 'when one alias is specified' do
-      let(:model_class) do
-        module Mongoid::ModelResolver::SeparateInstance
-          class Aliased
-            include Mongoid::Document
-            identify_as 'aliased', resolver: MONGOID_MODEL_RESOLVER_KEY__
-          end
+      around(:context) do |context|
+        quarantine(context) do
+          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            module Mongoid; module Specs; module SeparateInstance
+              class Aliased
+                include Mongoid::Document
+                identify_as 'aliased', resolver: MONGOID_MODEL_RESOLVER_KEY__
+              end
+            end; end; end
+          RUBY
         end
-
-        Mongoid::ModelResolver::SeparateInstance::Aliased
       end
+
+      let(:model_class) { Mongoid::Specs::SeparateInstance::Aliased }
 
       it_behaves_like 'a resolver', with_aliases: 'aliased'
     end
 
     context 'when multiple aliases are specified' do
-      let(:model_class) do
-        module Mongoid::ModelResolver::SeparateInstance
-          class AliasedMultiple
-            include Mongoid::Document
-            identify_as 'aliased', 'alias2', 'alias3', resolver: MONGOID_MODEL_RESOLVER_KEY__
-          end
+      around(:context) do |context|
+        quarantine(context) do
+          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            module Mongoid; module Specs; module SeparateInstance
+              class AliasedMultiple
+                include Mongoid::Document
+                identify_as 'aliased', 'alias2', 'alias3', resolver: MONGOID_MODEL_RESOLVER_KEY__
+              end
+            end; end; end
+          RUBY
         end
-
-        Mongoid::ModelResolver::SeparateInstance::AliasedMultiple
       end
+
+      let(:model_class) { Mongoid::Specs::SeparateInstance::AliasedMultiple }
 
       it_behaves_like 'a resolver', with_aliases: %w[ aliased alias2 alias3 ]
     end

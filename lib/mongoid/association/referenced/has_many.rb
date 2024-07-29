@@ -6,6 +6,7 @@ require 'mongoid/association/referenced/has_many/buildable'
 require 'mongoid/association/referenced/has_many/proxy'
 require 'mongoid/association/referenced/has_many/enumerable'
 require 'mongoid/association/referenced/has_many/eager'
+require 'mongoid/association/referenced/with_polymorphic_criteria'
 
 module Mongoid
   module Association
@@ -15,6 +16,7 @@ module Mongoid
       class HasMany
         include Relatable
         include Buildable
+        include WithPolymorphicCriteria
 
         # The options available for this type of association, in addition to the
         # common ones.
@@ -227,25 +229,6 @@ module Mongoid
           crit.association = self
           crit.parent_document = base
           with_ordering(crit)
-        end
-
-        def with_polymorphic_criterion(criteria, base)
-          if polymorphic?
-            # 1. get the resolver for the inverse association
-            resolver = klass.reflect_on_association(as).resolver
-
-            # 2. look up the list of keys from the resolver, given base.class
-            keys = resolver.keys_for(base.class)
-
-            # 3. use equality if there is just one key, `in` if there are multiple
-            if keys.many?
-              criteria.where(type => { :$in => keys })
-            else
-              criteria.where(type => keys.first)
-            end
-          else
-            criteria
-          end
         end
 
         def with_ordering(criteria)

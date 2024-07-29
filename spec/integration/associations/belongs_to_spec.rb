@@ -35,7 +35,7 @@ describe 'belongs_to associations' do
   end
 
   context 'when the association is polymorphic' do
-    def quarantine(example, polymorphic:, aliases:)
+    def quarantine(context, polymorphic:, dept_aliases:, team_aliases:)
       FeatureSandbox.quarantine do
         # Have to eval this, because otherwise we get syntax errors when defining a class
         # inside a method.
@@ -44,58 +44,85 @@ describe 'belongs_to associations' do
         Object.class_eval <<-RUBY
           class SandboxManager; include Mongoid::Document; end
           class SandboxDepartment; include Mongoid::Document; end
+          class SandboxTeam; include Mongoid::Document; end
         RUBY
 
         SandboxManager.belongs_to :unit, polymorphic: polymorphic
 
-        SandboxDepartment.identify_as *aliases, resolver: polymorphic
-        SandboxDepartment.has_one :sandbox_manager, as: :unit
+        SandboxDepartment.identify_as *dept_aliases, resolver: polymorphic
+        SandboxDepartment.has_many :sandbox_managers, as: :unit
 
-        example.run
+        SandboxTeam.identify_as *team_aliases, resolver: polymorphic
+        SandboxTeam.has_one :sandbox_manager, as: :unit
+
+        context.run
       end
     end
 
-    let(:manager) { SandboxManager.create(unit: department) }
+    let(:dept_manager) { SandboxManager.create(unit: department) }
+    let(:team_manager) { SandboxManager.create(unit: team) }
     let(:department) { SandboxDepartment.create }
+    let(:team) { SandboxTeam.create }
+
+    shared_context 'it finds the associated records' do
+      it 'successfully finds the manager\'s unit' do
+        expect(dept_manager.reload.unit).to be == department
+        expect(team_manager.reload.unit).to be == team
+      end
+
+      it 'successfully finds the unit\'s manager' do
+        dept_manager; team_manager # make sure these are created first...
+
+        expect(department.reload.sandbox_managers).to be == [ dept_manager ]
+        expect(team.reload.sandbox_manager).to be == team_manager
+      end
+    end
+
+    shared_context 'it searches for alternative aliases' do
+      it 'successfully finds the corresponding unit when unit_type is a different alias' do
+        dept_manager.update unit_type: 'sandbox_dept'
+        dept_manager.reload
+
+        team_manager.update unit_type: 'group'
+        team_manager.reload
+
+        expect(dept_manager.reload.unit_type).to be == 'sandbox_dept'
+        expect(dept_manager.unit).to be == department
+
+        expect(team_manager.reload.unit_type).to be == 'group'
+        expect(team_manager.unit).to be == team
+      end
+    end
 
     context 'when the association uses the default resolver' do
       context 'when there are no aliases given' do
-        around(:context) { |example| quarantine(example, polymorphic: true, aliases: []) }
+        around(:context) { |example| quarantine(example, polymorphic: true, dept_aliases: [], team_aliases: []) }
 
         it 'populates the unit_type with the class name' do
-          expect(manager.unit_type).to be == 'SandboxDepartment'
+          expect(dept_manager.unit_type).to be == 'SandboxDepartment'
+          expect(team_manager.unit_type).to be == 'SandboxTeam'
         end
 
-        it 'successfully finds the corresponding unit' do
-          expect(manager.reload.unit).to be == department
-        end
+        it_behaves_like 'it finds the associated records'
       end
 
       context 'when there are multiple aliases given' do
-        around(:context) { |example| quarantine(example, polymorphic: true, aliases: %w[ dept sandbox_dept ]) }
+        around(:context) { |example| quarantine(example, polymorphic: true, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ]) }
 
         it 'populates the unit_type with the first alias' do
-          expect(manager.unit_type).to be == 'dept'
+          expect(dept_manager.unit_type).to be == 'dept'
+          expect(team_manager.unit_type).to be == 'team'
         end
 
-        it 'successfully finds the corresponding unit' do
-          expect(manager.reload.unit).to be == department
-        end
-
-        it 'successfully finds the corresponding unit when unit_type is a different alias' do
-          manager.update unit_type: 'sandbox_dept'
-          manager.reload
-
-          expect(manager.reload.unit_type).to be == 'sandbox_dept'
-          expect(manager.unit).to be == department
-        end
+        it_behaves_like 'it finds the associated records'
+        it_behaves_like 'it searches for alternative aliases'
       end
     end
 
     context 'when the association uses a registered resolver' do
       around(:context) do |example|
         Mongoid::ModelResolver.register_resolver Mongoid::ModelResolver.new, :sandbox
-        quarantine(example, polymorphic: :sandbox, aliases: %w[ dept sandbox_dept ])
+        quarantine(example, polymorphic: :sandbox, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ])
       end
 
       it 'does not include the aliases in the default resolver' do
@@ -103,25 +130,17 @@ describe 'belongs_to associations' do
       end
 
       it 'populates the unit_type with the first alias' do
-        expect(manager.unit_type).to be == 'dept'
+        expect(dept_manager.unit_type).to be == 'dept'
+        expect(team_manager.unit_type).to be == 'team'
       end
 
-      it 'successfully finds the corresponding unit' do
-        expect(manager.reload.unit).to be == department
-      end
-
-      it 'successfully finds the corresponding unit when unit_type is a different alias' do
-        manager.update unit_type: 'sandbox_dept'
-        manager.reload
-
-        expect(manager.reload.unit_type).to be == 'sandbox_dept'
-        expect(manager.unit).to be == department
-      end
+      it_behaves_like 'it finds the associated records'
+      it_behaves_like 'it searches for alternative aliases'
     end
 
     context 'when the association uses an unregistered resolver' do
       around(:context) do |example|
-        quarantine(example, polymorphic: Mongoid::ModelResolver.new, aliases: %w[ dept sandbox_dept ])
+        quarantine(example, polymorphic: Mongoid::ModelResolver.new, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ])
       end
 
       it 'does not include the aliases in the default resolver' do
@@ -129,20 +148,12 @@ describe 'belongs_to associations' do
       end
 
       it 'populates the unit_type with the first alias' do
-        expect(manager.unit_type).to be == 'dept'
+        expect(dept_manager.unit_type).to be == 'dept'
+        expect(team_manager.unit_type).to be == 'team'
       end
 
-      it 'successfully finds the corresponding unit' do
-        expect(manager.reload.unit).to be == department
-      end
-
-      it 'successfully finds the corresponding unit when unit_type is a different alias' do
-        manager.update unit_type: 'sandbox_dept'
-        manager.reload
-
-        expect(manager.reload.unit_type).to be == 'sandbox_dept'
-        expect(manager.unit).to be == department
-      end
+      it_behaves_like 'it finds the associated records'
+      it_behaves_like 'it searches for alternative aliases'
     end
   end
 end
