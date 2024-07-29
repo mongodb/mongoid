@@ -140,6 +140,10 @@ en:
             A collation option is only supported if the query is executed on a MongoDB server
             with version >= 3.4."
           resolution: "Remove the collation option from the query."
+        invalid_around_callback:
+          message: "An around callback must contain a yield in its definition."
+          summary: "The block needs to be yielded to for around callbacks to function as intended."
+          resolution: "Ensure there is a yield statement inside the body of the around callback."
         invalid_async_query_executor:
           message: "Invalid async_query_executor option: %{executor}."
           summary: "A invalid async query executor was specified.
