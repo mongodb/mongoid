@@ -282,7 +282,7 @@ describe Mongoid::Clients::Sessions do
               end
             end
 
-            include_examples 'it aborts the transaction', Mongoid::Errors::InvalidTransactionNesting
+            include_examples 'it aborts the transaction', Mongoid::Errors::TransactionError
           end
         end
       end
@@ -591,7 +591,7 @@ describe Mongoid::Clients::Sessions do
             end
 
             it 'raises an error' do
-              expect(error).to be_a(Mongoid::Errors::InvalidTransactionNesting)
+              expect(error).to be_a(Mongoid::Errors::TransactionError)
             end
 
             it 'does not execute any operations' do
