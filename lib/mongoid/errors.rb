@@ -59,6 +59,9 @@ require "mongoid/errors/scope_overwrite"
 require "mongoid/errors/too_many_nested_attribute_records"
 require "mongoid/errors/unknown_attribute"
 require "mongoid/errors/unknown_model"
+require 'mongoid/errors/unrecognized_model_alias'
+require 'mongoid/errors/unrecognized_resolver'
+require 'mongoid/errors/unregistered_class'
 require "mongoid/errors/unsaved_document"
 require "mongoid/errors/unsupported_javascript"
 require "mongoid/errors/validations"

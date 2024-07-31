@@ -50,11 +50,24 @@ module Mongoid
           @attributes = attributes.with_indifferent_access
           @association = association
           @options = options
-          @class_name = options[:class_name] ? options[:class_name].constantize : association.klass
+          @class_name = class_from(options[:class_name])
           @destroy = @attributes.delete(:_destroy)
         end
 
         private
+
+        # Coerces the argument into a class, or defaults to the association's class.
+        #
+        # @param [ String | Mongoid::Document | nil ] name_or_class the value to coerce
+        #
+        # @return [ Mongoid::Document ] the resulting class
+        def class_from(name_or_class)
+          case name_or_class
+          when nil, false then association.klass
+          when String then name_or_class.constantize
+          else name_or_class
+          end
+        end
 
         # Extracts and converts the id to the expected type.
         #

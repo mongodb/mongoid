@@ -3,6 +3,7 @@
 require "mongoid/changeable"
 require "mongoid/collection_configurable"
 require "mongoid/findable"
+require 'mongoid/identifiable'
 require "mongoid/indexable"
 require "mongoid/inspectable"
 require "mongoid/interceptable"
@@ -41,6 +42,7 @@ module Mongoid
     include Attributes
     include Evolvable
     include Fields
+    include Identifiable
     include Indexable
     include Inspectable
     include Matchable

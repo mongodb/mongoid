@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require "mongoid/fields/validators/macro"
+require 'mongoid/fields/validators/macro'
+require 'mongoid/model_resolver'
 
 module Mongoid
 
