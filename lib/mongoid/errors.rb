@@ -69,6 +69,9 @@ require "mongoid/errors/transaction_error"
 require "mongoid/errors/transactions_not_supported"
 require "mongoid/errors/unknown_attribute"
 require "mongoid/errors/unknown_model"
+require 'mongoid/errors/unrecognized_model_alias'
+require 'mongoid/errors/unrecognized_resolver'
+require 'mongoid/errors/unregistered_class'
 require "mongoid/errors/unsaved_document"
 require "mongoid/errors/unsupported_javascript"
 require "mongoid/errors/validations"

@@ -250,7 +250,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
           end
 
           it 'raises error when resolver is accessed' do
-            expect { association.resolver }.to raise_error(KeyError)
+            expect { association.resolver }.to raise_error(Mongoid::Errors::UnrecognizedResolver)
           end
         end
 

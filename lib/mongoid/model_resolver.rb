@@ -44,8 +44,8 @@ module Mongoid
       #   When any other symbol or string, corresponds to the registered resolver with that identifier.
       #   Otherwise, it must be a resolver instance itself.
       #
-      # @raise KeyError if the given identifier is a symbol or string and it does not match any
-      #   registered resolver.
+      # @raise Mongoid::Errors::UnrecognizedResolver if the given identifier is a
+      #   symbol or string and it does not match any registered resolver.
       #
       # @return [ Mongoid::ModelResolver::Interface ] the resolver instance corresponding to the
       #   given argument.
@@ -53,7 +53,10 @@ module Mongoid
         case identifier_or_object
         when nil, false then nil
         when true, :default then instance
-        when String, Symbol then resolvers.fetch(identifier_or_object.to_sym)
+        when String, Symbol then
+          resolvers.fetch(identifier_or_object.to_sym) do |key|
+            raise Mongoid::Errors::UnrecognizedResolver, key
+          end
         else identifier_or_object
         end
       end
@@ -105,7 +108,7 @@ module Mongoid
       #
       # @param [ Mongoid::Document ] record the record instance for which to query the default key.
       #
-      # @raise KeyError if the record's class has not been registered with this resolver.
+      # @raise Mongoid::Errors::UnregisteredClass if the record's class has not been registered with this resolver.
       #
       # @return [ String ] the default key for the record's class.
       def default_key_for(record)
@@ -117,22 +120,34 @@ module Mongoid
       #
       # @param [ Mongoid::Document] record the record instance for which to query the registered keys.
       #
-      # @raise KeyError if the record's class has not been registered with this resolver.
+      # @raise Mongoid::Errors::UnregisteredClass if the record's class has not been registered with this resolver.
       #
       # @return [ Array<String> ] the list of keys that have been registered for the given class.
       def keys_for(record)
-        @model_to_keys.fetch(record.class)
+        @model_to_keys.fetch(record.class) do |klass|
+          # figure out which resolver this is
+          resolver = if self == Mongoid::ModelResolver.instance
+                       :default
+                     else
+                       Mongoid::ModelResolver.resolvers.keys.detect { |k| Mongoid::ModelResolver.resolvers[k] == self }
+                     end
+          resolver ||= self # if it hasn't been registered, we'll show it the best we can
+          raise Mongoid::Errors::UnregisteredClass.new(klass, resolver)
+        end
       end
 
       # Returns the document class that has been registered by the given key.
       #
       # @param [ String ] key the key by which to query the corresponding class.
       #
-      # @raise KeyError if the given key has not been registered with this resolver.
+      # @raise Mongoid::Errors::UnrecognizedModelAlias if the given key has not
+      #   been registered with this resolver.
       #
       # @return [ Class ] the document class that has been registered with the given key.
       def model_for(key)
-        @key_to_model.fetch(key)
+        @key_to_model.fetch(key) do
+          raise Mongoid::Errors::UnrecognizedModelAlias, key
+        end
       end
     end
   end
