@@ -89,21 +89,22 @@ module Mongoid
         def transaction(options = {}, session_options: {})
           with_session(session_options) do |session|
             begin
-              session.start_transaction(options)
-              yield
-              commit_transaction(session)
+              session.with_transaction(options) do
+                yield
+              end
+              run_commit_callbacks(session)
             rescue *transactions_not_supported_exceptions
               raise Mongoid::Errors::TransactionsNotSupported
             rescue Mongoid::Errors::Rollback
-              abort_transaction(session)
+              run_abort_callbacks(session)
             rescue Mongoid::Errors::InvalidSessionNesting
               # Session should be ended here.
               raise Mongoid::Errors::InvalidTransactionNesting.new
             rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
-              abort_transaction(session)
-              raise Mongoid::Errors::TransactionError(e)
+              run_abort_callbacks(session)
+              raise Mongoid::Errors::TransactionError.new(e)
             rescue StandardError => e
-              abort_transaction(session)
+              run_abort_callbacks(session)
               raise e
             end
           end
@@ -189,25 +190,21 @@ module Mongoid
           _session&.in_transaction? || false
         end
 
-        # Commits the active transaction on the session, and calls
-        # after_commit callbacks on modified documents.
+        # Runs after_commit callbacks on modified documents.
         #
         # @param [ Mongo::Session ] session Session on which
         #   a transaction is started.
-        def commit_transaction(session)
-          session.commit_transaction
+        def run_commit_callbacks(session)
           Threaded.clear_modified_documents(session).each do |doc|
             doc.run_after_callbacks(:commit)
           end
         end
 
-        # Aborts the active transaction on the session, and calls
-        # after_rollback callbacks on modified documents.
+        # Runs after_rollback callbacks on modified documents.
         #
         # @param [ Mongo::Session ] session Session on which
         #   a transaction is started.
-        def abort_transaction(session)
-          session.abort_transaction
+        def run_abort_callbacks(session)
           Threaded.clear_modified_documents(session).each do |doc|
             doc.run_after_callbacks(:rollback)
           end
