@@ -9,7 +9,7 @@ Mongoid::ModelResolver.register_resolver Mongoid::ModelResolver.new, MONGOID_MOD
 def quarantine(context, &block)
   state = {}
 
-  context.before(:context) do 
+  context.before(:context) do
     state[:quarantine] = FeatureSandbox.start_quarantine
     block&.call
   end
