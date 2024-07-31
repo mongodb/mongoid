@@ -53,7 +53,7 @@ module Mongoid
         case identifier_or_object
         when nil, false then nil
         when true, :default then instance
-        when String, Symbol then
+        when String, Symbol
           resolvers.fetch(identifier_or_object.to_sym) do |key|
             raise Mongoid::Errors::UnrecognizedResolver, key
           end

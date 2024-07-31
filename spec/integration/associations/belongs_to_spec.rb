@@ -6,6 +6,36 @@ require 'support/feature_sandbox'
 
 require_relative '../../mongoid/association/referenced/has_one_models'
 
+def quarantine(context, polymorphic:, dept_aliases:, team_aliases:)
+  state = {}
+
+  context.before(:context) do
+    state[:quarantine] = FeatureSandbox.start_quarantine
+
+    # Have to eval this, because otherwise we get syntax errors when defining a class
+    # inside a method.
+    #
+    # I know the scissors are sharp! But I want to run with them anwyay!
+    Object.class_eval <<-RUBY
+      class SandboxManager; include Mongoid::Document; end
+      class SandboxDepartment; include Mongoid::Document; end
+      class SandboxTeam; include Mongoid::Document; end
+    RUBY
+
+    SandboxManager.belongs_to :unit, polymorphic: polymorphic
+
+    SandboxDepartment.identify_as *dept_aliases, resolver: polymorphic
+    SandboxDepartment.has_many :sandbox_managers, as: :unit
+
+    SandboxTeam.identify_as *team_aliases, resolver: polymorphic
+    SandboxTeam.has_one :sandbox_manager, as: :unit
+  end
+
+  context.after(:context) do
+    FeatureSandbox.end_quarantine(state[:quarantine])
+  end
+end
+
 describe 'belongs_to associations' do
   context 'referencing top level classes when source class is namespaced' do
     let(:college) { HomCollege.create! }
@@ -35,30 +65,6 @@ describe 'belongs_to associations' do
   end
 
   context 'when the association is polymorphic' do
-    def quarantine(context, polymorphic:, dept_aliases:, team_aliases:)
-      FeatureSandbox.quarantine do
-        # Have to eval this, because otherwise we get syntax errors when defining a class
-        # inside a method.
-        #
-        # I know the scissors are sharp! But I want to run with them anwyay!
-        Object.class_eval <<-RUBY
-          class SandboxManager; include Mongoid::Document; end
-          class SandboxDepartment; include Mongoid::Document; end
-          class SandboxTeam; include Mongoid::Document; end
-        RUBY
-
-        SandboxManager.belongs_to :unit, polymorphic: polymorphic
-
-        SandboxDepartment.identify_as *dept_aliases, resolver: polymorphic
-        SandboxDepartment.has_many :sandbox_managers, as: :unit
-
-        SandboxTeam.identify_as *team_aliases, resolver: polymorphic
-        SandboxTeam.has_one :sandbox_manager, as: :unit
-
-        context.run
-      end
-    end
-
     let(:dept_manager) { SandboxManager.create(unit: department) }
     let(:team_manager) { SandboxManager.create(unit: team) }
     let(:department) { SandboxDepartment.create }
@@ -96,7 +102,7 @@ describe 'belongs_to associations' do
 
     context 'when the association uses the default resolver' do
       context 'when there are no aliases given' do
-        around(:context) { |example| quarantine(example, polymorphic: true, dept_aliases: [], team_aliases: []) }
+        quarantine(self, polymorphic: true, dept_aliases: [], team_aliases: [])
 
         it 'populates the unit_type with the class name' do
           expect(dept_manager.unit_type).to be == 'SandboxDepartment'
@@ -107,7 +113,7 @@ describe 'belongs_to associations' do
       end
 
       context 'when there are multiple aliases given' do
-        around(:context) { |example| quarantine(example, polymorphic: true, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ]) }
+        quarantine(self, polymorphic: true, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ])
 
         it 'populates the unit_type with the first alias' do
           expect(dept_manager.unit_type).to be == 'dept'
@@ -120,10 +126,8 @@ describe 'belongs_to associations' do
     end
 
     context 'when the association uses a registered resolver' do
-      around(:context) do |example|
-        Mongoid::ModelResolver.register_resolver Mongoid::ModelResolver.new, :sandbox
-        quarantine(example, polymorphic: :sandbox, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ])
-      end
+      before(:context) { Mongoid::ModelResolver.register_resolver Mongoid::ModelResolver.new, :sandbox }
+      quarantine(self, polymorphic: :sandbox, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ])
 
       it 'does not include the aliases in the default resolver' do
         expect(Mongoid::ModelResolver.instance.keys_for(SandboxDepartment.new)).not_to include('dept')
@@ -139,9 +143,9 @@ describe 'belongs_to associations' do
     end
 
     context 'when the association uses an unregistered resolver' do
-      around(:context) do |example|
-        quarantine(example, polymorphic: Mongoid::ModelResolver.new, dept_aliases: %w[ dept sandbox_dept ], team_aliases: %w[ team group ])
-      end
+      quarantine(self, polymorphic: Mongoid::ModelResolver.new,
+        dept_aliases: %w[ dept sandbox_dept ],
+        team_aliases: %w[ team group ])
 
       it 'does not include the aliases in the default resolver' do
         expect(Mongoid::ModelResolver.instance.keys_for(SandboxDepartment.new)).not_to include('dept')

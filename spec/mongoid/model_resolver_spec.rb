@@ -6,11 +6,16 @@ require 'support/feature_sandbox'
 MONGOID_MODEL_RESOLVER_KEY__ = :__separate_instance_spec_key
 Mongoid::ModelResolver.register_resolver Mongoid::ModelResolver.new, MONGOID_MODEL_RESOLVER_KEY__
 
-def quarantine(context)
-  FeatureSandbox.quarantine do
-    yield if block_given?
+def quarantine(context, &block)
+  state = {}
 
-    context.run
+  context.before(:context) do 
+    state[:quarantine] = FeatureSandbox.start_quarantine
+    block&.call
+  end
+
+  context.after(:context) do
+    FeatureSandbox.end_quarantine(state[:quarantine])
   end
 end
 
@@ -53,14 +58,12 @@ describe Mongoid::ModelResolver do
     let(:resolver) { described_class.instance }
 
     context 'when an alias is not specified' do
-      around(:context) do |context|
-        quarantine(context) do
-          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            module Mongoid; module Specs; module DefaultInstance
-              class Vanilla; include Mongoid::Document; end
-            end; end; end
-          RUBY
-        end
+      quarantine(self) do
+        Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          module Mongoid; module Specs; module DefaultInstance
+            class Vanilla; include Mongoid::Document; end
+          end; end; end
+        RUBY
       end
 
       let(:model_class) { Mongoid::Specs::DefaultInstance::Vanilla }
@@ -69,17 +72,15 @@ describe Mongoid::ModelResolver do
     end
 
     context 'when one alias is specified' do
-      around(:context) do |context|
-        quarantine(context) do
-          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            module Mongoid; module Specs; module DefaultInstance
-              class Aliased
-                include Mongoid::Document
-                identify_as 'aliased'
-              end
-            end; end; end
-          RUBY
-        end
+      quarantine(self) do
+        Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          module Mongoid; module Specs; module DefaultInstance
+            class Aliased
+              include Mongoid::Document
+              identify_as 'aliased'
+            end
+          end; end; end
+        RUBY
       end
 
       let(:model_class) { Mongoid::Specs::DefaultInstance::Aliased }
@@ -88,17 +89,15 @@ describe Mongoid::ModelResolver do
     end
 
     context 'when multiple aliases are specified' do
-      around(:context) do |context|
-        quarantine(context) do
-          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            module Mongoid; module Specs; module DefaultInstance
-              class AliasedMultiple
-                include Mongoid::Document
-                identify_as 'aliased', 'alias2', 'alias3'
-              end
-            end; end; end
-          RUBY
-        end
+      quarantine(self) do
+        Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          module Mongoid; module Specs; module DefaultInstance
+            class AliasedMultiple
+              include Mongoid::Document
+              identify_as 'aliased', 'alias2', 'alias3'
+            end
+          end; end; end
+        RUBY
       end
 
       let(:model_class) { Mongoid::Specs::DefaultInstance::AliasedMultiple }
@@ -115,17 +114,15 @@ describe Mongoid::ModelResolver do
     end
 
     context 'when an alias is not specified' do
-      around(:context) do |context|
-        quarantine(context) do
-          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            module Mongoid; module Specs; module SeparateInstance
-              class Vanilla
-                include Mongoid::Document
-                identify_as resolver: MONGOID_MODEL_RESOLVER_KEY__
-              end
-            end; end; end
-          RUBY
-        end
+      quarantine(self) do
+        Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          module Mongoid; module Specs; module SeparateInstance
+            class Vanilla
+              include Mongoid::Document
+              identify_as resolver: MONGOID_MODEL_RESOLVER_KEY__
+            end
+          end; end; end
+        RUBY
       end
 
       let(:model_class) { Mongoid::Specs::SeparateInstance::Vanilla }
@@ -134,17 +131,15 @@ describe Mongoid::ModelResolver do
     end
 
     context 'when one alias is specified' do
-      around(:context) do |context|
-        quarantine(context) do
-          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            module Mongoid; module Specs; module SeparateInstance
-              class Aliased
-                include Mongoid::Document
-                identify_as 'aliased', resolver: MONGOID_MODEL_RESOLVER_KEY__
-              end
-            end; end; end
-          RUBY
-        end
+      quarantine(self) do
+        Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          module Mongoid; module Specs; module SeparateInstance
+            class Aliased
+              include Mongoid::Document
+              identify_as 'aliased', resolver: MONGOID_MODEL_RESOLVER_KEY__
+            end
+          end; end; end
+        RUBY
       end
 
       let(:model_class) { Mongoid::Specs::SeparateInstance::Aliased }
@@ -153,17 +148,15 @@ describe Mongoid::ModelResolver do
     end
 
     context 'when multiple aliases are specified' do
-      around(:context) do |context|
-        quarantine(context) do
-          Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            module Mongoid; module Specs; module SeparateInstance
-              class AliasedMultiple
-                include Mongoid::Document
-                identify_as 'aliased', 'alias2', 'alias3', resolver: MONGOID_MODEL_RESOLVER_KEY__
-              end
-            end; end; end
-          RUBY
-        end
+      quarantine(self) do
+        Object.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          module Mongoid; module Specs; module SeparateInstance
+            class AliasedMultiple
+              include Mongoid::Document
+              identify_as 'aliased', 'alias2', 'alias3', resolver: MONGOID_MODEL_RESOLVER_KEY__
+            end
+          end; end; end
+        RUBY
       end
 
       let(:model_class) { Mongoid::Specs::SeparateInstance::AliasedMultiple }
