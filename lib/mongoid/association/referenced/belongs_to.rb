@@ -103,6 +103,21 @@ module Mongoid
           @polymorphic ||= !!@options[:polymorphic]
         end
 
+        # Returns the object responsible for converting polymorphic type references into
+        # class objects, and vice versa. This is obtained via the `:polymorphic` option
+        # that was given when the association was defined.
+        #
+        # See Mongoid::ModelResolver.resolver for how the `:polymorphic` option is 
+        # interpreted here.
+        #
+        # @raise KeyError if no such resolver has been registered under the given
+        #   identifier.
+        #
+        # @return [ nil | Mongoid::ModelResolver ] the resolver to use
+        def resolver
+          @resolver ||= Mongoid::ModelResolver.resolver(@options[:polymorphic])
+        end
+
         # The name of the field used to store the type of polymorphic association.
         #
         # @return [ String ] The field used to store the type of polymorphic association.

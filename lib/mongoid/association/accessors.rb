@@ -42,7 +42,8 @@ module Mongoid
       #
       # @return [ Proxy ] The association.
       def create_relation(object, association, selected_fields = nil)
-        type = @attributes[association.inverse_type]
+        key = @attributes[association.inverse_type]
+        type = key ? association.resolver.model_for(key) : nil
         target = if t = association.build(self, object, type, selected_fields)
           association.create_relation(self, t)
         else

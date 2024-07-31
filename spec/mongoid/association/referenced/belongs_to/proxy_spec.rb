@@ -2,6 +2,7 @@
 # rubocop:todo all
 
 require "spec_helper"
+require 'support/models/canvas'
 require_relative '../belongs_to_models.rb'
 
 describe Mongoid::Association::Referenced::BelongsTo::Proxy do
