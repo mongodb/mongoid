@@ -14,3 +14,14 @@ Tutorials
   tutorials/getting-started-rails6
   tutorials/documents
   tutorials/common-errors
+
+Overview
+--------
+
+See the following sections to learn more about working with Mongoid:
+
+- :ref:`Getting Started (Sinatra) <getting-started-sinatra>`
+- :ref:`Getting Started (Rails 7) <getting-started-7>`
+- :ref:`Getting Started (Rails 6) <getting-started-6>`
+- :ref:`Documents <documents>`
+- :ref:`Common Errors <common-errors>`

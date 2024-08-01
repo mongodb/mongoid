@@ -25,7 +25,7 @@ module Mongoid
         current = Time.configured.now
         field = database_field_name(field)
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
-        write_attribute(field, current) if field
+        write_attribute(field, current) if field.present?
 
         # If the document being touched is embedded, touch its parents
         # all the way through the composition hierarchy to the root object,

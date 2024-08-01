@@ -197,6 +197,8 @@ jobs:
       with:
         ruby-version: "${{matrix.ruby}}"
         bundler: 2
+    - name: Change permissions
+      run: chmod -R o-w /opt/hostedtoolcache/Ruby
     - name: bundle
       run: bundle install --jobs 4 --retry 3
       env:

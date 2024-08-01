@@ -1,3 +1,5 @@
+.. _getting-started-7:
+
 *************************
 Getting Started (Rails 7)
 *************************

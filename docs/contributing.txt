@@ -11,3 +11,11 @@ Contributing
 
   contributing/code-documentation
   contributing/contributing-guidelines
+
+Overview
+--------
+
+Learn how to contribute to the Mongoid repository in the following sections:
+
+- :ref:`Code Documentation <code-documentation>`
+- :ref:`Contributing Guidelines <contributing-guidelines>`
