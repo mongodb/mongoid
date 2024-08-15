@@ -2103,4 +2103,45 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  context "when accessors are already present and they are" do
+    shared_examples "replaced accessors tests" do
+      it "they are replaced by the field accessors" do
+        klass.create! name: "Mongoid"
+        expect(klass.find_by.name).to eq("Mongoid")
+      end
+    end
+
+    context "public or protected" do
+      let(:klass) do
+        Class.new do
+          attr_accessor :name
+
+          include Mongoid::Document
+          store_in collection: :any
+          field :name
+        end
+      end
+
+      include_examples "replaced accessors tests"
+    end
+
+    context "private" do
+      let(:klass) do
+        Class.new do
+          private
+
+          attr_accessor :name
+
+          public
+
+          include Mongoid::Document
+          store_in collection: :any
+          field :name
+        end
+      end
+
+      include_examples "replaced accessors tests"
+    end
+  end
 end

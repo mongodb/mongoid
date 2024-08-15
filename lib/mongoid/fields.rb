@@ -622,6 +622,7 @@ module Mongoid
       def create_accessors(name, meth, options = {})
         field = fields[name]
 
+        remove_any_existing_accessors(meth)
         create_field_getter(name, meth, field)
         create_field_getter_before_type_cast(name, meth)
         create_field_setter(name, meth, field)
@@ -632,6 +633,19 @@ module Mongoid
           create_translations_setter(name, meth, field)
           localized_fields[name] = field
         end
+      end
+
+      # Remove any existing accessors that collide with field's ones
+      #
+      # @example Remove any existing accessors.
+      #   Model.remove_any_existing_accessors("name")
+      #
+      # @param [ String ] meth The name of the method.
+      #
+      # @api private
+      def remove_any_existing_accessors(meth)
+        remove_method(meth) if method_defined?(meth, false) || private_method_defined?(meth, false)
+        remove_method("#{meth}=") if method_defined?("#{meth}=", false) || private_method_defined?("#{meth}=", false)
       end
 
       # Create the getter method for the provided field.
