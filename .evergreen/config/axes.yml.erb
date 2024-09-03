@@ -121,7 +121,7 @@ axes:
     values:
       - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
-        run_on: ubuntu2004-small
+        run_on: ubuntu2204-small
         variables:
           DOCKER_DISTRO: ubuntu2204
       - id: debian11
@@ -210,6 +210,10 @@ axes:
         display_name: "Rails 7.1"
         variables:
           RAILS: "7.1"
+      - id: "7.2"
+        display_name: "Rails 7.2"
+        variables:
+          RAILS: "7.2"
 
   - id: "i18n"
     display_name: I18n version
