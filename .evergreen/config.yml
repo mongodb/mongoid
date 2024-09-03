@@ -583,6 +583,10 @@ axes:
         display_name: "Rails 7.1"
         variables:
           RAILS: "7.1"
+      - id: "7.2"
+        display_name: "Rails 7.2"
+        variables:
+          RAILS: "7.2"
 
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
@@ -717,7 +721,7 @@ buildvariants:
     driver: ["current"]
     mongodb-version: "6.0"
     topology: "standalone"
-    rails: ['7.0', '7.1']
+    rails: ['7.0', '7.1', '7.2']
     os: ubuntu-22.04
     fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
@@ -778,7 +782,7 @@ buildvariants:
     mongodb-version: '6.0'
     topology: standalone
     app-tests: yes
-    rails: ['6.1', '7.0', '7.1']
+    rails: ['6.1', '7.0', '7.1', '7.2']
     os: ubuntu-20.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
