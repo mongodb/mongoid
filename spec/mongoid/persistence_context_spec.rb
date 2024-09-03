@@ -206,12 +206,25 @@ describe Mongoid::PersistenceContext do
 
         context 'when the options are valid extra options' do
 
-          let(:options) do
-            { collection: 'other' }
+          context 'collection' do
+
+            let(:options) do
+              { collection: 'other' }
+            end
+
+            it 'sets the options on the persistence context object' do
+              expect(persistence_context.collection_name).to eq(options[:collection].to_sym)
+            end
           end
 
-          it 'sets the options on the persistence context object' do
-            expect(persistence_context.collection_name).to eq(options[:collection].to_sym)
+          context 'collection_options' do
+            let(:options) do
+              { collection_options: { capped: true } }
+            end
+
+            it 'does not propagate to client options' do
+              expect(persistence_context.send(:client_options).key?(:collection_options)).to eq(false)
+            end
           end
         end
 
