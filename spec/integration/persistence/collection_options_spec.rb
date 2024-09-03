@@ -17,6 +17,7 @@ describe 'Collection options' do
   end
 
   after(:all) do
+    CollectionOptionsCapped.collection.drop
     Mongoid.deregister_model(CollectionOptionsCapped)
     Object.send(:remove_const, :CollectionOptionsCapped)
   end
