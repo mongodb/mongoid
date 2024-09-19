@@ -660,17 +660,6 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "jruby"
-  matrix_spec:
-    jruby: ["jruby-9.4"]
-    driver: ["current"]
-    topology: ['replica-set', 'sharded-cluster']
-    mongodb-version: '5.0'
-    os: rhel80
-  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
 - matrix_name: "ruby-2.7"
   matrix_spec:
     ruby: ["ruby-2.7"]
@@ -800,20 +789,6 @@ buildvariants:
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
      - name: "test"
-
-# https://github.com/rails/rails/issues/49737
-#- matrix_name: app-tests-jruby-9-4
-#  matrix_spec:
-#    jruby: ["jruby-9.4"]
-#    driver: ["current"]
-#    mongodb-version: '5.0'
-#    topology: standalone
-#    app-tests: yes
-#    rails: ['7.1']
-#    os: ubuntu-20.04
-#  display_name: "app tests ${driver}, ${jruby}"
-#  tasks:
-#     - name: "test"
 
 - matrix_name: "auto-encryption"
   matrix_spec:
