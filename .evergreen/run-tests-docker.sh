@@ -10,11 +10,13 @@ fi
 
 params=
 for var in MONGODB_VERSION TOPOLOGY RVM_RUBY \
-  SINGLE_MONGOS AUTH SSL APP_TESTS
+  SINGLE_MONGOS AUTH SSL APP_TESTS FLE RAILS DRIVER TEST_I18N_FALLBACKS
 do
   value="${!var}"
   if test -n "$value"; then
     params="$params $var=${!var}"
+  else
+    echo "$var not set"
   fi
 done
 
