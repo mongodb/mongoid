@@ -205,7 +205,7 @@ describe 'Mongoid application tests' do
       FileUtils.rm_rf(File.basename(repo_url))
       check_call(%w(git clone) + [repo_url])
       Dir.chdir(File.join(*[File.basename(repo_url), subdir].compact)) do
-        adjust_app_gemfile
+        adjust_app_gemfile(add_sprockets: false)
         adjust_rails_defaults
         check_call(%w(bundle install), env: clean_env)
         puts `git diff`
@@ -262,7 +262,7 @@ describe 'Mongoid application tests' do
     end
   end
 
-  def adjust_app_gemfile(rails_version: SpecConfig.instance.rails_version)
+  def adjust_app_gemfile(rails_version: SpecConfig.instance.rails_version, add_sprockets: true)
     remove_bundler_req
 
     gemfile_lines = IO.readlines('Gemfile')
@@ -280,6 +280,7 @@ describe 'Mongoid application tests' do
         gemfile_lines << "gem 'rails', '~> #{rails_version}.0'\n"
       end
     end
+    gemfile_lines << "gem 'sprockets-rails'\n" if add_sprockets
     File.open('Gemfile', 'w') do |f|
       f << gemfile_lines.join
     end
