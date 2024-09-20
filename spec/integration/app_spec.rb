@@ -267,7 +267,7 @@ describe 'Mongoid application tests' do
 
     gemfile_lines = IO.readlines('Gemfile')
     gemfile_lines.delete_if do |line|
-      line =~ /mongoid/
+      line =~ /mongoid/ || line =~ /sprockets/
     end
     gemfile_lines << "gem 'mongoid', path: '#{File.expand_path(BASE)}'\n"
     if rails_version
@@ -280,6 +280,7 @@ describe 'Mongoid application tests' do
         gemfile_lines << "gem 'rails', '~> #{rails_version}.0'\n"
       end
     end
+    gemfile_lines << "gem 'sprockets-rails'\n"
     File.open('Gemfile', 'w') do |f|
       f << gemfile_lines.join
     end

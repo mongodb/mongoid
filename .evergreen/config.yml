@@ -802,13 +802,3 @@ buildvariants:
   display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
   tasks:
     - name: "test"
-
-- matrix_name: atlas-full
-  matrix_spec:
-    ruby: ruby-3.2
-    os: actual-ubuntu-22.04
-    auth: auth
-    ssl: ssl
-  display_name: "Atlas (Full)"
-  tasks:
-    - name: testatlas_task_group
