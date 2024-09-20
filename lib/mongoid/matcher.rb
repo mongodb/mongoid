@@ -35,11 +35,17 @@ module Mongoid
     # from and behaves identically to association traversal for the purposes
     # of, for example, subsequent array element retrieval.
     #
-    # @param [ Document | Hash ] document The document to extract from.
+    # @param [ Document | Hash | String ] document The document to extract from.
     # @param [ String ] key The key path to extract.
     #
     # @return [ Object | Array ] Field value or values.
     module_function def extract_attribute(document, key)
+      # The matcher system will wind up sending atomic values to this as well,
+      # when attepting to match more complex types. If anything other than a
+      # Document or a Hash is given, we'll short-circuit the logic and just
+      # return an empty array.
+      return [] unless document.is_a?(Hash) || document.is_a?(Document)
+
       # Performance optimization; if the key does not include a '.' character,
       # it must reference an immediate attribute of the document.
       unless key.include?('.')
