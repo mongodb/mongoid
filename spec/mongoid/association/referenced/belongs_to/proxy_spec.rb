@@ -749,6 +749,10 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           person.save!
         end
 
+        # NOTE: there as a bad interdependency here, with the auto_save_spec.rb
+        # file. If auto_save_spec.rb runs before this, the following specs fail
+        # with "undefined method `nullify' for an instance of Person".
+
         context "when parent exists" do
 
           context "when child is destroyed" do
