@@ -54,7 +54,8 @@ module Mongoid
       # it must reference an immediate attribute of the document.
       unless key.include?('.')
         hash = document.respond_to?(:attributes) ? document.attributes : document
-        return [ hash[key] ] if hash.key?(key)
+        key = find_exact_key(hash, key)
+        return key ? [ hash[key] ] : []
       end
 
       if document.respond_to?(:as_attributes, true)
