@@ -93,7 +93,7 @@ fi
 
 export BUNDLE_GEMFILE
 
-if test "$TOPOLOGY"= "sharded-cluster"; then
+if test "$TOPOLOGY" = "sharded-cluster"; then
   # We assume that sharded cluster has two mongoses
   export MONGODB_URI="mongodb://localhost:27017,localhost:27018/?appName=test-suite&$uri_options"
 else
