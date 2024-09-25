@@ -13,7 +13,7 @@ module Mongoid
     end
 
     def expect_query(number)
-      if %i[ sharder load-balanced ].include?(ClusterConfig.instance.topology) && number > 0
+      if %i[ sharded load-balanced ].include?(ClusterConfig.instance.topology) && number > 0
         skip 'This spec requires replica set or standalone topology'
       end
       rv = nil
