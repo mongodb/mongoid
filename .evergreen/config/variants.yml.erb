@@ -111,6 +111,19 @@ buildvariants:
   tasks:
     - name: "test"
 
+- matrix_name: "rails-8"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    mongodb-version: "7.0"
+    topology: "standalone"
+    rails: ['8.0']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
+
 - matrix_name: "bson-min"
   matrix_spec:
     driver: [bson-min]
