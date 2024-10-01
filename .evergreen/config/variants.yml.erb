@@ -109,19 +109,6 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "rails-7"
-  matrix_spec:
-    ruby: ["ruby-3.3"]
-    driver: ["current"]
-    mongodb-version: "6.0"
-    topology: "standalone"
-    rails: ['7.0', '7.1', '7.2']
-    os: ubuntu-22.04
-    fle: helper
-  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
-  tasks:
-    - name: "test"
-
 - matrix_name: "bson-min"
   matrix_spec:
     driver: [bson-min]
@@ -144,6 +131,44 @@ buildvariants:
   tasks:
     - name: "test"
 
+- matrix_name: "rails-master"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    mongodb-version: "7.0"
+    topology: "standalone"
+    rails: ['master']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
+
+- matrix_name: "rails-8"
+  matrix_spec:
+    ruby: ["ruby-3.3"]
+    driver: ["current"]
+    mongodb-version: "7.0"
+    topology: "standalone"
+    rails: ['8.0']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
+
+- matrix_name: "rails-7"
+  matrix_spec:
+    ruby: ["ruby-3.3"]
+    driver: ["current"]
+    mongodb-version: "6.0"
+    topology: "standalone"
+    rails: ['7.0', '7.1', '7.2']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
 
 - matrix_name: "rails-6"
   matrix_spec:
@@ -169,27 +194,40 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: app-tests-rails-7
+- matrix_name: app-tests-rails-8
   matrix_spec:
-    ruby: ["ruby-3.1", "ruby-3.2", "ruby-3.3"]
+    ruby: ["ruby-3.2", "ruby-3.3"]
     driver: ["current"]
     mongodb-version: '7.0'
     topology: standalone
     app-tests: yes
-    rails: ['6.1', '7.0', '7.1', '7.2']
+    rails: ['8.0']
     os: ubuntu-22.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
     - name: "test"
 
-- matrix_name: app-tests-rails-6-0
+- matrix_name: app-tests-rails-7
+  matrix_spec:
+    ruby: ["ruby-3.2", "ruby-3.3"]
+    driver: ["current"]
+    mongodb-version: '7.0'
+    topology: standalone
+    app-tests: yes
+    rails: ['7.0', '7.1', '7.2']
+    os: ubuntu-22.04
+  display_name: "app tests ${driver}, ${ruby}, ${rails}"
+  tasks:
+    - name: "test"
+
+- matrix_name: app-tests-rails-6
   matrix_spec:
     ruby: ["ruby-3.0"]
     driver: ["current"]
     mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
-    rails: ['6.0']
+    rails: ['6.0', '6.1']
     os: ubuntu-20.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
