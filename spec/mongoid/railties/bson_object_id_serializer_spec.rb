@@ -2,7 +2,9 @@
 # rubocop:todo all
 
 require 'spec_helper'
-RSpec.context.skip 'This test requires Rails version specified' if ENV['RAILS'].nil?
+unless SpecConfig.instance.app_tests?
+  RSpec.context.skip 'Set APP_TESTS=1 in environment to run application tests'
+end
 
 require 'active_job'
 require 'mongoid/railties/bson_object_id_serializer'
