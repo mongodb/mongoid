@@ -41,35 +41,49 @@ describe Mongoid::Cacheable do
         document.save!
       end
 
-      context "with updated_at" do
-
-        context "with the default cache_timestamp_format" do
-
-          let!(:updated_at) do
-            document.updated_at.utc.to_formatted_s(:nsec)
-          end
-
-          it "has the id and updated_at key name" do
-            expect(document.cache_key).to eq("dokuments/#{document.id}-#{updated_at}")
+      context 'with cache_version' do
+        context 'with updated_at' do
+          it 'does not include the timestamp in the key' do
+            expect(document.cache_key).to eq("dokuments/#{document.id}")
           end
         end
+      end
 
-        context "with a different cache_timestamp_format" do
+      context 'without cache_version' do
+        before do
+          document.define_singleton_method(:cache_version) { nil }
+        end
 
-          before do
-            Dokument.cache_timestamp_format = :number
+        context "with updated_at" do
+
+          context "with the default cache_timestamp_format" do
+
+            let!(:updated_at) do
+              document.updated_at.utc.to_formatted_s(:nsec)
+            end
+
+            it "has the id and updated_at key name" do
+              expect(document.cache_key).to eq("dokuments/#{document.id}-#{updated_at}")
+            end
           end
 
-          after do
-            Dokument.cache_timestamp_format = :nsec
-          end
+          context "with a different cache_timestamp_format" do
 
-          let!(:updated_at) do
-            document.updated_at.utc.to_formatted_s(:number)
-          end
+            before do
+              Dokument.cache_timestamp_format = :number
+            end
 
-          it "has the id and updated_at key name" do
-            expect(document.cache_key).to eq("dokuments/#{document.id}-#{updated_at}")
+            after do
+              Dokument.cache_timestamp_format = :nsec
+            end
+
+            let!(:updated_at) do
+              document.updated_at.utc.to_formatted_s(:number)
+            end
+
+            it "has the id and updated_at key name" do
+              expect(document.cache_key).to eq("dokuments/#{document.id}-#{updated_at}")
+            end
           end
         end
       end
@@ -109,6 +123,34 @@ describe Mongoid::Cacheable do
 
       it "has the id and updated_at key name" do
         expect(agent.cache_key).to eq("short_agents/#{agent.id}-#{updated_at}")
+      end
+    end
+  end
+
+  describe 'cache_version' do
+    context 'when model has no updated_at field' do
+      let(:model) { Artist.create! }
+
+      it 'has a nil cache_version' do
+        expect(model.cache_version).to be_nil
+      end
+    end
+
+    context 'when model has updated_at field' do
+      context 'when updated_at is nil' do
+        let(:model) { Dokument.create!.tap { |v| v.updated_at = nil } }
+
+        it 'has a nil cache_version' do
+          expect(model.cache_version).to be_nil
+        end
+      end
+
+      context 'when updated_at is present' do
+        let(:model) { Dokument.create! }
+
+        it 'has a non-nil cache_version' do
+          expect(model.cache_version).not_to be_nil
+        end
       end
     end
   end

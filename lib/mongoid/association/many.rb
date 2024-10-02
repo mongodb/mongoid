@@ -178,6 +178,19 @@ module Mongoid
         criteria.unscoped
       end
 
+      # For compatibility with Rails' caching. Returns a string based on the
+      # given timestamp, and includes the number of records in the relation
+      # in the version.
+      #
+      # @param [ String | Symbol ] timestamp_column the timestamp column to
+      #   use when constructing the key.
+      #
+      # @return [ String ] the cache version string
+      def cache_version(timestamp_column = :updated_at)
+        @cache_version ||= {}
+        @cache_version[timestamp_column] ||= compute_cache_version(timestamp_column)
+      end
+
       private
 
       def _session
@@ -197,6 +210,54 @@ module Mongoid
       def find_or(method, attrs = {}, type = nil, &block)
         attrs[klass.discriminator_key] = type.discriminator_value if type
         where(attrs).first || send(method, attrs, type, &block)
+      end
+
+      # Computes the cache version for the relation using the given
+      # timestamp colum; see `#cache_version`.
+      #
+      # @param [ String | Symbol ] timestamp_column the timestamp column to
+      #   use when constructing the key.
+      #
+      # @return [ String ] the cache version string
+      def compute_cache_version(timestamp_column)
+        timestamp_column = timestamp_column.to_s
+
+        loaded = _target.respond_to?(:_loaded?) ?
+                    _target._loaded? :   # has_many
+                    true                 # embeds_many
+
+        size, timestamp = loaded ?
+          analyze_loaded_target(timestamp_column) :
+          analyze_unloaded_target(timestamp_column)
+
+        if timestamp
+          "#{size}-#{timestamp.utc.to_formatted_s(klass.cache_timestamp_format)}"
+        else
+          size.to_s
+        end
+      end
+
+      # Return a 2-tuple of the number of elements in the relation, and the
+      # largest timestamp value.
+      def analyze_loaded_target(timestamp_column)
+        newest = _target.select { |elem| elem.respond_to?(timestamp_column) }
+                        .max { |a, b| a[timestamp_column] <=> b[timestamp_column] }
+        [ _target.length, newest ? newest[timestamp_column] : nil ]
+      end
+
+      # Returns a 2-tuple of the number of elements in the relation, and the
+      # largest timestamp value. This will query the database to perform a
+      # count and a max.
+      def analyze_unloaded_target(timestamp_column)
+        pipeline = criteria
+          .group(_id: nil,
+                 count: { '$count' => {} },
+                 latest: { '$max' => "$#{timestamp_column}" })
+          .pipeline
+
+        result = klass.collection.aggregate(pipeline).to_a.first
+
+        result ? [ result["count"], result["latest"] ] : [ 0 ]
       end
     end
   end
