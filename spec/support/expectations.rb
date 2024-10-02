@@ -3,7 +3,6 @@
 
 module Mongoid
   module Expectations
-
     def connection_class
       if defined?(Mongo::Server::ConnectionBase)
         Mongo::Server::ConnectionBase
@@ -14,6 +13,9 @@ module Mongoid
     end
 
     def expect_query(number)
+      if %i[ sharded load-balanced ].include?(ClusterConfig.instance.topology) && number > 0
+        skip 'This spec requires replica set or standalone topology'
+      end
       rv = nil
       RSpec::Mocks.with_temporary_scope do
         if number > 0
