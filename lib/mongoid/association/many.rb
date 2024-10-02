@@ -247,11 +247,11 @@ module Mongoid
 
       # Returns a 2-tuple of the number of elements in the relation, and the
       # largest timestamp value. This will query the database to perform a
-      # count and a max.
+      # $sum and a $max.
       def analyze_unloaded_target(timestamp_column)
         pipeline = criteria
           .group(_id: nil,
-                 count: { '$count' => {} },
+                 count: { '$sum' => 1 },
                  latest: { '$max' => "$#{timestamp_column}" })
           .pipeline
 
