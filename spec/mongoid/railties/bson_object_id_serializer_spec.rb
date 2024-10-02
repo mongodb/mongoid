@@ -2,10 +2,16 @@
 # rubocop:todo all
 
 require 'spec_helper'
-require 'active_job'
-require 'mongoid/railties/bson_object_id_serializer'
+begin
+  require 'active_job'
+  require 'mongoid/railties/bson_object_id_serializer'
+rescue LoadError
+  should_skip = true
+end
 
 describe 'Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer' do
+
+  skip 'This test requires Rails version' if should_skip
 
   let(:serializer) { Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer.instance }
   let(:object_id) { BSON::ObjectId.new }
