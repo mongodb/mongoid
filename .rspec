@@ -1,3 +1,8 @@
 --tty
 --colour
---format <%= ENV["CI"] ? 'Rfc::Riff' : 'Fuubar'%>
+<% if ENV['CI'] %>
+--format RspecJunitFormatter
+--out rspec.xml
+<% else %>
+--format Fuubar
+<% end %>

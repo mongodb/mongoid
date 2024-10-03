@@ -112,7 +112,7 @@ elif test -n "$APP_TESTS"; then
 
   bundle exec rspec spec/integration/app_spec.rb
 else
-  bundle exec rake ci
+  bundle exec rake spec
 fi
 
 test_status=$?
