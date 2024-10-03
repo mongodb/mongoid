@@ -744,6 +744,19 @@ buildvariants:
   tasks:
     - name: "test"
 
+- matrix_name: "rails-master"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    mongodb-version: "7.0"
+    topology: "standalone"
+    rails: ['master']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
+
 - matrix_name: "bson-min"
   matrix_spec:
     driver: [bson-min]
@@ -790,32 +803,6 @@ buildvariants:
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
-
-- matrix_name: app-tests-rails-master
-  matrix_spec:
-    ruby: ["ruby-3.1", "ruby-3.2"]
-    driver: ["current"]
-    mongodb-version: '7.0'
-    topology: standalone
-    app-tests: yes
-    rails: ['master']
-    os: ubuntu-20.04
-  display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  tasks:
-    - name: "test"
-
-- matrix_name: app-tests-rails-8
-  matrix_spec:
-    ruby: ["ruby-3.1", "ruby-3.2"]
-    driver: ["current"]
-    mongodb-version: '7.0'
-    topology: standalone
-    app-tests: yes
-    rails: ['8.0']
-    os: ubuntu-20.04
-  display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  tasks:
-    - name: "test"
 
 - matrix_name: app-tests-rails-7
   matrix_spec:
