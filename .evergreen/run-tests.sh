@@ -110,7 +110,7 @@ elif test -n "$APP_TESTS"; then
     ./spec/shared/bin/install-node
   fi
 
-  bundle exec rspec spec/integration/app_spec.rb spec/mongoid/railties/bson_object_id_serializer_spec.rb
+  bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake ci
 fi
