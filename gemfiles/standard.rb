@@ -38,7 +38,6 @@ def standard_dependencies
   group :test do
     gem 'timecop'
     gem 'rspec-retry'
-    gem 'rspec_junit_formatter', require: false
     gem 'benchmark-ips'
     gem 'fuubar'
     gem 'rfc'
