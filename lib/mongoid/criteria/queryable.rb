@@ -6,7 +6,6 @@ require "mongoid/criteria/queryable/extensions"
 require "mongoid/criteria/queryable/key"
 require "mongoid/criteria/queryable/macroable"
 require "mongoid/criteria/queryable/mergeable"
-require "mongoid/criteria/queryable/mql"
 require "mongoid/criteria/queryable/smash"
 require "mongoid/criteria/queryable/aggregable"
 require "mongoid/criteria/queryable/pipeline"
@@ -30,7 +29,6 @@ module Mongoid
       include Storable
       include Expandable
       include Mergeable
-      include MQL
       include Aggregable
       include Selectable
       include Optional
@@ -87,6 +85,18 @@ module Mongoid
         @options = other.options.__deep_copy__
         @selector = other.selector.__deep_copy__
         @pipeline = other.pipeline.__deep_copy__
+      end
+
+      # Returns MongoDB command that will be sent to the server for this
+      # criteria.
+      #
+      # @return [ Hash ] The command.
+      def to_mql
+        {
+          :'$db' => database_name,
+          find: collection.name,
+          filter: selector
+        }.merge(options)
       end
     end
   end

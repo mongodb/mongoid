@@ -2,21 +2,39 @@
 
 require 'spec_helper'
 
-describe Mongoid::Criteria::Queryable::MQL do
+describe Mongoid::Criteria::Queryable do
+  let(:db) do
+    Mongoid.default_client.database.name
+  end
+
+  let(:common_attributes) do
+    {
+      :'$db' => db,
+      find: 'bands'
+    }
+  end
+
+  shared_examples 'translatable to mql' do
+    it 'returns mql' do
+      expect(criteria.to_mql).to eq(
+        common_attributes.merge(mql_attributes)
+      )
+    end
+  end
+
   describe '#to_mql' do
     context 'when simple where' do
       let(:criteria) do
         Band.where(name: 'Depeche Mode')
       end
 
-      it 'returns mql' do
-        expect(criteria.to_mql).to eq(
-          {
-            find:  'bands',
-            filter:  { 'name' => 'Depeche Mode' }
-          }
-        )
+      let(:mql_attributes) do
+        {
+          filter:  { 'name' => 'Depeche Mode' }
+        }
       end
+
+      it_behaves_like 'translatable to mql'
     end
 
     context 'with storage field name' do
@@ -25,17 +43,16 @@ describe Mongoid::Criteria::Queryable::MQL do
             .in(years: [ 1995, 1996 ])
       end
 
-      it 'returns mql' do
-        expect(criteria.to_mql).to eq(
-          {
-            find:  'bands',
-            filter:  {
-              'origin' =>  { '$ne' => 'UK' },
-              'y' => { '$in' => [ 1995, 1996 ] }
-            }
+      let(:mql_attributes) do
+        {
+          filter:  {
+            'origin' =>  { '$ne' => 'UK' },
+            'y' => { '$in' => [ 1995, 1996 ] }
           }
-        )
+        }
       end
+
+      it_behaves_like 'translatable to mql'
     end
 
     context 'with alias attribute' do
@@ -43,14 +60,13 @@ describe Mongoid::Criteria::Queryable::MQL do
         Band.where(d: true)
       end
 
-      it 'returns mql' do
-        expect(criteria.to_mql).to eq(
-          {
-            find:  'bands',
-            filter:  { 'deleted' => true }
-          }
-        )
+      let(:mql_attributes) do
+        {
+          filter:  { 'deleted' => true }
+        }
       end
+
+      it_behaves_like 'translatable to mql'
     end
 
     context 'with options' do
@@ -58,17 +74,16 @@ describe Mongoid::Criteria::Queryable::MQL do
         Band.where(genres: ['rock', 'hip-hop']).order(founded: 1).limit(100).skip(200)
       end
 
-      it 'returns mql' do
-        expect(criteria.to_mql).to eq(
-          {
-            find:  'bands',
-            filter:  { "genres" => [ "rock", "hip-hop" ] },
-            limit:  100,
-            skip:  200,
-            sort:  { 'founded' => 1 }
-          }
-        )
+      let(:mql_attributes) do
+        {
+          filter:  { "genres" => [ "rock", "hip-hop" ] },
+          limit:  100,
+          skip:  200,
+          sort:  { 'founded' => 1 }
+        }
       end
+
+      it_behaves_like 'translatable to mql'
     end
   end
 end
