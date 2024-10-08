@@ -6,6 +6,7 @@ require "mongoid/criteria/queryable/extensions"
 require "mongoid/criteria/queryable/key"
 require "mongoid/criteria/queryable/macroable"
 require "mongoid/criteria/queryable/mergeable"
+require "mongoid/criteria/queryable/mql"
 require "mongoid/criteria/queryable/smash"
 require "mongoid/criteria/queryable/aggregable"
 require "mongoid/criteria/queryable/pipeline"
@@ -29,6 +30,7 @@ module Mongoid
       include Storable
       include Expandable
       include Mergeable
+      include MQL
       include Aggregable
       include Selectable
       include Optional
