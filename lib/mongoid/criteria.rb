@@ -172,6 +172,43 @@ module Mongoid
       !!@embedded
     end
 
+    # Produce a clone of the current criteria object with it's "raw"
+    # setting set to the given value. A criteria set to "raw" will return
+    # all results as raw, demongoized hashes. When "raw" is not set, the
+    # criteria will return all results as instantiated Document instances.
+    #
+    # @example Return query results as raw hashes:
+    #   Person.where(city: 'Boston').raw
+    #
+    # @param [ true | false ] raw_results Whether the new criteria should be
+    #   placed in "raw" mode or not.
+    #
+    # @return [ Criteria ] the cloned criteria object.
+    def raw(raw_results = true)
+      clone.tap do |criteria|
+        criteria._raw_results = raw_results
+      end
+    end
+
+    # An internal helper for setting the "raw" flag on a given criteria
+    # object.
+    #
+    # @param [ true | false ] raw_results Whether the criteria should be placed
+    #   in "raw" mode or not.
+    #
+    # @api private
+    def _raw_results=(raw_results)
+      @raw_results = raw_results
+    end
+
+    # Predicate that answers the question: is this criteria object currently
+    # in raw mode? (See #raw for a description of raw mode.)
+    #
+    # @return [ true | false ] whether the criteria is in raw mode or not.
+    def raw_results?
+      @raw_results
+    end
+
     # Extract a single id from the provided criteria. Could be in an $and
     # query or a straight _id query.
     #
@@ -278,6 +315,7 @@ module Mongoid
       self.documents = other.documents.dup unless other.documents.empty?
       self.scoping_options = other.scoping_options
       self.inclusions = (inclusions + other.inclusions).uniq
+      self._raw_results = self.raw_results? || other.raw_results?
       self
     end
 
@@ -513,6 +551,7 @@ module Mongoid
       @inclusions = other.inclusions.dup
       @scoping_options = other.scoping_options
       @documents = other.documents.dup
+      @raw_results = other.raw_results?
       @context = nil
       super
     end

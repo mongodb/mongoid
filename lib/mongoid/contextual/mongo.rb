@@ -880,8 +880,14 @@ module Mongoid
       #
       # @param [ Document ] document The document to yield to.
       def yield_document(document, &block)
-        doc = document.respond_to?(:_id) ?
-            document : Factory.from_db(klass, document, criteria)
+        doc = if document.respond_to?(:_id)
+                document
+              elsif criteria.raw_results?
+                demongoize_hash(klass, document)
+              else
+                Factory.from_db(klass, document, criteria)
+              end
+
         yield(doc)
       end
 
@@ -979,6 +985,46 @@ module Mongoid
         demongoize_with_field(field, value, is_translation)
       end
 
+      # Demongoizes (converts from database to Ruby representation) the values
+      # of the given hash as if it were the raw representation of a document of
+      # the given klass.
+      #
+      # @param [ Document ] klass the Document class that the given hash ought
+      #   to represent
+      # @param [ Hash | nil ] hash the Hash instance containing the values to
+      #   demongoize.
+      #
+      # @return [ Hash | nil ] the demongoized result (nil if the input Hash
+      #   was nil)
+      #
+      # @api private
+      def demongoize_hash(klass, hash)
+        return nil unless hash
+
+        hash.each_with_object({}) do |(key, value), new_hash|
+          # does the key represent a declared field on the document?
+          if (field = klass.fields[key])
+            new_hash[key] = field.demongoize(value)
+            next
+          end
+
+          # does the key represent an emebedded relation on the document?
+          aliased_name = klass.aliased_associations[key] || key
+          if (assoc = klass.relations[aliased_name])
+            new_hash[key] = case value
+                            when Array then value.map { |hash| demongoize_hash(assoc.klass, hash) }
+                            when Hash then demongoize_hash(assoc.klass, value)
+                            else value
+                            end
+            next
+          end
+
+          # if its not a field or a relation, then we just pass it through
+          # literally
+          new_hash[key] = value
+        end
+      end
+
       # Demongoize the value for the given field. If the field is nil or the
       # field is a translations field, the value is demongoized using its class.
       #
@@ -1013,10 +1059,13 @@ module Mongoid
       # @return [ Array<Document> | Document ] The list of documents or a
       #   single document.
       def process_raw_docs(raw_docs, limit)
-        docs = raw_docs.map do |d|
-          Factory.from_db(klass, d, criteria)
-        end
-        docs = eager_load(docs)
+        docs = if criteria.raw_results?
+                 raw_docs.map { |doc| demongoize_hash(klass, doc) }
+               else
+                 mapped = raw_docs.map { |doc| Factory.from_db(klass, doc, criteria) }
+                 eager_load(mapped)
+               end
+
         limit ? docs : docs.first
       end
 
