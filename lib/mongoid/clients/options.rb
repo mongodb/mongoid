@@ -86,7 +86,7 @@ module Mongoid
         else
           PersistenceContext.get(self) ||
             PersistenceContext.get(self.class) ||
-            PersistenceContext.new(self.class, storage_options)
+            PersistenceContext.new(self.class, default_storage_options)
         end
       end
 
@@ -111,6 +111,10 @@ module Mongoid
       end
 
       private
+
+      def default_storage_options
+        Threaded.client_override ? { client: Threaded.client_override } : storage_options
+      end
 
       def set_persistence_context(options_or_context)
         PersistenceContext.set(self, options_or_context)
