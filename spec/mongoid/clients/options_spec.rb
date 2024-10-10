@@ -522,4 +522,49 @@ describe Mongoid::Clients::Options, retry: 3 do
       end
     end
   end
+
+  context 'when global client is overriden' do
+    before do
+      Mongoid.clients['override_client'] = { hosts: SpecConfig.instance.addresses, database: 'default_override_database' }
+      Mongoid.override_client('override_client')
+    end
+
+    after do
+      Mongoid.override_client(nil)
+      Mongoid.clients['override_client'] = nil
+    end
+
+    it 'sets the overriden client for new model' do
+      expect(Minim.create.persistence_context.client_name).to eq('override_client')
+    end
+
+    context 'when the client is set on the model level' do
+      before do
+        Mongoid.clients['train_client'] = { hosts: SpecConfig.instance.addresses, database: 'trains_database' }
+      end
+
+      after do
+        Mongoid.clients['train_client'] = nil
+      end
+
+      it 'does not override the client' do
+        Train.create
+        expect(Train.create.persistence_context.client_name).to eq('train_client')
+      end
+    end
+  end
+
+  context 'when global databse is overriden' do
+    before do
+      Mongoid.override_database('override_database')
+    end
+
+    after do
+      Mongoid.override_database(nil)
+    end
+
+    it 'sets the overriden database for new model' do
+      expect(Minim.new.persistence_context.database_name).to eq(:override_database)
+    end
+  end
 end

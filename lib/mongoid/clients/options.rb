@@ -113,7 +113,12 @@ module Mongoid
       private
 
       def default_storage_options
-        Threaded.client_override ? { client: Threaded.client_override } : storage_options
+        byebug
+        return storage_options if Threaded.client_override.nil? && Threaded.database_override.nil?
+        {}.tap do |opts|
+          opts[:client] = Threaded.client_override unless Threaded.client_override.nil?
+          opts[:database] = Threaded.database_override unless Threaded.database_override.nil?
+        end
       end
 
       def set_persistence_context(options_or_context)
