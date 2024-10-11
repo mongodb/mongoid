@@ -4,22 +4,6 @@
 require "spec_helper"
 require 'support/feature_sandbox'
 
-def quarantine(context)
-  state = {}
-
-  context.before(:context) do
-    state[:quarantine] = FeatureSandbox.start_quarantine
-
-    Object.class_eval <<-RUBY
-      class Train; include Mongoid::Document; store_in client: 'train_client', database: 'train_database'; end
-    RUBY
-  end
-
-  context.after(:context) do
-    FeatureSandbox.end_quarantine(state[:quarantine])
-  end
-end
-
 describe Mongoid::Clients::Options, retry: 3 do
 
   before do
@@ -541,8 +525,6 @@ describe Mongoid::Clients::Options, retry: 3 do
   end
 
   context 'with global overrides' do
-    quarantine(self)
-
     context 'when global client is overridden' do
       before do
         Mongoid.clients['override_client'] = { hosts: SpecConfig.instance.addresses, database: 'default_override_database' }
@@ -559,17 +541,18 @@ describe Mongoid::Clients::Options, retry: 3 do
       end
 
       context 'when the client is set on the model level' do
-        before do
+        around(:example) do |example|
+          opts = Minim.storage_options
+          Minim.storage_options = Minim.storage_options.merge( { client: 'train_client' } )
           Mongoid.clients['train_client'] = { hosts: SpecConfig.instance.addresses, database: 'trains_database' }
-        end
-
-        after do
+          example.run
           Mongoid.clients['train_client'] = nil
+          Minim.storage_options = opts
         end
 
         # This behaviour is consistent with 8.x
         it 'sets the overridden client for new model' do
-          expect(Train.create.persistence_context.client_name).to eq('override_client')
+          expect(Minim.create.persistence_context.client_name).to eq('override_client')
         end
       end
     end
@@ -587,18 +570,19 @@ describe Mongoid::Clients::Options, retry: 3 do
         expect(Minim.new.persistence_context.database_name).to eq(:override_database)
       end
 
-      context 'when the client is set on the model level' do
-        before do
+      context 'when the database is set on the model level' do
+        around(:example) do |example|
+          opts = Minim.storage_options
+          Minim.storage_options = Minim.storage_options.merge( { database: 'train_database' } )
           Mongoid.clients['train_client'] = { hosts: SpecConfig.instance.addresses, database: 'trains_database' }
-        end
-
-        after do
+          example.run
           Mongoid.clients['train_client'] = nil
+          Minim.storage_options = opts
         end
 
         # This behaviour is consistent with 8.x
         it 'sets the overridden client for new model' do
-          expect(Train.create.persistence_context.database_name).to eq(:override_database)
+          expect(Minim.create.persistence_context.database_name).to eq(:override_database)
         end
       end
     end
