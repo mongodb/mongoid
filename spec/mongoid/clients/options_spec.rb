@@ -2,6 +2,23 @@
 # rubocop:todo all
 
 require "spec_helper"
+require 'support/feature_sandbox'
+
+def quarantine(context)
+  state = {}
+
+  context.before(:context) do
+    state[:quarantine] = FeatureSandbox.start_quarantine
+
+    Object.class_eval <<-RUBY
+      class Train; include Mongoid::Document; store_in client: 'train_client', database: 'train_database'; end
+    RUBY
+  end
+
+  context.after(:context) do
+    FeatureSandbox.end_quarantine(state[:quarantine])
+  end
+end
 
 describe Mongoid::Clients::Options, retry: 3 do
 
@@ -524,6 +541,8 @@ describe Mongoid::Clients::Options, retry: 3 do
   end
 
   context 'with global overrides' do
+    quarantine(self)
+
     context 'when global client is overridden' do
       before do
         Mongoid.clients['override_client'] = { hosts: SpecConfig.instance.addresses, database: 'default_override_database' }
