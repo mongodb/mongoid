@@ -525,47 +525,63 @@ describe Mongoid::Clients::Options, retry: 3 do
 
   context 'with global overrides' do
     context 'when global client is overridden' do
-    before do
-      Mongoid.clients['override_client'] = { hosts: SpecConfig.instance.addresses, database: 'default_override_database' }
-      Mongoid.override_client('override_client')
-    end
-
-    after do
-      Mongoid.override_client(nil)
-      Mongoid.clients['override_client'] = nil
-    end
-
-    it 'sets the overridden client for new model' do
-      expect(Minim.create.persistence_context.client_name).to eq('override_client')
-    end
-
-    context 'when the client is set on the model level' do
       before do
-        Mongoid.clients['train_client'] = { hosts: SpecConfig.instance.addresses, database: 'trains_database' }
+        Mongoid.clients['override_client'] = { hosts: SpecConfig.instance.addresses, database: 'default_override_database' }
+        Mongoid.override_client('override_client')
       end
 
       after do
-        Mongoid.clients['train_client'] = nil
+        Mongoid.override_client(nil)
+        Mongoid.clients['override_client'] = nil
       end
 
-      it 'does not override the client' do
-        expect(Train.create.persistence_context.client_name).to eq('train_client')
+      it 'sets the overridden client for new model' do
+        expect(Minim.create.persistence_context.client_name).to eq('override_client')
+      end
+
+      context 'when the client is set on the model level' do
+        before do
+          Mongoid.clients['train_client'] = { hosts: SpecConfig.instance.addresses, database: 'trains_database' }
+        end
+
+        after do
+          Mongoid.clients['train_client'] = nil
+        end
+
+        # This behaviour is consistent with 8.x
+        it 'sets the overridden client for new model' do
+          expect(Train.create.persistence_context.client_name).to eq('override_client')
+        end
       end
     end
-  end
 
     context 'when global database is overridden' do
-    before do
-      Mongoid.override_database('override_database')
-    end
+      before do
+        Mongoid.override_database('override_database')
+      end
 
-    after do
-      Mongoid.override_database(nil)
-    end
+      after do
+        Mongoid.override_database(nil)
+      end
 
-    it 'sets the overridden database for new model' do
-      expect(Minim.new.persistence_context.database_name).to eq(:override_database)
+      it 'sets the overridden database for new model' do
+        expect(Minim.new.persistence_context.database_name).to eq(:override_database)
+      end
+
+      context 'when the client is set on the model level' do
+        before do
+          Mongoid.clients['train_client'] = { hosts: SpecConfig.instance.addresses, database: 'trains_database' }
+        end
+
+        after do
+          Mongoid.clients['train_client'] = nil
+        end
+
+        # This behaviour is consistent with 8.x
+        it 'sets the overridden client for new model' do
+          expect(Train.create.persistence_context.database_name).to eq(:override_database)
+        end
+      end
     end
-  end
   end
 end

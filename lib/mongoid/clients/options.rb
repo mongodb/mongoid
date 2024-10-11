@@ -118,10 +118,10 @@ module Mongoid
         return storage_options if Threaded.client_override.nil? && Threaded.database_override.nil?
 
         storage_options.tap do |opts|
-          # Client defined on the document class level has higher priority than global override.
-          opts[:client] ||= Threaded.client_override unless Threaded.client_override.nil?
-          # Database defined on the document class level has higher priority than global override.
-          opts[:database] ||= Threaded.database_override unless Threaded.database_override.nil?
+          # Globally overridden client replaces client defined for the document class.
+          opts[:client] = Threaded.client_override unless Threaded.client_override.nil?
+          # Globally overridden database replaces database defined for the document class.
+          opts[:database] = Threaded.database_override unless Threaded.database_override.nil?
         end
       end
 
