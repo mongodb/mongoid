@@ -113,11 +113,15 @@ module Mongoid
       private
 
       def default_storage_options
-        byebug
+        # Nothing is overridden, we use either the default storage_options
+        # or storage_options defined for the document class.
         return storage_options if Threaded.client_override.nil? && Threaded.database_override.nil?
-        {}.tap do |opts|
-          opts[:client] = Threaded.client_override unless Threaded.client_override.nil?
-          opts[:database] = Threaded.database_override unless Threaded.database_override.nil?
+
+        storage_options.tap do |opts|
+          # Client defined on the document class level has higher priority than global override.
+          opts[:client] ||= Threaded.client_override unless Threaded.client_override.nil?
+          # Database defined on the document class level has higher priority than global override.
+          opts[:database] ||= Threaded.database_override unless Threaded.database_override.nil?
         end
       end
 
