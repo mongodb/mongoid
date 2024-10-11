@@ -2323,6 +2323,30 @@ describe Mongoid::Criteria do
         expect(result['pass']['exp']).to be_a(Date)
       end
     end
+
+    context 'with projections' do
+      before { Person.create(title: 'sir', dob: Date.new(1980, 1, 1)) }
+
+      context 'using #only' do
+        let(:criteria) { Person.only(:dob).raw }
+
+        it 'produces a hash with only the _id and the requested key' do
+          expect(result).to be_a(Hash)
+          expect(result.keys).to be == %w[ _id dob ]
+          expect(result['dob']).to be == Date.new(1980, 1, 1)
+        end
+      end
+
+      context 'using #without' do
+        let(:criteria) { Person.without(:dob).raw }
+
+        it 'produces a hash that excludes requested key' do
+          expect(result).to be_a(Hash)
+          expect(result.keys).not_to include('dob')
+          expect(result.keys).to be_present
+        end
+      end
+    end
   end
 
   describe "#max_scan" do
