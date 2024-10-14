@@ -2,7 +2,6 @@
 # rubocop:todo all
 
 require "spec_helper"
-require 'support/feature_sandbox'
 
 describe Mongoid::Clients::Options, retry: 3 do
 
