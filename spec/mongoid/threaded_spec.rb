@@ -341,4 +341,27 @@ describe Mongoid::Threaded do
       end
     end
   end
+
+  describe '#clear_modified_documents' do
+    let(:session) do
+      double(Mongo::Session).tap do |session|
+        allow(session).to receive(:in_transaction?).and_return(true)
+      end
+    end
+
+    context 'when there are modified documents' do
+      before do
+        described_class.add_modified_document(session, Minim.new)
+        described_class.clear_modified_documents(session)
+      end
+
+      it 'removes the documents' do
+        expect(described_class.modified_documents).to be_empty
+      end
+
+      it 'removes the key' do
+        expect(described_class.modified_documents.key?(session)).to be_falsey
+      end
+    end
+  end
 end
