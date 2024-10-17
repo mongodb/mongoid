@@ -536,6 +536,20 @@ describe Mongoid::PersistenceContext do
         end
       end
     end
+
+    context 'when the database is specified as a proc' do
+      let(:options) { { database: ->{ 'other' } } }
+
+      after { persistence_context.client.close }
+
+      it 'evaluates the proc' do
+        expect(persistence_context.database_name).to eq(:other)
+      end
+
+      it 'does not pass the proc to the client' do
+        expect(persistence_context.client.database.name).to eq('other')
+      end
+    end
   end
 
   describe '#client' do
@@ -605,6 +619,23 @@ describe Mongoid::PersistenceContext do
             expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
           end
         end
+      end
+    end
+
+    context 'when the client is set as a proc in the storage options' do
+      let(:options) { {} }
+
+      before do
+        Band.store_in client: ->{ :alternative }
+      end
+
+      after do
+        persistence_context.client.close
+        Band.store_in client: nil
+      end
+
+      it 'uses the client option' do
+        expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
       end
     end
 

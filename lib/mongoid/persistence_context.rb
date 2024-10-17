@@ -117,12 +117,15 @@ module Mongoid
     def client
       @client ||= begin
         client = Clients.with_name(client_name)
+        options = client_options
+
         if database_name_option
           client = client.use(database_name)
+          options = options.except(:database, 'database')
         end
-        unless client_options.empty?
-          client = client.with(client_options)
-        end
+
+        client = client.with(options) unless options.empty?
+
         client
       end
     end
