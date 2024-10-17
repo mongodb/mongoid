@@ -883,7 +883,11 @@ module Mongoid
         doc = if document.respond_to?(:_id)
                 document
               elsif criteria.raw_results?
-                demongoize_hash(klass, document)
+                if criteria.typecast_results?
+                  demongoize_hash(klass, document)
+                else
+                  document
+                end
               else
                 Factory.from_db(klass, document, criteria)
               end
@@ -1062,7 +1066,11 @@ module Mongoid
       #   single document.
       def process_raw_docs(raw_docs, limit)
         docs = if criteria.raw_results?
-                 raw_docs.map { |doc| demongoize_hash(klass, doc) }
+                 if criteria.typecast_results?
+                   raw_docs.map { |doc| demongoize_hash(klass, doc) }
+                 else
+                   raw_docs
+                 end
                else
                  mapped = raw_docs.map { |doc| Factory.from_db(klass, doc, criteria) }
                  eager_load(mapped)

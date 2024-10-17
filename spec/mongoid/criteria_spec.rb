@@ -2270,80 +2270,171 @@ describe Mongoid::Criteria do
   end
 
   describe '#raw' do
-    let(:results) { criteria.to_a }
     let(:result) { results[0] }
 
-    context 'without associations' do
-      before do
-        Band.create(name: 'the band',
-                    active: true,
-                    genres: %w[ abc def ],
-                    member_count: 112,
-                    rating: 4.2,
-                    created: Time.now,
-                    updated: Time.now,
-                    sales: 1_234_567.89,
-                    decimal: 9_876_543.21,
-                    decibels: 140..170,
-                    deleted: false,
-                    mojo: Math::PI,
-                    tags: { 'one' => 1, 'two' => 2 },
-                    location: LatLng.new(41.74, -111.83))
-      end
+    context 'when the parameters are inconsistent' do
+      let(:results) { criteria.raw(false, typed: false).to_a }
+      let(:criteria) { Person }
 
-      let(:criteria) { Band.where(name: 'the band').raw }
-
-      it 'returns a hash' do
-        expect(result).to be_a(Hash)
-      end
-
-      it 'demongoizes the result' do
-        expect(result['genres']).to be_a(Array)
-        expect(result['decibels']).to be_a(Range)
-        expect(result['location']).to be_a(LatLng)
+      it 'raises an ArgumentError' do
+        expect { result }.to raise_error(ArgumentError)
       end
     end
 
-    context 'with associations' do
-      before do
-        Person.create({
-          addresses: [ Address.new(end_date: 2.months.from_now) ],
-          passport: Passport.new(exp: 1.year.from_now)
-        })
-      end
+    context 'when returning untyped results' do
+      let(:results) { criteria.raw.to_a }
 
-      let(:criteria) { Person.raw }
+      context 'without associations' do
+        before do
+          Band.create(name: 'the band',
+                      active: true,
+                      genres: %w[ abc def ],
+                      member_count: 112,
+                      rating: 4.2,
+                      created: Time.now,
+                      updated: Time.now,
+                      sales: 1_234_567.89,
+                      decimal: 9_876_543.21,
+                      decibels: 140..170,
+                      deleted: false,
+                      mojo: Math::PI,
+                      tags: { 'one' => 1, 'two' => 2 },
+                      location: LatLng.new(41.74, -111.83))
+        end
 
-      it 'demongoizes the embedded relation' do
-        expect(result['addresses']).to be_a(Array)
-        expect(result['addresses'][0]['end_date']).to be_a(Date)
+        let(:criteria) { Band.where(name: 'the band') }
 
-        # `pass` is how it is stored, `passport` is how it is aliased
-        expect(result['pass']).to be_a(Hash)
-        expect(result['pass']['exp']).to be_a(Date)
-      end
-    end
-
-    context 'with projections' do
-      before { Person.create(title: 'sir', dob: Date.new(1980, 1, 1)) }
-
-      context 'using #only' do
-        let(:criteria) { Person.only(:dob).raw }
-
-        it 'produces a hash with only the _id and the requested key' do
+        it 'returns a hash' do
           expect(result).to be_a(Hash)
-          expect(result.keys).to be == %w[ _id dob ]
-          expect(result['dob']).to be == Date.new(1980, 1, 1)
+        end
+
+        it 'does not demongoize the result' do
+          expect(result['genres']).to be_a(Array)
+          expect(result['decibels']).to be == { 'min' => 140, 'max' => 170 }
+          expect(result['location']).to be == [ -111.83, 41.74 ]
         end
       end
 
-      context 'using #without' do
-        let(:criteria) { Person.without(:dob).raw }
+      context 'with associations' do
+        before do
+          Person.create({
+            addresses: [ Address.new(end_date: 2.months.from_now) ],
+            passport: Passport.new(exp: 1.year.from_now)
+          })
+        end
 
-        it 'produces a hash that excludes requested key' do
+        let(:criteria) { Person }
+
+        it 'demongoizes the embedded relation' do
+          expect(result['addresses']).to be_a(Array)
+          expect(result['addresses'][0]['end_date']).to be_a(Time)
+
+          # `pass` is how it is stored, `passport` is how it is aliased
+          expect(result['pass']).to be_a(Hash)
+          expect(result['pass']['exp']).to be_a(Time)
+        end
+      end
+
+      context 'with projections' do
+        before { Person.create(title: 'sir', dob: Date.new(1980, 1, 1)) }
+
+        context 'using #only' do
+          let(:criteria) { Person.only(:dob) }
+
+          it 'produces a hash with only the _id and the requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).to be == %w[ _id dob ]
+            expect(result['dob']).to be == Date.new(1980, 1, 1)
+          end
+        end
+
+        context 'using #without' do
+          let(:criteria) { Person.without(:dob) }
+
+          it 'produces a hash that excludes requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).not_to include('dob')
+            expect(result.keys).to be_present
+          end
+        end
+      end
+    end
+
+    context 'when returning typed results' do
+      let(:results) { criteria.raw(typed: true).to_a }
+
+      context 'without associations' do
+        before do
+          Band.create(name: 'the band',
+                      active: true,
+                      genres: %w[ abc def ],
+                      member_count: 112,
+                      rating: 4.2,
+                      created: Time.now,
+                      updated: Time.now,
+                      sales: 1_234_567.89,
+                      decimal: 9_876_543.21,
+                      decibels: 140..170,
+                      deleted: false,
+                      mojo: Math::PI,
+                      tags: { 'one' => 1, 'two' => 2 },
+                      location: LatLng.new(41.74, -111.83))
+        end
+
+        let(:criteria) { Band.where(name: 'the band') }
+
+        it 'returns a hash' do
           expect(result).to be_a(Hash)
-          expect(result.keys).not_to include('dob')
-          expect(result.keys).to be_present
+        end
+
+        it 'demongoizes the result' do
+          expect(result['genres']).to be_a(Array)
+          expect(result['decibels']).to be_a(Range)
+          expect(result['location']).to be_a(LatLng)
+        end
+      end
+
+      context 'with associations' do
+        before do
+          Person.create({
+            addresses: [ Address.new(end_date: 2.months.from_now) ],
+            passport: Passport.new(exp: 1.year.from_now)
+          })
+        end
+
+        let(:criteria) { Person }
+
+        it 'demongoizes the embedded relation' do
+          expect(result['addresses']).to be_a(Array)
+          expect(result['addresses'][0]['end_date']).to be_a(Date)
+
+          # `pass` is how it is stored, `passport` is how it is aliased
+          expect(result['pass']).to be_a(Hash)
+          expect(result['pass']['exp']).to be_a(Date)
+        end
+      end
+
+      context 'with projections' do
+        before { Person.create(title: 'sir', dob: Date.new(1980, 1, 1)) }
+
+        context 'using #only' do
+          let(:criteria) { Person.only(:dob) }
+
+          it 'produces a hash with only the _id and the requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).to be == %w[ _id dob ]
+            expect(result['dob']).to be == Date.new(1980, 1, 1)
+          end
+        end
+
+        context 'using #without' do
+          let(:criteria) { Person.without(:dob) }
+
+          it 'produces a hash that excludes requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).not_to include('dob')
+            expect(result.keys).to be_present
+          end
         end
       end
     end
