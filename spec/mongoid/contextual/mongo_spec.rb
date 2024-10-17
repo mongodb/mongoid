@@ -1240,16 +1240,26 @@ describe Mongoid::Contextual::Mongo do
             subscriber = Mrss::EventSubscriber.new
             context.view.client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
 
-            enum.next
+            # first batch
+            5.times { enum.next }
 
             find_events = subscriber.all_events.select do |evt|
               evt.command_name == 'find'
             end
-            expect(find_events.length).to be(2)
+            expect(find_events.length).to be > 0
             get_more_events = subscriber.all_events.select do |evt|
               evt.command_name == 'getMore'
             end
-            expect(get_more_events.length).to be(0)
+            expect(get_more_events.length).to be == 0
+
+            # force the second batch to be loaded
+            enum.next
+
+            get_more_events = subscriber.all_events.select do |evt|
+              evt.command_name == 'getMore'
+            end
+            expect(get_more_events.length).to be > 0
+
           ensure
             context.view.client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
           end

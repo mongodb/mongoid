@@ -172,6 +172,67 @@ module Mongoid
       !!@embedded
     end
 
+    # Produce a clone of the current criteria object with it's "raw"
+    # setting set to the given value. A criteria set to "raw" will return
+    # all results as raw hashes. If `typed` is true, the values in the hashes
+    # will be typecast according to the fields that they correspond to.
+    #
+    # When "raw" is not set (or if `raw_results` is false), the criteria will
+    # return all results as instantiated Document instances.
+    #
+    # @example Return query results as raw hashes:
+    #   Person.where(city: 'Boston').raw
+    #
+    # @param [ true | false ] raw_results Whether the new criteria should be
+    #   placed in "raw" mode or not.
+    # @param [ true | false ] typed Whether the raw results should be typecast
+    #   before being returned. Default is true if raw_results is false, and
+    #   false otherwise.
+    #
+    # @return [ Criteria ] the cloned criteria object.
+    def raw(raw_results = true, typed: nil)
+      # default for typed is true when raw_results is false, and false when
+      # raw_results is true.
+      typed = !raw_results if typed.nil?
+
+      if !typed && !raw_results
+        raise ArgumentError, 'instantiated results must be typecast'
+      end
+
+      clone.tap do |criteria|
+        criteria._raw_results = { raw: raw_results, typed: typed }
+      end
+    end
+
+    # An internal helper for getting/setting the "raw" flag on a given criteria
+    # object.
+    #
+    # @return [ nil | Hash ] If set, it is a hash with two keys, :raw and :typed,
+    #   that describe whether raw results should be returned, and whether they
+    #   ought to be typecast.
+    #
+    # @api private
+    attr_accessor :_raw_results
+
+    # Predicate that answers the question: is this criteria object currently
+    # in raw mode? (See #raw for a description of raw mode.)
+    #
+    # @return [ true | false ] whether the criteria is in raw mode or not.
+    def raw_results?
+      _raw_results && _raw_results[:raw]
+    end
+
+    # Predicate that answers the question: should the results returned by
+    # this criteria object be typecast? (See #raw for a description of this.)
+    # The answer is meaningless unless #raw_results? is true, since if
+    # instantiated document objects are returned they will always be typecast.
+    #
+    # @return [ true | false ] whether the criteria should return typecast
+    #   results.
+    def typecast_results?
+      _raw_results && _raw_results[:typed]
+    end
+
     # Extract a single id from the provided criteria. Could be in an $and
     # query or a straight _id query.
     #
@@ -278,6 +339,7 @@ module Mongoid
       self.documents = other.documents.dup unless other.documents.empty?
       self.scoping_options = other.scoping_options
       self.inclusions = (inclusions + other.inclusions).uniq
+      self._raw_results = self._raw_results || other._raw_results
       self
     end
 
@@ -513,6 +575,7 @@ module Mongoid
       @inclusions = other.inclusions.dup
       @scoping_options = other.scoping_options
       @documents = other.documents.dup
+      self._raw_results = other._raw_results
       @context = nil
       super
     end
