@@ -86,7 +86,7 @@ module Mongoid
         else
           PersistenceContext.get(self) ||
             PersistenceContext.get(self.class) ||
-            PersistenceContext.new(self.class, storage_options)
+            PersistenceContext.new(self.class, default_storage_options)
         end
       end
 
@@ -111,6 +111,19 @@ module Mongoid
       end
 
       private
+
+      def default_storage_options
+        # Nothing is overridden, we use either the default storage_options
+        # or storage_options defined for the document class.
+        return storage_options if Threaded.client_override.nil? && Threaded.database_override.nil?
+
+        storage_options.tap do |opts|
+          # Globally overridden client replaces client defined for the document class.
+          opts[:client] = Threaded.client_override unless Threaded.client_override.nil?
+          # Globally overridden database replaces database defined for the document class.
+          opts[:database] = Threaded.database_override unless Threaded.database_override.nil?
+        end
+      end
 
       def set_persistence_context(options_or_context)
         PersistenceContext.set(self, options_or_context)
