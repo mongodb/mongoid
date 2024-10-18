@@ -378,7 +378,7 @@ module Mongoid
     def clear_modified_documents(session)
       modified_documents[session].dup
     ensure
-      modified_documents[session].clear
+      modified_documents.delete(session)
     end
 
     # Queries whether document callbacks should be executed by default for the
