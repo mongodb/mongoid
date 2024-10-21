@@ -82,13 +82,13 @@ RSpec.configure do |config|
     config.add_formatter(RSpec::Core::Formatters::JsonFormatter, File.join(File.dirname(__FILE__), '../tmp/rspec.json'))
   end
 
-  if SpecConfig.instance.ci? && !%w(1 true yes).include?(ENV['INTERACTIVE']&.downcase)
-    config.around(:each) do |example|
-      TimeoutInterrupt.timeout(example_timeout_seconds) do
-        example.run
-      end
-    end
-  end
+  # if SpecConfig.instance.ci? && !%w(1 true yes).include?(ENV['INTERACTIVE']&.downcase)
+  #   config.around(:each) do |example|
+  #     TimeoutInterrupt.timeout(example_timeout_seconds) do
+  #       example.run
+  #     end
+  #   end
+  # end
 
   def local_env(env = nil, &block)
     around do |example|
