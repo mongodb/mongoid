@@ -5,11 +5,11 @@ require "spec_helper"
 require "mongoid/railties/controller_runtime"
 
 describe "Mongoid::Railties::ControllerRuntime" do
-  controller_runtime = Mongoid::Railties::ControllerRuntime
-  collector = controller_runtime::Collector
+  CONTROLLER_RUNTIME = Mongoid::Railties::ControllerRuntime
+  COLLECTOR = CONTROLLER_RUNTIME::Collector
 
   def set_metric(value)
-    Mongoid::Threaded.set(collector::VARIABLE_NAME, value)
+    Mongoid::Threaded.set(COLLECTOR::VARIABLE_NAME, value)
   end
 
   def clear_metric!
@@ -20,30 +20,30 @@ describe "Mongoid::Railties::ControllerRuntime" do
 
     it "stores the metric in thread-safe manner" do
       clear_metric!
-      expect(collector.runtime).to eq(0)
+      expect(COLLECTOR.runtime).to eq(0)
       set_metric 42
-      expect(collector.runtime).to eq(42)
+      expect(COLLECTOR.runtime).to eq(42)
     end
 
     it "sets metric on both succeeded and failed" do
-      instance = collector.new
+      instance = COLLECTOR.new
       event_payload = OpenStruct.new duration: 42
 
       clear_metric!
       instance.succeeded event_payload
-      expect(collector.runtime).to eq(42000)
+      expect(COLLECTOR.runtime).to eq(42000)
 
       clear_metric!
       instance.failed event_payload
-      expect(collector.runtime).to eq(42000)
+      expect(COLLECTOR.runtime).to eq(42000)
     end
 
     it "resets the metric and returns the value" do
       clear_metric!
-      expect(collector.reset_runtime).to eq(0)
+      expect(COLLECTOR.reset_runtime).to eq(0)
       set_metric 42
-      expect(collector.reset_runtime).to eq(42)
-      expect(collector.runtime).to eq(0)
+      expect(COLLECTOR.reset_runtime).to eq(42)
+      expect(COLLECTOR.runtime).to eq(0)
     end
 
   end
@@ -67,7 +67,7 @@ describe "Mongoid::Railties::ControllerRuntime" do
   end
 
   controller_class = Class.new reference_controller_class do
-    include controller_runtime::ControllerExtension
+    include CONTROLLER_RUNTIME::ControllerExtension
   end
 
   let(:controller){ controller_class.new }
@@ -75,7 +75,7 @@ describe "Mongoid::Railties::ControllerRuntime" do
   it "resets the metric before each action" do
     set_metric 42
     controller.send(:process_action, 'foo')
-    expect(collector.runtime).to be(0)
+    expect(COLLECTOR.runtime).to be(0)
     expect(controller.instance_variable_get "@process_action").to be(true)
   end
 
