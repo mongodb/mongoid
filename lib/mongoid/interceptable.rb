@@ -191,12 +191,6 @@ module Mongoid
       fibers.reverse.each(&:resume)
     end
 
-    def copy_thread_state(source, target)
-      source.keys.each do |key|
-        target[key] = source[key]
-      end
-    end
-
     # Execute the callbacks of given kind for embedded documents without
     # around callbacks.
     #
