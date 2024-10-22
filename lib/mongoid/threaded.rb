@@ -18,6 +18,7 @@ module Mongoid
     CURRENT_SCOPE_KEY = '[mongoid]:current-scope'
 
     AUTOSAVES_KEY = '[mongoid]:autosaves'
+
     VALIDATIONS_KEY = '[mongoid]:validations'
 
     STACK_KEYS = Hash.new do |hash, key|
@@ -376,9 +377,7 @@ module Mongoid
     # @return [ Set<Mongoid::Document> ] Collection of modified documents before
     #   it was cleared.
     def clear_modified_documents(session)
-      modified_documents[session].dup
-    ensure
-      modified_documents.delete(session)
+      modified_documents.delete(session) || []
     end
 
     # Queries whether document callbacks should be executed by default for the

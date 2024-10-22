@@ -343,25 +343,20 @@ describe Mongoid::Threaded do
   end
 
   describe '#clear_modified_documents' do
-    around do |example|
-      session = Mongoid.default_client.start_session
-      session.start_transaction
-      doc = Minim.create!
-      described_class.add_modified_document(session, doc)
-      described_class.clear_modified_documents(session)
-      example.run(session)
-    ensure
-      session.abort_transaction
-      session.end_session
+    let(:session) do
+      double(Mongo::Session).tap do |session|
+        allow(session).to receive(:in_transaction?).and_return(true)
+      end
     end
 
     context 'when there are modified documents' do
-      it 'removes the documents' do
-        expect(described_class.modified_documents).to be_empty
+      before do
+        described_class.add_modified_document(session, Minim.new)
+        described_class.clear_modified_documents(session)
       end
 
-      it 'removes the key' do |session|
-        expect(described_class.modified_documents.key?(session)).to be_falsey
+      it 'removes the documents and keys' do
+        expect(described_class.modified_documents).to be_empty
       end
     end
   end
