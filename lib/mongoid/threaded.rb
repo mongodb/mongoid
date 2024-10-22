@@ -59,7 +59,7 @@ module Mongoid
       result = Thread.current.thread_variable_get(key)
 
       if result.nil? && default
-        result = default.call
+        result = yield
         set(key, result)
       end
 
