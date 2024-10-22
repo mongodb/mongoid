@@ -90,7 +90,19 @@ module Mongoid
     #
     # @return [ true | false ] whether the given variable is present or not.
     def has?(key)
-      Thread.current.thread_variable?(key)
+      # Here we have a classic example of JRuby not behaving like MRI. In
+      # MRI, if you set a thread variable to nil, it removes it from the list
+      # and subsequent calls to thread_variable?(key) will return false. Not
+      # so with JRuby. Once set, you cannot unset the thread variable.
+      #
+      # However, because setting a variable to nil is supposed to remove it,
+      # we can assume a nil-valued variable doesn't actually exist.
+
+      # So, instead of this:
+      # Thread.current.thread_variable?(key)
+
+      # We have to do this:
+      !get(key).nil?
     end
 
     # Begin entry into a named thread local stack.
