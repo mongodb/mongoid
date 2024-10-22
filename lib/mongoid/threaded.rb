@@ -36,6 +36,63 @@ module Mongoid
 
     extend self
 
+    # Queries the thread-local variable with the given name. If a block is
+    # given, and the variable does not already exist, the return value of the
+    # block will be set as the value of the variable before returning it.
+    #
+    # It is very important that applications (and espcially Mongoid)
+    # use this method instead of Thread#[], since Thread#[] is actually for
+    # fiber-local variables, and Mongoid uses Fibers as an implementation
+    # detail in some callbacks. Putting thread-local state in a fiber-local
+    # store will result in the state being invisible when relevant callbacks are
+    # run in a different fiber.
+    #
+    # Affected callbacks are cascading callbacks on embedded children.
+    #
+    # @param [ String | Symbol ] key the name of the variable to query
+    # @param [ Proc ] default an optional block that must return the default
+    #   (initial) value of this variable.
+    #
+    # @return [ Object | nil ] the value of the queried variable, or nil if
+    #   it is not set and no default was given.
+    def get(key, &default)
+      result = Thread.current.thread_variable_get(key)
+
+      if result.nil? && default
+        result = default.call
+        set(key, result)
+      end
+
+      result
+    end
+
+    # Sets a thread-local variable with the given name to the given value.
+    # See #get for a discussion of why this method is necessary, and why
+    # Thread#[]= should be avoided in cascading callbacks on embedded children.
+    #
+    # @param [ String | Symbol ] key the name of the variable to set.
+    # @param [ Object | nil ] value the value of the variable to set (or `nil`
+    #   if you wish to unset the variable)
+    def set(key, value)
+      Thread.current.thread_variable_set(key, value)
+    end
+
+    # Removes the named variable from thread-local storage.
+    #
+    # @param [ String | Symbol ] key the name of the variable to remove.
+    def delete(key)
+      set(key, nil)
+    end
+
+    # Queries the presence of a named variable in thread-local storage.
+    #
+    # @param [ String | Symbol ] key the name of the variable to query.
+    #
+    # @return [ true | false ] whether the given variable is present or not.
+    def has?(key)
+      Thread.current.thread_variable?(key)
+    end
+
     # Begin entry into a named thread local stack.
     #
     # @example Begin entry into the stack.
@@ -55,7 +112,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def database_override
-      Thread.current[DATABASE_OVERRIDE_KEY]
+      get(DATABASE_OVERRIDE_KEY)
     end
 
     # Set the global database override.
@@ -67,7 +124,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def database_override=(name)
-      Thread.current[DATABASE_OVERRIDE_KEY] = name
+      set(DATABASE_OVERRIDE_KEY, name)
     end
 
     # Are in the middle of executing the named stack
@@ -103,7 +160,7 @@ module Mongoid
     #
     # @return [ Array ] The stack.
     def stack(name)
-      Thread.current[STACK_KEYS[name]] ||= []
+      get(STACK_KEYS[name]) { [] }
     end
 
     # Begin autosaving a document on the current thread.
@@ -177,7 +234,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def client_override
-      Thread.current[CLIENT_OVERRIDE_KEY]
+      get(CLIENT_OVERRIDE_KEY)
     end
 
     # Set the global client override.
@@ -189,7 +246,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def client_override=(name)
-      Thread.current[CLIENT_OVERRIDE_KEY] = name
+      set(CLIENT_OVERRIDE_KEY, name)
     end
 
     # Get the current Mongoid scope.
@@ -202,12 +259,12 @@ module Mongoid
     #
     # @return [ Criteria ] The scope.
     def current_scope(klass = nil)
-      if klass && Thread.current[CURRENT_SCOPE_KEY].respond_to?(:keys)
-        Thread.current[CURRENT_SCOPE_KEY][
-            Thread.current[CURRENT_SCOPE_KEY].keys.find { |k| k <= klass }
-        ]
+      current_scope = get(CURRENT_SCOPE_KEY)
+
+      if klass && current_scope.respond_to?(:keys)
+        current_scope[current_scope.keys.find { |k| k <= klass }]
       else
-        Thread.current[CURRENT_SCOPE_KEY]
+        current_scope
       end
     end
 
@@ -220,7 +277,7 @@ module Mongoid
     #
     # @return [ Criteria ] The scope.
     def current_scope=(scope)
-      Thread.current[CURRENT_SCOPE_KEY] = scope
+      set(CURRENT_SCOPE_KEY, scope)
     end
 
     # Set the current Mongoid scope. Safe for multi-model scope chaining.
@@ -236,8 +293,8 @@ module Mongoid
       if scope.nil?
         unset_current_scope(klass)
       else
-        Thread.current[CURRENT_SCOPE_KEY] ||= {}
-        Thread.current[CURRENT_SCOPE_KEY][klass] = scope
+        current_scope = get(CURRENT_SCOPE_KEY) { {} }
+        current_scope[klass] = scope
       end
     end
 
@@ -284,7 +341,7 @@ module Mongoid
     #
     # @return [ Hash ] The current autosaves.
     def autosaves
-      Thread.current[AUTOSAVES_KEY] ||= {}
+      get(AUTOSAVES_KEY) { {} }
     end
 
     # Get all validations on the current thread.
@@ -294,7 +351,7 @@ module Mongoid
     #
     # @return [ Hash ] The current validations.
     def validations
-      Thread.current[VALIDATIONS_KEY] ||= {}
+      get(VALIDATIONS_KEY) { {} }
     end
 
     # Get all autosaves on the current thread for the class.
@@ -390,8 +447,8 @@ module Mongoid
     # @return [ true | false ] Whether or not document callbacks should be
     #   executed by default.
     def execute_callbacks?
-      if Thread.current.key?(EXECUTE_CALLBACKS)
-        Thread.current[EXECUTE_CALLBACKS]
+      if has?(EXECUTE_CALLBACKS)
+        get(EXECUTE_CALLBACKS)
       else
         true
       end
@@ -404,7 +461,7 @@ module Mongoid
     # @param flag [ true | false ] Whether or not document callbacks should be
     #   executed by default.
     def execute_callbacks=(flag)
-      Thread.current[EXECUTE_CALLBACKS] = flag
+      set(EXECUTE_CALLBACKS, flag)
     end
 
     # Returns the thread store of sessions.
@@ -413,7 +470,7 @@ module Mongoid
     #
     # @api private
     def sessions
-      Thread.current[SESSIONS_KEY] ||= {}.compare_by_identity
+      get(SESSIONS_KEY) { {}.compare_by_identity }
     end
 
     # Returns the thread store of modified documents.
@@ -423,9 +480,7 @@ module Mongoid
     #
     # @api private
     def modified_documents
-      Thread.current[MODIFIED_DOCUMENTS_KEY] ||= Hash.new do |h, k|
-        h[k] = Set.new
-      end
+      get(MODIFIED_DOCUMENTS_KEY) { Hash.new { |h, k| h[k] = Set.new } }
     end
 
     private
@@ -435,10 +490,12 @@ module Mongoid
     #
     # @param klass [ Class ] the class to remove from the current scope.
     def unset_current_scope(klass)
-      return unless Thread.current[CURRENT_SCOPE_KEY]
+      return unless has?(CURRENT_SCOPE_KEY)
 
-      Thread.current[CURRENT_SCOPE_KEY].delete(klass)
-      Thread.current[CURRENT_SCOPE_KEY] = nil if Thread.current[CURRENT_SCOPE_KEY].empty?
+      scope = get(CURRENT_SCOPE_KEY)
+      scope.delete(klass)
+
+      delete(CURRENT_SCOPE_KEY) if scope.empty?
     end
   end
 end

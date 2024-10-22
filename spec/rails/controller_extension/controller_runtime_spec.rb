@@ -8,8 +8,8 @@ describe "Mongoid::Railties::ControllerRuntime" do
   controller_runtime = Mongoid::Railties::ControllerRuntime
   collector = controller_runtime::Collector
 
-  def set_metric value
-    Thread.current["Mongoid.controller_runtime"] = value
+  def set_metric(value)
+    Mongoid::Threaded.set(collector::VARIABLE_NAME, value)
   end
 
   def clear_metric!
