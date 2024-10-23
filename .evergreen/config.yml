@@ -259,7 +259,7 @@ functions:
   "upload test results":
     - command: attach.xunit_results
       params:
-        file: ./src/tmp/rspec.xml
+        file: ./src/rspec.xml
 
   "run tests":
     - command: shell.exec
@@ -308,7 +308,7 @@ post:
   # Removed, causing timeouts
   # - func: "upload working dir"
   - func: "upload mo artifacts"
-  #- func: "upload test results"
+  # - func: "upload test results"
   - func: "upload test results to s3"
 
 task_groups:
@@ -586,6 +586,10 @@ axes:
         display_name: "Rails 7.2"
         variables:
           RAILS: "7.2"
+      - id: "8.0"
+        display_name: "Rails 8.0"
+        variables:
+          RAILS: "8.0"
 
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
@@ -727,6 +731,32 @@ buildvariants:
   tasks:
     - name: "test"
 
+- matrix_name: "rails-8"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    mongodb-version: "7.0"
+    topology: "standalone"
+    rails: ['8.0']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
+
+- matrix_name: "rails-master"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    mongodb-version: "7.0"
+    topology: "standalone"
+    rails: ['master']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
+
 - matrix_name: "bson-min"
   matrix_spec:
     driver: [bson-min]
@@ -776,12 +806,12 @@ buildvariants:
 
 - matrix_name: app-tests-rails-7
   matrix_spec:
-    ruby: ["ruby-3.1", "ruby-3.2"]
+    ruby: ["ruby-3.2"]
     driver: ["current"]
-    mongodb-version: '6.0'
+    mongodb-version: '7.0'
     topology: standalone
     app-tests: yes
-    rails: ['6.1', '7.0', '7.1', '7.2']
+    rails: ['7.0', '7.1', '7.2']
     os: ubuntu-20.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
@@ -794,7 +824,7 @@ buildvariants:
     mongodb-version: '5.0'
     topology: standalone
     app-tests: yes
-    rails: ['6.0']
+    rails: ['6.0', '6.1']
     os: rhel80
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
