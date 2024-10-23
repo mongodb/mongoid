@@ -62,6 +62,7 @@ module Mongoid
         rescue *transactions_not_supported_exceptions
           raise Mongoid::Errors::TransactionsNotSupported
         ensure
+          Threaded.clear_modified_documents(session)
           Threaded.clear_session(client: persistence_context.client)
         end
 
