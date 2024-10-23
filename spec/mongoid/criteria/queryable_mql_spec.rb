@@ -25,9 +25,9 @@ describe Mongoid::Criteria::Queryable do
 
       let(:mql) do
         {
-          :'$db' => db,
+          '$db': db,
           find: collection,
-          filter:  { 'name' => 'Depeche Mode' }
+          filter: { 'name' => 'Depeche Mode' }
         }
       end
 
@@ -42,10 +42,10 @@ describe Mongoid::Criteria::Queryable do
 
       let(:mql) do
         {
-          :'$db' => db,
+          '$db': db,
           find: collection,
-          filter:  {
-            'origin' =>  { '$ne' => 'UK' },
+          filter: {
+            'origin' => { '$ne' => 'UK' },
             'y' => { '$in' => [ 1995, 1996 ] }
           }
         }
@@ -61,9 +61,9 @@ describe Mongoid::Criteria::Queryable do
 
       let(:mql) do
         {
-          :'$db' => db,
+          '$db': db,
           find: collection,
-          filter:  { 'deleted' => true }
+          filter: { 'deleted' => true }
         }
       end
 
@@ -77,12 +77,12 @@ describe Mongoid::Criteria::Queryable do
 
       let(:mql) do
         {
-          :'$db' => db,
+          '$db': db,
           find: collection,
-          filter:  { "genres" => %w[rock hip-hop] },
-          limit:  100,
-          skip:  200,
-          sort:  { 'founded' => 1 }
+          filter: { 'genres' => %w[rock hip-hop] },
+          limit: 100,
+          skip: 200,
+          sort: { 'founded' => 1 }
         }
       end
 

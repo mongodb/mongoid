@@ -78,7 +78,7 @@ RSpec/BeforeAfterAll:
 RSpec/DescribeClass:
   Enabled: false
 
-RSpec/ExampleLength
+RSpec/ExampleLength:
   Max: 10
 
 RSpec/ImplicitExpect:
