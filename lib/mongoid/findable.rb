@@ -46,6 +46,7 @@ module Mongoid
       :none,
       :pick,
       :pluck,
+      :raw,
       :read,
       :second,
       :second!,
