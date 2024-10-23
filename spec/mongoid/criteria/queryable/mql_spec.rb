@@ -7,18 +7,13 @@ describe Mongoid::Criteria::Queryable do
     Mongoid.default_client.database.name
   end
 
-  let(:common_attributes) do
-    {
-      :'$db' => db,
-      find: 'bands'
-    }
+  let(:collection) do
+    Band.collection_name.to_s
   end
 
   shared_examples 'translatable to mql' do
     it 'returns mql' do
-      expect(criteria.to_mql).to eq(
-        common_attributes.merge(mql_attributes)
-      )
+      expect(criteria.to_mql).to eq(mql)
     end
   end
 
@@ -28,8 +23,10 @@ describe Mongoid::Criteria::Queryable do
         Band.where(name: 'Depeche Mode')
       end
 
-      let(:mql_attributes) do
+      let(:mql) do
         {
+          :'$db' => db,
+          find: collection,
           filter:  { 'name' => 'Depeche Mode' }
         }
       end
@@ -43,8 +40,10 @@ describe Mongoid::Criteria::Queryable do
             .in(years: [ 1995, 1996 ])
       end
 
-      let(:mql_attributes) do
+      let(:mql) do
         {
+          :'$db' => db,
+          find: collection,
           filter:  {
             'origin' =>  { '$ne' => 'UK' },
             'y' => { '$in' => [ 1995, 1996 ] }
@@ -60,8 +59,10 @@ describe Mongoid::Criteria::Queryable do
         Band.where(d: true)
       end
 
-      let(:mql_attributes) do
+      let(:mql) do
         {
+          :'$db' => db,
+          find: collection,
           filter:  { 'deleted' => true }
         }
       end
@@ -71,12 +72,14 @@ describe Mongoid::Criteria::Queryable do
 
     context 'with options' do
       let(:criteria) do
-        Band.where(genres: ['rock', 'hip-hop']).order(founded: 1).limit(100).skip(200)
+        Band.where(genres: %w[rock hip-hop]).order(founded: 1).limit(100).skip(200)
       end
 
-      let(:mql_attributes) do
+      let(:mql) do
         {
-          filter:  { "genres" => [ "rock", "hip-hop" ] },
+          :'$db' => db,
+          find: collection,
+          filter:  { "genres" => %w[rock hip-hop] },
           limit:  100,
           skip:  200,
           sort:  { 'founded' => 1 }

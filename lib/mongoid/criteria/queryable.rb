@@ -87,8 +87,7 @@ module Mongoid
         @pipeline = other.pipeline.__deep_copy__
       end
 
-      # Returns MongoDB command that will be sent to the server for this
-      # criteria.
+      # Returns selector and options of the criteria in form of MongoDB command.
       #
       # @return [ Hash ] The command.
       def to_mql
