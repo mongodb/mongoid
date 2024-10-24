@@ -285,6 +285,10 @@ module Mongoid
       # @api private
       PERSISTENCE_CONTEXT_KEY = :"[mongoid]:persistence_context"
 
+      def context_store
+        Threaded.get(PERSISTENCE_CONTEXT_KEY) { {} }
+      end
+
       # Get the persistence context for a given object from the thread local
       #   storage.
       #
@@ -295,8 +299,7 @@ module Mongoid
       #
       # @api private
       def get_context(object)
-        Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
-        Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id]
+        context_store[object.object_id]
       end
 
       # Store persistence context for a given object in the thread local
@@ -308,10 +311,9 @@ module Mongoid
       # @api private
       def store_context(object, context)
         if context.nil?
-          Thread.current[PERSISTENCE_CONTEXT_KEY]&.delete(object.object_id)
+          context_store.delete(object.object_id)
         else
-          Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
-          Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id] = context
+          context_store[object.object_id] = context
         end
       end
     end

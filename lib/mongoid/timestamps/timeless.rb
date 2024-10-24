@@ -46,6 +46,9 @@ module Mongoid
       class << self
         extend Forwardable
 
+        # The key to use to store the timeless table 
+        TIMELESS_TABLE_KEY = '[mongoid]:timeless'
+
         # Returns the in-memory thread cache of classes
         # for which to skip timestamping.
         #
@@ -53,7 +56,7 @@ module Mongoid
         #
         # @api private
         def timeless_table
-          Thread.current['[mongoid]:timeless'] ||= Hash.new
+          Threaded.get(TIMELESS_TABLE_KEY) { Hash.new }
         end
 
         def_delegators :timeless_table, :[]=, :[]
