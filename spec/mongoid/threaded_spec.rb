@@ -36,11 +36,11 @@ describe Mongoid::Threaded do
     context "when the stack has elements" do
 
       before do
-        Thread.current["[mongoid]:load-stack"] = [ true ]
+        described_class.stack('load').push(true)
       end
 
       after do
-        Thread.current["[mongoid]:load-stack"] = []
+        described_class.stack('load').clear
       end
 
       it "returns true" do
@@ -51,7 +51,7 @@ describe Mongoid::Threaded do
     context "when the stack has no elements" do
 
       before do
-        Thread.current["[mongoid]:load-stack"] = []
+        described_class.stack('load').clear
       end
 
       it "returns false" do
@@ -76,7 +76,7 @@ describe Mongoid::Threaded do
     context "when a stack has been initialized" do
 
       before do
-        Thread.current["[mongoid]:load-stack"] = [ true ]
+        described_class.stack('load').push(true)
       end
 
       let(:loading) do
@@ -84,7 +84,7 @@ describe Mongoid::Threaded do
       end
 
       after do
-        Thread.current["[mongoid]:load-stack"] = []
+        described_class.stack('load').clear
       end
 
       it "returns the stack" do
