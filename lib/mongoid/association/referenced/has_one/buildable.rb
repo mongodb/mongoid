@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'mongoid/association/referenced/with_polymorphic_criteria'
+
 module Mongoid
   module Association
     module Referenced
@@ -7,6 +9,7 @@ module Mongoid
 
         # The Builder behavior for has_one associations.
         module Buildable
+          include WithPolymorphicCriteria
 
           # This method either takes an _id or an object and queries for the
           # inverse side using the id or sets the object after clearing the
@@ -54,14 +57,6 @@ module Mongoid
 
           def execute_query(object, base)
             query_criteria(object, base).take
-          end
-
-          def with_polymorphic_criterion(criteria, base)
-            if polymorphic?
-              criteria.where(type => base.class.name)
-            else
-              criteria
-            end
           end
 
           def query?(object)
