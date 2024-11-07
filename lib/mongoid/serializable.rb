@@ -13,13 +13,12 @@ module Mongoid
     included do
 
       class << self
-        # include_root_in_json is a class attribute defined in ActiveSupport::Serializers::JSON.
-        # We want to be able to set the default value on Mongoid level
-        # via Mongoid.include_root_in_json.
-        # To do so we redefine geter here.
-        alias include_root_in_json_old include_root_in_json
         def include_root_in_json
-          include_root_in_json_old.nil? ? ::Mongoid.include_root_in_json : include_root_in_json_old
+          @include_root_in_json.nil? ? ::Mongoid.include_root_in_json : @include_root_in_json
+        end
+
+        def include_root_in_json=(new_value)
+          @include_root_in_json = new_value
         end
       end
     end
