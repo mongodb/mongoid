@@ -13,13 +13,14 @@ module Mongoid
     included do
 
       class << self
-        # Note that this intentionally only delegates :include_root_in_json
-        # and not :include_root_in_json? - delegating the latter produces
-        # wrong behavior.
-        # Also note that this intentionally uses the ActiveSupport delegation
-        # functionality and not the Ruby standard library one.
-        # See https://jira.mongodb.org/browse/MONGOID-4849.
-        delegate :include_root_in_json, to: ::Mongoid
+        # include_root_in_json is a class attribute defined in ActiveSupport::Serializers::JSON.
+        # We want to be able to set the default value on Mongoid level
+        # via Mongoid.include_root_in_json.
+        # To do so we redefine geter here.
+        alias include_root_in_json_old include_root_in_json
+        def include_root_in_json
+          include_root_in_json_old.nil? ? ::Mongoid.include_root_in_json : include_root_in_json_old
+        end
       end
     end
 
