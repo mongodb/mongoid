@@ -126,22 +126,6 @@ jobs:
           driver: current
           gemfile: Gemfile
           experimental: false
-        - mongodb: '4.0'
-          ruby: ruby-2.7
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '3.6'
-          ruby: ruby-2.7
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
 
     steps:
     - name: repo checkout
