@@ -105,7 +105,11 @@ module Mongoid
         if value
           Mongoid::Fields::Validators::Macro.validate_field_name(self, value)
           value = value.to_s
-          super
+          if defined?(::ActiveSupport::ClassAttribute)
+            ::ActiveSupport::ClassAttribute.redefine(self, 'discriminator_key', value)
+          else
+            super
+          end
         else
           # When discriminator key is set to nil, replace the class's definition
           # of the discriminator key reader (provided by class_attribute earlier)
@@ -119,7 +123,7 @@ module Mongoid
         # an existing field.
         # This condition also checks if the class has any descendants, because
         # if it doesn't then it doesn't need a discriminator key.
-        return unless !fields.key?(discriminator_key) && !descendants.empty?
+        return if fields.key?(discriminator_key) || descendants.empty?
 
         default_proc = -> { self.class.discriminator_value }
         field(discriminator_key, default: default_proc, type: String)
