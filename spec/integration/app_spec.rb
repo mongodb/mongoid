@@ -26,6 +26,8 @@ describe 'Mongoid application tests' do
   context 'demo application' do
     context 'sinatra' do
       it 'runs' do
+        skip 'https://jira.mongodb.org/browse/MONGOID-5826'
+
         clone_application(
           'https://github.com/mongoid/mongoid-demo',
           subdir: 'sinatra-minimal',
@@ -45,6 +47,8 @@ describe 'Mongoid application tests' do
 
     context 'rails-api' do
       it 'runs' do
+        skip 'https://jira.mongodb.org/browse/MONGOID-5826'
+
         clone_application(
           'https://github.com/mongoid/mongoid-demo',
           subdir: 'rails-api',
@@ -95,7 +99,7 @@ describe 'Mongoid application tests' do
         check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
 
         Dir.chdir('mongoid-test') do
-          adjust_app_gemfile
+          adjust_app_gemfile(add_sprockets: SpecConfig.instance.rails_version != '8.0')
           check_call(%w(bundle install), env: clean_env)
 
           check_call(%w(rails g model post), env: clean_env)
@@ -117,7 +121,7 @@ describe 'Mongoid application tests' do
         check_call(%w(rails new mongoid-test-config --skip-spring --skip-active-record), env: clean_env)
 
         Dir.chdir('mongoid-test-config') do
-          adjust_app_gemfile
+          adjust_app_gemfile(add_sprockets: SpecConfig.instance.rails_version != '8.0')
           check_call(%w(bundle install), env: clean_env)
 
           mongoid_config_file = File.join(TMP_BASE,'mongoid-test-config/config/mongoid.yml')
@@ -139,7 +143,7 @@ describe 'Mongoid application tests' do
     if (rails_version = SpecConfig.instance.rails_version) == 'master'
     else
       check_call(%w(gem list))
-      check_call(%w(gem install rails --no-document -v) + ["~> #{rails_version}.0"])
+      check_call(%w(gem install rails --no-document --force -v) + ["~> #{rails_version}.0"])
     end
   end
 
@@ -287,6 +291,10 @@ describe 'Mongoid application tests' do
   end
 
   def adjust_rails_defaults(rails_version: SpecConfig.instance.rails_version)
+    if !rails_version.match?(/^\d+\.\d+$/)
+      # This must be pre-release version, we trim it
+      rails_version = rails_version.split('.')[0..1].join('.')
+    end
     if File.exist?('config/application.rb')
       lines = IO.readlines('config/application.rb')
       lines.each do |line|

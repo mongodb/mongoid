@@ -3,6 +3,10 @@ source 'https://rubygems.org'
 gem 'actionpack', git: 'https://github.com/rails/rails'
 gem 'activemodel', git: 'https://github.com/rails/rails'
 
+group :test do
+  gem 'activejob', git: 'https://github.com/rails/rails'
+end
+
 gemspec path: '..'
 
 require_relative './standard'
