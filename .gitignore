@@ -31,3 +31,4 @@ examples
 .env
 .env.private*
 build
+rspec.xml
