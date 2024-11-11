@@ -30,7 +30,11 @@ module Mongoid
         if value
           Mongoid::Fields::Validators::Macro.validate_field_name(self, value)
           value = value.to_s
-          super
+          if defined?(::ActiveSupport::ClassAttribute)
+            ::ActiveSupport::ClassAttribute.redefine(self, 'discriminator_key', value)
+          else
+            super
+          end
         else
           # When discriminator key is set to nil, replace the class's definition
           # of the discriminator key reader (provided by class_attribute earlier)

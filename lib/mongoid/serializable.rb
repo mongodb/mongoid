@@ -12,13 +12,13 @@ module Mongoid
     included do
 
       class << self
-        # Note that this intentionally only delegates :include_root_in_json
-        # and not :include_root_in_json? - delegating the latter produces
-        # wrong behavior.
-        # Also note that this intentionally uses the ActiveSupport delegation
-        # functionality and not the Ruby standard library one.
-        # See https://jira.mongodb.org/browse/MONGOID-4849.
-        delegate :include_root_in_json, to: ::Mongoid
+        def include_root_in_json
+          @include_root_in_json.nil? ? ::Mongoid.include_root_in_json : @include_root_in_json
+        end
+
+        def include_root_in_json=(new_value)
+          @include_root_in_json = new_value
+        end
       end
     end
 
