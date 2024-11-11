@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
   # Ruby 3.0 requires ActiveModel 6.0 or higher.
   # activemodel 7.0.0 cannot be used due to Class#descendants issue
   # See: https://github.com/rails/rails/pull/43951
-  s.add_dependency("activemodel", ['>=5.1', '<7.3', '!= 7.0.0'])
+  s.add_dependency("activemodel", ['>=5.1', '<8.1', '!= 7.0.0'])
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
   s.add_dependency("concurrent-ruby", ['>= 1.0.5', '< 2.0'])
 
