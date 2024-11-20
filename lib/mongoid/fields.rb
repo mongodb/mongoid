@@ -462,7 +462,8 @@ module Mongoid
       #
       # @return [ String ] The name of the field as it's stored in the db.
       def database_field_name(name)
-        Fields.database_field_name(name, relations, aliased_fields, aliased_associations)
+        @database_field_names ||= {}
+        @database_field_names[name] ||= Fields.database_field_name(name, relations, aliased_fields, aliased_associations)
       end
 
       # Defines all the fields that are accessible on the Document
@@ -567,6 +568,7 @@ module Mongoid
       #
       # @api private
       def add_field(name, options = {})
+        @database_field_names[name] = nil if @database_field_names
         aliased = options[:as]
         aliased_fields[aliased.to_s] = name if aliased
         field = field_for(name, options)
