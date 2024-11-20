@@ -224,7 +224,19 @@ module InterceptableSpec
 
     attr_accessor :callback_registry
 
+    before_save :test_mongoid_state
+
     include CallbackTracking
+
+    private
+
+    # Helps test that cascading child callbacks have access to the Mongoid
+    # state objects; if the implementation uses fiber-local (instead of truly
+    # thread-local) variables, the related tests will fail because the
+    # cascading child callbacks use fibers to linearize the recursion.
+    def test_mongoid_state
+      Mongoid::Threaded.stack('interceptable').push(self)
+    end
   end
 end
 
