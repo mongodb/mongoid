@@ -631,7 +631,7 @@ buildvariants:
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
-    os: ubuntu-22.04
+    os: ubuntu-18.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -721,7 +721,7 @@ buildvariants:
     ruby: ["ruby-3.1"]
     mongodb-version: "5.0"
     topology: "standalone"
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -771,7 +771,7 @@ buildvariants:
     topology: "standalone"
     i18n: '*'
     test-i18n-fallbacks: yes
-    os: ubuntu-20.04
+    os: ubuntu-18.04
     toolchain: 2024-09-06
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
   tasks:
