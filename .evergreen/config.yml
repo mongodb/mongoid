@@ -625,24 +625,13 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-3.0"
-  matrix_spec:
-    ruby: ["ruby-3.0"]
-    driver: ["current"]
-    topology: ['replica-set']
-    mongodb-version: ['5.0']
-    os: rhel80
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
 - matrix_name: "jruby"
   matrix_spec:
     jruby: ["jruby-9.3"]
     driver: ["current"]
     topology: ['replica-set', 'sharded-cluster']
     mongodb-version: '5.0'
-    os: rhel80
+    os: ubuntu-22.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -720,7 +709,8 @@ buildvariants:
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
     topology: "standalone"
-    os: rhel80
+    os: ubuntu-20.04
+    toolchain: 2024-09-06
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -728,10 +718,10 @@ buildvariants:
 - matrix_name: "bson-master"
   matrix_spec:
     driver: [bson-master]
-    ruby: ["ruby-3.0"]
+    ruby: ["ruby-3.1"]
     mongodb-version: "5.0"
     topology: "standalone"
-    os: rhel80
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -739,12 +729,12 @@ buildvariants:
 
 - matrix_name: "rails-6"
   matrix_spec:
-    ruby: ["ruby-3.0"]
+    ruby: ["ruby-3.1"]
     driver: ["current"]
     mongodb-version: "6.0"
     topology: "standalone"
     rails: ['6.0', '6.1']
-    os: rhel80
+    os: ubuntu-22.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
@@ -775,13 +765,14 @@ buildvariants:
 
 - matrix_name: "i18n-fallbacks"
   matrix_spec:
-    ruby: "ruby-2.6"
+    ruby: "ruby-2.7"
     driver: ["current"]
     mongodb-version: "4.2"
     topology: "standalone"
     i18n: '*'
     test-i18n-fallbacks: yes
-    os: rhel80
+    os: ubuntu-20.04
+    toolchain: 2024-09-06
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
   tasks:
      - name: "test"
