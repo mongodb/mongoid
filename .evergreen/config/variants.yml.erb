@@ -5,7 +5,7 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['latest']
-    os: debian11
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -184,13 +184,13 @@ buildvariants:
 
 - matrix_name: app-tests-ruby-3
   matrix_spec:
-    ruby: ["ruby-3.0", "ruby-3.1"]
+    ruby: "ruby-3.1"
     driver: ["current"]
     mongodb-version: '6.0'
     topology: standalone
     app-tests: yes
     rails: ['6.0', '6.1', '7.0', '7.1']
-    os: rhel80
+    os: ubuntu-22.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
     - name: "test"
@@ -203,7 +203,8 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['5.2']
-    os: rhel80
+    os: ubuntu-20.04
+    toolchain: 2024-09-06
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
      - name: "test"
@@ -216,7 +217,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-22.04
+    os: ubuntu-18.04
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"

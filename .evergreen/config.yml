@@ -38,6 +38,12 @@ functions:
 
           git submodule update --init --recursive
 
+          if [ ! -d .mod ]; then
+            mkdir -p .mod
+            cd .mod
+            git clone https://github.com/mongodb-labs/drivers-evergreen-tools
+          fi
+
   "fetch egos":
     - command: shell.exec
       params:
@@ -61,7 +67,7 @@ functions:
               CURRENT_VERSION=latest
            fi
 
-           export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
+           export DRIVERS_TOOLS="$(pwd)/.mod/drivers-evergreen-tools"
 
            export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
            export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
@@ -95,6 +101,15 @@ functions:
               export SSL=${SSL}
               export APP_TESTS=${APP_TESTS}
               export DOCKER_DISTRO=${DOCKER_DISTRO}
+
+              export MONGODB_URI="${MONGODB_URI}"
+              export RVM_RUBY="${RVM_RUBY}"
+              export RAILS="${RAILS}"
+              export DRIVER="${DRIVER}"
+              export I18N="${I18N}"
+              export TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}"
+              export FLE="${FLE}"
+              export TOOLCHAIN_OVERRIDE="${TOOLCHAIN_OVERRIDE}"
            EOT
            # See what we've done
            cat expansion.yml
@@ -274,6 +289,16 @@ functions:
         working_dir: "src"
         script: |
           ${PREPARE_SHELL}
+          .evergreen/run-tests.sh
+
+  "run tests in docker":
+    - command: shell.exec
+      type: test
+      params:
+        shell: bash
+        working_dir: "src"
+        script: |
+          ${PREPARE_SHELL}
           env \
             MONGODB_URI="${MONGODB_URI}" \
             TOPOLOGY=${TOPOLOGY} \
@@ -442,19 +467,19 @@ axes:
     values:
       - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
+        run_on: ubuntu2204-small
+      - id: ubuntu-20.04
+        display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: ubuntu2204
+      - id: ubuntu-18.04
+        display_name: "Ubuntu 18.04"
+        run_on: ubuntu1804-small
       - id: debian11
         display_name: "Debian 11"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: debian11
+        run_on: debian11-small
       - id: rhel80
         display_name: "RHEL 8.0"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: rhel80
+        run_on: rhel80-small
 
   - id: "driver"
     display_name: Driver Version
@@ -558,6 +583,25 @@ axes:
         variables:
           APP_TESTS: yes
 
+  - id: toolchain
+    display_name: Toolchain Version
+    values:
+      - id: 2023-05-11
+        display_name: 2023-05-11
+        variables:
+          TOOLCHAIN_OVERRIDE: e8c60866f54bed7e336a37df3a97d6ae1b971b7d
+      - id: 2023-11-02
+        display_name: 2023-11-02
+        variables:
+          TOOLCHAIN_OVERRIDE: ded7ea845b08cf96f11a747d9540ba3199580dea
+      - id: 2024-08-07
+        display_name: 2024-08-07
+        variables:
+          TOOLCHAIN_OVERRIDE: c950fe1e85fd7d5e4ea69cc2afff456825583716
+      - id: 2024-09-06
+        display_name: 2024-09-06
+        variables:
+          TOOLCHAIN_OVERRIDE: deefab59d8f539bdd4a0154505f1e7d39a0857d0
 buildvariants:
 - matrix_name: "mongodb-latest"
   matrix_spec:
@@ -565,7 +609,7 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['latest']
-    os: debian11
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -744,13 +788,13 @@ buildvariants:
 
 - matrix_name: app-tests-ruby-3
   matrix_spec:
-    ruby: ["ruby-3.0", "ruby-3.1"]
+    ruby: "ruby-3.1"
     driver: ["current"]
     mongodb-version: '6.0'
     topology: standalone
     app-tests: yes
     rails: ['6.0', '6.1', '7.0', '7.1']
-    os: rhel80
+    os: ubuntu-22.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
     - name: "test"
@@ -763,7 +807,8 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['5.2']
-    os: rhel80
+    os: ubuntu-20.04
+    toolchain: 2024-09-06
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
      - name: "test"
@@ -776,7 +821,7 @@ buildvariants:
     topology: standalone
     app-tests: yes
     rails: ['6.0']
-    os: ubuntu-22.04
+    os: ubuntu-18.04
   display_name: "app tests ${driver}, ${jruby}"
   tasks:
      - name: "test"

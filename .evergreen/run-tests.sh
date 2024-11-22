@@ -13,6 +13,13 @@ set -o errexit  # Exit the script with error if any of the commands fail
 . `dirname "$0"`/../spec/shared/shlib/server.sh
 . `dirname "$0"`/functions.sh
 
+# set_env.sh sets the TOOLCHAIN_VERSION variable to a default value based on
+# the version spec/shared that's available. Here, we let the evergreen task
+# override it, if necessary, to get a newer or older toolchain build.
+if [ -n "$TOOLCHAIN_OVERRIDE" ]; then
+  TOOLCHAIN_VERSION=$TOOLCHAIN_OVERRIDE
+fi
+
 arch=`host_distro`
 
 set_fcv
