@@ -591,6 +591,33 @@ describe Mongoid::Document do
       expect(person.as_document["addresses"].first).to have_key(:locations)
     end
 
+    context 'when modifying the returned object' do
+      let(:record) do
+        RootCategory.create(categories: [{ name: 'tests' }]).reload
+      end
+
+      shared_examples_for 'an object with protected internal state' do
+        it 'does not expose internal state' do
+          before_change = record.as_document.dup
+          record.categories.first.name = 'things'
+          after_change = record.as_document
+          expect(before_change['categories'].first['name']).not_to eq('things')
+        end
+      end
+
+      context 'when legacy_attributes is true' do
+        config_override :legacy_attributes, true
+
+        it_behaves_like 'an object with protected internal state'
+      end
+
+      context 'when legacy_attributes is false' do
+        config_override :legacy_attributes, false
+
+        it_behaves_like 'an object with protected internal state'
+      end
+    end
+
     context "with relation define store_as option in embeded_many" do
 
       let!(:phone) do

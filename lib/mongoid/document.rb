@@ -133,7 +133,14 @@ module Mongoid
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
-      BSON::Document.new(as_attributes)
+      attrs = as_attributes
+
+      # legacy attributes have a tendency to leak internal state via
+      # `as_document`; we have to deep_dup the attributes here to prevent
+      # that.
+      attrs = attrs.deep_dup if Mongoid.legacy_attributes
+
+      BSON::Document.new(attrs)
     end
 
     # Calls #as_json on the document with additional, Mongoid-specific options.

@@ -12,6 +12,12 @@ functions:
 
           git submodule update --init --recursive
 
+          if [ ! -d .mod ]; then
+            mkdir -p .mod
+            cd .mod
+            git clone https://github.com/mongodb-labs/drivers-evergreen-tools
+          fi
+
   "fetch egos":
     - command: shell.exec
       params:
@@ -35,7 +41,7 @@ functions:
               CURRENT_VERSION=latest
            fi
 
-           export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
+           export DRIVERS_TOOLS="$(pwd)/.mod/drivers-evergreen-tools"
 
            export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
            export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
@@ -69,6 +75,15 @@ functions:
               export SSL=${SSL}
               export APP_TESTS=${APP_TESTS}
               export DOCKER_DISTRO=${DOCKER_DISTRO}
+
+              export MONGODB_URI="${MONGODB_URI}"
+              export RVM_RUBY="${RVM_RUBY}"
+              export RAILS="${RAILS}"
+              export DRIVER="${DRIVER}"
+              export I18N="${I18N}"
+              export TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}"
+              export FLE="${FLE}"
+              export TOOLCHAIN_OVERRIDE="${TOOLCHAIN_OVERRIDE}"
            EOT
            # See what we've done
            cat expansion.yml
@@ -241,6 +256,16 @@ functions:
         file: ./src/tmp/rspec.xml
 
   "run tests":
+    - command: shell.exec
+      type: test
+      params:
+        shell: bash
+        working_dir: "src"
+        script: |
+          ${PREPARE_SHELL}
+          .evergreen/run-tests.sh
+
+  "run tests in docker":
     - command: shell.exec
       type: test
       params:
