@@ -4,14 +4,6 @@ def standard_dependencies
   group :development do
     gem 'yard'
 
-    platform :mri do
-      # Debugger for VSCode.
-      if !ENV['CI'] && !ENV['DOCKER'] && RUBY_VERSION < '3.0'
-        gem 'debase'
-        gem 'ruby-debug-ide'
-      end
-    end
-
     # Evergreen configuration generation
     gem 'erubi'
     gem 'tilt'
