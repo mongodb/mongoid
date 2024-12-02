@@ -9,8 +9,28 @@ module Mongoid
   module Traversable
     extend ActiveSupport::Concern
 
+    class << self
+      def __redefine(owner, name, value)
+        if owner.singleton_class?
+          owner.redefine_method(name) { value }
+          owner.send(:public, name)
+        end
+        owner.redefine_singleton_method(name) { value }
+        owner.singleton_class.send(:public, name)
+        owner.redefine_singleton_method("#{name}=") do |new_value|
+          if owner.equal?(self)
+            value = new_value
+          else
+            ::Mongoid::Traversable.redefine(self, name, new_value)
+          end
+        end
+        owner.singleton_class.send(:public, "#{name}=")
+      end
+    end
+
     # Class-level methods for the Traversable behavior.
     module ClassMethods
+
       # Determines if the document is a subclass of another document.
       #
       # @example Check if the document is a subclass.
@@ -105,11 +125,7 @@ module Mongoid
         if value
           Mongoid::Fields::Validators::Macro.validate_field_name(self, value)
           value = value.to_s
-          if defined?(::ActiveSupport::ClassAttribute)
-            ::ActiveSupport::ClassAttribute.redefine(self, 'discriminator_key', value)
-          else
-            super
-          end
+          ::Mongoid::Traversable.__redefine(self, 'discriminator_key', value)
         else
           # When discriminator key is set to nil, replace the class's definition
           # of the discriminator key reader (provided by class_attribute earlier)
