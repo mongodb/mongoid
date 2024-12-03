@@ -8,8 +8,12 @@ module Mongoid
   # around traversing the document graph.
   module Traversable
     extend ActiveSupport::Concern
-
+    # This code is extracted from ActiveSupport so that we do not depend on
+    # their private API that may change at any time.
+    # This code should be reviewed and maybe removed when implementing
+    # https://jira.mongodb.org/browse/MONGOID-5832
     class << self
+      # @api private
       def __redefine(owner, name, value)
         if owner.singleton_class?
           owner.redefine_method(name) { value }
@@ -30,7 +34,6 @@ module Mongoid
 
     # Class-level methods for the Traversable behavior.
     module ClassMethods
-
       # Determines if the document is a subclass of another document.
       #
       # @example Check if the document is a subclass.
