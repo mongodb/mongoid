@@ -12,6 +12,10 @@ describe Mongoid::Timestamps::Timeless do
         include Mongoid::Document
         include Mongoid::Timestamps
 
+        field :color, type: String
+
+        embeds_many :chicks, class_name: 'Chick', cascade_callbacks: true
+
         before_save :lay_timeless_egg
 
         def lay_timeless_egg
@@ -22,6 +26,12 @@ describe Mongoid::Timestamps::Timeless do
       class Egg
         include Mongoid::Document
         include Mongoid::Timestamps
+      end
+
+      class Chick
+        include Mongoid::Document
+        include Mongoid::Timestamps
+        embedded_in :chicken, class_name: 'Chicken'
       end
     end
 
@@ -70,13 +80,40 @@ describe Mongoid::Timestamps::Timeless do
           Chicken.timeless.create!
         end
 
-        it "creates the parent with a timestamp" do
+        it "creates the parent with no timestamp" do
           expect(chicken.created_at).to be_nil
         end
 
         it "creates the child with no timestamp" do
           expect(Egg.last.created_at).to be_nil
         end
+      end
+
+      context "when root contains embedded doc and executes timeless" do
+
+          let!(:chicken) do
+            Chicken.create!(color: "red", chicks: [Chick.new])
+          end
+
+          before do
+            @before_update_chicken_timestamp = chicken.updated_at
+            @before_update_chick_timestamp = chicken.chicks.first.updated_at
+
+            chicken.color = "white"
+            sleep 2
+            chicken.timeless.save()
+
+            @after_update_chicken_timestamp = chicken.updated_at
+            @after_update_chick_timestamp = chicken.chicks.first.updated_at          
+          end
+
+          it "does not change the updated_at timestamp on the parent" do
+            expect(@after_update_chicken_timestamp).to eq(@before_update_chicken_timestamp)
+          end
+          
+          it "does not change the updated_at timestamp on the embedded document" do
+            expect(@after_update_chick_timestamp).to eq(@before_update_chick_timestamp)
+          end
       end
     end
 
