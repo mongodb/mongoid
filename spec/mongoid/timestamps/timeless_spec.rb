@@ -31,6 +31,7 @@ describe Mongoid::Timestamps::Timeless do
       class Chick
         include Mongoid::Document
         include Mongoid::Timestamps
+        field :color, type: String
         embedded_in :chicken, class_name: 'Chicken'
       end
     end
@@ -38,6 +39,7 @@ describe Mongoid::Timestamps::Timeless do
     after(:all) do
       Object.send(:remove_const, :Chicken)
       Object.send(:remove_const, :Egg)
+      Object.send(:remove_const, :Chick)
     end
 
     context "when timeless is used on one instance and then not used on another instance" do
@@ -92,14 +94,15 @@ describe Mongoid::Timestamps::Timeless do
       context "when root contains embedded doc and executes timeless" do
 
           let!(:chicken) do
-            Chicken.create!(color: "red", chicks: [Chick.new])
+            Chicken.create!(color: "red", chicks: [Chick.new(color: "red")])
           end
 
           before do
             @before_update_chicken_timestamp = chicken.updated_at
             @before_update_chick_timestamp = chicken.chicks.first.updated_at
-
             chicken.color = "white"
+            chicken.chicks.first.color = "white"
+
             sleep 2
             chicken.timeless.save()
 
@@ -114,6 +117,7 @@ describe Mongoid::Timestamps::Timeless do
           it "does not change the updated_at timestamp on the embedded document" do
             expect(@after_update_chick_timestamp).to eq(@before_update_chick_timestamp)
           end
+
       end
     end
 
