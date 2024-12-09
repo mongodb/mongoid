@@ -104,7 +104,7 @@ module Mongoid
           invalid?(options[:context] || :update)
         process_flagged_destroys
         update_children = cascadable_children(:update)
-        options[:touch] = false if timeless?
+        options[:touch] = false if respond_to?(:timeless?) && timeless?
         process_touch_option(options, update_children) do
           run_all_callbacks_for_update(update_children) do
             result = yield(self)
