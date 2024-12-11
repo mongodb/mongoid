@@ -552,7 +552,7 @@ module Mongoid
         # @return [ Selectable ] The new selectable.
         def not(*criteria)
           if criteria.empty?
-            dup.tap { |query| query.negating = true }
+            dup.tap { |query| query.negating = !query.negating }
           else
             criteria.compact.inject(self.clone) do |c, new_s|
               if new_s.is_a?(Selectable)
