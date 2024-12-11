@@ -9,7 +9,7 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :readonly_attributes, instance_writer: false, instance_reader: false
+        class_attribute :readonly_attributes
         self.readonly_attributes = ::Set.new
         def self.inherited(subclass)
           super
