@@ -1939,6 +1939,35 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
+  describe "#not" do
+    context "when negating a criterion" do
+      let(:selection) do
+        query.not(field: /value/)
+      end
+
+      it "adds the $not selector" do
+        expect(selection.selector).to eq({
+          "field" => { "$not" => /value/ }
+        })
+      end
+
+      it "returns a cloned query" do
+        expect(selection).to_not equal(query)
+      end
+
+      context "when toggling negation state" do
+        it "negates the negating value" do
+          expect(query.negating).to be_nil 
+          negated_query = query.not
+          expect(negated_query.negating).to be true
+          double_negated_query = negated_query.not
+          expect(double_negated_query.negating).to be false
+        end
+      end
+    end
+  end
+
+
   describe Symbol do
 
     describe "#all" do
