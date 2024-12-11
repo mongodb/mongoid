@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+lib/mongoid/attributes/readonly.rb# frozen_string_literal: true
 # rubocop:todo all
 
 require "spec_helper"
@@ -279,11 +279,11 @@ describe Mongoid::Attributes::Readonly do
         end
       end
 
-      it "ensures child inherits the readonly attributes from parent" do
+      it "ensures subclass inherits the readonly attributes from parent" do
         expect(OldPerson.readonly_attributes.to_a).to include("title","terms")
       end
 
-      it "ensures child does not modify parent's readonly attributes" do
+      it "ensures subclass does not modify parent's readonly attributes" do
         expect(Person.readonly_attributes.to_a).not_to include("age")
       end
     end
