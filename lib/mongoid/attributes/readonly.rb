@@ -9,8 +9,12 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :readonly_attributes
+        class_attribute :readonly_attributes, instance_writer: false, instance_reader: false
         self.readonly_attributes = ::Set.new
+        def self.inherited(subclass)
+          super
+          subclass.readonly_attributes = readonly_attributes.dup
+        end
       end
 
       # Are we able to write the attribute with the provided name?
