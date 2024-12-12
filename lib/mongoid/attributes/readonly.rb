@@ -9,12 +9,8 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :readonly_attributes
+        class_attribute :readonly_attributes, instance_accessor: false
         self.readonly_attributes = ::Set.new
-        def self.inherited(subclass)
-          super
-          subclass.readonly_attributes = readonly_attributes.dup
-        end
       end
 
       # Are we able to write the attribute with the provided name?
@@ -27,7 +23,7 @@ module Mongoid
       # @return [ true | false ] If the document is new, or if the field is not
       #   readonly.
       def attribute_writable?(name)
-        new_record? || (!readonly_attributes.include?(name) && _loaded?(name))
+        new_record? || (!self.class.readonly_attributes.include?(name) && _loaded?(name))
       end
 
       private
@@ -68,8 +64,9 @@ module Mongoid
         #
         # @param [ Symbol... ] *names The names of the fields.
         def attr_readonly(*names)
+          self.readonly_attributes = self.readonly_attributes.dup
           names.each do |name|
-            readonly_attributes << database_field_name(name)
+            self.readonly_attributes << database_field_name(name)
           end
         end
       end
