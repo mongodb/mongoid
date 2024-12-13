@@ -9,7 +9,7 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :readonly_attributes, instance_accessor: false
+        class_attribute :readonly_attributes
         self.readonly_attributes = ::Set.new
       end
 
@@ -63,6 +63,10 @@ module Mongoid
         #   end
         #
         # @param [ Symbol... ] *names The names of the fields.
+        # @note When a parent class contains readonly attributes and is then
+        # inherited by a child class, the child class will inherit the
+        # parent's readonly attribute at the time of its creation.
+        # Updating the parent does not propagate down to child classes after wards.
         def attr_readonly(*names)
           self.readonly_attributes = self.readonly_attributes.dup
           names.each do |name|
