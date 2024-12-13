@@ -23,7 +23,7 @@ module Mongoid
       # @return [ true | false ] If the document is new, or if the field is not
       #   readonly.
       def attribute_writable?(name)
-        new_record? || (!readonly_attributes.include?(name) && _loaded?(name))
+        new_record? || (!self.class.readonly_attributes.include?(name) && _loaded?(name))
       end
 
       private
@@ -63,9 +63,14 @@ module Mongoid
         #   end
         #
         # @param [ Symbol... ] *names The names of the fields.
+        # @note When a parent class contains readonly attributes and is then
+        # inherited by a child class, the child class will inherit the
+        # parent's readonly attributes at the time of its creation.
+        # Updating the parent does not propagate down to child classes after wards.
         def attr_readonly(*names)
+          self.readonly_attributes = self.readonly_attributes.dup
           names.each do |name|
-            readonly_attributes << database_field_name(name)
+            self.readonly_attributes << database_field_name(name)
           end
         end
       end
