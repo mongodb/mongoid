@@ -23,7 +23,7 @@ module Mongoid
 
     # The methods in the contexts themselves should all get delegated to,
     # including destructive, modification, and optional methods.
-    def_delegators :context, *(Mongo.public_instance_methods(false) - [ :skip, :limit ])
+    def_delegators :context, *(Mongo.public_instance_methods(false) - [ :skip, :limit, :load_async ])
 
     # This gets blank and empty included.
     def_delegators :context, *Queryable.public_instance_methods(false)
@@ -47,7 +47,11 @@ module Mongoid
     #
     # @return [ Criteria ] Returns self.
     def load_async
-      context.load_async if context.respond_to?(:load_async)
+      if context.respond_to?(:load_async)
+        context.load_async
+      else
+        Mongo.instance_method(:load_async).bind(context).call
+      end
       self
     end
 
