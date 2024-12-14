@@ -179,8 +179,8 @@ module Mongoid
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
-
       class << self
+        remove_method :discriminator_key if method_defined?(:discriminator_key)
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
         include DiscriminatorRetrieval
