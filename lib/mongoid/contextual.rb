@@ -47,11 +47,7 @@ module Mongoid
     #
     # @return [ Criteria ] Returns self.
     def load_async
-      if context.respond_to?(:load_async)
-        context.load_async
-      else
-        Mongo.instance_method(:load_async).bind(context).call
-      end
+      context.load_async if context.respond_to?(:load_async)
       self
     end
 
