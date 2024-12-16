@@ -13,8 +13,9 @@ module Mongoid
     included do
 
       class << self
-         remove_method :include_root_in_json if method_defined?(:include_root_in_json)
-         remove_method :include_root_in_json= if method_defined?(:include_root_in_json=)
+        # These methods are previously defined by ActiveModel which we override to include default behavior.
+        remove_method :include_root_in_json if method_defined?(:include_root_in_json)
+        remove_method :include_root_in_json= if method_defined?(:include_root_in_json=)
         def include_root_in_json
           @include_root_in_json.nil? ? ::Mongoid.include_root_in_json : @include_root_in_json
         end
