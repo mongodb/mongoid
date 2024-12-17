@@ -179,8 +179,9 @@ module Mongoid
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
-
       class << self
+        # The class attribute declaration above creates a default getter which we override with our custom method.
+        remove_method :discriminator_key
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
         include DiscriminatorRetrieval

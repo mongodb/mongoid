@@ -23,7 +23,7 @@ module Mongoid
 
     # The methods in the contexts themselves should all get delegated to,
     # including destructive, modification, and optional methods.
-    def_delegators :context, *(Mongo.public_instance_methods(false) - [ :skip, :limit ])
+    def_delegators :context, *(Mongo.public_instance_methods(false) - [ :skip, :limit, :load_async ])
 
     # This gets blank and empty included.
     def_delegators :context, *Queryable.public_instance_methods(false)
