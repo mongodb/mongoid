@@ -116,7 +116,7 @@ describe Mongoid::Association do
       end
     end
 
-    context "validation tests on associated values" do
+    context "when validation depends on association" do
       before(:all) do
         class Author
           include Mongoid::Document
