@@ -55,7 +55,7 @@ task :release do
     WARNING
   end
 
-  system 'gem', 'push', "mongoid-#{Mongoid::VERSION}.gem"
+  system 'bundle', 'exec', 'gem', 'push', "mongoid-#{Mongoid::VERSION}.gem"
 end
 
 RSpec::Core::RakeTask.new("spec") do |spec|
