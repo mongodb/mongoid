@@ -117,19 +117,19 @@ axes:
     values:
       - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
+        run_on: ubuntu2204-small
+      - id: ubuntu-20.04
+        display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: ubuntu2204
+      - id: ubuntu-18.04
+        display_name: "Ubuntu 18.04"
+        run_on: ubuntu1804-small
       - id: debian11
         display_name: "Debian 11"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: debian11
+        run_on: debian11-small
       - id: rhel80
         display_name: "RHEL 8.0"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: rhel80
+        run_on: rhel80-small
 
   - id: "driver"
     display_name: Driver Version
@@ -233,3 +233,22 @@ axes:
         variables:
           APP_TESTS: yes
 
+  - id: toolchain
+    display_name: Toolchain Version
+    values:
+      - id: 2023-05-11
+        display_name: 2023-05-11
+        variables:
+          TOOLCHAIN_OVERRIDE: e8c60866f54bed7e336a37df3a97d6ae1b971b7d
+      - id: 2023-11-02
+        display_name: 2023-11-02
+        variables:
+          TOOLCHAIN_OVERRIDE: ded7ea845b08cf96f11a747d9540ba3199580dea
+      - id: 2024-08-07
+        display_name: 2024-08-07
+        variables:
+          TOOLCHAIN_OVERRIDE: c950fe1e85fd7d5e4ea69cc2afff456825583716
+      - id: 2024-09-06
+        display_name: 2024-09-06
+        variables:
+          TOOLCHAIN_OVERRIDE: deefab59d8f539bdd4a0154505f1e7d39a0857d0
