@@ -59,7 +59,6 @@ jobs:
           aws_role_arn: ${{ secrets.AWS_ROLE_ARN }}
           aws_region_name: ${{ vars.AWS_REGION_NAME }}
           aws_secret_id: ${{ secrets.AWS_SECRET_ID }}
-          bundler_cache_version: 1
           dry_run: ${{ inputs.dry_run }}
           gem_name: mongoid
           product_name: Mongoid
