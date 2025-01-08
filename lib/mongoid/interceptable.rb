@@ -235,9 +235,6 @@ module Mongoid
         return false if env.halted
         env.value = !env.halted
         callback_list << [next_sequence, env]
-        if (grandchildren = child.send(:cascadable_children, kind))
-          _mongoid_run_child_before_callbacks(kind, children: grandchildren, callback_list: callback_list)
-        end
       end
       callback_list
     end

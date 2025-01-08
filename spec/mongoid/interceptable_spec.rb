@@ -389,6 +389,25 @@ describe Mongoid::Interceptable do
         end
       end
     end
+
+    context 'with embedded grandchildren' do
+      DCFCG = DuplicateCallbacksForCascadableGrandchildren
+
+      let(:parent) do
+        parent = DCFCG::Parent.new
+        child = DCFCG::Child.new
+        grandchild = DCFCG::Child.new
+
+        child.children = [ grandchild ]
+        parent.children = [ child ]
+
+        parent.tap(&:save)
+      end
+
+      it 'should not repeat any before callbacks' do
+        expect { parent }.not_to raise_exception(DCFCG::DuplicateCallbackDetected)
+      end
+    end
   end
 
   describe ".before_destroy" do

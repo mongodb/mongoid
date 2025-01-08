@@ -318,3 +318,30 @@ class InterceptableUser
   end
 end
 
+module DuplicateCallbacksForCascadableGrandchildren
+  class DuplicateCallbackDetected < RuntimeError
+  end
+
+  class Parent
+    include Mongoid::Document
+
+    embeds_many :children, cascade_callbacks: true, as: :parent
+  end
+
+  class Child
+    include Mongoid::Document
+
+    embedded_in :parent, polymorphic: true
+    embeds_many :children, cascade_callbacks: true, as: :parent
+
+    before_save :check_for_duplicate_callback
+
+    private
+
+    def check_for_duplicate_callback
+      raise DuplicateCallbackDetected if @callback_invoked
+      @callback_invoked = true
+    end
+  end
+end
+
