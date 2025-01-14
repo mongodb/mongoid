@@ -391,21 +391,80 @@ describe Mongoid::Interceptable do
     end
 
     context 'with embedded grandchildren' do
-      DCFCG = DuplicateCallbacksForCascadableGrandchildren
+      IS = InterceptableSpec
 
-      let(:parent) do
-        parent = DCFCG::Parent.new
-        child = DCFCG::Child.new
-        grandchild = DCFCG::Child.new
+      context 'when creating' do
+        let(:registry) { IS::CallbackRegistry.new(only: %i[ before_save ]) }
 
-        child.children = [ grandchild ]
-        parent.children = [ child ]
+        let(:expected_calls) do
+          [
+            # the parent
+            [ IS::CbParent, :before_save ],
 
-        parent.tap(&:save)
+            # the immediate child of the parent
+            [ IS::CbCascadedNode, :before_save ],
+
+            # the grandchild of the parent
+            [ IS::CbCascadedNode, :before_save ],
+          ]
+        end
+
+        let!(:parent) do
+          parent = IS::CbParent.new(registry)
+          child = IS::CbCascadedNode.new(registry)
+          grandchild = IS::CbCascadedNode.new(registry)
+
+          child.cb_cascaded_nodes = [ grandchild ]
+          parent.cb_cascaded_nodes = [ child ]
+
+          parent.tap(&:save)
+        end
+
+        it 'should cascade callbacks to grandchildren' do
+          expect(registry.calls).to be == expected_calls
+        end
       end
 
-      it 'should not repeat any before callbacks' do
-        expect { parent }.not_to raise_exception(DCFCG::DuplicateCallbackDetected)
+      context 'when updating' do
+        let(:registry) { IS::CallbackRegistry.new(only: %i[ before_update ]) }
+
+        let(:expected_calls) do
+          [
+            # the parent
+            [ IS::CbParent, :before_update ],
+
+            # the immediate child of the parent
+            [ IS::CbCascadedNode, :before_update ],
+
+            # the grandchild of the parent
+            [ IS::CbCascadedNode, :before_update ],
+          ]
+        end
+
+        let!(:parent) do
+          parent = IS::CbParent.new(nil)
+          child = IS::CbCascadedNode.new(nil)
+          grandchild = IS::CbCascadedNode.new(nil)
+
+          child.cb_cascaded_nodes = [ grandchild ]
+          parent.cb_cascaded_nodes = [ child ]
+
+          parent.save
+
+          parent.callback_registry = registry
+          child.callback_registry = registry
+          grandchild.callback_registry = registry
+
+          parent.name = 'updated'
+          child.name = 'updated'
+          grandchild.name = 'updated'
+
+          parent.tap(&:save)
+        end
+
+        it 'should cascade callbacks to grandchildren' do
+          expect(registry.calls).to be == expected_calls
+        end
       end
     end
   end

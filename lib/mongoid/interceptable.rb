@@ -152,9 +152,13 @@ module Mongoid
     # @api private
     def _mongoid_run_child_callbacks(kind, children: nil, &block)
       if Mongoid::Config.around_callbacks_for_embeds
-        _mongoid_run_child_callbacks_with_around(kind, children: children, &block)
+        _mongoid_run_child_callbacks_with_around(kind,
+                                                 children: children,
+                                                 &block)
       else
-        _mongoid_run_child_callbacks_without_around(kind, children: children, &block)
+        _mongoid_run_child_callbacks_without_around(kind,
+                                                    children: children,
+                                                    &block)
       end
     end
 
