@@ -88,7 +88,7 @@ module Mongoid
     # and finds one or many documents for the provided _id values.
     #
     # If this method is given a block, it delegates to +Enumerable#find+ and
-    # returns the first document of those found by the current Crieria object
+    # returns the first document of those found by the current Criteria object
     # for which the block returns a truthy value.
     #
     # Note that the "default proc" argument of Enumerable is not specially
@@ -99,7 +99,7 @@ module Mongoid
     #   a nested array. Each array will be flattened.
     #
     # @example Finds a document by its _id, invokes Findable#find.
-    #   critera.find("1234")
+    #   criteria.find("1234")
     #
     # @example Finds the first matching document using a block, invokes Enumerable#find.
     #   criteria.find { |item| item.name == "Depeche Mode" }
@@ -364,7 +364,7 @@ module Mongoid
       !!@none
     end
 
-    # Overriden to include _type in the fields.
+    # Overridden to include _type in the fields.
     #
     # @example Limit the fields returned from the database.
     #   Band.only(:name)
@@ -398,7 +398,7 @@ module Mongoid
       end
     end
 
-    # Overriden to exclude _id from the fields.
+    # Overridden to exclude _id from the fields.
     #
     # @example Exclude fields returned from the database.
     #   Band.without(:name)
@@ -414,7 +414,7 @@ module Mongoid
     # Returns true if criteria responds to the given method.
     #
     # @example Does the criteria respond to the method?
-    #   crtiteria.respond_to?(:each)
+    #   criteria.respond_to?(:each)
     #
     # @param [ Symbol ] name The name of the class method on the +Document+.
     # @param [ true | false ] include_private Whether to include privates.
@@ -483,8 +483,8 @@ module Mongoid
       # Historically this method required exactly one argument.
       # As of https://jira.mongodb.org/browse/MONGOID-4804 it also accepts
       # zero arguments.
-      # The underlying where implemetation that super invokes supports
-      # any number of arguments, but we don't presently allow mutiple
+      # The underlying where implementation that super invokes supports
+      # any number of arguments, but we don't presently allow multiple
       # arguments through this method. This API can be reconsidered in the
       # future.
       if args.length > 1

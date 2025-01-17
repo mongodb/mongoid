@@ -6,7 +6,7 @@ module Mongoid
     # class in a polymorphic association, but the class has not previously
     # been registered by resolver that was used for the query.
     #
-    # Here's an exammple:
+    # Here's an example:
     #
     #   class Department
     #     include Mongoid::Document

@@ -371,7 +371,7 @@ describe Mongoid::Fields do
         expect(klass.field(:test, type: :range).type).to be(Range)
       end
 
-      it "converts :regexp to Rexegp" do
+      it "converts :regexp to Regexp" do
         expect(klass.field(:test, type: :regexp).type).to be(Regexp)
       end
 
@@ -611,7 +611,7 @@ describe Mongoid::Fields do
 
     context "when the attribute has not been assigned" do
 
-      it "delgates to the getter" do
+      it "delegates to the getter" do
         expect(person.age_before_type_cast).to eq(person.age)
       end
     end

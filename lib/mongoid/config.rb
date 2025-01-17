@@ -166,7 +166,7 @@ module Mongoid
     #
     # Setting this flag to true restores the pre-9.0 behavior, where callbacks
     # for embedded documents are called. This may lead to stack overflow errors
-    # if there are more than cicrca 1000 embedded documents in the root
+    # if there are more than circa 1000 embedded documents in the root
     # document's dependencies graph.
     # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
     option :around_callbacks_for_embeds, default: false

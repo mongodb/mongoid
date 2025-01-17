@@ -324,7 +324,7 @@ module Mongoid
       # @param [ String ] key The key used to search the association tree.
       # @param [ Hash ] fields The fields to begin the search with.
       # @param [ Hash ] associations The associations to begin the search with.
-      # @param [ Hash ] aliased_associations The alaised associations to begin
+      # @param [ Hash ] aliased_associations The aliased associations to begin
       #   the search with.
       # @param &block The block.
       # @yieldparam [ Symbol ] The current method.

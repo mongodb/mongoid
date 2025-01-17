@@ -3806,7 +3806,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       person_two.addresses << address
     end
 
-    it "adds the document to the new paarent" do
+    it "adds the document to the new parent" do
       expect(person_two.addresses).to eq([ address ])
     end
 
@@ -4382,7 +4382,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           expect(artist.before_remove_embedded_called).to be true
         end
 
-        it "shoud clear the relation" do
+        it "clears the relation" do
           expect(artist.songs).to be_empty
         end
       end
