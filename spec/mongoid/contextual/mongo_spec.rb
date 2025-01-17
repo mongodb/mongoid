@@ -277,7 +277,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -331,7 +331,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all
@@ -381,7 +381,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -435,7 +435,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all

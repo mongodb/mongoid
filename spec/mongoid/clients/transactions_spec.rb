@@ -722,7 +722,7 @@ describe Mongoid::Clients::Sessions do
           end
         end
 
-        it 'commits the transacrion' do
+        it 'commits the transaction' do
           expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(0)
           expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(1)
         end
