@@ -147,7 +147,7 @@ module Mongoid
     # during query construction.
     #
     # If this method is given a block, it delegates to +Enumerable#find+ and
-    # returns the first document of those found by the current Crieria object
+    # returns the first document of those found by the current Criteria object
     # for which the block returns a truthy value. If both a block and ids are
     # given, the block is ignored and the documents for the given ids are
     # returned. If a block and a Proc are given, the method delegates to

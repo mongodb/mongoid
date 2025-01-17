@@ -292,7 +292,7 @@ module Mongoid
       # Get the persistence context for a given object from the thread local
       #   storage.
       #
-      # @param [ Object ] object Object to get the persistance context for.
+      # @param [ Object ] object Object to get the persistence context for.
       #
       # @return [ Mongoid::PersistenceContext | nil ] The persistence context
       #   for the object if previously stored, otherwise nil.
@@ -305,7 +305,7 @@ module Mongoid
       # Store persistence context for a given object in the thread local
       #   storage.
       #
-      # @param [ Object ] object Object to store the persistance context for.
+      # @param [ Object ] object Object to store the persistence context for.
       # @param [ Mongoid::PersistenceContext ] context Context to store
       #
       # @api private

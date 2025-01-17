@@ -90,7 +90,7 @@ module Mongoid
         # @example Get the sum for the provided block.
         #   aggregable.sum(&:likes)
         #
-        # @param [ Symbol | Numeric ] field The field to sum, or the intial
+        # @param [ Symbol | Numeric ] field The field to sum, or the initial
         #   value of the sum when a block is given.
         #
         # @return [ Numeric ] The sum value.

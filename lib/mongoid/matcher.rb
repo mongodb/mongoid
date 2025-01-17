@@ -45,7 +45,7 @@ module Mongoid
     # @return [ Object | Array ] Field value or values.
     module_function def extract_attribute(document, key)
       # The matcher system will wind up sending atomic values to this as well,
-      # when attepting to match more complex types. If anything other than a
+      # when attempting to match more complex types. If anything other than a
       # Document or a Hash is given, we'll short-circuit the logic and just
       # return an empty array.
       return [] unless document.is_a?(Hash) || document.is_a?(Document)

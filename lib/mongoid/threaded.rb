@@ -41,7 +41,7 @@ module Mongoid
     # given, and the variable does not already exist, the return value of the
     # block will be set as the value of the variable before returning it.
     #
-    # It is very important that applications (and espcially Mongoid)
+    # It is very important that applications (and especially Mongoid)
     # use this method instead of Thread#[], since Thread#[] is actually for
     # fiber-local variables, and Mongoid uses Fibers as an implementation
     # detail in some callbacks. Putting thread-local state in a fiber-local

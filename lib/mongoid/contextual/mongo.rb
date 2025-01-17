@@ -85,7 +85,7 @@ module Mongoid
       # Get the estimated number of documents matching the query.
       #
       # Unlike count, estimated_count does not take a block because it is not
-      # traditionally defined (with a block) on Enumarable like count is.
+      # traditionally defined (with a block) on Enumerable like count is.
       #
       # @example Get the estimated number of matching documents.
       #   context.estimated_count
@@ -1018,7 +1018,7 @@ module Mongoid
             next
           end
 
-          # does the key represent an emebedded relation on the document?
+          # does the key represent an embedded relation on the document?
           aliased_name = klass.aliased_associations[key] || key
           if (assoc = klass.relations[aliased_name])
             case value
