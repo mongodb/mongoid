@@ -300,6 +300,18 @@ module Mongoid
         !!(Mongoid::Document > superclass)
       end
 
+      # Returns the root class of the STI tree that the current
+      # class participates in. If the class is not an STI subclass, this
+      # returns the class itself.
+      #
+      # @return [ Mongoid::Document ] the root of the STI tree
+      def root_class
+        root = self
+        root = root.superclass while root.hereditary?
+
+        root
+      end
+
       # When inheriting, we want to copy the fields from the parent class and
       # set the on the child to start, mimicking the behavior of the old
       # class_inheritable_accessor that was deprecated in Rails edge.
