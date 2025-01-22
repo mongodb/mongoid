@@ -170,9 +170,9 @@ module Mongoid
       if child.nil?
         block&.call
       elsif tail.empty?
-        child.run_callbacks(child_callback_type(kind, child), &block)
+        child.run_callbacks(child_callback_type(kind, child), with_children: false, &block)
       else
-        child.run_callbacks(child_callback_type(kind, child)) do
+        child.run_callbacks(child_callback_type(kind, child), with_children: false) do
           _mongoid_run_child_callbacks_with_around(kind, children: tail, &block)
         end
       end

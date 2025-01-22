@@ -10,6 +10,10 @@ module InterceptableSpec
       @calls << [cls, cb]
     end
 
+    def reset!
+      @calls.clear
+    end
+
     attr_reader :calls
   end
 
