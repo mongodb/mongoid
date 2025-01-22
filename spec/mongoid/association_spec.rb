@@ -100,6 +100,66 @@ describe Mongoid::Association do
         expect(name).to_not be_an_embedded_many
       end
     end
+
+    context "when validation depends on association" do
+      before(:all) do
+        class Author
+          include Mongoid::Document
+          embeds_many :books, cascade_callbacks: true
+          field :condition, type: Boolean
+        end
+
+        class Book
+          include Mongoid::Document
+          embedded_in :author
+          validate :parent_condition_is_not_true
+
+          def parent_condition_is_not_true
+            return unless author&.condition
+            errors.add :base, "Author condition is true."
+          end
+        end
+
+        Author.delete_all
+        Book.delete_all
+      end
+
+      let(:author) { Author.new }
+      let(:book) { Book.new }
+
+      context "when author is not persisted" do
+        it "is valid without books" do
+          expect(author.valid?).to be true
+        end
+
+        it "is valid with a book" do
+          author.books << book
+          expect(author.valid?).to be true
+        end
+
+        it "is not valid when condition is true with a book" do
+          author.condition = true
+          author.books << book
+          expect(author.valid?).to be false
+        end
+      end
+
+      context "when author is persisted" do
+        before do
+          author.books << book
+          author.save
+        end
+
+        it "remains valid initially" do
+          expect(author.valid?).to be true
+        end
+
+        it "becomes invalid when condition is set to true" do
+          author.update_attributes(condition: true)
+          expect(author.valid?).to be false
+        end
+      end
+    end
   end
 
   describe "#embedded_one?" do
