@@ -31,6 +31,9 @@ module Mongoid
         docs_map = {}
         queue = [ klass.to_s ]
 
+        # account for single-collection inheritance
+        queue.push(klass.root_class.to_s) if klass != klass.root_class
+
         while klass = queue.shift
           if as = assoc_map.delete(klass)
             as.each do |assoc|
