@@ -392,6 +392,8 @@ describe Mongoid::Interceptable do
     context 'with embedded grandchildren' do
       IS = InterceptableSpec
 
+      config_override :prevent_multiple_calls_of_embedded_callbacks, true
+
       context 'when creating' do
         let(:registry) { IS::CallbackRegistry.new(only: %i[ before_save ]) }
 
