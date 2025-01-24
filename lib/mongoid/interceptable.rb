@@ -141,9 +141,13 @@ module Mongoid
     # @api private
     def _mongoid_run_child_callbacks(kind, children: nil, &block)
       if Mongoid::Config.around_callbacks_for_embeds
-        _mongoid_run_child_callbacks_with_around(kind, children: children, &block)
+        _mongoid_run_child_callbacks_with_around(kind,
+                                                 children: children,
+                                                 &block)
       else
-        _mongoid_run_child_callbacks_without_around(kind, children: children, &block)
+        _mongoid_run_child_callbacks_without_around(kind,
+                                                    children: children,
+                                                    &block)
       end
     end
 
@@ -163,13 +167,14 @@ module Mongoid
     #  @api private
     def _mongoid_run_child_callbacks_with_around(kind, children: nil, &block)
       child, *tail = (children || cascadable_children(kind))
+      with_children = !Mongoid::Config.prevent_multiple_calls_of_embedded_callbacks
       if child.nil?
         block&.call
       elsif tail.empty?
-        child.run_callbacks(child_callback_type(kind, child), &block)
+        child.run_callbacks(child_callback_type(kind, child), with_children: with_children, &block)
       else
-        child.run_callbacks(child_callback_type(kind, child)) do
-          _mongoid_run_child_callbacks_with_around(kind, children: tail, &block)
+        child.run_callbacks(child_callback_type(kind, child), with_children: with_children) do
+          _mongoid_run_child_callbacks(kind, children: tail, &block)
         end
       end
     end
@@ -218,9 +223,6 @@ module Mongoid
         return false if env.halted
         env.value = !env.halted
         callback_list << [next_sequence, env]
-        if (grandchildren = child.send(:cascadable_children, kind))
-          _mongoid_run_child_before_callbacks(kind, children: grandchildren, callback_list: callback_list)
-        end
       end
       callback_list
     end
