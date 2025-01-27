@@ -22,12 +22,19 @@ module Mongoid
       # @example Set the created at time.
       #   person.set_created_at
       def set_created_at
-        if !timeless? && !created_at
+        if able_to_set_created_at?
           time = Time.configured.now
           self.updated_at = time if is_a?(Updated) && !updated_at_changed?
           self.created_at = time
         end
         clear_timeless_option
+      end
+
+      # Is the created timestamp able to be set?
+      #
+      # @return [ true, false ] If the timestamp can be set.
+      def able_to_set_created_at?
+        !frozen? && !timeless? && !created_at
       end
     end
   end
