@@ -43,4 +43,27 @@ describe Mongoid::Timestamps::Created do
       expect(quiz.created_at).to be_within(10).of(Time.now.utc)
     end
   end
+
+  context "when the document is destroyed" do
+    let(:book) do
+      Book.create!
+    end
+
+    before do
+      Cover.before_save do
+        destroy if title == "delete me"
+      end
+    end
+
+    after do
+      Cover.reset_callbacks(:save)
+    end
+
+    it "does not set the created_at timestamp" do
+      book.covers << Cover.new(title: "delete me")
+      expect {
+        book.save
+      }.not_to raise_error
+    end
+  end
 end
