@@ -137,4 +137,18 @@ describe Mongoid::Extensions::Set do
       end
     end
   end
+
+  describe ".resizable?" do
+
+    it "returns true" do
+      expect(Set).to be_resizable
+    end
+  end
+
+  describe "#resizable?" do
+
+    it "returns true" do
+      expect(Set.new).to be_resizable
+    end
+  end
 end
