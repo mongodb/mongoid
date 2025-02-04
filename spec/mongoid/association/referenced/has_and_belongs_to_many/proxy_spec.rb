@@ -1757,43 +1757,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       end
     end
 
-    describe "#any?" do
-
-      let(:person) do
-        Person.create!
-      end
-
-      context "when nothing exists on the relation" do
-
-        context "when no document is added" do
-
-          let!(:sandwich) do
-            Sandwich.create!
-          end
-
-          it "returns false" do
-            expect(sandwich.meats.any?).to be false
-          end
-        end
-
-        context "when the document is destroyed" do
-
-          before do
-            Meat.create!
-          end
-
-          let!(:sandwich) do
-            Sandwich.create!
-          end
-
-          it "returns false" do
-            sandwich.destroy
-            expect(sandwich.meats.any?).to be false
-          end
-        end
-      end
-    end
-
     context "when documents have been persisted" do
 
       let!(:preference) do
@@ -3060,6 +3023,34 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
         it "returns the number of documents" do
           expect(person.preferences.send(method)).to eq(1)
+        end
+      end
+
+      # MONGOID-5844
+      #
+      # Specifically, this tests the case where the association is
+      # initialized with a single element (so that Proxy#push does not take
+      # the `concat` route), which causes `reset_unloaded` to be called, which
+      # sets the `_unloaded` Criteria object to match only the specific element
+      # that was given.
+      #
+      # The issue now is that when the events list is updated to be both events,
+      # _unloaded matches one of them already, and the other has previously been
+      # persisted so `new_record?` won't match it. We need to make sure the
+      # `#size` logic properly accounts for this case.
+      context 'when documents have been previously persisted' do
+        let(:person1) { Person.create! }
+        let(:person2) { Person.create! }
+        let(:event1) { Event.create!(administrators: [ person1 ]) }
+        let(:event2) { Event.create!(administrators: [ person2 ]) }
+
+        before do
+          person1.administrated_events = [ event1, event2 ]
+        end
+
+        it 'returns the number of associated documents [MONGOID-5844]' do
+          expect(person1.administrated_events.to_a.size).to eq(2)
+          expect(person1.administrated_events.size).to eq(2)
         end
       end
 

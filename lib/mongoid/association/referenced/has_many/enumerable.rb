@@ -422,11 +422,28 @@ module Mongoid
           #
           # @return [ Integer ] The size of the enumerable.
           def size
-            count = (_unloaded ? _unloaded.count : _loaded.count)
-            if count.zero?
-              count + _added.count
+            # If _unloaded is present, then it will match the set of documents
+            # that belong to this association, which have already been persisted
+            # to the database. This set of documents must be considered when
+            # computing the size of the association, along with anything that has
+            # since been added.
+            if _unloaded
+              if _added.any?
+                # Note that _added may include records that _unloaded already
+                # matches. This is the case if the association is assigned an array
+                # of items and some of them were already elements of the association.
+                #
+                # we need to thus make sure _unloaded.count excludes any elements
+                # that already exist in _added.
+
+                count = _unloaded.not(:_id.in => _added.values.map(&:id)).count
+                count + _added.values.count
+              else
+                _unloaded.count
+              end
+
             else
-              count + _added.values.count { |d| d.new_record? }
+              _loaded.count + _added.count
             end
           end
 
