@@ -16,6 +16,10 @@ describe 'Mongoid application tests' do
       skip 'Set APP_TESTS=1 in environment to run application tests'
     end
 
+    if SpecConfig.instance.rails_version < '7.1'
+      skip 'App tests require Rails > 7.0 (see https://stackoverflow.com/questions/79360526)'
+    end
+
     require 'fileutils'
     require 'mrss/child_process_helper'
     require 'open-uri'
