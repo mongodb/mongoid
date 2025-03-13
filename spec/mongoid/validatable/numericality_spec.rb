@@ -28,5 +28,21 @@ describe ActiveModel::Validations::NumericalityValidator do
         expect(model).to_not be_valid
       end
     end
+
+    context 'when the value is numeric' do
+      let(:model) { TestModel.new(amount: '15.0') }
+
+      it 'returns true' do
+        expect(model).to be_valid
+      end
+    end
+
+    context 'when the value is a BSON::Decimal128' do
+      let(:model) { TestModel.new(amount: BSON::Decimal128.new('15.0')) }
+
+      it 'returns true' do
+        expect(model).to be_valid
+      end
+    end
   end
 end
