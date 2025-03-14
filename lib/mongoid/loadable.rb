@@ -94,8 +94,8 @@ module Mongoid
 
     # Returns the array of paths where the application's model definitions
     # are located. If Rails is loaded, this defaults to the configured
-    # "app/models" paths (e.g. `config.paths["app/models"]`); otherwise, it
-    # defaults to `%w(./app/models ./lib/models)`.
+    # "app/models" paths (e.g. 'config.paths["app/models"]'); otherwise, it
+    # defaults to '%w(./app/models ./lib/models)'.
     #
     # Note that these paths are the *roots* of the directory hierarchies where
     # the models are located; it is not necessary to indicate every subdirectory,
