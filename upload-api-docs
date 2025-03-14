@@ -66,8 +66,8 @@ class Options
     @options = {}
     parse_cli_options!
     parse_env_options!
-    @options[:prefix] = 'docs/mongoid/v9.0/api'
-    @options[:docs_path] = 'build/public/v9.0/api'
+    @options[:prefix] = 'docs/mongoid/master/api'
+    @options[:docs_path] = 'build/public/master/api'
   end
 
   def [](key)
