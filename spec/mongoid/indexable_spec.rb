@@ -1004,6 +1004,9 @@ describe Mongoid::Indexable do
       end
 
       context 'when allow_duplicate_index_declarations is true' do
+        # 4.4 apparently doesn't recognize :name option for indexes?
+        min_server_version '5.0'
+
         config_override :allow_duplicate_index_declarations, true
 
         it 'creates both indexes' do
