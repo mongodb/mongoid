@@ -787,8 +787,12 @@ describe Mongoid::Clients::Sessions do
         Mongoid::Clients.with_name(:default).database.collections.each(&:drop)
         TransactionsSpecPerson.collection.create
         TransactionsSpecPersonWithOnCreate.collection.create
+        TransactionsSpecPersonWithAfterCreateCommit.collection.create
         TransactionsSpecPersonWithOnUpdate.collection.create
+        TransactionsSpecPersonWithAfterUpdateCommit.collection.create
+        TransactionsSpecPersonWithAfterSaveCommit.collection.create
         TransactionsSpecPersonWithOnDestroy.collection.create
+        TransactionsSpecPersonWithAfterDestroyCommit.collection.create
         TransactionSpecRaisesBeforeSave.collection.create
         TransactionSpecRaisesAfterSave.collection.create
       end
@@ -812,6 +816,18 @@ describe Mongoid::Clients::Sessions do
               person = nil
               TransactionsSpecPersonWithOnCreate.transaction do
                 person = TransactionsSpecPersonWithOnCreate.create!(name: 'James Bond')
+              end
+              person
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
+
+          context 'when callback is after_create_commit' do
+            let!(:subject) do
+              person = nil
+              TransactionsSpecPersonWithAfterCreateCommit.transaction do
+                person = TransactionsSpecPersonWithAfterCreateCommit.create!(name: 'James Bond')
               end
               person
             end
@@ -886,6 +902,94 @@ describe Mongoid::Clients::Sessions do
               it_behaves_like 'commit callbacks are called'
             end
           end
+
+          context 'with after_update_commit callback' do
+            let(:subject) do
+              TransactionsSpecPersonWithAfterUpdateCommit.create!(name: 'James Bond').tap do |subject|
+                subject.after_commit_counter.reset
+                subject.after_rollback_counter.reset
+              end
+            end
+
+            context 'when modified once' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+
+            context 'when modified multiple times' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                  subject.name = 'Jason Bourne'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+          end
+
+          context 'with after_save_commit callback' do
+            let(:subject) do
+              TransactionsSpecPersonWithAfterSaveCommit.create!(name: 'James Bond').tap do |subject|
+                subject.after_commit_counter.reset
+                subject.after_rollback_counter.reset
+              end
+            end
+
+            context 'when modified once' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+
+            context 'when created' do
+              before do
+                TransactionsSpecPersonWithAfterSaveCommit.transaction do
+                  subject
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+
+            context 'when modified multiple times' do
+              before do
+                subject.transaction do
+                  subject.name = 'Austin Powers'
+                  subject.save!
+                  subject.name = 'Jason Bourne'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+
+            context 'when created and modified' do
+              before do
+                TransactionsSpecPersonWithAfterSaveCommit.transaction do
+                  subject
+                  subject.name = 'Jason Bourne'
+                  subject.save!
+                end
+              end
+
+              it_behaves_like 'commit callbacks are called'
+            end
+          end
         end
 
         context 'update_attributes' do
@@ -913,6 +1017,34 @@ describe Mongoid::Clients::Sessions do
 
             before do
               TransactionsSpecPersonWithOnUpdate.transaction do
+                subject.update_attributes!(name: 'Foma Kiniaev')
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
+
+          context 'when callback is after_update_commit' do
+            let(:subject) do
+              TransactionsSpecPersonWithAfterUpdateCommit.create!(name: 'Jason Bourne')
+            end
+
+            before do
+              TransactionsSpecPersonWithAfterUpdateCommit.transaction do
+                subject.update_attributes!(name: 'Foma Kiniaev')
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
+
+          context 'when callback is after_save_commit' do
+            let(:subject) do
+              TransactionsSpecPersonWithAfterSaveCommit.create!(name: 'Jason Bourne')
+            end
+
+            before do
+              TransactionsSpecPersonWithAfterSaveCommit.transaction do
                 subject.update_attributes!(name: 'Foma Kiniaev')
               end
             end
@@ -958,6 +1090,31 @@ describe Mongoid::Clients::Sessions do
 
             let(:subject) do
               TransactionsSpecPersonWithOnDestroy.create!(name: 'James Bond').tap do |p|
+                p.after_commit_counter = after_commit_counter
+                p.after_rollback_counter = after_rollback_counter
+              end
+            end
+
+            before do
+              subject.transaction do
+                subject.destroy
+              end
+            end
+
+            it_behaves_like 'commit callbacks are called'
+          end
+
+          context 'with after_destroy_commit' do
+            let(:after_commit_counter) do
+              TransactionsSpecCounter.new
+            end
+
+            let(:after_rollback_counter) do
+              TransactionsSpecCounter.new
+            end
+
+            let(:subject) do
+              TransactionsSpecPersonWithAfterDestroyCommit.create!(name: 'James Bond').tap do |p|
                 p.after_commit_counter = after_commit_counter
                 p.after_rollback_counter = after_rollback_counter
               end
