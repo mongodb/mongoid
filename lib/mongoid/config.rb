@@ -180,6 +180,19 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5785 for more details.
     option :allow_scopes_to_unset_default_scope, default: false
 
+    # When this flag is false, indexes are (roughly) validated on the client
+    # to prevent duplicate indexes being declared. This validation is
+    # incomplete, however, and can result in some indexes being silently
+    # ignored.
+    #
+    # Setting this to true will allow duplicate indexes to be declared and sent
+    # to the server. The server will then validate the indexes and raise an
+    # exception if duplicates are detected.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5827 for an example of the
+    # consequences of duplicate index checking.
+    option :allow_duplicate_index_declarations, default: false
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.
