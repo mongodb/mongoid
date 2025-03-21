@@ -213,8 +213,8 @@ module Mongoid
 
         # Transforms custom options for after_commit and after_rollback callbacks
         # into options for +set_callback+.
-        def set_options_for_callbacks!(args)
-          options = args.extract_options!
+        def set_options_for_callbacks!(args, enforced_options = {})
+          options = args.extract_options!.merge(enforced_options)
           args << options
 
           if options[:on]
