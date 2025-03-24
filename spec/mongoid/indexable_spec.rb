@@ -645,5 +645,61 @@ describe Mongoid::Indexable do
         end
       end
     end
+
+    context 'when declaring a duplicate index with different options' do
+      def declare_duplicate_indexes!
+        klass.index({ name: 1 }, { partial_filter_expression: { name: 'a' } })
+        klass.index({ name: 1 }, { partial_filter_expression: { name: 'b' } })
+        klass.create_indexes
+      end
+
+      context 'when allow_duplicate_index_declarations is false' do
+        config_override :allow_duplicate_index_declarations, false
+
+        it 'silently ignores the duplicate definition' do
+          expect { declare_duplicate_indexes! }.not_to raise_exception
+        end
+      end
+
+      context 'when allow_duplicate_index_declarations is true' do
+        config_override :allow_duplicate_index_declarations, true
+
+        it 'raises a server error' do
+          expect { declare_duplicate_indexes! }.to raise_exception
+        end
+      end
+    end
+
+    context 'when declaring a duplicate index with different names' do
+      def declare_duplicate_indexes!
+        klass.index({ name: 1 }, { partial_filter_expression: { name: 'a' } })
+        klass.index({ name: 1 }, { name: 'alt_name', partial_filter_expression: { name: 'b' } })
+        klass.create_indexes
+      end
+
+      let(:index_count) { klass.collection.indexes.count }
+
+
+      context 'when allow_duplicate_index_declarations is false' do
+        config_override :allow_duplicate_index_declarations, false
+
+        it 'silently ignores the duplicate definition' do
+          expect { declare_duplicate_indexes! }.not_to raise_exception
+          expect(index_count).to be == 2 # _id and name
+        end
+      end
+
+      context 'when allow_duplicate_index_declarations is true' do
+        # 4.4 apparently doesn't recognize :name option for indexes?
+        min_server_version '5.0'
+
+        config_override :allow_duplicate_index_declarations, true
+
+        it 'creates both indexes' do
+          expect { declare_duplicate_indexes! }.not_to raise_exception
+          expect(index_count).to be == 3 # _id, name, alt_name
+        end
+      end
+    end
   end
 end
