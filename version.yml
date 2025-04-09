@@ -1,0 +1,5 @@
+---
+product: Mongoid
+package: mongoid
+current: 9.0.2
+location: lib/mongoid/version.rb
