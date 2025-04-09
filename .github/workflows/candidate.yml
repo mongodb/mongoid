@@ -9,6 +9,7 @@ on:
         required: true
         default: true
         type: boolean
+  push: # temporary to trick GH into recognizing the new workflow
 
 jobs:
   candidate:
