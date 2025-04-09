@@ -9,12 +9,10 @@ on:
         required: true
         default: true
         type: boolean
-  push: # temporary to trick GH into recognizing the new workflow
 
 jobs:
   candidate:
     name: "Mongoid Release Candidate"
-    environment: release
     runs-on: 'ubuntu-latest'
 
     permissions:
@@ -34,7 +32,7 @@ jobs:
 
     steps:
       - name: "Run the candidate action"
-        uses: jamis/drivers-github-tools/ruby/publish@ruby-3643-new-release-process
+        uses: jamis/drivers-github-tools/ruby/candidate@ruby-3643-new-release-process
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
