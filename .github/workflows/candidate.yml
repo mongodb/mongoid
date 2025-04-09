@@ -13,6 +13,7 @@ on:
 jobs:
   candidate:
     name: "Mongoid Release Candidate"
+    environment: release
     runs-on: 'ubuntu-latest'
 
     permissions:
