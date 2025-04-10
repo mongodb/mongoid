@@ -2,5 +2,5 @@
 name: Mongoid
 package: mongoid
 version:
-  number: 9.0.2
+  number: 9.1.0
   file: lib/mongoid/version.rb
