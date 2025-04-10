@@ -1,0 +1,6 @@
+---
+name: Mongoid
+package: mongoid
+version:
+  number: 9.0.2
+  file: lib/mongoid/version.rb
