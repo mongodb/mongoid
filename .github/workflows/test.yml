@@ -12,7 +12,7 @@ jobs:
     env:
       CI: true
       TESTOPTS: "-v"
-      BUNDLE_GEMFILE: ${{ matrix.rails == "" && "Gemfile" || format("gemfiles/rails-{0}.gemfile", matrix.rails) }}
+      BUNDLE_GEMFILE: "${{ matrix.rails == '' && 'Gemfile' || format('gemfiles/rails-{0}.gemfile', matrix.rails) }}"
     runs-on: ubuntu-22.04
     continue-on-error: "${{matrix.experimental}}"
     strategy:
