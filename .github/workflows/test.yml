@@ -14,7 +14,7 @@ jobs:
       TESTOPTS: "-v"
       BUNDLE_GEMFILE: "${{ matrix.rails == '' && 'Gemfile' || format('gemfiles/rails-{0}.gemfile', matrix.rails) }}"
     runs-on: ubuntu-22.04
-    continue-on-error: "${{matrix.experimental}}"
+    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
@@ -23,8 +23,6 @@ jobs:
         rails: [ ~, "8.0" ]
         fle: [ ~, "helper" ]
         topology: [ replica_set, sharded_cluster ]
-        experimental: false
-        task: test
 
     steps:
     - name: repo checkout
