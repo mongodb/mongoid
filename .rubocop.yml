@@ -75,6 +75,12 @@ Metrics/MethodLength:
 RSpec/BeforeAfterAll:
   Enabled: false
 
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 10
+
 RSpec/ImplicitExpect:
   EnforcedStyle: is_expected
 

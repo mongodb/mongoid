@@ -6,6 +6,7 @@ require_relative '../mongoid/shardable_models'
 
 describe 'Sharding helpers' do
   require_topology :sharded
+  min_server_version '4.4'
 
   describe 'shard_collection rake task' do
     let(:shard_collections) do

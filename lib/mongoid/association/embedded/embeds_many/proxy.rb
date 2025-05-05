@@ -494,7 +494,7 @@ module Mongoid
           #
           # @return [ Criteria | Object ] A Criteria or return value from the target.
           #
-          # TODO: make sure we are consistingly using respond_to_missing
+          # TODO: make sure we are consistently using respond_to_missing
           #   anywhere we define method_missing.
           # rubocop:disable Style/MissingRespondToMissing
           ruby2_keywords def method_missing(name, *args, &block)

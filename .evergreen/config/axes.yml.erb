@@ -54,7 +54,6 @@ axes:
         display_name: Sharded Cluster
         variables:
            TOPOLOGY: "sharded-cluster"
-           SINGLE_MONGOS: true
 
   - id: "auth"
     display_name: Authentication
@@ -99,6 +98,10 @@ axes:
         display_name: ruby-3.2
         variables:
           RVM_RUBY: "ruby-3.2"
+      - id: "ruby-3.3"
+        display_name: ruby-3.3
+        variables:
+          RVM_RUBY: "ruby-3.3"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -118,16 +121,21 @@ axes:
       - id: actual-ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2204-small
+      - id: ubuntu-22.04
+        display_name: "Ubuntu 20.04"
+        run_on: ubuntu2204-small
+        variables:
+          DOCKER_DISTRO: ubuntu2204
       - id: ubuntu-20.04
         display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
         variables:
           DOCKER_DISTRO: ubuntu2004
-      - id: ubuntu-22.04
+      - id: ubuntu-18.04
         display_name: "Ubuntu 22.04"
-        run_on: ubuntu2004-small
+        run_on: ubuntu1804-small
         variables:
-          DOCKER_DISTRO: ubuntu2204
+          DOCKER_DISTRO: ubuntu1804
       - id: debian11
         display_name: "Debian 11"
         run_on: ubuntu2004-small
@@ -210,6 +218,14 @@ axes:
         display_name: "Rails 7.1"
         variables:
           RAILS: "7.1"
+      - id: "7.2"
+        display_name: "Rails 7.2"
+        variables:
+          RAILS: "7.2"
+      - id: "8.0"
+        display_name: "Rails 8.0"
+        variables:
+          RAILS: "8.0"
 
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks

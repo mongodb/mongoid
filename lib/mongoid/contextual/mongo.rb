@@ -85,7 +85,7 @@ module Mongoid
       # Get the estimated number of documents matching the query.
       #
       # Unlike count, estimated_count does not take a block because it is not
-      # traditionally defined (with a block) on Enumarable like count is.
+      # traditionally defined (with a block) on Enumerable like count is.
       #
       # @example Get the estimated number of matching documents.
       #   context.estimated_count
@@ -885,8 +885,18 @@ module Mongoid
       #
       # @param [ Document ] document The document to yield to.
       def yield_document(document, &block)
-        doc = document.respond_to?(:_id) ?
-            document : Factory.from_db(klass, document, criteria)
+        doc = if document.respond_to?(:_id)
+                document
+              elsif criteria.raw_results?
+                if criteria.typecast_results?
+                  demongoize_hash(klass, document)
+                else
+                  document
+                end
+              else
+                Factory.from_db(klass, document, criteria)
+              end
+
         yield(doc)
       end
 
@@ -984,6 +994,48 @@ module Mongoid
         demongoize_with_field(field, value, is_translation)
       end
 
+      # Demongoizes (converts from database to Ruby representation) the values
+      # of the given hash as if it were the raw representation of a document of
+      # the given klass.
+      #
+      # @note this method will modify the given hash, in-place, for performance
+      # reasons. If you wish to preserve the original hash, duplicate it before
+      # passing it to this method.
+      #
+      # @param [ Document ] klass the Document class that the given hash ought
+      #   to represent
+      # @param [ Hash | nil ] hash the Hash instance containing the values to
+      #   demongoize.
+      #
+      # @return [ Hash | nil ] the demongoized result (nil if the input Hash
+      #   was nil)
+      #
+      # @api private
+      def demongoize_hash(klass, hash)
+        return nil unless hash
+
+        hash.each_key do |key|
+          value = hash[key]
+
+          # does the key represent a declared field on the document?
+          if (field = klass.fields[key])
+            hash[key] = field.demongoize(value)
+            next
+          end
+
+          # does the key represent an embedded relation on the document?
+          aliased_name = klass.aliased_associations[key] || key
+          if (assoc = klass.relations[aliased_name])
+            case value
+            when Array then value.each { |h| demongoize_hash(assoc.klass, h) }
+            when Hash then demongoize_hash(assoc.klass, value)
+            end
+          end
+        end
+
+        hash
+      end
+
       # Demongoize the value for the given field. If the field is nil or the
       # field is a translations field, the value is demongoized using its class.
       #
@@ -1018,10 +1070,17 @@ module Mongoid
       # @return [ Array<Document> | Document ] The list of documents or a
       #   single document.
       def process_raw_docs(raw_docs, limit)
-        docs = raw_docs.map do |d|
-          Factory.from_db(klass, d, criteria)
-        end
-        docs = eager_load(docs)
+        docs = if criteria.raw_results?
+                 if criteria.typecast_results?
+                   raw_docs.map { |doc| demongoize_hash(klass, doc) }
+                 else
+                   raw_docs
+                 end
+               else
+                 mapped = raw_docs.map { |doc| Factory.from_db(klass, doc, criteria) }
+                 eager_load(mapped)
+               end
+
         limit ? docs : docs.first
       end
 
