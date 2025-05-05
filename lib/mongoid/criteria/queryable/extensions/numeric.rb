@@ -43,7 +43,7 @@ module Mongoid
             # @return [ Integer ] The evolved object.
             def evolve(object)
               __evolve__(object) do |obj|
-                obj = obj.to_s
+                str = obj.to_s
                 if str.empty?
                   nil
                 else
@@ -53,7 +53,7 @@ module Mongoid
                   if str.empty?
                     0
                   else
-                    result = Integer(str) rescue Float(object)
+                    result = Integer(str) rescue Float(obj)
                     integer = result.to_i
                     integer == result ? integer : result
                   end
