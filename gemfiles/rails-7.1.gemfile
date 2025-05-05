@@ -4,6 +4,9 @@ source 'https://rubygems.org'
 gem 'actionpack', '~> 7.1'
 gem 'activemodel', '~> 7.1'
 
+group :test do
+  gem 'activejob', '~> 7.1'
+end
 gemspec path: '..'
 
 require_relative './standard'

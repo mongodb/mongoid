@@ -49,6 +49,11 @@ module Mongoid
     # @api private
     INVALID_BSON_CLASSES = [ BSON::Decimal128, BSON::Int32, BSON::Int64 ].freeze
 
+    # The suffix for generated translated fields.
+    # 
+    # @api private
+    TRANSLATIONS_SFX = '_translations'
+
     module ClassMethods
       # Returns the list of id fields for this model class, as both strings
       # and symbols.
@@ -101,8 +106,8 @@ module Mongoid
           ar.each_with_index do |fn, i|
             key = fn
             unless klass.fields.key?(fn) || klass.relations.key?(fn)
-              if tr = fn.match(/(.*)_translations\z/)&.captures&.first
-                key = tr
+              if fn.end_with?(TRANSLATIONS_SFX)
+                key = fn.delete_suffix(TRANSLATIONS_SFX)
               else
                 key = fn
               end
@@ -319,7 +324,7 @@ module Mongoid
       # @param [ String ] key The key used to search the association tree.
       # @param [ Hash ] fields The fields to begin the search with.
       # @param [ Hash ] associations The associations to begin the search with.
-      # @param [ Hash ] aliased_associations The alaised associations to begin
+      # @param [ Hash ] aliased_associations The aliased associations to begin
       #   the search with.
       # @param &block The block.
       # @yieldparam [ Symbol ] The current method.
@@ -408,7 +413,8 @@ module Mongoid
       #
       # @api private
       def database_field_name(name, relations, aliased_fields, aliased_associations)
-        return nil unless name.present?
+        return "" unless name.present?
+
         key = name.to_s
         segment, remaining = key.split('.', 2)
 
@@ -725,11 +731,11 @@ module Mongoid
       # @api private
       def create_translations_getter(name, meth)
         generated_methods.module_eval do
-          re_define_method("#{meth}_translations") do
+          re_define_method("#{meth}#{TRANSLATIONS_SFX}") do
             attributes[name] ||= {}
             attributes[name].with_indifferent_access
           end
-          alias_method :"#{meth}_t", :"#{meth}_translations"
+          alias_method :"#{meth}_t", :"#{meth}#{TRANSLATIONS_SFX}"
         end
       end
 
@@ -745,14 +751,14 @@ module Mongoid
       # @api private
       def create_translations_setter(name, meth, field)
         generated_methods.module_eval do
-          re_define_method("#{meth}_translations=") do |value|
+          re_define_method("#{meth}#{TRANSLATIONS_SFX}=") do |value|
             attribute_will_change!(name)
             value&.transform_values! do |_value|
               field.type.mongoize(_value)
             end
             attributes[name] = value
           end
-          alias_method :"#{meth}_t=", :"#{meth}_translations="
+          alias_method :"#{meth}_t=", :"#{meth}#{TRANSLATIONS_SFX}="
         end
       end
 

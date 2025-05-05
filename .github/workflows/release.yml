@@ -1,0 +1,67 @@
+name: "Mongoid Release"
+run-name: "Mongoid Release for ${{ github.ref }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Whether this is a dry run or not
+        required: true
+        default: true
+        type: boolean
+
+env:
+  SILK_ASSET_GROUP: mongoid
+  RELEASE_MESSAGE_TEMPLATE: |
+    Version {0} of the [Mongoid ODM for MongoDB](https://rubygems.org/gems/mongoid) is now available.
+
+    **Release Highlights**
+
+    TODO: one or more paragraphs describing important changes in this release
+
+    **Documentation**
+
+    Documentation is available at [MongoDB.com](https://www.mongodb.com/docs/mongoid/current/).
+
+    **Installation**
+
+    You may install this version via RubyGems, with:
+
+    gem install --version {0} mongoid
+
+jobs:
+  release:
+    name: "Mongoid Release"
+    environment: release
+    runs-on: 'ubuntu-latest'
+
+    permissions:
+      # required for all workflows
+      security-events: write
+
+      # required to fetch internal or private CodeQL packs
+      packages: read
+
+      # only required for workflows in private repositories
+      actions: read
+      contents: write
+
+      # required by the mongodb-labs/drivers-github-tools/setup@v2 step
+      # also required by `rubygems/release-gem`
+      id-token: write
+
+    steps:
+      - name: "Run the publish action"
+        uses: mongodb-labs/drivers-github-tools/ruby/publish@v2
+        with:
+          app_id: ${{ vars.APP_ID }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          aws_role_arn: ${{ secrets.AWS_ROLE_ARN }}
+          aws_region_name: ${{ vars.AWS_REGION_NAME }}
+          aws_secret_id: ${{ secrets.AWS_SECRET_ID }}
+          dry_run: ${{ inputs.dry_run }}
+          gem_name: mongoid
+          product_name: Mongoid
+          product_id: mongoid
+          release_message_template: ${{ env.RELEASE_MESSAGE_TEMPLATE }}
+          silk_asset_group: ${{ env.SILK_ASSET_GROUP }}

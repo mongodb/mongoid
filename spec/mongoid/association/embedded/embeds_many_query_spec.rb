@@ -28,6 +28,10 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       expect(legislator.attributes.keys).to eq(['_id', 'a'])
     end
 
+    it 'allows accessing the parent' do
+      expect { legislator.congress }.not_to raise_error
+    end
+
     context 'when using only with $' do
       before do
         Patient.destroy_all
