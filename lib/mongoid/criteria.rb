@@ -426,18 +426,6 @@ module Mongoid
 
     alias :to_ary :to_a
 
-    # Convenience for objects that want to be merged into a criteria.
-    #
-    # @example Convert to a criteria.
-    #   criteria.to_criteria
-    #
-    # @return [ Criteria ] self.
-    # @deprecated
-    def to_criteria
-      self
-    end
-    Mongoid.deprecate(self, :to_criteria)
-
     # Convert the criteria to a proc.
     #
     # @example Convert the criteria to a proc.
