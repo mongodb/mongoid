@@ -33,34 +33,6 @@ module Mongoid
 
           module ClassMethods
 
-            # Get the object as a numeric.
-            #
-            # @api private
-            #
-            # @example Get the object as numeric.
-            #   Object.__numeric__("1.442")
-            #
-            # @param [ Object ] object The object to convert.
-            #
-            # @return [ Object ] The converted number.
-            def __numeric__(object)
-              str = object.to_s
-              raise ArgumentError if str.empty?
-
-              # These requirements seem a bit odd, but they're explicitly specified in the tests,
-              # so we're obligated to keep them, for now. (This code was rewritten from a one-line
-              # regex, due to security concerns with a polynomial regex being used on uncontrolled
-              # data).
-
-              str = str.chop if str.end_with?('.')
-              return 0 if str.empty?
-
-              result = Integer(str) rescue Float(object)
-
-              integer = result.to_i
-              integer == result ? integer : result
-            end
-
             # Evolve the object to an integer.
             #
             # @example Evolve to integers.
@@ -71,7 +43,23 @@ module Mongoid
             # @return [ Integer ] The evolved object.
             def evolve(object)
               __evolve__(object) do |obj|
-                __numeric__(obj) rescue obj
+                str = obj.to_s
+                if str.empty?
+                  nil
+                else
+                  # These requirements seem a bit odd, but they're explicitly specified
+                  # in the tests, so we're obligated to keep them, for now.
+                  str = str.chop if str.end_with?('.')
+                  if str.empty?
+                    0
+                  else
+                    result = Integer(str) rescue Float(obj)
+                    integer = result.to_i
+                    integer == result ? integer : result
+                  end
+                end
+              rescue
+                obj
               end
             end
           end
