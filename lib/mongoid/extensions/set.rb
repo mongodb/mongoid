@@ -57,6 +57,7 @@ module Mongoid
           case object
           when ::Set then ::Array.mongoize(object.to_a).uniq
           when ::Array then ::Array.mongoize(object).uniq
+          else Mongoid::RawValue(object, 'Set')
           end
         end
       end
