@@ -43,7 +43,21 @@ module Mongoid
             # @return [ Integer ] The evolved object.
             def evolve(object)
               __evolve__(object) do |obj|
-                obj.to_s.match?(/\A[-+]?[0-9]*[0-9.]0*\z/) ? obj.to_i : Float(obj)
+                obj = obj.to_s
+                if str.empty?
+                  nil
+                else
+                  # These requirements seem a bit odd, but they're explicitly specified
+                  # in the tests, so we're obligated to keep them, for now.
+                  str = str.chop if str.end_with?('.')
+                  if str.empty?
+                    0
+                  else
+                    result = Integer(str) rescue Float(object)
+                    integer = result.to_i
+                    integer == result ? integer : result
+                  end
+                end
               rescue
                 obj
               end
