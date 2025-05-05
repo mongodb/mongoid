@@ -1,0 +1,44 @@
+************
+Mongoid 10.0
+************
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 10.0.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+Deprecated kernel monkey patch methods removed
+----------------------------------------------
+
+**Breaking change:** The following kernel monkey patch methods are removed.
+These were previously deprecated and were intended for internal Mongoid use only,
+so please refer to the Mongoid 9.x codebase for the implementation if you were using them.
+
+- ``Object#__sortable__``
+- ``Object#__find_args__``
+- ``Object#__setter__``
+- ``Object#__to_inc__``
+- ``Object#do_or_do_not``
+- ``Object#you_must``
+- ``Object#multi_arged?``
+- ``Object#regexp?``
+- ``Object.__mongoize_fk__``
+- ``Hash#__consolidate__``
+- ``Hash#delete_id``
+- ``Hash#extract_id``
+- ``Hash#to_criteria``
+- ``Mongoid::Criteria#to_criteria``
+- ``Integer#unconvertable_to_bson?``
+- ``String#unconvertable_to_bson?``
+- ``String#mongoid_id?``
+- ``Symbol#mongoid_id?``
