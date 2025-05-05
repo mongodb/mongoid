@@ -18,6 +18,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
+        - mongodb: '7.0'
+          ruby: ruby-3.3
+          topology: replica_set
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          gemfile: Gemfile
+          experimental: false
         - mongodb: '6.0'
           ruby: ruby-3.2
           topology: replica_set
@@ -39,18 +47,40 @@ jobs:
           topology: replica_set
           os: ubuntu-20.04
           task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
           driver: stable
           gemfile: gemfiles/driver_stable.gemfile
           experimental: false
-        - mongodb: '6.0'
+        - mongodb: '7.0'
+          ruby: ruby-3.3
+          topology: server
+          os: ubuntu-22.04
+          task: test
+          driver: current
+          rails: '8.0'
+          fle: helper
+          gemfile: gemfiles/rails-8.0.gemfile
+          experimental: false
+        - mongodb: '7.0'
+          ruby: ruby-3.2
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '7.2'
+          fle: helper
+          gemfile: gemfiles/rails-7.2.gemfile
+          experimental: false
+        - mongodb: '7.0'
+          ruby: ruby-3.2
+          topology: server
+          os: ubuntu-20.04
+          task: test
+          driver: current
+          rails: '7.1'
+          fle: helper
+          gemfile: gemfiles/rails-7.1.gemfile
+          experimental: false
+        - mongodb: '7.0'
           ruby: ruby-3.1
           topology: server
           os: ubuntu-20.04
@@ -69,16 +99,6 @@ jobs:
           rails: '6.1'
           fle: helper
           gemfile: gemfiles/rails-6.1.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '7.0'
-          fle: helper
-          gemfile: gemfiles/rails-7.0.gemfile
           experimental: false
         - mongodb: '6.0'
           ruby: ruby-3.0
@@ -126,28 +146,19 @@ jobs:
           driver: current
           gemfile: Gemfile
           experimental: false
-        - mongodb: '4.0'
-          ruby: ruby-2.7
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '3.6'
-          ruby: ruby-2.7
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
 
     steps:
     - name: repo checkout
       uses: actions/checkout@v2
       with:
         submodules: recursive
+
+    # the default python 3.8 doesn't cut it, and causes mongo-orchestration
+    # to fail in mongodb-labs/drivers-evergreen-tools.
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
     - id: start-mongodb
       name: start mongodb
       uses: mongodb-labs/drivers-evergreen-tools@master

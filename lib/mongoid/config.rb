@@ -178,10 +178,32 @@ module Mongoid
     #
     # Setting this flag to true restores the pre-9.0 behavior, where callbacks
     # for embedded documents are called. This may lead to stack overflow errors
-    # if there are more than cicrca 1000 embedded documents in the root
+    # if there are more than circa 1000 embedded documents in the root
     # document's dependencies graph.
     # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
     option :around_callbacks_for_embeds, default: false
+
+    # When this flag is false, named scopes cannot unset a default scope.
+    # This is the traditional (and default) behavior in Mongoid 9 and earlier.
+    #
+    # Setting this flag to true will allow named scopes to unset the default
+    # scope. This will be the default in Mongoid 10.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5785 for more details.
+    option :allow_scopes_to_unset_default_scope, default: false
+
+    # When this flag is false, indexes are (roughly) validated on the client
+    # to prevent duplicate indexes being declared. This validation is
+    # incomplete, however, and can result in some indexes being silently
+    # ignored.
+    #
+    # Setting this to true will allow duplicate indexes to be declared and sent
+    # to the server. The server will then validate the indexes and raise an
+    # exception if duplicates are detected.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5827 for an example of the
+    # consequences of duplicate index checking.
+    option :allow_duplicate_index_declarations, default: false
 
     # Returns the Config singleton, for use in the configure DSL.
     #
@@ -388,9 +410,13 @@ module Mongoid
     #   config.running_with_passenger?
     #
     # @return [ true | false ] If the app is deployed on Passenger.
+    #
+    # @deprecated
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end
+
+    Mongoid.deprecate(self, :running_with_passenger?)
 
     private
 

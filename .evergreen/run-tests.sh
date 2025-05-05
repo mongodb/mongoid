@@ -93,7 +93,12 @@ fi
 
 export BUNDLE_GEMFILE
 
-export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite&$uri_options"
+if test "$TOPOLOGY" = "sharded-cluster"; then
+  # We assume that sharded cluster has two mongoses
+  export MONGODB_URI="mongodb://localhost:27017,localhost:27018/?appName=test-suite&$uri_options"
+else
+  export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite&$uri_options"
+fi
 
 set +e
 if test -n "$TEST_CMD"; then
@@ -118,6 +123,6 @@ if test -f tmp/rspec-all.json; then
   mv tmp/rspec-all.json tmp/rspec.json
 fi
 
-python3 -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
+python3 -m mtools.mlaunch.mlaunch stop --dir "$dbdir" || true
 
 exit ${test_status}

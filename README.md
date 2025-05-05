@@ -14,14 +14,16 @@ Mongoid has [extensive user documentation](https://www.mongodb.com/docs/mongoid/
 Mongoid is built on top of the MongoDB Ruby driver which has
 [its own user documentation](https://www.mongodb.com/docs/ruby-driver/current/).
 
+High-level Mongoid documentation including tutorials and the reference that were in the docs folder can now be found at the docs-mongoid repository, [here](https://github.com/mongodb/docs-mongoid).
+
 Compatibility
 -------------
 
 Mongoid supports and is tested against:
 
-- MRI 2.7 - 3.1
+- MRI 2.7 - 3.2
 - JRuby 9.4
-- MongoDB server 3.6 - 6.0
+- MongoDB server 3.6 - 7.0
 
 Issues
 ------

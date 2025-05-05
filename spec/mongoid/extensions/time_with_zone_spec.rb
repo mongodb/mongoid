@@ -8,7 +8,7 @@ describe Mongoid::Extensions::TimeWithZone do
   describe ".demongoize" do
 
     let!(:time) do
-      Time.local(2010, 11, 19)
+      Time.zone.local(2010, 11, 19)
     end
 
     context "when the time zone is not defined" do
@@ -22,7 +22,7 @@ describe Mongoid::Extensions::TimeWithZone do
 
         it "returns the local time" do
           expect(ActiveSupport::TimeWithZone.demongoize(time).utc_offset).to eq(
-            Time.local(2010, 11, 19).utc_offset
+            Time.zone.local(2010, 11, 19).utc_offset
           )
         end
       end
@@ -41,7 +41,7 @@ describe Mongoid::Extensions::TimeWithZone do
       context "when we have a time close to midnight" do
 
         let(:time) do
-          Time.local(2010, 11, 19, 0, 30).utc
+          Time.zone.local(2010, 11, 19, 0, 30).utc
         end
 
         it "changes it back to the equivalent local time" do
@@ -136,7 +136,7 @@ describe Mongoid::Extensions::TimeWithZone do
   describe ".mongoize" do
 
     let!(:time) do
-      Time.local(2010, 11, 19)
+      Time.zone.local(2010, 11, 19)
     end
 
     context "when given nil" do
@@ -171,7 +171,7 @@ describe Mongoid::Extensions::TimeWithZone do
 
         it "returns a local date from the string" do
           expect(ActiveSupport::TimeWithZone.mongoize(time.to_s)).to eq(
-            Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
+            Time.zone.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
           )
         end
       end
@@ -275,7 +275,7 @@ describe Mongoid::Extensions::TimeWithZone do
       end
 
       it "converts to a utc time" do
-        expect(ActiveSupport::TimeWithZone.mongoize(date)).to eq(Time.local(date.year, date.month, date.day))
+        expect(ActiveSupport::TimeWithZone.mongoize(date)).to eq(Time.zone.local(date.year, date.month, date.day))
       end
 
       it "has a zero utc offset" do
@@ -302,7 +302,7 @@ describe Mongoid::Extensions::TimeWithZone do
       end
 
       it "returns a time" do
-        expect(ActiveSupport::TimeWithZone.mongoize(array)).to eq(Time.local(*array))
+        expect(ActiveSupport::TimeWithZone.mongoize(array)).to eq(Time.zone.local(*array))
       end
 
       context "when setting ActiveSupport time zone" do
@@ -320,7 +320,7 @@ describe Mongoid::Extensions::TimeWithZone do
   describe "#mongoize" do
 
     let!(:time) do
-      Time.local(2010, 11, 19)
+      Time.zone.local(2010, 11, 19)
     end
 
     it "converts to a utc time" do

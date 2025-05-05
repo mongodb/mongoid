@@ -90,11 +90,12 @@ module Mongoid
         # @example Get the sum for the provided block.
         #   aggregable.sum(&:likes)
         #
-        # @param [ Symbol ] field The field to sum.
+        # @param [ Symbol | Numeric ] field The field to sum, or the initial
+        #   value of the sum when a block is given.
         #
         # @return [ Numeric ] The sum value.
         def sum(field = nil)
-          return super() if block_given?
+          return super(field || 0) if block_given?
 
           aggregate_by(field, :sum) || 0
         end

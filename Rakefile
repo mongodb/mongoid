@@ -2,7 +2,6 @@
 # rubocop:todo all
 
 require "bundler"
-require "bundler/gem_tasks"
 Bundler.setup
 
 ROOT = File.expand_path(File.join(File.dirname(__FILE__)))
@@ -11,25 +10,53 @@ $: << File.join(ROOT, 'spec/shared/lib')
 
 require "rake"
 require "rspec/core/rake_task"
-require 'mrss/spec_organizer'
 
-$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-require "mongoid/version"
-
-tasks = Rake.application.instance_variable_get('@tasks')
-tasks['release:do'] = tasks.delete('release')
-
-task :gem => :build
+# stands in for the Bundler-provided `build` task, which builds the
+# gem for this project. Our release process builds the gems in a
+# particular way, in a GitHub action. This task is just to help remind
+# developers of that fact.
 task :build do
-  system "gem build mongoid.gemspec"
+  abort <<~WARNING
+    `rake build` does nothing in this project. The gem must be built via
+    the `Mongoid Release` action on GitHub, which is triggered manually when
+    a new release is ready.
+  WARNING
 end
 
-task :install => :build do
-  system "sudo gem install mongoid-#{Mongoid::VERSION}.gem"
+# `rake version` is used by the deployment system so get the release version
+# of the product beng deployed. It must do nothing more than just print the
+# product version number.
+# 
+# See the mongodb-labs/driver-github-tools/ruby/publish Github action.
+desc "Print the current value of Mongoid::VERSION"
+task :version do
+  require 'mongoid/version'
+
+  puts Mongoid::VERSION
 end
 
+# overrides the default Bundler-provided `release` task, which also
+# builds the gem. Our release process assumes the gem has already
+# been built (and signed via GPG), so we just need `rake release` to
+# push the gem to rubygems.
 task :release do
-  raise "Please use ./release.sh to release"
+  require 'mongoid/version'
+
+  if ENV['GITHUB_ACTION'].nil?
+    abort <<~WARNING
+      `rake release` must be invoked from the `Mongoid Release` GitHub action,
+      and must not be invoked locally. This ensures the gem is properly signed
+      and distributed by the appropriate user.
+
+      Note that it is the `rubygems/release-gem@v1` step in the `Mongoid Release`
+      action that invokes this task. Do not rename or remove this task, or the
+      release-gem step will fail. Reimplement this task with caution.
+
+      mongoid-#{Mongoid::VERSION}.gem was NOT pushed to RubyGems.
+    WARNING
+  end
+
+  system 'gem', 'push', "mongoid-#{Mongoid::VERSION}.gem"
 end
 
 RSpec::Core::RakeTask.new("spec") do |spec|
@@ -96,6 +123,8 @@ RUN_PRIORITY = %i(
 )
 
 def spec_organizer
+  require 'mrss/spec_organizer'
+
   Mrss::SpecOrganizer.new(
     root: ROOT,
     classifiers: CLASSIFIERS,
@@ -131,16 +160,10 @@ task :docs => 'docs:yard'
 namespace :docs do
   desc "Generate yard documentation"
   task :yard do
+    require "mongoid/version"
+
     out = File.join('yard-docs', Mongoid::VERSION)
     FileUtils.rm_rf(out)
     system "yardoc -o #{out} --title mongoid-#{Mongoid::VERSION}"
-  end
-end
-
-namespace :release do
-  task :check_private_key do
-    unless File.exist?('gem-private_key.pem')
-      raise "No private key present, cannot release"
-    end
   end
 end

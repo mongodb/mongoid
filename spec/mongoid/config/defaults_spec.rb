@@ -27,6 +27,8 @@ describe Mongoid::Config::Defaults do
       it "uses settings for 8.1" do
         expect(Mongoid.immutable_ids).to be false
         expect(Mongoid.legacy_persistence_context_behavior).to be true
+        expect(Mongoid.around_callbacks_for_embeds).to be true
+        expect(Mongoid.prevent_multiple_calls_of_embedded_callbacks).to be false
       end
     end
 
@@ -34,6 +36,8 @@ describe Mongoid::Config::Defaults do
       it "does not use settings for 8.1" do
         expect(Mongoid.immutable_ids).to be true
         expect(Mongoid.legacy_persistence_context_behavior).to be false
+        expect(Mongoid.around_callbacks_for_embeds).to be false
+        expect(Mongoid.prevent_multiple_calls_of_embedded_callbacks).to be true
       end
     end
 

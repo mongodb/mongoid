@@ -70,19 +70,23 @@ module Mongoid
         # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.blank?
-          begin
-            time = object.__mongoize_time__
-            if time.acts_like?(:time)
-              if object.respond_to?(:sec_fraction)
-                return ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
-              elsif time.respond_to?(:subsec)
-                return ::Time.at(time.to_i, time.subsec * 10**6).utc
-              else
-                return ::Time.at(time.to_i, time.usec).utc
+          
+          if object.respond_to?(:__mongoize_time__)
+            begin
+              time = object.__mongoize_time__
+              if time.acts_like?(:time)
+                if object.respond_to?(:sec_fraction)
+                  return ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
+                elsif time.respond_to?(:subsec)
+                  return ::Time.at(time.to_i, time.subsec * 10**6).utc
+                else
+                  return ::Time.at(time.to_i, time.usec).utc
+                end
               end
+            rescue ArgumentError
             end
-          rescue ArgumentError
           end
+
           Mongoid::RawValue.new(object, 'Time')
         end
       end
