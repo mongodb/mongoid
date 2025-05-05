@@ -14,6 +14,8 @@ Mongoid has [extensive user documentation](https://www.mongodb.com/docs/mongoid/
 Mongoid is built on top of the MongoDB Ruby driver which has
 [its own user documentation](https://www.mongodb.com/docs/ruby-driver/current/).
 
+High-level Mongoid documentation including tutorials and the reference that were in the docs folder can now be found at the docs-mongoid repository, [here](https://github.com/mongodb/docs-mongoid).
+
 Compatibility
 -------------
 

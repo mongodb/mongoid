@@ -15,13 +15,35 @@ describe Mongoid::Association::EagerLoadable do
       Mongoid::Contextual::Mongo.new(criteria)
     end
 
+    let(:association_host) { Account }
+
     let(:inclusions) do
       includes.map do |key|
-        Account.reflect_on_association(key)
+        association_host.reflect_on_association(key)
       end
     end
 
     let(:doc) { criteria.first }
+
+    context 'when root is an STI subclass' do
+      # Driver has_one Vehicle
+      # Vehicle belongs_to Driver
+      # Truck is a Vehicle
+
+      before do
+        Driver.create!(vehicle: Truck.new)
+      end
+
+      let(:criteria) { Truck.all }
+      let(:includes) { %i[ driver ] }
+      let(:association_host) { Truck }
+
+      it 'preloads the driver' do
+        expect(doc.ivar(:driver)).to be false
+        context.preload(inclusions, [ doc ])
+        expect(doc.ivar(:driver)).to be == Driver.first
+      end
+    end
 
     context "when belongs_to" do
 
@@ -43,7 +65,7 @@ describe Mongoid::Association::EagerLoadable do
       it "preloads the parent" do
         expect(doc.ivar(:person)).to be false
         context.preload(inclusions, [doc])
-        expect(doc.ivar(:person)).to eq(doc.person)
+        expect(doc.ivar(:person)).to be == person
       end
     end
 

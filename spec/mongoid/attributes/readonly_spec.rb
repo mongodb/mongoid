@@ -266,7 +266,26 @@ describe Mongoid::Attributes::Readonly do
           expect(child.mother).to be_nil
         end
       end
+    end
 
+    context "when a subclass inherits readonly fields" do
+      let(:attributes) do
+        [:title, :terms]
+      end
+
+      before do
+        class OldPerson < Person
+          attr_readonly :age
+        end
+      end
+
+      it "ensures subclass inherits the readonly attributes from parent" do
+        expect(OldPerson.readonly_attributes.to_a).to include("title","terms")
+      end
+
+      it "ensures subclass does not modify parent's readonly attributes" do
+        expect(Person.readonly_attributes.to_a).not_to include("age")
+      end
     end
   end
 end

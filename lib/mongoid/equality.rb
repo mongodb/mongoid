@@ -18,6 +18,7 @@ module Mongoid
     #
     # @return [ Integer ] -1, 0, 1.
     def <=>(other)
+      return super unless other.is_a?(Mongoid::Equality)
       attributes["_id"].to_s <=> other.attributes["_id"].to_s
     end
 

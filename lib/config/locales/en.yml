@@ -140,6 +140,10 @@ en:
             A collation option is only supported if the query is executed on a MongoDB server
             with version >= 3.4."
           resolution: "Remove the collation option from the query."
+        invalid_around_callback:
+          message: "An around callback must contain a yield in its definition."
+          summary: "The block needs to be yielded to for around callbacks to function as intended."
+          resolution: "Ensure there is a yield statement inside the body of the around callback."
         invalid_async_query_executor:
           message: "Invalid async_query_executor option: %{executor}."
           summary: "A invalid async query executor was specified.
@@ -676,6 +680,22 @@ en:
           resolution: "The _type field is a reserved one used by Mongoid to determine the
             class for instantiating an object. Please don't save data in this field or ensure
             that any values in this field correspond to valid models."
+        unrecognized_model_alias:
+          message: "Cannot find any model with type %{model_alias}"
+          summary: "A document is trying to load a polymorphic association, but the data refers to a type of object that can't be resolved (%{model_alias}). It might be that you've renamed the target class."
+          resolution: "Register the old name as an alias on the refactored target object, using `identify_as`. This will allow Mongoid to find the target type even if the name no longer matches what was stored in the database."
+        unrecognized_resolver:
+          message: "The model resolver %{resolver} was referenced, but never registered."
+          summary: "A polymorphic association has been configured to use a resolver
+            named %{resolver}, but that resolver has not yet been registered. This
+            might be a typo. Currently registered resolvers are: %{resolvers}."
+          resolution: "Register custom resolvers with
+            `Mongoid::ModelResolver.register_resolver` before attempting to query
+            a polymorphic association."
+        unregistered_class:
+          message: "The class %{klass} is not registered with the resolver %{resolver}."
+          summary: "A polymorphic association using the resolver %{resolver} has tried to link to a model of type %{klass}, but the resolver has no knowledge of any such model. This can happen if the association is configured to use a different resolver than the target mode."
+          resolution: "Make sure the target model is registered with the same resolver as the polymorphic association, using `identify_as`."
         unsaved_document:
           message: "Attempted to save %{document} before the parent %{base}."
           summary: "You cannot call create or create! through the

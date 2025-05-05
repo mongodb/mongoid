@@ -277,7 +277,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -331,7 +331,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all
@@ -381,7 +381,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -435,7 +435,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all
@@ -1240,16 +1240,26 @@ describe Mongoid::Contextual::Mongo do
             subscriber = Mrss::EventSubscriber.new
             context.view.client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
 
-            enum.next
+            # first batch
+            5.times { enum.next }
 
             find_events = subscriber.all_events.select do |evt|
               evt.command_name == 'find'
             end
-            expect(find_events.length).to be(2)
+            expect(find_events.length).to be > 0
             get_more_events = subscriber.all_events.select do |evt|
               evt.command_name == 'getMore'
             end
-            expect(get_more_events.length).to be(0)
+            expect(get_more_events.length).to be == 0
+
+            # force the second batch to be loaded
+            enum.next
+
+            get_more_events = subscriber.all_events.select do |evt|
+              evt.command_name == 'getMore'
+            end
+            expect(get_more_events.length).to be > 0
+
           ensure
             context.view.client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
           end
@@ -3638,6 +3648,75 @@ describe Mongoid::Contextual::Mongo do
 
             it "updates the last matching document" do
               expect(new_order.reload.genres).to eq(["electronic"])
+            end
+          end
+
+          context "when operation is $pull" do
+            context "when pulling single element" do
+
+              before do
+                depeche_mode.update_attribute(:genres, ["electronic", "pop"])
+                new_order.update_attribute(:genres, ["electronic", "pop"])
+                context.update_all("$pull" => { genres: "electronic" })
+              end
+
+              it "updates the first matching document" do
+                expect(depeche_mode.reload.genres).to eq(["pop"])
+              end
+
+              it "updates the last matching document" do
+                expect(new_order.reload.genres).to eq(["pop"])
+              end
+            end
+
+            context "when pulling based on condition" do
+              before do
+                depeche_mode.update_attribute(:genres, ["electronic", "pop", "dance"])
+                new_order.update_attribute(:genres, ["electronic", "pop", "dance"])
+                context.update_all("$pull" => { genres: { '$in' => ["electronic", "pop"] } })
+              end
+
+              it "updates the first matching document" do
+                expect(depeche_mode.reload.genres).to eq(["dance"])
+              end
+
+              it "updates the last matching document" do
+                expect(new_order.reload.genres).to eq(["dance"])
+              end
+            end
+          end
+
+          context "when operation is $pop" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["pop", "electronic"])
+            end
+
+            it "removes first element in array" do
+              context.update_all("$pop" => { genres: -1 })
+              expect(depeche_mode.reload.genres).to eq(["electronic"])
+            end
+
+            it "removes last element in array" do
+              context.update_all("$pop" => { genres: 1 })
+              expect(depeche_mode.reload.genres).to eq(["pop"])
+            end
+          end
+
+          context "when operation is $pullAll" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["pop", "electronic", "dance", "pop" ])
+              new_order.update_attribute(:genres, ["electronic", "pop", "electronic", "dance"])
+              context.update_all("$pullAll" => { genres: ["pop", "electronic"] })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["dance"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["dance"])
             end
           end
         end
