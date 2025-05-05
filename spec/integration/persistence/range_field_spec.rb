@@ -249,6 +249,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq nil
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)
@@ -262,6 +263,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq true
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)
@@ -275,6 +277,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq nil
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)
@@ -288,6 +291,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq true
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)
@@ -301,6 +305,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq nil
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)
@@ -314,6 +319,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq true
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)
@@ -327,6 +333,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq nil
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)
@@ -340,6 +347,7 @@ describe 'Range field persistence' do
 
       it do
         expect(subject).to be_a Hash
+        expect(subject).not_to be_a BSON::Document
         expect(subject['exclude_end']).to eq true
         expect(subject['min']).to be_within(0.01.second).of(now_utc)
         expect(subject['max']).to be_within(0.01.second).of(later_utc)

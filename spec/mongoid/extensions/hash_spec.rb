@@ -164,18 +164,59 @@ describe Mongoid::Extensions::Hash do
   end
 
   describe ".demongoize" do
-
-    let(:hash) do
-      { field: 1 }
+    let(:demongoized) do
+      Hash.demongoize(object)
     end
 
-    it "returns the hash" do
-      expect(Hash.demongoize(hash)).to eq(hash)
+    context 'when object is a Hash' do
+      let(:object) do
+        { field: 1 }
+      end
+
+      it 'returns the hash itself' do
+        expect(demongoized).to be(object)
+      end
+    end
+
+    context 'when object is a BSON::Document' do
+      let(:object) do
+        BSON::Document.new('field' => 1)
+      end
+
+      it 'returns a new Hash' do
+        expect(demongoized).to be_a(Hash)
+        expect(demongoized).not_to be_a(BSON::Document)
+      end
+
+      it 'returns a Hash with the correct contents' do
+        expect(demongoized).to eq('field' => 1)
+      end
+
+      context 'with nested documents' do
+        let(:object) do
+          BSON::Document.new('field1' => 1, 'nested' => BSON::Document.new('field2' => 2))
+        end
+
+        it 'returns a new Hash' do
+          expect(demongoized).to be_a(Hash)
+          expect(demongoized).not_to be_a(BSON::Document)
+        end
+
+        it 'the nested documents as Hashes' do
+          nested = demongoized['nested']
+          expect(nested).to be_a(Hash)
+          expect(nested).not_to be_a(BSON::Document)
+        end
+
+        it 'returns a Hash with the correct contents' do
+          expect(demongoized).to eq('field1' => 1, 'nested' => { 'field2' => 2 })
+        end
+      end
     end
 
     context "when object is nil" do
-      let(:demongoized) do
-        Hash.demongoize(nil)
+      let(:object) do
+        nil
       end
 
       it "returns nil" do
@@ -184,8 +225,8 @@ describe Mongoid::Extensions::Hash do
     end
 
     context "when the object is uncastable" do
-      let(:demongoized) do
-        Hash.demongoize(1)
+      let(:object) do
+        1
       end
 
       it "returns the object" do

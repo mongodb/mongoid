@@ -121,12 +121,39 @@ module Mongoid
         #
         # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
-          return if object.nil?
           case object
           when BSON::Document
+            # TODO: This can call object.transform_values after RUBY-3664
+            # is included in Mongoid's minimum BSON version.
             object.dup.transform_values!(&:mongoize)
           when Hash
             BSON::Document.new(object.transform_values(&:mongoize))
+          end
+        end
+
+        # Convert the object from its mongo friendly ruby type to a ruby type.
+        #
+        # @example Demongoize the object.
+        #   Hash.demongoize(object)
+        #
+        # @param [ Object ] object The object to demongoize.
+        #
+        # @return [ Hash | Object ] The demongoized Hash, or the object if
+        #   it cannot be cast.
+        def demongoize(object)
+          # TODO: This can simply call object.is_a?(Hash) ? object.to_hash : object
+          # after RUBY-3664 is included in Mongoid's minimum BSON version.
+          case object
+          when BSON::Document
+            hash = {}
+            object.each_pair do |k, v|
+              hash[k] = v.is_a?(BSON::Document) ? demongoize(v) : v
+            end
+            hash
+          when Hash
+            object.to_hash
+          else
+            super
           end
         end
 
