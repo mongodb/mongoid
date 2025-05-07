@@ -102,7 +102,7 @@ module Mongoid
     #
     #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
     #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
-    #      that uses the +async_query_concurrency+ for the +max_threads+ value.
+    #      that uses the +global_executor_concurrency+ for the +max_threads+ value.
     option :async_query_executor, default: :immediate
 
     # Defines how many asynchronous queries can be executed concurrently.
