@@ -18,6 +18,5 @@ end
 
 gem 'i18n', *i18n_versions
 
-platform :windows do
-  gem 'tzinfo-data'
-end
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem "tzinfo-data", platforms: %i[ windows jruby ]
