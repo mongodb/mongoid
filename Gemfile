@@ -17,3 +17,7 @@ if RUBY_PLATFORM =~ /java/
 end
 
 gem 'i18n', *i18n_versions
+
+platform :windows do
+  gem 'tzinfo-data'
+end
