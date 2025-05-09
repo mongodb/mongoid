@@ -3,15 +3,6 @@
 
 module Mongoid
   module Expectations
-    def connection_class
-      if defined?(Mongo::Server::ConnectionBase)
-        Mongo::Server::ConnectionBase
-      else
-        # Pre-2.8 drivers
-        Mongo::Server::Connection
-      end
-    end
-
     def expect_query(number)
       if %i[ sharded load-balanced ].include?(ClusterConfig.instance.topology) && number > 0
         skip 'This spec requires replica set or standalone topology'
@@ -19,9 +10,9 @@ module Mongoid
       rv = nil
       RSpec::Mocks.with_temporary_scope do
         if number > 0
-          expect_any_instance_of(connection_class).to receive(:command_started).exactly(number).times.and_call_original
+          expect_any_instance_of(Mongo::Server::ConnectionBase).to receive(:command_started).exactly(number).times.and_call_original
         else
-          expect_any_instance_of(connection_class).not_to receive(:command_started)
+          expect_any_instance_of(Mongo::Server::ConnectionBase).not_to receive(:command_started)
         end
         rv = yield
       end
