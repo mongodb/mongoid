@@ -9,13 +9,13 @@ module Mongoid
         skip 'This spec requires replica set or standalone topology'
       end
 
-      RSpec::Mocks.with_temporary_scope do
-        klass = Mongo::Server::ConnectionBase
+      klass = Mongo::Server::ConnectionBase
+      original_method = klass.instance_method(:command_started)
 
+      RSpec::Mocks.with_temporary_scope do
         if number > 0
           # Due to changes in Ruby 3.3, RSpec's #and_call_original (which wraps the target
           # method) causes infinite recursion. We can achieve the same behavior with binding.
-          original_method = klass.instance_method(:command_started)
           expect_any_instance_of(klass).to receive(:command_started).exactly(number).times do |*args, **kwargs|
             original_method.bind_call(*args, **kwargs)
           end
