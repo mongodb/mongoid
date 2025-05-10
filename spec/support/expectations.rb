@@ -3,7 +3,6 @@
 module Mongoid
   module Expectations
     # rubocop:disable Metrics/AbcSize
-    # rubocop:disable RSpec/AnyInstance
     def expect_query(number)
       if %i[ sharded load-balanced ].include?(ClusterConfig.instance.topology) && number > 0
         skip 'This spec requires replica set or standalone topology'
@@ -11,23 +10,23 @@ module Mongoid
 
       klass = Mongo::Server::ConnectionBase
       original_method = klass.instance_method(:command_started)
+      query_count = 0
 
-      RSpec::Mocks.with_temporary_scope do
-        if number > 0
-          # Due to changes in Ruby 3.3, RSpec's #and_call_original (which wraps the target
-          # method) causes infinite recursion. We can achieve the same behavior with binding.
-          expect_any_instance_of(klass).to receive(:command_started).exactly(number).times do |*args, **kwargs|
-            original_method.bind_call(*args, **kwargs)
-          end
-        else
-          expect_any_instance_of(klass).not_to receive(:command_started)
+      begin
+        klass.define_method(:command_started) do |*args, **kwargs|
+          query_count += 1
+          original_method.bind(self).call(*args, **kwargs)
         end
 
-        yield
+        result = yield
+        expect(query_count).to eq(number)
+        result
+      ensure
+        klass.remove_method(:command_started)
+        klass.define_method(:command_started, original_method)
       end
     end
     # rubocop:enable Metrics/AbcSize
-    # rubocop:enable RSpec/AnyInstance
 
     def expect_no_queries(&block)
       expect_query(0, &block)
