@@ -122,12 +122,8 @@ module Mongoid
         # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
-          case object
-          when BSON::Document
-            object.dup.transform_values!(&:mongoize)
-          when Hash
-            BSON::Document.new(object.transform_values(&:mongoize))
-          end
+
+          object.dup.transform_values!(&:mongoize)
         end
 
         # Can the size of this object change?
