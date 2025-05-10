@@ -2,7 +2,8 @@
 
 module Mongoid
   module Expectations
-    # rubocop:disable Metrics/AbcSize
+    # Previously this method used RSpec::Mocks with .exactly.times(n).and_call_original,
+    # which stopped working reliably in Ruby 3.3. Now we directly wrap the target method.
     def expect_query(number)
       if %i[ sharded load-balanced ].include?(ClusterConfig.instance.topology) && number > 0
         skip 'This spec requires replica set or standalone topology'
@@ -15,7 +16,7 @@ module Mongoid
       begin
         klass.define_method(:command_started) do |*args, **kwargs|
           query_count += 1
-          original_method.bind(self).call(*args, **kwargs)
+          original_method.bind_call(self, *args, **kwargs)
         end
 
         result = yield
@@ -26,7 +27,6 @@ module Mongoid
         klass.define_method(:command_started, original_method)
       end
     end
-    # rubocop:enable Metrics/AbcSize
 
     def expect_no_queries(&block)
       expect_query(0, &block)
