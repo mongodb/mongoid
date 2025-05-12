@@ -64,9 +64,15 @@ describe Mongoid::Errors::DocumentNotFound do
       end
 
       it "contains the problem in the message" do
-        expect(error.message).to include(
-          "Document not found for class Person with attributes {:name=>\"syd\"}."
-        )
+        if RUBY_VERSION >= '3.4.0'
+          expect(error.message).to include(
+            'Document not found for class Person with attributes {name: "syd"}.'
+          )
+        else
+          expect(error.message).to include(
+            'Document not found for class Person with attributes {:name=>"syd"}.'
+          )
+        end
       end
 
       it "contains the summary in the message" do
