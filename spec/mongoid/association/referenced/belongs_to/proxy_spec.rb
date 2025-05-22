@@ -2,6 +2,7 @@
 # rubocop:todo all
 
 require "spec_helper"
+require 'support/models/canvas'
 require_relative '../belongs_to_models.rb'
 
 describe Mongoid::Association::Referenced::BelongsTo::Proxy do
@@ -749,6 +750,10 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           person.drugs = [drug]
           person.save!
         end
+
+        # NOTE: there as a bad interdependency here, with the auto_save_spec.rb
+        # file. If auto_save_spec.rb runs before this, the following specs fail
+        # with "undefined method `nullify' for an instance of Person".
 
         context "when parent exists" do
 

@@ -46,6 +46,7 @@ module Mongoid
       :none,
       :pick,
       :pluck,
+      :raw,
       :read,
       :second,
       :second!,
@@ -55,13 +56,12 @@ module Mongoid
       :take,
       :take!,
       :tally,
-      :text_search,
       :third,
       :third!,
       :third_to_last,
       :third_to_last!,
       :update,
-      :update_all,
+      :update_all
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.
@@ -147,7 +147,7 @@ module Mongoid
     # during query construction.
     #
     # If this method is given a block, it delegates to +Enumerable#find+ and
-    # returns the first document of those found by the current Crieria object
+    # returns the first document of those found by the current Criteria object
     # for which the block returns a truthy value. If both a block and ids are
     # given, the block is ignored and the documents for the given ids are
     # returned. If a block and a Proc are given, the method delegates to
