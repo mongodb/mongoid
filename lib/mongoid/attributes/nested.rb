@@ -60,7 +60,8 @@ module Mongoid
             re_define_method(meth) do |attrs|
               _assigning do
                 if association.polymorphic? and association.inverse_type
-                  options = options.merge!(:class_name => self.send(association.inverse_type))
+                  klass = association.resolver.model_for(send(association.inverse_type))
+                  options = options.merge!(:class_name => klass)
                 end
                 association.nested_builder(attrs, options).build(self)
               end

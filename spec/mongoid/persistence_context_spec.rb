@@ -206,12 +206,25 @@ describe Mongoid::PersistenceContext do
 
         context 'when the options are valid extra options' do
 
-          let(:options) do
-            { collection: 'other' }
+          context 'collection' do
+
+            let(:options) do
+              { collection: 'other' }
+            end
+
+            it 'sets the options on the persistence context object' do
+              expect(persistence_context.collection_name).to eq(options[:collection].to_sym)
+            end
           end
 
-          it 'sets the options on the persistence context object' do
-            expect(persistence_context.collection_name).to eq(options[:collection].to_sym)
+          context 'collection_options' do
+            let(:options) do
+              { collection_options: { capped: true } }
+            end
+
+            it 'does not propagate to client options' do
+              expect(persistence_context.send(:client_options).key?(:collection_options)).to eq(false)
+            end
           end
         end
 
@@ -523,6 +536,20 @@ describe Mongoid::PersistenceContext do
         end
       end
     end
+
+    context 'when the database is specified as a proc' do
+      let(:options) { { database: ->{ 'other' } } }
+
+      after { persistence_context.client.close }
+
+      it 'evaluates the proc' do
+        expect(persistence_context.database_name).to eq(:other)
+      end
+
+      it 'does not pass the proc to the client' do
+        expect(persistence_context.client.database.name).to eq('other')
+      end
+    end
   end
 
   describe '#client' do
@@ -555,6 +582,14 @@ describe Mongoid::PersistenceContext do
 
       it 'uses the client option' do
         expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+      end
+
+      context 'when the client option is a proc' do
+        let(:options) { { client: -> { :alternative } } }
+
+        it 'evaluates the proc' do
+          expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+        end
       end
 
       context 'when there is a client override' do
@@ -592,6 +627,23 @@ describe Mongoid::PersistenceContext do
             expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
           end
         end
+      end
+    end
+
+    context 'when the client is set as a proc in the storage options' do
+      let(:options) { {} }
+
+      before do
+        Band.store_in client: ->{ :alternative }
+      end
+
+      after do
+        persistence_context.client.close
+        Band.store_in client: nil
+      end
+
+      it 'uses the client option' do
+        expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
       end
     end
 

@@ -169,12 +169,12 @@ module Mongoid
         args.size > 1 || !args.first.is_a?(Hash) && args.first.resizable?
       end
 
-      # Convenience method of raising an invalid options error.
+      # Convenience method of raising an invalid find error.
       #
       # @example Raise the error.
       #   criteria.raise_invalid
       #
-      # @raise [ Errors::InvalidOptions ] The error.
+      # @raise [ Errors::InvalidFind ] The error.
       def raise_invalid
         raise Errors::InvalidFind.new
       end

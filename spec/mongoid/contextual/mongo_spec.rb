@@ -277,7 +277,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -331,7 +331,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all
@@ -381,7 +381,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -435,7 +435,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all
@@ -1240,16 +1240,26 @@ describe Mongoid::Contextual::Mongo do
             subscriber = Mrss::EventSubscriber.new
             context.view.client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
 
-            enum.next
+            # first batch
+            5.times { enum.next }
 
             find_events = subscriber.all_events.select do |evt|
               evt.command_name == 'find'
             end
-            expect(find_events.length).to be(2)
+            expect(find_events.length).to be > 0
             get_more_events = subscriber.all_events.select do |evt|
               evt.command_name == 'getMore'
             end
-            expect(get_more_events.length).to be(0)
+            expect(get_more_events.length).to be == 0
+
+            # force the second batch to be loaded
+            enum.next
+
+            get_more_events = subscriber.all_events.select do |evt|
+              evt.command_name == 'getMore'
+            end
+            expect(get_more_events.length).to be > 0
+
           ensure
             context.view.client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
           end
@@ -3281,6 +3291,12 @@ describe Mongoid::Contextual::Mongo do
 
     it "limits the results" do
       expect(context.skip(1).entries).to eq([ new_order ])
+    end
+
+    context "with #last" do
+      it "returns the nth from last element" do
+        expect(context.skip(1).last).to eq(depeche_mode)
+      end
     end
   end
 

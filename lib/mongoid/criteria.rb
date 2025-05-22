@@ -88,7 +88,7 @@ module Mongoid
     # and finds one or many documents for the provided _id values.
     #
     # If this method is given a block, it delegates to +Enumerable#find+ and
-    # returns the first document of those found by the current Crieria object
+    # returns the first document of those found by the current Criteria object
     # for which the block returns a truthy value.
     #
     # Note that the "default proc" argument of Enumerable is not specially
@@ -99,7 +99,7 @@ module Mongoid
     #   a nested array. Each array will be flattened.
     #
     # @example Finds a document by its _id, invokes Findable#find.
-    #   critera.find("1234")
+    #   criteria.find("1234")
     #
     # @example Finds the first matching document using a block, invokes Enumerable#find.
     #   criteria.find { |item| item.name == "Depeche Mode" }
@@ -170,6 +170,67 @@ module Mongoid
     # @return [ true | false ] If the criteria is embedded.
     def embedded?
       !!@embedded
+    end
+
+    # Produce a clone of the current criteria object with it's "raw"
+    # setting set to the given value. A criteria set to "raw" will return
+    # all results as raw hashes. If `typed` is true, the values in the hashes
+    # will be typecast according to the fields that they correspond to.
+    #
+    # When "raw" is not set (or if `raw_results` is false), the criteria will
+    # return all results as instantiated Document instances.
+    #
+    # @example Return query results as raw hashes:
+    #   Person.where(city: 'Boston').raw
+    #
+    # @param [ true | false ] raw_results Whether the new criteria should be
+    #   placed in "raw" mode or not.
+    # @param [ true | false ] typed Whether the raw results should be typecast
+    #   before being returned. Default is true if raw_results is false, and
+    #   false otherwise.
+    #
+    # @return [ Criteria ] the cloned criteria object.
+    def raw(raw_results = true, typed: nil)
+      # default for typed is true when raw_results is false, and false when
+      # raw_results is true.
+      typed = !raw_results if typed.nil?
+
+      if !typed && !raw_results
+        raise ArgumentError, 'instantiated results must be typecast'
+      end
+
+      clone.tap do |criteria|
+        criteria._raw_results = { raw: raw_results, typed: typed }
+      end
+    end
+
+    # An internal helper for getting/setting the "raw" flag on a given criteria
+    # object.
+    #
+    # @return [ nil | Hash ] If set, it is a hash with two keys, :raw and :typed,
+    #   that describe whether raw results should be returned, and whether they
+    #   ought to be typecast.
+    #
+    # @api private
+    attr_accessor :_raw_results
+
+    # Predicate that answers the question: is this criteria object currently
+    # in raw mode? (See #raw for a description of raw mode.)
+    #
+    # @return [ true | false ] whether the criteria is in raw mode or not.
+    def raw_results?
+      _raw_results && _raw_results[:raw]
+    end
+
+    # Predicate that answers the question: should the results returned by
+    # this criteria object be typecast? (See #raw for a description of this.)
+    # The answer is meaningless unless #raw_results? is true, since if
+    # instantiated document objects are returned they will always be typecast.
+    #
+    # @return [ true | false ] whether the criteria should return typecast
+    #   results.
+    def typecast_results?
+      _raw_results && _raw_results[:typed]
     end
 
     # Extract a single id from the provided criteria. Could be in an $and
@@ -278,6 +339,7 @@ module Mongoid
       self.documents = other.documents.dup unless other.documents.empty?
       self.scoping_options = other.scoping_options
       self.inclusions = (inclusions + other.inclusions).uniq
+      self._raw_results = self._raw_results || other._raw_results
       self
     end
 
@@ -302,7 +364,7 @@ module Mongoid
       !!@none
     end
 
-    # Overriden to include _type in the fields.
+    # Overridden to include _type in the fields.
     #
     # @example Limit the fields returned from the database.
     #   Band.only(:name)
@@ -336,7 +398,7 @@ module Mongoid
       end
     end
 
-    # Overriden to exclude _id from the fields.
+    # Overridden to exclude _id from the fields.
     #
     # @example Exclude fields returned from the database.
     #   Band.without(:name)
@@ -352,7 +414,7 @@ module Mongoid
     # Returns true if criteria responds to the given method.
     #
     # @example Does the criteria respond to the method?
-    #   crtiteria.respond_to?(:each)
+    #   criteria.respond_to?(:each)
     #
     # @param [ Symbol ] name The name of the class method on the +Document+.
     # @param [ true | false ] include_private Whether to include privates.
@@ -421,8 +483,8 @@ module Mongoid
       # Historically this method required exactly one argument.
       # As of https://jira.mongodb.org/browse/MONGOID-4804 it also accepts
       # zero arguments.
-      # The underlying where implemetation that super invokes supports
-      # any number of arguments, but we don't presently allow mutiple
+      # The underlying where implementation that super invokes supports
+      # any number of arguments, but we don't presently allow multiple
       # arguments through this method. This API can be reconsidered in the
       # future.
       if args.length > 1
@@ -513,6 +575,7 @@ module Mongoid
       @inclusions = other.inclusions.dup
       @scoping_options = other.scoping_options
       @documents = other.documents.dup
+      self._raw_results = other._raw_results
       @context = nil
       super
     end

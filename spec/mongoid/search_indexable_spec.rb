@@ -28,7 +28,7 @@ class SearchIndexHelper
 
   # Wait until all of the indexes with the given names are absent from the
   # search index list.
-  def wait_for_absense_of(*names)
+  def wait_for_absence_of(*names)
     names.flatten.each do |name|
       timeboxed_wait do
         break if collection.search_indexes(name: name).empty?
@@ -123,7 +123,7 @@ describe Mongoid::SearchIndexable do
 
       before do
         model.remove_search_index id: target_index['id']
-        helper.wait_for_absense_of target_index['name']
+        helper.wait_for_absence_of target_index['name']
       end
 
       it 'removes the requested index' do
@@ -135,7 +135,7 @@ describe Mongoid::SearchIndexable do
       before do
         actual_indexes # wait for the indexes to be created
         model.remove_search_indexes
-        helper.wait_for_absense_of(actual_indexes.map { |i| i['name'] })
+        helper.wait_for_absence_of(actual_indexes.map { |i| i['name'] })
       end
 
       it 'removes the indexes' do
