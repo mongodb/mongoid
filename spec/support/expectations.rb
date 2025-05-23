@@ -1,29 +1,31 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Expectations
-
-    def connection_class
-      if defined?(Mongo::Server::ConnectionBase)
-        Mongo::Server::ConnectionBase
-      else
-        # Pre-2.8 drivers
-        Mongo::Server::Connection
-      end
-    end
-
+    # Previously this method used RSpec::Mocks with .exactly.times(n).and_call_original,
+    # which stopped working reliably in Ruby 3.3. Now we directly wrap the target method.
     def expect_query(number)
-      rv = nil
-      RSpec::Mocks.with_temporary_scope do
-        if number > 0
-          expect_any_instance_of(connection_class).to receive(:command_started).exactly(number).times.and_call_original
-        else
-          expect_any_instance_of(connection_class).not_to receive(:command_started)
-        end
-        rv = yield
+      if %i[ sharded load-balanced ].include?(ClusterConfig.instance.topology) && number > 0
+        skip 'This spec requires replica set or standalone topology'
       end
-      rv
+
+      klass = Mongo::Server::ConnectionBase
+      original_method = klass.instance_method(:command_started)
+      query_count = 0
+
+      begin
+        klass.define_method(:command_started) do |*args, **kwargs|
+          query_count += 1
+          original_method.bind_call(self, *args, **kwargs)
+        end
+
+        result = yield
+        expect(query_count).to eq(number)
+        result
+      ensure
+        klass.remove_method(:command_started)
+        klass.define_method(:command_started, original_method)
+      end
     end
 
     def expect_no_queries(&block)
