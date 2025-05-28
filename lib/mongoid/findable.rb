@@ -107,8 +107,14 @@ module Mongoid
     # @example Do any documents exist for given conditions.
     #   Person.exists?(name: "...")
     #
-    # @param [ Hash | Object | false ] id_or_conditions an _id to
-    #   search for, a hash of conditions, nil or false.
+    # @example Return false if nil is given.
+    #   missing_person = nil
+    #   Person.exists?(missing_person&._id) #=> false
+    #
+    # @param [ :none | Hash | BSON::ObjectId | nil | false ] id_or_conditions
+    #   May optionally supply search conditions as a hash or an object id.
+    #   Will always return false when given nil or false. The symbol :none is
+    #   the default when argument is not supplied.
     #
     # @return [ true | false ] If any documents exist for the conditions.
     #   Always false if passed nil or false.
