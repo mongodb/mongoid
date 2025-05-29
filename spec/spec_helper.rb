@@ -81,7 +81,7 @@ CONFIG = {
         heartbeat_frequency: 180,
         user: SpecConfig.instance.uri.client_options[:user] || MONGOID_ROOT_USER.name,
         password: SpecConfig.instance.uri.client_options[:password] || MONGOID_ROOT_USER.password,
-        auth_source: Mongo::Database::ADMIN
+        auth_source: Mongo::Database::ADMIN,
       )
     }
   },
@@ -94,6 +94,13 @@ CONFIG = {
     end,
   }
 }
+
+if SpecConfig.instance.uri.uri_options[:load_balanced]
+  # If the URI specifies load balancing, we need to set the load_balanced option
+  # in the client configuration.
+  CONFIG[:clients][:default][:options][:load_balanced] = true
+  CONFIG[:clients][:default][:options][:connect] = :load_balanced
+end
 
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
@@ -126,9 +133,12 @@ if %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
 end
 
 unless SpecConfig.instance.atlas?
+  uri_options = SpecConfig.instance.uri.uri_options.merge(server_selection_timeout: 3.03)
+  uri_options[:connect] = :load_balanced if uri_options[:load_balanced]
+
   # The user must be created before any of the tests are loaded, until
   # https://jira.mongodb.org/browse/MONGOID-4827 is implemented.
-  client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
+  client = Mongo::Client.new(SpecConfig.instance.addresses, uri_options)
   begin
     # Create the root user administrator as the first user to be added to the
     # database. This user will need to be authenticated in order to add any

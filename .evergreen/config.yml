@@ -39,7 +39,7 @@ functions:
           git submodule update --init --recursive
 
   "create expansions":
-    # Make an evergreen expansion file with dynamic values
+    # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
       params:
         working_dir: "src"
@@ -427,6 +427,10 @@ axes:
         display_name: Sharded Cluster
         variables:
            TOPOLOGY: "sharded-cluster"
+      - id: "load-balanced"
+        display_name: Load Balanced
+        variables:
+           TOPOLOGY: "load-balanced"
 
   - id: "auth"
     display_name: Authentication
@@ -639,22 +643,22 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-3.3"
+- matrix_name: "ruby-3.2 + db-7.0"
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
-    topology: '*'
+    topology: ['standalone', 'replica-set', 'sharded-cluster']
     mongodb-version: ['7.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-3.2"
+- matrix_name: "ruby-3.2 + db-6.0"
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
-    topology: '*'
+    topology: ['standalone', 'replica-set', 'sharded-cluster']
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -665,7 +669,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.1"]
     driver: ["current"]
-    topology: '*'
+    topology: ['standalone', 'replica-set', 'sharded-cluster']
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -698,7 +702,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-2.7"]
     driver: ["current"]
-    topology: '*'
+    topology: ['standalone', 'replica-set', 'sharded-cluster']
     mongodb-version: ['4.4']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
