@@ -39,7 +39,7 @@ functions:
           git submodule update --init --recursive
 
   "create expansions":
-    # Make an evergreen exapanstion file with dynamic values
+    # Make an evergreen exapansion file with dynamic values
     - command: shell.exec
       params:
         working_dir: "src"
