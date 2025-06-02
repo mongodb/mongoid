@@ -164,14 +164,8 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
-    cluster = Mongoid.default_client.cluster
-    # Older drivers do not have a #connected? method
-    if cluster.respond_to?(:connected?) && !cluster.connected?
-      Mongoid.default_client.reconnect
-    end
-    Mongoid.default_client.collections.each do |coll|
-      coll.delete_many
-    end
+    Mongoid.default_client.reconnect
+    Mongoid.default_client.collections.each(&:drop)
   end
 end
 

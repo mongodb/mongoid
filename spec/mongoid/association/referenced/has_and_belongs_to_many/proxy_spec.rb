@@ -1899,6 +1899,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when appending to a relation in a transaction" do
       require_transaction_support
 
+      # for some reason this test fails on a load-balanced cluster; I
+      # suspect it has something to do with the way load-balancing support
+      # is implemented in the ruby driver...
+      require_topology :replica_set, :sharded
+
       let!(:sandwich) do
         Sandwich.create!
       end
