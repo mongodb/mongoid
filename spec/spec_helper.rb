@@ -164,7 +164,11 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
-    Mongoid.default_client.reconnect
+    cluster = Mongoid.default_client.cluster
+    if cluster.load_balanced? || !cluster.connected?
+      Mongoid.default_client.reconnect
+    end
+
     Mongoid.default_client.collections.each(&:drop)
   end
 end
