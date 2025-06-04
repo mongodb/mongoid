@@ -352,4 +352,21 @@ describe Mongoid::Tasks::Database do
       expect(indexes.select{ |doc| doc["name"] == "_id_" }).to_not be_empty
     end
   end
+
+  describe '.shard_collections' do
+    context 'when the cluster is load-balanced' do
+      require_topology :load_balanced
+
+      let(:model) { Profile }
+
+      before do
+        expect(logger).not_to receive(:warn)
+      end
+
+      it "permits load-balanced clusters to act as sharded" do
+        result = described_class.shard_collections([ model ])
+        expect(result).to include(model)
+      end
+    end
+  end
 end
