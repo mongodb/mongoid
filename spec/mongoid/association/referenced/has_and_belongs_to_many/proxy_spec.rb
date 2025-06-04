@@ -1911,6 +1911,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       # replica set.
       require_topology :replica_set
 
+      # this also fails on server version 4.0, even with replica set,
+      # so we'll just skip it
+      min_server_version '5.0'
+
       let!(:sandwich) do
         Sandwich.create!
       end
