@@ -1,6 +1,9 @@
 # rubocop:todo all
 source 'https://rubygems.org'
 
+# See https://stackoverflow.com/questions/79360526
+gem 'concurrent-ruby', '< 1.3.5'
+
 gem 'actionpack', '~> 6.1'
 gem 'activemodel', '~> 6.1'
 
