@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'embeds_one associations' do
-  context 're-associating the same object' do
+  context 'when re-associating the same object' do
     context 'with dependent: destroy' do
       let(:canvas) do
         Canvas.create!(palette: Palette.new)
@@ -15,7 +15,7 @@ describe 'embeds_one associations' do
         canvas.palette = canvas.palette
         canvas.save!
         canvas.reload
-        canvas.palette.should == palette
+        expect(canvas.palette).to eq palette
       end
     end
   end
