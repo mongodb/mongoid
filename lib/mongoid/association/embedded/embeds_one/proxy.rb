@@ -32,8 +32,8 @@ module Mongoid
               bind_one
               characterize_one(_target)
               update_attributes_hash(_target)
-              _base._reset_memoized_descendants!
               _target.save if persistable?
+              _base._reset_memoized_descendants!
             end
           end
 
