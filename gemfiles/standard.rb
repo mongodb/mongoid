@@ -1,9 +1,8 @@
-# rubocop:todo all
 def standard_dependencies
   gem 'rake'
 
   group :development do
-    gem 'yard', '>= 0.9.35'
+    gem 'yard'
 
     platform :mri do
       # Debugger for VSCode.
@@ -16,15 +15,10 @@ def standard_dependencies
     # Evergreen configuration generation
     gem 'erubi'
     gem 'tilt'
-    gem 'solargraph', platform: :mri
   end
 
   group :development, :test do
     gem 'rspec', '~> 3.12'
-    gem 'rubocop', '~> 1.45.1'
-    gem 'rubocop-performance', '~> 1.16.0'
-    gem 'rubocop-rake', '~> 0.6.0'
-    gem 'rubocop-rspec', '~> 2.18.1'
 
     platform :mri do
       gem 'byebug'
@@ -46,9 +40,5 @@ def standard_dependencies
     platform :mri do
       gem 'timeout-interrupt'
     end
-  end
-
-  if ENV['FLE'] == 'helper'
-    gem 'libmongocrypt-helper', '~> 1.8.0'
   end
 end
