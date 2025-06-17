@@ -8,9 +8,11 @@ set -o errexit  # Exit the script with error if any of the commands fail
 #       RVM_RUBY                Define the Ruby version to test with, using its RVM identifier.
 #                               For example: "ruby-3.0" or "jruby-9.2"
 
-. `dirname "$0"`/../spec/shared/shlib/distro.sh
-. `dirname "$0"`/../spec/shared/shlib/set_env.sh
-. `dirname "$0"`/../spec/shared/shlib/server.sh
+MRSS_ROOT=`dirname "$0"`/../spec/shared
+
+. $MRSS_ROOT/shlib/distro.sh
+. $MRSS_ROOT/shlib/set_env.sh
+. $MRSS_ROOT/shlib/server.sh
 . `dirname "$0"`/functions.sh
 
 arch=`host_distro`
@@ -27,6 +29,10 @@ fi
 prepare_server $arch
 
 install_mlaunch_venv
+
+if test "$TOPOLOGY" = load-balanced; then
+  install_haproxy
+fi
 
 # Launching mongod under $MONGO_ORCHESTRATION_HOME
 # makes its log available through log collecting machinery

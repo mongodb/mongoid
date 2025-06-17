@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
 describe 'embeds_one associations' do
-
-  context 're-associating the same object' do
+  context 'when re-associating the same object' do
     context 'with dependent: destroy' do
       let(:canvas) do
         Canvas.create!(palette: Palette.new)
@@ -17,7 +15,7 @@ describe 'embeds_one associations' do
         canvas.palette = canvas.palette
         canvas.save!
         canvas.reload
-        canvas.palette.should == palette
+        expect(canvas.palette).to eq palette
       end
     end
   end
@@ -31,12 +29,33 @@ describe 'embeds_one associations' do
     end
 
     it 'loads the association correctly' do
-      expect { klass }.to_not raise_error
-      expect { klass.new.address }.to_not raise_error
+      expect { klass }.not_to raise_error
+      expect { klass.new.address }.not_to raise_error
       instance = klass.new
       address = Address.new
       instance.address = address
       expect(instance.address).to eq address
+    end
+  end
+
+  context 'when parent is persisted' do
+    let!(:person) do
+      Person.create!
+    end
+
+    context 'when assigning the new child' do
+      context 'when assigning an attribute to the child' do
+        before do
+          # person.reload
+          person.name = Name.new
+          person.name.first_name = 'Dmitry'
+          person.save!
+        end
+
+        it 'persists the child' do
+          expect(person.reload.name.first_name).to eq 'Dmitry'
+        end
+      end
     end
   end
 end

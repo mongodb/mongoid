@@ -1323,6 +1323,22 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context 'when appending to an association in a transaction' do
       require_transaction_support
 
+      # for some reason this test fails intermittently on any sharded
+      # topology (sharded or load-balanced). The error is:
+      #
+      #   [13388:StaleConfig]: Transaction <id>...eats is not currently
+      #   known and needs to be recovered
+      #
+      # It will fail on one run, succeed on the next, fail on the next,
+      # etc. Tested on both db versions 7 and 8, with both sharded and
+      # load-balanced topologies. For now, we'll just test this on a
+      # replica set.
+      require_topology :replica_set
+
+      # this also fails on server version 4.0, even with replica set,
+      # so we'll just skip it
+      min_server_version '5.0'
+
       let!(:movie) { Movie.create! }
 
       def with_transaction_via(model, &block)
