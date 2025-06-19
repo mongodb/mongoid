@@ -33,6 +33,38 @@ module TransactionsSpecCountable
   def after_rollback_counter=(new_counter)
     @after_rollback_counter = new_counter
   end
+
+  def after_save_commit_counter
+    @after_save_commit_counter ||= TransactionsSpecCounter.new
+  end
+
+  def after_save_commit_counter=(new_counter)
+    @after_save_commit_counter = new_counter
+  end
+
+  def after_create_commit_counter
+    @after_create_commit_counter ||= TransactionsSpecCounter.new
+  end
+
+  def after_create_commit_counter=(new_counter)
+    @after_create_commit_counter = new_counter
+  end
+
+  def after_update_commit_counter
+    @after_update_commit_counter ||= TransactionsSpecCounter.new
+  end
+
+  def after_update_commit_counter=(new_counter)
+    @after_update_commit_counter = new_counter
+  end
+
+  def after_destroy_commit_counter
+    @after_destroy_commit_counter ||= TransactionsSpecCounter.new
+  end
+
+  def after_destroy_commit_counter=(new_counter)
+    @after_destroy_commit_counter = new_counter
+  end
 end
 
 class TransactionsSpecPerson
@@ -65,6 +97,21 @@ class TransactionsSpecPersonWithOnCreate
   end
 end
 
+class TransactionsSpecPersonWithAfterCreateCommit
+  include Mongoid::Document
+  include TransactionsSpecCountable
+
+  field :name, type: String
+
+  after_create_commit do
+    after_commit_counter.inc
+  end
+
+  after_rollback on: :create do
+    after_rollback_counter.inc
+  end
+end
+
 class TransactionsSpecPersonWithOnUpdate
   include Mongoid::Document
   include TransactionsSpecCountable
@@ -76,6 +123,36 @@ class TransactionsSpecPersonWithOnUpdate
   end
 
   after_rollback on: :update do
+    after_rollback_counter.inc
+  end
+end
+
+class TransactionsSpecPersonWithAfterUpdateCommit
+  include Mongoid::Document
+  include TransactionsSpecCountable
+
+  field :name, type: String
+
+  after_update_commit do
+    after_commit_counter.inc
+  end
+
+  after_rollback on: :create do
+    after_rollback_counter.inc
+  end
+end
+
+class TransactionsSpecPersonWithAfterSaveCommit
+  include Mongoid::Document
+  include TransactionsSpecCountable
+
+  field :name, type: String
+
+  after_save_commit do
+    after_commit_counter.inc
+  end
+
+  after_rollback on: :create do
     after_rollback_counter.inc
   end
 end
@@ -94,6 +171,22 @@ class TransactionsSpecPersonWithOnDestroy
     after_rollback_counter.inc
   end
 end
+
+class TransactionsSpecPersonWithAfterDestroyCommit
+  include Mongoid::Document
+  include TransactionsSpecCountable
+
+  field :name, type: String
+
+  after_destroy_commit do
+    after_commit_counter.inc
+  end
+
+  after_rollback on: :create do
+    after_rollback_counter.inc
+  end
+end
+
 class TransactionSpecRaisesBeforeSave
   include Mongoid::Document
   include TransactionsSpecCountable
