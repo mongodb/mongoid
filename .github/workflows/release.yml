@@ -1,13 +1,24 @@
-name: "Mongoid Release"
-run-name: "Mongoid Release for ${{ github.ref }}"
+name: "Gem Release"
+run-name: "Gem Release for ${{ github.ref }}"
 
 on:
   # for auto-deploy when merging a release-candidate PR
-  pull_request:
-    types: [ closed ]
+  push:
+    - 'master'
+    - '*-stable'
+
+  # for manual release
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "The number of the merged release candidate PR"
+        required: true
 
 env:
   SILK_ASSET_GROUP: mongoid
+  GEM_NAME: mongoid
+  PRODUCT_NAME: Mongoid
+  PRODUCT_ID: mongoid
 
 permissions:
   # required for all workflows
@@ -48,8 +59,8 @@ jobs:
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
-          artifact: mongoid
-          gem_name: mongoid
+          artifact: 'ruby-3.2'
+          gem_name: ${{ env.GEM_NAME }}
           ruby_version: 'ruby-3.2'
           ref: ${{ needs.check.outputs.ref }}
 
@@ -68,9 +79,9 @@ jobs:
           aws_region_name: ${{ vars.AWS_REGION_NAME }}
           aws_secret_id: ${{ secrets.AWS_SECRET_ID }}
           dry_run: false
-          gem_name: mongoid
-          product_name: Mongoid
-          product_id: mongoid
+          gem_name: ${{ env.GEM_NAME }}
+          product_name: ${{ env.PRODUCT_NAME }}
+          product_id: ${{ env.PRODUCT_ID }}
           release_message: ${{ needs.check.outputs.message }}
           silk_asset_group: ${{ env.SILK_ASSET_GROUP }}
           ref: ${{ needs.check.outputs.ref }}
