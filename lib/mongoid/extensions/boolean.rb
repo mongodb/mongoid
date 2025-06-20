@@ -21,6 +21,8 @@ module Mongoid
           true
         elsif object.to_s =~ (/\A(false|f|no|n|off|0|0.0)\z/i)
           false
+        else
+          Mongoid::RawValue(object, 'Boolean')
         end
       end
       alias :demongoize :mongoize
