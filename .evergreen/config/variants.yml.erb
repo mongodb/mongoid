@@ -5,7 +5,7 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['6.0']
-    os: debian11
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -16,7 +16,7 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['latest']
-    os: debian11
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -60,7 +60,7 @@ buildvariants:
     ruby: ["ruby-3.2"]
     mongodb-version: "6.0"
     topology: ['replica-set', 'sharded-cluster']
-    os: debian11
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
