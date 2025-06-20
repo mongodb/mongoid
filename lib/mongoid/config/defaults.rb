@@ -25,6 +25,8 @@ module Mongoid
         when "8.1"
           self.immutable_ids = false
           self.legacy_persistence_context_behavior = true
+          self.around_callbacks_for_embeds = true
+          self.prevent_multiple_calls_of_embedded_callbacks = false
 
           load_defaults "9.0"
         when "9.0"

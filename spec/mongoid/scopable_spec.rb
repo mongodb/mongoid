@@ -3,6 +3,19 @@
 
 require "spec_helper"
 
+# Retrieve the singleton class for the given class.
+def singleton_class_for(klass)
+  class <<klass; self; end
+end
+
+# Helper method for removing a declared scope
+def remove_scope(klass, scope)
+  if klass._declared_scopes[scope]
+    singleton_class_for(klass).remove_method(scope)
+    klass._declared_scopes.delete(scope)
+  end
+end
+
 describe Mongoid::Scopable do
 
   describe ".default_scope" do
@@ -349,28 +362,13 @@ describe Mongoid::Scopable do
           Band.create!(name: 'testing')
         end
 
+        after do
+          remove_scope(Band, :tests)
+        end
+
         it 'applies the collation' do
           expect(Band.tests.first['name']).to eq('testing')
         end
-      end
-
-      context "when the lambda includes a geo_near query" do
-
-        before do
-          Bar.scope(:near_by, lambda{ |location| geo_near(location) })
-        end
-
-        after do
-          class << Bar
-            undef_method :near_by
-          end
-          Bar._declared_scopes.clear
-        end
-
-        it "allows the scope to be defined" do
-          expect(Bar.near_by([ 51.545099, -0.0106 ])).to be_a(Mongoid::Contextual::GeoNear)
-        end
-
       end
 
       context "when a block is provided" do
@@ -384,10 +382,7 @@ describe Mongoid::Scopable do
         end
 
         after do
-          class << Band
-            undef_method :active
-          end
-          Band._declared_scopes.clear
+          remove_scope(Band, :active)
         end
 
         let(:scope) do
@@ -409,10 +404,7 @@ describe Mongoid::Scopable do
         end
 
         after do
-          class << Record
-            undef_method :tool
-          end
-          Record._declared_scopes.clear
+          remove_scope(Record, :tool)
         end
 
         context "when calling the scope" do
@@ -442,10 +434,7 @@ describe Mongoid::Scopable do
         end
 
         after do
-          class << Band
-            undef_method :active
-          end
-          Band._declared_scopes.clear
+          remove_scope(Band, :active)
         end
 
         it "adds a method for the scope" do
@@ -480,10 +469,7 @@ describe Mongoid::Scopable do
             end
 
             after do
-              class << Band
-                undef_method :english
-              end
-              Band._declared_scopes.clear
+              remove_scope(Band, :english)
             end
 
             let(:scope) do
@@ -546,10 +532,7 @@ describe Mongoid::Scopable do
           config_override :scope_overwrite_exception, true
 
           after do
-            class << Band
-              undef_method :active
-            end
-            Band._declared_scopes.clear
+            remove_scope(Band, :active)
           end
 
           it "raises an exception" do
@@ -564,10 +547,7 @@ describe Mongoid::Scopable do
           config_override :scope_overwrite_exception, false
 
           after do
-            class << Band
-              undef_method :active
-            end
-            Band._declared_scopes.clear
+            remove_scope(Band, :active)
           end
 
           it "raises no exception" do
@@ -608,10 +588,7 @@ describe Mongoid::Scopable do
           end
 
           after do
-            class << Band
-              undef_method :active
-            end
-            Band._declared_scopes.clear
+            remove_scope(Band, :active)
           end
 
           let(:scope) do
@@ -671,11 +648,8 @@ describe Mongoid::Scopable do
         end
 
         after do
-          class << Band
-            undef_method :active
-            undef_method :named_by
-          end
-          Band._declared_scopes.clear
+          remove_scope(Band, :active)
+          remove_scope(Band, :named_by)
         end
 
         it "adds a method for the scope" do
@@ -717,10 +691,7 @@ describe Mongoid::Scopable do
             end
 
             after do
-              class << Band
-                undef_method :english
-              end
-              Band._declared_scopes.clear
+              remove_scope(Band, :english)
             end
 
             let(:scope) do
@@ -794,15 +765,9 @@ describe Mongoid::Scopable do
             end
 
             after do
-              class << Article
-                undef_method :is_public
-                undef_method :authored
-              end
-              Article._declared_scopes.clear
-              class << Author
-                undef_method :author
-              end
-              Author._declared_scopes.clear
+              remove_scope(Article, :is_public)
+              remove_scope(Article, :authored)
+              remove_scope(Author, :author)
             end
 
             context "when calling another model's scope from within a scope" do
@@ -835,10 +800,7 @@ describe Mongoid::Scopable do
           config_override :scope_overwrite_exception, true
 
           after do
-            class << Band
-              undef_method :active
-            end
-            Band._declared_scopes.clear
+            remove_scope(Band, :active)
           end
 
           it "raises an exception" do
@@ -853,10 +815,7 @@ describe Mongoid::Scopable do
           config_override :scope_overwrite_exception, false
 
           after do
-            class << Band
-              undef_method :active
-            end
-            Band._declared_scopes.clear
+            remove_scope(Band, :active)
           end
 
           it "raises no exception" do
@@ -886,11 +845,8 @@ describe Mongoid::Scopable do
         end
 
         after do
-          class << Band
-            undef_method :xxx
-            undef_method :yyy
-          end
-          Band._declared_scopes.clear
+          remove_scope(Band, :xxx)
+          remove_scope(Band, :yyy)
         end
 
         let(:criteria) do
@@ -920,15 +876,8 @@ describe Mongoid::Scopable do
       end
 
       after do
-        class << Shape
-          undef_method :located_at
-        end
-        Shape._declared_scopes.clear
-
-        class << Circle
-          undef_method :with_radius
-        end
-        Circle._declared_scopes.clear
+        remove_scope(Shape, :located_at)
+        remove_scope(Circle, :with_radius)
       end
 
       let(:shape_scope_keys) do
@@ -969,16 +918,9 @@ describe Mongoid::Scopable do
       end
 
       after do
-        class << Shape
-          undef_method :visible
-          undef_method :large
-        end
-        Shape._declared_scopes.clear
-
-        class << Circle
-          undef_method :large
-        end
-        Circle._declared_scopes.clear
+        remove_scope(Shape, :visible)
+        remove_scope(Shape, :large)
+        remove_scope(Circle, :large)
       end
 
       it "uses subclass context for all the other used scopes" do
@@ -1118,9 +1060,7 @@ describe Mongoid::Scopable do
           end
 
           after do
-            class << Band
-              undef_method :active
-            end
+            remove_scope(Band, :active)
           end
 
           let(:unscoped) do
@@ -1162,10 +1102,7 @@ describe Mongoid::Scopable do
         end
 
         after do
-          class << Band
-            undef_method :skipped
-          end
-          Band._declared_scopes.clear
+          remove_scope(Band, :skipped)
         end
 
         it "does not allow the default scope to be applied" do
@@ -1306,6 +1243,53 @@ describe Mongoid::Scopable do
     it "does not affect other models' default scopes within the given block" do
       Appointment.without_default_scope do
         expect(Audio.all.selector).not_to be_empty
+      end
+    end
+  end
+
+  describe "scoped queries" do
+    context "with a default scope" do
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      before do
+        Band.default_scope ->{ criteria }
+        Band.scope :unscoped_everyone, -> { unscoped }
+        Band.scope :removed_default, -> { scoped.remove_scoping(all) }
+
+        Band.create name: 'Depeche Mode'
+        Band.create name: 'They Might Be Giants'
+      end
+
+      after do
+        Band.default_scoping = nil
+        remove_scope Band, :unscoped_everyone
+        remove_scope Band, :removed_default
+      end
+
+      context "when allow_scopes_to_unset_default_scope == false" do # default for <= 9
+        config_override :allow_scopes_to_unset_default_scope, false
+
+        it 'merges the default scope into the query with unscoped' do
+          expect(Band.unscoped_everyone.selector).to include('name' => 'Depeche Mode')
+        end
+
+        it 'merges the default scope into the query with remove_scoping' do
+          expect(Band.removed_default.selector).to include('name' => 'Depeche Mode')
+        end
+      end
+
+      context "when allow_scopes_to_unset_default_scope == true" do # default for >= 10
+        config_override :allow_scopes_to_unset_default_scope, true
+
+        it 'does not merge the default scope into the query with unscoped' do
+          expect(Band.unscoped_everyone.selector).not_to include('name' => 'Depeche Mode')
+        end
+
+        it 'does not merge merges the default scope into the query with remove_scoping' do
+          expect(Band.removed_default.selector).not_to include('name' => 'Depeche Mode')
+        end
       end
     end
   end

@@ -17,6 +17,7 @@ require 'mongoid/timestamps'
 require 'mongoid/association'
 require 'mongoid/composable'
 require 'mongoid/touchable'
+require 'mongoid/model_resolver'
 
 module Mongoid
   # This is the base module for all domain objects that need to be persisted to
@@ -31,6 +32,7 @@ module Mongoid
 
     included do
       Mongoid.register_model(self)
+      Mongoid::ModelResolver.register(self)
     end
 
     # Regex for matching illegal BSON keys.
@@ -133,33 +135,6 @@ module Mongoid
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
       BSON::Document.new(as_attributes)
-    end
-
-    # Calls #as_json on the document with additional, Mongoid-specific options.
-    #
-    # @note Rails 6 changes return value of as_json for non-primitive types
-    #   such as BSON::ObjectId. In Rails <= 5, as_json returned these as
-    #   instances of the class. In Rails 6, these are returned serialized to
-    #   primitive types (e.g. {'$oid'=>'5bcfc40bde340b37feda98e9'}).
-    #   See https://github.com/rails/rails/commit/2e5cb980a448e7f4ab00df6e9ad4c1cc456616aa
-    #   for more information.
-    #
-    # @example Get the document as json.
-    #   document.as_json(compact: true)
-    #
-    # @param [ Hash ] options The options.
-    #
-    # @option options [ true | false ] :compact (Deprecated) Whether to include fields
-    #   with nil values in the json document.
-    #
-    # @return [ Hash ] The document as json.
-    def as_json(options = nil)
-      rv = super
-      if options && options[:compact]
-        Mongoid::Warnings.warn_as_json_compact_deprecated
-        rv = rv.compact
-      end
-      rv
     end
 
     # Returns an instance of the specified class with the attributes,

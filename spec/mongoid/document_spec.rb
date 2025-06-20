@@ -429,35 +429,6 @@ describe Mongoid::Document do
         end
       end
     end
-
-    context "when the Mongoid-specific options are provided" do
-
-      let(:options) do
-        { compact: true }
-      end
-
-      it "applies the Mongoid-specific options" do
-        expect(person.as_json(options)["title"]).to eq("Sir")
-        expect(person.as_json(options)["age"]).to eq(100)
-        expect(person.as_json(options).keys).not_to include("lunch_time")
-      end
-
-      context "when options for the super method are provided" do
-
-        let(:options) do
-          { compact: true, only: [:title, :pets, :ssn] }
-        end
-
-        it "passes the options through to the super method" do
-          expect(person.as_json(options)["title"]).to eq("Sir")
-          expect(person.as_json(options)["pets"]).to eq(false)
-        end
-
-        it "applies the Mongoid-specific options" do
-          expect(person.as_json(options).keys).not_to include("ssn")
-        end
-      end
-    end
   end
 
   describe "#as_document" do
@@ -881,7 +852,7 @@ describe Mongoid::Document do
 
       context "when the document has embedded documents" do
 
-        context "when the attribtues are protected" do
+        context "when the attributes are protected" do
 
           let!(:appointment) do
             manager.appointments.build

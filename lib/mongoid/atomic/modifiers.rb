@@ -119,7 +119,7 @@ module Mongoid
       end
 
       # Adds or appends an array operation with the $each specifier used
-      # in conjuction with $push.
+      # in conjunction with $push.
       #
       # @example Add the operation.
       #   modifications.add_operation(mods, field, value)

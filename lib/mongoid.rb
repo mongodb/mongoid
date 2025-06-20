@@ -4,7 +4,6 @@
 require "forwardable"
 require "time"
 require "set"
-require "ruby2_keywords"
 
 require "active_support"
 require "active_support/core_ext"
@@ -99,6 +98,16 @@ module Mongoid
   # @return [ true ] True.
   def disconnect_clients
     Clients.disconnect
+  end
+
+  # Reconnect all active clients.
+  #
+  # @example Reconnect all active clients.
+  #   Mongoid.reconnect_clients
+  #
+  # @return [ true ] True.
+  def reconnect_clients
+    Clients.reconnect
   end
 
   # Convenience method for getting a named client.

@@ -3806,7 +3806,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       person_two.addresses << address
     end
 
-    it "adds the document to the new paarent" do
+    it "adds the document to the new parent" do
       expect(person_two.addresses).to eq([ address ])
     end
 
@@ -4382,7 +4382,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           expect(artist.before_remove_embedded_called).to be true
         end
 
-        it "shoud clear the relation" do
+        it "clears the relation" do
           expect(artist.songs).to be_empty
         end
       end
@@ -4894,6 +4894,107 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       expect(user.orders.last).to be_a(EmmOrder)
 
       expect(user.orders.map(&:sku).sort).to eq([ 1, 2 ])
+    end
+  end
+
+  describe '#cache_version' do
+    context 'when the model does not have an updated_at column' do
+      let(:root_model) { Quiz.create! }
+      let(:root) { Quiz.find(root_model.id) }
+      let(:pages) { root.pages }
+
+      let(:prepopulated_root) do
+        root_model.pages << Page.new(content: 'Page #1')
+        root_model.pages << Page.new(content: 'Page #2')
+        Quiz.find(root_model.id)
+      end
+
+      shared_examples_for 'a cache_version generator' do
+        it 'produces a trivial cache_version' do
+          expect(pages.cache_version).to be == "#{pages.length}"
+        end
+      end
+
+      context 'when the relation is empty' do
+        it_behaves_like 'a cache_version generator'
+      end
+
+      context 'when the relation is not empty' do
+        let(:root) { prepopulated_root }
+
+        it_behaves_like 'a cache_version generator'
+      end
+    end
+
+    context 'when the model has an updated_at column' do
+      let(:root_model) { Book.create(title: 'Root') }
+      let(:root) { Book.find(root_model.id) }
+
+      let(:cover) { root_model.covers.first }
+      let(:covers) { root.covers }
+      let(:original_cache_version) { root.covers.cache_version }
+
+      let(:prepopulated_root) do
+        root_model.covers << Cover.new(title: 'Cover #1')
+        root_model.covers << Cover.new(title: 'Cover #2')
+        Book.find(root_model.id)
+      end
+
+      shared_examples_for 'a cache_version generator' do
+        it 'produces a consistent cache_version' do
+          expect(covers.cache_version).not_to be_nil
+          expect(covers.cache_version).to be == covers.cache_version
+        end
+      end
+
+      context 'when the relation is empty' do
+        it_behaves_like 'a cache_version generator'
+      end
+
+      context 'when the relation is not empty' do
+        let(:root) { prepopulated_root }
+        it_behaves_like 'a cache_version generator'
+      end
+
+      context 'when an element is updated' do
+        let(:updated_cache_version) do
+          cover.update title: 'modified'
+          cover.book.save!
+          cover.book.reload.covers.cache_version
+        end
+
+        let(:root) { prepopulated_root }
+
+        it 'changes the cache_version' do
+          expect(original_cache_version).not_to be == updated_cache_version
+        end
+      end
+
+      context 'when an element is added' do
+        let(:updated_cache_version) do
+          root.covers << Cover.new(title: 'Another Cover')
+          root.reload.covers.cache_version
+        end
+
+        let(:root) { prepopulated_root }
+
+        it 'changes the cache_version' do
+          expect(original_cache_version).not_to be == updated_cache_version
+        end
+      end
+
+      context 'when an element is removed' do
+        let(:updated_cache_version) do
+          cover.destroy
+          root.reload.covers.cache_version
+        end
+
+        let(:root) { prepopulated_root }
+
+        it 'changes the cache_version' do
+          expect(original_cache_version).not_to be == updated_cache_version
+        end
+      end
     end
   end
 end

@@ -3,7 +3,7 @@ def standard_dependencies
   gem 'rake'
 
   group :development do
-    gem 'yard'
+    gem 'yard', '>= 0.9.35'
 
     platform :mri do
       # Debugger for VSCode.
@@ -36,7 +36,6 @@ def standard_dependencies
   end
 
   group :test do
-    gem 'activejob'
     gem 'timecop'
     gem 'rspec-retry'
     gem 'benchmark-ips'
@@ -50,6 +49,6 @@ def standard_dependencies
   end
 
   if ENV['FLE'] == 'helper'
-    gem 'libmongocrypt-helper', '~> 1.8.0'
+    gem 'libmongocrypt-helper', '~> 1.14.0'
   end
 end

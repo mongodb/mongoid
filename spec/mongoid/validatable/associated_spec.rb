@@ -38,12 +38,18 @@ describe Mongoid::Validatable::AssociatedValidator do
           User.new(name: "test")
         end
 
-        let(:description) do
+        let(:description1) do
+          Description.new
+        end
+
+        let(:description2) do
           Description.new
         end
 
         before do
-          user.descriptions << description
+          user.descriptions << description1
+          user.descriptions << description2
+          user.valid?
         end
 
         it "only validates the parent once" do
@@ -51,12 +57,16 @@ describe Mongoid::Validatable::AssociatedValidator do
         end
 
         it "adds the errors from the relation" do
-          user.valid?
           expect(user.errors[:descriptions]).to_not be_nil
         end
 
+        it 'reports all failed validations' do
+          errors = user.descriptions.flat_map { |d| d.errors[:details] }
+          expect(errors.length).to be == 2
+        end
+
         it "only validates the child once" do
-          expect(description).to_not be_valid
+          expect(description1).to_not be_valid
         end
       end
 
@@ -76,7 +86,6 @@ describe Mongoid::Validatable::AssociatedValidator do
         end
 
         it "does not run validation on them" do
-          expect(description).to receive(:valid?).never
           expect(user).to be_valid
         end
 
@@ -85,14 +94,14 @@ describe Mongoid::Validatable::AssociatedValidator do
     end
   end
 
-  describe "#validate_each" do
+  describe "#validate" do
 
     let(:person) do
       Person.new
     end
 
     let(:validator) do
-      described_class.new(attributes: person.attributes)
+      described_class.new(attributes: person.relations.keys)
     end
 
     context "when the association is a one to one" do
@@ -100,7 +109,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is nil" do
 
         before do
-          validator.validate_each(person, :name, nil)
+          validator.validate(person)
         end
 
         it "adds no errors" do
@@ -109,14 +118,9 @@ describe Mongoid::Validatable::AssociatedValidator do
       end
 
       context "when the association is valid" do
-
-        let(:associated) do
-          double(valid?: true, flagged_for_destroy?: false)
-        end
-
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :name, associated)
+          person.name = Name.new(first_name: 'A', last_name: 'B')
+          validator.validate(person)
         end
 
         it "adds no errors" do
@@ -126,13 +130,9 @@ describe Mongoid::Validatable::AssociatedValidator do
 
       context "when the association is invalid" do
 
-        let(:associated) do
-          double(valid?: false, flagged_for_destroy?: false)
-        end
-
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :name, associated)
+          person.name = Name.new(first_name: 'Jamis', last_name: 'Buck')
+          validator.validate(person)
         end
 
         it "adds errors to the parent document" do
@@ -150,7 +150,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is empty" do
 
         before do
-          validator.validate_each(person, :addresses, [])
+          validator.validate(person)
         end
 
         it "adds no errors" do
@@ -160,13 +160,9 @@ describe Mongoid::Validatable::AssociatedValidator do
 
       context "when the association has invalid documents" do
 
-        let(:associated) do
-          double(valid?: false, flagged_for_destroy?: false)
-        end
-
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :addresses, [ associated ])
+          person.addresses << Address.new(street: '123')
+          validator.validate(person)
         end
 
         it "adds errors to the parent document" do
@@ -176,13 +172,10 @@ describe Mongoid::Validatable::AssociatedValidator do
 
       context "when the association has all valid documents" do
 
-        let(:associated) do
-          double(valid?: true, flagged_for_destroy?: false)
-        end
-
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :addresses, [ associated ])
+          person.addresses << Address.new(street: '123 First St')
+          person.addresses << Address.new(street: '456 Second St')
+          validator.validate(person)
         end
 
         it "adds no errors" do

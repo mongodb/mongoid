@@ -6,6 +6,7 @@ require "mongoid/validatable/localizable"
 require "mongoid/validatable/associated"
 require "mongoid/validatable/format"
 require "mongoid/validatable/length"
+require "mongoid/validatable/numericality"
 require "mongoid/validatable/queryable"
 require "mongoid/validatable/presence"
 require "mongoid/validatable/uniqueness"
@@ -36,6 +37,14 @@ module Mongoid
     #   document.exit_validate
     def exit_validate
       Threaded.exit_validate(self)
+    end
+
+    # Perform a validation within the associated block.
+    def validating
+      begin_validate
+      yield
+    ensure
+      exit_validate
     end
 
     # Given the provided options, are we performing validations?

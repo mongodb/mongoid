@@ -1663,7 +1663,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
             # Date instance is converted to a Time instance in local time,
             # because we are querying on a Time field and dates are interpreted
             # in local time when assigning to Time fields
-            {'published' => {'$gt' => Time.local(2020, 2, 3)}},
+            {'published' => {'$gt' => Time.zone.local(2020, 2, 3)}},
           ]}
         end
       end
@@ -2427,7 +2427,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context 'when a criterion has an aliased field' do
         let(:selection) { query.none_of({ id: 1 }) }
-        
+
         it 'adds the $nor selector and aliases the field' do
           expect(selection.selector).to eq('$nor' => [{ '_id' => 1 }])
         end
@@ -2514,7 +2514,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
             # Date instance is converted to a Time instance in local time,
             # because we are querying on a Time field and dates are interpreted
             # in local time when assigning to Time fields
-            {'published' => {'$gt' => Time.local(2020, 2, 3) } },
+            {'published' => {'$gt' => Time.zone.local(2020, 2, 3) } },
           ] }
         end
       end

@@ -7,147 +7,35 @@ name: Run Mongoid Tests
 - pull_request
 jobs:
   build:
-    name: "${{matrix.ruby}} drv:${{matrix.driver}} db:${{matrix.mongodb}}
+    name: "${{matrix.ruby}} db:${{matrix.mongodb}}
       rails:${{matrix.rails}} fle:${{matrix.fle}} ${{matrix.topology}}"
     env:
       CI: true
       TESTOPTS: "-v"
-    runs-on: ${{matrix.os}}
-    continue-on-error: "${{matrix.experimental}}"
+      BUNDLE_GEMFILE: "${{ matrix.rails == '' && 'Gemfile' || format('gemfiles/rails-{0}.gemfile', matrix.rails) }}"
+    runs-on: ubuntu-22.04
+    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - mongodb: '6.0'
-          ruby: ruby-3.2
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: stable
-          gemfile: gemfiles/driver_stable.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '7.0'
-          fle: helper
-          gemfile: gemfiles/rails-7.0.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.1
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.1'
-          fle: helper
-          gemfile: gemfiles/rails-6.1.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '7.0'
-          fle: helper
-          gemfile: gemfiles/rails-7.0.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.1'
-          fle: helper
-          gemfile: gemfiles/rails-6.1.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: ruby-3.0
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.0'
-          fle: helper
-          gemfile: gemfiles/rails-6.0.gemfile
-          experimental: false
-        - mongodb: '6.0'
-          ruby: jruby-9.4
-          topology: server
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          rails: '6.0'
-          fle: helper
-          gemfile: gemfiles/rails-6.0.gemfile
-          experimental: false
-        - mongodb: '5.0'
-          ruby: ruby-3.1
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '4.4'
-          ruby: ruby-2.7
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '4.0'
-          ruby: ruby-2.7
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
-        - mongodb: '3.6'
-          ruby: ruby-2.7
-          topology: replica_set
-          os: ubuntu-20.04
-          task: test
-          driver: current
-          gemfile: Gemfile
-          experimental: false
+        ruby: [ "3.3" ]
+        mongodb: [ "8.0" ]
+        rails: [ ~, "8.0" ]
+        fle: [ ~, "helper" ]
+        topology: [ replica_set, sharded_cluster ]
 
     steps:
     - name: repo checkout
       uses: actions/checkout@v2
       with:
         submodules: recursive
+
+    # the default python 3.8 doesn't cut it, and causes mongo-orchestration
+    # to fail in mongodb-labs/drivers-evergreen-tools.
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
     - id: start-mongodb
       name: start mongodb
       uses: mongodb-labs/drivers-evergreen-tools@master
@@ -158,7 +46,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       env:
         FLE: "${{matrix.fle}}"
-        BUNDLE_GEMFILE: "${{matrix.gemfile}}"
+        BUNDLE_GEMFILE: "${{env.BUNDLE_GEMFILE}}"
       with:
         ruby-version: "${{matrix.ruby}}"
         bundler: 2
@@ -166,12 +54,12 @@ jobs:
       run: bundle install --jobs 4 --retry 3
       env:
         FLE: "${{matrix.fle}}"
-        BUNDLE_GEMFILE: "${{matrix.gemfile}}"
+        BUNDLE_GEMFILE: "${{env.BUNDLE_GEMFILE}}"
     - name: test
       timeout-minutes: 60
       continue-on-error: "${{matrix.experimental}}"
       run: bundle exec rake ci
       env:
-        BUNDLE_GEMFILE: "${{matrix.gemfile}}"
+        BUNDLE_GEMFILE: "${{env.BUNDLE_GEMFILE}}"
         FLE: "${{matrix.fle}}"
         MONGODB_URI: "${{ steps.start-mongodb.outputs.cluster-uri }}"

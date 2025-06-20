@@ -28,9 +28,9 @@ module Mongoid
         @resolution_title = translate("resolution_title", {})
 
 
-        "\n#{@problem_title}:\n  #{@problem}"+
-        "\n#{@summary_title}:\n  #{@summary}"+
-        "\n#{@resolution_title}:\n  #{@resolution}"
+        "\n#{@problem_title}:\n  #{@problem&.strip}"+
+        "\n#{@summary_title}:\n  #{@summary&.strip}"+
+        "\n#{@resolution_title}:\n  #{@resolution&.strip}"
       end
 
       private

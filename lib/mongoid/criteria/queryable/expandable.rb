@@ -23,7 +23,7 @@ module Mongoid
         #
         # The following parameter forms are accepted:
         #
-        # - field is a string or symbol; value is the field query expresision
+        # - field is a string or symbol; value is the field query expression
         # - field is a Key instance; value is the field query expression
         # - field is a string corresponding to a MongoDB operator; value is
         #   the operator value expression.

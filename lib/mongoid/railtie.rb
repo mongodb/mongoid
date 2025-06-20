@@ -94,7 +94,7 @@ module Rails
       end
 
       # Rails runs all initializers first before getting into any generator
-      # code, so we have no way in the intitializer to know if we are
+      # code, so we have no way in the initializer to know if we are
       # generating a mongoid.yml. So instead of failing, we catch all the
       # errors and print them out.
       def handle_configuration_error(e)
@@ -120,9 +120,9 @@ module Rails
 
       # Add custom serializers for BSON::ObjectId
       initializer 'mongoid.active_job.custom_serializers' do
-        require 'mongoid/railties/bson_object_id_serializer'
+        ActiveSupport.on_load :active_job do
+          require 'mongoid/railties/bson_object_id_serializer'
 
-        config.after_initialize do
           ActiveJob::Serializers.add_serializers(
             [::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer]
           )

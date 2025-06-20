@@ -231,43 +231,31 @@ describe Mongoid::Tasks::Database do
     end
 
     context 'when wait is true' do
-      before do
-        allow(described_class).to receive(:wait_for_search_indexes)
-        described_class.create_search_indexes([ searchable_model_spy ], wait: true)
-      end
-
       it 'invokes both create_search_indexes and wait_for_search_indexes' do
-        expect(searchable_model_spy).to have_received(:create_search_indexes)
-        expect(described_class).to have_received(:wait_for_search_indexes).with(searchable_model_spy => index_names)
+        expect(searchable_model_spy).to receive(:create_search_indexes)
+        expect(described_class).to receive(:wait_for_search_indexes).with({ searchable_model_spy => index_names })
+
+        described_class.create_search_indexes([searchable_model_spy], wait: true)
       end
     end
 
     context 'when wait is false' do
-      before do
-        allow(described_class).to receive(:wait_for_search_indexes)
-        described_class.create_search_indexes([ searchable_model_spy ], wait: false)
-      end
-
       it 'invokes only create_search_indexes' do
-        expect(searchable_model_spy).to have_received(:create_search_indexes)
-        expect(described_class).not_to have_received(:wait_for_search_indexes)
+        expect(searchable_model_spy).to receive(:create_search_indexes)
+        expect(described_class).to_not receive(:wait_for_search_indexes)
+
+        described_class.create_search_indexes([searchable_model_spy], wait: false)
       end
     end
   end
 
   describe '.remove_search_indexes' do
-    before do
+    it 'calls remove_search_indexes on all non-embedded models' do
       models.each do |model|
-        allow(model).to receive(:remove_search_indexes) unless model.embedded?
+        expect(model).to receive(:remove_search_indexes) unless model.embedded?
       end
 
       described_class.remove_search_indexes(models)
-    end
-
-    it 'calls remove_search_indexes on all non-embedded models' do
-      models.each do |model|
-        expect(model).to have_received(:remove_search_indexes) unless model.embedded?
-      end
     end
   end
 
@@ -362,6 +350,23 @@ describe Mongoid::Tasks::Database do
 
     it "leaves _id index untouched" do
       expect(indexes.select{ |doc| doc["name"] == "_id_" }).to_not be_empty
+    end
+  end
+
+  describe '.shard_collections' do
+    context 'when the cluster is load-balanced' do
+      require_topology :load_balanced
+
+      let(:model) { Profile }
+
+      before do
+        expect(logger).not_to receive(:warn)
+      end
+
+      it "permits load-balanced clusters to act as sharded" do
+        result = described_class.shard_collections([ model ])
+        expect(result).to include(model)
+      end
     end
   end
 end
