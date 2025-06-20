@@ -71,8 +71,10 @@ module Mongoid
             if object.is_a?(String)
               # https://jira.mongodb.org/browse/MONGOID-4460
               time = ::Time.parse(object)
-            else
+            elsif object.respond_to?(:__mongoize_time__)
               time = object.__mongoize_time__
+            else
+              nil
             end
           rescue ArgumentError
             nil

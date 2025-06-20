@@ -25,7 +25,8 @@ module Mongoid
     # @return [ Array<Symbol> ] The list of extra options besides client options
     #   that determine the persistence context.
     EXTRA_OPTIONS = [ :client,
-                      :collection
+                      :collection,
+                      :collection_options
                     ].freeze
 
     # The full list of valid persistence context options.
@@ -116,12 +117,15 @@ module Mongoid
     def client
       @client ||= begin
         client = Clients.with_name(client_name)
+        options = client_options
+
         if database_name_option
           client = client.use(database_name)
+          options = options.except(:database, 'database')
         end
-        unless client_options.empty?
-          client = client.with(client_options)
-        end
+
+        client = client.with(options) unless options.empty?
+
         client
       end
     end
@@ -134,7 +138,7 @@ module Mongoid
     # @return [ Symbol ] The client name for this persistence
     #   context.
     def client_name
-      @client_name ||= options[:client] ||
+      @client_name ||= __evaluate__(options[:client]) ||
                          Threaded.client_override ||
                          __evaluate__(storage_options[:client])
     end
@@ -281,33 +285,35 @@ module Mongoid
       # @api private
       PERSISTENCE_CONTEXT_KEY = :"[mongoid]:persistence_context"
 
+      def context_store
+        Threaded.get(PERSISTENCE_CONTEXT_KEY) { {} }
+      end
+
       # Get the persistence context for a given object from the thread local
       #   storage.
       #
-      # @param [ Object ] object Object to get the persistance context for.
+      # @param [ Object ] object Object to get the persistence context for.
       #
       # @return [ Mongoid::PersistenceContext | nil ] The persistence context
       #   for the object if previously stored, otherwise nil.
       #
       # @api private
       def get_context(object)
-        Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
-        Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id]
+        context_store[object.object_id]
       end
 
       # Store persistence context for a given object in the thread local
       #   storage.
       #
-      # @param [ Object ] object Object to store the persistance context for.
+      # @param [ Object ] object Object to store the persistence context for.
       # @param [ Mongoid::PersistenceContext ] context Context to store
       #
       # @api private
       def store_context(object, context)
         if context.nil?
-          Thread.current[PERSISTENCE_CONTEXT_KEY]&.delete(object.object_id)
+          context_store.delete(object.object_id)
         else
-          Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
-          Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id] = context
+          context_store[object.object_id] = context
         end
       end
     end

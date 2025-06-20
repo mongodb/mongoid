@@ -303,7 +303,7 @@ module Mongoid
       # The associations above this one in the inclusion tree.
       #
       # @return [ Array<String> ] The associations.
-      attr_accessor :parent_inclusions
+      attr_writer :parent_inclusions
 
       # The associations above this one in the inclusion tree.
       #

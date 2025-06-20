@@ -5,7 +5,7 @@ require 'spec_helper'
 # @note This test ensures that we do not inadvertently introduce new monkey patches
 # to Mongoid. Existing monkey patch methods which are marked with +Mongoid.deprecated+
 # are excluded from this test.
-RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeClass
+RSpec.describe('Do not add monkey patches') do
   classes = [
     Object,
     Array,
@@ -45,7 +45,6 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
       __intersect_from_array__
       __intersect_from_object__
       __mongoize_object_id__
-      __mongoize_time__
       __union__
       __union_from_object__
       ivar
@@ -58,6 +57,7 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
     Array => %i[
       __evolve_date__
       __evolve_time__
+      __mongoize_time__
       __sort_option__
       __sort_pair__
       delete_one
@@ -65,15 +65,18 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
     Date => %i[
       __evolve_date__
       __evolve_time__
+      __mongoize_time__
     ],
     DateTime => %i[
       __evolve_date__
       __evolve_time__
+      __mongoize_time__
     ],
     FalseClass => %i[is_a?],
     Float => %i[
       __evolve_date__
       __evolve_time__
+      __mongoize_time__
     ],
     Hash => %i[
       __sort_option__
@@ -81,6 +84,7 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
     Integer => %i[
       __evolve_date__
       __evolve_time__
+      __mongoize_time__
     ],
     Module => %i[
       re_define_method
@@ -102,6 +106,7 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
       __evolve_time__
       __expr_part__
       __mongo_expression__
+      __mongoize_time__
       __sort_option__
       before_type_cast?
       collectionize
@@ -150,10 +155,12 @@ RSpec.describe('Do not add monkey patches') do # rubocop:disable RSpec/DescribeC
     Time => %i[
       __evolve_date__
       __evolve_time__
+      __mongoize_time__
     ],
     ActiveSupport::TimeWithZone => %i[
       __evolve_date__
       __evolve_time__
+      __mongoize_time__
       _bson_to_i
     ],
     BSON::Decimal128 => %i[

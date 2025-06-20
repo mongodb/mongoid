@@ -292,7 +292,7 @@ describe Mongoid::Atomic do
             end
           end
 
-          context "when adding a new child beetween two existing and updating one of them" do
+          context "when adding a new child between two existing and updating one of them" do
 
             let!(:new_address) do
               person.addresses.build(street: "Ipanema")
