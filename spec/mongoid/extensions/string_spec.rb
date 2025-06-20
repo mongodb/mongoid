@@ -151,7 +151,7 @@ describe Mongoid::Extensions::String do
 
   describe "#collectionize" do
 
-    context "when class is namepaced" do
+    context "when class is namespaced" do
 
       module Medical
         class Patient

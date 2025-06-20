@@ -160,7 +160,7 @@ module Mongoid
           # @example Delete all documents in the association.
           #   person.posts.delete_all
           #
-          # @example Conditonally delete all documents in the association.
+          # @example Conditionally delete all documents in the association.
           #   person.posts.delete_all({ :title => "Testing" })
           #
           # @param [ Hash ] conditions Optional conditions to delete with.
@@ -462,7 +462,7 @@ module Mongoid
           #
           # @return [ Criteria | Object ] A Criteria or return value from the target.
           #
-          # TODO: make sure we are consistingly using respond_to_missing
+          # TODO: make sure we are consistently using respond_to_missing
           #   anywhere we define method_missing.
           # rubocop:disable Style/MissingRespondToMissing
           ruby2_keywords def method_missing(name, *args, &block)
@@ -512,7 +512,7 @@ module Mongoid
           # @example Delete all documents in the association.
           #   person.posts.delete_all
           #
-          # @example Conditonally delete all documents in the association.
+          # @example Conditionally delete all documents in the association.
           #   person.posts.delete_all({ :title => "Testing" })
           #
           # @param [ Hash ] conditions Optional conditions to delete with.

@@ -215,7 +215,7 @@ Benchmark.ips do |bm|
   end
 
   # IMPROVEME:
-  # the same problem here as was metioned above.
+  # the same problem here as was mentioned above.
   bm.report("#find") do
     person.posts.find(person_post_id)
   end
