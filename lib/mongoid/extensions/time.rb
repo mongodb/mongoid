@@ -71,7 +71,7 @@ module Mongoid
         def mongoize(object)
           return if object.blank?
           begin
-            time = object.__mongoize_time__
+            time = object.respond_to?(:__mongoize_time__) ? object.__mongoize_time__ : nil
           rescue ArgumentError
             return
           end

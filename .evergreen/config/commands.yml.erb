@@ -13,7 +13,7 @@ functions:
           git submodule update --init --recursive
 
   "create expansions":
-    # Make an evergreen exapanstion file with dynamic values
+    # Make an evergreen exapansion file with dynamic values
     - command: shell.exec
       params:
         working_dir: "src"
@@ -233,7 +233,7 @@ functions:
   "upload test results":
     - command: attach.xunit_results
       params:
-        file: ./src/tmp/rspec.xml
+        file: ./src/rspec.xml
 
   "run tests":
     - command: shell.exec
@@ -282,7 +282,7 @@ post:
   # Removed, causing timeouts
   # - func: "upload working dir"
   - func: "upload mo artifacts"
-  #- func: "upload test results"
+  # - func: "upload test results"
   - func: "upload test results to s3"
 
 task_groups:

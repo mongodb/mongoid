@@ -17,6 +17,7 @@ require 'mongoid/timestamps'
 require 'mongoid/association'
 require 'mongoid/composable'
 require 'mongoid/touchable'
+require 'mongoid/model_resolver'
 
 module Mongoid
   # This is the base module for all domain objects that need to be persisted to
@@ -31,6 +32,7 @@ module Mongoid
 
     included do
       Mongoid.register_model(self)
+      Mongoid::ModelResolver.register(self)
     end
 
     # Regex for matching illegal BSON keys.

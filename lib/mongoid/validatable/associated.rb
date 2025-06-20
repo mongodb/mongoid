@@ -70,13 +70,16 @@ module Mongoid
           # Now, treating the target as an array, look at each element
           # and see if it is valid, but only if it has already been
           # persisted, or changed, and hasn't been flagged for destroy.
-          list.all? do |value|
-            if value && !value.flagged_for_destroy? && (!value.persisted? || value.changed?)
+          #
+          # use map.all? instead of just all?, because all? will do short-circuit
+          # evaluation and terminate on the first failed validation.
+          list.map do |value|
+            if value && !value.flagged_for_destroy?
               value.validated? ? true : value.valid?
             else
               true
             end
-          end
+          end.all?
         end
 
         document.errors.add(attribute, :invalid) unless valid

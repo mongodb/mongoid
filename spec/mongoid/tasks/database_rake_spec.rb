@@ -6,6 +6,7 @@ require "spec_helper"
 require "support/feature_sandbox"
 
 shared_context "rake task" do
+  min_server_version '4.4'
   let(:task_name) { self.class.top_level_description }
   let(:task) { Rake.application[task_name] }
   let(:task_file) { "mongoid/tasks/database" }

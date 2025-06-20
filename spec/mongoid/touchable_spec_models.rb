@@ -150,5 +150,21 @@ module TouchableSpec
 
       embedded_in :floor, touch: true, class_name: "TouchableSpec::Referenced::Floor"
     end
+
+    class Label
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      field :bands_updated_at, type: DateTime
+      has_many :bands, class_name: "TouchableSpec::Referenced::Band"
+    end
+    
+    class Band
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      belongs_to :label, touch: :bands_updated_at, class_name: "TouchableSpec::Referenced::Label"
+    end
+    
   end
 end
