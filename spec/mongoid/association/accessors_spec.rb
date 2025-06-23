@@ -5,7 +5,7 @@ require "spec_helper"
 
 describe Mongoid::Association::Accessors do
 
-  describe "\#{getter}?" do
+  describe '#{getter}?' do
 
     let(:person) do
       Person.create!
@@ -242,7 +242,7 @@ describe Mongoid::Association::Accessors do
     end
   end
 
-  describe "\#{getter}" do
+  describe '#{getter}' do
 
     let(:person) do
       Person.new
@@ -264,6 +264,16 @@ describe Mongoid::Association::Accessors do
 
           it "stores in the altered attribute" do
             expect(person.as_document["pass"]).to eq(passport.attributes)
+          end
+        end
+
+        context 'when the parent is frozen' do
+          before do
+            person.freeze
+          end
+
+          it 'returns nil' do
+            expect(person.passport).to be_nil
           end
         end
 
