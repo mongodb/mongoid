@@ -4,8 +4,9 @@ run-name: "Gem Release for ${{ github.ref }}"
 on:
   # for auto-deploy when merging a release-candidate PR
   push:
-    - 'master'
-    - '*-stable'
+    branches:
+      - 'master'
+      - '*-stable'
 
   # for manual release
   workflow_dispatch:
