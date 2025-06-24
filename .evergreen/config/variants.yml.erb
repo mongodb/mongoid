@@ -38,18 +38,7 @@ buildvariants:
     driver: ["current"]
     topology: '*'
     mongodb-version: ['4.4']
-    os: rhel80
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
-- matrix_name: "ruby-2.6"
-  matrix_spec:
-    ruby: ["ruby-2.6"]
-    driver: ["current"]
-    topology: ['replica-set']
-    mongodb-version: ['4.0']
-    os: rhel80
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -60,7 +49,7 @@ buildvariants:
     ruby: ["ruby-3.1"]
     mongodb-version: "6.0"
     topology: ['replica-set', 'sharded-cluster']
-    os: debian11
+    os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
@@ -68,10 +57,10 @@ buildvariants:
 - matrix_name: "driver-oldstable"
   matrix_spec:
     driver: [oldstable, min]
-    ruby: ["ruby-2.6"]
-    mongodb-version: "4.0"
+    ruby: ["ruby-2.7"]
+    mongodb-version: "4.4"
     topology: ['replica-set', 'sharded-cluster']
-    os: rhel80
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
@@ -79,10 +68,10 @@ buildvariants:
 - matrix_name: "driver-min"
   matrix_spec:
     driver: [min]
-    ruby: ["ruby-2.6"]
+    ruby: ["ruby-2.7"]
     mongodb-version: "3.6"
     topology: "standalone"
-    os: rhel80
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
@@ -140,22 +129,22 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-2.7"]
     driver: ["current"]
-    mongodb-version: "4.0"
+    mongodb-version: "4.4"
     topology: "standalone"
     rails: ['5.2']
-    os: rhel80
+    os: ubuntu-20.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
 
 - matrix_name: "i18n-1.0"
   matrix_spec:
-    ruby: "ruby-2.6"
+    ruby: "ruby-2.7"
     driver: ["current"]
     mongodb-version: "4.4"
     topology: "standalone"
     i18n: '1.0'
-    os: rhel80
+    os: ubuntu-20.04
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
