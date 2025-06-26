@@ -3387,6 +3387,12 @@ describe Mongoid::Contextual::Mongo do
     it "limits the results" do
       expect(context.skip(1).entries).to eq([ new_order ])
     end
+
+    context "with #last" do
+      it "returns the nth from last element" do
+        expect(context.skip(1).last).to eq(depeche_mode)
+      end
+    end
   end
 
   describe "#sort" do
