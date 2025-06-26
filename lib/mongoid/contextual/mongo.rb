@@ -1063,7 +1063,7 @@ module Mongoid
       end
 
       def retrieve_nth_to_last_with_limit(n, limit)
-        v = view.sort(inverse_sorting).skip(n).limit(limit || 1)
+        v = view.sort(inverse_sorting).limit(limit || 1)
         v = v.skip(n) if n > 0
         raw_docs = v.to_a.reverse
         process_raw_docs(raw_docs, limit)
