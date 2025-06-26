@@ -10,16 +10,16 @@ $: << File.join(ROOT, 'spec/shared/lib')
 require "rake"
 require "rspec/core/rake_task"
 
-# stands in for the Bundler-provided `build` task, which builds the
-# gem for this project. Our release process builds the gems in a
-# particular way, in a GitHub action. This task is just to help remind
-# developers of that fact.
+if File.exist?('./spec/shared/lib/tasks/candidate.rake')
+  load 'spec/shared/lib/tasks/candidate.rake'
+end
+
+desc 'Build the gem'
 task :build do
-  abort <<~WARNING
-    `rake build` does nothing in this project. The gem must be built via
-    the `Mongoid Release` action on GitHub, which is triggered manually when
-    a new release is ready.
-  WARNING
+  command = %w[ gem build ]
+  command << "--output=#{ENV['GEM_FILE_NAME']}" if ENV['GEM_FILE_NAME']
+  command << (ENV['GEMSPEC'] || 'mongoid.gemspec')
+  system(*command)
 end
 
 # `rake version` is used by the deployment system so get the release version
