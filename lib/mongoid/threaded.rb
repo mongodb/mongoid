@@ -57,7 +57,7 @@ module Mongoid
     # @return [ Object | nil ] the value of the queried variable, or nil if
     #   it is not set and no default was given.
     def get(key, &default)
-      result = Thread.current.thread_variable_get(key)
+      result = ActiveSupport::IsolatedExecutionState[key]
 
       if result.nil? && default
         result = yield
@@ -75,7 +75,7 @@ module Mongoid
     # @param [ Object | nil ] value the value of the variable to set (or `nil`
     #   if you wish to unset the variable)
     def set(key, value)
-      Thread.current.thread_variable_set(key, value)
+      ActiveSupport::IsolatedExecutionState[key] = value
     end
 
     # Removes the named variable from thread-local storage.
