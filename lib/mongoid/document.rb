@@ -32,6 +32,7 @@ module Mongoid
 
     included do
       Mongoid.register_model(self)
+      Mongoid::ModelResolver.register(self)
     end
 
     # Regex for matching illegal BSON keys.
