@@ -452,8 +452,7 @@ module Mongoid
           # Optimized version of #append that handles multiple documents
           # in a more efficient way.
           def append_many(documents, &block)
-            visited_docs = Set.new(_target.map { |doc| id_of(doc) })
-            unique_set = get_unique_new_docs(documents, visited_docs, &block)
+            unique_set = get_unique_new_docs(documents, &block)
 
             _unscoped.concat(unique_set)
             _target.push(*scope(unique_set))
@@ -463,8 +462,9 @@ module Mongoid
           end
 
           # Return a list of unique new documents that do not yet exist
-          # in the association, and which have not previously been seen.
-          def get_unique_new_docs(documents, visited_docs, &block)
+          # in the association.
+          def get_unique_new_docs(documents, &block)
+            visited_docs = Set.new(_target.map { |doc| id_of(doc) })
             next_index = _unscoped.size
 
             documents.select do |doc|
