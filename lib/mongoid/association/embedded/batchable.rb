@@ -313,18 +313,19 @@ module Mongoid
         #
         # @return [ Array<Hash> ] The documents as an array of hashes.
         def pre_process_batch_insert(docs)
-          docs.map do |doc|
-            next unless doc
-            append(doc)
-            if persistable? && !_assigning?
-              self.path = doc.atomic_path unless path
-              if doc.valid?(:create)
-                doc.run_before_callbacks(:save, :create)
-              else
-                self.inserts_valid = false
+          [].tap do |results|
+            append_many(docs) do |doc|
+              if persistable? && !_assigning?
+                self.path = doc.atomic_path unless path
+                if doc.valid?(:create)
+                  doc.run_before_callbacks(:save, :create)
+                else
+                  self.inserts_valid = false
+                end
               end
+
+              results << doc.send(:as_attributes)
             end
-            doc.send(:as_attributes)
           end
         end
 

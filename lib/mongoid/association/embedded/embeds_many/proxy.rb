@@ -443,6 +443,36 @@ module Mongoid
             execute_callback :after_add, document
           end
 
+          # Optimized version of #append that handles multiple documents
+          # in a more efficient way.
+          def append_many(documents, &block)
+            id_of = ->(doc){ doc._id || doc.object_id }
+
+            visited_docs = Set.new(_target.map(&id_of))
+            next_index = _unscoped.size
+
+            unique_set = documents.select do |doc|
+              next unless doc
+              next if visited_docs.include?(id_of[doc])
+
+              execute_callback :before_add, doc
+
+              visited_docs.add(id_of[doc])
+              integrate(doc)
+
+              doc._index = next_index
+              next_index += 1
+
+              block.call(doc) if block
+            end
+
+            _unscoped.concat(unique_set)
+            _target.push(*scope(unique_set))
+            update_attributes_hash
+
+            unique_set.each { |doc| execute_callback :after_add, doc }
+          end
+
           # Instantiate the binding associated with this association.
           #
           # @example Create the binding.
