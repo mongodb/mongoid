@@ -110,6 +110,19 @@ module Mongoid
     # to `:global_thread_pool`.
     option :global_executor_concurrency, default: nil
 
+    # Defines the isolation level that Mongoid uses to store its internal
+    # state.
+    #
+    # This option may be set to either `:thread` (the default) or `:fiber`.
+    #
+    # If set to `:thread`, Mongoid will use thread-local storage to manage
+    # its internal state.
+    #
+    # If set to `:fiber`, Mongoid will use fiber-local storage instead. This
+    # may be necessary if you are using libraries like Falcon, which use
+    # fibers to manage concurrency.
+    option :isolation_level, default: :thread
+
     # When this flag is false, a document will become read-only only once the
     # #readonly! method is called, and an error will be raised on attempting
     # to save or update such documents, instead of just on delete. When this

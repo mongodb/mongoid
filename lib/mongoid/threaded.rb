@@ -6,38 +6,56 @@ module Mongoid
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
-    DATABASE_OVERRIDE_KEY = '[mongoid]:db-override'
+    # The key for the shared thread- and fiber-local storage. It must be a
+    # symbol because keys for fiber-local storage must be symbols.
+    STORAGE_KEY = :'[mongoid]'
 
-    # Constant for the key to store clients.
-    CLIENTS_KEY = '[mongoid]:clients'
+    DATABASE_OVERRIDE_KEY = 'db-override'
 
     # The key to override the client.
-    CLIENT_OVERRIDE_KEY = '[mongoid]:client-override'
+    CLIENT_OVERRIDE_KEY = 'client-override'
 
     # The key for the current thread's scope stack.
-    CURRENT_SCOPE_KEY = '[mongoid]:current-scope'
+    CURRENT_SCOPE_KEY = 'current-scope'
 
-    AUTOSAVES_KEY = '[mongoid]:autosaves'
+    AUTOSAVES_KEY = 'autosaves'
 
-    VALIDATIONS_KEY = '[mongoid]:validations'
+    VALIDATIONS_KEY = 'validations'
 
     STACK_KEYS = Hash.new do |hash, key|
-      hash[key] = "[mongoid]:#{key}-stack"
+      hash[key] = "#{key}-stack"
     end
 
     # The key for the current thread's sessions.
-    SESSIONS_KEY = '[mongoid]:sessions'
+    SESSIONS_KEY = 'sessions'
 
     # The key for storing documents modified inside transactions.
-    MODIFIED_DOCUMENTS_KEY = '[mongoid]:modified-documents'
+    MODIFIED_DOCUMENTS_KEY = 'modified-documents'
 
     # The key storing the default value for whether or not callbacks are
     # executed on documents.
-    EXECUTE_CALLBACKS = '[mongoid]:execute-callbacks'
+    EXECUTE_CALLBACKS = 'execute-callbacks'
 
     extend self
 
-    # Queries the thread-local variable with the given name. If a block is
+    # Resets the current thread- or fiber-local storage to its initial state.
+    # This is useful for making sure the state is clean when starting a new
+    # thread or fiber.
+    #
+    # The value of Mongoid::Config.isolation_level is used to determine
+    # whether to reset the storage for the current thread or fiber.
+    def reset!
+      case Config.isolation_level
+      when :thread
+        Thread.current.thread_variable_set(STORAGE_KEY, nil)
+      when :fiber
+        Fiber[STORAGE_KEY] = nil
+      else
+        raise "Unknown isolation level: #{Config.isolation_level.inspect}"
+      end
+    end
+
+    # Queries the thread- or fiber-local variable with the given name. If a block is
     # given, and the variable does not already exist, the return value of the
     # block will be set as the value of the variable before returning it.
     #
@@ -57,7 +75,7 @@ module Mongoid
     # @return [ Object | nil ] the value of the queried variable, or nil if
     #   it is not set and no default was given.
     def get(key, &default)
-      result = Thread.current.thread_variable_get(key)
+      result = storage[key]
 
       if result.nil? && default
         result = yield
@@ -67,7 +85,7 @@ module Mongoid
       result
     end
 
-    # Sets a thread-local variable with the given name to the given value.
+    # Sets a variable in local storage with the given name to the given value.
     # See #get for a discussion of why this method is necessary, and why
     # Thread#[]= should be avoided in cascading callbacks on embedded children.
     #
@@ -75,35 +93,23 @@ module Mongoid
     # @param [ Object | nil ] value the value of the variable to set (or `nil`
     #   if you wish to unset the variable)
     def set(key, value)
-      Thread.current.thread_variable_set(key, value)
+      storage[key] = value
     end
 
-    # Removes the named variable from thread-local storage.
+    # Removes the named variable from local storage.
     #
     # @param [ String | Symbol ] key the name of the variable to remove.
     def delete(key)
-      set(key, nil)
+      storage.delete(key)
     end
 
-    # Queries the presence of a named variable in thread-local storage.
+    # Queries the presence of a named variable in local storage.
     #
     # @param [ String | Symbol ] key the name of the variable to query.
     #
     # @return [ true | false ] whether the given variable is present or not.
     def has?(key)
-      # Here we have a classic example of JRuby not behaving like MRI. In
-      # MRI, if you set a thread variable to nil, it removes it from the list
-      # and subsequent calls to thread_variable?(key) will return false. Not
-      # so with JRuby. Once set, you cannot unset the thread variable.
-      #
-      # However, because setting a variable to nil is supposed to remove it,
-      # we can assume a nil-valued variable doesn't actually exist.
-
-      # So, instead of this:
-      # Thread.current.thread_variable?(key)
-
-      # We have to do this:
-      !get(key).nil?
+      storage.key?(key)
     end
 
     # Begin entry into a named thread local stack.
@@ -508,5 +514,22 @@ module Mongoid
 
       delete(CURRENT_SCOPE_KEY) if scope.empty?
     end
+
+    # Returns the current thread- or fiber-local storage as a Hash. 
+    def storage
+      case Config.isolation_level
+      when :thread
+        if !Thread.current.thread_variable?(STORAGE_KEY)
+          Thread.current.thread_variable_set(STORAGE_KEY, {})
+        end
+
+        Thread.current.thread_variable_get(STORAGE_KEY)
+      when :fiber
+        Fiber[STORAGE_KEY] ||= {}
+      else
+        raise "Unknown isolation level: #{Config.isolation_level.inspect}"
+      end
+    end
+
   end
 end
