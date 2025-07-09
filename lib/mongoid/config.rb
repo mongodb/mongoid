@@ -121,7 +121,19 @@ module Mongoid
     # If set to `:fiber`, Mongoid will use fiber-local storage instead. This
     # may be necessary if you are using libraries like Falcon, which use
     # fibers to manage concurrency.
-    option :isolation_level, default: :thread
+    #
+    # Note that the `:fiber` isolation level is only supported in Ruby 3.2
+    # and later, due to semantic differences in how fiber storage is handled
+    # in earlier Ruby versions.
+    option :isolation_level, default: :thread, on_change: -> (level) do
+      if %i[ thread fiber ].exclude?(level)
+        raise Errors::UnsupportedIsolationLevel.new(level)
+      end
+
+      if level == :fiber && RUBY_VERSION < '3.2'
+        raise Errors::UnsupportedIsolationLevel.new(level)
+      end
+    end
 
     # When this flag is false, a document will become read-only only once the
     # #readonly! method is called, and an error will be raised on attempting

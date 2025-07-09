@@ -712,6 +712,16 @@ en:
             the expression %{javascript} is not allowed."
           resolution: "Please provide a standard hash to #where when the criteria
             is for an embedded association."
+        unsupported_isolation_level:
+          message: "The isolation level '%{level}' is not supported."
+          summary: >
+            You requested an isolation level of '%{level}', which is not
+            supported. Only `:thread` and `:fiber` isolation levels are
+            currently supported; note that the `:fiber` level is only
+            supported on Ruby versions 3.2 and higher.
+          resolution: >
+            Use `:thread` as the isolation level. If you are using Ruby 3.2
+            or higher, you may also use `:fiber`.
         validations:
           message: "Validation of %{document} failed."
           summary: "The following errors were found: %{errors}"
