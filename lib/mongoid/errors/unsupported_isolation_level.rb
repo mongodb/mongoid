@@ -2,7 +2,6 @@
 
 module Mongoid
   module Errors
-
     # Raised when an unsupported isolation level is used in Mongoid
     # configuration.
     class UnsupportedIsolationLevel < MongoidError
@@ -13,7 +12,7 @@ module Mongoid
       def initialize(level)
         super(
           compose_message(
-            "unsupported_isolation_level",
+            'unsupported_isolation_level',
             { level: level }
           )
         )

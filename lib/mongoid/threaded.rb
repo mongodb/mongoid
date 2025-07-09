@@ -515,21 +515,25 @@ module Mongoid
       delete(CURRENT_SCOPE_KEY) if scope.empty?
     end
 
-    # Returns the current thread- or fiber-local storage as a Hash. 
+    # Returns the current thread- or fiber-local storage as a Hash.
     def storage
       case Config.isolation_level
       when :thread
-        if !Thread.current.thread_variable?(STORAGE_KEY)
-          Thread.current.thread_variable_set(STORAGE_KEY, {})
+        storage_hash = Thread.current.thread_variable_get(STORAGE_KEY)
+
+        unless storage_hash
+          storage_hash = {}
+          Thread.current.thread_variable_set(STORAGE_KEY, storage_hash)
         end
 
-        Thread.current.thread_variable_get(STORAGE_KEY)
+        storage_hash
+
       when :fiber
         Fiber[STORAGE_KEY] ||= {}
+
       else
         raise "Unknown isolation level: #{Config.isolation_level.inspect}"
       end
     end
-
   end
 end
