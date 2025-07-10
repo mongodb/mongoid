@@ -74,5 +74,6 @@ require 'mongoid/errors/unrecognized_resolver'
 require 'mongoid/errors/unregistered_class'
 require "mongoid/errors/unsaved_document"
 require "mongoid/errors/unsupported_javascript"
+require "mongoid/errors/unsupported_isolation_level"
 require "mongoid/errors/validations"
 require "mongoid/errors/delete_restriction"
