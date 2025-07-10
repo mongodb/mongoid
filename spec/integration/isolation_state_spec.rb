@@ -59,13 +59,18 @@ describe 'Mongoid::Config.isolation_level' do
     config_override :isolation_level, :rails
     
     def self.with_rails_isolation_level(level)
-      puts "Rails version: #{ActiveSupport.version}"
       around do |example|
+        # changing the isolation level in Rails apparently can muck with the
+        # configured time zone, so we'll save and restore it, too.
+        tz_saved = Time.zone
+
         saved, ActiveSupport::IsolatedExecutionState.isolation_level =
           ActiveSupport::IsolatedExecutionState.isolation_level, level
+
         example.run
       ensure
         ActiveSupport::IsolatedExecutionState.isolation_level = saved
+        Time.zone = tz_saved
       end
     end
 
