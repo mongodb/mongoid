@@ -55,6 +55,65 @@ describe 'Mongoid::Config.isolation_level' do
     end
   end
 
+  context 'when set to :rails' do
+    config_override :isolation_level, :rails
+    
+    def self.with_rails_isolation_level(level)
+      puts "Rails version: #{ActiveSupport.version}"
+      around do |example|
+        saved, ActiveSupport::IsolatedExecutionState.isolation_level =
+          ActiveSupport::IsolatedExecutionState.isolation_level, level
+        example.run
+      ensure
+        ActiveSupport::IsolatedExecutionState.isolation_level = saved
+      end
+    end
+
+    context 'when using Rails < 7' do
+      max_rails_version '6.99'
+
+      it 'returns :thread' do
+        expect(Mongoid::Config.isolation_level).to eq(:rails)
+        expect(Mongoid::Config.real_isolation_level).to eq(:thread)
+      end
+    end
+
+    context 'when using Rails >= 7' do
+      min_rails_version '7.0'
+
+      context 'when IsolatedExecutionState.isolation_level is set to :thread' do
+        with_rails_isolation_level :thread
+
+        it 'returns :thread' do
+          expect(Mongoid::Config.isolation_level).to eq(:rails)
+          expect(Mongoid::Config.real_isolation_level).to eq(:thread)
+        end
+      end
+
+      context 'when IsolatedExecutionState.isolation_level is set to :fiber' do
+        with_rails_isolation_level :fiber
+
+        context 'when Ruby version is >= 3.2' do
+          ruby_version_gte '3.2'
+
+          it 'returns :fiber' do
+            expect(Mongoid::Config.isolation_level).to eq(:rails)
+            expect(Mongoid::Config.real_isolation_level).to eq(:fiber)
+          end
+        end
+
+        context 'when Ruby version is < 3.2' do
+          ruby_version_lt '3.2'
+
+          it 'raises an error' do
+            expect(Mongoid::Config.isolation_level).to eq(:rails)
+            expect { Mongoid::Config.real_isolation_level }.to raise_error(Mongoid::Errors::UnsupportedIsolationLevel)
+          end
+        end
+      end
+    end
+  end
+
   context 'when set to :thread' do
     config_override :isolation_level, :thread
 

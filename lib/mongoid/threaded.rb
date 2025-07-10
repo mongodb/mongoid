@@ -42,16 +42,16 @@ module Mongoid
     # This is useful for making sure the state is clean when starting a new
     # thread or fiber.
     #
-    # The value of Mongoid::Config.isolation_level is used to determine
+    # The value of Mongoid::Config.real_isolation_level is used to determine
     # whether to reset the storage for the current thread or fiber.
     def reset!
-      case Config.isolation_level
+      case Config.real_isolation_level
       when :thread
         Thread.current.thread_variable_set(STORAGE_KEY, nil)
       when :fiber
         Fiber[STORAGE_KEY] = nil
       else
-        raise "Unknown isolation level: #{Config.isolation_level.inspect}"
+        raise "Unknown isolation level: #{Config.real_isolation_level.inspect}"
       end
     end
 
@@ -517,7 +517,7 @@ module Mongoid
 
     # Returns the current thread- or fiber-local storage as a Hash.
     def storage
-      case Config.isolation_level
+      case Config.real_isolation_level
       when :thread
         storage_hash = Thread.current.thread_variable_get(STORAGE_KEY)
 
@@ -532,7 +532,7 @@ module Mongoid
         Fiber[STORAGE_KEY] ||= {}
 
       else
-        raise "Unknown isolation level: #{Config.isolation_level.inspect}"
+        raise "Unknown isolation level: #{Config.real_isolation_level.inspect}"
       end
     end
   end
