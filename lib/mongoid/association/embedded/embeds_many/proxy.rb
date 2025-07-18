@@ -443,6 +443,67 @@ module Mongoid
             execute_callback :after_add, document
           end
 
+          # Returns a unique id for the document, which is either
+          # its _id or its object_id.
+          def id_of(doc)
+            doc._id || doc.object_id
+          end
+
+          # Optimized version of #append that handles multiple documents
+          # in a more efficient way.
+          #
+          # @param [ Array<Document> ] documents The documents to append.
+          #
+          # @return [ EmbedsMany::Proxy ] This proxy instance.
+          def append_many(documents, &block)
+            unique_set = process_incoming_docs(documents, &block)
+
+            _unscoped.concat(unique_set)
+            _target.push(*scope(unique_set))
+            update_attributes_hash
+
+            unique_set.each { |doc| execute_callback :after_add, doc }
+
+            self
+          end
+
+          # Processes the list of documents, building a list of those
+          # that are not already in the association, and preparing
+          # each unique document to be integrated into the association.
+          #
+          # The :before_add callback is executed for each unique document
+          # as part of this step.
+          #
+          # @param [ Array<Document> ] documents The incoming documents to
+          #   process.
+          #
+          # @yield [ Document ] Optional block to call for each unique
+          #   document.
+          #
+          # @return [ Array<Document> ] The list of unique documents that
+          #   do not yet exist in the association.
+          def process_incoming_docs(documents, &block)
+            visited_docs = Set.new(_target.map { |doc| id_of(doc) })
+            next_index = _unscoped.size
+
+            documents.select do |doc|
+              next unless doc
+
+              id = id_of(doc)
+              next if visited_docs.include?(id)
+
+              execute_callback :before_add, doc
+
+              visited_docs.add(id)
+              integrate(doc)
+
+              doc._index = next_index
+              next_index += 1
+
+              block&.call(doc) || true
+            end
+          end
+
           # Instantiate the binding associated with this association.
           #
           # @example Create the binding.
