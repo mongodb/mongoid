@@ -64,7 +64,7 @@ Layout/SpaceInsidePercentLiteralDelimiters:
   Enabled: false
 
 Metrics/ClassLength:
-  Max: 200
+  Enabled: false
 
 Metrics/ModuleLength:
   Enabled: false
