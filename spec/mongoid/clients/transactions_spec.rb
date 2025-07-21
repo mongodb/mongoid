@@ -716,7 +716,7 @@ describe Mongoid::Clients::Sessions do
       require_transaction_support
 
       context 'when no error raised' do
-        before do
+        let!(:person) do
           Mongoid.transaction do
             Person.create!
           end
@@ -725,6 +725,10 @@ describe Mongoid::Clients::Sessions do
         it 'commits the transaction' do
           expect(other_events.count { |e| e.command_name == 'abortTransaction'}).to be(0)
           expect(other_events.count { |e| e.command_name == 'commitTransaction'}).to be(1)
+        end
+
+        it 'returns the value from the block' do
+          expect(person).to be_a(Person)
         end
 
         it 'executes the commands inside the transaction' do
