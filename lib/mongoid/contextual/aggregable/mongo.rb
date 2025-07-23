@@ -27,7 +27,8 @@ module Mongoid
         #   If no documents are found, then returned Hash will have
         #   count, sum of 0 and max, min, avg of nil.
         def aggregates(field)
-          result = collection.aggregate(pipeline(field), session: _session).to_a
+          hint = options[:hint]
+          result = collection.aggregate(pipeline(field), session: _session, hint: hint).to_a
           if result.empty?
             Aggregable::EMPTY_RESULT.dup
           else
