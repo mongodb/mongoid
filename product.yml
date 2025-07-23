@@ -1,0 +1,8 @@
+---
+name: Mongoid
+description: a Ruby ODM for MongoDB
+package: mongoid
+jira: https://jira.mongodb.org/projects/MONGOID
+version:
+  number: 8.0.10
+  file: lib/mongoid/version.rb
