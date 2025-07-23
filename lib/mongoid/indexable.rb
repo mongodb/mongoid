@@ -94,13 +94,7 @@ module Mongoid
       # @return [ Hash ] The index options.
       def index(spec, options = nil)
         specification = Specification.new(self, spec, options)
-
-        # the equality test for Indexable::Specification instances does not
-        # consider any options, which means names are not compared. This means
-        # that an index with different options from another, and a different
-        # name, will be silently ignored unless duplicate index declarations
-        # are allowed.
-        if Mongoid.allow_duplicate_index_declarations || !index_specifications.include?(specification)
+        if !index_specifications.include?(specification)
           index_specifications.push(specification)
         end
       end
@@ -115,8 +109,9 @@ module Mongoid
       #
       # @return [ Specification ] The found specification.
       def index_specification(index_hash, index_name = nil)
+        index = OpenStruct.new(fields: index_hash.keys, key: index_hash)
         index_specifications.detect do |spec|
-          spec.superficial_match?(key: index_hash, name: index_name)
+          spec == index || (index_name && index_name == spec.name)
         end
       end
 

@@ -29,25 +29,7 @@ module Mongoid
       #
       # @return [ true | false ] If the specs are equal.
       def ==(other)
-        superficial_match?(key: other.key)
-      end
-
-      # Performs a superficial comparison with the given criteria, checking
-      # only the key and (optionally) the name. Options are not compared.
-      #
-      # Note that the ordering of the fields in the key is significant. Two
-      # keys with different orderings will not match, here.
-      #
-      # @param [ Hash ] key the key that defines the index.
-      # @param [ String | nil ] name the name given to the index, or nil to
-      #    ignore the name.
-      #
-      # @return [ true | false ] the result of the comparison, true if this
-      #   specification matches the criteria, and false otherwise.
-      def superficial_match?(key: {}, name: nil)
-        (name && name == self.name) ||
-          self.fields == key.keys &&
-          self.key == key
+        fields == other.fields && key == other.key
       end
 
       # Instantiate a new index specification.
