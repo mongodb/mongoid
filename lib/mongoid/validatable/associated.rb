@@ -74,7 +74,7 @@ module Mongoid
           # use map.all? instead of just all?, because all? will do short-circuit
           # evaluation and terminate on the first failed validation.
           list.map do |value|
-            if value && !value.flagged_for_destroy?
+            if value && !value.flagged_for_destroy? && (!value.persisted? || value.changed?)
               value.validated? ? true : value.valid?
             else
               true
