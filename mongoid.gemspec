@@ -24,13 +24,6 @@ Gem::Specification.new do |s|
     'source_code_uri' => 'https://github.com/mongodb/mongoid',
   }
 
-  if File.exist?('gem-private_key.pem')
-    s.signing_key = 'gem-private_key.pem'
-    s.cert_chain = ['gem-public_cert.pem']
-  else
-    warn "[#{s.name}] Warning: No private key present, creating unsigned gem."
-  end
-
   s.required_ruby_version     = ">= 2.6"
   s.required_rubygems_version = ">= 1.3.6"
 
