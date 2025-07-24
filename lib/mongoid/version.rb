@@ -5,5 +5,5 @@ module Mongoid
   #
   # Note that this file is automatically updated via `rake candidate:create`.
   # Manual changes to this file will be overwritten by that rake task.
-  VERSION = '8.1.10'
+  VERSION = '8.1.11'
 end
