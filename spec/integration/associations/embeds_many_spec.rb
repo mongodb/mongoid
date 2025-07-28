@@ -200,6 +200,47 @@ describe 'embeds_many associations' do
         include_examples 'persists correctly'
       end
     end
+
+    context 'including duplicates in the assignment' do
+      let(:canvas) do
+        Canvas.create!(shapes: [Shape.new])
+      end
+
+      shared_examples 'persists correctly' do
+        it 'persists correctly' do
+          canvas.shapes.length.should eq 2
+          _canvas = Canvas.find(canvas.id)
+          _canvas.shapes.length.should eq 2
+        end
+      end
+
+      context 'via assignment operator' do
+        before do
+          canvas.shapes = [ canvas.shapes.first, Shape.new, canvas.shapes.first ]
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via attributes=' do
+        before do
+          canvas.attributes = { shapes: [ canvas.shapes.first, Shape.new, canvas.shapes.first ] }
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+
+      context 'via assign_attributes' do
+        before do
+          canvas.assign_attributes(shapes: [ canvas.shapes.first, Shape.new, canvas.shapes.first ])
+          canvas.save!
+        end
+
+        include_examples 'persists correctly'
+      end
+    end
   end
 
   context 'when an anonymous class defines an embeds_many association' do
