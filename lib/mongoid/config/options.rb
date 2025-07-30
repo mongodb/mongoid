@@ -40,8 +40,17 @@ module Mongoid
           end
 
           define_method("#{name}=") do |value|
+            old_value = settings[name]
             settings[name] = value
-            options[:on_change]&.call(value)
+
+            begin
+              options[:on_change]&.call(value)
+            rescue
+              # If the on_change callback raises an error, we need to roll
+              # the change back.
+              settings[name] = old_value
+              raise
+            end
           end
 
           define_method("#{name}?") do
