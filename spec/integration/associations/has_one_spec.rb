@@ -224,7 +224,7 @@ describe 'has_one associations' do
     end
 
     context "when explicitly setting the foreign key" do
-      let(:comment2) { HomComment.new(post_id: post.id, content: "2") }
+      let(:comment2) { HomComment.new(container_id: post.id, container_type: post.class.name, content: "2") }
 
       it "persists the new comment" do
         post.comment = comment1
@@ -264,10 +264,62 @@ describe 'has_one associations' do
 
     it "does not overwrite the original value" do
       pending "MONGOID-3999"
-      p1 = comment.post
+      p1 = comment.container
       expect(p1.title).to eq("post 1")
-      comment.post = post2
+      comment.container = post2
       expect(p1.title).to eq("post 1")
+    end
+  end
+
+  context 'with deeply nested trees' do
+    let(:post) { HomPost.create!(title: 'Post') }
+    let(:child) { post.create_comment(content: 'Child') }
+
+    # creating grandchild will cascade to create the other documents
+    let!(:grandchild) { child.create_comment(content: 'Grandchild') }
+
+    let(:updated_parent_title) { 'Post Updated' }
+    let(:updated_grandchild_content) { 'Grandchild Updated' }
+
+    context 'with nested attributes' do
+      let(:attributes) do
+        {
+          title: updated_parent_title,
+          comment_attributes: {
+            # no change for child
+            _id: child.id,
+            comment_attributes: {
+              _id: grandchild.id,
+              content: updated_grandchild_content,
+              num: updated_grandchild_num,
+            }
+          }
+        }
+      end
+
+      context 'when the grandchild is invalid' do
+        let(:updated_grandchild_num) { -1 } # invalid value
+
+        it 'will not save the parent' do
+          expect(post.update(attributes)).to be_falsey
+          expect(post.errors).not_to be_empty
+          expect(post.reload.title).not_to eq(updated_parent_title)
+          expect(grandchild.reload.content).not_to eq(updated_grandchild_content)
+          expect(grandchild.num).not_to eq(updated_grandchild_num)
+        end
+      end
+
+      context 'when the grandchild is valid' do
+        let(:updated_grandchild_num) { 1 }
+
+        it 'will save the parent' do
+          expect(post.update(attributes)).to be_truthy
+          expect(post.errors).to be_empty
+          expect(post.reload.title).to eq(updated_parent_title)
+          expect(grandchild.reload.content).to eq(updated_grandchild_content)
+          expect(grandchild.num).to eq(updated_grandchild_num)
+        end
+      end
     end
   end
 end

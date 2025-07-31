@@ -3,6 +3,24 @@
 
 require 'spec_helper'
 
+module EmbedsManySpec
+  class Post
+    include Mongoid::Document
+    field :title, type: String
+    embeds_many :comments, class_name: 'EmbedsManySpec::Comment', as: :container
+    accepts_nested_attributes_for :comments
+  end
+
+  class Comment
+    include Mongoid::Document
+    field :content, type: String
+    validates :content, presence: true
+    embedded_in :container, polymorphic: true
+    embeds_many :comments, class_name: 'EmbedsManySpec::Comment', as: :container
+    accepts_nested_attributes_for :comments
+  end
+end
+
 describe 'embeds_many associations' do
 
   context 're-associating the same object' do
@@ -256,6 +274,57 @@ describe 'embeds_many associations' do
       expect { klass }.to_not raise_error
       expect { klass.new.addresses }.to_not raise_error
       expect(klass.new.addresses.build).to be_a Address
+    end
+  end
+
+  context 'with deeply nested trees' do
+    let(:post) { EmbedsManySpec::Post.create!(title: 'Post') }
+    let(:child) { post.comments.create!(content: 'Child') }
+
+    # creating grandchild will cascade to create the other documents
+    let!(:grandchild) { child.comments.create!(content: 'Grandchild') }
+
+    let(:updated_parent_title) { 'Post Updated' }
+    let(:updated_grandchild_content) { 'Grandchild Updated' }
+
+    context 'with nested attributes' do
+      let(:attributes) do
+        {
+          title: updated_parent_title,
+          comments_attributes: [
+            {
+              # no change for comment1
+              _id: child.id,
+              comments_attributes: [
+                {
+                  _id: grandchild.id,
+                  content: updated_grandchild_content,
+                }
+              ]
+            }
+          ]
+        }
+      end
+
+      context 'when the grandchild is invalid' do
+        let(:updated_grandchild_content) { '' } # invalid value
+
+        it 'will not save the parent' do
+          expect(post.update(attributes)).to be_falsey
+          expect(post.errors).not_to be_empty
+          expect(post.reload.title).not_to eq(updated_parent_title)
+          expect(grandchild.reload.content).not_to eq(updated_grandchild_content)
+        end
+      end
+
+      context 'when the grandchild is valid' do
+        it 'will save the parent' do
+          expect(post.update(attributes)).to be_truthy
+          expect(post.errors).to be_empty
+          expect(post.reload.title).to eq(updated_parent_title)
+          expect(grandchild.reload.content).to eq(updated_grandchild_content)
+        end
+      end
     end
   end
 end
