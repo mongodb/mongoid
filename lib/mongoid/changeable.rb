@@ -17,8 +17,10 @@ module Mongoid
 
     # Indicates that the children of this document may have changed, and
     # ought to be checked when the document is validated.
-    def children_may_have_changed!(flag = true)
-      @children_may_have_changed = flag
+    #
+    # @api private
+    def children_may_have_changed!
+      @children_may_have_changed = true
     end
 
     # Has the document changed?
