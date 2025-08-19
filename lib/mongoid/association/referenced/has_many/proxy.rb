@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: consider refactoring this Proxy class, to satisfy the following
-# cops...
-# rubocop:disable Metrics/ClassLength
 module Mongoid
   module Association
     module Referenced
@@ -588,4 +585,3 @@ module Mongoid
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
