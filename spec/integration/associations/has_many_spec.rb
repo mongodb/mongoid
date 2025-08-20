@@ -126,4 +126,60 @@ describe 'has_many associations' do
       end
     end
   end
+
+  context 'with deeply nested trees' do
+    let(:post) { HmmPost.create!(title: 'Post') }
+    let(:child) { post.comments.create!(title: 'Child') }
+
+    # creating grandchild will cascade to create the other documents
+    let!(:grandchild) { child.comments.create!(title: 'Grandchild') }
+
+    let(:updated_parent_title) { 'Post Updated' }
+    let(:updated_grandchild_title) { 'Grandchild Updated' }
+
+    context 'with nested attributes' do
+      let(:attributes) do
+        {
+          title: updated_parent_title,
+          comments_attributes: [
+            {
+              # no change for comment1
+              _id: child.id,
+              comments_attributes: [
+                {
+                  _id: grandchild.id,
+                  title: updated_grandchild_title,
+                  num: updated_grandchild_num,
+                }
+              ]
+            }
+          ]
+        }
+      end
+
+      context 'when the grandchild is invalid' do
+        let(:updated_grandchild_num) { -1 } # invalid value
+
+        it 'will not save the parent' do
+          expect(post.update(attributes)).to be_falsey
+          expect(post.errors).not_to be_empty
+          expect(post.reload.title).not_to eq(updated_parent_title)
+          expect(grandchild.reload.title).not_to eq(updated_grandchild_title)
+          expect(grandchild.num).not_to eq(updated_grandchild_num)
+        end
+      end
+
+      context 'when the grandchild is valid' do
+        let(:updated_grandchild_num) { 1 }
+
+        it 'will save the parent' do
+          expect(post.update(attributes)).to be_truthy
+          expect(post.errors).to be_empty
+          expect(post.reload.title).to eq(updated_parent_title)
+          expect(grandchild.reload.title).to eq(updated_grandchild_title)
+          expect(grandchild.num).to eq(updated_grandchild_num)
+        end
+      end
+    end
+  end
 end
