@@ -92,8 +92,7 @@ module Mongoid
             begin
               session.with_transaction(options) do
                 yield
-              end
-              run_commit_callbacks(session)
+              end.tap { run_commit_callbacks(session) }
             rescue *transactions_not_supported_exceptions
               raise Mongoid::Errors::TransactionsNotSupported
             rescue Mongoid::Errors::Rollback
