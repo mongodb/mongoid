@@ -301,6 +301,10 @@ describe Mongoid::Serializable do
             { "title" => attributes["title"] }
           )
         end
+
+        it "doesn't include any fields when passed an empty array" do
+          expect(person.serializable_hash(only: [])).to be_empty
+        end
       end
 
       context "when specifying extra inclusions" do

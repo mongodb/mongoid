@@ -79,11 +79,11 @@ module Mongoid
     def field_names(options)
       names = (as_attributes.keys + attribute_names).uniq.sort
 
-      only = Array.wrap(options[:only]).map(&:to_s)
       except = Array.wrap(options[:except]).map(&:to_s)
       except |= [self.class.discriminator_key] unless Mongoid.include_type_for_serialization
 
-      if !only.empty?
+      if !options[:only].nil?
+        only = Array.wrap(options[:only]).map(&:to_s)
         names &= only
       elsif !except.empty?
         names -= except
