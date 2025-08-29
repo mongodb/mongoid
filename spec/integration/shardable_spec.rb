@@ -48,6 +48,8 @@ describe 'Sharding helpers' do
     end
 
     context 'when database does not exist' do
+      max_server_version '8.2.99'
+
       let(:model_cls) { SmMovie }
 
       before do
@@ -61,20 +63,7 @@ describe 'Sharding helpers' do
       let(:model_cls) { SmMovie }
 
       before do
-        SmMovie.collection.database.drop
-        retried = false
-
-        begin
-          SmMovie.collection.create
-          SmMovie.collection.drop
-        rescue Mongo::Error::OperationFailure => exc
-          if !retried && exc.code == 26 # NamespaceNotFound
-            retried = true
-            retry
-          end
-
-          raise
-        end
+        SmMovie.collection.drop
       end
 
       it_behaves_like 'shards collection'
