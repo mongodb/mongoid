@@ -302,16 +302,16 @@ describe Mongoid::Serializable do
           )
         end
 
-        context "when serializable_hash_with_legacy_only == false" do # default for <= 9
-          config_override :serializable_hash_with_legacy_only, false
+        context "when serializable_hash_with_legacy_only == true" do # default for <= 9
+          config_override :serializable_hash_with_legacy_only, true
 
           it "includes all fields when passed an empty array" do
             expect(person.serializable_hash(only: [])).to include attributes
           end
         end
 
-        context "when serializable_hash_with_legacy_only == true" do # default for >= 10
-          config_override :serializable_hash_with_legacy_only, true
+        context "when serializable_hash_with_legacy_only == false" do # default for >= 10
+          config_override :serializable_hash_with_legacy_only, false
 
           it "doesn't include any fields when passed an empty array" do
             expect(person.serializable_hash(only: [])).to be_empty
