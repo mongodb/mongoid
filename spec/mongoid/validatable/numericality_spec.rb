@@ -39,6 +39,8 @@ describe ActiveModel::Validations::NumericalityValidator do
     end
 
     context 'when the value is a BSON::Decimal128' do
+      min_rails_version '6.1'
+
       let(:model) { TestModel.new(amount: BSON::Decimal128.new('15.0')) }
 
       it 'returns true' do
