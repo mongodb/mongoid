@@ -82,8 +82,8 @@ module Mongoid
       except = Array.wrap(options[:except]).map(&:to_s)
       except |= [self.class.discriminator_key] unless Mongoid.include_type_for_serialization
 
-      if !options[:only].nil?
-        only = Array.wrap(options[:only]).map(&:to_s)
+      only = Array.wrap(options[:only]).map(&:to_s)
+      if !options[:only].nil? && (!Mongoid.serializable_hash_with_legacy_only || !only.empty?)
         names &= only
       elsif !except.empty?
         names -= except
