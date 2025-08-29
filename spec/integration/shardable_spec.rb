@@ -62,8 +62,19 @@ describe 'Sharding helpers' do
 
       before do
         SmMovie.collection.database.drop
-        SmMovie.collection.create
-        SmMovie.collection.drop
+        retried = false
+
+        begin
+          SmMovie.collection.create
+          SmMovie.collection.drop
+        rescue Mongo::Error::OperationFailure => exc
+          if !retried && exc.code == 26 # NamespaceNotFound
+            retried = true
+            retry
+          end
+
+          raise
+        end
       end
 
       it_behaves_like 'shards collection'
