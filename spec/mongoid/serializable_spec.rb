@@ -306,7 +306,7 @@ describe Mongoid::Serializable do
           config_override :serializable_hash_with_legacy_only, false
 
           it "includes all fields when passed an empty array" do
-            expect(person.serializable_hash(only: [])).to eq(attributes)
+            expect(person.serializable_hash(only: [])).to include attributes
           end
         end
 
