@@ -1,11 +1,11 @@
 # rubocop:todo all
 source 'https://rubygems.org'
 
-gem 'actionpack', '~> 6.1'
-gem 'activemodel', '~> 6.1'
+gem 'actionpack', '~> 6.1.0'
+gem 'activemodel', '~> 6.1.0'
 
 group :test do
-  gem 'activejob', '~> 6.1'
+  gem 'activejob', '~> 6.1.0'
 end
 gemspec path: '..'
 
