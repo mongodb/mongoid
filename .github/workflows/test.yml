@@ -38,7 +38,7 @@ jobs:
 
     - id: start-mongodb
       name: start mongodb
-      uses: mongodb-labs/drivers-evergreen-tools@master
+      uses: mongodb-labs/drivers-evergreen-tools@8c66939e0f2ad8ec03522cd7e8631f5a55e2c9f2
       with:
         version: "${{matrix.mongodb}}"
         topology: "${{matrix.topology}}"
