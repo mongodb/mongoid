@@ -179,11 +179,16 @@ module Mongoid
       # @example Do any documents exist for given conditions.
       #   context.exists?(name: "...")
       #
+      # @example Always return false.
+      #   context.exists?(false)
+      #
       # @note We don't use count here since Mongo does not use counted
       #   b-tree indexes.
       #
-      # @param [ Hash | Object | false ] id_or_conditions an _id to
-      #   search for, a hash of conditions, nil or false.
+      # @param [ :none | Hash | BSON::ObjectId | nil | false ] id_or_conditions
+      #   May optionally supply search conditions as a hash or an object id.
+      #   Will always return false when given nil or false. The symbol :none is
+      #   the default when argument is not supplied.
       #
       # @return [ true | false ] If the count is more than zero.
       #   Always false if passed nil or false.
