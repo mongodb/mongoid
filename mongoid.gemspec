@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
     warn "[#{s.name}] Warning: No private key present, creating unsigned gem."
   end
 
-  s.required_ruby_version     = ">= 2.5"
+  s.required_ruby_version     = ">= 2.6"
   s.required_rubygems_version = ">= 1.3.6"
 
   # Ruby 3.0 requires ActiveModel 6.0 or higher.
@@ -53,7 +53,7 @@ Gem::Specification.new do |s|
   # Therefore, usage of this gem looks like a reasonable solution at the moment.
   s.add_dependency("ruby2_keywords", "~> 0.0.5")
 
-  s.add_development_dependency("bson", ['>=4.9.4', '<5.0.0'])
+  s.add_development_dependency("bson", ['>=4.9.4', '<6.0.0'])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.test_files   = Dir.glob("spec/**/*")

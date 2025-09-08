@@ -30,34 +30,42 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Driver 2.18-2.21
      - Driver 2.17-2.10
      - Driver 2.9-2.7
 
    * - 7.5
      - |checkmark|
+     - |checkmark|
      -
 
    * - 7.4
+     -
      - |checkmark|
      -
 
    * - 7.3
+     -
      - |checkmark|
      -
 
    * - 7.2
+     -
      - |checkmark|
      -
 
    * - 7.1
+     -
      - |checkmark|
      - |checkmark|
 
    * - 7.0
+     -
      - |checkmark|
      - |checkmark|
 
    * - 6.4
+     -
      - |checkmark|
      - |checkmark|
 
@@ -90,8 +98,8 @@ is deprecated.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - D
+     -
+     -
      -
      -
      -
@@ -202,6 +210,8 @@ and will be removed in a next version.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - MongoDB 8.0
+     - MongoDB 7.0
      - MongoDB 6.0
      - MongoDB 5.0
      - MongoDB 4.4
@@ -220,12 +230,16 @@ and will be removed in a next version.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
+     - |checkmark|
      - D
      - D
      - D
      - D
 
    * - 7.4
+     -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -239,6 +253,8 @@ and will be removed in a next version.
 
    * - 7.3
      -
+     -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -250,6 +266,8 @@ and will be removed in a next version.
      - D
 
    * - 7.2
+     -
+     -
      -
      - |checkmark|
      - |checkmark|
@@ -263,6 +281,8 @@ and will be removed in a next version.
 
    * - 7.1
      -
+     -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -275,6 +295,8 @@ and will be removed in a next version.
 
    * - 7.0
      -
+     -
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -286,6 +308,8 @@ and will be removed in a next version.
      - D
 
    * - 6.4
+     -
+     -
      -
      - |checkmark|
      - |checkmark|

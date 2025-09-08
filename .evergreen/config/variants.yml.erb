@@ -1,0 +1,46 @@
+buildvariants:
+- matrix_name: "mongodb-8.0"
+  matrix_spec:
+    ruby: '*'
+    driver: ["current"]
+    topology: '*'
+    mongodb-version: ['8.0']
+    os: ubuntu-20.04
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tasks:
+    - name: "test"
+
+- matrix_name: "jruby"
+  matrix_spec:
+    jruby: '*'
+    driver: ["current"]
+    topology: ['replica-set', 'sharded-cluster']
+    mongodb-version: '8.0'
+    os: ubuntu-20.04
+  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tasks:
+    - name: "test"
+
+- matrix_name: "rails"
+  matrix_spec:
+    ruby: ["ruby-3.1"]
+    driver: ["current"]
+    mongodb-version: "8.0"
+    topology: "replica-set"
+    rails: '*'
+    os: ubuntu-20.04
+  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  tasks:
+    - name: "test"
+
+- matrix_name: "i18n-fallbacks"
+  matrix_spec:
+    ruby: "ruby-3.0"
+    driver: ["current"]
+    mongodb-version: "4.4"
+    topology: "standalone"
+    test-i18n-fallbacks: yes
+    os: ubuntu-20.04
+  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
+  tasks:
+     - name: "test"
