@@ -33,6 +33,13 @@ module Mongoid
         def deserialize(string)
           BSON::ObjectId.from_string(string)
         end
+
+        # Returns the klass this serializer handles.
+        #
+        # @return [ BSON::ObjectId ] The class this serializer handles.
+        def klass
+          BSON::ObjectId
+        end
       end
     end
   end

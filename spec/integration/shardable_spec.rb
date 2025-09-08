@@ -48,6 +48,8 @@ describe 'Sharding helpers' do
     end
 
     context 'when database does not exist' do
+      max_server_version '8.2.99'
+
       let(:model_cls) { SmMovie }
 
       before do
@@ -61,8 +63,6 @@ describe 'Sharding helpers' do
       let(:model_cls) { SmMovie }
 
       before do
-        SmMovie.collection.database.drop
-        SmMovie.collection.create
         SmMovie.collection.drop
       end
 
