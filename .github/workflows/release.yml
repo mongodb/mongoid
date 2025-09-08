@@ -1,0 +1,88 @@
+name: "Gem Release"
+run-name: "Gem Release for ${{ github.ref }}"
+
+on:
+  # for auto-deploy when merging a release-candidate PR
+  push:
+    branches:
+      - 'master'
+      - '*-stable'
+
+  # for manual release
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "The number of the merged release candidate PR"
+        required: true
+
+env:
+  SILK_ASSET_GROUP: mongoid
+  GEM_NAME: mongoid
+  PRODUCT_NAME: Mongoid
+  PRODUCT_ID: mongoid
+
+permissions:
+  # required for all workflows
+  security-events: write
+
+  # required to fetch internal or private CodeQL packs
+  packages: read
+
+  # only required for workflows in private repositories
+  actions: read
+  pull-requests: read
+  contents: write
+
+  # required by the mongodb-labs/drivers-github-tools/setup@v2 step
+  # also required by `rubygems/release-gem`
+  id-token: write
+
+jobs:
+  check:
+    name: "Check Release"
+    runs-on: ubuntu-latest
+    outputs:
+      message: ${{ steps.check.outputs.message }}
+      ref: ${{ steps.check.outputs.ref }}
+    steps:
+      - name: "Run the check action"
+        id: check
+        uses: jamis/drivers-github-tools/ruby/pr-check@ruby-3643-update-release-process
+
+  build:
+    name: "Build Gems"
+    needs: check
+    environment: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Run the build action"
+        uses: jamis/drivers-github-tools/ruby/build@ruby-3643-update-release-process
+        with:
+          app_id: ${{ vars.APP_ID }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          artifact: 'ruby-3.2'
+          gem_name: ${{ env.GEM_NAME }}
+          ruby_version: 'ruby-3.2'
+          ref: ${{ needs.check.outputs.ref }}
+
+  publish:
+    name: "Publish Gems"
+    needs: [ check, build ]
+    environment: release
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: "Run the publish action"
+        uses: jamis/drivers-github-tools/ruby/publish@ruby-3643-update-release-process
+        with:
+          app_id: ${{ vars.APP_ID }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          aws_role_arn: ${{ secrets.AWS_ROLE_ARN }}
+          aws_region_name: ${{ vars.AWS_REGION_NAME }}
+          aws_secret_id: ${{ secrets.AWS_SECRET_ID }}
+          dry_run: false
+          gem_name: ${{ env.GEM_NAME }}
+          product_name: ${{ env.PRODUCT_NAME }}
+          product_id: ${{ env.PRODUCT_ID }}
+          release_message: ${{ needs.check.outputs.message }}
+          silk_asset_group: ${{ env.SILK_ASSET_GROUP }}
+          ref: ${{ needs.check.outputs.ref }}
