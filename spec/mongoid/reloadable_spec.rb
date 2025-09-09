@@ -134,6 +134,16 @@ describe Mongoid::Reloadable do
 
           agent.title.should == '007'
         end
+
+        it 'sets new_record to false' do
+          expect(agent.new_record?).to be true
+
+          lambda do
+            agent.reload
+          end.should_not raise_error
+
+          expect(agent.new_record?).to be false
+        end
       end
     end
 
@@ -594,6 +604,20 @@ describe Mongoid::Reloadable do
           band.id.should_not be nil
           # _id changes
           band.id.should_not == original_id
+        end
+      end
+
+      context 'when there is no document matching our id' do
+        let(:agent) { Agent.new(id: BSON::ObjectId.new) }
+
+        it 'does not set new_record to false' do
+          expect(agent.new_record?).to be true
+
+          lambda do
+            agent.reload
+          end.should_not raise_error
+
+          expect(agent.new_record?).to be true
         end
       end
     end
