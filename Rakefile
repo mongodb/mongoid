@@ -1,7 +1,7 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "bundler"
-require "bundler/gem_tasks"
 Bundler.setup
 
 ROOT = File.expand_path(File.join(File.dirname(__FILE__)))
@@ -10,34 +10,53 @@ $: << File.join(ROOT, 'spec/shared/lib')
 
 require "rake"
 require "rspec/core/rake_task"
-require 'mrss/spec_organizer'
-require 'rubygems/package'
-require 'rubygems/security/policies'
 
-def signed_gem?(path_to_gem)
-  Gem::Package.new(path_to_gem, Gem::Security::HighSecurity).verify
-  true
-rescue Gem::Security::Exception => e
-  false
+if File.exist?('./spec/shared/lib/tasks/candidate.rake')
+  load 'spec/shared/lib/tasks/candidate.rake'
 end
 
-$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-require "mongoid/version"
-
-tasks = Rake.application.instance_variable_get('@tasks')
-tasks['release:do'] = tasks.delete('release')
-
-task :gem => :build
+desc 'Build the gem'
 task :build do
-  system "gem build mongoid.gemspec"
+  command = %w[ gem build ]
+  command << "--output=#{ENV['GEM_FILE_NAME']}" if ENV['GEM_FILE_NAME']
+  command << (ENV['GEMSPEC'] || 'mongoid.gemspec')
+  system(*command)
 end
 
-task :install => :build do
-  system "sudo gem install mongoid-#{Mongoid::VERSION}.gem"
+# `rake version` is used by the deployment system so get the release version
+# of the product beng deployed. It must do nothing more than just print the
+# product version number.
+# 
+# See the mongodb-labs/driver-github-tools/ruby/publish Github action.
+desc "Print the current value of Mongoid::VERSION"
+task :version do
+  require 'mongoid/version'
+
+  puts Mongoid::VERSION
 end
 
+# overrides the default Bundler-provided `release` task, which also
+# builds the gem. Our release process assumes the gem has already
+# been built (and signed via GPG), so we just need `rake release` to
+# push the gem to rubygems.
 task :release do
-  raise "Please use ./release.sh to release"
+  require 'mongoid/version'
+
+  if ENV['GITHUB_ACTION'].nil?
+    abort <<~WARNING
+      `rake release` must be invoked from the `Mongoid Release` GitHub action,
+      and must not be invoked locally. This ensures the gem is properly signed
+      and distributed by the appropriate user.
+
+      Note that it is the `rubygems/release-gem@v1` step in the `Mongoid Release`
+      action that invokes this task. Do not rename or remove this task, or the
+      release-gem step will fail. Reimplement this task with caution.
+
+      mongoid-#{Mongoid::VERSION}.gem was NOT pushed to RubyGems.
+    WARNING
+  end
+
+  system 'gem', 'push', "mongoid-#{Mongoid::VERSION}.gem"
 end
 
 RSpec::Core::RakeTask.new("spec") do |spec|
@@ -47,6 +66,46 @@ end
 RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.rspec_opts = %w(--format progress)
   spec.pattern = "spec/**/*_spec.rb"
+end
+
+desc 'Build and validate the evergreen config'
+task eg: %w[ eg:build eg:validate ]
+
+# 'eg' == 'evergreen', but evergreen is too many letters for convenience
+namespace :eg do
+  desc 'Builds the .evergreen/config.yml file from the templates'
+  task :build do
+    ruby '.evergreen/update-evergreen-configs'
+  end
+
+  desc 'Validates the .evergreen/config.yml file'
+  task :validate do
+    system 'evergreen validate --project mongoid .evergreen/config.yml'
+  end
+
+  desc 'Updates the evergreen executable to the latest available version'
+  task :update do
+    system 'evergreen get-update --install'
+  end
+
+  desc 'Runs the current branch as an evergreen patch'
+  task :patch do
+    system 'evergreen patch --uncommitted --project mongoid --browse --auto-description --yes'
+  end
+end
+
+namespace :generate do
+  desc 'Generates a mongoid.yml from the template'
+  task :config do
+    require 'mongoid'
+    require 'erb'
+
+    template_path = 'lib/rails/generators/mongoid/config/templates/mongoid.yml'
+    database_name = ENV['DATABASE_NAME'] || 'my_db'
+
+    config = ERB.new(File.read(template_path), trim_mode: '-').result(binding)
+    File.write('mongoid.yml', config)
+  end
 end
 
 CLASSIFIERS = [
@@ -64,6 +123,8 @@ RUN_PRIORITY = %i(
 )
 
 def spec_organizer
+  require 'mrss/spec_organizer'
+
   Mrss::SpecOrganizer.new(
     root: ROOT,
     classifiers: CLASSIFIERS,
@@ -97,34 +158,12 @@ desc "Generate all documentation"
 task :docs => 'docs:yard'
 
 namespace :docs do
-  desc "Generate yard documention"
+  desc "Generate yard documentation"
   task :yard do
+    require "mongoid/version"
+
     out = File.join('yard-docs', Mongoid::VERSION)
     FileUtils.rm_rf(out)
     system "yardoc -o #{out} --title mongoid-#{Mongoid::VERSION}"
-  end
-end
-
-namespace :release do
-  task :check_private_key do
-    unless File.exist?('gem-private_key.pem')
-      raise "No private key present, cannot release"
-    end
-  end
-end
-
-desc 'Verifies that all built gems in pkg/ are valid'
-task :verify do
-  gems = Dir['pkg/*.gem']
-  if gems.empty?
-    puts 'There are no gems in pkg/ to verify'
-  else
-    gems.each do |gem|
-      if signed_gem?(gem)
-        puts "#{gem} is signed"
-      else
-        abort "#{gem} is not signed"
-      end
-    end
   end
 end
