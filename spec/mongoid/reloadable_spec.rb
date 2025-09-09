@@ -134,16 +134,16 @@ describe Mongoid::Reloadable do
 
           agent.title.should == '007'
         end
-      end
 
-      it 'sets new_record to false' do
-        expect(agent.new_record?).to be true
+        it 'sets new_record to false' do
+          expect(agent.new_record?).to be true
 
-        lambda do
-          agent.reload
-        end.should_not raise_error
+          lambda do
+            agent.reload
+          end.should_not raise_error
 
-        expect(agent.new_record?).to be false
+          expect(agent.new_record?).to be false
+        end
       end
     end
 
