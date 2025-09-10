@@ -98,8 +98,8 @@ is deprecated.
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     -
-     -
+     - |checkmark|
+     - D
      -
      -
      -
