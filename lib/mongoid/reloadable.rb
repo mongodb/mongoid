@@ -17,6 +17,12 @@ module Mongoid
       reloaded = _reload
       check_for_deleted_document!(reloaded)
 
+      # In an instance where we create a new document, but set the ID to an existing one,
+      #   when the document is reloaded, we want to set new_record to false.
+      #   This is necessary otherwise saving will fail, as it will try to insert the document,
+      #   instead of attempting to update the existing document.
+      @new_record = false unless reloaded.nil? || reloaded.empty?
+
       reset_object!(reloaded)
 
       run_callbacks(:find) unless _find_callbacks.empty?
