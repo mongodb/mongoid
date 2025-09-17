@@ -33,7 +33,7 @@ permissions:
   pull-requests: read
   contents: write
 
-  # required by the mongodb-labs/drivers-github-tools/setup@v2 step
+  # required by the mongodb-labs/drivers-github-tools/setup@v3 step
   # also required by `rubygems/release-gem`
   id-token: write
 
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: "Run the check action"
         id: check
-        uses: jamis/drivers-github-tools/ruby/pr-check@ruby-3643-update-release-process
+        uses: mongodb-labs/drivers-github-tools/ruby/pr-check@v3
 
   build:
     name: "Build Gems"
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Run the build action"
-        uses: jamis/drivers-github-tools/ruby/build@ruby-3643-update-release-process
+        uses: mongodb-labs/drivers-github-tools/ruby/build@v3
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -72,7 +72,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: "Run the publish action"
-        uses: jamis/drivers-github-tools/ruby/publish@ruby-3643-update-release-process
+        uses: mongodb-labs/drivers-github-tools/ruby/publish@v3
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
