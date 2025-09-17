@@ -16,7 +16,6 @@ on:
         required: true
 
 env:
-  SILK_ASSET_GROUP: mongoid
   GEM_NAME: mongoid
   PRODUCT_NAME: Mongoid
   PRODUCT_ID: mongoid
@@ -84,5 +83,4 @@ jobs:
           product_name: ${{ env.PRODUCT_NAME }}
           product_id: ${{ env.PRODUCT_ID }}
           release_message: ${{ needs.check.outputs.message }}
-          silk_asset_group: ${{ env.SILK_ASSET_GROUP }}
           ref: ${{ needs.check.outputs.ref }}
