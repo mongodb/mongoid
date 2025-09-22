@@ -1730,7 +1730,7 @@ describe Mongoid::Attributes do
       end
     end
 
-    context 'when map_big_decimal_as_bson_decimal128 is enabled' do
+    context 'when map_big_decimal_to_decimal128 is enabled' do
       config_override :map_big_decimal_to_decimal128, true
 
       context 'when writing an identical number' do
