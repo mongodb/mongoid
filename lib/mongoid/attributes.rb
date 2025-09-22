@@ -371,7 +371,7 @@ module Mongoid
     # comparison purposes. This is necessary because `BSON::Decimal128` does
     # not implement `#==` in a way that is compatible with `BigDecimal`.
     def normalize_value(value)
-      value.is_a?(BSON::Decimal128) ? value.to_d : value
+      value.is_a?(BSON::Decimal128) ? BigDecimal(value.to_s) : value
     end
 
     # Determine if the attribute will not change, by comparing the current
