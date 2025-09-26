@@ -1971,6 +1971,10 @@ describe Mongoid::Criteria do
             Product.all.pluck(:tagline)
           end
 
+          let(:plucked_unaliased) do
+            Product.all.pluck(:tl)
+          end
+
           let(:plucked_translations) do
             Product.all.pluck(:tagline_translations)
           end
@@ -1981,6 +1985,10 @@ describe Mongoid::Criteria do
 
           it 'returns the demongoized translations' do
             expect(plucked.first).to eq('deutsch-text')
+          end
+
+          it 'returns the demongoized translations when unaliased' do
+            expect(plucked_unaliased.first).to eq('deutsch-text')
           end
 
           it 'returns the full translations hash to _translations' do
@@ -2090,6 +2098,10 @@ describe Mongoid::Criteria do
         Person.where(employer_id: 12345).pluck('pass.birthplace').first
       end
 
+      let(:plucked_unaliased) do
+        Person.where(employer_id: 12345).pluck('pass.bp').first
+      end
+
       let(:plucked_translations) do
         Person.where(employer_id: 12345).pluck('pass.birthplace_translations').first
       end
@@ -2101,6 +2113,12 @@ describe Mongoid::Criteria do
       it 'returns the translation for the current locale' do
         I18n.with_locale(:ja) do
           expect(plucked).to eq('京都')
+        end
+      end
+
+      it 'returns the translation for the current locale when unaliased' do
+        I18n.with_locale(:ja) do
+          expect(plucked_unaliased).to eq('京都')
         end
       end
 
