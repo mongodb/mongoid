@@ -338,7 +338,7 @@ module Mongoid
         normalized_select = fields.inject({}) do |hash, f|
           db_fn = klass.database_field_name(f)
           normalized_field_names.push(db_fn)
-          hash[klass.cleanse_localized_field_names(f)] = true
+          hash[klass.database_field_name(klass.cleanse_localized_field_names(f))] = true
           hash
         end
 
@@ -942,7 +942,7 @@ module Mongoid
           # _translations field.
           if obj.nil? & tr = meth.match(/(.*)_translations\z/)&.captures&.first
             is_translation = true
-            meth = tr
+            meth = klass.database_field_name(tr)
           end
 
           # 1. If curr is an array fetch from all elements in the array.

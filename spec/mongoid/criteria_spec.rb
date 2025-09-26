@@ -1957,6 +1957,83 @@ describe Mongoid::Criteria do
         end
       end
 
+      context 'when the localized field is aliased' do
+        before do
+          I18n.locale = :en
+          p = Product.create!(name: 'ACME Rocket Skates', tagline: 'english-text')
+          I18n.locale = :de
+          p.tagline = 'deutsch-text'
+          p.save!
+        end
+
+        context 'when plucking the entire field' do
+          let(:plucked) do
+            Product.all.pluck(:tagline)
+          end
+
+          let(:plucked_translations) do
+            Product.all.pluck(:tagline_translations)
+          end
+
+          let(:plucked_translations_both) do
+            Product.all.pluck(:tagline_translations, :tagline)
+          end
+
+          it 'returns the demongoized translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+
+          it 'returns the full translations hash to _translations' do
+            expect(plucked_translations.first).to eq({ 'de' => 'deutsch-text', 'en' => 'english-text' })
+          end
+
+          it 'returns both' do
+            expect(plucked_translations_both.first).to eq([{ 'de' => 'deutsch-text', 'en' => 'english-text' }, 'deutsch-text'])
+          end
+        end
+
+        context 'when plucking a specific locale' do
+
+          let(:plucked) do
+            Product.all.pluck(:'tagline.de')
+          end
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+
+        context 'when plucking a specific locale from _translations field' do
+
+          let(:plucked) do
+            Product.all.pluck(:'tagline_translations.de')
+          end
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+
+        context 'when fallbacks are enabled with a locale list' do
+          require_fallbacks
+
+          before do
+            I18n.fallbacks[:he] = [:en]
+          end
+
+          let(:plucked) do
+            Product.all.pluck(:tagline).first
+          end
+
+          it 'correctly uses the fallback' do
+            I18n.locale = :en
+            Product.create!(tagline: 'english-text')
+            I18n.locale = :he
+            expect(plucked).to eq 'english-text'
+          end
+        end
+      end
+
       context "when the localized field is embedded" do
         with_default_i18n_configs
 
@@ -1993,6 +2070,46 @@ describe Mongoid::Criteria do
         it "returns the translation for the requested locale" do
           expect(plucked_translations_field).to eq("Neil")
         end
+      end
+    end
+
+    context 'when the localized field is embedded and aliased' do
+      with_default_i18n_configs
+
+      before do
+        p = Passport.new
+        I18n.locale = :en
+        p.birthplace = 'Kyoto'
+        I18n.locale = :ja
+        p.birthplace = '京都'
+
+        Person.create!(passport: p, employer_id: 12345)
+      end
+
+      let(:plucked) do
+        Person.where(employer_id: 12345).pluck('pass.birthplace').first
+      end
+
+      let(:plucked_translations) do
+        Person.where(employer_id: 12345).pluck('pass.birthplace_translations').first
+      end
+
+      let(:plucked_translations_field) do
+        Person.where(employer_id: 12345).pluck('pass.birthplace_translations.en').first
+      end
+
+      it 'returns the translation for the current locale' do
+        I18n.with_locale(:ja) do
+          expect(plucked).to eq('京都')
+        end
+      end
+
+      it 'returns the full _translation hash' do
+        expect(plucked_translations).to eq({ 'en' => 'Kyoto', 'ja' => '京都' })
+      end
+
+      it 'returns the translation for the requested locale' do
+        expect(plucked_translations_field).to eq('Kyoto')
       end
     end
 
