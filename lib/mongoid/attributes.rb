@@ -371,7 +371,12 @@ module Mongoid
     # comparison purposes. This is necessary because `BSON::Decimal128` does
     # not implement `#==` in a way that is compatible with `BigDecimal`.
     def normalize_value(value)
-      value.is_a?(BSON::Decimal128) ? BigDecimal(value.to_s) : value
+      if value.is_a?(BSON::Decimal128)
+        # BSON::Decimal128#to_d was introduced in driver version 5.0.0
+        value.respond_to?(:to_d) ? value.to_d : BigDecimal(value.to_s)
+      else
+        value
+      end
     end
 
     # Determine if the attribute will not change, by comparing the current
