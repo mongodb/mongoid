@@ -372,7 +372,7 @@ module Mongoid
     # not implement `#==` in a way that is compatible with `BigDecimal`.
     def normalize_value(value)
       if value.is_a?(BSON::Decimal128)
-        # BSON::Decimal128#to_d was introduced in driver version 5.0.0
+        # BSON::Decimal128#to_d was introduced in bson-ruby version 5.0.0
         value.respond_to?(:to_d) ? value.to_d : BigDecimal(value.to_s)
       else
         value
