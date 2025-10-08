@@ -33,7 +33,7 @@ module Mongoid
 
           extend ClassMethods
 
-          def_delegator :criteria, :count
+          def_delegators :criteria, :count, :pluck
           def_delegators :_target, :first, :in_memory, :last, :reset, :uniq
 
           # Instantiate a new references_many association. Will set the foreign key
