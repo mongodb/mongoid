@@ -16,7 +16,6 @@ on:
         required: true
 
 env:
-  SILK_ASSET_GROUP: mongoid
   GEM_NAME: mongoid
   PRODUCT_NAME: Mongoid
   PRODUCT_ID: mongoid
@@ -47,7 +46,7 @@ jobs:
     steps:
       - name: "Run the check action"
         id: check
-        uses: jamis/drivers-github-tools/ruby/pr-check@ruby-3643-update-release-process
+        uses: mongodb-labs/drivers-github-tools/ruby/pr-check@v3
 
   build:
     name: "Build Gems"
@@ -56,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Run the build action"
-        uses: jamis/drivers-github-tools/ruby/build@ruby-3643-update-release-process
+        uses: mongodb-labs/drivers-github-tools/ruby/build@v3
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -72,7 +71,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: "Run the publish action"
-        uses: jamis/drivers-github-tools/ruby/publish@ruby-3643-update-release-process
+        uses: mongodb-labs/drivers-github-tools/ruby/publish@v3
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -84,5 +83,4 @@ jobs:
           product_name: ${{ env.PRODUCT_NAME }}
           product_id: ${{ env.PRODUCT_ID }}
           release_message: ${{ needs.check.outputs.message }}
-          silk_asset_group: ${{ env.SILK_ASSET_GROUP }}
           ref: ${{ needs.check.outputs.ref }}
