@@ -19,31 +19,22 @@ arch=`host_distro`
 
 set_fcv
 set_env_vars
-set_env_python
-set_env_ruby
+
+# Install rbenv and download the requested ruby version
+rm -rf ~/.rbenv
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+rm -rf ~/.rbenv/versions/
+curl --retry 3 -fL http://boxes.10gen.com/build/toolchain-drivers/mongo-ruby-toolchain/library/`host_distro`/$RVM_RUBY.tar.xz |tar -xC $HOME/.rbenv/ -Jf -
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init - bash)"
+export FULL_RUBY_VERSION=$(ls ~/.rbenv/versions | head -n1)
+rbenv global $FULL_RUBY_VERSION
 
 if test -n "$APP_TESTS"; then
   set_env_node
 fi
 
 prepare_server $arch
-
-install_mlaunch_venv
-
-if test "$TOPOLOGY" = load-balanced; then
-  install_haproxy
-fi
-
-# Launching mongod under $MONGO_ORCHESTRATION_HOME
-# makes its log available through log collecting machinery
-
-export dbdir="$MONGO_ORCHESTRATION_HOME"/db
-mkdir -p "$dbdir"
-
-calculate_server_args
-launch_server "$dbdir"
-
-uri_options="$URI_OPTIONS"
 
 which bundle
 bundle --version
