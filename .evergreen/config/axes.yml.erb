@@ -6,6 +6,10 @@ axes:
         display_name: "MongoDB Latest"
         variables:
            VERSION: "latest"
+      - id: "8.0"
+        display_name: "MongoDB 8.0"
+        variables:
+           VERSION: "8.0"
       - id: "7.0"
         display_name: "MongoDB 7.0"
         variables:
@@ -42,22 +46,18 @@ axes:
   - id: "topology"
     display_name: Topology
     values:
-      - id: "standalone"
+      - id: "server"
         display_name: Standalone
         variables:
-           TOPOLOGY: "standalone"
-      - id: "replica-set"
+           TOPOLOGY: "server"
+      - id: "replica_set"
         display_name: Replica Set
         variables:
-           TOPOLOGY: "replica-set"
-      - id: "sharded-cluster"
+           TOPOLOGY: "replica_set"
+      - id: "sharded_cluster"
         display_name: Sharded Cluster
         variables:
-           TOPOLOGY: "sharded-cluster"
-      - id: "load-balanced"
-        display_name: Load Balanced
-        variables:
-           TOPOLOGY: "load-balanced"
+           TOPOLOGY: "sharded_cluster"
 
   - id: "auth"
     display_name: Authentication
@@ -74,7 +74,7 @@ axes:
   - id: "ssl"
     display_name: SSL
     values:
-      - id: "ssl"
+      - id: "yes"
         display_name: SSL
         variables:
            SSL: "ssl"
@@ -122,34 +122,9 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: actual-ubuntu-22.04
-        display_name: "Ubuntu 22.04"
-        run_on: ubuntu2204-small
       - id: ubuntu-22.04
-        display_name: "Ubuntu 20.04"
-        run_on: ubuntu2204-small
-        variables:
-          DOCKER_DISTRO: ubuntu2204
-      - id: ubuntu-20.04
-        display_name: "Ubuntu 20.04"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: ubuntu2004
-      - id: ubuntu-18.04
         display_name: "Ubuntu 22.04"
-        run_on: ubuntu1804-small
-        variables:
-          DOCKER_DISTRO: ubuntu1804
-      - id: debian11
-        display_name: "Debian 11"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: debian11
-      - id: rhel80
-        display_name: "RHEL 8.0"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: rhel80
+        run_on: ubuntu2204-small
 
   - id: "driver"
     display_name: Driver Version

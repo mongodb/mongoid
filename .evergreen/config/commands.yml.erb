@@ -73,6 +73,27 @@ functions:
       params:
         file: src/expansion.yml
 
+  bootstrap-mongo-orchestration:
+      - command: shell.exec
+        params:
+          shell: "bash"
+          script: |
+            set -x
+            ${PREPARE_SHELL}
+
+            MONGODB_VERSION=${MONGODB_VERSION} \
+            TOPOLOGY=${TOPOLOGY} \
+            AUTH=${AUTH} \
+            SSL=${SSL} \
+            ORCHESTRATION_FILE=${ORCHESTRATION_FILE} \
+            REQUIRE_API_VERSION=${REQUIRE_API_VERSION} \
+            LOAD_BALANCER=${LOAD_BALANCER} \
+            REQUIRE_API_VERSION=${API_VERSION_REQUIRED}
+            sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
+      - command: expansions.update
+        params:
+          file: mo-expansion.yml
+
   "exec script" :
     - command: shell.exec
       type: test
@@ -251,7 +272,9 @@ functions:
             DRIVER="${DRIVER}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             FLE="${FLE}" \
-            .evergreen/run-tests-docker.sh
+            AUTH="${AUTH}" \
+            SSL="${SSL}" \
+            .evergreen/run-tests.sh
 
   "fix absolute paths":
     - command: shell.exec
@@ -333,6 +356,7 @@ task_groups:
 tasks:
     - name: "test"
       commands:
+        - func: bootstrap-mongo-orchestration
         - func: "run tests"
     - name: "test-full-atlas-task"
       commands:
