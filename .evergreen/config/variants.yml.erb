@@ -150,7 +150,7 @@ buildvariants:
     driver: ["current"]
     mongodb-version: "7.0"
     topology: "standalone"
-    rails: ['8.0']
+    rails: ['8.0', '8.1']
     os: ubuntu-22.04
     fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
@@ -201,7 +201,7 @@ buildvariants:
     mongodb-version: '7.0'
     topology: standalone
     app-tests: yes
-    rails: ['8.0']
+    rails: ['8.0', '8.1']
     os: ubuntu-22.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
