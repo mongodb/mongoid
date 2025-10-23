@@ -112,9 +112,6 @@ functions:
             AUTH=${AUTH} \
             SSL=${SSL} \
             ORCHESTRATION_FILE=${ORCHESTRATION_FILE} \
-            REQUIRE_API_VERSION=${REQUIRE_API_VERSION} \
-            LOAD_BALANCER=${LOAD_BALANCER} \
-            REQUIRE_API_VERSION=${API_VERSION_REQUIRED}
             sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
       - command: expansions.update
         params:
