@@ -285,7 +285,13 @@ functions:
             perl -p -i -e "s|ABSOLUTE_PATH_REPLACEMENT_TOKEN|${DRIVERS_TOOLS}|g" $filename
           done
 
-  "install dependencies":
+  "setup system":
+    - command: subprocess.exec
+      params:
+        binary: bash
+        include_expansions_in_env: ["PROJECT_DIRECTORY"]
+        args:
+          - "${DRIVERS_TOOLS}/.evergreen/setup.sh"
     - command: shell.exec
       type: test
       params:
@@ -299,7 +305,7 @@ pre:
   - func: "fetch source"
   - func: "create expansions"
   - func: "fix absolute paths"
-  - func: "install dependencies"
+  - func: "setup system"
 
 post:
   # Removed, causing timeouts

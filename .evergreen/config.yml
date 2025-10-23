@@ -311,7 +311,13 @@ functions:
             perl -p -i -e "s|ABSOLUTE_PATH_REPLACEMENT_TOKEN|${DRIVERS_TOOLS}|g" $filename
           done
 
-  "install dependencies":
+  "setup system":
+    - command: subprocess.exec
+      params:
+        binary: bash
+        include_expansions_in_env: ["PROJECT_DIRECTORY"]
+        args:
+          - "${DRIVERS_TOOLS}/.evergreen/setup.sh"
     - command: shell.exec
       type: test
       params:
@@ -325,7 +331,7 @@ pre:
   - func: "fetch source"
   - func: "create expansions"
   - func: "fix absolute paths"
-  - func: "install dependencies"
+  - func: "setup system"
 
 post:
   # Removed, causing timeouts
@@ -522,6 +528,9 @@ axes:
       - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2204-small
+      - id: ubuntu-20.04
+        display_name: "Ubuntu 20.04"
+        run_on: ubuntu2004-small
 
   - id: "driver"
     display_name: Driver Version
@@ -703,7 +712,7 @@ buildvariants:
     driver: ["current"]
     topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['4.4']
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -725,7 +734,7 @@ buildvariants:
     ruby: ["ruby-2.7"]
     mongodb-version: "4.0"
     topology: ['replica_set', 'sharded_cluster']
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
@@ -736,7 +745,7 @@ buildvariants:
     ruby: ["ruby-2.7"]
     mongodb-version: "4.4"
     topology: "server"
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
      - name: "test"
@@ -821,7 +830,7 @@ buildvariants:
     mongodb-version: "4.4"
     topology: "server"
     test-i18n-fallbacks: yes
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
