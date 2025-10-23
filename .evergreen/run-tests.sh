@@ -30,6 +30,13 @@ eval "$(rbenv init - bash)"
 export FULL_RUBY_VERSION=$(ls ~/.rbenv/versions | head -n1)
 rbenv global $FULL_RUBY_VERSION
 
+export JAVA_HOME=/opt/java/jdk21
+export JAVACMD=$JAVA_HOME/bin/java
+
+if test "$FLE" = "helper"; then
+  sudo apt-get update && sudo apt-get install -y cmake
+fi
+
 if test -n "$APP_TESTS"; then
   set_env_node
 fi

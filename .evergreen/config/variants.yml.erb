@@ -49,7 +49,7 @@ buildvariants:
     driver: ["current"]
     topology: ['replica_set']
     mongodb-version: ['5.0']
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -115,7 +115,7 @@ buildvariants:
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
     topology: "server"
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
@@ -228,7 +228,7 @@ buildvariants:
     topology: server
     app-tests: yes
     rails: ['6.0', '6.1']
-    os: ubuntu-22.04
+    os: ubuntu-20.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
      - name: "test"
@@ -242,7 +242,7 @@ buildvariants:
 #    topology: server
 #    app-tests: yes
 #    rails: ['7.1']
-#    os: ubuntu-22.04
+#    os: ubuntu-20.04
 #  display_name: "app tests ${driver}, ${jruby}"
 #  tasks:
 #     - name: "test"
