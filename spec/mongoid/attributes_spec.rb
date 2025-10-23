@@ -1729,6 +1729,19 @@ describe Mongoid::Attributes do
         end
       end
     end
+
+    context 'when map_big_decimal_to_decimal128 is enabled' do
+      config_override :map_big_decimal_to_decimal128, true
+
+      context 'when writing an identical number' do
+        let(:band) { Band.create!(name: 'Nirvana', sales: 123456.78).reload }
+
+        it 'does not mark the document as changed' do
+          band.sales = 123456.78
+          expect(band.changed?).to be false
+        end
+      end
+    end
   end
 
   describe "#typed_value_for" do
