@@ -34,8 +34,6 @@ if test -n "$APP_TESTS"; then
   set_env_node
 fi
 
-prepare_server $arch
-
 which bundle
 bundle --version
 

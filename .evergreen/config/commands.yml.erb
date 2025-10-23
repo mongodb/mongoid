@@ -52,7 +52,7 @@ functions:
             export PATH="$MONGODB_BINARIES:$PATH"
             export PROJECT="${project}"
 
-            export MONGODB_VERSION="${VERSION}"
+            export MONGODB_VERSION="${MONGODB_VERSION}"
             export TOPOLOGY="${TOPOLOGY}"
             export SINGLE_MONGOS="${SINGLE_MONGOS}"
             export AUTH="${AUTH}"
@@ -254,7 +254,7 @@ functions:
   "upload test results":
     - command: attach.xunit_results
       params:
-        file: ./src/rspec.xml
+        file: ./src/tmp/*.xml
 
   "run tests":
     - command: shell.exec
@@ -311,7 +311,7 @@ post:
   # Removed, causing timeouts
   # - func: "upload working dir"
   - func: "upload mo artifacts"
-  # - func: "upload test results"
+  - func: "upload test results"
   - func: "upload test results to s3"
 
 task_groups:
