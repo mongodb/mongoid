@@ -78,7 +78,7 @@ functions:
             export PATH="$MONGODB_BINARIES:$PATH"
             export PROJECT="${project}"
 
-            export MONGODB_VERSION="${VERSION}"
+            export MONGODB_VERSION="${MONGODB_VERSION}"
             export TOPOLOGY="${TOPOLOGY}"
             export SINGLE_MONGOS="${SINGLE_MONGOS}"
             export AUTH="${AUTH}"
@@ -98,6 +98,24 @@ functions:
     - command: expansions.update
       params:
         file: src/expansion.yml
+
+  bootstrap-mongo-orchestration:
+      - command: shell.exec
+        params:
+          shell: "bash"
+          script: |
+            set -x
+            ${PREPARE_SHELL}
+
+            MONGODB_VERSION=${MONGODB_VERSION} \
+            TOPOLOGY=${TOPOLOGY} \
+            AUTH=${AUTH} \
+            SSL=${SSL} \
+            ORCHESTRATION_FILE=${ORCHESTRATION_FILE} \
+            sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
+      - command: expansions.update
+        params:
+          file: mo-expansion.yml
 
   "exec script" :
     - command: shell.exec
@@ -259,7 +277,7 @@ functions:
   "upload test results":
     - command: attach.xunit_results
       params:
-        file: ./src/rspec.xml
+        file: ./src/tmp/*.xml
 
   "run tests":
     - command: shell.exec
@@ -277,7 +295,9 @@ functions:
             DRIVER="${DRIVER}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             FLE="${FLE}" \
-            .evergreen/run-tests-docker.sh
+            AUTH="${AUTH}" \
+            SSL="${SSL}" \
+            .evergreen/run-tests.sh
 
   "fix absolute paths":
     - command: shell.exec
@@ -288,7 +308,13 @@ functions:
             perl -p -i -e "s|ABSOLUTE_PATH_REPLACEMENT_TOKEN|${DRIVERS_TOOLS}|g" $filename
           done
 
-  "install dependencies":
+  "setup system":
+    - command: subprocess.exec
+      params:
+        binary: bash
+        include_expansions_in_env: ["PROJECT_DIRECTORY"]
+        args:
+          - "${DRIVERS_TOOLS}/.evergreen/setup.sh"
     - command: shell.exec
       type: test
       params:
@@ -302,13 +328,13 @@ pre:
   - func: "fetch source"
   - func: "create expansions"
   - func: "fix absolute paths"
-  - func: "install dependencies"
+  - func: "setup system"
 
 post:
   # Removed, causing timeouts
   # - func: "upload working dir"
   - func: "upload mo artifacts"
-  # - func: "upload test results"
+  - func: "upload test results"
   - func: "upload test results to s3"
 
 task_groups:
@@ -359,6 +385,7 @@ task_groups:
 tasks:
     - name: "test"
       commands:
+        - func: bootstrap-mongo-orchestration
         - func: "run tests"
     - name: "test-full-atlas-task"
       commands:
@@ -378,59 +405,59 @@ axes:
       - id: "latest"
         display_name: "MongoDB Latest"
         variables:
-           VERSION: "latest"
+           MONGODB_VERSION: "latest"
+      - id: "8.0"
+        display_name: "MongoDB 8.0"
+        variables:
+           MONGODB_VERSION: "8.0"
       - id: "7.0"
         display_name: "MongoDB 7.0"
         variables:
-           VERSION: "7.0"
+           MONGODB_VERSION: "7.0"
       - id: "6.0"
         display_name: "MongoDB 6.0"
         variables:
-           VERSION: "6.0"
+           MONGODB_VERSION: "6.0"
       - id: "5.3"
         display_name: "MongoDB 5.3"
         variables:
-           VERSION: "5.3"
+           MONGODB_VERSION: "5.3"
       - id: "5.0"
         display_name: "MongoDB 5.0"
         variables:
-           VERSION: "5.0"
+           MONGODB_VERSION: "5.0"
       - id: "4.4"
         display_name: "MongoDB 4.4"
         variables:
-           VERSION: "4.4"
+           MONGODB_VERSION: "4.4"
       - id: "4.2"
         display_name: "MongoDB 4.2"
         variables:
-           VERSION: "4.2"
+           MONGODB_VERSION: "4.2"
       - id: "4.0"
         display_name: "MongoDB 4.0"
         variables:
-           VERSION: "4.0"
+           MONGODB_VERSION: "4.0"
       - id: "3.6"
         display_name: "MongoDB 3.6"
         variables:
-           VERSION: "3.6"
+           MONGODB_VERSION: "3.6"
 
   - id: "topology"
     display_name: Topology
     values:
-      - id: "standalone"
+      - id: "server"
         display_name: Standalone
         variables:
-           TOPOLOGY: "standalone"
-      - id: "replica-set"
+           TOPOLOGY: "server"
+      - id: "replica_set"
         display_name: Replica Set
         variables:
-           TOPOLOGY: "replica-set"
-      - id: "sharded-cluster"
+           TOPOLOGY: "replica_set"
+      - id: "sharded_cluster"
         display_name: Sharded Cluster
         variables:
-           TOPOLOGY: "sharded-cluster"
-      - id: "load-balanced"
-        display_name: Load Balanced
-        variables:
-           TOPOLOGY: "load-balanced"
+           TOPOLOGY: "sharded_cluster"
 
   - id: "auth"
     display_name: Authentication
@@ -447,7 +474,7 @@ axes:
   - id: "ssl"
     display_name: SSL
     values:
-      - id: "ssl"
+      - id: "yes"
         display_name: SSL
         variables:
            SSL: "ssl"
@@ -495,34 +522,12 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: actual-ubuntu-22.04
+      - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2204-small
-      - id: ubuntu-22.04
-        display_name: "Ubuntu 20.04"
-        run_on: ubuntu2204-small
-        variables:
-          DOCKER_DISTRO: ubuntu2204
       - id: ubuntu-20.04
         display_name: "Ubuntu 20.04"
         run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: ubuntu2004
-      - id: ubuntu-18.04
-        display_name: "Ubuntu 22.04"
-        run_on: ubuntu1804-small
-        variables:
-          DOCKER_DISTRO: ubuntu1804
-      - id: debian11
-        display_name: "Debian 11"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: debian11
-      - id: rhel80
-        display_name: "RHEL 8.0"
-        run_on: ubuntu2004-small
-        variables:
-          DOCKER_DISTRO: rhel80
 
   - id: "driver"
     display_name: Driver Version
@@ -651,7 +656,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['7.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -662,7 +667,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -673,7 +678,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.1"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -684,7 +689,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.0"]
     driver: ["current"]
-    topology: ['replica-set']
+    topology: ['replica_set']
     mongodb-version: ['5.0']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -695,7 +700,7 @@ buildvariants:
   matrix_spec:
     jruby: ["jruby-9.4"]
     driver: ["current"]
-    topology: ['replica-set', 'sharded-cluster']
+    topology: ['replica_set', 'sharded_cluster']
     mongodb-version: '7.0'
     os: ubuntu-22.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -706,7 +711,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-2.7"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['4.4']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -718,7 +723,7 @@ buildvariants:
     driver: [master, stable]
     ruby: ["ruby-3.3"]
     mongodb-version: "6.0"
-    topology: ['replica-set', 'sharded-cluster']
+    topology: ['replica_set', 'sharded_cluster']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -728,8 +733,8 @@ buildvariants:
   matrix_spec:
     driver: [oldstable, min]
     ruby: ["ruby-2.7"]
-    mongodb-version: "4.0"
-    topology: ['replica-set', 'sharded-cluster']
+    mongodb-version: "4.4"
+    topology: ['replica_set', 'sharded_cluster']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -740,7 +745,7 @@ buildvariants:
     driver: [min]
     ruby: ["ruby-2.7"]
     mongodb-version: "4.4"
-    topology: "standalone"
+    topology: "server"
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -751,7 +756,7 @@ buildvariants:
     driver: [bson-min]
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
-    topology: "standalone"
+    topology: "server"
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -762,31 +767,32 @@ buildvariants:
     driver: [bson-master]
     ruby: ["ruby-3.3"]
     mongodb-version: "7.0"
-    topology: "standalone"
+    topology: "server"
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
 
-- matrix_name: "rails-master"
-  matrix_spec:
-    ruby: ["ruby-3.2"]
-    driver: ["current"]
-    mongodb-version: "7.0"
-    topology: "standalone"
-    rails: ['master']
-    os: ubuntu-22.04
-    fle: helper
-  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
-  tasks:
-    - name: "test"
+# Skip until Rails 8.1 supported
+#- matrix_name: "rails-master"
+#  matrix_spec:
+#    ruby: ["ruby-3.2"]
+#    driver: ["current"]
+#    mongodb-version: "7.0"
+#    topology: "server"
+#    rails: ['master']
+#    os: ubuntu-22.04
+#    fle: helper
+#  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+#  tasks:
+#    - name: "test"
 
 - matrix_name: "rails-8"
   matrix_spec:
     ruby: ["ruby-3.3"]
     driver: ["current"]
     mongodb-version: "7.0"
-    topology: "standalone"
+    topology: "server"
     rails: ['8.0', '8.1']
     os: ubuntu-22.04
     fle: helper
@@ -799,7 +805,7 @@ buildvariants:
     ruby: ["ruby-3.3"]
     driver: ["current"]
     mongodb-version: "6.0"
-    topology: "standalone"
+    topology: "server"
     rails: ['7.0', '7.1', '7.2']
     os: ubuntu-22.04
     fle: helper
@@ -812,9 +818,9 @@ buildvariants:
     ruby: ["ruby-3.0"]
     driver: ["current"]
     mongodb-version: "6.0"
-    topology: "standalone"
+    topology: "server"
     rails: ['6.0', '6.1']
-    os: ubuntu-20.04
+    os: ubuntu-22.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
@@ -824,7 +830,7 @@ buildvariants:
     ruby: "ruby-3.0"
     driver: ["current"]
     mongodb-version: "4.4"
-    topology: "standalone"
+    topology: "server"
     test-i18n-fallbacks: yes
     os: ubuntu-20.04
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
@@ -836,9 +842,9 @@ buildvariants:
     ruby: ["ruby-3.2", "ruby-3.3"]
     driver: ["current"]
     mongodb-version: '7.0'
-    topology: standalone
+    topology: server
     app-tests: yes
-    rails: ['8.0', '8.1']
+    rails: ['8.0']
     os: ubuntu-22.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
@@ -849,7 +855,7 @@ buildvariants:
     ruby: ["ruby-3.2", "ruby-3.3"]
     driver: ["current"]
     mongodb-version: '7.0'
-    topology: standalone
+    topology: server
     app-tests: yes
     rails: ['7.0', '7.1', '7.2']
     os: ubuntu-22.04
@@ -862,7 +868,7 @@ buildvariants:
     ruby: ["ruby-2.7"]
     driver: ["current"]
     mongodb-version: '5.0'
-    topology: standalone
+    topology: server
     app-tests: yes
     rails: ['6.0', '6.1']
     os: ubuntu-20.04
@@ -876,7 +882,7 @@ buildvariants:
 #    jruby: ["jruby-9.4"]
 #    driver: ["current"]
 #    mongodb-version: '5.0'
-#    topology: standalone
+#    topology: server
 #    app-tests: yes
 #    rails: ['7.1']
 #    os: ubuntu-20.04
@@ -888,7 +894,7 @@ buildvariants:
   matrix_spec:
     ruby: ruby-3.1
     driver: current
-    topology: replica-set
+    topology: replica_set
     mongodb-version: ['6.0']
     os: ubuntu-22.04
     rails: ['7.0']
@@ -900,9 +906,9 @@ buildvariants:
 - matrix_name: atlas-full
   matrix_spec:
     ruby: ruby-3.2
-    os: actual-ubuntu-22.04
+    os: ubuntu-22.04
     auth: auth
-    ssl: ssl
+    ssl: yes
   display_name: "Atlas (Full)"
   tasks:
     - name: testatlas_task_group
