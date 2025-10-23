@@ -106,13 +106,15 @@ set +e
 if test -n "$TEST_CMD"; then
   eval $TEST_CMD
 elif test -n "$TEST_I18N_FALLBACKS"; then
-  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb
+  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb \
+    spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb \
+    --format Rfc::Riff --format RspecJunitFormatter --out tmp/rspec.xml
 elif test -n "$APP_TESTS"; then
   if test -z "$DOCKER_PRELOAD"; then
     ./spec/shared/bin/install-node
   fi
 
-  bundle exec rspec spec/integration/app_spec.rb
+  bundle exec rspec spec/integration/app_spec.rb --format Rfc::Riff --format RspecJunitFormatter --out tmp/rspec.xml
 else
   bundle exec rake ci
 fi

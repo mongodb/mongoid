@@ -131,18 +131,19 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "rails-master"
-  matrix_spec:
-    ruby: ["ruby-3.2"]
-    driver: ["current"]
-    mongodb-version: "7.0"
-    topology: "server"
-    rails: ['master']
-    os: ubuntu-22.04
-    fle: helper
-  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
-  tasks:
-    - name: "test"
+# Skip until Rails 8.1 supported
+#- matrix_name: "rails-master"
+#  matrix_spec:
+#    ruby: ["ruby-3.2"]
+#    driver: ["current"]
+#    mongodb-version: "7.0"
+#    topology: "server"
+#    rails: ['master']
+#    os: ubuntu-22.04
+#    fle: helper
+#  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+#  tasks:
+#    - name: "test"
 
 - matrix_name: "rails-8"
   matrix_spec:
