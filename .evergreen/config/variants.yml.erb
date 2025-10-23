@@ -91,7 +91,7 @@ buildvariants:
   matrix_spec:
     driver: [oldstable, min]
     ruby: ["ruby-2.7"]
-    mongodb-version: "4.0"
+    mongodb-version: "4.4"
     topology: ['replica_set', 'sharded_cluster']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"

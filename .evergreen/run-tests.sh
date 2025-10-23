@@ -118,6 +118,4 @@ if test -f tmp/rspec-all.json; then
   mv tmp/rspec-all.json tmp/rspec.json
 fi
 
-python3 -m mtools.mlaunch.mlaunch stop --dir "$dbdir" || true
-
 exit ${test_status}
