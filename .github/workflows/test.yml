@@ -20,7 +20,7 @@ jobs:
       matrix:
         ruby: [ "3.3" ]
         mongodb: [ "8.0" ]
-        rails: [ ~, "8.0" ]
+        rails: [ ~, "8.1" ]
         fle: [ ~, "helper" ]
         topology: [ replica_set, sharded_cluster ]
 
