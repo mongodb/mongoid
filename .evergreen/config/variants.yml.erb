@@ -14,7 +14,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['7.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -25,7 +25,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -36,7 +36,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.1"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -47,7 +47,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-3.0"]
     driver: ["current"]
-    topology: ['replica-set']
+    topology: ['replica_set']
     mongodb-version: ['5.0']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -58,7 +58,7 @@ buildvariants:
   matrix_spec:
     jruby: ["jruby-9.4"]
     driver: ["current"]
-    topology: ['replica-set', 'sharded-cluster']
+    topology: ['replica_set', 'sharded_cluster']
     mongodb-version: '7.0'
     os: ubuntu-22.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -69,7 +69,7 @@ buildvariants:
   matrix_spec:
     ruby: ["ruby-2.7"]
     driver: ["current"]
-    topology: ['standalone', 'replica-set', 'sharded-cluster']
+    topology: ['server', 'replica_set', 'sharded_cluster']
     mongodb-version: ['4.4']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -81,7 +81,7 @@ buildvariants:
     driver: [master, stable]
     ruby: ["ruby-3.3"]
     mongodb-version: "6.0"
-    topology: ['replica-set', 'sharded-cluster']
+    topology: ['replica_set', 'sharded_cluster']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -91,8 +91,8 @@ buildvariants:
   matrix_spec:
     driver: [oldstable, min]
     ruby: ["ruby-2.7"]
-    mongodb-version: "4.0"
-    topology: ['replica-set', 'sharded-cluster']
+    mongodb-version: "4.4"
+    topology: ['replica_set', 'sharded_cluster']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -103,7 +103,7 @@ buildvariants:
     driver: [min]
     ruby: ["ruby-2.7"]
     mongodb-version: "4.4"
-    topology: "standalone"
+    topology: "server"
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -114,7 +114,7 @@ buildvariants:
     driver: [bson-min]
     ruby: ["ruby-2.7"]
     mongodb-version: "5.0"
-    topology: "standalone"
+    topology: "server"
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
@@ -125,18 +125,19 @@ buildvariants:
     driver: [bson-master]
     ruby: ["ruby-3.3"]
     mongodb-version: "7.0"
-    topology: "standalone"
+    topology: "server"
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
+
 
 - matrix_name: "rails-master"
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
     mongodb-version: "7.0"
-    topology: "standalone"
+    topology: "server"
     rails: ['master']
     os: ubuntu-22.04
     fle: helper
@@ -149,8 +150,8 @@ buildvariants:
     ruby: ["ruby-3.3"]
     driver: ["current"]
     mongodb-version: "7.0"
-    topology: "standalone"
-    rails: ['8.0']
+    topology: "server"
+    rails: ['8.0', '8.1']
     os: ubuntu-22.04
     fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
@@ -162,7 +163,7 @@ buildvariants:
     ruby: ["ruby-3.3"]
     driver: ["current"]
     mongodb-version: "6.0"
-    topology: "standalone"
+    topology: "server"
     rails: ['7.0', '7.1', '7.2']
     os: ubuntu-22.04
     fle: helper
@@ -175,9 +176,9 @@ buildvariants:
     ruby: ["ruby-3.0"]
     driver: ["current"]
     mongodb-version: "6.0"
-    topology: "standalone"
+    topology: "server"
     rails: ['6.0', '6.1']
-    os: ubuntu-20.04
+    os: ubuntu-22.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
      - name: "test"
@@ -187,7 +188,7 @@ buildvariants:
     ruby: "ruby-3.0"
     driver: ["current"]
     mongodb-version: "4.4"
-    topology: "standalone"
+    topology: "server"
     test-i18n-fallbacks: yes
     os: ubuntu-20.04
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
@@ -199,7 +200,7 @@ buildvariants:
     ruby: ["ruby-3.2", "ruby-3.3"]
     driver: ["current"]
     mongodb-version: '7.0'
-    topology: standalone
+    topology: server
     app-tests: yes
     rails: ['8.0']
     os: ubuntu-22.04
@@ -212,7 +213,7 @@ buildvariants:
     ruby: ["ruby-3.2", "ruby-3.3"]
     driver: ["current"]
     mongodb-version: '7.0'
-    topology: standalone
+    topology: server
     app-tests: yes
     rails: ['7.0', '7.1', '7.2']
     os: ubuntu-22.04
@@ -225,7 +226,7 @@ buildvariants:
     ruby: ["ruby-2.7"]
     driver: ["current"]
     mongodb-version: '5.0'
-    topology: standalone
+    topology: server
     app-tests: yes
     rails: ['6.0', '6.1']
     os: ubuntu-20.04
@@ -239,7 +240,7 @@ buildvariants:
 #    jruby: ["jruby-9.4"]
 #    driver: ["current"]
 #    mongodb-version: '5.0'
-#    topology: standalone
+#    topology: server
 #    app-tests: yes
 #    rails: ['7.1']
 #    os: ubuntu-20.04
@@ -251,7 +252,7 @@ buildvariants:
   matrix_spec:
     ruby: ruby-3.1
     driver: current
-    topology: replica-set
+    topology: replica_set
     mongodb-version: ['6.0']
     os: ubuntu-22.04
     rails: ['7.0']
@@ -263,9 +264,9 @@ buildvariants:
 - matrix_name: atlas-full
   matrix_spec:
     ruby: ruby-3.2
-    os: actual-ubuntu-22.04
+    os: ubuntu-22.04
     auth: auth
-    ssl: ssl
+    ssl: yes
   display_name: "Atlas (Full)"
   tasks:
     - name: testatlas_task_group
