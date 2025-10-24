@@ -608,6 +608,10 @@ axes:
         display_name: "Rails 8.0"
         variables:
           RAILS: "8.0"
+      - id: "8.1"
+        display_name: "Rails 8.1"
+        variables:
+          RAILS: "8.1"          
 
   - id: "test-i18n-fallbacks"
     display_name: Test i18n fallbacks
@@ -769,19 +773,19 @@ buildvariants:
   tasks:
     - name: "test"
 
-# Skip until Rails 8.1 supported
-#- matrix_name: "rails-master"
-#  matrix_spec:
-#    ruby: ["ruby-3.2"]
-#    driver: ["current"]
-#    mongodb-version: "7.0"
-#    topology: "server"
-#    rails: ['master']
-#    os: ubuntu-22.04
-#    fle: helper
-#  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
-#  tasks:
-#    - name: "test"
+
+- matrix_name: "rails-master"
+  matrix_spec:
+    ruby: ["ruby-3.2"]
+    driver: ["current"]
+    mongodb-version: "7.0"
+    topology: "server"
+    rails: ['master']
+    os: ubuntu-22.04
+    fle: helper
+  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tasks:
+    - name: "test"
 
 - matrix_name: "rails-8"
   matrix_spec:
@@ -789,7 +793,7 @@ buildvariants:
     driver: ["current"]
     mongodb-version: "7.0"
     topology: "server"
-    rails: ['8.0']
+    rails: ['8.0', '8.1']
     os: ubuntu-22.04
     fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
