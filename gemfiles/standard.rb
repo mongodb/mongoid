@@ -36,6 +36,7 @@ def standard_dependencies
     gem 'fuubar'
     gem 'rfc'
     gem 'childprocess'
+    gem 'rspec_junit_formatter'
 
     platform :mri do
       gem 'timeout-interrupt'
