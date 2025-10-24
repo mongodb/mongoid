@@ -1819,6 +1819,85 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
     end
   end
 
+  describe '#pluck' do
+    let(:person) do
+      Person.create!
+    end
+
+    let!(:post) do
+      Post.create!(person_id: person.id, title: 'Test Title')
+    end
+
+    let(:base) { Person }
+    let(:association) { Person.relations[:posts] }
+
+    let(:criteria) do
+      Post.where(person_id: person.id)
+    end
+
+    context 'when the enumerable is not loaded' do
+      let!(:enumerable) do
+        described_class.new(criteria, base, association)
+      end
+
+      context 'when the criteria is present' do
+        it 'delegates to the criteria pluck method' do
+          result = enumerable.pluck(:title)
+          expect(result).to eq(['Test Title'])
+        end
+
+        context 'when added docs are present' do
+          it 'combines the results from the criteria and the added docs' do
+            added_post = Post.new(title: 'Added Title', person_id: person.id)
+            enumerable << added_post
+
+            expect(criteria).to receive(:pluck).with(:title).and_return(['Test Title'])
+            result = enumerable.pluck(:title)
+            expect(result).to eq(['Test Title', 'Added Title'])
+          end
+        end
+      end
+
+      context 'when the criteria is not present' do
+        let(:enumerable) { described_class.new([], base, association) }
+
+        it 'returns nothing' do
+          result = enumerable.pluck(:title)
+          expect(result).to eq([])
+        end
+
+        context 'when added docs are present' do
+          it 'returns the values from the added docs' do
+            added_post = Post.new(title: 'Added Title', person_id: person.id)
+            enumerable << added_post
+
+            result = enumerable.pluck(:title)
+            expect(result).to eq(['Added Title'])
+          end
+        end
+      end
+    end
+
+    context 'when the enumerable is loaded' do
+      let(:enumerable) { described_class.new([post], base, association) }
+
+      it 'returns the values from the loaded' do
+        result = enumerable.pluck(:title)
+        expect(result).to eq(['Test Title'])
+      end
+
+      context 'when added docs are present' do
+        it 'returns the values from both loaded and added docs' do
+          added_post = Post.new(title: 'Added Title', person_id: person.id)
+          enumerable << added_post
+
+          result = enumerable.pluck(:title)
+          expect(result).to eq(['Test Title', 'Added Title'])
+        end
+      end
+    end
+  end
+
   describe "#reset" do
 
     let(:person) do

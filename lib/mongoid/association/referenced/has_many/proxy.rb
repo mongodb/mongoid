@@ -33,7 +33,7 @@ module Mongoid
 
           extend ClassMethods
 
-          def_delegators :criteria, :count, :pluck
+          def_delegators :criteria, :count
           def_delegators :_target, :first, :in_memory, :last, :reset, :uniq
 
           # Instantiate a new references_many association. Will set the foreign key
@@ -280,6 +280,22 @@ module Mongoid
           end
 
           alias nullify_all nullify
+
+          # Plucks the given field names from the documents in the
+          # association. It is safe to use whether the association is
+          # loaded or not, and whether there are unsaved documents in the
+          # association or not.
+          #
+          # @example Pluck the titles of all posts.
+          #   person.posts.pluck(:title)
+          #
+          # @param [ Symbol... ] *fields The field names to pluck.
+          #
+          # @return [ Array | Array<Array> ] The array of field values. If
+          #   multiple fields are given, an array of arrays is returned.
+          def pluck(*fields)
+            _target.pluck(*fields)
+          end
 
           # Clear the association. Will delete the documents from the db if they are
           # already persisted.
