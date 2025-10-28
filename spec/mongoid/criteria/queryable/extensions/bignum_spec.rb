@@ -3,6 +3,7 @@
 require "spec_helper"
 
 describe Bignum do
+  ruby_version_lt "2.4"
 
   describe ".evolve" do
 

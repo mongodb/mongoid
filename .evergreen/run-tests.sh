@@ -8,43 +8,38 @@ set -o errexit  # Exit the script with error if any of the commands fail
 #       RVM_RUBY                Define the Ruby version to test with, using its RVM identifier.
 #                               For example: "ruby-3.0" or "jruby-9.2"
 
-. `dirname "$0"`/../spec/shared/shlib/distro.sh
-. `dirname "$0"`/../spec/shared/shlib/set_env.sh
-. `dirname "$0"`/../spec/shared/shlib/server.sh
-. `dirname "$0"`/functions.sh
+MRSS_ROOT=`dirname "$0"`/../spec/shared
 
-# set_env.sh sets the TOOLCHAIN_VERSION variable to a default value based on
-# the version spec/shared that's available. Here, we let the evergreen task
-# override it, if necessary, to get a newer or older toolchain build.
-if [ -n "$TOOLCHAIN_OVERRIDE" ]; then
-  TOOLCHAIN_VERSION=$TOOLCHAIN_OVERRIDE
-fi
+. $MRSS_ROOT/shlib/distro.sh
+. $MRSS_ROOT/shlib/set_env.sh
+. $MRSS_ROOT/shlib/server.sh
+. `dirname "$0"`/functions.sh
 
 arch=`host_distro`
 
 set_fcv
 set_env_vars
-set_env_python
-set_env_ruby
+
+# Install rbenv and download the requested ruby version
+rm -rf ~/.rbenv
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+rm -rf ~/.rbenv/versions/
+curl --retry 3 -fL http://boxes.10gen.com/build/toolchain-drivers/mongo-ruby-toolchain/library/`host_distro`/$RVM_RUBY.tar.xz |tar -xC $HOME/.rbenv/ -Jf -
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init - bash)"
+export FULL_RUBY_VERSION=$(ls ~/.rbenv/versions | head -n1)
+rbenv global $FULL_RUBY_VERSION
+
+export JAVA_HOME=/opt/java/jdk21
+export JAVACMD=$JAVA_HOME/bin/java
+
+if test "$FLE" = "helper"; then
+  sudo apt-get update && sudo apt-get install -y cmake
+fi
 
 if test -n "$APP_TESTS"; then
   set_env_node
 fi
-
-prepare_server $arch
-
-install_mlaunch_venv
-
-# Launching mongod under $MONGO_ORCHESTRATION_HOME
-# makes its log available through log collecting machinery
-
-export dbdir="$MONGO_ORCHESTRATION_HOME"/db
-mkdir -p "$dbdir"
-
-calculate_server_args
-launch_server "$dbdir"
-
-uri_options="$URI_OPTIONS"
 
 which bundle
 bundle --version
@@ -58,6 +53,8 @@ if echo $RVM_RUBY |grep -q jruby && test "$DRIVER" = master-jruby; then
     gem build *.gemspec &&
     gem install *.gem)
 fi
+
+git config --global --add safe.directory "*"
 
 if test "$DRIVER" = "master"; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
@@ -92,28 +89,25 @@ elif test "$RAILS" = "master-jruby"; then
 elif test -n "$RAILS" && test "$RAILS" != 6.1; then
   bundle install --gemfile=gemfiles/rails-"$RAILS".gemfile
   BUNDLE_GEMFILE=gemfiles/rails-"$RAILS".gemfile
-elif test "$I18N" = "1.0"; then
-  bundle install --gemfile=gemfiles/i18n-1.0.gemfile
-  BUNDLE_GEMFILE=gemfiles/i18n-1.0.gemfile
 else
   bundle install
 fi
 
 export BUNDLE_GEMFILE
 
-export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite&$uri_options"
-
 set +e
 if test -n "$TEST_CMD"; then
   eval $TEST_CMD
 elif test -n "$TEST_I18N_FALLBACKS"; then
-  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb
+  bundle exec rspec spec/integration/i18n_fallbacks_spec.rb \
+    spec/mongoid/criteria_spec.rb spec/mongoid/contextual/mongo_spec.rb \
+    --format Rfc::Riff --format RspecJunitFormatter --out tmp/rspec.xml
 elif test -n "$APP_TESTS"; then
   if test -z "$DOCKER_PRELOAD"; then
     ./spec/shared/bin/install-node
   fi
-  
-  bundle exec rspec spec/integration/app_spec.rb
+
+  bundle exec rspec spec/integration/app_spec.rb --format Rfc::Riff --format RspecJunitFormatter --out tmp/rspec.xml
 else
   bundle exec rake ci
 fi
@@ -125,7 +119,5 @@ set -e
 if test -f tmp/rspec-all.json; then
   mv tmp/rspec-all.json tmp/rspec.json
 fi
-
-python3 -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
 
 exit ${test_status}
