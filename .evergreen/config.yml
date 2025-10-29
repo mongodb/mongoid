@@ -758,19 +758,6 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "i18n-fallbacks"
-  matrix_spec:
-    ruby: "ruby-3.0"
-    driver: ["current"]
-    mongodb-version: "4.4"
-    topology: "server"
-    test-i18n-fallbacks: yes
-    os: ubuntu-20.04
-  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-     - name: "test"
-
-
 - matrix_name: app-tests-rails-7
   matrix_spec:
     ruby: ["ruby-3.2", "ruby-3.3"]
