@@ -2,8 +2,7 @@
 
 require "spec_helper"
 
-describe "Fixnum" do
-  ruby_version_lt "2.4"
+describe Fixnum do
 
   describe ".evolve" do
 
