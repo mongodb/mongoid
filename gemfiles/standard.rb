@@ -10,7 +10,7 @@ def standard_dependencies
   end
 
   group :development, :test do
-    gem 'rspec-core', '~> 3.10'
+    gem 'rspec', '~> 3.12'
 
     platform :mri do
       gem 'byebug'
@@ -25,20 +25,10 @@ def standard_dependencies
     gem 'timecop'
     gem 'rspec-retry'
     gem 'benchmark-ips'
-    gem 'rspec', '~> 3.12'
     gem 'fuubar'
     gem 'rfc'
     gem 'childprocess'
-    gem 'puma' # for app tests
-
-    # to fix problem with modern net-imap requiring more modern ruby, on
-    # evergreen
-    if RUBY_VERSION < '2.7.3'
-      gem 'net-imap', '=0.3.7'
-
-    elsif RUBY_VERSION < '3.1'
-      gem 'net-imap', '=0.4.18'
-    end
+    gem 'rspec_junit_formatter'
 
     platform :mri do
       gem 'timeout-interrupt'
