@@ -297,6 +297,7 @@ functions:
             FLE="${FLE}" \
             AUTH="${AUTH}" \
             SSL="${SSL}" \
+            APP_TESTS="${APP_TESTS}" \
             .evergreen/run-tests.sh
 
   "fix absolute paths":
