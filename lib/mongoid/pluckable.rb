@@ -20,7 +20,9 @@ module Mongoid
           normalized_field_names.push(db_fn)
 
           if prepare_projection
-            projection[document_class.cleanse_localized_field_names(f)] = true
+            cleaned_name = document_class.cleanse_localized_field_names(f)
+            canonical_name = document_class.database_field_name(cleaned_name)
+            projection[canonical_name] = true
           end
         end
 
@@ -67,12 +69,17 @@ module Mongoid
 
         document_class.traverse_association_tree(field_name) do |meth, obj, is_field|
           field = obj if is_field
+
+          # use the correct document class to check for localized fields on
+          # embedded documents.
+          document_class = obj.klass if obj.respond_to?(:klass)
+
           is_translation = false
           # If no association or field was found, check if the meth is an
           # _translations field.
           if obj.nil? & tr = meth.match(/(.*)_translations\z/)&.captures&.first
             is_translation = true
-            meth = tr
+            meth = document_class.database_field_name(tr)
           end
 
           # 1. If curr is an array fetch from all elements in the array.

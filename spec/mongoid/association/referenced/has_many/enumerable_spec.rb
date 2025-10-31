@@ -1898,6 +1898,321 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
     end
   end
 
+  describe '#pluck with aliases' do
+    let!(:parent) do
+      Company.create!
+    end
+
+    context 'when the field is aliased' do
+      let!(:expensive) do
+        parent.products.create!(price: 100000)
+      end
+
+      let!(:cheap) do
+        parent.products.create!(price: 1)
+      end
+
+      context 'when using alias_attribute' do
+
+        let(:plucked) do
+          parent.products.pluck(:price)
+        end
+
+        it 'uses the aliases' do
+          expect(plucked).to eq([ 100000, 1 ])
+        end
+      end
+    end
+
+    context 'when plucking a localized field' do
+      with_default_i18n_configs
+
+      before do
+        I18n.locale = :en
+        p = parent.products.create!(name: 'english-text')
+        I18n.locale = :de
+        p.name = 'deutsch-text'
+        p.save!
+      end
+
+      context 'when plucking the entire field' do
+        let(:plucked) do
+          parent.products.all.pluck(:name)
+        end
+
+        let(:plucked_translations) do
+          parent.products.all.pluck(:name_translations)
+        end
+
+        let(:plucked_translations_both) do
+          parent.products.all.pluck(:name_translations, :name)
+        end
+
+        it 'returns the demongoized translations' do
+          expect(plucked.first).to eq('deutsch-text')
+        end
+
+        it 'returns the full translations hash to _translations' do
+          expect(plucked_translations.first).to eq({'de'=>'deutsch-text', 'en'=>'english-text'})
+        end
+
+        it 'returns both' do
+          expect(plucked_translations_both.first).to eq([{'de'=>'deutsch-text', 'en'=>'english-text'}, 'deutsch-text'])
+        end
+      end
+
+      context 'when plucking a specific locale' do
+
+        let(:plucked) do
+          parent.products.all.pluck(:'name.de')
+        end
+
+        it 'returns the specific translations' do
+          expect(plucked.first).to eq('deutsch-text')
+        end
+      end
+
+      context 'when plucking a specific locale from _translations field' do
+
+        let(:plucked) do
+          parent.products.all.pluck(:'name_translations.de')
+        end
+
+        it 'returns the specific translations' do
+          expect(plucked.first).to eq('deutsch-text')
+        end
+      end
+
+      context 'when fallbacks are enabled with a locale list' do
+        require_fallbacks
+
+        before do
+          I18n.fallbacks[:he] = [ :en ]
+        end
+
+        let(:plucked) do
+          parent.products.all.pluck(:name).first
+        end
+
+        it 'correctly uses the fallback' do
+          I18n.locale = :en
+          parent.products.create!(name: 'english-text')
+          I18n.locale = :he
+          expect(plucked).to eq 'english-text'
+        end
+      end
+
+      context 'when the localized field is aliased' do
+        before do
+          I18n.locale = :en
+          parent.products.delete_all
+          p = parent.products.create!(name: 'ACME Rocket Skates', tagline: 'english-text')
+          I18n.locale = :de
+          p.tagline = 'deutsch-text'
+          p.save!
+        end
+
+        context 'when plucking the entire field' do
+          let(:plucked) do
+            parent.products.all.pluck(:tagline)
+          end
+
+          let(:plucked_unaliased) do
+            parent.products.all.pluck(:tl)
+          end
+
+          let(:plucked_translations) do
+            parent.products.all.pluck(:tagline_translations)
+          end
+
+          let(:plucked_translations_both) do
+            parent.products.all.pluck(:tagline_translations, :tagline)
+          end
+
+          it 'returns the demongoized translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+
+          it 'returns the demongoized translations when unaliased' do
+            expect(plucked_unaliased.first).to eq('deutsch-text')
+          end
+
+          it 'returns the full translations hash to _translations' do
+            expect(plucked_translations.first).to eq({ 'de' => 'deutsch-text', 'en' => 'english-text' })
+          end
+
+          it 'returns both' do
+            expect(plucked_translations_both.first).to eq([{ 'de' => 'deutsch-text', 'en' => 'english-text' }, 'deutsch-text'])
+          end
+        end
+
+        context 'when plucking a specific locale' do
+
+          let(:plucked) do
+            parent.products.all.pluck(:'tagline.de')
+          end
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+
+        context 'when plucking a specific locale from _translations field' do
+
+          let(:plucked) do
+            parent.products.all.pluck(:'tagline_translations.de')
+          end
+
+          it 'returns the specific translations' do
+            expect(plucked.first).to eq('deutsch-text')
+          end
+        end
+
+        context 'when fallbacks are enabled with a locale list' do
+          require_fallbacks
+
+          before do
+            I18n.fallbacks[:he] = [:en]
+          end
+
+          let(:plucked) do
+            parent.products.all.pluck(:tagline).first
+          end
+
+          it 'correctly uses the fallback' do
+            I18n.locale = :en
+            parent.products.create!(tagline: 'english-text')
+            I18n.locale = :he
+            expect(plucked).to eq 'english-text'
+          end
+        end
+      end
+
+      context 'when the localized field is embedded' do
+        with_default_i18n_configs
+
+        before do
+          s = Seo.new
+          I18n.locale = :en
+          s.name = 'english-text'
+          I18n.locale = :de
+          s.name = 'deutsch-text'
+
+          parent.products.delete_all
+          parent.products.create!(name: 'ACME Tunnel Paint', seo: s)
+        end
+
+        let(:plucked) do
+          parent.products.pluck('seo.name').first
+        end
+
+        let(:plucked_translations) do
+          parent.products.pluck('seo.name_translations').first
+        end
+
+        let(:plucked_translations_field) do
+          parent.products.pluck('seo.name_translations.en').first
+        end
+
+        it 'returns the translation for the current locale' do
+          expect(plucked).to eq('deutsch-text')
+        end
+
+        it 'returns the full _translation hash' do
+          expect(plucked_translations).to eq({ 'en' => 'english-text', 'de' => 'deutsch-text' })
+        end
+
+        it 'returns the translation for the requested locale' do
+          expect(plucked_translations_field).to eq('english-text')
+        end
+      end
+    end
+
+    context 'when the localized field is embedded and aliased' do
+      with_default_i18n_configs
+
+      before do
+        s = Seo.new
+        I18n.locale = :en
+        s.description = 'english-text'
+        I18n.locale = :de
+        s.description = 'deutsch-text'
+
+        parent.products.delete_all
+        parent.products.create!(name: 'ACME Tunnel Paint', seo: s)
+      end
+
+      let(:plucked) do
+        parent.products.pluck('seo.description').first
+      end
+
+      let(:plucked_unaliased) do
+        parent.products.pluck('seo.desc').first
+      end
+
+      let(:plucked_translations) do
+        parent.products.pluck('seo.description_translations').first
+      end
+
+      let(:plucked_translations_field) do
+        parent.products.pluck('seo.description_translations.en').first
+      end
+
+      it 'returns the translation for the current locale' do
+        I18n.with_locale(:en) do
+          expect(plucked).to eq('english-text')
+        end
+      end
+
+      it 'returns the translation for the current locale when unaliased' do
+        I18n.with_locale(:en) do
+          expect(plucked_unaliased).to eq('english-text')
+        end
+      end
+
+      it 'returns the full _translation hash' do
+        expect(plucked_translations).to eq({ 'en' => 'english-text', 'de' => 'deutsch-text' })
+      end
+
+      it 'returns the translation for the requested locale' do
+        expect(plucked_translations_field).to eq('english-text')
+      end
+    end
+
+    context 'when plucking an embedded field' do
+      let(:label) { Label.new(sales: '1E2') }
+      let!(:band) { Band.create!(label: label) }
+
+      let(:plucked) { Band.where(_id: band.id).pluck('label.sales') }
+
+      it 'demongoizes the field' do
+        expect(plucked).to eq([ BigDecimal('1E2') ])
+      end
+    end
+
+    context 'when plucking an embeds_many field' do
+      let(:label) { Label.new(sales: '1E2') }
+      let!(:band) { Band.create!(labels: [label]) }
+
+      let(:plucked) { Band.where(_id: band.id).pluck('labels.sales') }
+
+      it 'demongoizes the field' do
+        expect(plucked.first).to eq([ BigDecimal('1E2') ])
+      end
+    end
+
+    context 'when plucking a nonexistent embedded field' do
+      let(:label) { Label.new(sales: '1E2') }
+      let!(:band) { Band.create!(label: label) }
+
+      let(:plucked) { Band.where(_id: band.id).pluck('label.qwerty') }
+
+      it 'returns nil' do
+        expect(plucked.first).to eq(nil)
+      end
+    end
+  end
+
   describe "#reset" do
 
     let(:person) do
