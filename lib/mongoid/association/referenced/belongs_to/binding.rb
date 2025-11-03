@@ -22,7 +22,13 @@ module Mongoid
             binding do
               check_polymorphic_inverses!(_target)
               bind_foreign_key(_base, record_id(_target))
-              bind_polymorphic_inverse_type(_base, _target.class.name)
+
+              # set the inverse type (e.g. "#{name}_type") for new polymorphic associations
+              if _association.inverse_type && !_base.frozen?
+                key = _association.resolver.default_key_for(_target)
+                bind_polymorphic_inverse_type(_base, key)
+              end
+
               if inverse = _association.inverse(_target)
                 if set_base_association
                   if _base.referenced_many?
