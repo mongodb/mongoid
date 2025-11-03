@@ -33,7 +33,7 @@ module Mongoid
 
           extend ClassMethods
 
-          def_delegator :criteria, :count
+          def_delegators :criteria, :count, :exists?
           def_delegators :_target, :first, :in_memory, :last, :reset, :uniq
 
           # Instantiate a new references_many association. Will set the foreign key
@@ -200,32 +200,6 @@ module Mongoid
             else
               to_enum
             end
-          end
-
-          # Determine if any documents in this association exist in the database.
-          #
-          # If the association contains documents but all of the documents
-          # exist only in the application, i.e. have not been persisted to the
-          # database, this method returns false.
-          #
-          # This method queries the database on each invocation even if the
-          # association is already loaded into memory.
-          #
-          # @example Are there persisted documents?
-          #   person.posts.exists?
-          #
-          # @param [ :none | nil | false | Hash | Object ] id_or_conditions
-          #   When :none (the default), returns true if any persisted
-          #   documents exist in the association. When nil or false, this
-          #   will always return false. When a Hash is given, this queries
-          #   the documents in the association for those that match the given
-          #   conditions, and returns true if any match. Any other argument is
-          #   interpreted as an id, and queries for the existence of documents
-          #   in the association with a matching _id.
-          #
-          # @return [ true | false ] True is persisted documents exist, false if not.
-          def exists?(id_or_conditions = :none)
-            criteria.exists?(id_or_conditions)
           end
 
           # Find the matching document on the association, either based on id or
