@@ -87,17 +87,6 @@ buildvariants:
   tasks:
      - name: "test"
 
-- matrix_name: "bson-min"
-  matrix_spec:
-    driver: [bson-min]
-    ruby: ["ruby-2.7"]
-    mongodb-version: "5.0"
-    topology: "server"
-    os: ubuntu-20.04
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-    - name: "test"
-
 - matrix_name: "rails-7"
   matrix_spec:
     ruby: ["ruby-3.3"]
@@ -106,8 +95,7 @@ buildvariants:
     topology: "server"
     rails: ['7.0', '7.1']
     os: ubuntu-22.04
-    fle: helper
-  display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  display_name: "${rails}, ${driver}, ${mongodb-version}"
   tasks:
     - name: "test"
 
@@ -148,16 +136,3 @@ buildvariants:
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
   tasks:
      - name: "test"
-
-- matrix_name: "auto-encryption"
-  matrix_spec:
-    ruby: ruby-3.1
-    driver: current
-    topology: replica_set
-    mongodb-version: ['6.0']
-    os: ubuntu-22.04
-    rails: ['7.0']
-    fle: helper
-  display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
-  tasks:
-    - name: "test"
