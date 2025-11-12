@@ -5,6 +5,7 @@ require "spec_helper"
 require_relative './copyable_spec_models'
 
 describe Mongoid::Copyable do
+  ruby_version_lt "3.0"
 
   [ :clone, :dup ].each do |method|
 

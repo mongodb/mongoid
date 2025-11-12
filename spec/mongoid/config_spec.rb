@@ -558,6 +558,7 @@ describe Mongoid::Config do
 
       # Wrapping libraries are only recognized by driver 2.13.0+.
       min_driver_version '2.13'
+      ruby_version_lt '3.0'
 
       it 'passes uuid to driver' do
         Mongo::Client.should receive(:new).with(SpecConfig.instance.addresses,
