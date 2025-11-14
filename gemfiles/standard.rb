@@ -4,17 +4,13 @@ def standard_dependencies
   group :development do
     gem 'yard'
 
-    platform :mri do
-      # Debugger for VSCode.
-      if !ENV['CI'] && !ENV['DOCKER'] && RUBY_VERSION < '3.0'
-        gem 'debase'
-        gem 'ruby-debug-ide'
-      end
-    end
+    # Evergreen configuration generation
+    gem 'erubi'
+    gem 'tilt'
   end
 
   group :development, :test do
-    gem 'rspec-core', '~> 3.10'
+    gem 'rspec', '~> 3.12'
 
     platform :mri do
       gem 'byebug'
@@ -29,11 +25,10 @@ def standard_dependencies
     gem 'timecop'
     gem 'rspec-retry'
     gem 'benchmark-ips'
-    gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
-    gem 'rspec-mocks-diag', '~> 3.0'
     gem 'fuubar'
     gem 'rfc'
     gem 'childprocess'
+    gem 'rspec_junit_formatter'
 
     platform :mri do
       gem 'timeout-interrupt'

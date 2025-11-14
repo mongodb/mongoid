@@ -12,8 +12,24 @@ functions:
 
           git submodule update --init --recursive
 
+          if [ ! -d .mod ]; then
+            mkdir -p .mod
+            cd .mod
+            git clone https://github.com/mongodb-labs/drivers-evergreen-tools
+          fi
+
+  "fetch egos":
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+
+          curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
+          chmod +x ./egos
+
   "create expansions":
-    # Make an evergreen exapansion file with dynamic values
+    # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
       params:
         working_dir: "src"
@@ -52,7 +68,7 @@ functions:
             export PATH="$MONGODB_BINARIES:$PATH"
             export PROJECT="${project}"
 
-            export MONGODB_VERSION="${VERSION}"
+            export MONGODB_VERSION="${MONGODB_VERSION}"
             export TOPOLOGY="${TOPOLOGY}"
             export SINGLE_MONGOS="${SINGLE_MONGOS}"
             export AUTH="${AUTH}"
@@ -72,6 +88,24 @@ functions:
     - command: expansions.update
       params:
         file: src/expansion.yml
+
+  bootstrap-mongo-orchestration:
+      - command: shell.exec
+        params:
+          shell: "bash"
+          script: |
+            set -x
+            ${PREPARE_SHELL}
+
+            MONGODB_VERSION=${MONGODB_VERSION} \
+            TOPOLOGY=${TOPOLOGY} \
+            AUTH=${AUTH} \
+            SSL=${SSL} \
+            ORCHESTRATION_FILE=${ORCHESTRATION_FILE} \
+            sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
+      - command: expansions.update
+        params:
+          file: mo-expansion.yml
 
   "exec script" :
     - command: shell.exec
@@ -233,7 +267,7 @@ functions:
   "upload test results":
     - command: attach.xunit_results
       params:
-        file: ./src/rspec.xml
+        file: ./src/tmp/*.xml
 
   "run tests":
     - command: shell.exec
@@ -251,7 +285,10 @@ functions:
             DRIVER="${DRIVER}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             FLE="${FLE}" \
-            .evergreen/run-tests-docker.sh
+            AUTH="${AUTH}" \
+            SSL="${SSL}" \
+            APP_TESTS="${APP_TESTS}" \
+            .evergreen/run-tests.sh
 
   "fix absolute paths":
     - command: shell.exec
@@ -262,7 +299,13 @@ functions:
             perl -p -i -e "s|ABSOLUTE_PATH_REPLACEMENT_TOKEN|${DRIVERS_TOOLS}|g" $filename
           done
 
-  "install dependencies":
+  "setup system":
+    - command: subprocess.exec
+      params:
+        binary: bash
+        include_expansions_in_env: ["PROJECT_DIRECTORY"]
+        args:
+          - "${DRIVERS_TOOLS}/.evergreen/setup.sh"
     - command: shell.exec
       type: test
       params:
@@ -276,13 +319,13 @@ pre:
   - func: "fetch source"
   - func: "create expansions"
   - func: "fix absolute paths"
-  - func: "install dependencies"
+  - func: "setup system"
 
 post:
   # Removed, causing timeouts
   # - func: "upload working dir"
   - func: "upload mo artifacts"
-  # - func: "upload test results"
+  - func: "upload test results"
   - func: "upload test results to s3"
 
 task_groups:
@@ -333,6 +376,7 @@ task_groups:
 tasks:
     - name: "test"
       commands:
+        - func: bootstrap-mongo-orchestration
         - func: "run tests"
     - name: "test-full-atlas-task"
       commands:
