@@ -81,7 +81,7 @@ module Mongoid
     option :map_big_decimal_to_decimal128, default: true
 
     # Allow BSON::Decimal128 to be parsed and returned directly in
-    # field values. When BSON 5 is present and the this option is set to false
+    # field values. When BSON 5 is present and this option is set to false
     # (the default), BSON::Decimal128 values in the database will be returned
     # as BigDecimal.
     #
@@ -97,7 +97,7 @@ module Mongoid
         end
       end
 
-    # Sets the async_query_executor for the application. By default the thread pool executor
+    # Sets the async_query_executor for the application. By default, the thread pool executor
     #   is set to `:immediate. Options are:
     #
     #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
