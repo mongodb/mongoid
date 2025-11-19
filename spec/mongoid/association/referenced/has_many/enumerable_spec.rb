@@ -1881,7 +1881,7 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
     context 'when the enumerable is loaded' do
       let(:enumerable) { described_class.new([post], base, association) }
 
-      it 'returns the values from the loaded' do
+      it 'returns the values from the loaded documents' do
         result = enumerable.pluck(:title)
         expect(result).to eq(['Test Title'])
       end

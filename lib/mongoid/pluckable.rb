@@ -61,7 +61,7 @@ module Mongoid
       # @param [ Hash ] attrs The attributes hash.
       # @param [ String ] field_name The name of the field to extract.
       #
-      # @param [ Object ] The value for the given field name
+      # @return [ Object ] The value for the given field name
       def extract_value(attrs, field_name, document_class)
         i = 1
         num_meths = field_name.count('.') + 1
@@ -77,7 +77,7 @@ module Mongoid
           is_translation = false
           # If no association or field was found, check if the meth is an
           # _translations field.
-          if obj.nil? & tr = meth.match(/(.*)_translations\z/)&.captures&.first
+          if obj.nil? && tr = meth.match(/(.*)_translations\z/)&.captures&.first
             is_translation = true
             meth = document_class.database_field_name(tr)
           end
