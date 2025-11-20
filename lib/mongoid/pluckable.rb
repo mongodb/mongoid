@@ -82,7 +82,7 @@ module Mongoid
           meth = document_class.database_field_name(tr)
         end
 
-        curr = descend(curr, meth, field, num_meths, is_translation)
+        curr = descend(i, curr, meth, field, num_meths, is_translation)
 
         i += 1
       end
@@ -91,6 +91,7 @@ module Mongoid
 
     # Descend one level in the attribute hash.
     #
+    # @param [ Integer ] part The current part index.
     # @param [ Hash | Array<Hash> ] current The current level in the attribute hash.
     # @param [ String ] method_name The method name to descend to.
     # @param [ Field|nil ] field The field to use for demongoization.
@@ -98,7 +99,9 @@ module Mongoid
     # @param [ Integer ] part_count The total number of parts in the field name.
     #
     # @return [ Object ] The value at the next level.
-    def descend(current, method_name, field, part_count, is_translation)
+    #
+    # rubocop:disable Metrics/ParameterLists
+    def descend(part, current, method_name, field, part_count, is_translation)
       # 1. If curr is an array fetch from all elements in the array.
       # 2. If the field is localized, and is not an _translations field
       #    (_translations fields don't show up in the fields hash).
@@ -113,7 +116,7 @@ module Mongoid
         res = fetch_and_demongoize(current, method_name, field)
         res.empty? ? nil : res
       elsif !is_translation && field&.localized?
-        if i < part_count
+        if part < part_count
           current.try(:fetch, method_name, nil)
         else
           fetch_and_demongoize(current, method_name, field)
@@ -124,5 +127,6 @@ module Mongoid
         fetch_and_demongoize(current, method_name, field)
       end
     end
+    # rubocop:enable Metrics/ParameterLists
   end
 end
