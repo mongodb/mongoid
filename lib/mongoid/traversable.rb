@@ -131,7 +131,6 @@ module Mongoid
       # @param [ String ] value The discriminator key to set.
       #
       # @api private
-      # rubocop:disable Metrics/AbcSize
       def discriminator_key=(value)
         raise Errors::InvalidDiscriminatorKeyTarget.new(self, superclass) if hereditary?
 
@@ -159,7 +158,6 @@ module Mongoid
         default_proc = -> { self.class.discriminator_value }
         field(discriminator_key, default: default_proc, type: String)
       end
-      # rubocop:enable Metrics/AbcSize
 
       # Returns the discriminator key.
       #
