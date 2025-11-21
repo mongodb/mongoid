@@ -72,6 +72,15 @@ Metrics/ModuleLength:
 Metrics/MethodLength:
   Max: 20
 
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/AbcSize:
+  Max: 20
+
 RSpec/BeforeAfterAll:
   Enabled: false
 

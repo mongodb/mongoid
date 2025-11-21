@@ -53,8 +53,6 @@ module Mongoid
           # @param [ Document... ] *args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
-          #
-          # rubocop:disable Metrics/AbcSize
           def <<(*args)
             docs = args.flatten
             return concat(docs) if docs.size > 1
@@ -89,7 +87,6 @@ module Mongoid
             end
             unsynced(_base, foreign_key) and self
           end
-          # rubocop:enable Metrics/AbcSize
 
           alias push <<
 
@@ -360,8 +357,6 @@ module Mongoid
           #   in bulk
           # @param [ Array ] inserts the list of Hashes of attributes that will
           #   be inserted (corresponding to the ``docs`` list)
-          #
-          # rubocop:disable Metrics/AbcSize
           def append_document(doc, ids, docs, inserts)
             return unless doc
 
@@ -379,7 +374,6 @@ module Mongoid
               unsynced(_base, foreign_key)
             end
           end
-          # rubocop:enable Metrics/AbcSize
         end
       end
     end

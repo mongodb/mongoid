@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 # rubocop:todo all
 
+require 'mongoid/pluckable'
+
 module Mongoid
   module Association
     module Referenced
@@ -12,6 +14,7 @@ module Mongoid
         class Enumerable
           extend Forwardable
           include ::Enumerable
+          include Pluckable
 
           # The three main instance variables are collections of documents.
           #
@@ -372,6 +375,43 @@ module Mongoid
           # @return [ Array<Object> ] The dumped data.
           def marshal_load(data)
             @_added, @_loaded, @_unloaded, @executed = data
+          end
+
+          # Plucks the given field names from the documents in the target.
+          # If the collection has been loaded, it plucks from the loaded
+          # documents; otherwise, it plucks from the unloaded criteria.
+          # Regardless, it also plucks from any added documents.
+          #
+          # @param [ Symbol... ] *fields The field names to pluck.
+          #
+          # @return [ Array | Array<Array> ] The array of field values. If
+          #   multiple fields are given, an array of arrays is returned.
+          def pluck(*keys)
+            [].tap do |results|
+              if _loaded? || _added.any?
+                klass = @_association.klass
+                prepared = prepare_pluck(keys, document_class: klass)
+              end
+
+              if _loaded?
+                docs = _loaded.values.map { |v| BSON::Document.new(v.attributes) }
+                results.concat pluck_from_documents(docs, prepared[:field_names], document_class: klass)
+              elsif _unloaded
+                criteria = if _added.any?
+                  ids_to_exclude = _added.keys
+                  _unloaded.not(:_id.in => ids_to_exclude)
+                else
+                  _unloaded
+                end
+
+                results.concat criteria.pluck(*keys)
+              end
+
+              if _added.any?
+                docs = _added.values.map { |v| BSON::Document.new(v.attributes) }
+                results.concat pluck_from_documents(docs, prepared[:field_names], document_class: klass)
+              end
+            end
           end
 
           # Reset the enumerable back to its persisted state.
