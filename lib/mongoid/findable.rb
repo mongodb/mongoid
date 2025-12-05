@@ -119,30 +119,30 @@ module Mongoid
     # Return true if any documents exist in the criteria.
     #
     # @example Determine if any documents exist
-    #   criteria.any?
+    #   Model.any?
     #   
     # @return [ true | false ] If any documents exist.
-    def any?(*args, &block)
+    def any?()
       limit(1).count > 0
     end
 
     # Return true if only one document exists in the criteria.
     #
     # @example Determine if only one document exists
-    #   criteria.one?
+    #   Model.one?
     #
     # @return [ true | false ] If only one document exists.
-    def one?(*args, &block)
+    def one?()
       limit(2).count == 1
     end
 
     # Return true if more than one document exists in the criteria.
     #
     # @example Determine if many documents exist
-    #   criteria.many?
+    #   Model.many?
     #
     # @return [ true | false ] If many documents exist.
-    def many?(*args, &block)
+    def many?()
       limit(2).count > 1
     end
 
