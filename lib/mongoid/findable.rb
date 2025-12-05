@@ -17,7 +17,6 @@ module Mongoid
     # directly from the class level.
     def_delegators :with_default_scope,
       :aggregates,
-      :any?,
       :avg,
       :create_with,
       :distinct,
@@ -117,6 +116,36 @@ module Mongoid
     #   Always false if passed nil or false.
     def exists?(id_or_conditions = :none)
       with_default_scope.exists?(id_or_conditions)
+    end
+
+    # Return true if any documents exist in the criteria.
+    #
+    # @example Determine if any documents exist
+    #   criteria.any?
+    #   
+    # @return [ true | false ] If any documents exist.
+    def any?(*args, &block)
+      limit(1).count > 0
+    end
+
+    # Return true if only one document exists in the criteria.
+    #
+    # @example Determine if only one document exists
+    #   criteria.one?
+    #
+    # @return [ true | false ] If only one document exists.
+    def one?(*args, &block)
+      limit(2).count == 1
+    end
+
+    # Return true if more than one document exists in the criteria.
+    #
+    # @example Determine if many documents exist
+    #   criteria.many?
+    #
+    # @return [ true | false ] If many documents exist.
+    def many?(*args, &block)
+      limit(2).count > 1
     end
 
     # Finds a +Document+ or multiple documents by their _id values.

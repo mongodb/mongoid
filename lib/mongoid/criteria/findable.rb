@@ -81,63 +81,6 @@ module Mongoid
         ids.empty? ? [] : from_database(ids)
       end
 
-      # Return true if any documents exist in the criteria.
-      #
-      # @example Determine if any documents exist
-      #   criteria.any?
-      #
-      # @example Determine if any documents match a block
-      #   criteria.any? { |doc| doc.name == "John" }
-      #
-      # @param [ Object... ] *args Args to delegate to the target.
-      # 
-      # @param [ Proc ] &block Block to delegate to the target.
-      #
-      # @return [ true | false ] If any documents exist.
-      def any?(*args, &block)
-        return entries.any?(*args, &block) if args.any? || block_given?
-        
-        limit(1).count > 0
-      end
-
-      # Return true if only one document exists in the criteria.
-      #
-      # @example Determine if only one document exists
-      #   criteria.one?
-      #   
-      # @example Determine if only one document matches a block
-      #   criteria.one? { |doc| doc.name == "John" }
-      #   
-      # @param [ Object... ] *args Args to delegate to the target.
-      # 
-      # @param [ Proc ] &block Block to delegate to the target.
-      #
-      # @return [ true | false ] If only one document exists.
-      def one?(*args, &block)
-        return entries.one?(*args, &block) if args.any? || block_given?
-
-        limit(2).count == 1
-      end
-
-      # Return true if more than one document exists in the criteria.
-      #
-      # @example Determine if many documents exist
-      #   criteria.many?
-      #   
-      # @example Determine if many documents match a block
-      #   criteria.many? { |doc| doc.name.start_with?("J") }
-      #   
-      # @param [ Object... ] *args Args to delegate to the target.
-      # 
-      # @param [ Proc ] &block Block to delegate to the target.
-      #
-      # @return [ true | false ] If many documents exist.
-      def many?(*args, &block)
-        return entries.many?(*args, &block) if args.any? || block_given?
-
-        limit(2).count > 1
-      end
-
       private
 
       # Get the finder used to generate the id query.
