@@ -86,29 +86,50 @@ module Mongoid
       # @example Determine if any documents exist
       #   criteria.any?
       #
+      # @example Determine if any documents match a block
+      #   criteria.any? { |doc| doc.name == "John" }
+      #
+      # @param [ Object... ] *args Args to delegate to the target.
+      # 
+      # @param [ Proc ] &block Block to delegate to the target.
+      #
       # @return [ true | false ] If any documents exist.
-      def any?
-        limit(1).count > 0
+      def any?(*args, &block)
+        return entries.any?(*args, &block) if args.any? || block_given?
       end
 
       # Return true if only one document exists in the criteria.
       #
       # @example Determine if only one document exists
       #   criteria.one?
+      #   
+      # @example Determine if only one document matches a block
+      #   criteria.one? { |doc| doc.name == "John" }
+      #   
+      # @param [ Object... ] *args Args to delegate to the target.
+      # 
+      # @param [ Proc ] &block Block to delegate to the target.
       #
       # @return [ true | false ] If only one document exists.
-      def one?
-        limit(2).count == 1
+      def one?(*args, &block)
+        return entries.one?(*args, &block) if args.any? || block_given?
       end
 
       # Return true if more than one document exists in the criteria.
       #
       # @example Determine if many documents exist
       #   criteria.many?
+      #   
+      # @example Determine if many documents match a block
+      #   criteria.many? { |doc| doc.name.start_with?("J") }
+      #   
+      # @param [ Object... ] *args Args to delegate to the target.
+      # 
+      # @param [ Proc ] &block Block to delegate to the target.
       #
       # @return [ true | false ] If many documents exist.
-      def many?
-        limit(2).count > 1
+      def many?(*args, &block)
+        return entries.many?(*args, &block) if args.any? || block_given?
       end
 
       private
