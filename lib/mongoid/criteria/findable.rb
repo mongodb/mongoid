@@ -96,6 +96,8 @@ module Mongoid
       # @return [ true | false ] If any documents exist.
       def any?(*args, &block)
         return entries.any?(*args, &block) if args.any? || block_given?
+        
+        limit(1).count > 0
       end
 
       # Return true if only one document exists in the criteria.
@@ -113,6 +115,8 @@ module Mongoid
       # @return [ true | false ] If only one document exists.
       def one?(*args, &block)
         return entries.one?(*args, &block) if args.any? || block_given?
+
+        limit(2).count == 1
       end
 
       # Return true if more than one document exists in the criteria.
@@ -130,6 +134,8 @@ module Mongoid
       # @return [ true | false ] If many documents exist.
       def many?(*args, &block)
         return entries.many?(*args, &block) if args.any? || block_given?
+
+        limit(2).count > 1
       end
 
       private
