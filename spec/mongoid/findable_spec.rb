@@ -161,84 +161,79 @@ describe Mongoid::Findable do
   end
 
   describe "#any?" do
-    context "when called on class" do
-      context "with documents" do
-        before do
-          Band.create!(name: "Tool")
-        end
-
-        it "returns true" do
-          expect(Band.any?).to be true
-        end
+    context "when called on collection with documents" do
+      before do
+        Band.create!(name: "Tool")
       end
 
-      context "with no documents" do
+      it "returns true" do
+        expect(Band.any?).to be true
+      end
+    end
 
-        it "returns false" do
-          expect(Band.any?).to be false
-        end
+    context "when called on collection with no documents" do
+
+      it "returns false" do
+        expect(Band.any?).to be false
       end
     end
   end
 
   describe "#one?" do
-    context "when called on class" do
-      context "with no documents" do
-        it "returns false" do
-          expect(Band.one?).to be false
-        end
-      end
-
-      context "with one document" do
-        before do
-          Band.create!(name: "Radiohead")
-        end
-
-        it "returns true" do
-          expect(Band.one?).to be true
-        end
-      end
-
-      context "with multiple documents" do
-        before do
-          Band.create!(name: "Tool")
-          Band.create!(name: "Radiohead")
-        end
-
-        it "returns false" do
-          expect(Band.one?).to be false
-        end
+    context "when called on collection with no documents" do
+      it "returns false" do
+        expect(Band.one?).to be false
       end
     end
+
+    context "when called on collection with one document" do
+      before do
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns true" do
+        expect(Band.one?).to be true
+      end
+    end
+
+    context "when called on collection with multiple documents" do
+      before do
+        Band.create!(name: "Tool")
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns false" do
+        expect(Band.one?).to be false
+      end
+    end
+
   end
 
   describe "#many?" do
-    context "when called on class" do
-      context "with no documents" do
-        it "returns false" do
-          expect(Band.many?).to be false
-        end
+    context "when called on collection with no documents" do
+      it "returns false" do
+        expect(Band.many?).to be false
+      end
+    end
+
+    context "when called on collection with one document" do
+      before do
+        Band.create!(name: "Radiohead")
       end
 
-      context "with one document" do
-        before do
-          Band.create!(name: "Radiohead")
-        end
+      it "returns false" do
+        expect(Band.many?).to be false
+      end
+    end
 
-        it "returns false" do
-          expect(Band.many?).to be false
-        end
+    context "when called on collection with multiple documents" do
+      before do
+        Band.create!(name: "Radiohead")
+        Band.create!(name: "Tool")
       end
 
-      context "with multiple documents" do
-        before do
-          Band.create!(name: "Radiohead")
-          Band.create!(name: "Tool")
-        end
-
-        it "returns true" do
-          expect(Band.many?).to be true
-        end
+      it "returns true" do
+        expect(Band.many?).to be true
       end
     end
   end
