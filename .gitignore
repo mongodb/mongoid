@@ -32,4 +32,3 @@ examples
 .env.private*
 build
 rspec.xml
-x.rb
