@@ -1347,9 +1347,6 @@ describe Mongoid::Criteria::Findable do
       end
 
       context "with no documents" do
-        before do
-          Band.delete_all
-        end
         it "returns false" do
           expect(Band.any?).to be false
         end
@@ -1400,10 +1397,6 @@ describe Mongoid::Criteria::Findable do
 
     context "when called on class" do
       context "with no documents" do
-        before do # can maybe delete this - not sure how cleanup works here
-          Band.delete_all
-        end
-
         it "returns false" do
           expect(Band.one?).to be false
         end
@@ -1476,10 +1469,6 @@ describe Mongoid::Criteria::Findable do
 
     context "when called on class" do
       context "with no documents" do
-        before do
-          Band.delete_all
-        end
-
         it "returns false" do
           expect(Band.many?).to be false
         end
