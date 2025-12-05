@@ -81,6 +81,36 @@ module Mongoid
         ids.empty? ? [] : from_database(ids)
       end
 
+      # Return true if any documents exist in the criteria.
+      #
+      # @example Determine if any documents exist
+      #   criteria.any?
+      #
+      # @return [ true | false ] If any documents exist.
+      def any?
+        limit(1).count > 0
+      end
+
+      # Return true if only one document exists in the criteria.
+      #
+      # @example Determine if only one document exists
+      #   criteria.one?
+      #
+      # @return [ true | false ] If only one document exists.
+      def one?
+        limit(2).count == 1
+      end
+
+      # Return true if more than one document exists in the criteria.
+      #
+      # @example Determine if many documents exist
+      #   criteria.many?
+      #
+      # @return [ true | false ] If many documents exist.
+      def many?
+        limit(2).count > 1
+      end
+
       private
 
       # Get the finder used to generate the id query.
