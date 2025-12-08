@@ -122,7 +122,7 @@ module Mongoid
     #   Model.any?
     #   
     # @return [ true | false ] If any documents exist.
-    def any?()
+    def any?
       limit(1).count > 0
     end
 
@@ -132,7 +132,7 @@ module Mongoid
     #   Model.one?
     #
     # @return [ true | false ] If only one document exists.
-    def one?()
+    def one?
       limit(2).count == 1
     end
 
@@ -142,7 +142,7 @@ module Mongoid
     #   Model.many?
     #
     # @return [ true | false ] If many documents exist.
-    def many?()
+    def many?
       limit(2).count > 1
     end
 
