@@ -4,5 +4,5 @@ description: a Ruby ODM for MongoDB
 package: mongoid
 jira: https://jira.mongodb.org/projects/MONGOID
 version:
-  number: 7.6.0
+  number: 7.7.0
   file: lib/mongoid/version.rb
