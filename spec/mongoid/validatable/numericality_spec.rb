@@ -50,7 +50,7 @@ describe ActiveModel::Validations::NumericalityValidator do
 
     context "when allow_blank is true and amount is Integer" do
       before(:all) do
-        class TestModelAllowBlank
+        class TestModelAllowBlankInteger
           include Mongoid::Document
           field :amount, type: Integer
           validates_numericality_of :amount, allow_blank: true
@@ -58,13 +58,13 @@ describe ActiveModel::Validations::NumericalityValidator do
       end
 
       after(:all) do
-        Object.send(:remove_const, :TestModelAllowBlank)
+        Object.send(:remove_const, :TestModelAllowBlankInteger)
       end
 
       context "when the value is blank" do
 
         let(:model) do
-          TestModelAllowBlank.new(amount: "")
+          TestModelAllowBlankInteger.new(amount: "")
         end
 
         it "returns true" do
@@ -75,19 +75,18 @@ describe ActiveModel::Validations::NumericalityValidator do
       context "when the value is a nonempty string" do
 
         let(:model) do
-          TestModelAllowBlank.new(amount: "A non-numeric string")
+          TestModelAllowBlankInteger.new(amount: "A non-numeric string")
         end
 
         it "returns false" do
-          puts model.inspect
           expect(model).to_not be_valid
         end
       end
     end
-    
+ 
     context "when allow_blank is true and amount is Float" do
       before(:all) do
-        class TestModelAllowBlank
+        class TestModelAllowBlankFloat
           include Mongoid::Document
           field :amount, type: Float
           validates_numericality_of :amount, allow_blank: true
@@ -95,17 +94,41 @@ describe ActiveModel::Validations::NumericalityValidator do
       end
 
       after(:all) do
-        Object.send(:remove_const, :TestModelAllowBlank)
+        Object.send(:remove_const, :TestModelAllowBlankFloat)
       end
 
       context "when the value is a nonempty string" do
 
         let(:model) do
-          TestModelAllowBlank.new(amount: "A non-numeric string")
+          TestModelAllowBlankFloat.new(amount: "A non-numeric string")
         end
 
         it "returns false" do
-          puts model.inspect
+          expect(model).to_not be_valid
+        end
+      end
+    end
+
+    context "when allow_blank is true and amount is BigDecimal" do
+      before(:all) do
+        class TestModelAllowBlankBigDecimal
+          include Mongoid::Document
+          field :amount, type: BigDecimal
+          validates_numericality_of :amount, allow_blank: true
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :TestModelAllowBlankBigDecimal)
+      end
+
+      context "when the value is a nonempty string" do
+
+        let(:model) do
+          TestModelAllowBlankBigDecimal.new(amount: "A non-numeric string")
+        end
+
+        it "returns false" do
           expect(model).to_not be_valid
         end
       end
