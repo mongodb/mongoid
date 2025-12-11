@@ -43,6 +43,8 @@ module Mongoid
           if object.is_a?(String)
             if object.numeric?
               object.to_f
+            else
+              object
             end
           else
             object.try(:to_f)
