@@ -32,8 +32,10 @@ module Mongoid
           attributes.each do |attrs|
             if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
-            else
+            elsif attrs.is_a?(Array) && attrs.length > 1 && attrs[1].respond_to?(:with_indifferent_access)
               process_attributes(parent, attrs[1].with_indifferent_access)
+            else
+              process_attributes(parent, Hash[*attrs].with_indifferent_access)
             end
           end
         end
