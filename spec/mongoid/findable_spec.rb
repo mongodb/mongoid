@@ -160,6 +160,84 @@ describe Mongoid::Findable do
     end
   end
 
+  describe "#any?" do
+    context "when called on collection with documents" do
+      before do
+        Band.create!(name: "Tool")
+      end
+
+      it "returns true" do
+        expect(Band.any?).to be true
+      end
+    end
+
+    context "when called on collection with no documents" do
+
+      it "returns false" do
+        expect(Band.any?).to be false
+      end
+    end
+  end
+
+  describe "#one?" do
+    context "when called on collection with no documents" do
+      it "returns false" do
+        expect(Band.one?).to be false
+      end
+    end
+
+    context "when called on collection with one document" do
+      before do
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns true" do
+        expect(Band.one?).to be true
+      end
+    end
+
+    context "when called on collection with multiple documents" do
+      before do
+        Band.create!(name: "Tool")
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns false" do
+        expect(Band.one?).to be false
+      end
+    end
+
+  end
+
+  describe "#many?" do
+    context "when called on collection with no documents" do
+      it "returns false" do
+        expect(Band.many?).to be false
+      end
+    end
+
+    context "when called on collection with one document" do
+      before do
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns false" do
+        expect(Band.many?).to be false
+      end
+    end
+
+    context "when called on collection with multiple documents" do
+      before do
+        Band.create!(name: "Radiohead")
+        Band.create!(name: "Tool")
+      end
+
+      it "returns true" do
+        expect(Band.many?).to be true
+      end
+    end
+  end
+
   describe "find_by!" do
 
     context "when the document is found" do

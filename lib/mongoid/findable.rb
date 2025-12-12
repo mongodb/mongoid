@@ -116,6 +116,36 @@ module Mongoid
       with_default_scope.exists?(id_or_conditions)
     end
 
+    # Return true if any documents exist in the criteria.
+    #
+    # @example Determine if any documents exist
+    #   Model.any?
+    #   
+    # @return [ true | false ] If any documents exist.
+    def any?
+      limit(1).count > 0
+    end
+
+    # Return true if only one document exists in the criteria.
+    #
+    # @example Determine if only one document exists
+    #   Model.one?
+    #
+    # @return [ true | false ] If only one document exists.
+    def one?
+      limit(2).count == 1
+    end
+
+    # Return true if more than one document exists in the criteria.
+    #
+    # @example Determine if many documents exist
+    #   Model.many?
+    #
+    # @return [ true | false ] If many documents exist.
+    def many?
+      limit(2).count > 1
+    end
+
     # Finds a +Document+ or multiple documents by their _id values.
     #
     # If a single non-Array argument is given, this argument is interpreted
