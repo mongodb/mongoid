@@ -32,7 +32,7 @@ module Mongoid
           attributes.each do |attrs|
             if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
-            elsif attrs[1].respond_to?(:with_indifferent_access)
+            elsif attrs.is_a?(Array) && attrs.length > 1 && attrs[1].respond_to?(:with_indifferent_access)
               process_attributes(parent, attrs[1].with_indifferent_access)
             else
               process_attributes(parent, Hash[*attrs].with_indifferent_access)
@@ -50,8 +50,6 @@ module Mongoid
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
         def initialize(association, attributes, options = {})
-          # If a hash is passed, and the first key is not an integer,
-          # we assume it's a single document being passed in.
           if attributes.respond_to?(:with_indifferent_access)
             @attributes = attributes.with_indifferent_access.sort do |a, b|
               a[0].to_i <=> b[0].to_i
