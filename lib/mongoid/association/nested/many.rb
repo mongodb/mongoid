@@ -48,7 +48,11 @@ module Mongoid
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
         def initialize(association, attributes, options = {})
-          if attributes.respond_to?(:with_indifferent_access)
+          # If a hash is passed, and the first key is not an integer,
+          # we assume it's a single document being passed in.
+          if attributes.is_a?(Hash) && !attributes.keys.first.is_a?(Integer)
+            @attributes = [attributes]
+          elsif attributes.respond_to?(:with_indifferent_access)
             @attributes = attributes.with_indifferent_access.sort do |a, b|
               a[0].to_i <=> b[0].to_i
             end
