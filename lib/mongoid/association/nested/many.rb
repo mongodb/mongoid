@@ -35,7 +35,7 @@ module Mongoid
             elsif attrs[1].respond_to?(:with_indifferent_access)
               process_attributes(parent, attrs[1].with_indifferent_access)
             else
-              process_attributes(parent, [attrs[1]])
+              process_attributes(parent, [attrs[1]].with_indifferent_access)
             end
           end
         end
