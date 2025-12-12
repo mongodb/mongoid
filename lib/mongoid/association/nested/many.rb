@@ -32,8 +32,10 @@ module Mongoid
           attributes.each do |attrs|
             if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
-            else
+            elsif attrs[1].respond_to?(:with_indifferent_access)
               process_attributes(parent, attrs[1].with_indifferent_access)
+            else
+              process_attributes(parent, [attrs[1]])
             end
           end
         end
@@ -50,9 +52,7 @@ module Mongoid
         def initialize(association, attributes, options = {})
           # If a hash is passed, and the first key is not an integer,
           # we assume it's a single document being passed in.
-          if attributes.is_a?(Hash) && !attributes.keys.first.is_a?(Integer)
-            @attributes = [attributes]
-          elsif attributes.respond_to?(:with_indifferent_access)
+          if attributes.respond_to?(:with_indifferent_access)
             @attributes = attributes.with_indifferent_access.sort do |a, b|
               a[0].to_i <=> b[0].to_i
             end
