@@ -80,7 +80,7 @@ module Mongoid
         relation.try(:in_memory) || relation
       elsif fields[attribute].try(:localized?)
         attributes[attribute]
-      elsif fields[attribute]&.type == BigDecimal || fields[attribute]&.type == Float || fields[attribute]&.type == Integer
+      elsif fields[attribute]&.type <= Numeric
         send("#{attr}_before_type_cast")
       else
         send(attr)
