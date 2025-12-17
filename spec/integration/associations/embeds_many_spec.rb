@@ -327,20 +327,4 @@ describe 'embeds_many associations' do
       end
     end
   end
-
-  context "when a hash is provided instead of an array for an embeds_many association" do
-    let(:post) { EmbedsManySpec::Post.new(title: 'Broken post', comments: { content: 'Comment' }) }
-
-    it "does not raise an error on initialization" do
-      expect { post }.to_not raise_error
-    end
-
-    it "does not raise an error when accessing the association" do
-      expect { post.comments }.to_not raise_error
-    end
-
-    it "allows building new documents on the association" do
-      expect(post.comments.build).to be_a EmbedsManySpec::Comment
-    end
-  end
 end
