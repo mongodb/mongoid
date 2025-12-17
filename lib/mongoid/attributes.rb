@@ -104,7 +104,8 @@ module Mongoid
     # @api private
     def process_raw_attribute(name, raw, field)
       value = field ? field.demongoize(raw) : raw
-      attribute_will_change!(name) if value.resizable?
+      is_relation = relations.key?(name)
+      attribute_will_change!(name) if value.resizable? && !is_relation
       value
     end
 
