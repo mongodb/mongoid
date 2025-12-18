@@ -24,8 +24,11 @@ module Mongoid
       #   accessible in the built document.
       #
       # @return [ Proxy ] The association.
+      # object is nil here
       def __build__(name, object, association, selected_fields = nil)
+        pp object
         relation = create_relation(object, association, selected_fields)
+        pp relation
         set_relation(name, relation)
       end
 
@@ -41,7 +44,10 @@ module Mongoid
       #   accessible in the created association document.
       #
       # @return [ Proxy ] The association.
+      # object is nil
       def create_relation(object, association, selected_fields = nil)
+        pp "object:"
+        pp object
         key = @attributes[association.inverse_type]
         type = key ? association.resolver.model_for(key) : nil
         target = if t = association.build(self, object, type, selected_fields)
@@ -107,6 +113,7 @@ module Mongoid
       #
       # @return [ Proxy ] The association.
       def get_relation(name, association, object, reload = false)
+        # binding.break
         field_name = database_field_name(name)
 
         # As per the comments under MONGOID-5034, I've decided to only raise on
@@ -123,6 +130,7 @@ module Mongoid
                            ) && field_name == association.key
           raise Mongoid::Errors::AttributeNotLoaded.new(self.class, field_name) unless try_get_parent
         end
+        # binding.break
 
         if !reload && (value = ivar(name)) != false
           value
