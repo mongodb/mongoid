@@ -2722,7 +2722,23 @@ describe Mongoid::Attributes do
     end
   end
 
-  context "when modifiying a set referenced with the [] notation" do
+  context "when accessing an embedded document with the attribute accessor" do
+    let(:band) { Band.create! }
+
+    before do
+      Band.where(id: band.id).update_all({
+        :$push => {records: { _id: BSON::ObjectId.new }}
+      })
+    end
+
+    it "does not throw a conflicting update error" do
+      b1 = Band.find(band.id)
+      b1[:records].is_a?(Array).should be true
+      expect { b1.save! }.not_to raise_error
+    end
+  end
+
+  context "when modifying a set referenced with the [] notation" do
     let(:catalog) { Catalog.create!(set_field: [ 1 ].to_set) }
 
     before do
