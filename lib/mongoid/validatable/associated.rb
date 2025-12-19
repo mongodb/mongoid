@@ -65,7 +65,6 @@ module Mongoid
         # might be a rather complex collection. We need to do this without
         # triggering a load, so it's a bit of a delicate dance.
         list = get_target_documents(target)
-        # this is currently an empty array
 
         valid = document.validating do
           # Now, treating the target as an array, look at each element
