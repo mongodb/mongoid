@@ -608,11 +608,20 @@ module Mongoid
           end
 
           def handle_empty_target
-            # Only mark as changed if the attribute is not already an empty array
-            unless _base.attributes[_association.store_as] == []
-              _base.send(:attribute_will_change!, _association.store_as)
+            # Only persist empty array if:
+            # 1. We're explicitly assigning (setter was called), OR
+            # 2. The attribute key already exists (replacing existing data with empty)
+            if _assigning? || _base.attributes.key?(_association.store_as)
+              # Only mark as changed if the attribute is not already an empty array
+              unless _base.attributes[_association.store_as] == []
+                _base.send(:attribute_will_change!, _association.store_as)
+              end
+              _base.attributes[_association.store_as] = []
+            else
+              # During initialization with no prior data, delete the key to maintain
+              # the original behavior of not persisting unassigned empty associations
+              _base.attributes.delete(_association.store_as)
             end
-            _base.attributes[_association.store_as] = []
           end
         end
       end
