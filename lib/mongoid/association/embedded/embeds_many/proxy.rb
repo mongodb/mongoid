@@ -607,6 +607,9 @@ module Mongoid
             end
           end
 
+          # Handle the case when the target is empty.
+          #
+          # @api private
           def handle_empty_target
             # Only persist empty array if:
             # 1. We're explicitly assigning (setter was called), OR
