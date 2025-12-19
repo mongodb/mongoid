@@ -601,14 +601,18 @@ module Mongoid
           # @api private
           def update_attributes_hash
             if _target.empty?
-              # Only mark as changed if the attribute is not already an empty array
-              unless _base.attributes[_association.store_as] == []
-                _base.send(:attribute_will_change!, _association.store_as)
-              end
-              _base.attributes[_association.store_as] = []
+              handle_empty_target
             else
               _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
             end
+          end
+
+          def handle_empty_target
+            # Only mark as changed if the attribute is not already an empty array
+            unless _base.attributes[_association.store_as] == []
+              _base.send(:attribute_will_change!, _association.store_as)
+            end
+            _base.attributes[_association.store_as] = []
           end
         end
       end
