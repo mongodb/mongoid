@@ -24,7 +24,6 @@ module Mongoid
       #   accessible in the built document.
       #
       # @return [ Proxy ] The association.
-      # object is nil here
       def __build__(name, object, association, selected_fields = nil)
         relation = create_relation(object, association, selected_fields)
         set_relation(name, relation)
@@ -42,7 +41,6 @@ module Mongoid
       #   accessible in the created association document.
       #
       # @return [ Proxy ] The association.
-      # object is nil
       def create_relation(object, association, selected_fields = nil)
         key = @attributes[association.inverse_type]
         type = key ? association.resolver.model_for(key) : nil

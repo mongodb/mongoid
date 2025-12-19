@@ -4271,6 +4271,25 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
+  context "when setting an embedded relation to an empty array" do
+    let(:document) do
+      Person.create!
+    end
+
+    let(:person) do
+      Person.find(document.id)
+    end
+
+    before do
+      person.update_attributes!(addresses: [])
+    end
+
+    it "sets the embedded relation to an empty array" do
+      expect(person.addresses).to be_empty
+      expect(person.attributes.keys).to include("addresses")
+    end
+  end
+
   context "when pushing with a before_add callback" do
 
     let(:artist) do
