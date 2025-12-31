@@ -251,6 +251,31 @@ module Mongoid
         Threaded.exit_execution("without_autobuild")
       end
 
+      # Is the current code executing within an association setter?
+      #
+      # @example Is setter active?
+      #   document.in_setter?
+      #
+      # @return [ true | false ] If within a setter.
+      def in_setter?
+        Threaded.executing?(:in_setter)
+      end
+
+      # Yield to the block with setter flag enabled.
+      #
+      # @example Execute within setter context.
+      #   in_setter do
+      #     # setter logic
+      #   end
+      #
+      # @return [ Object ] The result of the yield.
+      def in_setter
+        Threaded.begin_execution("in_setter")
+        yield
+      ensure
+        Threaded.exit_execution("in_setter")
+      end
+
       # Parse out the attributes and the options from the args passed to a
       # build_ or create_ methods.
       #
@@ -345,15 +370,16 @@ module Mongoid
         name = association.name
         association.inverse_class.tap do |klass|
           klass.re_define_method("#{name}=") do |object|
-            without_autobuild do
-              if value = get_relation(name, association, object)
-                if !value.respond_to?(:substitute)
-                  value = __build__(name, value, association) 
+            in_setter do
+              without_autobuild do
+                if value = get_relation(name, association, object)
+                  if !value.respond_to?(:substitute)
+                    value = __build__(name, value, association) 
+                  end
+                  set_relation(name, value.substitute(object.substitutable))
+                else
+                  __build__(name, object.substitutable, association)
                 end
-
-                set_relation(name, value.substitute(object.substitutable))
-              else
-                __build__(name, object.substitutable, association)
               end
             end
           end

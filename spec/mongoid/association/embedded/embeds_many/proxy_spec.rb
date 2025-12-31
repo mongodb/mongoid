@@ -4271,6 +4271,25 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
+  context "when setting an embedded relation to an empty array" do
+    let(:document) do
+      Person.create!
+    end
+
+    let(:person) do
+      Person.find(document.id)
+    end
+
+    before do
+      person.update_attributes!(addresses: [])
+    end
+
+    it "sets the embedded relation to an empty array" do
+      expect(person.addresses).to be_empty
+      expect(person.attributes.keys).to include("addresses")
+    end
+  end
+
   context "when pushing with a before_add callback" do
 
     let(:artist) do
@@ -4771,18 +4790,38 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
     context "in an embeds_many relation" do
 
-      let(:band) { Band.create! }
+      context "using .create! first" do
 
-      before do
-        band.labels = []
-        band.save!
+        let(:band) { Band.create! }
+
+        before do
+          band.labels = []
+          band.save!
+        end
+
+        let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+
+        it "persists the empty list" do
+          expect(reloaded_band).to have_key(:labels)
+          expect(reloaded_band[:labels]).to eq []
+        end
       end
 
-      let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+      context "using .new first" do
 
-      it "persists the empty list" do
-        expect(reloaded_band).to have_key(:labels)
-        expect(reloaded_band[:labels]).to eq []
+        let(:band) { Band.new }
+
+        before do
+          band.labels = []
+          band.save!
+        end
+
+        let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+
+        it "persists the empty list" do
+          expect(reloaded_band).to have_key(:labels)
+          expect(reloaded_band[:labels]).to eq []
+        end
       end
     end
 
