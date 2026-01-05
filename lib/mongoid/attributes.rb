@@ -173,6 +173,8 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
+          # TODO: remove this
+          # validate_attribute_value(field_name, value)
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
@@ -360,6 +362,31 @@ module Mongoid
     end
 
     private
+
+    # Validates an attribute value as being assignable to the specified field.
+    #
+    # For now, only Hash and Array fields are validated, and the value is
+    # being checked to be of an appropriate type (i.e. either Hash or Array,
+    # respectively, or nil).
+    #
+    # This method takes the name of the field as stored in the document
+    # in the database, not (necessarily) the Ruby method name used to read/write
+    # the said field.
+    #
+    # @param [ String, Symbol ] field_name The name of the field.
+    # @param [ Object ] value The value to be validated.
+    # TODO: remove this
+    # def validate_attribute_value(field_name, value)
+    #   return if value.nil?
+    #   field = fields[field_name]
+    #   return unless field
+    #   validatable_types = [ Hash, Array ]
+    #   if validatable_types.include?(field.type)
+    #     unless value.is_a?(field.type)
+    #       raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
+    #     end
+    #   end
+    # end
 
     def lookup_attribute_presence(name, value)
       if localized_fields.has_key?(name) && value
