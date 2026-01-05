@@ -620,7 +620,7 @@ module Mongoid
             # 1. We're explicitly assigning (setter was called), OR
             # 2. The attribute key already exists (replacing existing data with empty), OR
             # 3. We're executing within a setter
-            if _assigning? || _base.attributes.key?(_association.store_as) || in_setter?
+            if _base.attributes.key?(_association.store_as) || in_setter?
               # Only mark as changed if the attribute is not already an empty array
               unless _base.attributes[_association.store_as] == []
                 _base.send(:attribute_will_change!, _association.store_as)
