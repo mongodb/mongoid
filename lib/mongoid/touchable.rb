@@ -39,7 +39,7 @@ module Mongoid
           # seems to not always/ever be set here. See MONGOID-5014.
           _parent.touch
 
-          if field
+          if field.present?
             # If we are told to also touch a field, perform a separate write
             # for that field. See MONGOID-5136.
             # In theory we should combine the writes, which would require
