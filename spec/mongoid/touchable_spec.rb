@@ -149,6 +149,18 @@ describe Mongoid::Touchable do
             building.updated_at.should == update_time
           end
         end
+
+        context 'when not updating an additional field' do
+          it 'does not call set_field_atomic_updates' do
+            # Regression test for MONGOID-5833
+            entrance
+            update_time
+            expect(entrance).not_to receive(:set_field_atomic_updates)
+            entrance.touch
+
+            entrance.updated_at.should == update_time
+          end
+        end
       end
 
       context "when the document is referenced" do
