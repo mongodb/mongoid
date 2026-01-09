@@ -22,9 +22,9 @@ module Mongoid
       module_function def matches?(original_operator, value, condition)
         case condition
         when Regexp
-          value =~ condition
+          value.to_s =~ condition
         when ::BSON::Regexp::Raw
-          value =~ condition.compile
+          value.to_s =~ condition.compile
         else
           if value.kind_of?(Time) && condition.kind_of?(Time)
             EqImpl.time_eq?(value, condition)
