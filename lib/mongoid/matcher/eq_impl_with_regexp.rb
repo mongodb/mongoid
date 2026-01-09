@@ -20,6 +20,8 @@ module Mongoid
       #
       # @api private
       module_function def matches?(original_operator, value, condition)
+        return false if value.nil? && (condition.is_a?(Regexp) || condition.is_a?(::BSON::Regexp::Raw))
+
         case condition
         when Regexp
           value.to_s =~ condition
