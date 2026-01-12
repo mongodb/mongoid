@@ -25,8 +25,7 @@ module Mongoid
       def eager_load(docs)
         docs.tap do |d|
           if eager_loadable?
-            use_lookup = criteria.respond_to?(:use_lookup?) && criteria.use_lookup?
-            preload(criteria.inclusions, d, use_lookup)
+            preload(criteria.inclusions, d, criteria.use_lookup?)
           end
         end
       end
