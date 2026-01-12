@@ -13,7 +13,7 @@ module Mongoid
         class Proxy < Association::One
           # class-level methods for the HasOne::Proxy
           module ClassMethods
-            def eager_loader(association, docs)
+            def eager_loader(association, docs, use_lookup = false)
               Eager.new(association, docs)
             end
 

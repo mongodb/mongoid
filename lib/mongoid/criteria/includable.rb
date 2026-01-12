@@ -31,6 +31,28 @@ module Mongoid
         clone
       end
 
+      # Eager loads all the provided associations using aggregation $lookup.
+      #
+      # @example Eager load the provided associations.
+      #   Person.eager_load(:posts, :game)
+      #
+      # @param [ [ Symbol | Hash ]... ] *relations The names of the association(s)
+      #   to eager load.
+      #
+      # @return [ Criteria ] The cloned criteria.
+      def eager_load(*relations)
+        extract_includes_list(klass, nil, relations)
+        @use_lookup = true
+        clone
+      end
+
+      # Returns whether to use $lookup aggregation for eager loading.
+      #
+      # @return [ true | false ] Whether to use $lookup.
+      def use_lookup?
+        !!@use_lookup
+      end
+
       # Get a list of criteria that are to be executed for eager loading.
       #
       # @return [ Array<Mongoid::Association::Relatable> ] The inclusions.

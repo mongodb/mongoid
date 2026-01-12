@@ -25,7 +25,8 @@ module Mongoid
       def eager_load(docs)
         docs.tap do |d|
           if eager_loadable?
-            preload(criteria.inclusions, d)
+            use_lookup = criteria.respond_to?(:use_lookup?) && criteria.use_lookup?
+            preload(criteria.inclusions, d, use_lookup)
           end
         end
       end
@@ -37,7 +38,8 @@ module Mongoid
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   The associations to load.
       # @param [ Array<Mongoid::Document> ] docs The documents.
-      def preload(associations, docs)
+      # @param [ true | false ] use_lookup Whether to use $lookup for eager loading.
+      def preload(associations, docs, use_lookup = false)
         assoc_map = associations.group_by(&:inverse_class_name)
         docs_map = {}
         queue = [ klass.to_s ]
@@ -58,7 +60,7 @@ module Mongoid
                 ds = assoc.parent_inclusions.map{ |p| docs_map[p].to_a }.flatten
               end
 
-              res = assoc.relation.eager_loader([assoc], ds).run
+              res = assoc.relation.eager_loader([assoc], ds, use_lookup).run
 
               docs_map[assoc.name] ||= [].to_set
               docs_map[assoc.name].merge(res)

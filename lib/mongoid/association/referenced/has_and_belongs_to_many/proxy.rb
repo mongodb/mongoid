@@ -20,7 +20,7 @@ module Mongoid
             #
             # @param [ Mongoid::Association::Relatable ] association The association metadata.
             # @param [ Array<Document> ] docs The array of documents.
-            def eager_loader(association, docs)
+            def eager_loader(association, docs, use_lookup = false)
               Eager.new(association, docs)
             end
 

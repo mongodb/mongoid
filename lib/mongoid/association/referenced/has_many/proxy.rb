@@ -15,7 +15,7 @@ module Mongoid
 
           # class-level methods for HasMany::Proxy
           module ClassMethods
-            def eager_loader(association, docs)
+            def eager_loader(association, docs, use_lookup = false)
               Eager.new(association, docs)
             end
 

@@ -6,7 +6,7 @@ require_relative "./includable_spec_models.rb"
 
 describe Mongoid::Criteria::Includable do
 
-  describe "#includes" do
+  shared_examples_for "eager loading" do |method_name|
 
     let!(:person) do
       Person.create!(age: 1)
@@ -16,7 +16,7 @@ describe Mongoid::Criteria::Includable do
 
       it "raises an error" do
         expect {
-          Person.includes(:members)
+          Person.send(method_name, :members)
         }.to raise_error(Mongoid::Errors::InvalidIncludes)
       end
     end
@@ -32,7 +32,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:result) do
-        User.includes(:posts).first
+        User.send(method_name, :posts).first
       end
 
       it "executes the query" do
@@ -59,7 +59,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:result) do
-        User.includes(:posts, :descriptions).first
+        User.send(method_name, :posts, :descriptions).first
       end
 
       it "executes the query" do
@@ -85,7 +85,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:result) do
-        User.includes(:posts => [:alerts]).first
+        User.send(method_name, :posts => [:alerts]).first
       end
 
       it "executes the query" do
@@ -105,7 +105,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:results) do
-        User.includes(:posts => [{ :alerts => :items }]).to_a
+        User.send(method_name, :posts => [{ :alerts => :items }]).to_a
       end
 
       it "executes the query" do
@@ -151,7 +151,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:results) do
-          C.includes(:b).to_a.detect do |c|
+          C.send(method_name, :b).to_a.detect do |c|
             c.id == c_two.id
           end
         end
@@ -218,7 +218,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            D.includes(:b, :c).entries.detect do |d|
+            D.send(method_name, :b, :c).entries.detect do |d|
               d.id == d_two.id
             end
           end
@@ -289,7 +289,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            D.includes(:b, :c).entries.detect do |d|
+            D.send(method_name, :b, :c).entries.detect do |d|
               d.id == d_two.id
             end
           end
@@ -316,7 +316,7 @@ describe Mongoid::Criteria::Includable do
     context "when including the same association multiple times" do
 
       let(:criteria) do
-        Person.all.includes(:posts, :posts).includes(:posts)
+        Person.all.send(method_name, :posts, :posts).send(method_name, :posts)
       end
 
       let(:association) do
@@ -335,7 +335,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:criteria) do
-        Post.includes(:person)
+        Post.send(method_name, :person)
       end
 
       let!(:results) do
@@ -367,7 +367,7 @@ describe Mongoid::Criteria::Includable do
         context "when calling first" do
 
           let(:criteria) do
-            Post.includes(:person)
+            Post.send(method_name, :person)
           end
 
           let!(:document) do
@@ -388,7 +388,7 @@ describe Mongoid::Criteria::Includable do
         context "when calling last" do
 
           let!(:criteria) do
-            Post.asc(:_id).includes(:person)
+            Post.asc(:_id).send(method_name, :person)
           end
 
           let!(:document) do
@@ -439,7 +439,7 @@ describe Mongoid::Criteria::Includable do
         context "when calling first" do
 
           let(:criteria) do
-            peep.reload.addresses.includes(:band)
+            peep.reload.addresses.send(method_name, :band)
           end
 
           let(:context) do
@@ -464,7 +464,7 @@ describe Mongoid::Criteria::Includable do
         context "when calling last" do
 
           let(:criteria) do
-            peep.reload.addresses.includes(:band)
+            peep.reload.addresses.send(method_name, :band)
           end
 
           let(:context) do
@@ -489,7 +489,7 @@ describe Mongoid::Criteria::Includable do
         context "when iterating all documents" do
 
           let(:criteria) do
-            peep.reload.addresses.includes(:band)
+            peep.reload.addresses.send(method_name, :band)
           end
 
           let(:context) do
@@ -522,7 +522,7 @@ describe Mongoid::Criteria::Includable do
     context "when providing inclusions to the default scope" do
 
       before do
-        Person.default_scope(->{ Person.includes(:posts) })
+        Person.default_scope(->{ Person.send(method_name, :posts) })
       end
 
       after do
@@ -703,7 +703,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         let(:criteria) do
-          Person.where(id: person.id).includes(:preferences)
+          Person.where(id: person.id).send(method_name, :preferences)
         end
 
         it "only loads the existing related items" do
@@ -714,7 +714,7 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has no options" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
+          Person.asc(:age).send(method_name, :preferences)
         end
 
         let!(:documents) do
@@ -741,7 +741,7 @@ describe Mongoid::Criteria::Includable do
       context "when calling first on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
+          Person.asc(:age).send(method_name, :preferences)
         end
 
         let!(:from_db) do
@@ -768,7 +768,7 @@ describe Mongoid::Criteria::Includable do
       context "when calling last on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
+          Person.asc(:age).send(method_name, :preferences)
         end
 
         let!(:from_db) do
@@ -806,7 +806,7 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has no options" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:posts)
+          Person.asc(:age).send(method_name, :posts)
         end
 
         let!(:documents) do
@@ -833,7 +833,7 @@ describe Mongoid::Criteria::Includable do
       context "when calling first on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:posts)
+          Person.asc(:age).send(method_name, :posts)
         end
 
         let!(:from_db) do
@@ -859,7 +859,7 @@ describe Mongoid::Criteria::Includable do
       context "when calling last on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:posts)
+          Person.asc(:age).send(method_name, :posts)
         end
 
         let!(:from_db) do
@@ -893,7 +893,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:criteria) do
-          Person.includes(:posts).asc(:age).limit(1)
+          Person.send(method_name, :posts).asc(:age).limit(1)
         end
 
         let(:context) do
@@ -927,7 +927,7 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has no options" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:game)
+          Person.asc(:age).send(method_name, :game)
         end
 
         let(:context) do
@@ -958,7 +958,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:criteria) do
-          Person.where(id: person.id).includes(:game).asc(:age).limit(1)
+          Person.where(id: person.id).send(method_name, :game).asc(:age).limit(1)
         end
 
         let(:context) do
@@ -996,7 +996,7 @@ describe Mongoid::Criteria::Includable do
       context "when providing no options" do
 
         let!(:criteria) do
-          Game.includes(:person)
+          Game.send(method_name, :person)
         end
 
         let(:context) do
@@ -1019,7 +1019,7 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has limiting options" do
 
         let!(:criteria) do
-          Game.where(id: game_one.id).includes(:person).asc(:_id).limit(1)
+          Game.where(id: game_one.id).send(method_name, :person).asc(:_id).limit(1)
         end
 
         let(:context) do
@@ -1059,7 +1059,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let!(:criteria) do
-        Person.includes(:posts, :game).asc(:age)
+        Person.send(method_name, :posts, :game).asc(:age)
       end
 
       let(:context) do
@@ -1137,7 +1137,7 @@ describe Mongoid::Criteria::Includable do
 
         context "when including the belongs_to association" do
           let!(:result) do
-            C.includes(b: :a).first
+            C.send(method_name, b: :a).first
           end
 
           it "finds the right document" do
@@ -1155,7 +1155,7 @@ describe Mongoid::Criteria::Includable do
 
         context "when including a doubly-nested belongs_to association" do
           let!(:result) do
-            D.includes(c: { b: :a }).first
+            D.send(method_name, c: { b: :a }).first
           end
 
           it "finds the right document" do
@@ -1174,7 +1174,7 @@ describe Mongoid::Criteria::Includable do
 
         context "when including the has_many association" do
           let!(:result) do
-            A.includes(b: :c).first
+            A.send(method_name, b: :c).first
           end
 
           it "finds the right document" do
@@ -1192,7 +1192,7 @@ describe Mongoid::Criteria::Includable do
 
         context "when including a doubly-nested has_many association" do
           let!(:result) do
-            A.includes(b: { c: :d }).first
+            A.send(method_name, b: { c: :d }).first
           end
 
           it "finds the right document" do
@@ -1222,7 +1222,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            A.includes(b: :c).entries.sort
+            A.send(method_name, b: :c).entries.sort
           end
 
           it "finds the right document" do
@@ -1262,7 +1262,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            A.includes(b: { c: :d }, c: :d).first
+            A.send(method_name, b: { c: :d }, c: :d).first
           end
 
           it "finds the right document" do
@@ -1304,7 +1304,7 @@ describe Mongoid::Criteria::Includable do
 
       context "when including the same class twice" do
         let!(:results) do
-          IncPost.includes({ user: :comments }, :comments).entries.sort
+          IncPost.send(method_name, { user: :comments }, :comments).entries.sort
         end
 
         it "finds the right documents" do
@@ -1331,7 +1331,7 @@ describe Mongoid::Criteria::Includable do
         let!(:thread) { IncThread.create!(comments: user_comments) }
 
         let!(:result) do
-          IncThread.includes(comments: { user: { posts: :comments } }).first
+          IncThread.send(method_name, comments: { user: { posts: :comments } }).first
         end
 
         it "finds the right document" do
@@ -1362,6 +1362,14 @@ describe Mongoid::Criteria::Includable do
         end
       end
     end
+  end
+
+  describe "#includes" do
+    it_behaves_like "eager loading", :includes
+  end
+
+  describe "#eager_load" do
+    it_behaves_like "eager loading", :eager_load
   end
 
   describe "#inclusions" do

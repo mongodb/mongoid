@@ -16,10 +16,11 @@ module Mongoid
       # @param [ Array<Document> ] docs Documents to preload the associations
       #
       # @return [ Base ] The eager load preloader
-      def initialize(associations, docs)
+      def initialize(associations, docs, use_lookup = false)
         @associations = associations
         @docs = docs
         @grouped_docs = {}
+        @use_lookup = use_lookup
       end
 
       # Run the preloader.
@@ -55,7 +56,32 @@ module Mongoid
       # a single query. If the association is polymorphic, one query is
       # issued per association target class.
       def each_loaded_document(&block)
+        return each_loaded_document_of_class_with_lookup(@association.klass, keys_from_docs, &block) if @use_lookup
         each_loaded_document_of_class(@association.klass, keys_from_docs, &block)
+      end
+
+      # Prepares the criteria to retrieve the documents of the specified
+      # class, that have the foreign key included in the specified list of keys.
+      # When the documents are retrieved, the set of inclusions applied
+      # is the set of inclusions applied to the host document minus the
+      # association that is being eagerly loaded.
+      private def prepare_criteria_for_loaded_documents(cls, keys)
+        criteria = cls.criteria
+        criteria = criteria.apply_scope(@association.scope)
+        criteria = criteria.any_in(key => keys)
+        criteria.inclusions = criteria.inclusions - [@association]
+        criteria
+      end
+
+      private def inc_to_pipeline_stage(inc)
+        {
+          "$lookup": {
+            from: inc.inverse_class.collection_name,
+            localField: inc.foreign_key,
+            foreignField: "_id",
+            as: inc.name
+          }
+        }
       end
 
       # Retrieves the documents of the specified class, that have the
@@ -69,12 +95,28 @@ module Mongoid
         # Upstream code is responsible for eliminating nils from keys.
         return cls.none if keys.empty?
 
-        criteria = cls.criteria
-        criteria = criteria.apply_scope(@association.scope)
-        criteria = criteria.any_in(key => keys)
-        criteria.inclusions = criteria.inclusions - [@association]
+        criteria = prepare_criteria_for_loaded_documents(cls, keys)
         criteria.each do |doc|
           yield doc
+        end
+      end
+
+      # Retrieves the documents of the specified class, that have the
+      # foreign key included in the specified list of keys, using a
+      # $lookup aggregation stage to perform the eager load.
+      private def each_loaded_document_of_class_with_lookup(cls, keys)
+        # Note: keys should not include nil elements.
+        # Upstream code is responsible for eliminating nils from keys.
+        return cls.none if keys.empty?
+
+        criteria = prepare_criteria_for_loaded_documents(cls, keys)
+        pipeline = criteria.selector.to_pipeline
+        criteria.inclusions.each do |inc|
+          pipeline << inc_to_pipeline_stage(inc)
+        end
+        aggregated_docs = cls.collection.aggregate(pipeline)
+        aggregated_docs.each do |doc|
+          yield cls.instantiate(doc)
         end
       end
 
