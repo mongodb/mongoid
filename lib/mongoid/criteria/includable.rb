@@ -32,6 +32,7 @@ module Mongoid
       end
 
       # Eager loads all the provided associations using aggregation $lookup.
+      # The behavior should be identical to #includes.
       #
       # @example Eager load the provided associations.
       #   Person.eager_load(:posts, :game)
