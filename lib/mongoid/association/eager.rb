@@ -73,6 +73,7 @@ module Mongoid
         criteria
       end
 
+      # Converts an inclusion into a $lookup aggregation stage.
       private def inc_to_pipeline_stage(inc)
         {
           "$lookup": {
