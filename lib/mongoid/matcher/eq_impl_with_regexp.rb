@@ -20,13 +20,11 @@ module Mongoid
       #
       # @api private
       module_function def matches?(original_operator, value, condition)
-        return false if value.nil? && (condition.is_a?(Regexp) || condition.is_a?(::BSON::Regexp::Raw))
-
         case condition
         when Regexp
-          value.to_s =~ condition
+          value.respond_to?(:=~) && value =~ condition
         when ::BSON::Regexp::Raw
-          value.to_s =~ condition.compile
+          value.respond_to?(:=~) && value =~ condition.compile
         else
           if value.kind_of?(Time) && condition.kind_of?(Time)
             EqImpl.time_eq?(value, condition)
