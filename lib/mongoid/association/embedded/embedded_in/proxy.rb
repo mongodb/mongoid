@@ -94,8 +94,8 @@ module Mongoid
             #   aggregation stage to perform the eager load.
             #
             # @return [ Mongoid::Association::Embedded::Eager ]
-            def eager_loader(associations, docs, use_lookup = false)
-              Eager.new(associations, docs, use_lookup)
+            def eager_loader(associations, docs)
+              Eager.new(associations, docs)
             end
 
             # Returns true if the association is an embedded one. In this case

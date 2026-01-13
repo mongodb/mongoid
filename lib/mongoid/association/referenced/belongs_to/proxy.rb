@@ -107,7 +107,7 @@ module Mongoid
             #
             # @return [ Mongoid::Association::Referenced::BelongsTo::Eager ]
             #   The eager loader.
-            def eager_loader(association, docs, use_lookup = false)
+            def eager_loader(association, docs)
               Eager.new(association, docs)
             end
 

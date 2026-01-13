@@ -187,7 +187,7 @@ module Mongoid
             #   populated by the eager-loaded documents.
             #
             # @return [ Mongoid::Association::Embedded::Eager ]
-            def eager_loader(associations, docs, use_lookup = false)
+            def eager_loader(associations, docs)
               Eager.new(associations, docs)
             end
 

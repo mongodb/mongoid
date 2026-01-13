@@ -30,6 +30,9 @@ module Mongoid
         end
       end
 
+      # Load the associations for the given documents using $lookup.
+      #
+      # @return [ Array<Mongoid::Document> ] The given documents.
       def eager_load_with_lookup
         preload_for_lookup(criteria)
       end
@@ -41,7 +44,6 @@ module Mongoid
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   The associations to load.
       # @param [ Array<Mongoid::Document> ] docs The documents.
-      # @param [ true | false ] use_lookup Whether to use $lookup for eager loading.
       def preload(associations, docs)
         assoc_map = associations.group_by(&:inverse_class_name)
         docs_map = {}
@@ -87,7 +89,6 @@ module Mongoid
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   The associations to load.
       # @param [ Array<Mongoid::Document> ] docs The documents.
-      # @param [ true | false ] use_lookup Whether to use $lookup for eager loading.
       def preload_for_lookup(criteria)
         # pp criteria.inclusions
         assoc_map = criteria.inclusions.group_by(&:inverse_class_name)
@@ -123,8 +124,6 @@ module Mongoid
             end
           end
         end
-        # puts children_to_parents
-        puts pipeline
         Eager.new(criteria.inclusions, [], true, pipeline).run
       end
     end

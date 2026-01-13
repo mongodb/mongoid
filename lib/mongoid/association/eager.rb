@@ -14,6 +14,10 @@ module Mongoid
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   Associations to eager load
       # @param [ Array<Document> ] docs Documents to preload the associations
+      # @param [ Boolean ] use_lookup Whether to use $lookup aggregation
+      #   for eager loading. This is used in Criteria#eager_load.
+      # @param [ Array<Hash> ] pipeline The aggregation pipeline to use
+      #   when using $lookup for eager loading.
       #
       # @return [ Base ] The eager load preloader
       def initialize(associations, docs, use_lookup = false, pipeline = [])
@@ -35,7 +39,8 @@ module Mongoid
 
         if @use_lookup
           preload
-          return @loaded.flatten
+          @loaded = @docs # TODO some processing here
+          return @loaded
         end
 
         while shift_association
@@ -58,7 +63,8 @@ module Mongoid
           # For $lookup aggregation, execute pipeline and instantiate documents
           aggregated_docs = @associations.first.owner_class.collection.aggregate(@pipeline)
           aggregated_docs.each do |doc|
-            @loaded << @associations.first.owner_class.instantiate(doc)
+            parsed_doc = @associations.first.owner_class.instantiate(doc)
+            @docs << parsed_doc
           end
         else
           raise NotImplementedError
@@ -71,7 +77,6 @@ module Mongoid
       # a single query. If the association is polymorphic, one query is
       # issued per association target class.
       def each_loaded_document(&block)
-        return each_loaded_document_of_class_with_lookup(@association.klass, keys_from_docs, &block) if @use_lookup
         each_loaded_document_of_class(@association.klass, keys_from_docs, &block)
       end
 
@@ -102,23 +107,6 @@ module Mongoid
         criteria = prepare_criteria_for_loaded_documents(cls, keys)
         criteria.each do |doc|
           yield doc
-        end
-      end
-
-      # Retrieves the documents of the specified class, that have the
-      # foreign key included in the specified list of keys, using a
-      # $lookup aggregation stage to perform the eager load.
-      private def each_loaded_document_of_class_with_lookup(cls, pipeline)
-        # Note: keys should not include nil elements.
-        # Upstream code is responsible for eliminating nils from keys.
-        return cls.none if keys.empty?
-
-        criteria = cls.criteria
-        puts criteria
-        aggregated_docs = cls.collection.aggregate(pipeline)
-        aggregated_docs.each do |doc|
-          @loaded << cls.instantiate(doc)
-          yield cls.instantiate(doc)
         end
       end
 
