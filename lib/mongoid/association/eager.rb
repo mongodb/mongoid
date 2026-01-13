@@ -16,11 +16,12 @@ module Mongoid
       # @param [ Array<Document> ] docs Documents to preload the associations
       #
       # @return [ Base ] The eager load preloader
-      def initialize(associations, docs, use_lookup = false)
+      def initialize(associations, docs, use_lookup = false, pipeline = [])
         @associations = associations
         @docs = docs
         @grouped_docs = {}
         @use_lookup = use_lookup
+        @pipeline = pipeline
       end
 
       # Run the preloader.
@@ -31,6 +32,12 @@ module Mongoid
       # @return [ Array ] The list of documents given.
       def run
         @loaded = []
+
+        if @use_lookup
+          preload
+          return @loaded.flatten
+        end
+
         while shift_association
           preload
           @loaded << @docs.collect { |d| d.send(@association.name) if d.respond_to?(@association.name) }
@@ -47,7 +54,16 @@ module Mongoid
       # @example Preload the current association into the documents.
       #   loader.preload
       def preload
-        raise NotImplementedError
+        if @use_lookup
+          # For $lookup aggregation, execute pipeline and instantiate documents
+          binding.break
+          aggregated_docs = @associations.first.owner_class.collection.aggregate(@pipeline)
+          aggregated_docs.each do |doc|
+            @loaded << @associations.first.owner_class.instantiate(doc)
+          end
+        else
+          raise NotImplementedError
+        end
       end
 
       # Retrieves the documents referenced by the association, and
@@ -73,18 +89,6 @@ module Mongoid
         criteria
       end
 
-      # Converts an inclusion into a $lookup aggregation stage.
-      private def inc_to_pipeline_stage(inc)
-        {
-          "$lookup": {
-            from: inc.inverse_class.collection_name,
-            localField: inc.foreign_key,
-            foreignField: "_id",
-            as: inc.name
-          }
-        }
-      end
-
       # Retrieves the documents of the specified class, that have the
       # foreign key included in the specified list of keys.
       #
@@ -105,18 +109,16 @@ module Mongoid
       # Retrieves the documents of the specified class, that have the
       # foreign key included in the specified list of keys, using a
       # $lookup aggregation stage to perform the eager load.
-      private def each_loaded_document_of_class_with_lookup(cls, keys)
+      private def each_loaded_document_of_class_with_lookup(cls, pipeline)
         # Note: keys should not include nil elements.
         # Upstream code is responsible for eliminating nils from keys.
         return cls.none if keys.empty?
 
-        criteria = prepare_criteria_for_loaded_documents(cls, keys)
-        pipeline = criteria.selector.to_pipeline
-        criteria.inclusions.each do |inc|
-          pipeline << inc_to_pipeline_stage(inc)
-        end
+        criteria = cls.criteria
+        puts criteria
         aggregated_docs = cls.collection.aggregate(pipeline)
         aggregated_docs.each do |doc|
+          @loaded << cls.instantiate(doc)
           yield cls.instantiate(doc)
         end
       end

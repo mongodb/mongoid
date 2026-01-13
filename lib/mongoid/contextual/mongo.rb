@@ -853,6 +853,7 @@ module Mongoid
           end
         else
           return view unless eager_loadable?
+          return eager_load_with_lookup if criteria.use_lookup?
           docs = view.map do |doc|
             Factory.from_db(klass, doc, criteria)
           end
