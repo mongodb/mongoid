@@ -65,7 +65,7 @@ module Mongoid
                 ds = assoc.parent_inclusions.map{ |p| docs_map[p].to_a }.flatten
               end
 
-              res = assoc.relation.eager_loader([assoc], ds, false).run
+              res = assoc.relation.eager_loader([assoc], ds).run
 
               docs_map[assoc.name] ||= [].to_set
               docs_map[assoc.name].merge(res)
