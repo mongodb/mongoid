@@ -660,6 +660,7 @@ buildvariants:
     mongodb-version: ['7.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -671,6 +672,7 @@ buildvariants:
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -682,6 +684,7 @@ buildvariants:
     mongodb-version: ['6.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -693,6 +696,7 @@ buildvariants:
     mongodb-version: ['5.0']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -704,6 +708,7 @@ buildvariants:
     mongodb-version: '7.0'
     os: ubuntu-22.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -715,6 +720,7 @@ buildvariants:
     mongodb-version: ['4.4']
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -726,6 +732,7 @@ buildvariants:
     topology: ['replica_set', 'sharded_cluster']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
      - name: "test"
 
@@ -770,9 +777,9 @@ buildvariants:
     topology: "server"
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tags: ["pr"]
   tasks:
     - name: "test"
-
 
 - matrix_name: "rails-master"
   matrix_spec:
@@ -797,6 +804,7 @@ buildvariants:
     os: ubuntu-22.04
     fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -810,6 +818,7 @@ buildvariants:
     os: ubuntu-22.04
     fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -822,6 +831,7 @@ buildvariants:
     rails: ['6.0', '6.1']
     os: ubuntu-22.04
   display_name: "${rails}, ${driver}, ${mongodb-version}"
+  tags: ["pr"]
   tasks:
      - name: "test"
 
@@ -847,6 +857,7 @@ buildvariants:
     rails: ['8.0']
     os: ubuntu-22.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -860,6 +871,7 @@ buildvariants:
     rails: ['7.0', '7.1', '7.2']
     os: ubuntu-22.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
@@ -873,6 +885,7 @@ buildvariants:
     rails: ['6.0', '6.1']
     os: ubuntu-20.04
   display_name: "app tests ${driver}, ${ruby}, ${rails}"
+  tags: ["pr"]
   tasks:
      - name: "test"
 
@@ -900,6 +913,7 @@ buildvariants:
     rails: ['7.0']
     fle: helper
   display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
+  tags: ["pr"]
   tasks:
     - name: "test"
 
