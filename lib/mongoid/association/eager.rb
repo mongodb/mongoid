@@ -56,7 +56,6 @@ module Mongoid
       def preload
         if @use_lookup
           # For $lookup aggregation, execute pipeline and instantiate documents
-          binding.break
           aggregated_docs = @associations.first.owner_class.collection.aggregate(@pipeline)
           aggregated_docs.each do |doc|
             @loaded << @associations.first.owner_class.instantiate(doc)

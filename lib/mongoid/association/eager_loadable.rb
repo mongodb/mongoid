@@ -89,7 +89,6 @@ module Mongoid
       # @param [ Array<Mongoid::Document> ] docs The documents.
       # @param [ true | false ] use_lookup Whether to use $lookup for eager loading.
       def preload_for_lookup(criteria)
-        # binding.break
         # pp criteria.inclusions
         assoc_map = criteria.inclusions.group_by(&:inverse_class_name)
         children_to_parents = {}
