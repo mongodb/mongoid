@@ -23,6 +23,22 @@ module Mongoid
           # @return [ Document ] A single document.
           def build(base, object, type = nil, selected_fields = nil)
             return object unless query?(object)
+            
+            # Handle array from $lookup aggregation (returns array even for belongs_to)
+            if object.is_a?(Array)
+              if object.all? { |o| o.is_a?(Hash) }
+                doc = object.first
+                return doc ? Factory.execute_from_db(klass, doc, nil, selected_fields, execute_callbacks: false) : nil
+              elsif object.all? { |o| o.is_a?(Mongoid::Document) }
+                return object.first
+              end
+            end
+            
+            # Handle single hash from $lookup with $unwind
+            if object.is_a?(Hash)
+              return Factory.execute_from_db(klass, object, nil, selected_fields, execute_callbacks: false)
+            end
+
             execute_query(object, type)
           end
 

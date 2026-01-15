@@ -900,8 +900,14 @@ describe Mongoid::Criteria::Includable do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -934,8 +940,14 @@ describe Mongoid::Criteria::Includable do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -965,8 +977,14 @@ describe Mongoid::Criteria::Includable do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -1003,8 +1021,14 @@ describe Mongoid::Criteria::Includable do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:preload).twice.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:preload).twice.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:preload_for_lookup).twice.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -1026,8 +1050,14 @@ describe Mongoid::Criteria::Includable do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ game_one ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ game_one ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -1066,8 +1096,14 @@ describe Mongoid::Criteria::Includable do
         criteria.context
       end
 
-      before do
-        expect(context).to receive(:preload).twice.and_call_original
+      if method_name == :includes
+        before do
+          expect(context).to receive(:preload).twice.and_call_original
+        end
+      else
+        before do
+          expect(context).to receive(:preload_for_lookup).twice.and_call_original
+        end
       end
 
       let!(:documents) do

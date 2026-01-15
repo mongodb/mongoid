@@ -78,6 +78,21 @@ module Mongoid
           pipeline
         end
 
+        # Convert the options to aggregation pipeline friendly options.
+        # This version places sort last to comply with $lookup requirements.
+        #
+        # @example Convert the options to a pipeline.
+        #   options.to_pipeline_for_lookup
+        #
+        # @return [ Array<Hash> ] The options in pipeline form.
+        def to_pipeline_for_lookup
+          pipeline = []
+          pipeline.push({ "$sort" => sort }) if sort
+          pipeline.push({ "$skip" => skip }) if skip
+          pipeline.push({ "$limit" => limit }) if limit
+          pipeline
+        end
+
         # Perform a deep copy of the options.
         #
         # @example Perform a deep copy.
