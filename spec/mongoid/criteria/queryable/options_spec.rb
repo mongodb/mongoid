@@ -360,4 +360,95 @@ describe Mongoid::Criteria::Queryable::Options do
       end
     end
   end
+
+  describe "#to_pipeline_for_lookup" do
+
+    let(:options) do
+      described_class.new
+    end
+
+    context "when no options exist" do
+
+      let(:pipeline) do
+        options.to_pipeline_for_lookup
+      end
+
+      it "returns an empty array" do
+        expect(pipeline).to be_empty
+      end
+    end
+
+    context "when multiple options exist" do
+
+      before do
+        options[:fields] = { "name" => 1 }
+        options[:skip] = 10
+        options[:limit] = 10
+        options[:sort] = { "name" => 1 }
+      end
+
+      let(:pipeline) do
+        options.to_pipeline_for_lookup
+      end
+
+      it "returns stages in correct order for $lookup" do
+        expect(pipeline).to eq([
+          { "$sort" => { "name" => 1 }},
+          { "$skip" => 10 },
+          { "$limit" => 10 }
+        ])
+      end
+    end
+
+    context "when a sort exists" do
+
+      before do
+        options[:sort] = { "name" => 1 }
+      end
+
+      let(:pipeline) do
+        options.to_pipeline_for_lookup
+      end
+
+      it "converts the option to a $sort" do
+        expect(pipeline).to eq([
+          { "$sort" => { "name" => 1 }}
+        ])
+      end
+    end
+
+    context "when a limit exists" do
+
+      before do
+        options[:limit] = 10
+      end
+
+      let(:pipeline) do
+        options.to_pipeline_for_lookup
+      end
+
+      it "converts the option to a $limit" do
+        expect(pipeline).to eq([
+          { "$limit" => 10 }
+        ])
+      end
+    end
+
+    context "when a skip exists" do
+
+      before do
+        options[:skip] = 10
+      end
+
+      let(:pipeline) do
+        options.to_pipeline_for_lookup
+      end
+
+      it "converts the option to a $skip" do
+        expect(pipeline).to eq([
+          { "$skip" => 10 }
+        ])
+      end
+    end
+  end
 end

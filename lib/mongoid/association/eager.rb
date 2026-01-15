@@ -61,7 +61,6 @@ module Mongoid
       def preload
         if @use_lookup
           # For $lookup aggregation, execute pipeline and instantiate documents
-          # need to fix pipeline... currently it is not being built correctly
           aggregated_docs = @associations.first.owner_class.collection.aggregate(@pipeline)
           aggregated_docs.each do |doc|
             parsed_doc = @associations.first.owner_class.instantiate(doc)
