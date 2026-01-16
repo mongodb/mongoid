@@ -350,5 +350,27 @@ describe Mongoid::Association::EagerLoadable do
         expect(context.eager_loadable?).to be false
       end
     end
+
+    context "when criteria has multiple eager_load fields" do
+
+      let(:criteria) do
+        Post.eager_load(:person, :roles)
+      end
+
+      it "is eager_loadable" do
+        expect(context.eager_loadable?).to be true
+      end
+    end
+
+    context "when criteria has no eager_load fields" do
+
+      let(:criteria) do
+        Post.all
+      end
+
+      it "is not eager_loadable" do
+        expect(context.eager_loadable?).to be false
+      end
+    end
   end
 end
