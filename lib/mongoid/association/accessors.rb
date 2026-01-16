@@ -132,7 +132,7 @@ module Mongoid
               if object && needs_no_database_query?(object, association)
                 __build__(name, object, association)
               # Check if data was loaded via $lookup aggregation
-              elsif !association.embedded? && attributes.key?(name.to_s)
+              elsif !association.embedded? && attributes.key?(name.to_s).present?
                 # Use the pre-loaded association data from $lookup
                 __build__(name, attributes[name.to_s], association)
               else

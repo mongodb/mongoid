@@ -31,6 +31,8 @@ module Mongoid
                 return doc ? Factory.execute_from_db(klass, doc, nil, selected_fields, execute_callbacks: false) : nil
               elsif object.all? { |o| o.is_a?(Mongoid::Document) }
                 return object.first
+              else
+                raise ArgumentError, "Cannot build belongs_to association from array of mixed or non-Hash types"
               end
             end
             
