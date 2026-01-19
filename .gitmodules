@@ -1,6 +1,3 @@
-[submodule "test-apps"]
-	path = test-apps
-	url = https://github.com/mongoid/mongoid-test-apps
 [submodule "spec/shared"]
 	path = spec/shared
 	url = https://github.com/mongodb-labs/mongo-ruby-spec-shared

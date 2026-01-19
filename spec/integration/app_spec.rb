@@ -33,37 +33,30 @@ describe 'Mongoid application tests' do
     FileUtils.mkdir_p(TMP_BASE)
   end
 
-  context 'demo application' do
+  context 'generated application' do
     context 'sinatra' do
       it 'runs' do
-        skip 'https://jira.mongodb.org/browse/MONGOID-5826'
-
-        clone_application(
-          'https://github.com/mongoid/mongoid-demo',
-          subdir: 'sinatra-minimal',
-        ) do
-
+        create_sinatra_app('mongoid-sinatra-test') do
           # JRuby needs a long timeout
           start_app(%w(bundle exec ruby app.rb), 4567, 40) do |port|
             uri = URI.parse('http://localhost:4567/posts')
             resp = JSON.parse(uri.open.read)
 
             resp.should == []
-
           end
         end
       end
     end
 
     context 'rails-api' do
+      before(:all) do
+        if SpecConfig.instance.rails_version < '7.1'
+          skip '`rails new` with rails < 7.1 fails because modern concurrent-ruby removed logger dependency'
+        end
+      end
+
       it 'runs' do
-        skip 'https://jira.mongodb.org/browse/MONGOID-5826'
-
-        clone_application(
-          'https://github.com/mongoid/mongoid-demo',
-          subdir: 'rails-api',
-        ) do
-
+        create_rails_api_app('mongoid-rails-api-test') do
           # JRuby needs a long timeout
           start_app(%w(bundle exec rails s), 3000, 50) do |port|
             uri = URI.parse('http://localhost:3000/posts')
@@ -118,6 +111,141 @@ describe 'Mongoid application tests' do
         check_call(%w(bundle install), env: clean_env)
 
         yield
+      end
+    end
+  end
+
+  def create_sinatra_app(name)
+    Dir.chdir(TMP_BASE) do
+      FileUtils.rm_rf(name)
+      FileUtils.mkdir_p(name)
+
+      Dir.chdir(name) do
+        # Create minimal Sinatra app with Post model
+        File.open('app.rb', 'w') do |f|
+          f.write(<<~RUBY)
+            require 'sinatra'
+            require 'mongoid'
+            require 'json'
+
+            Mongoid.load!('config/mongoid.yml')
+
+            class Post
+              include Mongoid::Document
+              field :title, type: String
+            end
+
+            get '/posts' do
+              content_type :json
+              Post.all.to_json
+            end
+          RUBY
+        end
+
+        # Create Gemfile
+        File.open('Gemfile', 'w') do |f|
+          f.write(<<~RUBY)
+            source 'https://rubygems.org'
+            gem 'sinatra'
+            gem 'rackup'
+            gem 'mongoid', path: '#{File.expand_path(BASE)}'
+            gem 'puma'
+          RUBY
+        end
+
+        FileUtils.mkdir_p('config')
+        write_mongoid_yml
+        check_call(%w(bundle install), env: clean_env)
+
+        yield
+      end
+    end
+  end
+
+  def create_rails_api_app(name)
+    install_rails
+
+    Dir.chdir(TMP_BASE) do
+      FileUtils.rm_rf(name)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: clean_env)
+
+      Dir.chdir(name) do
+        adjust_rails_defaults
+        adjust_app_gemfile
+
+        # Create Post model
+        File.open('app/models/post.rb', 'w') do |f|
+          f.write(<<~RUBY)
+            class Post
+              include Mongoid::Document
+              field :title, type: String
+            end
+          RUBY
+        end
+
+        # Create PostsController
+        File.open('app/controllers/posts_controller.rb', 'w') do |f|
+          f.write(<<~RUBY)
+            class PostsController < ApplicationController
+              def index
+                render json: Post.all
+              end
+            end
+          RUBY
+        end
+
+        # Add route
+        routes_content = File.read('config/routes.rb')
+        routes_content.sub!(/Rails\.application\.routes\.draw do\n/,
+                           "Rails.application.routes.draw do\n  resources :posts, only: [:index]\n")
+        File.open('config/routes.rb', 'w') { |f| f.write(routes_content) }
+
+        write_mongoid_yml
+        check_call(%w(bundle install), env: clean_env)
+
+        yield
+      end
+    end
+  end
+
+  def create_rails_rake_test_app(name)
+    install_rails
+
+    Dir.chdir(TMP_BASE) do
+      FileUtils.rm_rf(name)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: clean_env)
+
+      Dir.chdir(name) do
+        adjust_rails_defaults
+        adjust_app_gemfile
+
+        # Create Post model with index
+        File.open('app/models/post.rb', 'w') do |f|
+          f.write(<<~RUBY)
+            class Post
+              include Mongoid::Document
+              include Mongoid::Timestamps
+              field :subject, type: String
+              field :message, type: String
+
+              index subject: 1
+            end
+          RUBY
+        end
+
+        # Create Comment model
+        File.open('app/models/comment.rb', 'w') do |f|
+          f.write(<<~RUBY)
+            class Comment
+              include Mongoid::Document
+              include Mongoid::Timestamps
+              belongs_to :post
+            end
+          RUBY
+        end
+
+        write_mongoid_yml
+        check_call(%w(bundle install), env: clean_env)
       end
     end
   end
@@ -186,12 +314,17 @@ describe 'Mongoid application tests' do
     end
   end
 
-  context 'local test applications' do
+  context 'generated test applications' do
+    before(:all) do
+      # Rails < 7.1 is incompatible with Ruby 4.0+
+      if RUBY_VERSION >= '4.0' && SpecConfig.instance.rails_version < '7.1'
+        skip 'Rails < 7.1 is incompatible with Ruby 4.0+. Set RAILS=7.1 or higher.'
+      end
+    end
+
     let(:client) { Mongoid.default_client }
 
     describe 'create_indexes rake task' do
-
-      APP_PATH = File.join(File.dirname(__FILE__), '../../test-apps/rails-api')
 
       %w(development production).each do |rails_env|
         context "in #{rails_env}" do
@@ -203,20 +336,11 @@ describe 'Mongoid application tests' do
                 clean_env.merge(RAILS_ENV: rails_env, AUTOLOADER: autoloader)
               end
 
+              let(:app_name) { "mongoid-rake-test-#{rails_env}-#{autoloader}" }
+              let(:app_path) { File.join(TMP_BASE, app_name) }
+
               before do
-                Dir.chdir(APP_PATH) do
-                  remove_bundler_req
-
-                  if BSON::Environment.jruby?
-                    # Remove existing Gemfile.lock - see
-                    # https://github.com/rubygems/rubygems/issues/3231
-                    require 'fileutils'
-                    FileUtils.rm_f('Gemfile.lock')
-                  end
-
-                  check_call(%w(bundle install), env: env)
-                  write_mongoid_yml
-                end
+                create_rails_rake_test_app(app_name)
 
                 client['posts'].drop
                 client['posts'].create
@@ -229,7 +353,7 @@ describe 'Mongoid application tests' do
                 index.should be nil
 
                 check_call(%w(bundle exec rake db:mongoid:create_indexes -t),
-                  cwd: APP_PATH, env: env)
+                  cwd: app_path, env: env)
 
                 index = client['posts'].indexes.detect do |index|
                   index['key'] == {'subject' => 1}
