@@ -50,8 +50,12 @@ describe 'Mongoid application tests' do
 
     context 'rails-api' do
       before(:all) do
-        if SpecConfig.instance.rails_version < '7.1'
-          skip '`rails new` with rails < 7.1 fails because modern concurrent-ruby removed logger dependency'
+        # Rails 6.0/6.1 have Logger issues on Ruby 3.1+
+        # Rails < 7.1 have concurrent-ruby issues on Ruby 4.0+
+        if RUBY_VERSION >= '4.0' && SpecConfig.instance.rails_version < '7.1'
+          skip 'Rails < 7.1 is not compatible with Ruby 4.0+. Set RAILS=7.1 or higher.'
+        elsif RUBY_VERSION >= '3.1' && SpecConfig.instance.rails_version < '6.1'
+          skip 'Rails < 6.1 is not compatible with Ruby 3.1+. Set RAILS=6.1 or higher.'
         end
       end
 
@@ -252,8 +256,12 @@ describe 'Mongoid application tests' do
 
   context 'new application - rails' do
     before(:all) do
-      if SpecConfig.instance.rails_version < '7.1'
-        skip '`rails new` with rails < 7.1 fails because modern concurrent-ruby removed logger dependency'
+      # Rails 6.0/6.1 have Logger issues on Ruby 3.1+
+      # Rails < 7.1 have concurrent-ruby issues on Ruby 4.0+
+      if RUBY_VERSION >= '4.0' && SpecConfig.instance.rails_version < '7.1'
+        skip 'Rails < 7.1 is not compatible with Ruby 4.0+. Set RAILS=7.1 or higher.'
+      elsif RUBY_VERSION >= '3.1' && SpecConfig.instance.rails_version < '6.1'
+        skip 'Rails < 6.1 is not compatible with Ruby 3.1+. Set RAILS=6.1 or higher.'
       end
     end
 
@@ -310,15 +318,24 @@ describe 'Mongoid application tests' do
     if (rails_version = SpecConfig.instance.rails_version) == 'master'
     else
       check_call(%w(gem list))
+
+      # Rails 6.0 and 6.1 need logger gem on Ruby 2.7+ due to stdlib changes
+      if rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
+        check_call(%w(gem install logger --no-document))
+      end
+
       check_call(%w(gem install rails --no-document --force -v) + ["~> #{rails_version}.0"])
     end
   end
 
   context 'generated test applications' do
     before(:all) do
-      # Rails < 7.1 is incompatible with Ruby 4.0+
+      # Rails 6.0/6.1 have Logger issues on Ruby 3.1+
+      # Rails < 7.1 have concurrent-ruby issues on Ruby 4.0+
       if RUBY_VERSION >= '4.0' && SpecConfig.instance.rails_version < '7.1'
-        skip 'Rails < 7.1 is incompatible with Ruby 4.0+. Set RAILS=7.1 or higher.'
+        skip 'Rails < 7.1 is not compatible with Ruby 4.0+. Set RAILS=7.1 or higher.'
+      elsif RUBY_VERSION >= '3.1' && SpecConfig.instance.rails_version < '6.1'
+        skip 'Rails < 6.1 is not compatible with Ruby 3.1+. Set RAILS=6.1 or higher.'
       end
     end
 

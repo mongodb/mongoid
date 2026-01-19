@@ -75,8 +75,8 @@ buildvariants:
     jruby: <%= jrubies %>
     driver: ["current"]
     topology: ['replica_set', 'sharded_cluster']
-    mongodb-version: '7.0'
-    os: ubuntu-22.04
+    mongodb-version: '8.0'
+    os: ubuntu-24.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   tags: ["pr"]
   tasks:
