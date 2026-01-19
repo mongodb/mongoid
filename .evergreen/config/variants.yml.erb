@@ -256,20 +256,6 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: app-tests-rails-6
-  matrix_spec:
-    ruby: ["ruby-2.7"]
-    driver: ["current"]
-    mongodb-version: '5.0'
-    topology: server
-    app-tests: yes
-    rails: ['6.0', '6.1']
-    os: ubuntu-20.04
-  display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  tags: ["pr"]
-  tasks:
-     - name: "test"
-
 # https://github.com/rails/rails/issues/49737
 #- matrix_name: app-tests-jruby-9-4
 #  matrix_spec:
