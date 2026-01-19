@@ -107,7 +107,7 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(insert_rails_gem_version(%W(rails new #{name} --skip-spring --skip-active-record)), env: clean_env)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --skip-spring --skip-active-record)), env: rails_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
@@ -171,7 +171,7 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: clean_env)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: rails_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
@@ -217,7 +217,7 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: clean_env)
+      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: rails_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
@@ -454,6 +454,12 @@ describe 'Mongoid application tests' do
       line =~ /mongoid/
     end
     gemfile_lines << "gem 'mongoid', path: '#{File.expand_path(BASE)}'\n"
+
+    # Rails 6.0 and 6.1 need logger gem on Ruby 2.7+ due to stdlib changes
+    if rails_version && rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
+      gemfile_lines << "gem 'logger'\n"
+    end
+
     if rails_version
       gemfile_lines.delete_if do |line|
         line =~ /gem ['"]rails['"]/
@@ -511,6 +517,17 @@ describe 'Mongoid application tests' do
 
   def clean_env
     @clean_env ||= Hash[ENV.keys.grep(/BUNDLE|RUBYOPT/).map { |k| [k, nil ] }]
+  end
+
+  def rails_env
+    # For Rails 6.0/6.1 on Ruby 2.7+, we need to require logger
+    # to fix "uninitialized constant ActiveSupport::LoggerThreadSafeLevel::Logger"
+    env = clean_env.dup
+    rails_version = SpecConfig.instance.rails_version
+    if rails_version && rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
+      env['RUBYOPT'] = '-rlogger'
+    end
+    env
   end
 
   def wait_for_port(port, timeout, process)
