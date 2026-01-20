@@ -1,7 +1,19 @@
+<%
+  latest_ruby = "ruby-4.0".inspect
+  recent_rubies = %w( ruby-4.0 ruby-3.4 ruby-3.3 )
+  recent_mri_rubies = %w( ruby-4.0 ruby-3.4 ruby-3.3 )
+  jrubies = %w( jruby-10.0 jruby-9.4 )
+  supported_mri_rubies_3 = %w( ruby-4.0 ruby-3.4 ruby-3.3 ruby-3.2 ruby-3.1 ruby-3.0 )
+  supported_mri_ruby_2 = "ruby-2.7".inspect
+  supported_rubies = (supported_mri_rubies_3 + [supported_mri_ruby_2] + jrubies)
+
+  latest_stable_mdb = "8.2".inspect
+  recent_mdbs = %w( 8.2 8.0 7.0 )
+%>
 buildvariants:
 - matrix_name: "mongodb-latest"
   matrix_spec:
-    ruby: ["ruby-3.3"]
+    ruby: [ "ruby-3.3" ]
     driver: ["current"]
     topology: '*'
     mongodb-version: ['latest']
@@ -10,24 +22,24 @@ buildvariants:
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-3.2 + db-7.0"
+- matrix_name: recent_mdbs
   matrix_spec:
-    ruby: ["ruby-3.2"]
+    ruby: <%= recent_rubies %>
     driver: ["current"]
-    topology: ['server', 'replica_set', 'sharded_cluster']
-    mongodb-version: ['7.0']
+    topology: '*'
+    mongodb-version: <%= recent_mdbs %>
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tags: ["pr"]
   tasks:
     - name: "test"
 
-- matrix_name: "ruby-3.2 + db-6.0"
+- matrix_name: "ruby-3.2"
   matrix_spec:
     ruby: ["ruby-3.2"]
     driver: ["current"]
     topology: ['server', 'replica_set', 'sharded_cluster']
-    mongodb-version: ['6.0']
+    mongodb-version: ['7.0']
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tags: ["pr"]
@@ -60,11 +72,11 @@ buildvariants:
 
 - matrix_name: "jruby"
   matrix_spec:
-    jruby: ["jruby-9.4"]
+    jruby: <%= jrubies %>
     driver: ["current"]
     topology: ['replica_set', 'sharded_cluster']
-    mongodb-version: '7.0'
-    os: ubuntu-22.04
+    mongodb-version: '8.0'
+    os: ubuntu-24.04
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   tags: ["pr"]
   tasks:
@@ -82,13 +94,24 @@ buildvariants:
   tasks:
     - name: "test"
 
+- matrix_name: "ruby-dev"
+  matrix_spec:
+    ruby: ["ruby-dev"]
+    driver: ["current"]
+    topology: [ 'replica_set' ]
+    mongodb-version: <%= latest_stable_mdb %>
+    os: ubuntu-24.04
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  tasks:
+    - name: "test"
+
 - matrix_name: "driver-upcoming"
   matrix_spec:
     driver: [master, stable]
-    ruby: ["ruby-3.3"]
-    mongodb-version: "6.0"
+    ruby: ["ruby-4.0"]
+    mongodb-version: <%= latest_stable_mdb %>
     topology: ['replica_set', 'sharded_cluster']
-    os: ubuntu-22.04
+    os: ubuntu-24.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tags: ["pr"]
   tasks:
@@ -130,10 +153,10 @@ buildvariants:
 - matrix_name: "bson-master"
   matrix_spec:
     driver: [bson-master]
-    ruby: ["ruby-3.3"]
-    mongodb-version: "7.0"
+    ruby: ["ruby-4.0"]
+    mongodb-version: <%= latest_stable_mdb %>
     topology: "server"
-    os: ubuntu-22.04
+    os: ubuntu-24.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tags: ["pr"]
   tasks:
@@ -141,12 +164,12 @@ buildvariants:
 
 - matrix_name: "rails-master"
   matrix_spec:
-    ruby: ["ruby-3.2"]
+    ruby: ["ruby-4.0"]
     driver: ["current"]
-    mongodb-version: "7.0"
+    mongodb-version: <%= latest_stable_mdb %>
     topology: "server"
     rails: ['master']
-    os: ubuntu-22.04
+    os: ubuntu-24.04
     fle: helper
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
   tasks:
@@ -154,9 +177,9 @@ buildvariants:
 
 - matrix_name: "rails-8"
   matrix_spec:
-    ruby: ["ruby-3.3"]
+    ruby: ["ruby-3.4"]
     driver: ["current"]
-    mongodb-version: "7.0"
+    mongodb-version: "8.0"
     topology: "server"
     rails: ['8.0', '8.1']
     os: ubuntu-22.04
@@ -207,9 +230,9 @@ buildvariants:
 
 - matrix_name: app-tests-rails-8
   matrix_spec:
-    ruby: ["ruby-3.2", "ruby-3.3"]
+    ruby: ["ruby-4.0", "ruby-3.4"]
     driver: ["current"]
-    mongodb-version: '7.0'
+    mongodb-version: <%= latest_stable_mdb %>
     topology: server
     app-tests: yes
     rails: ['8.0']
@@ -221,9 +244,9 @@ buildvariants:
 
 - matrix_name: app-tests-rails-7
   matrix_spec:
-    ruby: ["ruby-3.2", "ruby-3.3"]
+    ruby: ["ruby-3.4", "ruby-3.3"]
     driver: ["current"]
-    mongodb-version: '7.0'
+    mongodb-version: '8.0'
     topology: server
     app-tests: yes
     rails: ['7.0', '7.1', '7.2']
@@ -232,20 +255,6 @@ buildvariants:
   tags: ["pr"]
   tasks:
     - name: "test"
-
-- matrix_name: app-tests-rails-6
-  matrix_spec:
-    ruby: ["ruby-2.7"]
-    driver: ["current"]
-    mongodb-version: '5.0'
-    topology: server
-    app-tests: yes
-    rails: ['6.0', '6.1']
-    os: ubuntu-20.04
-  display_name: "app tests ${driver}, ${ruby}, ${rails}"
-  tags: ["pr"]
-  tasks:
-     - name: "test"
 
 # https://github.com/rails/rails/issues/49737
 #- matrix_name: app-tests-jruby-9-4
@@ -263,11 +272,11 @@ buildvariants:
 
 - matrix_name: "auto-encryption"
   matrix_spec:
-    ruby: ruby-3.1
+    ruby: ruby-3.4
     driver: current
     topology: replica_set
-    mongodb-version: ['6.0']
-    os: ubuntu-22.04
+    mongodb-version: <%= latest_stable_mdb %>
+    os: ubuntu-24.04
     rails: ['7.0']
     fle: helper
   display_name: "FLE: ${rails}, ${driver}, ${mongodb-version}"
@@ -277,7 +286,7 @@ buildvariants:
 
 - matrix_name: atlas-full
   matrix_spec:
-    ruby: ruby-3.2
+    ruby: ruby-3.4
     os: ubuntu-22.04
     auth: auth
     ssl: yes

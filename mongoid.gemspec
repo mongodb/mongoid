@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
   s.add_dependency("activemodel", ['>=5.1', '< 8.2', '!= 7.0.0'])
   s.add_dependency("mongo", ['>=2.18.0', '<3.0.0'])
   s.add_dependency("concurrent-ruby", ['>= 1.0.5', '< 2.0'])
+  s.add_dependency("ostruct")
 
   s.add_development_dependency("bson", '>=4.14.0', '<6.0.0')
 
