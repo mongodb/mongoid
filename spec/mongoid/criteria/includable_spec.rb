@@ -1461,9 +1461,9 @@ describe Mongoid::Criteria::Includable do
     end
   end
 
-  # describe "#includes" do
-  #   it_behaves_like "eager loading", :includes
-  # end
+  describe "#includes" do
+    it_behaves_like "eager loading", :includes
+  end
 
   describe "#eager_load" do
     it_behaves_like "eager loading", :eager_load
