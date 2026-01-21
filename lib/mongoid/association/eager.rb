@@ -38,7 +38,7 @@ module Mongoid
         @loaded = []
 
         if @use_lookup
-          preload
+          preload_with_lookup
           @loaded = @docs
           return @loaded.flatten
         end
@@ -59,16 +59,21 @@ module Mongoid
       # @example Preload the current association into the documents.
       #   loader.preload
       def preload
-        if @use_lookup
-          # For $lookup aggregation, execute pipeline and instantiate documents
-          owner_class = @associations.first.owner_class
-          aggregated_docs = owner_class.collection.aggregate(@pipeline)
-          aggregated_docs.each do |doc|
-            parsed_doc = Factory.from_db(owner_class, doc)
-            @docs << parsed_doc
-          end
-        else
-          raise NotImplementedError
+        raise NotImplementedError
+      end
+
+      # Preload the current association using $lookup aggregation.
+      # This method executes the aggregation pipeline
+      # and instantiates the documents.
+      # @example Preload the current association using $lookup.
+      #   loader.preload_with_lookup
+      def preload_with_lookup
+        # For $lookup aggregation, execute pipeline and instantiate documents
+        owner_class = @associations.first.owner_class
+        aggregated_docs = owner_class.collection.aggregate(@pipeline)
+        aggregated_docs.each do |doc|
+          parsed_doc = Factory.from_db(owner_class, doc)
+          @docs << parsed_doc
         end
       end
 
