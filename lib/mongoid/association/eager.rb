@@ -86,19 +86,6 @@ module Mongoid
         each_loaded_document_of_class(@association.klass, keys_from_docs, &block)
       end
 
-      # Prepares the criteria to retrieve the documents of the specified
-      # class, that have the foreign key included in the specified list of keys.
-      # When the documents are retrieved, the set of inclusions applied
-      # is the set of inclusions applied to the host document minus the
-      # association that is being eagerly loaded.
-      private def prepare_criteria_for_loaded_documents(cls, keys)
-        criteria = cls.criteria
-        criteria = criteria.apply_scope(@association.scope)
-        criteria = criteria.any_in(key => keys)
-        criteria.inclusions = criteria.inclusions - [@association]
-        criteria
-      end
-
       # Retrieves the documents of the specified class, that have the
       # foreign key included in the specified list of keys.
       #
@@ -192,6 +179,19 @@ module Mongoid
       # @return [ Mongoid::Association::Relatable ] The association object.
       def shift_association
         @association = @associations.shift
+      end
+
+      # Prepares the criteria to retrieve the documents of the specified
+      # class, that have the foreign key included in the specified list of keys.
+      # When the documents are retrieved, the set of inclusions applied
+      # is the set of inclusions applied to the host document minus the
+      # association that is being eagerly loaded.
+      def prepare_criteria_for_loaded_documents(cls, keys)
+        criteria = cls.criteria
+        criteria = criteria.apply_scope(@association.scope)
+        criteria = criteria.any_in(key => keys)
+        criteria.inclusions = criteria.inclusions - [@association]
+        criteria
       end
     end
   end
