@@ -41,24 +41,57 @@ module Mongoid
     include Clients::Sessions
     include Options
 
+    # Allowed methods for from_hash to prevent arbitrary method execution.
+    # Only query-building methods are allowed, not execution or modification methods.
+    ALLOWED_FROM_HASH_METHODS = %i[
+      all all_in all_of and any_in any_of asc ascending
+      batch_size between
+      collation comment cursor_type
+      desc descending
+      elem_match eq exists extras
+      geo_spatial group gt gte
+      hint
+      in includes
+      limit lt lte
+      max_distance max_scan max_time_ms merge mod
+      ne near near_sphere nin no_timeout none none_of nor not not_in
+      offset only or order order_by
+      project
+      raw read reorder
+      scoped skip slice snapshot
+      text_search type
+      unscoped unwind
+      where with_size with_type without
+    ].freeze
+
     class << self
       # Convert the given hash to a criteria. Will iterate over each keys in the
-      # hash which must correspond to method on a criteria object. The hash
-      # must also include a "klass" key.
+      # hash which must correspond to an allowed method on a criteria object. The hash
+      # can include a "klass" key that specifies the model class for the criteria.
       #
       # @example Convert the hash to a criteria.
       #   Criteria.from_hash({ klass: Band, where: { name: "Depeche Mode" })
       #
+      # @deprecated This method is deprecated and will
+      #  be removed in a future release.
+      #
       # @param [ Hash ] hash The hash to convert.
       #
       # @return [ Criteria ] The criteria.
+      #
+      # @raise [ ArgumentError ] If a method is not allowed in from_hash.
       def from_hash(hash)
         criteria = Criteria.new(hash.delete(:klass) || hash.delete('klass'))
         hash.each_pair do |method, args|
-          criteria = criteria.__send__(method, args)
+          method_sym = method.to_sym
+          unless ALLOWED_FROM_HASH_METHODS.include?(method_sym)
+            raise ArgumentError, "Method '#{method}' is not allowed in from_hash"
+          end
+          criteria = criteria.public_send(method_sym, args)
         end
         criteria
       end
+      Mongoid.deprecate(self, :from_hash)
     end
 
     # Static array used to check with method missing - we only need to ever
@@ -246,7 +279,8 @@ module Mongoid
     #   criteria.merge(other_criteria)
     #
     # @example Merge the criteria with a hash. The hash must contain a klass
-    #   key and the key/value pairs correspond to method names/args.
+    #   key that specifies the model class for the criteria and the key/value
+    #   pairs correspond to method names/args.
     #
     #   criteria.merge({
     #     klass: Band,
@@ -254,7 +288,7 @@ module Mongoid
     #     order_by: { name: 1 }
     #   })
     #
-    # @param [ Criteria ] other The other criterion to merge with.
+    # @param [ Criteria | Hash ] other The other criterion to merge with.
     #
     # @return [ Criteria ] A cloned self.
     def merge(other)
