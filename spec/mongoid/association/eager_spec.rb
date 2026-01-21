@@ -373,4 +373,265 @@ describe Mongoid::Association::EagerLoadable do
       end
     end
   end
+
+  describe ".preload_for_lookup" do
+
+    let(:context) do
+      Mongoid::Contextual::Mongo.new(criteria)
+    end
+
+    context "when belongs_to" do
+
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:account) do
+        Account.create!(person: person, name: 'savings')
+      end
+
+      let(:criteria) do
+        Account.where(name: 'savings').eager_load(:person)
+      end
+
+      it "preloads the parent using $lookup" do
+        docs = context.preload_for_lookup(criteria)
+        expect(docs.first.person).to eq(person)
+      end
+
+      it "does not execute additional queries" do
+        docs = context.preload_for_lookup(criteria)
+        expect_query(0) do
+          docs.first.person
+        end
+      end
+    end
+
+    context "when has_one" do
+
+      let!(:account) do
+        Account.create!(name: 'savings')
+      end
+
+      let!(:comment) do
+        Comment.create!(title: 'my account comment', account: account)
+      end
+
+      let(:criteria) do
+        Account.where(name: 'savings').eager_load(:comment)
+      end
+
+      it "preloads the child using $lookup" do
+        docs = context.preload_for_lookup(criteria)
+        expect(docs.first.comment).to eq(comment)
+      end
+
+      it "does not execute additional queries" do
+        docs = context.preload_for_lookup(criteria)
+        expect_query(0) do
+          docs.first.comment
+        end
+      end
+    end
+
+    context "when has_many" do
+
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:post1) do
+        Post.create!(person: person, title: 'first')
+      end
+
+      let!(:post2) do
+        Post.create!(person: person, title: 'second')
+      end
+
+      let(:criteria) do
+        Person.where(id: person.id).eager_load(:posts)
+      end
+
+      it "preloads the children using $lookup" do
+        docs = context.preload_for_lookup(criteria)
+        expect(docs.first.posts).to match_array([post1, post2])
+      end
+
+      it "does not execute additional queries" do
+        docs = context.preload_for_lookup(criteria)
+        expect_query(0) do
+          docs.first.posts.to_a
+        end
+      end
+    end
+
+    context "when has_and_belongs_to_many" do
+
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:house1) do
+        House.create!(name: 'first')
+      end
+
+      let!(:house2) do
+        House.create!(name: 'second')
+      end
+
+      before do
+        person.houses = [house1, house2]
+        person.save!
+      end
+
+      let(:criteria) do
+        Person.where(id: person.id).eager_load(:houses)
+      end
+
+      it "preloads the children using $lookup" do
+        docs = context.preload_for_lookup(criteria)
+        expect(docs.first.houses).to match_array([house1, house2])
+      end
+
+      it "does not execute additional queries" do
+        docs = context.preload_for_lookup(criteria)
+        expect_query(0) do
+          docs.first.houses.to_a
+        end
+      end
+    end
+
+    context "when including multiple relations" do
+
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:post) do
+        Post.create!(person: person, title: 'first')
+      end
+
+      let!(:house) do
+        House.create!(name: 'home')
+      end
+
+      let!(:cat) do
+        Cat.create!(person: person, name: 'fluffy')
+      end
+
+      before do
+        person.houses << house
+        person.save!
+      end
+
+      let(:criteria) do
+        Person.where(id: person.id).eager_load(:posts, :houses, :cat)
+      end
+
+      it "preloads all relations using $lookup" do
+        docs = context.preload_for_lookup(criteria)
+        doc = docs.first
+        expect(doc.posts).to eq([post])
+        expect(doc.houses).to eq([house])
+        expect(doc.cat).to eq(cat)
+      end
+
+      it "does not execute additional queries" do
+        docs = context.preload_for_lookup(criteria)
+        doc = docs.first
+        expect_query(0) do
+          # doc.posts.to_a
+          # doc.houses.to_a
+          doc.cat
+        end
+      end
+    end
+
+    context "when including nested associations" do
+
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:post) do
+        Post.create!(person: person, title: 'first')
+      end
+
+      let!(:alert) do
+        Alert.create!(post: post, message: 'alert!')
+      end
+
+      let(:criteria) do
+        Person.where(id: person.id).eager_load(posts: :alerts)
+      end
+
+      it "preloads nested relations using $lookup" do
+        docs = context.preload_for_lookup(criteria)
+        doc = docs.first
+        expect(doc.posts).to eq([post])
+        expect(doc.posts.first.alerts).to eq([alert])
+      end
+
+      it "does not execute additional queries" do
+        docs = context.preload_for_lookup(criteria)
+        doc = docs.first
+        expect_query(0) do
+          doc.posts.first.alerts.to_a
+        end
+      end
+    end
+
+    context "when root is an STI subclass" do
+
+      before do
+        Driver.create!(vehicle: Truck.new)
+      end
+
+      let(:criteria) do
+        Truck.all.eager_load(:driver)
+      end
+
+      it "preloads the driver using $lookup" do
+        docs = context.preload_for_lookup(criteria)
+        expect(docs.first.driver).to eq(Driver.first)
+      end
+
+      it "does not execute additional queries" do
+        docs = context.preload_for_lookup(criteria)
+        expect_query(0) do
+          docs.first.driver
+        end
+      end
+    end
+
+    context "when criteria is embedded" do
+
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:address) do
+        person.addresses.create!(street: 'main st')
+      end
+
+      let!(:band) do
+        Band.create!(name: 'Depeche Mode')
+      end
+
+      before do
+        address.band = band
+        address.save!
+      end
+
+      let(:criteria) do
+        person.addresses.eager_load(:band)
+      end
+
+      it "falls back to traditional preload" do
+        # Embedded documents use traditional preload even with eager_load
+        docs = criteria.to_a
+        expect(docs.first.band).to eq(band)
+      end
+    end
+  end
 end

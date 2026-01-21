@@ -132,7 +132,7 @@ module Mongoid
               if object && needs_no_database_query?(object, association)
                 __build__(name, object, association)
               # Check if data was loaded via $lookup aggregation
-              elsif !association.embedded? && attributes.key?(name.to_s).present?
+              elsif !association.embedded? && attributes.key?(name.to_s)
                 # Use the pre-loaded association data from $lookup
                 __build__(name, attributes[name.to_s], association)
               else
@@ -309,6 +309,7 @@ module Mongoid
           klass.re_define_method(name) do |reload = false|
             value = get_relation(name, association, nil, reload)
             if value.nil? && association.autobuilding? && !without_autobuild?
+              binding.break
               value = send("build_#{name}")
             end
             value

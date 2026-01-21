@@ -109,7 +109,7 @@ module Mongoid
         Eager.new(criteria.inclusions, [], true, pipeline).run
       end
 
-      def create_pipeline(current_assoc, mapping, embedded_path = nil, prefix = nil)
+      def create_pipeline(current_assoc, mapping)
         # Build nested pipeline for children and ordering
         pipeline_stages = []
 
@@ -122,20 +122,14 @@ module Mongoid
           local_field = current_assoc.primary_key
           foreign_field = current_assoc.foreign_key
         end
-
-        full_prefix = [embedded_path, prefix].compact.join(".")
         
         # Build the 'as' field with embedded path prefix if needed
-        as_field = if !full_prefix.blank?
-          "#{full_prefix}.#{current_assoc.name}"
-        else
-          current_assoc.name.to_s
-        end
+        as_field = current_assoc.name.to_s
         
         stage = {
           "$lookup" => {
             "from" => current_assoc.klass.collection.name,
-            "localField" => full_prefix.empty? ? local_field : "#{full_prefix}.#{local_field}",
+            "localField" => local_field,
             "foreignField" => foreign_field,
             "as" => as_field
           }
@@ -156,7 +150,7 @@ module Mongoid
         class_name = current_assoc.klass.to_s
         if child_assocs = mapping.delete(class_name)
           child_assocs.each do |child|
-            pipeline_stages << create_pipeline(child, mapping, nil)
+            pipeline_stages << create_pipeline(child, mapping)
           end
         end
         
