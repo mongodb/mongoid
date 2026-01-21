@@ -2368,7 +2368,7 @@ describe Mongoid::Attributes do
         end
 
         it "updates the attributes" do
-          expect(doc.pages).to be_empty
+          expect(doc.attributes).to_not have_key("pages")
         end
 
         it "has the same attributes after reloading" do
@@ -2475,7 +2475,7 @@ describe Mongoid::Attributes do
         end
 
         it "updates the attributes" do
-          expect(doc.pages).to be_empty
+          expect(doc.attributes).to_not have_key("pages")
         end
 
         it "has the same attributes after reloading" do
@@ -2497,7 +2497,7 @@ describe Mongoid::Attributes do
           end
 
           it "updates the attributes" do
-            expect(doc.pages).to be_empty
+            expect(doc.attributes).to_not have_key("pages")
           end
 
           it "has the same attributes after reloading" do

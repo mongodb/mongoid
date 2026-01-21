@@ -4271,22 +4271,24 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
-  context "when setting an embedded relation to an empty array" do
-    let(:document) do
-      Person.create!
-    end
-
-    let(:person) do
-      Person.find(document.id)
+  context "when trying to persist an empty list using before_save" do
+    let(:band) do
+      Band.create!
     end
 
     before do
-      person.update_attributes!(addresses: [])
+      Band.before_save do
+        self[:labels] ||= []
+      end
     end
 
-    it "sets the embedded relation to an empty array" do
-      expect(person.addresses).to be_empty
-      expect(person.attributes.keys).to include("addresses")
+    let(:reloaded_band) do
+      Band.collection.find(_id: band._id).first
+    end
+
+    it "persists the empty list" do
+      expect(reloaded_band).to have_key(:labels)
+      expect(reloaded_band[:labels]).to eq []
     end
   end
 
@@ -4790,38 +4792,18 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
     context "in an embeds_many relation" do
 
-      context "using .create! first" do
+      let(:band) { Band.create! }
 
-        let(:band) { Band.create! }
-
-        before do
-          band.labels = []
-          band.save!
-        end
-
-        let(:reloaded_band) { Band.collection.find(_id: band._id).first }
-
-        it "persists the empty list" do
-          expect(reloaded_band).to have_key(:labels)
-          expect(reloaded_band[:labels]).to eq []
-        end
+      before do
+        band.labels = []
+        band.save!
       end
 
-      context "using .new first" do
+      let(:reloaded_band) { Band.collection.find(_id: band._id).first }
 
-        let(:band) { Band.new }
-
-        before do
-          band.labels = []
-          band.save!
-        end
-
-        let(:reloaded_band) { Band.collection.find(_id: band._id).first }
-
-        it "persists the empty list" do
-          expect(reloaded_band).to have_key(:labels)
-          expect(reloaded_band[:labels]).to eq []
-        end
+      it "persists the empty list" do
+        expect(reloaded_band).to have_key(:labels)
+        expect(reloaded_band[:labels]).to eq []
       end
     end
 

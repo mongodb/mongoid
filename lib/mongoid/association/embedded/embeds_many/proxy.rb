@@ -601,29 +601,9 @@ module Mongoid
           # @api private
           def update_attributes_hash
             if _target.empty?
-              handle_empty_target
-            else
-              _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
-            end
-          end
-
-          # Check if we're currently in a setter
-          def in_setter?
-            _base.send(:in_setter?)
-          end
-
-          # Handle the case when the target is empty.
-          #
-          # @api private
-          def handle_empty_target
-            # Only persist empty array if:
-            # We're explicitly assigning (setter was called)
-            if _base.attributes.key?(_association.store_as) || in_setter?
-              _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
-            else
-              # During initialization with no prior data, delete the key to maintain
-              # the original behavior of not persisting unassigned empty associations
               _base.attributes.delete(_association.store_as)
+            else
+              _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
             end
           end
         end
