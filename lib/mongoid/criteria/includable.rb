@@ -43,7 +43,7 @@ module Mongoid
       # @return [ Criteria ] The cloned criteria.
       def eager_load(*relations)
         extract_includes_list(klass, nil, true, *relations)
-        @use_lookup = true
+        @use_lookup = !embedded?
         clone
       end
 

@@ -7,6 +7,10 @@ class IncUser
   has_many :comments, class_name: 'IncComment'
 end
 
+class IncAdmin < IncUser
+  field :admin_level, type: Integer
+end
+
 class IncPost
   include Mongoid::Document
   belongs_to :user, class_name: 'IncUser'

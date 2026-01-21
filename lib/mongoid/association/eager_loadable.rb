@@ -52,8 +52,6 @@ module Mongoid
         # account for single-collection inheritance
         queue.push(klass.root_class.to_s) if klass != klass.root_class
 
-        puts "why am i here"
-
         while klass = queue.shift
           if as = assoc_map.delete(klass)
             as.each do |assoc|
@@ -91,85 +89,29 @@ module Mongoid
         # then sort, skip, limit
         pipeline.concat(criteria.options.to_pipeline_for_lookup)
 
-        # Determine if we're querying embedded documents
-        # If so, we need to track the embedded path prefix for lookup 'as' fields
-        embedded_path = nil
-        if criteria.embedded? && criteria.association
-          pipeline, embedded_path = handle_embedded(pipeline, criteria)
-        end
-
         # account for single-collection inheritance
         root_class = klass.root_class
 
         if assoc_map[klass.to_s]
           assoc_map[klass.to_s].each do |assoc|
-            pipeline << create_pipeline(assoc, assoc_map, embedded_path)
+            # Create a copy of the mapping for each top-level association to avoid mutation issues
+            pipeline << create_pipeline(assoc, assoc_map.dup)
           end
         end
 
         if klass != root_class && assoc_map[root_class.to_s]
           assoc_map[root_class.to_s].each do |assoc|
-            pipeline << create_pipeline(assoc, assoc_map, embedded_path)
+            # Create a copy of the mapping for each top-level association to avoid mutation issues
+            pipeline << create_pipeline(assoc, assoc_map.dup)
           end
         end
-
-        pipeline << { "$replaceRoot" => { "newRoot" => embedded_path ? "$#{embedded_path}" : "$$ROOT" } } if embedded_path
-
-        pp pipeline
 
         Eager.new(criteria.inclusions, [], true, pipeline).run
-      end
-
-      # return pipeline and embedded
-      def handle_embedded(pipeline, criteria)
-        embedded_path = nil
-        embedded_steps = []
-        # For embedded documents, we need to match the parent document
-        # The parent_id should be in the embedded collection's base criteria
-        unless criteria.documents.empty?
-          document = criteria.documents[0]
-          while document && document.embedded? && criteria.documents[0].respond_to?(:_parent) && criteria.documents[0]._parent
-            embedded_field = document._association.store_as || document._association.name.to_s if document._association
-            embedded_steps << embedded_field
-
-            document = document._parent
-          end
-        end
-
-        # build the embedded path
-        embedded_steps.reverse.each do |step|
-          embedded_path = if embedded_path.blank?
-            step
-          else
-            "#{embedded_path}.#{step}"
-          end
-          pipeline << {
-            "$unwind" => "$#{embedded_path}"
-          }
-        end
-
-        # match the outermost document id
-        if pipeline.empty? || !pipeline.first.key?("$match")
-          pipeline.unshift({ "$match" => { "_id" => document.id } })
-        end
-
-        return pipeline, embedded_path
       end
 
       def create_pipeline(current_assoc, mapping, embedded_path = nil, prefix = nil)
         # Build nested pipeline for children and ordering
         pipeline_stages = []
-
-        # If embeds_many, set the prefix and continue recursively
-        if current_assoc.is_a?(Mongoid::Association::Embedded::EmbedsMany || Mongoid::Association::Embedded::EmbedsOne)
-          new_prefix = if prefix
-            "#{prefix}.#{current_assoc.name}"
-          else
-            current_assoc.name.to_s
-          end
-          pipeline_stages << create_pipeline(nil, mapping, embedded_path, new_prefix)
-          return pipeline_stages
-        end
 
         # For belongs_to and has_and_belongs_to_many, the foreign key is on the current document
         # For has_many/has_one, the foreign key is on the related document
@@ -210,9 +152,10 @@ module Mongoid
         
         # Add nested lookups for child associations
         # Child associations don't need the embedded_path prefix since they're referenced from the looked-up document
+        # Remove this class from the mapping to prevent infinite loops with circular references
         class_name = current_assoc.klass.to_s
-        if mapping[class_name]
-          mapping[class_name].each do |child|
+        if child_assocs = mapping.delete(class_name)
+          child_assocs.each do |child|
             pipeline_stages << create_pipeline(child, mapping, nil)
           end
         end
