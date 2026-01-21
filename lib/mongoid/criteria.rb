@@ -72,6 +72,9 @@ module Mongoid
       # @example Convert the hash to a criteria.
       #   Criteria.from_hash({ klass: Band, where: { name: "Depeche Mode" })
       #
+      # @deprecated This method is deprecated and will
+      #  be removed in a future release.
+      #
       # @param [ Hash ] hash The hash to convert.
       #
       # @return [ Criteria ] The criteria.
@@ -88,6 +91,7 @@ module Mongoid
         end
         criteria
       end
+      Mongoid.deprecate(self, :from_hash)
     end
 
     # Static array used to check with method missing - we only need to ever
