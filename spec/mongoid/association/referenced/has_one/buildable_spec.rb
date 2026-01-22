@@ -82,6 +82,17 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
       end
     end
 
+    context "when provided an array of hashes" do
+      let(:object) do
+        [{ "_id" => BSON::ObjectId.new, "name" => "Savings", "balance" => 500 }]
+      end
+
+      it "returns the document" do
+        expect(document.name).to eq("Savings")
+        expect(document.balance).to eq(500)
+      end
+    end
+
     context "when provided a object" do
 
       let(:object) do
