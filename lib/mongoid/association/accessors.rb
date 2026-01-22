@@ -227,7 +227,7 @@ module Mongoid
 
       def needs_no_database_query?(object, association)
         object.is_a?(Document) && !object.embedded? &&
-            object._id == attributes[association.key]
+            object[association.try(:primary_key) || :_id] == attributes[association.key]
       end
 
       # Is the current code executing without autobuild functionality?
@@ -309,7 +309,6 @@ module Mongoid
           klass.re_define_method(name) do |reload = false|
             value = get_relation(name, association, nil, reload)
             if value.nil? && association.autobuilding? && !without_autobuild?
-              binding.break
               value = send("build_#{name}")
             end
             value

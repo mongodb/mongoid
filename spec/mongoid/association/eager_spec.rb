@@ -540,8 +540,8 @@ describe Mongoid::Association::EagerLoadable do
         docs = context.preload_for_lookup(criteria)
         doc = docs.first
         expect_query(0) do
-          # doc.posts.to_a
-          # doc.houses.to_a
+          doc.posts.to_a
+          doc.houses.to_a
           doc.cat
         end
       end
