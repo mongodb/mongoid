@@ -167,6 +167,28 @@ module Mongoid
         true
       end
 
+      ALLOWED_TO_CRITERIA_METHODS = %i[
+        all all_in all_of and any_in any_of asc ascending
+        batch_size between
+        collation comment cursor_type
+        desc descending
+        elem_match eq exists extras
+        geo_spatial group gt gte
+        hint
+        in includes
+        limit lt lte
+        max_distance max_scan max_time_ms merge mod
+        ne near near_sphere nin no_timeout none none_of nor not not_in
+        offset only or order order_by
+        project
+        raw read reorder
+        scoped skip slice snapshot
+        text_search type
+        unscoped unwind
+        where with_size with_type without
+      ].freeze
+      private_constant :ALLOWED_TO_CRITERIA_METHODS
+
       # Convert this hash to a criteria. Will iterate over each keys in the
       # hash which must correspond to method on a criteria object. The hash
       # must also include a "klass" key.
@@ -178,7 +200,11 @@ module Mongoid
       def to_criteria
         criteria = Criteria.new(delete(:klass) || delete("klass"))
         each_pair do |method, args|
-          criteria = criteria.__send__(method, args)
+          method_sym = method.to_sym
+          unless ALLOWED_TO_CRITERIA_METHODS.include?(method_sym)
+            raise ArgumentError, "Method '#{method}' is not allowed in to_criteria"
+          end
+          criteria = criteria.public_send(method_sym, args)
         end
         criteria
       end
