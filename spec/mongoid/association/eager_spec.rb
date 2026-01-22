@@ -375,6 +375,8 @@ describe Mongoid::Association::EagerLoadable do
   end
 
   describe ".preload_for_lookup" do
+    # 4.4 lookup does not support the lookup pipeline as it is currently written
+    min_server_version '5.0'
 
     let(:context) do
       Mongoid::Contextual::Mongo.new(criteria)

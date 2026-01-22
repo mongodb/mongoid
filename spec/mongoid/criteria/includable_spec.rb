@@ -1466,6 +1466,8 @@ describe Mongoid::Criteria::Includable do
   end
 
   describe "#eager_load" do
+    # 4.4 lookup does not support the lookup pipeline as it is currently written
+    min_server_version '5.0'
     it_behaves_like "eager loading", :eager_load
   end
 
