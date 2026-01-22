@@ -467,4 +467,240 @@ describe Mongoid::Extensions::Hash do
 
     it_behaves_like 'unsatisfiable criteria method'
   end
+
+  describe '#to_criteria' do
+    subject(:criteria) { hash.to_criteria }
+
+    context 'when klass is specified' do
+      let(:hash) do
+        { klass: Band, where: { name: 'Songs Ohia' } }
+      end
+
+      it 'returns a criteria' do
+        expect(criteria).to be_a(Mongoid::Criteria)
+      end
+
+      it 'sets the klass' do
+        expect(criteria.klass).to eq(Band)
+      end
+
+      it 'sets the selector' do
+        expect(criteria.selector).to eq({ 'name' => 'Songs Ohia' })
+      end
+    end
+
+    context 'when klass is missing' do
+      let(:hash) do
+        { where: { name: 'Songs Ohia' } }
+      end
+
+      it 'returns a criteria' do
+        expect(criteria).to be_a(Mongoid::Criteria)
+      end
+
+      it 'has klass nil' do
+        expect(criteria.klass).to be_nil
+      end
+
+      it 'sets the selector' do
+        expect(criteria.selector).to eq({ 'name' => 'Songs Ohia' })
+      end
+    end
+
+    context 'with allowed methods' do
+      context 'when using multiple query methods' do
+        let(:hash) do
+          {
+            klass: Band,
+            where: { active: true },
+            limit: 10,
+            skip: 5,
+            order_by: { name: 1 }
+          }
+        end
+
+        it 'applies all methods successfully' do
+          expect(criteria.selector).to eq({ 'active' => true })
+          expect(criteria.options[:limit]).to eq(10)
+          expect(criteria.options[:skip]).to eq(5)
+          expect(criteria.options[:sort]).to eq({ 'name' => 1 })
+        end
+      end
+
+      context 'when using query selector methods' do
+        let(:hash) do
+          {
+            klass: Band,
+            gt: { members: 2 },
+            in: { genre: ['rock', 'metal'] }
+          }
+        end
+
+        it 'applies selector methods' do
+          expect(criteria.selector['members']).to eq({ '$gt' => 2 })
+          expect(criteria.selector['genre']).to eq({ '$in' => ['rock', 'metal'] })
+        end
+      end
+
+      context 'when using aggregation methods' do
+        let(:hash) do
+          {
+            klass: Band,
+            project: { name: 1, members: 1 }
+          }
+        end
+
+        it 'applies aggregation methods' do
+          expect { criteria }.not_to raise_error
+        end
+      end
+    end
+
+    context 'with disallowed methods' do
+      context 'when attempting to call create' do
+        let(:hash) do
+          { klass: Band, create: { name: 'Malicious' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'create' is not allowed in to_criteria")
+        end
+      end
+
+      context 'when attempting to call create!' do
+        let(:hash) do
+          { klass: Band, 'create!': { name: 'Malicious' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'create!' is not allowed in to_criteria")
+        end
+      end
+
+      context 'when attempting to call build' do
+        let(:hash) do
+          { klass: Band, build: { name: 'Malicious' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'build' is not allowed in to_criteria")
+        end
+      end
+
+      context 'when attempting to call find' do
+        let(:hash) do
+          { klass: Band, find: 'some_id' }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'find' is not allowed in to_criteria")
+        end
+      end
+
+      context 'when attempting to call execute_or_raise' do
+        let(:hash) do
+          { klass: Band, execute_or_raise: ['id1', 'id2'] }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'execute_or_raise' is not allowed in to_criteria")
+        end
+      end
+
+      context 'when attempting to call new' do
+        let(:hash) do
+          { klass: Band, new: { name: 'Test' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'new' is not allowed in to_criteria")
+        end
+      end
+
+      context 'when allowed method is combined with disallowed method' do
+        let(:hash) do
+          {
+            klass: Band,
+            where: { active: true },
+            create: { name: 'Malicious' }
+          }
+        end
+
+        it 'raises ArgumentError before executing any methods' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'create' is not allowed in to_criteria")
+        end
+      end
+    end
+
+    context 'security validation' do
+      # This test ensures that ALL public methods not in the allowlist are blocked
+      it 'blocks all dangerous public methods' do
+        dangerous_methods = %i[
+          build create create! new
+          find find_or_create_by find_or_create_by! find_or_initialize_by
+          first_or_create first_or_create! first_or_initialize
+          execute_or_raise multiple_from_db for_ids
+          documents= inclusions= scoping_options=
+          initialize freeze as_json
+        ]
+
+        dangerous_methods.each do |method|
+          hash = { klass: Band, method => 'arg' }
+          expect { hash.to_criteria }.to raise_error(
+            ArgumentError,
+            "Method '#{method}' is not allowed in to_criteria"
+          ), "Expected method '#{method}' to be blocked but it was allowed"
+        end
+      end
+
+      it 'blocks dangerous inherited methods from Object' do
+        # Critical security test: block send, instance_eval, etc.
+        inherited_dangerous = %i[
+          send __send__ instance_eval instance_exec
+          instance_variable_set method
+        ]
+
+        inherited_dangerous.each do |method|
+          hash = { klass: Band, method => 'arg' }
+          expect { hash.to_criteria }.to raise_error(
+            ArgumentError,
+            "Method '#{method}' is not allowed in to_criteria"
+          ), "Expected inherited method '#{method}' to be blocked"
+        end
+      end
+
+      it 'blocks Enumerable execution methods' do
+        # to_criteria should build queries, not execute them
+        enumerable_methods = %i[each map select count sum]
+
+        enumerable_methods.each do |method|
+          hash = { klass: Band, method => 'arg' }
+          expect { hash.to_criteria }.to raise_error(
+            ArgumentError,
+            "Method '#{method}' is not allowed in to_criteria"
+          ), "Expected Enumerable method '#{method}' to be blocked"
+        end
+      end
+
+      it 'allows all whitelisted methods' do
+        # Sample of allowed methods from each category
+        allowed_sample = {
+          where: { name: 'Test' },      # Query selector
+          limit: 10,                     # Query option
+          skip: 5,                       # Query option
+          gt: { age: 18 },              # Query selector
+          in: { status: ['active'] },   # Query selector
+          ascending: :name,              # Sorting
+          includes: :notes,            # Eager loading
+          merge: { klass: Band },        # Merge
+        }
+
+        allowed_sample.each do |method, args|
+          hash = { klass: Band, method => args }
+          expect { hash.to_criteria }.not_to raise_error,
+            "Expected method '#{method}' to be allowed but it was blocked"
+        end
+      end
+    end
+  end
 end
