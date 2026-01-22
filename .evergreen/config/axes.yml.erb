@@ -6,6 +6,10 @@ axes:
         display_name: "MongoDB Latest"
         variables:
            MONGODB_VERSION: "latest"
+      - id: "8.2"
+        display_name: "MongoDB 8.2"
+        variables:
+           MONGODB_VERSION: "8.2"
       - id: "8.0"
         display_name: "MongoDB 8.0"
         variables:
@@ -106,10 +110,18 @@ axes:
         display_name: ruby-3.3
         variables:
           RVM_RUBY: "ruby-3.3"
-      - id: "ruby-head"
-        display_name: ruby-head
+      - id: "ruby-3.4"
+        display_name: ruby-3.4
         variables:
-           RVM_RUBY: "ruby-head"
+          RVM_RUBY: "ruby-3.4"
+      - id: "ruby-4.0"
+        display_name: ruby-4.0
+        variables:
+          RVM_RUBY: "ruby-4.0"
+      - id: "ruby-dev"
+        display_name: ruby-dev
+        variables:
+           RVM_RUBY: "ruby-dev"
 
   - id: "jruby"
     display_name: JRuby Version
@@ -118,10 +130,17 @@ axes:
         display_name: jruby-9.4
         variables:
            RVM_RUBY: "jruby-9.4"
+      - id: "jruby-10.0"
+        display_name: jruby-10.0
+        variables:
+           RVM_RUBY: "jruby-10.0"
 
   - id: "os"
     display_name: OS
     values:
+      - id: ubuntu-24.04
+        display_name: "Ubuntu 24.04"
+        run_on: ubuntu2404-small
       - id: ubuntu-22.04
         display_name: "Ubuntu 22.04"
         run_on: ubuntu2204-small
