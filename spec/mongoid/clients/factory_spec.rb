@@ -89,6 +89,27 @@ describe Mongoid::Clients::Factory do
               Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)]
           end
 
+          context 'when Rails is available' do
+            before do
+              module ::Rails
+                def self.version
+                  '6.1.0'
+                end
+              end
+            end
+
+            after do
+              Object.send(:remove_const, :Rails)
+            end
+
+            it 'adds Rails as another wrapping library' do
+              client.options[:wrapping_libraries].should == [
+                BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
+                {'name' => 'Rails', 'version' => '6.1.0'},
+              ]
+            end
+          end
+
           context 'when configuration specifies a wrapping library' do
 
             let(:config) do
@@ -109,6 +130,28 @@ describe Mongoid::Clients::Factory do
                 BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
                 {'name' => 'Foo'},
               ]
+            end
+
+            context 'when Rails is available' do
+              before do
+                module ::Rails
+                  def self.version
+                    '6.1.0'
+                  end
+                end
+              end
+
+              after do
+                Object.send(:remove_const, :Rails)
+              end
+
+              it 'adds Rails as another wrapping library' do
+                client.options[:wrapping_libraries].should == [
+                  BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
+                  {'name' => 'Foo'},
+                  {'name' => 'Rails', 'version' => '6.1.0'},
+                ]
+              end
             end
           end
         end
