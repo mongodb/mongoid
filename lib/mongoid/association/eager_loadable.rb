@@ -109,13 +109,18 @@ module Mongoid
         Eager.new(criteria.inclusions, [], true, pipeline).run
       end
 
+      def switch_local_and_foreign_fields?(association)
+        association.is_a?(Mongoid::Association::Referenced::BelongsTo) ||
+          association.is_a?(Mongoid::Association::Referenced::HasAndBelongsToMany)
+      end
+
       def create_pipeline(current_assoc, mapping)
         # Build nested pipeline for children and ordering
         pipeline_stages = []
 
         # For belongs_to and has_and_belongs_to_many, the foreign key is on the current document
         # For has_many/has_one, the foreign key is on the related document
-        if current_assoc.is_a?(Mongoid::Association::Referenced::BelongsTo) || current_assoc.is_a?(Mongoid::Association::Referenced::HasAndBelongsToMany)
+        if switch_local_and_foreign_fields?(current_assoc)
           local_field = current_assoc.foreign_key
           foreign_field = current_assoc.primary_key
         else

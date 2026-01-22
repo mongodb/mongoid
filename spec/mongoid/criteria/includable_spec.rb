@@ -292,9 +292,6 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            D.send(method_name, :b, :c).entries.detect do |d|
-              d.id == d_two.id
-            end
             query = -> { D.send(method_name, :b, :c).entries.detect { |d| d.id == d_two.id } }
             method_name == :eager_load ? expect_query(1, &query) : query.call
           end
