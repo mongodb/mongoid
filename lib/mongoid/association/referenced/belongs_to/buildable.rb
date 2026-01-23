@@ -27,10 +27,11 @@ module Mongoid
             # Handle array from $lookup aggregation (returns array even for belongs_to)
             if object.is_a?(Array)
               first = object.first
-              return nil unless first
-              return first if first.is_a?(Mongoid::Document)
-              return Factory.execute_from_db(klass, first, nil, selected_fields, execute_callbacks: false) if first.is_a?(Hash)
-              raise ArgumentError, "Cannot build belongs_to association from array"
+              case first
+              when nil, Mongoid::Document then return first
+              when Hash then return Factory.execute_from_db(klass, first, nil, selected_fields, execute_callbacks: false)
+              else raise ArgumentError, "Cannot build belongs_to association from array"
+              end
             end
             
             # Handle single hash from $lookup with $unwind

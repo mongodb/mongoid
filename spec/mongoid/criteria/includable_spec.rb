@@ -1376,6 +1376,27 @@ describe Mongoid::Criteria::Includable do
       end
     end
 
+    context "when using a has_many association with an empty association" do
+      let!(:user) do
+        IncUser.create!
+      end
+
+      let!(:result) do
+        IncUser.send(method_name, :posts, :comments).where(id: user.id).first
+      end
+
+      it "executes the query" do
+        expect(result).to eq(user)
+      end
+
+      it "does not issue extra queries" do
+        expect_query(0) do
+          result.posts.to_a
+          result.comments.to_a
+        end
+      end
+    end
+
     context "when using a has_many association" do
 
       let!(:user) do

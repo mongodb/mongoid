@@ -69,19 +69,19 @@ Benchmark.bm(30) do |bm|
 
   puts "\n[ belongs_to Benchmarks ]"
   
-  bm.report("belongs_to: normal          ") do
+  bm.report("belongs_to: normal") do
     Account.all.each do |account|
       account.person.title
     end
   end
   
-  bm.report("belongs_to: includes        ") do
+  bm.report("belongs_to: includes") do
     Account.includes(:person).each do |account|
       account.person.title
     end
   end
   
-  bm.report("belongs_to: eager_load      ") do
+  bm.report("belongs_to: eager_load") do
     Account.eager_load(:person).each do |account|
       account.person.title
     end
@@ -89,19 +89,19 @@ Benchmark.bm(30) do |bm|
 
   puts "\n[ has_one Benchmarks ]"
   
-  bm.report("has_one: normal             ") do
+  bm.report("has_one: normal") do
     Person.all.each do |person|
       person.game&.name
     end
   end
   
-  bm.report("has_one: includes           ") do
+  bm.report("has_one: includes") do
     Person.includes(:game).each do |person|
       person.game&.name
     end
   end
   
-  bm.report("has_one: eager_load         ") do
+  bm.report("has_one: eager_load") do
     Person.eager_load(:game).each do |person|
       person.game&.name
     end
@@ -109,19 +109,19 @@ Benchmark.bm(30) do |bm|
 
   puts "\n[ has_many Benchmarks ]"
   
-  bm.report("has_many: normal            ") do
+  bm.report("has_many: normal") do
     Person.all.each do |person|
       person.posts.each { |post| post.title }
     end
   end
   
-  bm.report("has_many: includes          ") do
+  bm.report("has_many: includes") do
     Person.includes(:posts).each do |person|
       person.posts.each { |post| post.title }
     end
   end
   
-  bm.report("has_many: eager_load        ") do
+  bm.report("has_many: eager_load") do
     Person.eager_load(:posts).each do |person|
       person.posts.each { |post| post.title }
     end
@@ -129,19 +129,19 @@ Benchmark.bm(30) do |bm|
 
   puts "\n[ has_and_belongs_to_many Benchmarks ]"
   
-  bm.report("habtm: normal               ") do
+  bm.report("habtm: normal") do
     Person.all.each do |person|
       person.preferences.each { |pref| pref.name }
     end
   end
   
-  bm.report("habtm: includes             ") do
+  bm.report("habtm: includes") do
     Person.includes(:preferences).each do |person|
       person.preferences.each { |pref| pref.name }
     end
   end
   
-  bm.report("habtm: eager_load           ") do
+  bm.report("habtm: eager_load") do
     Person.eager_load(:preferences).each do |person|
       person.preferences.each { |pref| pref.name }
     end
@@ -149,7 +149,7 @@ Benchmark.bm(30) do |bm|
 
   puts "\n[ Multiple Associations Benchmarks ]"
   
-  bm.report("multiple: normal            ") do
+  bm.report("multiple: normal") do
     Person.all.each do |person|
       person.posts.each { |post| post.title }
       person.game&.name
@@ -157,7 +157,7 @@ Benchmark.bm(30) do |bm|
     end
   end
   
-  bm.report("multiple: includes          ") do
+  bm.report("multiple: includes") do
     Person.includes(:posts, :game, :preferences).each do |person|
       person.posts.each { |post| post.title }
       person.game&.name
@@ -165,7 +165,7 @@ Benchmark.bm(30) do |bm|
     end
   end
   
-  bm.report("multiple: eager_load        ") do
+  bm.report("multiple: eager_load") do
     Person.eager_load(:posts, :game, :preferences).each do |person|
       person.posts.each { |post| post.title }
       person.game&.name
@@ -182,7 +182,7 @@ Benchmark.bm(30) do |bm|
     end
   end
   
-  bm.report("nested: normal              ") do
+  bm.report("nested: normal") do
     Person.limit(1000).each do |person|
       person.posts.each do |post|
         post.alerts.each { |alert| alert.message }
@@ -190,7 +190,7 @@ Benchmark.bm(30) do |bm|
     end
   end
   
-  bm.report("nested: includes            ") do
+  bm.report("nested: includes") do
     Person.includes(posts: :alerts).limit(1000).each do |person|
       person.posts.each do |post|
         post.alerts.each { |alert| alert.message }
@@ -198,7 +198,7 @@ Benchmark.bm(30) do |bm|
     end
   end
   
-  bm.report("nested: eager_load          ") do
+  bm.report("nested: eager_load") do
     Person.eager_load(posts: :alerts).limit(1000).each do |person|
       person.posts.each do |post|
         post.alerts.each { |alert| alert.message }
