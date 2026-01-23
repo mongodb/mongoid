@@ -32,16 +32,22 @@ describe Mongoid::Clients::Factory do
 
   shared_examples_for 'includes rails wrapping library' do
     context 'when Rails is available' do
-      before do
-        module ::Rails
-          def self.version
-            '6.1.0'
+      around do |example|
+        rails_was_defined = defined?(::Rails)
+
+        if !rails_was_defined
+          module ::Rails
+            def self.version
+              '6.1.0'
+            end
           end
         end
-      end
 
-      after do
-        Object.send(:remove_const, :Rails)
+        example.run
+
+        if !rails_was_defined
+          Object.send(:remove_const, :Rails) if defined?(::Rails)
+        end
       end
 
       it 'adds Rails as another wrapping library' do
