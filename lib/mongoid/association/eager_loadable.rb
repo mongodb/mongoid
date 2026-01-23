@@ -144,6 +144,9 @@ module Mongoid
         if current_assoc.order
           sort_spec = current_assoc.order.is_a?(Hash) ? current_assoc.order : { current_assoc.order => 1 }
           pipeline_stages << { "$sort" => sort_spec }
+        else
+          # Default to sorting by _id to maintain insertion order consistency
+          pipeline_stages << { "$sort" => { "_id" => 1 } }
         end
         
         # Add nested lookups for child associations

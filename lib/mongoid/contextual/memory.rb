@@ -140,7 +140,9 @@ module Mongoid
       # @param [ Integer ] limit The number of documents to return.
       #
       # @return [ Document ] The first document.
-      def first(limit = 1)
+      def first(limit = nil)
+        use_first = limit.nil?
+        limit ||= 1
         if criteria.use_lookup?
           @criteria = criteria.limit(limit)
           result = eager_load_with_lookup()
@@ -148,11 +150,7 @@ module Mongoid
           result = eager_load(documents.first(limit))
         end
 
-        if limit == 1
-          result.first
-        else
-          result
-        end
+        use_first ? result.first : result
       end
       alias :one :first
       alias :find_first :first
