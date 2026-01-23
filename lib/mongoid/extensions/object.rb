@@ -213,14 +213,14 @@ module Mongoid
         #
         # @param [ Object ] object The object to demongoize.
         #
-        # @return [ Hash ] The object as a hash.
+        # @return [ Object ] The object.
         def demongoize(object)
           case object
-          when Hash
+          when BSON::Document, Hash
             # Recursively convert nested BSON::Documents to plain Hashes
             object.to_h.transform_values do |value|
               case value
-              when Hash
+              when BSON::Document, Hash
                 demongoize(value)
               when Array
                 value.map { |v| (v.is_a?(Hash) || v.is_a?(BSON::Document)) ? demongoize(v) : v }
@@ -229,7 +229,7 @@ module Mongoid
               end
             end
           else
-            {}
+            object
           end
         end
 
