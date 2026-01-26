@@ -131,6 +131,10 @@ module Mongoid
             [MONGOID_WRAPPING_LIBRARY] + options[:wrapping_libraries]
           else
             [MONGOID_WRAPPING_LIBRARY]
+          end.tap do |wrap|
+            if defined?(::Rails) && ::Rails.respond_to?(:version)
+              wrap << { name: 'Rails', version: ::Rails.version }
+            end
           end
           options[:wrapping_libraries] = wrap_lib
         end

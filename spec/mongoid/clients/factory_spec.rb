@@ -30,6 +30,34 @@ describe Mongoid::Clients::Factory do
     end
   end
 
+  shared_examples_for 'includes rails wrapping library' do
+    context 'when Rails is available' do
+      around do |example|
+        rails_was_defined = defined?(::Rails)
+
+        if !rails_was_defined
+          module ::Rails
+            def self.version
+              '6.1.0'
+            end
+          end
+        end
+
+        example.run
+
+        if !rails_was_defined
+          Object.send(:remove_const, :Rails) if defined?(::Rails)
+        end
+      end
+
+      it 'adds Rails as another wrapping library' do
+        expect(client.options[:wrapping_libraries]).to include(
+          {'name' => 'Rails', 'version' => '6.1.0'},
+        )
+      end
+    end
+  end
+
   describe ".create" do
 
     context "when provided a name" do
@@ -89,6 +117,8 @@ describe Mongoid::Clients::Factory do
               Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)]
           end
 
+          it_behaves_like 'includes rails wrapping library'
+
           context 'when configuration specifies a wrapping library' do
 
             let(:config) do
@@ -110,6 +140,8 @@ describe Mongoid::Clients::Factory do
                 {'name' => 'Foo'},
               ]
             end
+
+            it_behaves_like 'includes rails wrapping library'
           end
         end
 
