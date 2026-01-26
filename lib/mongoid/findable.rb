@@ -22,6 +22,7 @@ module Mongoid
       :distinct,
       :each,
       :each_with_index,
+      :eager_load,
       :extras,
       :fifth,
       :fifth!,

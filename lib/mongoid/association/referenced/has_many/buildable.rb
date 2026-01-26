@@ -23,6 +23,12 @@ module Mongoid
           # @return [ Document ] A single document.
           def build(base, object, type = nil, selected_fields = nil)
             return (object || []) unless query?(object)
+            
+            # Handle array of hashes from $lookup aggregation
+            if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
+              return object.map { |attrs| Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false) }
+            end
+            
             return [] if object.is_a?(Array)
             query_criteria(object, base)
           end

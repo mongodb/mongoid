@@ -14,12 +14,18 @@ module Mongoid
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   Associations to eager load
       # @param [ Array<Document> ] docs Documents to preload the associations
+      # @param [ Boolean ] use_lookup Whether to use $lookup aggregation
+      #   for eager loading. This is used in Criteria#eager_load.
+      # @param [ Array<Hash> ] pipeline The aggregation pipeline to use
+      #   when using $lookup for eager loading.
       #
       # @return [ Base ] The eager load preloader
-      def initialize(associations, docs)
+      def initialize(associations, docs, use_lookup = false, pipeline = [])
         @associations = associations
         @docs = docs
         @grouped_docs = {}
+        @use_lookup = use_lookup
+        @pipeline = pipeline
       end
 
       # Run the preloader.
@@ -30,6 +36,13 @@ module Mongoid
       # @return [ Array ] The list of documents given.
       def run
         @loaded = []
+
+        if @use_lookup
+          preload_with_lookup
+          @loaded = @docs
+          return @loaded.flatten
+        end
+
         while shift_association
           preload
           @loaded << @docs.collect { |d| d.send(@association.name) if d.respond_to?(@association.name) }
@@ -47,6 +60,21 @@ module Mongoid
       #   loader.preload
       def preload
         raise NotImplementedError
+      end
+
+      # Preload the current association using $lookup aggregation.
+      # This method executes the aggregation pipeline
+      # and instantiates the documents.
+      # @example Preload the current association using $lookup.
+      #   loader.preload_with_lookup
+      def preload_with_lookup
+        # For $lookup aggregation, execute pipeline and instantiate documents
+        owner_class = @associations.first.owner_class
+        aggregated_docs = owner_class.collection.aggregate(@pipeline)
+        aggregated_docs.each do |doc|
+          parsed_doc = Factory.from_db(owner_class, doc)
+          @docs << parsed_doc
+        end
       end
 
       # Retrieves the documents referenced by the association, and
@@ -69,10 +97,7 @@ module Mongoid
         # Upstream code is responsible for eliminating nils from keys.
         return cls.none if keys.empty?
 
-        criteria = cls.criteria
-        criteria = criteria.apply_scope(@association.scope)
-        criteria = criteria.any_in(key => keys)
-        criteria.inclusions = criteria.inclusions - [@association]
+        criteria = prepare_criteria_for_loaded_documents(cls, keys)
         criteria.each do |doc|
           yield doc
         end
@@ -154,6 +179,19 @@ module Mongoid
       # @return [ Mongoid::Association::Relatable ] The association object.
       def shift_association
         @association = @associations.shift
+      end
+
+      # Prepares the criteria to retrieve the documents of the specified
+      # class, that have the foreign key included in the specified list of keys.
+      # When the documents are retrieved, the set of inclusions applied
+      # is the set of inclusions applied to the host document minus the
+      # association that is being eagerly loaded.
+      def prepare_criteria_for_loaded_documents(cls, keys)
+        criteria = cls.criteria
+        criteria = criteria.apply_scope(@association.scope)
+        criteria = criteria.any_in(key => keys)
+        criteria.inclusions = criteria.inclusions - [@association]
+        criteria
       end
     end
   end

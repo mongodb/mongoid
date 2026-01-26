@@ -37,6 +37,11 @@ module Mongoid
       # @return [ Hash ] The options.
       attr_reader :options
 
+      # The class that owns this association.
+      #
+      # @return [ Class ] The owner class.
+      attr_reader :owner_class
+
       # Initialize the Association.
       #
       # @param [ Class ] _class The class of the model who owns this association.

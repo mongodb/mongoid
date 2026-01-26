@@ -90,6 +90,8 @@ module Mongoid
             # @param [ Array<Mongoid::Document> ] docs The parent documents
             #   that possess the given associations, which ought to be
             #   populated by the eager-loaded documents.
+            # @param [ true | false ] use_lookup Whether to use a $lookup
+            #   aggregation stage to perform the eager load.
             #
             # @return [ Mongoid::Association::Embedded::Eager ]
             def eager_loader(associations, docs)

@@ -27,8 +27,31 @@ module Mongoid
       #
       # @return [ Criteria ] The cloned criteria.
       def includes(*relations)
-        extract_includes_list(klass, nil, relations)
+        extract_includes_list(klass, nil, false, *relations)
         clone
+      end
+
+      # Eager loads all the provided associations using aggregation $lookup.
+      # The behavior should be identical to #includes.
+      #
+      # @example Eager load the provided associations.
+      #   Person.eager_load(:posts, :game)
+      #
+      # @param [ [ Symbol | Hash ]... ] *relations The names of the association(s)
+      #   to eager load.
+      #
+      # @return [ Criteria ] The cloned criteria.
+      def eager_load(*relations)
+        extract_includes_list(klass, nil, true, *relations)
+        @use_lookup = !embedded?
+        clone
+      end
+
+      # Returns whether to use $lookup aggregation for eager loading.
+      #
+      # @return [ true | false ] Whether to use $lookup.
+      def use_lookup?
+        !!@use_lookup
       end
 
       # Get a list of criteria that are to be executed for eager loading.
@@ -71,23 +94,32 @@ module Mongoid
       #   association originates.
       # @param [ String ] parent The name of the association above this one in
       #   the inclusion tree, if it is a nested inclusion.
+      # @param [ Boolean ] is_eager_load Whether this is an eager load operation.
       # @param [ [ Symbol | Hash | Array<Symbol | Hash> ]... ] *relations_list
       #   The names of the association(s) to eager load.
-      def extract_includes_list(_parent_class, parent, *relations_list)
+      def extract_includes_list(_parent_class, parent, is_eager_load = false, *relations_list)
         relations_list.flatten.each do |relation_object|
           if relation_object.is_a?(Hash)
             relation_object.each do |relation, _includes|
               association = _parent_class.reflect_on_association(relation)
-              raise Errors::InvalidIncludes.new(_klass, [ relation ]) unless association
+              raise_eager_error(is_eager_load, _klass, relation) unless association
               add_inclusion(association, parent)
-              extract_includes_list(association.klass, association.name, _includes)
+              extract_includes_list(association.klass, association.name, is_eager_load, _includes)
             end
           else
             association = _parent_class.reflect_on_association(relation_object)
-            raise Errors::InvalidIncludes.new(_parent_class, [ relation_object ]) unless association
+            raise_eager_error(is_eager_load, _parent_class, relation_object) unless association
             add_inclusion(association, parent)
           end
         end
+      end
+    end
+
+    def raise_eager_error(is_eager_load, klass, relation)
+      if is_eager_load
+        raise ArgumentError, "Eager loading only supports arguments that are the names of associations on #{klass}"
+      else
+        raise Errors::InvalidIncludes.new(klass, [ relation ])
       end
     end
   end

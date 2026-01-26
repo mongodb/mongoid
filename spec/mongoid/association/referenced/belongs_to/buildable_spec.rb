@@ -133,6 +133,21 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       end
     end
 
+    context "when provided an array of hashes" do
+      let(:object) do
+        [
+          { "_id" => BSON::ObjectId.new, "username" => "user1" },
+          { "_id" => BSON::ObjectId.new, "username" => "user2" }
+        ]
+      end
+
+      it "queries and returns the document" do
+        first_doc = document
+        expect(first_doc).to be_a(Person)
+        expect(first_doc.username).to eq("user1")
+      end 
+    end
+
     context "when provided a object" do
 
       let!(:person) do

@@ -92,6 +92,27 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
       end
     end
 
+    context "when provided an array of hashes" do
+      let(:object) do
+        [
+          { "_id" => BSON::ObjectId.new, "name" => "Emails"},
+          { "_id" => BSON::ObjectId.new, "name" => "SMS"}
+        ]
+      end
+
+      let(:preference1) do
+        Preference.new(object[0])
+      end
+
+      let(:preference2) do
+        Preference.new(object[1])
+      end
+
+      it "returns the documents" do
+        expect(documents).to eq([ preference1, preference2 ])
+      end
+    end
+
     context "when provided a object" do
 
       context "when the object is not nil" do

@@ -374,6 +374,7 @@ module Mongoid
       self.scoping_options = other.scoping_options
       self.inclusions = (inclusions + other.inclusions).uniq
       self._raw_results = self._raw_results || other._raw_results
+      @use_lookup = @use_lookup || other.use_lookup?
       self
     end
 
@@ -611,6 +612,7 @@ module Mongoid
       @documents = other.documents.dup
       self._raw_results = other._raw_results
       @context = nil
+      @use_lookup = other.use_lookup?
       super
     end
 

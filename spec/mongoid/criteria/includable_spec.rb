@@ -6,7 +6,7 @@ require_relative "./includable_spec_models.rb"
 
 describe Mongoid::Criteria::Includable do
 
-  describe "#includes" do
+  shared_examples_for "eager loading" do |method_name|
 
     let!(:person) do
       Person.create!(age: 1)
@@ -14,10 +14,14 @@ describe Mongoid::Criteria::Includable do
 
     context "when providing a name that is not a relation" do
 
+      let(:expected_error) do
+        method_name == :eager_load ? ArgumentError : Mongoid::Errors::InvalidIncludes
+      end
+
       it "raises an error" do
         expect {
-          Person.includes(:members)
-        }.to raise_error(Mongoid::Errors::InvalidIncludes)
+          Person.send(method_name, :members)
+        }.to raise_error(expected_error)
       end
     end
 
@@ -32,7 +36,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:result) do
-        User.includes(:posts).first
+        User.send(method_name, :posts).first
       end
 
       it "executes the query" do
@@ -59,7 +63,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:result) do
-        User.includes(:posts, :descriptions).first
+        User.send(method_name, :posts, :descriptions).first
       end
 
       it "executes the query" do
@@ -85,7 +89,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:result) do
-        User.includes(:posts => [:alerts]).first
+        User.send(method_name, :posts => [:alerts]).first
       end
 
       it "executes the query" do
@@ -105,7 +109,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:results) do
-        User.includes(:posts => [{ :alerts => :items }]).to_a
+        User.send(method_name, :posts => [{ :alerts => :items }]).to_a
       end
 
       it "executes the query" do
@@ -151,7 +155,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:results) do
-          C.includes(:b).to_a.detect do |c|
+          C.send(method_name, :b).to_a.detect do |c|
             c.id == c_two.id
           end
         end
@@ -218,9 +222,8 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            D.includes(:b, :c).entries.detect do |d|
-              d.id == d_two.id
-            end
+            query = -> { D.send(method_name, :b, :c).entries.detect { |d| d.id == d_two.id } }
+            method_name == :eager_load ? expect_query(1, &query) : query.call
           end
 
           it "returns the correct documents" do
@@ -235,7 +238,7 @@ describe Mongoid::Criteria::Includable do
 
           it "does not query the db on c" do
             expect_query(0) do
-              results.b
+              results.c
             end
           end
         end
@@ -289,9 +292,8 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            D.includes(:b, :c).entries.detect do |d|
-              d.id == d_two.id
-            end
+            query = -> { D.send(method_name, :b, :c).entries.detect { |d| d.id == d_two.id } }
+            method_name == :eager_load ? expect_query(1, &query) : query.call
           end
 
           it "returns the correct documents" do
@@ -306,7 +308,7 @@ describe Mongoid::Criteria::Includable do
 
           it "does not query the db on c" do
             expect_query(0) do
-              results.b
+              results.c
             end
           end
         end
@@ -316,7 +318,7 @@ describe Mongoid::Criteria::Includable do
     context "when including the same association multiple times" do
 
       let(:criteria) do
-        Person.all.includes(:posts, :posts).includes(:posts)
+        Person.all.send(method_name, :posts, :posts).send(method_name, :posts)
       end
 
       let(:association) do
@@ -335,7 +337,7 @@ describe Mongoid::Criteria::Includable do
       end
 
       let(:criteria) do
-        Post.includes(:person)
+        Post.send(method_name, :person)
       end
 
       let!(:results) do
@@ -367,11 +369,12 @@ describe Mongoid::Criteria::Includable do
         context "when calling first" do
 
           let(:criteria) do
-            Post.includes(:person)
+            Post.send(method_name, :person)
           end
 
           let!(:document) do
-            criteria.first
+            query = -> { criteria.first }
+            method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
           end
 
           it "eager loads the first document" do
@@ -388,7 +391,7 @@ describe Mongoid::Criteria::Includable do
         context "when calling last" do
 
           let!(:criteria) do
-            Post.asc(:_id).includes(:person)
+            Post.asc(:_id).send(method_name, :person)
           end
 
           let!(:document) do
@@ -439,7 +442,7 @@ describe Mongoid::Criteria::Includable do
         context "when calling first" do
 
           let(:criteria) do
-            peep.reload.addresses.includes(:band)
+            peep.reload.addresses.send(method_name, :band)
           end
 
           let(:context) do
@@ -447,6 +450,8 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:document) do
+            # Since this is called on an embedded criteria, we will be using the includes path
+            # rather than the $lookup path, so we do not need to check queries.
             criteria.first
           end
 
@@ -464,7 +469,7 @@ describe Mongoid::Criteria::Includable do
         context "when calling last" do
 
           let(:criteria) do
-            peep.reload.addresses.includes(:band)
+            peep.reload.addresses.send(method_name, :band)
           end
 
           let(:context) do
@@ -472,7 +477,8 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:document) do
-            criteria.last
+            query = -> { criteria.last }
+            method_name == :eager_load ? expect_query(2, &query) : query.call
           end
 
           it "eager loads the last document" do
@@ -489,7 +495,7 @@ describe Mongoid::Criteria::Includable do
         context "when iterating all documents" do
 
           let(:criteria) do
-            peep.reload.addresses.includes(:band)
+            peep.reload.addresses.send(method_name, :band)
           end
 
           let(:context) do
@@ -497,7 +503,8 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:documents) do
-            criteria.to_a
+            query = -> { criteria.to_a }
+            method_name == :eager_load ? expect_query(2, &query) : query.call
           end
 
           it "eager loads the first document" do
@@ -522,7 +529,7 @@ describe Mongoid::Criteria::Includable do
     context "when providing inclusions to the default scope" do
 
       before do
-        Person.default_scope(->{ Person.includes(:posts) })
+        Person.default_scope(->{ Person.send(method_name, :posts) })
       end
 
       after do
@@ -544,7 +551,8 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:documents) do
-          criteria.entries
+          query = -> { criteria.entries }
+          method_name == :eager_load ? expect_less_than_queries(2, &query) : query.call
         end
 
         it "returns the correct documents" do
@@ -574,7 +582,11 @@ describe Mongoid::Criteria::Includable do
           end
 
           before do
-            expect(new_context).to receive(:eager_load).with([person]).once.and_call_original
+            if method_name == :eager_load
+              expect(new_context).to receive(:eager_load_with_lookup).once.and_call_original
+            else
+              expect(new_context).to receive(:eager_load).with([person]).once.and_call_original
+            end
           end
 
           let!(:from_db) do
@@ -625,7 +637,11 @@ describe Mongoid::Criteria::Includable do
         end
 
         before do
-          expect(context).to receive(:eager_load).with([person]).once.and_call_original
+          if method_name == :eager_load
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          else
+            expect(context).to receive(:eager_load).with([person]).once.and_call_original
+          end
         end
 
         let!(:from_db) do
@@ -664,7 +680,8 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:documents) do
-          criteria.entries
+          query = -> { criteria.entries }
+          method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
         end
 
         it "returns the correct documents" do
@@ -703,7 +720,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         let(:criteria) do
-          Person.where(id: person.id).includes(:preferences)
+          Person.where(id: person.id).send(method_name, :preferences)
         end
 
         it "only loads the existing related items" do
@@ -714,11 +731,12 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has no options" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
+          Person.asc(:age).send(method_name, :preferences)
         end
 
         let!(:documents) do
-          criteria.entries
+          query = -> { criteria.entries }
+          method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
         end
 
         it "returns the correct documents" do
@@ -741,11 +759,13 @@ describe Mongoid::Criteria::Includable do
       context "when calling first on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
+          Person.asc(:age).send(method_name, :preferences)
         end
 
+        # here
         let!(:from_db) do
-          criteria.first
+          query = -> { criteria.first }
+          method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
         end
 
         it "returns the correct documents" do
@@ -768,11 +788,12 @@ describe Mongoid::Criteria::Includable do
       context "when calling last on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:preferences)
+          Person.asc(:age).send(method_name, :preferences)
         end
 
         let!(:from_db) do
-          criteria.last
+          query = -> { criteria.last }
+          method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
         end
 
         it "returns the correct documents" do
@@ -806,11 +827,12 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has no options" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:posts)
+          Person.asc(:age).send(method_name, :posts)
         end
 
         let!(:documents) do
-          criteria.entries
+          query = -> { criteria.entries }
+          method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
         end
 
         it "returns the correct documents" do
@@ -833,7 +855,7 @@ describe Mongoid::Criteria::Includable do
       context "when calling first on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:posts)
+          Person.asc(:age).send(method_name, :posts)
         end
 
         let!(:from_db) do
@@ -859,7 +881,7 @@ describe Mongoid::Criteria::Includable do
       context "when calling last on the criteria" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:posts)
+          Person.asc(:age).send(method_name, :posts)
         end
 
         let!(:from_db) do
@@ -893,15 +915,21 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:criteria) do
-          Person.includes(:posts).asc(:age).limit(1)
+          Person.send(method_name, :posts).asc(:age).limit(1)
         end
 
         let(:context) do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -927,15 +955,21 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has no options" do
 
         let!(:criteria) do
-          Person.asc(:age).includes(:game)
+          Person.asc(:age).send(method_name, :game)
         end
 
         let(:context) do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -958,15 +992,21 @@ describe Mongoid::Criteria::Includable do
         end
 
         let!(:criteria) do
-          Person.where(id: person.id).includes(:game).asc(:age).limit(1)
+          Person.where(id: person.id).send(method_name, :game).asc(:age).limit(1)
         end
 
         let(:context) do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -996,15 +1036,21 @@ describe Mongoid::Criteria::Includable do
       context "when providing no options" do
 
         let!(:criteria) do
-          Game.includes(:person)
+          Game.send(method_name, :person)
         end
 
         let(:context) do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:preload).twice.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:preload).twice.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:preload_for_lookup).twice.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -1019,15 +1065,21 @@ describe Mongoid::Criteria::Includable do
       context "when the criteria has limiting options" do
 
         let!(:criteria) do
-          Game.where(id: game_one.id).includes(:person).asc(:_id).limit(1)
+          Game.where(id: game_one.id).send(method_name, :person).asc(:_id).limit(1)
         end
 
         let(:context) do
           criteria.context
         end
 
-        before do
-          expect(context).to receive(:eager_load).with([ game_one ]).once.and_call_original
+        if method_name == :includes
+          before do
+            expect(context).to receive(:eager_load).with([ game_one ]).once.and_call_original
+          end
+        else
+          before do
+            expect(context).to receive(:eager_load_with_lookup).once.and_call_original
+          end
         end
 
         let!(:documents) do
@@ -1059,15 +1111,21 @@ describe Mongoid::Criteria::Includable do
       end
 
       let!(:criteria) do
-        Person.includes(:posts, :game).asc(:age)
+        Person.send(method_name, :posts, :game).asc(:age)
       end
 
       let(:context) do
         criteria.context
       end
 
-      before do
-        expect(context).to receive(:preload).twice.and_call_original
+      if method_name == :includes
+        before do
+          expect(context).to receive(:preload).twice.and_call_original
+        end
+      else
+        before do
+          expect(context).to receive(:preload_for_lookup).twice.and_call_original
+        end
       end
 
       let!(:documents) do
@@ -1076,6 +1134,35 @@ describe Mongoid::Criteria::Includable do
 
       it "returns the correct documents" do
         expect(criteria).to eq([ person ])
+      end
+    end
+
+    context "when classes inherit from each other" do
+      let!(:admin) do
+        IncAdmin.create!(admin_level: 2)
+      end
+
+      let!(:post) do
+        admin.posts.create!
+      end
+
+      let(:criteria) do
+        IncUser.send(method_name, :posts)
+      end
+
+      let!(:documents) do
+        query = -> { criteria.entries }
+        method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
+      end
+
+      it "returns the correct documents" do
+        expect(documents).to eq([ admin ])
+      end
+
+      it "eager loads the posts" do
+        expect_query(0) do
+          expect(documents.first.posts).to eq([ post ])
+        end
       end
     end
 
@@ -1137,7 +1224,7 @@ describe Mongoid::Criteria::Includable do
 
         context "when including the belongs_to association" do
           let!(:result) do
-            C.includes(b: :a).first
+            C.send(method_name, b: :a).first
           end
 
           it "finds the right document" do
@@ -1147,7 +1234,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           it "does not execute a query" do
-            expect_no_queries do
+            expect_query(0) do
               result.b.a
             end
           end
@@ -1155,7 +1242,8 @@ describe Mongoid::Criteria::Includable do
 
         context "when including a doubly-nested belongs_to association" do
           let!(:result) do
-            D.includes(c: { b: :a }).first
+            query = -> { D.send(method_name, c: { b: :a }).first }
+            method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
           end
 
           it "finds the right document" do
@@ -1166,7 +1254,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           it "does not execute a query" do
-            expect_no_queries do
+            expect_query(0) do
               result.c.b.a
             end
           end
@@ -1174,7 +1262,8 @@ describe Mongoid::Criteria::Includable do
 
         context "when including the has_many association" do
           let!(:result) do
-            A.includes(b: :c).first
+            query = -> { A.send(method_name, b: :c).first }
+            method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
           end
 
           it "finds the right document" do
@@ -1184,7 +1273,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           it "does not executes a query" do
-            expect_no_queries do
+            expect_query(0) do
               result.b.c
             end
           end
@@ -1192,7 +1281,8 @@ describe Mongoid::Criteria::Includable do
 
         context "when including a doubly-nested has_many association" do
           let!(:result) do
-            A.includes(b: { c: :d }).first
+            query = -> { A.send(method_name, b: { c: :d }).first }
+            method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
           end
 
           it "finds the right document" do
@@ -1203,7 +1293,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           it "does not execute a query" do
-            expect_no_queries do
+            expect_query(0) do
               result.b.c.d
             end
           end
@@ -1222,7 +1312,8 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            A.includes(b: :c).entries.sort
+            query = -> { A.send(method_name, b: :c).entries.sort }
+            method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
           end
 
           it "finds the right document" do
@@ -1234,7 +1325,7 @@ describe Mongoid::Criteria::Includable do
           end
 
           it "does not execute a query" do
-            expect_no_queries do
+            expect_query(0) do
               results.each do |a|
                 a.b.c
               end
@@ -1262,7 +1353,8 @@ describe Mongoid::Criteria::Includable do
           end
 
           let!(:results) do
-            A.includes(b: { c: :d }, c: :d).first
+            query = -> { A.send(method_name, b: { c: :d }, c: :d).first }
+            method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
           end
 
           it "finds the right document" do
@@ -1275,11 +1367,32 @@ describe Mongoid::Criteria::Includable do
           end
 
           it "does not execute a query" do
-            expect_no_queries do
+            expect_query(0) do
               results.c.d
               results.b.c.d
             end
           end
+        end
+      end
+    end
+
+    context "when using a has_many association with an empty association" do
+      let!(:user) do
+        IncUser.create!
+      end
+
+      let!(:result) do
+        IncUser.send(method_name, :posts, :comments).where(id: user.id).first
+      end
+
+      it "executes the query" do
+        expect(result).to eq(user)
+      end
+
+      it "does not issue extra queries" do
+        expect_query(0) do
+          result.posts.to_a
+          result.comments.to_a
         end
       end
     end
@@ -1304,7 +1417,8 @@ describe Mongoid::Criteria::Includable do
 
       context "when including the same class twice" do
         let!(:results) do
-          IncPost.includes({ user: :comments }, :comments).entries.sort
+          query = -> { IncPost.send(method_name, { user: :comments }, :comments).entries.sort }
+          method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
         end
 
         it "finds the right documents" do
@@ -1317,7 +1431,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not execute a query" do
-          expect_no_queries do
+          expect_query(0) do
             results.each do |res|
               res.user
               res.user.comments.to_a
@@ -1331,7 +1445,8 @@ describe Mongoid::Criteria::Includable do
         let!(:thread) { IncThread.create!(comments: user_comments) }
 
         let!(:result) do
-          IncThread.includes(comments: { user: { posts: :comments } }).first
+          query = -> { IncThread.send(method_name, comments: { user: { posts: :comments } }).first }
+          method_name == :eager_load ? expect_less_than_queries(3, &query) : query.call
         end
 
         it "finds the right document" do
@@ -1352,7 +1467,7 @@ describe Mongoid::Criteria::Includable do
         end
 
         it "does not execute a query" do
-          expect_no_queries do
+          expect_query(0) do
             result.comments.each do |comment|
               comment.user.posts.each do |post|
                 post.comments.to_a
@@ -1362,6 +1477,16 @@ describe Mongoid::Criteria::Includable do
         end
       end
     end
+  end
+
+  describe "#includes" do
+    it_behaves_like "eager loading", :includes
+  end
+
+  describe "#eager_load" do
+    # 4.4 lookup does not support the lookup pipeline as it is currently written
+    min_server_version '5.0'
+    it_behaves_like "eager loading", :eager_load
   end
 
   describe "#inclusions" do
@@ -1415,7 +1540,7 @@ describe Mongoid::Criteria::Includable do
     end
 
     it "does not execute a query" do
-      expect_no_queries do
+      expect_query(0) do
         result.posts.to_a
         result.highlighted_post
       end
@@ -1448,7 +1573,7 @@ describe Mongoid::Criteria::Includable do
     end
 
     it "does not execute a query" do
-      expect_no_queries do
+      expect_query(0) do
         result.posts.to_a
         result.highlighted_post
         result.pinned_post

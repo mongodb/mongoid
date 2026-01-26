@@ -131,6 +131,10 @@ module Mongoid
             _loading do
               if object && needs_no_database_query?(object, association)
                 __build__(name, object, association)
+              # Check if data was loaded via $lookup aggregation
+              elsif !association.embedded? && attributes.key?(name.to_s)
+                # Use the pre-loaded association data from $lookup
+                __build__(name, attributes[name.to_s], association)
               else
                 selected_fields = _mongoid_filter_selected_fields(association.key)
                 __build__(name, attributes[association.key], association, selected_fields)
@@ -223,7 +227,7 @@ module Mongoid
 
       def needs_no_database_query?(object, association)
         object.is_a?(Document) && !object.embedded? &&
-            object._id == attributes[association.key]
+            object[association.try(:primary_key) || :_id] == attributes[association.key]
       end
 
       # Is the current code executing without autobuild functionality?

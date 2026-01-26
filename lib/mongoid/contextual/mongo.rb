@@ -853,6 +853,7 @@ module Mongoid
           end
         else
           return view unless eager_loadable?
+          return eager_load_with_lookup if criteria.use_lookup?
           docs = view.map do |doc|
             Factory.from_db(klass, doc, criteria)
           end
@@ -992,7 +993,12 @@ module Mongoid
                  end
                else
                  mapped = raw_docs.map { |doc| Factory.from_db(klass, doc, criteria) }
-                 eager_load(mapped)
+                 if !criteria.use_lookup?
+                  # $lookup already eager loads related documents
+                  eager_load(mapped)
+                 else
+                  mapped
+                 end
                end
 
         limit ? docs : docs.first
@@ -1031,7 +1037,14 @@ module Mongoid
         sort = view.sort || { _id: 1 }
         v = view.sort(sort).limit(limit || 1)
         v = v.skip(n) if n > 0
-        if raw_docs = v.to_a
+        if criteria.use_lookup?
+          # Update criteria and view with the sort, skip, and limit before eager loading
+          @criteria = criteria.order_by(sort).limit(limit || 1)
+          @criteria = @criteria.skip(n) if n > 0
+          @view = collection.find(criteria.selector, session: _session).limit(limit || 1).sort(sort)
+          @view = @view.skip(n) if n > 0
+          eager_load_with_lookup
+        elsif raw_docs = v.to_a
           process_raw_docs(raw_docs, limit)
         end
       end
@@ -1043,8 +1056,17 @@ module Mongoid
       def retrieve_nth_to_last_with_limit(n, limit)
         v = view.sort(inverse_sorting).limit(limit || 1)
         v = v.skip(n) if n > 0
-        raw_docs = v.to_a.reverse
-        process_raw_docs(raw_docs, limit)
+        if criteria.use_lookup?
+          # Update criteria and view with the inverse sort, skip, and limit before eager loading
+          @criteria = criteria.order_by(inverse_sorting).limit(limit || 1)
+          @criteria = @criteria.skip(n) if n > 0
+          @view = collection.find(criteria.selector, session: _session).limit(limit || 1).sort(inverse_sorting)
+          @view = @view.skip(n) if n > 0
+          eager_load_with_lookup.reverse
+        else
+          raw_docs = v.to_a.reverse
+          process_raw_docs(raw_docs, limit)
+        end
       end
     end
   end

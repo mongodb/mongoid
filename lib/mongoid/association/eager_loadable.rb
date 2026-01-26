@@ -30,6 +30,13 @@ module Mongoid
         end
       end
 
+      # Load the associations for the given documents using $lookup.
+      #
+      # @return [ Array<Mongoid::Document> ] The given documents.
+      def eager_load_with_lookup
+        preload_for_lookup(criteria)
+      end
+
       # Load the associations for the given documents. This will be done
       # recursively to load the associations of the given documents'
       # associated documents.
@@ -65,6 +72,97 @@ module Mongoid
             end
           end
         end
+      end
+
+      # Load the associations for the given documents. This will be done
+      # recursively to load the associations of the given documents'
+      # associated documents.
+      #
+      # @param [ Array<Mongoid::Association::Relatable> ] associations
+      #   The associations to load.
+      # @param [ Array<Mongoid::Document> ] docs The documents.
+      def preload_for_lookup(criteria)
+        assoc_map = criteria.inclusions.group_by(&:inverse_class_name)
+
+        # match first
+        pipeline = criteria.selector.to_pipeline
+        # then sort, skip, limit
+        pipeline.concat(criteria.options.to_pipeline_for_lookup)
+
+        # account for single-collection inheritance
+        root_class = klass.root_class
+
+        if assoc_map[klass.to_s]
+          assoc_map[klass.to_s].each do |assoc|
+            # Create a copy of the mapping for each top-level association to avoid mutation issues
+            pipeline << create_pipeline(assoc, assoc_map.dup)
+          end
+        end
+
+        if klass != root_class && assoc_map[root_class.to_s]
+          assoc_map[root_class.to_s].each do |assoc|
+            # Create a copy of the mapping for each top-level association to avoid mutation issues
+            pipeline << create_pipeline(assoc, assoc_map.dup)
+          end
+        end
+
+        Eager.new(criteria.inclusions, [], true, pipeline).run
+      end
+
+      def switch_local_and_foreign_fields?(association)
+        association.is_a?(Mongoid::Association::Referenced::BelongsTo) ||
+          association.is_a?(Mongoid::Association::Referenced::HasAndBelongsToMany)
+      end
+
+      def create_pipeline(current_assoc, mapping)
+        # Build nested pipeline for children and ordering
+        pipeline_stages = []
+
+        # For belongs_to and has_and_belongs_to_many, the foreign key is on the current document
+        # For has_many/has_one, the foreign key is on the related document
+        if switch_local_and_foreign_fields?(current_assoc)
+          local_field = current_assoc.foreign_key
+          foreign_field = current_assoc.primary_key
+        else
+          local_field = current_assoc.primary_key
+          foreign_field = current_assoc.foreign_key
+        end
+        
+        # Build the 'as' field with embedded path prefix if needed
+        as_field = current_assoc.name.to_s
+        
+        stage = {
+          "$lookup" => {
+            "from" => current_assoc.klass.collection.name,
+            "localField" => local_field,
+            "foreignField" => foreign_field,
+            "as" => as_field
+          }
+        }
+        
+        # Add ordering if defined on the association, or default to _id for consistent order
+        if current_assoc.order
+          sort_spec = current_assoc.order.is_a?(Hash) ? current_assoc.order : { current_assoc.order => 1 }
+          pipeline_stages << { "$sort" => sort_spec }
+        else
+          # Default to sorting by _id to maintain insertion order consistency
+          pipeline_stages << { "$sort" => { "_id" => 1 } }
+        end
+        
+        # Add nested lookups for child associations
+        # Child associations don't need the embedded_path prefix since they're referenced from the looked-up document
+        # Remove this class from the mapping to prevent infinite loops with circular references
+        class_name = current_assoc.klass.to_s
+        if child_assocs = mapping.delete(class_name)
+          child_assocs.each do |child|
+            pipeline_stages << create_pipeline(child, mapping)
+          end
+        end
+        
+        # Always add pipeline since we always have at least $sort
+        stage["$lookup"]["pipeline"] = pipeline_stages
+        
+        stage
       end
     end
   end

@@ -141,11 +141,16 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       def first(limit = nil)
-        if limit
-          eager_load(documents.first(limit))
+        use_first = limit.nil?
+        limit ||= 1
+        if criteria.use_lookup?
+          @criteria = criteria.limit(limit)
+          result = eager_load_with_lookup()
         else
-          eager_load([documents.first]).first
+          result = eager_load(documents.first(limit))
         end
+
+        use_first ? result.first : result
       end
       alias :one :first
       alias :find_first :first
@@ -530,7 +535,7 @@ module Mongoid
       def documents_for_iteration
         docs = documents[skipping || 0, limiting || documents.length] || []
         if eager_loadable?
-          eager_load(docs)
+          criteria.use_lookup? ? eager_load_with_lookup() : eager_load(docs)
         end
         docs
       end
