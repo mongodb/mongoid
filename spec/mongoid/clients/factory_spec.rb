@@ -35,7 +35,7 @@ describe Mongoid::Clients::Factory do
       around do |example|
         rails_was_defined = defined?(::Rails)
 
-        if !rails_was_defined || !Rails.respond_to?(:version)
+        if !rails_was_defined || !::Rails.respond_to?(:version)
           module ::Rails
             def self.version
               '6.1.0'
