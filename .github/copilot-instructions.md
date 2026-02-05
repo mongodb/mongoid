@@ -28,7 +28,7 @@ When reviewing code, focus on:
 - Acknowledge good patterns when you see them
 - Ask clarifying questions when code intent is unclear
 - When possible, suggest that the pull request be labelled as a `bug`, a `feature`, or a `bcbreak` (a "backwards-compatibility break").
-- PR's that change only tests or infrastructure configuration do not need to be labelled.
+- PRs that change only tests or infrastructure configuration do not need to be labelled.
 
 Always prioritize security vulnerabilities and performance issues that could impact users.
 
@@ -44,9 +44,9 @@ Always suggest changes to improve readability and testability. For example, this
   
   # Consider:
   def valid_email?(email)
-    email && email.include?('@') && email.length > 5;
+    email && email.include?('@') && email.length > 5
   end
   
-  submitButton.enabled = is_valid_email?(user.email);
+  submitButton.enabled = valid_email?(user.email);
 ```
 
