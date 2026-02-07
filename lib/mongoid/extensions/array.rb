@@ -138,6 +138,8 @@ module Mongoid
           case object
           when ::Array, ::Set
             object.map(&:mongoize)
+          else
+            Mongoid::RawValue(object, 'Array')
           end
         end
 

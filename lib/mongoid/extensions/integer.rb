@@ -54,8 +54,10 @@ module Mongoid
             if object.numeric?
               object.to_i
             end
+          elsif object.respond_to?(:to_i)
+            object.to_i
           else
-            object.try(:to_i)
+            Mongoid::RawValue(object, 'Integer')
           end
         end
         alias :demongoize :mongoize

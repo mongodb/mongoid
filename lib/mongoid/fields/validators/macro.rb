@@ -18,6 +18,7 @@ module Mongoid
           :fallbacks,
           :association,
           :pre_processed,
+          :strict,
           :subtype,
           :type,
           :overwrite,
