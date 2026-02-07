@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require 'support/models/sandwich'
 require_relative '../association/referenced/has_many_models'
 require_relative '../association/referenced/has_and_belongs_to_many_models'
 require_relative './nested_spec_models'

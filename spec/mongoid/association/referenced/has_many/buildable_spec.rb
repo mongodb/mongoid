@@ -99,6 +99,10 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         Post.where(association.foreign_key => object, 'ratable_type' => 'Rating')
       end
 
+      before do
+        Post.belongs_to :ratable, polymorphic: true
+      end
+
       it "adds the type to the criteria" do
         expect(documents).to eq(criteria)
       end

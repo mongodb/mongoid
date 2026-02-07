@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require "mongoid/fields/validators/macro"
+require 'mongoid/fields/validators/macro'
+require 'mongoid/model_resolver'
 
 module Mongoid
 
@@ -345,6 +346,9 @@ module Mongoid
       # @param [ Class ] subclass The inheriting class.
       def inherited(subclass)
         super
+
+        Mongoid::ModelResolver.register(subclass)
+
         @_type = nil
         subclass.aliased_fields = aliased_fields.dup
         subclass.localized_fields = localized_fields.dup
