@@ -199,30 +199,6 @@ describe Mongoid::Extensions::String do
     end
   end
 
-  describe "#reader" do
-
-    context "when string is a reader" do
-
-      it "returns self" do
-        expect("attribute".reader).to eq("attribute")
-      end
-    end
-
-    context "when string is a writer" do
-
-      it "returns the reader" do
-        expect("attribute=".reader).to eq("attribute")
-      end
-    end
-
-    context "when the string is before_type_cast" do
-
-      it "returns the reader" do
-        expect("attribute_before_type_cast".reader).to eq("attribute")
-      end
-    end
-  end
-
   describe "#numeric?" do
 
     context "when the string is an integer" do
@@ -319,39 +295,4 @@ describe Mongoid::Extensions::String do
       end
     end
   end
-
-  describe "#writer?" do
-
-    context "when string is a reader" do
-
-      it "returns false" do
-        expect("attribute".writer?).to be false
-      end
-    end
-
-    context "when string is a writer" do
-
-      it "returns true" do
-        expect("attribute=".writer?).to be true
-      end
-    end
-  end
-
-  describe "#before_type_cast?" do
-
-    context "when string is a reader" do
-
-      it "returns false" do
-        expect("attribute".before_type_cast?).to be false
-      end
-    end
-
-    context "when string is before_type_cast" do
-
-      it "returns true" do
-        expect("attribute_before_type_cast".before_type_cast?).to be true
-      end
-    end
-  end
-
 end
