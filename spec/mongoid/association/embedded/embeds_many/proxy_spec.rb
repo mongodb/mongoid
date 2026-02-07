@@ -4271,6 +4271,27 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
+  context "when trying to persist an empty list using before_save" do
+    let(:band) do
+      Band.create!
+    end
+
+    before do
+      Band.before_save do
+        self[:labels] ||= []
+      end
+    end
+
+    let(:reloaded_band) do
+      Band.collection.find(_id: band._id).first
+    end
+
+    it "persists the empty list" do
+      expect(reloaded_band).to have_key(:labels)
+      expect(reloaded_band[:labels]).to eq []
+    end
+  end
+
   context "when pushing with a before_add callback" do
 
     let(:artist) do
