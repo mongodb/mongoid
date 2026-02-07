@@ -59,6 +59,16 @@ module Mongoid
           when ::Array then ::Array.mongoize(object).uniq
           end
         end
+
+        # Returns whether the object's size can be changed.
+        #
+        # @example Is the object resizable?
+        #   Set.resizable?
+        #
+        # @return [ true ] true.
+        def resizable?
+          true
+        end
       end
     end
   end
