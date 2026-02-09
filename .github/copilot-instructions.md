@@ -5,18 +5,16 @@ When reviewing code, focus on:
 - Check for instances of potential method call injection, dynamic code execution, symbol injection or other code injection vulnerabilities.
 
 ## Performance Red Flags
-- Identify N+1 database query problems.
 - Spot inefficient loops and algorithmic issues.
 - Check for memory leaks and resource cleanup.
-- Review caching opportunities for expensive operations.
 
 ## Code Quality Essentials
-- Rubocop is used by this project to enforce code style. There is no need to comment on style issues that Rubocop would catch, unless you have a specific reason to do so.
 - Methods should be focused and appropriately sized. If a method is doing too much, suggest refactorings to split it up.
 - Use clear, descriptive naming conventions.
 - Avoid encapsulation violations and ensure proper separation of concerns.
 - All public classes, modules, and methods should have clear documentation in YARD format.
 - If `method_missing` is implemented, ensure that `respond_to_missing?` is also implemented.
+- Rubocop is used by this project to enforce code style. Always refer to the project's .rubocop.yml file for guidance on the project's style preferences.
 
 ## Mongoid-specific Concerns
 - Mongoid::Document classes may be declared to exist in different database clusters. Look for code that should be multi-cluster-aware.
