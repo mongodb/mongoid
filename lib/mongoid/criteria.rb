@@ -396,7 +396,7 @@ module Mongoid
     #
     # @return [ true | false ] If the criteria is a none.
     def empty_and_chainable?
-      !!@none
+      !!@none || Queryable::Contradiction.contradicted?(self)
     end
 
     # Overridden to include _type in the fields.
