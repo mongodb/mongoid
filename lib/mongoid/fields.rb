@@ -100,6 +100,17 @@ module Mongoid
       def cleanse_localized_field_names(name)
         name = database_field_name(name.to_s)
 
+        # Fast path: if no dots, avoid array allocations entirely
+        unless name.include?(".")
+          # Simple field without nesting - just check for translation suffix
+          if !fields.key?(name) && !relations.key?(name) && name.end_with?(TRANSLATIONS_SFX)
+            return name.delete_suffix(TRANSLATIONS_SFX)
+          end
+
+          return name
+        end
+
+        # Slow path for nested fields (original logic)
         klass = self
         [].tap do |res|
           ar = name.split('.')
@@ -186,6 +197,7 @@ module Mongoid
           default = field.eval_default(self)
           unless default.nil? || field.lazy?
             attribute_will_change!(name)
+            clear_demongoized_cache(name)
             attributes[name] = default
           end
         end
@@ -338,6 +350,26 @@ module Mongoid
       #
       # @api private
       def traverse_association_tree(key, fields, associations, aliased_associations)
+        # Fast path: if no dots, it's a simple field lookup
+        unless key.include?(".")
+          aliased = key
+          if aliased_associations && a = aliased_associations.fetch(key, nil)
+            aliased = a.to_s
+          end
+
+          if fields && f = fields[aliased]
+            yield(key, f, true) if block_given?
+            return f
+          elsif associations && rel = associations[aliased]
+            yield(key, rel, false) if block_given?
+            return nil
+          else
+            yield(key, nil, false) if block_given?
+            return nil
+          end
+        end
+
+        # Slow path for nested fields (original logic)
         klass = nil
         field = nil
         key.split('.').each_with_index do |meth, i|
@@ -416,6 +448,13 @@ module Mongoid
         return "" unless name.present?
 
         key = name.to_s
+
+        # Fast path: if no dots, avoid split allocation
+        unless key.include?(".")
+          return aliased_fields[key]&.dup || key
+        end
+
+        # Slow path for nested fields (original logic with split)
         segment, remaining = key.split('.', 2)
 
         # Don't get the alias for the field when a belongs_to association
@@ -648,10 +687,38 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method(meth) do
             raw = read_raw_attribute(name)
+            # Handle lazy defaults outside of cache to avoid recursive locking
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
-            else
+            # Don't cache localized fields as they depend on I18n.locale
+            elsif field.localized?
               process_raw_attribute(name.to_s, raw, field)
+            else
+              # Atomically fetch or compute the cached value
+              # Cache stores [raw_value, demongoized_value] to detect stale cache
+              value = @__demongoized_cache.compute_if_absent(name) do
+                # Cache miss - compute and store
+                demongoized = process_raw_attribute(name.to_s, raw, field)
+                [raw, demongoized]
+              end
+
+              # Check if cached raw value matches current raw value
+              if value[0] != raw
+                # Raw value changed (direct attributes hash modification) - recompute
+                demongoized = process_raw_attribute(name.to_s, raw, field)
+                @__demongoized_cache[name] = [raw, demongoized]
+                value = [raw, demongoized]
+              end
+
+              demongoized_value = value[1]
+
+              # For resizable values (like arrays), we need to track changes on every read
+              # because mutations can happen to the cached object. This matches master behavior
+              # where process_raw_attribute is called on every read.
+              is_relation = relations.key?(name.to_s)
+              attribute_will_change!(name.to_s) if demongoized_value.resizable? && !is_relation
+
+              demongoized_value
             end
           end
         end

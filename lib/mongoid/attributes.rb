@@ -146,8 +146,24 @@ module Mongoid
           attribute_will_change!(access)
           delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
           attributes.delete(access)
+          # Clear cache since the attribute is being removed
+          clear_demongoized_cache(access)
         end
       end
+    end
+
+    # Clear the demongoized cache for a specific field.
+    #
+    # This method centralizes cache invalidation to ensure all attribute
+    # mutation paths (write, remove, unset, rename) remain consistent.
+    #
+    # @param [ String ] name The field name to clear from cache.
+    #
+    # @return [ void ]
+    #
+    # @api private
+    def clear_demongoized_cache(name)
+      @__demongoized_cache.delete(name)
     end
 
     # Write a single attribute to the document attribute hash. This will
@@ -173,6 +189,9 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
+          # Clear demongoized cache for this field since we're writing a new value
+          clear_demongoized_cache(field_name)
+
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
@@ -241,6 +260,9 @@ module Mongoid
     # Determine if the attribute is missing from the document, due to loading
     # it from the database with missing fields.
     #
+    # Cache the projector keyed by __selected_fields to automatically handle
+    # invalidation when selected fields change.
+    #
     # @example Is the attribute missing?
     #   document.attribute_missing?("test")
     #
@@ -248,7 +270,8 @@ module Mongoid
     #
     # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
-      !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
+      @__projector_cache[__selected_fields] ||= Projector.new(__selected_fields)
+      !@__projector_cache[__selected_fields].attribute_or_path_allowed?(name)
     end
 
     # Return type-casted attributes.

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'concurrent/map'
 require 'mongoid/positional'
 require 'mongoid/evolvable'
 require 'mongoid/extensions'
@@ -235,8 +236,77 @@ module Mongoid
     def prepare_to_process_attributes
       @new_record = true
       @attributes ||= {}
+      initialize_field_caches
       apply_pre_processed_defaults
       apply_default_scoping
+    end
+
+    # Initialize field cache instance variables to ensure consistent object shape.
+    #
+    # This method initializes two cache hashes used for performance optimization:
+    # - @__projector_cache: Caches Projector instances keyed by __selected_fields
+    # - @__demongoized_cache: Caches demongoized (type-converted) field values
+    #
+    # == Why Object Shape Consistency Matters
+    #
+    # Ruby's JIT compilers (YJIT, MJIT) optimize code based on object shapes. When
+    # objects of the same class have different instance variables added at different
+    # times, they have different "shapes". This is called shape polymorphism, which
+    # prevents the JIT from generating optimal code.
+    #
+    # By initializing these ivars early in all document creation paths, we ensure
+    # all Mongoid documents have the same shape from the start, allowing the JIT
+    # to generate faster code.
+    #
+    # == When This Method Is Called
+    #
+    # This method is automatically invoked in all document instantiation paths:
+    #
+    # 1. New documents (via initialize):
+    #      doc = Band.new(name: "Beatles")
+    #      # → initialize → prepare_to_process_attributes → initialize_field_caches
+    #
+    # 2. Documents loaded from database (via allocate, bypasses initialize):
+    #      doc = Band.find(id)
+    #      # → instantiate_document → initialize_field_caches
+    #
+    # 3. Reloaded documents:
+    #      doc.reload
+    #      # → reset_readonly → initialize_field_caches
+    #
+    # == Performance Impact
+    #
+    # Without this initialization, documents created through different code paths
+    # would have ivars created in different orders or not at all, causing shape
+    # polymorphism. The JIT cannot optimize when objects have different shapes.
+    #
+    # With this initialization:
+    # - All documents have the same shape immediately
+    # - JIT can generate optimized code paths
+    # - No conditional ivar initialization (||=) needed in hot paths
+    #
+    # @example Object shape without initialization (BAD - before this PR)
+    #   # Documents created via different paths have different shapes
+    #   doc1 = Band.new(name: "Test")           # Shape: @attributes, @new_record
+    #   doc2 = Band.find(id)                     # Shape: @attributes, @new_record
+    #
+    #   doc1.name                                # Lazy creates @__demongoized_cache
+    #   # doc1 shape: @attributes, @new_record, @__demongoized_cache
+    #   # doc2 shape: @attributes, @new_record (no cache yet)
+    #   # Different shapes = JIT cannot optimize!
+    #
+    # @example Object shape with initialization (GOOD - after this PR)
+    #   doc1 = Band.new(name: "Test")           # initialize_field_caches called
+    #   doc2 = Band.find(id)                     # initialize_field_caches called
+    #   # Both have: @attributes, @new_record, @__demongoized_cache, @__projector_cache
+    #   # Same shape from the start = JIT can optimize!
+    #
+    # @return [ void ]
+    #
+    # @api private
+    def initialize_field_caches
+      @__projector_cache = Concurrent::Map.new
+      @__demongoized_cache = Concurrent::Map.new
     end
 
     # Returns the logger
@@ -415,6 +485,7 @@ module Mongoid
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
         doc.instance_variable_set(:@attributes_before_type_cast, attributes.dup)
+        doc.send(:initialize_field_caches)
 
         doc._handle_callbacks_after_instantiation(execute_callbacks, &block)
 

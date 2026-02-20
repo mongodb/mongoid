@@ -27,6 +27,9 @@ module Mongoid
               process_attribute old_field, nil
             else
               attributes[new_name] = attributes.delete(old_field)
+              # Clear cache for both old and new field names
+              clear_demongoized_cache(old_field)
+              clear_demongoized_cache(new_name)
             end
             ops[atomic_attribute_name(old_field)] = atomic_attribute_name(new_name)
           end
