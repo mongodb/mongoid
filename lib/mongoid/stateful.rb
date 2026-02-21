@@ -156,6 +156,7 @@ module Mongoid
 
     def reset_readonly
       self.__selected_fields = nil
+      initialize_field_caches
     end
   end
 end
