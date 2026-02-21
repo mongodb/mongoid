@@ -165,6 +165,7 @@ module Mongoid
     def clear_demongoized_cache(name)
       @__demongoized_cache.delete(name)
     end
+    private :clear_demongoized_cache
 
     # Write a single attribute to the document attribute hash. This will
     # also fire the before and after update callbacks, and perform any
@@ -270,8 +271,10 @@ module Mongoid
     #
     # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
-      @__projector_cache[__selected_fields] ||= Projector.new(__selected_fields)
-      !@__projector_cache[__selected_fields].attribute_or_path_allowed?(name)
+      projector = @__projector_cache.compute_if_absent(__selected_fields) do
+        Projector.new(__selected_fields)
+      end
+      !projector.attribute_or_path_allowed?(name)
     end
 
     # Return type-casted attributes.
