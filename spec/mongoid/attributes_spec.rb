@@ -2479,6 +2479,8 @@ describe Mongoid::Attributes do
         end
 
         it "has the same attributes after reloading" do
+          puts doc.attributes
+          puts doc.reload.attributes
           expect(doc.attributes).to eq(doc.reload.attributes)
         end
       end
