@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'concurrent/map'
 require 'mongoid/positional'
 require 'mongoid/evolvable'
 require 'mongoid/extensions'
@@ -235,8 +236,25 @@ module Mongoid
     def prepare_to_process_attributes
       @new_record = true
       @attributes ||= {}
+      initialize_field_caches
       apply_pre_processed_defaults
       apply_default_scoping
+    end
+
+    # Initialize field cache instance variables to ensure consistent object shape.
+    #
+    # Initializes @__projector_cache and @__demongoized_cache early in all document
+    # creation paths. This ensures all documents have the same instance variable
+    # layout from the start, allowing Ruby's JIT compilers (YJIT, MJIT) to generate
+    # optimized code. Without this, lazy cache creation would cause shape polymorphism,
+    # preventing JIT optimizations.
+    #
+    # @return [ void ]
+    #
+    # @api private
+    def initialize_field_caches
+      @__projector_cache = Concurrent::Map.new
+      @__demongoized_cache = Concurrent::Map.new
     end
 
     # Returns the logger
@@ -415,6 +433,7 @@ module Mongoid
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
         doc.instance_variable_set(:@attributes_before_type_cast, attributes.dup)
+        doc.send(:initialize_field_caches)
 
         doc._handle_callbacks_after_instantiation(execute_callbacks, &block)
 
