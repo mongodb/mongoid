@@ -235,6 +235,9 @@ module Mongoid
     def prepare_to_process_attributes
       @new_record = true
       @attributes ||= {}
+      # Eagerly initialize attribute accessor to capture configuration at document creation time.
+      # Uses singleton for non-caching mode to avoid per-document memory overhead.
+      @attribute_accessor = build_attribute_accessor
       apply_pre_processed_defaults
       apply_default_scoping
     end
@@ -415,6 +418,9 @@ module Mongoid
         doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
         doc.instance_variable_set(:@attributes_before_type_cast, attributes.dup)
+        # Eagerly initialize attribute accessor to capture configuration at document load time.
+        # Uses singleton for non-caching mode to avoid per-document memory overhead.
+        doc.instance_variable_set(:@attribute_accessor, doc.send(:build_attribute_accessor))
 
         doc._handle_callbacks_after_instantiation(execute_callbacks, &block)
 

@@ -38,6 +38,24 @@ module Mongoid
     # error.
     option :belongs_to_required_by_default, default: true
 
+    # Cache attribute values for improved performance.
+    # When enabled, attribute reads will cache the type-casted (demongoized) value
+    # to avoid repeated type conversions on subsequent reads.
+    #
+    # Memory considerations:
+    # - When enabled: Each document instance allocates a CachingAccessor object
+    #   with its own Concurrent::Map for the cache. Each cached field value is
+    #   stored in this map.
+    # - When disabled (default): All documents share a single stateless Accessor
+    #   instance, resulting in zero memory overhead.
+    #
+    # For applications that keep many document instances in memory (for example,
+    # thousands or more), this additional per-document and per-field state can lead
+    # to noticeable memory overhead. Enable this option only when the performance
+    # benefits of avoiding repeated type conversions justify the extra memory use
+    # for your workload.
+    option :cache_attribute_values, default: false
+
     # Set the global discriminator key.
     option :discriminator_key, default: "_type"
 

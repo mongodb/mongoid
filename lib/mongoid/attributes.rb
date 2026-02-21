@@ -2,6 +2,8 @@
 # rubocop:todo all
 
 require "active_model/attribute_methods"
+require "mongoid/attributes/accessor"
+require "mongoid/attributes/caching_accessor"
 require "mongoid/attributes/dynamic"
 require "mongoid/attributes/embedded"
 require "mongoid/attributes/nested"
@@ -143,6 +145,7 @@ module Mongoid
       validate_writable_field_name!(name.to_s)
       as_writable_attribute!(name) do |access|
         _assigning do
+          attribute_accessor.invalidate(access)
           attribute_will_change!(access)
           delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
           attributes.delete(access)
@@ -173,6 +176,9 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
+          # Invalidate cache for this field
+          attribute_accessor.invalidate(field_name)
+
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
@@ -261,7 +267,37 @@ module Mongoid
       attribute_names.map { |name| [name, send(name)] }.to_h
     end
 
+    # Get the attribute accessor strategy for this document.
+    # Returns a caching accessor if enabled, otherwise a basic accessor.
+    #
+    # @return [ Accessor | CachingAccessor ] The attribute accessor.
+    #
+    # @api private
+    def attribute_accessor
+      @attribute_accessor ||= build_attribute_accessor
+    end
+
     private
+
+    # Build an attribute accessor instance based on current configuration.
+    #
+    # This method centralizes the choice between the basic and caching
+    # accessor implementations, ensuring consistent behavior based on
+    # the configuration at document creation time.
+    #
+    # For non-caching mode, returns a shared singleton to avoid per-document
+    # memory overhead. For caching mode, creates a new instance with its own cache.
+    #
+    # @return [ Accessor | CachingAccessor ] The attribute accessor instance.
+    #
+    # @api private
+    def build_attribute_accessor
+      if Mongoid::Config.cache_attribute_values
+        Attributes::CachingAccessor.new
+      else
+        Attributes::Accessor.instance
+      end
+    end
 
     # Does the string contain dot syntax for accessing hashes?
     #

@@ -39,6 +39,9 @@ module Mongoid
     def reset_object!(attributes)
       reset_atomic_updates!
 
+      # Reset attribute cache
+      attribute_accessor.reset!
+
       @attributes = attributes
       @attributes_before_type_cast = @attributes.dup
       @changed_attributes = {}

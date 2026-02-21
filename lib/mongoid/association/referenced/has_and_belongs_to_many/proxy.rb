@@ -122,6 +122,7 @@ module Mongoid
             append(doc)
             doc.apply_post_processed_defaults
             _base.public_send(foreign_key).push(doc.public_send(_association.primary_key))
+            _base.attribute_accessor.invalidate(foreign_key)
             unsynced(doc, inverse_foreign_key)
             yield(doc) if block_given?
             doc.run_pending_callbacks
@@ -367,6 +368,7 @@ module Mongoid
               ids[pk] = true
               save_or_delay(doc, docs, inserts)
             else
+              _base.attribute_accessor.invalidate(foreign_key)
               existing = _base.public_send(foreign_key)
               return if existing.include?(pk)
 

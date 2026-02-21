@@ -26,6 +26,7 @@ module Mongoid
             new_value = (current || 0) + increment
             process_attribute field, new_value if executing_atomically?
             attributes[field] = new_value
+            attribute_accessor.invalidate(field)
             ops[atomic_attribute_name(field)] = increment
           end
           { "$inc" => ops } unless ops.empty?
