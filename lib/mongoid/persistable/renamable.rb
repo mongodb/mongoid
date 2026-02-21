@@ -22,6 +22,8 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(renames) do |old_field, new_field|
             new_name = new_field.to_s
+            attribute_accessor.invalidate(old_field)
+            attribute_accessor.invalidate(new_name)
             if executing_atomically?
               process_attribute new_name, attributes[old_field]
               process_attribute old_field, nil

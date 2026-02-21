@@ -22,6 +22,7 @@ module Mongoid
         prepare_atomic_operation do |ops|
           fields.flatten.each do |field|
             normalized = database_field_name(field)
+            attribute_accessor.invalidate(normalized)
             if executing_atomically?
               process_attribute normalized, nil
             else

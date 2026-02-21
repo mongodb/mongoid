@@ -180,6 +180,8 @@ RSpec.configure do |config|
   config.extend(Mongoid::Macros)
 
   config.before(:suite) do
+    # Enable attribute value caching globally for tests
+    Mongoid::Config.cache_attribute_values = true
     Mongoid.purge!
   end
 
