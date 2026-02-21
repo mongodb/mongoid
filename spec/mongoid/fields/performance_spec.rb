@@ -443,12 +443,12 @@ describe 'Mongoid::Fields performance optimizations' do
 
       it 'handles concurrent projector cache access safely' do
         band = Band.create!(name: 'Test')
+        limited = Band.only(:name).find(band.id)
         errors = Concurrent::Array.new
 
         threads = Array.new(10) do
           Thread.new do
             100.times do
-              limited = Band.only(:name).find(band.id)
               limited.attribute_missing?('rating')
             rescue StandardError => e
               errors << e
