@@ -27,6 +27,7 @@ def standard_dependencies
 
     platform :mri do
       gem 'byebug'
+      gem 'allocation_stats', require: false
     end
 
     platform :jruby do
