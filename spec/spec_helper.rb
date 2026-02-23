@@ -126,6 +126,8 @@ end
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
+  # Enable cache for all tests
+  config.cache_attribute_values = true
 end
 
 # Autoload every model for the test suite that sits in spec/support/models.
