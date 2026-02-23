@@ -686,8 +686,8 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
+            # Handle lazy defaults first (before reading raw value)
             raw = read_raw_attribute(name)
-            # Handle lazy defaults outside of cache to avoid recursive locking
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
             # Don't cache localized fields as they depend on I18n.locale
@@ -698,9 +698,10 @@ module Mongoid
               # Atomically fetch or compute the cached value
               # Cache stores [raw_value, demongoized_value] to detect stale cache
               value = @__demongoized_cache.compute_if_absent(name) do
-                # Cache miss - compute and store
-                demongoized = process_raw_attribute(name.to_s, raw, field)
-                [raw, demongoized]
+                # Cache miss - re-read raw inside block to avoid race conditions
+                current_raw = read_raw_attribute(name)
+                demongoized = process_raw_attribute(name.to_s, current_raw, field)
+                [current_raw, demongoized]
               end
 
               # Check if cached raw value matches current raw value
