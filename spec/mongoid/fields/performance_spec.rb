@@ -16,6 +16,15 @@ end
 # Core field types (String, Integer, Float, etc.) must have exactly 0 allocations
 # to verify the caching optimization is working correctly.
 describe 'Mongoid::Fields performance optimizations' do
+  # Enable caching for all performance tests
+  around do |example|
+    original_value = Mongoid::Config.cache_attribute_values
+    Mongoid::Config.cache_attribute_values = true
+    example.run
+  ensure
+    Mongoid::Config.cache_attribute_values = original_value
+  end
+
   let(:band) do
     Band.new(
       name: 'Test Band',

@@ -693,7 +693,8 @@ module Mongoid
             # Don't cache localized fields as they depend on I18n.locale
             elsif field.localized?
               process_raw_attribute(name.to_s, raw, field)
-            else
+            # Check if caching is enabled
+            elsif Mongoid::Config.cache_attribute_values?
               # Atomically fetch or compute the cached value
               # Cache stores [raw_value, demongoized_value] to detect stale cache
               value = @__demongoized_cache.compute_if_absent(name) do
@@ -719,6 +720,9 @@ module Mongoid
               attribute_will_change!(name.to_s) if demongoized_value.resizable? && !is_relation
 
               demongoized_value
+            else
+              # Caching disabled - use original behavior
+              process_raw_attribute(name.to_s, raw, field)
             end
           end
         end
