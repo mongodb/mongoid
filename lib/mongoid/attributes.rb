@@ -161,6 +161,8 @@ module Mongoid
     #
     # @return [ void ]
     #
+    # @since 9.1.0
+    #
     # @api private
     def clear_demongoized_cache(name)
       @__demongoized_cache.delete(name) if Mongoid::Config.cache_attribute_values?

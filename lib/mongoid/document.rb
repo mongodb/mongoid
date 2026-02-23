@@ -251,6 +251,8 @@ module Mongoid
     #
     # @return [ void ]
     #
+    # @since 9.1.0
+    #
     # @api private
     def initialize_field_caches
       return unless Mongoid::Config.cache_attribute_values?
