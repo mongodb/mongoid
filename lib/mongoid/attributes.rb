@@ -163,7 +163,7 @@ module Mongoid
     #
     # @api private
     def clear_demongoized_cache(name)
-      @__demongoized_cache.delete(name)
+      @__demongoized_cache.delete(name) if Mongoid::Config.cache_attribute_values?
     end
     private :clear_demongoized_cache
 
@@ -262,7 +262,7 @@ module Mongoid
     # it from the database with missing fields.
     #
     # Cache the projector keyed by __selected_fields to automatically handle
-    # invalidation when selected fields change.
+    # invalidation when selected fields change (only if caching is enabled).
     #
     # @example Is the attribute missing?
     #   document.attribute_missing?("test")
@@ -271,10 +271,14 @@ module Mongoid
     #
     # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
-      projector = @__projector_cache.compute_if_absent(__selected_fields) do
-        Projector.new(__selected_fields)
+      if Mongoid::Config.cache_attribute_values?
+        projector = @__projector_cache.compute_if_absent(__selected_fields) do
+          Projector.new(__selected_fields)
+        end
+        !projector.attribute_or_path_allowed?(name)
+      else
+        !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
       end
-      !projector.attribute_or_path_allowed?(name)
     end
 
     # Return type-casted attributes.

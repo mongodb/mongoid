@@ -217,6 +217,23 @@ module Mongoid
     # document might be ignored, or it might work, depending on the situation.
     option :immutable_ids, default: true
 
+    # When this flag is true, Mongoid will cache demongoized attribute values
+    # to improve read performance. The cache stores both the raw BSON value
+    # and the demongoized Ruby object, automatically invalidating when the
+    # underlying raw value changes.
+    #
+    # This optimization can significantly improve performance for fields with
+    # expensive demongoization (e.g., Time, Date, custom types), especially
+    # in read-heavy workloads.
+    #
+    # The cache is disabled by default to maintain backward compatibility.
+    # Enable it to gain performance improvements:
+    #
+    #   Mongoid.configure do |config|
+    #     config.cache_attribute_values = true
+    #   end
+    option :cache_attribute_values, default: false
+
     # When this flag is true, callbacks for every embedded document will be
     # called only once, even if the embedded document is embedded in multiple
     # documents in the root document's dependencies graph.
