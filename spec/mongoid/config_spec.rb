@@ -894,6 +894,13 @@ describe Mongoid::Config do
         stub_const('CacheBand', band_class)
       end
 
+      around do |example|
+        original_value = Mongoid::Config.cache_attribute_values
+        example.run
+      ensure
+        Mongoid::Config.cache_attribute_values = original_value
+      end
+
       it 'uses caching when enabled' do
         Mongoid::Config.cache_attribute_values = true
         
