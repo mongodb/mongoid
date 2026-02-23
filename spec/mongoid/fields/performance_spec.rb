@@ -435,12 +435,14 @@ describe 'Mongoid::Fields performance optimizations' do
       it 'handles concurrent field access safely' do
         band = Band.new(name: 'Test Band', rating: 8.5)
         errors = Concurrent::Array.new
+        results = Concurrent::Array.new
 
         threads = Array.new(10) do
           Thread.new do
             100.times do
-              band.name
-              band.rating
+              name = band.name
+              rating = band.rating
+              results << [ name, rating ]
             rescue StandardError => e
               errors << e
             end
@@ -449,6 +451,12 @@ describe 'Mongoid::Fields performance optimizations' do
 
         threads.each(&:join)
         expect(errors).to be_empty
+
+        # Verify all threads read correct values
+        results.each do |name, rating|
+          expect(name).to eq('Test Band')
+          expect(rating).to eq(8.5)
+        end
       end
 
       it 'handles concurrent projector cache access safely' do

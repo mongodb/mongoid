@@ -234,13 +234,22 @@ module Mongoid
     #   end
     #
     # @note This option must be set during application initialization and
-    #   should not be changed at runtime. Documents created before the option
-    #   is enabled will not have caches initialized and will not benefit from
-    #   caching even if the option is later enabled. If the option is
-    #   disabled after being enabled, documents created while it was enabled
-    #   will retain their per-attribute caches but, once the option is
-    #   disabled, those caches will no longer be consulted when reading
-    #   attribute values.
+    #   should not be changed at runtime. Changing this flag at runtime is
+    #   unsupported and may lead to undefined behavior or errors.
+    #
+    #   If caching is enabled after documents are created:
+    #   - Pre-existing documents will not have cache instance variables
+    #     initialized, causing NoMethodError when field accessors attempt
+    #     to use the cache
+    #   - Only newly created documents will benefit from caching
+    #
+    #   If caching is disabled after documents are created:
+    #   - Pre-existing documents will retain their cache instance variables
+    #     but the caches will not be consulted, wasting memory
+    #   - Newly created documents will not have caches
+    #
+    #   To avoid inconsistent behavior, always configure this option once
+    #   at application boot and do not modify it thereafter.
     option :cache_attribute_values, default: false
 
     # When this flag is true, callbacks for every embedded document will be
