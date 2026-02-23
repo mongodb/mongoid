@@ -510,6 +510,71 @@ module Mongoid
             entries.as_json(options)
           end
 
+          # Get the sum of the provided field for all documents in the
+          # enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the sum of a field.
+          #   enumerable.sum(:likes)
+          #
+          # @param [ Symbol ] field The field to sum.
+          #
+          # @return [ Numeric ] The sum value.
+          def sum(field = nil)
+            return super(field || 0) if block_given?
+
+            field_values_for(field).sum || 0
+          end
+
+          # Get the average of the provided field for all documents in the
+          # enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the average of a field.
+          #   enumerable.avg(:likes)
+          #
+          # @param [ Symbol ] field The field to average.
+          #
+          # @return [ Float | nil ] The average value or nil if no documents.
+          def avg(field)
+            values = field_values_for(field)
+            return nil if values.empty?
+
+            values.sum / values.size.to_f
+          end
+
+          # Get the minimum value of the provided field for all documents in
+          # the enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the min of a field.
+          #   enumerable.min(:likes)
+          #
+          # @param [ Symbol ] field The field to min.
+          #
+          # @return [ Numeric | nil ] The min value or nil if no documents.
+          def min(field = nil)
+            return super() if block_given?
+
+            field_values_for(field).min
+          end
+
+          # Get the maximum value of the provided field for all documents in
+          # the enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the max of a field.
+          #   enumerable.max(:likes)
+          #
+          # @param [ Symbol ] field The field to max.
+          #
+          # @return [ Numeric | nil ] The max value or nil if no documents.
+          def max(field = nil)
+            return super() if block_given?
+
+            field_values_for(field).max
+          end
+
           # Return all the unique documents in the enumerable.
           #
           # @note This operation loads all documents from the database.
@@ -523,6 +588,15 @@ module Mongoid
           end
 
           private
+
+          # Collect non-nil values for the given field from all documents.
+          #
+          # @param [ Symbol ] field The field name.
+          #
+          # @return [ Array<Numeric> ] The non-nil field values.
+          def field_values_for(field)
+            map { |doc| doc.public_send(field) }.compact
+          end
 
           def set_base(document)
             if @_association.is_a?(Referenced::HasMany)
