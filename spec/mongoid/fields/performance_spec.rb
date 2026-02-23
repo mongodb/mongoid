@@ -3,6 +3,7 @@
 # rubocop:disable RSpec/ContextWording, RSpec/ExampleLength
 
 require 'spec_helper'
+require 'concurrent/array'
 
 # Allocation tracking is optional (only available on MRI with allocation_stats gem)
 begin
@@ -478,10 +479,12 @@ describe 'Mongoid::Fields performance optimizations' do
         I18n.available_locales = %i[en es]
         I18n.locale = :en
 
-        example.run
-
-        I18n.available_locales = previous_available_locales
-        I18n.locale = previous_locale
+        begin
+          example.run
+        ensure
+          I18n.available_locales = previous_available_locales
+          I18n.locale = previous_locale
+        end
       end
 
       it 'does not cache localized fields to preserve i18n behavior' do
