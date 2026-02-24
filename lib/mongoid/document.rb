@@ -256,6 +256,7 @@ module Mongoid
     # @api private
     def initialize_field_caches
       return unless Mongoid::Config.cache_attribute_values?
+
       @__projector_cache = Concurrent::Map.new
       @__demongoized_cache = Concurrent::Map.new
     end
