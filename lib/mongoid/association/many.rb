@@ -10,7 +10,15 @@ module Mongoid
       extend Forwardable
       include ::Enumerable
 
-      def_delegators :criteria, :avg, :max, :min, :sum
+      %i[avg max min sum].each do |method|
+        define_method(method) do |*args, &block|
+          if _target.respond_to?(:_loaded?) && _target._loaded?
+            _target.public_send(method, *args, &block)
+          else
+            criteria.public_send(method, *args, &block)
+          end
+        end
+      end
       def_delegators :_target, :length, :size, :any?
 
       # Is the association empty?
