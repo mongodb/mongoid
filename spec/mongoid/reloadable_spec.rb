@@ -7,6 +7,132 @@ describe Mongoid::Reloadable do
 
   describe "#reload" do
 
+    context "when called during after_save" do
+
+      context "when using non-sharded documents" do
+
+        class NonShardedProfile
+          include Mongoid::Document
+
+          attr_reader :after_save_count, :after_save_name_val
+
+          field :name, type: String
+
+          after_save :on_after_save
+
+          def on_after_save
+            @after_save_count = @after_save_count ? @after_save_count + 1 : 1
+
+            self.reload
+
+            @after_save_name_val = self.name
+          end
+        end
+
+        context "when using reload during a post-persist callback" do
+
+          context "when document is not yet persisted" do
+
+            context "when after_save" do
+              let(:profile) do
+                NonShardedProfile.new(name: "Alice")
+              end
+
+              it "reloads successfully" do
+                expect(profile.after_save_count).to be nil
+                expect(profile.after_save_name_val).to be nil
+                profile.name = "Bob"
+                profile.save
+                expect(profile.after_save_count).to eq(1)
+                expect(profile.after_save_name_val).to eq("Bob")
+              end
+            end
+          end
+
+          context "when document is already persisted" do
+
+            context "when after_save" do
+              let(:profile) do
+                NonShardedProfile.create(name: "Alice")
+              end
+
+              it "reloads successfully" do
+                expect(profile.after_save_count).to eq(1)
+                expect(profile.after_save_name_val).to eq("Alice")
+                profile.name = "Bob"
+                profile.save
+                expect(profile.after_save_count).to eq(2)
+                expect(profile.after_save_name_val).to eq("Bob")
+              end
+            end
+          end
+        end
+      end
+
+      context "when using sharded documents" do
+        require_topology :sharded
+
+        class ShardedProfile
+          include Mongoid::Document
+
+          attr_reader :after_save_count, :after_save_name_val
+
+          field :name, type: String
+
+          shard_key :name
+
+          after_save :on_after_save
+
+          def on_after_save
+            @after_save_count = @after_save_count ? @after_save_count + 1 : 1
+
+            self.reload
+
+            @after_save_name_val = self.name
+          end
+        end
+
+        context "when using reload during a post-persist callback" do
+
+          context "when document is not yet persisted" do
+
+            context "when after_save" do
+              let(:profile) do
+                ShardedProfile.new(name: "Alice")
+              end
+
+              it "reloads successfully" do
+                expect(profile.after_save_count).to be nil
+                expect(profile.after_save_name_val).to be nil
+                profile.name = "Bob"
+                profile.save
+                expect(profile.after_save_count).to eq(1)
+                expect(profile.after_save_name_val).to eq("Bob")
+              end
+            end
+          end
+
+          context "when document is already persisted" do
+
+            context "when after_save" do
+              let(:profile) do
+                ShardedProfile.create(name: "Alice")
+              end
+
+              it "reloads successfully" do
+                expect(profile.after_save_count).to eq(1)
+                expect(profile.after_save_name_val).to eq("Alice")
+                profile.name = "Bob"
+                profile.save
+                expect(profile.after_save_count).to eq(2)
+                expect(profile.after_save_name_val).to eq("Bob")
+              end
+            end
+          end
+        end
+      end
+    end
+
     context 'when persistence options are set' do
 
       let(:person) do
