@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/contextual/queryable"
 require "mongoid/contextual/mongo"
@@ -6,6 +7,9 @@ require "mongoid/contextual/memory"
 require "mongoid/contextual/none"
 
 module Mongoid
+
+  # Parent mixin module which adds aggregation (#sum, #avg, etc.) and
+  # atomic (#set, #unset, #push, etc.) behavior to Mongoid::Criteria.
   module Contextual
     extend Forwardable
 
@@ -19,7 +23,7 @@ module Mongoid
 
     # The methods in the contexts themselves should all get delegated to,
     # including destructive, modification, and optional methods.
-    def_delegators :context, *(Mongo.public_instance_methods(false) - [ :skip, :limit ])
+    def_delegators :context, *(Mongo.public_instance_methods(false) - [ :skip, :limit, :load_async ])
 
     # This gets blank and empty included.
     def_delegators :context, *Queryable.public_instance_methods(false)

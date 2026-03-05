@@ -1,7 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
+
+    # Mixin module included in Mongoid::Criteria which adds
+    # functionality related to default query scopes and named
+    # scopes.
     module Scopable
 
       # Applies the default scope to the criteria.
@@ -61,7 +66,7 @@ module Mongoid
         self
       end
 
-      # Forces the criteria to be scoped, unless its inside an unscoped block.
+      # Forces the criteria to be scoped, unless it's inside an unscoped block.
       #
       # @example Force the criteria to be scoped.
       #   criteria.scoped(skip: 10)

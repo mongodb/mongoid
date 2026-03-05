@@ -1,7 +1,9 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "active_model/attribute_methods"
 require "mongoid/attributes/dynamic"
+require "mongoid/attributes/embedded"
 require "mongoid/attributes/nested"
 require "mongoid/attributes/processing"
 require "mongoid/attributes/projector"
@@ -102,7 +104,8 @@ module Mongoid
     # @api private
     def process_raw_attribute(name, raw, field)
       value = field ? field.demongoize(raw) : raw
-      attribute_will_change!(name) if value.resizable?
+      is_relation = relations.key?(name)
+      attribute_will_change!(name) if value.resizable? && !is_relation
       value
     end
 
@@ -135,7 +138,7 @@ module Mongoid
     # @param [ String | Symbol ] name The name of the attribute to remove.
     #
     # @raise [ Errors::ReadonlyAttribute ] If the field cannot be removed due
-    #   to being flagged as reaodnly.
+    #   to being flagged as readonly.
     def remove_attribute(name)
       validate_writable_field_name!(name.to_s)
       as_writable_attribute!(name) do |access|
@@ -173,7 +176,7 @@ module Mongoid
           localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
-          unless attributes[field_name] == typed_value || attribute_changed?(field_name)
+          unless attribute_will_not_change?(field_name, typed_value) || attribute_changed?(field_name)
             attribute_will_change!(field_name)
           end
           if localized
@@ -298,7 +301,7 @@ module Mongoid
         if fields.key?(normalized)
           attributes[normalized]
         else
-          attributes.__nested__(normalized)
+          Embedded.traverse(attributes, normalized)
         end
       else
         attributes[normalized]
@@ -363,6 +366,24 @@ module Mongoid
         value = localized_fields[name].send(:lookup, value)
       end
       value.present?
+    end
+
+    # If `value` is a `BSON::Decimal128`, convert it to a `BigDecimal` for
+    # comparison purposes. This is necessary because `BSON::Decimal128` does
+    # not implement `#==` in a way that is compatible with `BigDecimal`.
+    def normalize_value(value)
+      value.is_a?(BSON::Decimal128) ? BigDecimal(value.to_s) : value
+    end
+
+    # Determine if the attribute will not change, by comparing the current
+    # value with the new value. The values are normalized to account for
+    # types that do not implement `#==` in a way that is compatible with
+    # each other, such as `BSON::Decimal128` and `BigDecimal`.
+    def attribute_will_not_change?(field_name, typed_value)
+      normalized_attribute = normalize_value(attributes[field_name])
+      normalized_typed_value = normalize_value(typed_value)
+
+      normalized_attribute == normalized_typed_value
     end
   end
 end

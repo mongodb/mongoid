@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -30,8 +31,8 @@ describe Mongoid::Criteria::Marshalable do
       let(:dump) { Marshal.dump(criteria) }
 
       before do
-        expect_any_instance_of(Mongoid::Criteria).to receive(:marshal_dump).and_wrap_original do |m, *args|
-          data = m.call(*args)
+        expect_any_instance_of(Mongoid::Criteria).to receive(:marshal_dump).and_wrap_original do |m, *args, **kwargs|
+          data = m.call(*args, **kwargs)
           data[1] = :mongo1x
           data
         end

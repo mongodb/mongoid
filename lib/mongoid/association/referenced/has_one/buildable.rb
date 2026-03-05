@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+# rubocop:todo all
+
+require 'mongoid/association/referenced/with_polymorphic_criteria'
 
 module Mongoid
   module Association
@@ -7,6 +10,7 @@ module Mongoid
 
         # The Builder behavior for has_one associations.
         module Buildable
+          include WithPolymorphicCriteria
 
           # This method either takes an _id or an object and queries for the
           # inverse side using the id or sets the object after clearing the
@@ -20,6 +24,12 @@ module Mongoid
           # @return [ Document ] A single document.
           def build(base, object, type = nil, selected_fields = nil)
             if query?(object)
+              # Handle array of hashes from $lookup aggregation
+              if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
+                doc = object.first
+                return doc ? Factory.execute_from_db(klass, doc, nil, selected_fields, execute_callbacks: false) : nil
+              end
+              
               if !base.new_record?
                 execute_query(object, base)
               end
@@ -54,14 +64,6 @@ module Mongoid
 
           def execute_query(object, base)
             query_criteria(object, base).take
-          end
-
-          def with_polymorphic_criterion(criteria, base)
-            if polymorphic?
-              criteria.where(type => base.class.name)
-            else
-              criteria
-            end
           end
 
           def query?(object)

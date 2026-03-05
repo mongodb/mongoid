@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -131,6 +132,15 @@ module Mongoid
           { name.to_s => transform_value(object, negating) }
         end
 
+        # Gets the raw selector condition that would be passed to Mongo.
+        #
+        # @example Gets the raw selector condition.
+        #   key.transform_value(50)
+        #
+        # @param [ Object ] value The value to be included.
+        # @param [ true | false ] negating If the selection should be negated.
+        #
+        # @return [ Hash ] The raw MongoDB selector.
         def transform_value(value, negating = false)
           if block
             expr = block[value]

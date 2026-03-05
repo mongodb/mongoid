@@ -1,8 +1,13 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
+
+      # Mixin module containing common functionality used to
+      # perform #accepts_nested_attributes_for attribute assignment
+      # on associations.
       module Buildable
 
         attr_accessor :attributes, :existing, :association, :options
@@ -59,6 +64,33 @@ module Mongoid
         # @return [ BSON::ObjectId | String | Object ] The converted id.
         def convert_id(klass, id)
           klass.using_object_ids? ? BSON::ObjectId.mongoize(id) : id
+        end
+
+        private
+
+        # Get the id attribute from the given hash, whether it's
+        # prefixed with an underscore or is a symbol.
+        #
+        # @example Get the id.
+        #   extract_id({ _id: 1 })
+        #
+        # @param [ Hash ] hash The hash from which to extract.
+        #
+        # @return [ Object ] The value of the id.
+        def extract_id(hash)
+          hash['_id'] || hash[:_id] || hash['id'] || hash[:id]
+        end
+
+        # Deletes the id key from the given hash.
+        #
+        # @example Delete an id value.
+        #   delete_id({ "_id" => 1 })
+        #
+        # @param [ Hash ] hash The hash from which to delete.
+        #
+        # @return [ Object ] The deleted value, or nil.
+        def delete_id(hash)
+          hash.delete('_id') || hash.delete(:_id) || hash.delete('id') || hash.delete(:id)
         end
       end
     end

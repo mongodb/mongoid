@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/criteria/findable"
 require "mongoid/criteria/includable"
@@ -40,6 +41,59 @@ module Mongoid
     include Clients::Sessions
     include Options
 
+    # Allowed methods for from_hash to prevent arbitrary method execution.
+    # Only query-building methods are allowed, not execution or modification methods.
+    ALLOWED_FROM_HASH_METHODS = %i[
+      all all_in all_of and any_in any_of asc ascending
+      batch_size between
+      collation comment cursor_type
+      desc descending
+      elem_match eq exists extras
+      geo_spatial group gt gte
+      hint
+      in includes
+      limit lt lte
+      max_distance max_scan max_time_ms merge mod
+      ne near near_sphere nin no_timeout none none_of nor not not_in
+      offset only or order order_by
+      project
+      raw read reorder
+      scoped skip slice snapshot
+      text_search type
+      unscoped unwind
+      where with_size with_type without
+    ].freeze
+
+    class << self
+      # Convert the given hash to a criteria. Will iterate over each keys in the
+      # hash which must correspond to an allowed method on a criteria object. The hash
+      # can include a "klass" key that specifies the model class for the criteria.
+      #
+      # @example Convert the hash to a criteria.
+      #   Criteria.from_hash({ klass: Band, where: { name: "Depeche Mode" })
+      #
+      # @deprecated This method is deprecated and will
+      #  be removed in a future release.
+      #
+      # @param [ Hash ] hash The hash to convert.
+      #
+      # @return [ Criteria ] The criteria.
+      #
+      # @raise [ ArgumentError ] If a method is not allowed in from_hash.
+      def from_hash(hash)
+        criteria = Criteria.new(hash.delete(:klass) || hash.delete('klass'))
+        hash.each_pair do |method, args|
+          method_sym = method.to_sym
+          unless ALLOWED_FROM_HASH_METHODS.include?(method_sym)
+            raise ArgumentError, "Method '#{method}' is not allowed in from_hash"
+          end
+          criteria = criteria.public_send(method_sym, args)
+        end
+        criteria
+      end
+      Mongoid.deprecate(self, :from_hash)
+    end
+
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
     CHECK = []
@@ -67,7 +121,7 @@ module Mongoid
     # and finds one or many documents for the provided _id values.
     #
     # If this method is given a block, it delegates to +Enumerable#find+ and
-    # returns the first document of those found by the current Crieria object
+    # returns the first document of those found by the current Criteria object
     # for which the block returns a truthy value.
     #
     # Note that the "default proc" argument of Enumerable is not specially
@@ -78,7 +132,7 @@ module Mongoid
     #   a nested array. Each array will be flattened.
     #
     # @example Finds a document by its _id, invokes Findable#find.
-    #   critera.find("1234")
+    #   criteria.find("1234")
     #
     # @example Finds the first matching document using a block, invokes Enumerable#find.
     #   criteria.find { |item| item.name == "Depeche Mode" }
@@ -151,6 +205,67 @@ module Mongoid
       !!@embedded
     end
 
+    # Produce a clone of the current criteria object with it's "raw"
+    # setting set to the given value. A criteria set to "raw" will return
+    # all results as raw hashes. If `typed` is true, the values in the hashes
+    # will be typecast according to the fields that they correspond to.
+    #
+    # When "raw" is not set (or if `raw_results` is false), the criteria will
+    # return all results as instantiated Document instances.
+    #
+    # @example Return query results as raw hashes:
+    #   Person.where(city: 'Boston').raw
+    #
+    # @param [ true | false ] raw_results Whether the new criteria should be
+    #   placed in "raw" mode or not.
+    # @param [ true | false ] typed Whether the raw results should be typecast
+    #   before being returned. Default is true if raw_results is false, and
+    #   false otherwise.
+    #
+    # @return [ Criteria ] the cloned criteria object.
+    def raw(raw_results = true, typed: nil)
+      # default for typed is true when raw_results is false, and false when
+      # raw_results is true.
+      typed = !raw_results if typed.nil?
+
+      if !typed && !raw_results
+        raise ArgumentError, 'instantiated results must be typecast'
+      end
+
+      clone.tap do |criteria|
+        criteria._raw_results = { raw: raw_results, typed: typed }
+      end
+    end
+
+    # An internal helper for getting/setting the "raw" flag on a given criteria
+    # object.
+    #
+    # @return [ nil | Hash ] If set, it is a hash with two keys, :raw and :typed,
+    #   that describe whether raw results should be returned, and whether they
+    #   ought to be typecast.
+    #
+    # @api private
+    attr_accessor :_raw_results
+
+    # Predicate that answers the question: is this criteria object currently
+    # in raw mode? (See #raw for a description of raw mode.)
+    #
+    # @return [ true | false ] whether the criteria is in raw mode or not.
+    def raw_results?
+      _raw_results && _raw_results[:raw]
+    end
+
+    # Predicate that answers the question: should the results returned by
+    # this criteria object be typecast? (See #raw for a description of this.)
+    # The answer is meaningless unless #raw_results? is true, since if
+    # instantiated document objects are returned they will always be typecast.
+    #
+    # @return [ true | false ] whether the criteria should return typecast
+    #   results.
+    def typecast_results?
+      _raw_results && _raw_results[:typed]
+    end
+
     # Extract a single id from the provided criteria. Could be in an $and
     # query or a straight _id query.
     #
@@ -159,7 +274,7 @@ module Mongoid
     #
     # @return [ Object ] The id.
     def extract_id
-      selector.extract_id
+      selector['_id'] || selector[:_id] || selector['id'] || selector[:id]
     end
 
     # Adds a criterion to the +Criteria+ that specifies additional options
@@ -222,10 +337,11 @@ module Mongoid
     # may be desired.
     #
     # @example Merge the criteria with another criteria.
-    #   criteri.merge(other_criteria)
+    #   criteria.merge(other_criteria)
     #
     # @example Merge the criteria with a hash. The hash must contain a klass
-    #   key and the key/value pairs correspond to method names/args.
+    #   key that specifies the model class for the criteria and the key/value
+    #   pairs correspond to method names/args.
     #
     #   criteria.merge({
     #     klass: Band,
@@ -233,7 +349,7 @@ module Mongoid
     #     order_by: { name: 1 }
     #   })
     #
-    # @param [ Criteria ] other The other criterion to merge with.
+    # @param [ Criteria | Hash ] other The other criterion to merge with.
     #
     # @return [ Criteria ] A cloned self.
     def merge(other)
@@ -247,16 +363,18 @@ module Mongoid
     # @example Merge another criteria into this criteria.
     #   criteria.merge(Person.where(name: "bob"))
     #
-    # @param [ Criteria ] other The criteria to merge in.
+    # @param [ Criteria | Hash ] other The criteria to merge in.
     #
     # @return [ Criteria ] The merged criteria.
     def merge!(other)
-      criteria = other.to_criteria
-      selector.merge!(criteria.selector)
-      options.merge!(criteria.options)
-      self.documents = criteria.documents.dup unless criteria.documents.empty?
-      self.scoping_options = criteria.scoping_options
-      self.inclusions = (inclusions + criteria.inclusions).uniq
+      other = self.class.from_hash(other) if other.is_a?(Hash)
+      selector.merge!(other.selector)
+      options.merge!(other.options)
+      self.documents = other.documents.dup unless other.documents.empty?
+      self.scoping_options = other.scoping_options
+      self.inclusions = (inclusions + other.inclusions).uniq
+      self._raw_results = self._raw_results || other._raw_results
+      @use_lookup = @use_lookup || other.use_lookup?
       self
     end
 
@@ -281,7 +399,7 @@ module Mongoid
       !!@none
     end
 
-    # Overriden to include _type in the fields.
+    # Overridden to include _type in the fields.
     #
     # @example Limit the fields returned from the database.
     #   Band.only(:name)
@@ -315,7 +433,7 @@ module Mongoid
       end
     end
 
-    # Overriden to exclude _id from the fields.
+    # Overridden to exclude _id from the fields.
     #
     # @example Exclude fields returned from the database.
     #   Band.without(:name)
@@ -331,7 +449,7 @@ module Mongoid
     # Returns true if criteria responds to the given method.
     #
     # @example Does the criteria respond to the method?
-    #   crtiteria.respond_to?(:each)
+    #   criteria.respond_to?(:each)
     #
     # @param [ Symbol ] name The name of the class method on the +Document+.
     # @param [ true | false ] include_private Whether to include privates.
@@ -349,9 +467,11 @@ module Mongoid
     #   criteria.to_criteria
     #
     # @return [ Criteria ] self.
+    # @deprecated
     def to_criteria
       self
     end
+    Mongoid.deprecate(self, :to_criteria)
 
     # Convert the criteria to a proc.
     #
@@ -398,8 +518,8 @@ module Mongoid
       # Historically this method required exactly one argument.
       # As of https://jira.mongodb.org/browse/MONGOID-4804 it also accepts
       # zero arguments.
-      # The underlying where implemetation that super invokes supports
-      # any number of arguments, but we don't presently allow mutiple
+      # The underlying where implementation that super invokes supports
+      # any number of arguments, but we don't presently allow multiple
       # arguments through this method. This API can be reconsidered in the
       # future.
       if args.length > 1
@@ -438,6 +558,8 @@ module Mongoid
     # @param [ Hash ] scope The scope for the code.
     #
     # @return [ Criteria ] The criteria.
+    #
+    # @deprecated
     def for_js(javascript, scope = {})
       code = if scope.empty?
         # CodeWithScope is not supported for $where as of MongoDB 4.4
@@ -447,6 +569,7 @@ module Mongoid
       end
       js_query(code)
     end
+    Mongoid.deprecate(self, :for_js)
 
     private
 
@@ -487,7 +610,9 @@ module Mongoid
       @inclusions = other.inclusions.dup
       @scoping_options = other.scoping_options
       @documents = other.documents.dup
+      self._raw_results = other._raw_results
       @context = nil
+      @use_lookup = other.use_lookup?
       super
     end
 

@@ -1,3 +1,4 @@
+# rubocop:todo all
 class SmMovie
   include Mongoid::Document
 

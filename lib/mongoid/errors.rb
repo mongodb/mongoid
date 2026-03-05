@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/errors/mongoid_error"
 require "mongoid/errors/ambiguous_relationship"
@@ -12,6 +13,7 @@ require "mongoid/errors/empty_config_file"
 require "mongoid/errors/immutable_attribute"
 require "mongoid/errors/in_memory_collation_not_supported"
 require "mongoid/errors/invalid_auto_encryption_configuration"
+require "mongoid/errors/invalid_around_callback"
 require "mongoid/errors/invalid_async_query_executor"
 require "mongoid/errors/invalid_collection"
 require "mongoid/errors/invalid_config_file"
@@ -67,7 +69,11 @@ require "mongoid/errors/transaction_error"
 require "mongoid/errors/transactions_not_supported"
 require "mongoid/errors/unknown_attribute"
 require "mongoid/errors/unknown_model"
+require 'mongoid/errors/unrecognized_model_alias'
+require 'mongoid/errors/unrecognized_resolver'
+require 'mongoid/errors/unregistered_class'
 require "mongoid/errors/unsaved_document"
 require "mongoid/errors/unsupported_javascript"
+require "mongoid/errors/unsupported_isolation_level"
 require "mongoid/errors/validations"
 require "mongoid/errors/delete_restriction"

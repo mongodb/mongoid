@@ -1,10 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/validatable/macros"
 require "mongoid/validatable/localizable"
 require "mongoid/validatable/associated"
 require "mongoid/validatable/format"
 require "mongoid/validatable/length"
+require "mongoid/validatable/numericality"
 require "mongoid/validatable/queryable"
 require "mongoid/validatable/presence"
 require "mongoid/validatable/uniqueness"
@@ -37,6 +39,14 @@ module Mongoid
       Threaded.exit_validate(self)
     end
 
+    # Perform a validation within the associated block.
+    def validating
+      begin_validate
+      yield
+    ensure
+      exit_validate
+    end
+
     # Given the provided options, are we performing validations?
     #
     # @example Are we performing validations?
@@ -67,7 +77,7 @@ module Mongoid
         begin_validate
         relation = without_autobuild { send(attr) }
         exit_validate
-        relation.do_or_do_not(:in_memory) || relation
+        relation.try(:in_memory) || relation
       elsif fields[attribute].try(:localized?)
         attributes[attribute]
       else

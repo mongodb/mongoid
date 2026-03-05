@@ -1,15 +1,9 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
 describe Mongoid::Extensions::TrueClass do
-
-  describe "#__sortable__" do
-
-    it "returns 1" do
-      expect(true.__sortable__).to eq(1)
-    end
-  end
 
   describe "#is_a?" do
 

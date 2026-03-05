@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 class Shape
   include Mongoid::Document

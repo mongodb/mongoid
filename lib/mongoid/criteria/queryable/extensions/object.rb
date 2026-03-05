@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional object behavior.
+        # Adds query type-casting behavior to Object class.
         module Object
 
           # Combine the two objects using the add strategy.
@@ -127,9 +128,11 @@ module Mongoid
           #   obj.regexp?
           #
           # @return [ false ] Always false.
+          # @deprecated
           def regexp?
             false
           end
+          Mongoid.deprecate(self, :regexp?)
 
           module ClassMethods
 

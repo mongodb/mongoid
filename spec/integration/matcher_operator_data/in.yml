@@ -114,16 +114,16 @@
   document:
     name: [Boris]
   query:
-    count:
+    name:
       $in:
         - !ruby/regexp /..ris/
-  matches: false
+  matches: true
 
 - name: array field - does not match native regexp as element value
   document:
     name: [Boris]
   query:
-    count:
+    name:
       $in:
         - !ruby/regexp /ri$/
   matches: false
@@ -132,18 +132,18 @@
   document:
     name: [Boris]
   query:
-    count:
+    name:
       $in:
         - !ruby/object:BSON::Regexp::Raw
           pattern: ..ris
           options: ''
-  matches: false
+  matches: true
 
 - name: array field - does not match bson regexp as element value
   document:
     name: [Boris]
   query:
-    count:
+    name:
       $in:
         - !ruby/object:BSON::Regexp::Raw
           pattern: ..ri$

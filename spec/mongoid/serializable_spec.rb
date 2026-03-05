@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -300,6 +301,22 @@ describe Mongoid::Serializable do
             { "title" => attributes["title"] }
           )
         end
+
+        context "when serializable_hash_with_legacy_only == true" do # default for <= 9
+          config_override :serializable_hash_with_legacy_only, true
+
+          it "includes all fields when passed an empty array" do
+            expect(person.serializable_hash(only: [])).to include attributes
+          end
+        end
+
+        context "when serializable_hash_with_legacy_only == false" do # default for >= 10
+          config_override :serializable_hash_with_legacy_only, false
+
+          it "doesn't include any fields when passed an empty array" do
+            expect(person.serializable_hash(only: [])).to be_empty
+          end
+        end
       end
 
       context "when specifying extra inclusions" do
@@ -510,13 +527,15 @@ describe Mongoid::Serializable do
             end
 
             it "includes the first relation" do
-              expect(relation_hash[0]).to include
+              expect(relation_hash[0]).to include(
                 { "_id" => "kudamm", "street" => "Kudamm" }
+              )
             end
 
             it "includes the second relation" do
-              expect(relation_hash[1]).to include
+              expect(relation_hash[1]).to include(
                 { "_id" => "tauentzienstr", "street" => "Tauentzienstr" }
+              )
             end
           end
 
@@ -527,13 +546,15 @@ describe Mongoid::Serializable do
             end
 
             it "includes the first relation" do
-              expect(relation_hash[0]).to include
+              expect(relation_hash[0]).to include(
                 { "_id" => "kudamm", "street" => "Kudamm" }
+              )
             end
 
             it "includes the second relation" do
-              expect(relation_hash[1]).to include
+              expect(relation_hash[1]).to include(
                 { "_id" => "tauentzienstr", "street" => "Tauentzienstr" }
+              )
             end
           end
 
@@ -652,8 +673,9 @@ describe Mongoid::Serializable do
             end
 
             it "includes the specified relation" do
-              expect(relation_hash).to include
-                { "_id" => "leo-marvin", "first_name" => "Leo", "last_name" => "Marvin" }
+              expect(relation_hash).to include(
+                { "_id" => "Leo-Marvin", "first_name" => "Leo", "last_name" => "Marvin" }
+              )
             end
           end
 
@@ -664,8 +686,9 @@ describe Mongoid::Serializable do
             end
 
             it "includes the specified relation" do
-              expect(relation_hash).to include
-                { "_id" => "leo-marvin", "first_name" => "Leo", "last_name" => "Marvin" }
+              expect(relation_hash).to include(
+                { "_id" => "Leo-Marvin", "first_name" => "Leo", "last_name" => "Marvin" }
+              )
             end
           end
 
@@ -676,8 +699,9 @@ describe Mongoid::Serializable do
             end
 
             it "includes the specified relation sans exceptions" do
-              expect(relation_hash).to include
+              expect(relation_hash).to include(
                 { "first_name" => "Leo", "last_name" => "Marvin" }
+              )
             end
           end
         end

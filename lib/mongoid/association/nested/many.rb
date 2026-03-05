@@ -1,8 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
+
+      # Builder class used to perform #accepts_nested_attributes_for
+      # attribute assignment on many-to-n associations.
       class Many
         include Buildable
 
@@ -12,6 +16,9 @@ module Mongoid
         # This attempts to perform 3 operations, either one of an update of
         # the existing association, a replacement of the association with a new
         # document, or a removal of the association.
+        # 
+        # It raises an argument error if the attributes are not a Hash or an 
+        # Array of key/value pairs.
         #
         # @example Build the nested attrs.
         #   many.build(person)
@@ -28,8 +35,12 @@ module Mongoid
           attributes.each do |attrs|
             if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
-            else
+            elsif attrs.is_a?(Array) && attrs.length > 1 && attrs[1].respond_to?(:with_indifferent_access)
               process_attributes(parent, attrs[1].with_indifferent_access)
+            elsif attrs.is_a?(Array) && attrs.length.even?
+              process_attributes(parent, Hash[*attrs].with_indifferent_access)
+            else
+              raise ArgumentError, "Attributes for nested association '#{association.name}' must be a Hash or an Array of key/value pairs."
             end
           end
         end
@@ -97,7 +108,8 @@ module Mongoid
         # @param [ Hash ] attrs The single document attributes to process.
         def process_attributes(parent, attrs)
           return if reject?(parent, attrs)
-          if id = attrs.extract_id
+
+          if (id = extract_id(attrs))
             update_nested_relation(parent, id, attrs)
           else
             existing.push(Factory.build(@class_name, attrs)) unless destroyable?(attrs)
@@ -149,7 +161,7 @@ module Mongoid
         # @param [ Document ] doc The document to update.
         # @param [ Hash ] attrs The attributes.
         def update_document(doc, attrs)
-          attrs.delete_id
+          delete_id(attrs)
           if association.embedded?
             doc.assign_attributes(attrs)
           else
@@ -185,6 +197,8 @@ module Mongoid
             update_document(doc, attrs)
             existing.push(doc) unless destroyable?(attrs)
           end
+
+          parent.children_may_have_changed!
         end
       end
     end

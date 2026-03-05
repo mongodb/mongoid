@@ -1,6 +1,8 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
+require 'support/models/sandwich'
 require_relative '../association/referenced/has_many_models'
 require_relative '../association/referenced/has_and_belongs_to_many_models'
 require_relative './nested_spec_models'
@@ -3037,7 +3039,7 @@ describe Mongoid::Attributes::Nested do
                   person.save!
                 end
 
-                it "does not perist the invalid value" do
+                it "does not persist the invalid value" do
                   expect(post_two.reload.title).to eq("First response")
                 end
               end

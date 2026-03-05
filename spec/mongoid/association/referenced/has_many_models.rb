@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 class HmmCompany
   include Mongoid::Document
@@ -94,4 +95,28 @@ class HmmAnimal
   scope :reptile, -> { where(taxonomy: 'reptile') }
 
   belongs_to :trainer, class_name: 'HmmTrainer', scope: -> { where(name: 'Dave') }
+end
+
+class HmmPost
+  include Mongoid::Document
+
+  field :title, type: String
+
+  has_many :comments, class_name: 'HmmComment', as: :container
+
+  accepts_nested_attributes_for :comments, allow_destroy: true
+end
+
+class HmmComment
+  include Mongoid::Document
+
+  field :title, type: String
+  field :num, type: Integer, default: 0
+
+  belongs_to :container, polymorphic: true
+  has_many :comments, class_name: 'HmmComment', as: :container
+
+  accepts_nested_attributes_for :comments, allow_destroy: true
+
+  validates :num, numericality: { greater_than_or_equal_to: 0 }
 end

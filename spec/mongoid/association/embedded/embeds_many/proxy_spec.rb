@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative '../embeds_many_models.rb'
@@ -1862,51 +1863,56 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
-  describe "#delete" do
+  %i[ delete delete_one ].each do |method|
+    describe "\##{method}" do
+      let(:address_one) { Address.new(street: "first") }
+      let(:address_two) { Address.new(street: "second") }
 
-    let(:person) do
-      Person.new
-    end
-
-    let(:address_one) do
-      Address.new(street: "first")
-    end
-
-    let(:address_two) do
-      Address.new(street: "second")
-    end
-
-    before do
-      person.addresses << [ address_one, address_two ]
-    end
-
-    context "when the document exists in the relation" do
-
-      let!(:deleted) do
-        person.addresses.delete(address_one)
+      before do
+        person.addresses << [ address_one, address_two ]
       end
 
-      it "deletes the document" do
-        expect(person.addresses).to eq([ address_two ])
+      shared_examples_for 'deleting from the collection' do
+        context 'when the document exists in the relation' do
+          let!(:deleted) do
+            person.addresses.send(method, address_one)
+          end
+
+          it 'deletes the document' do
+            expect(person.addresses).to eq([ address_two ])
+            expect(person.reload.addresses).to eq([ address_two ]) if person.persisted?
+          end
+
+          it 'deletes the document from the unscoped' do
+            expect(person.addresses.send(:_unscoped)).to eq([ address_two ])
+          end
+
+          it 'reindexes the relation' do
+            expect(address_two._index).to eq(0)
+          end
+
+          it 'returns the document' do
+            expect(deleted).to eq(address_one)
+          end
+        end
+
+        context 'when the document does not exist' do
+          it 'returns nil' do
+            expect(person.addresses.send(method, Address.new)).to be_nil
+          end
+        end
       end
 
-      it "deletes the document from the unscoped" do
-        expect(person.addresses.send(:_unscoped)).to eq([ address_two ])
+      context 'when the root document is unpersisted' do
+        let(:person) { Person.new }
+
+        it_behaves_like 'deleting from the collection'
       end
 
-      it "reindexes the relation" do
-        expect(address_two._index).to eq(0)
-      end
+      context 'when the root document is persisted' do
+        let(:person) { Person.create }
 
-      it "returns the document" do
-        expect(deleted).to eq(address_one)
-      end
-    end
-
-    context "when the document does not exist" do
-
-      it "returns nil" do
-        expect(person.addresses.delete(Address.new)).to be_nil
+        it_behaves_like 'deleting from the collection'
       end
     end
   end
@@ -2305,8 +2311,36 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         person.addresses.create!(street: "Bond St")
       end
 
+      let(:address) { person.addresses.first }
+
       it "returns true" do
         expect(person.addresses.exists?).to be true
+      end
+
+      context 'when given specifying conditions' do
+        context 'when the record exists in the association' do
+          it 'returns true by condition' do
+            expect(person.addresses.exists?(street: 'Bond St')).to be true
+          end
+
+          it 'returns true by id' do
+            expect(person.addresses.exists?(address._id)).to be true
+          end
+
+          it 'returns false when given false' do
+            expect(person.addresses.exists?(false)).to be false
+          end
+
+          it 'returns false when given nil' do
+            expect(person.addresses.exists?(nil)).to be false
+          end
+        end
+
+        context 'when the record does not exist in the association' do
+          it 'returns false' do
+            expect(person.addresses.exists?(street: 'Garfield Ave')).to be false
+          end
+        end
       end
     end
 
@@ -2318,6 +2352,13 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
 
       it "returns false" do
         expect(person.addresses.exists?).to be false
+      end
+
+      context 'when given specifying conditions' do
+        it 'returns false' do
+          expect(person.addresses.exists?(street: 'Hyde Park Dr')).to be false
+          expect(person.addresses.exists?(street: 'Garfield Ave')).to be false
+        end
       end
     end
   end
@@ -3765,7 +3806,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       person_two.addresses << address
     end
 
-    it "adds the document to the new paarent" do
+    it "adds the document to the new parent" do
       expect(person_two.addresses).to eq([ address ])
     end
 
@@ -4341,7 +4382,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           expect(artist.before_remove_embedded_called).to be true
         end
 
-        it "shoud clear the relation" do
+        it "clears the relation" do
           expect(artist.songs).to be_empty
         end
       end
@@ -4853,6 +4894,107 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       expect(user.orders.last).to be_a(EmmOrder)
 
       expect(user.orders.map(&:sku).sort).to eq([ 1, 2 ])
+    end
+  end
+
+  describe '#cache_version' do
+    context 'when the model does not have an updated_at column' do
+      let(:root_model) { Quiz.create! }
+      let(:root) { Quiz.find(root_model.id) }
+      let(:pages) { root.pages }
+
+      let(:prepopulated_root) do
+        root_model.pages << Page.new(content: 'Page #1')
+        root_model.pages << Page.new(content: 'Page #2')
+        Quiz.find(root_model.id)
+      end
+
+      shared_examples_for 'a cache_version generator' do
+        it 'produces a trivial cache_version' do
+          expect(pages.cache_version).to be == "#{pages.length}"
+        end
+      end
+
+      context 'when the relation is empty' do
+        it_behaves_like 'a cache_version generator'
+      end
+
+      context 'when the relation is not empty' do
+        let(:root) { prepopulated_root }
+
+        it_behaves_like 'a cache_version generator'
+      end
+    end
+
+    context 'when the model has an updated_at column' do
+      let(:root_model) { Book.create(title: 'Root') }
+      let(:root) { Book.find(root_model.id) }
+
+      let(:cover) { root_model.covers.first }
+      let(:covers) { root.covers }
+      let(:original_cache_version) { root.covers.cache_version }
+
+      let(:prepopulated_root) do
+        root_model.covers << Cover.new(title: 'Cover #1')
+        root_model.covers << Cover.new(title: 'Cover #2')
+        Book.find(root_model.id)
+      end
+
+      shared_examples_for 'a cache_version generator' do
+        it 'produces a consistent cache_version' do
+          expect(covers.cache_version).not_to be_nil
+          expect(covers.cache_version).to be == covers.cache_version
+        end
+      end
+
+      context 'when the relation is empty' do
+        it_behaves_like 'a cache_version generator'
+      end
+
+      context 'when the relation is not empty' do
+        let(:root) { prepopulated_root }
+        it_behaves_like 'a cache_version generator'
+      end
+
+      context 'when an element is updated' do
+        let(:updated_cache_version) do
+          cover.update title: 'modified'
+          cover.book.save!
+          cover.book.reload.covers.cache_version
+        end
+
+        let(:root) { prepopulated_root }
+
+        it 'changes the cache_version' do
+          expect(original_cache_version).not_to be == updated_cache_version
+        end
+      end
+
+      context 'when an element is added' do
+        let(:updated_cache_version) do
+          root.covers << Cover.new(title: 'Another Cover')
+          root.reload.covers.cache_version
+        end
+
+        let(:root) { prepopulated_root }
+
+        it 'changes the cache_version' do
+          expect(original_cache_version).not_to be == updated_cache_version
+        end
+      end
+
+      context 'when an element is removed' do
+        let(:updated_cache_version) do
+          cover.destroy
+          root.reload.covers.cache_version
+        end
+
+        let(:root) { prepopulated_root }
+
+        it 'changes the cache_version' do
+          expect(original_cache_version).not_to be == updated_cache_version
+        end
+      end
     end
   end
 end

@@ -1,13 +1,16 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
+
+      # Builder class used to perform #accepts_nested_attributes_for
+      # attribute assignment on one-to-n associations.
       class One
         include Buildable
 
         attr_accessor :destroy
-
 
         # Builds the association depending on the attributes and the options
         # passed to the macro.
@@ -26,7 +29,7 @@ module Mongoid
           return if reject?(parent, attributes)
           @existing = parent.send(association.name)
           if update?
-            attributes.delete_id
+            delete_id(attributes)
             existing.assign_attributes(attributes)
           elsif replace?
             parent.send(association.setter, Factory.build(@class_name, attributes))
@@ -34,7 +37,7 @@ module Mongoid
             parent.send(association.setter, nil)
           else
             check_for_id_violation!
-          end
+          end.tap { parent.children_may_have_changed! }
         end
 
         # Create the new builder for nested attributes on one-to-one
@@ -50,11 +53,24 @@ module Mongoid
           @attributes = attributes.with_indifferent_access
           @association = association
           @options = options
-          @class_name = options[:class_name] ? options[:class_name].constantize : association.klass
+          @class_name = class_from(options[:class_name])
           @destroy = @attributes.delete(:_destroy)
         end
 
         private
+
+        # Coerces the argument into a class, or defaults to the association's class.
+        #
+        # @param [ String | Mongoid::Document | nil ] name_or_class the value to coerce
+        #
+        # @return [ Mongoid::Document ] the resulting class
+        def class_from(name_or_class)
+          case name_or_class
+          when nil, false then association.klass
+          when String then name_or_class.constantize
+          else name_or_class
+          end
+        end
 
         # Extracts and converts the id to the expected type.
         #

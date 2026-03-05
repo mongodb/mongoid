@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Config
@@ -65,11 +66,7 @@ module Mongoid
         ]
 
         result = ERB.new(contents).result
-        data = if RUBY_VERSION < '2.6'
-          YAML.safe_load(result, permitted_classes, [], true)
-        else
-          YAML.safe_load(result, permitted_classes: permitted_classes, aliases: true)
-        end
+        data = YAML.safe_load(result, permitted_classes: permitted_classes, aliases: true)
 
         unless data.is_a?(Hash)
           raise Mongoid::Errors::InvalidConfigFile.new(path)

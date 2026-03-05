@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'mongoid/association/accessors'
 require 'mongoid/association/builders'
@@ -18,6 +19,10 @@ require 'mongoid/association/reflections'
 require 'mongoid/association/eager_loadable'
 
 module Mongoid
+
+  # Mixin module which adds association behavior to a Mongoid document.
+  # Adds methods such as #embedded? which indicate a document's
+  # relative association state.
   module Association
     extend ActiveSupport::Concern
     include Embedded::Cyclic

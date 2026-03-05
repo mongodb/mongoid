@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './attributes/nested_spec_models'
@@ -286,6 +287,22 @@ describe Mongoid::Attributes do
             }.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'title' on Person which was not loaded/)
           end
         end
+      end
+
+      context "when given nil" do
+
+        it "returns nil" do
+         expect(person[nil]).to be nil
+        end
+
+      end
+
+      context "when given an empty string" do
+
+        it "returns nil" do
+         expect(person[""]).to be nil
+        end
+
       end
 
       context "when the field was not explicitly defined" do
@@ -1712,6 +1729,19 @@ describe Mongoid::Attributes do
         end
       end
     end
+
+    context 'when map_big_decimal_to_decimal128 is enabled' do
+      config_override :map_big_decimal_to_decimal128, true
+
+      context 'when writing an identical number' do
+        let(:band) { Band.create!(name: 'Nirvana', sales: 123456.78).reload }
+
+        it 'does not mark the document as changed' do
+          band.sales = 123456.78
+          expect(band.changed?).to be false
+        end
+      end
+    end
   end
 
   describe "#typed_value_for" do
@@ -1722,7 +1752,7 @@ describe Mongoid::Attributes do
 
     context "when the key has been specified as a field" do
 
-      it "retuns the typed value" do
+      it "returns the typed value" do
         person.send(:typed_value_for, "age", "51")
       end
     end
@@ -2494,7 +2524,7 @@ describe Mongoid::Attributes do
         end
       end
 
-      context "when doing delete_one" do
+      context "when doing _remove" do
         let(:doc) { NestedBook.create! }
         let(:page) { NestedPage.new }
         before do
@@ -2502,7 +2532,7 @@ describe Mongoid::Attributes do
           doc.pages << NestedPage.new
           doc.pages << NestedPage.new
 
-          doc.pages.send(:delete_one, page)
+          doc.pages._remove(page)
         end
 
         it "updates the attributes" do
@@ -2678,7 +2708,7 @@ describe Mongoid::Attributes do
     end
   end
 
-  context "when modifiying a hash referenced with the [] notation" do
+  context "when modifying a hash referenced with the [] notation" do
     let(:church) { Church.create!(location: { x: 1 }) }
 
     before do
@@ -2692,7 +2722,23 @@ describe Mongoid::Attributes do
     end
   end
 
-  context "when modifiying a set referenced with the [] notation" do
+  context "when accessing an embedded document with the attribute accessor" do
+    let(:band) { Band.create! }
+
+    before do
+      Band.where(id: band.id).update_all({
+        :$push => {records: { _id: BSON::ObjectId.new }}
+      })
+    end
+
+    it "does not throw a conflicting update error" do
+      b1 = Band.find(band.id)
+      b1[:records].is_a?(Array).should be true
+      expect { b1.save! }.not_to raise_error
+    end
+  end
+
+  context "when modifying a set referenced with the [] notation" do
     let(:catalog) { Catalog.create!(set_field: [ 1 ].to_set) }
 
     before do
@@ -2704,6 +2750,33 @@ describe Mongoid::Attributes do
     it "persists the updated hash" do
       pending "MONGOID-2951"
       catalog.set_field.should == Set.new([ 1, 2 ])
+    end
+  end
+
+  context 'when an embedded field has a capitalized store_as name' do
+    let(:person) { Person.new(Purse: { brand: 'Gucci' }) }
+
+    it 'sets the value' do
+      expect(person.purse.brand).to eq('Gucci')
+    end
+
+    it 'saves successfully' do
+      expect(person.save!).to eq(true)
+    end
+
+    context 'when persisted' do
+      before do
+        person.save!
+        person.reload
+      end
+
+      it 'persists the value' do
+        expect(person.reload.purse.brand).to eq('Gucci')
+      end
+
+      it 'uses the correct key in the database' do
+        expect(person.collection.find(_id: person.id).first['Purse']['_id']).to eq(person.purse.id)
+      end
     end
   end
 end

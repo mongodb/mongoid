@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -187,6 +188,12 @@ describe Mongoid::Equality do
 
     it "compares based on the document id" do
       expect(first <=> second).to eq(-1)
+    end
+    
+    it "doesn't break if one isn't a document" do
+      expect do
+        first <=> "Foo"
+      end.to_not raise_error
     end
   end
 

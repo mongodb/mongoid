@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 class Person
   include Mongoid::Document
@@ -42,6 +43,7 @@ class Post
   field :title, :type => String
   field :content, :type => String
   belongs_to :person
+  has_many :alerts
 
   index person_id: 1
 end
@@ -62,4 +64,32 @@ class Preference
   has_and_belongs_to_many :people, :validate => false
 
   index person_ids: 1
+end
+
+class Account
+  include Mongoid::Document
+
+  field :name, :type => String
+  belongs_to :person
+  has_one :comment
+
+  index person_id: 1
+end
+
+class Comment
+  include Mongoid::Document
+
+  field :title, :type => String
+  belongs_to :account
+
+  index account_id: 1
+end
+
+class Alert
+  include Mongoid::Document
+
+  field :message, :type => String
+  belongs_to :post
+
+  index post_id: 1
 end

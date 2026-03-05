@@ -1,15 +1,21 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
+require 'mongoid/atomic_update_preparer'
+require 'mongoid/pluckable'
 require "mongoid/contextual/mongo/documents_loader"
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
-require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
 require "mongoid/association/eager_loadable"
 
 module Mongoid
   module Contextual
+
+    # Context object used for performing bulk query and persistence
+    # operations on documents which are persisted in the database and
+    # have not been loaded into application memory.
     class Mongo
       extend Forwardable
       include Enumerable
@@ -17,8 +23,7 @@ module Mongoid
       include Atomic
       include Association::EagerLoadable
       include Queryable
-
-      Mongoid.deprecate(self, :geo_near)
+      include Pluckable
 
       # Options constant.
       OPTIONS = [ :hint,
@@ -69,13 +74,20 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       def count(options = {}, &block)
         return super(&block) if block_given?
-        view.count_documents(options)
+
+        if valid_for_count_documents?
+          view.count_documents(options)
+        else
+          # TODO: Remove this when we remove the deprecated for_js API.
+          # https://jira.mongodb.org/browse/MONGOID-5681
+          view.count(options)
+        end
       end
 
       # Get the estimated number of documents matching the query.
       #
       # Unlike count, estimated_count does not take a block because it is not
-      # traditionally defined (with a block) on Enumarable like count is.
+      # traditionally defined (with a block) on Enumerable like count is.
       #
       # @example Get the estimated number of matching documents.
       #   context.estimated_count
@@ -250,29 +262,6 @@ module Mongoid
         end
       end
 
-      # Execute a $geoNear command against the database.
-      #
-      # @example Find documents close to 10, 10.
-      #   context.geo_near([ 10, 10 ])
-      #
-      # @example Find with spherical distance.
-      #   context.geo_near([ 10, 10 ]).spherical
-      #
-      # @example Find with a max distance.
-      #   context.geo_near([ 10, 10 ]).max_distance(0.5)
-      #
-      # @example Provide a distance multiplier.
-      #   context.geo_near([ 10, 10 ]).distance_multiplier(1133)
-      #
-      # @param [ Array<Float> ] coordinates The coordinates.
-      #
-      # @return [ GeoNear ] The GeoNear command.
-      #
-      # @deprecated
-      def geo_near(coordinates)
-        GeoNear.new(collection, criteria, coordinates)
-      end
-
       # Create the new Mongo context. This delegates operations to the
       # underlying driver.
       #
@@ -344,23 +333,12 @@ module Mongoid
       #   in the array will be a single value. Otherwise, each
       #   result in the array will be an array of values.
       def pluck(*fields)
-        # Multiple fields can map to the same field name. For example, plucking
-        # a field and its _translations field map to the same field in the database.
-        # because of this, we need to keep track of the fields requested.
-        normalized_field_names = []
-        normalized_select = fields.inject({}) do |hash, f|
-          db_fn = klass.database_field_name(f)
-          normalized_field_names.push(db_fn)
-          hash[klass.cleanse_localized_field_names(f)] = true
-          hash
-        end
-
-        view.projection(normalized_select).reduce([]) do |plucked, doc|
-          values = normalized_field_names.map do |n|
-            extract_value(doc, n)
-          end
-          plucked << (values.size == 1 ? values.first : values)
-        end
+        # Multiple fields can map to the same field name. For example,
+        # plucking a field and its _translations field map to the same
+        # field in the database. because of this, we need to prepare the
+        # projection specifically.
+        prep = prepare_pluck(fields, prepare_projection: true)
+        pluck_from_documents(view.projection(prep[:projection]), prep[:field_names])
       end
 
       # Pick the single field values from the database.
@@ -401,7 +379,7 @@ module Mongoid
       #
       # @return [ Document ] The document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents to take.
       def take!
         # Do to_a first so that the Mongo#first method is not used and the
@@ -583,7 +561,7 @@ module Mongoid
       #
       # @return [ Document ] The first document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def first!
         first || raise_document_not_found_error
@@ -625,7 +603,7 @@ module Mongoid
       #
       # @return [ Document ] The last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def last!
         last || raise_document_not_found_error
@@ -649,7 +627,7 @@ module Mongoid
       #
       # @return [ Document ] The second document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second!
         second || raise_document_not_found_error
@@ -673,7 +651,7 @@ module Mongoid
       #
       # @return [ Document ] The third document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third!
         third || raise_document_not_found_error
@@ -697,7 +675,7 @@ module Mongoid
       #
       # @return [ Document ] The fourth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fourth!
         fourth || raise_document_not_found_error
@@ -721,7 +699,7 @@ module Mongoid
       #
       # @return [ Document ] The fifth document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def fifth!
         fifth || raise_document_not_found_error
@@ -747,7 +725,7 @@ module Mongoid
       #
       # @return [ Document ] The second to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def second_to_last!
         second_to_last || raise_document_not_found_error
@@ -773,7 +751,7 @@ module Mongoid
       #
       # @return [ Document ] The third to last document.
       #
-      # @raises [ Mongoid::Errors::DocumentNotFound ] raises when there are no
+      # @raise [ Mongoid::Errors::DocumentNotFound ] raises when there are no
       #   documents available.
       def third_to_last!
         third_to_last || raise_document_not_found_error
@@ -805,8 +783,8 @@ module Mongoid
       # @return [ true | false ] If the update succeeded.
       def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
-        attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        view.send(method, attributes.__consolidate__(klass), opts)
+
+        view.send(method, AtomicUpdatePreparer.prepare(attributes, klass), opts)
       end
 
       # Apply the field limitations.
@@ -875,6 +853,7 @@ module Mongoid
           end
         else
           return view unless eager_loadable?
+          return eager_load_with_lookup if criteria.use_lookup?
           docs = view.map do |doc|
             Factory.from_db(klass, doc, criteria)
           end
@@ -893,8 +872,18 @@ module Mongoid
       #
       # @param [ Document ] document The document to yield to.
       def yield_document(document, &block)
-        doc = document.respond_to?(:_id) ?
-            document : Factory.from_db(klass, document, criteria)
+        doc = if document.respond_to?(:_id)
+                document
+              elsif criteria.raw_results?
+                if criteria.typecast_results?
+                  demongoize_hash(klass, document)
+                else
+                  document
+                end
+              else
+                Factory.from_db(klass, document, criteria)
+              end
+
         yield(doc)
       end
 
@@ -904,78 +893,6 @@ module Mongoid
 
       def acknowledged_write?
         collection.write_concern.nil? || collection.write_concern.acknowledged?
-      end
-
-      # Fetch the element from the given hash and demongoize it using the
-      # given field. If the obj is an array, map over it and call this method
-      # on all of its elements.
-      #
-      # @param [ Hash | Array<Hash> ] obj The hash or array of hashes to fetch from.
-      # @param [ String ] meth The key to fetch from the hash.
-      # @param [ Field ] field The field to use for demongoization.
-      #
-      # @return [ Object ] The demongoized value.
-      #
-      # @api private
-      def fetch_and_demongoize(obj, meth, field)
-        if obj.is_a?(Array)
-          obj.map { |doc| fetch_and_demongoize(doc, meth, field) }
-        else
-          res = obj.try(:fetch, meth, nil)
-          field ? field.demongoize(res) : res.class.demongoize(res)
-        end
-      end
-
-      # Extracts the value for the given field name from the given attribute
-      # hash.
-      #
-      # @param [ Hash ] attrs The attributes hash.
-      # @param [ String ] field_name The name of the field to extract.
-      #
-      # @param [ Object ] The value for the given field name
-      def extract_value(attrs, field_name)
-        i = 1
-        num_meths = field_name.count('.') + 1
-        curr = attrs.dup
-
-        klass.traverse_association_tree(field_name) do |meth, obj, is_field|
-          field = obj if is_field
-          is_translation = false
-          # If no association or field was found, check if the meth is an
-          # _translations field.
-          if obj.nil? & tr = meth.match(/(.*)_translations\z/)&.captures&.first
-            is_translation = true
-            meth = tr
-          end
-
-          # 1. If curr is an array fetch from all elements in the array.
-          # 2. If the field is localized, and is not an _translations field
-          #    (_translations fields don't show up in the fields hash).
-          #    - If this is the end of the methods, return the translation for
-          #      the current locale.
-          #    - Otherwise, return the whole translations hash so the next method
-          #      can select the language it wants.
-          # 3. If the meth is an _translations field, do not demongoize the
-          #    value so the full hash is returned.
-          # 4. Otherwise, fetch and demongoize the value for the key meth.
-          curr = if curr.is_a? Array
-            res = fetch_and_demongoize(curr, meth, field)
-            res.empty? ? nil : res
-          elsif !is_translation && field&.localized?
-            if i < num_meths
-              curr.try(:fetch, meth, nil)
-            else
-              fetch_and_demongoize(curr, meth, field)
-            end
-          elsif is_translation
-            curr.try(:fetch, meth, nil)
-          else
-            fetch_and_demongoize(curr, meth, field)
-          end
-
-          i += 1
-        end
-        curr
       end
 
       # Recursively demongoize the given value. This method recursively traverses
@@ -990,6 +907,48 @@ module Mongoid
       def recursive_demongoize(field_name, value, is_translation)
         field = klass.traverse_association_tree(field_name)
         demongoize_with_field(field, value, is_translation)
+      end
+
+      # Demongoizes (converts from database to Ruby representation) the values
+      # of the given hash as if it were the raw representation of a document of
+      # the given klass.
+      #
+      # @note this method will modify the given hash, in-place, for performance
+      # reasons. If you wish to preserve the original hash, duplicate it before
+      # passing it to this method.
+      #
+      # @param [ Document ] klass the Document class that the given hash ought
+      #   to represent
+      # @param [ Hash | nil ] hash the Hash instance containing the values to
+      #   demongoize.
+      #
+      # @return [ Hash | nil ] the demongoized result (nil if the input Hash
+      #   was nil)
+      #
+      # @api private
+      def demongoize_hash(klass, hash)
+        return nil unless hash
+
+        hash.each_key do |key|
+          value = hash[key]
+
+          # does the key represent a declared field on the document?
+          if (field = klass.fields[key])
+            hash[key] = field.demongoize(value)
+            next
+          end
+
+          # does the key represent an embedded relation on the document?
+          aliased_name = klass.aliased_associations[key] || key
+          if (assoc = klass.relations[aliased_name])
+            case value
+            when Array then value.each { |h| demongoize_hash(assoc.klass, h) }
+            when Hash then demongoize_hash(assoc.klass, value)
+            end
+          end
+        end
+
+        hash
       end
 
       # Demongoize the value for the given field. If the field is nil or the
@@ -1026,11 +985,44 @@ module Mongoid
       # @return [ Array<Document> | Document ] The list of documents or a
       #   single document.
       def process_raw_docs(raw_docs, limit)
-        docs = raw_docs.map do |d|
-          Factory.from_db(klass, d, criteria)
-        end
-        docs = eager_load(docs)
+        docs = if criteria.raw_results?
+                 if criteria.typecast_results?
+                   raw_docs.map { |doc| demongoize_hash(klass, doc) }
+                 else
+                   raw_docs
+                 end
+               else
+                 mapped = raw_docs.map { |doc| Factory.from_db(klass, doc, criteria) }
+                 if !criteria.use_lookup?
+                  # $lookup already eager loads related documents
+                  eager_load(mapped)
+                 else
+                  mapped
+                 end
+               end
+
         limit ? docs : docs.first
+      end
+
+      # Queries whether the current context is valid for use with
+      # the #count_documents? predicate. A context is valid if it
+      # does not include a `$where` operator.
+      #
+      # @return [ true | false ] whether or not the current context
+      #   excludes a `$where` operator.
+      #
+      # TODO: Remove this method when we remove the deprecated for_js API.
+      # https://jira.mongodb.org/browse/MONGOID-5681
+      def valid_for_count_documents?(hash = view.filter)
+        # Note that `view.filter` is a BSON::Document, and all keys in a
+        # BSON::Document are strings; we don't need to worry about symbol
+        # representations of `$where`.
+        hash.keys.each do |key|
+          return false if key == '$where'
+          return false if hash[key].is_a?(Hash) && !valid_for_count_documents?(hash[key])
+        end
+
+        true
       end
 
       def raise_document_not_found_error
@@ -1045,7 +1037,14 @@ module Mongoid
         sort = view.sort || { _id: 1 }
         v = view.sort(sort).limit(limit || 1)
         v = v.skip(n) if n > 0
-        if raw_docs = v.to_a
+        if criteria.use_lookup?
+          # Update criteria and view with the sort, skip, and limit before eager loading
+          @criteria = criteria.order_by(sort).limit(limit || 1)
+          @criteria = @criteria.skip(n) if n > 0
+          @view = collection.find(criteria.selector, session: _session).limit(limit || 1).sort(sort)
+          @view = @view.skip(n) if n > 0
+          eager_load_with_lookup
+        elsif raw_docs = v.to_a
           process_raw_docs(raw_docs, limit)
         end
       end
@@ -1055,10 +1054,19 @@ module Mongoid
       end
 
       def retrieve_nth_to_last_with_limit(n, limit)
-        v = view.sort(inverse_sorting).skip(n).limit(limit || 1)
+        v = view.sort(inverse_sorting).limit(limit || 1)
         v = v.skip(n) if n > 0
-        raw_docs = v.to_a.reverse
-        process_raw_docs(raw_docs, limit)
+        if criteria.use_lookup?
+          # Update criteria and view with the inverse sort, skip, and limit before eager loading
+          @criteria = criteria.order_by(inverse_sorting).limit(limit || 1)
+          @criteria = @criteria.skip(n) if n > 0
+          @view = collection.find(criteria.selector, session: _session).limit(limit || 1).sort(inverse_sorting)
+          @view = @view.skip(n) if n > 0
+          eager_load_with_lookup.reverse
+        else
+          raw_docs = v.to_a.reverse
+          process_raw_docs(raw_docs, limit)
+        end
       end
     end
   end

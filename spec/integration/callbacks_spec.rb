@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'spec_helper'
 require_relative './callbacks_models'
@@ -552,6 +553,54 @@ describe 'callbacks integration tests' do
           :age => [false, true, false]
         }
       )
+    end
+  end
+
+  context 'nested embedded documents' do
+    config_override :prevent_multiple_calls_of_embedded_callbacks, true
+    config_override :around_callbacks_for_embeds, true
+
+    let(:logger) { Array.new }
+
+    let(:root) do
+      Root.new(
+        embedded_once: [
+          EmbeddedOnce.new(
+            embedded_twice: [EmbeddedTwice.new]
+          )
+        ]
+      )
+    end
+
+    before(:each) do
+      root.logger = logger
+      root.embedded_once.first.logger = logger
+      root.embedded_once.first.embedded_twice.first.logger = logger
+    end
+
+    it 'runs callbacks in the correct order' do
+      root.save!
+      expect(logger).to eq(%i[embedded_twice embedded_once root])
+    end
+  end
+
+  context 'cascade callbacks' do
+    ruby_version_gte '3.0'
+    require_mri
+
+    let(:book) do
+      Book.new
+    end
+
+    before do
+      1500.times do
+        book.pages.build
+      end
+    end
+
+    # https://jira.mongodb.org/browse/MONGOID-5658
+    it 'does not raise SystemStackError' do
+      expect { book.save! }.not_to raise_error(SystemStackError)
     end
   end
 end

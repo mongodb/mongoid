@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative '../has_many_models'
@@ -284,6 +285,57 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
       it 'eager loads the included docs' do
         expect(eager.animals._loaded).to eq(animal1._id => animal1)
         expect(eager.animals).to eq [animal1]
+      end
+    end
+
+    context "when calling aggregation methods on an eager loaded association" do
+
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
+
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:post1) do
+        OrderedPost.create!(person: person, rating: 10)
+      end
+
+      let!(:post2) do
+        OrderedPost.create!(person: person, rating: 20)
+      end
+
+      let!(:post3) do
+        OrderedPost.create!(person: person, rating: 30)
+      end
+
+      let!(:eager) do
+        Person.includes(:ordered_posts).first
+      end
+
+      it "does not query the database for sum" do
+        expect_no_queries do
+          expect(eager.ordered_posts.sum(:rating)).to eq(60)
+        end
+      end
+
+      it "does not query the database for avg" do
+        expect_no_queries do
+          expect(eager.ordered_posts.avg(:rating)).to eq(20.0)
+        end
+      end
+
+      it "does not query the database for min" do
+        expect_no_queries do
+          expect(eager.ordered_posts.min(:rating)).to eq(10)
+        end
+      end
+
+      it "does not query the database for max" do
+        expect_no_queries do
+          expect(eager.ordered_posts.max(:rating)).to eq(30)
+        end
       end
     end
   end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -26,6 +27,34 @@ describe Mongoid::Clients::Factory do
         expected_addresses.include?(address)
       end
       expect(ok).to be true
+    end
+  end
+
+  shared_examples_for 'includes rails wrapping library' do
+    context 'when Rails is available' do
+      around do |example|
+        rails_was_defined = defined?(::Rails)
+
+        if !rails_was_defined
+          module ::Rails
+            def self.version
+              '6.1.0'
+            end
+          end
+        end
+
+        example.run
+
+        if !rails_was_defined
+          Object.send(:remove_const, :Rails) if defined?(::Rails)
+        end
+      end
+
+      it 'adds Rails as another wrapping library' do
+        expect(client.options[:wrapping_libraries]).to include(
+          {'name' => 'Rails', 'version' => '6.1.0'},
+        )
+      end
     end
   end
 
@@ -88,6 +117,8 @@ describe Mongoid::Clients::Factory do
               Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)]
           end
 
+          it_behaves_like 'includes rails wrapping library'
+
           context 'when configuration specifies a wrapping library' do
 
             let(:config) do
@@ -109,6 +140,8 @@ describe Mongoid::Clients::Factory do
                 {'name' => 'Foo'},
               ]
             end
+
+            it_behaves_like 'includes rails wrapping library'
           end
         end
 
@@ -252,23 +285,6 @@ describe Mongoid::Clients::Factory do
         restore_config_clients
         include_context 'with encryption'
 
-        let(:config) do
-          {
-            default: { hosts: SpecConfig.instance.addresses, database: database_id },
-            encrypted: {
-              hosts: SpecConfig.instance.addresses,
-              database: database_id,
-              options: {
-                auto_encryption_options: {
-                  kms_providers: kms_providers,
-                  key_vault_namespace: key_vault_namespace,
-                  extra_options: extra_options
-                }
-              }
-            }
-          }
-        end
-
         before do
           Mongoid::Config.send(:clients=, config)
           key_vault_client[key_vault_collection].drop
@@ -282,12 +298,60 @@ describe Mongoid::Clients::Factory do
           described_class.create(:encrypted)
         end
 
-        it "returns a client" do
-          expect(client).to be_a(Mongo::Client)
+        context 'when no key vault client is provided' do
+          let(:config) do
+            {
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              encrypted: {
+                hosts: SpecConfig.instance.addresses,
+                database: database_id,
+                options: {
+                  auto_encryption_options: {
+                    kms_providers: kms_providers,
+                    key_vault_namespace: key_vault_namespace,
+                    extra_options: extra_options
+                  }
+                }
+              }
+            }
+          end
+
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
+          end
+
+          it 'sets schema_map for the client' do
+            expect(client.options[:auto_encryption_options][:schema_map]).not_to be_nil
+          end
         end
 
-        it 'sets schema_map for the client' do
-          expect(client.options[:auto_encryption_options][:schema_map]).not_to be_nil
+        context 'when a key vault client is provided' do
+          let(:config) do
+            {
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              key_vault: { hosts: SpecConfig.instance.addresses, database: database_id },
+              encrypted: {
+                hosts: SpecConfig.instance.addresses,
+                database: database_id,
+                options: {
+                  auto_encryption_options: {
+                    key_vault_client: :key_vault,
+                    kms_providers: kms_providers,
+                    key_vault_namespace: key_vault_namespace,
+                    extra_options: extra_options
+                  }
+                }
+              }
+            }
+          end
+
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
+          end
+
+          it 'sets key_vault_client option for the client' do
+            expect(client.options[:auto_encryption_options][:key_vault_client]).to eq(Mongoid::Clients.with_name(:key_vault))
+          end
         end
       end
     end

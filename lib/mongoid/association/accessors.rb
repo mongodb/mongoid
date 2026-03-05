@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -41,7 +42,8 @@ module Mongoid
       #
       # @return [ Proxy ] The association.
       def create_relation(object, association, selected_fields = nil)
-        type = @attributes[association.inverse_type]
+        key = @attributes[association.inverse_type]
+        type = key ? association.resolver.model_for(key) : nil
         target = if t = association.build(self, object, type, selected_fields)
           association.create_relation(self, t)
         else
@@ -115,7 +117,11 @@ module Mongoid
         # during binding or when cascading callbacks. Whenever we retrieve
         # associations within the codebase, we use without_autobuild.
         if !without_autobuild? && association.embedded? && attribute_missing?(field_name)
-          raise Mongoid::Errors::AttributeNotLoaded.new(self.class, field_name)
+          # We always allow accessing the parent document of an embedded one.
+          try_get_parent = association.is_a?(
+                             Mongoid::Association::Embedded::EmbeddedIn
+                           ) && field_name == association.key
+          raise Mongoid::Errors::AttributeNotLoaded.new(self.class, field_name) unless try_get_parent
         end
 
         if !reload && (value = ivar(name)) != false
@@ -125,6 +131,10 @@ module Mongoid
             _loading do
               if object && needs_no_database_query?(object, association)
                 __build__(name, object, association)
+              # Check if data was loaded via $lookup aggregation
+              elsif !association.embedded? && attributes.key?(name.to_s)
+                # Use the pre-loaded association data from $lookup
+                __build__(name, attributes[name.to_s], association)
               else
                 selected_fields = _mongoid_filter_selected_fields(association.key)
                 __build__(name, attributes[association.key], association, selected_fields)
@@ -217,7 +227,7 @@ module Mongoid
 
       def needs_no_database_query?(object, association)
         object.is_a?(Document) && !object.embedded? &&
-            object._id == attributes[association.key]
+            object[association.try(:primary_key) || :_id] == attributes[association.key]
       end
 
       # Is the current code executing without autobuild functionality?

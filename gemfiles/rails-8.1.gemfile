@@ -1,0 +1,14 @@
+# rubocop:todo all
+source 'https://rubygems.org'
+
+gem 'actionpack', '~> 8.1.0'
+gem 'activemodel', '~> 8.1.0'
+
+group :test do
+  gem 'activejob', '~> 8.1.0'
+end
+gemspec path: '..'
+
+require_relative './standard'
+
+standard_dependencies

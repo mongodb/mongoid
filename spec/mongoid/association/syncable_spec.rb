@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -43,7 +44,7 @@ describe "Syncable Association" do
       Object.send(:remove_const, :TestModel)
     end
 
-    it 'prohibits the use of :_sycned as an attribute' do
+    it 'prohibits the use of :_synced as an attribute' do
       expect {
         model_synced
       }.to raise_exception(Mongoid::Errors::InvalidField)

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -148,7 +149,7 @@ describe Mongoid::Contextual::MapReduce do
         end
       end
 
-      context "when the statstics are requested" do
+      context "when the statistics are requested" do
         max_server_version '4.2'
 
         it "raises an error" do

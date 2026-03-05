@@ -1,9 +1,10 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Attributes
 
-    # Defines behavior around that lovel Rails feature nested attributes.
+    # Defines behavior for the Rails nested attributes feature.
     module Nested
       extend ActiveSupport::Concern
 
@@ -59,7 +60,8 @@ module Mongoid
             re_define_method(meth) do |attrs|
               _assigning do
                 if association.polymorphic? and association.inverse_type
-                  options = options.merge!(:class_name => self.send(association.inverse_type))
+                  klass = association.resolver.model_for(send(association.inverse_type))
+                  options = options.merge!(:class_name => klass)
                 end
                 association.nested_builder(attrs, options).build(self)
               end

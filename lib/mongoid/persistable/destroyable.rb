@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Persistable
@@ -50,6 +51,9 @@ module Mongoid
       #   the delete action. Callbacks will still be run even if false.
       # @option options [ true | false ] :suppress Whether to update
       #   the parent document in-memory when deleting an embedded document.
+      #
+      # @raises [ Mongoid::Errors::DocumentNotDestroyed ] Raised if
+      #   the document was not destroyed.
       #
       # @return [ true ] Always true.
       def destroy!(options = {})

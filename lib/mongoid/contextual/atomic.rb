@@ -1,7 +1,14 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Contextual
+
+    # Mixin module included in Mongoid::Criteria which provides a
+    # direct method interface to MongoDB's Update Operators ($set,
+    # $pull, $inc, etc.) These operators can be applied to update
+    # all documents in the database within the criteria scope,
+    # without loading each document into Mongoid's memory.
     module Atomic
 
       # Execute an atomic $addToSet on the matching documents.
@@ -162,17 +169,14 @@ module Mongoid
       # @example Unset the field on the matches.
       #   context.unset(:name)
       #
-      # @param [ [ String | Symbol | Array<String | Symbol> | Hash ]... ] *args
-      #   The name(s) of the field(s) to unset.
-      #   If a Hash is specified, its keys will be used irrespective of what
-      #   each key's value is, even if the value is nil or false.
+      # @param [ [ String | Symbol | Array<String | Symbol> | Hash ]... ] *unsets
+      #   The name(s) of the field(s) to unset. If a Hash is specified,
+      #   its keys will be used irrespective of value, even if the value
+      #   is nil or false.
       #
       # @return [ nil ] Nil.
-      def unset(*args)
-        fields = args.map { |a| a.is_a?(Hash) ? a.keys : a }
-                     .__find_args__
-                     .map { |f| [database_field_name(f), true] }
-        view.update_many("$unset" => Hash[fields])
+      def unset(*unsets)
+        view.update_many('$unset' => collect_unset_operations(unsets))
       end
 
       # Performs an atomic $min update operation on the given field or fields.
@@ -239,6 +243,25 @@ module Mongoid
         ops.each_with_object({}) do |(field, value), operations|
           operations[database_field_name(field)] = { "$each" => Array.wrap(value).mongoize }
         end
+      end
+
+      # Builds the selector an atomic $unset operation from arguments.
+      #
+      # @example Prepare selector from array.
+      #   context.collect_unset_operations([:name, :age])
+      #   #=> { "name" => true, "age" => true }
+      #
+      # @example Prepare selector from hash.
+      #   context.collect_unset_operations({ name: 1 }, { age: 1 })
+      #   #=> { "name" => true, "age" => true }
+      #
+      # @param [ String | Symbol | Array<String | Symbol> | Hash ] ops
+      #   The name(s) of the field(s) to unset.
+      #
+      # @return [ Hash ] The selector for the atomic $unset operation.
+      def collect_unset_operations(ops)
+        ops.map { |op| op.is_a?(Hash) ? op.keys : op }.flatten
+           .map { |field| [database_field_name(field), true] }.to_h
       end
     end
   end

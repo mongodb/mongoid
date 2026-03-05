@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -78,6 +79,17 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
         it "returns nil" do
           expect(document).to eq(nil)
         end
+      end
+    end
+
+    context "when provided an array of hashes" do
+      let(:object) do
+        [{ "_id" => BSON::ObjectId.new, "name" => "Savings", "balance" => 500 }]
+      end
+
+      it "returns the document" do
+        expect(document.name).to eq("Savings")
+        expect(document.balance).to eq(500)
       end
     end
 

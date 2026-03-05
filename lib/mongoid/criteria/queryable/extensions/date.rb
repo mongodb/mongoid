@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional date behavior.
+        # Adds query type-casting behavior to Date class.
         module Date
 
           # Evolve the date into a mongo friendly time, UTC midnight.
@@ -25,7 +26,7 @@ module Mongoid
           #
           # @return [ Time | ActiveSupport::TimeWithZone ] The date as a local time.
           def __evolve_time__
-            ::Time.configured.local(year, month, day)
+            ::Time.zone.local(year, month, day)
           end
 
           module ClassMethods

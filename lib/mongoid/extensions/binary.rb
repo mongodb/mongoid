@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Extensions
+
+    # Adds type-casting behavior to BSON::Binary class.
     module Binary
 
       # Turn the object from the ruby type we deal with to a Mongo friendly

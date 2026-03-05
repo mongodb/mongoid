@@ -1,38 +1,116 @@
 # frozen_string_literal: true
 
-require "mongoid/threaded/lifecycle"
+require 'mongoid/threaded/lifecycle'
 
 module Mongoid
-
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
+    # The key for the shared thread- and fiber-local storage. It must be a
+    # symbol because keys for fiber-local storage must be symbols.
+    STORAGE_KEY = :'[mongoid]'
 
-    DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
-
-    # Constant for the key to store clients.
-    CLIENTS_KEY = "[mongoid]:clients"
+    DATABASE_OVERRIDE_KEY = 'db-override'
 
     # The key to override the client.
-    CLIENT_OVERRIDE_KEY = "[mongoid]:client-override"
+    CLIENT_OVERRIDE_KEY = 'client-override'
 
     # The key for the current thread's scope stack.
-    CURRENT_SCOPE_KEY = "[mongoid]:current-scope"
+    CURRENT_SCOPE_KEY = 'current-scope'
 
-    AUTOSAVES_KEY = "[mongoid]:autosaves"
-    VALIDATIONS_KEY = "[mongoid]:validations"
+    AUTOSAVES_KEY = 'autosaves'
+
+    VALIDATIONS_KEY = 'validations'
 
     STACK_KEYS = Hash.new do |hash, key|
-      hash[key] = "[mongoid]:#{key}-stack"
+      hash[key] = "#{key}-stack"
     end
 
     # The key for the current thread's sessions.
-    SESSIONS_KEY="[mongoid]:sessions"
+    SESSIONS_KEY = 'sessions'
 
     # The key for storing documents modified inside transactions.
-    MODIFIED_DOCUMENTS_KEY="[mongoid]:modified-documents"
+    MODIFIED_DOCUMENTS_KEY = 'modified-documents'
+
+    # The key storing the default value for whether or not callbacks are
+    # executed on documents.
+    EXECUTE_CALLBACKS = 'execute-callbacks'
 
     extend self
+
+    # Resets the current thread- or fiber-local storage to its initial state.
+    # This is useful for making sure the state is clean when starting a new
+    # thread or fiber.
+    #
+    # The value of Mongoid::Config.real_isolation_level is used to determine
+    # whether to reset the storage for the current thread or fiber.
+    def reset!
+      case Config.real_isolation_level
+      when :thread
+        Thread.current.thread_variable_set(STORAGE_KEY, nil)
+      when :fiber
+        Fiber[STORAGE_KEY] = nil
+      else
+        raise "Unknown isolation level: #{Config.real_isolation_level.inspect}"
+      end
+    end
+
+    # Queries the thread- or fiber-local variable with the given name. If a block is
+    # given, and the variable does not already exist, the return value of the
+    # block will be set as the value of the variable before returning it.
+    #
+    # It is very important that applications (and especially Mongoid)
+    # use this method instead of Thread#[], since Thread#[] is actually for
+    # fiber-local variables, and Mongoid uses Fibers as an implementation
+    # detail in some callbacks. Putting thread-local state in a fiber-local
+    # store will result in the state being invisible when relevant callbacks are
+    # run in a different fiber.
+    #
+    # Affected callbacks are cascading callbacks on embedded children.
+    #
+    # @param [ String | Symbol ] key the name of the variable to query
+    # @param [ Proc ] default an optional block that must return the default
+    #   (initial) value of this variable.
+    #
+    # @return [ Object | nil ] the value of the queried variable, or nil if
+    #   it is not set and no default was given.
+    def get(key, &default)
+      result = storage[key]
+
+      if result.nil? && default
+        result = yield
+        set(key, result)
+      end
+
+      result
+    end
+
+    # Sets a variable in local storage with the given name to the given value.
+    # See #get for a discussion of why this method is necessary, and why
+    # Thread#[]= should be avoided in cascading callbacks on embedded children.
+    #
+    # @param [ String | Symbol ] key the name of the variable to set.
+    # @param [ Object | nil ] value the value of the variable to set (or `nil`
+    #   if you wish to unset the variable)
+    def set(key, value)
+      storage[key] = value
+    end
+
+    # Removes the named variable from local storage.
+    #
+    # @param [ String | Symbol ] key the name of the variable to remove.
+    def delete(key)
+      storage.delete(key)
+    end
+
+    # Queries the presence of a named variable in local storage.
+    #
+    # @param [ String | Symbol ] key the name of the variable to query.
+    #
+    # @return [ true | false ] whether the given variable is present or not.
+    def has?(key)
+      storage.key?(key)
+    end
 
     # Begin entry into a named thread local stack.
     #
@@ -53,7 +131,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def database_override
-      Thread.current[DATABASE_OVERRIDE_KEY]
+      get(DATABASE_OVERRIDE_KEY)
     end
 
     # Set the global database override.
@@ -65,7 +143,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def database_override=(name)
-      Thread.current[DATABASE_OVERRIDE_KEY] = name
+      set(DATABASE_OVERRIDE_KEY, name)
     end
 
     # Are in the middle of executing the named stack
@@ -101,7 +179,7 @@ module Mongoid
     #
     # @return [ Array ] The stack.
     def stack(name)
-      Thread.current[STACK_KEYS[name]] ||= []
+      get(STACK_KEYS[name]) { [] }
     end
 
     # Begin autosaving a document on the current thread.
@@ -175,7 +253,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def client_override
-      Thread.current[CLIENT_OVERRIDE_KEY]
+      get(CLIENT_OVERRIDE_KEY)
     end
 
     # Set the global client override.
@@ -187,7 +265,7 @@ module Mongoid
     #
     # @return [ String | Symbol ] The override.
     def client_override=(name)
-      Thread.current[CLIENT_OVERRIDE_KEY] = name
+      set(CLIENT_OVERRIDE_KEY, name)
     end
 
     # Get the current Mongoid scope.
@@ -200,12 +278,12 @@ module Mongoid
     #
     # @return [ Criteria ] The scope.
     def current_scope(klass = nil)
-      if klass && Thread.current[CURRENT_SCOPE_KEY].respond_to?(:keys)
-        Thread.current[CURRENT_SCOPE_KEY][
-            Thread.current[CURRENT_SCOPE_KEY].keys.find { |k| k <= klass }
-        ]
+      current_scope = get(CURRENT_SCOPE_KEY)
+
+      if klass && current_scope.respond_to?(:keys)
+        current_scope[current_scope.keys.find { |k| k <= klass }]
       else
-        Thread.current[CURRENT_SCOPE_KEY]
+        current_scope
       end
     end
 
@@ -218,7 +296,7 @@ module Mongoid
     #
     # @return [ Criteria ] The scope.
     def current_scope=(scope)
-      Thread.current[CURRENT_SCOPE_KEY] = scope
+      set(CURRENT_SCOPE_KEY, scope)
     end
 
     # Set the current Mongoid scope. Safe for multi-model scope chaining.
@@ -232,13 +310,10 @@ module Mongoid
     # @return [ Criteria ] The scope.
     def set_current_scope(scope, klass)
       if scope.nil?
-        if Thread.current[CURRENT_SCOPE_KEY]
-          Thread.current[CURRENT_SCOPE_KEY].delete(klass)
-          Thread.current[CURRENT_SCOPE_KEY] = nil if Thread.current[CURRENT_SCOPE_KEY].empty?
-        end
+        unset_current_scope(klass)
       else
-        Thread.current[CURRENT_SCOPE_KEY] ||= {}
-        Thread.current[CURRENT_SCOPE_KEY][klass] = scope
+        current_scope = get(CURRENT_SCOPE_KEY) { {} }
+        current_scope[klass] = scope
       end
     end
 
@@ -285,7 +360,7 @@ module Mongoid
     #
     # @return [ Hash ] The current autosaves.
     def autosaves
-      Thread.current[AUTOSAVES_KEY] ||= {}
+      get(AUTOSAVES_KEY) { {} }
     end
 
     # Get all validations on the current thread.
@@ -295,7 +370,7 @@ module Mongoid
     #
     # @return [ Hash ] The current validations.
     def validations
-      Thread.current[VALIDATIONS_KEY] ||= {}
+      get(VALIDATIONS_KEY) { {} }
     end
 
     # Get all autosaves on the current thread for the class.
@@ -309,6 +384,7 @@ module Mongoid
     def autosaves_for(klass)
       autosaves[klass] ||= []
     end
+
     # Get all validations on the current thread for the class.
     #
     # @example Get all validations.
@@ -329,7 +405,7 @@ module Mongoid
     # @param [ Mongo::Session ] session The session to save.
     # @param [ Mongo::Client | nil ] client The client to cache the session for.
     def set_session(session, client: nil)
-      sessions[client.object_id] = session
+      sessions[client] = session
     end
 
     # Get the cached session for this thread for a client.
@@ -341,7 +417,7 @@ module Mongoid
     #
     # @return [ Mongo::Session | nil ] The session cached on this thread or nil.
     def get_session(client: nil)
-      sessions[client.object_id]
+      sessions[client]
     end
 
     # Clear the cached session for this thread for a client.
@@ -353,7 +429,7 @@ module Mongoid
     #
     # @return [ nil ]
     def clear_session(client: nil)
-      sessions.delete(client.object_id)&.end_session
+      sessions.delete(client)&.end_session
     end
 
     # Store a reference to the document that was modified inside a transaction
@@ -363,9 +439,9 @@ module Mongoid
     #   was modified.
     # @param [ Mongoid::Document ] document Mongoid document that was modified.
     def add_modified_document(session, document)
-      if session&.in_transaction?
-        modified_documents[session] << document
-      end
+      return unless session&.in_transaction?
+
+      modified_documents[session] << document
     end
 
     # Clears the set of modified documents for the given session, and return the
@@ -376,20 +452,87 @@ module Mongoid
     # @return [ Set<Mongoid::Document> ] Collection of modified documents before
     #   it was cleared.
     def clear_modified_documents(session)
-      modified_documents[session].dup
-    ensure
-      modified_documents[session].clear
+      modified_documents.delete(session) || []
     end
 
+    # Queries whether document callbacks should be executed by default for the
+    # current thread.
+    #
+    # Unless otherwise indicated (by #execute_callbacks=), this will return
+    # true.
+    #
+    # @return [ true | false ] Whether or not document callbacks should be
+    #   executed by default.
+    def execute_callbacks?
+      if has?(EXECUTE_CALLBACKS)
+        get(EXECUTE_CALLBACKS)
+      else
+        true
+      end
+    end
+
+    # Indicates whether document callbacks should be invoked by default for
+    # the current thread. Individual documents may further override the
+    # callback behavior, but this will be used for the default behavior.
+    #
+    # @param flag [ true | false ] Whether or not document callbacks should be
+    #   executed by default.
+    def execute_callbacks=(flag)
+      set(EXECUTE_CALLBACKS, flag)
+    end
+
+    # Returns the thread store of sessions.
+    #
+    # @return [ Hash<Integer, Set> ] The sessions indexed by client object ID.
+    #
     # @api private
     def sessions
-      Thread.current[SESSIONS_KEY] ||= {}
+      get(SESSIONS_KEY) { {}.compare_by_identity }
     end
 
+    # Returns the thread store of modified documents.
+    #
+    # @return [ Hash<Mongo::Session, Set<Mongoid::Document>> ] The modified
+    #   documents indexed by session.
+    #
     # @api private
     def modified_documents
-      Thread.current[MODIFIED_DOCUMENTS_KEY] ||= Hash.new do |h, k|
-        h[k] = Set.new
+      get(MODIFIED_DOCUMENTS_KEY) { Hash.new { |h, k| h[k] = Set.new } }
+    end
+
+    private
+
+    # Removes the given klass from the current scope, and tidies the current
+    # scope list.
+    #
+    # @param klass [ Class ] the class to remove from the current scope.
+    def unset_current_scope(klass)
+      return unless has?(CURRENT_SCOPE_KEY)
+
+      scope = get(CURRENT_SCOPE_KEY)
+      scope.delete(klass)
+
+      delete(CURRENT_SCOPE_KEY) if scope.empty?
+    end
+
+    # Returns the current thread- or fiber-local storage as a Hash.
+    def storage
+      case Config.real_isolation_level
+      when :thread
+        storage_hash = Thread.current.thread_variable_get(STORAGE_KEY)
+
+        unless storage_hash
+          storage_hash = {}
+          Thread.current.thread_variable_set(STORAGE_KEY, storage_hash)
+        end
+
+        storage_hash
+
+      when :fiber
+        Fiber[STORAGE_KEY] ||= {}
+
+      else
+        raise "Unknown isolation level: #{Config.real_isolation_level.inspect}"
       end
     end
   end

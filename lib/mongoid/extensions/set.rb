@@ -1,9 +1,11 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Extensions
-    module Set
 
+    # Adds type-casting behavior to Set class.
+    module Set
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
@@ -15,8 +17,17 @@ module Mongoid
         ::Set.mongoize(self)
       end
 
-      module ClassMethods
+      # Returns whether the object's size can be changed.
+      #
+      # @example Is the object resizable?
+      #   object.resizable?
+      #
+      # @return [ true ] true.
+      def resizable?
+        true
+      end
 
+      module ClassMethods
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.

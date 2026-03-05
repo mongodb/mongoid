@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -12,6 +13,20 @@ describe Mongoid::Association do
       default: ->{ BSON::ObjectId.new },
       overwrite: true
     )
+  end
+
+  context "when class_name references an unknown class" do
+    context "when loading" do
+      it "does not raise an exception" do
+        expect do
+          class AssocationSpecModel
+            include Mongoid::Document
+
+            embedded_in :parent, class_name: 'SomethingBogusThatDoesNotExistYet'
+          end
+        end.not_to raise_exception
+      end
+    end
   end
 
   describe "#embedded?" do

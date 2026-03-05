@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+# rubocop:todo all
+
+require 'mongoid/pluckable'
 
 module Mongoid
   module Association
@@ -11,6 +14,7 @@ module Mongoid
         class Enumerable
           extend Forwardable
           include ::Enumerable
+          include Pluckable
 
           # The three main instance variables are collections of documents.
           #
@@ -252,7 +256,7 @@ module Mongoid
           # Initialize the new enumerable either with a criteria or an array.
           #
           # @example Initialize the enumerable with a criteria.
-          #   Enumberable.new(Post.where(:person_id => id))
+          #   Enumerable.new(Post.where(:person_id => id))
           #
           # @example Initialize the enumerable with an array.
           #   Enumerable.new([ post ])
@@ -373,6 +377,43 @@ module Mongoid
             @_added, @_loaded, @_unloaded, @executed = data
           end
 
+          # Plucks the given field names from the documents in the target.
+          # If the collection has been loaded, it plucks from the loaded
+          # documents; otherwise, it plucks from the unloaded criteria.
+          # Regardless, it also plucks from any added documents.
+          #
+          # @param [ Symbol... ] *fields The field names to pluck.
+          #
+          # @return [ Array | Array<Array> ] The array of field values. If
+          #   multiple fields are given, an array of arrays is returned.
+          def pluck(*keys)
+            [].tap do |results|
+              if _loaded? || _added.any?
+                klass = @_association.klass
+                prepared = prepare_pluck(keys, document_class: klass)
+              end
+
+              if _loaded?
+                docs = _loaded.values.map { |v| BSON::Document.new(v.attributes) }
+                results.concat pluck_from_documents(docs, prepared[:field_names], document_class: klass)
+              elsif _unloaded
+                criteria = if _added.any?
+                  ids_to_exclude = _added.keys
+                  _unloaded.not(:_id.in => ids_to_exclude)
+                else
+                  _unloaded
+                end
+
+                results.concat criteria.pluck(*keys)
+              end
+
+              if _added.any?
+                docs = _added.values.map { |v| BSON::Document.new(v.attributes) }
+                results.concat pluck_from_documents(docs, prepared[:field_names], document_class: klass)
+              end
+            end
+          end
+
           # Reset the enumerable back to its persisted state.
           #
           # @example Reset the enumerable.
@@ -418,11 +459,28 @@ module Mongoid
           #
           # @return [ Integer ] The size of the enumerable.
           def size
-            count = (_unloaded ? _unloaded.count : _loaded.count)
-            if count.zero?
-              count + _added.count
+            # If _unloaded is present, then it will match the set of documents
+            # that belong to this association, which have already been persisted
+            # to the database. This set of documents must be considered when
+            # computing the size of the association, along with anything that has
+            # since been added.
+            if _unloaded
+              if _added.any?
+                # Note that _added may include records that _unloaded already
+                # matches. This is the case if the association is assigned an array
+                # of items and some of them were already elements of the association.
+                #
+                # we need to thus make sure _unloaded.count excludes any elements
+                # that already exist in _added.
+
+                count = _unloaded.not(:_id.in => _added.values.map(&:id)).count
+                count + _added.values.count
+              else
+                _unloaded.count
+              end
+
             else
-              count + _added.values.count { |d| d.new_record? }
+              _loaded.count + _added.count
             end
           end
 
@@ -452,6 +510,71 @@ module Mongoid
             entries.as_json(options)
           end
 
+          # Get the sum of the provided field for all documents in the
+          # enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the sum of a field.
+          #   enumerable.sum(:likes)
+          #
+          # @param [ Symbol ] field The field to sum.
+          #
+          # @return [ Numeric ] The sum value.
+          def sum(field = nil)
+            return super(field || 0) if block_given?
+
+            field_values_for(field).sum || 0
+          end
+
+          # Get the average of the provided field for all documents in the
+          # enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the average of a field.
+          #   enumerable.avg(:likes)
+          #
+          # @param [ Symbol ] field The field to average.
+          #
+          # @return [ Float | nil ] The average value or nil if no documents.
+          def avg(field)
+            values = field_values_for(field)
+            return nil if values.empty?
+
+            values.sum / values.size.to_f
+          end
+
+          # Get the minimum value of the provided field for all documents in
+          # the enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the min of a field.
+          #   enumerable.min(:likes)
+          #
+          # @param [ Symbol ] field The field to min.
+          #
+          # @return [ Numeric | nil ] The min value or nil if no documents.
+          def min(field = nil)
+            return super() if block_given?
+
+            field_values_for(field).min
+          end
+
+          # Get the maximum value of the provided field for all documents in
+          # the enumerable. When the association is loaded, computes in memory
+          # without querying the database.
+          #
+          # @example Get the max of a field.
+          #   enumerable.max(:likes)
+          #
+          # @param [ Symbol ] field The field to max.
+          #
+          # @return [ Numeric | nil ] The max value or nil if no documents.
+          def max(field = nil)
+            return super() if block_given?
+
+            field_values_for(field).max
+          end
+
           # Return all the unique documents in the enumerable.
           #
           # @note This operation loads all documents from the database.
@@ -466,6 +589,15 @@ module Mongoid
 
           private
 
+          # Collect non-nil values for the given field from all documents.
+          #
+          # @param [ Symbol ] field The field name.
+          #
+          # @return [ Array<Numeric> ] The non-nil field values.
+          def field_values_for(field)
+            map { |doc| doc.public_send(field) }.compact
+          end
+
           def set_base(document)
             if @_association.is_a?(Referenced::HasMany)
               document.set_relation(@_association.inverse, @_base) if @_association
@@ -477,10 +609,46 @@ module Mongoid
           end
 
           def unloaded_documents
-            if _unloaded.selector._mongoid_unsatisfiable_criteria?
+            if unsatisfiable_criteria?(_unloaded.selector)
               []
             else
               _unloaded
+            end
+          end
+
+          # Checks whether conditions in the given hash are known to be
+          # unsatisfiable, i.e. querying with this hash will always return no
+          # documents.
+          #
+          # This method only handles condition shapes that Mongoid itself uses when
+          # it builds association queries. Return value true indicates the condition
+          # always produces an empty document set. Note however that return value false
+          # is not a guarantee that the condition won't produce an empty document set.
+          #
+          # @example Unsatisfiable conditions
+          #   unsatisfiable_criteria?({'_id' => {'$in' => []}})
+          #   # => true
+          #
+          # @example Conditions which may be satisfiable
+          #   unsatisfiable_criteria?({'_id' => '123'})
+          #   # => false
+          #
+          # @example Conditions which are unsatisfiable that this method does not handle
+          #   unsatisfiable_criteria?({'foo' => {'$in' => []}})
+          #   # => false
+          #
+          # @param [ Hash ] selector The conditions to check.
+          #
+          # @return [ true | false ] Whether hash contains known unsatisfiable
+          #   conditions.
+          def unsatisfiable_criteria?(selector)
+            unsatisfiable_criteria = { '_id' => { '$in' => [] } }
+            return true if selector == unsatisfiable_criteria
+            return false unless selector.length == 1 && selector.keys == %w[$and]
+
+            value = selector.values.first
+            value.is_a?(Array) && value.any? do |sub_value|
+              sub_value.is_a?(Hash) && unsatisfiable_criteria?(sub_value)
             end
           end
         end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -35,11 +36,11 @@ describe Mongoid::Threaded do
     context "when the stack has elements" do
 
       before do
-        Thread.current["[mongoid]:load-stack"] = [ true ]
+        described_class.stack('load').push(true)
       end
 
       after do
-        Thread.current["[mongoid]:load-stack"] = []
+        described_class.stack('load').clear
       end
 
       it "returns true" do
@@ -50,7 +51,7 @@ describe Mongoid::Threaded do
     context "when the stack has no elements" do
 
       before do
-        Thread.current["[mongoid]:load-stack"] = []
+        described_class.stack('load').clear
       end
 
       it "returns false" do
@@ -75,7 +76,7 @@ describe Mongoid::Threaded do
     context "when a stack has been initialized" do
 
       before do
-        Thread.current["[mongoid]:load-stack"] = [ true ]
+        described_class.stack('load').push(true)
       end
 
       let(:loading) do
@@ -83,7 +84,7 @@ describe Mongoid::Threaded do
       end
 
       after do
-        Thread.current["[mongoid]:load-stack"] = []
+        described_class.stack('load').clear
       end
 
       it "returns the stack" do
@@ -337,6 +338,25 @@ describe Mongoid::Threaded do
 
       it 'returns session' do
         expect(described_class.get_session(client: client)).to be(client_session)
+      end
+    end
+  end
+
+  describe '#clear_modified_documents' do
+    let(:session) do
+      double(Mongo::Session).tap do |session|
+        allow(session).to receive(:in_transaction?).and_return(true)
+      end
+    end
+
+    context 'when there are modified documents' do
+      before do
+        described_class.add_modified_document(session, Minim.new)
+        described_class.clear_modified_documents(session)
+      end
+
+      it 'removes the documents and keys' do
+        expect(described_class.modified_documents).to be_empty
       end
     end
   end

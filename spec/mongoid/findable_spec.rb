@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -155,6 +156,84 @@ describe Mongoid::Findable do
             expect(result).to be_nil
           end
         end
+      end
+    end
+  end
+
+  describe "#any?" do
+    context "when called on collection with documents" do
+      before do
+        Band.create!(name: "Tool")
+      end
+
+      it "returns true" do
+        expect(Band.any?).to be true
+      end
+    end
+
+    context "when called on collection with no documents" do
+
+      it "returns false" do
+        expect(Band.any?).to be false
+      end
+    end
+  end
+
+  describe "#one?" do
+    context "when called on collection with no documents" do
+      it "returns false" do
+        expect(Band.one?).to be false
+      end
+    end
+
+    context "when called on collection with one document" do
+      before do
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns true" do
+        expect(Band.one?).to be true
+      end
+    end
+
+    context "when called on collection with multiple documents" do
+      before do
+        Band.create!(name: "Tool")
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns false" do
+        expect(Band.one?).to be false
+      end
+    end
+
+  end
+
+  describe "#many?" do
+    context "when called on collection with no documents" do
+      it "returns false" do
+        expect(Band.many?).to be false
+      end
+    end
+
+    context "when called on collection with one document" do
+      before do
+        Band.create!(name: "Radiohead")
+      end
+
+      it "returns false" do
+        expect(Band.many?).to be false
+      end
+    end
+
+    context "when called on collection with multiple documents" do
+      before do
+        Band.create!(name: "Radiohead")
+        Band.create!(name: "Tool")
+      end
+
+      it "returns true" do
+        expect(Band.many?).to be true
       end
     end
   end
@@ -863,7 +942,7 @@ describe Mongoid::Findable do
         Band.create!(name: "Photek")
       end
 
-      it 'returns the currect count' do
+      it 'returns the correct count' do
         expect(Band.count).to eq(2)
       end
     end
@@ -903,7 +982,7 @@ describe Mongoid::Findable do
     time_zone_override "Asia/Kolkata"
 
     let!(:time) do
-      Time.zone.now.tap do |t|
+      Time.current.tap do |t|
         User.create!(last_login: t, name: 'Tom')
       end
     end

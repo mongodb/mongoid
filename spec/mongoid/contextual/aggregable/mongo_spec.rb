@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -240,6 +241,39 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
         it "returns empty result" do
           expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => nil, "min" => nil, "max" => nil })
+        end
+      end
+    end
+
+    context 'regarding hints' do
+      let(:client) { Person.collection.client }
+      let(:subscriber) { Mrss::EventSubscriber.new }
+
+      before do
+        client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+        maybe_hint.aggregates(:age)
+      end
+
+      after do
+        client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+      end
+
+      let(:event) { subscriber.single_command_started_event('aggregate') }
+      let(:command) { event.command }
+
+      context 'when no hint is provided' do
+        let(:maybe_hint) { Person }
+
+        it 'does not include the hint in the command' do
+          expect(command['hint']).to be_nil
+        end
+      end
+
+      context 'when a hint is provided' do
+        let(:maybe_hint) { Person.hint(age: 1) }
+
+        it 'includes the hint with the command' do
+          expect(command['hint']).to eq({ 'age' => 1 })
         end
       end
     end
@@ -512,6 +546,17 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
         it "returns the sum for the provided block" do
           expect(sum).to eq(1500)
+        end
+      end
+
+      context "when provided a block with initial value" do
+
+        let(:sum) do
+          context.sum(500, &:likes)
+        end
+
+        it "returns the sum for the provided block starting from initial value" do
+          expect(sum).to eq(2000)
         end
       end
     end

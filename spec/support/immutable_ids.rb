@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Mongoid
   module ImmutableIds
     def immutable_id_examples_as(name)

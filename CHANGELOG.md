@@ -105,7 +105,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#4005 Fixed inclusion of mongoid with Rails components that don't have the Rails environment.
 
-* \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
+* \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Attributes::Dynamic
 
 * \#3991 Fixed embedded documents not flagging as changed after calling #changed? and modifying the
 child elements.
@@ -798,7 +798,7 @@ child elements.
         Band.where(name: "Placebo").unset(:members, :origin)
 
 * \#2669 Passing a block to `Criteria#new` now properly sends the
-  block through to the model's contructor. (Arthur Neves)
+  block through to the model's constructor. (Arthur Neves)
 
 * \#2667 `exists?` no longer hits the database in cases where we have
   the necessary information in memory.
@@ -1200,7 +1200,7 @@ child elements.
 
 * \#2571 Remove blank error message from locales. (Jordan Elver)
 
-* \#2568 Fix uniqueness validation for lacalized fields when a scope is also
+* \#2568 Fix uniqueness validation for localized fields when a scope is also
   provided.
 
 * \#2552 Ensure `InvalidPath` errors are raised when embedded documents try to
@@ -1609,7 +1609,7 @@ child elements.
 
         Band.first.touch
 
-    Update a specific time field along with the udpated_at.
+    Update a specific time field along with the updated_at.
 
         Band.first.touch(:founded)
 
@@ -1728,7 +1728,7 @@ child elements.
         # { "name" => "foo", "my_preferences" => [{ "value" => "ok" }]}
 
 * \#1806 `Model.find_or_create_by` and `Model.find_or_initialize_by` can now
-  take documents as paramters for belongs_to relations.
+  take documents as parameters for belongs_to relations.
 
         person = Person.first
         Game.find_or_create_by(person: person)
@@ -2506,7 +2506,7 @@ child elements.
 * \#2038 Allow inverse relations to be determined by foreign keys alone
   if defined on both sides, not just an inverse_of declaration.
 
-* \#2023 Allow serilialization of dynamic types that conflict with core
+* \#2023 Allow serialization of dynamic types that conflict with core
   Ruby methods to still be serialized.
 
 * \#2008 Presence validation should hit the db to check validity if the
@@ -2611,7 +2611,7 @@ child elements.
   had the foreign key link persisted.
 
 * \#1820 Destroying embedded documents in an embeds_many should also
-  removed the document from the underlying _uncoped target and reindex
+  removed the document from the underlying _unscoped target and reindex
   the relation.
 
 * \#1814 Don't cascade callbacks on after_initialize.
@@ -3059,7 +3059,7 @@ child elements.
   key without error.
 
 * \#1350, \#1351 Fixed errors in the string conversions of double quotes and
-  tilde when paramterizing keys.
+  tilde when parametrizing keys.
 
 * \#1349 Mongoid documents should not blow up when including Enumerable.
   (Jonas Nicklas)

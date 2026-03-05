@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
 
-        # This module contains additional symbol behavior.
+        # Adds query type-casting behavior to Symbol class.
         module Symbol
 
           # Get the symbol as a specification.

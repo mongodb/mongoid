@@ -1,3 +1,4 @@
+# rubocop:todo all
 class SystemRole
  include Mongoid::Document
 

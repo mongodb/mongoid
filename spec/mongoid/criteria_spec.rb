@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -287,23 +288,8 @@ describe Mongoid::Criteria do
       Band.where(name: "Depeche Mode")
     end
 
-    # as_json changed in rails 6 to call as_json on serializable_hash.
-    # https://github.com/rails/rails/commit/2e5cb980a448e7f4ab00df6e9ad4c1cc456616aa
-
-    context 'rails < 6' do
-      max_rails_version '5.2'
-
-      it "returns the criteria as a json hash" do
-        expect(criteria.as_json).to eq([ band.serializable_hash ])
-      end
-    end
-
-    context 'rails >= 6' do
-      min_rails_version '6.0'
-
-      it "returns the criteria as a json hash" do
-        expect(criteria.as_json).to eq([ band.serializable_hash.as_json ])
-      end
+    it "returns the criteria as a json hash" do
+      expect(criteria.as_json).to eq([ band.serializable_hash.as_json ])
     end
   end
 
@@ -1044,26 +1030,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#geo_near" do
-    max_server_version '4.0'
-
-    before do
-      Bar.create_indexes
-    end
-
-    let!(:match) do
-      Bar.create!(location: [ 52.30, 13.25 ])
-    end
-
-    let(:criteria) do
-      Bar.geo_near([ 52, 13 ]).max_distance(10).spherical
-    end
-
-    it "returns the matching documents" do
-      expect(criteria).to eq([ match ])
-    end
-  end
-
   describe "#eq" do
 
     let!(:match) do
@@ -1460,52 +1426,68 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#merge!" do
+  describe '#merge!' do
+    let(:band) { Band.new }
+    let(:criteria) { Band.scoped.where(name: 'Depeche Mode').asc(:name) }
+    let(:association) { Band.relations['records'] }
+    subject(:merged) { criteria.merge!(other) }
 
-    let(:band) do
-      Band.new
-    end
+    context 'when merging a Criteria' do
+      let(:other) do
+        { klass: Band, includes: [:records] }
+      end
 
-    let(:criteria) do
-      Band.scoped.where(name: "Depeche Mode").asc(:name)
-    end
+      it 'merges the selector' do
+        expect(merged.selector).to eq({ 'name' => 'Depeche Mode' })
+      end
 
-    let(:mergeable) do
-      Band.includes(:records).tap do |crit|
-        crit.documents = [ band ]
+      it 'merges the options' do
+        expect(merged.options).to eq({ sort: { 'name' => 1 }})
+      end
+
+      it 'merges the scoping options' do
+        expect(merged.scoping_options).to eq([ nil, nil ])
+      end
+
+      it 'merges the inclusions' do
+        expect(merged.inclusions).to eq([ association ])
+      end
+
+      it 'returns the same criteria' do
+        expect(merged).to equal(criteria)
       end
     end
 
-    let(:association) do
-      Band.relations["records"]
-    end
+    context 'when merging a Hash' do
+      let(:other) do
+        Band.includes(:records).tap do |crit|
+          crit.documents = [ band ]
+        end
+      end
 
-    let(:merged) do
-      criteria.merge!(mergeable)
-    end
+      it 'merges the selector' do
+        expect(merged.selector).to eq({ 'name' => 'Depeche Mode' })
+      end
 
-    it "merges the selector" do
-      expect(merged.selector).to eq({ "name" => "Depeche Mode" })
-    end
+      it 'merges the options' do
+        expect(merged.options).to eq({ sort: { 'name' => 1 }})
+      end
 
-    it "merges the options" do
-      expect(merged.options).to eq({ sort: { "name" => 1 }})
-    end
+      it 'merges the documents' do
+        expect(merged.documents).to eq([ band ])
+      end
 
-    it "merges the documents" do
-      expect(merged.documents).to eq([ band ])
-    end
+      it 'merges the scoping options' do
+        expect(merged.scoping_options).to eq([ nil, nil ])
+      end
 
-    it "merges the scoping options" do
-      expect(merged.scoping_options).to eq([ nil, nil ])
-    end
+      it 'merges the inclusions' do
+        expect(merged.inclusions).to eq([ association ])
+      end
 
-    it "merges the inclusions" do
-      expect(merged.inclusions).to eq([ association ])
-    end
-
-    it "returns the same criteria" do
-      expect(merged).to equal(criteria)
+      it 'returns the same criteria' do
+        expect(merged).to equal(criteria)
+      end
     end
   end
 
@@ -2287,6 +2269,177 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe '#raw' do
+    let(:result) { results[0] }
+
+    context 'when the parameters are inconsistent' do
+      let(:results) { criteria.raw(false, typed: false).to_a }
+      let(:criteria) { Person }
+
+      it 'raises an ArgumentError' do
+        expect { result }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when returning untyped results' do
+      let(:results) { criteria.raw.to_a }
+
+      context 'without associations' do
+        before do
+          Band.create(name: 'the band',
+                      active: true,
+                      genres: %w[ abc def ],
+                      member_count: 112,
+                      rating: 4.2,
+                      created: Time.now,
+                      updated: Time.now,
+                      sales: 1_234_567.89,
+                      decimal: 9_876_543.21,
+                      decibels: 140..170,
+                      deleted: false,
+                      mojo: Math::PI,
+                      tags: { 'one' => 1, 'two' => 2 },
+                      location: LatLng.new(41.74, -111.83))
+        end
+
+        let(:criteria) { Band.where(name: 'the band') }
+
+        it 'returns a hash' do
+          expect(result).to be_a(Hash)
+        end
+
+        it 'does not demongoize the result' do
+          expect(result['genres']).to be_a(Array)
+          expect(result['decibels']).to be == { 'min' => 140, 'max' => 170 }
+          expect(result['location']).to be == [ -111.83, 41.74 ]
+        end
+      end
+
+      context 'with associations' do
+        before do
+          Person.create({
+            addresses: [ Address.new(end_date: 2.months.from_now) ],
+            passport: Passport.new(exp: 1.year.from_now)
+          })
+        end
+
+        let(:criteria) { Person }
+
+        it 'demongoizes the embedded relation' do
+          expect(result['addresses']).to be_a(Array)
+          expect(result['addresses'][0]['end_date']).to be_a(Time)
+
+          # `pass` is how it is stored, `passport` is how it is aliased
+          expect(result['pass']).to be_a(Hash)
+          expect(result['pass']['exp']).to be_a(Time)
+        end
+      end
+
+      context 'with projections' do
+        before { Person.create(title: 'sir', dob: Date.new(1980, 1, 1)) }
+
+        context 'using #only' do
+          let(:criteria) { Person.only(:dob) }
+
+          it 'produces a hash with only the _id and the requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).to be == %w[ _id dob ]
+            expect(result['dob']).to be == Date.new(1980, 1, 1)
+          end
+        end
+
+        context 'using #without' do
+          let(:criteria) { Person.without(:dob) }
+
+          it 'produces a hash that excludes requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).not_to include('dob')
+            expect(result.keys).to be_present
+          end
+        end
+      end
+    end
+
+    context 'when returning typed results' do
+      let(:results) { criteria.raw(typed: true).to_a }
+
+      context 'without associations' do
+        before do
+          Band.create(name: 'the band',
+                      active: true,
+                      genres: %w[ abc def ],
+                      member_count: 112,
+                      rating: 4.2,
+                      created: Time.now,
+                      updated: Time.now,
+                      sales: 1_234_567.89,
+                      decimal: 9_876_543.21,
+                      decibels: 140..170,
+                      deleted: false,
+                      mojo: Math::PI,
+                      tags: { 'one' => 1, 'two' => 2 },
+                      location: LatLng.new(41.74, -111.83))
+        end
+
+        let(:criteria) { Band.where(name: 'the band') }
+
+        it 'returns a hash' do
+          expect(result).to be_a(Hash)
+        end
+
+        it 'demongoizes the result' do
+          expect(result['genres']).to be_a(Array)
+          expect(result['decibels']).to be_a(Range)
+          expect(result['location']).to be_a(LatLng)
+        end
+      end
+
+      context 'with associations' do
+        before do
+          Person.create({
+            addresses: [ Address.new(end_date: 2.months.from_now) ],
+            passport: Passport.new(exp: 1.year.from_now)
+          })
+        end
+
+        let(:criteria) { Person }
+
+        it 'demongoizes the embedded relation' do
+          expect(result['addresses']).to be_a(Array)
+          expect(result['addresses'][0]['end_date']).to be_a(Date)
+
+          # `pass` is how it is stored, `passport` is how it is aliased
+          expect(result['pass']).to be_a(Hash)
+          expect(result['pass']['exp']).to be_a(Date)
+        end
+      end
+
+      context 'with projections' do
+        before { Person.create(title: 'sir', dob: Date.new(1980, 1, 1)) }
+
+        context 'using #only' do
+          let(:criteria) { Person.only(:dob) }
+
+          it 'produces a hash with only the _id and the requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).to be == %w[ _id dob ]
+            expect(result['dob']).to be == Date.new(1980, 1, 1)
+          end
+        end
+
+        context 'using #without' do
+          let(:criteria) { Person.without(:dob) }
+
+          it 'produces a hash that excludes requested key' do
+            expect(result).to be_a(Hash)
+            expect(result.keys).not_to include('dob')
+            expect(result.keys).to be_present
+          end
+        end
+      end
+    end
+  end
+
   describe "#max_scan" do
     max_server_version '4.0'
 
@@ -2304,17 +2457,6 @@ describe Mongoid::Criteria do
 
     it "executes the criteria while properly giving the max scan to Mongo" do
       expect(criteria.to_ary).to eq [band]
-    end
-  end
-
-  describe "#to_criteria" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    it "returns self" do
-      expect(criteria.to_criteria).to eq(criteria)
     end
   end
 
@@ -2633,7 +2775,6 @@ describe Mongoid::Criteria do
       end
 
       context "when querying on a BSON::Decimal128" do
-        min_server_version '3.4'
 
         let(:decimal) do
           BSON::Decimal128.new("0.0005")
@@ -2976,6 +3117,12 @@ describe Mongoid::Criteria do
       Band.create!(name: "Depeche Mode")
     end
 
+    it 'is deprecated' do
+      expect(Mongoid.logger).to receive(:warn).with(/for_js is deprecated/).and_call_original
+
+      Band.for_js("this.name == 'Depeche Mode'")
+    end
+
     context "when the code has no scope" do
 
       let(:criteria) do
@@ -3024,11 +3171,11 @@ describe Mongoid::Criteria do
     context "when the method exists on the criteria" do
 
       before do
-        expect(criteria).to receive(:to_criteria).and_call_original
+        expect(criteria).to receive(:only).and_call_original
       end
 
       it "calls the method on the criteria" do
-        expect(criteria.to_criteria).to eq(criteria)
+        expect(criteria.only).to eq(criteria)
       end
     end
 
@@ -3231,6 +3378,242 @@ describe Mongoid::Criteria do
 
         it "does not use an $in query" do
           expect(selection).to eq({ dkey: { "$in" => [ "Firefox", "Browser" ]}})
+        end
+      end
+    end
+  end
+
+  describe '.from_hash' do
+    subject(:criteria) { described_class.from_hash(hash) }
+
+    context 'when klass is specified' do
+      let(:hash) do
+        { klass: Band, where: { name: 'Songs Ohia' } }
+      end
+
+      it 'returns a criteria' do
+        expect(criteria).to be_a(Mongoid::Criteria)
+      end
+
+      it 'sets the klass' do
+        expect(criteria.klass).to eq(Band)
+      end
+
+      it 'sets the selector' do
+        expect(criteria.selector).to eq({ 'name' => 'Songs Ohia' })
+      end
+    end
+
+    context 'when klass is missing' do
+      let(:hash) do
+        { where: { name: 'Songs Ohia' } }
+      end
+
+      it 'returns a criteria' do
+        expect(criteria).to be_a(Mongoid::Criteria)
+      end
+
+      it 'has klass nil' do
+        expect(criteria.klass).to be_nil
+      end
+
+      it 'sets the selector' do
+        expect(criteria.selector).to eq({ 'name' => 'Songs Ohia' })
+      end
+    end
+
+    context 'with allowed methods' do
+      context 'when using multiple query methods' do
+        let(:hash) do
+          {
+            klass: Band,
+            where: { active: true },
+            limit: 10,
+            skip: 5,
+            order_by: { name: 1 }
+          }
+        end
+
+        it 'applies all methods successfully' do
+          expect(criteria.selector).to eq({ 'active' => true })
+          expect(criteria.options[:limit]).to eq(10)
+          expect(criteria.options[:skip]).to eq(5)
+          expect(criteria.options[:sort]).to eq({ 'name' => 1 })
+        end
+      end
+
+      context 'when using query selector methods' do
+        let(:hash) do
+          {
+            klass: Band,
+            gt: { members: 2 },
+            in: { genre: ['rock', 'metal'] }
+          }
+        end
+
+        it 'applies selector methods' do
+          expect(criteria.selector['members']).to eq({ '$gt' => 2 })
+          expect(criteria.selector['genre']).to eq({ '$in' => ['rock', 'metal'] })
+        end
+      end
+
+      context 'when using aggregation methods' do
+        let(:hash) do
+          {
+            klass: Band,
+            project: { name: 1, members: 1 }
+          }
+        end
+
+        it 'applies aggregation methods' do
+          expect { criteria }.not_to raise_error
+        end
+      end
+    end
+
+    context 'with disallowed methods' do
+      context 'when attempting to call create' do
+        let(:hash) do
+          { klass: Band, create: { name: 'Malicious' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'create' is not allowed in from_hash")
+        end
+      end
+
+      context 'when attempting to call create!' do
+        let(:hash) do
+          { klass: Band, 'create!': { name: 'Malicious' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'create!' is not allowed in from_hash")
+        end
+      end
+
+      context 'when attempting to call build' do
+        let(:hash) do
+          { klass: Band, build: { name: 'Malicious' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'build' is not allowed in from_hash")
+        end
+      end
+
+      context 'when attempting to call find' do
+        let(:hash) do
+          { klass: Band, find: 'some_id' }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'find' is not allowed in from_hash")
+        end
+      end
+
+      context 'when attempting to call execute_or_raise' do
+        let(:hash) do
+          { klass: Band, execute_or_raise: ['id1', 'id2'] }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'execute_or_raise' is not allowed in from_hash")
+        end
+      end
+
+      context 'when attempting to call new' do
+        let(:hash) do
+          { klass: Band, new: { name: 'Test' } }
+        end
+
+        it 'raises ArgumentError' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'new' is not allowed in from_hash")
+        end
+      end
+
+      context 'when allowed method is combined with disallowed method' do
+        let(:hash) do
+          {
+            klass: Band,
+            where: { active: true },
+            create: { name: 'Malicious' }
+          }
+        end
+
+        it 'raises ArgumentError before executing any methods' do
+          expect { criteria }.to raise_error(ArgumentError, "Method 'create' is not allowed in from_hash")
+        end
+      end
+    end
+
+    context 'security validation' do
+      # This test ensures that ALL public methods not in the allowlist are blocked
+      it 'blocks all dangerous public methods' do
+        dangerous_methods = %i[
+          build create create! new
+          find find_or_create_by find_or_create_by! find_or_initialize_by
+          first_or_create first_or_create! first_or_initialize
+          execute_or_raise multiple_from_db for_ids
+          documents= inclusions= scoping_options=
+          initialize freeze as_json
+        ]
+
+        dangerous_methods.each do |method|
+          hash = { klass: Band, method => 'arg' }
+          expect { described_class.from_hash(hash) }.to raise_error(
+            ArgumentError,
+            "Method '#{method}' is not allowed in from_hash"
+          ), "Expected method '#{method}' to be blocked but it was allowed"
+        end
+      end
+
+      it 'blocks dangerous inherited methods from Object' do
+        # Critical security test: block send, instance_eval, etc.
+        inherited_dangerous = %i[
+          send __send__ instance_eval instance_exec
+          instance_variable_set method
+        ]
+
+        inherited_dangerous.each do |method|
+          hash = { klass: Band, method => 'arg' }
+          expect { described_class.from_hash(hash) }.to raise_error(
+            ArgumentError,
+            "Method '#{method}' is not allowed in from_hash"
+          ), "Expected inherited method '#{method}' to be blocked"
+        end
+      end
+
+      it 'blocks Enumerable execution methods' do
+        # from_hash should build queries, not execute them
+        enumerable_methods = %i[each map select count sum]
+
+        enumerable_methods.each do |method|
+          hash = { klass: Band, method => 'arg' }
+          expect { described_class.from_hash(hash) }.to raise_error(
+            ArgumentError,
+            "Method '#{method}' is not allowed in from_hash"
+          ), "Expected Enumerable method '#{method}' to be blocked"
+        end
+      end
+
+      it 'allows all whitelisted methods' do
+        # Sample of allowed methods from each category
+        allowed_sample = {
+          where: { name: 'Test' },      # Query selector
+          limit: 10,                     # Query option
+          skip: 5,                       # Query option
+          gt: { age: 18 },              # Query selector
+          in: { status: ['active'] },   # Query selector
+          ascending: :name,              # Sorting
+          includes: :notes,            # Eager loading
+          merge: { klass: Band },        # Merge
+        }
+
+        allowed_sample.each do |method, args|
+          hash = { klass: Band, method => args }
+          expect { described_class.from_hash(hash) }.not_to raise_error
+#            "Expected method '#{method}' to be allowed but it was blocked"
         end
       end
     end

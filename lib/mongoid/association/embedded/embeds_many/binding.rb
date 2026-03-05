@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Association
@@ -20,7 +21,7 @@ module Mongoid
             doc.parentize(_base)
             binding do
               remove_associated(doc)
-              doc.do_or_do_not(_association.inverse_setter(_target), _base)
+              try_method(doc, _association.inverse_setter(_target), _base)
             end
           end
 
@@ -32,7 +33,7 @@ module Mongoid
           # @param [ Document ] doc The single document to unbind.
           def unbind_one(doc)
             binding do
-              doc.do_or_do_not(_association.inverse_setter(_target), nil)
+              try_method(doc, _association.inverse_setter(_target), nil)
             end
           end
         end

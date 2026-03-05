@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -137,7 +138,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when a collation is specified' do
-      min_server_version '3.4'
 
       let(:context) do
         described_class.new(criteria)
@@ -156,6 +156,16 @@ describe Mongoid::Contextual::Mongo do
         it 'applies the collation' do
           expect(count).to eq(1)
         end
+      end
+    end
+
+    context 'when for_js is present' do
+      let(:context) do
+        Band.for_js('this.name == "Depeche Mode"')
+      end
+
+      it 'counts the expected records' do
+        expect(context.count).to eq(1)
       end
     end
   end
@@ -267,7 +277,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -294,7 +304,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -322,7 +331,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all
@@ -372,7 +381,7 @@ describe Mongoid::Contextual::Mongo do
         Band.create!(name: "New Order")
       end
 
-      context "when the selector is contraining" do
+      context "when the selector is constraining" do
 
         let(:criteria) do
           Band.where(name: "Depeche Mode")
@@ -399,7 +408,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -427,7 +435,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when the selector is not contraining" do
+      context "when the selector is not constraining" do
 
         let(:criteria) do
           Band.all
@@ -523,8 +531,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when a collation is specified' do
-      min_server_version '3.4'
-
       before do
         Band.create!(name: 'DEPECHE MODE')
       end
@@ -1091,33 +1097,49 @@ describe Mongoid::Contextual::Mongo do
       let!(:person2) { Person.create!(ssn: BSON::Decimal128.new("1")) }
       let(:tally) { Person.tally("ssn") }
 
+      let(:tallied_classes) do
+        tally.keys.map(&:class).sort do |a, b|
+          a.to_s.casecmp(b.to_s)
+        end
+      end
+
       context "< BSON 5" do
         max_bson_version '4.99.99'
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).attributes["ssn"].should be_a BSON::Regexp::Raw
-          Person.find(person2.id).attributes["ssn"].should be_a BSON::Decimal128
+          expect(Person.find(person1.id).attributes["ssn"]).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).attributes["ssn"]).to be_a BSON::Decimal128
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BSON::Decimal128, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
 
-      context ">= BSON 5" do
+      context '>= BSON 5' do
         min_bson_version "5.0"
 
         it "stores the correct types in the database" do
-          Person.find(person1.id).ssn.should be_a BSON::Regexp::Raw
-          Person.find(person2.id).ssn.should be_a BigDeimal
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BigDecimal
         end
 
         it "tallies the correct type" do
-          tally.keys.map(&:class).sort do |a,b|
-            a.to_s <=> b.to_s
-          end.should == [BigDecimal, BSON::Regexp::Raw]
+          expect(tallied_classes).to be == [ BigDecimal, BSON::Regexp::Raw ]
+        end
+      end
+
+      context '>= BSON 5 with decimal128 allowed' do
+        min_bson_version "5.0"
+        config_override :allow_bson5_decimal128, true
+
+        it "stores the correct types in the database" do
+          expect(Person.find(person1.id).ssn).to be_a BSON::Regexp::Raw
+          expect(Person.find(person2.id).ssn).to be_a BSON::Decimal128
+        end
+
+        it "tallies the correct type" do
+          expect(tallied_classes).to be == [ BSON::Decimal128, BSON::Regexp::Raw ]
         end
       end
     end
@@ -1138,7 +1160,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when the criteria has a collation' do
-      min_server_version '3.4'
 
       let(:criteria) do
         Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1219,16 +1240,26 @@ describe Mongoid::Contextual::Mongo do
             subscriber = Mrss::EventSubscriber.new
             context.view.client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
 
-            enum.next
+            # first batch
+            5.times { enum.next }
 
             find_events = subscriber.all_events.select do |evt|
               evt.command_name == 'find'
             end
-            expect(find_events.length).to be(2)
+            expect(find_events.length).to be > 0
             get_more_events = subscriber.all_events.select do |evt|
               evt.command_name == 'getMore'
             end
-            expect(get_more_events.length).to be(0)
+            expect(get_more_events.length).to be == 0
+
+            # force the second batch to be loaded
+            enum.next
+
+            get_more_events = subscriber.all_events.select do |evt|
+              evt.command_name == 'getMore'
+            end
+            expect(get_more_events.length).to be > 0
+
           ensure
             context.view.client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
           end
@@ -1595,7 +1626,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when a collation is specified on the criteria' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1749,7 +1779,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when a collation is specified on the criteria' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1824,7 +1853,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when a collation is specified on the criteria' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1901,7 +1929,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2074,7 +2101,6 @@ describe Mongoid::Contextual::Mongo do
           end
 
           context 'when the criteria has a collation' do
-            min_server_version '3.4'
 
             let(:criteria) do
               Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2247,7 +2273,6 @@ describe Mongoid::Contextual::Mongo do
       end
 
       context 'when the criteria has a collation' do
-        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2420,7 +2445,6 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context 'when the criteria has a collation' do
-          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -3268,6 +3292,12 @@ describe Mongoid::Contextual::Mongo do
     it "limits the results" do
       expect(context.skip(1).entries).to eq([ new_order ])
     end
+
+    context "with #last" do
+      it "returns the nth from last element" do
+        expect(context.skip(1).last).to eq(depeche_mode)
+      end
+    end
   end
 
   describe "#sort" do
@@ -3469,7 +3499,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when provided array filters' do
-      min_server_version '3.6'
 
       before do
         Band.delete_all
@@ -3581,31 +3610,149 @@ describe Mongoid::Contextual::Mongo do
 
         context "when the attributes are in the correct type" do
 
+          context "when operation is $set" do
+
+            before do
+              context.update_all("$set" => { name: "Smiths" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.name).to eq("Smiths")
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.name).to eq("Smiths")
+            end
+          end
+
+          context "when operation is $push" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["electronic"])
+              new_order.update_attribute(:genres, ["electronic"])
+              context.update_all("$push" => { genres: "pop" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["electronic", "pop"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["electronic", "pop"])
+            end
+          end
+
+          context "when operation is $addToSet" do
+
+            before do
+              context.update_all("$addToSet" => { genres: "electronic" })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["electronic"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["electronic"])
+            end
+          end
+
+          context "when operation is $pull" do
+            context "when pulling single element" do
+
+              before do
+                depeche_mode.update_attribute(:genres, ["electronic", "pop"])
+                new_order.update_attribute(:genres, ["electronic", "pop"])
+                context.update_all("$pull" => { genres: "electronic" })
+              end
+
+              it "updates the first matching document" do
+                expect(depeche_mode.reload.genres).to eq(["pop"])
+              end
+
+              it "updates the last matching document" do
+                expect(new_order.reload.genres).to eq(["pop"])
+              end
+            end
+
+            context "when pulling based on condition" do
+              before do
+                depeche_mode.update_attribute(:genres, ["electronic", "pop", "dance"])
+                new_order.update_attribute(:genres, ["electronic", "pop", "dance"])
+                context.update_all("$pull" => { genres: { '$in' => ["electronic", "pop"] } })
+              end
+
+              it "updates the first matching document" do
+                expect(depeche_mode.reload.genres).to eq(["dance"])
+              end
+
+              it "updates the last matching document" do
+                expect(new_order.reload.genres).to eq(["dance"])
+              end
+            end
+          end
+
+          context "when operation is $pop" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["pop", "electronic"])
+            end
+
+            it "removes first element in array" do
+              context.update_all("$pop" => { genres: -1 })
+              expect(depeche_mode.reload.genres).to eq(["electronic"])
+            end
+
+            it "removes last element in array" do
+              context.update_all("$pop" => { genres: 1 })
+              expect(depeche_mode.reload.genres).to eq(["pop"])
+            end
+          end
+
+          context "when operation is $pullAll" do
+
+            before do
+              depeche_mode.update_attribute(:genres, ["pop", "electronic", "dance", "pop" ])
+              new_order.update_attribute(:genres, ["electronic", "pop", "electronic", "dance"])
+              context.update_all("$pullAll" => { genres: ["pop", "electronic"] })
+            end
+
+            it "updates the first matching document" do
+              expect(depeche_mode.reload.genres).to eq(["dance"])
+            end
+
+            it "updates the last matching document" do
+              expect(new_order.reload.genres).to eq(["dance"])
+            end
+          end
+        end
+
+        context 'when using aliased field names' do
           before do
-            context.update_all("$set" => { name: "Smiths" })
+            context.update_all('$set' => { years: 100 })
           end
 
           it "updates the first matching document" do
-            expect(depeche_mode.reload.name).to eq("Smiths")
+            expect(depeche_mode.reload.years).to eq(100)
           end
 
           it "updates the last matching document" do
-            expect(new_order.reload.name).to eq("Smiths")
+            expect(new_order.reload.years).to eq(100)
           end
         end
 
         context "when the attributes must be mongoized" do
 
           before do
-            context.update_all("$set" => { member_count: "1" })
+            context.update_all("$set" => { location: LatLng.new(52.30, 13.25) })
           end
 
           it "updates the first matching document" do
-            expect(depeche_mode.reload.member_count).to eq(1)
+            expect(depeche_mode.reload.location).to eq(LatLng.new(52.30, 13.25))
           end
 
           it "updates the last matching document" do
-            expect(new_order.reload.member_count).to eq(1)
+            expect(new_order.reload.location).to eq(LatLng.new(52.30, 13.25))
           end
         end
       end
@@ -3642,7 +3789,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context 'when provided array filters' do
-      min_server_version '3.6'
 
       before do
         Band.delete_all

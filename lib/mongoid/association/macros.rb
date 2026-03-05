@@ -2,7 +2,6 @@
 
 module Mongoid
   module Association
-
     # This module contains the core macros for defining associations between
     # documents. They can be either embedded or referenced.
     module Macros
@@ -35,10 +34,15 @@ module Mongoid
         # @api private
         class_attribute :aliased_associations
 
+        # @return [ Set<String> ] The set of associations that are configured
+        #   with :store_as parameter.
+        class_attribute :stored_as_associations
+
         self.embedded = false
         self.embedded_relations = BSON::Document.new
         self.relations = BSON::Document.new
         self.aliased_associations = {}
+        self.stored_as_associations = Set.new
       end
 
       # This is convenience for libraries still on the old API.
@@ -48,11 +52,11 @@ module Mongoid
       #
       # @return [ Hash ] The associations.
       def associations
-        self.relations
+        relations
       end
 
+      # Class methods for associations.
       module ClassMethods
-
         # Adds the association back to the parent document. This macro is
         # necessary to set the references from the child back to the parent
         # document. If a child does not define this association calling
@@ -145,6 +149,8 @@ module Mongoid
           define_association!(__method__, name, options, &block)
         end
 
+        # rubocop:disable Naming/PredicateName
+
         # Adds a referenced association from a parent Document to many
         # Documents in another database or collection.
         #
@@ -211,14 +217,17 @@ module Mongoid
           define_association!(__method__, name, options, &block)
         end
 
+        # rubocop:enable Naming/PredicateName
+
         private
 
         def define_association!(macro_name, name, options = {}, &block)
           Association::MACRO_MAPPING[macro_name].new(self, name, options, &block).tap do |assoc|
             assoc.setup!
-            self.relations = self.relations.merge(name => assoc)
+            self.relations = relations.merge(name => assoc)
             if assoc.embedded? && assoc.respond_to?(:store_as) && assoc.store_as != name
-              self.aliased_associations[assoc.store_as] = name
+              aliased_associations[assoc.store_as] = name
+              stored_as_associations << assoc.store_as
             end
           end
         end

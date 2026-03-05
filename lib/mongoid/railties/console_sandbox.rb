@@ -1,3 +1,4 @@
+# rubocop:todo all
 require "mongoid/threaded"
 require "mongoid/errors/transactions_not_supported"
 

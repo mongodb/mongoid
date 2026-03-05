@@ -8,38 +8,34 @@ Mongoid is an ODM (Object-Document Mapper) framework for MongoDB in Ruby.
 Documentation
 -------------
 
-Mongoid has [extensive user documentation](https://www.mongodb.com/docs/mongoid/current/).
-[API documentation](https://www.mongodb.com/docs/mongoid/current/api/) is also available.
-
-Mongoid is built on top of the MongoDB Ruby driver which has
-[its own user documentation](https://www.mongodb.com/docs/ruby-driver/current/).
+* [User documentation](https://www.mongodb.com/docs/mongoid/current/)
+* [API documentation](https://www.mongodb.com/docs/mongoid/current/api/)
+* [Ruby driver documentation](https://www.mongodb.com/docs/ruby-driver/current/) (which Mongoid is built on top of)
 
 Compatibility
 -------------
 
 Mongoid supports and is tested against:
 
-- MRI 2.6 - 3.1
-- JRuby 9.3
-- MongoDB server 3.6 - 6.0
+- MRI 2.7 - 4.0
+- JRuby 9.4 and 10.0
+- MongoDB server 3.6 - 8.2
 
 Issues
 ------
 
-Please use the [MONGOID project](https://jira.mongodb.org/browse/MONGOID/)
-in MongoDB JIRA to report issues with Mongoid.
+Please use the [MONGOID project](https://jira.mongodb.org/browse/MONGOID/) in MongoDB JIRA to report issues with Mongoid.
 
 Support
 -------
 
 * [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoid)
 * [MongoDB Community Forum](https://developer.mongodb.com/community/forums/tags/c/drivers-odms-connectors/7/mongoid-odm)
-* [#mongoid](http://webchat.freenode.net/?channels=mongoid) on Freenode IRC
 
 License
 -------
 
-Copyright (c) 2015-Present MongoDB Inc.  
+Copyright (c) 2015-Present MongoDB Inc. \
 Copyright (c) 2009-2016 Durran Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining

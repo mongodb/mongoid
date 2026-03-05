@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/config/defaults"
 require "mongoid/config/environment"
@@ -22,10 +23,10 @@ module Mongoid
 
     LOCK = Mutex.new
 
-    # Application name that is printed to the mongodb logs upon establishing
-    # a connection in server versions >= 3.4. Note that the name cannot
-    # exceed 128 bytes. It is also used as the database name if the
-    # database name is not explicitly defined.
+    # Application name that is printed to the MongoDB logs upon establishing
+    # a connection. Note that the name cannot exceed 128 bytes in length.
+    # It is also used as the database name if the database name is not
+    # explicitly defined.
     option :app_name, default: nil
 
     # (Deprecated) In MongoDB 4.0 and earlier, set whether to create
@@ -79,18 +80,101 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
-    # Sets the async_query_executor for the application. By default the thread pool executor
+    # Allow BSON::Decimal128 to be parsed and returned directly in
+    # field values. When BSON 5 is present and this option is set to false
+    # (the default), BSON::Decimal128 values in the database will be returned
+    # as BigDecimal.
+    #
+    # @note this option only has effect when BSON 5+ is present. Otherwise,
+    #   the setting is ignored.
+    option :allow_bson5_decimal128, default: false, on_change: -> (allow) do
+        if BSON::VERSION >= '5.0.0'
+          if allow
+            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)
+          else
+            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BigDecimal)
+          end
+        end
+      end
+
+    # Sets the async_query_executor for the application. By default, the thread pool executor
     #   is set to `:immediate. Options are:
     #
     #   - :immediate - Initializes a single +Concurrent::ImmediateExecutor+
     #   - :global_thread_pool - Initializes a single +Concurrent::ThreadPoolExecutor+
-    #      that uses the +async_query_concurrency+ for the +max_threads+ value.
+    #      that uses the +global_executor_concurrency+ for the +max_threads+ value.
     option :async_query_executor, default: :immediate
 
     # Defines how many asynchronous queries can be executed concurrently.
     # This option should be set only if `async_query_executor` is set
     # to `:global_thread_pool`.
     option :global_executor_concurrency, default: nil
+
+    VALID_ISOLATION_LEVELS = %i[ rails thread fiber ].freeze
+
+    # Defines the isolation level that Mongoid uses to store its internal
+    # state.
+    #
+    # Valid values are:
+    # - `:rails` - Uses the isolation level that Rails currently has
+    #  configured. (This is the default.)
+    # - `:thread` - Uses thread-local storage.
+    # - `:fiber` - Uses fiber-local storage (only supported in Ruby 3.2+).
+    #
+    # If set to `:fiber`, Mongoid will use fiber-local storage instead. This
+    # may be necessary if you are using libraries like Falcon, which use
+    # fibers to manage concurrency.
+    #
+    # Note that the `:fiber` isolation level is only supported in Ruby 3.2
+    # and later, due to semantic differences in how fiber storage is handled
+    # in earlier Ruby versions.
+    option :isolation_level, default: :rails, on_change: -> (level) do
+      validate_isolation_level!(level)
+    end
+
+    # Returns the (potentially-dereferenced) isolation level that Mongoid
+    # will use to store its internal state. If `isolation_level` is set to
+    # `:rails`, this will return the isolation level that Rails is current
+    # configured to use (`ActiveSupport::IsolatedExecutionState.isolation_level`).
+    #
+    # If using an older version of Rails that does not support
+    # ActiveSupport::IsolatedExecutionState, this will return `:thread`
+    # instead.
+    #
+    # @api private
+    def real_isolation_level
+      return isolation_level unless isolation_level == :rails
+
+      if defined?(ActiveSupport::IsolatedExecutionState)
+        ActiveSupport::IsolatedExecutionState.isolation_level.tap do |level|
+          # We can't guarantee that Rails will always support the same
+          # isolation levels as Mongoid, so we check here to make sure
+          # it's something we can work with.
+          validate_isolation_level!(level)
+        end
+      else
+        # The default, if Rails does not support IsolatedExecutionState,
+        :thread
+      end
+    end
+
+    # Checks to see if the provided isolation level is something that Mongoid
+    # supports. Raises Errors::UnsupportedIsolationLevel if it is not.
+    #
+    # This will also raise an error if the isolation level is set to `:fiber`
+    # and the Ruby version is less than 3.2, since fiber-local storage
+    # is not supported in earlier Ruby versions.
+    #
+    # @api private
+    def validate_isolation_level!(level)
+      unless VALID_ISOLATION_LEVELS.include?(level)
+        raise Errors::UnsupportedIsolationLevel.new(level)
+      end
+
+      if level == :fiber && RUBY_VERSION < '3.2'
+        raise Errors::UnsupportedIsolationLevel.new(level)
+      end
+    end
 
     # When this flag is false, a document will become read-only only once the
     # #readonly! method is called, and an error will be raised on attempting
@@ -102,12 +186,88 @@ module Mongoid
     # reload, but when it is turned off, it won't be.
     option :legacy_readonly, default: false
 
+    # When this flag is false (the default as of Mongoid 9.0), a document that
+    # is created or loaded will remember the storage options that were active
+    # when it was loaded, and will use those same options by default when
+    # saving or reloading itself.
+    #
+    # When this flag is true you'll get pre-9.0 behavior, where a document will
+    # not remember the storage options from when it was loaded/created, and
+    # subsequent updates will need to explicitly set up those options each time.
+    #
+    # For example:
+    #
+    #    record = Model.with(collection: 'other_collection') { Model.first }
+    #
+    # This will try to load the first document from 'other_collection' and
+    # instantiate it as a Model instance. Pre-9.0, the record object would
+    # not remember that it came from 'other_collection', and attempts to
+    # update it or reload it would fail unless you first remembered to
+    # explicitly specify the collection every time.
+    #
+    # As of Mongoid 9.0, the record will remember that it came from
+    # 'other_collection', and updates and reloads will automatically default
+    # to that collection, for that record object.
+    option :legacy_persistence_context_behavior, default: false
+
     # When this flag is true, any attempt to change the _id of a persisted
     # document will raise an exception (`Errors::ImmutableAttribute`).
     # This is the default in 9.0. Setting this flag to false restores the
     # pre-9.0 behavior, where changing the _id of a persisted
     # document might be ignored, or it might work, depending on the situation.
     option :immutable_ids, default: true
+
+    # When this flag is true, callbacks for every embedded document will be
+    # called only once, even if the embedded document is embedded in multiple
+    # documents in the root document's dependencies graph.
+    # This is the default in 9.0. Setting this flag to false restores the
+    # pre-9.0 behavior, where callbacks are called for every occurrence of an
+    # embedded document. The pre-9.0 behavior leads to a problem that for multi
+    # level nested documents callbacks are called multiple times.
+    # See https://jira.mongodb.org/browse/MONGOID-5542
+    option :prevent_multiple_calls_of_embedded_callbacks, default: true
+
+    # When this flag is false, callbacks for embedded documents will not be
+    # called. This is the default in 9.0.
+    #
+    # Setting this flag to true restores the pre-9.0 behavior, where callbacks
+    # for embedded documents are called. This may lead to stack overflow errors
+    # if there are more than circa 1000 embedded documents in the root
+    # document's dependencies graph.
+    # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
+    option :around_callbacks_for_embeds, default: false
+
+    # When this flag is false, named scopes cannot unset a default scope.
+    # This is the traditional (and default) behavior in Mongoid 9 and earlier.
+    #
+    # Setting this flag to true will allow named scopes to unset the default
+    # scope. This will be the default in Mongoid 10.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5785 for more details.
+    option :allow_scopes_to_unset_default_scope, default: false
+
+    # When this flag is false, indexes are (roughly) validated on the client
+    # to prevent duplicate indexes being declared. This validation is
+    # incomplete, however, and can result in some indexes being silently
+    # ignored.
+    #
+    # Setting this to true will allow duplicate indexes to be declared and sent
+    # to the server. The server will then validate the indexes and raise an
+    # exception if duplicates are detected.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5827 for an example of the
+    # consequences of duplicate index checking.
+    option :allow_duplicate_index_declarations, default: false
+
+    # When this flag is true, performing a serializable_hash(only: []) will
+    # result in all fields being included. This is the traditional (and default)
+    # behavior in Mongoid 9 and earlier.
+    #
+    # Setting this flag to false will change the behavior to suppress all fields
+    # in the serialized hash. This will be the default in Mongoid 10.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5892 for more details.
+    option :serializable_hash_with_legacy_only, default: true
 
     # Returns the Config singleton, for use in the configure DSL.
     #
@@ -314,9 +474,13 @@ module Mongoid
     #   config.running_with_passenger?
     #
     # @return [ true | false ] If the app is deployed on Passenger.
+    #
+    # @deprecated
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end
+
+    Mongoid.deprecate(self, :running_with_passenger?)
 
     private
 

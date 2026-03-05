@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/extensions/array"
 require "mongoid/extensions/big_decimal"

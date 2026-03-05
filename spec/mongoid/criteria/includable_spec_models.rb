@@ -1,9 +1,14 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 class IncUser
   include Mongoid::Document
   has_many :posts, class_name: 'IncPost'
   has_many :comments, class_name: 'IncComment'
+end
+
+class IncAdmin < IncUser
+  field :admin_level, type: Integer
 end
 
 class IncPost

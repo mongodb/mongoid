@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'singleton'
 
@@ -16,8 +17,8 @@ class SpecConfig
       STDERR.puts "Please consider providing the correct uri via MONGODB_URI environment variable."
       @uri_str = DEFAULT_MONGODB_URI
     end
-    
-    @uri = Mongo::URI.new(@uri_str)
+
+    @uri = Mongo::URI.get(@uri_str)
   end
 
   attr_reader :uri_str
@@ -55,6 +56,10 @@ class SpecConfig
     !!ENV['CI']
   end
 
+  def atlas?
+    !!ENV['ATLAS_URI']
+  end
+
   def rails_version
     v = ENV['RAILS']
     if v == ''
@@ -76,5 +81,10 @@ class SpecConfig
       rails_version_re = /^#{rails_version}(?:\..*)?$/
       versions.detect { |v| v =~ rails_version_re }
     end
+  end
+
+  # Returns whether the test suite was configured with a single mongos.
+  def single_mongos?
+    %w(1 true yes).include?(ENV['SINGLE_MONGOS'])
   end
 end

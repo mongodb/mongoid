@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -88,6 +89,27 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
 
       it "returns the criteria" do
         expect(documents).to eq(criteria)
+      end
+    end
+
+    context "when provided an array of hashes" do
+      let(:object) do
+        [
+          { "_id" => BSON::ObjectId.new, "name" => "Emails"},
+          { "_id" => BSON::ObjectId.new, "name" => "SMS"}
+        ]
+      end
+
+      let(:preference1) do
+        Preference.new(object[0])
+      end
+
+      let(:preference2) do
+        Preference.new(object[1])
+      end
+
+      it "returns the documents" do
+        expect(documents).to eq([ preference1, preference2 ])
       end
     end
 

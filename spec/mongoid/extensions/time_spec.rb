@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -7,7 +8,7 @@ describe Mongoid::Extensions::Time do
   describe ".demongoize" do
 
     let!(:time) do
-      Time.local(2010, 11, 19)
+      Time.zone.local(2010, 11, 19)
     end
 
     context "when the time zone is not defined" do
@@ -21,7 +22,7 @@ describe Mongoid::Extensions::Time do
 
         it "returns the local time" do
           expect(Time.demongoize(time).utc_offset).to eq(
-            Time.local(2010, 11, 19).utc_offset
+            Time.zone.local(2010, 11, 19).utc_offset
           )
         end
       end
@@ -40,7 +41,7 @@ describe Mongoid::Extensions::Time do
       context "when we have a time close to midnight" do
 
         let(:time) do
-          Time.local(2010, 11, 19, 0, 30).utc
+          Time.zone.local(2010, 11, 19, 0, 30).utc
         end
 
         it "changes it back to the equivalent local time" do
@@ -321,7 +322,7 @@ describe Mongoid::Extensions::Time do
   describe ".mongoize" do
 
     let!(:time) do
-      Time.local(2010, 11, 19)
+      Time.zone.local(2010, 11, 19)
     end
 
     context "when given nil" do
@@ -607,7 +608,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "converts to a utc time" do
-        expect(Time.mongoize(date)).to eq(Time.local(date.year, date.month, date.day))
+        expect(Time.mongoize(date)).to eq(Time.zone.local(date.year, date.month, date.day))
       end
 
       it "has a zero utc offset" do
@@ -634,7 +635,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "returns a time" do
-        expect(Time.mongoize(array)).to eq(Time.local(*array))
+        expect(Time.mongoize(array)).to eq(Time.zone.local(*array))
       end
 
       context "when setting ActiveSupport time zone" do
@@ -652,11 +653,11 @@ describe Mongoid::Extensions::Time do
   describe "#mongoize" do
 
     let!(:time) do
-      Time.local(2010, 11, 19)
+      Time.zone.local(2010, 11, 19)
     end
 
     let!(:eom_time) do
-      Time.local(2012, 11, 30, 23, 59, 59, 999999.999)
+      Time.zone.local(2012, 11, 30, 23, 59, 59, 999999.999)
     end
 
     let!(:eom_time_mongoized) do

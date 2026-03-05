@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 
@@ -99,8 +100,28 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         Post.where(association.foreign_key => object, 'ratable_type' => 'Rating')
       end
 
+      before do
+        Post.belongs_to :ratable, polymorphic: true
+      end
+
       it "adds the type to the criteria" do
         expect(documents).to eq(criteria)
+      end
+    end
+
+    context "when provided an array of hashes" do
+      let(:object) do
+        [
+          { "_id" => BSON::ObjectId.new, "title" => "Post 1" },
+          { "_id" => BSON::ObjectId.new, "title" => "Post 2" }
+        ]
+      end
+
+      it "queries and returns the documents" do
+        for doc in documents
+          expect(doc).to be_a(Post)
+        end
+        expect(documents.map(&:title)).to eq(["Post 1", "Post 2"])
       end
     end
 

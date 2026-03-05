@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "spec_helper"
 require_relative './embeds_many_models'
@@ -25,6 +26,10 @@ describe Mongoid::Association::Embedded::EmbedsMany do
         legislator.b
       end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'b' on EmmLegislator which was not loaded/)
       expect(legislator.attributes.keys).to eq(['_id', 'a'])
+    end
+
+    it 'allows accessing the parent' do
+      expect { legislator.congress }.not_to raise_error
     end
 
     context 'when using only with $' do

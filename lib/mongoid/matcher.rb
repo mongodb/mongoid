@@ -1,8 +1,11 @@
+# rubocop:todo all
 module Mongoid
 
+  # Utility module containing methods which assist in performing
+  # in-memory matching of documents with MQL query expressions.
+  #
   # @api private
   module Matcher
-
     # Extracts field values in the document at the specified key.
     #
     # The document can be a Hash or a model instance.
@@ -36,16 +39,30 @@ module Mongoid
     # from and behaves identically to association traversal for the purposes
     # of, for example, subsequent array element retrieval.
     #
-    # @param [ Document | Hash ] document The document to extract from.
+    # @param [ Document | Hash | String ] document The document to extract from.
     # @param [ String ] key The key path to extract.
     #
     # @return [ Object | Array ] Field value or values.
     module_function def extract_attribute(document, key)
+      # The matcher system will wind up sending atomic values to this as well,
+      # when attempting to match more complex types. If anything other than a
+      # Document or a Hash is given, we'll short-circuit the logic and just
+      # return an empty array.
+      return [] unless document.is_a?(Hash) || document.is_a?(Document)
+
+      # Performance optimization; if the key does not include a '.' character,
+      # it must reference an immediate attribute of the document.
+      unless key.include?('.')
+        hash = document.respond_to?(:attributes) ? document.attributes : document
+        key = find_exact_key(hash, key)
+        return key ? [ hash[key] ] : []
+      end
+
       if document.respond_to?(:as_attributes, true)
         # If a document has hash fields, as_attributes would keep those fields
         # as Hash instances which do not offer indifferent access.
         # Convert to BSON::Document to get indifferent access on hash fields.
-        document = BSON::Document.new(document.send(:as_attributes))
+        document = document.send(:as_attributes)
       end
 
       current = [document]
@@ -55,8 +72,9 @@ module Mongoid
         current.each do |doc|
           case doc
           when Hash
-            if doc.key?(field)
-              new << doc[field]
+            actual_key = find_exact_key(doc, field)
+            if !actual_key.nil?
+              new << doc[actual_key]
             end
           when Array
             if (index = field.to_i).to_s == field
@@ -66,8 +84,9 @@ module Mongoid
             end
             doc.each do |subdoc|
               if Hash === subdoc
-                if subdoc.key?(field)
-                  new << subdoc[field]
+                actual_key = find_exact_key(subdoc, field)
+                if !actual_key.nil?
+                  new << subdoc[actual_key]
                 end
               end
             end
@@ -78,6 +97,20 @@ module Mongoid
       end
 
       current
+    end
+
+    # Indifferent string or symbol key lookup, returning the exact key.
+    #
+    # @param [ Hash ] hash The input hash.
+    # @param [ String | Symbol ] key The key to perform indifferent lookups with.
+    #
+    # @return [ String | Symbol | nil ] The exact key (with the correct type) that exists in the hash, or nil if the key does not exist.
+    module_function def find_exact_key(hash, key)
+      key_s = key.to_s
+      return key_s if hash.key?(key_s)
+
+      key_sym = key.to_sym
+      hash.key?(key_sym) ? key_sym : nil
     end
   end
 end

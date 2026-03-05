@@ -1,3 +1,4 @@
+# rubocop:todo all
 require 'spec_helper'
 
 describe 'Criteria logical operations' do

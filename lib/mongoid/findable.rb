@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
 
@@ -21,6 +22,7 @@ module Mongoid
       :distinct,
       :each,
       :each_with_index,
+      :eager_load,
       :extras,
       :fifth,
       :fifth!,
@@ -37,7 +39,6 @@ module Mongoid
       :for_js,
       :fourth,
       :fourth!,
-      :geo_near,
       :includes,
       :last!,
       :map_reduce,
@@ -46,6 +47,7 @@ module Mongoid
       :none,
       :pick,
       :pluck,
+      :raw,
       :read,
       :second,
       :second!,
@@ -55,13 +57,12 @@ module Mongoid
       :take,
       :take!,
       :tally,
-      :text_search,
       :third,
       :third!,
       :third_to_last,
       :third_to_last!,
       :update,
-      :update_all,
+      :update_all
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.
@@ -116,6 +117,36 @@ module Mongoid
       with_default_scope.exists?(id_or_conditions)
     end
 
+    # Return true if any documents exist in the criteria.
+    #
+    # @example Determine if any documents exist
+    #   Model.any?
+    #   
+    # @return [ true | false ] If any documents exist.
+    def any?
+      limit(1).count > 0
+    end
+
+    # Return true if only one document exists in the criteria.
+    #
+    # @example Determine if only one document exists
+    #   Model.one?
+    #
+    # @return [ true | false ] If only one document exists.
+    def one?
+      limit(2).count == 1
+    end
+
+    # Return true if more than one document exists in the criteria.
+    #
+    # @example Determine if many documents exist
+    #   Model.many?
+    #
+    # @return [ true | false ] If many documents exist.
+    def many?
+      limit(2).count > 1
+    end
+
     # Finds a +Document+ or multiple documents by their _id values.
     #
     # If a single non-Array argument is given, this argument is interpreted
@@ -133,7 +164,7 @@ module Mongoid
     # even if its _id is given multiple times in the argument to +find+.
     # If the +raise_not_found_error+ Mongoid configuration option is truthy,
     # +Errors::DocumentNotFound+ exception is raised if any of the specified
-    # _ids were not found in the database. If the ++raise_not_found_error+
+    # _ids were not found in the database. If the +raise_not_found_error+
     # Mongoid configuration option is falsy, only those documents which are
     # found are returned; if no documents are found, the return value is an
     # empty array.
@@ -147,7 +178,7 @@ module Mongoid
     # during query construction.
     #
     # If this method is given a block, it delegates to +Enumerable#find+ and
-    # returns the first document of those found by the current Crieria object
+    # returns the first document of those found by the current Criteria object
     # for which the block returns a truthy value. If both a block and ids are
     # given, the block is ignored and the documents for the given ids are
     # returned. If a block and a Proc are given, the method delegates to

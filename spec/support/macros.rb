@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
   module Macros
@@ -73,7 +74,7 @@ module Mongoid
 
     def query_cache_enabled
       around do |example|
-        Mongoid::QueryCache.cache do
+        Mongo::QueryCache.cache do
           example.run
         end
       end
@@ -81,10 +82,10 @@ module Mongoid
 
     def override_query_cache(enabled)
       around do |example|
-        cache_enabled = Mongoid::QueryCache.enabled?
-        Mongoid::QueryCache.enabled = enabled
+        cache_enabled = Mongo::QueryCache.enabled?
+        Mongo::QueryCache.enabled = enabled
         example.run
-        Mongoid::QueryCache.enabled = cache_enabled
+        Mongo::QueryCache.enabled = cache_enabled
       end
     end
 
@@ -102,12 +103,9 @@ module Mongoid
       end
     end
 
-    def time_zone_override(tz)
+    def time_zone_override(time_zone)
       around do |example|
-        old_tz = Time.zone
-        Time.zone = tz
-        example.run
-        Time.zone = old_tz
+        Time.use_zone(time_zone) { example.run }
       end
     end
 

@@ -1,10 +1,12 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require 'spec_helper'
 require_relative '../mongoid/shardable_models'
 
 describe 'Sharding helpers' do
   require_topology :sharded
+  min_server_version '4.4'
 
   describe 'shard_collection rake task' do
     let(:shard_collections) do
@@ -46,6 +48,8 @@ describe 'Sharding helpers' do
     end
 
     context 'when database does not exist' do
+      max_server_version '8.2.99'
+
       let(:model_cls) { SmMovie }
 
       before do
@@ -59,8 +63,6 @@ describe 'Sharding helpers' do
       let(:model_cls) { SmMovie }
 
       before do
-        SmMovie.collection.database.drop
-        SmMovie.collection.create
         SmMovie.collection.drop
       end
 

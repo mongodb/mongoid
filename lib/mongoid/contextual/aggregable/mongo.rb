@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 require "mongoid/contextual/aggregable"
 
@@ -26,7 +27,12 @@ module Mongoid
         #   If no documents are found, then returned Hash will have
         #   count, sum of 0 and max, min, avg of nil.
         def aggregates(field)
-          result = collection.aggregate(pipeline(field), session: _session).to_a
+          result = collection.aggregate(
+                    pipeline(field),
+                    session: _session,
+                    hint: view.hint
+                  ).to_a
+
           if result.empty?
             Aggregable::EMPTY_RESULT.dup
           else
@@ -95,11 +101,14 @@ module Mongoid
         # @example Get the sum for the provided block.
         #   aggregable.sum(&:likes)
         #
-        # @param [ Symbol ] field The field to sum.
+        # @param [ Symbol | Numeric ] field The field to sum, or the initial
+        #    value of the sum when a block is given.
         #
         # @return [ Float ] The sum value.
         def sum(field = nil)
-          block_given? ? super() : aggregates(field)["sum"] || 0
+          return super(field || 0) if block_given?
+
+          aggregates(field)["sum"] || 0
         end
 
         private

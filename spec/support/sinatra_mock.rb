@@ -1,3 +1,4 @@
+# rubocop:todo all
 module Sinatra
   module Base
     extend self

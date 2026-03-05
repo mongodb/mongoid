@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:todo all
 
 module Mongoid
 
@@ -10,7 +11,7 @@ module Mongoid
     # Delegate the cluster method to the client.
     def_delegators :client, :cluster
 
-    # Delegate the storage options method to the object.
+    # Delegate the storage_options method to the object.
     def_delegators :@object, :storage_options
 
     # The options defining this persistence context.
@@ -24,7 +25,8 @@ module Mongoid
     # @return [ Array<Symbol> ] The list of extra options besides client options
     #   that determine the persistence context.
     EXTRA_OPTIONS = [ :client,
-                      :collection
+                      :collection,
+                      :collection_options
                     ].freeze
 
     # The full list of valid persistence context options.
@@ -44,6 +46,26 @@ module Mongoid
     def initialize(object, opts = {})
       @object = object
       set_options!(opts)
+    end
+
+    # Returns a new persistence context that is consistent with the given
+    # child document, inheriting most appropriate settings.
+    #
+    # @param [ Mongoid::Document | Class ] document the child document
+    #
+    # @return [ PersistenceContext ] the new persistence context
+    #
+    # @api private
+    def for_child(document)
+      if document.is_a?(Class)
+        return self if document == (@object.is_a?(Class) ? @object : @object.class)
+      elsif document.is_a?(Mongoid::Document)
+        return self if document.class == (@object.is_a?(Class) ? @object : @object.class)
+      else
+        raise ArgumentError, 'must specify a class or a document instance'
+      end
+
+      PersistenceContext.new(document, options.merge(document.storage_options))
     end
 
     # Get the collection for this persistence context.
@@ -68,7 +90,7 @@ module Mongoid
     #   context.collection_name
     #
     # @return [ String ] The collection name for this persistence
-    #  context.
+    #   context.
     def collection_name
       @collection_name ||= (__evaluate__(options[:collection] ||
                              storage_options[:collection]))
@@ -80,7 +102,7 @@ module Mongoid
     #   context.database_name
     #
     # @return [ String ] The database name for this persistence
-    #  context.
+    #   context.
     def database_name
       __evaluate__(database_name_option) || client.database.name
     end
@@ -91,24 +113,34 @@ module Mongoid
     #   context.client
     #
     # @return [ Mongo::Client ] The client for this persistence
-    #  context.
+    #   context.
     def client
       @client ||= begin
         client = Clients.with_name(client_name)
+        options = client_options
+
         if database_name_option
           client = client.use(database_name)
+          options = options.except(:database, 'database')
         end
-        unless client_options.empty?
-          client = client.with(client_options)
-        end
+
+        client = client.with(options) unless options.empty?
+
         client
       end
     end
 
+    # Get the client name for this persistence context.
+    #
+    # @example Get the client name for this persistence context.
+    #   context.client_name
+    #
+    # @return [ Symbol ] The client name for this persistence
+    #   context.
     def client_name
-      @client_name ||= options[:client] ||
+      @client_name ||= __evaluate__(options[:client]) ||
                          Threaded.client_override ||
-                         storage_options && __evaluate__(storage_options[:client])
+                         __evaluate__(storage_options[:client])
     end
 
     # Determine if this persistence context is equal to another.
@@ -137,6 +169,18 @@ module Mongoid
     # @api private
     def reusable_client?
       @options.keys == [:client]
+    end
+
+    # The subset of provided options that may be used as storage
+    # options.
+    #
+    # @return [ Hash | nil ] the requested storage options, or nil if
+    #   none were specified.
+    #
+    # @api private
+    def requested_storage_options
+      slice = @options.slice(*Mongoid::Clients::Validators::Storage::VALID_OPTIONS)
+      slice.any? ? slice : nil
     end
 
     private
@@ -170,7 +214,7 @@ module Mongoid
     def database_name_option
       @database_name_option ||= options[:database] ||
                                   Threaded.database_override ||
-                                  storage_options && storage_options[:database]
+                                  storage_options[:database]
     end
 
     class << self
@@ -241,33 +285,35 @@ module Mongoid
       # @api private
       PERSISTENCE_CONTEXT_KEY = :"[mongoid]:persistence_context"
 
+      def context_store
+        Threaded.get(PERSISTENCE_CONTEXT_KEY) { {} }
+      end
+
       # Get the persistence context for a given object from the thread local
       #   storage.
       #
-      # @param [ Object ] object Object to get the persistance context for.
+      # @param [ Object ] object Object to get the persistence context for.
       #
       # @return [ Mongoid::PersistenceContext | nil ] The persistence context
       #   for the object if previously stored, otherwise nil.
       #
       # @api private
       def get_context(object)
-        Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
-        Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id]
+        context_store[object.object_id]
       end
 
       # Store persistence context for a given object in the thread local
       #   storage.
       #
-      # @param [ Object ] object Object to store the persistance context for.
+      # @param [ Object ] object Object to store the persistence context for.
       # @param [ Mongoid::PersistenceContext ] context Context to store
       #
       # @api private
       def store_context(object, context)
         if context.nil?
-          Thread.current[PERSISTENCE_CONTEXT_KEY]&.delete(object.object_id)
+          context_store.delete(object.object_id)
         else
-          Thread.current[PERSISTENCE_CONTEXT_KEY] ||= {}
-          Thread.current[PERSISTENCE_CONTEXT_KEY][object.object_id] = context
+          context_store[object.object_id] = context
         end
       end
     end
