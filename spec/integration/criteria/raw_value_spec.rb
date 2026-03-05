@@ -311,8 +311,8 @@ describe 'Queries with Mongoid::RawValue criteria' do
         expect(Band.where(founded: Mongoid::RawValue(BigDecimal('1577923200'))).to_a).to eq [band7]
       end
 
-      it 'matches objects without raw value because BigDecimal cannot be evolved to Date' do
-        expect(Band.where(founded: BigDecimal('1577923200')).to_a).to eq [band7]
+      it 'matches objects without raw value' do
+        expect(Band.where(founded: BigDecimal('1577923200')).to_a).to eq [band3, band4]
       end
     end
 
@@ -321,8 +321,8 @@ describe 'Queries with Mongoid::RawValue criteria' do
         expect(Band.where(updated: Mongoid::RawValue(BigDecimal('1578153600'))).to_a).to eq [band7]
       end
 
-      it 'matches objects without raw value because BigDecimal cannot be evolved to Time' do
-        expect(Band.where(updated: BigDecimal('1578153600')).to_a).to eq [band7]
+      it 'matches objects without raw value' do
+        expect(Band.where(updated: BigDecimal('1578153600')).to_a).to eq [band4, band5]
       end
     end
   end

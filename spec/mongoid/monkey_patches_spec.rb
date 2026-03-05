@@ -62,6 +62,10 @@ RSpec.describe('Do not add monkey patches') do
       __sort_pair__
       delete_one
     ],
+    BigDecimal => %i[
+      __evolve_date__
+      __evolve_time__
+    ],
     Date => %i[
       __evolve_date__
       __evolve_time__
