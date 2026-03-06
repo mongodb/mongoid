@@ -26,6 +26,7 @@ module Mongoid
             new_value = (current || 0) * factor
             process_attribute field, new_value if executing_atomically?
             attributes[field] = new_value
+            clear_demongoized_cache(field)
             ops[atomic_attribute_name(field)] = factor
           end
           { "$mul" => ops } unless ops.empty?

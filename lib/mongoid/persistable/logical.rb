@@ -27,6 +27,7 @@ module Mongoid
             end
             process_attribute field, value if executing_atomically?
             attributes[field] = value
+            clear_demongoized_cache(field)
             ops[atomic_attribute_name(field)] = values
           end
           { "$bit" => ops } unless ops.empty?

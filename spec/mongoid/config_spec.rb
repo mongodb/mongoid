@@ -846,6 +846,91 @@ describe Mongoid::Config do
     end
   end
 
+  describe 'cache_attribute_values option' do
+    context 'when not set in the config' do
+      it 'defaults to false' do
+        Mongoid::Config.reset
+        configuration = CONFIG.merge(options: {})
+
+        Mongoid.configure { |config| config.load_configuration(configuration) }
+
+        expect(Mongoid::Config.cache_attribute_values).to be(false)
+      end
+    end
+
+    context 'when set to true in the config' do
+      it 'enables field value caching' do
+        Mongoid::Config.reset
+        configuration = CONFIG.merge(options: { cache_attribute_values: true })
+
+        Mongoid.configure { |config| config.load_configuration(configuration) }
+
+        expect(Mongoid::Config.cache_attribute_values).to be(true)
+      end
+    end
+
+    context 'when set to false in the config' do
+      it 'disables field value caching' do
+        Mongoid::Config.reset
+        configuration = CONFIG.merge(options: { cache_attribute_values: false })
+
+        Mongoid.configure { |config| config.load_configuration(configuration) }
+
+        expect(Mongoid::Config.cache_attribute_values).to be(false)
+      end
+    end
+
+    context 'functional behavior' do
+      let(:band_class) do
+        Class.new do
+          include Mongoid::Document
+          store_in collection: 'bands'
+          field :name, type: String
+          field :updated, type: Time
+        end
+      end
+
+      before do
+        stub_const('CacheBand', band_class)
+      end
+
+      around do |example|
+        original_value = Mongoid::Config.cache_attribute_values
+        example.run
+      ensure
+        Mongoid::Config.cache_attribute_values = original_value
+      end
+
+      it 'uses caching when enabled' do
+        Mongoid::Config.cache_attribute_values = true
+        
+        band = CacheBand.new(name: 'Test', updated: Time.current)
+        
+        # First access should populate cache
+        first_result = band.updated
+        
+        # Second access should return cached value (same object_id if caching works)
+        second_result = band.updated
+        
+        expect(first_result.object_id).to eq(second_result.object_id)
+      end
+
+      it 'does not use caching when disabled' do
+        Mongoid::Config.cache_attribute_values = false
+        
+        band = CacheBand.new(name: 'Test', updated: Time.current)
+        
+        # Each access should call process_raw_attribute
+        first_result = band.updated
+        second_result = band.updated
+        
+        # When caching is disabled, cache objects should not be initialized
+        expect(band.instance_variable_get(:@__demongoized_cache)).to be_nil
+        expect(band.instance_variable_get(:@__projector_cache)).to be_nil
+      end
+    end
+  end
+
   describe 'deprecations' do
     {}.each do |option, default|
 
