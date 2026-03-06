@@ -349,24 +349,11 @@ module Mongoid
       #   or no field was found for the given key.
       #
       # @api private
-      def traverse_association_tree(key, fields, associations, aliased_associations)
+      def traverse_association_tree(key, fields, associations, aliased_associations, &block)
         # Fast path: if no dots, it's a simple field lookup
         unless key.include?(".")
-          aliased = key
-          if aliased_associations && a = aliased_associations.fetch(key, nil)
-            aliased = a.to_s
-          end
-
-          if fields && f = fields[aliased]
-            yield(key, f, true) if block_given?
-            return f
-          elsif associations && rel = associations[aliased]
-            yield(key, rel, false) if block_given?
-            return nil
-          else
-            yield(key, nil, false) if block_given?
-            return nil
-          end
+          field, _klass = process_field_or_association(key, key, fields, associations, aliased_associations, &block)
+          return field
         end
 
         # Slow path for nested fields (original logic)
@@ -377,30 +364,43 @@ module Mongoid
           rs = i == 0 ? associations : klass&.relations
           as = i == 0 ? aliased_associations : klass&.aliased_associations
 
-          # Associations can possibly have two "keys", their name and their alias.
-          # The fields name is what is used to store it in the klass's relations
-          # and field hashes, and the alias is what's used to store that field
-          # in the database. The key inputted to this function is the aliased
-          # key. We can convert them back to their names by looking in the
-          # aliased_associations hash.
-          aliased = meth
-          if as && a = as.fetch(meth, nil)
-            aliased = a.to_s
-          end
-
-          field = nil
-          klass = nil
-          if fs && f = fs[aliased]
-            field = f
-            yield(meth, f, true) if block_given?
-          elsif rs && rel = rs[aliased]
-            klass = rel.klass
-            yield(meth, rel, false) if block_given?
-          else
-            yield(meth, nil, false) if block_given?
-          end
+          field, klass = process_field_or_association(meth, meth, fs, rs, as, &block)
         end
         field
+      end
+
+      # Process a single field or association segment.
+      #
+      # @param [ String ] key The original key for yielding.
+      # @param [ String ] meth The method/segment name to look up.
+      # @param [ Hash ] fields The fields hash to search.
+      # @param [ Hash ] associations The associations hash to search.
+      # @param [ Hash ] aliased_associations The aliased associations hash.
+      #
+      # @return [ Array<Field, Class> ] Returns [field, klass] where field is
+      #   the found field (or nil) and klass is the relation klass (or nil).
+      #
+      # @api private
+      def process_field_or_association(key, meth, fields, associations, aliased_associations)
+        # Resolve alias if present
+        aliased = meth
+        if aliased_associations && a = aliased_associations.fetch(meth, nil)
+          aliased = a.to_s
+        end
+
+        field = nil
+        klass = nil
+        if fields && f = fields[aliased]
+          field = f
+          yield(key, f, true) if block_given?
+        elsif associations && rel = associations[aliased]
+          klass = rel.klass
+          yield(key, rel, false) if block_given?
+        else
+          yield(key, nil, false) if block_given?
+        end
+
+        [field, klass]
       end
 
       # Get the name of the provided field as it is stored in the database.
@@ -708,8 +708,7 @@ module Mongoid
               if value[0] != raw
                 # Raw value changed (direct attributes hash modification) - recompute
                 demongoized = process_raw_attribute(name.to_s, raw, field)
-                @__demongoized_cache[name] = [raw, demongoized]
-                value = [raw, demongoized]
+                value = @__demongoized_cache[name] = [raw, demongoized]
               end
 
               demongoized_value = value[1]

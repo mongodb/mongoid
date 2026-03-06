@@ -165,6 +165,8 @@ describe 'Mongoid::Fields performance optimizations' do
 
   describe 'critical edge cases' do
     context 'Time field transformations' do
+      config_override :use_utc, true
+
       it 'applies UTC conversion when configured' do
         time_with_zone = Time.new(2020, 1, 1, 12, 0, 0, '+03:00')
         band.updated = time_with_zone
@@ -172,10 +174,8 @@ describe 'Mongoid::Fields performance optimizations' do
 
         reloaded = Band.find(band.id)
 
-        if Mongoid::Config.use_utc?
-          expect(reloaded.updated.utc?).to be(true)
-          expect(reloaded.updated.hour).to eq(9) # 12:00 +03:00 = 09:00 UTC
-        end
+        expect(reloaded.updated.utc?).to be(true)
+        expect(reloaded.updated.hour).to eq(9) # 12:00 +03:00 = 09:00 UTC
       end
 
       it 'preserves timezone conversions after caching' do
@@ -183,7 +183,7 @@ describe 'Mongoid::Fields performance optimizations' do
         band.updated # First read - caches value
         band.updated # Second read - from cache
 
-        expect(band.updated.utc?).to be(true) if Mongoid::Config.use_utc?
+        expect(band.updated.utc?).to be(true)
       end
     end
 

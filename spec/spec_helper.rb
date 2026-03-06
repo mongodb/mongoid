@@ -139,7 +139,7 @@ Mongoid.configure do |config|
   # 1. All existing tests pass with the optimization active
   # 2. No regressions are introduced by the caching layer
   # 3. The feature is production-ready when users opt-in
-  config.cache_attribute_values = true
+  config.cache_attribute_values = ENV['MONGOID_CACHING_ENABLED'] == '1'
 end
 
 # Autoload every model for the test suite that sits in spec/support/models.

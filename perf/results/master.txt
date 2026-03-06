@@ -1,0 +1,58 @@
+Mongoid Field Access Caching Performance Benchmark
+======================================================================
+Branch: master
+Commit: 202c69500
+======================================================================
+
+✗ Field caching not available (master branch baseline)
+
+Running benchmarks (5s each with 2s warmup)...
+======================================================================
+
+[ Single Document Field Access ]
+
+[ Collection Iteration ]
+
+[ Embedded Documents ]
+
+[ Referenced Associations ]
+
+[ Mixed Read/Write ]
+ruby 3.4.8 (2025-12-17 revision 995b59f666) +PRISM [arm64-darwin24]
+Warming up --------------------------------------
+   read single field    87.977k i/100ms
+read multiple fields    40.873k i/100ms
+     read after find   122.000 i/100ms
+iterate all (10 docs)
+                       126.000 i/100ms
+iterate embedded (5 docs)
+                         5.091k i/100ms
+iterate posts (10 docs)
+                         1.965k i/100ms
+     write then read    24.179k i/100ms
+Calculating -------------------------------------
+   read single field    845.112k (±10.7%) i/s    (1.18 μs/i) -      4.223M in   5.077361s
+read multiple fields    405.135k (± 3.7%) i/s    (2.47 μs/i) -      2.044M in   5.051877s
+     read after find      1.235k (± 4.9%) i/s  (809.99 μs/i) -      6.222k in   5.052775s
+iterate all (10 docs)
+                          1.308k (± 4.7%) i/s  (764.35 μs/i) -      6.552k in   5.019281s
+iterate embedded (5 docs)
+                         51.141k (± 2.6%) i/s   (19.55 μs/i) -    259.641k in   5.080617s
+iterate posts (10 docs)
+                         19.551k (± 2.7%) i/s   (51.15 μs/i) -     98.250k in   5.029056s
+     write then read    251.594k (± 2.8%) i/s    (3.97 μs/i) -      1.257M in   5.001528s
+
+======================================================================
+Benchmark Complete!
+======================================================================
+
+Interpretation:
+- Current branch should show ~5-15% improvement over master
+- Improvements come from eliminating allocations (see performance_spec.rb)
+- Larger datasets will show more significant gains
+
+To compare branches:
+  1. Run this script on current branch and save output
+  2. Run on master branch: git checkout master && ruby perf/benchmark_field_cache.rb
+  3. Compare iterations/sec between runs
+======================================================================
