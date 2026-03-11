@@ -190,6 +190,9 @@ if ORIGINAL_BRANCH == 'master'
   # Just run benchmark on master
   eval(BENCHMARK_SCRIPT)
 else
+  # Get repository root
+  repo_root = File.expand_path('..', __dir__)
+
   # Create temp script
   temp_script = Tempfile.new(['benchmark', '.rb'])
   temp_script.write(BENCHMARK_SCRIPT)
@@ -200,7 +203,7 @@ else
   current_output = Tempfile.new(['benchmark_current', '.txt'])
   current_output.close
   
-  system("cd #{__dir__} && ruby #{temp_script.path} > #{current_output.path} 2>&1", exception: true)
+  system("cd #{repo_root} && ruby #{temp_script.path} > #{current_output.path} 2>&1", exception: true)
   
   # Switch to master and run
   puts "\nSwitching to master branch..."
@@ -208,7 +211,7 @@ else
   master_output.close
   
   system("git checkout master -q", exception: true)
-  system("cd #{__dir__} && ruby #{temp_script.path} > #{master_output.path} 2>&1", exception: true)
+  system("cd #{repo_root} && ruby #{temp_script.path} > #{master_output.path} 2>&1", exception: true)
   
   # Switch back to original branch
   system("git checkout #{ORIGINAL_BRANCH} -q", exception: true)
