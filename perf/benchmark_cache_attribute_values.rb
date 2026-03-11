@@ -109,7 +109,14 @@ BENCHMARK_SCRIPT = <<~'RUBY'
     )
   end
 
+  # Disable GC during benchmark for more stable results
+  GC.disable
+
+  # Run GC before starting to ensure clean state
+  3.times { GC.start }
+
   Benchmark.ips do |x|
+    # Balance between accuracy and speed
     x.config(time: 5, warmup: 2)
 
     puts "\n[ Repeated Field Access (10x per iteration) ]"
@@ -139,6 +146,9 @@ BENCHMARK_SCRIPT = <<~'RUBY'
       band.name
     end
   end
+
+  # Re-enable GC after benchmark
+  GC.enable
 RUBY
 
 def parse_results(text)
@@ -198,12 +208,13 @@ else
   temp_script.write(BENCHMARK_SCRIPT)
   temp_script.close
   
-  # Run on current branch
-  puts "Running benchmark on current branch..."
+  # Run on current branch in isolated process
+  puts "Running benchmark on current branch (this will take ~90 seconds)..."
   current_output = Tempfile.new(['benchmark_current', '.txt'])
   current_output.close
   
-  system("cd #{repo_root} && ruby #{temp_script.path} > #{current_output.path} 2>&1", exception: true)
+  # Use bundle exec to ensure proper gem environment, run in fresh process
+  system("cd #{repo_root} && bundle exec ruby #{temp_script.path} > #{current_output.path} 2>&1", exception: true)
   
   # Switch to master and run
   puts "\nSwitching to master branch..."
@@ -211,7 +222,14 @@ else
   master_output.close
   
   system("git checkout master -q", exception: true)
-  system("cd #{repo_root} && ruby #{temp_script.path} > #{master_output.path} 2>&1", exception: true)
+  
+  # Bundle install might be needed if dependencies differ
+  puts "Ensuring dependencies are installed on master..."
+  system("cd #{repo_root} && bundle install --quiet > /dev/null 2>&1")
+  
+  puts "Running benchmark on master branch (this will take ~90 seconds)..."
+  # Use bundle exec to ensure proper gem environment, run in fresh process
+  system("cd #{repo_root} && bundle exec ruby #{temp_script.path} > #{master_output.path} 2>&1", exception: true)
   
   # Switch back to original branch
   system("git checkout #{ORIGINAL_BRANCH} -q", exception: true)
