@@ -114,4 +114,28 @@ describe Mongoid::Atomic::Modifiers do
     end
   end
 
+  context 'when setting and then unsetting an embedded field' do
+    let(:book1) { ModifierModels::Book.new(title: "Slaughterhouse-Five", foreword: ModifierModels::Foreword.new(text: "Introduction")) }
+    let(:book2) { ModifierModels::Book.new(title: "Cat's Cradle") }
+    let(:books) { [ book1, book2 ] }
+    let(:library) { ModifierModels::Library.create!(name: 'City Library', books: books) }
+
+    let(:new_book) { ModifierModels::Book.new(title: 'Breakfast of Champions', foreword: ModifierModels::Foreword.new(text: 'Foreword')) }
+
+    before do
+      # prepare the '$set' operation
+      library.assign_attributes(books: [book1, book2, new_book])
+      # prepare the '$unset' operation
+      library.books[0].assign_attributes(foreword: nil)
+    end
+
+    it 'does not fail because of the conflict' do
+      expect { library.save! }.not_to raise_error
+
+      library.reload
+      expect(library.books[0].foreword).to be_nil
+      expect(library.books[2].foreword).not_to be_nil
+    end
+  end
+
 end
