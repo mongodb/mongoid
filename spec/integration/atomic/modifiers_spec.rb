@@ -106,9 +106,9 @@ describe Mongoid::Atomic::Modifiers do
 
       it "adds all modifiers to top level" do
         expect(modifiers).to eq("$unset" => {
-          foobar: true,
-          foo: true,
-          bar: true,
+          'foobar' => true,
+          'foo' => true,
+          'bar' => true,
         })
       end
     end

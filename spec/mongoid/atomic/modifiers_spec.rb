@@ -517,7 +517,7 @@ describe Mongoid::Atomic::Modifiers do
         context 'when the child is a new document' do
           let(:sets) { { 'books' => [ { 'title' => '1984' } ] } }
 
-          # if the child is a new document, it's path will not be set correctly,
+          # if the child is a new document, its path will not be set correctly,
           # effectively giving it a `nil` index.
           let(:unsets) { [ 'books.title' ] }
 
@@ -531,7 +531,7 @@ describe Mongoid::Atomic::Modifiers do
         context 'when the child is a persisted document' do
           let(:sets) { { 'books' => [ { 'title' => '1984' } ] } }
 
-          # if the child is a persisted document, it's path will be set correctly,
+          # if the child is a persisted document, its path will be set correctly,
           # referencing the child by index.
           let(:unsets) { [ 'books.0.title' ] }
 

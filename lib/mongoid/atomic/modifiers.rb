@@ -89,6 +89,8 @@ module Mongoid
       # @param [ Array<String> ] modifications The unset association names.
       def unset(modifications)
         modifications.each do |field|
+          field = field.to_s
+
           if unset_conflict?(field)
             # If the conflicting $set covers the entire parent field (not just a
             # sub-path), it writes the complete current state, which already
@@ -174,7 +176,7 @@ module Mongoid
       #
       # @return [ true | false ] If this field is a conflict.
       def unset_conflict?(field)
-        key = field.to_s.split('.', 2)[0]
+        key = field.split('.', 2)[0]
         set_fields.has_key?(key)
       end
 
@@ -197,9 +199,11 @@ module Mongoid
       # current (live) state of the array already includes all pending changes
       # (e.g., embedded association removed), so a $unset for any children.*.x
       # field is unnecessary.
+      #
+      # @param [ String ] field the field
       def unset_superseded_by_set?(field)
-        key = field.to_s.split('.', 2)[0]
-        set_fields[key] == key
+        key = field.split('.', 2).first
+        sets(initialize: false).has_key?(key)
       end
 
       # Get the conflicting pull modifications.
@@ -315,7 +319,9 @@ module Mongoid
       #   modifiers.sets
       #
       # @return [ Hash ] The $set operations.
-      def sets
+      def sets(initialize: true)
+        return self['$set'] unless initialize
+
         self["$set"] ||= {}
       end
 
