@@ -79,7 +79,7 @@ module Mongoid
       # @return [ Document ] The instantiated document.
       def instantiate_without_type(execute_callbacks)
         klass.instantiate_document(attributes, selected_fields, execute_callbacks: execute_callbacks).tap do |obj|
-          if criteria&.association && criteria&.parent_document
+          if criteria&.association && criteria.parent_document
             obj.set_relation(criteria.association.inverse, criteria.parent_document)
           end
         end

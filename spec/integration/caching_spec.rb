@@ -15,8 +15,8 @@ describe 'caching integration tests' do
     end
 
     it 'uses a unique key' do
-      expect(store.read(model1)).to be == 'model1'
-      expect(store.read(model2)).to be == 'model2'
+      expect(store.read(model1)).to eq 'model1'
+      expect(store.read(model2)).to eq 'model2'
     end
 
     context 'when updating' do
@@ -29,8 +29,8 @@ describe 'caching integration tests' do
       let(:reloaded_model2) { Person.find(model2.id) }
 
       it 'still finds the models' do
-        expect(store.read(reloaded_model1)).to be == 'model1'
-        expect(store.read(reloaded_model2)).to be == 'model2'
+        expect(store.read(reloaded_model1)).to eq 'model1'
+        expect(store.read(reloaded_model2)).to eq 'model2'
       end
     end
   end
@@ -45,8 +45,8 @@ describe 'caching integration tests' do
     end
 
     it 'uses a unique key' do
-      expect(store.read(model1)).to be == 'model1'
-      expect(store.read(model2)).to be == 'model2'
+      expect(store.read(model1)).to eq 'model1'
+      expect(store.read(model2)).to eq 'model2'
     end
 
     context 'when updating' do

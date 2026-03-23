@@ -149,8 +149,6 @@ module Mongoid
           define_association!(__method__, name, options, &block)
         end
 
-        # rubocop:disable Naming/PredicateName
-
         # Adds a referenced association from a parent Document to many
         # Documents in another database or collection.
         #
@@ -216,8 +214,6 @@ module Mongoid
         def has_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
-
-        # rubocop:enable Naming/PredicateName
 
         private
 
