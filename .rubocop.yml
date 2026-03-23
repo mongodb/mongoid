@@ -115,11 +115,11 @@ Style/TernaryParentheses:
 Lint/UselessConstantScoping:
   Enabled: false
 
-Naming/PredicateMethod:
-  Enabled: false
-
-Naming/PredicatePrefix:
-  Enabled: false
+# Naming/PredicateMethod:
+#   Enabled: false
+#
+# Naming/PredicatePrefix:
+#   Enabled: false
 
 RSpec/IndexedLet:
   Enabled: false

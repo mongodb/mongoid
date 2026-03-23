@@ -167,7 +167,7 @@ module Mongoid
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
         # @param &block Optional block for defining extensions.
-        def has_many(name, options = {}, &block)
+        def has_many(name, options = {}, &block) # rubocop:disable Naming/PredicatePrefix
           define_association!(__method__, name, options, &block)
         end
 
@@ -189,7 +189,7 @@ module Mongoid
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
         # @param &block Optional block for defining extensions.
-        def has_and_belongs_to_many(name, options = {}, &block)
+        def has_and_belongs_to_many(name, options = {}, &block) # rubocop:disable Naming/PredicatePrefix
           define_association!(__method__, name, options, &block)
         end
 
@@ -211,7 +211,7 @@ module Mongoid
         # @param [ Symbol ] name The name of the association.
         # @param [ Hash ] options The association options.
         # @param &block Optional block for defining extensions.
-        def has_one(name, options = {}, &block)
+        def has_one(name, options = {}, &block) # rubocop:disable Naming/PredicatePrefix
           define_association!(__method__, name, options, &block)
         end
 
