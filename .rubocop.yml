@@ -1,4 +1,4 @@
-require:
+plugins:
   - rubocop-performance
   - rubocop-rake
   - rubocop-rspec
@@ -111,3 +111,21 @@ Style/ParallelAssignment:
 
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
+
+Lint/UselessConstantScoping:
+  Enabled: false
+
+# Naming/PredicateMethod:
+#   Enabled: false
+#
+# Naming/PredicatePrefix:
+#   Enabled: false
+
+RSpec/IndexedLet:
+  Enabled: false
+
+RSpec/LeakyLocalVariable:
+  Enabled: false
+
+RSpec/RemoveConst:
+  Enabled: false

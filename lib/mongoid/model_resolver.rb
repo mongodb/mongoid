@@ -19,6 +19,7 @@ module Mongoid
 
     class << self
       extend Forwardable
+
       def_delegators :instance, :register
 
       # Returns the default instance of the ModelResolver.

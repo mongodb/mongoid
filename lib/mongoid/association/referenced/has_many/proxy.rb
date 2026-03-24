@@ -259,8 +259,8 @@ module Mongoid
           # @yield [ Object ] Yields each enumerable element to the block.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
-          def find(*args, &block)
-            matching = criteria.find(*args, &block)
+          def find(...)
+            matching = criteria.find(...)
             Array(matching).each { |doc| _target.push(doc) }
             matching
           end

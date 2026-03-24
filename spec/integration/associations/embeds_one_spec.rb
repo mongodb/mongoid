@@ -12,7 +12,7 @@ describe 'embeds_one associations' do
       let!(:palette) { canvas.palette }
 
       it 'does not destroy the dependent object' do
-        canvas.palette = canvas.palette
+        canvas.palette = canvas.palette # rubocop:disable Lint/SelfAssignment
         canvas.save!
         canvas.reload
         expect(canvas.palette).to eq palette
@@ -24,6 +24,7 @@ describe 'embeds_one associations' do
     let(:klass) do
       Class.new do
         include Mongoid::Document
+
         embeds_one :address
       end
     end

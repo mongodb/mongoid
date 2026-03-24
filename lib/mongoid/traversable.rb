@@ -8,6 +8,7 @@ module Mongoid
   # around traversing the document graph.
   module Traversable
     extend ActiveSupport::Concern
+
     # This code is extracted from ActiveSupport so that we do not depend on
     # their private API that may change at any time.
     # This code should be reviewed and maybe removed when implementing
