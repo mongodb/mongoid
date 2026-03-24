@@ -518,7 +518,8 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
     end
 
     before do
-      post; post_two
+      post
+      post_two
 
       enumerable._loaded[post.id] = post
       enumerable << post

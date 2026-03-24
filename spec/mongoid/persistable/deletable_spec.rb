@@ -243,8 +243,11 @@ describe Mongoid::Persistable::Deletable do
     context 'when deleting all documents with a custom discriminator key' do
       before do
         Canvas.discriminator_key = 'dkey'
-        
-        firefox; firefox2; browser; canvas
+
+        firefox
+        firefox2
+        browser
+        canvas
 
         Firefox.delete_all
       end
@@ -276,7 +279,10 @@ describe Mongoid::Persistable::Deletable do
         Canvas.discriminator_key = 'dkey'
         Firefox.discriminator_value = 'dvalue'
 
-        firefox; firefox2; browser; canvas
+        firefox
+        firefox2
+        browser
+        canvas
 
         Firefox.delete_all
       end

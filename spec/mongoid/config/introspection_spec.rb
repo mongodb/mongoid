@@ -41,7 +41,7 @@ describe Mongoid::Config::Introspection do
         it 'is parsed by the introspection scraper' do
           expect(option).not_to be_nil
 
-          if option.default.match(/^'.*?'$/)
+          if option.default.match?(/^'.*?'$/)
             expect(option.default).to eq "'#{default_value}'"
           else
             expect(option.default).to eq default_value.inspect

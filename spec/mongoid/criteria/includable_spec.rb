@@ -946,7 +946,8 @@ describe Mongoid::Criteria::Includable do
         end
 
         before do
-          person_two; game_three
+          person_two
+          game_three
 
           if method_name == :includes
             expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
@@ -1041,8 +1042,10 @@ describe Mongoid::Criteria::Includable do
       let(:context) { criteria.context }
 
       before do
-        post_one; post_two
-        game_one; game_two
+        post_one
+        post_two
+        game_one
+        game_two
 
         if method_name == :includes
           expect(context).to receive(:preload).twice.and_call_original

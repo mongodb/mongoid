@@ -372,7 +372,8 @@ describe Mongoid::Reloadable do
         end
 
         before do
-          address; location
+          address
+          location
 
           Person.collection.find({ '_id' => person.id })
                 .update_one({ '$set' => { 'addresses.0.locations.0.name' => 'work' } })
