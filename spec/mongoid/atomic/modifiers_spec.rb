@@ -501,6 +501,47 @@ describe Mongoid::Atomic::Modifiers do
           expect(modifiers).to eq({})
         end
       end
+
+      context 'when the unsets conflict with a prior set' do
+        before do
+          # `generate_atomic_updates` always calls `unset` before `set`, but in the case
+          # of nested documents, `generate_atomic_updates` is always called for the
+          # child documents after the parent.
+          #
+          # The following initialization assumes that `sets` is what is set on the parent,
+          # and `unsets` is what is set on the children.
+          modifiers.set(sets)
+          modifiers.unset(unsets)
+        end
+
+        context 'when the child is a new document' do
+          let(:sets) { { 'books' => [ { 'title' => '1984' } ] } }
+
+          # if the child is a new document, its path will not be set correctly,
+          # effectively giving it a `nil` index.
+          let(:unsets) { [ 'books.title' ] }
+
+          it 'conflicts' do
+            expect(modifiers).to eq(
+              { '$set' => { 'books' => [ { 'title' => '1984' } ] } }
+            )
+          end
+        end
+
+        context 'when the child is a persisted document' do
+          let(:sets) { { 'books' => [ { 'title' => '1984' } ] } }
+
+          # if the child is a persisted document, its path will be set correctly,
+          # referencing the child by index.
+          let(:unsets) { [ 'books.0.title' ] }
+
+          it 'conflicts' do
+            expect(modifiers).to eq(
+              { '$set' => { 'books' => [ { 'title' => '1984' } ] } }
+            )
+          end
+        end
+      end
     end
   end
 end

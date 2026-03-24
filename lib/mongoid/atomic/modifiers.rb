@@ -89,7 +89,17 @@ module Mongoid
       # @param [ Array<String> ] modifications The unset association names.
       def unset(modifications)
         modifications.each do |field|
-          unsets.update(field => true)
+          field = field.to_s
+
+          if unset_conflict?(field)
+            # If the conflicting $set covers the entire parent field (not just a
+            # sub-path), it writes the complete current state, which already
+            # reflects this unset. Skip the $unset — it's redundant.
+            next if unset_superseded_by_set?(field)
+            conflicting_unsets.update(field => true)
+          else
+            unsets.update(field => true)
+          end
         end
       end
 
@@ -160,6 +170,16 @@ module Mongoid
         pull_fields.has_key?(name) || push_fields.has_key?(name)
       end
 
+      # Is the operation going to be a conflict for an $unset?
+      #
+      # @param [ String ] field The field.
+      #
+      # @return [ true | false ] If this field is a conflict.
+      def unset_conflict?(field)
+        key = field.split('.', 2)[0]
+        set_fields.has_key?(key)
+      end
+
       # Is the operation going to be a conflict for a $push?
       #
       # @example Is this a conflict for a push?
@@ -172,6 +192,18 @@ module Mongoid
         name = field.split(".", 2)[0]
         set_fields.has_key?(name) || pull_fields.has_key?(name) ||
           (push_fields.keys.count { |item| item.split('.', 2).first == name } > 1)
+      end
+
+      # Returns true if the $unset is made redundant by a $set that covers
+      # the entire root-level field. When $set "children" is issued, the
+      # current (live) state of the array already includes all pending changes
+      # (e.g., embedded association removed), so a $unset for any children.*.x
+      # field is unnecessary.
+      #
+      # @param [ String ] field the field
+      def unset_superseded_by_set?(field)
+        key = field.split('.', 2).first
+        sets(initialize: false).has_key?(key)
       end
 
       # Get the conflicting pull modifications.
@@ -202,6 +234,13 @@ module Mongoid
       # @return [ Hash ] The conflicting set operations.
       def conflicting_sets
         conflicts["$set"] ||= {}
+      end
+
+      # Get the conflicting unset modifications.
+      #
+      # @return [ Hash ] The conflicting unset operations.
+      def conflicting_unsets
+        conflicts['$unset'] ||= {}
       end
 
       # Get the push operations that would have conflicted with the sets.
@@ -280,7 +319,9 @@ module Mongoid
       #   modifiers.sets
       #
       # @return [ Hash ] The $set operations.
-      def sets
+      def sets(initialize: true)
+        return self['$set'] unless initialize
+
         self["$set"] ||= {}
       end
 
