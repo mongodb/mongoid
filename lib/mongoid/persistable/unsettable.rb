@@ -26,6 +26,7 @@ module Mongoid
               process_attribute normalized, nil
             else
               attributes.delete(normalized)
+              clear_demongoized_cache(normalized)
             end
             ops[atomic_attribute_name(normalized)] = true
           end

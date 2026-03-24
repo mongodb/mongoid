@@ -22,6 +22,7 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(pulls) do |field, value|
             (send(field) || []).delete(value)
+            clear_demongoized_cache(field)
             ops[atomic_attribute_name(field)] = value
           end
           { "$pull" => ops }
@@ -41,6 +42,7 @@ module Mongoid
           process_atomic_operations(pulls) do |field, value|
             existing = send(field) || []
             value.each{ |val| existing.delete(val) }
+            clear_demongoized_cache(field)
             ops[atomic_attribute_name(field)] = value
           end
           { "$pullAll" => ops }

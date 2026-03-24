@@ -217,6 +217,41 @@ module Mongoid
     # document might be ignored, or it might work, depending on the situation.
     option :immutable_ids, default: true
 
+    # When this flag is true, Mongoid will cache demongoized attribute values
+    # to improve read performance. The cache stores both the raw BSON value
+    # and the demongoized Ruby object, automatically invalidating when the
+    # underlying raw value changes.
+    #
+    # This optimization can significantly improve performance for fields with
+    # expensive demongoization (e.g., Time, Date, custom types), especially
+    # in read-heavy workloads.
+    #
+    # The cache is disabled by default to maintain backward compatibility.
+    # Enable it to gain performance improvements:
+    #
+    #   Mongoid.configure do |config|
+    #     config.cache_attribute_values = true
+    #   end
+    #
+    # @note This option must be set during application initialization and
+    #   should not be changed at runtime. Changing this flag at runtime is
+    #   unsupported and may lead to undefined behavior or errors.
+    #
+    #   If caching is enabled after documents are created:
+    #   - Pre-existing documents will not have cache instance variables
+    #     initialized, causing NoMethodError when field accessors attempt
+    #     to use the cache
+    #   - Only newly created documents will benefit from caching
+    #
+    #   If caching is disabled after documents are created:
+    #   - Pre-existing documents will retain their cache instance variables
+    #     but the caches will not be consulted, wasting memory
+    #   - Newly created documents will not have caches
+    #
+    #   To avoid inconsistent behavior, always configure this option once
+    #   at application boot and do not modify it thereafter.
+    option :cache_attribute_values, default: false
+
     # When this flag is true, callbacks for every embedded document will be
     # called only once, even if the embedded document is embedded in multiple
     # documents in the root document's dependencies graph.

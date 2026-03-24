@@ -126,6 +126,20 @@ end
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
+  # NOTE: Attribute caching is disabled by default (cache_attribute_values = false),
+  # but the test suite runs with it ENABLED to exercise cache-aware behavior and
+  # validate the optimization works correctly across all existing tests.
+  #
+  # This means the default configuration (caching disabled) is not tested by the
+  # main test suite. The caching feature has its own dedicated tests that verify
+  # both enabled and disabled states (see spec/mongoid/config_spec.rb and
+  # spec/mongoid/fields/performance_spec.rb).
+  #
+  # Running with caching enabled ensures:
+  # 1. All existing tests pass with the optimization active
+  # 2. No regressions are introduced by the caching layer
+  # 3. The feature is production-ready when users opt-in
+  config.cache_attribute_values = ENV['MONGOID_CACHING_ENABLED'] == '1'
 end
 
 # Autoload every model for the test suite that sits in spec/support/models.

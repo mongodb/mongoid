@@ -100,6 +100,17 @@ module Mongoid
       def cleanse_localized_field_names(name)
         name = database_field_name(name.to_s)
 
+        # Fast path: if no dots, avoid array allocations entirely
+        unless name.include?(".")
+          # Simple field without nesting - just check for translation suffix
+          if !fields.key?(name) && !relations.key?(name) && name.end_with?(TRANSLATIONS_SFX)
+            return name.delete_suffix(TRANSLATIONS_SFX)
+          end
+
+          return name
+        end
+
+        # Slow path for nested fields (original logic)
         klass = self
         [].tap do |res|
           ar = name.split('.')
@@ -186,6 +197,7 @@ module Mongoid
           default = field.eval_default(self)
           unless default.nil? || field.lazy?
             attribute_will_change!(name)
+            clear_demongoized_cache(name)
             attributes[name] = default
           end
         end
@@ -337,7 +349,14 @@ module Mongoid
       #   or no field was found for the given key.
       #
       # @api private
-      def traverse_association_tree(key, fields, associations, aliased_associations)
+      def traverse_association_tree(key, fields, associations, aliased_associations, &block)
+        # Fast path: if no dots, it's a simple field lookup
+        unless key.include?(".")
+          field, _klass = process_field_or_association(key, key, fields, associations, aliased_associations, &block)
+          return field
+        end
+
+        # Slow path for nested fields (original logic)
         klass = nil
         field = nil
         key.split('.').each_with_index do |meth, i|
@@ -345,30 +364,43 @@ module Mongoid
           rs = i == 0 ? associations : klass&.relations
           as = i == 0 ? aliased_associations : klass&.aliased_associations
 
-          # Associations can possibly have two "keys", their name and their alias.
-          # The fields name is what is used to store it in the klass's relations
-          # and field hashes, and the alias is what's used to store that field
-          # in the database. The key inputted to this function is the aliased
-          # key. We can convert them back to their names by looking in the
-          # aliased_associations hash.
-          aliased = meth
-          if as && a = as.fetch(meth, nil)
-            aliased = a.to_s
-          end
-
-          field = nil
-          klass = nil
-          if fs && f = fs[aliased]
-            field = f
-            yield(meth, f, true) if block_given?
-          elsif rs && rel = rs[aliased]
-            klass = rel.klass
-            yield(meth, rel, false) if block_given?
-          else
-            yield(meth, nil, false) if block_given?
-          end
+          field, klass = process_field_or_association(meth, meth, fs, rs, as, &block)
         end
         field
+      end
+
+      # Process a single field or association segment.
+      #
+      # @param [ String ] key The original key for yielding.
+      # @param [ String ] meth The method/segment name to look up.
+      # @param [ Hash ] fields The fields hash to search.
+      # @param [ Hash ] associations The associations hash to search.
+      # @param [ Hash ] aliased_associations The aliased associations hash.
+      #
+      # @return [ Array<Field, Class> ] Returns [field, klass] where field is
+      #   the found field (or nil) and klass is the relation klass (or nil).
+      #
+      # @api private
+      def process_field_or_association(key, meth, fields, associations, aliased_associations)
+        # Resolve alias if present
+        aliased = meth
+        if aliased_associations && a = aliased_associations.fetch(meth, nil)
+          aliased = a.to_s
+        end
+
+        field = nil
+        klass = nil
+        if fields && f = fields[aliased]
+          field = f
+          yield(key, f, true) if block_given?
+        elsif associations && rel = associations[aliased]
+          klass = rel.klass
+          yield(key, rel, false) if block_given?
+        else
+          yield(key, nil, false) if block_given?
+        end
+
+        [field, klass]
       end
 
       # Get the name of the provided field as it is stored in the database.
@@ -416,6 +448,13 @@ module Mongoid
         return "" unless name.present?
 
         key = name.to_s
+
+        # Fast path: if no dots, avoid split allocation
+        unless key.include?(".")
+          return aliased_fields[key]&.dup || key
+        end
+
+        # Slow path for nested fields (original logic with split)
         segment, remaining = key.split('.', 2)
 
         # Don't get the alias for the field when a belongs_to association
@@ -647,10 +686,42 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
+            # Handle lazy defaults first (before reading raw value)
             raw = read_raw_attribute(name)
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
+            # Don't cache localized fields as they depend on I18n.locale
+            elsif field.localized?
+              process_raw_attribute(name.to_s, raw, field)
+            # Check if caching is enabled
+            elsif Mongoid::Config.cache_attribute_values?
+              # Atomically fetch or compute the cached value
+              # Cache stores [raw_value, demongoized_value] to detect stale cache
+              value = @__demongoized_cache.compute_if_absent(name) do
+                # Cache miss - re-read raw inside block to avoid race conditions
+                current_raw = read_raw_attribute(name)
+                demongoized = process_raw_attribute(name.to_s, current_raw, field)
+                [current_raw, demongoized]
+              end
+
+              # Check if cached raw value matches current raw value
+              if value[0] != raw
+                # Raw value changed (direct attributes hash modification) - recompute
+                demongoized = process_raw_attribute(name.to_s, raw, field)
+                value = @__demongoized_cache[name] = [raw, demongoized]
+              end
+
+              demongoized_value = value[1]
+
+              # For resizable values (like arrays), we need to track changes on every read
+              # because mutations can happen to the cached object. This matches master behavior
+              # where process_raw_attribute is called on every read.
+              is_relation = relations.key?(name.to_s)
+              attribute_will_change!(name.to_s) if demongoized_value.resizable? && !is_relation
+
+              demongoized_value
             else
+              # Caching disabled - use original behavior
               process_raw_attribute(name.to_s, raw, field)
             end
           end

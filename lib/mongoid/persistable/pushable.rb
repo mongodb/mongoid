@@ -31,6 +31,7 @@ module Mongoid
             values.each do |val|
               existing.push(val) unless existing.include?(val)
             end
+            clear_demongoized_cache(field)
             ops[atomic_attribute_name(field)] = { "$each" => values }
           end
           { "$addToSet" => ops }
@@ -57,6 +58,7 @@ module Mongoid
             end
             values = [ value ].flatten(1)
             values.each{ |val| existing.push(val) }
+            clear_demongoized_cache(field)
             ops[atomic_attribute_name(field)] = { "$each" => values }
           end
           { "$push" => ops }

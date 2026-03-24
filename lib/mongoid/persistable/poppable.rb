@@ -27,6 +27,7 @@ module Mongoid
           process_atomic_operations(pops) do |field, value|
             values = send(field)
             value > 0 ? values.pop : values.shift
+            clear_demongoized_cache(field)
             ops[atomic_attribute_name(field)] = value
           end
           { "$pop" => ops }
