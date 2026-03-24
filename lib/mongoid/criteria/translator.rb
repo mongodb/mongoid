@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # This is a helper module for translating atomic and composite
     # Ruby values into corresponding query and option components.
     # Originally implemented as patches to core classes, that approach
@@ -28,19 +26,18 @@ module Mongoid
       # @return [ Hash | Numeric ] The direction.
       def to_direction(value)
         case value
-        when Hash then
+        when Hash
           value
-        when Numeric then
+        when Numeric
           value
-        when String then
-          value =~ /desc/i ? -1 : 1
-        when Symbol then
+        when String
+          /desc/i.match?(value) ? -1 : 1
+        when Symbol
           to_direction(value.to_s)
         else
           raise ArgumentError, "cannot translate #{value.inspect} (#{value.class}) to a direction specification"
         end
       end
     end
-
   end
 end

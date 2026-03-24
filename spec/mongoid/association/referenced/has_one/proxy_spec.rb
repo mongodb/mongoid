@@ -1,14 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Association::Referenced::HasOne::Proxy do
-
-  describe "#=" do
-
-    context "when the relationship is an illegal embedded reference" do
-
+  describe '#=' do
+    context 'when the relationship is an illegal embedded reference' do
       let(:game) do
         Game.new
       end
@@ -17,15 +13,14 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         Video.new
       end
 
-      it "raises a mixed relation error" do
-        expect {
+      it 'raises a mixed relation error' do
+        expect do
           game.video = video
-        }.to raise_error(Mongoid::Errors::MixedRelations)
+        end.to raise_error(Mongoid::Errors::MixedRelations)
       end
     end
 
-    context "when the relation is cyclic" do
-
+    context 'when the relation is cyclic' do
       let(:user) do
         User.new
       end
@@ -38,15 +33,13 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         user.role = role
       end
 
-      it "does not raise an error" do
+      it 'does not raise an error' do
         expect(user.role).to eq(role)
       end
     end
 
-    context "when the relation is not polymorphic" do
-
-      context "when the parent is a new record" do
-
+    context 'when the relation is not polymorphic' do
+      context 'when the parent is a new record' do
         let(:person) do
           Person.new
         end
@@ -56,37 +49,36 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
 
         let(:association) do
-          Game.relations["person"]
+          Game.relations['person']
         end
 
         before do
-          expect(association).to receive(:criteria).never
+          expect(association).not_to receive(:criteria)
           person.game = game
         end
 
-        it "sets the target of the relation" do
+        it 'sets the target of the relation' do
           expect(person.game._target).to eq(game)
         end
 
-        it "sets the foreign key on the relation" do
+        it 'sets the foreign key on the relation' do
           expect(game.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it 'sets the base on the inverse relation' do
           expect(game.person).to eq(person)
         end
 
-        it "sets the same instance on the inverse relation" do
+        it 'sets the same instance on the inverse relation' do
           expect(game.person).to eql(person)
         end
 
-        it "does not save the target" do
-          expect(game).to_not be_persisted
+        it 'does not save the target' do
+          expect(game).not_to be_persisted
         end
       end
 
-      context "when the parent is not a new record" do
-
+      context 'when the parent is not a new record' do
         let(:person) do
           Person.create!
         end
@@ -99,49 +91,47 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           person.game = game
         end
 
-        it "sets the target of the relation" do
+        it 'sets the target of the relation' do
           expect(person.game._target).to eq(game)
         end
 
-        it "sets the foreign key of the relation" do
+        it 'sets the foreign key of the relation' do
           expect(game.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it 'sets the base on the inverse relation' do
           expect(game.person).to eq(person)
         end
 
-        it "sets the same instance on the inverse relation" do
+        it 'sets the same instance on the inverse relation' do
           expect(game.person).to eql(person)
         end
 
-        it "saves the target" do
+        it 'saves the target' do
           expect(game).to be_persisted
         end
 
-        context "when reloading the parent" do
-
+        context 'when reloading the parent' do
           before do
             person.reload
           end
 
-          context "when setting a new document on the relation" do
-
+          context 'when setting a new document on the relation' do
             before do
               person.game = Game.new
             end
 
-            it "detaches the previous relation" do
-              expect {
+            it 'detaches the previous relation' do
+              expect do
                 game.reload
-              }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Game with id\(s\)/)
+              end.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                 /Document\(s\) not found for class Game with id\(s\)/)
             end
           end
         end
       end
 
-      context "when relation have a different primary_key" do
-
+      context 'when relation have a different primary_key' do
         let(:person) do
           Person.create!
         end
@@ -154,32 +144,30 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           person.cat = cat
         end
 
-        it "sets the target of the relation" do
+        it 'sets the target of the relation' do
           expect(person.cat._target).to eq(cat)
         end
 
-        it "sets the foreign key of the relation" do
+        it 'sets the foreign key of the relation' do
           expect(cat.person_id).to eq(person.username)
         end
 
-        it "sets the base on the inverse relation" do
+        it 'sets the base on the inverse relation' do
           expect(cat.person).to eq(person)
         end
 
-        it "sets the same instance on the inverse relation" do
+        it 'sets the same instance on the inverse relation' do
           expect(cat.person).to eql(person)
         end
 
-        it "saves the target" do
+        it 'saves the target' do
           expect(cat).to be_persisted
         end
       end
     end
 
-    context "when the relation is polymorphic" do
-
-      context "when the parent is a new record" do
-
+    context 'when the relation is polymorphic' do
+      context 'when the parent is a new record' do
         let(:bar) do
           Bar.new
         end
@@ -192,29 +180,28 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           bar.rating = rating
         end
 
-        it "sets the target of the relation" do
+        it 'sets the target of the relation' do
           expect(bar.rating._target).to eq(rating)
         end
 
-        it "sets the foreign key on the relation" do
+        it 'sets the foreign key on the relation' do
           expect(rating.ratable_id).to eq(bar.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it 'sets the base on the inverse relation' do
           expect(rating.ratable).to eq(bar)
         end
 
-        it "sets the same instance on the inverse relation" do
+        it 'sets the same instance on the inverse relation' do
           expect(rating.ratable).to eql(bar)
         end
 
-        it "does not save the target" do
-          expect(rating).to_not be_persisted
+        it 'does not save the target' do
+          expect(rating).not_to be_persisted
         end
       end
 
-      context "when the parent is not a new record" do
-
+      context 'when the parent is not a new record' do
         let(:bar) do
           Bar.create!
         end
@@ -227,396 +214,378 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           bar.rating = rating
         end
 
-        it "sets the target of the relation" do
+        it 'sets the target of the relation' do
           expect(bar.rating._target).to eq(rating)
         end
 
-        it "sets the foreign key of the relation" do
+        it 'sets the foreign key of the relation' do
           expect(rating.ratable_id).to eq(bar.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it 'sets the base on the inverse relation' do
           expect(rating.ratable).to eq(bar)
         end
 
-        it "sets the same instance on the inverse relation" do
+        it 'sets the same instance on the inverse relation' do
           expect(rating.ratable).to eql(bar)
         end
 
-        it "saves the target" do
+        it 'saves the target' do
           expect(rating).to be_persisted
         end
       end
 
-      context "when replacing an existing persisted (dependent: :destroy) relation" do
-
+      context 'when replacing an existing persisted (dependent: :destroy) relation' do
         let!(:person) do
           Person.create!
         end
 
         let!(:game) do
-          person.create_game(name: "Starcraft")
+          person.create_game(name: 'Starcraft')
         end
 
-        context "with a new one created via the parent" do
-
+        context 'with a new one created via the parent' do
           let!(:new_game) do
-            person.create_game(name: "Starcraft 2")
+            person.create_game(name: 'Starcraft 2')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.game).to eq(new_game)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(game.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(game.person).to be_nil
           end
 
-          it "destroys the old child" do
+          it 'destroys the old child' do
             expect(game).to be_destroyed
           end
 
-          it "leaves the old child unpersisted" do
+          it 'leaves the old child unpersisted' do
             expect(game.persisted?).to be false
           end
 
-          it "leaves the new child persisted" do
+          it 'leaves the new child persisted' do
             expect(new_game.persisted?).to be true
           end
         end
 
-        context "with a new one built via the parent" do
-
+        context 'with a new one built via the parent' do
           let!(:new_game) do
-            person.build_game(name: "Starcraft 2")
+            person.build_game(name: 'Starcraft 2')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.game).to eq(new_game)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(game.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(game.person).to be_nil
           end
 
-          it "does not destroy the old child" do
-            expect(game).to_not be_destroyed
+          it 'does not destroy the old child' do
+            expect(game).not_to be_destroyed
           end
 
-          it "leaves the old child persisted" do
+          it 'leaves the old child persisted' do
             expect(game.persisted?).to be true
           end
 
-          it "leaves the new child unpersisted" do
+          it 'leaves the new child unpersisted' do
             expect(new_game.persisted?).to be false
           end
         end
       end
 
-      context "when replacing an existing unpersisted (dependent: :destroy) relation" do
-
+      context 'when replacing an existing unpersisted (dependent: :destroy) relation' do
         let!(:person) do
           Person.create!
         end
 
         let!(:game) do
-          person.build_game(name: "Starcraft")
+          person.build_game(name: 'Starcraft')
         end
 
-        context "with a new one created via the parent" do
-
+        context 'with a new one created via the parent' do
           let!(:new_game) do
-            person.create_game(name: "Starcraft 2")
+            person.create_game(name: 'Starcraft 2')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.game).to eq(new_game)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(game.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(game.person).to be_nil
           end
 
-          it "destroys the old child" do
+          it 'destroys the old child' do
             expect(game).to be_destroyed
           end
 
-          it "leaves the old child unpersisted" do
+          it 'leaves the old child unpersisted' do
             expect(game.persisted?).to be false
           end
 
-          it "leaves the new child persisted" do
+          it 'leaves the new child persisted' do
             expect(new_game.persisted?).to be true
           end
         end
 
-        context "with a new one built via the parent" do
-
+        context 'with a new one built via the parent' do
           let!(:new_game) do
-            person.build_game(name: "Starcraft 2")
+            person.build_game(name: 'Starcraft 2')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.game).to eq(new_game)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(game.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(game.person).to be_nil
           end
 
-          it "does not destroy the old child" do
-            expect(game).to_not be_destroyed
+          it 'does not destroy the old child' do
+            expect(game).not_to be_destroyed
           end
 
-          it "leaves the old child unpersisted" do
+          it 'leaves the old child unpersisted' do
             expect(game.persisted?).to be false
           end
 
-          it "leaves the new child unpersisted" do
+          it 'leaves the new child unpersisted' do
             expect(new_game.persisted?).to be false
           end
         end
       end
 
-      context "when replacing an existing persisted (dependent: :nullify) relation" do
-
+      context 'when replacing an existing persisted (dependent: :nullify) relation' do
         let!(:person) do
           Person.create!
         end
 
         let!(:cat) do
-          person.create_cat(name: "Cuddles")
+          person.create_cat(name: 'Cuddles')
         end
 
-        context "with a new one created via the parent" do
-
+        context 'with a new one created via the parent' do
           let!(:new_cat) do
-            person.create_cat(name: "Brutus")
+            person.create_cat(name: 'Brutus')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.cat).to eq(new_cat)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(cat.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(cat.person).to be_nil
           end
 
-          it "does not destroy the old child" do
-            expect(cat).to_not be_destroyed
+          it 'does not destroy the old child' do
+            expect(cat).not_to be_destroyed
           end
 
-          it "leaves the old child persisted" do
+          it 'leaves the old child persisted' do
             expect(cat.persisted?).to be true
           end
 
-          it "leaves the new child persisted" do
+          it 'leaves the new child persisted' do
             expect(new_cat.persisted?).to be true
           end
         end
 
-        context "with a new one built via the parent" do
-
+        context 'with a new one built via the parent' do
           let!(:new_cat) do
-            person.build_cat(name: "Brutus")
+            person.build_cat(name: 'Brutus')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.cat).to eq(new_cat)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(cat.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(cat.person).to be_nil
           end
 
-          it "does not destroy the old child" do
-            expect(cat).to_not be_destroyed
+          it 'does not destroy the old child' do
+            expect(cat).not_to be_destroyed
           end
 
-          it "leaves the old child persisted" do
+          it 'leaves the old child persisted' do
             expect(cat.persisted?).to be true
           end
 
-          it "leaves the new child unpersisted" do
+          it 'leaves the new child unpersisted' do
             expect(new_cat.persisted?).to be false
           end
         end
       end
 
-      context "when replacing an existing unpersisted (dependent: :nullify) relation" do
-
+      context 'when replacing an existing unpersisted (dependent: :nullify) relation' do
         let!(:person) do
           Person.create!
         end
 
         let!(:cat) do
-          person.build_cat(name: "Cuddles")
+          person.build_cat(name: 'Cuddles')
         end
 
-        context "with a new one created via the parent" do
-
+        context 'with a new one created via the parent' do
           let!(:new_cat) do
-            person.create_cat(name: "Brutus")
+            person.create_cat(name: 'Brutus')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.cat).to eq(new_cat)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(cat.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(cat.person).to be_nil
           end
 
-          it "does not destroy the old child" do
-            expect(cat).to_not be_destroyed
+          it 'does not destroy the old child' do
+            expect(cat).not_to be_destroyed
           end
 
-          it "leaves the old child unpersisted" do
+          it 'leaves the old child unpersisted' do
             expect(cat.persisted?).to be false
           end
 
-          it "leaves the new child persisted" do
+          it 'leaves the new child persisted' do
             expect(new_cat.persisted?).to be true
           end
         end
 
-        context "with a new one built via the parent" do
-
+        context 'with a new one built via the parent' do
           let!(:new_cat) do
-            person.build_cat(name: "Brutus")
+            person.build_cat(name: 'Brutus')
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.cat).to eq(new_cat)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(cat.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(cat.person).to be_nil
           end
 
-          it "does not destroy the old child" do
-            expect(cat).to_not be_destroyed
+          it 'does not destroy the old child' do
+            expect(cat).not_to be_destroyed
           end
 
-          it "leaves the old child unpersisted" do
+          it 'leaves the old child unpersisted' do
             expect(cat.persisted?).to be false
           end
 
-          it "leaves the new child unpersisted" do
+          it 'leaves the new child unpersisted' do
             expect(new_cat.persisted?).to be false
           end
         end
       end
 
-      context "when replacing an existing relation with a new one" do
-
+      context 'when replacing an existing relation with a new one' do
         let!(:person) do
           Person.create!
         end
 
-        context "when dependent is destroy" do
-
+        context 'when dependent is destroy' do
           let!(:game) do
-            person.create_game(name: "Starcraft")
+            person.create_game(name: 'Starcraft')
           end
 
           let!(:new_game) do
-            Game.create!(name: "Starcraft 2")
+            Game.create!(name: 'Starcraft 2')
           end
 
           before do
             person.game = new_game
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.game).to eq(new_game)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(game.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(game.person).to be_nil
           end
 
-          it "destroys the old child" do
+          it 'destroys the old child' do
             expect(game).to be_destroyed
           end
         end
 
-        context "when dependent is not set" do
-
+        context 'when dependent is not set' do
           let!(:account) do
-            person.create_account(name: "savings")
+            person.create_account(name: 'savings')
           end
 
           let!(:new_account) do
-            Account.create!(name: "checking")
+            Account.create!(name: 'checking')
           end
 
           before do
             person.account = new_account
           end
 
-          it "sets the new relation on the parent" do
+          it 'sets the new relation on the parent' do
             expect(person.account).to eq(new_account)
           end
 
-          it "removes the old foreign key reference" do
+          it 'removes the old foreign key reference' do
             expect(account.person_id).to be_nil
           end
 
-          it "removes the reference to the parent" do
+          it 'removes the reference to the parent' do
             expect(account.person).to be_nil
           end
 
-          it "nullifies the old child" do
-            expect(account).to_not be_destroyed
+          it 'nullifies the old child' do
+            expect(account).not_to be_destroyed
           end
         end
       end
     end
   end
 
-  describe "#= nil" do
-
-    context "when the relation is not polymorphic" do
-
-      context "when the parent is a new record" do
-
+  describe '#= nil' do
+    context 'when the relation is not polymorphic' do
+      context 'when the parent is a new record' do
         let(:person) do
           Person.new
         end
@@ -630,21 +599,20 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           person.game = nil
         end
 
-        it "sets the relation to nil" do
+        it 'sets the relation to nil' do
           expect(person.game).to be_nil
         end
 
-        it "removed the inverse relation" do
+        it 'removed the inverse relation' do
           expect(game.person).to be_nil
         end
 
-        it "removes the foreign key value" do
+        it 'removes the foreign key value' do
           expect(game.person_id).to be_nil
         end
       end
 
-      context "when the parent is not a new record" do
-
+      context 'when the parent is not a new record' do
         let(:person) do
           Person.create!
         end
@@ -658,28 +626,26 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           person.game = nil
         end
 
-        it "sets the relation to nil" do
+        it 'sets the relation to nil' do
           expect(person.game).to be_nil
         end
 
-        it "removed the inverse relation" do
+        it 'removed the inverse relation' do
           expect(game.person).to be_nil
         end
 
-        it "removes the foreign key value" do
+        it 'removes the foreign key value' do
           expect(game.person_id).to be_nil
         end
 
-        it "deletes the target from the database" do
+        it 'deletes the target from the database' do
           expect(game).to be_destroyed
         end
       end
     end
 
-    context "when the relation is polymorphic" do
-
-      context "when the parent is a new record" do
-
+    context 'when the relation is polymorphic' do
+      context 'when the parent is a new record' do
         let(:bar) do
           Bar.new
         end
@@ -693,21 +659,20 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           bar.rating = nil
         end
 
-        it "sets the relation to nil" do
+        it 'sets the relation to nil' do
           expect(bar.rating).to be_nil
         end
 
-        it "removed the inverse relation" do
+        it 'removed the inverse relation' do
           expect(rating.ratable).to be_nil
         end
 
-        it "removes the foreign key value" do
+        it 'removes the foreign key value' do
           expect(rating.ratable_id).to be_nil
         end
       end
 
-      context "when the parent is not a new record" do
-
+      context 'when the parent is not a new record' do
         let(:bar) do
           Bar.create!
         end
@@ -721,44 +686,40 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           bar.rating = nil
         end
 
-        it "sets the relation to nil" do
+        it 'sets the relation to nil' do
           expect(bar.rating).to be_nil
         end
 
-        it "removed the inverse relation" do
+        it 'removed the inverse relation' do
           expect(rating.ratable).to be_nil
         end
 
-        it "removes the foreign key value" do
+        it 'removes the foreign key value' do
           expect(rating.ratable_id).to be_nil
         end
 
-        it "applies the appropriate dependent option" do
-          expect(rating).to_not be_destroyed
+        it 'applies the appropriate dependent option' do
+          expect(rating).not_to be_destroyed
         end
       end
     end
   end
 
   describe "#build_#\{name}" do
-
-    context "when the relationship is an illegal embedded reference" do
-
+    context 'when the relationship is an illegal embedded reference' do
       let(:game) do
         Game.new
       end
 
-      it "raises a mixed relation error" do
-        expect {
-          game.build_video(title: "Tron")
-        }.to raise_error(Mongoid::Errors::MixedRelations)
+      it 'raises a mixed relation error' do
+        expect do
+          game.build_video(title: 'Tron')
+        end.to raise_error(Mongoid::Errors::MixedRelations)
       end
     end
 
-    context "when the relation is not polymorphic" do
-
-      context "when using object ids" do
-
+    context 'when the relation is not polymorphic' do
+      context 'when using object ids' do
         let(:person) do
           Person.create!
         end
@@ -767,25 +728,24 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           person.build_game(score: 50)
         end
 
-        it "returns a new document" do
+        it 'returns a new document' do
           expect(game.score).to eq(50)
         end
 
-        it "sets the foreign key on the document" do
+        it 'sets the foreign key on the document' do
           expect(game.person_id).to eq(person.id)
         end
 
-        it "sets the inverse relation" do
+        it 'sets the inverse relation' do
           expect(game.person).to eq(person)
         end
 
-        it "does not save the built document" do
-          expect(game).to_not be_persisted
+        it 'does not save the built document' do
+          expect(game).not_to be_persisted
         end
       end
 
-      context "when providing no attributes" do
-
+      context 'when providing no attributes' do
         let(:person) do
           Person.create!
         end
@@ -794,21 +754,20 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           person.build_game
         end
 
-        it "sets the foreign key on the document" do
+        it 'sets the foreign key on the document' do
           expect(game.person_id).to eq(person.id)
         end
 
-        it "sets the inverse relation" do
+        it 'sets the inverse relation' do
           expect(game.person).to eq(person)
         end
 
-        it "does not save the built document" do
-          expect(game).to_not be_persisted
+        it 'does not save the built document' do
+          expect(game).not_to be_persisted
         end
       end
 
-      context "when providing nil attributes" do
-
+      context 'when providing nil attributes' do
         let(:person) do
           Person.create!
         end
@@ -817,24 +776,22 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           person.build_game(nil)
         end
 
-        it "sets the foreign key on the document" do
+        it 'sets the foreign key on the document' do
           expect(game.person_id).to eq(person.id)
         end
 
-        it "sets the inverse relation" do
+        it 'sets the inverse relation' do
           expect(game.person).to eq(person)
         end
 
-        it "does not save the built document" do
-          expect(game).to_not be_persisted
+        it 'does not save the built document' do
+          expect(game).not_to be_persisted
         end
       end
     end
 
-    context "when the relation is polymorphic" do
-
-      context "when using object ids" do
-
+    context 'when the relation is polymorphic' do
+      context 'when using object ids' do
         let(:bar) do
           Bar.create!
         end
@@ -843,42 +800,39 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
           bar.build_rating(value: 5)
         end
 
-        it "returns a new document" do
+        it 'returns a new document' do
           expect(rating.value).to eq(5)
         end
 
-        it "sets the foreign key on the document" do
+        it 'sets the foreign key on the document' do
           expect(rating.ratable_id).to eq(bar.id)
         end
 
-        it "sets the inverse relation" do
+        it 'sets the inverse relation' do
           expect(rating.ratable).to eq(bar)
         end
 
-        it "does not save the built document" do
-          expect(rating).to_not be_persisted
+        it 'does not save the built document' do
+          expect(rating).not_to be_persisted
         end
       end
     end
   end
 
   describe "#create_#\{name}" do
-
-    context "when the relationship is an illegal embedded reference" do
-
+    context 'when the relationship is an illegal embedded reference' do
       let(:game) do
         Game.new
       end
 
-      it "raises a mixed relation error" do
-        expect {
-          game.create_video(title: "Tron")
-        }.to raise_error(Mongoid::Errors::MixedRelations)
+      it 'raises a mixed relation error' do
+        expect do
+          game.create_video(title: 'Tron')
+        end.to raise_error(Mongoid::Errors::MixedRelations)
       end
     end
 
-    context "when the relation is not polymorphic" do
-
+    context 'when the relation is not polymorphic' do
       let(:person) do
         Person.create!
       end
@@ -887,25 +841,24 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         person.create_game(score: 50)
       end
 
-      it "returns a new document" do
+      it 'returns a new document' do
         expect(game.score).to eq(50)
       end
 
-      it "sets the foreign key on the document" do
+      it 'sets the foreign key on the document' do
         expect(game.person_id).to eq(person.id)
       end
 
-      it "sets the inverse relation" do
+      it 'sets the inverse relation' do
         expect(game.person).to eq(person)
       end
 
-      it "saves the document" do
+      it 'saves the document' do
         expect(game).to be_persisted
       end
     end
 
-    context "when providing no attributes" do
-
+    context 'when providing no attributes' do
       let(:person) do
         Person.create!
       end
@@ -914,21 +867,20 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         person.create_game
       end
 
-      it "sets the foreign key on the document" do
+      it 'sets the foreign key on the document' do
         expect(game.person_id).to eq(person.id)
       end
 
-      it "sets the inverse relation" do
+      it 'sets the inverse relation' do
         expect(game.person).to eq(person)
       end
 
-      it "saves the document" do
+      it 'saves the document' do
         expect(game).to be_persisted
       end
     end
 
-    context "when providing nil attributes" do
-
+    context 'when providing nil attributes' do
       let(:person) do
         Person.create!
       end
@@ -937,21 +889,20 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         person.create_game(nil)
       end
 
-      it "sets the foreign key on the document" do
+      it 'sets the foreign key on the document' do
         expect(game.person_id).to eq(person.id)
       end
 
-      it "sets the inverse relation" do
+      it 'sets the inverse relation' do
         expect(game.person).to eq(person)
       end
 
-      it "saves the document" do
+      it 'saves the document' do
         expect(game).to be_persisted
       end
     end
 
-    context "when the relation is polymorphic" do
-
+    context 'when the relation is polymorphic' do
       let(:bar) do
         Bar.create!
       end
@@ -960,58 +911,54 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         bar.create_rating(value: 5)
       end
 
-      it "returns a new document" do
+      it 'returns a new document' do
         expect(rating.value).to eq(5)
       end
 
-      it "sets the foreign key on the document" do
+      it 'sets the foreign key on the document' do
         expect(rating.ratable_id).to eq(bar.id)
       end
 
-      it "sets the inverse relation" do
+      it 'sets the inverse relation' do
         expect(rating.ratable).to eq(bar)
       end
 
-      it "saves the document" do
+      it 'saves the document' do
         expect(rating).to be_persisted
       end
     end
   end
 
-  describe ".embedded?" do
-
-    it "returns false" do
-      expect(described_class).to_not be_embedded
+  describe '.embedded?' do
+    it 'returns false' do
+      expect(described_class).not_to be_embedded
     end
   end
 
-  describe "#nullify" do
-
+  describe '#nullify' do
     let(:person) do
       Person.create!
     end
 
     let!(:game) do
-      person.create_game(name: "Starcraft II")
+      person.create_game(name: 'Starcraft II')
     end
 
-    context "when the instance has been set" do
-
+    context 'when the instance has been set' do
       before do
         person.game.nullify
       end
 
-      it "removes the foreign key from the target" do
+      it 'removes the foreign key from the target' do
         expect(game.person_id).to be_nil
       end
 
-      it "removes the reference from the target" do
+      it 'removes the reference from the target' do
         expect(game.person).to be_nil
       end
     end
 
-    context "when the instance has been reloaded" do
-
+    context 'when the instance has been reloaded' do
       let(:from_db) do
         Person.find(person.id)
       end
@@ -1024,24 +971,23 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         from_db.game.nullify
       end
 
-      it "removes the foreign key from the target" do
+      it 'removes the foreign key from the target' do
         expect(game_reloaded.person_id).to be_nil
       end
 
-      it "removes the reference from the target" do
+      it 'removes the reference from the target' do
         expect(game_reloaded.person).to be_nil
       end
     end
   end
 
-  describe "#respond_to?" do
-
+  describe '#respond_to?' do
     let(:person) do
       Person.new
     end
 
     let!(:game) do
-      person.build_game(name: "Tron")
+      person.build_game(name: 'Tron')
     end
 
     let(:document) do
@@ -1049,56 +995,51 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     end
 
     Mongoid::Document.public_instance_methods(true).each do |method|
-
       context "when checking #{method}" do
-
-        it "returns true" do
+        it 'returns true' do
           expect(document.respond_to?(method)).to be true
         end
       end
     end
   end
 
-  context "when reloading the relation" do
-
+  context 'when reloading the relation' do
     let!(:person) do
       Person.create!
     end
 
     let!(:game_one) do
-      Game.create!(name: "Warcraft 3")
+      Game.create!(name: 'Warcraft 3')
     end
 
     let!(:game_two) do
-      Game.create!(name: "Starcraft 2")
+      Game.create!(name: 'Starcraft 2')
     end
 
     before do
       person.game = game_one
     end
 
-    context "when the relation references the same document" do
-
+    context 'when the relation references the same document' do
       before do
-        Game.collection.find({ _id: game_one.id }).
-            update_one({ "$set" => { name: "Diablo 2" }})
+        Game.collection.find({ _id: game_one.id })
+            .update_one({ '$set' => { name: 'Diablo 2' } })
       end
 
       let(:reloaded) do
         person.game(true)
       end
 
-      it "reloads the document from the database" do
-        expect(reloaded.name).to eq("Diablo 2")
+      it 'reloads the document from the database' do
+        expect(reloaded.name).to eq('Diablo 2')
       end
 
-      it "sets a new document instance" do
-        expect(reloaded).to_not equal(game_one)
+      it 'sets a new document instance' do
+        expect(reloaded).not_to equal(game_one)
       end
     end
 
-    context "when the relation references a different document" do
-
+    context 'when the relation references a different document' do
       before do
         person.game = game_two
       end
@@ -1107,20 +1048,18 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         person.game(true)
       end
 
-      it "reloads the new document from the database" do
-        expect(reloaded.name).to eq("Starcraft 2")
+      it 'reloads the new document from the database' do
+        expect(reloaded.name).to eq('Starcraft 2')
       end
 
-      it "sets a new document instance" do
-        expect(reloaded).to_not equal(game_one)
+      it 'sets a new document instance' do
+        expect(reloaded).not_to equal(game_one)
       end
     end
   end
 
-  context "when dependent is set to delete for child" do
-
-    context "when autobuild is true for child" do
-
+  context 'when dependent is set to delete for child' do
+    context 'when autobuild is true for child' do
       let(:explosion) do
         Explosion.create!
       end
@@ -1135,27 +1074,27 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         bomb.explosion.clear
       end
 
-      it "clearing the child raises no error" do
-        expect{ clear_child }.not_to raise_error
+      it 'clearing the child raises no error' do
+        expect { clear_child }.not_to raise_error
       end
     end
   end
 
-  context "when there is a foreign key in the aliased associations" do
-    it "has the correct aliases" do
+  context 'when there is a foreign key in the aliased associations' do
+    it 'has the correct aliases' do
       # Instances of Driver do not respond to vehicle_id.
-      expect(Driver.aliased_associations.key?("vehicle_id")).to be false
-      expect(Vehicle.aliased_associations.key?("driver_id")).to be false
-      expect(Vehicle.aliased_fields["driver"]).to eq("driver_id")
+      expect(Driver.aliased_associations.key?('vehicle_id')).to be false
+      expect(Vehicle.aliased_associations.key?('driver_id')).to be false
+      expect(Vehicle.aliased_fields['driver']).to eq('driver_id')
     end
   end
 
-  context "when the document is not persisted and the association is invalid" do
-
+  context 'when the document is not persisted and the association is invalid' do
     before do
       class HomParent
         include Mongoid::Document
-        has_one :child, class_name: "HomChild"
+
+        has_one :child, class_name: 'HomChild'
         field :name
         validates :name, presence: true
       end
@@ -1179,20 +1118,19 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     let(:child) { HomChild.new }
     let(:parent) { HomParent.new }
 
-
-    context "when belongs_to_required_by_default is true" do
+    context 'when belongs_to_required_by_default is true' do
       config_override :belongs_to_required_by_default, true
 
-      context "when optional is true" do
+      context 'when optional is true' do
         let(:optional) { true }
 
-        it "persists the child with the parent_id" do
+        it 'persists the child with the parent_id' do
           expect(HomChild.first.parent_id).to eq(parent._id)
           expect(HomParent.count).to eq(0)
         end
       end
 
-      context "when optional is false" do
+      context 'when optional is false' do
         let(:optional) { false }
 
         it "doesn't persist the parent or the child" do
@@ -1201,7 +1139,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
       end
 
-      context "when optional is not set" do
+      context 'when optional is not set' do
         let(:belongs_to) do
           HomChild.belongs_to :parent, autosave: true, validate: false
         end
@@ -1213,19 +1151,19 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
       end
     end
 
-    context "when belongs_to_required_by_default is false" do
+    context 'when belongs_to_required_by_default is false' do
       config_override :belongs_to_required_by_default, false
 
-      context "when optional is true" do
+      context 'when optional is true' do
         let(:optional) { true }
 
-        it "persists the child with the parent_id" do
+        it 'persists the child with the parent_id' do
           expect(HomChild.first.parent_id).to eq(parent._id)
           expect(HomParent.count).to eq(0)
         end
       end
 
-      context "when optional is false" do
+      context 'when optional is false' do
         let(:optional) { false }
 
         it "doesn't persist the parent or the child" do
@@ -1234,12 +1172,12 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
       end
 
-      context "when optional is not set" do
+      context 'when optional is not set' do
         let(:belongs_to) do
           HomChild.belongs_to :parent, autosave: true, validate: false
         end
 
-        it "persists the child with the parent_id" do
+        it 'persists the child with the parent_id' do
           expect(HomChild.first.parent_id).to eq(parent._id)
           expect(HomParent.count).to eq(0)
         end

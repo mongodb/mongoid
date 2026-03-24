@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Mixin module included into Mongoid::Document which adds behavior for
   # getting the various lifecycle states a document can transition through.
   module Stateful
-
     attr_writer :destroyed, :flagged_for_destroy, :previously_new_record
 
     # Sets whether the document has been persisted to the database.
@@ -16,9 +13,7 @@ module Mongoid
     # @return [ true | false ] The set value.
     def new_record=(new_value)
       @new_record ||= false
-      if @new_record && !new_value
-        @previously_new_record = true
-      end
+      @previously_new_record = true if @new_record && !new_value
       @new_record = new_value
     end
 
@@ -73,8 +68,8 @@ module Mongoid
     def flagged_for_destroy?
       @flagged_for_destroy ||= false
     end
-    alias :marked_for_destruction? :flagged_for_destroy?
-    alias :_destroy :flagged_for_destroy?
+    alias marked_for_destruction? flagged_for_destroy?
+    alias _destroy flagged_for_destroy?
 
     # Returns true if the +Document+ has been successfully destroyed, and false
     # if it hasn't. This is determined by the variable @destroyed and NOT
@@ -126,7 +121,7 @@ module Mongoid
     # @return [ true | false ] If the document is readonly.
     def readonly?
       if Mongoid.legacy_readonly
-        __selected_fields != nil
+        !__selected_fields.nil?
       else
         @readonly ||= false
       end

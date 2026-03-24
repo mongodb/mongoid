@@ -1,30 +1,28 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/changeable"
-require "mongoid/collection_configurable"
-require "mongoid/encryptable"
-require "mongoid/findable"
+require 'mongoid/changeable'
+require 'mongoid/collection_configurable'
+require 'mongoid/encryptable'
+require 'mongoid/findable'
 require 'mongoid/identifiable'
-require "mongoid/indexable"
-require "mongoid/inspectable"
-require "mongoid/interceptable"
-require "mongoid/matcher"
-require "mongoid/matchable"
-require "mongoid/persistable"
-require "mongoid/reloadable"
+require 'mongoid/indexable'
+require 'mongoid/inspectable'
+require 'mongoid/interceptable'
+require 'mongoid/matcher'
+require 'mongoid/matchable'
+require 'mongoid/persistable'
+require 'mongoid/reloadable'
 require 'mongoid/search_indexable'
-require "mongoid/selectable"
-require "mongoid/scopable"
-require "mongoid/serializable"
-require "mongoid/shardable"
-require "mongoid/stateful"
-require "mongoid/cacheable"
-require "mongoid/traversable"
-require "mongoid/validatable"
+require 'mongoid/selectable'
+require 'mongoid/scopable'
+require 'mongoid/serializable'
+require 'mongoid/shardable'
+require 'mongoid/stateful'
+require 'mongoid/cacheable'
+require 'mongoid/traversable'
+require 'mongoid/validatable'
 
 module Mongoid
-
   # This module provides inclusions of all behavior in a Mongoid document.
   module Composable
     extend ActiveSupport::Concern
@@ -105,21 +103,19 @@ module Mongoid
     # separately.
     #
     # @return [ Array<Symbol> ] A list of reserved method names.
-    RESERVED_METHOD_NAMES = [ :fields,
-                              :aliased_fields,
-                              :localized_fields,
-                              :index_specifications,
-                              :shard_key_fields,
-                              :nested_attributes,
-                              :readonly_attributes,
-                              :storage_options,
-                              :cascades,
-                              :cyclic,
-                              :cache_timestamp_format
-                            ]
+    RESERVED_METHOD_NAMES = %i[fields
+                               aliased_fields
+                               localized_fields
+                               index_specifications
+                               shard_key_fields
+                               nested_attributes
+                               readonly_attributes
+                               storage_options
+                               cascades
+                               cyclic
+                               cache_timestamp_format]
 
     class << self
-
       # Get a list of methods that would be a bad idea to define as field names
       # or override when including Mongoid::Document.
       #

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Weapon
   include Mongoid::Document
@@ -14,7 +13,7 @@ class Weapon
 
   field :after_find_player
   field :after_initialize_player
-  field :after_default_player, default: ->{ self.player&._id }
+  field :after_default_player, default: -> { player&._id }
 
   after_find do |doc|
     doc.after_find_player = player&._id

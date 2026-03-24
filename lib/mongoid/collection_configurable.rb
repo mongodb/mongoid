@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Encapsulates behavior around defining collections.
   module CollectionConfigurable
     extend ActiveSupport::Concern
@@ -26,22 +24,20 @@ module Mongoid
           # This is most probably an anonymous class, we ignore them.
           return
         end
-        if collection_name.match(/^system\./)
+        if /^system\./.match?(collection_name)
           # We do not do anything with system collections.
           return
         end
-        if force
-          collection.drop
-        end
+
+        collection.drop if force
         if coll_options = collection.database.list_collections(filter: { name: collection_name.to_s }).first
-          if force
-            raise Errors::DropCollectionFailure.new(collection_name)
-          else
-            logger.debug(
-              "MONGOID: Collection '#{collection_name}' already exists " +
-              "in database '#{database_name}' with options '#{coll_options}'."
-            )
-          end
+          raise Errors::DropCollectionFailure.new(collection_name) if force
+
+          logger.debug(
+            "MONGOID: Collection '#{collection_name}' already exists " +
+            "in database '#{database_name}' with options '#{coll_options}'."
+          )
+
         else
           begin
             collection.database[collection_name, storage_options.fetch(:collection_options, {})].create

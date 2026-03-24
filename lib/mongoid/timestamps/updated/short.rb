@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Timestamps
     module Updated
-
       # Adds an updated_at timestamp to the document, but it is stored as u_at
       # with an updated_at alias.
       module Short
@@ -12,7 +10,8 @@ module Mongoid
 
         included do
           include Updated
-          fields.delete("updated_at")
+
+          fields.delete('updated_at')
           field :u_at, type: Time, as: :updated_at
         end
       end

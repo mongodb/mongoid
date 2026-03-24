@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
-require_relative './has_one_models'
+require 'spec_helper'
+require_relative 'has_one_models'
 
 describe Mongoid::Association::Referenced::HasOne do
   context 'when projecting with #only' do
@@ -25,7 +24,7 @@ describe Mongoid::Association::Referenced::HasOne do
       expect do
         accreditation.year
       end.to raise_error(Mongoid::Errors::AttributeNotLoaded)
-      expect(legislator.attributes.keys).to eq(['_id', 'degree'])
+      expect(legislator.attributes.keys).to eq(%w[_id degree])
     end
 
     # Delete this test when https://jira.mongodb.org/browse/MONGOID-4704 is

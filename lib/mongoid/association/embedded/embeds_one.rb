@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/association/embedded/embeds_one/binding'
 require 'mongoid/association/embedded/embeds_one/buildable'
@@ -8,7 +7,6 @@ require 'mongoid/association/embedded/embeds_one/proxy'
 module Mongoid
   module Association
     module Embedded
-
       # The EmbedsOne type association.
       class EmbedsOne
         include Relatable
@@ -18,12 +16,12 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        ASSOCIATION_OPTIONS = [
-            :autobuild,
-            :as,
-            :cascade_callbacks,
-            :cyclic,
-            :store_as
+        ASSOCIATION_OPTIONS = %i[
+          autobuild
+          as
+          cascade_callbacks
+          cyclic
+          store_as
         ]
 
         # The complete list of valid options for this association, including
@@ -46,7 +44,7 @@ module Mongoid
         #
         # @return [ String ] The field name.
         def store_as
-          @store_as ||= (@options[:store_as].try(:to_s) || name.to_s)
+          @store_as ||= @options[:store_as].try(:to_s) || name.to_s
         end
 
         # The key that is used to get the attributes for the associated object.
@@ -59,7 +57,9 @@ module Mongoid
         # Is this association type embedded?
         #
         # @return [ true ] Always true.
-        def embedded?; true; end
+        def embedded?
+          true
+        end
 
         # Get the default validation setting for the association. Determines if
         # by default a validates associated will occur.
@@ -68,12 +68,16 @@ module Mongoid
         #   Proxy.validation_default
         #
         # @return [ true | false ] The validation default.
-        def validation_default; true; end
+        def validation_default
+          true
+        end
 
         # Does this association type store the foreign key?
         #
         # @return [ false ] Always false.
-        def stores_foreign_key?; false; end
+        def stores_foreign_key?
+          false
+        end
 
         # The primary key
         #
@@ -129,20 +133,18 @@ module Mongoid
           @relation_complements ||= [ Embedded::EmbeddedIn ].freeze
         end
 
-        def polymorphic_inverses(other = nil)
+        def polymorphic_inverses(_other = nil)
           [ as ]
         end
 
-        def determine_inverses(other)
+        def determine_inverses(_other)
           matches = relation_class.relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
               # https://jira.mongodb.org/browse/MONGOID-4882
               rel.relation_class_name.sub(/\A::/, '') == inverse_class_name
+          end
+          raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches) if matches.size > 1
 
-          end
-          if matches.size > 1
-            raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)
-          end
           matches.collect { |m| m.name } unless matches.blank?
         end
       end

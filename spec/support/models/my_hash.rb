@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-class MyHash < ::Hash
+class MyHash < Hash
 end

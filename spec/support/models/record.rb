@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Record
   include Mongoid::Document
+
   field :name, type: String
   field :producers, type: Array
 
@@ -48,8 +48,7 @@ class Record
     band.name
   end
 
-  def dont_call_me_twice
-  end
+  def dont_call_me_twice; end
 
   validate { dont_call_me_twice }
 end

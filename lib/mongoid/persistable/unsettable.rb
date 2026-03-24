@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for $unset operations.
     module Unsettable
       extend ActiveSupport::Concern
@@ -29,7 +27,7 @@ module Mongoid
             end
             ops[atomic_attribute_name(normalized)] = true
           end
-          { "$unset" => ops }
+          { '$unset' => ops }
         end
       end
     end

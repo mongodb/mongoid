@@ -1,15 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
-
       # Mixin module containing common functionality used to
       # perform #accepts_nested_attributes_for attribute assignment
       # on associations.
       module Buildable
-
         attr_accessor :attributes, :existing, :association, :options
 
         # Determines if destroys are allowed for this document.
@@ -33,12 +30,12 @@ module Mongoid
         # @return [ true | false ] True and call proc or method if rejectable, false if not.
         def reject?(document, attrs)
           case callback = options[:reject_if]
-            when Symbol
-              document.method(callback).arity == 0 ? document.send(callback) : document.send(callback, attrs)
-            when Proc
-              callback.call(attrs)
-            else
-              false
+          when Symbol
+            (document.method(callback).arity == 0) ? document.send(callback) : document.send(callback, attrs)
+          when Proc
+            callback.call(attrs)
+          else
+            false
           end
         end
 

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module provides the extra behavior for including associations in JSON
   # and XML serialization.
   module Serializable
@@ -11,7 +9,6 @@ module Mongoid
     # We need to redefine where the JSON configuration is getting defined,
     # similar to +ActiveRecord+.
     included do
-
       class << self
         # These methods are previously defined by ActiveModel which we override to include default behavior.
         remove_method :include_root_in_json if method_defined?(:include_root_in_json)
@@ -20,9 +17,7 @@ module Mongoid
           @include_root_in_json.nil? ? ::Mongoid.include_root_in_json : @include_root_in_json
         end
 
-        def include_root_in_json=(new_value)
-          @include_root_in_json = new_value
-        end
+        attr_writer :include_root_in_json
       end
     end
 
@@ -81,7 +76,7 @@ module Mongoid
 
       only = Array.wrap(options[:only]).map(&:to_s)
       except = Array.wrap(options[:except]).map(&:to_s)
-      except |= [self.class.discriminator_key] unless Mongoid.include_type_for_serialization
+      except |= [ self.class.discriminator_key ] unless Mongoid.include_type_for_serialization
 
       if !options[:only].nil? && (!Mongoid.serializable_hash_with_legacy_only || !only.empty?)
         names &= only

@@ -1,23 +1,19 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Fields::Standard do
-
-  describe "#lazy?" do
-
+  describe '#lazy?' do
     let(:field) do
       described_class.new(:test, type: String)
     end
 
-    it "returns false" do
-      expect(field).to_not be_lazy
+    it 'returns false' do
+      expect(field).not_to be_lazy
     end
   end
 
-  describe "#pre_processed?" do
-
+  describe '#pre_processed?' do
     before(:all) do
       class FieldTest
         include Mongoid::Document
@@ -28,63 +24,57 @@ describe Mongoid::Fields::Standard do
       Object.send(:remove_const, :FieldTest)
     end
 
-    context "when the field has a default" do
-
-      context "when the default is a proc" do
-
-        context "when the pre-processed option is true" do
-
+    context 'when the field has a default' do
+      context 'when the default is a proc' do
+        context 'when the pre-processed option is true' do
           let(:field) do
             described_class.new(
               :test,
-              default: ->{ "testing" },
+              default: -> { 'testing' },
               pre_processed: true,
               klass: FieldTest,
               type: String
             )
           end
 
-          it "returns true" do
+          it 'returns true' do
             expect(field).to be_pre_processed
           end
         end
 
-        context "when the pre-processed option is not true" do
-
+        context 'when the pre-processed option is not true' do
           let(:field) do
             described_class.new(
               :test,
-              default: ->{ "testing" },
+              default: -> { 'testing' },
               klass: FieldTest,
               type: String
             )
           end
 
-          it "returns false" do
-            expect(field).to_not be_pre_processed
+          it 'returns false' do
+            expect(field).not_to be_pre_processed
           end
         end
       end
 
-      context "when the default is not a proc" do
-
+      context 'when the default is not a proc' do
         let(:field) do
           described_class.new(
             :test,
-            default: "testing",
+            default: 'testing',
             klass: FieldTest,
             type: String
           )
         end
 
-        it "returns true" do
+        it 'returns true' do
           expect(field).to be_pre_processed
         end
       end
     end
 
-    context "when the field has no default" do
-
+    context 'when the field has no default' do
       let(:field) do
         described_class.new(
           :test,
@@ -92,77 +82,71 @@ describe Mongoid::Fields::Standard do
         )
       end
 
-      it "returns false" do
-        expect(field).to_not be_pre_processed
+      it 'returns false' do
+        expect(field).not_to be_pre_processed
       end
     end
   end
 
-  context "when checking hash values in a custom serializer" do
-
+  context 'when checking hash values in a custom serializer' do
     let(:image) do
-      Image.new("test")
+      Image.new('test')
     end
 
-    it "does not conflict with the ruby core hash" do
+    it 'does not conflict with the ruby core hash' do
       expect(image.hash_is_hash).to be true
     end
   end
 
-  context "when included in a hash" do
-
+  context 'when included in a hash' do
     let(:hash) do
       MyHash.new
     end
 
-    context "when setting a value" do
-
+    context 'when setting a value' do
       before do
-        hash[:key] = "value"
+        hash[:key] = 'value'
       end
 
-      it "allows normal hash access" do
-        expect(hash[:key]).to eq("value")
+      it 'allows normal hash access' do
+        expect(hash[:key]).to eq('value')
       end
     end
 
-    context "when getting a non existent value" do
-
-      it "returns nil" do
+    context 'when getting a non existent value' do
+      it 'returns nil' do
         expect(hash[:key]).to be_nil
       end
     end
   end
 
-  context "when subclassing a serializable field" do
-
+  context 'when subclassing a serializable field' do
     let(:thumbnail) do
-      Thumbnail.new("test")
+      Thumbnail.new('test')
     end
 
-    it "inherits the parents deserialize method" do
-      expect(Thumbnail.demongoize("testy").name).to eq("testy")
+    it 'inherits the parents deserialize method' do
+      expect(Thumbnail.demongoize('testy').name).to eq('testy')
     end
 
-    it "inherits the parents serialize method" do
-      expect(thumbnail.mongoize).to eq("test")
+    it 'inherits the parents serialize method' do
+      expect(thumbnail.mongoize).to eq('test')
     end
 
-    context "when instantiating the class" do
-
+    context 'when instantiating the class' do
       let(:movie) do
         Movie.new(
-          poster: Image.new("poster"),
-          poster_thumb: Thumbnail.new("thumb")
+          poster: Image.new('poster'),
+          poster_thumb: Thumbnail.new('thumb')
         )
       end
 
-      it "deserializes the parent type" do
-        expect(movie.poster.name).to eq("poster")
+      it 'deserializes the parent type' do
+        expect(movie.poster.name).to eq('poster')
       end
 
-      it "deserializes the child type" do
-        expect(movie.poster_thumb.name).to eq("thumb")
+      it 'deserializes the child type' do
+        expect(movie.poster_thumb.name).to eq('thumb')
       end
     end
   end

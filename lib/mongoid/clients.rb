@@ -1,14 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/clients/factory"
-require "mongoid/clients/validators"
-require "mongoid/clients/storage_options"
-require "mongoid/clients/options"
-require "mongoid/clients/sessions"
+require 'mongoid/clients/factory'
+require 'mongoid/clients/validators'
+require 'mongoid/clients/storage_options'
+require 'mongoid/clients/options'
+require 'mongoid/clients/sessions'
 
 module Mongoid
-
   # Mixin module included into Mongoid::Document which adds
   # database client connection functionality. Also contains
   # singleton class methods related to managing database clients.
@@ -19,7 +17,6 @@ module Mongoid
     include Sessions
 
     class << self
-
       # Clear all clients from the current thread.
       #
       # @example Clear all clients.
@@ -75,8 +72,10 @@ module Mongoid
       def with_name(name)
         name_as_symbol = name.to_sym
         return clients[name_as_symbol] if clients[name_as_symbol]
+
         CREATE_LOCK.synchronize do
-          if (key_vault_client = Mongoid.clients.dig(name_as_symbol, :options, :auto_encryption_options, :key_vault_client))
+          if (key_vault_client = Mongoid.clients.dig(name_as_symbol, :options, :auto_encryption_options,
+                                                     :key_vault_client))
             clients[key_vault_client.to_sym] ||= Clients::Factory.create(key_vault_client)
           end
           clients[name_as_symbol] ||= Clients::Factory.create(name)
@@ -102,8 +101,6 @@ module Mongoid
       def clients
         @clients ||= {}
       end
-
-      private
 
       CREATE_LOCK = Mutex.new
     end

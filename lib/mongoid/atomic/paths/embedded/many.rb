@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Atomic
     module Paths
       module Embedded
-
         # This class encapsulates behavior for locating and updating
         # documents that are defined as an embedded 1-n.
         class Many
@@ -19,7 +17,7 @@ module Mongoid
           # @param [ Document ] document The document to generate the paths for.
           def initialize(document)
             @document, @parent = document, document._parent
-            @insert_modifier, @delete_modifier ="$push", "$pull"
+            @insert_modifier, @delete_modifier = '$push', '$pull'
           end
 
           # Get the position of the document in the hierarchy. This will
@@ -32,12 +30,11 @@ module Mongoid
           # @return [ String ] The position of the document.
           def position
             pos = parent.atomic_position
-            locator = document.new_record? ? "" : ".#{document._index}"
-            "#{pos}#{"." unless pos.blank?}#{document._association.store_as}#{locator}"
+            locator = document.new_record? ? '' : ".#{document._index}"
+            "#{pos}#{'.' unless pos.blank?}#{document._association.store_as}#{locator}"
           end
 
           class << self
-
             # Get the position of where the document would go for the given
             # association. The use case for this function is when trying to
             # persist an empty list for an embedded association. All of the
@@ -51,7 +48,7 @@ module Mongoid
             # @return [ String ] The position string.
             def position_without_document(parent, association)
               pos = parent.atomic_position
-              "#{pos}#{"." unless pos.blank?}#{association.store_as}"
+              "#{pos}#{'.' unless pos.blank?}#{association.store_as}"
             end
           end
         end

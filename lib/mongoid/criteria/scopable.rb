@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # Mixin module included in Mongoid::Criteria which adds
     # functionality related to default query scopes and named
     # scopes.
     module Scopable
-
       # Applies the default scope to the criteria.
       #
       # @example Apply the default scope.
@@ -77,9 +74,7 @@ module Mongoid
       def scoped(options = nil)
         crit = clone
         crit.options.merge!(options || {})
-        if klass.default_scopable? && !scoped?
-          crit.apply_default_scope
-        end
+        crit.apply_default_scope if klass.default_scopable? && !scoped?
         crit
       end
 
@@ -103,7 +98,8 @@ module Mongoid
         crit = clone
         unless unscoped?
           crit.scoping_options = false, true
-          crit.selector.clear; crit.options.clear
+          crit.selector.clear
+          crit.options.clear
         end
         crit
       end
@@ -151,9 +147,7 @@ module Mongoid
       # @return [ Criteria ] The criteria.
       def with_default_scope
         crit = clone
-        if klass.default_scopable? && !unscoped? && !scoped?
-          crit.apply_default_scope
-        end
+        crit.apply_default_scope if klass.default_scopable? && !unscoped? && !scoped?
         crit
       end
 

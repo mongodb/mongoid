@@ -1,20 +1,17 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
-
   let(:base) do
     double
   end
 
   let(:options) do
-    { }
+    {}
   end
 
-  describe "#build" do
-
+  describe '#build' do
     let(:documents) do
       association.build(base, object)
     end
@@ -23,82 +20,77 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
       Mongoid::Association::Embedded::EmbedsMany.new(Person, :addresses, options)
     end
 
-    context "when passed an array of documents" do
-
+    context 'when passed an array of documents' do
       let(:object) do
-        [ Address.new(city: "London") ]
+        [ Address.new(city: 'London') ]
       end
 
-      it "returns an array of documents" do
+      it 'returns an array of documents' do
         expect(documents).to eq(object)
       end
     end
 
-    context "when the array is empty" do
-
+    context 'when the array is empty' do
       let(:object) do
         []
       end
 
-      it "returns an empty array" do
+      it 'returns an empty array' do
         expect(documents).to eq(object)
       end
     end
 
-    context "when passed nil" do
-
+    context 'when passed nil' do
       let(:object) do
         nil
       end
 
-      it "returns an empty array" do
+      it 'returns an empty array' do
         expect(documents).to be_empty
       end
     end
 
-    context "when no type is in the object" do
-
+    context 'when no type is in the object' do
       let(:object) do
-        [ { "city" => "London" }, { "city" => "Shanghai" } ]
+        [ { 'city' => 'London' }, { 'city' => 'Shanghai' } ]
       end
 
-      it "returns an array of documents" do
-        expect(documents).to be_a_kind_of(Array)
+      it 'returns an array of documents' do
+        expect(documents).to be_a(Array)
       end
 
-      it "creates the correct type of documents" do
-        expect(documents[0]).to be_a_kind_of(Address)
+      it 'creates the correct type of documents' do
+        expect(documents[0]).to be_a(Address)
       end
 
-      it "sets the object on the documents" do
-        expect(documents[0].city).to eq("London")
-        expect(documents[1].city).to eq("Shanghai")
+      it 'sets the object on the documents' do
+        expect(documents[0].city).to eq('London')
+        expect(documents[1].city).to eq('Shanghai')
       end
     end
 
-    context "when a type is in the object" do
-
+    context 'when a type is in the object' do
       let(:association) do
         Mongoid::Association::Embedded::EmbedsMany.new(Person, :shapes)
       end
 
       let(:object) do
         [
-            { "_type" => "Circle", "radius" => 100 },
-            { "_type" => "Square", "width" => 50 }
+          { '_type' => 'Circle', 'radius' => 100 },
+          { '_type' => 'Square', 'width' => 50 }
         ]
       end
 
-      it "returns an array of documents" do
-        expect(documents).to be_a_kind_of(Array)
+      it 'returns an array of documents' do
+        expect(documents).to be_a(Array)
       end
 
-      it "creates the correct type of document" do
-        expect(documents[0]).to be_a_kind_of(Circle)
-        expect(documents[1]).to be_a_kind_of(Square)
+      it 'creates the correct type of document' do
+        expect(documents[0]).to be_a(Circle)
+        expect(documents[1]).to be_a(Square)
       end
 
-      it "sets the object on the document" do
+      it 'sets the object on the document' do
         expect(documents[0].radius).to eq(100)
         expect(documents[1].width).to eq(50)
       end
@@ -106,9 +98,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
   end
 
   context 'when the object is already associated with another object' do
-
-    context "when using <<" do
-
+    context 'when using <<' do
       let(:person1) do
         Person.new
       end
@@ -128,12 +118,11 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
 
       it 'clears the object of its previous association' do
         expect(person1.appointments).to eq([])
-        expect(person2.appointments).to eq([appointment])
+        expect(person2.appointments).to eq([ appointment ])
       end
     end
 
-    context "when using concat" do
-
+    context 'when using concat' do
       let(:person1) do
         Person.new
       end
@@ -147,18 +136,17 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
       end
 
       before do
-        person1.appointments.concat([appointment])
-        person2.appointments.concat([appointment])
+        person1.appointments.concat([ appointment ])
+        person2.appointments.concat([ appointment ])
       end
 
       it 'clears the object of its previous association' do
         expect(person1.appointments).to eq([])
-        expect(person2.appointments).to eq([appointment])
+        expect(person2.appointments).to eq([ appointment ])
       end
     end
 
-    context "when using =" do
-
+    context 'when using =' do
       let(:person1) do
         Person.new
       end
@@ -181,12 +169,11 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
 
       it 'clears the object of its previous association' do
         expect(person1.appointments).to eq([])
-        expect(person2.appointments).to eq([appointment])
+        expect(person2.appointments).to eq([ appointment ])
       end
     end
 
-    context "when using = on the same document twice" do
-
+    context 'when using = on the same document twice' do
       let(:person1) do
         Person.new
       end
@@ -208,7 +195,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
       before do
         person1.appointments = apts
         person1.appointments = person1.appointments.reverse
-        expect(apts).to eq([ appointment1, appointment2  ])
+        expect(apts).to eq([ appointment1, appointment2 ])
       end
 
       it 'clears the object of its previous association' do

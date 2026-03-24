@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $not expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/not/
     #
     # @api private
     module Not
-
       # Returns whether a value satisfies an $not expression.
       #
       # @param [ true | false ] exists Whether the value exists.

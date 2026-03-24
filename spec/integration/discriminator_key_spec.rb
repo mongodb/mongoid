@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
-describe "#discriminator_key" do
-
-  context "when the discriminator key is not set on a class" do
+describe '#discriminator_key' do
+  context 'when the discriminator key is not set on a class' do
     let(:piano) do
       Piano.new
     end
@@ -14,18 +12,18 @@ describe "#discriminator_key" do
       Guitar.new
     end
 
-    it "sets the child discriminator key to _type: Piano" do
-      expect(piano._type).to eq("Piano")
+    it 'sets the child discriminator key to _type: Piano' do
+      expect(piano._type).to eq('Piano')
     end
 
-    it "sets the child discriminator key to _type: Guitar" do
-      expect(guitar._type).to eq("Guitar")
+    it 'sets the child discriminator key to _type: Guitar' do
+      expect(guitar._type).to eq('Guitar')
     end
   end
 
-  context "when the discriminator key is changed in the parent" do
+  context 'when the discriminator key is changed in the parent' do
     before do
-      Instrument.discriminator_key = "hello2"
+      Instrument.discriminator_key = 'hello2'
     end
 
     after do
@@ -40,17 +38,17 @@ describe "#discriminator_key" do
       Guitar.new
     end
 
-    it "changes in the child class: Piano" do
-      expect(piano.hello2).to eq("Piano")
+    it 'changes in the child class: Piano' do
+      expect(piano.hello2).to eq('Piano')
     end
 
-    it "changes in the child class: Guitar" do
-      expect(guitar.hello2).to eq("Guitar")
+    it 'changes in the child class: Guitar' do
+      expect(guitar.hello2).to eq('Guitar')
     end
   end
 
-  context "when the discriminator key is changed at the base level" do
-    context "after class creation" do
+  context 'when the discriminator key is changed at the base level' do
+    context 'after class creation' do
       before do
         class GlobalIntDiscriminatorParent
           include Mongoid::Document
@@ -59,11 +57,11 @@ describe "#discriminator_key" do
         class GlobalIntDiscriminatorChild < GlobalIntDiscriminatorParent
         end
 
-        Mongoid.discriminator_key = "test"
+        Mongoid.discriminator_key = 'test'
       end
 
       after do
-        Mongoid.discriminator_key = "_type"
+        Mongoid.discriminator_key = '_type'
         Object.send(:remove_const, :GlobalIntDiscriminatorParent)
         Object.send(:remove_const, :GlobalIntDiscriminatorChild)
       end
@@ -72,20 +70,19 @@ describe "#discriminator_key" do
         GlobalIntDiscriminatorChild.new
       end
 
-      it "has a discriminator key _type" do
-        expect(child._type).to eq("GlobalIntDiscriminatorChild")
+      it 'has a discriminator key _type' do
+        expect(child._type).to eq('GlobalIntDiscriminatorChild')
       end
 
-      it "does not have the new global value as a field" do
-        expect(defined?(child.test)).to be nil
+      it 'does not have the new global value as a field' do
+        expect(defined?(child.test)).to be_nil
       end
     end
 
-    context "before class creation" do
-      config_override :discriminator_key, "test"
+    context 'before class creation' do
+      config_override :discriminator_key, 'test'
 
       before do
-
         class PreGlobalIntDiscriminatorParent
           include Mongoid::Document
         end
@@ -103,18 +100,18 @@ describe "#discriminator_key" do
         PreGlobalIntDiscriminatorChild.new
       end
 
-      it "creates a field with new discriminator key" do
-        expect(child.test).to eq("PreGlobalIntDiscriminatorChild")
+      it 'creates a field with new discriminator key' do
+        expect(child.test).to eq('PreGlobalIntDiscriminatorChild')
       end
 
-      it "does not have the default value as a field" do
-        expect(defined?(child._type)).to be nil
+      it 'does not have the default value as a field' do
+        expect(defined?(child._type)).to be_nil
       end
     end
   end
 
-  context "when the discriminator key is changed in the parent" do
-    context "after child class creation" do
+  context 'when the discriminator key is changed in the parent' do
+    context 'after child class creation' do
       before do
         class LocalIntDiscriminatorParent
           include Mongoid::Document
@@ -123,7 +120,7 @@ describe "#discriminator_key" do
         class LocalIntDiscriminatorChild < LocalIntDiscriminatorParent
         end
 
-        LocalIntDiscriminatorParent.discriminator_key = "test2"
+        LocalIntDiscriminatorParent.discriminator_key = 'test2'
       end
 
       after do
@@ -135,20 +132,21 @@ describe "#discriminator_key" do
         LocalIntDiscriminatorChild.new
       end
 
-      it "still has _type field in the child" do
-        expect(child._type).to include("LocalIntDiscriminatorChild")
+      it 'still has _type field in the child' do
+        expect(child._type).to include('LocalIntDiscriminatorChild')
       end
 
-      it "has the new field in the child" do
-        expect(child.test2).to include("LocalIntDiscriminatorChild")
+      it 'has the new field in the child' do
+        expect(child.test2).to include('LocalIntDiscriminatorChild')
       end
     end
 
-    context "before child class creation" do
+    context 'before child class creation' do
       before do
         class PreLocalIntDiscriminatorParent
           include Mongoid::Document
-          self.discriminator_key = "test2"
+
+          self.discriminator_key = 'test2'
         end
 
         class PreLocalIntDiscriminatorChild < PreLocalIntDiscriminatorParent
@@ -164,22 +162,23 @@ describe "#discriminator_key" do
         PreLocalIntDiscriminatorChild.new
       end
 
-      it "creates a new field in the child" do
-        expect(child.test2).to include("PreLocalIntDiscriminatorChild")
+      it 'creates a new field in the child' do
+        expect(child.test2).to include('PreLocalIntDiscriminatorChild')
       end
 
-      it "does not have the default value as a field" do
-        expect(defined?(child._type)).to be nil
+      it 'does not have the default value as a field' do
+        expect(defined?(child._type)).to be_nil
       end
     end
   end
 
-  context "when adding to the db" do
-    context "when changing the discriminator_key" do
+  context 'when adding to the db' do
+    context 'when changing the discriminator_key' do
       before do
         class DBDiscriminatorParent
           include Mongoid::Document
-          self.discriminator_key = "dkey"
+
+          self.discriminator_key = 'dkey'
         end
 
         class DBDiscriminatorChild < DBDiscriminatorParent
@@ -192,16 +191,16 @@ describe "#discriminator_key" do
         Object.send(:remove_const, :DBDiscriminatorChild)
       end
 
-      it "has the correct count" do
+      it 'has the correct count' do
         expect(DBDiscriminatorChild.count).to eq(1)
       end
 
-      it "has the correct count in the parent" do
+      it 'has the correct count in the parent' do
         expect(DBDiscriminatorParent.count).to eq(1)
       end
     end
 
-    context "when changing the discriminator_key after saving to the db" do
+    context 'when changing the discriminator_key after saving to the db' do
       before do
         class DBDiscriminatorParent
           include Mongoid::Document
@@ -210,7 +209,7 @@ describe "#discriminator_key" do
         class DBDiscriminatorChild < DBDiscriminatorParent
         end
         DBDiscriminatorChild.create!
-        DBDiscriminatorParent.discriminator_key = "dkey2"
+        DBDiscriminatorParent.discriminator_key = 'dkey2'
         DBDiscriminatorChild.create!
       end
 
@@ -219,27 +218,27 @@ describe "#discriminator_key" do
         Object.send(:remove_const, :DBDiscriminatorChild)
       end
 
-      it "only finds the documents with the new discriminator key" do
+      it 'only finds the documents with the new discriminator key' do
         expect(DBDiscriminatorChild.count).to eq(1)
       end
 
-      it "has the correct count in the parent" do
+      it 'has the correct count in the parent' do
         expect(DBDiscriminatorParent.count).to eq(2)
       end
     end
   end
 
-  context "documentation tests" do
-
-    context "Example 1" do
+  context 'documentation tests' do
+    context 'Example 1' do
       before do
         class Example1Shape
           include Mongoid::Document
+
           field :x, type: Integer
           field :y, type: Integer
           embedded_in :canvas
 
-          self.discriminator_key = "shape_type"
+          self.discriminator_key = 'shape_type'
         end
 
         class Example1Circle < Example1Shape
@@ -266,27 +265,28 @@ describe "#discriminator_key" do
         Example1Circle.new
       end
 
-      it "has the new discriminator key: Rectangle" do
-        expect(rectangle.shape_type).to eq("Example1Rectangle")
+      it 'has the new discriminator key: Rectangle' do
+        expect(rectangle.shape_type).to eq('Example1Rectangle')
       end
 
-      it "does not have the default discriminator key: Rectangle" do
-        expect(defined?(rectangle._type)).to be nil
+      it 'does not have the default discriminator key: Rectangle' do
+        expect(defined?(rectangle._type)).to be_nil
       end
 
-      it "has the new discriminator key: Circle" do
-        expect(circle.shape_type).to eq("Example1Circle")
+      it 'has the new discriminator key: Circle' do
+        expect(circle.shape_type).to eq('Example1Circle')
       end
 
-      it "does not have the default discriminator key: Circle" do
-        expect(defined?(circle._type)).to be nil
+      it 'does not have the default discriminator key: Circle' do
+        expect(defined?(circle._type)).to be_nil
       end
     end
 
-    context "Example 2" do
+    context 'Example 2' do
       before do
         class Example2Shape
           include Mongoid::Document
+
           field :x, type: Integer
           field :y, type: Integer
           embedded_in :canvas
@@ -301,11 +301,11 @@ describe "#discriminator_key" do
           field :height, type: Float
         end
 
-        Example2Shape.discriminator_key = "shape_type"
+        Example2Shape.discriminator_key = 'shape_type'
       end
 
       after do
-        Example2Shape.discriminator_key = "_type"
+        Example2Shape.discriminator_key = '_type'
         Object.send(:remove_const, :Example2Shape)
         Object.send(:remove_const, :Example2Circle)
         Object.send(:remove_const, :Example2Rectangle)
@@ -319,29 +319,30 @@ describe "#discriminator_key" do
         Example2Circle.new
       end
 
-      it "has the new discriminator key: Rectangle" do
-        expect(rectangle.shape_type).to eq("Example2Rectangle")
+      it 'has the new discriminator key: Rectangle' do
+        expect(rectangle.shape_type).to eq('Example2Rectangle')
       end
 
-      it "has default discriminator key: Rectangle" do
-        expect(rectangle._type).to eq("Example2Rectangle")
+      it 'has default discriminator key: Rectangle' do
+        expect(rectangle._type).to eq('Example2Rectangle')
       end
 
-      it "has the new discriminator key: Circle" do
-        expect(circle.shape_type).to eq("Example2Circle")
+      it 'has the new discriminator key: Circle' do
+        expect(circle.shape_type).to eq('Example2Circle')
       end
 
-      it "has default discriminator key: Circle" do
-        expect(circle._type).to eq("Example2Circle")
+      it 'has default discriminator key: Circle' do
+        expect(circle._type).to eq('Example2Circle')
       end
     end
 
-    context "Example 3" do
-      config_override :discriminator_key, "shape_type"
+    context 'Example 3' do
+      config_override :discriminator_key, 'shape_type'
 
       before do
         class Example3Shape
           include Mongoid::Document
+
           field :x, type: Integer
           field :y, type: Integer
           embedded_in :canvas
@@ -355,7 +356,6 @@ describe "#discriminator_key" do
           field :width, type: Float
           field :height, type: Float
         end
-
       end
 
       after do
@@ -372,20 +372,20 @@ describe "#discriminator_key" do
         Example3Circle.new
       end
 
-      it "has the new discriminator key: Rectangle" do
-        expect(rectangle.shape_type).to eq("Example3Rectangle")
+      it 'has the new discriminator key: Rectangle' do
+        expect(rectangle.shape_type).to eq('Example3Rectangle')
       end
 
-      it "does not have the default discriminator key: Rectangle" do
-        expect(defined?(rectangle._type)).to be nil
+      it 'does not have the default discriminator key: Rectangle' do
+        expect(defined?(rectangle._type)).to be_nil
       end
 
-      it "has the new discriminator key: Circle" do
-        expect(circle.shape_type).to eq("Example3Circle")
+      it 'has the new discriminator key: Circle' do
+        expect(circle.shape_type).to eq('Example3Circle')
       end
 
-      it "does not have the default discriminator key: Circle" do
-        expect(defined?(circle._type)).to be nil
+      it 'does not have the default discriminator key: Circle' do
+        expect(defined?(circle._type)).to be_nil
       end
     end
   end

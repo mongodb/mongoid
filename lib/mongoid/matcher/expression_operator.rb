@@ -1,7 +1,5 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # Singleton module provides lookup of logical query operator
     # matchers.
     #
@@ -10,7 +8,7 @@ module Mongoid
       MAP = {
         '$and' => And,
         '$nor' => Nor,
-        '$or' => Or,
+        '$or' => Or
       }.freeze
 
       # Returns the matcher module for a given operator.

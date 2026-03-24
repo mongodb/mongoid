@@ -1,26 +1,24 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/persistable/creatable"
-require "mongoid/persistable/deletable"
-require "mongoid/persistable/destroyable"
-require "mongoid/persistable/incrementable"
-require "mongoid/persistable/logical"
-require "mongoid/persistable/maxable"
-require "mongoid/persistable/minable"
-require "mongoid/persistable/multipliable"
-require "mongoid/persistable/poppable"
-require "mongoid/persistable/pullable"
-require "mongoid/persistable/pushable"
-require "mongoid/persistable/renamable"
-require "mongoid/persistable/savable"
-require "mongoid/persistable/settable"
-require "mongoid/persistable/updatable"
-require "mongoid/persistable/upsertable"
-require "mongoid/persistable/unsettable"
+require 'mongoid/persistable/creatable'
+require 'mongoid/persistable/deletable'
+require 'mongoid/persistable/destroyable'
+require 'mongoid/persistable/incrementable'
+require 'mongoid/persistable/logical'
+require 'mongoid/persistable/maxable'
+require 'mongoid/persistable/minable'
+require 'mongoid/persistable/multipliable'
+require 'mongoid/persistable/poppable'
+require 'mongoid/persistable/pullable'
+require 'mongoid/persistable/pushable'
+require 'mongoid/persistable/renamable'
+require 'mongoid/persistable/savable'
+require 'mongoid/persistable/settable'
+require 'mongoid/persistable/updatable'
+require 'mongoid/persistable/upsertable'
+require 'mongoid/persistable/unsettable'
 
 module Mongoid
-
   # Contains general behavior for persistence operations.
   module Persistable
     extend ActiveSupport::Concern
@@ -44,7 +42,7 @@ module Mongoid
     include Unsettable
 
     # The atomic operations that deal with arrays or sets in the db.
-    LIST_OPERATIONS = [ "$addToSet", "$push", "$pull", "$pullAll" ].freeze
+    LIST_OPERATIONS = [ '$addToSet', '$push', '$pull', '$pullAll' ].freeze
 
     # Execute operations atomically (in a single database call) for everything
     # that would happen inside the block. This method supports nesting further
@@ -174,9 +172,7 @@ module Mongoid
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
-      if in_transaction?
-        Threaded.add_modified_document(_session, self)
-      end
+      Threaded.add_modified_document(_session, self) if in_transaction?
       true
     end
 
@@ -193,6 +189,7 @@ module Mongoid
     # @return [ Object ] The result of the operation.
     def prepare_atomic_operation
       raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+
       operations = yield({})
       persist_or_delay_atomic_operation(operations)
       self
@@ -229,6 +226,7 @@ module Mongoid
     #   document._mongoid_remove_atomic_context_changes
     def _mongoid_remove_atomic_context_changes
       return unless executing_atomically?
+
       _mongoid_atomic_context_changed_fields.each { |f| remove_change f }
     end
 
@@ -241,6 +239,7 @@ module Mongoid
     #   document._mongoid_reset_atomic_context_changes!
     def _mongoid_reset_atomic_context_changes!
       return unless executing_atomically?
+
       _mongoid_atomic_context_changed_fields.each { |f| reset_attribute! f }
     end
 
@@ -252,6 +251,7 @@ module Mongoid
     #   document._mongoid_push_atomic_context
     def _mongoid_push_atomic_context
       return unless executing_atomically?
+
       @atomic_context = {}
       @atomic_updates_to_execute_stack << @atomic_context
     end
@@ -264,6 +264,7 @@ module Mongoid
     #   document._mongoid_pop_atomic_context
     def _mongoid_pop_atomic_context
       return unless executing_atomically?
+
       @atomic_updates_to_execute_stack.pop
       @atomic_context = @atomic_updates_to_execute_stack.last
     end
@@ -309,10 +310,10 @@ module Mongoid
     #
     # @param [ Hash ] operations The atomic operations.
     def persist_atomic_operations(operations)
-      if persisted? && operations && !operations.empty?
-        selector = atomic_selector
-        _root.collection.find(selector).update_one(positionally(selector, operations), session: _session)
-      end
+      return unless persisted? && operations && !operations.empty?
+
+      selector = atomic_selector
+      _root.collection.find(selector).update_one(positionally(selector, operations), session: _session)
     end
   end
 end

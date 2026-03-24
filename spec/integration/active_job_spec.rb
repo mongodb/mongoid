@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 begin
@@ -21,7 +20,7 @@ begin
 
     before do
       ActiveJob::Serializers.add_serializers(
-        [::Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer]
+        [ Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer ]
       )
     end
 

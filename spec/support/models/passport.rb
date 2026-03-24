@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Passport
   include Mongoid::Document

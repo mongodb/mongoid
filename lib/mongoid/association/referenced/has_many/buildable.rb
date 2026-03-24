@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
       class HasMany
-
         # The Builder behavior for has_many associations.
         module Buildable
-
           # This method either takes an _id or an object and queries for the
           # inverse side using the id or sets the object.
           #
@@ -21,15 +18,18 @@ module Mongoid
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, selected_fields = nil)
-            return (object || []) unless query?(object)
-            
+          def build(base, object, _type = nil, selected_fields = nil)
+            return object || [] unless query?(object)
+
             # Handle array of hashes from $lookup aggregation
             if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
-              return object.map { |attrs| Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false) }
+              return object.map do |attrs|
+                Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false)
+              end
             end
-            
+
             return [] if object.is_a?(Array)
+
             query_criteria(object, base)
           end
 

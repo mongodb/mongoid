@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Attributes
-
     # This module contains the behavior for dynamic attributes.
     module Dynamic
       extend ActiveSupport::Concern
@@ -88,10 +86,10 @@ module Mongoid
       # @param [ Object ] value The value of the field.
       def process_attribute(name, value)
         responds = respond_to?("#{name}=")
-        if !responds
-          write_attribute(name, value)
-        else
+        if responds
           send("#{name}=", value)
+        else
+          write_attribute(name, value)
         end
       end
 
@@ -102,8 +100,8 @@ module Mongoid
       #
       # @return [ String ] An array of pretty printed dynamic field values.
       def inspect_dynamic_fields
-        keys = attributes.keys - fields.keys - relations.keys - ["_id", self.class.discriminator_key]
-        return keys.map do |name|
+        keys = attributes.keys - fields.keys - relations.keys - [ '_id', self.class.discriminator_key ]
+        keys.map do |name|
           "#{name}: #{attributes[name].inspect}"
         end
       end
@@ -122,6 +120,7 @@ module Mongoid
       def method_missing(name, *args)
         attr = name.to_s
         return super unless attributes.has_key?(attr.reader)
+
         if attr.writer?
           getter = attr.reader
           define_dynamic_writer(getter)

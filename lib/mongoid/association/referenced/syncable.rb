@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
-
       # This module handles the behavior for synchronizing foreign keys between
       # both sides of a many to many associations.
       module Syncable
-
         # Is the document able to be synced on the inverse side? This is only if
         # the key has changed and the association bindings have not been run.
         #
@@ -54,9 +51,9 @@ module Mongoid
         # @return [ Object ] The updated values.
         def remove_inverse_keys(association)
           foreign_keys = send(association.foreign_key)
-          unless foreign_keys.nil? || foreign_keys.empty?
-            association.criteria(self, foreign_keys).pull(association.inverse_foreign_key => _id)
-          end
+          return if foreign_keys.nil? || foreign_keys.empty?
+
+          association.criteria(self, foreign_keys).pull(association.inverse_foreign_key => _id)
         end
 
         # Update the inverse keys for the association.
@@ -68,32 +65,31 @@ module Mongoid
         #
         # @return [ Object ] The updated values.
         def update_inverse_keys(association)
-          if previous_changes.has_key?(association.foreign_key)
-            old, new = previous_changes[association.foreign_key]
-            adds, subs = new - (old || []), (old || []) - new
+          return unless previous_changes.has_key?(association.foreign_key)
 
-            # If we are autosaving we don't want a duplicate to get added - the
-            # $addToSet would run previously and then the $push and $each from the
-            # inverse on the autosave would cause this. We delete each id from
-            # what's in memory in case a mix of id addition and object addition
-            # had occurred.
-            if association.autosave?
-              send(association.name).in_memory.each do |doc|
-                adds.delete_one(doc._id)
-              end
-            end
+          old, new = previous_changes[association.foreign_key]
+          adds, subs = new - (old || []), (old || []) - new
 
-            unless adds.empty?
-              association.criteria(self, adds).without_options.add_to_set(association.inverse_foreign_key => _id)
-            end
-            unless subs.empty?
-              association.criteria(self, subs).without_options.pull(association.inverse_foreign_key => _id)
+          # If we are autosaving we don't want a duplicate to get added - the
+          # $addToSet would run previously and then the $push and $each from the
+          # inverse on the autosave would cause this. We delete each id from
+          # what's in memory in case a mix of id addition and object addition
+          # had occurred.
+          if association.autosave?
+            send(association.name).in_memory.each do |doc|
+              adds.delete_one(doc._id)
             end
           end
+
+          unless adds.empty?
+            association.criteria(self, adds).without_options.add_to_set(association.inverse_foreign_key => _id)
+          end
+          return if subs.empty?
+
+          association.criteria(self, subs).without_options.pull(association.inverse_foreign_key => _id)
         end
 
         module ClassMethods
-
           # Set up the syncing of many to many foreign keys.
           #
           # @example Set up the syncing.
@@ -101,10 +97,10 @@ module Mongoid
           #
           # @param [ Mongoid::Association::Relatable ] association The association metadata.
           def _synced(association)
-            unless association.forced_nil_inverse?
-              synced_save(association)
-              synced_destroy(association)
-            end
+            return if association.forced_nil_inverse?
+
+            synced_save(association)
+            synced_destroy(association)
           end
 
           private
@@ -123,9 +119,9 @@ module Mongoid
           # @return [ Class ] The class getting set up.
           def synced_save(association)
             set_callback(
-                :save,
-                :after,
-                if: ->(doc) { doc._syncable?(association) }
+              :save,
+              :after,
+              if: ->(doc) { doc._syncable?(association) }
             ) do |doc|
               doc.update_inverse_keys(association)
             end
@@ -142,8 +138,8 @@ module Mongoid
           # @return [ Class ] The class getting set up.
           def synced_destroy(association)
             set_callback(
-                :destroy,
-                :after
+              :destroy,
+              :after
             ) do |doc|
               doc.remove_inverse_keys(association)
             end

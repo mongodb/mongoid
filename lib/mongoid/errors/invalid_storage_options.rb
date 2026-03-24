@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when options provided to :store_in are invalid.
     class InvalidStorageOptions < MongoidError
-
       # Create the new error.
       #
       # @example Create the new error.
@@ -17,7 +14,7 @@ module Mongoid
       def initialize(klass, options)
         super(
           compose_message(
-            "invalid_storage_options",
+            'invalid_storage_options',
             { klass: klass, options: options }
           )
         )

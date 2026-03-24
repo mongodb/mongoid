@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class HmmCompany
   include Mongoid::Document
@@ -8,7 +7,7 @@ class HmmCompany
   has_many :emails, primary_key: :p, foreign_key: :f, class_name: 'HmmEmail'
 
   # The addresses are added with different dependency mechanisms in tests:
-  #has_many :addresses, class_name: 'HmmAddress', dependent: :destroy
+  # has_many :addresses, class_name: 'HmmAddress', dependent: :destroy
 end
 
 class HmmEmail

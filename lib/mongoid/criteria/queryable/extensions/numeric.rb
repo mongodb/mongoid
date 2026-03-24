@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Numeric module and its children.
         module Numeric
-
           # Evolve the numeric value into a mongo friendly date, aka UTC time at
           # midnight.
           #
@@ -32,7 +29,6 @@ module Mongoid
           end
 
           module ClassMethods
-
             # Get the object as a numeric.
             #
             # @api private
@@ -55,10 +51,14 @@ module Mongoid
               str = str.chop if str.end_with?('.')
               return 0 if str.empty?
 
-              result = Integer(str) rescue Float(object)
+              result = begin
+                Integer(str)
+              rescue StandardError
+                Float(object)
+              end
 
               integer = result.to_i
-              integer == result ? integer : result
+              (integer == result) ? integer : result
             end
 
             # Evolve the object to an integer.
@@ -71,7 +71,9 @@ module Mongoid
             # @return [ Integer ] The evolved object.
             def evolve(object)
               __evolve__(object) do |obj|
-                __numeric__(obj) rescue obj
+                __numeric__(obj)
+              rescue StandardError
+                obj
               end
             end
           end
@@ -81,10 +83,10 @@ module Mongoid
   end
 end
 
-::Integer.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Numeric)
-::Integer.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods)
+Integer.include Mongoid::Criteria::Queryable::Extensions::Numeric
+Integer.extend Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods
 
-::Float.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Numeric)
-::Float.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods)
+Float.include Mongoid::Criteria::Queryable::Extensions::Numeric
+Float.extend Mongoid::Criteria::Queryable::Extensions::Numeric::ClassMethods
 
-::BigDecimal.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Numeric)
+BigDecimal.include Mongoid::Criteria::Queryable::Extensions::Numeric

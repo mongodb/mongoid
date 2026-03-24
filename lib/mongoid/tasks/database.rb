@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Tasks
-
     # Utility module to manage database collections, indexes, sharding, etc.
     # Invoked from Rake tasks.
     module Database
@@ -42,6 +40,7 @@ module Mongoid
       def create_indexes(models = ::Mongoid.models)
         models.each do |model|
           next if model.index_specifications.empty?
+
           if !model.embedded? || model.cyclic?
             model.create_indexes
             logger.info("MONGOID: Created indexes on #{model}:")
@@ -87,21 +86,22 @@ module Mongoid
         undefined_by_model = {}
 
         models.each do |model|
-          unless model.embedded?
-            begin
-              model.collection.indexes(session: model.send(:_session)).each do |index|
-                # ignore default index
-                unless index['name'] == '_id_'
-                  key = index['key'].symbolize_keys
-                  spec = model.index_specification(key, index['name'])
-                  unless spec
-                    # index not specified
-                    undefined_by_model[model] ||= []
-                    undefined_by_model[model] << index
-                  end
-                end
-              end
-            rescue Mongo::Error::OperationFailure; end
+          next if model.embedded?
+
+          begin
+            model.collection.indexes(session: model.send(:_session)).each do |index|
+              # ignore default index
+              next if index['name'] == '_id_'
+
+              key = index['key'].symbolize_keys
+              spec = model.index_specification(key, index['name'])
+              next if spec
+
+              # index not specified
+              undefined_by_model[model] ||= []
+              undefined_by_model[model] << index
+            end
+          rescue Mongo::Error::OperationFailure
           end
         end
 
@@ -139,6 +139,7 @@ module Mongoid
       def remove_indexes(models = ::Mongoid.models)
         models.each do |model|
           next if model.embedded?
+
           begin
             model.remove_indexes
           rescue Mongo::Error::OperationFailure
@@ -155,6 +156,7 @@ module Mongoid
       def remove_search_indexes(models = ::Mongoid.models)
         models.each do |model|
           next if model.embedded?
+
           model.remove_search_indexes
         end
       end
@@ -194,17 +196,16 @@ module Mongoid
           # the error code when they are asked to collStats a non-existent
           # collection (https://jira.mongodb.org/browse/SERVER-50070).
           begin
-            stats = model.collection.database.command(collStats: model.collection.name).first
-          rescue Mongo::Error::OperationFailure => exc
+            model.collection.database.command(collStats: model.collection.name).first
+          rescue Mongo::Error::OperationFailure => e
             # Code 26 is database does not exist.
             # Code 8 is collection does not exist, as of 4.0.
             # On 3.6 and earlier match the text of exception message.
-            if exc.code == 26 || exc.code == 8 ||
-              exc.code.nil? && exc.message =~ /not found/
-            then
+            if e.code == 26 || e.code == 8 ||
+               (e.code.nil? && e.message =~ /not found/)
               model.collection.create
 
-              stats = model.collection.database.command(collStats: model.collection.name).first
+              model.collection.database.command(collStats: model.collection.name).first
             else
               raise
             end
@@ -220,13 +221,10 @@ module Mongoid
 
           begin
             admin_db.command(enableSharding: model.collection.database.name)
-          rescue Mongo::Error::OperationFailure => exc
+          rescue Mongo::Error::OperationFailure => e
             # Server 2.6 fails if sharding is already enabled
-            if exc.code == 23 || exc.code.nil? && exc.message =~ /already enabled/
-              # Nothing
-            else
-              raise
-            end
+            raise unless e.code == 23 || (e.code.nil? && e.message =~ /already enabled/)
+            # Nothing
           end
 
           begin

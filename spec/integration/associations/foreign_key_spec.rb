@@ -1,8 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
-require_relative './foreign_key_spec_models'
+require_relative 'foreign_key_spec_models'
 
 describe 'Association foreign key configuration' do
   describe 'has_many/belongs_to' do
@@ -28,13 +27,13 @@ describe 'Association foreign key configuration' do
       expect(email.company.id).to eq(company.id)
     end
 
-    it "has the correct criteria" do
-      company = ForeignKeySpec::Company.create!(c: "3")
-      email = ForeignKeySpec::Email.create!(company: company)
+    it 'has the correct criteria' do
+      company = ForeignKeySpec::Company.create!(c: '3')
+      ForeignKeySpec::Email.create!(company: company)
 
       criteria = ForeignKeySpec::Email.where(company: company)
 
-      expect(criteria.selector).to eq({ "c_ref" => "3" })
+      expect(criteria.selector).to eq({ 'c_ref' => '3' })
     end
 
     context 'with default scope' do
@@ -42,7 +41,7 @@ describe 'Association foreign key configuration' do
         it 'looks up child' do
           company = ForeignKeySpec::ScopedCompany.create!(c: 'test')
           on_email = ForeignKeySpec::ScopedEmail.create!(company: company, s: 'on')
-          off_email = ForeignKeySpec::ScopedEmail.create!(company: company, s: 'off')
+          ForeignKeySpec::ScopedEmail.create!(company: company, s: 'off')
 
           company = ForeignKeySpec::ScopedCompany.find(company.id)
           expect(company.emails.length).to eq(1)
@@ -58,7 +57,7 @@ describe 'Association foreign key configuration' do
 
           company = ForeignKeySpec::ScopedCompany.find(company.id)
           expect(company.emails.unscoped.length).to eq(2)
-          expect(company.emails.unscoped.map(&:id).sort).to eq([on_email.id, off_email.id].sort)
+          expect(company.emails.unscoped.map(&:id).sort).to eq([ on_email.id, off_email.id ].sort)
         end
       end
     end
@@ -83,7 +82,7 @@ describe 'Association foreign key configuration' do
       company = ForeignKeySpec::Company.create!(c: 'test')
       founder = ForeignKeySpec::Founder.create!(company: company)
 
-      email = ForeignKeySpec::Founder.find(founder.id)
+      ForeignKeySpec::Founder.find(founder.id)
       expect(founder.company.id).to eq(company.id)
     end
   end
@@ -100,9 +99,9 @@ describe 'Association foreign key configuration' do
       zoo.animals << animal
       zoo.save!
 
-      expect(zoo.animals).to eq([animal])
+      expect(zoo.animals).to eq([ animal ])
       zoo = ForeignKeySpec::Zoo.find(zoo.id)
-      expect(zoo.animals).to eq([animal])
+      expect(zoo.animals).to eq([ animal ])
     end
   end
 end

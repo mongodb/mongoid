@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to String class.
         module String
-
           # Evolve the string into a mongodb friendly date.
           #
           # @example Evolve the string.
@@ -37,7 +34,7 @@ module Mongoid
           #
           # @return [ String ] The string with $ at the front.
           def __mongo_expression__
-            start_with?("$") ? self : "$#{self}"
+            start_with?('$') ? self : "$#{self}"
           end
 
           # Get the string as a sort option.
@@ -47,7 +44,7 @@ module Mongoid
           #
           # @return [ Hash ] The string as a sort option hash.
           def __sort_option__
-            split(/,/).inject({}) do |hash, spec|
+            split(',').inject({}) do |hash, spec|
               hash.tap do |_hash|
                 field, direction = spec.strip.split(/\s/)
                 _hash[field.to_sym] = Mongoid::Criteria::Translator.to_direction(direction)
@@ -69,7 +66,6 @@ module Mongoid
           end
 
           module ClassMethods
-
             # Get the value as a expression.
             #
             # @example Get the value as an expression.
@@ -82,7 +78,7 @@ module Mongoid
             # @return [ Hash ] The selection.
             def __expr_part__(key, value, negating = false)
               if negating
-                { key => { "$#{__regexp?(value) ? "not" : "ne"}" => value }}
+                { key => { "$#{__regexp?(value) ? 'not' : 'ne'}" => value } }
               else
                 { key => value }
               end
@@ -120,5 +116,5 @@ module Mongoid
   end
 end
 
-::String.__send__(:include, Mongoid::Criteria::Queryable::Extensions::String)
-::String.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::String::ClassMethods)
+String.include Mongoid::Criteria::Queryable::Extensions::String
+String.extend Mongoid::Criteria::Queryable::Extensions::String::ClassMethods

@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $lte expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/lte/
     #
     # @api private
     module Lte
-
       # Returns whether a value satisfies a $lte expression.
       #
       # @param [ true | false ] exists Whether the value exists.

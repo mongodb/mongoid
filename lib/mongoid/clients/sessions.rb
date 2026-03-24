@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Clients
-
     # Encapsulates behavior for using sessions and transactions.
     module Sessions
-
       # Add class method mixin functionality.
       #
       # @todo Replace with ActiveSupport::Concern
@@ -15,10 +12,9 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Actions that can be used to trigger transactional callbacks.
         # @api private
-        CALLBACK_ACTIONS = [:create, :destroy, :update]
+        CALLBACK_ACTIONS = %i[create destroy update]
 
         # Execute a block within the context of a session.
         #
@@ -40,24 +36,21 @@ module Mongoid
         #
         # @yieldparam [ Mongo::Session ] The session being used for the block.
         def with_session(options = {})
-          if Threaded.get_session(client: persistence_context.client)
-            raise Mongoid::Errors::InvalidSessionNesting.new
-          end
+          raise Mongoid::Errors::InvalidSessionNesting.new if Threaded.get_session(client: persistence_context.client)
+
           session = persistence_context.client.start_session(options)
           Threaded.set_session(session, client: persistence_context.client)
           yield(session)
-        rescue Mongo::Error::InvalidSession => ex
-          if Mongo::Error::SessionsNotSupported === ex
-            raise Mongoid::Errors::SessionsNotSupported.new
-          else
-            raise ex
-          end
-        rescue Mongo::Error::OperationFailure => ex
-          if (ex.code == 40415 && ex.server_message =~ /startTransaction/) ||
-             (ex.code == 20 && ex.server_message =~ /Transaction/)
+        rescue Mongo::Error::InvalidSession => e
+          raise Mongoid::Errors::SessionsNotSupported.new if e.is_a?(Mongo::Error::SessionsNotSupported)
+
+          raise e
+        rescue Mongo::Error::OperationFailure => e
+          if (e.code == 40_415 && e.server_message =~ /startTransaction/) ||
+             (e.code == 20 && e.server_message =~ /Transaction/)
             raise Mongoid::Errors::TransactionsNotSupported.new
           else
-            raise ex
+            raise e
           end
         rescue *transactions_not_supported_exceptions
           raise Mongoid::Errors::TransactionsNotSupported
@@ -87,26 +80,22 @@ module Mongoid
         #   by MongoDB deployment or MongoDB driver.
         #
         # @yield Provided block will be executed inside a transaction.
-        def transaction(options = {}, session_options: {})
+        def transaction(options = {}, session_options: {}, &block)
           with_session(session_options) do |session|
-            begin
-              session.with_transaction(options) do
-                yield
-              end.tap { run_commit_callbacks(session) }
-            rescue *transactions_not_supported_exceptions
-              raise Mongoid::Errors::TransactionsNotSupported
-            rescue Mongoid::Errors::Rollback
-              run_abort_callbacks(session)
-            rescue Mongoid::Errors::InvalidSessionNesting
-              # Session should be ended here.
-              raise Mongoid::Errors::InvalidTransactionNesting.new
-            rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
-              run_abort_callbacks(session)
-              raise Mongoid::Errors::TransactionError.new(e)
-            rescue StandardError => e
-              run_abort_callbacks(session)
-              raise e
-            end
+            session.with_transaction(options, &block).tap { run_commit_callbacks(session) }
+          rescue *transactions_not_supported_exceptions
+            raise Mongoid::Errors::TransactionsNotSupported
+          rescue Mongoid::Errors::Rollback
+            run_abort_callbacks(session)
+          rescue Mongoid::Errors::InvalidSessionNesting
+            # Session should be ended here.
+            raise Mongoid::Errors::InvalidTransactionNesting.new
+          rescue Mongo::Error::InvalidSession, Mongo::Error::InvalidTransactionOperation => e
+            run_abort_callbacks(session)
+            raise Mongoid::Errors::TransactionError.new(e)
+          rescue StandardError => e
+            run_abort_callbacks(session)
+            raise e
           end
         end
 
@@ -123,7 +112,7 @@ module Mongoid
 
         # Shortcut for +after_commit :hook, on: [ :create, :update ]+
         def after_save_commit(*args, &block)
-          set_options_for_callbacks!(args, on: [ :create, :update ])
+          set_options_for_callbacks!(args, on: %i[create update])
           set_callback(:commit, :after, *args, &block)
         end
 
@@ -216,14 +205,14 @@ module Mongoid
           options = args.extract_options!.merge(enforced_options)
           args << options
 
-          if options[:on]
-            fire_on = Array(options[:on])
-            assert_valid_transaction_action(fire_on)
-            options[:if] = [
-              -> { transaction_include_any_action?(fire_on) },
-              *options[:if]
-            ]
-          end
+          return unless options[:on]
+
+          fire_on = Array(options[:on])
+          assert_valid_transaction_action(fire_on)
+          options[:if] = [
+            -> { transaction_include_any_action?(fire_on) },
+            *options[:if]
+          ]
         end
 
         # Asserts that the given actions are valid for after_commit
@@ -232,9 +221,10 @@ module Mongoid
         # @param [ Array<Symbol> ] actions Actions to be checked.
         # @raise [ ArgumentError ] If any of the actions is not valid.
         def assert_valid_transaction_action(actions)
-          if (actions - CALLBACK_ACTIONS).any?
-            raise ArgumentError, ":on conditions for after_commit and after_rollback callbacks have to be one of #{CALLBACK_ACTIONS}"
-          end
+          return unless (actions - CALLBACK_ACTIONS).any?
+
+          raise ArgumentError,
+                ":on conditions for after_commit and after_rollback callbacks have to be one of #{CALLBACK_ACTIONS}"
         end
 
         def transaction_include_any_action?(actions)
@@ -274,17 +264,17 @@ module Mongoid
         # a model within a transaction, where the model is not itself
         # controlled by that transaction. this is potentially a bug, so
         # let's tell them about it.
-        if session.nil?
-          # This is hacky; we're hijacking Mongoid::Errors::MongoidError in
-          # order to get the spiffy error message translation. If we later
-          # decide to raise an error instead of just writing a message, we can
-          # subclass MongoidError and raise that exception here.
-          message = Errors::MongoidError.new.compose_message(
-            'client_session_mismatch',
-            model: self.class.name
-          )
-          logger.info(message)
-        end
+        return unless session.nil?
+
+        # This is hacky; we're hijacking Mongoid::Errors::MongoidError in
+        # order to get the spiffy error message translation. If we later
+        # decide to raise an error instead of just writing a message, we can
+        # subclass MongoidError and raise that exception here.
+        message = Errors::MongoidError.new.compose_message(
+          'client_session_mismatch',
+          model: self.class.name
+        )
+        logger.info(message)
       end
     end
   end

@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
     # Adds type-casting behavior to Array class.
     module Array
-
       # Evolve the array into an array of object ids.
       #
       # @example Evolve the array to object ids.
@@ -25,7 +23,7 @@ module Mongoid
       # @return [ Array ] The array of args.
       # @deprecated
       def __find_args__
-        flat_map{ |a| a.__find_args__ }.uniq{ |a| a.to_s }
+        flat_map { |a| a.__find_args__ }.uniq { |a| a.to_s }
       end
       Mongoid.deprecate(self, :__find_args__)
 
@@ -63,7 +61,7 @@ module Mongoid
       # @return [ true | false ] If the array is multi args.
       # @deprecated
       def multi_arged?
-        !first.is_a?(Hash) && first.resizable? || size > 1
+        (!first.is_a?(Hash) && first.resizable?) || size > 1
       end
       Mongoid.deprecate(self, :multi_arged?)
 
@@ -104,7 +102,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the provided object to a proper array of foreign keys.
         #
         # @example Mongoize the object.
@@ -135,6 +132,7 @@ module Mongoid
         # @return [ Array | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
+
           case object
           when ::Array, ::Set
             object.map(&:mongoize)
@@ -155,5 +153,5 @@ module Mongoid
   end
 end
 
-::Array.__send__(:include, Mongoid::Extensions::Array)
-::Array.extend(Mongoid::Extensions::Array::ClassMethods)
+Array.include Mongoid::Extensions::Array
+Array.extend(Mongoid::Extensions::Array::ClassMethods)

@@ -1,17 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Mixin module which is included in Mongoid::Document to add "touch"
   # functionality to update a document's timestamp(s) atomically.
   module Touchable
-
     # Used to provide mixin functionality.
     #
     # @todo Refactor using ActiveSupport::Concern
     module InstanceMethods
-
       # Suppresses the invocation of touch callbacks, for the class that
       # includes this module, for the duration of the block.
       #
@@ -19,8 +15,8 @@ module Mongoid
       #   person.suppress_touch_callbacks { ... }
       #
       # @api private
-      def suppress_touch_callbacks
-        Touchable.suppress_touch_callbacks(self.class.name) { yield }
+      def suppress_touch_callbacks(&block)
+        Touchable.suppress_touch_callbacks(self.class.name, &block)
       end
 
       # Queries whether touch callbacks are being suppressed for the class
@@ -77,7 +73,7 @@ module Mongoid
 
         field = database_field_name(field)
 
-        write_attribute(:updated_at, now) if respond_to?("updated_at=")
+        write_attribute(:updated_at, now) if respond_to?(:updated_at=)
         write_attribute(field, now) if field.present?
 
         touches = _extract_touches_from_atomic_sets(field) || {}
@@ -103,6 +99,7 @@ module Mongoid
       # @api private
       def _run_touch_callbacks_from_root
         return if touch_callbacks_suppressed?
+
         _parent._run_touch_callbacks_from_root if _touchable_parent?
         run_callbacks(:touch)
       end
@@ -132,9 +129,7 @@ module Mongoid
         touchable_keys << field.to_s if field.present?
 
         updates.keys.each_with_object({}) do |key, touches|
-          if touchable_keys.include?(key.split('.').last)
-            touches[key] = updates.delete(key)
-          end
+          touches[key] = updates.delete(key) if touchable_keys.include?(key.split('.').last)
         end
       end
     end
@@ -187,7 +182,7 @@ module Mongoid
     private
 
     # The key to use to store the active touch callback suppression statuses
-    SUPPRESS_TOUCH_CALLBACKS_KEY = "[mongoid]:suppress-touch-callbacks"
+    SUPPRESS_TOUCH_CALLBACKS_KEY = '[mongoid]:suppress-touch-callbacks'
 
     # Returns a hash to be used to store and query the various touch callback
     # suppression statuses for different classes.

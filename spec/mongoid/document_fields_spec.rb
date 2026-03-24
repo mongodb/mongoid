@@ -1,14 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Document do
-
   describe 'BSON::Binary field' do
     context 'when assigned a BSON::Binary instance' do
       let(:data) do
-        BSON::Binary.new("hello world")
+        BSON::Binary.new('hello world')
       end
 
       let(:registry) do
@@ -33,7 +31,7 @@ describe Mongoid::Document do
       let(:data) do
         # Frozen string literals do not allow setting encoding on a string
         # literal - work around by composing the string at runtime
-        ([0, 253, 254] * 2).map(&:chr).join.force_encoding('BINARY')
+        ([ 0, 253, 254 ] * 2).map(&:chr).join.force_encoding('BINARY')
       end
 
       let(:registry) do
@@ -62,14 +60,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.data.should be nil
+        registry.data.should be_nil
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should be nil
+        _registry.data.should be_nil
       end
     end
 
@@ -83,14 +81,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.data.should be nil
+        registry.data.should be_nil
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should be nil
+        _registry.data.should be_nil
       end
     end
   end
@@ -150,20 +148,20 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.obj_id.should be nil
+        registry.obj_id.should be_nil
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should be nil
+        _registry.obj_id.should be_nil
       end
     end
 
     context 'when assigned an invalid string' do
       let(:obj_id) do
-        "hello"
+        'hello'
       end
 
       let(:registry) do
@@ -171,14 +169,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.obj_id.should == "hello"
+        registry.obj_id.should == 'hello'
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == "hello"
+        _registry.obj_id.should == 'hello'
       end
     end
 
@@ -207,7 +205,7 @@ describe Mongoid::Document do
   describe 'Hash field' do
     context 'with symbol key and value' do
       let(:church) do
-        Church.create!(location: {state: :ny})
+        Church.create!(location: { state: :ny })
       end
 
       let(:found_church) do
@@ -219,7 +217,7 @@ describe Mongoid::Document do
       end
 
       it 'stringifies the key' do
-        found_church.location.keys.should == %w(state)
+        found_church.location.keys.should == %w[state]
       end
 
       it 'retrieves value as symbol via driver' do
@@ -228,7 +226,7 @@ describe Mongoid::Document do
         church
 
         v = Church.collection.find.first
-        v['location'].should == {'state' => :ny}
+        v['location'].should == { 'state' => :ny }
       end
     end
   end
@@ -240,10 +238,10 @@ describe Mongoid::Document do
       expect(Mop.find(mop.id).regexp_field).to be_a Regexp
       expect(
         Mop.collection.find(
-          "_id" => mop.id,
-          "regexp_field" => { "$type" => 'regex' }
+          '_id' => mop.id,
+          'regexp_field' => { '$type' => 'regex' }
         ).count
-      ).to be == 1
+      ).to eq 1
     end
   end
 
@@ -254,10 +252,10 @@ describe Mongoid::Document do
       expect(Mop.find(mop.id).bson_regexp_field).to be_a BSON::Regexp::Raw
       expect(
         Mop.collection.find(
-          "_id" => mop.id,
-          "bson_regexp_field" => { "$type" => 'regex' }
+          '_id' => mop.id,
+          'bson_regexp_field' => { '$type' => 'regex' }
         ).count
-      ).to be == 1
+      ).to eq 1
     end
   end
 end

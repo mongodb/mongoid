@@ -1,4 +1,3 @@
-# rubocop:todo all
 def standard_dependencies
   gem 'rake'
 
@@ -49,7 +48,7 @@ def standard_dependencies
     end
   end
 
-  if ENV['FLE'] == 'helper'
-    gem 'libmongocrypt-helper', '~> 1.14.0'
-  end
+  return unless ENV['FLE'] == 'helper'
+
+  gem 'libmongocrypt-helper', '~> 1.14.0'
 end

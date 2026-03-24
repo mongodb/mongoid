@@ -1,54 +1,49 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Persistable::Renamable do
-
-  describe "#rename" do
-
-    context "when the document is a root document" do
-
-      shared_examples_for "a renamable root document" do
-
-        it "renames the first field" do
-          expect(person.salutation).to eq("sir")
+  describe '#rename' do
+    context 'when the document is a root document' do
+      shared_examples_for 'a renamable root document' do
+        it 'renames the first field' do
+          expect(person.salutation).to eq('sir')
         end
 
-        it "removes the first original value" do
+        it 'removes the first original value' do
           expect(person.title).to be_nil
         end
 
-        it "renames the second field" do
+        it 'renames the second field' do
           expect(person.date_of_birth.to_date).to eq(date)
         end
 
-        it "removes the second original value" do
+        it 'removes the second original value' do
           expect(person.dob).to be_nil
         end
 
-        it "returns self object" do
+        it 'returns self object' do
           expect(rename).to eq(person)
         end
 
-        it "persists the first rename" do
-          expect(person.reload.salutation).to eq("sir")
+        it 'persists the first rename' do
+          expect(person.reload.salutation).to eq('sir')
         end
 
-        it "persists the first original removal" do
+        it 'persists the first original removal' do
           expect(person.reload.title).to be_nil
         end
 
-        it "persists the second rename" do
+        it 'persists the second rename' do
           expect(person.reload.date_of_birth.to_date).to eq(date)
         end
 
-        it "persists the second original removal" do
+        it 'persists the second original removal' do
           expect(person.reload.dob).to be_nil
         end
 
-        it "clears out the dirty changes" do
-          expect(person).to_not be_changed
+        it 'clears out the dirty changes' do
+          expect(person).not_to be_changed
         end
       end
 
@@ -57,54 +52,50 @@ describe Mongoid::Persistable::Renamable do
       end
 
       let(:person) do
-        Person.create!(title: "sir", dob: date)
+        Person.create!(title: 'sir', dob: date)
       end
 
-      context "when provided symbol names" do
-
+      context 'when provided symbol names' do
         let!(:rename) do
           person.rename(title: :salutation, dob: :date_of_birth)
         end
 
-        it_behaves_like "a renamable root document"
+        it_behaves_like 'a renamable root document'
       end
 
-      context "when provided string names" do
-
+      context 'when provided string names' do
         let!(:rename) do
-          person.rename(title: "salutation", dob: "date_of_birth")
+          person.rename(title: 'salutation', dob: 'date_of_birth')
         end
 
-        it_behaves_like "a renamable root document"
+        it_behaves_like 'a renamable root document'
       end
     end
 
-    context "when the document is embedded" do
-
-      shared_examples_for "a renamable embedded document" do
-
-        it "renames the first field" do
-          expect(name.mi).to eq("blah")
+    context 'when the document is embedded' do
+      shared_examples_for 'a renamable embedded document' do
+        it 'renames the first field' do
+          expect(name.mi).to eq('blah')
         end
 
-        it "removes the first original value" do
+        it 'removes the first original value' do
           expect(name.middle).to be_nil
         end
 
-        it "returns self object" do
+        it 'returns self object' do
           expect(rename).to eq(name)
         end
 
-        it "persists the first rename" do
-          expect(name.reload.mi).to eq("blah")
+        it 'persists the first rename' do
+          expect(name.reload.mi).to eq('blah')
         end
 
-        it "persists the first original removal" do
+        it 'persists the first original removal' do
           expect(name.reload.middle).to be_nil
         end
 
-        it "clears out the dirty changes" do
-          expect(name).to_not be_changed
+        it 'clears out the dirty changes' do
+          expect(name).not_to be_changed
         end
       end
 
@@ -113,70 +104,66 @@ describe Mongoid::Persistable::Renamable do
       end
 
       let(:name) do
-        person.create_name(first_name: "test", last_name: "user", middle: "blah")
+        person.create_name(first_name: 'test', last_name: 'user', middle: 'blah')
       end
 
-      context "when provided symbol names" do
-
+      context 'when provided symbol names' do
         let!(:rename) do
           name.rename(middle: :mi)
         end
 
-        it_behaves_like "a renamable embedded document"
+        it_behaves_like 'a renamable embedded document'
       end
 
-      context "when provided string names" do
-
+      context 'when provided string names' do
         let!(:rename) do
-          name.rename(middle: "mi")
+          name.rename(middle: 'mi')
         end
 
-        it_behaves_like "a renamable embedded document"
+        it_behaves_like 'a renamable embedded document'
       end
     end
 
-    context "when executing atomically" do
-
+    context 'when executing atomically' do
       let(:person) do
-        Person.create!(title: "sir")
+        Person.create!(title: 'sir')
       end
 
-      it "marks a dirty change for the renamed fields" do
+      it 'marks a dirty change for the renamed fields' do
         person.atomically do
           person.rename title: :salutation
-          expect(person.changes).to eq({"title" => ["sir", nil], "salutation" => [nil, "sir"]})
+          expect(person.changes).to eq({ 'title' => [ 'sir', nil ], 'salutation' => [ nil, 'sir' ] })
         end
       end
     end
 
-    context "when executing on a readonly document" do
-
+    context 'when executing on a readonly document' do
       let(:person) do
-        Person.create!(title: "sir")
+        Person.create!(title: 'sir')
       end
 
-      context "when legacy_readonly is true" do
+      context 'when legacy_readonly is true' do
         config_override :legacy_readonly, true
 
         before do
-          person.__selected_fields = { "test_array" => 1 }
+          person.__selected_fields = { 'test_array' => 1 }
         end
 
-        it "persists the changes" do
+        it 'persists the changes' do
           expect(person).to be_readonly
           person.rename title: :salutation
-          expect(person.reload.salutation).to eq("sir")
+          expect(person.reload.salutation).to eq('sir')
         end
       end
 
-      context "when legacy_readonly is false" do
+      context 'when legacy_readonly is false' do
         config_override :legacy_readonly, false
 
         before do
           person.readonly!
         end
 
-        it "raises a ReadonlyDocument error" do
+        it 'raises a ReadonlyDocument error' do
           expect(person).to be_readonly
           expect do
             person.rename(title: :salutation)

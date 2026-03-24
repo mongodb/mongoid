@@ -1,20 +1,19 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
-require_relative './has_and_belongs_to_many_models'
+require 'spec_helper'
+require_relative 'has_and_belongs_to_many_models'
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany do
   context 'when projecting with #only' do
     before do
       contract = HabtmmContract.create!(item: 'foo')
-      contract.signatures << HabtmmSignature.create!(contracts: [contract], name: 'Dave', year: 2019)
+      contract.signatures << HabtmmSignature.create!(contracts: [ contract ], name: 'Dave', year: 2019)
       contract.save!
     end
 
     let(:contract) do
       HabtmmContract.where(item: 'foo').only(:signature_ids,
-        'signatures._id', 'signatures.name').first
+                                             'signatures._id', 'signatures.name').first
     end
 
     let(:signature) { contract.signatures.first }
@@ -27,7 +26,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
       expect do
         signature.year
       end.to raise_error(Mongoid::Errors::AttributeNotLoaded)
-      expect(signature.attributes.keys).to eq(['_id', 'name'])
+      expect(signature.attributes.keys).to eq(%w[_id name])
     end
 
     # Delete this test when https://jira.mongodb.org/browse/MONGOID-4704 is

@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Array class.
         module Array
-
           # Combine the two objects using the add strategy.
           #
           # @example Add the object to the array.
@@ -27,7 +24,9 @@ module Mongoid
           #   [ 1, 2 ].__array__
           #
           # @return [ Array ] self
-          def __array__; self; end
+          def __array__
+            self
+          end
 
           # Makes a deep copy of the array, deep copying every element inside the
           # array.
@@ -93,9 +92,8 @@ module Mongoid
           #
           # @return [ Hash ] The array as sort criterion.
           def __sort_option__
-            multi.inject({}) do |options, criteria|
+            multi.each_with_object({}) do |criteria, options|
               options.merge!(criteria.__sort_pair__)
-              options
             end
           end
 
@@ -120,11 +118,10 @@ module Mongoid
           #
           # @return [ Array ] The multi-dimensional array.
           def multi
-            first.is_a?(::Symbol) || first.is_a?(::String) ? [ self ] : self
+            (first.is_a?(::Symbol) || first.is_a?(::String)) ? [ self ] : self
           end
 
           module ClassMethods
-
             # Evolve the object when the serializer is defined as an array.
             #
             # @example Evolve the object.
@@ -148,5 +145,5 @@ module Mongoid
   end
 end
 
-::Array.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Array)
-::Array.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Array::ClassMethods)
+Array.include Mongoid::Criteria::Queryable::Extensions::Array
+Array.extend Mongoid::Criteria::Queryable::Extensions::Array::ClassMethods

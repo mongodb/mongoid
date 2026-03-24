@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Tasks
@@ -33,7 +32,7 @@ module Mongoid
           kms_providers: kms_providers
         )
         client_encryption_opts = {}.tap do |opts|
-          opts[:key_alt_names] = [key_alt_name] if key_alt_name
+          opts[:key_alt_names] = [ key_alt_name ] if key_alt_name
         end
         data_key_id = client_encryption.create_data_key(kms_provider_name, client_encryption_opts)
         {
@@ -58,27 +57,23 @@ module Mongoid
       def prepare_arguments(kms_provider_name, client_name)
         client = (client_name || 'default').to_s
         client_options = Mongoid.clients[client]
-        unless client_options.is_a?(Hash)
-          raise Errors::NoClientConfig.new(client)
-        end
+        raise Errors::NoClientConfig.new(client) unless client_options.is_a?(Hash)
+
         auto_encryption_options = client_options.dig(:options, :auto_encryption_options)
-        unless auto_encryption_options.is_a?(Hash)
-          raise Errors::InvalidAutoEncryptionConfiguration.new(client)
-        end
+        raise Errors::InvalidAutoEncryptionConfiguration.new(client) unless auto_encryption_options.is_a?(Hash)
+
         key_vault_namespace = auto_encryption_options[:key_vault_namespace]
-        unless key_vault_namespace.is_a?(String)
-          raise Errors::InvalidAutoEncryptionConfiguration.new(client)
-        end
+        raise Errors::InvalidAutoEncryptionConfiguration.new(client) unless key_vault_namespace.is_a?(String)
+
         kms_providers = auto_encryption_options[:kms_providers]
-        unless kms_providers.is_a?(Hash)
-          raise Errors::InvalidAutoEncryptionConfiguration.new(client)
-        end
+        raise Errors::InvalidAutoEncryptionConfiguration.new(client) unless kms_providers.is_a?(Hash)
+
         valid_kms_provider_name = get_kms_provider_name(kms_provider_name, kms_providers)
         unless kms_providers.key?(valid_kms_provider_name)
           raise Errors::InvalidAutoEncryptionConfiguration.new(client, valid_kms_provider_name)
         end
 
-        [valid_kms_provider_name, kms_providers, key_vault_namespace]
+        [ valid_kms_provider_name, kms_providers, key_vault_namespace ]
       end
 
       # Get kms provider name to use for creating a data key.

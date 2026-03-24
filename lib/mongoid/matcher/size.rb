@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $size expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/size/
     #
     # @api private
     module Size
-
       # Returns whether a value satisfies a $size expression.
       #
       # @param [ true | false ] exists Not used.
@@ -19,7 +16,7 @@ module Mongoid
       # @return [ true | false ] Whether the value matches.
       #
       # @api private
-      module_function def matches?(exists, value, condition)
+      module_function def matches?(_exists, value, condition)
         case condition
         when Float
           raise Errors::InvalidQuery, "$size argument must be a non-negative integer: #{Errors::InvalidQuery.truncate_expr(condition)}"
@@ -31,7 +28,7 @@ module Mongoid
           raise Errors::InvalidQuery, "$size argument must be a non-negative integer: #{Errors::InvalidQuery.truncate_expr(condition)}"
         end
 
-        if Array === value
+        if value.is_a?(Array)
           value.length == condition
         else
           false

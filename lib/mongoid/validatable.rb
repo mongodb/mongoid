@@ -1,18 +1,16 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/validatable/macros"
-require "mongoid/validatable/localizable"
-require "mongoid/validatable/associated"
-require "mongoid/validatable/format"
-require "mongoid/validatable/length"
-require "mongoid/validatable/numericality"
-require "mongoid/validatable/queryable"
-require "mongoid/validatable/presence"
-require "mongoid/validatable/uniqueness"
+require 'mongoid/validatable/macros'
+require 'mongoid/validatable/localizable'
+require 'mongoid/validatable/associated'
+require 'mongoid/validatable/format'
+require 'mongoid/validatable/length'
+require 'mongoid/validatable/numericality'
+require 'mongoid/validatable/queryable'
+require 'mongoid/validatable/presence'
+require 'mongoid/validatable/uniqueness'
 
 module Mongoid
-
   # This module provides additional validations that ActiveModel does not
   # provide: validates_associated and validates_uniqueness_of.
   module Validatable
@@ -58,7 +56,7 @@ module Mongoid
     #
     # @return [ true | false ] If we are validating.
     def performing_validations?(options = {})
-      options[:validate].nil? ? true : options[:validate]
+      options[:validate].nil? || options[:validate]
     end
 
     # Overrides the default ActiveModel behavior since we need to handle
@@ -97,7 +95,7 @@ module Mongoid
     #
     # @return [ true | false ] True if valid, false if not.
     def valid?(context = nil)
-      super context ? context : (new_record? ? :create : :update)
+      super(context || (new_record? ? :create : :update))
     end
 
     # Used to prevent infinite loops in associated validations.
@@ -121,7 +119,6 @@ module Mongoid
     end
 
     module ClassMethods
-
       # Adds an associated validator for the association if the validate option
       # was not provided or set to true.
       #
@@ -130,9 +127,9 @@ module Mongoid
       #
       # @param [ Mongoid::Association::Relatable ] association The association metadata.
       def validates_relation(association)
-        if association.validate?
-          validates_associated(association.name)
-        end
+        return unless association.validate?
+
+        validates_associated(association.name)
       end
 
       # Add validation with the supplied validators for the provided fields
@@ -151,9 +148,7 @@ module Mongoid
         if args.first == PresenceValidator
           args.last[:attributes].each do |name|
             association = relations[name.to_s]
-            if association && association.autosave?
-              Association::Referenced::AutoSave.define_autosave!(association)
-            end
+            Association::Referenced::AutoSave.define_autosave!(association) if association && association.autosave?
           end
         end
         super

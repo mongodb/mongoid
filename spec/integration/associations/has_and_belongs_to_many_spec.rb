@@ -1,16 +1,17 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
 module HabtmSpec
   class Page
     include Mongoid::Document
+
     embeds_many :blocks, class_name: 'HabtmSpec::Block'
   end
 
   class Block
     include Mongoid::Document
+
     embedded_in :page, class_name: 'HabtmSpec::Page'
   end
 
@@ -21,6 +22,7 @@ module HabtmSpec
 
   class Attachment
     include Mongoid::Document
+
     field :file, type: String
   end
 
@@ -49,7 +51,7 @@ module HabtmSpec
     include Mongoid::Document
 
     field :name, type: String
-    
+
     has_and_belongs_to_many :items, class_name: 'HabtmSpec::Item', inverse_of: :colors
     has_and_belongs_to_many :beams, class_name: 'HabtmSpec::Beam', inverse_of: :colors
 
@@ -58,18 +60,18 @@ module HabtmSpec
 end
 
 describe 'has_and_belongs_to_many associations' do
-
   context 'when an anonymous class defines a has_and_belongs_to_many association' do
     let(:klass) do
       Class.new do
         include Mongoid::Document
+
         has_and_belongs_to_many :movies, inverse_of: nil
       end
     end
 
     it 'loads the association correctly' do
-      expect { klass }.to_not raise_error
-      expect { klass.new.movies }.to_not raise_error
+      expect { klass }.not_to raise_error
+      expect { klass.new.movies }.not_to raise_error
       expect(klass.new.movies.build).to be_a Movie
     end
   end
@@ -80,11 +82,12 @@ describe 'has_and_belongs_to_many associations' do
     let(:page) { HabtmSpec::Page.create! }
 
     let(:image_block) do
-      image_block = page.blocks.build({
-        _type: 'HabtmSpec::ImageBlock',
-        attachment_ids: [ attachment.id.to_s ],
-        attachments_attributes: { '1234' => { file: 'bar.jpg', id: attachment.id.to_s } }
-      })
+      page.blocks.build({
+                          _type: 'HabtmSpec::ImageBlock',
+                          attachment_ids: [ attachment.id.to_s ],
+                          attachments_attributes: { '1234' => { file: 'bar.jpg',
+                                                                id: attachment.id.to_s } }
+                        })
     end
 
     it 'does not raise on save' do
@@ -111,7 +114,7 @@ describe 'has_and_belongs_to_many associations' do
               beams_attributes: [
                 {
                   _id: beam.id,
-                  name: updated_beam_name,
+                  name: updated_beam_name
                 }
               ]
             }
@@ -122,7 +125,7 @@ describe 'has_and_belongs_to_many associations' do
       context 'when the beam is invalid' do
         let(:updated_beam_name) { '' } # invalid value
 
-        it 'will not save the parent' do
+        it 'does not save the parent' do
           expect(item.update(attributes)).to be_falsey
           expect(item.errors).not_to be_empty
           expect(item.reload.title).not_to eq(updated_item_title)
@@ -131,7 +134,7 @@ describe 'has_and_belongs_to_many associations' do
       end
 
       context 'when the beam is valid' do
-        it 'will save the parent' do
+        it 'saves the parent' do
           expect(item.update(attributes)).to be_truthy
           expect(item.errors).to be_empty
           expect(item.reload.title).to eq(updated_item_title)

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Order
   include Mongoid::Document
+
   field :status, type: Mongoid::StringifiedSymbol
 
   # This is a dummy field that verifies the Mongoid::Fields::StringifiedSymbol

@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
-
       # Mixin module included into Mongoid::Document which adds
       # the ability to cache the count of opposite-side documents
       # in referenced n-to-many associations.
@@ -26,7 +24,6 @@ module Mongoid
         end
 
         module ClassMethods
-
           # Reset the given counter using the .count() query from the
           # db. This method is useful in case that a counter got
           # corrupted, or a new counter was added to the collection.
@@ -56,7 +53,7 @@ module Mongoid
           # @param [ String ] id The id of the object to update.
           # @param [ Hash ] counters
           def update_counters(id, counters)
-            where(:_id => id).inc(counters)
+            where(_id: id).inc(counters)
           end
 
           # Increment the counter name from the entries that match the
@@ -113,12 +110,10 @@ module Mongoid
                   end
                 end
 
-                if record = __send__(name)
-                  unless current.nil?
-                    record[cache_column] = (record[cache_column] || 0) + 1
-                    record.class.with(record.persistence_context) do |_class|
-                      _class.increment_counter(cache_column, current) if record.persisted?
-                    end
+                if (record = __send__(name)) && !current.nil?
+                  record[cache_column] = (record[cache_column] || 0) + 1
+                  record.class.with(record.persistence_context) do |_class|
+                    _class.increment_counter(cache_column, current) if record.persisted?
                   end
                 end
               end

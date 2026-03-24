@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Timestamps::Timeless do
-
-  describe "#timeless" do
-
+  describe '#timeless' do
     before(:all) do
       class Chicken
         include Mongoid::Document
@@ -30,8 +27,7 @@ describe Mongoid::Timestamps::Timeless do
       Object.send(:remove_const, :Egg)
     end
 
-    context "when timeless is used on one instance and then not used on another instance" do
-
+    context 'when timeless is used on one instance and then not used on another instance' do
       let!(:first_instance) do
         egg = Egg.create!
         egg.timeless.save!
@@ -43,47 +39,42 @@ describe Mongoid::Timestamps::Timeless do
       end
 
       it "second instance's created_at is not nil" do
-        expect(second_instance.created_at).to_not be_nil
+        expect(second_instance.created_at).not_to be_nil
       end
     end
 
-    context "when others persist in the scope of the chain" do
-
-      context "when the root executes normally" do
-
+    context 'when others persist in the scope of the chain' do
+      context 'when the root executes normally' do
         let!(:chicken) do
           Chicken.create!
         end
 
-        it "creates the parent with a timestamp" do
-          expect(chicken.created_at).to_not be_nil
+        it 'creates the parent with a timestamp' do
+          expect(chicken.created_at).not_to be_nil
         end
 
-        it "creates the child with no timestamp" do
+        it 'creates the child with no timestamp' do
           expect(Egg.last.created_at).to be_nil
         end
       end
 
-      context "when the root executes timeless" do
-
+      context 'when the root executes timeless' do
         let!(:chicken) do
           Chicken.timeless.create!
         end
 
-        it "creates the parent with a timestamp" do
+        it 'creates the parent with a timestamp' do
           expect(chicken.created_at).to be_nil
         end
 
-        it "creates the child with no timestamp" do
+        it 'creates the child with no timestamp' do
           expect(Egg.last.created_at).to be_nil
         end
       end
     end
 
-    context "when used as a proxy method" do
-
-      context "when used on the document instance" do
-
+    context 'when used as a proxy method' do
+      context 'when used on the document instance' do
         let(:document) do
           Dokument.new
         end
@@ -92,56 +83,53 @@ describe Mongoid::Timestamps::Timeless do
           document.timeless.save!
         end
 
-        it "does not set the created timestamp" do
+        it 'does not set the created timestamp' do
           expect(document.created_at).to be_nil
         end
 
-        it "does not set the updated timestamp" do
+        it 'does not set the updated timestamp' do
           expect(document.updated_at).to be_nil
         end
 
-        it "clears out the timeless option after save" do
-          expect(document).to_not be_timeless
+        it 'clears out the timeless option after save' do
+          expect(document).not_to be_timeless
         end
 
-        context "when subsequently persisting" do
-
+        context 'when subsequently persisting' do
           before do
-            document.update_attribute(:title, "Sir")
+            document.update_attribute(:title, 'Sir')
           end
 
-          it "sets the updated timestamp" do
-            expect(document.updated_at).to_not be_nil
+          it 'sets the updated timestamp' do
+            expect(document.updated_at).not_to be_nil
           end
         end
       end
 
-      context "when used on the class" do
-
+      context 'when used on the class' do
         let!(:document) do
           Dokument.timeless.create!
         end
 
-        it "does not set the created timestamp" do
+        it 'does not set the created timestamp' do
           expect(document.created_at).to be_nil
         end
 
-        it "does not set the updated timestamp" do
+        it 'does not set the updated timestamp' do
           expect(document.updated_at).to be_nil
         end
 
-        it "clears out the timeless option after save" do
-          expect(document).to_not be_timeless
+        it 'clears out the timeless option after save' do
+          expect(document).not_to be_timeless
         end
 
-        context "when subsequently persisting" do
-
+        context 'when subsequently persisting' do
           before do
-            document.update_attribute(:title, "Sir")
+            document.update_attribute(:title, 'Sir')
           end
 
-          it "sets the updated timestamp" do
-            expect(document.updated_at).to_not be_nil
+          it 'sets the updated timestamp' do
+            expect(document.updated_at).not_to be_nil
           end
         end
       end

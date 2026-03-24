@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to DateTime class.
         module DateTime
-
           # Evolve the date time into a mongo friendly UTC time.
           #
           # @example Evolve the date time.
@@ -16,13 +13,12 @@ module Mongoid
           #
           # @return [ Time ] The converted time in UTC.
           def __evolve_time__
-            usec = strftime("%6N").to_f
+            usec = strftime('%6N').to_f
             u = utc
             ::Time.utc(u.year, u.month, u.day, u.hour, u.min, u.sec, usec)
           end
 
           module ClassMethods
-
             # Evolve the object to an date.
             #
             # @example Evolve dates.
@@ -49,5 +45,5 @@ module Mongoid
   end
 end
 
-::DateTime.__send__(:include, Mongoid::Criteria::Queryable::Extensions::DateTime)
-::DateTime.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::DateTime::ClassMethods)
+DateTime.include Mongoid::Criteria::Queryable::Extensions::DateTime
+DateTime.extend Mongoid::Criteria::Queryable::Extensions::DateTime::ClassMethods

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for persistence operations that save documents.
     module Savable
-
       # Save the document - will perform an insert if the document is new, and
       # update if not.
       #

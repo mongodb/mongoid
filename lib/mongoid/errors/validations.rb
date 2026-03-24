@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when a persistence method ending in ! fails validation. The message
     # will contain the full error messages from the +Document+ in question.
     #
@@ -11,17 +9,17 @@ module Mongoid
     #   Validations.new(person.errors)
     class Validations < MongoidError
       attr_reader :document
-      alias :record :document
+      alias record document
 
       def initialize(document)
         @document = document
 
         super(
           compose_message(
-            "validations",
+            'validations',
             {
               document: document.class,
-              errors: document.errors.full_messages.join(", ")
+              errors: document.errors.full_messages.join(', ')
             }
           )
         )

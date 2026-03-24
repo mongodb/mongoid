@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $all expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/all/
     #
     # @api private
     module All
-
       # Returns whether a value satisfies an $all expression.
       #
       # @param [ true | false ] exists Not used.
@@ -18,8 +15,8 @@ module Mongoid
       # @return [ true | false ] Whether the value matches.
       #
       # @api private
-      module_function def matches?(exists, value, condition)
-        unless Array === condition
+      module_function def matches?(_exists, value, condition)
+        unless condition.is_a?(Array)
           raise Errors::InvalidQuery, "$all argument must be an array: #{Errors::InvalidQuery.truncate_expr(condition)}"
         end
 

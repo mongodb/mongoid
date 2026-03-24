@@ -1,33 +1,30 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Criteria::Marshalable do
-  describe "Marshal.dump" do
-
+  describe 'Marshal.dump' do
     let(:criteria) do
-      Band.where(name: "Depeche Mode")
+      Band.where(name: 'Depeche Mode')
     end
 
-    it "does not error" do
-      expect {
+    it 'does not error' do
+      expect do
         Marshal.dump(criteria)
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 
-  describe "Marshal.load" do
-
+  describe 'Marshal.load' do
     let(:criteria) do
-      Band.where(name: "Depeche Mode")
+      Band.where(name: 'Depeche Mode')
     end
 
-    it "loads the proper attributes" do
+    it 'loads the proper attributes' do
       expect(Marshal.load(Marshal.dump(criteria))).to eq(criteria)
     end
 
-    context "when it receives driver mongo1x" do
+    context 'when it receives driver mongo1x' do
       let(:dump) { Marshal.dump(criteria) }
 
       before do
@@ -38,7 +35,7 @@ describe Mongoid::Criteria::Marshalable do
         end
       end
 
-      it "raises an error" do
+      it 'raises an error' do
         expect do
           Marshal.load(dump)
         end.to raise_error(NotImplementedError, /Mongoid no longer supports marshalling with driver version 1.x./)

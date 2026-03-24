@@ -1,21 +1,20 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Account
   include Mongoid::Document
 
-  field :_id, type: String, overwrite: true, default: ->{ name.try(:parameterize) }
+  field :_id, type: String, overwrite: true, default: -> { name.try(:parameterize) }
 
   field :number, type: String
   field :balance, type: Integer
   field :nickname, type: String
   field :name, type: String
-  field :balanced, type: Mongoid::Boolean, default: ->{ balance? ? true : false }
+  field :balanced, type: Mongoid::Boolean, default: -> { balance? || false }
 
   field :overridden, type: String
 
   embeds_many :memberships
-  belongs_to :creator, class_name: "User", foreign_key: :creator_id
+  belongs_to :creator, class_name: 'User', foreign_key: :creator_id
   belongs_to :person
   has_many :alerts, autosave: false
   has_and_belongs_to_many :agents
@@ -26,7 +25,7 @@ class Account
   validates_length_of :name, maximum: 10, on: :create
 
   def overridden
-    self[:overridden] = "not recommended"
+    self[:overridden] = 'not recommended'
   end
 
   # MONGOID-3365

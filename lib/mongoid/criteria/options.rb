@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # Module containing functionality for getting options on a Criteria object.
     module Options
-
       private
 
       def persistence_context

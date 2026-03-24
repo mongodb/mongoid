@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
-
     # This is the superclass for one to one relations and defines the common
     # behavior or those proxies.
     class One < Association::Proxy
-
       # Clear this relation - same as calling #delete on the document.
       #
       # @example Clear the relation.

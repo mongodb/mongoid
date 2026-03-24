@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module defines the finder methods that hang off the document at the
   # class level.
   module Findable
@@ -16,53 +14,53 @@ module Mongoid
     # These are methods defined on the criteria that should also be accessible
     # directly from the class level.
     def_delegators :with_default_scope,
-      :aggregates,
-      :avg,
-      :create_with,
-      :distinct,
-      :each,
-      :each_with_index,
-      :eager_load,
-      :extras,
-      :fifth,
-      :fifth!,
-      :find_one_and_delete,
-      :find_one_and_replace,
-      :find_one_and_update,
-      :find_or_create_by,
-      :find_or_create_by!,
-      :find_or_initialize_by,
-      :first!,
-      :first_or_create,
-      :first_or_create!,
-      :first_or_initialize,
-      :for_js,
-      :fourth,
-      :fourth!,
-      :includes,
-      :last!,
-      :map_reduce,
-      :max,
-      :min,
-      :none,
-      :pick,
-      :pluck,
-      :raw,
-      :read,
-      :second,
-      :second!,
-      :second_to_last,
-      :second_to_last!,
-      :sum,
-      :take,
-      :take!,
-      :tally,
-      :third,
-      :third!,
-      :third_to_last,
-      :third_to_last!,
-      :update,
-      :update_all
+                   :aggregates,
+                   :avg,
+                   :create_with,
+                   :distinct,
+                   :each,
+                   :each_with_index,
+                   :eager_load,
+                   :extras,
+                   :fifth,
+                   :fifth!,
+                   :find_one_and_delete,
+                   :find_one_and_replace,
+                   :find_one_and_update,
+                   :find_or_create_by,
+                   :find_or_create_by!,
+                   :find_or_initialize_by,
+                   :first!,
+                   :first_or_create,
+                   :first_or_create!,
+                   :first_or_initialize,
+                   :for_js,
+                   :fourth,
+                   :fourth!,
+                   :includes,
+                   :last!,
+                   :map_reduce,
+                   :max,
+                   :min,
+                   :none,
+                   :pick,
+                   :pluck,
+                   :raw,
+                   :read,
+                   :second,
+                   :second!,
+                   :second_to_last,
+                   :second_to_last!,
+                   :sum,
+                   :take,
+                   :take!,
+                   :tally,
+                   :third,
+                   :third!,
+                   :third_to_last,
+                   :third_to_last!,
+                   :update,
+                   :update_all
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.
@@ -121,7 +119,7 @@ module Mongoid
     #
     # @example Determine if any documents exist
     #   Model.any?
-    #   
+    #
     # @return [ true | false ] If any documents exist.
     def any?
       limit(1).count > 0
@@ -221,9 +219,8 @@ module Mongoid
     # @return [ Document | nil ] A matching document.
     def find_by(attrs = {})
       result = where(attrs).find_first
-      if result.nil? && Mongoid.raise_not_found_error
-        raise(Errors::DocumentNotFound.new(self, attrs))
-      end
+      raise(Errors::DocumentNotFound.new(self, attrs)) if result.nil? && Mongoid.raise_not_found_error
+
       yield(result) if result && block_given?
       result
     end
@@ -242,6 +239,7 @@ module Mongoid
     def find_by!(attrs = {})
       result = where(attrs).find_first
       raise(Errors::DocumentNotFound.new(self, attrs)) unless result
+
       yield(result) if result && block_given?
       result
     end
@@ -257,7 +255,7 @@ module Mongoid
     def first(limit = nil)
       with_default_scope.first(limit)
     end
-    alias :one :first
+    alias one first
 
     # Find the last +Document+ given the conditions.
     #

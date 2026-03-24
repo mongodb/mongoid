@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
@@ -26,10 +25,9 @@ module Mongoid
       #
       # @return [ true | false ] If the other is a boolean.
       def is_a?(other)
-        if other == Mongoid::Boolean || other.class == Mongoid::Boolean
-          return true
-        end
-        super(other)
+        return true if other == Mongoid::Boolean || other.class == Mongoid::Boolean
+
+        super
       end
     end
   end

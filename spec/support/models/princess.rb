@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Princess
   include Mongoid::Document
+
   field :primary_color
   field :name, type: String
   def color

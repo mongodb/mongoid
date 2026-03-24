@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Embedded
       class EmbedsOne
-
         # Builder class for embeds_one associations.
         module Buildable
           include Threaded::Lifecycle
@@ -41,10 +39,8 @@ module Mongoid
           private
 
           def clear_associated(doc)
-            if doc && (inv = inverse(doc))
-              if associated = doc.ivar(inv)
-                associated.substitute(nil)
-              end
+            if doc && (inv = inverse(doc)) && (associated = doc.ivar(inv))
+              associated.substitute(nil)
             end
           end
         end

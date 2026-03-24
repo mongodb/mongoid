@@ -1,15 +1,14 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
-describe "Mongoid::Tasks::Encryption" do
+describe 'Mongoid::Tasks::Encryption' do
   require_enterprise
   require_libmongocrypt
   include_context 'with encryption'
   restore_config_clients
 
-  describe ".create_data_key" do
+  describe '.create_data_key' do
     let(:config) do
       {
         default: { hosts: SpecConfig.instance.addresses, database: database_id },
@@ -45,9 +44,10 @@ describe "Mongoid::Tasks::Encryption" do
         before do
           expect_any_instance_of(Mongo::ClientEncryption)
             .to receive(:create_data_key)
-                  .with('local', { key_alt_names: [key_alt_name] })
-                  .and_return(data_key_id)
+            .with('local', { key_alt_names: [ key_alt_name ] })
+            .and_return(data_key_id)
         end
+
         it 'creates a data key' do
           result = Mongoid::Tasks::Encryption.create_data_key(
             kms_provider_name: 'local',
@@ -71,9 +71,10 @@ describe "Mongoid::Tasks::Encryption" do
             before do
               expect_any_instance_of(Mongo::ClientEncryption)
                 .to receive(:create_data_key)
-                      .with('local', {})
-                      .and_return(data_key_id)
+                .with('local', {})
+                .and_return(data_key_id)
             end
+
             it 'creates a data key' do
               result = Mongoid::Tasks::Encryption.create_data_key(client_name: :encrypted)
               expect(result).to eq(
@@ -90,9 +91,10 @@ describe "Mongoid::Tasks::Encryption" do
             before do
               expect_any_instance_of(Mongo::ClientEncryption)
                 .to receive(:create_data_key)
-                      .with('local', {key_alt_names: [key_alt_name]})
-                      .and_return(data_key_id)
+                .with('local', { key_alt_names: [ key_alt_name ] })
+                .and_return(data_key_id)
             end
+
             it 'creates a data key' do
               result = Mongoid::Tasks::Encryption.create_data_key(
                 client_name: :encrypted,
@@ -114,17 +116,17 @@ describe "Mongoid::Tasks::Encryption" do
 
     context 'when the client name is incorrect' do
       it 'raises an error' do
-        expect {
+        expect do
           Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'local', client_name: :wrong_client)
-        }.to raise_error(Mongoid::Errors::NoClientConfig)
+        end.to raise_error(Mongoid::Errors::NoClientConfig)
       end
     end
 
     context 'when the client does not have auto_encryption_options' do
       it 'raises an error' do
-        expect {
+        expect do
           Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'local', client_name: :default)
-        }.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
+        end.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
       end
     end
 
@@ -146,9 +148,9 @@ describe "Mongoid::Tasks::Encryption" do
       end
 
       it 'raises an error' do
-        expect {
+        expect do
           Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'local', client_name: :encrypted)
-        }.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
+        end.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
       end
     end
 
@@ -170,17 +172,17 @@ describe "Mongoid::Tasks::Encryption" do
       end
 
       it 'raises an error' do
-        expect {
+        expect do
           Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'local', client_name: :encrypted)
-        }.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
+        end.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
       end
     end
 
     context 'when kms_providers does not include used provider' do
       it 'raises an error' do
-        expect {
+        expect do
           Mongoid::Tasks::Encryption.create_data_key(kms_provider_name: 'aws', client_name: :encrypted)
-        }.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
+        end.to raise_error(Mongoid::Errors::InvalidAutoEncryptionConfiguration)
       end
     end
   end

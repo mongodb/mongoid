@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Date class.
         module Date
-
           # Evolve the date into a mongo friendly time, UTC midnight.
           #
           # @example Evolve the date.
@@ -30,7 +27,6 @@ module Mongoid
           end
 
           module ClassMethods
-
             # Evolve the object to an date.
             #
             # @example Evolve dates.
@@ -60,5 +56,5 @@ module Mongoid
   end
 end
 
-::Date.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Date)
-::Date.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Date::ClassMethods)
+Date.include Mongoid::Criteria::Queryable::Extensions::Date
+Date.extend Mongoid::Criteria::Queryable::Extensions::Date::ClassMethods

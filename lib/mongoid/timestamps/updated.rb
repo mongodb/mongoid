@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/timestamps/updated/short"
+require 'mongoid/timestamps/updated/short'
 
 module Mongoid
   module Timestamps
@@ -24,9 +23,7 @@ module Mongoid
       # @example Set the updated at time.
       #   person.set_updated_at
       def set_updated_at
-        if able_to_set_updated_at?
-          self.updated_at = Time.current unless updated_at_changed?
-        end
+        self.updated_at = Time.current if able_to_set_updated_at? && !updated_at_changed?
 
         clear_timeless_option
       end

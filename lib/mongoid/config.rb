@@ -1,15 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/config/defaults"
-require "mongoid/config/environment"
-require "mongoid/config/options"
-require "mongoid/config/validators"
-require "mongoid/config/introspection"
-require "mongoid/config/encryption"
+require 'mongoid/config/defaults'
+require 'mongoid/config/environment'
+require 'mongoid/config/options'
+require 'mongoid/config/validators'
+require 'mongoid/config/introspection'
+require 'mongoid/config/encryption'
 
 module Mongoid
-
   # This module defines all the configuration options for Mongoid, including
   # the database connections.
   module Config
@@ -39,7 +37,7 @@ module Mongoid
     option :belongs_to_required_by_default, default: true
 
     # Set the global discriminator key.
-    option :discriminator_key, default: "_type"
+    option :discriminator_key, default: '_type'
 
     # Raise an exception when a field is redefined.
     option :duplicate_fields_exception, default: false
@@ -87,15 +85,15 @@ module Mongoid
     #
     # @note this option only has effect when BSON 5+ is present. Otherwise,
     #   the setting is ignored.
-    option :allow_bson5_decimal128, default: false, on_change: -> (allow) do
-        if BSON::VERSION >= '5.0.0'
-          if allow
-            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)
-          else
-            BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BigDecimal)
-          end
+    option :allow_bson5_decimal128, default: false, on_change: lambda { |allow|
+      if BSON::VERSION >= '5.0.0'
+        if allow
+          BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BSON::Decimal128)
+        else
+          BSON::Registry.register(BSON::Decimal128::BSON_TYPE, BigDecimal)
         end
       end
+    }
 
     # Sets the async_query_executor for the application. By default, the thread pool executor
     #   is set to `:immediate. Options are:
@@ -128,9 +126,9 @@ module Mongoid
     # Note that the `:fiber` isolation level is only supported in Ruby 3.2
     # and later, due to semantic differences in how fiber storage is handled
     # in earlier Ruby versions.
-    option :isolation_level, default: :rails, on_change: -> (level) do
+    option :isolation_level, default: :rails, on_change: lambda { |level|
       validate_isolation_level!(level)
-    end
+    }
 
     # Returns the (potentially-dereferenced) isolation level that Mongoid
     # will use to store its internal state. If `isolation_level` is set to
@@ -167,13 +165,11 @@ module Mongoid
     #
     # @api private
     def validate_isolation_level!(level)
-      unless VALID_ISOLATION_LEVELS.include?(level)
-        raise Errors::UnsupportedIsolationLevel.new(level)
-      end
+      raise Errors::UnsupportedIsolationLevel.new(level) unless VALID_ISOLATION_LEVELS.include?(level)
 
-      if level == :fiber && RUBY_VERSION < '3.2'
-        raise Errors::UnsupportedIsolationLevel.new(level)
-      end
+      return unless level == :fiber && RUBY_VERSION < '3.2'
+
+      raise Errors::UnsupportedIsolationLevel.new(level)
     end
 
     # When this flag is false, a document will become read-only only once the
@@ -295,11 +291,11 @@ module Mongoid
     #   config.connect_to("mongoid_test")
     #
     # @param [ String ] name The database name.
-    def connect_to(name, options = { read: { mode: :primary }})
+    def connect_to(name, options = { read: { mode: :primary } })
       self.clients = {
         default: {
           database: name,
-          hosts: [ "localhost:27017" ],
+          hosts: [ 'localhost:27017' ],
           options: options
         }
       }
@@ -439,12 +435,12 @@ module Mongoid
     #
     # @param [ Hash ] options The configuration options.
     def options=(options)
-      if options
-        Validators::AsyncQueryExecutor.validate(options)
-        options.each_pair do |option, value|
-          Validators::Option.validate(option)
-          send("#{option}=", value)
-        end
+      return unless options
+
+      Validators::AsyncQueryExecutor.validate(options)
+      options.each_pair do |option, value|
+        Validators::Option.validate(option)
+        send("#{option}=", value)
       end
     end
 
@@ -465,7 +461,7 @@ module Mongoid
     #
     # @return [ String ] The time zone.
     def time_zone
-      use_utc? ? "UTC" : ::Time.zone
+      use_utc? ? 'UTC' : ::Time.zone
     end
 
     # Is the application running under passenger?
@@ -491,6 +487,7 @@ module Mongoid
 
     def clients=(clients)
       raise Errors::NoClientsConfig.new unless clients
+
       c = clients.with_indifferent_access
       Validators::Client.validate(c)
       @clients = c
@@ -501,11 +498,11 @@ module Mongoid
     #
     # @return [Mongo::Client] Client according to global overrides.
     def global_client
-      client =  if Threaded.client_override
-                  Clients.with_name(Threaded.client_override)
-                else
-                  Clients.default
-                end
+      client = if Threaded.client_override
+                 Clients.with_name(Threaded.client_override)
+               else
+                 Clients.default
+               end
       if Threaded.database_override
         client.use(Threaded.database_override)
       else

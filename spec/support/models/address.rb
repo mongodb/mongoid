@@ -1,10 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Address
   include Mongoid::Document
 
-  field :_id, type: String, overwrite: true, default: ->{ street.try(:parameterize) }
+  field :_id, type: String, overwrite: true, default: -> { street.try(:parameterize) }
 
   attr_accessor :mode
 
@@ -35,10 +34,11 @@ class Address
 
   embedded_in :addressable, polymorphic: true do
     def extension
-      "Testing"
+      'Testing'
     end
+
     def doctor?
-      title == "Dr"
+      title == 'Dr'
     end
   end
 
@@ -48,12 +48,12 @@ class Address
   belongs_to :account
   belongs_to :band
 
-  scope :without_postcode, ->{ where(postcode: nil) }
-  scope :ordered, ->{ order_by(state: 1) }
-  scope :without_postcode_ordered, ->{ without_postcode.ordered }
-  scope :rodeo, ->{ where(street: "Rodeo Dr") } do
+  scope :without_postcode, -> { where(postcode: nil) }
+  scope :ordered, -> { order_by(state: 1) }
+  scope :without_postcode_ordered, -> { without_postcode.ordered }
+  scope :rodeo, -> { where(street: 'Rodeo Dr') } do
     def mansion?
-      all? { |address| address.street == "Rodeo Dr" }
+      all? { |address| address.street == 'Rodeo Dr' }
     end
   end
 
@@ -70,11 +70,11 @@ class Address
 
   class << self
     def california
-      where(state: "CA")
+      where(state: 'CA')
     end
 
     def homes
-      where(address_type: "Home")
+      where(address_type: 'Home')
     end
 
     def streets

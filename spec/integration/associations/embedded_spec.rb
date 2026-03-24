@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 require_relative '../../mongoid/association/embedded/embeds_many_models'
@@ -18,25 +17,25 @@ describe 'embedded associations' do
     shared_examples_for 'an embedded association' do
       it 'adds child documents to parent association object' do
         legislator
-        congress.legislators._target.should == [legislator]
+        congress.legislators._target.should == [ legislator ]
       end
 
       it 'adds child documents to parent association object criteria' do
         legislator
-        congress.legislators.criteria.documents.should == [legislator]
+        congress.legislators.criteria.documents.should == [ legislator ]
       end
 
       it 'populates documents on parent association object' do
-        congress.legislators.documents.should == [legislator]
+        congress.legislators.documents.should == [ legislator ]
       end
 
       it 'returns created child when referencing embedded association' do
-        congress.legislators.should == [legislator]
+        congress.legislators.should == [ legislator ]
       end
 
       it 'returns created child when referencing Criteria created from embedded association' do
         congress.legislators.all.should be_a(Mongoid::Criteria)
-        congress.legislators.all.to_a.should == [legislator]
+        congress.legislators.all.to_a.should == [ legislator ]
       end
     end
 
@@ -71,32 +70,32 @@ describe 'embedded associations' do
 
     shared_examples_for 'adds child documents to parent association' do
       it 'adds child documents to parent association' do
-        manufactory.products._target.should == [product]
+        manufactory.products._target.should == [ product ]
       end
     end
 
     shared_examples_for 'an embedded association' do
       it 'adds child documents to parent association object' do
         product
-        manufactory.products._target.should == [product]
+        manufactory.products._target.should == [ product ]
       end
 
       it 'adds child documents to parent association object criteria' do
         product
-        manufactory.products.criteria.documents.should == [product]
+        manufactory.products.criteria.documents.should == [ product ]
       end
 
       it 'populates documents on parent association object' do
-        manufactory.products.documents.should == [product]
+        manufactory.products.documents.should == [ product ]
       end
 
       it 'returns created child when referencing embedded association' do
-        manufactory.products.should == [product]
+        manufactory.products.should == [ product ]
       end
 
       it 'returns created child when referencing Criteria created from embedded association' do
         manufactory.products.all.should be_a(Mongoid::Criteria)
-        manufactory.products.all.to_a.should == [product]
+        manufactory.products.all.to_a.should == [ product ]
       end
     end
 
@@ -111,7 +110,7 @@ describe 'embedded associations' do
     context 'when association is loaded' do
       before do
         # This query must be before the product is created
-        manufactory.products.where(name: "Car").first
+        manufactory.products.where(name: 'Car').first
 
         product
       end
@@ -126,7 +125,6 @@ describe 'embedded associations' do
     end
 
     context 'embeds_one' do
-
       shared_examples 'is set' do
         it 'is set' do
           parent.child = child_cls.new
@@ -150,7 +148,6 @@ describe 'embedded associations' do
     end
 
     context 'embeds_many' do
-
       let(:child) { parent.legislators.new }
 
       shared_examples 'is set' do
@@ -217,7 +214,7 @@ describe 'embedded associations' do
       end
 
       context 'embeds_many' do
-        let(:parent) { EmmCongress.create!(legislators: [EmmLegislator.new]) }
+        let(:parent) { EmmCongress.create!(legislators: [ EmmLegislator.new ]) }
 
         it 'updates' do
           first_updated_at = parent.updated_at
@@ -245,7 +242,7 @@ describe 'embedded associations' do
       end
 
       context 'embeds_many' do
-        let(:parent) { EmmCongress.create!(legislators: [EmmLegislator.new]) }
+        let(:parent) { EmmCongress.create!(legislators: [ EmmLegislator.new ]) }
 
         it 'updates' do
           pending 'https://jira.mongodb.org/browse/MONGOID-3252'
@@ -261,8 +258,9 @@ describe 'embedded associations' do
     end
   end
 
-  context "when summing properties on an embedded child" do
+  context 'when summing properties on an embedded child' do
     let(:user) { EmmUser.new }
+
     before do
       user.orders.build(amount: 200)
       expect(user.orders.sum(:amount)).to eq(200)
@@ -271,7 +269,7 @@ describe 'embedded associations' do
       user.orders.build(amount: 500)
     end
 
-    it "the cache is cleared after deletion" do
+    it 'the cache is cleared after deletion' do
       expect(user.orders.sum(:amount)).to eq(500)
     end
   end
@@ -279,10 +277,10 @@ describe 'embedded associations' do
   context 'when modifying an embedded document & removing another embedded document' do
     let(:user) do
       EmmUser.create!(orders: [
-        EmmOrder.new(sku: 0, amount: 0),
-        EmmOrder.new(sku: 1, amount: 1),
-        EmmOrder.new(sku: 2, amount: 2),
-      ])
+                        EmmOrder.new(sku: 0, amount: 0),
+                        EmmOrder.new(sku: 1, amount: 1),
+                        EmmOrder.new(sku: 2, amount: 2)
+                      ])
     end
 
     context 'when modifying first and removing second' do
@@ -292,9 +290,9 @@ describe 'embedded associations' do
         user.save!
         user.reload
 
-        user.orders.map do
-          |order| [order.sku, order.amount]
-        end.should == [[1, 10], [2, 2]]
+        user.orders.map do |order|
+          [ order.sku, order.amount ]
+        end.should == [ [ 1, 10 ], [ 2, 2 ] ]
       end
     end
 
@@ -305,9 +303,9 @@ describe 'embedded associations' do
         user.save!
         user.reload
 
-        user.orders.map do
-          |order| [order.sku, order.amount]
-        end.should == [[1, 1], [2, 20]]
+        user.orders.map do |order|
+          [ order.sku, order.amount ]
+        end.should == [ [ 1, 1 ], [ 2, 20 ] ]
       end
     end
   end
@@ -315,37 +313,37 @@ describe 'embedded associations' do
   context 'when modifying a nested embedded document & removing another nested embedded document' do
     let(:user) do
       EmmUser.create!(orders: [
-        EmmOrder.new(sku: 0, surcharges: [EmmSurcharge.new(amount: 0)]),
-        EmmOrder.new(sku: 1, surcharges: [EmmSurcharge.new(amount: 1)]),
-        EmmOrder.new(sku: 2, surcharges: [EmmSurcharge.new(amount: 2)]),
-      ])
+                        EmmOrder.new(sku: 0, surcharges: [ EmmSurcharge.new(amount: 0) ]),
+                        EmmOrder.new(sku: 1, surcharges: [ EmmSurcharge.new(amount: 1) ]),
+                        EmmOrder.new(sku: 2, surcharges: [ EmmSurcharge.new(amount: 2) ])
+                      ])
     end
 
     context 'when modifying first and removing second' do
       it 'works correctly' do
         pending 'MONGOID-5364'
 
-        user.orders[1].assign_attributes(surcharges: [amount: 10])
+        user.orders[1].assign_attributes(surcharges: [ { amount: 10 } ])
         user.orders[0].destroy
         user.save!
         user.reload
 
-        user.orders.map do
-          |order| [order.sku, order.surcharges.first.amount]
-        end.should == [[1, 10], [2, 2]]
+        user.orders.map do |order|
+          [ order.sku, order.surcharges.first.amount ]
+        end.should == [ [ 1, 10 ], [ 2, 2 ] ]
       end
     end
 
     context 'when removing first and modifying second' do
       it 'works correctly' do
         user.orders[0].destroy
-        user.orders[1].assign_attributes(surcharges: [amount: 20])
+        user.orders[1].assign_attributes(surcharges: [ { amount: 20 } ])
         user.save!
         user.reload
 
-        user.orders.map do
-          |order| [order.sku, order.surcharges.first.amount]
-        end.should == [[1, 1], [2, 20]]
+        user.orders.map do |order|
+          [ order.sku, order.surcharges.first.amount ]
+        end.should == [ [ 1, 1 ], [ 2, 20 ] ]
       end
     end
   end

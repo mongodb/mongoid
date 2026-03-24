@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
-
       # This is a smart hash for use with options and selectors.
       class Smash < Hash
-
         # @attribute [r] aliases The aliases.
         attr_reader :aliases
 
@@ -85,7 +82,7 @@ module Mongoid
         #
         # @return [ String ] The normalized key.
         def localized_key(name, serializer)
-          serializer && serializer.localized? ? "#{name}.#{::I18n.locale}" : name
+          (serializer && serializer.localized?) ? "#{name}.#{::I18n.locale}" : name
         end
 
         # Get the pair of objects needed to store the value in a hash by the
@@ -105,8 +102,6 @@ module Mongoid
           name = Fields.database_field_name(field, associations, aliases, aliased_associations)
           [ name, get_serializer(name) ]
         end
-
-        private
 
         # Retrieves the serializer for the given name. If the name exists in
         # the serializers hash then return that immediately, otherwise

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
@@ -7,11 +6,13 @@ module RefHasManySpec
   module OverrideInitialize
     class Parent
       include Mongoid::Document
+
       has_many :children, inverse_of: :parent
     end
 
     class Child
       include Mongoid::Document
+
       belongs_to :parent
       field :name, type: String
 
@@ -736,7 +737,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         let(:child)  { parent.children.send(method) }
 
         it 'calls #initialize' do
-          expect(child.name).to be == 'default'
+          expect(child.name).to eq 'default'
         end
       end
 
@@ -2548,9 +2549,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     let(:post_two) { Post.create!(rating: 10) }
 
     let(:max) do
-      person.posts.max do |a, b|
-        a.rating <=> b.rating
-      end
+      person.posts.max_by(&:rating)
     end
 
     before do
@@ -2635,9 +2634,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     let(:post_two) { Post.create!(rating: 10) }
 
     let(:min) do
-      person.posts.min do |a, b|
-        a.rating <=> b.rating
-      end
+      person.posts.min_by(&:rating)
     end
 
     before do
@@ -3257,7 +3254,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       shared_examples_for 'a cache_version generator' do
         it 'produces a trivial cache_version' do
-          expect(posts.cache_version).to be == "#{posts.length}"
+          expect(posts.cache_version).to eq "#{posts.length}"
         end
       end
 
@@ -3306,7 +3303,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       shared_examples_for 'a cache_version generator' do
         it 'produces a consistent cache_version' do
           expect(child_pages.cache_version).not_to be_nil
-          expect(child_pages.cache_version).to be == child_pages.cache_version
+          expect(child_pages.cache_version).to eq child_pages.cache_version
         end
       end
 
@@ -3319,6 +3316,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
         context 'when the relation is not empty' do
           let(:root) { prepopulated_root }
+
           it_behaves_like 'a cache_version generator'
         end
       end
@@ -3332,6 +3330,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
         context 'when the relation is not empty' do
           let(:root) { prepopulated_root }
+
           it_behaves_like 'a cache_version generator'
         end
       end
@@ -3345,7 +3344,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         let(:root) { prepopulated_root }
 
         it 'changes the cache_version' do
-          expect(original_cache_version).not_to be == updated_cache_version
+          expect(original_cache_version).not_to eq updated_cache_version
         end
       end
 
@@ -3358,7 +3357,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         let(:root) { prepopulated_root }
 
         it 'changes the cache_version' do
-          expect(original_cache_version).not_to be == updated_cache_version
+          expect(original_cache_version).not_to eq updated_cache_version
         end
       end
 
@@ -3371,7 +3370,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         let(:root) { prepopulated_root }
 
         it 'changes the cache_version' do
-          expect(original_cache_version).not_to be == updated_cache_version
+          expect(original_cache_version).not_to eq updated_cache_version
         end
       end
     end

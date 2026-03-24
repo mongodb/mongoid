@@ -1,14 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Warnings do
-
-  describe ".warn_*" do
-
-    context "when calling a warn_* method" do
-
+  describe '.warn_*' do
+    context 'when calling a warn_* method' do
       let(:id) { :geo_haystack_deprecated }
       let(:message) do
         'The geoHaystack type is deprecated.'
@@ -21,12 +17,12 @@ describe Mongoid::Warnings do
         end
       end
 
-      it "logs the warning" do
+      it 'logs the warning' do
         expect_any_instance_of(Logger).to receive(:warn).once.with(message)
         Mongoid::Warnings.send("warn_#{id}")
       end
 
-      it "logs the warning only once" do
+      it 'logs the warning only once' do
         expect_any_instance_of(Logger).to receive(:warn).once.with(message)
         Mongoid::Warnings.send("warn_#{id}")
         Mongoid::Warnings.send("warn_#{id}")

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module is responsible for taking update selectors and switching out
   # the indexes for the $ positional operator where appropriate.
   module Positional
-
     # Takes the provided selector and atomic operations and replaces the
     # indexes of the embedded documents with the positional operator when
     # needed.
@@ -32,11 +29,10 @@ module Mongoid
     #
     # @return [ Hash ] The new operations.
     def positionally(selector, operations, processed = {})
-      if selector.size == 1 || selector.values.any? { |val| val.nil? }
-        return operations
-      end
-      keys = selector.keys.map{ |m| m.sub('._id','') } - ['_id']
-      keys = keys.sort_by { |s| s.length*-1 }
+      return operations if selector.size == 1 || selector.values.any? { |val| val.nil? }
+
+      keys = selector.keys.map { |m| m.sub('._id', '') } - [ '_id' ]
+      keys = keys.sort_by { |s| s.length * -1 }
       process_operations(keys, operations, processed)
     end
 
@@ -62,9 +58,7 @@ module Mongoid
       matches = position.scan(/\.\d+\./)
       if matches.size == 1
         keys.each do |kk|
-          if position =~ /\A#{kk}\.\d+\.(.*)\z/
-            return "#{kk}.$.#{$1}"
-          end
+          return "#{kk}.$.#{::Regexp.last_match(1)}" if position =~ /\A#{kk}\.\d+\.(.*)\z/
         end
       end
       position

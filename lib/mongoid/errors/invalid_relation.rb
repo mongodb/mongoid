@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when trying to create an association that conflicts with
     # an already defined method.
     class InvalidRelation < MongoidError
-
       # Create the new error.
       #
       # @example Create the error.
@@ -17,15 +14,15 @@ module Mongoid
       # @param [ Symbol ] name The method name.
       def initialize(klass, name)
         super(
-            compose_message(
-                "invalid_relation",
-                {
-                    name: name,
-                    origin: origin(klass, name),
-                    file: location(klass, name)[0],
-                    line: location(klass, name)[1]
-                }
-            )
+          compose_message(
+            'invalid_relation',
+            {
+              name: name,
+              origin: origin(klass, name),
+              file: location(klass, name)[0],
+              line: location(klass, name)[1]
+            }
+          )
         )
       end
 
@@ -55,7 +52,7 @@ module Mongoid
       # @return [ Array<String, Integer> ] The location of the method.
       def location(klass, name)
         @location ||=
-            (klass.instance_method(name).source_location || [ "Unknown", 0 ])
+          klass.instance_method(name).source_location || [ 'Unknown', 0 ]
       end
     end
   end

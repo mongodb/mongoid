@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Vehicle
   include Mongoid::Document
@@ -15,5 +14,5 @@ class Vehicle
   accepts_nested_attributes_for :crates
 end
 
-require "support/models/car"
-require "support/models/truck"
+require 'support/models/car'
+require 'support/models/truck'

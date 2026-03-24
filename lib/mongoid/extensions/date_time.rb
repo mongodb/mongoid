@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Time class.
     module DateTime
-
       # Mongoize the date time into a time.
       #
       # @example Mongoize the date time.
@@ -29,7 +26,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
@@ -59,5 +55,5 @@ module Mongoid
   end
 end
 
-::DateTime.__send__(:include, Mongoid::Extensions::DateTime)
-::DateTime.extend(Mongoid::Extensions::DateTime::ClassMethods)
+DateTime.include Mongoid::Extensions::DateTime
+DateTime.extend(Mongoid::Extensions::DateTime::ClassMethods)

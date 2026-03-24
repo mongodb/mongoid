@@ -1,7 +1,5 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # Singleton module provides lookup of query operator matchers
     # related to field values.
     #
@@ -27,7 +25,7 @@ module Mongoid
         '$not' => Not,
         '$regex' => Regex,
         '$size' => Size,
-        '$type' => Type,
+        '$type' => Type
       }.freeze
 
       # Returns the matcher module for a given operator.
@@ -51,9 +49,9 @@ module Mongoid
       # @todo Refactor this as it is only relevant to $lt, $lte, $gt, $gte.
       #
       # @api private
-      module_function def apply_array_field_operator(exists, value, condition)
-        if Array === value
-          value.any? { |v| yield v }
+      module_function def apply_array_field_operator(_exists, value, _condition, &block)
+        if value.is_a?(Array)
+          value.any?(&block)
         else
           yield value
         end

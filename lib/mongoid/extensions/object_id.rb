@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to BSON::ObjectId.
     module ObjectId
-
       # Evolve the object id.
       #
       # @example Evolve the object id.
@@ -16,10 +13,9 @@ module Mongoid
       def __evolve_object_id__
         self
       end
-      alias :__mongoize_object_id__ :__evolve_object_id__
+      alias __mongoize_object_id__ __evolve_object_id__
 
       module ClassMethods
-
         # Evolve the object into a mongo-friendly value to query with.
         #
         # @example Evolve the object.
@@ -48,5 +44,5 @@ module Mongoid
   end
 end
 
-BSON::ObjectId.__send__(:include, Mongoid::Extensions::ObjectId)
+BSON::ObjectId.include Mongoid::Extensions::ObjectId
 BSON::ObjectId.extend(Mongoid::Extensions::ObjectId::ClassMethods)

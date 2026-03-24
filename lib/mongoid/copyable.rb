@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module contains the behavior of Mongoid's clone/dup of documents.
   module Copyable
     extend ActiveSupport::Concern
@@ -29,7 +27,7 @@ module Mongoid
       attrs = clone_document.except(*self.class.id_fields)
       Copyable.clone_with_hash(self.class, attrs)
     end
-    alias :dup :clone
+    alias dup clone
 
     private
 
@@ -54,9 +52,9 @@ module Mongoid
       Factory.build(klass, attrs).tap do |object|
         dynamic_attrs.each do |attr_name, value|
           assoc = object.embedded_relations[attr_name]
-          if assoc&.one? && Hash === value
+          if assoc&.one? && value.is_a?(Hash)
             object.send("#{attr_name}=", clone_with_hash(assoc.klass, value))
-          elsif assoc&.many? && Array === value
+          elsif assoc&.many? && value.is_a?(Array)
             docs = value.map { |h| clone_with_hash(assoc.klass, h) }
             object.send("#{attr_name}=", docs)
           elsif object.respond_to?("#{attr_name}=")
@@ -101,10 +99,10 @@ module Mongoid
         if association.is_a?(Association::Embedded::EmbedsMany)
           attrs[association.key].each do |attr|
             embedded_klass = if type = attr[self.class.discriminator_key]
-              association.relation_class.get_discriminator_mapping(type) || association.relation_class
-            else
-              association.relation_class
-            end
+                               association.relation_class.get_discriminator_mapping(type) || association.relation_class
+                             else
+                               association.relation_class
+                             end
             process_localized_attributes(embedded_klass, attr)
           end
         else

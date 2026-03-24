@@ -1,15 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to String class.
     module String
-
       # @attribute [rw] unconvertable_to_bson If the document is unconvertable.
       # @deprecated
       attr_accessor :unconvertable_to_bson
+
       Mongoid.deprecate(self, :unconvertable_to_bson, :unconvertable_to_bson=)
 
       # Evolve the string into an object id if possible.
@@ -60,7 +58,7 @@ module Mongoid
       #
       # @return [ String ] The string in collection friendly form.
       def collectionize
-        tableize.gsub("/", "_")
+        tableize.tr('/', '_')
       end
 
       # Is the string a valid value for a Mongoid id?
@@ -95,7 +93,7 @@ module Mongoid
       #
       # @return [ String ] The string stripped of "=".
       def reader
-        delete("=").sub(/\_before\_type\_cast\z/, '')
+        delete('=').sub(/_before_type_cast\z/, '')
       end
 
       # Is this string a writer?
@@ -105,7 +103,7 @@ module Mongoid
       #
       # @return [ true | false ] If the string contains "=".
       def writer?
-        include?("=")
+        include?('=')
       end
 
       # Is this string a valid_method_name?
@@ -125,9 +123,8 @@ module Mongoid
       #
       # @return [ true | false ] If the string ends with "_before_type_cast"
       def before_type_cast?
-        ends_with?("_before_type_cast")
+        ends_with?('_before_type_cast')
       end
-
 
       # Is the object not to be converted to bson on criteria creation?
       #
@@ -156,7 +153,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
         #
@@ -169,11 +165,11 @@ module Mongoid
         def mongoize(object)
           object.try(:to_s)
         end
-        alias :demongoize :mongoize
+        alias demongoize mongoize
       end
     end
   end
 end
 
-::String.__send__(:include, Mongoid::Extensions::String)
-::String.extend(Mongoid::Extensions::String::ClassMethods)
+String.include Mongoid::Extensions::String
+String.extend(Mongoid::Extensions::String::ClassMethods)

@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
-
     # This is the superclass for all many to one and many to many association
     # proxies.
     class Many < Association::Proxy
@@ -230,13 +228,18 @@ module Mongoid
       def compute_cache_version(timestamp_column)
         timestamp_column = timestamp_column.to_s
 
-        loaded = _target.respond_to?(:_loaded?) ?
-                    _target._loaded? :   # has_many
-                    true                 # embeds_many
+        # has_many
+        loaded = if _target.respond_to?(:_loaded?)
+                   _target._loaded?
+                 else
+                   true
+                 end # embeds_many
 
-        size, timestamp = loaded ?
-          analyze_loaded_target(timestamp_column) :
-          analyze_unloaded_target(timestamp_column)
+        size, timestamp = if loaded
+                            analyze_loaded_target(timestamp_column)
+                          else
+                            analyze_unloaded_target(timestamp_column)
+                          end
 
         if timestamp
           "#{size}-#{timestamp.utc.to_formatted_s(klass.cache_timestamp_format)}"
@@ -258,14 +261,14 @@ module Mongoid
       # $sum and a $max.
       def analyze_unloaded_target(timestamp_column)
         pipeline = criteria
-          .group(_id: nil,
-                 count: { '$sum' => 1 },
-                 latest: { '$max' => "$#{timestamp_column}" })
-          .pipeline
+                   .group(_id: nil,
+                          count: { '$sum' => 1 },
+                          latest: { '$max' => "$#{timestamp_column}" })
+                   .pipeline
 
         result = klass.collection.aggregate(pipeline).to_a.first
 
-        result ? [ result["count"], result["latest"] ] : [ 0 ]
+        result ? [ result['count'], result['latest'] ] : [ 0 ]
       end
     end
   end

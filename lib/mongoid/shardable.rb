@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module contains behavior for adding shard key fields to updates.
   module Shardable
     extend ActiveSupport::Concern
@@ -94,8 +92,8 @@ module Mongoid
     #
     # @api private
     def shard_key_field_value(field, prefer_persisted:)
-      if field.include?(".")
-        relation, remaining = field.split(".", 2)
+      if field.include?('.')
+        relation, remaining = field.split('.', 2)
         send(relation)&.shard_key_field_value(remaining, prefer_persisted: prefer_persisted)
       elsif prefer_persisted && !new_record?
         attribute_was(field)
@@ -105,7 +103,6 @@ module Mongoid
     end
 
     module ClassMethods
-
       # Specifies a shard key with the field(s) specified.
       #
       # @example Specify the shard key.
@@ -120,34 +117,28 @@ module Mongoid
       def shard_key(*args)
         unless args.first.is_a?(Hash)
           # Shorthand syntax
-          if args.last.is_a?(Hash)
-            raise ArgumentError, 'Shorthand shard_key syntax does not permit options'
-          end
+          raise ArgumentError, 'Shorthand shard_key syntax does not permit options' if args.last.is_a?(Hash)
 
           spec = Hash[args.map do |name|
-            [name, 1]
+            [ name, 1 ]
           end]
 
           return shard_key(spec)
         end
 
-        if args.length > 2
-          raise ArgumentError, 'Full shard_key syntax requires 1 or 2 arguments'
-        end
+        raise ArgumentError, 'Full shard_key syntax requires 1 or 2 arguments' if args.length > 2
 
         spec, options = args
 
         spec = Hash[spec.map do |name, value|
-          if value.is_a?(Symbol)
-            value = value.to_s
-          end
-          [database_field_name(name).to_sym, value]
+          value = value.to_s if value.is_a?(Symbol)
+          [ database_field_name(name).to_sym, value ]
         end]
 
         self.shard_key_fields = spec.keys
         self.shard_config = {
           key: spec.freeze,
-          options: (options || {}).dup.freeze,
+          options: (options || {}).dup.freeze
         }.freeze
       end
     end

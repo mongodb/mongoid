@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
@@ -12,7 +11,6 @@ module Mongoid
       #
       # @api private
       module Expandable
-
         private
 
         # Expands the specified condition to MongoDB syntax.
@@ -39,7 +37,7 @@ module Mongoid
         # @return [ Array<String, Object> ] The expanded field and value.
         def expand_one_condition(field, value)
           kv = field.__expr_part__(value.__expand_complex__, negating?)
-          [kv.keys.first.to_s, kv.values.first]
+          [ kv.keys.first.to_s, kv.values.first ]
         end
 
         # Expand criterion values to arrays, to be used with operators that
@@ -54,15 +52,12 @@ module Mongoid
         #
         # @api private
         def expand_condition_to_array_values(criterion)
-          if criterion.nil?
-            raise ArgumentError, 'Criterion cannot be nil here'
-          end
+          raise ArgumentError, 'Criterion cannot be nil here' if criterion.nil?
 
           Hash[criterion.map do |key, value|
-            [key, value.__array__]
+            [ key, value.__array__ ]
           end]
         end
-
       end
     end
   end

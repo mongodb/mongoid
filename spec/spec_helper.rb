@@ -1,12 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'lite_spec_helper'
 
-MODELS = File.join(File.dirname(__FILE__), "support/models")
+MODELS = File.join(File.dirname(__FILE__), 'support/models')
 $LOAD_PATH.unshift(MODELS)
 
-require "action_controller"
+require 'action_controller'
 require 'rspec/retry'
 
 if SpecConfig.instance.client_debug?
@@ -22,11 +21,11 @@ end
 # database names for each process running since we do not have transactions
 # and want a clean slate before each spec run.
 def database_id
-  "mongoid_test"
+  'mongoid_test'
 end
 
 def database_id_alt
-  "mongoid_test_alt"
+  'mongoid_test_alt'
 end
 
 # Helper for dynamically creating a new one-off document class, without having to
@@ -55,11 +54,11 @@ begin
   require 'support/client_registry'
   require 'mrss/constraints'
   require 'mrss/event_subscriber'
-rescue LoadError => exc
+rescue LoadError => e
   raise LoadError.new <<~MSG.strip
     The test suite requires shared tooling to be installed.
     Please refer to spec/README.md for instructions.
-    #{exc.class}: #{exc}
+    #{e.class}: #{e}
   MSG
 end
 
@@ -72,7 +71,7 @@ require 'support/macros'
 require 'support/constraints'
 require 'support/crypt'
 
-use_ssl = %w[ ssl 1 true ].include?(ENV['SSL'])
+use_ssl = %w[ ssl 1 true ].include?(ENV.fetch('SSL', nil))
 ssl_options = { ssl: use_ssl }.freeze
 
 # Give MongoDB servers time to start up in CI environments
@@ -83,7 +82,7 @@ if SpecConfig.instance.ci?
     begin
       client.command(ping: 1)
       break
-    rescue Mongo::Error::OperationFailure => e
+    rescue Mongo::Error::OperationFailure
       sleep(2)
       client.cluster.scan!
     end
@@ -102,17 +101,17 @@ CONFIG = {
         heartbeat_frequency: 180,
         user: SpecConfig.instance.uri.client_options[:user] || MONGOID_ROOT_USER.name,
         password: SpecConfig.instance.uri.client_options[:password] || MONGOID_ROOT_USER.password,
-        auth_source: Mongo::Database::ADMIN,
+        auth_source: Mongo::Database::ADMIN
       )
     }
   },
   options: {
     belongs_to_required_by_default: false,
     log_level: if SpecConfig.instance.client_debug?
-      :debug
-    else
-      :info
-    end,
+                 :debug
+               else
+                 :info
+               end
   }
 }
 
@@ -129,8 +128,8 @@ Mongoid.configure do |config|
 end
 
 # Autoload every model for the test suite that sits in spec/support/models.
-Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
-  name = File.basename(file, ".rb")
+Dir[File.join(MODELS, '*.rb')].sort.each do |file|
+  name = File.basename(file, '.rb')
   autoload name.camelize.to_sym, name
 end
 
@@ -141,17 +140,15 @@ module Mongoid
 end
 
 ActiveSupport::Inflector.inflections do |inflect|
-  inflect.irregular("canvas", "canvases")
-  inflect.singular("address_components", "address_component")
+  inflect.irregular('canvas', 'canvases')
+  inflect.singular('address_components', 'address_component')
 end
 
 Time.zone = 'UTC'
 
 I18n.config.enforce_available_locales = false
 
-if %w(yes true 1).include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
-  require "i18n/backend/fallbacks"
-end
+require 'i18n/backend/fallbacks' if %w[yes true 1].include?((ENV['TEST_I18N_FALLBACKS'] || '').downcase)
 
 unless SpecConfig.instance.atlas?
   uri_options = SpecConfig.instance.uri.uri_options.merge(server_selection_timeout: 3.03)
@@ -165,7 +162,7 @@ unless SpecConfig.instance.atlas?
     # database. This user will need to be authenticated in order to add any
     # more users to any other databases.
     client.database.users.create(MONGOID_ROOT_USER)
-  rescue Mongo::Error::OperationFailure => e
+  rescue Mongo::Error::OperationFailure
   ensure
     client.close
   end
@@ -184,11 +181,9 @@ RSpec.configure do |config|
   end
 
   # Drop all collections and clear the identity map before each spec.
-  config.before(:each) do
+  config.before do
     cluster = Mongoid.default_client.cluster
-    if cluster.load_balanced? || !cluster.connected?
-      Mongoid.default_client.reconnect
-    end
+    Mongoid.default_client.reconnect if cluster.load_balanced? || !cluster.connected?
 
     Mongoid.default_client.collections.each(&:drop)
   end
@@ -196,7 +191,6 @@ end
 
 # A subscriber to be used with the Ruby driver for testing.
 class EventSubscriber
-
   # The started events.
   attr_reader :started_events
 

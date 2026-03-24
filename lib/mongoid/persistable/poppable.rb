@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for $pop operations.
     module Poppable
       extend ActiveSupport::Concern
@@ -26,10 +24,10 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(pops) do |field, value|
             values = send(field)
-            value > 0 ? values.pop : values.shift
+            (value > 0) ? values.pop : values.shift
             ops[atomic_attribute_name(field)] = value
           end
-          { "$pop" => ops }
+          { '$pop' => ops }
         end
       end
     end

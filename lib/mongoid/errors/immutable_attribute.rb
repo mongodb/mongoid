@@ -1,15 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when attempting the change the value of an
     # immutable attribute. For example, the _id attribute is immutable,
     # and attempting to change it on a document that has already been
     # persisted will result in this error.
     class ImmutableAttribute < MongoidError
-
       # Create the new error.
       #
       # @example Create the new error.
@@ -19,7 +16,7 @@ module Mongoid
       # @param [ Object ] value The attempted set value.
       def initialize(name, value)
         super(
-          compose_message("immutable_attribute", { name: name, value: value })
+          compose_message('immutable_attribute', { name: name, value: value })
         )
       end
     end

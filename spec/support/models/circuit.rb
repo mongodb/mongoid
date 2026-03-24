@@ -1,7 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Circuit
   include Mongoid::Document
-  embeds_many :buses, order: [[ :saturday, :asc], [ :departure_time, :asc], [ :number, :asc ]]
+
+  embeds_many :buses, order: [ %i[saturday asc], %i[departure_time asc], %i[number asc] ]
 end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 require_relative '../has_many_models'
 
 describe Mongoid::Association::Referenced::HasMany::Proxy do

@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
       class BelongsTo
-
         # Binding class for belongs_to associations.
         class Binding
           include Bindable
@@ -30,14 +28,12 @@ module Mongoid
                 bind_polymorphic_inverse_type(_base, key)
               end
 
-              if inverse = _association.inverse(_target)
-                if set_base_association
-                  if _base.referenced_many?
-                    _target.__send__(inverse).push(_base)
-                  else
-                    remove_associated(_target)
-                    _target.set_relation(inverse, _base)
-                  end
+              if (inverse = _association.inverse(_target)) && set_base_association
+                if _base.referenced_many?
+                  _target.__send__(inverse).push(_base)
+                else
+                  remove_associated(_target)
+                  _target.set_relation(inverse, _base)
                 end
               end
             end
@@ -77,11 +73,11 @@ module Mongoid
           # @param [ Document ] doc The document to check.
           def check_polymorphic_inverses!(doc)
             inverses = _association.inverses(doc)
-            if inverses.length > 1 && _base.send(_association.foreign_key).nil?
-              raise Errors::InvalidSetPolymorphicRelation.new(
-                  _association.name, _base.class.name, _target.class.name
-              )
-            end
+            return unless inverses.length > 1 && _base.send(_association.foreign_key).nil?
+
+            raise Errors::InvalidSetPolymorphicRelation.new(
+              _association.name, _base.class.name, _target.class.name
+            )
           end
         end
       end

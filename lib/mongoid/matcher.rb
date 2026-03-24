@@ -1,6 +1,4 @@
-# rubocop:todo all
 module Mongoid
-
   # Utility module containing methods which assist in performing
   # in-memory matching of documents with MQL query expressions.
   #
@@ -65,7 +63,7 @@ module Mongoid
         document = document.send(:as_attributes)
       end
 
-      current = [document]
+      current = [ document ]
 
       key.to_s.split('.').each do |field|
         new = []
@@ -73,21 +71,15 @@ module Mongoid
           case doc
           when Hash
             actual_key = find_exact_key(doc, field)
-            if !actual_key.nil?
-              new << doc[actual_key]
-            end
+            new << doc[actual_key] unless actual_key.nil?
           when Array
-            if (index = field.to_i).to_s == field
-              if doc.length > index
-                new << doc[index]
-              end
+            if ((index = field.to_i).to_s == field) && (doc.length > index)
+              new << doc[index]
             end
             doc.each do |subdoc|
-              if Hash === subdoc
+              if subdoc.is_a?(Hash)
                 actual_key = find_exact_key(subdoc, field)
-                if !actual_key.nil?
-                  new << subdoc[actual_key]
-                end
+                new << subdoc[actual_key] unless actual_key.nil?
               end
             end
           end

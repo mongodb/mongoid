@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when attempting to create a new client that does
     # not have a named configuration.
     class NoClientConfig < MongoidError
-
       # Create the new error.
       #
       # @example Create the error.
@@ -15,7 +12,7 @@ module Mongoid
       #
       # @param [ String | Symbol ] name The name of the client.
       def initialize(name)
-        super(compose_message("no_client_config", { name: name }))
+        super(compose_message('no_client_config', { name: name }))
       end
     end
   end

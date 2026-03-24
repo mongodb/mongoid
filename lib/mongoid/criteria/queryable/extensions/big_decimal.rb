@@ -1,17 +1,14 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "bigdecimal"
+require 'bigdecimal'
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to BigDecimal class.
         module BigDecimal
           module ClassMethods
-
             # Evolves the big decimal into a MongoDB friendly value.
             #
             # @example Evolve the big decimal
@@ -24,6 +21,7 @@ module Mongoid
             def evolve(object)
               __evolve__(object) do |obj|
                 return if obj.nil?
+
                 case obj
                 when ::BigDecimal
                   if Mongoid.map_big_decimal_to_decimal128
@@ -52,4 +50,4 @@ module Mongoid
   end
 end
 
-::BigDecimal.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::BigDecimal::ClassMethods)
+BigDecimal.extend Mongoid::Criteria::Queryable::Extensions::BigDecimal::ClassMethods

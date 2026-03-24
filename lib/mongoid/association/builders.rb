@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
-
     # This module is responsible for defining the build and create methods used
     # in one to one associations.
     #
@@ -32,7 +30,7 @@ module Mongoid
       #
       # @return [ Array<Hash> ] The attributes and options.
       def parse_args(*args)
-        [ args.first || {}, args.size > 1 ? args[1] : {} ]
+        [ args.first || {}, (args.size > 1) ? args[1] : {} ]
       end
 
       # Defines a builder method. This is defined as #build_name.

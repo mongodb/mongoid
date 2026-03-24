@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for setting a field (or fields) to the smaller of
     # either it's current value, or a given value.
     module Minable
@@ -28,10 +26,10 @@ module Mongoid
               ops[atomic_attribute_name(field)] = value
             end
           end
-          { "$min" => ops } unless ops.empty?
+          { '$min' => ops } unless ops.empty?
         end
       end
-      alias :clamp_upper_bound :set_min
+      alias clamp_upper_bound set_min
     end
   end
 end

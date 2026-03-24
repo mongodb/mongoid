@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $lt expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/lt/
     #
     # @api private
     module Lt
-
       # Returns whether a value satisfies a $lt expression.
       #
       # @param [ true | false ] exists Whether the value exists.

@@ -1,4 +1,3 @@
-# rubocop:todo all
 source 'https://rubygems.org'
 
 gem 'actionpack', git: 'https://github.com/rails/rails'
@@ -10,6 +9,6 @@ end
 
 gemspec path: '..'
 
-require_relative './standard'
+require_relative 'standard'
 
 standard_dependencies

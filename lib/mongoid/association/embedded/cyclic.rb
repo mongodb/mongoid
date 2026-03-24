@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Embedded
-
       # This module provides convenience macros for using cyclic embedded
       # associations.
       module Cyclic
@@ -15,7 +13,6 @@ module Mongoid
         end
 
         module ClassMethods
-
           # Create a cyclic embedded association that creates a tree hierarchy for
           # the document and many embedded child documents.
           #
@@ -38,10 +35,10 @@ module Mongoid
           # or its children.
           def recursively_embeds_many(options = {})
             embeds_many(
-                cyclic_child_name,
-                options.merge(class_name: self.name, cyclic: true)
+              cyclic_child_name,
+              options.merge(class_name: name, cyclic: true)
             )
-            embedded_in cyclic_parent_name, class_name: self.name, cyclic: true
+            embedded_in cyclic_parent_name, class_name: name, cyclic: true
           end
 
           # Create a cyclic embedded association that creates a single self
@@ -66,10 +63,10 @@ module Mongoid
           # or its children.
           def recursively_embeds_one(options = {})
             embeds_one(
-                cyclic_child_name(false),
-                options.merge(class_name: self.name, cyclic: true)
+              cyclic_child_name(false),
+              options.merge(class_name: name, cyclic: true)
             )
-            embedded_in cyclic_parent_name, class_name: self.name, cyclic: true
+            embedded_in cyclic_parent_name, class_name: name, cyclic: true
           end
 
           private
@@ -81,7 +78,7 @@ module Mongoid
           #
           # @return [ String ] "parent_" plus the class name underscored.
           def cyclic_parent_name
-            ("parent_#{self.name.demodulize.underscore.singularize}").to_sym
+            :"parent_#{name.demodulize.underscore.singularize}"
           end
 
           # Determines the child name given the class.
@@ -94,7 +91,7 @@ module Mongoid
           # @return [ String ] "child_" plus the class name underscored in
           #   singular or plural form.
           def cyclic_child_name(many = true)
-            ("child_#{self.name.demodulize.underscore.send(many ? :pluralize : :singularize)}").to_sym
+            :"child_#{name.demodulize.underscore.send(many ? :pluralize : :singularize)}"
           end
         end
       end

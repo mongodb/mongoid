@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Document do
-
   let(:klass) do
     Person
   end
@@ -40,28 +38,28 @@ describe Mongoid::Document do
       config_override :legacy_persistence_context_behavior, false
 
       it 'remembers its persistence context when created' do
-        expect(person.collection_name).to be == :extra_people
+        expect(person.collection_name).to eq :extra_people
       end
 
       it 'remembers its context when queried specifically' do
         person_by_id = Person.with(options) { Person.find(_id: person._id) }
-        expect(person_by_id.collection_name).to be == :extra_people
+        expect(person_by_id.collection_name).to eq :extra_people
       end
 
       it 'remembers its context when queried generally' do
         person # force the person to be created
         person_generally = Person.with(options) { Person.all[0] }
-        expect(person_generally.collection_name).to be == :extra_people
+        expect(person_generally.collection_name).to eq :extra_people
       end
 
       it 'can be reloaded without specifying the context' do
         expect { person.reload }.not_to raise_error
-        expect(person.collection_name).to be == :extra_people
+        expect(person.collection_name).to eq :extra_people
       end
 
       it 'can be updated without specifying the context' do
         person.update username: 'zyg15'
-        expect(Person.with(options) { Person.first.username }).to be == 'zyg15'
+        expect(Person.with(options) { Person.first.username }).to eq 'zyg15'
       end
 
       it 'an explicit context takes precedence over a remembered context when persisting' do
@@ -82,18 +80,18 @@ describe Mongoid::Document do
       config_override :legacy_persistence_context_behavior, true
 
       it 'does not remember its persistence context when created' do
-        expect(person.collection_name).to be == :people
+        expect(person.collection_name).to eq :people
       end
 
       it 'does not remember its context when queried specifically' do
         person_by_id = Person.with(options) { Person.find(_id: person._id) }
-        expect(person_by_id.collection_name).to be == :people
+        expect(person_by_id.collection_name).to eq :people
       end
 
       it 'does not remember its context when queried generally' do
         person # force the person to be created
         person_generally = Person.with(options) { Person.all[0] }
-        expect(person_generally.collection_name).to be == :people
+        expect(person_generally.collection_name).to eq :people
       end
 
       it 'cannot be reloaded without specifying the context' do
@@ -102,7 +100,7 @@ describe Mongoid::Document do
 
       it 'cannot be updated without specifying the context' do
         person.update username: 'zyg15'
-        expect(Person.with(options) { Person.first.username }).to be == 'zyg14'
+        expect(Person.with(options) { Person.first.username }).to eq 'zyg14'
       end
     end
   end

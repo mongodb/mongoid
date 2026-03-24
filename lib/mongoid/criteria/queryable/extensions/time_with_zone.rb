@@ -1,15 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to
         # ActiveSupport::TimeWithZone class.
         module TimeWithZone
-
           # Evolve the time as a date, UTC midnight.
           #
           # @example Evolve the time to a date query format.
@@ -31,7 +28,6 @@ module Mongoid
           end
 
           module ClassMethods
-
             # Evolve the object to an date.
             #
             # @example Evolve dates.
@@ -58,11 +54,5 @@ module Mongoid
   end
 end
 
-::ActiveSupport::TimeWithZone.__send__(
-  :include,
-  Mongoid::Criteria::Queryable::Extensions::TimeWithZone
-)
-::ActiveSupport::TimeWithZone.__send__(
-  :extend,
-  Mongoid::Criteria::Queryable::Extensions::TimeWithZone::ClassMethods
-)
+ActiveSupport::TimeWithZone.include Mongoid::Criteria::Queryable::Extensions::TimeWithZone
+ActiveSupport::TimeWithZone.extend Mongoid::Criteria::Queryable::Extensions::TimeWithZone::ClassMethods

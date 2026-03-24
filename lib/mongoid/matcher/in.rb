@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $in expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/in/
     #
     # @api private
     module In
-
       # Returns whether a value satisfies an $in expression.
       #
       # @param [ true | false ] exists Not used.
@@ -18,19 +15,19 @@ module Mongoid
       # @return [ true | false ] Whether the value matches.
       #
       # @api private
-      module_function def matches?(exists, value, condition)
-        unless Array === condition
+      module_function def matches?(_exists, value, condition)
+        unless condition.is_a?(Array)
           raise Errors::InvalidQuery, "$in argument must be an array: #{Errors::InvalidQuery.truncate_expr(condition)}"
         end
-        if Array === value
-          if value.any? { |v|
-            condition.any? do |c|
-              EqImplWithRegexp.matches?('$in', v, c)
-            end
-          } then
-            return true
+
+        if value.is_a?(Array) && value.any? do |v|
+          condition.any? do |c|
+            EqImplWithRegexp.matches?('$in', v, c)
           end
         end
+          return true
+        end
+
         condition.any? do |c|
           EqImplWithRegexp.matches?('$in', value, c)
         end

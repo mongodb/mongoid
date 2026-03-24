@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when a bad configuration option is attempted to be
     # set.
     class InvalidConfigOption < MongoidError
-
       # Create the new error.
       #
       # @example Create the new error.
@@ -17,8 +14,8 @@ module Mongoid
       def initialize(name)
         super(
           compose_message(
-            "invalid_config_option",
-            { name: name, options: Config.settings.keys.map(&:inspect).join(", ") }
+            'invalid_config_option',
+            { name: name, options: Config.settings.keys.map(&:inspect).join(', ') }
           )
         )
       end

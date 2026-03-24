@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Config
-
     # Encapsulates logic for setting options.
     module Options
-
       # Get the defaults or initialize a new empty hash.
       #
       # @example Get the defaults.
@@ -45,7 +42,7 @@ module Mongoid
 
             begin
               options[:on_change]&.call(value)
-            rescue
+            rescue StandardError
               # If the on_change callback raises an error, we need to roll
               # the change back.
               settings[name] = old_value
@@ -90,13 +87,13 @@ module Mongoid
       #
       # @return [ Integer ] The log level.
       def log_level
-        if level = settings[:log_level]
-          unless level.is_a?(Integer)
-            # JRuby String#constantize does not work here.
-            level = Logger.const_get(level.upcase.to_s)
-          end
-          level
+        return unless level = settings[:log_level]
+
+        unless level.is_a?(Integer)
+          # JRuby String#constantize does not work here.
+          level = Logger.const_get(level.upcase.to_s)
         end
+        level
       end
     end
   end

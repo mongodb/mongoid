@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
@@ -7,7 +6,7 @@ describe Mongoid::Document do
   context 'when including class uses delegate' do
     let(:patient) do
       DelegatingPatient.new(
-        email: Email.new(address: 'test@example.com'),
+        email: Email.new(address: 'test@example.com')
       )
     end
 
@@ -24,7 +23,7 @@ describe Mongoid::Document do
     it 'persists separate id and _id values' do
       shirt = Shirt.create!(id: 'hello', _id: 'foo')
       shirt = Shirt.find(shirt._id)
-      shirt.id.should == 'hello'
+      shirt.id.should
       shirt._id.should == 'foo'
     end
   end
@@ -35,17 +34,17 @@ describe Mongoid::Document do
 
       let(:profile) do
         # Profile shard_key :name
-        Profile.create!(name: "Alice")
+        Profile.create!(name: 'Alice')
       end
 
-      it "successfully reloads the document after saving an update to the sharded field" do
-        expect(profile.name).to eq("Alice")
-        profile.name = "Bob"
+      it 'successfully reloads the document after saving an update to the sharded field' do
+        expect(profile.name).to eq('Alice')
+        profile.name = 'Bob'
         profile.save!
 
         profile.reload
 
-        expect(profile.name).to eq("Bob")
+        expect(profile.name).to eq('Bob')
       end
     end
   end

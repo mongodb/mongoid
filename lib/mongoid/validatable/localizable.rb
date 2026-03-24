@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Validatable
-
     # Adds localization support to validations.
     module Localizable
-
       # Validates each for localized fields.
       #
       # @example Validate localized fields.

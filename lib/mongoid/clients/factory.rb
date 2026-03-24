@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Clients
-
     # Factory used to create database clients.
     module Factory
       extend self
@@ -24,8 +22,10 @@ module Mongoid
       # @return [ Mongo::Client ] The new client.
       def create(name = nil)
         return default unless name
+
         config = Mongoid.clients[name]
         raise Errors::NoClientConfig.new(name) unless config
+
         create_client(config)
       end
 
@@ -56,6 +56,7 @@ module Mongoid
       # @return [ Mongo::Client ] The client.
       def create_client(configuration)
         raise Errors::NoClientsConfig.new unless configuration
+
         config = configuration.dup
         uri = config.delete(:uri)
         database = config.delete(:database) || Mongo::URI.get(uri).database
@@ -64,9 +65,7 @@ module Mongoid
         if opts.key?(:auto_encryption_options)
           opts[:auto_encryption_options] = build_auto_encryption_options(opts, database)
         end
-        unless config.empty?
-          default_logger.warn("Unknown config options detected: #{config}.")
-        end
+        default_logger.warn("Unknown config options detected: #{config}.") unless config.empty?
         if uri
           Mongo::Client.new(uri, options(opts))
         else
@@ -109,7 +108,7 @@ module Mongoid
 
       MONGOID_WRAPPING_LIBRARY = {
         name: 'Mongoid',
-        version: VERSION,
+        version: VERSION
       }.freeze
 
       def driver_version
@@ -126,19 +125,17 @@ module Mongoid
         options = opts.dup
         options[:platform] = PLATFORM_DETAILS
         options[:app_name] = Mongoid::Config.app_name if Mongoid::Config.app_name
-        if (driver_version <=> [2, 13]) >= 0
+        if (driver_version <=> [ 2, 13 ]) >= 0
           wrap_lib = if options[:wrapping_libraries]
-            [MONGOID_WRAPPING_LIBRARY] + options[:wrapping_libraries]
-          else
-            [MONGOID_WRAPPING_LIBRARY]
-          end.tap do |wrap|
-            if defined?(::Rails) && ::Rails.respond_to?(:version)
-              wrap << { name: 'Rails', version: ::Rails.version }
-            end
+                       [ MONGOID_WRAPPING_LIBRARY ] + options[:wrapping_libraries]
+                     else
+                       [ MONGOID_WRAPPING_LIBRARY ]
+                     end.tap do |wrap|
+            wrap << { name: 'Rails', version: ::Rails.version } if defined?(::Rails) && ::Rails.respond_to?(:version)
           end
           options[:wrapping_libraries] = wrap_lib
         end
-        options.reject{ |k, _v| k == :hosts }.to_hash.symbolize_keys!
+        options.reject { |k, _v| k == :hosts }.to_hash.symbolize_keys!
       end
     end
   end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/association/referenced/has_one/binding'
 require 'mongoid/association/referenced/has_one/buildable'
@@ -9,7 +8,6 @@ require 'mongoid/association/referenced/has_one/eager'
 module Mongoid
   module Association
     module Referenced
-
       # The has_one association.
       class HasOne
         include Relatable
@@ -19,14 +17,14 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        ASSOCIATION_OPTIONS = [
-            :as,
-            :autobuild,
-            :autosave,
-            :dependent,
-            :foreign_key,
-            :primary_key,
-            :scope,
+        ASSOCIATION_OPTIONS = %i[
+          as
+          autobuild
+          autosave
+          dependent
+          foreign_key
+          primary_key
+          scope
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -38,7 +36,7 @@ module Mongoid
         # The default foreign key suffix.
         #
         # @return [ String ] '_id'
-        FOREIGN_KEY_SUFFIX = '_id'.freeze
+        FOREIGN_KEY_SUFFIX = '_id'
 
         # The list of association complements.
         #
@@ -60,19 +58,26 @@ module Mongoid
         # @return [ String ] The foreign key field for saving the
         #   association reference.
         def foreign_key
-          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
+          @foreign_key ||= if @options[:foreign_key]
+                             @options[:foreign_key].to_s
+                           else
                              default_foreign_key_field
+                           end
         end
 
         # Is this association type embedded?
         #
         # @return [ false ] Always false.
-        def embedded?; false; end
+        def embedded?
+          false
+        end
 
         # The default for validation the association object.
         #
         # @return [ true ] Always true.
-        def validation_default; true; end
+        def validation_default
+          true
+        end
 
         # Get the association proxy class for this association type.
         #
@@ -120,7 +125,9 @@ module Mongoid
         # Does this association type store the foreign key?
         #
         # @return [ false ] Always false.
-        def stores_foreign_key?; false; end
+        def stores_foreign_key?
+          false
+        end
 
         # Get the path calculator for the supplied document.
         #
@@ -163,19 +170,17 @@ module Mongoid
           @default_foreign_key_field ||= "#{inverse}#{FOREIGN_KEY_SUFFIX}"
         end
 
-        def polymorphic_inverses(other)
+        def polymorphic_inverses(_other)
           [ as ]
         end
 
         def determine_inverses(other)
           matches = (other || relation_class).relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
-                rel.relation_class_name == inverse_class_name
+              rel.relation_class_name == inverse_class_name
+          end
+          raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches) if matches.size > 1
 
-          end
-          if matches.size > 1
-            raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)
-          end
           matches.collect { |m| m.name } unless matches.blank?
         end
 

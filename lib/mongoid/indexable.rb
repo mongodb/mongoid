@@ -1,12 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/indexable/specification"
-require "mongoid/indexable/validators/options"
-require "ostruct"
+require 'mongoid/indexable/specification'
+require 'mongoid/indexable/validators/options'
+require 'ostruct'
 
 module Mongoid
-
   # Encapsulates behavior around defining indexes.
   module Indexable
     extend ActiveSupport::Concern
@@ -17,7 +15,6 @@ module Mongoid
     end
 
     module ClassMethods
-
       # Send the actual index creation comments to the MongoDB driver
       #
       # @example Create the indexes for the class.
@@ -27,7 +24,7 @@ module Mongoid
       def create_indexes
         return unless index_specifications
 
-        default_options = {background: Config.background_indexing}
+        default_options = { background: Config.background_indexing }
 
         index_specifications.each do |spec|
           key, options = spec.key, default_options.merge(spec.options)
@@ -51,17 +48,16 @@ module Mongoid
       def remove_indexes
         indexed_database_names.each do |database|
           with(database: database) do |klass|
-            begin
-              klass.collection.indexes(session: _session).each do |spec|
-                unless spec["name"] == "_id_"
-                  klass.collection.indexes(session: _session).drop_one(spec["key"])
-                  logger.info(
-                    "MONGOID: Removed index '#{spec["name"]}' on collection " +
-                    "'#{klass.collection.name}' in database '#{database}'."
-                  )
-                end
-              end
-            rescue Mongo::Error::OperationFailure; end
+            klass.collection.indexes(session: _session).each do |spec|
+              next if spec['name'] == '_id_'
+
+              klass.collection.indexes(session: _session).drop_one(spec['key'])
+              logger.info(
+                "MONGOID: Removed index '#{spec['name']}' on collection " +
+                "'#{klass.collection.name}' in database '#{database}'."
+              )
+            end
+          rescue Mongo::Error::OperationFailure
           end
         end and true
       end
@@ -74,8 +70,8 @@ module Mongoid
       #
       # @return [ true ] If the operation succeeded.
       def add_indexes
-        if hereditary? && !index_keys.include?(self.discriminator_key.to_sym => 1)
-          index({ self.discriminator_key.to_sym => 1 }, unique: false, background: true)
+        if hereditary? && !index_keys.include?(discriminator_key.to_sym => 1)
+          index({ discriminator_key.to_sym => 1 }, unique: false, background: true)
         end
         true
       end
@@ -101,9 +97,9 @@ module Mongoid
         # that an index with different options from another, and a different
         # name, will be silently ignored unless duplicate index declarations
         # are allowed.
-        if Mongoid.allow_duplicate_index_declarations || !index_specifications.include?(specification)
-          index_specifications.push(specification)
-        end
+        return unless Mongoid.allow_duplicate_index_declarations || !index_specifications.include?(specification)
+
+        index_specifications.push(specification)
       end
 
       # Get an index specification for the provided key.

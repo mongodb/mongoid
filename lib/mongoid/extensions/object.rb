@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
@@ -18,7 +17,7 @@ module Mongoid
       def __evolve_object_id__
         self
       end
-      alias :__mongoize_object_id__ :__evolve_object_id__
+      alias __mongoize_object_id__ __evolve_object_id__
 
       # Convert the object to args for a find query.
       #
@@ -68,7 +67,6 @@ module Mongoid
       end
       Mongoid.deprecate(self, :__to_inc__)
 
-
       # Do or do not, there is no try. -- Yoda.
       #
       # @example Do or do not.
@@ -95,11 +93,9 @@ module Mongoid
       # @return [ Object | false ] The value or false.
       def ivar(name)
         var_name = "@_#{name}"
-        if instance_variable_defined?(var_name)
-          return instance_variable_get(var_name)
-        else
-          false
-        end
+        return instance_variable_get(var_name) if instance_variable_defined?(var_name)
+
+        false
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -144,11 +140,9 @@ module Mongoid
       #
       # @return [ true | false ] If the variable was defined.
       def remove_ivar(name)
-        if instance_variable_defined?("@_#{name}")
-          return remove_instance_variable("@_#{name}")
-        else
-          false
-        end
+        return remove_instance_variable("@_#{name}") if instance_variable_defined?("@_#{name}")
+
+        false
       end
 
       # Is the object's size changable? Only returns true for arrays and hashes
@@ -201,7 +195,8 @@ module Mongoid
         # @return [ Object ] The converted object.
         # @deprecated
         def __mongoize_fk__(association, object)
-          return nil if !object || object == ""
+          return nil if !object || object == ''
+
           association.convert_to_foreign_key(object)
         end
         Mongoid.deprecate(self, :__mongoize_fk__)

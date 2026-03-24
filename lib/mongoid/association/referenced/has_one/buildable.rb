@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/association/referenced/with_polymorphic_criteria'
 
@@ -7,7 +6,6 @@ module Mongoid
   module Association
     module Referenced
       class HasOne
-
         # The Builder behavior for has_one associations.
         module Buildable
           include WithPolymorphicCriteria
@@ -22,17 +20,15 @@ module Mongoid
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(base, object, _type = nil, selected_fields = nil)
             if query?(object)
               # Handle array of hashes from $lookup aggregation
               if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
                 doc = object.first
                 return doc ? Factory.execute_from_db(klass, doc, nil, selected_fields, execute_callbacks: false) : nil
               end
-              
-              if !base.new_record?
-                execute_query(object, base)
-              end
+
+              execute_query(object, base) unless base.new_record?
             else
               clear_associated(object)
               object
@@ -44,10 +40,10 @@ module Mongoid
           def clear_associated(object)
             unless inverse
               raise Errors::InverseNotFound.new(
-                  @owner_class,
-                  name,
-                  object.class,
-                  foreign_key,
+                @owner_class,
+                name,
+                object.class,
+                foreign_key
               )
             end
             if object && (associated = object.send(inverse))

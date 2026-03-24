@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $eq expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/eq/
     #
     # @api private
     module Eq
-
       # Returns whether a value satisfies an $eq expression.
       #
       # @param [ true | false ] exists Whether the value exists.

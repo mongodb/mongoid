@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Oscar
   include Mongoid::Document
+
   field :title, type: String
   field :destroy_after_save, type: Mongoid::Boolean, default: false
   before_save :complain

@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
-
     # Base class for eager load preload functions.
     class Eager
       # Instantiate the eager load class.
@@ -92,15 +90,13 @@ module Mongoid
       # When the documents are retrieved, the set of inclusions applied
       # is the set of inclusions applied to the host document minus the
       # association that is being eagerly loaded.
-      private def each_loaded_document_of_class(cls, keys)
-        # Note: keys should not include nil elements.
+      private def each_loaded_document_of_class(cls, keys, &block)
+        # NOTE: keys should not include nil elements.
         # Upstream code is responsible for eliminating nils from keys.
         return cls.none if keys.empty?
 
         criteria = prepare_criteria_for_loaded_documents(cls, keys)
-        criteria.each do |doc|
-          yield doc
-        end
+        criteria.each(&block)
       end
 
       # Set the pre-loaded document into its parent.
@@ -128,7 +124,7 @@ module Mongoid
       def grouped_docs
         @grouped_docs[@association.name] ||= @docs.group_by do |doc|
           doc.send(group_by_key) if doc.respond_to?(group_by_key)
-        end.reject do |k, v|
+        end.reject do |k, _v|
           k.nil?
         end
       end
@@ -190,7 +186,7 @@ module Mongoid
         criteria = cls.criteria
         criteria = criteria.apply_scope(@association.scope)
         criteria = criteria.any_in(key => keys)
-        criteria.inclusions = criteria.inclusions - [@association]
+        criteria.inclusions = criteria.inclusions - [ @association ]
         criteria
       end
     end

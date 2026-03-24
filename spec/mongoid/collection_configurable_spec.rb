@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::CollectionConfigurable do
-
   before(:all) do
     class CollectionConfigurableValidOptions
       include Mongoid::Document
@@ -45,7 +43,7 @@ describe Mongoid::CollectionConfigurable do
     Object.send(:remove_const, :CollectionConfigurableInvalidOptions)
   end
 
-  after(:each) do
+  after do
     [
       CollectionConfigurableValidOptions,
       CollectionConfigurableUnknownOptions
@@ -59,13 +57,12 @@ describe Mongoid::CollectionConfigurable do
       let(:subject) do
         CollectionConfigurableValidOptions
       end
-
-      before(:each) do
-        subject.create_collection
-      end
-
       let(:coll_options) do
         subject.collection.database.list_collections(filter: { name: subject.collection_name.to_s }).first
+      end
+
+      before do
+        subject.create_collection
       end
 
       it 'creates the collection' do
@@ -110,7 +107,7 @@ describe Mongoid::CollectionConfigurable do
 
     context 'when force is false' do
       let(:logger) do
-        double("logger").tap do |log|
+        double('logger').tap do |log|
           expect(log).to receive(:debug).once.with(/Collection '#{subject.collection_name}' already exist/)
         end
       end
@@ -127,7 +124,7 @@ describe Mongoid::CollectionConfigurable do
 
     context 'when force is true' do
       let(:logger) do
-        double("logger")
+        double('logger')
       end
 
       let(:coll_options) do
@@ -140,7 +137,7 @@ describe Mongoid::CollectionConfigurable do
       end
 
       it 'does not log a message' do
-        expect(logger).to receive(:debug).never.with(/Collection '#{subject.collection_name}' already exist/)
+        expect(logger).not_to receive(:debug).with(/Collection '#{subject.collection_name}' already exist/)
         subject.create_collection(force: true)
       end
 

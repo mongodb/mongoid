@@ -293,7 +293,7 @@ module Mongoid
           # @param [ Symbol ] key The key to flag on the document.
           #
           # @return [ true ] true.
-          def unsynced(doc, key) # rubocop:disable Naming/PredicateMethod
+          def unsynced(doc, key)
             doc._synced[key] = false
             true
           end

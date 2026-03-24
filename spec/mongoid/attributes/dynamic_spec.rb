@@ -1,12 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Attributes::Dynamic do
   shared_examples_for 'dynamic field' do
     let(:raw_attributes) do
-      {attr_name => 'foo bar'}
+      { attr_name => 'foo bar' }
     end
 
     context 'when reading attributes' do
@@ -38,14 +37,14 @@ describe Mongoid::Attributes::Dynamic do
         context 'reading via read_attribute' do
           it 'returns nil' do
             bar = Bar.new
-            expect(bar.read_attribute(:foo)).to be nil
+            expect(bar.read_attribute(:foo)).to be_nil
           end
         end
 
         context 'reading via []' do
           it 'returns nil' do
             bar = Bar.new
-            expect(bar[:foo]).to be nil
+            expect(bar[:foo]).to be_nil
           end
         end
       end

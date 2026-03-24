@@ -1,16 +1,20 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Artist
   include Mongoid::Document
 
-  attr_accessor :before_add_called, :after_add_called, :before_add_referenced_called, :after_add_referenced_called, :before_remove_embedded_called, :after_remove_embedded_called, :before_remove_referenced_called, :after_remove_referenced_called
+  attr_accessor :before_add_called, :after_add_called, :before_add_referenced_called, :after_add_referenced_called,
+                :before_remove_embedded_called, :after_remove_embedded_called, :before_remove_referenced_called, :after_remove_referenced_called
 
   field :name, type: String
 
-  embeds_many :songs, before_add: [ :before_add_song, Proc.new { |artist, song| song.before_add_called = true } ], before_remove: :before_remove_song
+  embeds_many :songs, before_add: [ :before_add_song, proc { |_artist, song|
+    song.before_add_called = true
+  } ], before_remove: :before_remove_song
   embeds_many :labels, after_add: :after_add_label, after_remove: :after_remove_label
-  has_many :albums, dependent: :destroy, before_add: [:before_add_album, Proc.new { |artist, album| album.before_add_called = true} ], after_add: :after_add_album, before_remove: :before_remove_album, after_remove: :after_remove_album
+  has_many :albums, dependent: :destroy, before_add: [ :before_add_album, proc { |_artist, album|
+    album.before_add_called = true
+  } ], after_add: :after_add_album, before_remove: :before_remove_album, after_remove: :after_remove_album
   belongs_to :band
 
   before_create :before_create_stub
@@ -57,35 +61,35 @@ class Artist
     2.times { |n| songs.create!(title: "#{n}") }
   end
 
-  def before_add_song(song)
+  def before_add_song(_song)
     @before_add_called = true
   end
 
-  def after_add_label(label)
+  def after_add_label(_label)
     @after_add_called = true
   end
 
-  def before_add_album(album)
+  def before_add_album(_album)
     @before_add_referenced_called = true
   end
 
-  def after_add_album(album)
+  def after_add_album(_album)
     @after_add_referenced_called = true
   end
 
-  def before_remove_song(song)
+  def before_remove_song(_song)
     @before_remove_embedded_called = true
   end
 
-  def after_remove_label(label)
+  def after_remove_label(_label)
     @after_remove_embedded_called = true
   end
 
-  def before_remove_album(album)
+  def before_remove_album(_album)
     @before_remove_referenced_called = true
   end
 
-  def after_remove_album(album)
+  def after_remove_album(_album)
     @after_remove_referenced_called = true
   end
 end

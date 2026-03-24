@@ -1,16 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Association::Referenced::HasOne::Buildable do
-
   let(:base) do
     double(new_record?: false)
   end
 
-  describe "#build" do
-
+  describe '#build' do
     let(:document) do
       association.build(base, object)
     end
@@ -23,8 +20,7 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
       Mongoid::Association::Referenced::HasOne.new(Person, :account, options)
     end
 
-    context "when provided an id" do
-
+    context 'when provided an id' do
       let!(:account) do
         Account.create!(person_id: object, name: 'banking', balance: 200)
       end
@@ -37,13 +33,12 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
         expect_any_instance_of(Mongoid::Criteria).to receive(:where).with(association.foreign_key => object).and_call_original
       end
 
-      it "sets the document" do
+      it 'sets the document' do
         expect(document).to eq(account)
       end
     end
 
-    context "when scope is specified" do
-
+    context 'when scope is specified' do
       let!(:account) do
         Account.create!(person_id: object, name: 'banking', balance: 200)
       end
@@ -54,7 +49,7 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
 
       let(:options) do
         {
-            scope: -> { gt(balance: 100) }
+          scope: -> { gt(balance: 100) }
         }
       end
 
@@ -63,48 +58,44 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
         expect_any_instance_of(Mongoid::Criteria).to receive(:gt).with(balance: 100).and_call_original
       end
 
-      context "when document satisfies scope" do
-
-        it "sets the document" do
+      context 'when document satisfies scope' do
+        it 'sets the document' do
           expect(document).to eq(account)
         end
       end
 
-      context "when document does not satisfy scope" do
-
+      context 'when document does not satisfy scope' do
         let!(:account) do
           Account.create!(person_id: object, name: 'banking', balance: 50)
         end
 
-        it "returns nil" do
+        it 'returns nil' do
           expect(document).to eq(nil)
         end
       end
     end
 
-    context "when provided an array of hashes" do
+    context 'when provided an array of hashes' do
       let(:object) do
-        [{ "_id" => BSON::ObjectId.new, "name" => "Savings", "balance" => 500 }]
+        [ { '_id' => BSON::ObjectId.new, 'name' => 'Savings', 'balance' => 500 } ]
       end
 
-      it "returns the document" do
-        expect(document.name).to eq("Savings")
+      it 'returns the document' do
+        expect(document.name).to eq('Savings')
         expect(document.balance).to eq(500)
       end
     end
 
-    context "when provided a object" do
-
+    context 'when provided a object' do
       let(:object) do
         Account.new
       end
 
-      it "returns the object" do
+      it 'returns the object' do
         expect(document).to eq(object)
       end
 
       context 'when the object is already associated with another object' do
-
         let(:original_person) do
           Person.new
         end
@@ -127,19 +118,17 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
       end
     end
 
-    context "when the document is not found" do
-
+    context 'when the document is not found' do
       let(:object) do
         BSON::ObjectId.new
       end
 
-      it "returns nil" do
+      it 'returns nil' do
         expect(document).to be_nil
       end
     end
 
-    context "when the document is persisted" do
-
+    context 'when the document is persisted' do
       let(:person) do
         Person.create!
       end
@@ -148,13 +137,12 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
         Game.create!(person: person)
       end
 
-      it "returns the document" do
+      it 'returns the document' do
         expect(person.game).to eq(game)
       end
     end
 
-    context "when the document have a non standard pk" do
-
+    context 'when the document have a non standard pk' do
       let(:person) do
         Person.create!
       end
@@ -163,7 +151,7 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
         Cat.create!(person: person)
       end
 
-      it "returns the document" do
+      it 'returns the document' do
         expect(person.cat).to eq(cat)
       end
     end

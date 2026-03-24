@@ -1,11 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
 module EmbedsManySpec
   class Post
     include Mongoid::Document
+
     field :title, type: String
     embeds_many :comments, class_name: 'EmbedsManySpec::Comment', as: :container
     accepts_nested_attributes_for :comments
@@ -13,6 +13,7 @@ module EmbedsManySpec
 
   class Comment
     include Mongoid::Document
+
     field :content, type: String
     validates :content, presence: true
     embedded_in :container, polymorphic: true
@@ -22,30 +23,29 @@ module EmbedsManySpec
 end
 
 describe 'embeds_many associations' do
-
   context 're-associating the same object' do
     context 'with dependent: destroy' do
       let(:canvas) do
-        Canvas.create!(shapes: [Shape.new])
+        Canvas.create!(shapes: [ Shape.new ])
       end
 
       let!(:shape) { canvas.shapes.first }
 
       it 'does not destroy the dependent object' do
-        canvas.shapes = [shape]
+        canvas.shapes = [ shape ]
         canvas.save!
         canvas.reload
-        canvas.shapes.should == [shape]
+        canvas.shapes.should == [ shape ]
       end
     end
   end
 
   context 'clearing association when parent is not saved' do
-    let!(:parent) { Canvas.create!(shapes: [Shape.new]) }
+    let!(:parent) { Canvas.create!(shapes: [ Shape.new ]) }
 
-    let(:unsaved_parent) { Canvas.new(id: parent.id, shapes: [Shape.new]) }
+    let(:unsaved_parent) { Canvas.new(id: parent.id, shapes: [ Shape.new ]) }
 
-    context "using #clear" do
+    context 'using #clear' do
       it 'deletes the target from the database' do
         unsaved_parent.shapes.clear
 
@@ -67,7 +67,7 @@ describe 'embeds_many associations' do
       end
     end
 
-    context "using #delete_all" do
+    context 'using #delete_all' do
       before do
         unsaved_parent.shapes.delete_all
       end
@@ -75,7 +75,7 @@ describe 'embeds_many associations' do
       include_examples 'does not delete the target from the database'
     end
 
-    context "using #destroy_all" do
+    context 'using #destroy_all' do
       before do
         unsaved_parent.shapes.destroy_all
       end
@@ -87,7 +87,7 @@ describe 'embeds_many associations' do
   context 'assigning attributes to the same association' do
     context 'setting then clearing' do
       let(:canvas) do
-        Canvas.create!(shapes: [Shape.new])
+        Canvas.create!(shapes: [ Shape.new ])
       end
 
       shared_examples 'persists correctly' do
@@ -100,7 +100,7 @@ describe 'embeds_many associations' do
 
       context 'via assignment operator' do
         before do
-          canvas.shapes = [Shape.new, Shape.new]
+          canvas.shapes = [ Shape.new, Shape.new ]
           canvas.shapes = []
           canvas.save!
         end
@@ -110,8 +110,8 @@ describe 'embeds_many associations' do
 
       context 'via attributes=' do
         before do
-          canvas.attributes = {shapes: [Shape.new, Shape.new]}
-          canvas.attributes = {shapes: []}
+          canvas.attributes = { shapes: [ Shape.new, Shape.new ] }
+          canvas.attributes = { shapes: [] }
           canvas.save!
         end
 
@@ -120,7 +120,7 @@ describe 'embeds_many associations' do
 
       context 'via assign_attributes' do
         before do
-          canvas.assign_attributes(shapes: [Shape.new, Shape.new])
+          canvas.assign_attributes(shapes: [ Shape.new, Shape.new ])
           canvas.assign_attributes(shapes: [])
           canvas.save!
         end
@@ -131,7 +131,7 @@ describe 'embeds_many associations' do
 
     context 'clearing then setting' do
       let(:canvas) do
-        Canvas.create!(shapes: [Shape.new])
+        Canvas.create!(shapes: [ Shape.new ])
       end
 
       shared_examples 'persists correctly' do
@@ -145,7 +145,7 @@ describe 'embeds_many associations' do
       context 'via assignment operator' do
         before do
           canvas.shapes = []
-          canvas.shapes = [Shape.new, Shape.new]
+          canvas.shapes = [ Shape.new, Shape.new ]
           canvas.save!
         end
 
@@ -154,8 +154,8 @@ describe 'embeds_many associations' do
 
       context 'via attributes=' do
         before do
-          canvas.attributes = {shapes: []}
-          canvas.attributes = {shapes: [Shape.new, Shape.new]}
+          canvas.attributes = { shapes: [] }
+          canvas.attributes = { shapes: [ Shape.new, Shape.new ] }
           canvas.save!
         end
 
@@ -165,7 +165,7 @@ describe 'embeds_many associations' do
       context 'via assign_attributes' do
         before do
           canvas.assign_attributes(shapes: [])
-          canvas.assign_attributes(shapes: [Shape.new, Shape.new])
+          canvas.assign_attributes(shapes: [ Shape.new, Shape.new ])
           canvas.save!
         end
 
@@ -175,7 +175,7 @@ describe 'embeds_many associations' do
 
     context 'updating a child then clearing' do
       let(:canvas) do
-        Canvas.create!(shapes: [Shape.new])
+        Canvas.create!(shapes: [ Shape.new ])
       end
 
       shared_examples 'persists correctly' do
@@ -202,7 +202,7 @@ describe 'embeds_many associations' do
       context 'via attributes=' do
         before do
           canvas.shapes.first.x = 1
-          canvas.attributes = {shapes: []}
+          canvas.attributes = { shapes: [] }
           canvas.save!
         end
 
@@ -222,7 +222,7 @@ describe 'embeds_many associations' do
 
     context 'including duplicates in the assignment' do
       let(:canvas) do
-        Canvas.create!(shapes: [Shape.new])
+        Canvas.create!(shapes: [ Shape.new ])
       end
 
       shared_examples 'persists correctly' do
@@ -266,13 +266,14 @@ describe 'embeds_many associations' do
     let(:klass) do
       Class.new do
         include Mongoid::Document
+
         embeds_many :addresses
       end
     end
 
     it 'loads the association correctly' do
-      expect { klass }.to_not raise_error
-      expect { klass.new.addresses }.to_not raise_error
+      expect { klass }.not_to raise_error
+      expect { klass.new.addresses }.not_to raise_error
       expect(klass.new.addresses.build).to be_a Address
     end
   end
@@ -298,7 +299,7 @@ describe 'embeds_many associations' do
               comments_attributes: [
                 {
                   _id: grandchild.id,
-                  content: updated_grandchild_content,
+                  content: updated_grandchild_content
                 }
               ]
             }
@@ -309,7 +310,7 @@ describe 'embeds_many associations' do
       context 'when the grandchild is invalid' do
         let(:updated_grandchild_content) { '' } # invalid value
 
-        it 'will not save the parent' do
+        it 'does not save the parent' do
           expect(post.update(attributes)).to be_falsey
           expect(post.errors).not_to be_empty
           expect(post.reload.title).not_to eq(updated_parent_title)
@@ -318,7 +319,7 @@ describe 'embeds_many associations' do
       end
 
       context 'when the grandchild is valid' do
-        it 'will save the parent' do
+        it 'saves the parent' do
           expect(post.update(attributes)).to be_truthy
           expect(post.errors).to be_empty
           expect(post.reload.title).to eq(updated_parent_title)
@@ -328,18 +329,18 @@ describe 'embeds_many associations' do
     end
   end
 
-  context "when a hash is provided instead of an array for an embeds_many association" do
+  context 'when a hash is provided instead of an array for an embeds_many association' do
     let(:post) { EmbedsManySpec::Post.new(title: 'Broken post', comments: { content: 'Comment' }) }
 
-    it "does not raise an error on initialization" do
-      expect { post }.to_not raise_error
+    it 'does not raise an error on initialization' do
+      expect { post }.not_to raise_error
     end
 
-    it "does not raise an error when accessing the association" do
-      expect { post.comments }.to_not raise_error
+    it 'does not raise an error when accessing the association' do
+      expect { post.comments }.not_to raise_error
     end
 
-    it "allows building new documents on the association" do
+    it 'allows building new documents on the association' do
       expect(post.comments.build).to be_a EmbedsManySpec::Comment
     end
   end

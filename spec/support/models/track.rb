@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Track
   include Mongoid::Document
+
   field :name, type: String
 
   field :before_create_called, type: Mongoid::Boolean, default: false

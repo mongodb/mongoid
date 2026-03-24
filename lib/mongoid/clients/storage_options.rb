@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Clients
-
     # Mixin module included into Mongoid::Document which adds
     # the ability to set the collection in which to store the
     # document by default.
@@ -46,7 +44,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Give this model specific custom default storage options.
         #
         # @example Store this model by default in "artists"
@@ -82,7 +79,7 @@ module Mongoid
         # @return [ Class ] The model class.
         def store_in(options)
           Validators::Storage.validate(self, options)
-          self.storage_options = self.storage_options.merge(options)
+          self.storage_options = storage_options.merge(options)
         end
 
         # Reset the store_in options

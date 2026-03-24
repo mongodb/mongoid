@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when a client is configured without hosts.
     class NoClientHosts < MongoidError
-
       # Create the new error.
       #
       # @example Create the new error.
@@ -17,7 +14,7 @@ module Mongoid
       def initialize(name, config)
         super(
           compose_message(
-            "no_client_hosts",
+            'no_client_hosts',
             { name: name, config: config }
           )
         )

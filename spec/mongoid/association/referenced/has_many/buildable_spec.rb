@@ -1,16 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Association::Referenced::HasMany::Buildable do
-
   let(:base) do
     double
   end
 
-  describe "#build" do
-
+  describe '#build' do
     let(:documents) do
       association.build(base, object)
     end
@@ -23,8 +20,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
       Mongoid::Association::Referenced::HasMany.new(Person, :posts, options)
     end
 
-    context "when provided an id" do
-
+    context 'when provided an id' do
       let(:object) do
         BSON::ObjectId.new
       end
@@ -33,16 +29,15 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         Post.where(association.foreign_key => object)
       end
 
-      it "returns the criteria" do
+      it 'returns the criteria' do
         expect(documents).to eq(criteria)
       end
     end
 
-    context "when order is specified" do
-
+    context 'when order is specified' do
       let(:options) do
         {
-          order: :rating.asc,
+          order: :rating.asc
         }
       end
 
@@ -54,16 +49,15 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         Post.where(association.foreign_key => object).order_by(options[:order])
       end
 
-      it "adds the ordering to the criteria" do
+      it 'adds the ordering to the criteria' do
         expect(documents).to eq(criteria)
       end
     end
 
-    context "when scope is specified" do
-
+    context 'when scope is specified' do
       let(:options) do
         {
-          scope: -> { where(rating: 3) },
+          scope: -> { where(rating: 3) }
         }
       end
 
@@ -75,13 +69,12 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         Post.where(association.foreign_key => object, rating: 3)
       end
 
-      it "adds the ordering to the criteria" do
+      it 'adds the ordering to the criteria' do
         expect(documents).to eq(criteria)
       end
     end
 
-    context "when the relation is polymorphic" do
-
+    context 'when the relation is polymorphic' do
       let(:options) do
         {
           as: :ratable
@@ -104,56 +97,52 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         Post.belongs_to :ratable, polymorphic: true
       end
 
-      it "adds the type to the criteria" do
+      it 'adds the type to the criteria' do
         expect(documents).to eq(criteria)
       end
     end
 
-    context "when provided an array of hashes" do
+    context 'when provided an array of hashes' do
       let(:object) do
         [
-          { "_id" => BSON::ObjectId.new, "title" => "Post 1" },
-          { "_id" => BSON::ObjectId.new, "title" => "Post 2" }
+          { '_id' => BSON::ObjectId.new, 'title' => 'Post 1' },
+          { '_id' => BSON::ObjectId.new, 'title' => 'Post 2' }
         ]
       end
 
-      it "queries and returns the documents" do
+      it 'queries and returns the documents' do
         for doc in documents
           expect(doc).to be_a(Post)
         end
-        expect(documents.map(&:title)).to eq(["Post 1", "Post 2"])
+        expect(documents.map(&:title)).to eq([ 'Post 1', 'Post 2' ])
       end
     end
 
-    context "when provided a object" do
-
+    context 'when provided a object' do
       let(:object) do
         [ Person.new ]
       end
 
-      it "returns the object" do
+      it 'returns the object' do
         expect(documents).to eq(object)
       end
     end
 
-    context "when no documents found in the database" do
-
-      context "when the ids are empty" do
-
+    context 'when no documents found in the database' do
+      context 'when the ids are empty' do
         let(:object) do
           [ nil ]
         end
 
-        it "returns an empty array" do
+        it 'returns an empty array' do
           expect(documents).to be_empty
         end
 
-        context "during initialization" do
-
-          it "returns an empty array" do
+        context 'during initialization' do
+          it 'returns an empty array' do
             Person.new do |p|
               expect(p.posts).to be_empty
-              expect(p.posts._association).to_not be_nil
+              expect(p.posts._association).not_to be_nil
             end
           end
         end
@@ -161,9 +150,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
     end
 
     context 'when the object is already associated with another object' do
-
-      context "when using <<" do
-
+      context 'when using <<' do
         let(:person1) do
           Person.new
         end
@@ -184,13 +171,12 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         it 'clears the object of its previous association' do
           expect(person1.drugs).to eq([])
           expect(person1.drug_ids).to eq([])
-          expect(person2.drugs).to eq([drug])
-          expect(person2.drug_ids).to eq([drug._id])
+          expect(person2.drugs).to eq([ drug ])
+          expect(person2.drug_ids).to eq([ drug._id ])
         end
       end
 
-      context "when using concat" do
-
+      context 'when using concat' do
         let(:person1) do
           Person.new
         end
@@ -204,20 +190,19 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         end
 
         before do
-          person1.drugs.concat([drug])
-          person2.drugs.concat([drug])
+          person1.drugs.concat([ drug ])
+          person2.drugs.concat([ drug ])
         end
 
         it 'clears the object of its previous association' do
           expect(person1.drugs).to eq([])
           expect(person1.drug_ids).to eq([])
-          expect(person2.drugs).to eq([drug])
-          expect(person2.drug_ids).to eq([drug._id])
+          expect(person2.drugs).to eq([ drug ])
+          expect(person2.drug_ids).to eq([ drug._id ])
         end
       end
 
-      context "when using =" do
-
+      context 'when using =' do
         let(:person1) do
           Person.new
         end
@@ -231,20 +216,19 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         end
 
         before do
-          person1.drugs = [drug]
-          person2.drugs = [drug]
+          person1.drugs = [ drug ]
+          person2.drugs = [ drug ]
         end
 
         it 'clears the object of its previous association' do
           expect(person1.drugs).to eq([])
           expect(person1.drug_ids).to eq([])
-          expect(person2.drugs).to eq([drug])
-          expect(person2.drug_ids).to eq([drug._id])
+          expect(person2.drugs).to eq([ drug ])
+          expect(person2.drug_ids).to eq([ drug._id ])
         end
       end
 
-      context "when using = on the same document twice" do
-
+      context 'when using = on the same document twice' do
         let(:person1) do
           Person.new
         end
@@ -258,13 +242,13 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         end
 
         before do
-          person1.drugs = [drug]
-          person1.drugs = [drug]
+          person1.drugs = [ drug ]
+          person1.drugs = [ drug ]
         end
 
         it 'clears the object of its previous association' do
-          expect(person1.drugs).to eq([drug])
-          expect(person1.drug_ids).to eq([drug._id])
+          expect(person1.drugs).to eq([ drug ])
+          expect(person1.drug_ids).to eq([ drug._id ])
         end
       end
     end

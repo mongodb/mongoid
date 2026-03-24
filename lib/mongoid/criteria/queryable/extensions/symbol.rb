@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Symbol class.
         module Symbol
-
           # Get the symbol as a specification.
           #
           # @example Get the symbol as a criteria.
@@ -23,7 +20,6 @@ module Mongoid
           end
 
           module ClassMethods
-
             # Adds a method on symbol as a convenience for the MongoDB operator.
             #
             # @example Add the $in method.
@@ -35,7 +31,7 @@ module Mongoid
             # @param [ String ] additional The additional MongoDB operator.
             def add_key(name, strategy, operator, additional = nil, &block)
               define_method(name) do
-                method = "__#{strategy}__".to_sym
+                method = :"__#{strategy}__"
                 Key.new(self, method, operator, additional, &block)
               end
             end
@@ -61,5 +57,5 @@ module Mongoid
   end
 end
 
-::Symbol.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Symbol)
-::Symbol.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Symbol::ClassMethods)
+Symbol.include Mongoid::Criteria::Queryable::Extensions::Symbol
+Symbol.extend Mongoid::Criteria::Queryable::Extensions::Symbol::ClassMethods

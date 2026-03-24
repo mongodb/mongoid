@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 require 'concurrent-ruby'
 
 describe Mongoid::Contextual::Mongo::DocumentsLoader do
@@ -39,7 +38,7 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
       # our task will stay in its initial state.
       Concurrent::ThreadPoolExecutor.new(
         min_threads: 0,
-        max_threads: 0,
+        max_threads: 0
       )
     end
 
@@ -87,7 +86,7 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
     end
 
     let(:criteria) do
-      Band.where(name: "Depeche Mode")
+      Band.where(name: 'Depeche Mode')
     end
 
     let(:klass) do
@@ -101,7 +100,7 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
     context 'asynchronously' do
       it 'loads documents' do
         subject.wait!
-        expect(subject.value).to eq([band])
+        expect(subject.value).to eq([ band ])
       end
     end
 
@@ -115,12 +114,12 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
         # our task will stay in its initial state.
         Concurrent::ThreadPoolExecutor.new(
           min_threads: 0,
-          max_threads: 0,
+          max_threads: 0
         )
       end
 
       it 'loads documents' do
-        expect(subject.execute).to eq([band])
+        expect(subject.execute).to eq([ band ])
       end
     end
   end
@@ -151,12 +150,12 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
     end
   end
 
-  describe ".global_thread_pool_async_query_executor" do
-    before(:each) do
+  describe '.global_thread_pool_async_query_executor' do
+    before do
       described_class.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
     end
 
-    after(:each) do
+    after do
       described_class.class_variable_set(:@@global_thread_pool_async_query_executor, nil)
     end
 
@@ -166,7 +165,7 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
       it 'returns an executor' do
         executor = described_class.global_thread_pool_async_query_executor
         expect(executor).not_to be_nil
-        expect(executor.max_length).to eq( 50 )
+        expect(executor.max_length).to eq(50)
       end
     end
 
@@ -174,7 +173,7 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
       it 'returns an executor' do
         executor = described_class.global_thread_pool_async_query_executor
         expect(executor).not_to be_nil
-        expect(executor.max_length).to eq( 4 )
+        expect(executor.max_length).to eq(4)
       end
     end
 
@@ -187,7 +186,7 @@ describe Mongoid::Contextual::Mongo::DocumentsLoader do
         second_executor = described_class.global_thread_pool_async_query_executor
 
         expect(first_executor).not_to eq(second_executor)
-        expect(second_executor.max_length).to eq( 100 )
+        expect(second_executor.max_length).to eq(100)
       end
     end
   end

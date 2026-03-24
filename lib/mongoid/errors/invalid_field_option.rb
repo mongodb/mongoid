@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when trying to create a field that has an invalid
     # option.
     class InvalidFieldOption < MongoidError
-
       # Create the new error.
       #
       # @example Create the error.
@@ -20,12 +17,12 @@ module Mongoid
       def initialize(klass, name, option, valid)
         super(
           compose_message(
-            "invalid_field_option",
+            'invalid_field_option',
             {
               name: name,
               klass: klass,
               option: option,
-              valid: valid.join(", ")
+              valid: valid.join(', ')
             }
           )
         )

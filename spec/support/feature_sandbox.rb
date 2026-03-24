@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 # A helper utility for allowing features to be loaded and constants defined
 # inside a sandbox, where they can be unloaded and undefined when finished.
@@ -60,9 +59,7 @@ module FeatureSandbox
   def unload_constants(parent, list)
     list.each do |name|
       obj = parent.const_get(name)
-      if obj.is_a?(Module) && obj.constants(false).any?
-        unload_constants(obj, obj.constants(false))
-      end
+      unload_constants(obj, obj.constants(false)) if obj.is_a?(Module) && obj.constants(false).any?
 
       Mongoid.deregister_model(obj) if obj.is_a?(Mongoid::Document)
 

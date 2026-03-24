@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # Module providing functionality for parsing (nested) inclusion definitions.
     module Includable
-
       # Eager loads all the provided associations. Will load all the documents
       # into the identity map whose ids match based on the extra query for the
       # ids.
@@ -118,9 +115,9 @@ module Mongoid
     def raise_eager_error(is_eager_load, klass, relation)
       if is_eager_load
         raise ArgumentError, "Eager loading only supports arguments that are the names of associations on #{klass}"
-      else
-        raise Errors::InvalidIncludes.new(klass, [ relation ])
       end
+
+      raise Errors::InvalidIncludes.new(klass, [ relation ])
     end
   end
 end

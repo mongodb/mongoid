@@ -100,7 +100,6 @@ module Mongoid
     #
     # @return [ Object ] The value at the next level.
     #
-    # rubocop:disable Metrics/ParameterLists
     def descend(part, current, method_name, field, part_count, is_translation)
       # 1. If curr is an array fetch from all elements in the array.
       # 2. If the field is localized, and is not an _translations field
@@ -127,6 +126,5 @@ module Mongoid
         fetch_and_demongoize(current, method_name, field)
       end
     end
-    # rubocop:enable Metrics/ParameterLists
   end
 end

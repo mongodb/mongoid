@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Validatable
-
     # Validates whether or not a field is unique against the documents in the
     # database.
     #
@@ -42,6 +40,7 @@ module Mongoid
         with_query(document) do
           attrib, val = to_validate(document, attribute, value)
           return unless validation_required?(document, attrib)
+
           if document.embedded?
             validate_embedded(document, attrib, val)
           else
@@ -64,7 +63,7 @@ module Mongoid
       # @param [ Object ] value The value of the object.
       def add_error(document, attribute, value)
         document.errors.add(
-          attribute, :taken, **options.except(:case_sensitive, :scope).merge(value: value)
+          attribute, :taken, **options.except(:case_sensitive, :scope), value: value
         )
       end
 
@@ -129,15 +128,13 @@ module Mongoid
         field = document.database_field_name(attribute)
 
         if value && localized?(document, field)
-          conditions = (value || {}).inject([]) { |acc, (k,v)| acc << { "#{field}.#{k}" => filter(v) }}
-          selector = { "$or" => conditions }
+          conditions = (value || {}).inject([]) { |acc, (k, v)| acc << { "#{field}.#{k}" => filter(v) } }
+          selector = { '$or' => conditions }
         else
           selector = { field => filter(value) }
         end
 
-        if document.persisted? && !document.embedded?
-          selector.merge!(_id: { "$ne" => document._id })
-        end
+        selector.merge!(_id: { '$ne' => document._id }) if document.persisted? && !document.embedded?
         selector
       end
 
@@ -152,7 +149,7 @@ module Mongoid
       #
       # @return [ Object | Regexp ] The value, filtered or not.
       def filter(value)
-        !case_sensitive? && value ? /\A#{Regexp.escape(value.to_s)}\z/i : value
+        (!case_sensitive? && value) ? /\A#{Regexp.escape(value.to_s)}\z/i : value
       end
 
       # Scope the criteria to the scope options provided.
@@ -200,7 +197,7 @@ module Mongoid
       # @return [ true | false ] If the scope reference has changed.
       def scope_value_changed?(document)
         Array.wrap(options[:scope]).any? do |item|
-          document.send("attribute_changed?", item.to_s)
+          document.send(:attribute_changed?, item.to_s)
         end
       end
 
@@ -240,6 +237,7 @@ module Mongoid
       # @param [ Object ] value The value.
       def validate_embedded(document, attribute, value)
         return if skip_validation?(document)
+
         relation = document._parent.send(document.association_name)
         criteria = create_criteria(relation, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
@@ -266,9 +264,9 @@ module Mongoid
         criteria = create_criteria(klass, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
 
-        if criteria.read(mode: :primary).exists?
-          add_error(document, attribute, value)
-        end
+        return unless criteria.read(mode: :primary).exists?
+
+        add_error(document, attribute, value)
       end
 
       # Are we required to validate the document?
@@ -282,7 +280,7 @@ module Mongoid
       # @return [ true | false ] If we need to validate.
       def validation_required?(document, attribute)
         document.new_record? ||
-          document.send("attribute_changed?", attribute.to_s) ||
+          document.send(:attribute_changed?, attribute.to_s) ||
           scope_value_changed?(document)
       end
 
