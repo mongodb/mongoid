@@ -41,8 +41,7 @@ module Mongoid
             "reside in a different cluster than #{klass} (client: #{root_client}): " \
             "#{offender_list}. Falling back to #includes behavior."
           )
-          docs = view.map { |doc| Mongoid::Factory.from_db(klass, doc, criteria) }
-          return eager_load(docs)
+          return eager_load(docs_for_lookup_fallback)
         end
 
         preload_for_lookup(criteria)
@@ -119,6 +118,15 @@ module Mongoid
       end
 
       private
+
+      # Returns the materialized documents to use when falling back from
+      # $lookup to #includes-style preloading. Must be implemented by each
+      # concrete context class.
+      #
+      # @return [ Array<Mongoid::Document> ] The materialized documents.
+      def docs_for_lookup_fallback
+        raise NotImplementedError, "#{self.class} must implement #docs_for_lookup_fallback"
+      end
 
       # Returns the inclusions whose target class resides in a different cluster
       # than the root class.

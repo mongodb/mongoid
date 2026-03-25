@@ -821,6 +821,14 @@ module Mongoid
         @view = view.send(name, spec)
       end
 
+      # Returns materialized documents for use in the cross-cluster $lookup
+      # fallback. Reads from the collection view and instantiates documents.
+      #
+      # @api private
+      def docs_for_lookup_fallback
+        view.map { |doc| Factory.from_db(klass, doc, criteria) }
+      end
+
       # Map the inverse sort symbols to the correct MongoDB values.
       #
       # @api private

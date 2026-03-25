@@ -521,6 +521,14 @@ module Mongoid
 
       private
 
+      # Returns materialized documents for use in the cross-cluster $lookup
+      # fallback. In the memory context, documents are already instantiated.
+      #
+      # @api private
+      def docs_for_lookup_fallback
+        documents
+      end
+
       # Get the documents the context should iterate. This follows 3 rules:
       #
       # @api private
