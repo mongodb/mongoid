@@ -616,4 +616,72 @@ describe Mongoid::Association::EagerLoadable do
       end
     end
   end
+
+  describe '.eager_load_with_lookup' do
+    let(:context) do
+      Mongoid::Contextual::Mongo.new(criteria)
+    end
+
+    context 'when all associations are on the same cluster' do
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:post) do
+        Post.create!(person: person)
+      end
+
+      let(:criteria) do
+        Person.where(id: person.id).eager_load(:posts)
+      end
+
+      it 'uses $lookup aggregation' do
+        expect(context).not_to receive(:eager_load)
+        context.eager_load_with_lookup
+      end
+
+      it 'correctly loads associations' do
+        docs = context.eager_load_with_lookup
+        expect(docs.first.posts).to eq([ post ])
+      end
+    end
+
+    context 'when an association is on a different cluster' do
+      let!(:person) do
+        Person.create!
+      end
+
+      let!(:post) do
+        Post.create!(person: person)
+      end
+
+      let(:criteria) do
+        Person.where(id: person.id).eager_load(:posts)
+      end
+
+      before do
+        allow(Post).to receive(:client_name).and_return(:other_cluster)
+      end
+
+      it 'logs a warning' do
+        expect(Mongoid.logger).to receive(:warn).with(
+          /eager_load cannot use \$lookup aggregation.*posts.*Falling back to #includes/
+        )
+        context.eager_load_with_lookup
+      end
+
+      it 'falls back to #includes behavior and still loads associations' do
+        allow(Mongoid.logger).to receive(:warn)
+        docs = context.eager_load_with_lookup
+        expect(docs.first.posts).to eq([ post ])
+      end
+
+      it 'mentions the offending association and client in the warning' do
+        expect(Mongoid.logger).to receive(:warn).with(
+          /posts \(other_cluster\)/
+        )
+        context.eager_load_with_lookup
+      end
+    end
+  end
 end
