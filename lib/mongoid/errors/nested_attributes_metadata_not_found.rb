@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when metadata could not be found when defining
     # nested attributes, or the name was incorrect.
     class NestedAttributesMetadataNotFound < MongoidError
-
       # Create the new metadata error.
       #
       # @example Create the new metadata error.
@@ -18,7 +15,7 @@ module Mongoid
       def initialize(klass, name)
         super(
           compose_message(
-            "nested_attributes_metadata_not_found",
+            'nested_attributes_metadata_not_found',
             { klass: klass, name: name }
           )
         )

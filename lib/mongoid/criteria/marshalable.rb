@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # Mixin module for Mongoid::Criteria which adds custom
     # Marshal.dump functionality.
     module Marshalable
-
       # Provides the data needed to Marshal.dump a criteria.
       #
       # @example Dump the criteria.
@@ -33,7 +30,7 @@ module Mongoid
         @klass, driver, @inclusions, @documents, @strategy, @negating, @use_lookup = data
 
         if driver == :mongo1x
-          raise NotImplementedError, "Mongoid no longer supports marshalling with driver version 1.x."
+          raise NotImplementedError, 'Mongoid no longer supports marshalling with driver version 1.x.'
         end
 
         @selector = load_hash(Queryable::Selector, raw_selector)
@@ -43,9 +40,8 @@ module Mongoid
       private
 
       def dump_hash(name)
-        send(name).inject({}) do |raw, (key, value)|
+        send(name).each_with_object({}) do |(key, value), raw|
           raw[key] = value
-          raw
         end
       end
 

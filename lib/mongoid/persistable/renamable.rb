@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for $rename operations.
     module Renamable
       extend ActiveSupport::Concern
@@ -30,7 +28,7 @@ module Mongoid
             end
             ops[atomic_attribute_name(old_field)] = atomic_attribute_name(new_name)
           end
-          { "$rename" => ops }
+          { '$rename' => ops }
         end
       end
     end

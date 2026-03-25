@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Sandwich
   include Mongoid::Document
+
   has_and_belongs_to_many :meats
 
   field :name, type: String

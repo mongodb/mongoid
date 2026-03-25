@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Fields
-
     # Represents a standard field definition (name, type, etc.)
     # used to enforce consistent schema structure to the BSON
     # documents which Mongoid persists.
@@ -27,7 +25,7 @@ module Mongoid
       # @param [ Hash ] mods The current modifications.
       # @param [ Array ] new The new elements to add.
       # @param [ Array ] old The old elements getting removed.
-      def add_atomic_changes(document, name, key, mods, new, old)
+      def add_atomic_changes(_document, _name, key, mods, new, _old)
         mods[key] = new
       end
 
@@ -77,9 +75,9 @@ module Mongoid
         # @todo: Durran, change API in 4.0 to take the class as a parameter.
         # This is here temporarily to address #2529 without changing the
         # constructor signature.
-        if default_val.respond_to?(:call)
-          define_default_method(options[:klass])
-        end
+        return unless default_val.respond_to?(:call)
+
+        define_default_method(options[:klass])
       end
 
       # Does this field do lazy default evaluation?
@@ -140,7 +138,7 @@ module Mongoid
       # @return [ true | false ] If the field's default is pre-processed.
       def pre_processed?
         @pre_processed ||=
-          (options[:pre_processed] || (default_val && !default_val.is_a?(::Proc)))
+          options[:pre_processed] || (default_val && !default_val.is_a?(::Proc))
       end
 
       # Get the type of this field - inferred from the class name.

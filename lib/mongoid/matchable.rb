@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module contains all the behavior for Ruby implementations of MongoDB
   # selectors.
   module Matchable

@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
-
       # Builder class used to perform #accepts_nested_attributes_for
       # attribute assignment on many-to-n associations.
       class Many
@@ -16,8 +14,8 @@ module Mongoid
         # This attempts to perform 3 operations, either one of an update of
         # the existing association, a replacement of the association with a new
         # document, or a removal of the association.
-        # 
-        # It raises an argument error if the attributes are not a Hash or an 
+        #
+        # It raises an argument error if the attributes are not a Hash or an
         # Array of key/value pairs.
         #
         # @example Build the nested attrs.
@@ -29,9 +27,8 @@ module Mongoid
         # @return [ Array ] The attributes.
         def build(parent, options = {})
           @existing = parent.send(association.name)
-          if over_limit?(attributes)
-            raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
-          end
+          raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit]) if over_limit?(attributes)
+
           attributes.each do |attrs|
             if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
@@ -40,7 +37,8 @@ module Mongoid
             elsif attrs.is_a?(Array) && attrs.length.even?
               process_attributes(parent, Hash[*attrs].with_indifferent_access)
             else
-              raise ArgumentError, "Attributes for nested association '#{association.name}' must be a Hash or an Array of key/value pairs."
+              raise ArgumentError,
+                    "Attributes for nested association '#{association.name}' must be a Hash or an Array of key/value pairs."
             end
           end
         end
@@ -55,13 +53,13 @@ module Mongoid
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
         def initialize(association, attributes, options = {})
-          if attributes.respond_to?(:with_indifferent_access)
-            @attributes = attributes.with_indifferent_access.sort do |a, b|
-              a[0].to_i <=> b[0].to_i
-            end
-          else
-            @attributes = attributes
-          end
+          @attributes = if attributes.respond_to?(:with_indifferent_access)
+                          attributes.with_indifferent_access.sort do |a, b|
+                            a[0].to_i <=> b[0].to_i
+                          end
+                        else
+                          attributes
+                        end
           @association = association
           @options = options
           @class_name = options[:class_name] ? options[:class_name].constantize : association.klass

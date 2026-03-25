@@ -1,57 +1,49 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
-require "support/feature_sandbox"
+require 'spec_helper'
+require 'support/feature_sandbox'
 
 describe Mongoid::Config::Environment do
-
   around do |example|
     FeatureSandbox.quarantine do
       example.run
     end
   end
 
-  describe "#env_name" do
-
-    context "when using rails" do
-
-      context "when an environment exists" do
-
+  describe '#env_name' do
+    context 'when using rails' do
+      context 'when an environment exists' do
         before do
-          require "support/rails_mock"
-          Rails.env = "production"
+          require 'support/rails_mock'
+          Rails.env = 'production'
         end
 
-        it "returns the rails environment" do
-          expect(described_class.env_name).to eq("production")
+        it 'returns the rails environment' do
+          expect(described_class.env_name).to eq('production')
         end
       end
     end
 
-    context "when using sinatra" do
+    context 'when using sinatra' do
+      before { require 'support/sinatra_mock' }
 
-      before { require "support/sinatra_mock" }
-
-      it "returns the sinatra environment" do
-        expect(described_class.env_name).to eq("staging")
+      it 'returns the sinatra environment' do
+        expect(described_class.env_name).to eq('staging')
       end
     end
 
-    context "when the rack env variable is defined" do
+    context 'when the rack env variable is defined' do
+      before { ENV['RACK_ENV'] = 'acceptance' }
 
-      before { ENV["RACK_ENV"] = "acceptance" }
+      after { ENV['RACK_ENV'] = nil }
 
-      after { ENV["RACK_ENV"] = nil }
-
-      it "returns the rack environment" do
-        expect(described_class.env_name).to eq("acceptance")
+      it 'returns the rack environment' do
+        expect(described_class.env_name).to eq('acceptance')
       end
     end
 
-    context "when no environment information is found" do
-
-      it "raises an error" do
+    context 'when no environment information is found' do
+      it 'raises an error' do
         expect { described_class.env_name }.to raise_error(
           Mongoid::Errors::NoEnvironment
         )
@@ -59,19 +51,19 @@ describe Mongoid::Config::Environment do
     end
   end
 
-  describe "#load_yaml" do
+  describe '#load_yaml' do
+    subject { described_class.load_yaml(path, environment) }
+
     let(:path) { 'mongoid.yml' }
     let(:environment) {}
 
     before do
-      require "support/rails_mock"
-      Rails.env = "test"
+      require 'support/rails_mock'
+      Rails.env = 'test'
     end
 
-    subject { described_class.load_yaml(path, environment) }
-
     context 'when file not found' do
-      let(:path) { 'not/a/valid/path'}
+      let(:path) { 'not/a/valid/path' }
 
       it { expect { subject }.to raise_error(Errno::ENOENT) }
     end
@@ -116,7 +108,7 @@ describe Mongoid::Config::Environment do
 
       context 'when environment not specified' do
         it 'uses the rails environment' do
-          is_expected.to eq("clients"=>["test"])
+          expect(subject).to eq('clients' => [ 'test' ])
         end
       end
 
@@ -124,7 +116,7 @@ describe Mongoid::Config::Environment do
         let(:environment) { 'development' }
 
         it 'uses the specified environment' do
-          is_expected.to eq("clients"=>["dev"])
+          expect(subject).to eq('clients' => [ 'dev' ])
         end
       end
 
@@ -138,9 +130,7 @@ describe Mongoid::Config::Environment do
     context 'when configuration includes schema map' do
       paths = Dir.glob(File.join(File.dirname(__FILE__), '../../support/schema_maps/*.json'))
 
-      if paths.empty?
-        raise "Expected to find some schema maps"
-      end
+      raise 'Expected to find some schema maps' if paths.empty?
 
       before do
         allow(File).to receive(:read).with('mongoid.yml').and_return(file_contents)
@@ -155,7 +145,7 @@ describe Mongoid::Config::Environment do
                 hosts: [localhost]
                 options:
                   auto_encryption_options:
-                    schema_map: #{schema_map.to_yaml.sub(/\A---/, '').gsub(/\n/, "\n" + ' '*100)}
+                    schema_map: #{schema_map.to_yaml.sub(/\A---/, '').gsub("\n", "\n" + (' ' * 100))}
         FILE
       end
 

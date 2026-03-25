@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Range class.
         module Range
-
           # Get the range as an array.
           #
           # @example Get the range as an array.
@@ -26,7 +23,7 @@ module Mongoid
           #
           # @return [ Hash ] The $gte/$lte range query with times at UTC midnight.
           def __evolve_date__
-            __evolve_range_naive__.transform_values! {|v| v&.__evolve_date__ }
+            __evolve_range_naive__.transform_values! { |v| v&.__evolve_date__ }
           end
 
           # Convert the range to a $gte/$lte mongo friendly query for times.
@@ -36,7 +33,7 @@ module Mongoid
           #
           # @return [ Hash ] The $gte/$lte range query with times in UTC.
           def __evolve_time__
-            __evolve_range_naive__.transform_values! {|v| v&.__evolve_time__ }
+            __evolve_range_naive__.transform_values! { |v| v&.__evolve_time__ }
           end
 
           # Convert the range to a $gte/$lte mongo friendly query.
@@ -72,12 +69,11 @@ module Mongoid
           def __evolve_range_naive__
             hash = {}
             hash['$gte'] = self.begin if self.begin
-            hash[exclude_end? ? "$lt" : "$lte"] = self.end if self.end
+            hash[exclude_end? ? '$lt' : '$lte'] = self.end if self.end
             hash
           end
 
           module ClassMethods
-
             # Evolve the range. This will transform it into a $gte/$lte selection.
             # Endless and beginning-less ranges will use only $gte or $lte respectively.
             # End-excluded ranges (...) will use $lt selector instead of $lte.
@@ -90,6 +86,7 @@ module Mongoid
             # @return [ Hash ] The range as a gte/lte criteria.
             def evolve(object)
               return object unless object.is_a?(::Range)
+
               object.__evolve_range__
             end
           end
@@ -99,5 +96,5 @@ module Mongoid
   end
 end
 
-::Range.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Range)
-::Range.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Range::ClassMethods)
+Range.include Mongoid::Criteria::Queryable::Extensions::Range
+Range.extend Mongoid::Criteria::Queryable::Extensions::Range::ClassMethods

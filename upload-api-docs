@@ -61,7 +61,7 @@ class FileUploader
 end
 
 # This class contains logic for parsing CLI and ENV options.
-class Options # rubocop:disable Style/OneClassPerFile
+class Options
   def initialize
     @options = {}
     parse_cli_options!

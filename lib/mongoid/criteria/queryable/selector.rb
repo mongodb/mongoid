@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
-
       # The selector is a special kind of hash that knows how to serialize values
       # coming into it as well as being alias and locale aware for key names.
       class Selector < Smash
-
         # Merges another selector into this one.
         #
         # @example Merge in another selector.
@@ -31,9 +28,7 @@ module Mongoid
                 end
               end
             end
-            if multi_selection?(key)
-              value = (self[key.to_s] || []).concat(value)
-            end
+            value = (self[key.to_s] || []).concat(value) if multi_selection?(key)
             store(key, value)
           end
         end
@@ -58,7 +53,7 @@ module Mongoid
           end
           super(store_name, store_value)
         end
-        alias :[]= :store
+        alias []= store
 
         # Convert the selector to an aggregation pipeline entry.
         #
@@ -68,7 +63,7 @@ module Mongoid
         # @return [ Array<Hash> ] The pipeline entry for the selector.
         def to_pipeline
           pipeline = []
-          pipeline.push({ "$match" => self }) unless empty?
+          pipeline.push({ '$match' => self }) unless empty?
           pipeline
         end
 
@@ -85,7 +80,7 @@ module Mongoid
         # @return [ Array<String, String> ] The store name and store value.
         def store_creds(name, serializer, value)
           store_name = localized_key(name, serializer)
-          if Range === value
+          if value.is_a?(Range)
             evolve_range(store_name, serializer, value)
           else
             [ store_name, evolve(serializer, value) ]
@@ -104,18 +99,15 @@ module Mongoid
         #
         # @api private
         def evolve_multi(specs)
-          unless specs.is_a?(Array)
-            raise ArgumentError, "specs is not an array: #{specs.inspect}"
-          end
+          raise ArgumentError, "specs is not an array: #{specs.inspect}" unless specs.is_a?(Array)
+
           specs.map do |spec|
             Hash[spec.map do |key, value|
               # If an application nests conditionals, e.g.
               # {'$or' => [{'$or' => {...}}]},
               # when evolve_multi is called for the top level hash,
               # this call recursively transforms the bottom level $or.
-              if multi_selection?(key)
-                value = evolve_multi(value)
-              end
+              value = evolve_multi(value) if multi_selection?(key)
 
               # storage_pair handles field aliases but not localization for
               # some reason, although per its documentation Smash supposedly
@@ -130,9 +122,7 @@ module Mongoid
               # involves complex keys. For example, {:foo.lt => 5} produces
               # {'foo' => {'$lt' => 5}}. This step should be done after all
               # value-based processing is complete.
-              if key.is_a?(Key)
-                evolved_value = key.transform_value(evolved_value)
-              end
+              evolved_value = key.transform_value(evolved_value) if key.is_a?(Key)
 
               [ final_key, evolved_value ]
             end]
@@ -195,11 +185,11 @@ module Mongoid
         # @return [ Object ] The serialized hash.
         def evolve_hash(serializer, value)
           value.each_pair do |operator, _value|
-            if operator =~ /exists|type|size/
-              value[operator] = _value
-            else
-              value[operator] = evolve(serializer, _value)
-            end
+            value[operator] = if /exists|type|size/.match?(operator)
+                                _value
+                              else
+                                evolve(serializer, _value)
+                              end
           end
         end
 
@@ -239,13 +229,14 @@ module Mongoid
         def evolve_range(key, serializer, value)
           v = value.__evolve_range__(serializer: serializer)
           assocs = []
-          Fields.traverse_association_tree(key, serializers, associations, aliased_associations) do |meth, obj, is_field|
-            assocs.push([meth, obj, is_field])
+          Fields.traverse_association_tree(key, serializers, associations,
+                                           aliased_associations) do |meth, obj, is_field|
+            assocs.push([ meth, obj, is_field ])
           end
 
           # Iterate backwards until you get a field with type
           # Array or an embeds_many association.
-          inner_key = ""
+          inner_key = ''
           loop do
             # If there are no arrays or embeds_many associations, just return
             # the key and value without $elemMatch.
@@ -262,10 +253,10 @@ module Mongoid
           # the inner key (2) is ignored, and the outer key (1) is the original
           # key.
           if inner_key.blank?
-            [ key, { "$elemMatch" => v }]
+            [ key, { '$elemMatch' => v } ]
           else
             store_key = assocs.map(&:first).join('.')
-            store_value = { "$elemMatch" => { inner_key.chop => v } }
+            store_value = { '$elemMatch' => { inner_key.chop => v } }
             [ store_key,  store_value ]
           end
         end
@@ -282,7 +273,7 @@ module Mongoid
         #
         # @return [ true | false ] If the key is for a multi-select.
         def multi_selection?(key)
-          %w($and $or $nor).include?(key)
+          %w[$and $or $nor].include?(key)
         end
       end
     end

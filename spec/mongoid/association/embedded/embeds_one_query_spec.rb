@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
-require_relative './embeds_one_models'
+require 'spec_helper'
+require_relative 'embeds_one_models'
 
 describe Mongoid::Association::Embedded::EmbedsOne do
-
   context 'when projecting with #only' do
     before do
       parent = EomParent.new(name: 'foo')
@@ -22,8 +20,9 @@ describe Mongoid::Association::Embedded::EmbedsOne do
       # has a default value specified in the model
       expect do
         parent.child.b
-      end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'b' on EomChild which was not loaded/)
-      expect(parent.child.attributes.keys).to eq(['_id', 'a'])
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded,
+                         /Attempted to access attribute 'b' on EomChild which was not loaded/)
+      expect(parent.child.attributes.keys).to eq(%w[_id a])
     end
   end
 end

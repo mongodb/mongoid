@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Hash class.
     module Hash
-
       # Evolves each value in the hash to an object id if it is convertable.
       #
       # @example Convert the hash values.
@@ -55,7 +52,7 @@ module Mongoid
       # @return [ Object ] The deleted value, or nil.
       # @deprecated
       def delete_id
-        delete("_id") || delete(:_id) || delete("id") || delete(:id)
+        delete('_id') || delete(:_id) || delete('id') || delete(:id)
       end
       Mongoid.deprecate(self, :delete_id)
 
@@ -68,7 +65,7 @@ module Mongoid
       # @return [ Object ] The value of the id.
       # @deprecated
       def extract_id
-        self["_id"] || self[:_id] || self["id"] || self[:id]
+        self['_id'] || self[:_id] || self['id'] || self[:id]
       end
       Mongoid.deprecate(self, :extract_id)
 
@@ -107,10 +104,7 @@ module Mongoid
       end
       Mongoid.deprecate(self, :to_criteria)
 
-      private
-
       module ClassMethods
-
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
         #
@@ -122,6 +116,7 @@ module Mongoid
         # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
+
           case object
           when BSON::Document
             object.dup.transform_values!(&:mongoize)
@@ -144,5 +139,5 @@ module Mongoid
   end
 end
 
-::Hash.__send__(:include, Mongoid::Extensions::Hash)
-::Hash.extend(Mongoid::Extensions::Hash::ClassMethods)
+Hash.include Mongoid::Extensions::Hash
+Hash.extend(Mongoid::Extensions::Hash::ClassMethods)

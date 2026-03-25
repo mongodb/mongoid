@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Nested
-
       # Builder class used to perform #accepts_nested_attributes_for
       # attribute assignment on one-to-n associations.
       class One
@@ -27,6 +25,7 @@ module Mongoid
         # @return [ Document ] The built document.
         def build(parent)
           return if reject?(parent, attributes)
+
           @existing = parent.send(association.name)
           if update?
             delete_id(attributes)
@@ -158,11 +157,9 @@ module Mongoid
 
           # otherwise, an attempt has been made to set the _id of an existing,
           # persisted document.
-          if Mongoid::Config.immutable_ids
-            raise Errors::ImmutableAttribute.new(:_id, id)
-          else
-            Mongoid::Warnings.warn_mutable_ids
-          end
+          raise Errors::ImmutableAttribute.new(:_id, id) if Mongoid::Config.immutable_ids
+
+          Mongoid::Warnings.warn_mutable_ids
         end
       end
     end

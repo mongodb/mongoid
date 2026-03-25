@@ -1,47 +1,42 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Inspectable do
-
-  describe "#inspect" do
-
-    context "when not allowing dynamic fields" do
-
+  describe '#inspect' do
+    context 'when not allowing dynamic fields' do
       let(:person) do
-        Person.new(title: "CEO")
+        Person.new(title: 'CEO')
       end
 
       let(:inspected) do
         person.inspect
       end
 
-      it "includes the model type" do
-        expect(inspected).to include("#<Person")
+      it 'includes the model type' do
+        expect(inspected).to include('#<Person')
       end
 
-      it "displays the id" do
+      it 'displays the id' do
         expect(inspected).to include("_id: #{person.id}")
       end
 
-      it "displays defined fields" do
-        expect(inspected).to include(%q,title: "CEO",)
+      it 'displays defined fields' do
+        expect(inspected).to include('title: "CEO"')
       end
 
-      it "displays field aliases" do
-        expect(inspected).to include("t(test):")
+      it 'displays field aliases' do
+        expect(inspected).to include('t(test):')
       end
 
-      it "displays the default discriminator key" do
-        expect(inspected).to include(%q,_type: "Person",)
+      it 'displays the default discriminator key' do
+        expect(inspected).to include('_type: "Person"')
       end
     end
 
-    context "when using a custom discriminator key" do
-
+    context 'when using a custom discriminator key' do
       before do
-        Person.discriminator_key = "dkey"
+        Person.discriminator_key = 'dkey'
       end
 
       after do
@@ -49,30 +44,29 @@ describe Mongoid::Inspectable do
       end
 
       let(:person) do
-        Person.new(title: "CEO")
+        Person.new(title: 'CEO')
       end
 
       let(:inspected) do
         person.inspect
       end
 
-      it "displays the new discriminator key" do
-        expect(inspected).to include(%q,dkey: "Person",)
+      it 'displays the new discriminator key' do
+        expect(inspected).to include('dkey: "Person"')
       end
     end
 
-    context "when allowing dynamic fields" do
-
+    context 'when allowing dynamic fields' do
       let(:person) do
-        Person.new(title: "CEO", some_attribute: "foo")
+        Person.new(title: 'CEO', some_attribute: 'foo')
       end
 
       let(:inspected) do
         person.inspect
       end
 
-      it "includes dynamic attributes" do
-        expect(inspected).to include(%q,some_attribute: "foo",)
+      it 'includes dynamic attributes' do
+        expect(inspected).to include('some_attribute: "foo"')
       end
     end
 
@@ -80,48 +74,45 @@ describe Mongoid::Inspectable do
       let(:shirt) { Shirt.new(id: 1, _id: 2) }
 
       it 'shows the correct _id and id values' do
-        shirt.inspect.should == "#<Shirt _id: 2, color: nil, id: \"1\">"
+        shirt.inspect.should == '#<Shirt _id: 2, color: nil, id: "1">'
       end
     end
   end
 
-  describe "#pretty_inspect" do
-
-    context "when not allowing dynamic fields" do
-
+  describe '#pretty_inspect' do
+    context 'when not allowing dynamic fields' do
       let(:person) do
-        Person.new(title: "CEO")
+        Person.new(title: 'CEO')
       end
 
       let(:pretty_inspected) do
         person.pretty_inspect
       end
 
-      it "includes the model type" do
-        expect(pretty_inspected).to include("#<Person")
+      it 'includes the model type' do
+        expect(pretty_inspected).to include('#<Person')
       end
 
-      it "displays the id" do
+      it 'displays the id' do
         expect(pretty_inspected).to include("_id: #{person.id}")
       end
 
-      it "displays defined fields" do
-        expect(pretty_inspected).to include(%q,title: "CEO",)
+      it 'displays defined fields' do
+        expect(pretty_inspected).to include('title: "CEO"')
       end
 
-      it "displays field aliases" do
-        expect(pretty_inspected).to include("t(test):")
+      it 'displays field aliases' do
+        expect(pretty_inspected).to include('t(test):')
       end
 
-      it "displays the default discriminator key" do
-        expect(pretty_inspected).to include(%q,_type: "Person",)
+      it 'displays the default discriminator key' do
+        expect(pretty_inspected).to include('_type: "Person"')
       end
     end
 
-    context "when using a custom discriminator key" do
-
+    context 'when using a custom discriminator key' do
       before do
-        Person.discriminator_key = "dkey"
+        Person.discriminator_key = 'dkey'
       end
 
       after do
@@ -129,30 +120,29 @@ describe Mongoid::Inspectable do
       end
 
       let(:person) do
-        Person.new(title: "CEO")
+        Person.new(title: 'CEO')
       end
 
       let(:pretty_inspected) do
         person.pretty_inspect
       end
 
-      it "displays the new discriminator key" do
-        expect(pretty_inspected).to include(%q,dkey: "Person",)
+      it 'displays the new discriminator key' do
+        expect(pretty_inspected).to include('dkey: "Person"')
       end
     end
 
-    context "when allowing dynamic fields" do
-
+    context 'when allowing dynamic fields' do
       let(:person) do
-        Person.new(title: "CEO", some_attribute: "foo")
+        Person.new(title: 'CEO', some_attribute: 'foo')
       end
 
       let(:pretty_inspected) do
         person.pretty_inspect
       end
 
-      it "includes dynamic attributes" do
-        expect(pretty_inspected).to include(%q,some_attribute: "foo",)
+      it 'includes dynamic attributes' do
+        expect(pretty_inspected).to include('some_attribute: "foo"')
       end
     end
 

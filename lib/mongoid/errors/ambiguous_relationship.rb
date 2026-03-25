@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised in case of an ambiguous association.
     #
     # @example An ambiguous association.
@@ -21,7 +19,6 @@ module Mongoid
     #     belongs_to :referred_by, class_name: "Person"
     #   end
     class AmbiguousRelationship < MongoidError
-
       # Create the new error.
       #
       # @example Create the error.
@@ -36,12 +33,12 @@ module Mongoid
       def initialize(klass, inverse, name, candidates)
         super(
           compose_message(
-            "ambiguous_relationship",
+            'ambiguous_relationship',
             {
               klass: klass,
               inverse: inverse,
               name: name.inspect,
-              candidates: candidates.map(&:inspect).join(", ")
+              candidates: candidates.map(&:inspect).join(', ')
             }
           )
         )

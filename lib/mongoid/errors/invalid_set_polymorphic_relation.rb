@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when trying to set a polymorphic "references in" association to a
     # model with multiple "references many/one" associations pointing to that
     # first model.
@@ -26,13 +24,13 @@ module Mongoid
     #   face = Face.new
     #   eye.eyeable = face # Raises error
     class InvalidSetPolymorphicRelation < MongoidError
-
       # Create the new invalid set polymorphic association error.
       #
       # @example Create the error.
       #   InvalidSetPolymorphicRelation.new
       def initialize(name, klass, other_klass)
-        super(compose_message("invalid_set_polymorphic_relation", { name: name, klass: klass, other_klass: other_klass }))
+        super(compose_message('invalid_set_polymorphic_relation',
+                              { name: name, klass: klass, other_klass: other_klass }))
       end
     end
   end

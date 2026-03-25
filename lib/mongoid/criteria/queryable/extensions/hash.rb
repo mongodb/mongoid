@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Hash class.
         module Hash
-
           # Add an object to a hash using the merge strategies.
           #
           # @example Add an object to a hash.
@@ -161,4 +158,4 @@ module Mongoid
   end
 end
 
-::Hash.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Hash)
+Hash.include Mongoid::Criteria::Queryable::Extensions::Hash

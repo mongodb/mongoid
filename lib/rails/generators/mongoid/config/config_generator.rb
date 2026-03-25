@@ -1,14 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'rails/generators/mongoid_generator'
 
 module Mongoid
   module Generators
-
     # Generator class for Mongoid configuration files.
     class ConfigGenerator < Rails::Generators::Base
-      desc "Creates Mongoid configuration files"
+      desc 'Creates Mongoid configuration files'
 
       argument :database_name, type: :string, optional: true
 
@@ -16,7 +14,7 @@ module Mongoid
       #
       # @return [ String ] The path.
       def self.source_root
-        @_mongoid_source_root ||= File.expand_path("../templates", __FILE__)
+        @_mongoid_source_root ||= File.expand_path('templates', __dir__)
       end
 
       # Returns the underscored name of the Rails application.

@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This exception is raised when a bad value is attempted to be converted to
     # a date or time.
     class InvalidTime < MongoidError
-
       # Create the new invalid date error.
       #
       # @example Create the new invalid date error.
@@ -15,7 +12,7 @@ module Mongoid
       #
       # @param [ Object ] value The value that was attempted.
       def initialize(value)
-        super(compose_message("invalid_time", { value: value }))
+        super(compose_message('invalid_time', { value: value }))
       end
     end
   end

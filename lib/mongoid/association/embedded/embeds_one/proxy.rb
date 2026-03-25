@@ -147,7 +147,7 @@ module Mongoid
           #
           # @return [ true | false ] whether a nil document was substituted
           #   or not.
-          def replace_with_nil_document(replacement) # rubocop:disable Naming/PredicateMethod
+          def replace_with_nil_document(replacement)
             return false if replacement
 
             update_attributes_hash(replacement)

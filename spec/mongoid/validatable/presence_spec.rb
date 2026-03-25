@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 require_relative '../association/referenced/has_one_models'
 
 describe Mongoid::Validatable::PresenceValidator do
-
-  describe "#validate_each" do
-
+  describe '#validate_each' do
     let(:product) do
       Product.new
     end
@@ -16,205 +13,182 @@ describe Mongoid::Validatable::PresenceValidator do
       described_class.new(attributes: product.attributes)
     end
 
-    context "when the field is not localized" do
-
-      context "when the value is valid" do
-
+    context 'when the field is not localized' do
+      context 'when the value is valid' do
         before do
-          validator.validate_each(product, :brand_name, "Apple")
+          validator.validate_each(product, :brand_name, 'Apple')
         end
 
-        it "adds no errors" do
+        it 'adds no errors' do
           expect(product.errors[:brand_name]).to be_empty
         end
       end
 
-      context "when the value is nil" do
-
+      context 'when the value is nil' do
         before do
           validator.validate_each(product, :brand_name, nil)
         end
 
-        it "adds errors" do
-          expect(product.errors[:brand_name]).to eq(["can't be blank"])
+        it 'adds errors' do
+          expect(product.errors[:brand_name]).to eq([ "can't be blank" ])
         end
       end
 
-      context "when the value is empty" do
-
+      context 'when the value is empty' do
         before do
-          validator.validate_each(product, :brand_name, "")
+          validator.validate_each(product, :brand_name, '')
         end
 
-        it "adds errors" do
-          expect(product.errors[:brand_name]).to eq(["can't be blank"])
+        it 'adds errors' do
+          expect(product.errors[:brand_name]).to eq([ "can't be blank" ])
         end
       end
     end
 
-    context "when the field is localized" do
-
-      context "when the value is valid" do
-
+    context 'when the field is localized' do
+      context 'when the value is valid' do
         before do
-          validator.validate_each(product, :name, { "en" => "iPod Nano 8GB - Black" })
+          validator.validate_each(product, :name, { 'en' => 'iPod Nano 8GB - Black' })
         end
 
-        it "adds no errors" do
+        it 'adds no errors' do
           expect(product.errors[:name]).to be_empty
         end
       end
 
-      context "when the value is nil" do
-
+      context 'when the value is nil' do
         before do
           validator.validate_each(product, :name, nil)
         end
 
-        it "adds errors" do
-          expect(product.errors[:name]).to eq(["can't be blank"])
+        it 'adds errors' do
+          expect(product.errors[:name]).to eq([ "can't be blank" ])
         end
       end
 
-      context "when the localized value is nil" do
-
+      context 'when the localized value is nil' do
         before do
-          validator.validate_each(product, :name, { "en" => nil })
+          validator.validate_each(product, :name, { 'en' => nil })
         end
 
-        it "adds errors" do
-          expect(product.errors[:name]).to eq(["can't be blank in en"])
+        it 'adds errors' do
+          expect(product.errors[:name]).to eq([ "can't be blank in en" ])
         end
       end
 
-      context "when the value is empty" do
-
+      context 'when the value is empty' do
         before do
-          validator.validate_each(product, :name, { "en" => "" })
+          validator.validate_each(product, :name, { 'en' => '' })
         end
 
-        it "adds errors" do
-          expect(product.errors[:name]).to eq(["can't be blank in en"])
+        it 'adds errors' do
+          expect(product.errors[:name]).to eq([ "can't be blank in en" ])
         end
       end
 
-      context "when the value is empty for a language" do
-
+      context 'when the value is empty for a language' do
         before do
           validator.validate_each(
             product,
             :name,
-            { "en" => "iPod Nano 8GB - Black", "de" => "" }
+            { 'en' => 'iPod Nano 8GB - Black', 'de' => '' }
           )
         end
 
-        it "adds errors" do
-          expect(product.errors[:name]).to eq(["can't be blank in de"])
+        it 'adds errors' do
+          expect(product.errors[:name]).to eq([ "can't be blank in de" ])
         end
       end
 
-      context "when the value is empty for all language" do
-
+      context 'when the value is empty for all language' do
         before do
           validator.validate_each(
             product,
             :name,
-            { "en" => "", "de" => "" }
+            { 'en' => '', 'de' => '' }
           )
         end
 
-        it "adds errors" do
-          expect(product.errors[:name]).to eq(["can't be blank in en", "can't be blank in de"])
+        it 'adds errors' do
+          expect(product.errors[:name]).to eq([ "can't be blank in en", "can't be blank in de" ])
         end
       end
     end
 
-    context "when the field is aliased" do
-
-      context "when the aliased field name is validated" do
-
-        context "when the value is valid" do
-
+    context 'when the field is aliased' do
+      context 'when the aliased field name is validated' do
+        context 'when the value is valid' do
           before do
-            validator.validate_each(product, :sku, "12345")
+            validator.validate_each(product, :sku, '12345')
           end
 
-          it "adds no errors" do
+          it 'adds no errors' do
             expect(product.errors[:sku]).to be_empty
           end
         end
 
-        context "when the value is invalid" do
-
+        context 'when the value is invalid' do
           before do
             validator.validate_each(product, :sku, nil)
           end
 
-          it "adds errors" do
-            expect(product.errors[:sku]).to eq(["can't be blank"])
+          it 'adds errors' do
+            expect(product.errors[:sku]).to eq([ "can't be blank" ])
           end
         end
       end
 
-      context "when the underlying field name is validated" do
-
-        context "when the value is valid" do
-
+      context 'when the underlying field name is validated' do
+        context 'when the value is valid' do
           before do
-            validator.validate_each(product, :stock_keeping_unit, "12345")
+            validator.validate_each(product, :stock_keeping_unit, '12345')
           end
 
-          it "adds no errors" do
+          it 'adds no errors' do
             expect(product.errors[:stock_keeping_unit]).to be_empty
           end
         end
 
-        context "when the value is invalid" do
-
+        context 'when the value is invalid' do
           before do
             validator.validate_each(product, :stock_keeping_unit, nil)
           end
 
-          it "adds errors" do
-            expect(product.errors[:stock_keeping_unit]).to eq(["can't be blank"])
+          it 'adds errors' do
+            expect(product.errors[:stock_keeping_unit]).to eq([ "can't be blank" ])
           end
         end
       end
 
-      context "when the field is localized" do
-
-        context "when the localized value is valid" do
-
+      context 'when the field is localized' do
+        context 'when the localized value is valid' do
           before do
-            validator.validate_each(product, :tagline, { "en" => "12345" })
+            validator.validate_each(product, :tagline, { 'en' => '12345' })
           end
 
-          it "adds no errors" do
+          it 'adds no errors' do
             expect(product.errors[:tagline]).to be_empty
           end
         end
 
-        context "when one of the localized values is invalid" do
-
+        context 'when one of the localized values is invalid' do
           before do
             validator.validate_each(
-                product,
-                :tagline, { "en" => "12345", "fr" => nil }
+              product,
+              :tagline, { 'en' => '12345', 'fr' => nil }
             )
           end
 
-          it "adds errors" do
-            expect(product.errors[:tagline]).to eq(["can't be blank in fr"])
+          it 'adds errors' do
+            expect(product.errors[:tagline]).to eq([ "can't be blank in fr" ])
           end
         end
       end
     end
   end
 
-  context "when validating a relation" do
-
-    context "when the relation is a has one" do
-
+  context 'when validating a relation' do
+    context 'when the relation is a has one' do
       around do |example|
         original_relations = Person.relations
         Person.has_one :game, autosave: true
@@ -225,25 +199,22 @@ describe Mongoid::Validatable::PresenceValidator do
         Person.relations = original_relations
       end
 
-      context "when the relation is new" do
-
+      context 'when the relation is new' do
         let(:person) do
           Person.new
         end
 
-        context "when the base is valid" do
-
+        context 'when the base is valid' do
           let!(:game) do
             person.build_game
           end
 
-          context "when saving the base" do
-
+          context 'when saving the base' do
             before do
               person.save!
             end
 
-            it "saves the relation" do
+            it 'saves the relation' do
               expect(game.reload).to eq(game)
             end
           end
@@ -251,8 +222,7 @@ describe Mongoid::Validatable::PresenceValidator do
       end
     end
 
-    context "when the association is a has one and autosave is false" do
-
+    context 'when the association is a has one and autosave is false' do
       before do
         HomCollege.validates :accreditation, presence: true
       end
@@ -261,48 +231,46 @@ describe Mongoid::Validatable::PresenceValidator do
         HomCollege.reset_callbacks(:validate)
       end
 
-      it "does not change autosave on the association" do
-        expect(HomCollege.relations["accreditation"].autosave?).to be false
+      it 'does not change autosave on the association' do
+        expect(HomCollege.relations['accreditation'].autosave?).to be false
       end
 
-      context "when the association target is new" do
-
+      context 'when the association target is new' do
         let(:parent) do
           HomCollege.new
         end
 
-        context "when the parent is valid" do
-
+        context 'when the parent is valid' do
           let!(:child) do
             parent.build_accreditation
           end
 
-          context "when saving the parent" do
-
+          context 'when saving the parent' do
             before do
               parent.associations[:accreditation].options[:autosave].should be_falsy
 
               parent.save!
             end
 
-            it "does not save the association target" do
+            it 'does not save the association target' do
               child.persisted?.should be false
 
-              expect { child.reload }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class HomAccreditation with id\(s\)/)
+              expect do
+                child.reload
+              end.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                 /Document\(s\) not found for class HomAccreditation with id\(s\)/)
             end
           end
         end
       end
     end
 
-    context "when the relation is a belongs to" do
-
+    context 'when the relation is a belongs to' do
       let(:product) do
-        Product.create!(name: "testing")
+        Product.create!(name: 'testing')
       end
 
-      context "when the relation is present" do
-
+      context 'when the relation is present' do
         let(:purchase) do
           Purchase.create!
         end
@@ -311,21 +279,19 @@ describe Mongoid::Validatable::PresenceValidator do
           purchase.line_items.create!(product: product)
         end
 
-        context "when the foreign key is nil" do
-
+        context 'when the foreign key is nil' do
           before do
-            line_item.attributes["product_id"] = nil
+            line_item.attributes['product_id'] = nil
           end
 
-          it "is not valid" do
-            expect(line_item).to_not be_valid
+          it 'is not valid' do
+            expect(line_item).not_to be_valid
           end
         end
       end
     end
 
-    context "when the relation is a many to many" do
-
+    context 'when the relation is a many to many' do
       before do
         Person.validates :houses, presence: true
       end
@@ -335,8 +301,7 @@ describe Mongoid::Validatable::PresenceValidator do
         Person.reset_callbacks(:validate)
       end
 
-      context "when the relation has documents" do
-
+      context 'when the relation has documents' do
         let!(:house) do
           House.create!
         end
@@ -345,20 +310,18 @@ describe Mongoid::Validatable::PresenceValidator do
           Person.create!(houses: [ house ])
         end
 
-        context "when the relation is loaded from the db" do
-
+        context 'when the relation is loaded from the db' do
           let(:loaded) do
             Person.find(person.id)
           end
 
-          it "is valid" do
+          it 'is valid' do
             expect(loaded).to be_valid
           end
         end
 
-        context "when the relation is in memory" do
-
-          it "is valid" do
+        context 'when the relation is in memory' do
+          it 'is valid' do
             expect(person).to be_valid
           end
         end
@@ -366,50 +329,46 @@ describe Mongoid::Validatable::PresenceValidator do
     end
   end
 
-  context "when validating a localized field" do
-
-    context "when any translation is blank" do
-
+  context 'when validating a localized field' do
+    context 'when any translation is blank' do
       let(:product) do
         Product.new
       end
 
       before do
-        product.name_translations = { "de" => "" }
+        product.name_translations = { 'de' => '' }
       end
 
-      it "is not a valid document" do
-        expect(product).to_not be_valid
+      it 'is not a valid document' do
+        expect(product).not_to be_valid
       end
 
-      it "includes the proper errors" do
+      it 'includes the proper errors' do
         product.valid?
-        expect(product.errors[:name]).to_not be_empty
+        expect(product.errors[:name]).not_to be_empty
       end
     end
 
-    context "when any translation is nil" do
-
+    context 'when any translation is nil' do
       let(:product) do
         Product.new
       end
 
       before do
-        product.name_translations = { "de" => nil }
+        product.name_translations = { 'de' => nil }
       end
 
-      it "is not a valid document" do
-        expect(product).to_not be_valid
+      it 'is not a valid document' do
+        expect(product).not_to be_valid
       end
 
-      it "includes the proper errors" do
+      it 'includes the proper errors' do
         product.valid?
-        expect(product.errors[:name]).to_not be_empty
+        expect(product.errors[:name]).not_to be_empty
       end
     end
 
-    context "when the entire field is nil" do
-
+    context 'when the entire field is nil' do
       let(:product) do
         Product.new
       end
@@ -418,18 +377,17 @@ describe Mongoid::Validatable::PresenceValidator do
         product.name_translations = nil
       end
 
-      it "is not a valid document" do
-        expect(product).to_not be_valid
+      it 'is not a valid document' do
+        expect(product).not_to be_valid
       end
 
-      it "includes the proper errors" do
+      it 'includes the proper errors' do
         product.valid?
-        expect(product.errors[:name]).to_not be_empty
+        expect(product.errors[:name]).not_to be_empty
       end
     end
 
-    context "when the entire field is empty" do
-
+    context 'when the entire field is empty' do
       let(:product) do
         Product.new
       end
@@ -438,40 +396,41 @@ describe Mongoid::Validatable::PresenceValidator do
         product.name_translations = {}
       end
 
-      it "is not a valid document" do
-        expect(product).to_not be_valid
+      it 'is not a valid document' do
+        expect(product).not_to be_valid
       end
 
-      it "includes the proper errors" do
+      it 'includes the proper errors' do
         product.valid?
-        expect(product.errors[:name]).to_not be_empty
+        expect(product.errors[:name]).not_to be_empty
       end
     end
 
-    context "when the translations are present" do
-
+    context 'when the translations are present' do
       let(:product) do
         Product.new
       end
 
       before do
-        product.name_translations = { "en" => "test" }
+        product.name_translations = { 'en' => 'test' }
       end
 
-      it "is a valid document" do
+      it 'is a valid document' do
         expect(product).to be_valid
       end
     end
   end
 
-  context "when presence_of array attribute is updated and saved" do
-
+  context 'when presence_of array attribute is updated and saved' do
     let(:updated_products) do
-      [ "Laptop", "Tablet", "Smartphone", "Desktop" ]
+      %w[Laptop Tablet Smartphone Desktop]
+    end
+    let(:reloaded) do
+      Manufacturer.find(manufacturer.id)
     end
 
     let(:manufacturer) do
-      Manufacturer.create!(products: [ "Laptop", "Tablet" ])
+      Manufacturer.create!(products: %w[Laptop Tablet])
     end
 
     before do
@@ -479,90 +438,79 @@ describe Mongoid::Validatable::PresenceValidator do
       manufacturer.save!
     end
 
-    let(:reloaded) do
-      Manufacturer.find(manufacturer.id)
-    end
-
-    it "persists the changes" do
+    it 'persists the changes' do
       expect(reloaded.products).to eq(updated_products)
     end
   end
 
-  context "when an array attribute has been updated" do
-
+  context 'when an array attribute has been updated' do
     let(:updated_products) do
-      [ "Laptop", "Tablet", "Smartphone", "Desktop" ]
+      %w[Laptop Tablet Smartphone Desktop]
     end
 
     let(:manufacturer) do
-      Manufacturer.create!(products: [ "Laptop", "Tablet" ])
+      Manufacturer.create!(products: %w[Laptop Tablet])
     end
 
-    context "when retrieved, flattened and iterated" do
-
+    context 'when retrieved, flattened and iterated' do
       before do
         manufacturer.products = updated_products
         attrs = manufacturer.attributes
-        [attrs].flatten.each { |attr| }
+        [ attrs ].flatten.each { |attr| }
       end
 
-      it "does not destroy the models change list" do
-        expect(manufacturer.changes).to_not be_empty
+      it 'does not destroy the models change list' do
+        expect(manufacturer.changes).not_to be_empty
       end
 
-      it "maintains the list of changes" do
+      it 'maintains the list of changes' do
         expect(manufacturer.changes).to eq({
-          "products" => [
-            [ "Laptop", "Tablet" ],
-            [ "Laptop", "Tablet", "Smartphone", "Desktop" ]
-          ]
-        })
+                                             'products' => [
+                                               %w[Laptop Tablet],
+                                               %w[Laptop Tablet Smartphone Desktop]
+                                             ]
+                                           })
       end
     end
   end
 
-  context "when validating a boolean false value" do
-
+  context 'when validating a boolean false value' do
     let(:template) do
       Template.new
     end
 
-    context "when the value is false" do
-
-      it "is a valid document" do
+    context 'when the value is false' do
+      it 'is a valid document' do
         expect(template).to be_valid
       end
     end
 
-    context "when the value is true" do
-
+    context 'when the value is true' do
       before do
         template.active = true
       end
 
-      it "is a valid document" do
+      it 'is a valid document' do
         expect(template).to be_valid
       end
     end
   end
 
-  context "when describing validation on the instance level" do
-
+  context 'when describing validation on the instance level' do
     let!(:dictionary) do
-      Dictionary.create!(name: "en")
+      Dictionary.create!(name: 'en')
     end
 
     let(:validators) do
       dictionary.validates_presence_of :name
     end
 
-    it "adds the validation only to the instance" do
+    it 'adds the validation only to the instance' do
       expect(validators).to eq([ described_class ])
     end
   end
 
-  context "when validating an array" do
-
+  context 'when validating an array' do
     before do
       Person.validates :aliases, presence: { allow_blank: false }
     end
@@ -571,21 +519,19 @@ describe Mongoid::Validatable::PresenceValidator do
       Person.reset_callbacks(:validate)
     end
 
-    context "when allow blank is false" do
-
+    context 'when allow blank is false' do
       let(:person) do
         Person.new
       end
 
-      context "when the array is empty" do
-
+      context 'when the array is empty' do
         before do
           person.array = []
           person.valid?
         end
 
-        it "adds the errors to the document" do
-          expect(person.errors[:aliases]).to_not be_empty
+        it 'adds the errors to the document' do
+          expect(person.errors[:aliases]).not_to be_empty
         end
       end
     end

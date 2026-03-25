@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Person
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
+
   attr_accessor :mode
 
   class_attribute :somebody_elses_important_class_options
@@ -13,7 +13,7 @@ class Person
   field :title
   field :terms, type: Mongoid::Boolean
   field :pets, type: Mongoid::Boolean, default: false
-  field :age, type: Integer, default: "100"
+  field :age, type: Integer, default: '100'
   field :dob, type: Date
   field :employer_id
   field :lunch_time, type: Time
@@ -21,8 +21,8 @@ class Person
   field :map, type: Hash
   field :map_with_default, type: Hash, default: {}
   field :score, type: Integer
-  field :blood_alcohol_content, type: Float, default: ->{ 0.0 }
-  field :last_drink_taken_at, type: Date, default: ->{ 1.day.ago.in_time_zone("Alaska") }
+  field :blood_alcohol_content, type: Float, default: -> { 0.0 }
+  field :last_drink_taken_at, type: Date, default: -> { 1.day.ago.in_time_zone('Alaska') }
   field :ssn
   field :owner_id, type: Integer
   field :security_code
@@ -52,13 +52,14 @@ class Person
   attr_reader :rescored
 
   embeds_many :favorites, order: :title.desc, inverse_of: :perp, validate: false
-  embeds_many :videos, order: [[ :title, :asc ]], validate: false
-  embeds_many :phone_numbers, class_name: "Phone", validate: false
+  embeds_many :videos, order: [ %i[title asc] ], validate: false
+  embeds_many :phone_numbers, class_name: 'Phone', validate: false
   embeds_many :phones, store_as: :mobile_phones, validate: false
   embeds_many :addresses, as: :addressable, validate: false do
     def extension
-      "Testing"
+      'Testing'
     end
+
     def find_by_street(street)
       where(street: street).first
     end
@@ -71,14 +72,15 @@ class Person
   embeds_many :messages, validate: false
 
   embeds_one :passport, autobuild: true, store_as: :pass, validate: false
-  embeds_one :purse, store_as: "Purse"
-  embeds_one :pet, class_name: "Animal", validate: false
+  embeds_one :purse, store_as: 'Purse'
+  embeds_one :pet, class_name: 'Animal', validate: false
   embeds_one :name, as: :namable, validate: false do
     def extension
-      "Testing"
+      'Testing'
     end
+
     def dawkins?
-      first_name == "Richard" && last_name == "Dawkins"
+      first_name == 'Richard' && last_name == 'Dawkins'
     end
   end
   embeds_one :quiz, validate: false
@@ -86,7 +88,7 @@ class Person
   # Must have dependent: :destroy
   has_one :game, dependent: :destroy, validate: false do
     def extension
-      "Testing"
+      'Testing'
     end
   end
 
@@ -95,7 +97,7 @@ class Person
     dependent: :delete_all,
     validate: false do
     def extension
-      "Testing"
+      'Testing'
     end
   end
   has_many :ordered_posts, order: :rating.desc, validate: false
@@ -119,7 +121,7 @@ class Person
     :administrated_events,
     class_name: 'Event',
     inverse_of: :administrators,
-    dependent:  :nullify,
+    dependent: :nullify,
     validate: false
 
   belongs_to :mother, class_name: 'Person'
@@ -135,9 +137,9 @@ class Person
   accepts_nested_attributes_for :quiz
   accepts_nested_attributes_for :services, allow_destroy: true
 
-  scope :minor, ->{ where(:age.lt => 18) }
-  scope :without_ssn, ->{ without(:ssn) }
-  scope :search, ->(query){ any_of({ title: query }) }
+  scope :minor, -> { where(:age.lt => 18) }
+  scope :without_ssn, -> { without(:ssn) }
+  scope :search, ->(query) { any_of({ title: query }) }
 
   def self.older_than(age:)
     where(:age.gt => age)
@@ -148,12 +150,12 @@ class Person
     self.score_without_rescoring = score
   end
 
-  alias_method :score_without_rescoring=, :score=
-  alias_method :score=, :score_with_rescoring=
+  alias score_without_rescoring= score=
+  alias score= score_with_rescoring=
 
   def update_addresses
     addresses.each do |address|
-      address.street = "Updated Address"
+      address.street = 'Updated Address'
     end
   end
 
@@ -171,18 +173,20 @@ class Person
 
   def overridden_setter=(value)
     @override_called = true
-    super(value)
+    super
   end
 
   class << self
     def accepted
       scoped.where(terms: true)
     end
+
     def knight
-      scoped.where(title: "Sir")
+      scoped.where(title: 'Sir')
     end
+
     def old
-      scoped.where(age: { "$gt" => 50 })
+      scoped.where(age: { '$gt' => 50 })
     end
   end
 
@@ -199,10 +203,10 @@ class Person
   end
 
   def preference_names=(names)
-    names.split(",").each do |name|
+    names.split(',').each do |name|
       preference = Preference.where(name: name).first
       if preference
-        self.preferences << preference
+        preferences << preference
       else
         preferences.build(name: name)
       end
@@ -210,7 +214,7 @@ class Person
   end
 
   def set_on_map_with_default=(value)
-    self.map_with_default["key"] = value
+    map_with_default['key'] = value
   end
 
   def set_personal_data(ssn:, age:)
@@ -226,8 +230,8 @@ class Person
   private
 
   def secret_name
-    "secret"
+    'secret'
   end
 end
 
-require "support/models/doctor"
+require 'support/models/doctor'

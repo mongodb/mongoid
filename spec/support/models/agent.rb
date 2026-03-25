@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Agent
   include Mongoid::Document
   include Mongoid::Timestamps::Updated
+
   field :title, type: String
   field :number, type: String
   field :dob, type: Time

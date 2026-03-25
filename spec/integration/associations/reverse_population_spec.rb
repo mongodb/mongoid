@@ -1,15 +1,14 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
-require_relative './reverse_population_spec_models'
+require_relative 'reverse_population_spec_models'
 
 describe 'Association reverse population' do
   describe 'has_many/belongs_to' do
     it 'populates child in parent' do
       company = ReversePopulationSpec::Company.create!
       email = ReversePopulationSpec::Email.create!(company: company)
-      expect(company.emails).to eq([email])
+      expect(company.emails).to eq([ email ])
     end
   end
 
@@ -27,9 +26,9 @@ describe 'Association reverse population' do
       zoo = ReversePopulationSpec::Zoo.create!
       animal.zoos << zoo
       animal.save!
-      expect(zoo.animals).to eq([animal])
+      expect(zoo.animals).to eq([ animal ])
       zoo = ReversePopulationSpec::Zoo.find(zoo.id)
-      expect(zoo.animals).to eq([animal])
+      expect(zoo.animals).to eq([ animal ])
     end
   end
 end

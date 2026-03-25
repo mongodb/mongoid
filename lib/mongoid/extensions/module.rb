@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Module class.
     module Module
-
       # Redefine the method. Will undef the method if it exists or simply
       # just define it.
       #
@@ -27,4 +24,4 @@ module Mongoid
   end
 end
 
-::Module.__send__(:include, Mongoid::Extensions::Module)
+Module.include Mongoid::Extensions::Module

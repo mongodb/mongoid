@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Fields
-
     # Represents a BSON document field definition which stores
     # a foreign key that references the ID of another document.
     # Used for association behavior.
     class ForeignKey < Standard
-
       # Adds the atomic changes for this type of resizable field.
       #
       # @example Add the atomic changes.
@@ -23,8 +20,8 @@ module Mongoid
       # @param [ Array ] new_elements The new elements to add.
       # @param [ Array ] old_elements The old elements getting removed.
       def add_atomic_changes(document, name, key, mods, new_elements, old_elements)
-        old = (old_elements || [])
-        new = (new_elements || [])
+        old = old_elements || []
+        new = new_elements || []
         if new.length > old.length
           if new.first(old.length) == old
             document.atomic_array_add_to_sets[key] = new.drop(old.length)
@@ -109,7 +106,7 @@ module Mongoid
       # @return [ true | false ] If the field is a BSON::ObjectId.
       def object_id_field?
         @object_id_field ||=
-            association.polymorphic? ? true : association.klass.using_object_ids?
+          association.polymorphic? || association.klass.using_object_ids?
       end
 
       # Returns true if an array, false if not.
@@ -133,7 +130,7 @@ module Mongoid
       #
       # @return [ Object ] The converted object.
       def mongoize_foreign_key(object)
-        if type == Array || type == Set
+        if [ Array, Set ].include?(type)
           object = object.to_a if type == Set || object.is_a?(Set)
 
           if object.resizable?
@@ -155,7 +152,7 @@ module Mongoid
       # @param [ Document ] doc The document.
       #
       # @return [ Object ] The called proc.
-      def evaluate_default_proc(doc)
+      def evaluate_default_proc(_doc)
         serialize_default(default_val[])
       end
 
@@ -168,7 +165,7 @@ module Mongoid
       #
       # @return [ Fields::Standard ] The field.
       def related_id_field
-        @related_id_field ||= association.klass.fields["_id"]
+        @related_id_field ||= association.klass.fields['_id']
       end
 
       def primary_key_field
@@ -186,7 +183,9 @@ module Mongoid
       # @param [ Object ] object The default.
       #
       # @return [ Object ] The serialized default.
-      def serialize_default(object); object; end
+      def serialize_default(object)
+        object
+      end
     end
   end
 end

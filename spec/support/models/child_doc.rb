@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class ChildDoc
   include Mongoid::Document
@@ -16,10 +15,10 @@ class ChildDoc
   end
 
   def update_position
-    if @position && (@position.to_i > 0)
-      parent_doc.children_order.delete(id)
-      parent_doc.children_order.insert(@position.to_i - 1, id)
-      parent_doc.save!
-    end
+    return unless @position && (@position.to_i > 0)
+
+    parent_doc.children_order.delete(id)
+    parent_doc.children_order.insert(@position.to_i - 1, id)
+    parent_doc.save!
   end
 end

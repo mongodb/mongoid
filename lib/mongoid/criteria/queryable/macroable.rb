@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
-
       # Adds macro behavior for adding symbol methods.
       module Macroable
-
         # Adds a method on Symbol for convenience in where queries for the
         # provided operators.
         #

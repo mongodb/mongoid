@@ -1,4 +1,3 @@
-# rubocop:todo all
 require 'spec_helper'
 require 'support/crypt/models'
 
@@ -52,11 +51,11 @@ describe 'Encryption' do
   it 'encrypts and decrypts fields' do
     patient = Crypt::Patient.create!(
       code: '12345',
-      medical_records: ['one', 'two', 'three'],
+      medical_records: %w[one two three],
       blood_type: 'A+',
       blood_type_key_name: key_alt_name,
-      ssn: 123456789,
-      insurance: Crypt::Insurance.new(policy_number: 123456789)
+      ssn: 123_456_789,
+      insurance: Crypt::Insurance.new(policy_number: 123_456_789)
     )
     Crypt::Patient.find(patient.id).tap do |found_patient|
       expect(found_patient.code).to eq(patient.code)
@@ -70,11 +69,11 @@ describe 'Encryption' do
   it 'stores data encrypted in the database' do
     patient = Crypt::Patient.create!(
       code: '12345',
-      medical_records: ['one', 'two', 'three'],
+      medical_records: %w[one two three],
       blood_type: 'A+',
       blood_type_key_name: key_alt_name,
-      ssn: 123456789,
-      insurance: Crypt::Insurance.new(policy_number: 123456789)
+      ssn: 123_456_789,
+      insurance: Crypt::Insurance.new(policy_number: 123_456_789)
     )
     unencrypted_client[Crypt::Patient.collection.name].find(_id: patient.id).first.tap do |doc|
       %w[medical_records blood_type ssn].each do |field|
@@ -91,10 +90,8 @@ describe 'Encryption' do
     unencrypted_client
       .use(Crypt::Car.storage_options[:database])[Crypt::Car.collection.name]
       .find(_id: car.id).first.tap do |doc|
-        expect(doc[:vin]).to be_a(BSON::Binary)
-        expect(doc[:vin].type).to eq(:ciphertext)
+      expect(doc[:vin]).to be_a(BSON::Binary)
+      expect(doc[:vin].type).to eq(:ciphertext)
     end
   end
-
-
 end

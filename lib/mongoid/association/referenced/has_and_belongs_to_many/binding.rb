@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
       class HasAndBelongsToMany
-
         # Binding class for all has_and_belongs_to_many associations.
         class Binding
           include Bindable

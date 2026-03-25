@@ -1,7 +1,5 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher used to evaluate whether an $elemMatch predicate
     # matches and individual document. The $elemMatch predicate can be a
     # logical expressions including $and, $or, $nor, and $not. $not can
@@ -9,7 +7,6 @@ module Mongoid
     #
     # @api private
     module ElemMatchExpression
-
       # Returns whether a document satisfies an $elemMatch expression.
       #
       # @param [ Mongoid::Document ] document The document.

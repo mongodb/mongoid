@@ -1,13 +1,12 @@
-# rubocop:todo all
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem 'bson', git: "https://github.com/mongodb/bson-ruby"
-gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver"
+gem 'bson', git: 'https://github.com/mongodb/bson-ruby'
+gem 'mongo', git: 'https://github.com/mongodb/mongo-ruby-driver'
 
 gem 'actionpack'
 
 gemspec path: '..'
 
-require_relative './standard'
+require_relative 'standard'
 
 standard_dependencies

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 shared_context 'setting ActiveSupport time zone' do
   time_zone_override 'Tokyo'

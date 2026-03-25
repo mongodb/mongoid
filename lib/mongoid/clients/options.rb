@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Clients
-
     # Mixin module included into Mongoid::Document which gives
     # the ability to manage the database context for persistence
     # and query operations. For example, this includes saving
@@ -25,7 +23,7 @@ module Mongoid
       # @option options [ String | Symbol ] :collection The collection name.
       # @option options [ String | Symbol ] :database The database name.
       # @option options [ String | Symbol ] :client The client name.
-      def with(options_or_context, &block)
+      def with(options_or_context)
         original_context = PersistenceContext.get(self)
         original_cluster = persistence_context.cluster
         set_persistence_context(options_or_context)
@@ -134,7 +132,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Get the database client name for the current persistence context
         # of the document class.
         #
@@ -207,7 +204,7 @@ module Mongoid
         # @option options [ String | Symbol ] :collection The collection name.
         # @option options [ String | Symbol ] :database The database name.
         # @option options [ String | Symbol ] :client The client name.
-        def with(options, &block)
+        def with(options)
           original_context = PersistenceContext.get(self)
           original_cluster = persistence_context.cluster
           PersistenceContext.set(self, options)

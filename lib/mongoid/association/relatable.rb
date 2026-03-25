@@ -1,12 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/association/constrainable'
 require 'mongoid/association/options'
 
 module Mongoid
   module Association
-
     # This module provides behaviors shared between Association types.
     module Relatable
       include Constrainable
@@ -15,17 +13,17 @@ module Mongoid
       # The options shared between all association types.
       #
       # @return [ Array<Symbol> ] The shared options.
-      SHARED_OPTIONS = [
-                         :class_name,
-                         :inverse_of,
-                         :validate,
-                         :extend
-                       ].freeze
+      SHARED_OPTIONS = %i[
+        class_name
+        inverse_of
+        validate
+        extend
+      ].freeze
 
       # The primary key default.
       #
       # @return [ String ] The primary key field default.
-      PRIMARY_KEY_DEFAULT = '_id'.freeze
+      PRIMARY_KEY_DEFAULT = '_id'
 
       # The name of the association.
       #
@@ -67,8 +65,8 @@ module Mongoid
       def ==(other)
         relation_class_name == other.relation_class_name &&
           inverse_class_name == other.inverse_class_name &&
-            name == other.name &&
-              options == other.options
+          name == other.name &&
+          options == other.options
       end
 
       # Get the callbacks for a given type.
@@ -95,7 +93,9 @@ module Mongoid
       # @param [ Document ] doc The document to be bound.
       #
       # @return [ true | false ] Whether the document can be bound.
-      def bindable?(doc); false; end
+      def bindable?(_doc)
+        false
+      end
 
       # Get the inverse names.
       #
@@ -153,7 +153,7 @@ module Mongoid
       def relation_class_name
         @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name)
       end
-      alias :class_name :relation_class_name
+      alias class_name relation_class_name
 
       # The class of the association object(s).
       #
@@ -175,7 +175,7 @@ module Mongoid
           resolve_name(inverse_class, cls_name)
         end
       end
-      alias :klass :relation_class
+      alias klass relation_class
 
       # The class name of the object owning this association.
       #
@@ -190,7 +190,7 @@ module Mongoid
       def inverse_class
         @owner_class
       end
-      alias :inverse_klass :inverse_class
+      alias inverse_klass inverse_class
 
       # The foreign key field if this association stores a foreign key.
       # Otherwise, the primary key.
@@ -218,7 +218,7 @@ module Mongoid
       #
       # @return [ String ] The name of the foreign key setter.
       def foreign_key_setter
-        # note: You can't check if this association stores foreign key
+        # NOTE: You can't check if this association stores foreign key
         # See HasOne and HasMany binding, they referenced foreign_key_setter
         @foreign_key_setter ||= "#{foreign_key}=" if foreign_key
       end
@@ -248,7 +248,7 @@ module Mongoid
       #
       # @return [ String ] The foreign key check.
       def foreign_key_check
-        @foreign_key_check ||= "#{foreign_key}_previously_changed?" if (stores_foreign_key? && foreign_key)
+        @foreign_key_check ||= "#{foreign_key}_previously_changed?" if stores_foreign_key? && foreign_key
       end
 
       # Create an association proxy object using the owner and target.
@@ -266,16 +266,19 @@ module Mongoid
       #
       # @return [ true | false ] If the dependent method is destructive.
       def destructive?
-        @destructive ||= !!(dependent && (dependent == :delete_all || dependent == :destroy))
+        @destructive ||= !!(dependent && %i[delete_all destroy].include?(dependent))
       end
 
       # Get the counter cache column name.
       #
       # @return [ String ] The counter cache column name.
       def counter_cache_column_name
-        @counter_cache_column_name ||= (@options[:counter_cache].is_a?(String) ||
-            @options[:counter_cache].is_a?(Symbol)) ?
-            @options[:counter_cache] : "#{inverse || inverse_class_name.demodulize.underscore.pluralize}_count"
+        @counter_cache_column_name ||= if @options[:counter_cache].is_a?(String) ||
+                                          @options[:counter_cache].is_a?(Symbol)
+                                         @options[:counter_cache]
+                                       else
+                                         "#{inverse || inverse_class_name.demodulize.underscore.pluralize}_count"
+                                       end
       end
 
       # Get the extension.
@@ -321,14 +324,14 @@ module Mongoid
       #
       # @return [ true | false ] true if it is a *_many association, false if not.
       def many?
-        [Referenced::HasMany, Embedded::EmbedsMany].any? { |a| self.is_a?(a) }
+        [ Referenced::HasMany, Embedded::EmbedsMany ].any? { |a| is_a?(a) }
       end
 
       # Is this association an embeds_one or has_one association?
       #
       # @return [ true | false ] true if it is a *_one association, false if not.
       def one?
-        [Referenced::HasOne, Embedded::EmbedsOne].any? { |a| self.is_a?(a) }
+        [ Referenced::HasOne, Embedded::EmbedsOne ].any? { |a| is_a?(a) }
       end
 
       # Is this association an embedded_in or belongs_to association?
@@ -336,7 +339,7 @@ module Mongoid
       # @return [ true | false ] true if it is an embedded_in or belongs_to
       #   association, false if not.
       def in_to?
-        [Referenced::BelongsTo, Embedded::EmbeddedIn].any? { |a| self.is_a?(a) }
+        [ Referenced::BelongsTo, Embedded::EmbeddedIn ].any? { |a| is_a?(a) }
       end
 
       private
@@ -352,15 +355,15 @@ module Mongoid
       end
 
       def define_touchable!
-        if touchable?
-          Touchable.define_touchable!(self)
-        end
+        return unless touchable?
+
+        Touchable.define_touchable!(self)
       end
 
       def define_autosaver!
-        if autosave?
-          Association::Referenced::AutoSave.define_autosave!(self)
-        end
+        return unless autosave?
+
+        Association::Referenced::AutoSave.define_autosave!(self)
       end
 
       def define_builder!
@@ -392,15 +395,15 @@ module Mongoid
       end
 
       def define_counter_cache_callbacks!
-        if counter_cached?
-          Association::Referenced::CounterCache.define_callbacks!(self)
-        end
+        return unless counter_cached?
+
+        Association::Referenced::CounterCache.define_callbacks!(self)
       end
 
       def define_dependency!
-        if dependent
-          Association::Depending.define_dependency!(self)
-        end
+        return unless dependent
+
+        Association::Depending.define_dependency!(self)
       end
 
       def validate!
@@ -410,27 +413,25 @@ module Mongoid
           end
         end
 
-        [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
-          if Mongoid.destructive_fields.include?(n)
-            raise Errors::InvalidRelation.new(@owner_class, n)
-          end
+        [ name, :"#{name}?", :"#{name}=" ].each do |n|
+          raise Errors::InvalidRelation.new(@owner_class, n) if Mongoid.destructive_fields.include?(n)
         end
       end
 
       def polymorph!
-        if polymorphic?
-          @owner_class.polymorphic = true
-        end
+        return unless polymorphic?
+
+        @owner_class.polymorphic = true
       end
 
       def create_extension!(&block)
-        if block
-          extension_module_name = "#{@owner_class.to_s.demodulize}#{name.to_s.camelize}RelationExtension"
-          silence_warnings do
-            @owner_class.const_set(extension_module_name, Module.new(&block))
-          end
-          @extension = "#{@owner_class}::#{extension_module_name}".constantize
+        return unless block
+
+        extension_module_name = "#{@owner_class.to_s.demodulize}#{name.to_s.camelize}RelationExtension"
+        silence_warnings do
+          @owner_class.const_set(extension_module_name, Module.new(&block))
         end
+        @extension = "#{@owner_class}::#{extension_module_name}".constantize
       end
 
       def default_inverse
@@ -443,7 +444,7 @@ module Mongoid
       # [Foo::Bar, Foo, Object].
       def namespace_hierarchy(mod)
         parent = Object
-        hier = [parent]
+        hier = [ parent ]
 
         # name is not present on anonymous modules
         if mod.name
@@ -468,31 +469,28 @@ module Mongoid
         parts = name.to_s.split('::')
         if parts.first == ''
           parts.shift
-          hierarchy = [Object]
+          hierarchy = [ Object ]
         else
           hierarchy = namespace_hierarchy(mod)
         end
         hierarchy.each do |ns|
-          begin
-            parts.each do |part|
-              # Simple const_get sometimes pulls names out of weird scopes,
-              # perhaps confusing the receiver (ns in this case) with the
-              # local scope. Walk the class hierarchy ourselves one node
-              # at a time by specifying false as the second argument.
-              ns = ns.const_get(part, false)
-            end
-            cls = ns
-            break
-          rescue NameError => e
-            if exc.nil?
-              exc = e
-            end
+          parts.each do |part|
+            # Simple const_get sometimes pulls names out of weird scopes,
+            # perhaps confusing the receiver (ns in this case) with the
+            # local scope. Walk the class hierarchy ourselves one node
+            # at a time by specifying false as the second argument.
+            ns = ns.const_get(part, false)
           end
+          cls = ns
+          break
+        rescue NameError => e
+          exc = e if exc.nil?
         end
         if cls.nil?
           # Raise the first exception, this is from the most specific namespace
           raise exc
         end
+
         cls
       end
     end

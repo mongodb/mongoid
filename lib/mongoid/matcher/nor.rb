@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $nor expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/nor/
     #
     # @api private
     module Nor
-
       # Returns whether a document satisfies a $nor expression.
       #
       # @param [ Mongoid::Document ] document The document.
@@ -27,9 +24,7 @@ module Mongoid
         end
 
         expr.each do |sub_expr|
-          if Expression.matches?(document, sub_expr)
-            return false
-          end
+          return false if Expression.matches?(document, sub_expr)
         end
 
         expr.any?

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for persistence operations that upsert documents.
     module Upsertable
-
       # Perform an upsert of the document. If the document does not exist in the
       # database, then Mongo will insert a new one, otherwise the fields will get
       # overwritten with new values on the existing document.
@@ -36,18 +33,18 @@ module Mongoid
       def upsert(options = {})
         prepare_upsert(options) do
           if options[:replace]
-            if options[:set_on_insert]
-              raise ArgumentError, "cannot specify :set_on_insert with `replace: true`"
-            end
+            raise ArgumentError, 'cannot specify :set_on_insert with `replace: true`' if options[:set_on_insert]
 
             collection.find(atomic_selector).replace_one(
-              as_attributes, upsert: true, session: _session)
+              as_attributes, upsert: true, session: _session
+            )
           else
-            attrs = { "$set" => as_attributes }
-            attrs["$setOnInsert"] = options[:set_on_insert] if options[:set_on_insert]
+            attrs = { '$set' => as_attributes }
+            attrs['$setOnInsert'] = options[:set_on_insert] if options[:set_on_insert]
 
             collection.find(atomic_selector).update_one(
-              attrs, upsert: true, session: _session)
+              attrs, upsert: true, session: _session
+            )
           end
         end
       end
@@ -71,6 +68,7 @@ module Mongoid
       def prepare_upsert(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return false if performing_validations?(options) && invalid?(:upsert)
+
         result = run_callbacks(:upsert) do
           yield(self)
           true

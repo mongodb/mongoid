@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 require_relative '../has_one_models'
 
 describe Mongoid::Association::Referenced::HasOne::Eager do
-
-  describe ".grouped_doc" do
-
+  describe '.grouped_doc' do
     let(:person) do
       Person.create!
     end
@@ -21,7 +18,7 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
     end
 
     let(:eager) do
-      described_class.new([association], docs).tap do |b|
+      described_class.new([ association ], docs).tap do |b|
         b.send(:shift_association)
       end
     end
@@ -30,13 +27,12 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
       Cat.create!(person: person)
     end
 
-    it "aggregates by the relation primary key" do
-      expect(eager.send(:grouped_docs).keys).to eq([person.username])
+    it 'aggregates by the relation primary key' do
+      expect(eager.send(:grouped_docs).keys).to eq([ person.username ])
     end
   end
 
-  describe ".set_on_parent" do
-
+  describe '.set_on_parent' do
     let(:person) do
       Person.create!
     end
@@ -50,7 +46,7 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
     end
 
     let(:eager) do
-      described_class.new([association], docs).tap do |b|
+      described_class.new([ association ], docs).tap do |b|
         b.send(:shift_association)
       end
     end
@@ -60,10 +56,8 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
       eager
     end
 
-    it "sets the relation into the parent" do
-      docs.each do |doc|
-        expect(doc).to receive(:set_relation).once.with(:cat, :foo)
-      end
+    it 'sets the relation into the parent' do
+      expect(docs).to all(receive(:set_relation).once.with(:cat, :foo))
       eager.send(:set_on_parent, person.username, :foo)
     end
 
@@ -72,7 +66,7 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
       # same connection object.
       require_no_multi_shard
 
-      it "doesnt call an extra query" do
+      it 'doesnt call an extra query' do
         expect_query(0) do
           eager.send(:set_on_parent, person.username, :foo)
         end
@@ -80,8 +74,7 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
     end
   end
 
-  describe ".includes" do
-
+  describe '.includes' do
     let(:person) do
       Person.create!
     end
@@ -91,70 +84,64 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
       Cat.create!(person: Person.create!)
     end
 
-    context "when including the has_one relation" do
+    context 'when including the has_one relation' do
       # Query count assertions require that all queries are sent using the
       # same connection object.
       require_no_multi_shard
 
-      it "queries twice" do
-
+      it 'queries twice' do
         expect_query(2) do
-
           Person.all.includes(:cat).each do |person|
-            expect(person.cat).to_not be_nil
+            expect(person.cat).not_to be_nil
           end
         end
       end
     end
 
-    context "when including more than one has_one relation" do
+    context 'when including more than one has_one relation' do
       # Query count assertions require that all queries are sent using the
       # same connection object.
       require_no_multi_shard
 
-      it "queries 3 times" do
-
+      it 'queries 3 times' do
         expect_query(3) do
-
           Person.all.includes(:cat, :account).each do |person|
-            expect(person.cat).to_not be_nil
+            expect(person.cat).not_to be_nil
           end
         end
       end
     end
 
-    context "when the relation is not polymorphic" do
-
+    context 'when the relation is not polymorphic' do
       let!(:game) do
-        person.create_game(name: "Tron")
+        person.create_game(name: 'Tron')
       end
 
       let!(:eager) do
         Person.where(_id: person.id).includes(:game).first
       end
 
-      it "puts the documents in the parent document" do
+      it 'puts the documents in the parent document' do
         expect(eager.ivar(:game)).to eq(game)
       end
 
-      it "does not query when touching the association" do
+      it 'does not query when touching the association' do
         expect_query(0) do
           expect(eager.game).to eq(game)
         end
       end
 
-      it "does not query when updating the association" do
+      it 'does not query when updating the association' do
         expect_query(0) do
-          eager.game.name = "Revenge of Racing of Magic"
-          expect(eager.game.name).to eq("Revenge of Racing of Magic")
+          eager.game.name = 'Revenge of Racing of Magic'
+          expect(eager.game.name).to eq('Revenge of Racing of Magic')
         end
       end
     end
 
-    context "when the relation is polymorphic" do
-
+    context 'when the relation is polymorphic' do
       let!(:book) do
-        Book.create!(name: "Game of Thrones")
+        Book.create!(name: 'Game of Thrones')
       end
 
       let!(:rating) do
@@ -165,18 +152,18 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
         Book.all.includes(:rating).first
       end
 
-      it "puts the found documents in the parent document" do
+      it 'puts the found documents in the parent document' do
         expect(eager.ivar(:rating)).to eq(rating)
       end
 
-      it "does not query when touching the association" do
+      it 'does not query when touching the association' do
         expect_query(0) do
           expect(eager.rating).to eq(rating)
         end
       end
     end
 
-    context "when the association has scope" do
+    context 'when the association has scope' do
       let!(:trainer1) { HomTrainer.create!(name: 'Dave') }
       let!(:trainer2) { HomTrainer.create!(name: 'Ash') }
       let!(:animal1) { HomAnimal.create!(taxonomy: 'reptile', trainer: trainer1) }

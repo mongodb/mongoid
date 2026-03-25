@@ -1,7 +1,5 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # This module is used by $eq and other operators that need to perform
     # the matching that $eq performs (for example, $ne which negates the result
     # of $eq). Unlike $eq this module takes an original operator as an
@@ -10,7 +8,6 @@ module Mongoid
     #
     # @api private
     module EqImpl
-
       # Returns whether a value satisfies an $eq (or similar) expression.
       #
       # @param [ true | false ] exists Not used.
@@ -21,26 +18,24 @@ module Mongoid
       # @return [ true | false ] Whether the value matches.
       #
       # @api private
-      module_function def matches?(exists, value, condition, original_operator)
+      module_function def matches?(_exists, value, condition, original_operator)
         case condition
         when Range
           # Since $ne invokes $eq, the exception message needs to handle
           # both operators.
           raise Errors::InvalidQuery, "Range is not supported as an argument to '#{original_operator}'"
-=begin
-          if value.is_a?(Array)
-            value.any? { |elt| condition.include?(elt) }
-          else
-            condition.include?(value)
-          end
-=end
+        #           if value.is_a?(Array)
+        #             value.any? { |elt| condition.include?(elt) }
+        #           else
+        #             condition.include?(value)
+        #           end
         else
           # When doing a comparison with Time objects, compare using millisecond precision
-          if value.kind_of?(Time) && condition.kind_of?(Time)
+          if value.is_a?(Time) && condition.is_a?(Time)
             time_eq?(value, condition)
-          elsif value.is_a?(Array) && condition.kind_of?(Time)
+          elsif value.is_a?(Array) && condition.is_a?(Time)
             value.map do |v|
-              if v.kind_of?(Time)
+              if v.is_a?(Time)
                 time_rounded_to_millis(v)
               else
                 v
@@ -48,7 +43,7 @@ module Mongoid
             end.include?(time_rounded_to_millis(condition))
           else
             value == condition ||
-            value.is_a?(Array) && value.include?(condition)
+              (value.is_a?(Array) && value.include?(condition))
           end
         end
       end
@@ -77,7 +72,7 @@ module Mongoid
       #
       # @return [ true | false ] The time rounded to the millisecond.
       module_function def time_rounded_to_millis(time)
-        return time._bson_to_i * 1000 + time.usec.divmod(1000).first
+        (time._bson_to_i * 1000) + time.usec.divmod(1000).first
       end
     end
   end

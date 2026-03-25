@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Contains the behavior around inspecting documents via inspect.
   module Inspectable
-
     # Returns the class name plus its attributes. If using dynamic fields will
     # include those as well.
     #
@@ -31,7 +28,7 @@ module Mongoid
     def pretty_print(pretty_printer)
       keys = fields.keys | attributes.keys
       pretty_printer.group(1, "#<#{self.class.name}", '>') do
-        sep = lambda { pretty_printer.text(',') }
+        sep = -> { pretty_printer.text(',') }
         pretty_printer.seplist(keys, sep) do |key|
           pretty_printer.breakable
           field = fields[key]
@@ -40,7 +37,7 @@ module Mongoid
           pretty_printer.text(':')
           pretty_printer.group(1) do
             pretty_printer.breakable
-            if key == "_id"
+            if key == '_id'
               pretty_printer.text(_id.to_s)
             else
               pretty_printer.pp(@attributes[key])
@@ -62,9 +59,9 @@ module Mongoid
     # @return [ String ] An array of pretty printed field values.
     def inspect_fields
       fields.map do |name, field|
-        unless name == "_id"
+        unless name == '_id'
           as = field.options[:as]
-          "#{name}#{as ? "(#{as})" : nil}: #{@attributes[name].inspect}"
+          "#{name}#{"(#{as})" if as}: #{@attributes[name].inspect}"
         end
       end.compact
     end

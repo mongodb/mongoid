@@ -1,11 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
 describe 'distinct on aliased fields' do
-
   let(:client) { Person.collection.client }
+  let(:event) do
+    subscriber.single_command_started_event('distinct')
+  end
+  let(:command) { event.command }
 
   let(:subscriber) do
     Mrss::EventSubscriber.new
@@ -18,12 +20,6 @@ describe 'distinct on aliased fields' do
   after do
     client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
   end
-
-  let(:event) do
-    subscriber.single_command_started_event('distinct')
-  end
-
-  let(:command) { event.command }
 
   context 'top level field' do
     let(:query) do
@@ -51,8 +47,11 @@ describe 'distinct on aliased fields' do
 end
 
 describe 'pluck on aliased fields' do
-
   let(:client) { Person.collection.client }
+  let(:event) do
+    subscriber.single_command_started_event('find')
+  end
+  let(:command) { event.command }
 
   let(:subscriber) do
     Mrss::EventSubscriber.new
@@ -66,12 +65,6 @@ describe 'pluck on aliased fields' do
     client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
   end
 
-  let(:event) do
-    subscriber.single_command_started_event('find')
-  end
-
-  let(:command) { event.command }
-
   context 'top level field' do
     let(:query) do
       Person.pluck(:test)
@@ -80,7 +73,7 @@ describe 'pluck on aliased fields' do
     it 'expands the alias' do
       query
 
-      command['projection'].should == {'t' => true}
+      command['projection'].should == { 't' => true }
     end
   end
 
@@ -92,7 +85,7 @@ describe 'pluck on aliased fields' do
     it 'expands the alias' do
       query
 
-      command['projection'].should == {'phone_numbers.ext' => true}
+      command['projection'].should == { 'phone_numbers.ext' => true }
     end
   end
 end

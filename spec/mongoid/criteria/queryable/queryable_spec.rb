@@ -1,107 +1,95 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Query do
-
-  describe "#==" do
-
+  describe '#==' do
     let(:query) do
       described_class.new
     end
 
-    context "when the objects have the same selector" do
-
+    context 'when the objects have the same selector' do
       let(:other) do
         described_class.new
       end
 
-      context "when the options are the same" do
-
-        it "returns true" do
+      context 'when the options are the same' do
+        it 'returns true' do
           expect(query).to eq(other)
         end
       end
 
-      context "when the options are different" do
-
+      context 'when the options are different' do
         before do
           other.options[:skip] = 20
         end
 
-        it "returns false" do
-          expect(query).to_not eq(other)
+        it 'returns false' do
+          expect(query).not_to eq(other)
         end
       end
     end
 
-    context "when the objects have different selectors" do
-
+    context 'when the objects have different selectors' do
       let(:other) do
         described_class.new do |query|
-          query.selector["field"] = "value"
+          query.selector['field'] = 'value'
         end
       end
 
-      it "returns false" do
-        expect(query).to_not eq(other)
+      it 'returns false' do
+        expect(query).not_to eq(other)
       end
     end
 
-    context "when the objects are different types" do
-
+    context 'when the objects are different types' do
       let(:other) do
-        "Query"
+        'Query'
       end
 
-      it "returns false" do
-        expect(query).to_not eq(other)
+      it 'returns false' do
+        expect(query).not_to eq(other)
       end
     end
   end
 
-  describe "#initialize" do
-
-    context "when passed no arguments" do
-
+  describe '#initialize' do
+    context 'when passed no arguments' do
       let(:query) do
         described_class.new
       end
 
-      it "initializes the selector" do
+      it 'initializes the selector' do
         expect(query.selector).to eq({})
       end
 
-      it "initializes the options" do
+      it 'initializes the options' do
         expect(query.options).to eq({})
       end
     end
 
-    context "when passed a block" do
-
+    context 'when passed a block' do
       let(:query) do
         described_class.new do |query|
-          query.selector["field"] = "value"
+          query.selector['field'] = 'value'
         end
       end
 
-      it "yields to the block" do
-        expect(query.selector).to eq({ "field" => "value" })
+      it 'yields to the block' do
+        expect(query.selector).to eq({ 'field' => 'value' })
       end
     end
   end
 
-  describe "#initialize_copy" do
-
+  describe '#initialize_copy' do
     let(:sort) do
-      { "name" => 1 }
+      { 'name' => 1 }
     end
 
     let(:query) do
       described_class.new do |query|
-        query.selector["field"] = "value"
-        query.options["sort"] = { "field" => sort }
+        query.selector['field'] = 'value'
+        query.options['sort'] = { 'field' => sort }
       end
     end
 
@@ -109,32 +97,32 @@ describe Mongoid::Query do
       query.clone
     end
 
-    it "returns a query" do
+    it 'returns a query' do
       expect(cloned).to be_a(Mongoid::Query)
     end
 
-    it "returns a new instance" do
-      expect(cloned).to_not equal(query)
+    it 'returns a new instance' do
+      expect(cloned).not_to equal(query)
     end
 
-    it "retains the selector values" do
-      expect(cloned.selector).to eq({ "field" => "value" })
+    it 'retains the selector values' do
+      expect(cloned.selector).to eq({ 'field' => 'value' })
     end
 
-    it "retains the option values" do
-      expect(cloned.options).to eq({ "sort" => { "field" => sort }})
+    it 'retains the option values' do
+      expect(cloned.options).to eq({ 'sort' => { 'field' => sort } })
     end
 
-    it "deep copies the selector" do
-      expect(cloned.selector).to_not equal(query.selector)
+    it 'deep copies the selector' do
+      expect(cloned.selector).not_to equal(query.selector)
     end
 
-    it "deep copies the options" do
-      expect(cloned.options).to_not equal(query.options)
+    it 'deep copies the options' do
+      expect(cloned.options).not_to equal(query.options)
     end
 
-    it "deep copies n levels deep" do
-      expect(cloned.options["sort"]["field"]).to_not equal(sort)
+    it 'deep copies n levels deep' do
+      expect(cloned.options['sort']['field']).not_to equal(sort)
     end
   end
 end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
@@ -17,14 +16,12 @@ end
 
 def insert_rails_gem_version(cmd)
   gem_version = gem_version_argument(SpecConfig.instance.installed_rails_version)
-  cmd.tap { cmd[1,0] = gem_version if gem_version }
+  cmd.tap { cmd[1, 0] = gem_version if gem_version }
 end
 
 describe 'Mongoid application tests' do
   before(:all) do
-    unless SpecConfig.instance.app_tests?
-      skip 'Set APP_TESTS=1 in environment to run application tests'
-    end
+    skip 'Set APP_TESTS=1 in environment to run application tests' unless SpecConfig.instance.app_tests?
 
     require 'fileutils'
     require 'mrss/child_process_helper'
@@ -38,7 +35,7 @@ describe 'Mongoid application tests' do
       it 'runs' do
         create_sinatra_app('mongoid-sinatra-test') do
           # JRuby needs a long timeout
-          start_app(%w(bundle exec ruby app.rb), 4567, 40) do |port|
+          start_app(%w[bundle exec ruby app.rb], 4567, 40) do |_port|
             uri = URI.parse('http://localhost:4567/posts')
             resp = JSON.parse(uri.open.read)
 
@@ -62,7 +59,7 @@ describe 'Mongoid application tests' do
       it 'runs' do
         create_rails_api_app('mongoid-rails-api-test') do
           # JRuby needs a long timeout
-          start_app(%w(bundle exec rails s), 3000, 50) do |port|
+          start_app(%w[bundle exec rails s], 3000, 50) do |_port|
             uri = URI.parse('http://localhost:3000/posts')
             resp = JSON.parse(uri.open.read)
 
@@ -87,12 +84,16 @@ describe 'Mongoid application tests' do
     ensure
       # The process may have already died (due to an error exit) -
       # in this case killing it will raise an exception.
-      Process.kill('TERM', process.pid) rescue nil
+      begin
+        Process.kill('TERM', process.pid)
+      rescue StandardError
+        nil
+      end
       status = process.wait
     end
 
     # Exit should be either success or SIGTERM
-    allowed_statuses = [0, 15, 128 + 15]
+    allowed_statuses = [ 0, 15, 128 + 15 ]
     if RUBY_PLATFORM == 'java'
       # Puma on JRuby exits with status 1 when it receives a TERM signal.
       allowed_statuses << 1
@@ -107,12 +108,12 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(insert_rails_gem_version(%W(rails new #{name} --skip-spring --skip-active-record)), env: rails_env)
+      check_call(insert_rails_gem_version(%W[rails new #{name} --skip-spring --skip-active-record]), env: rails_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
         adjust_app_gemfile
-        check_call(%w(bundle install), env: clean_env)
+        check_call(%w[bundle install], env: clean_env)
 
         yield
       end
@@ -126,40 +127,36 @@ describe 'Mongoid application tests' do
 
       Dir.chdir(name) do
         # Create minimal Sinatra app with Post model
-        File.open('app.rb', 'w') do |f|
-          f.write(<<~RUBY)
-            require 'sinatra'
-            require 'mongoid'
-            require 'json'
+        File.write('app.rb', <<~RUBY)
+          require 'sinatra'
+          require 'mongoid'
+          require 'json'
 
-            Mongoid.load!('config/mongoid.yml')
+          Mongoid.load!('config/mongoid.yml')
 
-            class Post
-              include Mongoid::Document
-              field :title, type: String
-            end
+          class Post
+            include Mongoid::Document
+            field :title, type: String
+          end
 
-            get '/posts' do
-              content_type :json
-              Post.all.to_json
-            end
-          RUBY
-        end
+          get '/posts' do
+            content_type :json
+            Post.all.to_json
+          end
+        RUBY
 
         # Create Gemfile
-        File.open('Gemfile', 'w') do |f|
-          f.write(<<~RUBY)
-            source 'https://rubygems.org'
-            gem 'sinatra'
-            gem 'rackup'
-            gem 'mongoid', path: '#{File.expand_path(BASE)}'
-            gem 'puma'
-          RUBY
-        end
+        File.write('Gemfile', <<~RUBY)
+          source 'https://rubygems.org'
+          gem 'sinatra'
+          gem 'rackup'
+          gem 'mongoid', path: '#{File.expand_path(BASE)}'
+          gem 'puma'
+        RUBY
 
         FileUtils.mkdir_p('config')
         write_mongoid_yml
-        check_call(%w(bundle install), env: clean_env)
+        check_call(%w[bundle install], env: clean_env)
 
         yield
       end
@@ -171,41 +168,38 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: rails_env)
+      check_call(insert_rails_gem_version(%W[rails new #{name} --api --skip-spring --skip-active-record]),
+                 env: rails_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
         adjust_app_gemfile
 
         # Create Post model
-        File.open('app/models/post.rb', 'w') do |f|
-          f.write(<<~RUBY)
-            class Post
-              include Mongoid::Document
-              field :title, type: String
-            end
-          RUBY
-        end
+        File.write('app/models/post.rb', <<~RUBY)
+          class Post
+            include Mongoid::Document
+            field :title, type: String
+          end
+        RUBY
 
         # Create PostsController
-        File.open('app/controllers/posts_controller.rb', 'w') do |f|
-          f.write(<<~RUBY)
-            class PostsController < ApplicationController
-              def index
-                render json: Post.all
-              end
+        File.write('app/controllers/posts_controller.rb', <<~RUBY)
+          class PostsController < ApplicationController
+            def index
+              render json: Post.all
             end
-          RUBY
-        end
+          end
+        RUBY
 
         # Add route
         routes_content = File.read('config/routes.rb')
-        routes_content.sub!(/Rails\.application\.routes\.draw do\n/,
-                           "Rails.application.routes.draw do\n  resources :posts, only: [:index]\n")
-        File.open('config/routes.rb', 'w') { |f| f.write(routes_content) }
+        routes_content.sub!("Rails.application.routes.draw do\n",
+                            "Rails.application.routes.draw do\n  resources :posts, only: [:index]\n")
+        File.write('config/routes.rb', routes_content)
 
         write_mongoid_yml
-        check_call(%w(bundle install), env: clean_env)
+        check_call(%w[bundle install], env: clean_env)
 
         yield
       end
@@ -217,39 +211,36 @@ describe 'Mongoid application tests' do
 
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(name)
-      check_call(insert_rails_gem_version(%W(rails new #{name} --api --skip-spring --skip-active-record)), env: rails_env)
+      check_call(insert_rails_gem_version(%W[rails new #{name} --api --skip-spring --skip-active-record]),
+                 env: rails_env)
 
       Dir.chdir(name) do
         adjust_rails_defaults
         adjust_app_gemfile
 
         # Create Post model with index
-        File.open('app/models/post.rb', 'w') do |f|
-          f.write(<<~RUBY)
-            class Post
-              include Mongoid::Document
-              include Mongoid::Timestamps
-              field :subject, type: String
-              field :message, type: String
+        File.write('app/models/post.rb', <<~RUBY)
+          class Post
+            include Mongoid::Document
+            include Mongoid::Timestamps
+            field :subject, type: String
+            field :message, type: String
 
-              index subject: 1
-            end
-          RUBY
-        end
+            index subject: 1
+          end
+        RUBY
 
         # Create Comment model
-        File.open('app/models/comment.rb', 'w') do |f|
-          f.write(<<~RUBY)
-            class Comment
-              include Mongoid::Document
-              include Mongoid::Timestamps
-              belongs_to :post
-            end
-          RUBY
-        end
+        File.write('app/models/comment.rb', <<~RUBY)
+          class Comment
+            include Mongoid::Document
+            include Mongoid::Timestamps
+            belongs_to :post
+          end
+        RUBY
 
         write_mongoid_yml
-        check_call(%w(bundle install), env: clean_env)
+        check_call(%w[bundle install], env: clean_env)
       end
     end
   end
@@ -267,8 +258,8 @@ describe 'Mongoid application tests' do
 
     it 'creates' do
       prepare_new_rails_app 'mongoid-test' do
-        check_call(%w(rails g model post), env: clean_env)
-        check_call(%w(rails g model comment post:belongs_to), env: clean_env)
+        check_call(%w[rails g model post], env: clean_env)
+        check_call(%w[rails g model comment post:belongs_to], env: clean_env)
 
         # https://jira.mongodb.org/browse/MONGOID-4885
         comment_text = File.read('app/models/comment.rb')
@@ -282,20 +273,20 @@ describe 'Mongoid application tests' do
         mongoid_config_file = File.join(TMP_BASE, 'mongoid-test-config/config/mongoid.yml')
 
         File.exist?(mongoid_config_file).should be false
-        check_call(%w(rails g mongoid:config), env: clean_env)
+        check_call(%w[rails g mongoid:config], env: clean_env)
         File.exist?(mongoid_config_file).should be true
 
         config_text = File.read(mongoid_config_file)
-        expect(config_text).to match /mongoid_test_config_development/
-        expect(config_text).to match /mongoid_test_config_test/
+        expect(config_text).to match(/mongoid_test_config_development/)
+        expect(config_text).to match(/mongoid_test_config_test/)
 
         Mongoid::Config::Introspection.options(include_deprecated: true).each do |opt|
           if opt.deprecated?
             # deprecated options should not be included
             expect(config_text).not_to include "# #{opt.name}:"
           else
-            block = "    #{opt.indented_comment(indent: 4)}\n" \
-                    "    # #{opt.name}: #{opt.default}\n"
+            block = "    #{opt.indented_comment(indent: 4)}\n    " \
+                    "# #{opt.name}: #{opt.default}\n"
             expect(config_text).to include block
           end
         end
@@ -307,24 +298,21 @@ describe 'Mongoid application tests' do
         mongoid_initializer = File.join(TMP_BASE, 'mongoid-test-init/config/initializers/mongoid.rb')
 
         File.exist?(mongoid_initializer).should be false
-        check_call(%w(rails g mongoid:config), env: clean_env)
+        check_call(%w[rails g mongoid:config], env: clean_env)
         File.exist?(mongoid_initializer).should be true
       end
     end
   end
 
   def install_rails
-    check_call(%w(gem uni rails -a))
-    if (rails_version = SpecConfig.instance.rails_version) == 'master'
-    else
-      check_call(%w(gem list))
+    check_call(%w[gem uni rails -a])
+    unless (rails_version = SpecConfig.instance.rails_version) == 'master'
+      check_call(%w[gem list])
 
       # Rails 6.0 and 6.1 need logger gem on Ruby 2.7+ due to stdlib changes
-      if rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
-        check_call(%w(gem install logger --no-document))
-      end
+      check_call(%w[gem install logger --no-document]) if rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
 
-      check_call(%w(gem install rails --no-document --force -v) + ["~> #{rails_version}.0"])
+      check_call(%w[gem install rails --no-document --force -v] + [ "~> #{rails_version}.0" ])
     end
   end
 
@@ -342,13 +330,10 @@ describe 'Mongoid application tests' do
     let(:client) { Mongoid.default_client }
 
     describe 'create_indexes rake task' do
-
-      %w(development production).each do |rails_env|
+      %w[development production].each do |rails_env|
         context "in #{rails_env}" do
-
-          %w(classic zeitwerk).each do |autoloader|
+          %w[classic zeitwerk].each do |autoloader|
             context "with #{autoloader} autoloader" do
-
               let(:env) do
                 clean_env.merge(RAILS_ENV: rails_env, AUTOLOADER: autoloader)
               end
@@ -365,15 +350,15 @@ describe 'Mongoid application tests' do
 
               it 'creates an index' do
                 index = client['posts'].indexes.detect do |index|
-                  index['key'] == {'subject' => 1}
+                  index['key'] == { 'subject' => 1 }
                 end
-                index.should be nil
+                index.should be_nil
 
-                check_call(%w(bundle exec rake db:mongoid:create_indexes -t),
-                  cwd: app_path, env: env)
+                check_call(%w[bundle exec rake db:mongoid:create_indexes -t],
+                           cwd: app_path, env: env)
 
                 index = client['posts'].indexes.detect do |index|
-                  index['key'] == {'subject' => 1}
+                  index['key'] == { 'subject' => 1 }
                 end
                 index.should be_a(Hash)
               end
@@ -387,11 +372,11 @@ describe 'Mongoid application tests' do
   def clone_application(repo_url, subdir: nil)
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(File.basename(repo_url))
-      check_call(%w(git clone) + [repo_url])
-      Dir.chdir(File.join(*[File.basename(repo_url), subdir].compact)) do
+      check_call(%w[git clone] + [ repo_url ])
+      Dir.chdir(File.join(*[ File.basename(repo_url), subdir ].compact)) do
         adjust_app_gemfile
         adjust_rails_defaults
-        check_call(%w(bundle install), env: clean_env)
+        check_call(%w[bundle install], env: clean_env)
         puts `git diff`
 
         write_mongoid_yml
@@ -403,24 +388,19 @@ describe 'Mongoid application tests' do
 
   def parse_mongodb_uri(uri)
     pre, query = uri.split('?', 2)
-    if pre =~ %r,\A(mongodb(?:.*?))://([^/]+)(?:/(.*))?\z,
-      protocol = $1
-      hosts = $2
-      database = $3
-      if database == ''
-        database = nil
-      end
-    else
-      raise ArgumentError, "Invalid MongoDB URI: #{uri}"
-    end
-    if query == ''
-      query = nil
-    end
+    raise ArgumentError, "Invalid MongoDB URI: #{uri}" unless pre =~ %r{\A(mongodb(?:.*?))://([^/]+)(?:/(.*))?\z}
+
+    protocol = Regexp.last_match(1)
+    hosts = Regexp.last_match(2)
+    database = Regexp.last_match(3)
+    database = nil if database == ''
+
+    query = nil if query == ''
     {
       protocol: protocol,
       hosts: hosts,
       database: database,
-      query: query,
+      query: query
     }
   end
 
@@ -435,12 +415,12 @@ describe 'Mongoid application tests' do
     parts[:database] = 'mongoid_test'
     uri = build_mongodb_uri(parts)
     p uri
-    env_config = {'clients' => {'default' => {
-      # TODO massive hack, will fail if uri specifies a database name or
+    env_config = { 'clients' => { 'default' => {
+      # TODO: massive hack, will fail if uri specifies a database name or
       # any uri options
-      'uri' => uri,
-    }}}
-    config = {'development' => env_config, 'production' => env_config}
+      'uri' => uri
+    } } }
+    config = { 'development' => env_config, 'production' => env_config }
     File.open('config/mongoid.yml', 'w') do |f|
       f << YAML.dump(config)
     end
@@ -456,19 +436,17 @@ describe 'Mongoid application tests' do
     gemfile_lines << "gem 'mongoid', path: '#{File.expand_path(BASE)}'\n"
 
     # Rails 6.0 and 6.1 need logger gem on Ruby 2.7+ due to stdlib changes
-    if rails_version && rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
-      gemfile_lines << "gem 'logger'\n"
-    end
+    gemfile_lines << "gem 'logger'\n" if rails_version && rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
 
     if rails_version
       gemfile_lines.delete_if do |line|
         line =~ /gem ['"]rails['"]/
       end
-      if rails_version == 'master'
-        gemfile_lines << "gem 'rails', git: 'https://github.com/rails/rails'\n"
-      else
-        gemfile_lines << "gem 'rails', '~> #{rails_version}.0'\n"
-      end
+      gemfile_lines << if rails_version == 'master'
+                         "gem 'rails', git: 'https://github.com/rails/rails'\n"
+                       else
+                         "gem 'rails', '~> #{rails_version}.0'\n"
+                       end
     end
     File.open('Gemfile', 'w') do |f|
       f << gemfile_lines.join
@@ -476,33 +454,34 @@ describe 'Mongoid application tests' do
   end
 
   def adjust_rails_defaults(rails_version: SpecConfig.instance.rails_version)
-    if !rails_version.match?(/^\d+\.\d+$/)
+    unless rails_version.match?(/^\d+\.\d+$/)
       # This must be pre-release version, we trim it
       rails_version = rails_version.split('.')[0..1].join('.')
     end
-    if File.exist?('config/application.rb')
-      lines = IO.readlines('config/application.rb')
-      lines.each do |line|
-        line.gsub!(/config.load_defaults \d\.\d/, "config.load_defaults #{rails_version}")
-      end
-      File.open('config/application.rb', 'w') do |f|
-        f << lines.join
-      end
+    return unless File.exist?('config/application.rb')
+
+    lines = IO.readlines('config/application.rb')
+    lines.each do |line|
+      line.gsub!(/config.load_defaults \d\.\d/, "config.load_defaults #{rails_version}")
+    end
+    File.open('config/application.rb', 'w') do |f|
+      f << lines.join
     end
   end
 
   def remove_bundler_req
     return unless File.file?('Gemfile.lock')
+
     # TODO: Remove this method completely when we get rid of .lock files in
     # mongoid-demo apps.
     lock_lines = IO.readlines('Gemfile.lock')
     # Get rid of the bundled with line so that whatever bundler is installed
     # on the system is usable with the application.
-    if i = lock_lines.index("BUNDLED WITH\n")
-      lock_lines.slice!(i, 2)
-      File.open('Gemfile.lock', 'w') do |f|
-        f << lock_lines.join
-      end
+    return unless i = lock_lines.index("BUNDLED WITH\n")
+
+    lock_lines.slice!(i, 2)
+    File.open('Gemfile.lock', 'w') do |f|
+      f << lock_lines.join
     end
   end
 
@@ -512,11 +491,11 @@ describe 'Mongoid application tests' do
     # in `initialize': too long unix socket path (126bytes given but 108bytes max) (ArgumentError)
     # Is it trying to create unix sockets in current directory?
     # https://stackoverflow.com/questions/30302021/rails-runner-without-spring
-    check_call(%w(bin/spring binstub --remove --all), env: clean_env)
+    check_call(%w[bin/spring binstub --remove --all], env: clean_env)
   end
 
   def clean_env
-    @clean_env ||= Hash[ENV.keys.grep(/BUNDLE|RUBYOPT/).map { |k| [k, nil ] }]
+    @clean_env ||= Hash[ENV.keys.grep(/BUNDLE|RUBYOPT/).map { |k| [ k, nil ] }]
   end
 
   def rails_env
@@ -524,27 +503,19 @@ describe 'Mongoid application tests' do
     # to fix "uninitialized constant ActiveSupport::LoggerThreadSafeLevel::Logger"
     env = clean_env.dup
     rails_version = SpecConfig.instance.rails_version
-    if rails_version && rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
-      env['RUBYOPT'] = '-rlogger'
-    end
+    env['RUBYOPT'] = '-rlogger' if rails_version && rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
     env
   end
 
   def wait_for_port(port, timeout, process)
     deadline = Mongoid::Utils.monotonic_time + timeout
     loop do
-      begin
-        Socket.tcp('localhost', port, nil, nil, connect_timeout: 0.5) do |socket|
-          return
-        end
-      rescue IOError, SystemCallError
-        unless process.alive?
-          raise "Process #{process} died while waiting for port #{port}"
-        end
-        if Mongoid::Utils.monotonic_time > deadline
-          raise
-        end
+      Socket.tcp('localhost', port, nil, nil, connect_timeout: 0.5) do |_socket|
+        return
       end
+    rescue IOError, SystemCallError
+      raise "Process #{process} died while waiting for port #{port}" unless process.alive?
+      raise if Mongoid::Utils.monotonic_time > deadline
     end
   end
 end

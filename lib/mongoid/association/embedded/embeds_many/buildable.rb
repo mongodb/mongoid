@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Embedded
       class EmbedsMany
-
         # Builder class for embeds_many associations.
         module Buildable
           include Threaded::Lifecycle
@@ -27,9 +25,10 @@ module Mongoid
           #   will not be accessible in the built documents.
           #
           # @return [ Array<Document ] The documents.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(base, object, _type = nil, selected_fields = nil)
             return [] if object.blank?
             return object if object.first.is_a?(Document)
+
             docs = []
             object.each do |attrs|
               if _loading? && base.persisted?

@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Embedded
       class EmbeddedIn
-
         # The Binding object for embedded_in associations.
         class Binding
           include Bindable
@@ -60,13 +58,12 @@ module Mongoid
           #
           # @param [ Document ] doc The document to check.
           def check_polymorphic_inverses!(doc)
-            if inverses = _association.inverses(doc)
-              if inverses.length > 1
-                raise Errors::InvalidSetPolymorphicRelation.new(
-                    _association.name, _base.class.name, _target.class.name
-                )
-              end
-            end
+            return unless inverses = _association.inverses(doc)
+            return unless inverses.length > 1
+
+            raise Errors::InvalidSetPolymorphicRelation.new(
+              _association.name, _base.class.name, _target.class.name
+            )
           end
         end
       end

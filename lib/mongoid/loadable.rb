@@ -1,21 +1,19 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Defines how Mongoid can autoload all defined models.
   module Loadable
     # The default list of paths where model classes should be looked for. If
     # Rails is present, the "app/models" paths will be used instead.
     # (See #model_paths.)
-    DEFAULT_MODEL_PATHS = %w( ./app/models ./lib/models ).freeze
+    DEFAULT_MODEL_PATHS = %w[ ./app/models ./lib/models ].freeze
 
     # The default list of glob patterns that match paths to ignore when loading
     # models. Defaults to '*/models/concerns/*', which Rails uses for extensions
     # to models (and which cause errors when loaded out of order).
     #
     # See #ignore_patterns.
-    DEFAULT_IGNORE_PATTERNS = %w( */models/concerns/* ).freeze
+    DEFAULT_IGNORE_PATTERNS = %w[ */models/concerns/* ].freeze
 
     # Search a list of model paths to get every model and require it, so
     # that indexing and inheritance work in both development and production
@@ -62,16 +60,16 @@ module Mongoid
     #   via `require_dependency` or `require`.
     def files_under_path(path)
       files = if preload_models.resizable?
-          preload_models.
-            map { |model| "#{path}/#{model.underscore}.rb" }.
-            select { |file_name| File.exists?(file_name) }
-        else
-          Dir.glob("#{path}/**/*.rb").
-            reject { |file_name| ignored?(file_name) }
-        end
+                preload_models
+                  .map { |model| "#{path}/#{model.underscore}.rb" }
+                  .select { |file_name| File.exist?(file_name) }
+              else
+                Dir.glob("#{path}/**/*.rb")
+                   .reject { |file_name| ignored?(file_name) }
+              end
 
       # strip the path and the suffix from each entry
-      files.map { |file| file.gsub(/^#{path}\// , "").gsub(/\.rb$/, "") }
+      files.map { |file| file.gsub(%r{^#{path}/}, '').gsub(/\.rb$/, '') }
     end
 
     # A convenience method for loading a model's file. If Rails'
@@ -103,9 +101,11 @@ module Mongoid
     #
     # @return [ Array<String> ] the array of model paths
     def model_paths
-      @model_paths ||= defined?(Rails) ?
-        Rails.application.config.paths["app/models"].expanded :
-        DEFAULT_MODEL_PATHS
+      @model_paths ||= if defined?(Rails)
+                         Rails.application.config.paths['app/models'].expanded
+                       else
+                         DEFAULT_MODEL_PATHS
+                       end
     end
 
     # Returns the array of glob patterns that determine whether a given
@@ -143,5 +143,4 @@ module Mongoid
       ignore_patterns.any? { |pattern| File.fnmatch?(pattern, file_path) }
     end
   end
-
 end

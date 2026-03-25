@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to NilClass.
         module NilClass
-
           # Add this object to nil.
           #
           # @example Add the object to a nil value.
@@ -17,7 +14,9 @@ module Mongoid
           # @param [ Object ] object The object to add.
           #
           # @return [ Object ] The provided object.
-          def __add__(object); object; end
+          def __add__(object)
+            object
+          end
 
           # Add this object to nil.
           #
@@ -27,7 +26,9 @@ module Mongoid
           # @param [ Object ] object The object to expanded.
           #
           # @return [ Object ] The provided object.
-          def __expanded__(object); object; end
+          def __expanded__(object)
+            object
+          end
 
           # Evolve the nil into a date or time.
           #
@@ -35,8 +36,10 @@ module Mongoid
           #   nil.__evolve_time__
           #
           # @return [ nil ] nil.
-          def __evolve_time__; self; end
-          alias :__evolve_date__ :__evolve_time__
+          def __evolve_time__
+            self
+          end
+          alias __evolve_date__ __evolve_time__
 
           # Add this object to nil.
           #
@@ -46,7 +49,9 @@ module Mongoid
           # @param [ Object ] object The object to intersect.
           #
           # @return [ Object ] The provided object.
-          def __intersect__(object); object; end
+          def __intersect__(object)
+            object
+          end
 
           # Add this object to nil.
           #
@@ -56,7 +61,9 @@ module Mongoid
           # @param [ Object ] object The object to override.
           #
           # @return [ Object ] The provided object.
-          def __override__(object); object; end
+          def __override__(object)
+            object
+          end
 
           # Add this object to nil.
           #
@@ -66,11 +73,13 @@ module Mongoid
           # @param [ Object ] object The object to union.
           #
           # @return [ Object ] The provided object.
-          def __union__(object); object; end
+          def __union__(object)
+            object
+          end
         end
       end
     end
   end
 end
 
-::NilClass.__send__(:include, Mongoid::Criteria::Queryable::Extensions::NilClass)
+NilClass.include Mongoid::Criteria::Queryable::Extensions::NilClass

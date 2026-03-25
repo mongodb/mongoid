@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Contextual
-
     # Represents a mapReduce database command instruction.
     class MapReduce
       extend Forwardable
@@ -20,7 +18,7 @@ module Mongoid
       #
       # @return [ Hash ] The counts.
       def counts
-        results["counts"]
+        results['counts']
       end
 
       # Iterates over each of the documents in the map/reduce, excluding the
@@ -32,12 +30,10 @@ module Mongoid
       #   end
       #
       # @return [ Enumerator ] The enumerator.
-      def each
+      def each(&block)
         validate_out!
         if block_given?
-          @map_reduce.each do |doc|
-            yield doc
-          end
+          @map_reduce.each(&block)
         else
           @map_reduce.to_enum
         end
@@ -50,7 +46,7 @@ module Mongoid
       #
       # @return [ Integer ] The number of emitted documents.
       def emitted
-        counts["emit"]
+        counts['emit']
       end
 
       # Provide a finalize js function for the map/reduce.
@@ -87,7 +83,7 @@ module Mongoid
       #
       # @return [ Integer ] The number of input documents.
       def input
-        counts["input"]
+        counts['input']
       end
 
       # Sets the map/reduce to use jsMode.
@@ -138,7 +134,7 @@ module Mongoid
       #
       # @return [ Integer ] The number of output documents.
       def output
-        counts["output"]
+        counts['output']
       end
 
       # Get the raw output from the map/reduce operation.
@@ -153,7 +149,7 @@ module Mongoid
         opts = { read: criteria.options.fetch(:read) } if criteria.options[:read]
         @map_reduce.database.command(cmd, (opts || {}).merge(session: _session)).first
       end
-      alias :results :raw
+      alias results raw
 
       # Execute the map/reduce, returning the raw output.
       # Useful when you don't care about map/reduce's output.
@@ -162,7 +158,7 @@ module Mongoid
       #   map_reduce.execute
       #
       # @return [ Hash ] The raw output
-      alias :execute :raw
+      alias execute raw
 
       # Get the number of documents reduced by the map/reduce.
       #
@@ -171,7 +167,7 @@ module Mongoid
       #
       # @return [ Integer ] The number of reduced documents.
       def reduced
-        counts["reduce"]
+        counts['reduce']
       end
 
       # Adds a javascript object to the global scope of the map/reduce.
@@ -194,7 +190,7 @@ module Mongoid
       #
       # @return [ Float ] The time in milliseconds.
       def time
-        results["timeMillis"]
+        results['timeMillis']
       end
 
       # Get a pretty string representation of the map/reduce, including the
@@ -205,14 +201,14 @@ module Mongoid
       #
       # @return [ String ] The inspection string.
       def inspect
-%Q{#<Mongoid::Contextual::MapReduce
+        %(#<Mongoid::Contextual::MapReduce
   selector: #{criteria.selector.inspect}
   class:    #{criteria.klass}
   map:      #{command[:map]}
   reduce:   #{command[:reduce]}
   finalize: #{command[:finalize]}
   out:      #{command[:out].inspect}>
-}
+)
       end
 
       # Returns the selector of the command spec.

@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error should be raised to deliberately rollback a transaction without
     # passing on an exception.
     # Normally, raising an exception inside a Mongoid transaction causes rolling

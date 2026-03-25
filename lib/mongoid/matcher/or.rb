@@ -1,14 +1,11 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # In-memory matcher for $or expression.
     #
     # @see https://www.mongodb.com/docs/manual/reference/operator/query/or/
     #
     # @api private
     module Or
-
       # Returns whether a document satisfies an $or expression.
       #
       # @param [ Mongoid::Document ] document The document.

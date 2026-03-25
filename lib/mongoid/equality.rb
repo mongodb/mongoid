@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module contains the behavior of Mongoid's clone/dup of documents.
   module Equality
     # Leave the current contents of this module outside of InstanceMethods
@@ -19,7 +17,8 @@ module Mongoid
     # @return [ Integer ] -1, 0, 1.
     def <=>(other)
       return super unless other.is_a?(Mongoid::Equality)
-      attributes["_id"].to_s <=> other.attributes["_id"].to_s
+
+      attributes['_id'].to_s <=> other.attributes['_id'].to_s
     end
 
     # Performs equality checking on the document ids. For more robust
@@ -33,7 +32,7 @@ module Mongoid
     # @return [ true | false ] True if the ids are equal, false if not.
     def ==(other)
       self.class == other.class &&
-          attributes["_id"] == other.attributes["_id"]
+        attributes['_id'] == other.attributes['_id']
     end
 
     # Delegates to ==. Used when needing checks in hashes.
@@ -45,7 +44,7 @@ module Mongoid
     #
     # @return [ true | false ] True if equal, false if not.
     def eql?(other)
-      self == (other)
+      self == other
     end
 
     module ClassMethods

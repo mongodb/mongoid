@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when querying the database for a document by a specific id or by
     # set of attributes which does not exist. If multiple ids were passed then
     # it will display all of those.
     class DocumentNotFound < MongoidError
-
       attr_reader :klass, :params
 
       # Create the new error.
@@ -24,9 +21,7 @@ module Mongoid
       # @param [ Array | Hash ] unmatched The unmatched ids, if appropriate. If
       #   there is a shard key this will be a hash.
       def initialize(klass, params, unmatched = nil)
-        if !unmatched && !params.is_a?(Hash)
-          unmatched = Array(params) if params
-        end
+        unmatched = Array(params) if !unmatched && !params.is_a?(Hash) && params
 
         @klass, @params = klass, params
         super(
@@ -56,9 +51,9 @@ module Mongoid
       # @return [ String ] The missing string.
       def missing(unmatched)
         if unmatched.is_a?(::Array)
-          unmatched.join(", ")
+          unmatched.join(', ')
         elsif unmatched.is_a?(::Hash)
-          unmatched[:_id] || unmatched["_id"]
+          unmatched[:_id] || unmatched['_id']
         else
           unmatched
         end
@@ -74,7 +69,7 @@ module Mongoid
       # @return [ String ] The searched string.
       def searched(params)
         if params.is_a?(::Array)
-          params.take(3).join(", ") + " ..."
+          params.take(3).join(', ') + ' ...'
         else
           params
         end
@@ -100,13 +95,13 @@ module Mongoid
       # @return [ String ] The problem.
       def message_key(params, unmatched)
         if !params && !unmatched
-          "no_documents_found"
-        elsif Hash === params
-          "document_with_attributes_not_found"
-        elsif Hash === unmatched && unmatched.size >= 2
-          "document_with_shard_key_not_found"
+          'no_documents_found'
+        elsif params.is_a?(Hash)
+          'document_with_attributes_not_found'
+        elsif unmatched.is_a?(Hash) && unmatched.size >= 2
+          'document_with_shard_key_not_found'
         else
-          "document_not_found"
+          'document_not_found'
         end
       end
 
@@ -114,12 +109,12 @@ module Mongoid
       #
       # @return [ String ] the shard key and value.
       def shard_key(unmatched)
-        if Hash === unmatched
-          h = unmatched.dup
-          h.delete("_id")
-          h.delete(:_id)
-          h.map{|k,v| "#{k}: #{v}" }.join(", ")
-        end
+        return unless unmatched.is_a?(Hash)
+
+        h = unmatched.dup
+        h.delete('_id')
+        h.delete(:_id)
+        h.map { |k, v| "#{k}: #{v}" }.join(', ')
       end
     end
   end

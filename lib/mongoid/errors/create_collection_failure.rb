@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when an attempt to create a collection failed.
     class CreateCollectionFailure < MongoidError
-
       # Instantiate the create collection error.
       #
       # @param [ String ] collection_name The name of the collection that
@@ -19,14 +16,14 @@ module Mongoid
       # @api private
       def initialize(collection_name, collection_options, error)
         super(
-            compose_message(
-                "create_collection_failure",
-                {
-                  collection_name: collection_name,
-                  collection_options: collection_options,
-                  error: "#{error.class}: #{error.message}"
-                }
-            )
+          compose_message(
+            'create_collection_failure',
+            {
+              collection_name: collection_name,
+              collection_options: collection_options,
+              error: "#{error.class}: #{error.message}"
+            }
+          )
         )
       end
     end

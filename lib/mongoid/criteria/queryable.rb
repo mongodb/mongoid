@@ -1,23 +1,21 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/criteria/queryable/expandable"
-require "mongoid/criteria/queryable/extensions"
-require "mongoid/criteria/queryable/key"
-require "mongoid/criteria/queryable/macroable"
-require "mongoid/criteria/queryable/mergeable"
-require "mongoid/criteria/queryable/smash"
-require "mongoid/criteria/queryable/aggregable"
-require "mongoid/criteria/queryable/pipeline"
-require "mongoid/criteria/queryable/optional"
-require "mongoid/criteria/queryable/options"
-require "mongoid/criteria/queryable/selectable"
-require "mongoid/criteria/queryable/selector"
-require "mongoid/criteria/queryable/storable"
+require 'mongoid/criteria/queryable/expandable'
+require 'mongoid/criteria/queryable/extensions'
+require 'mongoid/criteria/queryable/key'
+require 'mongoid/criteria/queryable/macroable'
+require 'mongoid/criteria/queryable/mergeable'
+require 'mongoid/criteria/queryable/smash'
+require 'mongoid/criteria/queryable/aggregable'
+require 'mongoid/criteria/queryable/pipeline'
+require 'mongoid/criteria/queryable/optional'
+require 'mongoid/criteria/queryable/options'
+require 'mongoid/criteria/queryable/selectable'
+require 'mongoid/criteria/queryable/selector'
+require 'mongoid/criteria/queryable/storable'
 
 module Mongoid
   class Criteria
-
     # A queryable is any object that needs queryable's dsl injected into it to build
     # MongoDB queries. For example, a Mongoid::Criteria is an Queryable.
     #
@@ -50,6 +48,7 @@ module Mongoid
       # @return [ true | false ] If the objects are equal.
       def ==(other)
         return false unless other.is_a?(Queryable)
+
         selector == other.selector && options == other.options
       end
 
@@ -92,7 +91,7 @@ module Mongoid
       # @return [ Hash ] The command.
       def to_mql
         {
-          :'$db' => database_name,
+          '$db': database_name,
           find: collection.name,
           filter: selector
         }.merge(options)

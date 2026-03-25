@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Atomic
     module Paths
-
       # This class encapsulates behavior for locating and updating root
       # documents atomically.
       class Root
-
         attr_reader :document, :path, :position
 
         # Create the new root path utility.
@@ -18,7 +15,7 @@ module Mongoid
         #
         # @param [ Document ] document The document to generate the paths for.
         def initialize(document)
-          @document, @path, @position = document, "", ""
+          @document, @path, @position = document, '', ''
         end
 
         # Asking for the insert modifier on a document with a root path

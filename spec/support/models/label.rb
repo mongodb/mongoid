@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Label
   include Mongoid::Document
@@ -47,7 +46,8 @@ class Label
   end
 
   private
+
   def cleanup
-    self.name = self.name.downcase.capitalize if self.name
+    self.name = name.downcase.capitalize if name
   end
 end

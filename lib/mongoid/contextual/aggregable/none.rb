@@ -1,14 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/contextual/aggregable"
+require 'mongoid/contextual/aggregable'
 
 module Mongoid
   module Contextual
     module Aggregable
       # Contains behavior for aggregating values in null context.
       module None
-
         # Get all the aggregate values for the provided field in null context.
         # Provided for interface consistency with Aggregable::Mongo.
         #
@@ -59,7 +57,7 @@ module Mongoid
         # @param [ Symbol ] _field The field to max.
         #
         # @return [ nil ] Always nil.
-        alias :max :min
+        alias max min
       end
     end
   end

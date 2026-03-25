@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Atomic
     module Paths
       module Embedded
-
         # This class encapsulates behavior for locating and updating
         # documents that are defined as an embedded 1-1.
         class One
@@ -19,7 +17,7 @@ module Mongoid
           # @param [ Document ] document The document to generate the paths for.
           def initialize(document)
             @document, @parent = document, document._parent
-            @insert_modifier, @delete_modifier ="$set", "$unset"
+            @insert_modifier, @delete_modifier = '$set', '$unset'
           end
 
           # Get the position of the document in the hierarchy. This will
@@ -32,7 +30,7 @@ module Mongoid
           # @return [ String ] The position of the document.
           def position
             pos = parent.atomic_position
-            "#{pos}#{"." unless pos.blank?}#{document._association.store_as}"
+            "#{pos}#{'.' unless pos.blank?}#{document._association.store_as}"
           end
         end
       end

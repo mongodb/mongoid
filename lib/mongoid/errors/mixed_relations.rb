@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when trying to reference an embedded document from
     # a document in another collection that is not its parent.
     #
@@ -22,7 +20,7 @@ module Mongoid
       def initialize(root_klass, embedded_klass)
         super(
           compose_message(
-            "mixed_relations",
+            'mixed_relations',
             { root: root_klass, embedded: embedded_klass }
           )
         )

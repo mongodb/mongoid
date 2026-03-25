@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
       class BelongsTo
-
         # The Builder behavior for belongs_to associations.
         module Buildable
-
           # This method either takes an _id or an object and queries for the
           # inverse side using the id or sets the object.
           #
@@ -21,19 +18,20 @@ module Mongoid
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(_base, object, type = nil, selected_fields = nil)
             return object unless query?(object)
-            
+
             # Handle array from $lookup aggregation (returns array even for belongs_to)
             if object.is_a?(Array)
               first = object.first
               case first
               when nil, Mongoid::Document then return first
-              when Hash then return Factory.execute_from_db(klass, first, nil, selected_fields, execute_callbacks: false)
-              else raise ArgumentError, "Cannot build belongs_to association from array"
+              when Hash then return Factory.execute_from_db(klass, first, nil, selected_fields,
+                                                            execute_callbacks: false)
+              else raise ArgumentError, 'Cannot build belongs_to association from array'
               end
             end
-            
+
             # Handle single hash from $lookup with $unwind
             if object.is_a?(Hash)
               return Factory.execute_from_db(klass, object, nil, selected_fields, execute_callbacks: false)
@@ -49,7 +47,11 @@ module Mongoid
           end
 
           def query_criteria(object, type)
-            cls = type ? (type.is_a?(String) ? type.constantize : type) : relation_class
+            cls = if type
+                    type.is_a?(String) ? type.constantize : type
+                  else
+                    relation_class
+                  end
             crit = cls.criteria
             crit = crit.apply_scope(scope)
             crit.where(primary_key => object)

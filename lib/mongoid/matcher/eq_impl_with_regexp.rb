@@ -1,13 +1,10 @@
-# rubocop:todo all
 module Mongoid
   module Matcher
-
     # This is an internal equality implementation that performs exact
     # comparisons and regular expression matches.
     #
     # @api private
     module EqImplWithRegexp
-
       # Returns whether a value satisfies an $eq (or similar) expression,
       # performing a regular expression match if the condition is a regular
       # expression.
@@ -19,14 +16,14 @@ module Mongoid
       # @return [ true | false ] Whether the value matches.
       #
       # @api private
-      module_function def matches?(original_operator, value, condition)
+      module_function def matches?(_original_operator, value, condition)
         case condition
         when Regexp
           value.respond_to?(:=~) && value =~ condition
         when ::BSON::Regexp::Raw
           value.respond_to?(:=~) && value =~ condition.compile
         else
-          if value.kind_of?(Time) && condition.kind_of?(Time)
+          if value.is_a?(Time) && condition.is_a?(Time)
             EqImpl.time_eq?(value, condition)
           else
             value == condition

@@ -1,14 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Threaded
-    BIND = 'bind'.freeze
-    ASSIGN = 'assign'.freeze
-    BUILD = 'build'.freeze
-    LOAD = 'load'.freeze
-    CREATE = 'create'.freeze
-    
+    BIND = 'bind'
+    ASSIGN = 'assign'
+    BUILD = 'build'
+    LOAD = 'load'
+    CREATE = 'create'
+
     # This module contains convenience methods for document lifecycle that
     # resides on thread locals.
     module Lifecycle
@@ -129,7 +128,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Execute a block in creating mode.
         #
         # @example Execute in creating mode.
@@ -144,7 +142,6 @@ module Mongoid
         ensure
           Threaded.exit_execution(CREATE)
         end
-
       end
     end
   end

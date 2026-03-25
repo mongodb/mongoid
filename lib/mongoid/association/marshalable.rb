@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
-
     # Mixin module for Mongoid::Association::Proxy which adds
     # custom Marshal.dump functionality.
     module Marshalable
-
       # Provides the data needed to Marshal.dump an association proxy.
       #
       # @example Dump the proxy.

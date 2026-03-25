@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/association/referenced/has_many/binding'
 require 'mongoid/association/referenced/has_many/buildable'
@@ -11,7 +10,6 @@ require 'mongoid/association/referenced/with_polymorphic_criteria'
 module Mongoid
   module Association
     module Referenced
-
       # The has_many association.
       class HasMany
         include Relatable
@@ -22,18 +20,18 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        ASSOCIATION_OPTIONS = [
-            :after_add,
-            :after_remove,
-            :as,
-            :autosave,
-            :before_add,
-            :before_remove,
-            :dependent,
-            :foreign_key,
-            :order,
-            :primary_key,
-            :scope,
+        ASSOCIATION_OPTIONS = %i[
+          after_add
+          after_remove
+          as
+          autosave
+          before_add
+          before_remove
+          dependent
+          foreign_key
+          order
+          primary_key
+          scope
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -45,7 +43,7 @@ module Mongoid
         # The default foreign key suffix.
         #
         # @return [ String ] '_id'
-        FOREIGN_KEY_SUFFIX = '_id'.freeze
+        FOREIGN_KEY_SUFFIX = '_id'
 
         # The list of association complements.
         #
@@ -78,30 +76,38 @@ module Mongoid
           self
         end
 
-
         # Get the foreign key field on the inverse for saving the association reference.
         #
         # @return [ String ] The foreign key field on the inverse for saving the
         #   association reference.
         def foreign_key
-          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
+          @foreign_key ||= if @options[:foreign_key]
+                             @options[:foreign_key].to_s
+                           else
                              default_foreign_key_field
+                           end
         end
 
         # Is this association type embedded?
         #
         # @return [ false ] Always false.
-        def embedded?; false; end
+        def embedded?
+          false
+        end
 
         # The default for validation the association object.
         #
         # @return [ true ] Always true.
-        def validation_default; true; end
+        def validation_default
+          true
+        end
 
         # Does this association type store the foreign key?
         #
         # @return [ true ] Always true.
-        def stores_foreign_key?; false; end
+        def stores_foreign_key?
+          false
+        end
 
         # Get the association proxy class for this association type.
         #
@@ -200,18 +206,18 @@ module Mongoid
           @default_foreign_key_field ||= "#{inverse}#{FOREIGN_KEY_SUFFIX}"
         end
 
-        def polymorphic_inverses(other)
+        def polymorphic_inverses(_other)
           [ as ]
         end
 
         def determine_inverses(other)
           matches = (other || relation_class).relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
-                rel.relation_class_name == inverse_class_name
-
+              rel.relation_class_name == inverse_class_name
           end
           if matches.size > 1
             return [ default_inverse.name ] if default_inverse
+
             raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)
           end
           matches.collect { |m| m.name } unless matches.blank?
@@ -242,7 +248,7 @@ module Mongoid
         def with_inverse_field_criterion(criteria)
           inverse_association = inverse_association(klass)
           if inverse_association.try(:inverse_of)
-            criteria.any_in(inverse_association.inverse_of => [name, nil])
+            criteria.any_in(inverse_association.inverse_of => [ name, nil ])
           else
             criteria
           end

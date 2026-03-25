@@ -1,18 +1,16 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/criteria/findable"
-require "mongoid/criteria/includable"
-require "mongoid/criteria/inspectable"
-require "mongoid/criteria/marshalable"
-require "mongoid/criteria/modifiable"
-require "mongoid/criteria/queryable"
-require "mongoid/criteria/scopable"
-require "mongoid/criteria/options"
-require "mongoid/criteria/translator"
+require 'mongoid/criteria/findable'
+require 'mongoid/criteria/includable'
+require 'mongoid/criteria/inspectable'
+require 'mongoid/criteria/marshalable'
+require 'mongoid/criteria/modifiable'
+require 'mongoid/criteria/queryable'
+require 'mongoid/criteria/scopable'
+require 'mongoid/criteria/options'
+require 'mongoid/criteria/translator'
 
 module Mongoid
-
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
   # objects from the database. It is a DSL that essentially sets up the
   # selector and options arguments that get passed on to a Mongo::Collection
@@ -23,14 +21,14 @@ module Mongoid
     include Enumerable
 
     # @api private
-    alias :_enumerable_find :find
+    alias _enumerable_find find
 
     include Contextual
     include Queryable
     include Findable
 
     # @api private
-    alias :_findable_find :find
+    alias _findable_find find
 
     include Inspectable
     include Includable
@@ -87,6 +85,7 @@ module Mongoid
           unless ALLOWED_FROM_HASH_METHODS.include?(method_sym)
             raise ArgumentError, "Method '#{method}' is not allowed in from_hash"
           end
+
           criteria = criteria.public_send(method_sym, args)
         end
         criteria
@@ -110,6 +109,7 @@ module Mongoid
     # @return [ true | false ] If the objects are equal.
     def ==(other)
       return super if other.respond_to?(:selector)
+
       entries == other
     end
 
@@ -191,9 +191,7 @@ module Mongoid
     # @param [ Array<Document> ] docs The embedded documents.
     #
     # @return [ Array<Document> ] The embedded documents.
-    def documents=(docs)
-      @documents = docs
-    end
+    attr_writer :documents
 
     # Is the criteria for embedded documents?
     #
@@ -228,9 +226,7 @@ module Mongoid
       # raw_results is true.
       typed = !raw_results if typed.nil?
 
-      if !typed && !raw_results
-        raise ArgumentError, 'instantiated results must be typecast'
-      end
+      raise ArgumentError, 'instantiated results must be typecast' if !typed && !raw_results
 
       clone.tap do |criteria|
         criteria._raw_results = { raw: raw_results, typed: typed }
@@ -300,7 +296,7 @@ module Mongoid
     # @return [ Array<String> ] The fields.
     def field_list
       if options[:fields]
-        options[:fields].keys.reject{ |key| key == klass.discriminator_key }
+        options[:fields].keys.reject { |key| key == klass.discriminator_key }
       else
         []
       end
@@ -373,8 +369,8 @@ module Mongoid
       self.documents = other.documents.dup unless other.documents.empty?
       self.scoping_options = other.scoping_options
       self.inclusions = (inclusions + other.inclusions).uniq
-      self._raw_results = self._raw_results || other._raw_results
-      @use_lookup = @use_lookup || other.use_lookup?
+      self._raw_results = _raw_results || other._raw_results
+      @use_lookup ||= other.use_lookup?
       self
     end
 
@@ -410,13 +406,10 @@ module Mongoid
     def only(*args)
       args = args.flatten
       return clone if args.empty?
-      if (args & Fields::IDS).empty?
-        args.unshift(:_id)
-      end
-      if klass.hereditary?
-        args.push(klass.discriminator_key.to_sym)
-      end
-      super(*args)
+
+      args.unshift(:_id) if (args & Fields::IDS).empty?
+      args.push(klass.discriminator_key.to_sym) if klass.hereditary?
+      super
     end
 
     # Set the read preference for the criteria.
@@ -443,7 +436,7 @@ module Mongoid
     # @return [ Criteria ] The cloned criteria.
     def without(*args)
       args -= id_fields
-      super(*args)
+      super
     end
 
     # Returns true if criteria responds to the given method.
@@ -459,7 +452,7 @@ module Mongoid
       super || klass.respond_to?(name) || CHECK.respond_to?(name, include_private)
     end
 
-    alias :to_ary :to_a
+    alias to_ary to_a
 
     # Convenience for objects that want to be merged into a criteria.
     #
@@ -480,7 +473,7 @@ module Mongoid
     #
     # @return [ Proc ] The wrapped criteria.
     def to_proc
-      ->{ self }
+      -> { self }
     end
 
     # Adds a criterion to the +Criteria+ that specifies a type or an Array of
@@ -494,7 +487,7 @@ module Mongoid
     #
     # @return [ Criteria ] The cloned criteria.
     def type(types)
-      any_in(self.discriminator_key.to_sym => Array(types))
+      any_in(discriminator_key.to_sym => Array(types))
     end
 
     # This is the general entry point for most MongoDB queries. This either
@@ -522,14 +515,11 @@ module Mongoid
       # any number of arguments, but we don't presently allow multiple
       # arguments through this method. This API can be reconsidered in the
       # future.
-      if args.length > 1
-        raise ArgumentError, "Criteria#where requires zero or one arguments (given #{args.length})"
-      end
+      raise ArgumentError, "Criteria#where requires zero or one arguments (given #{args.length})" if args.length > 1
+
       if args.length == 1
         expression = args.first
-        if expression.is_a?(::String) && embedded?
-          raise Errors::UnsupportedJavascript.new(klass, expression)
-        end
+        raise Errors::UnsupportedJavascript.new(klass, expression) if expression.is_a?(::String) && embedded?
       end
       super
     end
@@ -562,11 +552,11 @@ module Mongoid
     # @deprecated
     def for_js(javascript, scope = {})
       code = if scope.empty?
-        # CodeWithScope is not supported for $where as of MongoDB 4.4
-        BSON::Code.new(javascript)
-      else
-        BSON::CodeWithScope.new(javascript, scope)
-      end
+               # CodeWithScope is not supported for $where as of MongoDB 4.4
+               BSON::Code.new(javascript)
+             else
+               BSON::CodeWithScope.new(javascript, scope)
+             end
       js_query(code)
     end
     Mongoid.deprecate(self, :for_js)
@@ -587,9 +577,9 @@ module Mongoid
     # @raise [ Errors::DocumentNotFound ] If none are found and raising an
     #   error.
     def check_for_missing_documents!(result, ids)
-      if (result.size < ids.size) && Mongoid.raise_not_found_error
-        raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
-      end
+      return unless (result.size < ids.size) && Mongoid.raise_not_found_error
+
+      raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
     end
 
     # Clone or dup the current +Criteria+. This will return a new criteria with
@@ -632,7 +622,7 @@ module Mongoid
           klass.send(name, *args, &block)
         end
       elsif CHECK.respond_to?(name)
-        return entries.send(name, *args, &block)
+        entries.send(name, *args, &block)
       else
         super
       end
@@ -659,8 +649,8 @@ module Mongoid
     # @return [ true | false ] If type selection should be added.
     def type_selectable?
       klass.hereditary? &&
-        !selector.keys.include?(self.discriminator_key) &&
-        !selector.keys.include?(self.discriminator_key.to_sym)
+        !selector.keys.include?(discriminator_key) &&
+        !selector.keys.include?(discriminator_key.to_sym)
     end
 
     # Get the selector for type selection.
@@ -674,7 +664,7 @@ module Mongoid
     def type_selection
       klasses = klass._types
       if klasses.size > 1
-        { klass.discriminator_key.to_sym => { "$in" => klass._types }}
+        { klass.discriminator_key.to_sym => { '$in' => klass._types } }
       else
         { klass.discriminator_key.to_sym => klass._types[0] }
       end

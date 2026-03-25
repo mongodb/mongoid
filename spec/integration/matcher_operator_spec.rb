@@ -1,15 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
 def mop_error?(spec, kind)
-  unless %w(matcher driver dsl).include?(kind)
-    raise ArgumentError, "Bogus kind: #{kind}"
-  end
+  raise ArgumentError, "Bogus kind: #{kind}" unless %w[matcher driver dsl].include?(kind)
 
   spec['error'] == true || spec['error'] == kind ||
-    spec['error'].is_a?(Array) && spec['error'].include?(kind)
+    (spec['error'].is_a?(Array) && spec['error'].include?(kind))
 end
 
 describe 'Matcher operators' do
@@ -42,7 +39,6 @@ describe 'Matcher operators' do
 
       specs.each do |spec|
         context spec['name'] do
-
           if spec['pending']
             before do
               # Cannot use `pending` here because some of the queries may work
@@ -51,9 +47,7 @@ describe 'Matcher operators' do
             end
           end
 
-          if spec['min_server_version']
-            min_server_version spec['min_server_version'].to_s
-          end
+          min_server_version spec['min_server_version'].to_s if spec['min_server_version']
 
           let(:query) { spec.fetch('query') }
           let(:result) { spec.fetch('matches') }
@@ -80,14 +74,12 @@ describe 'Matcher operators' do
             context 'via driver' do
               if mop_error?(spec, 'driver')
                 it 'produces an error' do
-                  begin
-                    Mop.collection.find(query).any?
-                  rescue Mongo::Error::OperationFailure
-                  rescue Mongo::Error::InvalidDocument
-                  rescue BSON::Error::UnserializableClass
-                  else
-                    fail "Expected an exception to be raised"
-                  end
+                  Mop.collection.find(query).any?
+                rescue Mongo::Error::OperationFailure
+                rescue Mongo::Error::InvalidDocument
+                rescue BSON::Error::UnserializableClass
+                else
+                  raise 'Expected an exception to be raised'
                 end
               else
                 it 'produces the correct result' do
@@ -99,15 +91,13 @@ describe 'Matcher operators' do
             context 'via Mongoid DSL' do
               if mop_error?(spec, 'dsl')
                 it 'produces an error' do
-                  begin
-                    Mop.where(query).any?
-                  rescue Mongo::Error::OperationFailure
-                  rescue BSON::Error::UnserializableClass
-                  rescue Mongoid::Errors::InvalidQuery
-                  rescue Mongoid::Errors::CriteriaArgumentRequired
-                  else
-                    fail "Expected the query to raise an error"
-                  end
+                  Mop.where(query).any?
+                rescue Mongo::Error::OperationFailure
+                rescue BSON::Error::UnserializableClass
+                rescue Mongoid::Errors::InvalidQuery
+                rescue Mongoid::Errors::CriteriaArgumentRequired
+                else
+                  raise 'Expected the query to raise an error'
                 end
               else
                 it 'produces the correct result' do

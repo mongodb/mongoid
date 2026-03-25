@@ -1,18 +1,15 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when invalid arguments are passed to #find.
     class InvalidFind < MongoidError
-
       # Create the new invalid find error.
       #
       # @example Create the error.
       #   InvalidFind.new
       def initialize
-        super(compose_message("calling_document_find_with_nil_is_invalid", {}))
+        super(compose_message('calling_document_find_with_nil_is_invalid', {}))
       end
     end
   end

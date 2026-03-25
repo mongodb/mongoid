@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
-
     # This module defines the behavior for setting up cascading deletes and
     # nullifies for associations, and how to delegate to the appropriate strategy.
     module Depending
@@ -20,7 +18,6 @@ module Mongoid
       end
 
       class_methods do
-
         # Returns all dependent association metadata objects.
         #
         # @return [ Array<Mongoid::Association::Relatable> ] The dependent
@@ -30,19 +27,20 @@ module Mongoid
         def _all_dependents
           superclass_dependents = superclass.respond_to?(:_all_dependents) ? superclass._all_dependents : []
           dependents + superclass_dependents.reject do |new_dep|
-            dependents.any? do |old_dep| old_dep.name == new_dep.name
+            dependents.any? do |old_dep|
+              old_dep.name == new_dep.name
             end
           end
         end
       end
 
       # The valid dependent strategies.
-      STRATEGIES = [
-          :delete_all,
-          :destroy,
-          :nullify,
-          :restrict_with_exception,
-          :restrict_with_error
+      STRATEGIES = %i[
+        delete_all
+        destroy
+        nullify
+        restrict_with_exception
+        restrict_with_error
       ]
 
       # Attempt to add the cascading information for the document to know how
@@ -62,9 +60,7 @@ module Mongoid
             klass.dependents_owner = klass
           end
 
-          if association.dependent && !klass.dependents.include?(association)
-            klass.dependents.push(association)
-          end
+          klass.dependents.push(association) if association.dependent && !klass.dependents.include?(association)
         end
       end
 
@@ -77,11 +73,11 @@ module Mongoid
       # @raises [ Mongoid::Errors::InvalidDependentStrategy ]
       #   Error if invalid.
       def self.validate!(association)
-        unless STRATEGIES.include?(association.dependent)
-          raise Errors::InvalidDependentStrategy.new(association,
-                                                     association.dependent,
-                                                     STRATEGIES)
-        end
+        return if STRATEGIES.include?(association.dependent)
+
+        raise Errors::InvalidDependentStrategy.new(association,
+                                                   association.dependent,
+                                                   STRATEGIES)
       end
 
       # Perform all cascading deletes, destroys, or nullifies. Will delegate to
@@ -100,30 +96,30 @@ module Mongoid
       private
 
       def _dependent_delete_all!(association)
-        if relation = send(association.name)
-          if relation.respond_to?(:dependents) && relation.dependents.blank?
-            relation.clear
-          else
-            ::Array.wrap(send(association.name)).each { |rel| rel.delete }
-          end
+        return unless relation = send(association.name)
+
+        if relation.respond_to?(:dependents) && relation.dependents.blank?
+          relation.clear
+        else
+          ::Array.wrap(send(association.name)).each { |rel| rel.delete }
         end
       end
 
       def _dependent_destroy!(association)
-        if relation = send(association.name)
-          if relation.is_a?(Enumerable)
-            relation.entries
-            relation.each { |doc| doc.destroy }
-          else
-            relation.destroy
-          end
+        return unless relation = send(association.name)
+
+        if relation.is_a?(Enumerable)
+          relation.entries
+          relation.each { |doc| doc.destroy }
+        else
+          relation.destroy
         end
       end
 
       def _dependent_nullify!(association)
-        if relation = send(association.name)
-          relation.nullify
-        end
+        return unless relation = send(association.name)
+
+        relation.nullify
       end
 
       def _dependent_restrict_with_exception!(association)
@@ -133,10 +129,10 @@ module Mongoid
       end
 
       def _dependent_restrict_with_error!(association)
-        if (relation = send(association.name)) && !relation.blank?
-          errors.add(association.name, :destroy_restrict_with_error_dependencies_exist)
-          throw(:abort, false)
-        end
+        return unless (relation = send(association.name)) && !relation.blank?
+
+        errors.add(association.name, :destroy_restrict_with_error_dependencies_exist)
+        throw(:abort, false)
       end
     end
   end

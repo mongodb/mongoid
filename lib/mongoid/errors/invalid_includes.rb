@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when an invalid value is passed to an eager
     # loading query.
     class InvalidIncludes < MongoidError
-
       # Initialize the error.
       #
       # @example Initialize the error.
@@ -18,11 +15,11 @@ module Mongoid
       def initialize(klass, args)
         super(
           compose_message(
-            "invalid_includes",
+            'invalid_includes',
             {
               klass: klass.name,
-              args: args.map(&:inspect).join(", "),
-              relations: klass.relations.keys.map(&:inspect).join(", ")
+              args: args.map(&:inspect).join(', '),
+              relations: klass.relations.keys.map(&:inspect).join(', ')
             }
           )
         )

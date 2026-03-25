@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # This module contains behavior for all Mongoid scoping - named scopes,
   # default scopes, and criteria accessors via scoped and unscoped.
   module Scopable
@@ -26,15 +24,14 @@ module Mongoid
     #
     # @return [ true | false ] If default scoping was applied.
     def apply_default_scoping
-      if default_scoping
-        default_scoping.call.selector.each do |field, value|
-          attributes[field] = value unless value.respond_to?(:each)
-        end
+      return unless default_scoping
+
+      default_scoping.call.selector.each do |field, value|
+        attributes[field] = value unless value.respond_to?(:each)
       end
     end
 
     module ClassMethods
-
       # Returns a hash of all the scopes defined for this class, including
       # scopes defined on ancestor classes.
       #
@@ -50,10 +47,8 @@ module Mongoid
       # @return [ Hash ] The scopes defined for this class
       def scopes
         defined_scopes = {}
-        ancestors.reverse.each do |klass|
-          if klass.respond_to?(:_declared_scopes)
-            defined_scopes.merge!(klass._declared_scopes)
-          end
+        ancestors.reverse_each do |klass|
+          defined_scopes.merge!(klass._declared_scopes) if klass.respond_to?(:_declared_scopes)
         end
         defined_scopes.freeze
       end
@@ -80,8 +75,8 @@ module Mongoid
       # @raise [ Errors::InvalidScope ] If the scope is not a proc or criteria.
       #
       # @return [ Proc ] The default scope.
-      def default_scope(value = nil)
-        value = Proc.new { yield } if block_given?
+      def default_scope(value = nil, &block)
+        value = proc(&block) if block_given?
         check_scope_validity(value)
         self.default_scoping = process_default_scope(value)
       end
@@ -106,7 +101,7 @@ module Mongoid
       # @return [ Criteria ] The queryable.
       def queryable
         crit = Threaded.current_scope(self) || Criteria.new(self)
-        crit.embedded = true if (crit.klass.embedded? && !crit.klass.cyclic?)
+        crit.embedded = true if crit.klass.embedded? && !crit.klass.cyclic?
         crit
       end
 
@@ -195,7 +190,7 @@ module Mongoid
       def with_default_scope
         queryable.with_default_scope
       end
-      alias :criteria :with_default_scope
+      alias criteria with_default_scope
 
       # Pushes the provided criteria onto the scope stack, and removes it after the
       # provided block is yielded.
@@ -245,18 +240,15 @@ module Mongoid
       # @raise [ Errors::ScopeOverwrite ] If the name exists and configured to
       #   raise the error.
       def check_scope_name(name)
-        if _declared_scopes[name] || respond_to?(name, true)
-          if Mongoid.scope_overwrite_exception
-            raise Errors::ScopeOverwrite.new(self.name, name)
-          else
-            Mongoid.logger.warn(
-              "Creating scope :#{name} which conflicts with #{self.name}.#{name}. " +
-              "Calls to `Mongoid::Criteria##{name}` will delegate to " +
-              "`Mongoid::Criteria##{name}` for criteria with klass #{self.name} " +
-              "and will ignore the declared scope."
-            )
-          end
-        end
+        return unless _declared_scopes[name] || respond_to?(name, true)
+        raise Errors::ScopeOverwrite.new(self.name, name) if Mongoid.scope_overwrite_exception
+
+        Mongoid.logger.warn(
+          "Creating scope :#{name} which conflicts with #{self.name}.#{name}. " +
+          "Calls to `Mongoid::Criteria##{name}` will delegate to " +
+          "`Mongoid::Criteria##{name}` for criteria with klass #{self.name} " +
+          'and will ignore the declared scope.'
+        )
       end
 
       # Checks if the intended scope is a valid object, either a criteria or
@@ -271,9 +263,9 @@ module Mongoid
       #
       # @raise [ Errors::InvalidScope ] If the scope is not a valid object.
       def check_scope_validity(value)
-        unless value.respond_to?(:call)
-          raise Errors::InvalidScope.new(self, value)
-        end
+        return if value.respond_to?(:call)
+
+        raise Errors::InvalidScope.new(self, value)
       end
 
       # Defines the actual class method that will execute the scope when
@@ -318,7 +310,7 @@ module Mongoid
       # @param [ Criteria | Proc ] value The default scope value.
       def process_default_scope(value)
         if existing = default_scoping
-          ->{ existing.call.merge(value.to_proc.call) }
+          -> { existing.call.merge(value.to_proc.call) }
         else
           value.to_proc
         end

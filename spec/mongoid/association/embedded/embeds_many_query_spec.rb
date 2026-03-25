@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
-require_relative './embeds_many_models'
+require 'spec_helper'
+require_relative 'embeds_many_models'
 
 describe Mongoid::Association::Embedded::EmbedsMany do
-
   context 'when projecting with #only' do
     before do
       congress = EmmCongress.new(name: 'foo')
@@ -24,8 +22,9 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       # has a default value specified in the model
       expect do
         legislator.b
-      end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'b' on EmmLegislator which was not loaded/)
-      expect(legislator.attributes.keys).to eq(['_id', 'a'])
+      end.to raise_error(Mongoid::Errors::AttributeNotLoaded,
+                         /Attempted to access attribute 'b' on EmmLegislator which was not loaded/)
+      expect(legislator.attributes.keys).to eq(%w[_id a])
     end
 
     it 'allows accessing the parent' do
@@ -39,13 +38,13 @@ describe Mongoid::Association::Embedded::EmbedsMany do
           title: 'Steve',
           addresses: [
             Address.new(number: '123'),
-            Address.new(number: '456'),
-          ],
+            Address.new(number: '456')
+          ]
         )
       end
 
       let(:patient) do
-        Patient.where('addresses.number' => {'$gt' => 100}).only('addresses.$').first
+        Patient.where('addresses.number' => { '$gt' => 100 }).only('addresses.$').first
       end
 
       it 'loads embedded association' do
@@ -53,7 +52,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       end
     end
 
-    context "when excluding the relation" do
+    context 'when excluding the relation' do
       let(:congress) do
         EmmCongress.where(name: 'foo').only(:_id).first
       end
@@ -61,7 +60,8 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       it 'raises AttributeNotLoaded' do
         expect do
           congress.legislators
-        end.to raise_error(Mongoid::Errors::AttributeNotLoaded, /Attempted to access attribute 'legislators' on EmmCongress which was not loaded/)
+        end.to raise_error(Mongoid::Errors::AttributeNotLoaded,
+                           /Attempted to access attribute 'legislators' on EmmCongress which was not loaded/)
       end
     end
   end

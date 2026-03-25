@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Actor
   include Mongoid::Document
+
   field :name
   field :after_custom_count, type: Integer, default: 0
   has_and_belongs_to_many :tags
@@ -13,9 +13,9 @@ class Actor
 
   def do_something
     run_callbacks(:custom) do
-      self.name = "custom"
+      self.name = 'custom'
     end
   end
 end
 
-require "support/models/actress"
+require 'support/models/actress'

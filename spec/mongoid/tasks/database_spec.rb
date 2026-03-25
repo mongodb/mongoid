@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Tasks::Database do
-
   before(:all) do
     module DatabaseSpec
       class Measurement
@@ -15,10 +13,10 @@ describe Mongoid::Tasks::Database do
 
         embeds_many :comments
 
-        store_in collection: "measurement",
-          collection_options: {
-            capped: true, size: 10000
-          }
+        store_in collection: 'measurement',
+                 collection_options: {
+                   capped: true, size: 10_000
+                 }
       end
 
       class Comment
@@ -29,8 +27,8 @@ describe Mongoid::Tasks::Database do
         embedded_in :measurement
 
         store_in collection_options: {
-            capped: true, size: 10000
-          }
+          capped: true, size: 10_000
+        }
       end
 
       class Note
@@ -41,7 +39,7 @@ describe Mongoid::Tasks::Database do
         recursively_embeds_one
 
         store_in collection_options: {
-          capped: true, size: 10000
+          capped: true, size: 10_000
         }
       end
     end
@@ -57,32 +55,30 @@ describe Mongoid::Tasks::Database do
     Object.send(:remove_const, :DatabaseSpec)
   end
 
-
   let(:logger) do
-    double("logger").tap do |log|
+    double('logger').tap do |log|
       allow(log).to receive(:info)
     end
+  end
+  let(:models) do
+    [ User, Account, Address, Draft ]
   end
 
   before do
     allow(Mongoid::Tasks::Database).to receive(:logger).and_return(logger)
   end
 
-  let(:models) do
-    [ User, Account, Address, Draft ]
-  end
-
   describe '.create_collections' do
     context 'collection_options are specified' do
       let(:models) do
-        [DatabaseSpec::Measurement]
+        [ DatabaseSpec::Measurement ]
       end
 
       after do
         DatabaseSpec::Measurement.collection.drop
       end
 
-      [true, false].each do |force|
+      [ true, false ].each do |force|
         context "when force is #{force}" do
           it 'creates the collection' do
             expect(DatabaseSpec::Measurement).to receive(:create_collection).once.with(force: force)
@@ -94,10 +90,10 @@ describe Mongoid::Tasks::Database do
 
     context 'collection_options are not specified' do
       let(:models) do
-        [Person]
+        [ Person ]
       end
 
-      [true, false].each do |force|
+      [ true, false ].each do |force|
         context "when force is #{force}" do
           it 'creates the collection' do
             expect(Person).to receive(:create_collection).once.with(force: force)
@@ -106,14 +102,13 @@ describe Mongoid::Tasks::Database do
         end
       end
 
-      context "when collection options is defined on embedded model" do
-
+      context 'when collection options is defined on embedded model' do
         let(:models) do
-          [DatabaseSpec::Comment]
+          [ DatabaseSpec::Comment ]
         end
 
         let(:logger) do
-          double("logger").tap do |log|
+          double('logger').tap do |log|
             expect(log).to receive(:info).once.with(/MONGOID: collection options ignored on: .*, please define in the root model/)
           end
         end
@@ -122,23 +117,22 @@ describe Mongoid::Tasks::Database do
           allow(Mongoid::Tasks::Database).to receive(:logger).and_return(logger)
         end
 
-        it "does nothing, but logging" do
-          expect(DatabaseSpec::Comment).to receive(:create_collection).never
+        it 'does nothing, but logging' do
+          expect(DatabaseSpec::Comment).not_to receive(:create_collection)
           Mongoid::Tasks::Database.create_collections(models)
         end
       end
 
-      context "when collection options is defined on cyclic model" do
-
+      context 'when collection options is defined on cyclic model' do
         let(:models) do
-          [DatabaseSpec::Note]
+          [ DatabaseSpec::Note ]
         end
 
         after do
           DatabaseSpec::Note.collection.drop
         end
 
-        it "creates the collection" do
+        it 'creates the collection' do
           expect(DatabaseSpec::Note).to receive(:create_collection).once
           Mongoid::Tasks::Database.create_collections(models)
         end
@@ -146,8 +140,7 @@ describe Mongoid::Tasks::Database do
     end
   end
 
-  describe ".create_indexes" do
-
+  describe '.create_indexes' do
     let!(:klass) do
       User
     end
@@ -156,36 +149,32 @@ describe Mongoid::Tasks::Database do
       Mongoid::Tasks::Database.create_indexes(models)
     end
 
-    context "with ordinary Rails models" do
-
-      it "creates the indexes for the models" do
+    context 'with ordinary Rails models' do
+      it 'creates the indexes for the models' do
         expect(klass).to receive(:create_indexes).once
         indexes
       end
     end
 
-    context "with a model without indexes" do
-
+    context 'with a model without indexes' do
       let(:klass) do
         Account
       end
 
-      it "does nothing" do
-        expect(klass).to receive(:create_indexes).never
+      it 'does nothing' do
+        expect(klass).not_to receive(:create_indexes)
         indexes
       end
     end
 
-    context "when an exception is raised" do
-
-      it "is not swallowed" do
+    context 'when an exception is raised' do
+      it 'is not swallowed' do
         expect(klass).to receive(:create_indexes).and_raise(ArgumentError)
         expect { indexes }.to raise_error(ArgumentError)
       end
     end
 
-    context "when index is defined on embedded model" do
-
+    context 'when index is defined on embedded model' do
       let!(:klass) do
         Address
       end
@@ -194,19 +183,18 @@ describe Mongoid::Tasks::Database do
         klass.index(street: 1)
       end
 
-      it "does nothing, but logging" do
-        expect(klass).to receive(:create_indexes).never
+      it 'does nothing, but logging' do
+        expect(klass).not_to receive(:create_indexes)
         indexes
       end
     end
 
-    context "when index is defined on self-embedded (cyclic) model" do
-
+    context 'when index is defined on self-embedded (cyclic) model' do
       let(:klass) do
         Draft
       end
 
-      it "creates the indexes for the models" do
+      it 'creates the indexes for the models' do
         expect(klass).to receive(:create_indexes).once
         indexes
       end
@@ -217,6 +205,7 @@ describe Mongoid::Tasks::Database do
     let(:searchable_model) do
       Class.new do
         include Mongoid::Document
+
         store_in collection: BSON::ObjectId.new.to_s
 
         search_index mappings: { dynamic: true }
@@ -235,16 +224,16 @@ describe Mongoid::Tasks::Database do
         expect(searchable_model_spy).to receive(:create_search_indexes)
         expect(described_class).to receive(:wait_for_search_indexes).with({ searchable_model_spy => index_names })
 
-        described_class.create_search_indexes([searchable_model_spy], wait: true)
+        described_class.create_search_indexes([ searchable_model_spy ], wait: true)
       end
     end
 
     context 'when wait is false' do
       it 'invokes only create_search_indexes' do
         expect(searchable_model_spy).to receive(:create_search_indexes)
-        expect(described_class).to_not receive(:wait_for_search_indexes)
+        expect(described_class).not_to receive(:wait_for_search_indexes)
 
-        described_class.create_search_indexes([searchable_model_spy], wait: false)
+        described_class.create_search_indexes([ searchable_model_spy ], wait: false)
       end
     end
   end
@@ -259,9 +248,8 @@ describe Mongoid::Tasks::Database do
     end
   end
 
-  describe ".undefined_indexes" do
-
-    before(:each) do
+  describe '.undefined_indexes' do
+    before do
       Mongoid::Tasks::Database.create_indexes(models)
     end
 
@@ -269,54 +257,50 @@ describe Mongoid::Tasks::Database do
       Mongoid::Tasks::Database.undefined_indexes(models)
     end
 
-    it "returns the removed indexes" do
+    it 'returns the removed indexes' do
       expect(indexes).to be_empty
     end
 
-    context "with extra index on model collection" do
-
-      before(:each) do
+    context 'with extra index on model collection' do
+      before do
         User.collection.indexes.create_one(account_expires: 1)
       end
 
       let(:names) do
-        indexes[User].map{ |index| index['name'] }
+        indexes[User].map { |index| index['name'] }
       end
 
-      it "should have single index returned" do
-        expect(names).to eq(['account_expires_1'])
+      it 'has single index returned' do
+        expect(names).to eq([ 'account_expires_1' ])
       end
     end
   end
 
-  describe ".remove_undefined_indexes" do
-
+  describe '.remove_undefined_indexes' do
     let(:indexes) do
       User.collection.indexes
     end
+    let(:removed_indexes) do
+      Mongoid::Tasks::Database.undefined_indexes(models)
+    end
 
-    before(:each) do
+    before do
       Mongoid::Tasks::Database.create_indexes(models)
       indexes.create_one(account_expires: 1)
       Mongoid::Tasks::Database.remove_undefined_indexes(models)
     end
 
-    let(:removed_indexes) do
-      Mongoid::Tasks::Database.undefined_indexes(models)
-    end
-
-    it "returns the removed indexes" do
+    it 'returns the removed indexes' do
       expect(removed_indexes).to be_empty
     end
 
     context 'when the index is a text index' do
-
       before do
         class Band
           index origin: Mongo::Index::TEXT
         end
-        Mongoid::Tasks::Database.create_indexes([Band])
-        Mongoid::Tasks::Database.remove_undefined_indexes([Band])
+        Mongoid::Tasks::Database.create_indexes([ Band ])
+        Mongoid::Tasks::Database.remove_undefined_indexes([ Band ])
       end
 
       let(:indexes) do
@@ -329,8 +313,7 @@ describe Mongoid::Tasks::Database do
     end
   end
 
-  describe ".remove_indexes" do
-
+  describe '.remove_indexes' do
     let!(:klass) do
       User
     end
@@ -339,17 +322,17 @@ describe Mongoid::Tasks::Database do
       klass.collection.indexes
     end
 
-    before :each do
+    before do
       Mongoid::Tasks::Database.create_indexes(models)
       Mongoid::Tasks::Database.remove_indexes(models)
     end
 
-    it "removes indexes from klass" do
-      expect(indexes.reject{ |doc| doc["name"] == "_id_" }).to be_empty
+    it 'removes indexes from klass' do
+      expect(indexes.reject { |doc| doc['name'] == '_id_' }).to be_empty
     end
 
-    it "leaves _id index untouched" do
-      expect(indexes.select{ |doc| doc["name"] == "_id_" }).to_not be_empty
+    it 'leaves _id index untouched' do
+      expect(indexes.select { |doc| doc['name'] == '_id_' }).not_to be_empty
     end
   end
 
@@ -363,7 +346,7 @@ describe Mongoid::Tasks::Database do
         expect(logger).not_to receive(:warn)
       end
 
-      it "permits load-balanced clusters to act as sharded" do
+      it 'permits load-balanced clusters to act as sharded' do
         result = described_class.shard_collections([ model ])
         expect(result).to include(model)
       end

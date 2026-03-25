@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
@@ -57,7 +56,7 @@ describe 'Mongoid::Config.isolation_level' do
 
   context 'when set to :rails' do
     config_override :isolation_level, :rails
-    
+
     def self.with_rails_isolation_level(level)
       around do |example|
         # changing the isolation level in Rails apparently can muck with the
@@ -175,7 +174,7 @@ describe 'Mongoid::Config.isolation_level' do
 
       describe '#reset!' do
         context 'when operating in nested fibers' do
-          let (:result) do
+          let(:result) do
             fiber_operation('a') do
               Mongoid::Threaded.reset!
 

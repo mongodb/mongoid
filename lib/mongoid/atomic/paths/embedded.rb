@@ -1,16 +1,13 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/atomic/paths/embedded/one"
-require "mongoid/atomic/paths/embedded/many"
+require 'mongoid/atomic/paths/embedded/one'
+require 'mongoid/atomic/paths/embedded/many'
 
 module Mongoid
   module Atomic
     module Paths
-
       # Common functionality between the two different embedded paths.
       module Embedded
-
         attr_reader :delete_modifier, :document, :insert_modifier, :parent
 
         # Get the path to the document in the hierarchy.
@@ -20,7 +17,7 @@ module Mongoid
         #
         # @return [ String ] The path to the document.
         def path
-          @path ||= position.sub(/\.\d+\z/, "")
+          @path ||= position.sub(/\.\d+\z/, '')
         end
       end
     end

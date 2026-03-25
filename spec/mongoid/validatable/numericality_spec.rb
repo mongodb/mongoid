@@ -1,11 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe ActiveModel::Validations::NumericalityValidator do
-  describe "#validate_each" do
-    context "when allow_blank is false" do
+  describe '#validate_each' do
+    context 'when allow_blank is false' do
       let(:model_class) do
         test_model do
           field :amount, type: BigDecimal
@@ -13,14 +12,13 @@ describe ActiveModel::Validations::NumericalityValidator do
         end
       end
 
-      context "when the value is non numeric" do
-
+      context 'when the value is non numeric' do
         let(:model) do
-          model_class.new(amount: "asdf")
+          model_class.new(amount: 'asdf')
         end
 
-        it "returns false" do
-          expect(model).to_not be_valid
+        it 'returns false' do
+          expect(model).not_to be_valid
         end
       end
 
@@ -43,7 +41,7 @@ describe ActiveModel::Validations::NumericalityValidator do
       end
     end
 
-    context "when allow_blank is true and amount is Integer" do
+    context 'when allow_blank is true and amount is Integer' do
       let(:model_class) do
         test_model do
           field :amount, type: Integer
@@ -51,25 +49,23 @@ describe ActiveModel::Validations::NumericalityValidator do
         end
       end
 
-      context "when the value is blank" do
-
+      context 'when the value is blank' do
         let(:model) do
-          model_class.new(amount: "")
+          model_class.new(amount: '')
         end
 
-        it "returns true" do
+        it 'returns true' do
           expect(model).to be_valid
         end
       end
 
-      context "when the value is a nonempty string" do
-
+      context 'when the value is a nonempty string' do
         let(:model) do
-          model_class.new(amount: "A non-numeric string")
+          model_class.new(amount: 'A non-numeric string')
         end
 
-        it "returns false" do
-          expect(model).to_not be_valid
+        it 'returns false' do
+          expect(model).not_to be_valid
         end
       end
     end
@@ -88,7 +84,7 @@ describe ActiveModel::Validations::NumericalityValidator do
         end
 
         it 'is invalid' do
-          expect(model).to_not be_valid
+          expect(model).not_to be_valid
         end
       end
 
@@ -102,8 +98,8 @@ describe ActiveModel::Validations::NumericalityValidator do
         end
       end
     end
- 
-    context "when allow_blank is true and amount is Float" do
+
+    context 'when allow_blank is true and amount is Float' do
       let(:model_class) do
         test_model do
           field :amount, type: Float
@@ -111,19 +107,18 @@ describe ActiveModel::Validations::NumericalityValidator do
         end
       end
 
-      context "when the value is a nonempty string" do
-
+      context 'when the value is a nonempty string' do
         let(:model) do
-          model_class.new(amount: "A non-numeric string")
+          model_class.new(amount: 'A non-numeric string')
         end
 
-        it "returns false" do
-          expect(model).to_not be_valid
+        it 'returns false' do
+          expect(model).not_to be_valid
         end
       end
     end
 
-    context "when allow_blank is true and amount is BigDecimal" do
+    context 'when allow_blank is true and amount is BigDecimal' do
       let(:model_class) do
         test_model do
           field :amount, type: BigDecimal
@@ -131,14 +126,13 @@ describe ActiveModel::Validations::NumericalityValidator do
         end
       end
 
-      context "when the value is a nonempty string" do
-
+      context 'when the value is a nonempty string' do
         let(:model) do
-          model_class.new(amount: "A non-numeric string")
+          model_class.new(amount: 'A non-numeric string')
         end
 
-        it "returns false" do
-          expect(model).to_not be_valid
+        it 'returns false' do
+          expect(model).not_to be_valid
         end
       end
     end

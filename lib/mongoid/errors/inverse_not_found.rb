@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when no inverse_of definition can be found when needed.
     class InverseNotFound < MongoidError
-
       # Create then new error.
       #
       # @example Create the new error.
@@ -19,7 +16,7 @@ module Mongoid
       def initialize(base, name, klass, inverse)
         super(
           compose_message(
-            "inverse_not_found",
+            'inverse_not_found',
             { base: base, name: name, klass: klass, inverse: inverse }
           )
         )

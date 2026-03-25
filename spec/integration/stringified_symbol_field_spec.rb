@@ -5,6 +5,34 @@ describe "StringifiedSymbol fields" do
 
   before do
     Order.destroy_all
+    client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+    subscriber.clear_events!
+
+    document1
+    document2
+  end
+
+  after do
+    client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+  end
+
+  # Using command monitoring to test that StringifiedSymbol sends a string and returns a symbol
+  let(:client) { Order.collection.client }
+  let(:query) { {'saved_status' => {'$eq' => 'test'}} }
+  let(:document1) { Order.create!(saved_status: :test) }
+  let(:document2) { Order.where(query).first }
+  let(:subscriber) { EventSubscriber.new }
+
+  let(:find_events) do
+    subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
+  end
+
+  let(:insert_events) do
+    subscriber.started_events.select { |event| event.command_name.to_s == 'insert' }
+  end
+
+  let(:update_events) do
+    subscriber.started_events.select { |event| event.command_name.to_s == 'update' }
   end
 
   context "when querying the database" do
@@ -30,49 +58,6 @@ describe "StringifiedSymbol fields" do
       doc = Order.where(symbol_query).first
       expect(doc.saved_status).to eq(:test)
     end
-  end
-
-  # Using command monitoring to test that StringifiedSymbol sends a string and returns a symbol
-  let(:client) { Order.collection.client }
-
-  before do
-    client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
-  end
-
-  after do
-    client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
-  end
-
-  let(:subscriber) do
-    EventSubscriber.new
-  end
-
-  let(:find_events) do
-    subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
-  end
-
-  let(:insert_events) do
-    subscriber.started_events.select { |event| event.command_name.to_s == 'insert' }
-  end
-
-  let(:update_events) do
-    subscriber.started_events.select { |event| event.command_name.to_s == 'update' }
-  end
-
-  before do
-    subscriber.clear_events!
-  end
-
-  let(:query) do
-    {'saved_status' => {'$eq' => 'test'}}
-  end
-
-  let!(:document1) do
-    Order.create!(saved_status: :test)
-  end
-
-  let!(:document2) do
-    Order.where(query).first
   end
 
   context "when inserting document" do

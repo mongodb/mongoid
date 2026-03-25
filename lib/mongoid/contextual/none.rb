@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/contextual/aggregable/none"
+require 'mongoid/contextual/aggregable/none'
 
 module Mongoid
   module Contextual
-
     # Context object used for performing bulk query and persistence
     # operations on a null set. The method interface of this class
     # is consistent with Mongoid::Contextual::Mongo.
@@ -49,9 +47,9 @@ module Mongoid
       #   end
       #
       # @return [ Enumerator ] The enumerator.
-      def each
+      def each(&block)
         if block_given?
-          [].each { |doc| yield(doc) }
+          [].each(&block)
           self
         else
           to_enum
@@ -73,7 +71,9 @@ module Mongoid
       #   search for, a hash of conditions, nil or false.
       #
       # @return [ false ] Always false.
-      def exists?(id_or_conditions = :none); false; end
+      def exists?(_id_or_conditions = :none)
+        false
+      end
 
       # Pluck the field values in null context.
       #
@@ -316,10 +316,10 @@ module Mongoid
       def length
         entries.length
       end
-      alias :size :length
+      alias size length
 
-      alias :find_first :first
-      alias :one :first
+      alias find_first first
+      alias one first
 
       private
 

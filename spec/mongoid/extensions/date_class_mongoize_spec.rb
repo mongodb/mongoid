@@ -1,14 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Extensions::Date do
-
-  describe ".mongoize" do
-
-    context "when provided a date" do
-
+  describe '.mongoize' do
+    context 'when provided a date' do
       let(:date) do
         Date.new(2010, 1, 1)
       end
@@ -21,17 +17,16 @@ describe Mongoid::Extensions::Date do
         Time.utc(2010, 1, 1, 0, 0, 0)
       end
 
-      it "returns the time" do
+      it 'returns the time' do
         expect(mongoized).to eq(expected)
       end
     end
 
-    context "when provided a string" do
+    context 'when provided a string' do
       # This also configures a non-UTC time zone for AS which we want
       include_context 'setting ActiveSupport time zone'
 
-      context "when the string is a valid date" do
-
+      context 'when the string is a valid date' do
         let(:mongoized) do
           Date.mongoize('2010-01-01')
         end
@@ -44,15 +39,14 @@ describe Mongoid::Extensions::Date do
           Time.utc(2010, 1, 1, 0, 0, 0, 0)
         end
 
-        it "returns the beginning of date in UTC" do
+        it 'returns the beginning of date in UTC' do
           expect(mongoized).to eq(expected)
         end
       end
 
-      context "when the string is a valid date and time" do
-
+      context 'when the string is a valid date and time' do
         let(:mongoized) do
-          Date.mongoize("2010-01-01 02:00:00")
+          Date.mongoize('2010-01-01 02:00:00')
         end
 
         let(:expected) do
@@ -60,67 +54,63 @@ describe Mongoid::Extensions::Date do
           Time.utc(2010, 1, 1, 0, 0, 0, 0)
         end
 
-        it "returns beginning of date in UTC" do
+        it 'returns beginning of date in UTC' do
           expect(mongoized).to eq(expected)
         end
       end
 
-      context "when the string is a valid date and time in later time zone" do
-
+      context 'when the string is a valid date and time in later time zone' do
         let(:mongoized) do
           # Tokyo is +9
-          Date.mongoize("2010-01-01 00:00:00 +1000")
+          Date.mongoize('2010-01-01 00:00:00 +1000')
         end
 
         let(:expected) do
           Time.utc(2010, 1, 1, 0, 0, 0, 0)
         end
 
-        it "returns the date specified in the string without regard for local day" do
+        it 'returns the date specified in the string without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
 
-      context "when the string is a valid date and time in earlier time zone" do
-
+      context 'when the string is a valid date and time in earlier time zone' do
         let(:mongoized) do
           # Tokyo is +9
-          Date.mongoize("2010-01-01 20:00:00 +0400")
+          Date.mongoize('2010-01-01 20:00:00 +0400')
         end
 
         let(:expected) do
           Time.utc(2010, 1, 1, 0, 0, 0, 0)
         end
 
-        it "returns the date specified in the string without regard for local day" do
+        it 'returns the date specified in the string without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
 
-      context "when the string is empty" do
-
+      context 'when the string is empty' do
         let(:mongoized) do
-          Date.mongoize("")
+          Date.mongoize('')
         end
 
-        it "returns nil" do
+        it 'returns nil' do
           expect(mongoized).to be_nil
         end
       end
 
-      context "when the string is an invalid time" do
-
+      context 'when the string is an invalid time' do
         let(:mongoized) do
-          Date.mongoize("time")
+          Date.mongoize('time')
         end
 
-        it "returns nil" do
+        it 'returns nil' do
           expect(mongoized).to be_nil
         end
       end
     end
 
-    context "when provided a float" do
+    context 'when provided a float' do
       include_context 'setting ActiveSupport time zone'
 
       let(:float) do
@@ -133,34 +123,34 @@ describe Mongoid::Extensions::Date do
 
       context 'float in the same local day' do
         let(:time) do
-          Time.utc(2010, 1, 1, 2, 3, 4, 123456)
+          Time.utc(2010, 1, 1, 2, 3, 4, 123_456)
         end
 
         let(:expected) do
           Time.utc(2010, 1, 1, 0, 0, 0, 0)
         end
 
-        it "returns start of the day as date" do
+        it 'returns start of the day as date' do
           expect(mongoized).to eq(expected)
         end
       end
 
       context 'float in a different local day' do
         let(:time) do
-          Time.utc(2010, 1, 1, 22, 3, 4, 123456)
+          Time.utc(2010, 1, 1, 22, 3, 4, 123_456)
         end
 
         let(:expected) do
           Time.utc(2010, 1, 2, 0, 0, 0, 0)
         end
 
-        it "returns start of the day as date" do
+        it 'returns start of the day as date' do
           expect(mongoized).to eq(expected)
         end
       end
     end
 
-    context "when provided an integer" do
+    context 'when provided an integer' do
       include_context 'setting ActiveSupport time zone'
 
       let(:integer) do
@@ -180,7 +170,7 @@ describe Mongoid::Extensions::Date do
           Time.utc(2010, 1, 1, 0, 0, 0, 0)
         end
 
-        it "returns start of the day as date" do
+        it 'returns start of the day as date' do
           expect(mongoized).to eq(expected)
         end
       end
@@ -194,13 +184,13 @@ describe Mongoid::Extensions::Date do
           Time.utc(2010, 1, 2, 0, 0, 0, 0)
         end
 
-        it "returns start of the day as date" do
+        it 'returns start of the day as date' do
           expect(mongoized).to eq(expected)
         end
       end
     end
 
-    context "when provided a time" do
+    context 'when provided a time' do
       include_context 'setting ActiveSupport time zone'
 
       let(:mongoized) do
@@ -216,7 +206,7 @@ describe Mongoid::Extensions::Date do
           Time.utc(2010, 1, 1, 22, 3, 4)
         end
 
-        it "returns the date specified in the time without regard for local day" do
+        it 'returns the date specified in the time without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
@@ -230,13 +220,13 @@ describe Mongoid::Extensions::Date do
           Time.utc(2010, 1, 1, 2, 3, 4)
         end
 
-        it "returns the date specified in the time without regard for local day" do
+        it 'returns the date specified in the time without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
     end
 
-    context "when provided an AS::TimeWithZone" do
+    context 'when provided an AS::TimeWithZone' do
       include_context 'setting ActiveSupport time zone'
 
       let(:mongoized) do
@@ -253,7 +243,7 @@ describe Mongoid::Extensions::Date do
           ActiveSupport::TimeZone['PST8PDT'].local(2010, 1, 1, 1, 3, 4)
         end
 
-        it "returns the date specified in the time without regard for local day" do
+        it 'returns the date specified in the time without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
@@ -267,13 +257,13 @@ describe Mongoid::Extensions::Date do
           ActiveSupport::TimeZone['Moscow'].local(2010, 1, 1, 1, 3, 4)
         end
 
-        it "returns the date specified in the time without regard for local day" do
+        it 'returns the date specified in the time without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
     end
 
-    context "when provided a DateTime" do
+    context 'when provided a DateTime' do
       include_context 'setting ActiveSupport time zone'
 
       let(:mongoized) do
@@ -290,7 +280,7 @@ describe Mongoid::Extensions::Date do
           DateTime.parse('2010-01-01 01:03:04 -0800')
         end
 
-        it "returns the date specified in the time without regard for local day" do
+        it 'returns the date specified in the time without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
@@ -304,13 +294,13 @@ describe Mongoid::Extensions::Date do
           DateTime.parse('2010-01-01 01:03:04 +0100')
         end
 
-        it "returns the date specified in the time without regard for local day" do
+        it 'returns the date specified in the time without regard for local day' do
           expect(mongoized).to eq(expected)
         end
       end
     end
 
-    context "when provided an array" do
+    context 'when provided an array' do
       include_context 'setting ActiveSupport time zone'
 
       let(:expected) do
@@ -325,14 +315,13 @@ describe Mongoid::Extensions::Date do
         Date.mongoize(array)
       end
 
-      it "returns the array as a time" do
+      it 'returns the array as a time' do
         expect(mongoized).to eq(expected)
       end
     end
 
-    context "when provided nil" do
-
-      it "returns nil" do
+    context 'when provided nil' do
+      it 'returns nil' do
         expect(Date.mongoize(nil)).to be_nil
       end
     end

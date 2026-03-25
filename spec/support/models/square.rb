@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Square < Shape
   field :width, type: Integer, default: 0

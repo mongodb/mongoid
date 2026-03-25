@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/association/referenced/auto_save'
 require 'mongoid/association/referenced/counter_cache'

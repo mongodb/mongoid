@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Contextual
-
     # Mixin module which adds methods to Mongoid::Criteria that
     # indicate the criteria query result will be an empty set.
     module Queryable
-
       # @attribute [r] collection The collection to query against.
       # @attribute [r] criteria The criteria for the context.
       # @attribute [r] klass The klass for the criteria.
@@ -22,7 +19,7 @@ module Mongoid
       def blank?
         !exists?
       end
-      alias :empty? :blank?
+      alias empty? blank?
     end
   end
 end

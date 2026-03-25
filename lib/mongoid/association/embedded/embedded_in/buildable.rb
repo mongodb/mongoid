@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Embedded
       class EmbeddedIn
-
         # The Builder behavior for embedded_in associations.
         module Buildable
           include Threaded::Lifecycle
@@ -24,8 +22,9 @@ module Mongoid
           #   will not be accessible in the built document.
           #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(_base, object, _type = nil, selected_fields = nil)
             return object unless object.is_a?(Hash)
+
             if _loading?
               Factory.from_db(klass, object, nil, selected_fields)
             else

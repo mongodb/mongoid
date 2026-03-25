@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Indexable
-
     # Encapsulates behavior around an index specification.
     class Specification
-
       # The mappings of nice Ruby-style names to the corresponding driver
       # option name.
       MAPPINGS = {
@@ -47,8 +44,8 @@ module Mongoid
       #   specification matches the criteria, and false otherwise.
       def superficial_match?(key: {}, name: nil)
         (name && name == self.name) ||
-          self.fields == key.keys &&
-          self.key == key
+          (fields == key.keys &&
+            self.key == key)
       end
 
       # Instantiate a new index specification.
@@ -75,7 +72,7 @@ module Mongoid
       #
       # @return [ String ] name The index name.
       def name
-        @name ||= key.reduce([]) do |n, (k,v)|
+        @name ||= key.reduce([]) do |n, (k, v)|
           n << "#{k}_#{v}"
         end.join('_')
       end
@@ -112,7 +109,6 @@ module Mongoid
       #
       # @return [ Hash ] The normalized options.
       def normalize_options!(options)
-
         options.transform_keys! do |option|
           option = option.to_sym
           MAPPINGS[option] || option

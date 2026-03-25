@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Validatable
-
     # Validates whether or not an association is valid or not. Will correctly
     # handle has one and has many associations.
     #
@@ -75,7 +73,7 @@ module Mongoid
           # evaluation and terminate on the first failed validation.
           list.map do |value|
             if value && !value.flagged_for_destroy? && (!value.persisted? || value.changed?)
-              value.validated? ? true : value.valid?
+              value.validated? || value.valid?
             else
               true
             end
@@ -84,8 +82,6 @@ module Mongoid
 
         document.errors.add(attribute, :invalid) unless valid
       end
-
-      private
 
       # Examine the given target object and return an array of
       # documents (possibly empty) that the target represents.

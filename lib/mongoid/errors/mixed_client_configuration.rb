@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when a client configuration contains both a uri and
     # other standard options.
     class MixedClientConfiguration < MongoidError
-
       # Initialize the error.
       #
       # @example Initialize the error.
@@ -18,7 +15,7 @@ module Mongoid
       def initialize(name, config)
         super(
           compose_message(
-            "mixed_client_configuration",
+            'mixed_client_configuration',
             { name: name, config: config }
           )
         )

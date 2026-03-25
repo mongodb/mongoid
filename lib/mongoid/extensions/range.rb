@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
@@ -53,17 +52,18 @@ module Mongoid
         # @return [ Range | nil ] The range, or nil if object cannot be represented as range.
         def demongoize(object)
           return if object.nil?
-          if object.is_a?(Hash)
-            hash = object.slice('min', 'max', 'exclude_end', :min, :max, :exclude_end)
-            unless hash.blank?
-              begin
-                ::Range.new(hash["min"] || hash[:min],
-                            hash["max"] || hash[:max],
-                            hash["exclude_end"] || hash[:exclude_end])
-              rescue ArgumentError
-                nil
-              end
-            end
+
+          return unless object.is_a?(Hash)
+
+          hash = object.slice('min', 'max', 'exclude_end', :min, :max, :exclude_end)
+          return if hash.blank?
+
+          begin
+            ::Range.new(hash['min'] || hash[:min],
+                        hash['max'] || hash[:max],
+                        hash['exclude_end'] || hash[:exclude_end])
+          rescue ArgumentError
+            nil
           end
         end
 
@@ -78,6 +78,7 @@ module Mongoid
         # @return [ Hash | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
+
           case object
           when Hash then __mongoize_hash__(object)
           when Range then __mongoize_range__(object)
@@ -98,9 +99,7 @@ module Mongoid
           hash = {}
           hash['min'] = object.begin.mongoize if object.begin
           hash['max'] = object.end.mongoize if object.end
-          if object.respond_to?(:exclude_end?) && object.exclude_end?
-            hash['exclude_end'] = true
-          end
+          hash['exclude_end'] = true if object.respond_to?(:exclude_end?) && object.exclude_end?
           hash
         end
       end

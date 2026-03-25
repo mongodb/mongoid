@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when calling #save! or .create! on a model when one
     # of the callbacks returns false.
     class Callback < MongoidError
-
       # Create the new callbacks error.
       #
       # @example Create the new callbacks error.
@@ -17,7 +14,7 @@ module Mongoid
       # @param [ Symbol ] method The name of the method.
       def initialize(klass, method)
         super(
-          compose_message("callbacks", { klass: klass, method: method })
+          compose_message('callbacks', { klass: klass, method: method })
         )
       end
     end

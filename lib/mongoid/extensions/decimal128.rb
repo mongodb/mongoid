@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to BSON::Decimal128 class.
     module Decimal128
-
       # Evolve the decimal128.
       #
       # @example Evolve the decimal128.
@@ -18,7 +15,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Evolve the object into a mongo-friendly value to query with.
         #
         # @example Evolve the object.
@@ -35,5 +31,5 @@ module Mongoid
   end
 end
 
-BSON::Decimal128.__send__(:include, Mongoid::Extensions::Decimal128)
+BSON::Decimal128.include Mongoid::Extensions::Decimal128
 BSON::Decimal128.extend(Mongoid::Extensions::Decimal128::ClassMethods)

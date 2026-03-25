@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
-
     # This module contains all the behavior related to accessing associations
     # through the getters and setters, and how to delegate to builders to
     # create new ones.
@@ -45,10 +43,8 @@ module Mongoid
         key = @attributes[association.inverse_type]
         type = key ? association.resolver.model_for(key) : nil
         target = if t = association.build(self, object, type, selected_fields)
-          association.create_relation(self, t)
-        else
-          nil
-        end
+                   association.create_relation(self, t)
+                 end
 
         # Only need to do this on embedded associations. The pending callbacks
         # are only added when materializing the documents, which only happens
@@ -71,9 +67,9 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the association.
       def reset_relation_criteria(name)
-        if instance_variable_defined?("@_#{name}")
-          send(name).reset_unloaded
-        end
+        return unless instance_variable_defined?("@_#{name}")
+
+        send(name).reset_unloaded
       end
 
       # Set the supplied association to an instance variable on the class with the
@@ -119,8 +115,8 @@ module Mongoid
         if !without_autobuild? && association.embedded? && attribute_missing?(field_name)
           # We always allow accessing the parent document of an embedded one.
           try_get_parent = association.is_a?(
-                             Mongoid::Association::Embedded::EmbeddedIn
-                           ) && field_name == association.key
+            Mongoid::Association::Embedded::EmbeddedIn
+          ) && field_name == association.key
           raise Mongoid::Errors::AttributeNotLoaded.new(self.class, field_name) unless try_get_parent
         end
 
@@ -166,8 +162,7 @@ module Mongoid
         # and the provided list does not include the association, any of its
         # fields should be allowed.
         if __selected_fields.values.all? { |v| v == 0 } &&
-          __selected_fields.keys.none? { |k| k.split('.', 2).first == assoc_key }
-        then
+           __selected_fields.keys.none? { |k| k.split('.', 2).first == assoc_key }
           return nil
         end
 
@@ -218,16 +213,14 @@ module Mongoid
         # document that the $ is referring to should be retrieved with all
         # fields. See https://www.mongodb.com/docs/manual/reference/operator/projection/positional/
         # and https://jira.mongodb.org/browse/MONGOID-4769.
-        if filtered.keys == %w($)
-          filtered = nil
-        end
+        filtered = nil if filtered.keys == %w[$]
 
         filtered
       end
 
       def needs_no_database_query?(object, association)
         object.is_a?(Document) && !object.embedded? &&
-            object[association.try(:primary_key) || :_id] == attributes[association.key]
+          object[association.try(:primary_key) || :_id] == attributes[association.key]
       end
 
       # Is the current code executing without autobuild functionality?
@@ -249,10 +242,10 @@ module Mongoid
       #
       # @return [ Object ] The result of the yield.
       def without_autobuild
-        Threaded.begin_execution("without_autobuild")
+        Threaded.begin_execution('without_autobuild')
         yield
       ensure
-        Threaded.exit_execution("without_autobuild")
+        Threaded.exit_execution('without_autobuild')
       end
 
       # Parse out the attributes and the options from the args passed to a
@@ -265,7 +258,7 @@ module Mongoid
       #
       # @return [ Array<Hash> ] The attributes and options.
       def parse_args(*args)
-        [args.first || {}, args.size > 1 ? args[1] : {}]
+        [ args.first || {}, (args.size > 1) ? args[1] : {} ]
       end
 
       # Adds the existence check for associations.
@@ -308,9 +301,7 @@ module Mongoid
         association.inverse_class.tap do |klass|
           klass.re_define_method(name) do |reload = false|
             value = get_relation(name, association, nil, reload)
-            if value.nil? && association.autobuilding? && !without_autobuild?
-              value = send("build_#{name}")
-            end
+            value = send("build_#{name}") if value.nil? && association.autobuilding? && !without_autobuild?
             value
           end
         end
@@ -351,9 +342,7 @@ module Mongoid
           klass.re_define_method("#{name}=") do |object|
             without_autobuild do
               if value = get_relation(name, association, object)
-                if !value.respond_to?(:substitute)
-                  value = __build__(name, value, association) 
-                end
+                value = __build__(name, value, association) unless value.respond_to?(:substitute)
 
                 set_relation(name, value.substitute(object.substitutable))
               else

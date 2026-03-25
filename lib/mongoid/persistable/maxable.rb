@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for setting a field (or fields) to the larger of
     # either it's current value, or a given value.
     module Maxable
@@ -28,10 +26,10 @@ module Mongoid
               ops[atomic_attribute_name(field)] = value
             end
           end
-          { "$max" => ops } unless ops.empty?
+          { '$max' => ops } unless ops.empty?
         end
       end
-      alias :clamp_lower_bound :set_max
+      alias clamp_lower_bound set_max
     end
   end
 end

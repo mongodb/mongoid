@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Pet
   include Mongoid::Document
+
   field :name
   field :weight, type: Float, default: 0.0
   embeds_many :vet_visits

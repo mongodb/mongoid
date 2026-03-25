@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Student
   include Mongoid::Document
@@ -9,7 +8,7 @@ class Student
   field :name, type: String
   field :grade, type: Integer, default: 3
 
-  after_destroy do |doc|
+  after_destroy do |_doc|
     school.after_destroy_triggered = true if school
   end
 end

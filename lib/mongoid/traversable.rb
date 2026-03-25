@@ -66,7 +66,6 @@ module Mongoid
       #
       # @param [ Class ] subclass The inheriting class.
       #
-      # rubocop:disable Metrics/AbcSize
       def inherited(subclass)
         super
 

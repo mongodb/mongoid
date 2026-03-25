@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Set class.
     module Set
       # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -54,6 +52,7 @@ module Mongoid
         # @return [ Array | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.nil?
+
           case object
           when ::Set then ::Array.mongoize(object.to_a).uniq
           when ::Array then ::Array.mongoize(object).uniq
@@ -64,5 +63,5 @@ module Mongoid
   end
 end
 
-::Set.__send__(:include, Mongoid::Extensions::Set)
-::Set.extend(Mongoid::Extensions::Set::ClassMethods)
+Set.include Mongoid::Extensions::Set
+Set.extend(Mongoid::Extensions::Set::ClassMethods)

@@ -1,5 +1,4 @@
-# rubocop:todo all
-require "mongoid/association/eager_loadable"
+require 'mongoid/association/eager_loadable'
 
 module Mongoid
   module Contextual
@@ -30,7 +29,7 @@ module Mongoid
         # @return [ Concurrent::ThreadPoolExecutor ] The executor
         #   to be used to execute document loading tasks.
         def self.global_thread_pool_async_query_executor
-          create_pool = Proc.new do |concurrency|
+          create_pool = proc do |concurrency|
             Concurrent::ThreadPoolExecutor.new(
               min_threads: 0,
               max_threads: concurrency,

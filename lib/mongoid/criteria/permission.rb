@@ -1,50 +1,47 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # Mixin module for Mongoid::Criteria which adds strong
     # parameters validation when using ActionController::Parameters
     # objects as arguments to condition methods.
     module Permission
-
-      [:all,
-       :all_in,
-       :and,
-       :all_of,
-       :between,
-       :elem_match,
-       :exists,
-       :gt,
-       :gte,
-       :in,
-       :any_in,
-       :lt,
-       :lte,
-       :max_distance,
-       :mod,
-       :ne,
-       :excludes,
-       :near,
-       :near_sphere,
-       :nin,
-       :not_in,
-       :nor,
-       :negating?,
-       :not,
-       :or,
-       :any_of,
-       :with_size,
-       :with_type,
-       :where,
-       :within_box,
-       :within_circle,
-       :within_polygon,
-       :within_spherical_circle
-      ].each do |method|
+      %i[all
+         all_in
+         and
+         all_of
+         between
+         elem_match
+         exists
+         gt
+         gte
+         in
+         any_in
+         lt
+         lte
+         max_distance
+         mod
+         ne
+         excludes
+         near
+         near_sphere
+         nin
+         not_in
+         nor
+         negating?
+         not
+         or
+         any_of
+         with_size
+         with_type
+         where
+         within_box
+         within_circle
+         within_polygon
+         within_spherical_circle].each do |method|
         define_method(method) do |*criteria|
           raise Errors::CriteriaNotPermitted.new(klass, method, criteria) unless should_permit?(criteria)
+
           super(*criteria)
         end
       end

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Extensions
-
     # Adds type-casting behavior to Time class.
     module Time
-
       # Mongoizes a Time into a time.
       #
       # Time always mongoize into Time instances
@@ -29,7 +26,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
@@ -40,19 +36,20 @@ module Mongoid
         # @return [ Time | nil ] The object as a time.
         def demongoize(object)
           return if object.blank?
+
           time = if object.acts_like?(:time)
-            Mongoid::Config.use_utc? ? object : object.getlocal
-          elsif object.acts_like?(:date)
-            ::Date.demongoize(object).to_time
-          elsif object.is_a?(String)
-            begin
-              object.__mongoize_time__
-            rescue ArgumentError
-              nil
-            end
-          elsif object.is_a?(BSON::Timestamp)
-            ::Time.at(object.seconds)
-          end
+                   Mongoid::Config.use_utc? ? object : object.getlocal
+                 elsif object.acts_like?(:date)
+                   ::Date.demongoize(object).to_time
+                 elsif object.is_a?(String)
+                   begin
+                     object.__mongoize_time__
+                   rescue ArgumentError
+                     nil
+                   end
+                 elsif object.is_a?(BSON::Timestamp)
+                   ::Time.at(object.seconds)
+                 end
 
           return if time.nil?
 
@@ -70,20 +67,21 @@ module Mongoid
         # @return [ Time | nil ] The object mongoized or nil.
         def mongoize(object)
           return if object.blank?
+
           begin
             time = object.respond_to?(:__mongoize_time__) ? object.__mongoize_time__ : nil
           rescue ArgumentError
             return
           end
 
-          if time.acts_like?(:time)
-            if object.respond_to?(:sec_fraction)
-              ::Time.at(time.to_i, object.sec_fraction * 10**6).utc
-            elsif time.respond_to?(:subsec)
-              ::Time.at(time.to_i, time.subsec * 10**6).utc
-            else
-              ::Time.at(time.to_i, time.usec).utc
-            end
+          return unless time.acts_like?(:time)
+
+          if object.respond_to?(:sec_fraction)
+            ::Time.at(time.to_i, object.sec_fraction * (10**6)).utc
+          elsif time.respond_to?(:subsec)
+            ::Time.at(time.to_i, time.subsec * (10**6)).utc
+          else
+            ::Time.at(time.to_i, time.usec).utc
           end
         end
       end
@@ -91,5 +89,5 @@ module Mongoid
   end
 end
 
-::Time.__send__(:include, Mongoid::Extensions::Time)
-::Time.extend(Mongoid::Extensions::Time::ClassMethods)
+Time.include Mongoid::Extensions::Time
+Time.extend(Mongoid::Extensions::Time::ClassMethods)

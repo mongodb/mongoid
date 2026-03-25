@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Embedded
       class EmbedsOne
-
         # Binding class for all embeds_one associations.
         class Binding
           include Bindable

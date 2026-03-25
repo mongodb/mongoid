@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for persistence operations that create new documents.
     module Creatable
       extend ActiveSupport::Concern
@@ -38,7 +36,7 @@ module Mongoid
       #
       # @return [ Hash ] The insert ops.
       def atomic_inserts
-        { atomic_insert_modifier => { atomic_position => as_attributes }}
+        { atomic_insert_modifier => { atomic_position => as_attributes } }
       end
 
       # Insert the embedded document.
@@ -51,13 +49,15 @@ module Mongoid
       # @return [ Document ] The document.
       def insert_as_embedded
         raise Errors::NoParent.new(self.class.name) unless _parent
+
         if _parent.new_record?
           _parent.insert
         else
           selector = _parent.atomic_selector
           _root.collection.find(selector).update_one(
-              positionally(selector, atomic_inserts),
-              session: _session)
+            positionally(selector, atomic_inserts),
+            session: _session
+          )
         end
       end
 
@@ -104,7 +104,8 @@ module Mongoid
       def prepare_insert(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self if performing_validations?(options) &&
-          invalid?(options[:context] || :create)
+                       invalid?(options[:context] || :create)
+
         ensure_client_compatibility!
         run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
           run_callbacks(:save, with_children: false) do
@@ -127,7 +128,6 @@ module Mongoid
       end
 
       module ClassMethods
-
         # Create a new document. This will instantiate a new document and
         # insert it in a single call. Will always return the document
         # whether save passed or not.

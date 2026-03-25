@@ -1,27 +1,25 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Fields
     module Validators
-
       # Validates the params passed to the field macro.
       module Macro
         extend self
 
-        OPTIONS = [
-          :as,
-          :default,
-          :identity,
-          :label,
-          :localize,
-          :fallbacks,
-          :association,
-          :pre_processed,
-          :subtype,
-          :type,
-          :overwrite,
-          :encrypt
+        OPTIONS = %i[
+          as
+          default
+          identity
+          label
+          localize
+          fallbacks
+          association
+          pre_processed
+          subtype
+          type
+          overwrite
+          encrypt
         ]
 
         # Validate the field definition.
@@ -46,11 +44,9 @@ module Mongoid
         # @param [ Class ] klass The model class.
         # @param [ Symbol ] name The field name.
         # @param [ Hash ] options The provided options.
-        def validate_relation(klass, name, options = {})
-          [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
-            if Mongoid.destructive_fields.include?(n)
-              raise Errors::InvalidRelation.new(klass, n)
-            end
+        def validate_relation(klass, name, _options = {})
+          [ name, :"#{name}?", :"#{name}=" ].each do |n|
+            raise Errors::InvalidRelation.new(klass, n) if Mongoid.destructive_fields.include?(n)
           end
         end
 
@@ -66,10 +62,8 @@ module Mongoid
         #
         # @api private
         def validate_field_name(klass, name)
-          [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
-            if Mongoid.destructive_fields.include?(n)
-              raise Errors::InvalidField.new(klass, name, n)
-            end
+          [ name, :"#{name}?", :"#{name}=" ].each do |n|
+            raise Errors::InvalidField.new(klass, name, n) if Mongoid.destructive_fields.include?(n)
           end
         end
 
@@ -88,13 +82,10 @@ module Mongoid
         #
         # @api private
         def validate_name_uniqueness(klass, name, options)
-          if !options[:overwrite] && klass.fields.keys.include?(name.to_s)
-            if Mongoid.duplicate_fields_exception
-              raise Errors::InvalidField.new(klass, name, name)
-            else
-              Mongoid.logger.warn("Overwriting existing field #{name} in class #{klass.name}.") if Mongoid.logger
-            end
-          end
+          return unless !options[:overwrite] && klass.fields.keys.include?(name.to_s)
+          raise Errors::InvalidField.new(klass, name, name) if Mongoid.duplicate_fields_exception
+
+          Mongoid.logger.warn("Overwriting existing field #{name} in class #{klass.name}.") if Mongoid.logger
         end
 
         # Validate that the field options are allowed.
@@ -115,9 +106,7 @@ module Mongoid
               raise Errors::InvalidFieldOption.new(klass, name, option, OPTIONS)
             end
 
-            if option == :type && options[option] == Symbol
-              Mongoid::Warnings.warn_symbol_type_deprecated
-            end
+            Mongoid::Warnings.warn_symbol_type_deprecated if option == :type && options[option] == Symbol
           end
         end
       end

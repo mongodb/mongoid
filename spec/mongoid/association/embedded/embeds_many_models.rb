@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class EmmCongress
   include Mongoid::Document
@@ -44,7 +43,6 @@ class EmmManufactory
   embeds_many :products, order: :id.desc, class_name: 'EmmProduct'
 end
 
-
 class EmmProduct
   include Mongoid::Document
 
@@ -56,17 +54,18 @@ end
 class EmmInner
   include Mongoid::Document
 
-  embeds_many :friends, :class_name => self.name, :cyclic => true
-  embedded_in :parent, :class_name => self.name, :cyclic => true
+  embeds_many :friends, class_name: name, cyclic: true
+  embedded_in :parent, class_name: name, cyclic: true
 
-  field :level, :type => Integer
+  field :level, type: Integer
 end
 
 class EmmOuter
   include Mongoid::Document
+
   embeds_many :inners, class_name: 'EmmInner'
 
-  field :level, :type => Integer
+  field :level, type: Integer
 end
 
 class EmmCustomerAddress
@@ -183,32 +182,30 @@ end
 class EmmPost
   include Mongoid::Document
 
-  embeds_many :company_tags, class_name: "EmmCompanyTag"
-  embeds_many :user_tags, class_name: "EmmUserTag"
+  embeds_many :company_tags, class_name: 'EmmCompanyTag'
+  embeds_many :user_tags, class_name: 'EmmUserTag'
 end
-
 
 class EmmCompanyTag
   include Mongoid::Document
 
   field :title, type: String
 
-  embedded_in :post, class_name: "EmmPost"
+  embedded_in :post, class_name: 'EmmPost'
 end
-
 
 class EmmUserTag
   include Mongoid::Document
 
   field :title, type: String
 
-  embedded_in :post, class_name: "EmmPost"
+  embedded_in :post, class_name: 'EmmPost'
 end
 
 class EmmSchool
   include Mongoid::Document
 
-  embeds_many :students, class_name: "EmmStudent"
+  embeds_many :students, class_name: 'EmmStudent'
 
   field :name, type: :string
 
@@ -218,23 +215,26 @@ end
 class EmmStudent
   include Mongoid::Document
 
-  embedded_in :school, class_name: "EmmSchool"
+  embedded_in :school, class_name: 'EmmSchool'
 end
 
 class EmmParent
   include Mongoid::Document
-  embeds_many :blocks, class_name: "EmmBlock"
+
+  embeds_many :blocks, class_name: 'EmmBlock'
 end
 
 class EmmBlock
   include Mongoid::Document
+
   field :name, type: String
-  embeds_many :children, class_name: "EmmChild"
+  embeds_many :children, class_name: 'EmmChild'
 end
 
 class EmmChild
   include Mongoid::Document
-  embedded_in :block, class_name: "EmmBlock"
+
+  embedded_in :block, class_name: 'EmmBlock'
 
   field :size, type: Integer
   field :order, type: Integer

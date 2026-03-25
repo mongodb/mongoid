@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # Mixin module for Mongoid::Criteria which adds the ability
     # to build or create new documents with attributes initialized
     # to the conditions of the criteria.
     module Modifiable
-
       # @attribute [r] create_attrs Additional attributes to add to the Document upon creation.
       # @api private
       attr_reader :create_attrs
@@ -26,7 +23,7 @@ module Mongoid
       def build(attrs = {}, &block)
         create_document(:new, attrs, &block)
       end
-      alias :new :build
+      alias new build
 
       # Create a document in the database given the selector and return it.
       # Complex criteria, such as $in and $or operations will get ignored.
@@ -173,11 +170,8 @@ module Mongoid
       # @return [ Document ] The new or saved document.
       def create_document(method, attrs = nil, &block)
         attrs = (create_attrs || {}).merge(attrs || {})
-        attributes = selector.reduce(attrs) do |hash, (key, value)|
-          unless invalid_key?(hash, key) || invalid_embedded_doc?(value)
-            hash[key] = value
-          end
-          hash
+        attributes = selector.each_with_object(attrs) do |(key, value), hash|
+          hash[key] = value unless invalid_key?(hash, key) || invalid_embedded_doc?(value)
         end
         if embedded?
           attributes[:_parent] = parent_document
@@ -219,8 +213,6 @@ module Mongoid
       def first_or(method, attrs = {}, &block)
         first || create_document(method, attrs, &block)
       end
-
-      private
 
       def invalid_key?(hash, key)
         # @todo Change this to BSON::String::ILLEGAL_KEY when ruby driver 2.3.0 is

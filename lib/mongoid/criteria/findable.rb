@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
-
     # Mixin module included in Mongoid::Criteria which adds the ability
     # to find document by id.
     module Findable
-
       # Execute the criteria or raise an error if no documents found.
       #
       # @example Execute or raise
@@ -60,7 +57,7 @@ module Mongoid
       def for_ids(ids)
         ids = mongoize_ids(ids)
         if ids.size > 1
-          send(id_finder, { _id: { "$in" => ids }})
+          send(id_finder, { _id: { '$in' => ids } })
         else
           send(id_finder, { _id: ids.first })
         end
@@ -77,6 +74,7 @@ module Mongoid
       # @return [ Array<Document> ] The found documents.
       def multiple_from_db(ids)
         return entries if embedded?
+
         ids = mongoize_ids(ids)
         ids.empty? ? [] : from_database(ids)
       end
@@ -130,7 +128,7 @@ module Mongoid
       def mongoize_ids(ids)
         ids.map do |id|
           id = id[:_id] if id.respond_to?(:keys) && id[:_id]
-          klass.fields["_id"].mongoize(id)
+          klass.fields['_id'].mongoize(id)
         end
       end
 
@@ -148,7 +146,7 @@ module Mongoid
           when Array, Set
             prepare_ids_for_find(arg)
           when Range
-            arg.begin&.numeric? && arg.end&.numeric? ? arg.to_a : arg
+            (arg.begin&.numeric? && arg.end&.numeric?) ? arg.to_a : arg
           else
             arg
           end
@@ -166,7 +164,7 @@ module Mongoid
       #
       # @return [ true | false ] Whether the arguments are a list.
       def multi_args?(args)
-        args.size > 1 || !args.first.is_a?(Hash) && args.first.resizable?
+        args.size > 1 || (!args.first.is_a?(Hash) && args.first.resizable?)
       end
 
       # Convenience method of raising an invalid find error.

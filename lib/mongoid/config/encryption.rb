@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/extensions/boolean'
 require 'mongoid/stringified_symbol'
@@ -24,6 +23,7 @@ module Mongoid
         visited = Set.new
         models.each_with_object({}) do |model, map|
           next if visited.include?(model)
+
           visited << model
           next if model.embedded?
           next unless model.encrypted?
@@ -182,8 +182,6 @@ module Mongoid
           DETERMINISTIC_ALGORITHM
         when false
           RANDOM_ALGORITHM
-        else
-          nil
         end
       end
 

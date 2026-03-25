@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Persistable
-
     # Defines behavior for $mul operations.
     module Multipliable
       extend ActiveSupport::Concern
@@ -28,7 +26,7 @@ module Mongoid
             attributes[field] = new_value
             ops[atomic_attribute_name(field)] = factor
           end
-          { "$mul" => ops } unless ops.empty?
+          { '$mul' => ops } unless ops.empty?
         end
       end
     end

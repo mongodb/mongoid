@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Encapsulates behavior around caching.
   module Cacheable
     extend ActiveSupport::Concern
@@ -30,6 +28,7 @@ module Mongoid
       return "#{model_key}/new" if new_record?
       return "#{model_key}/#{_id}" if cache_version
       return "#{model_key}/#{_id}-#{updated_at.utc.to_formatted_s(cache_timestamp_format)}" if try(:updated_at)
+
       "#{model_key}/#{_id}"
     end
 
@@ -45,9 +44,9 @@ module Mongoid
     # value from the memory store. It shouldn't find it, because the version
     # has changed.
     def cache_version
-      if has_attribute?('updated_at') && updated_at.present?
-        updated_at.utc.to_formatted_s(cache_timestamp_format)
-      end
+      return unless has_attribute?('updated_at') && updated_at.present?
+
+      updated_at.utc.to_formatted_s(cache_timestamp_format)
     end
   end
 end

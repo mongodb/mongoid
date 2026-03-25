@@ -1,94 +1,85 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Extensions::TimeWithZone do
-
-  describe ".demongoize" do
-
+  describe '.demongoize' do
     let!(:time) do
       Time.zone.local(2010, 11, 19)
     end
 
-    context "when the time zone is not defined" do
+    context 'when the time zone is not defined' do
       config_override :use_utc, false
 
-      context "when the local time is not observing daylight saving" do
-
+      context 'when the local time is not observing daylight saving' do
         let(:time) do
           Time.utc(2010, 11, 19)
         end
 
-        it "returns the local time" do
+        it 'returns the local time' do
           expect(ActiveSupport::TimeWithZone.demongoize(time).utc_offset).to eq(
             Time.zone.local(2010, 11, 19).utc_offset
           )
         end
       end
 
-      context "when the local time is observing daylight saving" do
-
+      context 'when the local time is observing daylight saving' do
         let(:time) do
           Time.utc(2010, 9, 19)
         end
 
-        it "returns the local time" do
+        it 'returns the local time' do
           expect(ActiveSupport::TimeWithZone.demongoize(time)).to eq(time.getlocal)
         end
       end
 
-      context "when we have a time close to midnight" do
-
+      context 'when we have a time close to midnight' do
         let(:time) do
           Time.zone.local(2010, 11, 19, 0, 30).utc
         end
 
-        it "changes it back to the equivalent local time" do
+        it 'changes it back to the equivalent local time' do
           expect(ActiveSupport::TimeWithZone.demongoize(time)).to eq(time)
         end
       end
 
-      context "when setting ActiveSupport time zone" do
-        time_zone_override "Stockholm"
+      context 'when setting ActiveSupport time zone' do
+        time_zone_override 'Stockholm'
 
-        it "returns an ActiveSupport::TimeWithZone" do
+        it 'returns an ActiveSupport::TimeWithZone' do
           expect(ActiveSupport::TimeWithZone.demongoize(time).class).to eq(ActiveSupport::TimeWithZone)
         end
 
-        context "when the local time is not observing daylight saving" do
-
+        context 'when the local time is not observing daylight saving' do
           let(:new_time) do
             Time.utc(2010, 11, 19, 12)
           end
 
-          it "returns the local time" do
+          it 'returns the local time' do
             expect(ActiveSupport::TimeWithZone.demongoize(new_time)).to eq(
               Time.zone.local(2010, 11, 19, 13)
             )
           end
         end
 
-        context "when the local time is observing daylight saving" do
-
+        context 'when the local time is observing daylight saving' do
           let(:new_time) do
             Time.utc(2010, 9, 19, 12)
           end
 
-          it "returns the local time" do
+          it 'returns the local time' do
             expect(ActiveSupport::TimeWithZone.demongoize(new_time)).to eq(
               Time.zone.local(2010, 9, 19, 14)
             )
           end
         end
 
-        context "when we have a time close to midnight" do
-
+        context 'when we have a time close to midnight' do
           let(:new_time) do
             Time.utc(2010, 11, 19, 0, 30)
           end
 
-          it "change it back to the equivalent local time" do
+          it 'change it back to the equivalent local time' do
             expect(ActiveSupport::TimeWithZone.demongoize(new_time)).to eq(
               Time.zone.local(2010, 11, 19, 1, 30)
             )
@@ -97,27 +88,27 @@ describe Mongoid::Extensions::TimeWithZone do
       end
     end
 
-    context "when the time zone is defined as UTC" do
+    context 'when the time zone is defined as UTC' do
       config_override :use_utc, true
 
-      it "returns utc" do
+      it 'returns utc' do
         expect(ActiveSupport::TimeWithZone.demongoize(time.dup.utc).utc_offset).to eq(0)
       end
 
-      context "when setting ActiveSupport time zone" do
-        time_zone_override "Stockholm"
+      context 'when setting ActiveSupport time zone' do
+        time_zone_override 'Stockholm'
 
         let(:time) do
           Time.utc(2010, 11, 19, 0, 30)
         end
 
-        it "returns utc" do
+        it 'returns utc' do
           expect(ActiveSupport::TimeWithZone.demongoize(time)).to eq(
             ActiveSupport::TimeZone['UTC'].local(2010, 11, 19, 0, 30)
           )
         end
 
-        it "returns an ActiveSupport::TimeWithZone" do
+        it 'returns an ActiveSupport::TimeWithZone' do
           expect(ActiveSupport::TimeWithZone.demongoize(time).class).to eq(
             ActiveSupport::TimeWithZone
           )
@@ -125,82 +116,74 @@ describe Mongoid::Extensions::TimeWithZone do
       end
     end
 
-    context "when time is nil" do
-
-      it "returns nil" do
+    context 'when time is nil' do
+      it 'returns nil' do
         expect(ActiveSupport::TimeWithZone.demongoize(nil)).to be_nil
       end
     end
   end
 
-  describe ".mongoize" do
-
+  describe '.mongoize' do
     let!(:time) do
       Time.zone.local(2010, 11, 19)
     end
 
-    context "when given nil" do
-
-      it "returns nil" do
+    context 'when given nil' do
+      it 'returns nil' do
         expect(ActiveSupport::TimeWithZone.mongoize(nil)).to be_nil
       end
     end
 
-    context "when string is empty" do
-
+    context 'when string is empty' do
       let(:mongoized) do
-        ActiveSupport::TimeWithZone.mongoize("")
+        ActiveSupport::TimeWithZone.mongoize('')
       end
 
-      it "returns nil" do
+      it 'returns nil' do
         expect(mongoized).to be_nil
       end
     end
 
-    context "when given a string" do
-
-      context "when the string is a valid time" do
-
-        it "converts to a utc time" do
+    context 'when given a string' do
+      context 'when the string is a valid time' do
+        it 'converts to a utc time' do
           expect(ActiveSupport::TimeWithZone.mongoize(time.to_s).utc_offset).to eq(0)
         end
 
-        it "serializes with time parsing" do
+        it 'serializes with time parsing' do
           expect(ActiveSupport::TimeWithZone.mongoize(time.to_s)).to eq(Time.parse(time.to_s).utc)
         end
 
-        it "returns a local date from the string" do
+        it 'returns a local date from the string' do
           expect(ActiveSupport::TimeWithZone.mongoize(time.to_s)).to eq(
             Time.zone.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
           )
         end
       end
 
-      context "when the string is an invalid time" do
+      context 'when the string is an invalid time' do
         let(:mongoized) do
-          ActiveSupport::TimeWithZone.mongoize("time")
+          ActiveSupport::TimeWithZone.mongoize('time')
         end
 
-        it "returns nil" do
+        it 'returns nil' do
           expect(mongoized).to be_nil
         end
       end
 
-      context "when setting ActiveSupport time zone" do
-        time_zone_override "Stockholm"
+      context 'when setting ActiveSupport time zone' do
+        time_zone_override 'Stockholm'
 
-        context "when the local time is not observing daylight saving" do
-
-          it "returns the local time" do
+        context 'when the local time is not observing daylight saving' do
+          it 'returns the local time' do
             expect(ActiveSupport::TimeWithZone.mongoize('2010-11-19 5:00:00')).to eq(
               Time.utc(2010, 11, 19, 4)
             )
           end
         end
 
-        context "when the local time is observing daylight saving" do
-
-          it "returns the local time" do
+        context 'when the local time is observing daylight saving' do
+          it 'returns the local time' do
             expect(ActiveSupport::TimeWithZone.mongoize('2010-9-19 5:00:00')).to eq(
               Time.utc(2010, 9, 19, 3)
             )
@@ -209,8 +192,7 @@ describe Mongoid::Extensions::TimeWithZone do
       end
     end
 
-    context "when given a DateTime" do
-
+    context 'when given a DateTime' do
       let!(:time) do
         Time.now
       end
@@ -221,14 +203,14 @@ describe Mongoid::Extensions::TimeWithZone do
         )
       end
 
-      context "when setting ActiveSupport time zone" do
-        time_zone_override "Stockholm"
+      context 'when setting ActiveSupport time zone' do
+        time_zone_override 'Stockholm'
 
         let(:datetime) do
           DateTime.new(2010, 11, 19)
         end
 
-        it "assumes the given time is local" do
+        it 'assumes the given time is local' do
           expect(ActiveSupport::TimeWithZone.mongoize(datetime)).to eq(
             Time.utc(2010, 11, 19)
           )
@@ -236,17 +218,16 @@ describe Mongoid::Extensions::TimeWithZone do
       end
     end
 
-    context "when given a Time" do
-
-      it "converts to a utc time" do
+    context 'when given a Time' do
+      it 'converts to a utc time' do
         expect(ActiveSupport::TimeWithZone.mongoize(time).utc_offset).to eq(0)
       end
 
-      it "returns utc times unchanged" do
+      it 'returns utc times unchanged' do
         expect(ActiveSupport::TimeWithZone.mongoize(time.utc)).to eq(time.utc)
       end
 
-      it "returns the time as utc" do
+      it 'returns the time as utc' do
         expect(ActiveSupport::TimeWithZone.mongoize(time)).to eq(time.utc)
       end
 
@@ -255,60 +236,57 @@ describe Mongoid::Extensions::TimeWithZone do
       end
     end
 
-    context "when given an ActiveSupport::TimeWithZone" do
-
+    context 'when given an ActiveSupport::TimeWithZone' do
       before do
         1.hour.ago
       end
 
-      it "converts it to utc" do
-        expect(ActiveSupport::TimeWithZone.mongoize(time.in_time_zone("Alaska"))).to eq(
+      it 'converts it to utc' do
+        expect(ActiveSupport::TimeWithZone.mongoize(time.in_time_zone('Alaska'))).to eq(
           Time.at(time.to_i).utc
         )
       end
     end
 
-    context "when given a Date" do
-
+    context 'when given a Date' do
       let(:date) do
         Date.today
       end
 
-      it "converts to a utc time" do
+      it 'converts to a utc time' do
         expect(ActiveSupport::TimeWithZone.mongoize(date)).to eq(Time.zone.local(date.year, date.month, date.day))
       end
 
-      it "has a zero utc offset" do
+      it 'has a zero utc offset' do
         expect(ActiveSupport::TimeWithZone.mongoize(date).utc_offset).to eq(0)
       end
 
-      context "when setting ActiveSupport time zone" do
-        time_zone_override "Stockholm"
+      context 'when setting ActiveSupport time zone' do
+        time_zone_override 'Stockholm'
 
         let(:date) do
           Date.new(2010, 11, 19)
         end
 
-        it "assumes the given time is local" do
+        it 'assumes the given time is local' do
           expect(ActiveSupport::TimeWithZone.mongoize(date)).to eq(Time.utc(2010, 11, 18, 23))
         end
       end
     end
 
-    context "when given an array" do
-
+    context 'when given an array' do
       let(:array) do
-        [ 2010, 11, 19, 00, 24, 49 ]
+        [ 2010, 11, 19, 0o0, 24, 49 ]
       end
 
-      it "returns a time" do
+      it 'returns a time' do
         expect(ActiveSupport::TimeWithZone.mongoize(array)).to eq(Time.zone.local(*array))
       end
 
-      context "when setting ActiveSupport time zone" do
-        time_zone_override "Stockholm"
+      context 'when setting ActiveSupport time zone' do
+        time_zone_override 'Stockholm'
 
-        it "assumes the given time is local" do
+        it 'assumes the given time is local' do
           expect(ActiveSupport::TimeWithZone.mongoize(array)).to eq(
             Time.utc(2010, 11, 18, 23, 24, 49)
           )
@@ -317,17 +295,16 @@ describe Mongoid::Extensions::TimeWithZone do
     end
   end
 
-  describe "#mongoize" do
-
+  describe '#mongoize' do
     let!(:time) do
       Time.zone.local(2010, 11, 19)
     end
 
-    it "converts to a utc time" do
+    it 'converts to a utc time' do
       expect(time.mongoize.utc_offset).to eq(0)
     end
 
-    it "returns the time as utc" do
+    it 'returns the time as utc' do
       expect(time.mongoize).to eq(time.utc)
     end
 
@@ -336,23 +313,20 @@ describe Mongoid::Extensions::TimeWithZone do
     end
   end
 
-  describe "__mongoize_time__" do
-
+  describe '__mongoize_time__' do
     let(:time) do
-      ActiveSupport::TimeZone['Magadan'].at(1543331265.123457)
+      ActiveSupport::TimeZone['Magadan'].at(1_543_331_265.123457)
     end
+    let(:mongoized) do
+      time.__mongoize_time__
+    end
+    let(:expected_time) { time.in_time_zone }
 
     before do
       expect(time).to be_a(ActiveSupport::TimeWithZone)
     end
 
-    let(:mongoized) do
-      time.__mongoize_time__
-    end
-
-    let(:expected_time) { time.in_time_zone }
-
-    context "when setting ActiveSupport time zone" do
+    context 'when setting ActiveSupport time zone' do
       include_context 'setting ActiveSupport time zone'
 
       it_behaves_like 'mongoizes to AS::TimeWithZone'

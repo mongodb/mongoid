@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Association
     module Referenced
       class HasAndBelongsToMany
-
         # The Builder behavior for has_and_belongs_to_many associations.
         module Buildable
-
           # This builder either takes a hash and queries for the
           # object or an array of documents, where it will just return them.
           #
@@ -21,13 +18,15 @@ module Mongoid
           # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Array<Document> ] The documents.
-          def build(base, object, type = nil, selected_fields = nil)
+          def build(_base, object, _type = nil, selected_fields = nil)
             if query?(object)
               # Handle array of hashes from $lookup aggregation
               if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
-                return object.map { |attrs| Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false) }
+                return object.map do |attrs|
+                  Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false)
+                end
               end
-              
+
               query_criteria(object)
             else
               object.try(:dup)

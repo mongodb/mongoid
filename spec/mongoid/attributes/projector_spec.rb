@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Attributes::Projector do
   Dir[File.join(File.dirname(__FILE__), 'projector_data', '*.yml')].sort.each do |path|
@@ -10,10 +9,7 @@ describe Mongoid::Attributes::Projector do
 
       specs.each do |spec|
         context spec['name'] do
-
-          if spec['pending']
-            pending spec['pending'].to_s
-          end
+          pending spec['pending'].to_s if spec['pending']
 
           let(:projection) do
             spec['projection']

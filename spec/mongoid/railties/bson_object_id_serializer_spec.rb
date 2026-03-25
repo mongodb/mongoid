@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 
@@ -7,9 +6,7 @@ begin
   require 'active_job'
   require 'mongoid/railties/bson_object_id_serializer'
 
-
   describe 'Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer' do
-
     let(:serializer) { Mongoid::Railties::ActiveJobSerializers::BsonObjectIdSerializer.instance }
     let(:object_id) { BSON::ObjectId.new }
 

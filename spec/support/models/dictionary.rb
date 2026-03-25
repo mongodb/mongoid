@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Dictionary
   include Mongoid::Document
+
   field :name, type: String
   field :publisher, type: String
   field :year, type: Integer

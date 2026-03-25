@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Object class.
         module Object
-
           # Combine the two objects using the add strategy.
           #
           # @example Add the object to the array.
@@ -100,7 +97,9 @@ module Mongoid
           #   1.__deep_copy__
           #
           # @return [ Object ] self.
-          def __deep_copy__; self; end
+          def __deep_copy__
+            self
+          end
 
           # Get the object as an array.
           #
@@ -135,7 +134,6 @@ module Mongoid
           Mongoid.deprecate(self, :regexp?)
 
           module ClassMethods
-
             # Evolve the object.
             #
             # @note This is here for API compatibility.
@@ -164,9 +162,10 @@ module Mongoid
             # @return [ Object ] The evolved object.
             def __evolve__(object)
               return nil if object.nil?
+
               case object
               when ::Array
-                object.map{ |obj| evolve(obj) }
+                object.map { |obj| evolve(obj) }
               when ::Range
                 object.__evolve_range__
               else
@@ -181,5 +180,5 @@ module Mongoid
   end
 end
 
-::Object.__send__(:include, Mongoid::Criteria::Queryable::Extensions::Object)
-::Object.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Object::ClassMethods)
+Object.include Mongoid::Criteria::Queryable::Extensions::Object
+Object.extend Mongoid::Criteria::Queryable::Extensions::Object::ClassMethods

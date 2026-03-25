@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when attempting to destroy a model which has
     # an association with dependency option set to restrict.
     class DeleteRestriction < MongoidError
-
       # Create the new callbacks error.
       #
       # @param [ Document ] document The document that was attempted to be
@@ -17,7 +14,7 @@ module Mongoid
       def initialize(document, association_name)
         super(
           compose_message(
-            "delete_restriction",
+            'delete_restriction',
             { document: document.class, relation: association_name }
           )
         )

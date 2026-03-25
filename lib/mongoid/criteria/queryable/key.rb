@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
-
       # Key objects represent specifications for building query expressions
       # utilizing MongoDB selectors.
       #
@@ -59,7 +57,6 @@ module Mongoid
       # MongoDB query expression required to obtain the key's condition,
       # given the value.
       class Key
-
         # @return [ String | Symbol ] The name of the field.
         attr_reader :name
 
@@ -86,15 +83,16 @@ module Mongoid
         # @return [ true | false ] If the objects are equal.
         def ==(other)
           return false unless other.is_a?(Key)
+
           name == other.name && operator == other.operator && expanded == other.expanded
         end
-        alias :eql? :==
+        alias eql? ==
 
         # Calculate the hash code for a key.
         #
         # @return [ Integer ] The hash code for the key.
         def hash
-          [name, operator, expanded].hash
+          [ name, operator, expanded ].hash
         end
 
         # Instantiate the new key.
@@ -142,21 +140,17 @@ module Mongoid
         #
         # @return [ Hash ] The raw MongoDB selector.
         def transform_value(value, negating = false)
-          if block
-            expr = block[value]
-          else
-            expr = value
-          end
+          expr = if block
+                   block[value]
+                 else
+                   value
+                 end
 
-          if expanded
-            expr = {expanded => expr}
-          end
+          expr = { expanded => expr } if expanded
 
-          expr = {operator => expr}
+          expr = { operator => expr }
 
-          if negating && operator != '$not'
-            expr = {'$not' => expr}
-          end
+          expr = { '$not' => expr } if negating && operator != '$not'
 
           expr
         end
@@ -170,7 +164,7 @@ module Mongoid
         def __sort_option__
           { name => operator }
         end
-        alias :__sort_pair__ :__sort_option__
+        alias __sort_pair__ __sort_option__
 
         # Convert the key to a string.
         #

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when defining a scope of an invalid type.
     class InvalidScope < MongoidError
-
       # Create the error.
       #
       # @example Create the error.
@@ -16,7 +13,7 @@ module Mongoid
       # @param [ Object ] value The attempted scope value.
       def initialize(klass, value)
         super(
-          compose_message("invalid_scope", { klass: klass, value: value })
+          compose_message('invalid_scope', { klass: klass, value: value })
         )
       end
     end

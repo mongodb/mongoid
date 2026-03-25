@@ -1,12 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Contextual
     module Aggregable
       # Contains behavior for aggregating values in memory.
       module Memory
-
         # Get all the aggregate values for the provided field.
         # Provided for interface consistency with Aggregable::Mongo.
         #
@@ -16,7 +14,7 @@ module Mongoid
         #   If no documents are present, then returned Hash will have
         #   count, sum of 0 and max, min, avg of nil.
         def aggregates(field)
-          %w(count sum avg min max).each_with_object({}) do |method, hash|
+          %w[count sum avg min max].each_with_object({}) do |method, hash|
             hash[method] = send(method, field)
           end
         end

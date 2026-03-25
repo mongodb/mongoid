@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # Raised when an invalid index is defined.
     class InvalidIndex < MongoidError
-
       # Create the new error.
       #
       # @example Create the error.
@@ -18,7 +15,7 @@ module Mongoid
       def initialize(klass, spec, options)
         super(
           compose_message(
-            "invalid_index",
+            'invalid_index',
             { klass: klass.name, spec: spec, options: options }
           )
         )

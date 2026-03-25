@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Mongoid::Association::Embedded::EmbedsMany::Binding do
-
   let(:person) do
     Person.new
   end
@@ -18,17 +16,15 @@ describe Mongoid::Association::Embedded::EmbedsMany::Binding do
   end
 
   let(:association) do
-    Person.relations["addresses"]
+    Person.relations['addresses']
   end
 
-  describe "#bind_one" do
-
+  describe '#bind_one' do
     let(:binding) do
       described_class.new(person, target, association)
     end
 
-    context "when the document is bindable" do
-
+    context 'when the document is bindable' do
       let(:address_two) do
         Address.new
       end
@@ -37,19 +33,18 @@ describe Mongoid::Association::Embedded::EmbedsMany::Binding do
         binding.bind_one(address_two)
       end
 
-      it "parentizes the document" do
+      it 'parentizes the document' do
         expect(address_two._parent).to eq(person)
       end
 
-      it "sets the inverse relation" do
+      it 'sets the inverse relation' do
         expect(address_two.addressable).to eq(person)
       end
     end
 
-    context "when the document is not bindable" do
-
-      it "does nothing" do
-        expect(person.addresses).to receive(:<<).never
+    context 'when the document is not bindable' do
+      it 'does nothing' do
+        expect(person.addresses).not_to receive(:<<)
         binding.bind_one(address)
       end
     end

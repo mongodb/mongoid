@@ -1,13 +1,10 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
-
       # Contains behavior for merging existing selection with new selection.
       module Mergeable
-
         # @attribute [rw] strategy The name of the current strategy.
         attr_accessor :strategy
 
@@ -105,7 +102,7 @@ module Mongoid
         # @return [ Mergeable ] The new mergeable.
         def __expanded__(criterion, outer, inner)
           selection(criterion) do |selector, field, value|
-            selector.store(field, { outer => { inner => value }})
+            selector.store(field, { outer => { inner => value } })
           end
         end
 
@@ -162,10 +159,9 @@ module Mongoid
             sel = query.selector
             criteria.flatten.each do |expr|
               next unless expr
+
               result_criteria = sel[operator] || []
-              if expr.is_a?(Selectable)
-                expr = expr.selector
-              end
+              expr = expr.selector if expr.is_a?(Selectable)
               normalized = _mongoid_expand_keys(expr)
               sel.store(operator, result_criteria.push(normalized))
             end
@@ -192,17 +188,17 @@ module Mongoid
           clone.tap do |query|
             sel = query.selector
             _mongoid_flatten_arrays(criteria).each do |criterion|
-              if criterion.is_a?(Selectable)
-                expr = _mongoid_expand_keys(criterion.selector)
-              else
-                expr = _mongoid_expand_keys(criterion)
-              end
+              expr = if criterion.is_a?(Selectable)
+                       _mongoid_expand_keys(criterion.selector)
+                     else
+                       _mongoid_expand_keys(criterion)
+                     end
               if sel.empty?
-                sel.store(operator, [expr])
-              elsif sel.keys == [operator]
-                sel.store(operator, sel[operator] + [expr])
+                sel.store(operator, [ expr ])
+              elsif sel.keys == [ operator ]
+                sel.store(operator, sel[operator] + [ expr ])
               else
-                operands = [sel.dup] + [expr]
+                operands = [ sel.dup ] + [ expr ]
                 sel.clear
                 sel.store(operator, operands)
               end
@@ -257,9 +253,7 @@ module Mongoid
         #
         # @return [ BSON::Document ] The expanded criteria.
         private def _mongoid_expand_keys(expr)
-          unless expr.is_a?(Hash)
-            raise ArgumentError, 'Argument must be a Hash'
-          end
+          raise ArgumentError, 'Argument must be a Hash' unless expr.is_a?(Hash)
 
           result = BSON::Document.new
           expr.each do |field, value|
@@ -278,7 +272,7 @@ module Mongoid
                     else
                       raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
                       result['$and'] ||= []
-                      result['$and'] << {k => v}
+                      result['$and'] << { k => v }
                     end
                   else
                     # The new value is a simple value.
@@ -287,11 +281,11 @@ module Mongoid
                     # https://www.mongodb.com/docs/manual/reference/operator/query/eq/#std-label-eq-usage-examples
                     # for the description of relevant server behavior.
                     op = case v
-                    when Regexp, BSON::Regexp::Raw
-                      '$regex'
-                    else
-                      '$eq'
-                    end
+                         when Regexp, BSON::Regexp::Raw
+                           '$regex'
+                         else
+                           '$eq'
+                         end
                     # If there isn't an $eq/$regex operator already in the
                     # query, transform the new value into an operator
                     # expression and add it to the existing hash. Otherwise
@@ -299,7 +293,7 @@ module Mongoid
                     if existing.key?(op)
                       raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
                       result['$and'] ||= []
-                      result['$and'] << {k => v}
+                      result['$and'] << { k => v }
                     else
                       existing.update(op => v)
                     end
@@ -308,17 +302,17 @@ module Mongoid
                   # Existing value is a simple value.
                   # See the notes above about transformations to $eq/$regex.
                   op = case existing
-                  when Regexp, BSON::Regexp::Raw
-                    '$regex'
-                  else
-                    '$eq'
-                  end
+                       when Regexp, BSON::Regexp::Raw
+                         '$regex'
+                       else
+                         '$eq'
+                       end
                   if v.is_a?(Hash) && !v.key?(op)
-                    result[k] = {op => existing}.update(v)
+                    result[k] = { op => existing }.update(v)
                   else
                     raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
                     result['$and'] ||= []
-                    result['$and'] << {k => v}
+                    result['$and'] << { k => v }
                   end
                 end
               else
@@ -341,9 +335,7 @@ module Mongoid
         #
         # @return [ Mergeable ] The new mergeable.
         def __override__(criterion, operator)
-          if criterion.is_a?(Selectable)
-            criterion = criterion.selector
-          end
+          criterion = criterion.selector if criterion.is_a?(Selectable)
           selection(criterion) do |selector, field, value|
             expression = prepare(field, operator, value)
             existing = selector[field]
@@ -419,15 +411,15 @@ module Mongoid
         #
         # @return [ Object ] The serialized value.
         def prepare(field, operator, value)
-          unless operator =~ /exists|type|size/
+          unless /exists|type|size/.match?(operator)
             value = value.__expand_complex__
             field = field.to_s
             name = aliases[field] || field
             serializer = serializers[name]
-            value = serializer ? serializer.evolve(value) : value
+            value = serializer.evolve(value) if serializer
           end
           selection = { operator => value }
-          negating? ? { "$not" => selection } : selection
+          negating? ? { '$not' => selection } : selection
         end
       end
     end

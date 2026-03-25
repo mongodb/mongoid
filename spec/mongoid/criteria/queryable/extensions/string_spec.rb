@@ -1,82 +1,73 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "spec_helper"
+require 'spec_helper'
 
 describe String do
-
-  describe "#__evolve_date__" do
-
-    context "when the string is verbose" do
-
+  describe '#__evolve_date__' do
+    context 'when the string is verbose' do
       let(:date) do
-        "1st Jan 2010"
+        '1st Jan 2010'
       end
 
       let(:evolved) do
         date.__evolve_date__
       end
 
-      it "returns the strings as a times" do
+      it 'returns the strings as a times' do
         expect(evolved).to eq(Time.new(2010, 1, 1, 0, 0, 0, 0).utc)
       end
     end
 
-    context "when the string is in international format" do
-
+    context 'when the string is in international format' do
       let(:date) do
-        "2010-1-1"
+        '2010-1-1'
       end
 
       let(:evolved) do
         date.__evolve_date__
       end
 
-      it "returns the strings as a times" do
+      it 'returns the strings as a times' do
         expect(evolved).to eq(Time.new(2010, 1, 1, 0, 0, 0, 0).utc)
       end
     end
   end
 
-  describe "#__evolve_time__" do
-
-    context "when the string is verbose" do
-
+  describe '#__evolve_time__' do
+    context 'when the string is verbose' do
       let(:date) do
-        "1st Jan 2010 12:00:00+01:00"
+        '1st Jan 2010 12:00:00+01:00'
       end
 
       let(:evolved) do
         date.__evolve_time__
       end
 
-      it "returns the string as a utc time" do
+      it 'returns the string as a utc time' do
         expect(evolved).to eq(Time.new(2010, 1, 1, 11, 0, 0, 0).utc)
       end
     end
 
-    context "when the string is in international format" do
-
+    context 'when the string is in international format' do
       let(:date) do
-        "2010-01-01 12:00:00+01:00"
+        '2010-01-01 12:00:00+01:00'
       end
 
       let(:evolved) do
         date.__evolve_time__
       end
 
-      it "returns the string as a utc time" do
+      it 'returns the string as a utc time' do
         expect(evolved).to eq(Time.new(2010, 1, 1, 11, 0, 0, 0).utc)
       end
     end
 
-    context "when the string without timezone" do
-
-      context "when setting ActiveSupport time zone" do
-        time_zone_override "Tokyo"
+    context 'when the string without timezone' do
+      context 'when setting ActiveSupport time zone' do
+        time_zone_override 'Tokyo'
 
         let(:date) do
-          "2010-01-01 5:00:00"
+          '2010-01-01 5:00:00'
         end
 
         let(:evolved) do
@@ -90,92 +81,83 @@ describe String do
     end
   end
 
-  describe "#__sort_option__" do
-
-    context "when the string contains ascending" do
-
+  describe '#__sort_option__' do
+    context 'when the string contains ascending' do
       let(:option) do
-        "field_one ascending, field_two ascending".__sort_option__
+        'field_one ascending, field_two ascending'.__sort_option__
       end
 
-      it "returns the ascending sort option hash" do
+      it 'returns the ascending sort option hash' do
         expect(option).to eq({ field_one: 1, field_two: 1 })
       end
     end
 
-    context "when the string contains asc" do
-
+    context 'when the string contains asc' do
       let(:option) do
-        "field_one asc, field_two asc".__sort_option__
+        'field_one asc, field_two asc'.__sort_option__
       end
 
-      it "returns the ascending sort option hash" do
+      it 'returns the ascending sort option hash' do
         expect(option).to eq({ field_one: 1, field_two: 1 })
       end
     end
 
-    context "when the string contains ASCENDING" do
-
+    context 'when the string contains ASCENDING' do
       let(:option) do
-        "field_one ASCENDING, field_two ASCENDING".__sort_option__
+        'field_one ASCENDING, field_two ASCENDING'.__sort_option__
       end
 
-      it "returns the ascending sort option hash" do
+      it 'returns the ascending sort option hash' do
         expect(option).to eq({ field_one: 1, field_two: 1 })
       end
     end
 
-    context "when the string contains ASC" do
-
+    context 'when the string contains ASC' do
       let(:option) do
-        "field_one ASC, field_two ASC".__sort_option__
+        'field_one ASC, field_two ASC'.__sort_option__
       end
 
-      it "returns the ascending sort option hash" do
+      it 'returns the ascending sort option hash' do
         expect(option).to eq({ field_one: 1, field_two: 1 })
       end
     end
 
-    context "when the string contains descending" do
-
+    context 'when the string contains descending' do
       let(:option) do
-        "field_one descending, field_two descending".__sort_option__
+        'field_one descending, field_two descending'.__sort_option__
       end
 
-      it "returns the descending sort option hash" do
+      it 'returns the descending sort option hash' do
         expect(option).to eq({ field_one: -1, field_two: -1 })
       end
     end
 
-    context "when the string contains desc" do
-
+    context 'when the string contains desc' do
       let(:option) do
-        "field_one desc, field_two desc".__sort_option__
+        'field_one desc, field_two desc'.__sort_option__
       end
 
-      it "returns the descending sort option hash" do
+      it 'returns the descending sort option hash' do
         expect(option).to eq({ field_one: -1, field_two: -1 })
       end
     end
 
-    context "when the string contains DESCENDING" do
-
+    context 'when the string contains DESCENDING' do
       let(:option) do
-        "field_one DESCENDING, field_two DESCENDING".__sort_option__
+        'field_one DESCENDING, field_two DESCENDING'.__sort_option__
       end
 
-      it "returns the descending sort option hash" do
+      it 'returns the descending sort option hash' do
         expect(option).to eq({ field_one: -1, field_two: -1 })
       end
     end
 
-    context "when the string contains DESC" do
-
+    context 'when the string contains DESC' do
       let(:option) do
-        "field_one DESC, field_two DESC".__sort_option__
+        'field_one DESC, field_two DESC'.__sort_option__
       end
 
-      it "returns the descending sort option hash" do
+      it 'returns the descending sort option hash' do
         expect(option).to eq({ field_one: -1, field_two: -1 })
       end
     end
@@ -183,6 +165,7 @@ describe String do
 
   describe '#__expr_part__' do
     subject(:specified) { 'field'.__expr_part__(value) }
+
     let(:value) { 10 }
 
     it 'returns the expression with the value' do
@@ -228,7 +211,7 @@ describe String do
         let(:value) { 'test' }
 
         it 'returns the expression with the value negated' do
-          expect(specified).to eq({ 'field' => { '$ne' => 'test' }})
+          expect(specified).to eq({ 'field' => { '$ne' => 'test' } })
         end
       end
     end

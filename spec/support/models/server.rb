@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Server
   include Mongoid::Document
+
   field :name, type: String
   field :after, type: Mongoid::Boolean, default: false
   belongs_to :node

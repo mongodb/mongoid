@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 class Name
   include Mongoid::Document
@@ -7,7 +6,7 @@ class Name
 
   validate :is_not_jamis
 
-  field :_id, type: String, overwrite: true, default: ->{
+  field :_id, type: String, overwrite: true, default: lambda {
     "#{first_name}-#{last_name}"
   }
 
@@ -30,8 +29,8 @@ class Name
   private
 
   def is_not_jamis
-    if first_name == 'Jamis' && last_name == 'Buck'
-      errors.add(:base, :invalid)
-    end
+    return unless first_name == 'Jamis' && last_name == 'Buck'
+
+    errors.add(:base, :invalid)
   end
 end

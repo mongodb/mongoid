@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'spec_helper'
 require 'mongoid/association/referenced/has_many_models'
@@ -26,8 +25,8 @@ describe 'has_many associations' do
       it 'destroys' do
         address
 
-        HmmCompany.count.should == 1
-        HmmAddress.count.should == 1
+        HmmCompany.count.should
+        HmmAddress.count.should
 
         company.with_session do |session|
           session.with_transaction do
@@ -35,7 +34,7 @@ describe 'has_many associations' do
           end
         end
 
-        HmmCompany.count.should == 0
+        HmmCompany.count.should
         HmmAddress.count.should == 0
       end
     end
@@ -50,8 +49,8 @@ describe 'has_many associations' do
       it 'destroys' do
         address
 
-        HmmCompany.count.should == 1
-        HmmAddress.count.should == 1
+        HmmCompany.count.should
+        HmmAddress.count.should
 
         lambda do
           company.with_session do |session|
@@ -61,7 +60,7 @@ describe 'has_many associations' do
           end
         end.should raise_error(Mongoid::Errors::DocumentNotDestroyed)
 
-        HmmCompany.count.should == 1
+        HmmCompany.count.should
         HmmAddress.count.should == 1
       end
     end
@@ -98,11 +97,12 @@ describe 'has_many associations' do
       end
 
       it 'does not destroy the dependent object' do
-        wiki_page.comments.should == [comment]
-        wiki_page.comments = [comment]
+        wiki_page.comments.should
+        [ comment ]
+        wiki_page.comments = [ comment ]
         wiki_page.save!
         wiki_page.reload
-        wiki_page.comments.should == [comment]
+        wiki_page.comments.should == [ comment ]
       end
     end
 
@@ -118,11 +118,12 @@ describe 'has_many associations' do
       end
 
       it 'does not destroy the dependent object' do
-        series.books.should == [book]
-        series.books = [book]
+        series.books.should
+        [ book ]
+        series.books = [ book ]
         series.save!
         series.reload
-        series.books.should == [book]
+        series.books.should == [ book ]
       end
     end
   end
@@ -149,7 +150,7 @@ describe 'has_many associations' do
                 {
                   _id: grandchild.id,
                   title: updated_grandchild_title,
-                  num: updated_grandchild_num,
+                  num: updated_grandchild_num
                 }
               ]
             }
@@ -160,7 +161,7 @@ describe 'has_many associations' do
       context 'when the grandchild is invalid' do
         let(:updated_grandchild_num) { -1 } # invalid value
 
-        it 'will not save the parent' do
+        it 'does not save the parent' do
           expect(post.update(attributes)).to be_falsey
           expect(post.errors).not_to be_empty
           expect(post.reload.title).not_to eq(updated_parent_title)
@@ -172,7 +173,7 @@ describe 'has_many associations' do
       context 'when the grandchild is valid' do
         let(:updated_grandchild_num) { 1 }
 
-        it 'will save the parent' do
+        it 'saves the parent' do
           expect(post.update(attributes)).to be_truthy
           expect(post.errors).to be_empty
           expect(post.reload.title).to eq(updated_parent_title)

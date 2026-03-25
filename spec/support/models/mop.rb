@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 # This class is used for embedded matcher testing.
 class Mop

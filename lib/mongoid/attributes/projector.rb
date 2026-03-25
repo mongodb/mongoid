@@ -1,9 +1,7 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Attributes
-
     # This module defines projection helpers.
     #
     # Projection rules are rather non-trivial. See
@@ -32,8 +30,7 @@ module Mongoid
         end
       end
 
-      attr_reader :id_projection_value
-      attr_reader :content_projection
+      attr_reader :id_projection_value, :content_projection
 
       # Determine if the specified attribute, or a dot notation path, is allowed
       # by the configured projection, if any.
@@ -48,11 +45,7 @@ module Mongoid
       def attribute_or_path_allowed?(name)
         # Special handling for _id.
         if name == '_id'
-          result = unless id_projection_value.nil?
-            value_inclusionary?(id_projection_value)
-          else
-            true
-          end
+          result = id_projection_value.nil? || value_inclusionary?(id_projection_value)
           return result
         end
 
@@ -65,24 +58,20 @@ module Mongoid
         # Find an item which matches or is a parent of the requested name/path.
         # This handles the case when, for example, the projection was
         # {foo: true} and we want to know if foo.bar is allowed.
-        item, value = content_projection.detect do |path, value|
+        item, value = content_projection.detect do |path, _value|
           (name + '.').start_with?(path + '.')
         end
-        if item
-          return value_inclusionary?(value)
-        end
+        return value_inclusionary?(value) if item
 
         if content_inclusionary?
           # Find an item which would be a strict child of the requested name/path.
           # This handles the case when, for example, the projection was
           # {"foo.bar" => true} and we want to know if foo is allowed.
           # (It is as a container of bars.)
-          item, value = content_projection.detect do |path, value|
+          item, = content_projection.detect do |path, _value|
             (path + '.').start_with?(name + '.')
           end
-          if item
-            return true
-          end
+          return true if item
         end
 
         !content_inclusionary?
@@ -94,9 +83,7 @@ module Mongoid
       #
       # An empty projection is inclusionary.
       def content_inclusionary?
-        if content_projection.empty?
-          return value_inclusionary?(id_projection_value)
-        end
+        return value_inclusionary?(id_projection_value) if content_projection.empty?
 
         value_inclusionary?(content_projection.values.first)
       end

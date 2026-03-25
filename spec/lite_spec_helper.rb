@@ -1,13 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "shared", "lib"))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'shared', 'lib'))
 
 # Load byebug before mongoid, to place breakpoints in the lib methods.
 # But SpecConfig needs the driver code - require the driver here.
-require "mongo"
+require 'mongo'
 
 # MRI 2.5 and JRuby 9.2 change visibility of Object#pp when 'pp' is required,
 # which happens when RSpec reports anything. This creates an issue for tests
@@ -21,9 +20,9 @@ require 'support/spec_config'
 require 'mrss/lite_constraints'
 
 if Gem::Version.new(Mongo::VERSION) < Gem::Version.new('2.18.0.alpha')
-  require "mrss/session_registry_legacy"
+  require 'mrss/session_registry_legacy'
 else
-  require "mrss/session_registry"
+  require 'mrss/session_registry'
 end
 
 Mrss.patch_mongo_for_session_registry
@@ -53,7 +52,7 @@ end
 
 STANDARD_TIMEOUTS = {
   app: 500, # App tests under JRuby take a REALLY long time (over 5 minutes per test).
-  default: 30,
+  default: 30
 }.freeze
 
 def timeout_type
@@ -75,24 +74,24 @@ end
 
 RSpec.configure do |config|
   config.expect_with(:rspec) do |c|
-    c.syntax = [:should, :expect]
+    c.syntax = %i[should expect]
   end
 
   if SpecConfig.instance.ci?
     config.add_formatter(RSpec::Core::Formatters::JsonFormatter, File.join(File.dirname(__FILE__), '../tmp/rspec.json'))
   end
 
-  if SpecConfig.instance.ci? && !%w(1 true yes).include?(ENV['INTERACTIVE']&.downcase)
-    config.around(:each) do |example|
+  if SpecConfig.instance.ci? && !%w[1 true yes].include?(ENV['INTERACTIVE']&.downcase)
+    config.around do |example|
       TimeoutInterrupt.timeout(example_timeout_seconds) do
         example.run
       end
     end
   end
 
-  def local_env(env = nil, &block)
+  def local_env(env = nil)
     around do |example|
-      env ||= block.call
+      env ||= yield
       saved_env = ENV.to_h
       ENV.update(env)
 

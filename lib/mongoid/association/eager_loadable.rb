@@ -1,14 +1,11 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
-require "mongoid/association/eager"
+require 'mongoid/association/eager'
 
 module Mongoid
   module Association
-
     # This module defines the eager loading behavior for criteria.
     module EagerLoadable
-
       # Indicates whether the criteria has association
       # inclusions which should be eager loaded.
       #
@@ -24,9 +21,7 @@ module Mongoid
       # @return [ Array<Mongoid::Document> ] The given documents.
       def eager_load(docs)
         docs.tap do |d|
-          if eager_loadable?
-            preload(criteria.inclusions, d)
-          end
+          preload(criteria.inclusions, d) if eager_loadable?
         end
       end
 
@@ -53,23 +48,21 @@ module Mongoid
         queue.push(klass.root_class.to_s) if klass != klass.root_class
 
         while klass = queue.shift
-          if as = assoc_map.delete(klass)
-            as.each do |assoc|
-              queue << assoc.class_name
+          next unless as = assoc_map.delete(klass)
 
-              # If this class is nested in the inclusion tree, only load documents
-              # for the association above it. If there is no parent association,
-              # we will include documents from the documents passed to this method.
-              ds = docs
-              if assoc.parent_inclusions.length > 0
-                ds = assoc.parent_inclusions.map{ |p| docs_map[p].to_a }.flatten
-              end
+          as.each do |assoc|
+            queue << assoc.class_name
 
-              res = assoc.relation.eager_loader([assoc], ds).run
+            # If this class is nested in the inclusion tree, only load documents
+            # for the association above it. If there is no parent association,
+            # we will include documents from the documents passed to this method.
+            ds = docs
+            ds = assoc.parent_inclusions.map { |p| docs_map[p].to_a }.flatten if assoc.parent_inclusions.length > 0
 
-              docs_map[assoc.name] ||= [].to_set
-              docs_map[assoc.name].merge(res)
-            end
+            res = assoc.relation.eager_loader([ assoc ], ds).run
+
+            docs_map[assoc.name] ||= [].to_set
+            docs_map[assoc.name].merge(res)
           end
         end
       end
@@ -127,28 +120,28 @@ module Mongoid
           local_field = current_assoc.primary_key
           foreign_field = current_assoc.foreign_key
         end
-        
+
         # Build the 'as' field with embedded path prefix if needed
         as_field = current_assoc.name.to_s
-        
+
         stage = {
-          "$lookup" => {
-            "from" => current_assoc.klass.collection.name,
-            "localField" => local_field,
-            "foreignField" => foreign_field,
-            "as" => as_field
+          '$lookup' => {
+            'from' => current_assoc.klass.collection.name,
+            'localField' => local_field,
+            'foreignField' => foreign_field,
+            'as' => as_field
           }
         }
-        
+
         # Add ordering if defined on the association, or default to _id for consistent order
         if current_assoc.order
           sort_spec = current_assoc.order.is_a?(Hash) ? current_assoc.order : { current_assoc.order => 1 }
-          pipeline_stages << { "$sort" => sort_spec }
+          pipeline_stages << { '$sort' => sort_spec }
         else
           # Default to sorting by _id to maintain insertion order consistency
-          pipeline_stages << { "$sort" => { "_id" => 1 } }
+          pipeline_stages << { '$sort' => { '_id' => 1 } }
         end
-        
+
         # Add nested lookups for child associations
         # Child associations don't need the embedded_path prefix since they're referenced from the looked-up document
         # Remove this class from the mapping to prevent infinite loops with circular references
@@ -158,10 +151,10 @@ module Mongoid
             pipeline_stages << create_pipeline(child, mapping)
           end
         end
-        
+
         # Always add pipeline since we always have at least $sort
-        stage["$lookup"]["pipeline"] = pipeline_stages
-        
+        stage['$lookup']['pipeline'] = pipeline_stages
+
         stage
       end
     end

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   module Errors
-
     # This error is raised when a client is configured without a database.
     class NoClientDatabase < MongoidError
-
       # Create the new error.
       #
       # @example Create the new error.
@@ -17,7 +14,7 @@ module Mongoid
       def initialize(name, config)
         super(
           compose_message(
-            "no_client_database",
+            'no_client_database',
             { name: name, config: config }
           )
         )

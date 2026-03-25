@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
-
   # Contains logging behavior.
   module Loggable
-
     # Get the logger.
     #
     # @note Will try to grab Rails' logger first before creating a new logger
@@ -17,6 +14,7 @@ module Mongoid
     # @return [ Logger ] The logger.
     def logger
       return @logger if defined?(@logger)
+
       @logger = rails_logger || default_logger
     end
 
@@ -57,11 +55,9 @@ module Mongoid
     #
     # @return [ Logger ] The Rails logger.
     def rails_logger
-      if defined?(::Rails)
-        ::Rails.logger
-      else
-        nil
-      end
+      return unless defined?(::Rails)
+
+      ::Rails.logger
     end
   end
 end

@@ -2,8 +2,6 @@
 
 require 'spec_helper'
 
-# rubocop:disable RSpec/LeakyConstantDeclaration
-# rubocop:disable Lint/ConstantDefinitionInBlock
 describe 'Collection options' do
   before(:all) do
     class CollectionOptionsCapped

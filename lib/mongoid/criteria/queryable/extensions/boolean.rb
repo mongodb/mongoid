@@ -1,15 +1,12 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 module Mongoid
   class Criteria
     module Queryable
       module Extensions
-
         # Adds query type-casting behavior to Mongoid::Boolean class.
         module Boolean
           module ClassMethods
-
             # Evolve the value into a boolean value stored in MongoDB. Will return
             # true for any of these values: true, t, yes, y, 1, 1.0.
             #
@@ -31,4 +28,4 @@ module Mongoid
   end
 end
 
-Mongoid::Boolean.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Boolean::ClassMethods)
+Mongoid::Boolean.extend Mongoid::Criteria::Queryable::Extensions::Boolean::ClassMethods

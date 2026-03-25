@@ -1,18 +1,16 @@
 # frozen_string_literal: true
-# rubocop:todo all
 
 require 'mongoid/atomic_update_preparer'
 require 'mongoid/pluckable'
-require "mongoid/contextual/mongo/documents_loader"
-require "mongoid/contextual/atomic"
-require "mongoid/contextual/aggregable/mongo"
-require "mongoid/contextual/command"
-require "mongoid/contextual/map_reduce"
-require "mongoid/association/eager_loadable"
+require 'mongoid/contextual/mongo/documents_loader'
+require 'mongoid/contextual/atomic'
+require 'mongoid/contextual/aggregable/mongo'
+require 'mongoid/contextual/command'
+require 'mongoid/contextual/map_reduce'
+require 'mongoid/association/eager_loadable'
 
 module Mongoid
   module Contextual
-
     # Context object used for performing bulk query and persistence
     # operations on documents which are persisted in the database and
     # have not been loaded into application memory.
@@ -26,19 +24,18 @@ module Mongoid
       include Pluckable
 
       # Options constant.
-      OPTIONS = [ :hint,
-                  :limit,
-                  :skip,
-                  :sort,
-                  :batch_size,
-                  :max_scan,
-                  :max_time_ms,
-                  :snapshot,
-                  :comment,
-                  :read,
-                  :cursor_type,
-                  :collation
-                ].freeze
+      OPTIONS = %i[hint
+                   limit
+                   skip
+                   sort
+                   batch_size
+                   max_scan
+                   max_time_ms
+                   snapshot
+                   comment
+                   read
+                   cursor_type
+                   collation].freeze
 
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
@@ -97,12 +94,11 @@ module Mongoid
       #
       # @return [ Integer ] The number of matches.
       def estimated_count(options = {})
-        unless self.criteria.selector.empty?
-          if klass.default_scoping?
-            raise Mongoid::Errors::InvalidEstimatedCountScoping.new(self.klass)
-          else
-            raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
-          end
+        unless criteria.selector.empty?
+          raise Mongoid::Errors::InvalidEstimatedCountScoping.new(klass) if klass.default_scoping?
+
+          raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(klass)
+
         end
         view.estimated_document_count(options)
       end
@@ -116,7 +112,7 @@ module Mongoid
       def delete
         view.delete_many.deleted_count
       end
-      alias :delete_all :delete
+      alias delete_all delete
 
       # Destroy all documents in the database that match the selector.
       #
@@ -131,7 +127,7 @@ module Mongoid
           count
         end
       end
-      alias :destroy_all :destroy
+      alias destroy_all destroy
 
       # Get the distinct values in the db for the provided field.
       #
@@ -190,9 +186,10 @@ module Mongoid
       # @return [ true | false ] If the count is more than zero.
       #   Always false if passed nil or false.
       def exists?(id_or_conditions = :none)
-        return false if self.view.limit == 0
+        return false if view.limit == 0
+
         case id_or_conditions
-        when :none then !!(view.projection(_id: 1).limit(1).first)
+        when :none then !!view.projection(_id: 1).limit(1).first
         when nil, false then false
         when Hash then Mongo.new(criteria.where(id_or_conditions)).exists?
         else Mongo.new(criteria.where(_id: id_or_conditions)).exists?
@@ -214,9 +211,9 @@ module Mongoid
       #
       # @return [ Document ] The result of the command.
       def find_one_and_update(update, options = {})
-        if doc = view.find_one_and_update(update, options)
-          Factory.from_db(klass, doc)
-        end
+        return unless doc = view.find_one_and_update(update, options)
+
+        Factory.from_db(klass, doc)
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -234,9 +231,9 @@ module Mongoid
       #
       # @return [ Document ] The result of the command.
       def find_one_and_replace(replacement, options = {})
-        if doc = view.find_one_and_replace(replacement, options)
-          Factory.from_db(klass, doc)
-        end
+        return unless doc = view.find_one_and_replace(replacement, options)
+
+        Factory.from_db(klass, doc)
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -247,19 +244,19 @@ module Mongoid
       #
       # @return [ Document ] The result of the command.
       def find_one_and_delete
-        if doc = view.find_one_and_delete
-          Factory.from_db(klass, doc)
-        end
+        return unless doc = view.find_one_and_delete
+
+        Factory.from_db(klass, doc)
       end
 
       # Return the first result without applying sort
       #
       # @api private
       def find_first
-        if raw_doc = view.first
-          doc = Factory.from_db(klass, raw_doc, criteria)
-          eager_load([doc]).first
-        end
+        return unless raw_doc = view.first
+
+        doc = Factory.from_db(klass, raw_doc, criteria)
+        eager_load([ doc ]).first
       end
 
       # Create the new Mongo context. This delegates operations to the
@@ -287,9 +284,9 @@ module Mongoid
       #
       # @return [ Integer ] The number of documents.
       def length
-        self.count
+        count
       end
-      alias :size :length
+      alias size length
 
       # Limits the number of documents that are returned from the database.
       #
@@ -384,11 +381,9 @@ module Mongoid
       def take!
         # Do to_a first so that the Mongo#first method is not used and the
         # result is not sorted.
-        if fst = limit(1).to_a.first
-          fst
-        else
-          raise Errors::DocumentNotFound.new(klass, nil, nil)
-        end
+        raise Errors::DocumentNotFound.new(klass, nil, nil) unless fst = limit(1).to_a.first
+
+        fst
       end
 
       # Get a hash of counts for the values of a single field. For example,
@@ -432,20 +427,20 @@ module Mongoid
         name = klass.cleanse_localized_field_names(field)
 
         fld = klass.traverse_association_tree(name)
-        pipeline = [ { "$group" => { _id: "$#{name}", counts: { "$sum": 1 } } } ]
-        pipeline.unshift("$match" => view.filter) unless view.filter.blank?
+        pipeline = [ { '$group' => { _id: "$#{name}", counts: { '$sum': 1 } } } ]
+        pipeline.unshift('$match' => view.filter) unless view.filter.blank?
 
-        collection.aggregate(pipeline).reduce({}) do |tallies, doc|
+        collection.aggregate(pipeline).each_with_object({}) do |doc, tallies|
           is_translation = "#{name}_translations" == field.to_s
-          val = doc["_id"]
+          val = doc['_id']
 
           key = if val.is_a?(Array)
-            val.map do |v|
-              demongoize_with_field(fld, v, is_translation)
-            end
-          else
-            demongoize_with_field(fld, val, is_translation)
-          end
+                  val.map do |v|
+                    demongoize_with_field(fld, v, is_translation)
+                  end
+                else
+                  demongoize_with_field(fld, val, is_translation)
+                end
 
           # The only time where a key will already exist in the tallies hash
           # is when the values are stored differently in the database, but
@@ -455,8 +450,7 @@ module Mongoid
           # demongoized value is just the translation in the current locale,
           # which can be the same across multiple of those unequal hashes.
           tallies[key] ||= 0
-          tallies[key] += doc["counts"]
-          tallies
+          tallies[key] += doc['counts']
         end
       end
 
@@ -545,7 +539,7 @@ module Mongoid
           retrieve_nth_with_limit(0, limit)
         end
       end
-      alias :one :first
+      alias one first
 
       # Get the first document in the database for the criteria's selector or
       # raise an error if none is found.
@@ -794,9 +788,9 @@ module Mongoid
       # @example Apply the field limitations.
       #   context.apply_fields
       def apply_fields
-        if spec = criteria.options[:fields]
-          @view = view.projection(spec)
-        end
+        return unless spec = criteria.options[:fields]
+
+        @view = view.projection(spec)
       end
 
       # Apply the options.
@@ -810,9 +804,9 @@ module Mongoid
         OPTIONS.each do |name|
           apply_option(name)
         end
-        if criteria.options[:timeout] == false
-          @view = view.no_cursor_timeout
-        end
+        return unless criteria.options[:timeout] == false
+
+        @view = view.no_cursor_timeout
       end
 
       # Apply an option.
@@ -822,9 +816,9 @@ module Mongoid
       # @example Apply the skip option.
       #   context.apply_option(:skip)
       def apply_option(name)
-        if spec = criteria.options[name]
-          @view = view.send(name, spec)
-        end
+        return unless spec = criteria.options[name]
+
+        @view = view.send(name, spec)
       end
 
       # Map the inverse sort symbols to the correct MongoDB values.
@@ -832,7 +826,7 @@ module Mongoid
       # @api private
       def inverse_sorting
         sort = view.sort || { _id: 1 }
-        Hash[sort.map{|k, v| [k, -1*v]}]
+        Hash[sort.map { |k, v| [ k, -1 * v ] }]
       end
 
       # Get the documents the context should iterate.
@@ -854,6 +848,7 @@ module Mongoid
         else
           return view unless eager_loadable?
           return eager_load_with_lookup if criteria.use_lookup?
+
           docs = view.map do |doc|
             Factory.from_db(klass, doc, criteria)
           end
@@ -871,7 +866,7 @@ module Mongoid
       #   end
       #
       # @param [ Document ] document The document to yield to.
-      def yield_document(document, &block)
+      def yield_document(document)
         doc = if document.respond_to?(:_id)
                 document
               elsif criteria.raw_results?
@@ -940,11 +935,11 @@ module Mongoid
 
           # does the key represent an embedded relation on the document?
           aliased_name = klass.aliased_associations[key] || key
-          if (assoc = klass.relations[aliased_name])
-            case value
-            when Array then value.each { |h| demongoize_hash(assoc.klass, h) }
-            when Hash then demongoize_hash(assoc.klass, value)
-            end
+          next unless (assoc = klass.relations[aliased_name])
+
+          case value
+          when Array then value.each { |h| demongoize_hash(assoc.klass, h) }
+          when Hash then demongoize_hash(assoc.klass, value)
           end
         end
 
@@ -993,11 +988,11 @@ module Mongoid
                  end
                else
                  mapped = raw_docs.map { |doc| Factory.from_db(klass, doc, criteria) }
-                 if !criteria.use_lookup?
-                  # $lookup already eager loads related documents
-                  eager_load(mapped)
+                 if criteria.use_lookup?
+                   mapped
                  else
-                  mapped
+                   # $lookup already eager loads related documents
+                   eager_load(mapped)
                  end
                end
 
