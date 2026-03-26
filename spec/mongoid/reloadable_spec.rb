@@ -684,7 +684,7 @@ describe Mongoid::Reloadable do
         end
 
         it 'reloads the document' do
-          band.name.should
+          band.name.should == 'test'
 
           band.reload
 
@@ -701,7 +701,7 @@ describe Mongoid::Reloadable do
 
         it 'creates a new document with default values' do
           original_id = band.id
-          band.name.should
+          band.name.should == 'test'
 
           band.reload
 
@@ -737,7 +737,7 @@ describe Mongoid::Reloadable do
       end
 
       it 'resets the associations' do
-        church.acolytes.first.name.should
+        church.acolytes.first.name.should == 'test'
 
         church.reload
 

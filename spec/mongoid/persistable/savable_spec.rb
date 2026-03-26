@@ -302,8 +302,8 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.crates.length.should
-          _truck.crates.first.volume.should
+          _truck.crates.length.should == 2
+          _truck.crates.first.volume.should == 2
           _truck.crates.last.volume.should == 1
         end
       end
@@ -319,8 +319,8 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.seats.length.should
-          _truck.seats.first.armrests.length.should
+          _truck.seats.length.should == 1
+          _truck.seats.first.armrests.length.should == 1
           _truck.seats.first.armrests.first.side.should == 'left'
         end
       end
@@ -336,9 +336,9 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.crates.length.should
-          _truck.crates.first.toys.length.should
-          _truck.crates.first.toys.first.name.should
+          _truck.crates.length.should == 2
+          _truck.crates.first.toys.length.should == 1
+          _truck.crates.first.toys.first.name.should == 'Bear'
           _truck.crates.last.toys.length.should == 0
         end
 
@@ -351,9 +351,9 @@ describe Mongoid::Persistable::Savable do
             truck.save!
 
             _truck = Truck.find(truck.id)
-            _truck.crates.length.should
-            _truck.crates.first.toys.length.should
-            _truck.crates.first.toys.first.name.should
+            _truck.crates.length.should == 2
+            _truck.crates.first.toys.length.should == 1
+            _truck.crates.first.toys.first.name.should == 'Bear'
             _truck.crates.last.toys.length.should == 0
           end
         end

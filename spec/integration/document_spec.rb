@@ -23,7 +23,7 @@ describe Mongoid::Document do
     it 'persists separate id and _id values' do
       shirt = Shirt.create!(id: 'hello', _id: 'foo')
       shirt = Shirt.find(shirt._id)
-      shirt.id.should
+      shirt.id.should == 'hello'
       shirt._id.should == 'foo'
     end
   end

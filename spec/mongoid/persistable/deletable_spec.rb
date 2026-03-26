@@ -318,7 +318,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Bolt.count.should
+            Bolt.count.should == 1
             parent.delete
             Bolt.count.should == 1
           end
@@ -330,7 +330,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Threadlocker.count.should
+            Threadlocker.count.should == 1
             parent.delete
             Threadlocker.count.should == 1
           end
@@ -342,7 +342,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Sealer.count.should
+            Sealer.count.should == 1
             parent.delete
             Sealer.count.should == 1
           end
@@ -356,7 +356,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Nut.count.should
+            Nut.count.should == 1
             parent.delete
             Nut.count.should == 1
           end
@@ -368,7 +368,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Washer.count.should
+            Washer.count.should == 1
             parent.delete
             Washer.count.should == 1
           end
@@ -380,7 +380,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Spacer.count.should
+            Spacer.count.should == 1
             parent.delete
             Spacer.count.should == 1
           end
@@ -468,7 +468,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Bolt.count.should
+            Bolt.count.should == 1
             Hole.delete_all
             Bolt.count.should == 1
           end
@@ -480,7 +480,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Threadlocker.count.should
+            Threadlocker.count.should == 1
             Hole.delete_all
             Threadlocker.count.should == 1
           end
@@ -492,7 +492,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Sealer.count.should
+            Sealer.count.should == 1
             Hole.delete_all
             Sealer.count.should == 1
           end
@@ -506,7 +506,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Nut.count.should
+            Nut.count.should == 1
             Hole.delete_all
             Nut.count.should == 1
           end
@@ -518,7 +518,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Washer.count.should
+            Washer.count.should == 1
             Hole.delete_all
             Washer.count.should == 1
           end
@@ -530,7 +530,7 @@ describe Mongoid::Persistable::Deletable do
           end
 
           it 'does not destroy dependent documents' do
-            Spacer.count.should
+            Spacer.count.should == 1
             Hole.delete_all
             Spacer.count.should == 1
           end

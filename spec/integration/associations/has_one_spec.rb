@@ -25,8 +25,8 @@ describe 'has_one associations' do
       it 'destroys' do
         address
 
-        HomCollege.count.should
-        HomAddress.count.should
+        HomCollege.count.should == 1
+        HomAddress.count.should == 1
 
         HomCollege.with_session do |session|
           session.with_transaction do
@@ -34,7 +34,7 @@ describe 'has_one associations' do
           end
         end
 
-        HomCollege.count.should
+        HomCollege.count.should == 0
         HomAddress.count.should == 0
       end
     end
@@ -49,8 +49,8 @@ describe 'has_one associations' do
       it 'does not destroy' do
         address
 
-        HomCollege.count.should
-        HomAddress.count.should
+        HomCollege.count.should == 1
+        HomAddress.count.should == 1
 
         lambda do
           HomCollege.with_session do |session|
@@ -60,7 +60,7 @@ describe 'has_one associations' do
           end
         end.should raise_error(Mongoid::Errors::DocumentNotDestroyed)
 
-        HomCollege.count.should
+        HomCollege.count.should == 1
         HomAddress.count.should == 1
       end
     end
@@ -143,8 +143,7 @@ describe 'has_one associations' do
       end
 
       it 'does not destroy the dependent object' do
-        person.game.should
-        game
+        person.game.should == game
         person.game = person.game
         person.save!
         person.reload
@@ -164,8 +163,7 @@ describe 'has_one associations' do
       end
 
       it 'does not destroy the dependent object' do
-        person.account.should
-        account
+        person.account.should == account
         person.account = person.account
         person.save!
         person.reload

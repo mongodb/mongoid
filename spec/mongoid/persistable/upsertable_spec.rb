@@ -52,7 +52,7 @@ describe Mongoid::Persistable::Upsertable do
 
         shared_examples 'replaces the existing fields' do
           it 'replaces the existing fields' do
-            Band.count.should
+            Band.count.should == 1
 
             existing.reload
             existing.views.should be_nil
@@ -62,7 +62,7 @@ describe Mongoid::Persistable::Upsertable do
 
         shared_examples 'retains the existing fields' do
           it 'retains the existing fields' do
-            Band.count.should
+            Band.count.should == 1
 
             existing.reload
             existing.views.should eq(42)

@@ -221,7 +221,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Bolt.count.should
+            Bolt.count.should == 1
             parent.destroy
             Bolt.count.should == 0
           end
@@ -233,7 +233,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Threadlocker.count.should
+            Threadlocker.count.should == 1
             parent.destroy
             Threadlocker.count.should == 0
           end
@@ -245,7 +245,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Sealer.count.should
+            Sealer.count.should == 1
             expect { parent.destroy }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Sealer.count.should == 1
           end
@@ -259,7 +259,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Nut.count.should
+            Nut.count.should == 1
             parent.destroy
             Nut.count.should == 0
           end
@@ -271,7 +271,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Washer.count.should
+            Washer.count.should == 1
             parent.destroy
             Washer.count.should == 0
           end
@@ -283,7 +283,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Spacer.count.should
+            Spacer.count.should == 1
             expect { parent.destroy }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Spacer.count.should == 1
           end
@@ -547,7 +547,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Bolt.count.should
+            Bolt.count.should == 1
             Hole.destroy_all
             Bolt.count.should == 0
           end
@@ -561,7 +561,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Threadlocker.count.should
+            Threadlocker.count.should == 1
             Hole.destroy_all
             Threadlocker.count.should == 0
           end
@@ -575,7 +575,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Sealer.count.should
+            Sealer.count.should == 1
             expect { Hole.destroy_all }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Sealer.count.should == 1
           end
@@ -589,7 +589,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Nut.count.should
+            Nut.count.should == 1
             Hole.destroy_all
             Nut.count.should == 0
           end
@@ -601,7 +601,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Washer.count.should
+            Washer.count.should == 1
             Hole.destroy_all
             Washer.count.should == 0
           end
@@ -613,7 +613,7 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Spacer.count.should
+            Spacer.count.should == 1
             expect { Hole.destroy_all }.to raise_error(Mongoid::Errors::DeleteRestriction)
             Spacer.count.should == 1
           end

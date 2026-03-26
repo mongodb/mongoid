@@ -25,8 +25,8 @@ describe 'has_many associations' do
       it 'destroys' do
         address
 
-        HmmCompany.count.should
-        HmmAddress.count.should
+        HmmCompany.count.should == 1
+        HmmAddress.count.should == 1
 
         company.with_session do |session|
           session.with_transaction do
@@ -34,7 +34,7 @@ describe 'has_many associations' do
           end
         end
 
-        HmmCompany.count.should
+        HmmCompany.count.should == 0
         HmmAddress.count.should == 0
       end
     end
@@ -49,8 +49,8 @@ describe 'has_many associations' do
       it 'destroys' do
         address
 
-        HmmCompany.count.should
-        HmmAddress.count.should
+        HmmCompany.count.should == 1
+        HmmAddress.count.should == 1
 
         lambda do
           company.with_session do |session|
@@ -60,7 +60,7 @@ describe 'has_many associations' do
           end
         end.should raise_error(Mongoid::Errors::DocumentNotDestroyed)
 
-        HmmCompany.count.should
+        HmmCompany.count.should == 1
         HmmAddress.count.should == 1
       end
     end
@@ -97,8 +97,7 @@ describe 'has_many associations' do
       end
 
       it 'does not destroy the dependent object' do
-        wiki_page.comments.should
-        [ comment ]
+        wiki_page.comments.should == [comment]
         wiki_page.comments = [ comment ]
         wiki_page.save!
         wiki_page.reload
@@ -118,8 +117,7 @@ describe 'has_many associations' do
       end
 
       it 'does not destroy the dependent object' do
-        series.books.should
-        [ book ]
+        series.books.should == [book]
         series.books = [ book ]
         series.save!
         series.reload

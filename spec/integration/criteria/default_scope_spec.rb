@@ -11,7 +11,7 @@ describe 'Criteria and default scope' do
     end
 
     it 'is added after order of default scope' do
-      sort_options.should
+      sort_options.should == {'status' => -1, 'name' => 1}
 
       # Keys in Ruby are ordered
       sort_options.keys.should == %w[name status]

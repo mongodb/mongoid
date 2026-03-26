@@ -26,8 +26,7 @@ describe Mongoid::Criteria::Queryable::Expandable do
       it 'does not modify input' do
         criterion_copy = criterion.dup.freeze
 
-        query.send(:expand_condition_to_array_values, criterion).should
-        expected
+        query.send(:expand_condition_to_array_values, criterion).should == expected
 
         expect(criterion).to eq(criterion_copy)
       end

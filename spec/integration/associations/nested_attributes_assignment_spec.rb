@@ -26,10 +26,10 @@ describe 'nested attributes assignment' do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.capacity.should
-          _truck.crates.length.should
-          _truck.crates.first.volume.should
-          _truck.crates.first.toys.length.should
+          _truck.capacity.should == 1
+          _truck.crates.length.should == 1
+          _truck.crates.first.volume.should == 2
+          _truck.crates.first.toys.length.should == 1
           _truck.crates.first.toys.first.name.should == 'Bear'
         end
       end
@@ -70,10 +70,10 @@ describe 'nested attributes assignment' do
             truck.save!
 
             _truck = Truck.find(truck.id)
-            _truck.capacity.should
-            _truck.crates.length.should
-            _truck.crates.first.volume.should
-            _truck.crates.first.toys.length.should
+            _truck.capacity.should == 2
+            _truck.crates.length.should == 1
+            _truck.crates.first.volume.should == 3
+            _truck.crates.first.toys.length.should == 1
             _truck.crates.first.toys.first.name.should == 'Rhino'
           end
         end
@@ -97,13 +97,13 @@ describe 'nested attributes assignment' do
             truck.save!
 
             _truck = Truck.find(truck.id)
-            _truck.capacity.should
-            _truck.crates.length.should
-            _truck.crates.first.volume.should
-            _truck.crates.first.toys.length.should
-            _truck.crates.first.toys.first.name.should
-            _truck.crates.last.volume.should
-            _truck.crates.last.toys.length.should
+            _truck.capacity.should == 2
+            _truck.crates.length.should == 2
+            _truck.crates.first.volume.should == 2
+            _truck.crates.first.toys.length.should == 1
+            _truck.crates.first.toys.first.name.should == 'Bear'
+            _truck.crates.last.volume.should == 3
+            _truck.crates.last.toys.length.should == 1
             _truck.crates.last.toys.last.name.should == 'Rhino'
           end
         end
