@@ -27,8 +27,23 @@ module Mongoid
 
       # Load the associations for the given documents using $lookup.
       #
+      # If any of the associated collections reside in a different cluster than
+      # the root class, falls back to the #includes behavior and logs a warning.
+      #
       # @return [ Array<Mongoid::Document> ] The given documents.
       def eager_load_with_lookup
+        offenders = cross_cluster_inclusions
+        if offenders.any?
+          root_client = klass.client_name
+          offender_list = offenders.map { |a| "#{a.name} (#{a.klass.client_name})" }.join(', ')
+          Mongoid.logger.warn(
+            'eager_load cannot use $lookup aggregation because the following associations ' \
+            "reside in a different cluster than #{klass} (client: #{root_client}): " \
+            "#{offender_list}. Falling back to #includes behavior."
+          )
+          return eager_load(docs_for_lookup_fallback)
+        end
+
         preload_for_lookup(criteria)
       end
 
@@ -101,6 +116,28 @@ module Mongoid
 
         Eager.new(criteria.inclusions, [], true, pipeline).run
       end
+
+      private
+
+      # Returns the materialized documents to use when falling back from
+      # $lookup to #includes-style preloading. Must be implemented by each
+      # concrete context class.
+      #
+      # @return [ Array<Mongoid::Document> ] The materialized documents.
+      def docs_for_lookup_fallback
+        raise NotImplementedError, "#{self.class} must implement #docs_for_lookup_fallback"
+      end
+
+      # Returns the inclusions whose target class resides in a different cluster
+      # than the root class.
+      #
+      # @return [ Array<Mongoid::Association::Relatable> ] The offending inclusions.
+      def cross_cluster_inclusions
+        root_client = klass.client_name
+        criteria.inclusions.reject { |assoc| assoc.klass.client_name == root_client }
+      end
+
+      public
 
       def switch_local_and_foreign_fields?(association)
         association.is_a?(Mongoid::Association::Referenced::BelongsTo) ||
