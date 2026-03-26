@@ -387,7 +387,7 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
       shared_examples 'sums and returns an integer' do
         it 'sums' do
-          sum.should == 1500
+          sum.should eq 1500
         end
 
         it 'returns integer' do
@@ -412,7 +412,7 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
         shared_examples 'sums and returns an integer' do
           it 'sums' do
-            sum.should == -500
+            sum.should eq(-500)
           end
 
           it 'returns integer' do
@@ -442,7 +442,7 @@ describe Mongoid::Contextual::Aggregable::Memory do
       end
 
       it 'sums' do
-        sum.should == 1500
+        sum.should eq 1500
       end
 
       it 'returns integer' do

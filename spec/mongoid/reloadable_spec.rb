@@ -239,7 +239,7 @@ describe Mongoid::Reloadable do
             agent.reload
           end.should_not raise_error
 
-          agent.title.should == '007'
+          agent.title.should eq '007'
         end
 
         it 'sets new_record to false' do
@@ -684,11 +684,11 @@ describe Mongoid::Reloadable do
         end
 
         it 'reloads the document' do
-          band.name.should == 'test'
+          band.name.should eq 'test'
 
           band.reload
 
-          band.name.should == 'Sun Project'
+          band.name.should eq 'Sun Project'
         end
       end
 
@@ -701,7 +701,7 @@ describe Mongoid::Reloadable do
 
         it 'creates a new document with default values' do
           original_id = band.id
-          band.name.should == 'test'
+          band.name.should eq 'test'
 
           band.reload
 
@@ -737,13 +737,13 @@ describe Mongoid::Reloadable do
       end
 
       it 'resets the associations' do
-        church.acolytes.first.name.should == 'test'
+        church.acolytes.first.name.should eq 'test'
 
         church.reload
 
         church.acolytes._loaded?.should be false
 
-        church.acolytes.first.name.should == 'Borg'
+        church.acolytes.first.name.should eq 'Borg'
       end
     end
 

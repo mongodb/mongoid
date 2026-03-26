@@ -11,7 +11,7 @@ describe 'Queries on Date fields' do
 
   shared_examples 'converts to beginning of day in UTC' do
     it 'converts to beginning of day in UTC' do
-      selector['founded'].should == Time.utc(arg.year, arg.month, arg.day)
+      selector['founded'].should eq Time.utc(arg.year, arg.month, arg.day)
     end
   end
 

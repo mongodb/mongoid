@@ -23,7 +23,7 @@ describe Mongoid::Document do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should == data
+        _registry.data.should eq data
       end
     end
 
@@ -46,7 +46,7 @@ describe Mongoid::Document do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.data.should == BSON::Binary.new(data)
+        _registry.data.should eq BSON::Binary.new(data)
       end
     end
 
@@ -113,7 +113,7 @@ describe Mongoid::Document do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == obj_id
+        _registry.obj_id.should eq obj_id
       end
     end
 
@@ -134,7 +134,7 @@ describe Mongoid::Document do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == BSON::ObjectId.from_string(obj_id)
+        _registry.obj_id.should eq BSON::ObjectId.from_string(obj_id)
       end
     end
 
@@ -169,14 +169,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.obj_id.should == 'hello'
+        registry.obj_id.should eq 'hello'
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == 'hello'
+        _registry.obj_id.should eq 'hello'
       end
     end
 
@@ -190,14 +190,14 @@ describe Mongoid::Document do
       end
 
       it 'assigns nil' do
-        registry.obj_id.should == :sym
+        registry.obj_id.should eq :sym
       end
 
       it 'persists' do
         registry.save!
 
         _registry = Registry.find(registry.id)
-        _registry.obj_id.should == :sym
+        _registry.obj_id.should eq :sym
       end
     end
   end
@@ -213,11 +213,11 @@ describe Mongoid::Document do
       end
 
       it 'round-trips the value' do
-        found_church.location[:state].should == :ny
+        found_church.location[:state].should eq :ny
       end
 
       it 'stringifies the key' do
-        found_church.location.keys.should == %w[state]
+        found_church.location.keys.should eq %w[state]
       end
 
       it 'retrieves value as symbol via driver' do
@@ -226,7 +226,7 @@ describe Mongoid::Document do
         church
 
         v = Church.collection.find.first
-        v['location'].should == { 'state' => :ny }
+        v['location'].should eq({ 'state' => :ny })
       end
     end
   end

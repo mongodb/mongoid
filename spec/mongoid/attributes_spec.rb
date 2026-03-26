@@ -443,11 +443,11 @@ describe Mongoid::Attributes do
       end
 
       it 'writes the value into attributes' do
-        bar.attributes.should == { '_id' => bar.id, 'missing_field' => 42 }
+        bar.attributes.should eq({ '_id' => bar.id, 'missing_field' => 42 })
       end
 
       it 'makes the attribute accessible via []' do
-        bar['missing_field'].should == 42
+        bar['missing_field'].should eq 42
       end
 
       context 'when writing fields on a document with projection' do
@@ -488,7 +488,7 @@ describe Mongoid::Attributes do
 
           it 'writes the value' do
             from_db[:undefined_field] = 'x'
-            from_db[:undefined_field].should == 'x'
+            from_db[:undefined_field].should eq 'x'
           end
         end
       end
@@ -1545,7 +1545,7 @@ describe Mongoid::Attributes do
 
         it 'writes the value' do
           from_db.write_attribute(:undefined_field, 'x')
-          from_db.read_attribute(:undefined_field).should == 'x'
+          from_db.read_attribute(:undefined_field).should eq 'x'
         end
       end
     end
@@ -2561,7 +2561,7 @@ describe Mongoid::Attributes do
     end
 
     it 'persists the updated hash' do
-      church.location.should == { 'x' => 1, 'y' => 2 }
+      church.location.should eq({ 'x' => 1, 'y' => 2 })
     end
   end
 
@@ -2592,7 +2592,7 @@ describe Mongoid::Attributes do
 
     it 'persists the updated hash' do
       pending 'MONGOID-2951'
-      catalog.set_field.should == Set.new([ 1, 2 ])
+      catalog.set_field.should eq Set.new([ 1, 2 ])
     end
   end
 

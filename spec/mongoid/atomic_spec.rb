@@ -357,13 +357,15 @@ describe Mongoid::Atomic do
           it 'correctly distributes the operations' do
             pending 'https://jira.mongodb.org/browse/MONGOID-4982'
 
-            truck.atomic_updates.should == {
-              '$set' => { 'crates.0.volume' => 2 },
-              '$push' => { 'crates.0.toys' => { '$each' => [ crate.toys.first.attributes ] } },
-              conflicts: {
-                '$push' => { 'crates' => { '$each' => [ truck.crates.last.attributes ] } }
+            truck.atomic_updates.should eq(
+              {
+                '$set' => { 'crates.0.volume' => 2 },
+                '$push' => { 'crates.0.toys' => { '$each' => [ crate.toys.first.attributes ] } },
+                conflicts: {
+                  '$push' => { 'crates' => { '$each' => [ truck.crates.last.attributes ] } }
+                }
               }
-            }
+            )
           end
         end
       end
@@ -378,16 +380,18 @@ describe Mongoid::Atomic do
       end
 
       it 'has the correct updates' do
-        account.atomic_updates.should == {
-          '$push' => {
-            'memberships' => {
-              '$each' => [
-                { '_id' => nil, 'name' => 'm1' },
-                { '_id' => nil, 'name' => 'm2' }
-              ]
+        account.atomic_updates.should eq(
+          {
+            '$push' => {
+              'memberships' => {
+                '$each' => [
+                  { '_id' => nil, 'name' => 'm1' },
+                  { '_id' => nil, 'name' => 'm2' }
+                ]
+              }
             }
           }
-        }
+        )
       end
     end
   end

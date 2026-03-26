@@ -766,7 +766,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       pending 'MONGOID-5080'
 
       inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-      inverse_assoc.name.should == :tank
+      inverse_assoc.name.should eq :tank
     end
 
     context 'when embedded association is not namespaced but has class_name' do
@@ -776,7 +776,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
 
       it 'has the correct inverses' do
         inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-        inverse_assoc.name.should == :tank
+        inverse_assoc.name.should eq :tank
       end
     end
 
@@ -800,7 +800,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
         pending 'MONGOID-5080'
 
         inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-        inverse_assoc.name.should == :car
+        inverse_assoc.name.should eq :car
       end
     end
 
@@ -813,7 +813,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
         pending 'unqualified class_name arguments do not work per MONGOID-5080'
 
         inverse_assoc.should be_a(Mongoid::Association::Embedded::EmbeddedIn)
-        inverse_assoc.name.should == :tank
+        inverse_assoc.name.should eq :tank
       end
     end
   end

@@ -1816,7 +1816,7 @@ describe Mongoid::Criteria do
           I18n.locale = :en
           Dictionary.create!(description: 'english-text')
           I18n.locale = :he
-          plucked.should == 'english-text'
+          plucked.should eq 'english-text'
         end
       end
 
@@ -2401,13 +2401,13 @@ describe Mongoid::Criteria do
     context 'when provided no arguments' do
       context 'on a model class' do
         it 'returns an empty criteria' do
-          Band.where.selector.should == {}
+          Band.where.selector.should eq({})
         end
       end
 
       context 'on an association' do
         it 'returns an empty criteria' do
-          match.records.where.selector.should == {}
+          match.records.where.selector.should eq({})
         end
       end
     end

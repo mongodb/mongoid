@@ -373,7 +373,7 @@ describe Mongoid::Association::Depending do
           end
 
           it 'does not delete the associated documents' do
-            child.class.find(child.id).should == child
+            child.class.find(child.id).should eq child
           end
         end
       end
@@ -420,7 +420,7 @@ describe Mongoid::Association::Depending do
             end
 
             it 'does not remove the references to the removed document' do
-              from_db.ratable_id.should == parent.id
+              from_db.ratable_id.should eq parent.id
             end
           end
         end
@@ -851,7 +851,7 @@ describe Mongoid::Association::Depending do
           it 'adds an error to the parent object' do
             expect(person.destroy).to be(false)
 
-            person.errors[:restrictable_posts].first.should ==
+            person.errors[:restrictable_posts].first.should eq \
               'is not empty and prevents the document from being destroyed'
           end
         end

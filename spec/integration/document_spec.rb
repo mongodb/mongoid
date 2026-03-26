@@ -11,7 +11,7 @@ describe Mongoid::Document do
     end
 
     it 'works for instance level delegation' do
-      patient.address.should == 'test@example.com'
+      patient.address.should eq 'test@example.com'
     end
 
     it 'works for class level delegation' do
@@ -23,8 +23,8 @@ describe Mongoid::Document do
     it 'persists separate id and _id values' do
       shirt = Shirt.create!(id: 'hello', _id: 'foo')
       shirt = Shirt.find(shirt._id)
-      shirt.id.should == 'hello'
-      shirt._id.should == 'foo'
+      shirt.id.should eq 'hello'
+      shirt._id.should eq 'foo'
     end
   end
 

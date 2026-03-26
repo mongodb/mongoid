@@ -24,7 +24,7 @@ describe 'Matcher.extract_attribute' do
           let(:expected) { spec.fetch('result') }
 
           it 'has the expected result' do
-            actual.should == expected
+            actual.should eq expected
           end
         end
       end

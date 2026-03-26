@@ -591,7 +591,7 @@ describe Mongoid::Association::Accessors do
               end
 
               it 'retrieves other fields' do
-                persisted_person.passport.country.should == 'USA'
+                persisted_person.passport.country.should eq 'USA'
               end
             end
 

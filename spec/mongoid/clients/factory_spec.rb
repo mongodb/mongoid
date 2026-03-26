@@ -100,7 +100,7 @@ describe Mongoid::Clients::Factory do
           end
 
           it 'sets Mongoid as a wrapping library' do
-            client.options[:wrapping_libraries].should == [ BSON::Document.new(
+            client.options[:wrapping_libraries].should eq [ BSON::Document.new(
               Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY
             ) ]
           end
@@ -122,7 +122,7 @@ describe Mongoid::Clients::Factory do
             end
 
             it 'adds Mongoid as another wrapping library' do
-              client.options[:wrapping_libraries].should == [
+              client.options[:wrapping_libraries].should eq [
                 BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
                 { 'name' => 'Foo' }
               ]

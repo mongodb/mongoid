@@ -221,9 +221,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Bolt.count.should == 1
+            Bolt.count.should eq 1
             parent.destroy
-            Bolt.count.should == 0
+            Bolt.count.should eq 0
           end
         end
 
@@ -233,9 +233,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Threadlocker.count.should == 1
+            Threadlocker.count.should eq 1
             parent.destroy
-            Threadlocker.count.should == 0
+            Threadlocker.count.should eq 0
           end
         end
 
@@ -245,9 +245,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Sealer.count.should == 1
+            Sealer.count.should eq 1
             expect { parent.destroy }.to raise_error(Mongoid::Errors::DeleteRestriction)
-            Sealer.count.should == 1
+            Sealer.count.should eq 1
           end
         end
       end
@@ -259,9 +259,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Nut.count.should == 1
+            Nut.count.should eq 1
             parent.destroy
-            Nut.count.should == 0
+            Nut.count.should eq 0
           end
         end
 
@@ -271,9 +271,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Washer.count.should == 1
+            Washer.count.should eq 1
             parent.destroy
-            Washer.count.should == 0
+            Washer.count.should eq 0
           end
         end
 
@@ -283,9 +283,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Spacer.count.should == 1
+            Spacer.count.should eq 1
             expect { parent.destroy }.to raise_error(Mongoid::Errors::DeleteRestriction)
-            Spacer.count.should == 1
+            Spacer.count.should eq 1
           end
         end
       end
@@ -547,9 +547,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Bolt.count.should == 1
+            Bolt.count.should eq 1
             Hole.destroy_all
-            Bolt.count.should == 0
+            Bolt.count.should eq 0
           end
         end
 
@@ -561,9 +561,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Threadlocker.count.should == 1
+            Threadlocker.count.should eq 1
             Hole.destroy_all
-            Threadlocker.count.should == 0
+            Threadlocker.count.should eq 0
           end
         end
 
@@ -575,9 +575,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Sealer.count.should == 1
+            Sealer.count.should eq 1
             expect { Hole.destroy_all }.to raise_error(Mongoid::Errors::DeleteRestriction)
-            Sealer.count.should == 1
+            Sealer.count.should eq 1
           end
         end
       end
@@ -589,9 +589,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'destroys dependent documents' do
-            Nut.count.should == 1
+            Nut.count.should eq 1
             Hole.destroy_all
-            Nut.count.should == 0
+            Nut.count.should eq 0
           end
         end
 
@@ -601,9 +601,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'deletes dependent documents' do
-            Washer.count.should == 1
+            Washer.count.should eq 1
             Hole.destroy_all
-            Washer.count.should == 0
+            Washer.count.should eq 0
           end
         end
 
@@ -613,9 +613,9 @@ describe Mongoid::Persistable::Destroyable do
           end
 
           it 'raises an exception' do
-            Spacer.count.should == 1
+            Spacer.count.should eq 1
             expect { Hole.destroy_all }.to raise_error(Mongoid::Errors::DeleteRestriction)
-            Spacer.count.should == 1
+            Spacer.count.should eq 1
           end
         end
       end

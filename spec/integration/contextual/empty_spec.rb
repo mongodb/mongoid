@@ -12,13 +12,13 @@ describe 'Contextual classes when dealing with empty result set' do
 
     describe '#count' do
       it 'is 0' do
-        context.count.should == 0
+        context.count.should eq 0
       end
     end
 
     describe '#length' do
       it 'is 0' do
-        context.length.should == 0
+        context.length.should eq 0
       end
     end
 
@@ -26,7 +26,7 @@ describe 'Contextual classes when dealing with empty result set' do
 
     describe '#distinct' do
       it 'is empty array' do
-        context.distinct(:foo).should == []
+        context.distinct(:foo).should eq []
       end
     end
 
@@ -47,7 +47,7 @@ describe 'Contextual classes when dealing with empty result set' do
         end
 
         it 'returns empty Enumerable' do
-          context.each.to_a.should == []
+          context.each.to_a.should eq []
         end
       end
     end
@@ -67,7 +67,7 @@ describe 'Contextual classes when dealing with empty result set' do
         it 'returns empty array' do
           skip 'MONGOID-5148'
 
-          context.map(:field).should == []
+          context.map(:field).should eq []
         end
       end
     end

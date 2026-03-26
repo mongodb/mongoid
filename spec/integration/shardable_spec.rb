@@ -18,7 +18,7 @@ describe 'Sharding helpers' do
 
     shared_examples_for 'shards collection' do
       it 'returns the model class' do
-        shard_collections.should == [ model_cls ]
+        shard_collections.should eq [ model_cls ]
       end
 
       it 'shards collection' do
@@ -99,7 +99,7 @@ describe 'Sharding helpers' do
       let(:model_cls) { SmActor }
 
       it 'returns empty array' do
-        shard_collections.should == []
+        shard_collections.should eq []
       end
 
       it 'does not shards collection' do
@@ -118,7 +118,7 @@ describe 'Sharding helpers' do
       end
 
       it 'returns empty array' do
-        shard_collections.should == []
+        shard_collections.should eq []
       end
 
       context 'pre-4.2' do

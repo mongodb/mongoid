@@ -29,7 +29,7 @@ describe 'distinct on aliased fields' do
     it 'expands the alias' do
       query
 
-      command['key'].should == 't'
+      command['key'].should eq 't'
     end
   end
 
@@ -41,7 +41,7 @@ describe 'distinct on aliased fields' do
     it 'expands the alias' do
       query
 
-      command['key'].should == 'phone_numbers.ext'
+      command['key'].should eq 'phone_numbers.ext'
     end
   end
 end
@@ -73,7 +73,7 @@ describe 'pluck on aliased fields' do
     it 'expands the alias' do
       query
 
-      command['projection'].should == { 't' => true }
+      command['projection'].should eq({ 't' => true })
     end
   end
 
@@ -85,7 +85,7 @@ describe 'pluck on aliased fields' do
     it 'expands the alias' do
       query
 
-      command['projection'].should == { 'phone_numbers.ext' => true }
+      command['projection'].should eq({ 'phone_numbers.ext' => true })
     end
   end
 end

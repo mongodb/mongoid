@@ -12,22 +12,22 @@ describe 'callbacks integration tests' do
         end
 
         it 'writes the attribute value into the model' do
-          instance.age.should == 100_000
+          instance.age.should eq 100_000
         end
 
         it 'persists the attribute value' do
-          Galaxy.find(instance.id).age.should == 100_000
+          Galaxy.find(instance.id).age.should eq 100_000
         end
       end
 
       context 'embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.stars.first.age.should == 42_000
+            instance.stars.first.age.should eq 42_000
           end
 
           it 'persists the attribute value' do
-            Galaxy.find(instance.id).stars.first.age.should == 42_000
+            Galaxy.find(instance.id).stars.first.age.should eq 42_000
           end
         end
 
@@ -51,11 +51,11 @@ describe 'callbacks integration tests' do
       context 'nested embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.stars.first.planets.first.age.should == 2_000
+            instance.stars.first.planets.first.age.should eq 2_000
           end
 
           it 'persists the attribute value' do
-            Galaxy.find(instance.id).stars.first.planets.first.age.should == 2_000
+            Galaxy.find(instance.id).stars.first.planets.first.age.should eq 2_000
           end
         end
 
@@ -89,11 +89,11 @@ describe 'callbacks integration tests' do
       context 'embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.stars.first.age.should == 42_000
+            instance.stars.first.age.should eq 42_000
           end
 
           it 'persists the attribute value' do
-            Galaxy.find(instance.id).stars.first.age.should == 42_000
+            Galaxy.find(instance.id).stars.first.age.should eq 42_000
           end
         end
 
@@ -119,11 +119,11 @@ describe 'callbacks integration tests' do
       context 'nested embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.stars.first.planets.first.age.should == 2_000
+            instance.stars.first.planets.first.age.should eq 2_000
           end
 
           it 'persists the attribute value' do
-            Galaxy.find(instance.id).stars.first.planets.first.age.should == 2_000
+            Galaxy.find(instance.id).stars.first.planets.first.age.should eq 2_000
           end
         end
 
@@ -155,11 +155,11 @@ describe 'callbacks integration tests' do
       context 'embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.stars.first.age.should == 42_000
+            instance.stars.first.age.should eq 42_000
           end
 
           it 'persists the attribute value' do
-            Galaxy.find(instance.id).stars.first.age.should == 42_000
+            Galaxy.find(instance.id).stars.first.age.should eq 42_000
           end
         end
 
@@ -183,11 +183,11 @@ describe 'callbacks integration tests' do
       context 'nested embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.stars.first.planets.first.age.should == 2_000
+            instance.stars.first.planets.first.age.should eq 2_000
           end
 
           it 'persists the attribute value' do
-            Galaxy.find(instance.id).stars.first.planets.first.age.should == 2_000
+            Galaxy.find(instance.id).stars.first.planets.first.age.should eq 2_000
           end
         end
 
@@ -217,11 +217,11 @@ describe 'callbacks integration tests' do
       context 'embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.president.age.should == 79
+            instance.president.age.should eq 79
           end
 
           it 'persists the attribute value' do
-            Country.find(instance.id).president.age.should == 79
+            Country.find(instance.id).president.age.should eq 79
           end
         end
 
@@ -245,11 +245,11 @@ describe 'callbacks integration tests' do
       context 'nested embedded document' do
         shared_examples 'persists the attribute value' do
           it 'writes the attribute value into the model' do
-            instance.president.first_spouse.age.should == 70
+            instance.president.first_spouse.age.should eq 70
           end
 
           it 'persists the attribute value' do
-            Country.find(instance.id).president.first_spouse.age.should == 70
+            Country.find(instance.id).president.first_spouse.age.should eq 70
           end
         end
 
@@ -279,7 +279,7 @@ describe 'callbacks integration tests' do
       obj.frequency = 2
       obj.save!
 
-      obj.previous.should == 2
+      obj.previous.should eq 2
     end
   end
 

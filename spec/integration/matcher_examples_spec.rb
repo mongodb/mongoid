@@ -716,13 +716,13 @@ describe 'Matcher' do
 
         context '$not with regexp' do
           it 'finds' do
-            band.records.where(producers: { '$elemMatch': { '$not': /bar/ } }).count.should == 1
+            band.records.where(producers: { '$elemMatch': { '$not': /bar/ } }).count.should eq 1
           end
         end
 
         context '$not with operator' do
           it 'finds' do
-            band.records.where(producers: { '$elemMatch': { '$not': { '$eq': 'bar' } } }).count.should == 1
+            band.records.where(producers: { '$elemMatch': { '$not': { '$eq': 'bar' } } }).count.should eq 1
           end
         end
       end

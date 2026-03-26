@@ -11,10 +11,10 @@ describe 'Criteria and default scope' do
     end
 
     it 'is added after order of default scope' do
-      sort_options.should == {'status' => -1, 'name' => 1}
+      sort_options.should eq({ 'status' => -1, 'name' => 1 })
 
       # Keys in Ruby are ordered
-      sort_options.keys.should == %w[name status]
+      sort_options.keys.should eq %w[name status]
     end
   end
 
@@ -23,7 +23,7 @@ describe 'Criteria and default scope' do
       let(:base) { Appointment.where }
 
       it 'has default scope' do
-        base.selector.should == { 'active' => true }
+        base.selector.should eq({ 'active' => true })
       end
 
       describe '.or' do
@@ -32,10 +32,14 @@ describe 'Criteria and default scope' do
         end
 
         it 'adds new condition in parallel to default scope conditions' do
-          criteria.selector.should == { '$or' => [
-            { 'active' => true },
-            { 'timed' => true }
-          ] }
+          criteria.selector.should eq(
+            {
+              '$or' => [
+                { 'active' => true },
+                { 'timed' => true }
+              ]
+            }
+          )
         end
       end
 
@@ -45,7 +49,7 @@ describe 'Criteria and default scope' do
         end
 
         it 'maintains default scope conditions' do
-          criteria.selector.should == { 'active' => true, 'timed' => true }
+          criteria.selector.should eq({ 'active' => true, 'timed' => true })
         end
       end
     end
@@ -59,10 +63,14 @@ describe 'Criteria and default scope' do
         end
 
         it 'adds new condition in parallel to default scope conditions' do
-          criteria.selector.should == { '$or' => [
-            { 'active' => true },
-            { 'timed' => true }
-          ] }
+          criteria.selector.should eq(
+            {
+              '$or' => [
+                { 'active' => true },
+                { 'timed' => true }
+              ]
+            }
+          )
         end
       end
     end
