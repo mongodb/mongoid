@@ -17,25 +17,25 @@ describe 'embedded associations' do
     shared_examples_for 'an embedded association' do
       it 'adds child documents to parent association object' do
         legislator
-        congress.legislators._target.should == [ legislator ]
+        congress.legislators._target.should eq [ legislator ]
       end
 
       it 'adds child documents to parent association object criteria' do
         legislator
-        congress.legislators.criteria.documents.should == [ legislator ]
+        congress.legislators.criteria.documents.should eq [ legislator ]
       end
 
       it 'populates documents on parent association object' do
-        congress.legislators.documents.should == [ legislator ]
+        congress.legislators.documents.should eq [ legislator ]
       end
 
       it 'returns created child when referencing embedded association' do
-        congress.legislators.should == [ legislator ]
+        congress.legislators.should eq [ legislator ]
       end
 
       it 'returns created child when referencing Criteria created from embedded association' do
         congress.legislators.all.should be_a(Mongoid::Criteria)
-        congress.legislators.all.to_a.should == [ legislator ]
+        congress.legislators.all.to_a.should eq [ legislator ]
       end
     end
 
@@ -70,32 +70,32 @@ describe 'embedded associations' do
 
     shared_examples_for 'adds child documents to parent association' do
       it 'adds child documents to parent association' do
-        manufactory.products._target.should == [ product ]
+        manufactory.products._target.should eq [ product ]
       end
     end
 
     shared_examples_for 'an embedded association' do
       it 'adds child documents to parent association object' do
         product
-        manufactory.products._target.should == [ product ]
+        manufactory.products._target.should eq [ product ]
       end
 
       it 'adds child documents to parent association object criteria' do
         product
-        manufactory.products.criteria.documents.should == [ product ]
+        manufactory.products.criteria.documents.should eq [ product ]
       end
 
       it 'populates documents on parent association object' do
-        manufactory.products.documents.should == [ product ]
+        manufactory.products.documents.should eq [ product ]
       end
 
       it 'returns created child when referencing embedded association' do
-        manufactory.products.should == [ product ]
+        manufactory.products.should eq [ product ]
       end
 
       it 'returns created child when referencing Criteria created from embedded association' do
         manufactory.products.all.should be_a(Mongoid::Criteria)
-        manufactory.products.all.to_a.should == [ product ]
+        manufactory.products.all.to_a.should eq [ product ]
       end
     end
 
@@ -128,7 +128,7 @@ describe 'embedded associations' do
       shared_examples 'is set' do
         it 'is set' do
           parent.child = child_cls.new
-          parent.child.parent.should == parent
+          parent.child.parent.should eq parent
         end
       end
 
@@ -152,7 +152,7 @@ describe 'embedded associations' do
 
       shared_examples 'is set' do
         it 'is set' do
-          child.congress.should == parent
+          child.congress.should eq parent
         end
       end
 
@@ -292,7 +292,7 @@ describe 'embedded associations' do
 
         user.orders.map do |order|
           [ order.sku, order.amount ]
-        end.should == [ [ 1, 10 ], [ 2, 2 ] ]
+        end.should eq [ [ 1, 10 ], [ 2, 2 ] ]
       end
     end
 
@@ -305,7 +305,7 @@ describe 'embedded associations' do
 
         user.orders.map do |order|
           [ order.sku, order.amount ]
-        end.should == [ [ 1, 1 ], [ 2, 20 ] ]
+        end.should eq [ [ 1, 1 ], [ 2, 20 ] ]
       end
     end
   end
@@ -330,7 +330,7 @@ describe 'embedded associations' do
 
         user.orders.map do |order|
           [ order.sku, order.surcharges.first.amount ]
-        end.should == [ [ 1, 10 ], [ 2, 2 ] ]
+        end.should eq [ [ 1, 10 ], [ 2, 2 ] ]
       end
     end
 
@@ -343,7 +343,7 @@ describe 'embedded associations' do
 
         user.orders.map do |order|
           [ order.sku, order.surcharges.first.amount ]
-        end.should == [ [ 1, 1 ], [ 2, 20 ] ]
+        end.should eq [ [ 1, 1 ], [ 2, 20 ] ]
       end
     end
   end

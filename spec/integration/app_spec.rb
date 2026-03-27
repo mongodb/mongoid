@@ -39,7 +39,7 @@ describe 'Mongoid application tests' do
             uri = URI.parse('http://localhost:4567/posts')
             resp = JSON.parse(uri.open.read)
 
-            resp.should == []
+            resp.should eq []
           end
         end
       end
@@ -63,7 +63,7 @@ describe 'Mongoid application tests' do
             uri = URI.parse('http://localhost:3000/posts')
             resp = JSON.parse(uri.open.read)
 
-            resp.should == []
+            resp.should eq []
           end
         end
       end

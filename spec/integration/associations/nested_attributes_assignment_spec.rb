@@ -26,11 +26,11 @@ describe 'nested attributes assignment' do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.capacity.should
-          _truck.crates.length.should
-          _truck.crates.first.volume.should
-          _truck.crates.first.toys.length.should
-          _truck.crates.first.toys.first.name.should == 'Bear'
+          _truck.capacity.should eq 1
+          _truck.crates.length.should eq 1
+          _truck.crates.first.volume.should eq 2
+          _truck.crates.first.toys.length.should eq 1
+          _truck.crates.first.toys.first.name.should eq 'Bear'
         end
       end
     end
@@ -70,11 +70,11 @@ describe 'nested attributes assignment' do
             truck.save!
 
             _truck = Truck.find(truck.id)
-            _truck.capacity.should
-            _truck.crates.length.should
-            _truck.crates.first.volume.should
-            _truck.crates.first.toys.length.should
-            _truck.crates.first.toys.first.name.should == 'Rhino'
+            _truck.capacity.should eq 2
+            _truck.crates.length.should eq 1
+            _truck.crates.first.volume.should eq 3
+            _truck.crates.first.toys.length.should eq 1
+            _truck.crates.first.toys.first.name.should eq 'Rhino'
           end
         end
 
@@ -97,14 +97,14 @@ describe 'nested attributes assignment' do
             truck.save!
 
             _truck = Truck.find(truck.id)
-            _truck.capacity.should
-            _truck.crates.length.should
-            _truck.crates.first.volume.should
-            _truck.crates.first.toys.length.should
-            _truck.crates.first.toys.first.name.should
-            _truck.crates.last.volume.should
-            _truck.crates.last.toys.length.should
-            _truck.crates.last.toys.last.name.should == 'Rhino'
+            _truck.capacity.should eq 2
+            _truck.crates.length.should eq 2
+            _truck.crates.first.volume.should eq 2
+            _truck.crates.first.toys.length.should eq 1
+            _truck.crates.first.toys.first.name.should eq 'Bear'
+            _truck.crates.last.volume.should eq 3
+            _truck.crates.last.toys.length.should eq 1
+            _truck.crates.last.toys.last.name.should eq 'Rhino'
           end
         end
       end

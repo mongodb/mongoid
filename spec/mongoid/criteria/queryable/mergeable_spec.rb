@@ -52,17 +52,17 @@ describe Mongoid::Criteria::Queryable::Mergeable do
     end
 
     it 'expands simple keys' do
-      query.send(:_mongoid_expand_keys, { a: 1 }).should == { 'a' => 1 }
+      query.send(:_mongoid_expand_keys, { a: 1 }).should eq({ 'a' => 1 })
     end
 
     it 'expands Key instances' do
-      query.send(:_mongoid_expand_keys, { gt => 42 }).should == { 'age' => { '$gt' => 42 } }
+      query.send(:_mongoid_expand_keys, { gt => 42 }).should eq({ 'age' => { '$gt' => 42 } })
     end
 
     it 'expands multiple Key instances on the same field' do
-      query.send(:_mongoid_expand_keys, { gt => 42, lt => 50 }).should == {
-        'age' => { '$gt' => 42, '$lt' => 50 }
-      }
+      query.send(:_mongoid_expand_keys, { gt => 42, lt => 50 }).should eq(
+        { 'age' => { '$gt' => 42, '$lt' => 50 } }
+      )
     end
 
     context 'given implicit equality and Key instance on the same field' do
@@ -70,17 +70,17 @@ describe Mongoid::Criteria::Queryable::Mergeable do
         context "for non-regular expression value #{value}" do
           context 'implicit equality then Key instance' do
             it 'expands implicit equality with $eq and combines with Key operator' do
-              query.send(:_mongoid_expand_keys, { 'age' => value, lt => 50 }).should == {
-                'age' => { '$eq' => value, '$lt' => 50 }
-              }
+              query.send(:_mongoid_expand_keys, { 'age' => value, lt => 50 }).should eq(
+                { 'age' => { '$eq' => value, '$lt' => 50 } }
+              )
             end
           end
 
           context 'symbol operator then implicit equality' do
             it 'expands implicit equality with $eq and combines with Key operator' do
-              query.send(:_mongoid_expand_keys, { gt => 42, 'age' => value }).should == {
-                'age' => { '$gt' => 42, '$eq' => value }
-              }
+              query.send(:_mongoid_expand_keys, { gt => 42, 'age' => value }).should eq(
+                { 'age' => { '$gt' => 42, '$eq' => value } }
+              )
             end
           end
         end
@@ -92,17 +92,17 @@ describe Mongoid::Criteria::Queryable::Mergeable do
         context "for regular expression value #{value}" do
           context 'implicit equality then Key instance' do
             it 'expands implicit equality with $eq and combines with Key operator' do
-              query.send(:_mongoid_expand_keys, { 'age' => value, lt => 50 }).should == {
-                'age' => { '$regex' => value, '$lt' => 50 }
-              }
+              query.send(:_mongoid_expand_keys, { 'age' => value, lt => 50 }).should eq(
+                { 'age' => { '$regex' => value, '$lt' => 50 } }
+              )
             end
           end
 
           context 'Key instance then implicit equality' do
             it 'expands implicit equality with $eq and combines with Key operator' do
-              query.send(:_mongoid_expand_keys, { gt => 50, 'age' => value }).should == {
-                'age' => { '$gt' => 50, '$regex' => value }
-              }
+              query.send(:_mongoid_expand_keys, { gt => 50, 'age' => value }).should eq(
+                { 'age' => { '$gt' => 50, '$regex' => value } }
+              )
             end
           end
         end
@@ -110,13 +110,13 @@ describe Mongoid::Criteria::Queryable::Mergeable do
     end
 
     it 'Ruby does not allow same symbol operator with different values' do
-      { gt => 42, gtp => 50 }.should == { gtp => 50 }
+      { gt => 42, gtp => 50 }.should eq({ gtp => 50 })
     end
 
     context 'field name => value' do
       shared_examples_for 'expands' do
         it 'expands' do
-          expanded.should == { 'foo' => 'bar' }
+          expanded.should eq({ 'foo' => 'bar' })
         end
       end
 
@@ -147,14 +147,14 @@ describe Mongoid::Criteria::Queryable::Mergeable do
       end
 
       it 'expands' do
-        expanded.should == { 'foo' => { '$gt' => 'bar' } }
+        expanded.should eq({ 'foo' => { '$gt' => 'bar' } })
       end
     end
 
     context 'operator => operator value expression' do
       shared_examples_for 'expands' do
         it 'expands' do
-          expanded.should == { 'foo' => { '$in' => [ 'bar' ] } }
+          expanded.should eq({ 'foo' => { '$in' => [ 'bar' ] } })
         end
       end
 

@@ -124,11 +124,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
             # have a way to distinguish how method_missing was invoked
             # (i.e. via an explicit send or method call).
             # See https://jira.mongodb.org/browse/MONGOID-5009
-            game.person.secret_name.should == 'secret'
+            game.person.secret_name.should eq 'secret'
           end
 
           it 'allows private methods to be invoked' do
-            game.person.send(:secret_name).should == 'secret'
+            game.person.send(:secret_name).should eq 'secret'
           end
 
           it 'properly exposes delegated methods visibility' do

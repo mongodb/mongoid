@@ -25,8 +25,8 @@ describe 'has_one associations' do
       it 'destroys' do
         address
 
-        HomCollege.count.should
-        HomAddress.count.should
+        HomCollege.count.should eq 1
+        HomAddress.count.should eq 1
 
         HomCollege.with_session do |session|
           session.with_transaction do
@@ -34,8 +34,8 @@ describe 'has_one associations' do
           end
         end
 
-        HomCollege.count.should
-        HomAddress.count.should == 0
+        HomCollege.count.should eq 0
+        HomAddress.count.should eq 0
       end
     end
 
@@ -49,8 +49,8 @@ describe 'has_one associations' do
       it 'does not destroy' do
         address
 
-        HomCollege.count.should
-        HomAddress.count.should
+        HomCollege.count.should eq 1
+        HomAddress.count.should eq 1
 
         lambda do
           HomCollege.with_session do |session|
@@ -60,8 +60,8 @@ describe 'has_one associations' do
           end
         end.should raise_error(Mongoid::Errors::DocumentNotDestroyed)
 
-        HomCollege.count.should
-        HomAddress.count.should == 1
+        HomCollege.count.should eq 1
+        HomAddress.count.should eq 1
       end
     end
   end
@@ -76,26 +76,26 @@ describe 'has_one associations' do
     shared_examples 'delegates to the field' do |reloaded: false|
       context 'non-conflicting field name' do
         it 'delegates to the field' do
-          parent.accreditation.price.should == 42
+          parent.accreditation.price.should eq 42
         end
 
         context 'using send' do
           it 'delegates to the field' do
-            parent.accreditation.send(:price).should == 42
+            parent.accreditation.send(:price).should eq 42
           end
         end
       end
 
       context 'field name that conflicts with Kernel' do
         it 'delegates to the field' do
-          parent.accreditation.format.should == 'fmt'
+          parent.accreditation.format.should eq 'fmt'
         end
 
         context 'using send' do
           it 'delegates to the field' do
             pending 'MONGOID-5018' if reloaded
 
-            parent.accreditation.send(:format).should == 'fmt'
+            parent.accreditation.send(:format).should eq 'fmt'
           end
         end
       end
@@ -143,12 +143,11 @@ describe 'has_one associations' do
       end
 
       it 'does not destroy the dependent object' do
-        person.game.should
-        game
+        person.game.should eq game
         person.game = person.game
         person.save!
         person.reload
-        person.game.should == game
+        person.game.should eq game
       end
     end
 
@@ -164,12 +163,11 @@ describe 'has_one associations' do
       end
 
       it 'does not destroy the dependent object' do
-        person.account.should
-        account
+        person.account.should eq account
         person.account = person.account
         person.save!
         person.reload
-        person.account.should == account
+        person.account.should eq account
       end
     end
   end

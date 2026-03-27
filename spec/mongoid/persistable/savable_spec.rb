@@ -302,9 +302,9 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.crates.length.should
-          _truck.crates.first.volume.should
-          _truck.crates.last.volume.should == 1
+          _truck.crates.length.should eq 2
+          _truck.crates.first.volume.should eq 2
+          _truck.crates.last.volume.should eq 1
         end
       end
 
@@ -319,9 +319,9 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.seats.length.should
-          _truck.seats.first.armrests.length.should
-          _truck.seats.first.armrests.first.side.should == 'left'
+          _truck.seats.length.should eq 1
+          _truck.seats.first.armrests.length.should eq 1
+          _truck.seats.first.armrests.first.side.should eq 'left'
         end
       end
 
@@ -336,10 +336,10 @@ describe Mongoid::Persistable::Savable do
           truck.save!
 
           _truck = Truck.find(truck.id)
-          _truck.crates.length.should
-          _truck.crates.first.toys.length.should
-          _truck.crates.first.toys.first.name.should
-          _truck.crates.last.toys.length.should == 0
+          _truck.crates.length.should eq 2
+          _truck.crates.first.toys.length.should eq 1
+          _truck.crates.first.toys.first.name.should eq 'Bear'
+          _truck.crates.last.toys.length.should eq 0
         end
 
         context 'when also updating first embedded top level association' do
@@ -351,10 +351,10 @@ describe Mongoid::Persistable::Savable do
             truck.save!
 
             _truck = Truck.find(truck.id)
-            _truck.crates.length.should
-            _truck.crates.first.toys.length.should
-            _truck.crates.first.toys.first.name.should
-            _truck.crates.last.toys.length.should == 0
+            _truck.crates.length.should eq 2
+            _truck.crates.first.toys.length.should eq 1
+            _truck.crates.first.toys.first.name.should eq 'Bear'
+            _truck.crates.last.toys.length.should eq 0
           end
         end
       end

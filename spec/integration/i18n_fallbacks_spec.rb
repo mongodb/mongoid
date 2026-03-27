@@ -20,7 +20,7 @@ describe 'i18n fallbacks' do
         I18n.locale = :en
         product.description = 'Marvelous!'
         I18n.locale = :de
-        product.description.should == 'Marvelous in German'
+        product.description.should eq 'Marvelous in German'
       end
     end
 
@@ -30,7 +30,7 @@ describe 'i18n fallbacks' do
         I18n.locale = :en
         product.description = 'Marvelous!'
         I18n.locale = :de
-        product.description.should == 'Marvelous!'
+        product.description.should eq 'Marvelous!'
       end
     end
 

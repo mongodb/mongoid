@@ -298,15 +298,15 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
           end
 
           expect_no_queries do
-            eager.map(&:reviewable).compact.should == [ reviewable ]
+            eager.map(&:reviewable).compact.should eq [ reviewable ]
           end
 
           expect_no_queries do
-            eager.map(&:reviewer).compact.should == [ reviewer ]
+            eager.map(&:reviewer).compact.should eq [ reviewer ]
           end
 
           expect_no_queries do
-            eager.map(&:template).compact.should == [ template ]
+            eager.map(&:template).compact.should eq [ template ]
           end
         end
       end
@@ -322,7 +322,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         it 'does not error' do
-          eager.map(&:reviewer).should == [ nil ]
+          eager.map(&:reviewer).should eq [ nil ]
         end
       end
     end

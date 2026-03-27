@@ -1576,7 +1576,7 @@ describe Mongoid::Fields do
       let(:shape) { Shape.new }
 
       it 'is correctly set' do
-        shape.attributes['_type'].should == 'Shape'
+        shape.attributes['_type'].should eq 'Shape'
       end
     end
 
@@ -1584,7 +1584,7 @@ describe Mongoid::Fields do
       let(:circle) { Circle.new }
 
       it 'is correctly set' do
-        circle.attributes['_type'].should == 'Circle'
+        circle.attributes['_type'].should eq 'Circle'
       end
     end
   end

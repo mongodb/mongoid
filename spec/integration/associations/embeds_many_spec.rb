@@ -35,7 +35,7 @@ describe 'embeds_many associations' do
         canvas.shapes = [ shape ]
         canvas.save!
         canvas.reload
-        canvas.shapes.should == [ shape ]
+        canvas.shapes.should eq [ shape ]
       end
     end
   end
@@ -63,7 +63,7 @@ describe 'embeds_many associations' do
 
         unsaved_parent.new_record?.should be true
         parent.reload
-        parent.shapes.length.should == 1
+        parent.shapes.length.should eq 1
       end
     end
 

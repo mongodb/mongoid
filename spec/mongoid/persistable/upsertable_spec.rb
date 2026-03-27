@@ -52,21 +52,21 @@ describe Mongoid::Persistable::Upsertable do
 
         shared_examples 'replaces the existing fields' do
           it 'replaces the existing fields' do
-            Band.count.should
+            Band.count.should eq 1
 
             existing.reload
             existing.views.should be_nil
-            existing.name.should == 'Tool'
+            existing.name.should eq 'Tool'
           end
         end
 
         shared_examples 'retains the existing fields' do
           it 'retains the existing fields' do
-            Band.count.should
+            Band.count.should eq 1
 
             existing.reload
             existing.views.should eq(42)
-            existing.name.should == 'Tool'
+            existing.name.should eq 'Tool'
           end
         end
 

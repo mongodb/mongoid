@@ -1101,8 +1101,8 @@ describe Mongoid::Changeable do
       end
 
       it 'does not add to the changes or changed_attributes hash' do
-        person.changes.should
-        person.changed_attributes.should == {}
+        person.changes.should eq({})
+        person.changed_attributes.should eq({})
       end
     end
 
@@ -1120,9 +1120,8 @@ describe Mongoid::Changeable do
       end
 
       it 'adds to the changes or changed_attributes hash' do
-        person.changes.should
-        { 'user_account_ids' => [ nil, [ user_account._id ] ] }
-        person.changed_attributes.should == { 'user_account_ids' => nil }
+        person.changes.should eq({ 'user_account_ids' => [ nil, [ user_account._id ] ] })
+        person.changed_attributes.should eq({ 'user_account_ids' => nil })
       end
     end
 
@@ -1140,8 +1139,8 @@ describe Mongoid::Changeable do
       end
 
       it 'does not add to the changes or changed_attributes hash' do
-        person.changes.should
-        person.changed_attributes.should == {}
+        person.changes.should eq({})
+        person.changed_attributes.should eq({})
       end
     end
 
@@ -1159,9 +1158,8 @@ describe Mongoid::Changeable do
       end
 
       it 'does not add to the changes or changed_attributes hash' do
-        person.changes.should
-        { 'user_account_ids' => [ [ user_account._id ], [] ] }
-        person.changed_attributes.should == { 'user_account_ids' => [ user_account._id ] }
+        person.changes.should eq({ 'user_account_ids' => [ [ user_account._id ], [] ] })
+        person.changed_attributes.should eq({ 'user_account_ids' => [ user_account._id ] })
       end
     end
 

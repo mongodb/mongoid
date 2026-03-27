@@ -15,7 +15,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to top level' do
-          modified.selector.should == { '$and' => [ { 'foo' => 'bar' } ] }
+          modified.selector.should eq({ '$and' => [ { 'foo' => 'bar' } ] })
         end
       end
 
@@ -29,8 +29,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to top level' do
-          modified.selector.should == { 'zoom' => 'zoom',
-                                        '$and' => [ { 'foo' => 'bar' } ] }
+          modified.selector.should eq({ 'zoom' => 'zoom', '$and' => [ { 'foo' => 'bar' } ] })
         end
       end
 
@@ -44,9 +43,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to existing $and' do
-          modified.selector.should == {
-            '$and' => [ { 'zoom' => 'zoom' }, { 'foo' => 'bar' } ]
-          }
+          modified.selector.should eq({ '$and' => [ { 'zoom' => 'zoom' }, { 'foo' => 'bar' } ] })
         end
       end
 
@@ -60,9 +57,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to existing $and' do
-          modified.selector.should == {
-            '$and' => [ { 'foo' => 'zoom' }, { 'foo' => 'bar' } ]
-          }
+          modified.selector.should eq({ '$and' => [ { 'foo' => 'zoom' }, { 'foo' => 'bar' } ] })
         end
       end
 
@@ -76,9 +71,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to existing $and' do
-          modified.selector.should == {
-            '$and' => [ { 'zoom' => 'zoom' }, { 'foo' => 'bar' } ], 'foo' => 'baz'
-          }
+          modified.selector.should eq({ '$and' => [ { 'zoom' => 'zoom' }, { 'foo' => 'bar' } ], 'foo' => 'baz' })
         end
       end
     end
@@ -90,7 +83,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to top level' do
-          modified.selector.should == { '$or' => [ { 'foo' => 'bar' } ] }
+          modified.selector.should eq({ '$or' => [ { 'foo' => 'bar' } ] })
         end
       end
 
@@ -104,10 +97,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds the new conditions' do
-          modified.selector.should == {
-            'zoom' => 'zoom',
-            '$or' => [ { 'foo' => 'bar' } ]
-          }
+          modified.selector.should eq({ 'zoom' => 'zoom', '$or' => [ { 'foo' => 'bar' } ] })
         end
       end
 
@@ -121,9 +111,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
 
         it 'adds to existing $or' do
-          modified.selector.should == {
-            '$or' => [ { 'zoom' => 'zoom' }, { 'foo' => 'bar' } ]
-          }
+          modified.selector.should eq({ '$or' => [ { 'zoom' => 'zoom' }, { 'foo' => 'bar' } ] })
         end
       end
     end
@@ -136,9 +124,7 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the condition' do
-        modified.selector.should == {
-          'foo' => 'bar'
-        }
+        modified.selector.should eq({ 'foo' => 'bar' })
       end
     end
 
@@ -164,10 +150,7 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the condition' do
-        modified.selector.should == {
-          'foo' => 'bar',
-          'zoom' => 'zoom'
-        }
+        modified.selector.should eq({ 'foo' => 'bar', 'zoom' => 'zoom' })
       end
     end
 
@@ -181,10 +164,7 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the new condition using $and' do
-        modified.selector.should == {
-          'foo' => 'bar',
-          '$and' => [ { 'foo' => 'zoom' } ]
-        }
+        modified.selector.should eq({ 'foo' => 'bar', '$and' => [ { 'foo' => 'zoom' } ] })
       end
     end
 
@@ -198,12 +178,7 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'combines the conditions using $and' do
-        modified.selector.should == {
-          'foo' => {
-            '$in' => [ 'bar' ],
-            '$nin' => [ 'zoom' ]
-          }
-        }
+        modified.selector.should eq({ 'foo' => { '$in' => [ 'bar' ], '$nin' => [ 'zoom' ] } })
       end
     end
 
@@ -217,12 +192,7 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'combines the conditions using $and' do
-        modified.selector.should == {
-          'foo' => {
-            :$in => [ 'bar' ],
-            :$nin => [ 'zoom' ]
-          }
-        }
+        modified.selector.should eq({ 'foo' => { :$in => [ 'bar' ], :$nin => [ 'zoom' ] } })
       end
     end
 
@@ -236,10 +206,12 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the new condition using $and' do
-        modified.selector.should == {
-          'foo' => { '$in' => [ 'bar' ] },
-          '$and' => [ { 'foo' => { '$in' => [ 'zoom' ] } } ]
-        }
+        modified.selector.should eq(
+          {
+            'foo' => { '$in' => [ 'bar' ] },
+            '$and' => [ { 'foo' => { '$in' => [ 'zoom' ] } } ]
+          }
+        )
       end
     end
 
@@ -253,10 +225,12 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
 
       it 'adds the new condition using $and' do
-        modified.selector.should == {
-          'foo' => { :$in => [ 'bar' ] },
-          '$and' => [ { 'foo' => { :$in => [ 'zoom' ] } } ]
-        }
+        modified.selector.should eq(
+          {
+            'foo' => { :$in => [ 'bar' ] },
+            '$and' => [ { 'foo' => { :$in => [ 'zoom' ] } } ]
+          }
+        )
       end
     end
   end

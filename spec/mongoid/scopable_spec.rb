@@ -537,7 +537,7 @@ describe Mongoid::Scopable do
           end
 
           it 'sets the conditions from keyword arguments' do
-            scope.selector.should == { 'name' => 'Emily', 'deleted' => true }
+            scope.selector.should eq({ 'name' => 'Emily', 'deleted' => true })
           end
         end
 
@@ -1119,15 +1119,15 @@ describe Mongoid::Scopable do
       it 'restores previous scope' do
         Band.with_scope(c1) do |_crit|
           Band.with_scope(c2) do |_crit2|
-            Mongoid::Threaded.current_scope(Band).selector.should == {
-              'active' => true,
-              '$and' => [ { 'active' => false } ]
-            }
+            Mongoid::Threaded.current_scope(Band).selector.should eq(
+              {
+                'active' => true,
+                '$and' => [ { 'active' => false } ]
+              }
+            )
           end
 
-          Mongoid::Threaded.current_scope(Band).selector.should == {
-            'active' => true
-          }
+          Mongoid::Threaded.current_scope(Band).selector.should eq({ 'active' => true })
         end
       end
     end
@@ -1141,9 +1141,7 @@ describe Mongoid::Scopable do
             Mongoid::Threaded.current_scope(Band).should be_nil
           end
 
-          Mongoid::Threaded.current_scope(Band).selector.should == {
-            'active' => true
-          }
+          Mongoid::Threaded.current_scope(Band).selector.should eq({ 'active' => true })
         end
       end
     end
