@@ -755,7 +755,9 @@ module Mongoid
         #
         # @return [ Selectable ] The cloned selectable.
         def where(*criteria)
-          criteria.inject(clone) do |_query, criterion|
+          return clone.reset_strategies! if criteria.empty?
+
+          criteria.inject(self) do |query, criterion|
             raise Errors::CriteriaArgumentRequired, :where if criterion.nil?
 
             # We need to save the criterion in an instance variable so
@@ -766,14 +768,12 @@ module Mongoid
             # only ever specify one criterion to #where.
             @criterion = criterion
             if criterion.is_a?(String)
-              js_query(criterion)
+              query.js_query(criterion)
             else
-              expr_query(criterion)
+              query.expr_query(criterion)
             end
-          end.reset_strategies!
+          end
         end
-
-        private
 
         # Adds the specified expression to the query.
         #
@@ -813,21 +813,6 @@ module Mongoid
           end
         end
 
-        # Force the values of the criterion to be evolved.
-        #
-        # @api private
-        #
-        # @example Force values to booleans.
-        #   selectable.force_typing(criterion) do |val|
-        #     Boolean.evolve(val)
-        #   end
-        #
-        # @param [ Hash ] criterion The criterion.
-        def typed_override(criterion, operator, &block)
-          criterion.transform_values!(&block) if criterion
-          __override__(criterion, operator)
-        end
-
         # Create a javascript selection.
         #
         # @api private
@@ -848,6 +833,23 @@ module Mongoid
             end
             query.reset_strategies!
           end
+        end
+
+        private
+
+        # Force the values of the criterion to be evolved.
+        #
+        # @api private
+        #
+        # @example Force values to booleans.
+        #   selectable.force_typing(criterion) do |val|
+        #     Boolean.evolve(val)
+        #   end
+        #
+        # @param [ Hash ] criterion The criterion.
+        def typed_override(criterion, operator, &block)
+          criterion.transform_values!(&block) if criterion
+          __override__(criterion, operator)
         end
 
         # Take the provided criterion and store it as a selection in the query

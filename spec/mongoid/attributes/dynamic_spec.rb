@@ -106,7 +106,7 @@ describe Mongoid::Attributes::Dynamic do
       end
     end
 
-    context 'when writing attributes via #{attribute}=' do
+    context 'when writing attributes via <attribute>=' do
       context 'when attribute is not already set' do
         let(:bar) { Bar.new }
 
