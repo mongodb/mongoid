@@ -507,15 +507,12 @@ describe 'Mongoid application tests' do
     env
   end
 
-  def wait_for_port(port, timeout, process)
-    deadline = Mongoid::Utils.monotonic_time + timeout
-    loop do
-      Socket.tcp('localhost', port, nil, nil, connect_timeout: 0.5) do |_socket|
-        return
-      end
-    rescue IOError, SystemCallError
-      raise "Process #{process} died while waiting for port #{port}" unless process.alive?
-      raise if Mongoid::Utils.monotonic_time > deadline
-    end
+  def wait_for_port(port, timeout, process, deadline: Mongoid::Utils.monotonic_time + timeout)
+    Socket.tcp('localhost', port, nil, nil, connect_timeout: 0.5).close
+  rescue IOError, SystemCallError
+    raise "Process #{process} died while waiting for port #{port}" unless process.alive?
+    raise if Mongoid::Utils.monotonic_time > deadline
+
+    retry
   end
 end

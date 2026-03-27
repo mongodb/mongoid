@@ -26,11 +26,6 @@ Lint/AmbiguousRange:
 Lint/AssignmentInCondition:
   Enabled: false
 
-# Offense count: 1
-Lint/BinaryOperatorWithIdenticalOperands:
-  Exclude:
-    - 'spec/mongoid/equality_spec.rb'
-
 # Offense count: 225
 # Configuration parameters: AllowedMethods.
 # AllowedMethods: enums
@@ -84,11 +79,6 @@ Lint/EmptyClass:
     - 'spec/support/models/bed.rb'
     - 'spec/support/models/other_owner_object.rb'
 
-# Offense count: 1
-Lint/FloatComparison:
-  Exclude:
-    - 'lib/mongoid/matcher/bits.rb'
-
 # Offense count: 2
 Lint/HashCompareByIdentity:
   Exclude:
@@ -101,23 +91,12 @@ Lint/IneffectiveAccessModifier:
     - 'lib/mongoid/association/builders.rb'
     - 'lib/mongoid/copyable.rb'
 
-# Offense count: 1
-# This cop supports unsafe autocorrection (--autocorrect-all).
-Lint/InterpolationCheck:
-  Exclude:
-    - 'spec/mongoid/attributes/dynamic_spec.rb'
-
 # Offense count: 2
 # Configuration parameters: AllowedParentClasses.
 Lint/MissingSuper:
   Exclude:
     - 'lib/mongoid/criteria/queryable/pipeline.rb'
     - 'lib/mongoid/criteria/queryable/smash.rb'
-
-# Offense count: 1
-Lint/NonLocalExitFromIterator:
-  Exclude:
-    - 'spec/integration/app_spec.rb'
 
 # Offense count: 3
 # This cop supports safe autocorrection (--autocorrect).
@@ -172,11 +151,6 @@ Lint/SuppressedException:
 # Configuration parameters: AllowKeywordBlockArguments.
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
-
-# Offense count: 1
-Lint/UnmodifiedReduceAccumulator:
-  Exclude:
-    - 'lib/mongoid/criteria/queryable/selectable.rb'
 
 # Offense count: 6
 Lint/UnreachableCode:
