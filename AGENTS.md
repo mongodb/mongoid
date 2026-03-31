@@ -1,3 +1,17 @@
+# Project Description
+
+Mongoid is a Ruby Object-Document Mapper (ODM) framework for MongoDB. Mongoid allows developers to define their data models using Ruby classes, and it handles the mapping between these classes and the underlying MongoDB collections. It is built on top of the MongoDB Ruby driver, and is intended to be a (mostly) drop-in replacement for ActiveRecord in Ruby on Rails applications.
+
+# Project Structure
+
+- `examples` - example scripts showing how to use Mongoid
+- `gemfiles` - Gemfiles for testing different usage scenarios. `standard.gemfile` is the default, and is used for development, testing, and production.
+- `lib` - the main source code for Mongoid
+- `perf` - performance and benchmark scripts
+- `spec` - RSpec tests for Mongoid
+
+# Code Review Guidelines
+
 When reviewing code, focus on:
 
 ## Security Critical Issues
@@ -26,25 +40,10 @@ When reviewing code, focus on:
 - Acknowledge good patterns when you see them
 - Ask clarifying questions when code intent is unclear
 - When possible, suggest that the pull request be labelled as a `bug`, a `feature`, or a `bcbreak` (a "backwards-compatibility break").
-- PRs that change only tests or infrastructure configuration do not need to be labelled.
+- PR's with no user-visible effect do not need to be labeled.
 
 Always prioritize security vulnerabilities and performance issues that could impact users.
 
-Always suggest changes to improve readability and testability. For example, this suggestion seeks to make the code more readable, reusable, and testable:
+Always suggest changes to improve readability and testability.
 
-```ruby
-  # Instead of:
-  if (user.email && user.email.include?('@') && user.email.length > 5)
-    submitButton.enabled = true
-  else
-    submitButton.enabled = false
-  end
-  
-  # Consider:
-  def valid_email?(email)
-    email && email.include?('@') && email.length > 5
-  end
-  
-  submitButton.enabled = valid_email?(user.email);
-```
-
+Be encouraging.
