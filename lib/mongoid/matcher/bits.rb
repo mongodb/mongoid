@@ -33,7 +33,10 @@ module Mongoid
 
           int_matches?(value, condition)
         when Float
-          if (int_cond = condition.to_i).to_f == condition
+          # Allow floats that are whole numbers (e.g. 50.0), but reject those
+          # with a fractional part (e.g. 50.1) since bitwise ops require integers.
+          int_cond = condition.to_i
+          if int_cond == condition
             if int_cond < 0
               raise Errors::InvalidQuery,
                     "Invalid value for $#{operator_name} argument: negative numbers are not allowed: #{condition}"

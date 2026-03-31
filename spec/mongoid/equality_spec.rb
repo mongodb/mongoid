@@ -119,7 +119,7 @@ describe Mongoid::Equality do
 
       context 'when the instance is the same' do
         it 'returns true' do
-          expect(person === person).to be true
+          expect(person === person).to be true # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
         end
       end
     end
