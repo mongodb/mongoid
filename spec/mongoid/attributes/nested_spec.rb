@@ -192,7 +192,7 @@ describe Mongoid::Attributes::Nested do
         context 'when allow_reparenting_via_nested_attributes is false' do
           config_override :allow_reparenting_via_nested_attributes, false
 
-          it 'sets raises an exception' do
+          it 'raises a document not found error' do
             expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
