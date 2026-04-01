@@ -131,12 +131,11 @@ module Mongoid
     }
 
     # When this flag is true, it will be possible to change the parent of a
-    # record in a non-embedded "many" association (such as `has_many` or
-    # `has_and_belongs_to_many`) by passing the child record's id in the nested
-    # attributes for another parent record.
+    # record in a "has_many" association by passing the child record's id in the
+    # nested attributes for another parent record.
     #
     # When this flag is false, attempting to change the parent of a record in a
-    # non-embedded "many" association via nested attributes will raise an error.
+    # "has-many" association via nested attributes will raise an error.
     #
     # The default is `false`. Note that allowing reparenting via nested attributes
     # is a potential security risk, since it could allow a malicious user to move

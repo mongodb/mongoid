@@ -152,22 +152,47 @@ describe Mongoid::Attributes::Nested do
       end
     end
 
-    context 'when the relation is a references many' do
+    context 'when the relation is a has-many' do
       before do
         Person.send(:undef_method, :posts_attributes=)
         Person.accepts_nested_attributes_for :posts
       end
 
-      let(:person) do
-        Person.new(posts_attributes: { '1' => { title: 'First' } })
+      context 'when adding a new document to a relation' do
+        let(:person) do
+          Person.new(posts_attributes: { '1' => { title: 'First' } })
+        end
+
+        it 'sets the nested attributes' do
+          expect(person.posts.first.title).to eq('First')
+        end
       end
 
-      it 'sets the nested attributes' do
-        expect(person.posts.first.title).to eq('First')
+      context 'when adding an existing document to a relation' do
+        let(:person1) { Person.create! }
+        let(:post) { person1.posts.create!(title: 'Sample Post') }
+
+        let(:person2) { Person.create!(posts_attributes: { '0' => { id: post.id, title: 'Reparented!' } }) }
+
+        context 'when allow_reparenting_via_nested_attributes is false' do
+          config_override :allow_reparenting_via_nested_attributes, false
+
+          it 'raises a document not found error' do
+            expect { person2 }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context 'when allow_reparenting_via_nested_attributes is true' do
+          config_override :allow_reparenting_via_nested_attributes, true
+
+          it 'sets the nested attributes' do
+            expect(person2.posts.map(&:title)).to eq([ 'Reparented!' ])
+          end
+        end
       end
     end
 
-    context 'when the relation is a references and referenced in many' do
+    context 'when the relation is a has-and-belongs-to-many' do
       before do
         Person.send(:undef_method, :preferences_attributes=)
         Person.accepts_nested_attributes_for :preferences
@@ -189,41 +214,16 @@ describe Mongoid::Attributes::Nested do
           )
         end
 
-        context 'when allow_reparenting_via_nested_attributes is false' do
-          config_override :allow_reparenting_via_nested_attributes, false
-
-          it 'raises a document not found error' do
-            expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound)
-          end
+        it 'sets the nested attributes' do
+          expect(person.preferences.map(&:name)).to eq([ preference.name ])
         end
 
-        context 'when allow_reparenting_via_nested_attributes is true' do
-          config_override :allow_reparenting_via_nested_attributes, true
-
-          it 'sets the nested attributes' do
-            expect(person.preferences.map(&:name)).to eq([ preference.name ])
-          end
-
-          it 'updates attributes of existing document which is added to relation' do
-            preference_name = 'updated preference'
-            person = Person.new(
-              preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
-            )
-            expect(person.preferences.map(&:name)).to eq([ preference_name ])
-          end
-        end
-      end
-
-      context 'when referencing an existing document in a relation' do
-        let(:preference) { Preference.create!(name: 'sample preference') }
-        let(:person) do
-          Person.create(preferences: [ preference ]).tap do |person|
-            person.preferences_attributes = { 0 => { id: preference.id, name: 'updated name' } }
-          end
-        end
-
-        it 'updates attributes of existing document' do
-          expect(person.preferences.map(&:name)).to eq([ 'updated name' ])
+        it 'updates attributes of existing document which is added to relation' do
+          preference_name = 'updated preference'
+          person = Person.new(
+            preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
+          )
+          expect(person.preferences.map(&:name)).to eq([ preference_name ])
         end
       end
     end
@@ -3431,7 +3431,7 @@ describe Mongoid::Attributes::Nested do
                   person.preferences_attributes =
                     { 'foo' => { 'id' => 'test', 'name' => 'Test' } }
                 end.to raise_error(Mongoid::Errors::DocumentNotFound,
-                                   /Document not found for class Preference/)
+                                   /Document\(s\) not found for class Preference/)
               end
             end
           end
