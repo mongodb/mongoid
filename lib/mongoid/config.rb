@@ -130,6 +130,21 @@ module Mongoid
       validate_isolation_level!(level)
     }
 
+    # When this flag is true, it will be possible to change the parent of a
+    # record in a has_many association by passing the child record's id in the
+    # nested attributes for another parent record.
+    #
+    # When this flag is false, attempting to change the parent of a record in a
+    # has_many association via nested attributes will raise an error.
+    #
+    # The default is `false`. Note that allowing reparenting via nested attributes
+    # is a potential security risk, since it could allow a malicious user to move
+    # records that they do not own to a parent record that they do own.
+    #
+    # This option will be removed in Mongoid 10, and the only behavior will be
+    # as if this option were set to false.
+    option :allow_reparenting_via_nested_attributes, default: false
+
     # Returns the (potentially-dereferenced) isolation level that Mongoid
     # will use to store its internal state. If `isolation_level` is set to
     # `:rails`, this will return the isolation level that Rails is current

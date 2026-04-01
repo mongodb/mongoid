@@ -189,16 +189,41 @@ describe Mongoid::Attributes::Nested do
           )
         end
 
-        it 'sets the nested attributes' do
-          expect(person.preferences.map(&:name)).to eq([ preference.name ])
+        context 'when allow_reparenting_via_nested_attributes is false' do
+          config_override :allow_reparenting_via_nested_attributes, false
+
+          it 'sets raises an exception' do
+            expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
         end
 
-        it 'updates attributes of existing document which is added to relation' do
-          preference_name = 'updated preference'
-          person = Person.new(
-            preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
-          )
-          expect(person.preferences.map(&:name)).to eq([ preference_name ])
+        context 'when allow_reparenting_via_nested_attributes is true' do
+          config_override :allow_reparenting_via_nested_attributes, true
+
+          it 'sets the nested attributes' do
+            expect(person.preferences.map(&:name)).to eq([ preference.name ])
+          end
+
+          it 'updates attributes of existing document which is added to relation' do
+            preference_name = 'updated preference'
+            person = Person.new(
+              preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
+            )
+            expect(person.preferences.map(&:name)).to eq([ preference_name ])
+          end
+        end
+      end
+
+      context 'when referencing an existing document in a relation' do
+        let(:preference) { Preference.create!(name: 'sample preference') }
+        let(:person) do
+          Person.create(preferences: [ preference ]).tap do |person|
+            person.preferences_attributes = { 0 => { id: preference.id, name: 'updated name' } }
+          end
+        end
+
+        it 'updates attributes of existing document' do
+          expect(person.preferences.map(&:name)).to eq([ 'updated name' ])
         end
       end
     end
@@ -1221,7 +1246,7 @@ describe Mongoid::Attributes::Nested do
                   person.addresses_attributes =
                     { 'foo' => { 'id' => 'test', 'street' => 'Test' } }
                 end.to raise_error(Mongoid::Errors::DocumentNotFound,
-                                   /Document\(s\) not found for class Address with id\(s\)/)
+                                   /Document\(s\) not found for class Address/)
               end
             end
           end
@@ -2719,7 +2744,7 @@ describe Mongoid::Attributes::Nested do
                       { '0' =>
                         { 'id' => BSON::ObjectId.new.to_s, 'title' => 'Rogue' } }
                   end.to raise_error(Mongoid::Errors::DocumentNotFound,
-                                     /Document\(s\) not found for class Post with id\(s\)/)
+                                     /Document not found for class Post/)
                 end
               end
             end
@@ -2751,7 +2776,7 @@ describe Mongoid::Attributes::Nested do
                   person.posts_attributes =
                     { 'foo' => { 'id' => 'test', 'title' => 'Test' } }
                 end.to raise_error(Mongoid::Errors::DocumentNotFound,
-                                   /Document\(s\) not found for class Post with id\(s\)/)
+                                   /Document not found for class Post/)
               end
             end
           end
@@ -3406,7 +3431,7 @@ describe Mongoid::Attributes::Nested do
                   person.preferences_attributes =
                     { 'foo' => { 'id' => 'test', 'name' => 'Test' } }
                 end.to raise_error(Mongoid::Errors::DocumentNotFound,
-                                   /Document\(s\) not found for class Preference with id\(s\)/)
+                                   /Document not found for class Preference/)
               end
             end
           end
