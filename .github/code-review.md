@@ -1,3 +1,5 @@
+# Code Reviews
+
 When reviewing code, focus on:
 
 ## Security Critical Issues
@@ -26,25 +28,10 @@ When reviewing code, focus on:
 - Acknowledge good patterns when you see them
 - Ask clarifying questions when code intent is unclear
 - When possible, suggest that the pull request be labelled as a `bug`, a `feature`, or a `bcbreak` (a "backwards-compatibility break").
-- PRs that change only tests or infrastructure configuration do not need to be labelled.
+- PR's with no user-visible effect do not need to be labeled.
 
 Always prioritize security vulnerabilities and performance issues that could impact users.
 
-Always suggest changes to improve readability and testability. For example, this suggestion seeks to make the code more readable, reusable, and testable:
+Always suggest changes to improve readability and testability.
 
-```ruby
-  # Instead of:
-  if (user.email && user.email.include?('@') && user.email.length > 5)
-    submitButton.enabled = true
-  else
-    submitButton.enabled = false
-  end
-  
-  # Consider:
-  def valid_email?(email)
-    email && email.include?('@') && email.length > 5
-  end
-  
-  submitButton.enabled = valid_email?(user.email);
-```
-
+When reviewing code, be encouraging.
