@@ -1399,4 +1399,117 @@ describe Mongoid::Touchable do
       end
     end
   end
+
+  describe 'touch merged with embedded insert' do
+    context 'when pushing an embedded document with touch: true' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      let(:floor) do
+        building.floors.create!(level: 1)
+      end
+
+      before do
+        # Ensure building and floor are persisted and timestamps are set.
+        building
+        floor
+      end
+
+      it 'issues a single update_one when pushing a child into a touchable parent' do
+        sofa = TouchableSpec::Embedded::Sofa.new
+
+        expect_query(1) do
+          floor.sofas.push(sofa)
+        end
+      end
+
+      it 'updates updated_at on the parent after push' do
+        original_floor_updated_at = floor.updated_at
+        original_building_updated_at = building.updated_at
+
+        Timecop.travel(Time.now + 10) do
+          floor.sofas.push(TouchableSpec::Embedded::Sofa.new)
+        end
+
+        building.reload
+        expect(building.updated_at).to be > original_building_updated_at
+        expect(building.floors.first.updated_at).to be > original_floor_updated_at
+      end
+
+      it 'persists the embedded document' do
+        sofa = TouchableSpec::Embedded::Sofa.new
+        floor.sofas.push(sofa)
+
+        building.reload
+        expect(building.floors.first.sofas.length).to eq(1)
+      end
+
+      it 'runs touch callbacks on the parent chain' do
+        sofa = TouchableSpec::Embedded::Sofa.new
+        floor.sofas.push(sofa)
+
+        # Verify callbacks ran by checking the in-memory timestamps
+        # were updated (touch sets updated_at in-memory via write_attribute).
+        expect(floor.updated_at).to be_within(5).of(Time.now)
+        expect(building.updated_at).to be_within(5).of(Time.now)
+      end
+    end
+
+    context 'when pushing an embedded document with touch: false' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      let(:floor) do
+        building.floors.create!(level: 1)
+      end
+
+      before do
+        building
+        floor
+      end
+
+      it 'does not merge touch updates (touch: false on Chair)' do
+        original_floor_updated_at = floor.updated_at
+
+        Timecop.travel(Time.now + 10) do
+          floor.chairs.push(TouchableSpec::Embedded::Chair.new)
+        end
+
+        # Floor should not be touched because Chair has touch: false.
+        expect(floor.updated_at).to eq(original_floor_updated_at)
+      end
+    end
+
+    context 'when pushing into a non-touchable parent' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      let(:entrance) do
+        building.entrances.create!(level: 0)
+      end
+
+      before do
+        building
+        entrance
+      end
+
+      it 'does not touch the building (Entrance has touch: false)' do
+        # Reload to get the MongoDB-persisted timestamp (with truncated
+        # sub-millisecond precision) so the comparison is stable.
+        building.reload
+        original_building_updated_at = building.updated_at
+
+        Timecop.travel(Time.now + 10) do
+          entrance.cameras.push(TouchableSpec::Embedded::Camera.new)
+        end
+
+        building.reload
+        # Camera touches Entrance, but Entrance does NOT touch Building.
+        expect(building.updated_at).to eq(original_building_updated_at)
+      end
+    end
+  end
 end

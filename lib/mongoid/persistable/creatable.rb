@@ -41,6 +41,12 @@ module Mongoid
 
       # Insert the embedded document.
       #
+      # When the parent association is touchable (which is the default for
+      # +embedded_in+), the touch timestamp updates are merged into the
+      # same +update_one+ call that performs the insert. This avoids a
+      # second round-trip that the +after_save+ touch callback would
+      # otherwise issue.
+      #
       # @api private
       #
       # @example Insert the document as embedded.
@@ -54,8 +60,18 @@ module Mongoid
           _parent.insert
         else
           selector = _parent.atomic_selector
+          operations = atomic_inserts
+
+          if _touchable_parent?
+            touches = _parent._gather_touch_updates(Time.current)
+            if touches.present?
+              operations['$set'] = touches
+              Threaded.begin_touch_merged(self)
+            end
+          end
+
           _root.collection.find(selector).update_one(
-            positionally(selector, atomic_inserts),
+            positionally(selector, operations),
             session: _session
           )
         end
