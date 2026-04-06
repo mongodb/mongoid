@@ -22,6 +22,8 @@ module Mongoid
 
     VALIDATIONS_KEY = 'validations'
 
+    TOUCH_MERGED_KEY = 'touch-merged'
+
     STACK_KEYS = Hash.new do |hash, key|
       hash[key] = "#{key}-stack"
     end
@@ -202,6 +204,17 @@ module Mongoid
       validations_for(document.class).push(document._id)
     end
 
+    # Mark that a document's touch updates have been merged into
+    # an atomic insert on the current thread.
+    #
+    # @example Begin touch merged.
+    #   Threaded.begin_touch_merged(doc)
+    #
+    # @param [ Document ] document The embedded document being inserted.
+    def begin_touch_merged(document)
+      touch_merged_for(document.class).push(document._id)
+    end
+
     # Exit autosaving a document on the current thread.
     #
     # @example Exit autosave.
@@ -220,6 +233,16 @@ module Mongoid
     # @param [ Document ] document The document to validate.
     def exit_validate(document)
       validations_for(document.class).delete_one(document._id)
+    end
+
+    # Clear the touch-merged flag for a document on the current thread.
+    #
+    # @example Exit touch merged.
+    #   Threaded.exit_touch_merged(doc)
+    #
+    # @param [ Document ] document The document to clear.
+    def exit_touch_merged(document)
+      touch_merged_for(document.class).delete_one(document._id)
     end
 
     # Begin suppressing default scopes for given model on the current thread.
@@ -353,6 +376,19 @@ module Mongoid
       validations_for(document.class).include?(document._id)
     end
 
+    # Is the document flagged as having had its touch updates
+    # merged into an atomic insert?
+    #
+    # @example Is the document touch-merged?
+    #   Threaded.touch_merged?(doc)
+    #
+    # @param [ Document ] document The document to check.
+    #
+    # @return [ true | false ] If the document's touch was merged.
+    def touch_merged?(document)
+      touch_merged_for(document.class).include?(document._id)
+    end
+
     # Get all autosaves on the current thread.
     #
     # @example Get all autosaves.
@@ -395,6 +431,28 @@ module Mongoid
     # @return [ Array ] The current validations.
     def validations_for(klass)
       validations[klass] ||= []
+    end
+
+    # Get all touch-merged tracking on the current thread.
+    #
+    # @example Get all touch-merged.
+    #   Threaded.touch_merged
+    #
+    # @return [ Hash ] The current touch-merged tracking hash.
+    def touch_merged
+      get(TOUCH_MERGED_KEY) { {} }
+    end
+
+    # Get all touch-merged document IDs on the current thread for the class.
+    #
+    # @example Get all touch-merged.
+    #   Threaded.touch_merged_for(Sofa)
+    #
+    # @param [ Class ] klass The class to check.
+    #
+    # @return [ Array ] The current touch-merged document IDs.
+    def touch_merged_for(klass)
+      touch_merged[klass] ||= []
     end
 
     # Cache a session for this thread for a client.
