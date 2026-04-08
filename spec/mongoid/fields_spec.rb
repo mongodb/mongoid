@@ -2045,4 +2045,82 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  describe '.vector_field' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        vector_field :embedding, dimensions: 1536
+      end
+    end
+
+    it 'defines an Array field with the given name' do
+      expect(model.fields['embedding'].type).to eq(Array)
+    end
+
+    it 'adds a vector search index spec' do
+      expect(model.search_index_specs).to eq [
+        {
+          type: 'vectorSearch',
+          definition: {
+            fields: [ {
+              type: 'vector',
+              path: 'embedding',
+              numDimensions: 1536,
+              similarity: 'cosine'
+            } ]
+          }
+        }
+      ]
+    end
+
+    it 'adds a vector_search_score field' do
+      expect(model.fields).to have_key('vector_search_score')
+    end
+
+    context 'with a custom similarity' do
+      let(:model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          vector_field :embedding, dimensions: 768, similarity: 'dotProduct'
+        end
+      end
+
+      it 'uses the given similarity in the index spec' do
+        field_spec = model.search_index_specs.first.dig(:definition, :fields).first
+        expect(field_spec[:similarity]).to eq('dotProduct')
+      end
+    end
+
+    context 'with an explicit index name' do
+      let(:model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          vector_field :embedding, dimensions: 1536, index: :article_vectors
+        end
+      end
+
+      it 'names the index spec accordingly' do
+        expect(model.search_index_specs.first[:name]).to eq('article_vectors')
+      end
+    end
+
+    context 'when dimensions is omitted' do
+      it 'raises ArgumentError' do
+        expect do
+          Class.new do
+            include Mongoid::Document
+
+            vector_field :embedding
+          end
+        end.to raise_error(ArgumentError, /dimensions/)
+      end
+    end
+  end
 end

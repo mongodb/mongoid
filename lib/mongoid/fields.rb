@@ -460,6 +460,50 @@ module Mongoid
         Fields.database_field_name(name, relations, aliased_fields, aliased_associations)
       end
 
+      # Declares a vector embedding field and registers a corresponding Atlas
+      # Vector Search index for it in one step.
+      #
+      # The field is stored as an Array. For advanced index options
+      # (quantization, indexing method, HNSW tuning) use the explicit
+      # +field+ + +vector_search_index+ combination instead.
+      #
+      # @example Minimal declaration.
+      #   class Article
+      #     include Mongoid::Document
+      #     vector_field :embedding, dimensions: 1536
+      #   end
+      #
+      # @example With all options.
+      #   class Article
+      #     include Mongoid::Document
+      #     vector_field :embedding, dimensions: 1536,
+      #                              similarity: 'dotProduct',
+      #                              index: :article_vectors
+      #   end
+      #
+      # @param [ Symbol | String ] name The name of the embedding field.
+      # @param [ Integer ] dimensions The number of vector dimensions. Required.
+      # @param [ String ] similarity The similarity metric to use: 'cosine'
+      #   (default), 'euclidean', or 'dotProduct'.
+      # @param [ Symbol | String | nil ] index The name for the vector search
+      #   index. If omitted the index is unnamed and Atlas calls it 'default'.
+      def vector_field(name, dimensions:, similarity: 'cosine', index: nil)
+        field(name, type: Array)
+
+        field_spec = {
+          type: 'vector',
+          path: name.to_s,
+          numDimensions: dimensions,
+          similarity: similarity
+        }
+
+        if index
+          vector_search_index(index, fields: [ field_spec ])
+        else
+          vector_search_index(fields: [ field_spec ])
+        end
+      end
+
       # Defines all the fields that are accessible on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.

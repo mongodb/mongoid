@@ -55,6 +55,50 @@ module Mongoid
       self.search_index_specs = []
     end
 
+    # Performs a vector search for documents similar to this one, using
+    # this document's stored embedding as the query vector. The document
+    # itself is excluded from the results.
+    #
+    # @example Find articles similar to this one.
+    #   article.vector_search(limit: 5, filter: { status: 'published' })
+    #
+    # @param [ String | Symbol | nil ] index The name of the vector search
+    #   index to use (optional if only one is declared on the model).
+    # @param [ String | Symbol | nil ] path The field containing the stored
+    #   vector (optional if unambiguous from the index definition).
+    # @param [ Integer ] limit The maximum number of results (default: 10).
+    # @param [ Integer | nil ] num_candidates The number of candidates to
+    #   consider during the ANN search; defaults to limit * 10.
+    # @param [ Hash | nil ] filter An optional MongoDB filter to pre-filter
+    #   candidates before scoring.
+    # @param [ Array ] pipeline Additional aggregation stages to append after
+    #   the vector search and score projection.
+    #
+    # @return [ Array<Mongoid::Document> ] matching documents, each with
+    #   a populated +vector_search_score+ attribute.
+    def vector_search(index: nil, path: nil, limit: 10, num_candidates: nil, filter: nil, pipeline: [])
+      _index, resolved_path = self.class.send(:resolve_vector_index, index, path)
+      query_vector = public_send(resolved_path)
+
+      if query_vector.nil?
+        raise ArgumentError,
+              "#{resolved_path} is nil on this document; cannot perform vector search"
+      end
+
+      self_filter = { '_id' => { '$ne' => _id } }
+      combined_filter = filter ? { '$and' => [ self_filter, filter ] } : self_filter
+
+      self.class.vector_search(
+        query_vector,
+        index: index,
+        path: path,
+        limit: limit,
+        num_candidates: num_candidates,
+        filter: combined_filter,
+        pipeline: pipeline
+      )
+    end
+
     # Implementations for the feature's class-level methods.
     module ClassMethods
       # Request the creation of all registered search indices. Note
@@ -152,6 +196,82 @@ module Mongoid
         search_index_specs.push(spec)
       end
 
+      # Adds a vector search index definition. Also defines a read-only
+      # +vector_search_score+ field on the model the first time it is called,
+      # which is populated on documents returned by +vector_search+.
+      #
+      # @example Create a vector search index.
+      #   class Person
+      #     include Mongoid::Document
+      #     vector_search_index({ fields: [...] })
+      #     vector_search_index :my_vector_index, { fields: [...] }
+      #   end
+      #
+      # @param [ Symbol | String | Hash ] name_or_defn Either the name of the index to
+      #    define, or the index definition.
+      # @param [ Hash ] defn The vector search index definition.
+      def vector_search_index(name_or_defn, defn = nil)
+        name = name_or_defn
+        name, defn = nil, name if name.is_a?(Hash)
+
+        spec = { type: 'vectorSearch', definition: defn }.tap { |s| s[:name] = name.to_s if name }
+        search_index_specs.push(spec)
+
+        return if fields.key?('vector_search_score')
+
+        field :vector_search_score, type: Float
+        attr_readonly :vector_search_score
+      end
+
+      # Performs an Atlas Vector Search query and returns matching documents.
+      # Each returned document has a +vector_search_score+ attribute populated
+      # with its relevance score.
+      #
+      # The vector field (given by +path:+) is excluded from the returned
+      # documents by default, as vectors are large and rarely useful after
+      # retrieval.
+      #
+      # @example Search by an explicit query vector.
+      #   Article.vector_search(embedding, limit: 5, filter: { status: 'published' })
+      #
+      # @param [ Array<Numeric> ] vector The query vector.
+      # @param [ String | Symbol | nil ] index The name of the vector search
+      #   index to use (optional if only one is declared on the model).
+      # @param [ String | Symbol | nil ] path The field containing the stored
+      #   vector (optional if unambiguous from the index definition).
+      # @param [ Integer ] limit The maximum number of results (default: 10).
+      # @param [ Integer | nil ] num_candidates The number of candidates to
+      #   consider during the ANN search; defaults to limit * 10.
+      # @param [ Hash | nil ] filter An optional MongoDB filter to pre-filter
+      #   candidates before scoring.
+      # @param [ Array ] pipeline Additional aggregation stages to append after
+      #   the vector search and score projection.
+      #
+      # @return [ Array<Mongoid::Document> ] matching documents, each with
+      #   a populated +vector_search_score+ attribute.
+      def vector_search(vector, index: nil, path: nil, limit: 10, num_candidates: nil, filter: nil, pipeline: []) # rubocop:disable Metrics/ParameterLists
+        resolved_index, resolved_path = resolve_vector_index(index, path)
+        num_candidates ||= limit * 10
+
+        vs_options = {
+          'index' => resolved_index,
+          'path' => resolved_path,
+          'queryVector' => vector,
+          'numCandidates' => num_candidates,
+          'limit' => limit
+        }
+        vs_options['filter'] = filter if filter
+
+        agg_pipeline = [
+          { '$vectorSearch' => vs_options },
+          { '$addFields'    => { 'vector_search_score' => { '$meta' => 'vectorSearchScore' } } },
+          { '$project'      => { resolved_path => 0 } }
+        ]
+        agg_pipeline.concat(Array(pipeline))
+
+        collection.aggregate(agg_pipeline).map { |doc| instantiate(doc) }
+      end
+
       private
 
       # Retrieves the index records for the indexes with the given names.
@@ -161,6 +281,54 @@ module Mongoid
       # @return [ Array<Hash> ] the raw index documents
       def get_indexes(names)
         collection.search_indexes.select { |i| names.include?(i['name']) }
+      end
+
+      # Resolves the index name and vector path from the declared specs,
+      # applying inference when either is omitted.
+      #
+      # @param [ String | Symbol | nil ] index The requested index name.
+      # @param [ String | Symbol | nil ] path The requested field path.
+      #
+      # @return [ Array<String> ] the resolved [ index_name, field_path ] pair.
+      def resolve_vector_index(index, path)
+        vector_specs = search_index_specs.select { |s| s[:type] == 'vectorSearch' }
+
+        raise ArgumentError, "No vector search indexes declared on #{name}" if vector_specs.empty?
+
+        spec = if index
+                 found = vector_specs.find { |s| s[:name] == index.to_s }
+                 raise ArgumentError, "No vector search index '#{index}' declared on #{name}" unless found
+
+                 found
+               elsif vector_specs.size == 1
+                 vector_specs.first
+               else
+                 raise ArgumentError,
+                       "#{name} has multiple vector search indexes; specify index: to select one"
+               end
+
+        resolved_index = spec[:name] || 'default'
+        resolved_path  = path ? path.to_s : infer_vector_path(spec)
+
+        [ resolved_index, resolved_path ]
+      end
+
+      # Infers the vector field path from the index definition by locating
+      # the first field declared with type 'vector'.
+      #
+      # @param [ Hash ] spec The vector search index spec.
+      #
+      # @return [ String ] the field path.
+      def infer_vector_path(spec)
+        field_list = spec.dig(:definition, :fields) || spec.dig(:definition, 'fields') || []
+        vector_field = field_list.find { |f| (f[:type] || f['type']) == 'vector' }
+
+        unless vector_field
+          raise ArgumentError,
+                "Cannot infer vector path on #{name}: no 'vector' type field in index definition; specify path:"
+        end
+
+        (vector_field[:path] || vector_field['path']).to_s
       end
     end
   end
