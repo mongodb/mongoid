@@ -940,5 +940,6 @@ buildvariants:
     auth: auth
     ssl: yes
   display_name: "Atlas (Full)"
+  tags: ["pr"]
   tasks:
     - name: testatlas_task_group

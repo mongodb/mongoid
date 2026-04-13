@@ -211,6 +211,19 @@ module Mongoid
       association.inverse_class.class_eval do
         define_method(method_name) do
           without_autobuild do
+            # If the touch updates were already merged into an atomic
+            # insert (see Persistable::Creatable#insert_as_embedded),
+            # skip the redundant persistence but still run :touch
+            # callbacks and clean up dirty tracking.
+            if Threaded.touch_merged?(self)
+              Threaded.exit_touch_merged(self)
+              if relation = __send__(name)
+                relation._run_touch_callbacks_from_root
+                relation._clear_touch_updates(association.touch_field)
+              end
+              next
+            end
+
             if !touch_callbacks_suppressed? && relation = __send__(name)
               # This looks up touch_field at runtime, rather than at method definition time.
               # If touch_field is nil, it will only touch the default field (updated_at).
