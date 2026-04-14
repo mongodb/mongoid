@@ -215,6 +215,61 @@ describe Mongoid::SearchIndexable do
     end
   end
 
+  describe '.auto_embed_search argument validation' do
+    let(:no_index_model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+      end
+    end
+
+    let(:single_embed_model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        auto_embed_field :description, model: 'voyage-4'
+      end
+    end
+
+    let(:multi_embed_model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        auto_embed_field :description, model: 'voyage-4', index: :idx1
+        auto_embed_field :summary,     model: 'voyage-4', index: :idx2
+      end
+    end
+
+    it 'raises ArgumentError when no auto-embed indexes are declared' do
+      expect { no_index_model.auto_embed_search('hello') }
+        .to raise_error(ArgumentError, /No auto-embed indexes declared/)
+    end
+
+    it 'raises ArgumentError when multiple indexes exist and none is specified' do
+      expect { multi_embed_model.auto_embed_search('hello') }
+        .to raise_error(ArgumentError, /multiple auto-embed indexes/)
+    end
+
+    it 'raises ArgumentError when the specified index name does not exist' do
+      expect { single_embed_model.auto_embed_search('hello', index: 'nonexistent') }
+        .to raise_error(ArgumentError, /No auto-embed index 'nonexistent'/)
+    end
+
+    it 'raises ArgumentError when a model with only vector (non-autoEmbed) indexes is used' do
+      model = Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        vector_search_index fields: [ { type: 'vector', path: 'emb', numDimensions: 3, similarity: 'cosine' } ]
+      end
+      expect { model.auto_embed_search('hello') }
+        .to raise_error(ArgumentError, /No auto-embed indexes declared/)
+    end
+  end
+
   # Atlas integration tests — skipped when ATLAS_URI is not set.
 
   context 'Atlas integration' do

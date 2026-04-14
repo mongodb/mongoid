@@ -272,6 +272,59 @@ module Mongoid
         collection.aggregate(agg_pipeline).map { |doc| instantiate(doc) }
       end
 
+      # Performs an Atlas Vector Search query using auto-embedding. Atlas
+      # generates the query vector from the supplied text at query time; no
+      # pre-computed embedding is required.
+      #
+      # Each returned document has a +vector_search_score+ attribute populated
+      # with its relevance score.
+      #
+      # @example Search by text.
+      #   Article.auto_embed_search('machine learning', limit: 5)
+      #
+      # @example Exact nearest-neighbor search (no numCandidates).
+      #   Article.auto_embed_search('deep learning', exact: true, limit: 5)
+      #
+      # @param [ String ] text The query text.
+      # @param [ String | Symbol | nil ] index The name of the auto-embed index
+      #   to use (optional when only one is declared on the model).
+      # @param [ String | Symbol | nil ] path The indexed text field path
+      #   (optional if unambiguous from the index definition).
+      # @param [ Integer ] limit Maximum number of results (default: 10).
+      # @param [ Integer | nil ] num_candidates Candidates for ANN search;
+      #   defaults to limit * 10. Ignored when exact: true.
+      # @param [ Hash | nil ] filter Optional MongoDB filter for pre-filtering.
+      # @param [ true | false ] exact Use exact nearest-neighbor (ENN) search
+      #   instead of ANN (default: false). When true, numCandidates is omitted.
+      # @param [ String | nil ] model Query-time embedding model override.
+      # @param [ Array ] pipeline Additional aggregation stages appended after
+      #   the vector search and score projection.
+      #
+      # @return [ Array<Mongoid::Document> ] matching documents, each with
+      #   a populated +vector_search_score+ attribute.
+      def auto_embed_search(text, index: nil, path: nil, limit: 10, num_candidates: nil, filter: nil, exact: false, model: nil, pipeline: []) # rubocop:disable Metrics/ParameterLists
+        resolved_index, resolved_path = resolve_auto_embed_index(index, path)
+
+        vs_options = {
+          'index' => resolved_index,
+          'path' => resolved_path,
+          'query' => { 'text' => text },
+          'limit' => limit
+        }
+        vs_options['numCandidates'] = num_candidates || (limit * 10) unless exact
+        vs_options['exact'] = true if exact
+        vs_options['filter'] = filter if filter
+        vs_options['model'] = model if model
+
+        agg_pipeline = [
+          { '$vectorSearch' => vs_options },
+          { '$addFields'    => { 'vector_search_score' => { '$meta' => 'vectorSearchScore' } } }
+        ]
+        agg_pipeline.concat(Array(pipeline))
+
+        collection.aggregate(agg_pipeline).map { |doc| instantiate(doc) }
+      end
+
       private
 
       # Retrieves the index records for the indexes with the given names.
@@ -329,6 +382,68 @@ module Mongoid
         end
 
         (vector_field[:path] || vector_field['path']).to_s
+      end
+
+      # Resolves the index name and text field path for an auto-embedding
+      # query, applying inference when either is omitted.
+      #
+      # @param [ String | Symbol | nil ] index The requested index name.
+      # @param [ String | Symbol | nil ] path The requested field path.
+      #
+      # @return [ Array<String> ] the resolved [ index_name, field_path ] pair.
+      def resolve_auto_embed_index(index, path)
+        auto_embed_specs = search_index_specs.select do |s|
+          s[:type] == 'vectorSearch' &&
+            (s.dig(:definition, :fields) || s.dig(:definition, 'fields') || [])
+              .any? { |f| (f[:type] || f['type']) == 'autoEmbed' }
+        end
+
+        raise ArgumentError, "No auto-embed indexes declared on #{name}" if auto_embed_specs.empty?
+
+        # Extracted to keep cyclomatic complexity within RuboCop's threshold.
+        spec = select_auto_embed_spec(auto_embed_specs, index)
+        resolved_index = spec[:name] || 'default'
+        resolved_path  = path ? path.to_s : infer_auto_embed_path(spec)
+
+        [ resolved_index, resolved_path ]
+      end
+
+      # Picks one spec from the list of auto-embed specs, guided by +index+.
+      #
+      # @param [ Array<Hash> ] specs The candidate auto-embed specs.
+      # @param [ String | Symbol | nil ] index The requested index name.
+      #
+      # @return [ Hash ] the selected spec.
+      def select_auto_embed_spec(specs, index)
+        if index
+          found = specs.find { |s| s[:name] == index.to_s }
+          raise ArgumentError, "No auto-embed index '#{index}' declared on #{name}" unless found
+
+          found
+        elsif specs.size == 1
+          specs.first
+        else
+          raise ArgumentError,
+                "#{name} has multiple auto-embed indexes; specify index: to select one"
+        end
+      end
+
+      # Infers the text field path from an index definition by locating
+      # the first field declared with type 'autoEmbed'.
+      #
+      # @param [ Hash ] spec The vector search index spec.
+      #
+      # @return [ String ] the field path.
+      def infer_auto_embed_path(spec)
+        field_list = spec.dig(:definition, :fields) || spec.dig(:definition, 'fields') || []
+        ae_field   = field_list.find { |f| (f[:type] || f['type']) == 'autoEmbed' }
+
+        unless ae_field
+          raise ArgumentError,
+                "Cannot infer path on #{name}: no 'autoEmbed' field in index definition; specify path:"
+        end
+
+        (ae_field[:path] || ae_field['path']).to_s
       end
     end
   end
