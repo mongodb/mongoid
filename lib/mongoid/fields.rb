@@ -504,6 +504,64 @@ module Mongoid
         end
       end
 
+      # Registers an Atlas Vector Search index for the named text field using
+      # the auto-embedding (autoEmbed) type. Atlas generates the embeddings
+      # automatically at index and query time; no pre-computed vectors are
+      # required.
+      #
+      # The named field must already be declared on the model (or be an
+      # existing document attribute). This method only registers the search
+      # index; it does not create or modify the Ruby field definition.
+      #
+      # @example Minimal declaration.
+      #   class Article
+      #     include Mongoid::Document
+      #     field :description, type: String
+      #     auto_embed_field :description, model: 'voyage-4'
+      #   end
+      #
+      # @example With all options.
+      #   class Article
+      #     include Mongoid::Document
+      #     field :description, type: String
+      #     auto_embed_field :description,
+      #                      model: 'voyage-4',
+      #                      num_dimensions: 512,
+      #                      quantization: 'binary',
+      #                      similarity: 'cosine',
+      #                      index: :article_embed
+      #   end
+      #
+      # @param [ Symbol | String ] name The text field to auto-embed.
+      # @param [ String ] model The embedding model name. Defaults to 'voyage-4'
+      #   (recommended). Supported values at Public Preview: voyage-4-large,
+      #   voyage-4, voyage-4-lite, voyage-code-3.
+      # @param [ Integer | nil ] num_dimensions Number of vector dimensions.
+      #   Supported values: 256, 512, 1024, 2048. Default: 1024.
+      # @param [ String | nil ] quantization Quantization type: float, scalar,
+      #   binary, or binaryNoRescore. Default: scalar.
+      # @param [ String | nil ] similarity Similarity function: dotProduct,
+      #   cosine, or euclidean.
+      # @param [ Symbol | String | nil ] index The index name. If omitted the
+      #   index is unnamed and Atlas calls it 'default'.
+      def auto_embed_field(name, model: 'voyage-4', num_dimensions: nil, quantization: nil, similarity: nil, index: nil)
+        field_spec = {
+          type: 'autoEmbed',
+          modality: 'text',
+          path: name.to_s,
+          model: model
+        }
+        field_spec[:numDimensions] = num_dimensions if num_dimensions
+        field_spec[:quantization]  = quantization  if quantization
+        field_spec[:similarity]    = similarity    if similarity
+
+        if index
+          vector_search_index(index, fields: [ field_spec ])
+        else
+          vector_search_index(fields: [ field_spec ])
+        end
+      end
+
       # Defines all the fields that are accessible on the Document
       # For each field that is defined, a getter and setter will be
       # added as an instance method to the Document.

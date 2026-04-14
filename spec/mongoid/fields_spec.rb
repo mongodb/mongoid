@@ -2123,4 +2123,115 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  describe '.auto_embed_field' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        auto_embed_field :description, model: 'voyage-4'
+      end
+    end
+
+    it 'registers a vectorSearch index spec with autoEmbed type' do
+      expect(model.search_index_specs).to eq [
+        {
+          type: 'vectorSearch',
+          definition: {
+            fields: [
+              { type: 'autoEmbed', modality: 'text', path: 'description', model: 'voyage-4' }
+            ]
+          }
+        }
+      ]
+    end
+
+    it 'adds a vector_search_score field' do
+      expect(model.fields).to have_key('vector_search_score')
+    end
+
+    it 'does not define a Ruby field for the named attribute' do
+      expect(model.fields).not_to have_key('description')
+    end
+
+    context 'with optional numDimensions' do
+      let(:model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          auto_embed_field :description, model: 'voyage-4', num_dimensions: 512
+        end
+      end
+
+      it 'includes numDimensions in the field spec' do
+        field_spec = model.search_index_specs.first.dig(:definition, :fields).first
+        expect(field_spec[:numDimensions]).to eq 512
+      end
+    end
+
+    context 'with optional quantization' do
+      let(:model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          auto_embed_field :description, model: 'voyage-4', quantization: 'binary'
+        end
+      end
+
+      it 'includes quantization in the field spec' do
+        field_spec = model.search_index_specs.first.dig(:definition, :fields).first
+        expect(field_spec[:quantization]).to eq 'binary'
+      end
+    end
+
+    context 'with optional similarity' do
+      let(:model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          auto_embed_field :description, model: 'voyage-4', similarity: 'cosine'
+        end
+      end
+
+      it 'includes similarity in the field spec' do
+        field_spec = model.search_index_specs.first.dig(:definition, :fields).first
+        expect(field_spec[:similarity]).to eq 'cosine'
+      end
+    end
+
+    context 'with a named index' do
+      let(:model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          auto_embed_field :description, model: 'voyage-4', index: :article_embed
+        end
+      end
+
+      it 'registers the index under the given name' do
+        expect(model.search_index_specs.first[:name]).to eq 'article_embed'
+      end
+    end
+
+    context 'when model: is omitted' do
+      let(:model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          auto_embed_field :description
+        end
+      end
+
+      it 'defaults model to voyage-4' do
+        field_spec = model.search_index_specs.first.dig(:definition, :fields).first
+        expect(field_spec[:model]).to eq 'voyage-4'
+      end
+    end
+  end
 end
