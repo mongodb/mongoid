@@ -215,6 +215,48 @@ describe Mongoid::SearchIndexable do
     end
   end
 
+  describe '#auto_embed_search argument validation' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        field :description, type: String
+        auto_embed_field :description, model: 'voyage-4'
+      end
+    end
+
+    it 'raises ArgumentError when the text field is nil' do
+      doc = model.new(description: nil)
+      expect { doc.auto_embed_search }.to raise_error(ArgumentError, /description is nil/)
+    end
+
+    it 'raises ArgumentError when no auto-embed indexes are declared on the model' do
+      bare_model = Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        field :description, type: String
+      end
+      doc = bare_model.new(description: 'hello')
+      expect { doc.auto_embed_search }.to raise_error(ArgumentError, /No auto-embed indexes declared/)
+    end
+
+    it 'raises ArgumentError when multiple indexes exist and none is specified' do
+      multi_model = Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        field :description, type: String
+        field :summary,     type: String
+        auto_embed_field :description, model: 'voyage-4', index: :idx1
+        auto_embed_field :summary,     model: 'voyage-4', index: :idx2
+      end
+      doc = multi_model.new(description: 'hello')
+      expect { doc.auto_embed_search }.to raise_error(ArgumentError, /multiple auto-embed indexes/)
+    end
+  end
+
   describe '.auto_embed_search argument validation' do
     let(:no_index_model) do
       Class.new do

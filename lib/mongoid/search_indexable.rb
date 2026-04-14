@@ -99,6 +99,52 @@ module Mongoid
       )
     end
 
+    # Performs an Atlas Vector Search query for documents with text similar
+    # to this document's stored text field, using auto-embedding. The current
+    # document is excluded from the results.
+    #
+    # @example Find articles with similar descriptions.
+    #   article.auto_embed_search(limit: 5, filter: { status: 'published' })
+    #
+    # @param [ String | Symbol | nil ] index The name of the auto-embed index
+    #   to use (optional when only one is declared on the model).
+    # @param [ String | Symbol | nil ] path The indexed text field path
+    #   (optional if unambiguous from the index definition).
+    # @param [ Integer ] limit Maximum number of results (default: 10).
+    # @param [ Integer | nil ] num_candidates Candidates for ANN search;
+    #   defaults to limit * 10. Ignored when exact: true.
+    # @param [ Hash | nil ] filter Optional MongoDB filter for pre-filtering.
+    # @param [ true | false ] exact Use exact nearest-neighbor search (default: false).
+    # @param [ String | nil ] model Query-time embedding model override.
+    # @param [ Array ] pipeline Additional aggregation stages to append.
+    #
+    # @return [ Array<Mongoid::Document> ] matching documents, each with
+    #   a populated +vector_search_score+ attribute.
+    def auto_embed_search(index: nil, path: nil, limit: 10, num_candidates: nil, filter: nil, exact: false, model: nil, pipeline: []) # rubocop:disable Metrics/ParameterLists
+      _index, resolved_path = self.class.send(:resolve_auto_embed_index, index, path)
+      text = public_send(resolved_path)
+
+      if text.nil?
+        raise ArgumentError,
+              "#{resolved_path} is nil on this document; cannot perform auto-embed search"
+      end
+
+      self_filter = { '_id' => { '$ne' => _id } }
+      combined_filter = filter ? { '$and' => [ self_filter, filter ] } : self_filter
+
+      self.class.auto_embed_search(
+        text,
+        index: index,
+        path: path,
+        limit: limit,
+        num_candidates: num_candidates,
+        filter: combined_filter,
+        exact: exact,
+        model: model,
+        pipeline: pipeline
+      )
+    end
+
     # Implementations for the feature's class-level methods.
     module ClassMethods
       # Request the creation of all registered search indices. Note
