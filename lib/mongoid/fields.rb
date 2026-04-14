@@ -504,26 +504,20 @@ module Mongoid
         end
       end
 
-      # Registers an Atlas Vector Search index for the named text field using
-      # the auto-embedding (autoEmbed) type. Atlas generates the embeddings
-      # automatically at index and query time; no pre-computed vectors are
-      # required.
-      #
-      # The named field must already be declared on the model (or be an
-      # existing document attribute). This method only registers the search
-      # index; it does not create or modify the Ruby field definition.
+      # Declares a text field and registers a corresponding Atlas Vector Search
+      # index for it using the auto-embedding (autoEmbed) type. Atlas generates
+      # the embeddings automatically at index and query time; no pre-computed
+      # vectors are required.
       #
       # @example Minimal declaration.
       #   class Article
       #     include Mongoid::Document
-      #     field :description, type: String
-      #     auto_embed_field :description, model: 'voyage-4'
+      #     auto_embed_field :description
       #   end
       #
       # @example With all options.
       #   class Article
       #     include Mongoid::Document
-      #     field :description, type: String
       #     auto_embed_field :description,
       #                      model: 'voyage-4',
       #                      num_dimensions: 512,
@@ -532,7 +526,8 @@ module Mongoid
       #                      index: :article_embed
       #   end
       #
-      # @param [ Symbol | String ] name The text field to auto-embed.
+      # @param [ Symbol | String ] name The name of the text field to declare
+      #   and auto-embed.
       # @param [ String ] model The embedding model name. Defaults to 'voyage-4'
       #   (recommended). Supported values at Public Preview: voyage-4-large,
       #   voyage-4, voyage-4-lite, voyage-code-3.
@@ -545,6 +540,8 @@ module Mongoid
       # @param [ Symbol | String | nil ] index The index name. If omitted the
       #   index is unnamed and Atlas calls it 'default'.
       def auto_embed_field(name, model: 'voyage-4', num_dimensions: nil, quantization: nil, similarity: nil, index: nil)
+        field(name, type: String)
+
         field_spec = {
           type: 'autoEmbed',
           modality: 'text',

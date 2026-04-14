@@ -221,7 +221,6 @@ describe Mongoid::SearchIndexable do
         include Mongoid::Document
 
         store_in collection: BSON::ObjectId.new.to_s
-        field :description, type: String
         auto_embed_field :description, model: 'voyage-4'
       end
     end
@@ -247,8 +246,6 @@ describe Mongoid::SearchIndexable do
         include Mongoid::Document
 
         store_in collection: BSON::ObjectId.new.to_s
-        field :description, type: String
-        field :summary,     type: String
         auto_embed_field :description, model: 'voyage-4', index: :idx1
         auto_embed_field :summary,     model: 'voyage-4', index: :idx2
       end
@@ -446,7 +443,6 @@ describe Mongoid::SearchIndexable do
           include Mongoid::Document
 
           store_in collection: BSON::ObjectId.new.to_s
-          field :description, type: String
           auto_embed_field :description, model: 'voyage-4'
         end
       end
@@ -524,7 +520,6 @@ describe Mongoid::SearchIndexable do
             include Mongoid::Document
 
             store_in collection: BSON::ObjectId.new.to_s
-            field :description, type: String
             auto_embed_field :description,
                              model: 'voyage-4',
                              num_dimensions: 512,

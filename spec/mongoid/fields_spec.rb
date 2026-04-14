@@ -2151,8 +2151,8 @@ describe Mongoid::Fields do
       expect(model.fields).to have_key('vector_search_score')
     end
 
-    it 'does not define a Ruby field for the named attribute' do
-      expect(model.fields).not_to have_key('description')
+    it 'defines a String field for the named attribute' do
+      expect(model.fields['description'].type).to eq String
     end
 
     context 'with optional numDimensions' do
